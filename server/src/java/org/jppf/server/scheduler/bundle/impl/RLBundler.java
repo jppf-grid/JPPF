@@ -50,7 +50,7 @@ public class RLBundler extends AbstractRLBundler
 	 * Creates a new instance with the specified parameters.
 	 * @param profile the parameters of the algorithm, grouped as a performance analysis profile.
 	 */
-	public RLBundler(LoadBalancingProfile profile)
+	public RLBundler(final LoadBalancingProfile profile)
 	{
 		super(profile);
 	}
@@ -61,7 +61,7 @@ public class RLBundler extends AbstractRLBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
 	@Override
-    public Bundler copy()
+	public Bundler copy()
 	{
 		return new RLBundler(profile);
 	}
@@ -72,7 +72,7 @@ public class RLBundler extends AbstractRLBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
 	@Override
-    protected int maxSize()
+	protected int maxSize()
 	{
 		return JPPFDriver.getQueue().getMaxBundleSize();
 	}

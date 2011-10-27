@@ -35,7 +35,7 @@ public class TestFromJSP
 	 * @param taskDuration the duration in milliseconds of each task in the job.
 	 * @return the job result as a string message.
 	 */
-	public static String testGS(String jobName, int nbTasks, long taskDuration)
+	public static String testGS(final String jobName, final int nbTasks, final long taskDuration)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2>Results for job ").append(jobName).append("</h2>");

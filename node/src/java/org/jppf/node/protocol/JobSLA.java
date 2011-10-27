@@ -23,7 +23,7 @@ import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This interface represents the Service Level Agreement Between a JPPF job and a server.
- * It determines the state, conditions and order in which a job will be executed. 
+ * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
 public interface JobSLA
@@ -85,7 +85,7 @@ public interface JobSLA
 
 	/**
 	 * Set the job schedule.
-	 * @param jobSchedule a <code>JPPFSchedule</code> instance. 
+	 * @param jobSchedule a <code>JPPFSchedule</code> instance.
 	 */
 	void setJobSchedule(JPPFSchedule jobSchedule);
 

@@ -50,7 +50,7 @@ public class ServerDebug implements ServerDebugMBean
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String[] classLoaderChannels()
+	public String[] classLoaderChannels()
 	{
 		String[] result = null;
 		synchronized(classLoaderSet)
@@ -64,9 +64,9 @@ public class ServerDebug implements ServerDebugMBean
 				ClassContext ctx = (ClassContext) channel.getContext();
 				sb.append(", type=").append(ctx.isProvider() ? "provider" : "node");
 				sb.append(", state=").append(ctx.getState());
-                sb.append(", pending requests=").append(ctx.getNbPendingRequests());
-                sb.append(", current request=").append(ctx.getCurrentRequest());
-                sb.append(", resource=").append(ctx.getResource());
+				sb.append(", pending requests=").append(ctx.getNbPendingRequests());
+				sb.append(", current request=").append(ctx.getCurrentRequest());
+				sb.append(", resource=").append(ctx.getResource());
 				result[count++] = sb.toString();
 			}
 		}
@@ -78,7 +78,7 @@ public class ServerDebug implements ServerDebugMBean
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String[] nodeDataChannels()
+	public String[] nodeDataChannels()
 	{
 		return viewChannels(nodeSet);
 	}
@@ -86,6 +86,7 @@ public class ServerDebug implements ServerDebugMBean
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String[] clientDataChannels()
 	{
 		return viewChannels(clientSet);
@@ -96,7 +97,7 @@ public class ServerDebug implements ServerDebugMBean
 	 * @param set the set to view.
 	 * @return an array of state strings for each channel.
 	 */
-	private static String[] viewChannels(Set<ChannelWrapper<?>> set)
+	private static String[] viewChannels(final Set<ChannelWrapper<?>> set)
 	{
 		String[] result = null;
 		synchronized(set)
@@ -119,10 +120,10 @@ public class ServerDebug implements ServerDebugMBean
 	 * @param channel the channel to add.
 	 * @param serverName the name of the server that owns the channel.
 	 */
-	public void addChannel(ChannelWrapper<?> channel, String serverName)
+	public void addChannel(final ChannelWrapper<?> channel, final String serverName)
 	{
 		Set<ChannelWrapper<?>> set = NioServer.CLASS_SERVER.equals(serverName) ? classLoaderSet
-			: NioServer.NODE_SERVER.equals(serverName) ? nodeSet : clientSet;
+				: NioServer.NODE_SERVER.equals(serverName) ? nodeSet : clientSet;
 		synchronized(set)
 		{
 			set.add(channel);
@@ -134,10 +135,10 @@ public class ServerDebug implements ServerDebugMBean
 	 * @param channel the channel to add.
 	 * @param serverName the name of the server that owns the channel.
 	 */
-	public void removeChannel(ChannelWrapper<?> channel, String serverName)
+	public void removeChannel(final ChannelWrapper<?> channel, final String serverName)
 	{
 		Set<ChannelWrapper<?>> set = NioServer.CLASS_SERVER.equals(serverName) ? classLoaderSet
-			: NioServer.NODE_SERVER.equals(serverName) ? nodeSet : clientSet;
+				: NioServer.NODE_SERVER.equals(serverName) ? nodeSet : clientSet;
 		synchronized(set)
 		{
 			set.remove(channel);

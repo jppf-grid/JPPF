@@ -29,6 +29,7 @@ public class AvailableProcessors implements AvailableProcessorsMBean
 	 * @return the available processors as an integer value.
 	 * @see org.jppf.example.mbean.AvailableProcessorsMBean#queryAvailableProcessors()
 	 */
+	@Override
 	public Integer queryAvailableProcessors()
 	{
 		// we use the java.lang.Runtime API

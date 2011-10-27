@@ -23,7 +23,7 @@ import java.io.IOException;
 import org.apache.commons.httpclient.*;
 
 /**
- * Retry handler used when a request results in an IO exception. 
+ * Retry handler used when a request results in an IO exception.
  * @author Laurent Cohen
  */
 public class JPPFMethodExceptionHandler implements HttpMethodRetryHandler
@@ -37,7 +37,7 @@ public class JPPFMethodExceptionHandler implements HttpMethodRetryHandler
 	 * Initialize this exception handler with the specified maximum retry count.
 	 * @param maxRetry the max retry counnt to use.
 	 */
-	public JPPFMethodExceptionHandler(int maxRetry)
+	public JPPFMethodExceptionHandler(final int maxRetry)
 	{
 		this.maxRetry = maxRetry;
 	}
@@ -50,7 +50,8 @@ public class JPPFMethodExceptionHandler implements HttpMethodRetryHandler
 	 * @return true if the request should be resent, false otherwise.
 	 * @see org.apache.commons.httpclient.HttpMethodRetryHandler#retryMethod(org.apache.commons.httpclient.HttpMethod, java.io.IOException, int)
 	 */
-	public boolean retryMethod(HttpMethod method, IOException e, int retryCount)
+	@Override
+	public boolean retryMethod(final HttpMethod method, final IOException e, final int retryCount)
 	{
 		return retryCount < maxRetry;
 	}

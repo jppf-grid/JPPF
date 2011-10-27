@@ -38,7 +38,7 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
 	 * @param panel the tree table panel to which this action applies.
 	 * @param collapse determines whether this action is for collapsing or expanding graph vertices.
 	 */
-	public ExpandOrCollapseGraphAction(GraphOption panel, boolean collapse)
+	public ExpandOrCollapseGraphAction(final GraphOption panel, final boolean collapse)
 	{
 		super(panel);
 		this.collapse = collapse;
@@ -59,7 +59,7 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void actionPerformed(ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		synchronized(panel)
 		{

@@ -42,7 +42,7 @@ public class ManyConnections
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -75,7 +75,7 @@ public class ManyConnections
 	 * Print a message to the log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);

@@ -53,7 +53,7 @@ public class OneOf extends ExecutionPolicy
 	 * @param propertyName the name of the property to compare.
 	 * @param values the values to compare with.
 	 */
-	public OneOf(String propertyName, double...values)
+	public OneOf(final String propertyName, final double...values)
 	{
 		this.propertyName = propertyName;
 		this.numberValues = values;
@@ -65,7 +65,7 @@ public class OneOf extends ExecutionPolicy
 	 * @param ignoreCase determines if the comparison should ignore the string case.
 	 * @param values the values to compare with.
 	 */
-	public OneOf(String propertyName, boolean ignoreCase, String...values)
+	public OneOf(final String propertyName, final boolean ignoreCase, final String...values)
 	{
 		this.propertyName = propertyName;
 		this.stringValues = values;
@@ -79,7 +79,7 @@ public class OneOf extends ExecutionPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		try
 		{
@@ -114,7 +114,7 @@ public class OneOf extends ExecutionPolicy
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		if (computedToString == null)
 		{

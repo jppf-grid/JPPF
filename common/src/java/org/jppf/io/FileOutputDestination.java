@@ -32,7 +32,7 @@ public class FileOutputDestination extends ChannelOutputDestination
 	 * @param path the path to the file to read from.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public FileOutputDestination(String path) throws Exception
+	public FileOutputDestination(final String path) throws Exception
 	{
 		this(new File(path));
 	}
@@ -42,7 +42,7 @@ public class FileOutputDestination extends ChannelOutputDestination
 	 * @param file the file to read from.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public FileOutputDestination(File file) throws Exception
+	public FileOutputDestination(final File file) throws Exception
 	{
 		super(new FileOutputStream(file).getChannel());
 	}
@@ -53,7 +53,7 @@ public class FileOutputDestination extends ChannelOutputDestination
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		((FileChannel) channel).force(false);
 		channel.close();

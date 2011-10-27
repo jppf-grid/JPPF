@@ -44,7 +44,7 @@ public class ChannelInputSource implements InputSource
 	 * Initialize this input source with the specified <code>SocketWrapper</code>.
 	 * @param channel the backing <code>SocketWrapper</code>.
 	 */
-	public ChannelInputSource(ReadableByteChannel channel)
+	public ChannelInputSource(final ReadableByteChannel channel)
 	{
 		this.channel = channel;
 	}
@@ -59,7 +59,7 @@ public class ChannelInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] data, int offset, int len) throws Exception
+	public int read(final byte[] data, final int offset, final int len) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
 		return read(buffer);
@@ -80,7 +80,7 @@ public class ChannelInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
 	@Override
-    public int read(ByteBuffer data) throws Exception
+	public int read(final ByteBuffer data) throws Exception
 	{
 		if (tmpDirectBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
 		else tmpDirectBuffer.clear();
@@ -105,12 +105,12 @@ public class ChannelInputSource implements InputSource
 
 	/**
 	 * Read an int value from this input source.
-	 * @return the value read, or -1 if an end of file condition was reached. 
+	 * @return the value read, or -1 if an end of file condition was reached.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
 	@Override
-    public int readInt() throws Exception
+	public int readInt() throws Exception
 	{
 		return SerializationUtils.readInt(channel);
 	}
@@ -123,7 +123,7 @@ public class ChannelInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
 	@Override
-    public int skip(int n) throws Exception
+	public int skip(final int n) throws Exception
 	{
 		ByteBuffer buf = ByteBuffer.allocate(n);
 		read(buf);
@@ -136,7 +136,7 @@ public class ChannelInputSource implements InputSource
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 	}
 }

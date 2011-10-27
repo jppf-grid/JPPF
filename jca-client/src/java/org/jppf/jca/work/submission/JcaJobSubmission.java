@@ -28,12 +28,12 @@ import org.jppf.node.protocol.Task;
 public class JcaJobSubmission extends AbstractJobSubmission
 {
 	/**
-	 * Initialize this job submission. 
+	 * Initialize this job submission.
 	 * @param job the submitted job.
 	 * @param connection the connection to execute the job on.
 	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
 	 */
-	JcaJobSubmission(JPPFJob job, AbstractJPPFClientConnection connection, boolean locallyExecuting)
+	JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting)
 	{
 		super(job, connection, locallyExecuting);
 	}
@@ -41,6 +41,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void run()
 	{
 		JcaSubmissionResult result = (JcaSubmissionResult) job.getResultListener();
@@ -81,6 +82,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getId()
 	{
 		return job.getJobUuid();

@@ -34,7 +34,7 @@ public class MyCustomPolicy extends CustomPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		String s = getProperty(info, "processing.thread");
 		int n = 1;

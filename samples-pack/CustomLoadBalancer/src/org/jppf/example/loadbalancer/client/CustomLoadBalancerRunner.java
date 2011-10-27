@@ -51,7 +51,7 @@ public class CustomLoadBalancerRunner
 	 * @param args by default, we do not use the command line arguments,
 	 * however nothing prevents us from using them if need be.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -114,9 +114,9 @@ public class CustomLoadBalancerRunner
 	 * @return an instance of the {@link JPPFJob} class.
 	 * @throws Exception if an error occurs while creating the job or adding tasks.
 	 */
-	public JPPFJob createJob(String jobName, int nbTasks, int size, long duration,
-		long allowedTime, ExecutionPolicy policy) throws Exception
-	{
+	public JPPFJob createJob(final String jobName, final int nbTasks, final int size, final long duration,
+			final long allowedTime, final ExecutionPolicy policy) throws Exception
+			{
 		// Create a JPPF job.
 		JPPFJob job = new JPPFJob();
 
@@ -150,16 +150,16 @@ public class CustomLoadBalancerRunner
 		job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
 
 		return job;
-	}
+			}
 
 	/**
 	 * Collect and process the execution results of a job.
 	 * @param job the JPPF job to process.
 	 * @throws Exception if an error occurs while processing the results.
 	 */
-	public void processJobResults(JPPFJob job) throws Exception
+	public void processJobResults(final JPPFJob job) throws Exception
 	{
-		// Print a banner to visually separate the results for each job. 
+		// Print a banner to visually separate the results for each job.
 		System.out.println("\n********** Results for job : " + job.getName() + " **********\n");
 
 		// Get the results collector.

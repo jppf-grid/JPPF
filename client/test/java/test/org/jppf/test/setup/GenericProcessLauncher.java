@@ -93,7 +93,7 @@ public class GenericProcessLauncher
 	private ServerSocket processServer = null;
 	/**
 	 * The port number the erver socket listens to.
-	 */ 
+	 */
 	private int processPort = 0;
 
 	/**
@@ -122,7 +122,7 @@ public class GenericProcessLauncher
 	 * Set the path to the JPPF configuration file.
 	 * @param jppfConfig the path as a string.
 	 */
-	public void setJppfConfig(String jppfConfig)
+	public void setJppfConfig(final String jppfConfig)
 	{
 		this.jppfConfig = jppfConfig;
 	}
@@ -140,7 +140,7 @@ public class GenericProcessLauncher
 	 * Set the path to the commons-logging configuration file.
 	 * @param comonsLogging the path as a string.
 	 */
-	public void setComonsLogging(String comonsLogging)
+	public void setComonsLogging(final String comonsLogging)
 	{
 		this.comonsLogging = comonsLogging;
 	}
@@ -158,7 +158,7 @@ public class GenericProcessLauncher
 	 * Set the path to the log4j configuration file.
 	 * @param log4j the path as a string.
 	 */
-	public void setLog4j(String log4j)
+	public void setLog4j(final String log4j)
 	{
 		this.log4j = log4j;
 	}
@@ -176,7 +176,7 @@ public class GenericProcessLauncher
 	 * Set the directory in which the program runs.
 	 * @param dir the directory as a string.
 	 */
-	public void setDir(String dir)
+	public void setDir(final String dir)
 	{
 		this.dir = dir;
 	}
@@ -194,7 +194,7 @@ public class GenericProcessLauncher
 	 * Set the main class.
 	 * @param mainClass the main class as a string.
 	 */
-	public void setMainClass(String mainClass)
+	public void setMainClass(final String mainClass)
 	{
 		this.mainClass = mainClass;
 	}
@@ -203,7 +203,7 @@ public class GenericProcessLauncher
 	 * Add an element (jar or folder) to the classpath.
 	 * @param element the classpath element to add.
 	 */
-	public void addClasspathElement(String element)
+	public void addClasspathElement(final String element)
 	{
 		classpath.add(element);
 	}
@@ -212,7 +212,7 @@ public class GenericProcessLauncher
 	 * Add a JVM option (including system property definitions).
 	 * @param option the option to add.
 	 */
-	public void addJvmOption(String option)
+	public void addJvmOption(final String option)
 	{
 		jvmOptions.add(option);
 	}
@@ -221,7 +221,7 @@ public class GenericProcessLauncher
 	 * Add a program argument.
 	 * @param arg the argument to add.
 	 */
-	public void addArgument(String arg)
+	public void addArgument(final String arg)
 	{
 		arguments.add(arg);
 	}
@@ -291,7 +291,7 @@ public class GenericProcessLauncher
 			Runnable r = new Runnable()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
 					while (true)
 					{

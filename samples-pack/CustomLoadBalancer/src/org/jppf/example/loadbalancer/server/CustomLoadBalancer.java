@@ -21,7 +21,6 @@ package org.jppf.example.loadbalancer.server;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
@@ -32,8 +31,8 @@ import org.slf4j.*;
  * based on known information about the nodes and the jobs.
  * <p>In this implementation, we assume each job provides the following metadata:
  * <ul>
- * <li>"task.memory": the maximum memory footprint of each task in bytes</li> 
- * <li>"task.time": the maximum duration of a task in milliseconds</li> 
+ * <li>"task.memory": the maximum memory footprint of each task in bytes</li>
+ * <li>"task.time": the maximum duration of a task in milliseconds</li>
  * <li>"allowed.time": the maximum allowed time for execution of a single set of tasks on a node, in milliseconds</li>
  * <li>"id": the id of the current job being executed, used for debugging and logging</li>
  * </ul>
@@ -62,7 +61,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * Creates a new instance with the specified parameters profile.
 	 * @param profile the parameters of the load-balancing algorithm.
 	 */
-	public CustomLoadBalancer(LoadBalancingProfile profile)
+	public CustomLoadBalancer(final LoadBalancingProfile profile)
 	{
 		super(profile);
 		if (log.isDebugEnabled()) log.debug("creating CustomLoadBalancer #" + this.bundlerNumber);
@@ -74,6 +73,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @return a new <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
+	@Override
 	public Bundler copy()
 	{
 		return new CustomLoadBalancer(null);
@@ -84,6 +84,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @return  the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
+	@Override
 	public int getBundleSize()
 	{
 		return bundleSize;
@@ -94,6 +95,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @return a {@link JPPFSystemInformation} instance.
 	 * @see org.jppf.server.scheduler.bundle.NodeAwareness#getNodeConfiguration()
 	 */
+	@Override
 	public JPPFSystemInformation getNodeConfiguration()
 	{
 		return nodeConfiguration;
@@ -104,7 +106,8 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
 	 * @see org.jppf.server.scheduler.bundle.NodeAwareness#setNodeConfiguration(org.jppf.management.JPPFSystemInformation)
 	 */
-	public void setNodeConfiguration(JPPFSystemInformation nodeConfiguration)
+	@Override
+	public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration)
 	{
 		this.nodeConfiguration = nodeConfiguration;
 		if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + nodeConfiguration);
@@ -115,6 +118,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
+	@Override
 	protected int maxSize()
 	{
 		return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
@@ -125,6 +129,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @return a {@link JPPFJobMetadata} instance.
 	 * @see org.jppf.server.scheduler.bundle.JobAwareness#getJobMetadata()
 	 */
+	@Override
 	public JobMetadata getJobMetadata()
 	{
 		return jobMetadata;
@@ -135,7 +140,8 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * @param metadata a {@link JPPFJobMetadata} instance.
 	 * @see org.jppf.server.scheduler.bundle.JobAwareness#setJobMetadata(org.jppf.server.protocol.JPPFJobMetadata)
 	 */
-	public void setJobMetadata(JobMetadata metadata)
+	@Override
+	public void setJobMetadata(final JobMetadata metadata)
 	{
 		this.jobMetadata = metadata;
 		// compute the number of tasks to send to the node,
@@ -159,7 +165,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 		long allowedTime = props.getLong("allowed.time", -1);
 		// if allowed time is not defined we assume no time limit
 		if (allowedTime <= 0) allowedTime = Long.MAX_VALUE;
-		// get the number of processing threads in the node 
+		// get the number of processing threads in the node
 		int nbThreads = getNodeConfiguration().getJppf().getInt("processing.threads", -1);
 		// if number of threads is not defined, we assume it is the number of available processors
 		if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
@@ -179,7 +185,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 		// if max time is longer than the allowed time, reduce the number of tasks by the appropriate amount
 		if (maxTime > allowedTime)
 		{
-			maxTasks = (int) ((maxTasks * allowedTime) / maxTime); 
+			maxTasks = (int) ((maxTasks * allowedTime) / maxTime);
 		}
 		// finally, store the computation result, ensuring that 1 <= size <= maxSize
 		bundleSize = Math.max(1, Math.min(maxTasks, maxSize()));
@@ -193,6 +199,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
 	 */
+	@Override
 	public void dispose()
 	{
 		if (log.isDebugEnabled()) log.debug("disposing bundler #" + this.bundlerNumber);

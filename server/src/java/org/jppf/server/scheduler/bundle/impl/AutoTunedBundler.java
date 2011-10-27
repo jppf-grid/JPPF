@@ -53,7 +53,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @param profile the parameters of the auto-tuning algorithm,
 	 * grouped as a performance analysis profile.
 	 */
-	public AutoTunedBundler(LoadBalancingProfile profile)
+	public AutoTunedBundler(final LoadBalancingProfile profile)
 	{
 		super((AnnealingTuneProfile) profile);
 	}
@@ -84,7 +84,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
 	@Override
-	public void feedback(int bundleSize, double time)
+	public void feedback(final int bundleSize, final double time)
 	{
 		assert bundleSize > 0;
 		if (traceEnabled)
@@ -118,7 +118,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 	}
 
 	/**
-	 * Recompute the bundle size after a performance profile change has been detected. 
+	 * Recompute the bundle size after a performance profile change has been detected.
 	 */
 	private void performAnalysis()
 	{
@@ -156,7 +156,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 			}
 		}
 		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
-			+ " with the mean execution of " + stableMean);
+				+ " with the mean execution of " + stableMean);
 	}
 
 	/**

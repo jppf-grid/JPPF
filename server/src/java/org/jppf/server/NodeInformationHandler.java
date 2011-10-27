@@ -52,7 +52,7 @@ public class NodeInformationHandler
 	 * @param channel a <code>SocketChannel</code> instance.
 	 * @param info a <code>JPPFNodeManagementInformation</code> instance.
 	 */
-	public void addNodeInformation(ChannelWrapper<?> channel, JPPFManagementInfo info)
+	public void addNodeInformation(final ChannelWrapper<?> channel, final JPPFManagementInfo info)
 	{
 		if (debugEnabled) log.debug("adding node information for " + info + ", channel=" + channel);
 		synchronized (nodeInfo)
@@ -69,7 +69,7 @@ public class NodeInformationHandler
 	 * Remove a node information object from the map of node information.
 	 * @param channel a <code>SocketChannel</code> instance.
 	 */
-	public void removeNodeInformation(ChannelWrapper<?> channel)
+	public void removeNodeInformation(final ChannelWrapper<?> channel)
 	{
 		if (debugEnabled) log.debug("removing node information for channel=" + channel);
 		JPPFManagementInfo info = null;
@@ -112,7 +112,7 @@ public class NodeInformationHandler
 	 * @param channel the node for which to get the information.
 	 * @return a <code>JPPFManagementInfo</code> instance, or null if no information is recorded for the node.
 	 */
-	public JPPFManagementInfo getNodeInformation(ChannelWrapper<?> channel)
+	public JPPFManagementInfo getNodeInformation(final ChannelWrapper<?> channel)
 	{
 		synchronized (nodeInfo)
 		{
@@ -125,7 +125,7 @@ public class NodeInformationHandler
 	 * @param uuid the uuid of the node for which to get the information.
 	 * @return a <code>JPPFManagementInfo</code> instance, or null if no information is recorded for the node.
 	 */
-	public JPPFManagementInfo getNodeInformation(String uuid)
+	public JPPFManagementInfo getNodeInformation(final String uuid)
 	{
 		synchronized (uuidMap)
 		{

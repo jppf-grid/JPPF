@@ -27,7 +27,7 @@ public class ClassLoadingTask extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -35,11 +35,11 @@ public class ClassLoadingTask extends JPPFTask
       AbstractJPPFClassLoader jppfClassLoader = (AbstractJPPFClassLoader) getClass().getClassLoader();
       System.out.println("jppfClassLoader = " + jppfClassLoader);
       Class c = jppfClassLoader.loadClass("com.hazelcast.core.Hazelcast");
-      */
-      Class c = Class.forName("com.hazelcast.core.Hazelcast");
-      String s = "loaded " + c + ", classloader = " + c.getClassLoader() + ", task class loader = " + getClass().getClassLoader();
-      System.out.println(s);
-      setResult(s);
+			 */
+			Class c = Class.forName("com.hazelcast.core.Hazelcast");
+			String s = "loaded " + c + ", classloader = " + c.getClassLoader() + ", task class loader = " + getClass().getClassLoader();
+			System.out.println(s);
+			setResult(s);
 		}
 		catch (Exception e)
 		{

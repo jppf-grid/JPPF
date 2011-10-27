@@ -19,6 +19,7 @@
 package org.jppf.doc;
 
 import static org.jppf.doc.ParameterNames.*;
+
 import java.util.*;
 
 /**
@@ -33,7 +34,7 @@ public class ParametersHandler
 	 * @return a mmaping of parameter names to object values.
 	 * @throws Exception if an error occurs while parsing the arguments.
 	 */
-	public Map<ParameterNames, Object> parseArguments(String...args) throws Exception
+	public Map<ParameterNames, Object> parseArguments(final String...args) throws Exception
 	{
 		if ((args == null) || (args.length < 3)) throw new IllegalArgumentException("not enough arguments there must be at least the 3 arguments: -s sourceDir -d destDir -t templatesDir");
 		Map<ParameterNames, Object> map = new EnumMap<ParameterNames, Object>(ParameterNames.class);
@@ -41,7 +42,7 @@ public class ParametersHandler
 		while (i < args.length)
 		{
 			String cmd = args[i++];
-			if (!cmd.startsWith("-")) throw new IllegalArgumentException("unknown option '" + cmd + "', all options must start with '-'"); 
+			if (!cmd.startsWith("-")) throw new IllegalArgumentException("unknown option '" + cmd + "', all options must start with '-'");
 			else if ("-s".equals(cmd)) map.put(SOURCE_DIR, args[i++]);
 			else if ("-d".equals(cmd)) map.put(DEST_DIR, args[i++]);
 			else if ("-t".equals(cmd)) map.put(TEMPLATES_DIR, args[i++]);
@@ -65,7 +66,7 @@ public class ParametersHandler
 		if (map.get(RECURSIVE) == null) map.put(RECURSIVE, false);
 		if (map.get(FILE_INCLUDES) == null) map.put(FILE_INCLUDES, JPPFFileFilter.DEFAULT_INCLUDES);
 		if (map.get(DIR_EXCLUDES) == null) map.put(DIR_EXCLUDES, JPPFDirFilter.DEFAULT_EXCLUDES);
-		
+
 		return map;
 	}
 
@@ -74,7 +75,7 @@ public class ParametersHandler
 	 * @param source the string to parse.
 	 * @return an array of strings.
 	 */
-	private static String[] parseCommaSeparatedNames(String source)
+	private static String[] parseCommaSeparatedNames(final String source)
 	{
 		if (source == null) return null;
 		String[] result = source.split(",");

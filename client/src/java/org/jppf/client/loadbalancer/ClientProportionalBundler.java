@@ -19,7 +19,7 @@
 package org.jppf.client.loadbalancer;
 
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.proportional.*;
+import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler;
 import org.slf4j.*;
 
 /**
@@ -47,7 +47,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * @param profile the parameters of the auto-tuning algorithm,
 	 * grouped as a performance analysis profile.
 	 */
-	public ClientProportionalBundler(LoadBalancingProfile profile)
+	public ClientProportionalBundler(final LoadBalancingProfile profile)
 	{
 		super(profile);
 	}
@@ -58,7 +58,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
 	@Override
-    public Bundler copy()
+	public Bundler copy()
 	{
 		return new ClientProportionalBundler(profile);
 	}
@@ -69,7 +69,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
 	@Override
-    protected int maxSize()
+	protected int maxSize()
 	{
 		return maxBundleSize;
 	}
@@ -78,7 +78,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
 	 * Get the maximum size returned by this bundler.
 	 * @param maxBundleSize the size as an int.
 	 */
-	public void setMaxSize(int maxBundleSize)
+	public void setMaxSize(final int maxBundleSize)
 	{
 		this.maxBundleSize = maxBundleSize;
 	}

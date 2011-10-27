@@ -69,8 +69,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		createTreeTableModel();
 		createUI();
 		panelManager = new JobDataPanelManager(this);
-	  populateTreeTableModel();
-	  StatsHandler.getInstance().getJppfClient(null).addClientListener(this);
+		populateTreeTableModel();
+		StatsHandler.getInstance().getJppfClient(null).addClientListener(this);
 		treeTable.expandAll();
 	}
 
@@ -137,7 +137,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 				try
 				{
 					NodeJobInformation[] subJobInfo = proxy.getNodeInformation(id);
-                    for (NodeJobInformation nji: subJobInfo) panelManager.subJobAdded(driverName, nji.jobInfo, nji.nodeInfo);
+					for (NodeJobInformation nji: subJobInfo) panelManager.subJobAdded(driverName, nji.jobInfo, nji.nodeInfo);
 				}
 				catch(Exception e)
 				{
@@ -151,12 +151,12 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * Create, initialize and layout the GUI components displayed in this panel.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
-	  treeTable = new JPPFTreeTable(model);
-	  treeTable.getTree().setLargeModel(true);
-	  treeTable.getTree().setRootVisible(false);
-	  treeTable.getTree().setShowsRootHandles(true);
+		treeTable = new JPPFTreeTable(model);
+		treeTable.getTree().setLargeModel(true);
+		treeTable.getTree().setRootVisible(false);
+		treeTable.getTree().setShowsRootHandles(true);
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 		treeTable.doLayout();
@@ -177,7 +177,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.driverAdded(clientConnection);
 			}
@@ -194,7 +194,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.driverRemoved(driverName);
 			}
@@ -212,7 +212,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.jobAdded(driverName, jobInfo);
 			}
@@ -230,7 +230,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.jobRemoved(driverName, jobInfo);
 			}
@@ -248,7 +248,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		Runnable r = new SynchronizedTask(this)
 		{
 			@Override
-            public void perform()
+			public void perform()
 			{
 				panelManager.jobUpdated(driverName, jobInfo);
 			}
@@ -300,7 +300,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	@Override
-	public synchronized void newConnection(ClientEvent event)
+	public synchronized void newConnection(final ClientEvent event)
 	{
 		driverAdded(event.getConnection());
 	}
@@ -309,7 +309,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void connectionFailed(ClientEvent event)
+	public void connectionFailed(final ClientEvent event)
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
 		driverRemoved(c.getJmxConnection().getId());
@@ -323,7 +323,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				treeTable.invalidate();
 				treeTable.doLayout();

@@ -45,7 +45,7 @@ public interface OptionProperties extends Serializable
 	String getLabel();
 	/**
 	 * Get the root of the option tree this option belongs to.
-	 * @return a <code>OptionElement</code> instance. 
+	 * @return a <code>OptionElement</code> instance.
 	 */
 	OptionProperties getRoot();
 	/**

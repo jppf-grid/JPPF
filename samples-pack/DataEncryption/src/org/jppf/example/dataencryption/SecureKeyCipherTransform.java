@@ -28,7 +28,7 @@ import org.jppf.example.dataencryption.helper.Helper;
 import org.slf4j.*;
 
 /**
- * Sample data transform that uses the DES cyptographic algorithm with a 56 bits secret key. 
+ * Sample data transform that uses the DES cyptographic algorithm with a 56 bits secret key.
  * @author Laurent Cohen
  */
 public class SecureKeyCipherTransform implements JPPFDataTransform
@@ -53,7 +53,8 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 	 * @throws Exception if any error occurs while encrypting the data.
 	 * @see org.jppf.data.transform.JPPFDataTransform#wrap(byte[])
 	 */
-	public void wrap(InputStream source, OutputStream destination) throws Exception
+	@Override
+	public void wrap(final InputStream source, final OutputStream destination) throws Exception
 	{
 		// create a cipher instance
 		Cipher cipher = Cipher.getInstance(Helper.getTransformation());
@@ -88,7 +89,8 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 	 * @throws Exception if any error occurs while decrypting the data.
 	 * @see org.jppf.data.transform.JPPFDataTransform#unwrap(byte[])
 	 */
-	public void unwrap(InputStream source, OutputStream destination) throws Exception
+	@Override
+	public void unwrap(final InputStream source, final OutputStream destination) throws Exception
 	{
 		// start by reading the secret key to use to decrypt the data
 		DataInputStream dis = new DataInputStream(source);
@@ -131,7 +133,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 	 * @param destination the stream into which the encrypted/decrypted data is written.
 	 * @throws Exception if any error occurs while encrypting or decrypting the data.
 	 */
-	private void transform(InputStream source, OutputStream destination) throws Exception
+	private void transform(final InputStream source, final OutputStream destination) throws Exception
 	{
 		byte[] buffer = new byte[8192];
 		// encrypt or decrypt from source to destination

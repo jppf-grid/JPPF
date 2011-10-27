@@ -58,7 +58,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	 */
 	private String uuid = new JPPFUuid().toString();
 	/**
-	 * Contains the text of the script, after its first execution. 
+	 * Contains the text of the script, after its first execution.
 	 */
 	private String scriptText = null;
 
@@ -67,7 +67,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	 * @param language the name of the scripting language to use.
 	 * @param content the actual source of the script to execute.
 	 */
-	public ScriptedValueChangeListener(String language, String content)
+	public ScriptedValueChangeListener(final String language, final String content)
 	{
 		this.language = language;
 		this.script = content;
@@ -82,7 +82,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 	 */
 	@Override
-    public void valueChanged(ValueChangeEvent event)
+	public void valueChanged(final ValueChangeEvent event)
 	{
 		OptionElement option = event.getOption();
 		if (scriptText == null)

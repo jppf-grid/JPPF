@@ -40,7 +40,7 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	/**
 	 * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
 	 */
-	protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true); 
+	protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
 	/**
 	 * The server that handles this state.
 	 */
@@ -54,7 +54,7 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public ClassServerState(ClassNioServer server)
+	public ClassServerState(final ClassNioServer server)
 	{
 		this.server = server;
 	}
@@ -65,7 +65,7 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	 * @param request the selection key wrapping the requesting channel.
 	 * @throws Exception if an error occurs while setting the new requester's state.
 	 */
-	protected void sendNullResponse(ChannelWrapper request) throws Exception
+	protected void sendNullResponse(final ChannelWrapper request) throws Exception
 	{
 		if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
 		ClassContext requestContext = (ClassContext) request.getContext();

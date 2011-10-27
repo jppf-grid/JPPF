@@ -39,13 +39,13 @@ public class Pair<U, V> implements Serializable
 	 * The second object of this pair.
 	 */
 	private V second = null;
-	
+
 	/**
 	 * Initialize this pair with two values.
 	 * @param first the first value of the new pair.
 	 * @param second the second value of the new pair.
 	 */
-	public Pair(U first, V second)
+	public Pair(final U first, final V second)
 	{
 		this.first = first;
 		this.second = second;
@@ -75,7 +75,7 @@ public class Pair<U, V> implements Serializable
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-    public int hashCode()
+	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
@@ -91,7 +91,7 @@ public class Pair<U, V> implements Serializable
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;

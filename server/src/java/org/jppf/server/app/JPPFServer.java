@@ -68,19 +68,19 @@ abstract class JPPFServer extends Thread
 	 * @param name the name given to the thread in which this server runs.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public JPPFServer(int port, String name) throws JPPFException
+	public JPPFServer(final int port, final String name) throws JPPFException
 	{
 		super(name);
 		this.port = port;
 		init(port);
 	}
-	
+
 	/**
 	 * Start the underlying server socket by making it accept incoming connections.
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -102,13 +102,13 @@ abstract class JPPFServer extends Thread
 			end();
 		}
 	}
-	
+
 	/**
 	 * Start serving a new incoming connection.
 	 * @param socket the socket connecting with this socket server.
 	 * @throws Exception if the new connection can't be initialized.
 	 */
-	protected void serve(Socket socket) throws Exception
+	protected void serve(final Socket socket) throws Exception
 	{
 		//socket.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
 		if (debugEnabled) log.debug("Server " + server + " serving new socket: " + socket);
@@ -116,7 +116,7 @@ abstract class JPPFServer extends Thread
 		connections.add(connection);
 		connection.start();
 	}
-	
+
 	/**
 	 * Instanciate a wrapper for the socket connection opened by this socket server.
 	 * Subclasses must implement this method.
@@ -132,7 +132,7 @@ abstract class JPPFServer extends Thread
 	 * @param port the port the underlying server listens to.
 	 * @throws JPPFException if the server socket can't be opened on the specified port.
 	 */
-	protected void init(int port) throws JPPFException
+	protected void init(final int port) throws JPPFException
 	{
 		Exception e = null;
 		try
@@ -180,7 +180,7 @@ abstract class JPPFServer extends Thread
 	 * Remove the specified connection from the list of active connections of this server.
 	 * @param connection the connection to remove.
 	 */
-	public synchronized void removeConnection(JPPFConnection connection)
+	public synchronized void removeConnection(final JPPFConnection connection)
 	{
 		connections.remove(connection);
 	}
@@ -209,7 +209,7 @@ abstract class JPPFServer extends Thread
 	 * Set this server in the specified stopped state.
 	 * @param stopped true if this server is stopped, false otherwise.
 	 */
-	protected synchronized void setStopped(boolean stopped)
+	protected synchronized void setStopped(final boolean stopped)
 	{
 		this.stopped = stopped;
 	}

@@ -104,7 +104,7 @@ public class JPPFStats implements Serializable
 		s.maxQueueSize = maxQueueSize;
 		s.nbNodes = nbNodes;
 		s.maxNodes = maxNodes;
-		*/
+		 */
 		s.clients = clients.makeCopy();
 		s.footprint = footprint;
 		return s;
@@ -136,7 +136,7 @@ public class JPPFStats implements Serializable
 		sb.append("maxNodes : ").append(maxNodes).append('\n');
 		sb.append("nbClients : ").append(nbClients).append('\n');
 		sb.append("maxClients : ").append(maxClients).append('\n');
-		*/
+		 */
 		return sb.toString();
 	}
 
@@ -144,7 +144,7 @@ public class JPPFStats implements Serializable
 	 * Set the total number of tasks executed.
 	 * @param totalTasksExecuted - the number of tasks as an int value.
 	 */
-	public void setTotalTasksExecuted(int totalTasksExecuted)
+	public void setTotalTasksExecuted(final int totalTasksExecuted)
 	{
 		this.totalTasksExecuted = totalTasksExecuted;
 	}
@@ -198,7 +198,7 @@ public class JPPFStats implements Serializable
 	 * Set the total footprint of all the data that was sent to the nodes.
 	 * @param footprint the footprint as a long value.
 	 */
-	public void setFootprint(long footprint)
+	public void setFootprint(final long footprint)
 	{
 		this.footprint = footprint;
 	}

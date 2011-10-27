@@ -40,9 +40,9 @@ public final class SerializationUtils
 	 * @param value the int value to serialize.
 	 * @return an array of bytes filled with the value's representation.
 	 */
-	public static byte[] writeInt(int value)
+	public static byte[] writeInt(final int value)
 	{
-    return writeInt(value, new byte[4], 0);
+		return writeInt(value, new byte[4], 0);
 	}
 
 	/**
@@ -52,10 +52,10 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
-	public static byte[] writeBoolean(boolean value, byte[] data, int offset)
+	public static byte[] writeBoolean(final boolean value, final byte[] data, final int offset)
 	{
 		data[offset] = value ? (byte) 1 : 0;
-    return data;
+		return data;
 	}
 
 	/**
@@ -65,12 +65,12 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
-	public static byte[] writeChar(char value, byte[] data, int offset)
+	public static byte[] writeChar(final char value, final byte[] data, final int offset)
 	{
 		int pos = offset;
-    data[pos++] = (byte) ((value >>>  8) & 0xFF);
-    data[pos++] = (byte) ((value       ) & 0xFF);
-    return data;
+		data[pos++] = (byte) ((value >>>  8) & 0xFF);
+		data[pos++] = (byte) ((value       ) & 0xFF);
+		return data;
 	}
 
 	/**
@@ -80,12 +80,12 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
-	public static byte[] writeShort(short value, byte[] data, int offset)
+	public static byte[] writeShort(final short value, final byte[] data, final int offset)
 	{
 		int pos = offset;
-    data[pos++] = (byte) ((value >>>  8) & 0xFF);
-    data[pos++] = (byte) ((value       ) & 0xFF);
-    return data;
+		data[pos++] = (byte) ((value >>>  8) & 0xFF);
+		data[pos++] = (byte) ((value       ) & 0xFF);
+		return data;
 	}
 
 	/**
@@ -95,14 +95,14 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
-	public static byte[] writeInt(int value, byte[] data, int offset)
+	public static byte[] writeInt(final int value, final byte[] data, final int offset)
 	{
 		int pos = offset;
-    data[pos++] = (byte) ((value >>> 24) & 0xFF);
-    data[pos++] = (byte) ((value >>> 16) & 0xFF);
-    data[pos++] = (byte) ((value >>>  8) & 0xFF);
-    data[pos++] = (byte) ((value       ) & 0xFF);
-    return data;
+		data[pos++] = (byte) ((value >>> 24) & 0xFF);
+		data[pos++] = (byte) ((value >>> 16) & 0xFF);
+		data[pos++] = (byte) ((value >>>  8) & 0xFF);
+		data[pos++] = (byte) ((value       ) & 0xFF);
+		return data;
 	}
 
 	/**
@@ -112,18 +112,18 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
-	public static byte[] writeLong(long value, byte[] data, int offset)
+	public static byte[] writeLong(final long value, final byte[] data, final int offset)
 	{
 		int pos = offset;
-    data[pos++] = (byte) ((value >>> 56) & 0xFF);
-    data[pos++] = (byte) ((value >>> 48) & 0xFF);
-    data[pos++] = (byte) ((value >>> 40) & 0xFF);
-    data[pos++] = (byte) ((value >>> 32) & 0xFF);
-    data[pos++] = (byte) ((value >>> 24) & 0xFF);
-    data[pos++] = (byte) ((value >>> 16) & 0xFF);
-    data[pos++] = (byte) ((value >>>  8) & 0xFF);
-    data[pos++] = (byte) ((value       ) & 0xFF);
-    return data;
+		data[pos++] = (byte) ((value >>> 56) & 0xFF);
+		data[pos++] = (byte) ((value >>> 48) & 0xFF);
+		data[pos++] = (byte) ((value >>> 40) & 0xFF);
+		data[pos++] = (byte) ((value >>> 32) & 0xFF);
+		data[pos++] = (byte) ((value >>> 24) & 0xFF);
+		data[pos++] = (byte) ((value >>> 16) & 0xFF);
+		data[pos++] = (byte) ((value >>>  8) & 0xFF);
+		data[pos++] = (byte) ((value       ) & 0xFF);
+		return data;
 	}
 
 	/**
@@ -132,12 +132,12 @@ public final class SerializationUtils
 	 * @param os the stream to write to.
 	 * @throws IOException if an error occurs while writing the data.
 	 */
-	public static void writeInt(int value, OutputStream os) throws IOException
+	public static void writeInt(final int value, final OutputStream os) throws IOException
 	{
-    os.write((byte) ((value >>> 24) & 0xFF));
-    os.write((byte) ((value >>> 16) & 0xFF));
-    os.write((byte) ((value >>>  8) & 0xFF));
-    os.write((byte) ((value       ) & 0xFF));
+		os.write((byte) ((value >>> 24) & 0xFF));
+		os.write((byte) ((value >>> 16) & 0xFF));
+		os.write((byte) ((value >>>  8) & 0xFF));
+		os.write((byte) ((value       ) & 0xFF));
 	}
 
 	/**
@@ -146,7 +146,7 @@ public final class SerializationUtils
 	 * @param value the value to write.
 	 * @throws IOException if an error occurs while writing the data.
 	 */
-	public static void writeInt(WritableByteChannel channel, int value) throws IOException
+	public static void writeInt(final WritableByteChannel channel, final int value) throws IOException
 	{
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(value);
@@ -167,7 +167,7 @@ public final class SerializationUtils
 	 * @return the value read from the channel.
 	 * @throws IOException if an error occurs while reading the data.
 	 */
-	public static int readInt(ReadableByteChannel channel) throws IOException
+	public static int readInt(final ReadableByteChannel channel) throws IOException
 	{
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		int count = 0;
@@ -188,9 +188,9 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
 	 */
-	public static boolean readBoolean(byte[] data, int offset)
+	public static boolean readBoolean(final byte[] data, final int offset)
 	{
-    return data[offset] != 0;
+		return data[offset] != 0;
 	}
 
 	/**
@@ -199,12 +199,12 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
 	 */
-	public static char readChar(byte[] data, int offset)
+	public static char readChar(final byte[] data, final int offset)
 	{
 		int pos = offset;
-    int result = (data[pos++] & 0xFF) << 8;
-    result    += (data[pos++] & 0xFF);
-    return (char) result;
+		int result = (data[pos++] & 0xFF) << 8;
+		result    += (data[pos++] & 0xFF);
+		return (char) result;
 	}
 
 	/**
@@ -213,12 +213,12 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
 	 */
-	public static short readShort(byte[] data, int offset)
+	public static short readShort(final byte[] data, final int offset)
 	{
 		int pos = offset;
-    int result = (data[pos++] & 0xFF) << 8;
-    result    += (data[pos++] & 0xFF);
-    return (short) result;
+		int result = (data[pos++] & 0xFF) << 8;
+		result    += (data[pos++] & 0xFF);
+		return (short) result;
 	}
 
 	/**
@@ -227,14 +227,14 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
 	 */
-	public static int readInt(byte[] data, int offset)
+	public static int readInt(final byte[] data, final int offset)
 	{
 		int pos = offset;
-    int result = (data[pos++] & 0xFF) << 24;
-    result    += (data[pos++] & 0xFF) << 16;
-    result    += (data[pos++] & 0xFF) <<  8;
-    result    += (data[pos++] & 0xFF);
-    return result;
+		int result = (data[pos++] & 0xFF) << 24;
+		result    += (data[pos++] & 0xFF) << 16;
+		result    += (data[pos++] & 0xFF) <<  8;
+		result    += (data[pos++] & 0xFF);
+		return result;
 	}
 
 	/**
@@ -243,18 +243,18 @@ public final class SerializationUtils
 	 * @param offset the position in the array of byte at which the serializatrion should start.
 	 * @return the int value read from the array of bytes
 	 */
-	public static long readLong(byte[] data, int offset)
+	public static long readLong(final byte[] data, final int offset)
 	{
 		int pos = offset;
-    long result = (long) (data[pos++] & 0xFF) << 56;
-    result     += (long) (data[pos++] & 0xFF) << 48;
-    result     += (long) (data[pos++] & 0xFF) << 40;
-    result     += (long) (data[pos++] & 0xFF) << 32;
-    result     += (long) (data[pos++] & 0xFF) << 24;
-    result     += (long) (data[pos++] & 0xFF) << 16;
-    result     += (long) (data[pos++] & 0xFF) <<  8;
-    result     += (long) (data[pos++] & 0xFF);
-    return result;
+		long result = (long) (data[pos++] & 0xFF) << 56;
+		result     += (long) (data[pos++] & 0xFF) << 48;
+		result     += (long) (data[pos++] & 0xFF) << 40;
+		result     += (long) (data[pos++] & 0xFF) << 32;
+		result     += (long) (data[pos++] & 0xFF) << 24;
+		result     += (long) (data[pos++] & 0xFF) << 16;
+		result     += (long) (data[pos++] & 0xFF) <<  8;
+		result     += (data[pos++] & 0xFF);
+		return result;
 	}
 
 	/**
@@ -263,13 +263,13 @@ public final class SerializationUtils
 	 * @return the int value read from the stream.
 	 * @throws IOException if an error occurs while reading the data.
 	 */
-	public static int readInt(InputStream is) throws IOException
+	public static int readInt(final InputStream is) throws IOException
 	{
-    int result = (is.read() & 0xFF) << 24;
-    result    += (is.read() & 0xFF) << 16;
-    result    += (is.read() & 0xFF) <<  8;
-    result    += (is.read() & 0xFF);
-    return result;
+		int result = (is.read() & 0xFF) << 24;
+		result    += (is.read() & 0xFF) << 16;
+		result    += (is.read() & 0xFF) <<  8;
+		result    += (is.read() & 0xFF);
+		return result;
 	}
 
 	/**
@@ -278,16 +278,16 @@ public final class SerializationUtils
 	 * @return the int value read from the stream.
 	 * @throws IOException if an error occurs while reading the data.
 	 */
-	public static long readLong(InputStream is) throws IOException
+	public static long readLong(final InputStream is) throws IOException
 	{
-    long result = (long) (is.read() & 0xFF) << 56;
-    result     += (long) (is.read() & 0xFF) << 48;
-    result     += (long) (is.read() & 0xFF) << 40;
-    result     += (long) (is.read() & 0xFF) << 32;
-    result     += (long) (is.read() & 0xFF) << 24;
-    result     += (long) (is.read() & 0xFF) << 16;
-    result     += (long) (is.read() & 0xFF) <<  8;
-    result     += (long) (is.read() & 0xFF);
-    return result;
+		long result = (long) (is.read() & 0xFF) << 56;
+		result     += (long) (is.read() & 0xFF) << 48;
+		result     += (long) (is.read() & 0xFF) << 40;
+		result     += (long) (is.read() & 0xFF) << 32;
+		result     += (long) (is.read() & 0xFF) << 24;
+		result     += (long) (is.read() & 0xFF) << 16;
+		result     += (long) (is.read() & 0xFF) <<  8;
+		result     += (is.read() & 0xFF);
+		return result;
 	}
 }

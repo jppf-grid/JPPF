@@ -29,14 +29,14 @@ public class HelloTask extends JPPFTask
 	/**
 	 * Explicit serialVersionUID.
 	 */
-    private static final long serialVersionUID = -3172628037383355176L;
+	private static final long serialVersionUID = -3172628037383355176L;
 
 	/**
 	 * Duration of this task in milliseconds.
 	 */
 	private long duration = 0L;
 
-    /**
+	/**
 	 * Default constructor.
 	 */
 	public HelloTask()
@@ -47,7 +47,7 @@ public class HelloTask extends JPPFTask
 	 * Initialize this task with the specified duration.
 	 * @param duration duration of this task in milliseconds.
 	 */
-	public HelloTask(long duration)
+	public HelloTask(final long duration)
 	{
 		this.duration = duration;
 	}
@@ -57,7 +57,7 @@ public class HelloTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		String s;
 		try

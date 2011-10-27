@@ -41,7 +41,7 @@ public class TaskExecutionNotification extends Notification
 	 * @param sequenceNumber the notification sequence number.
 	 * @param taskInformation information about the task that triggered this notification.
 	 */
-	public TaskExecutionNotification(ObjectName source, long sequenceNumber, TaskInformation taskInformation)
+	public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation)
 	{
 		super("task.monitor", source, sequenceNumber, taskInformation.getTimestamp());
 		this.taskInformation = taskInformation;

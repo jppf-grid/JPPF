@@ -18,7 +18,7 @@
 
 package org.jppf.jca.work;
 
-import static org.jppf.client.JPPFClientConnectionStatus.*;
+import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
 
 import java.util.*;
 
@@ -56,7 +56,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @param info the connection properties for this connection.
 	 * @param client the JPPF client that owns this connection.
 	 */
-	public JPPFJcaClientConnection(String uuid, String name, JPPFConnectionInformation info, JPPFJcaClient client)
+	public JPPFJcaClientConnection(final String uuid, final String name, final JPPFConnectionInformation info, final JPPFJcaClient client)
 	{
 		configure(uuid, name, info.host, info.serverPorts[0], info.serverPorts[0], 0);
 		status.set(DISCONNECTED);
@@ -76,7 +76,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			delegate = new JcaClassServerDelegate(name, uuid, host, classServerPort, (JPPFJcaClient) client);
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
-				public void statusChanged(ClientConnectionStatusEvent event)
+				@Override
+				public void statusChanged(final ClientConnectionStatusEvent event)
 				{
 					delegateStatusChanged(event);
 				}
@@ -84,7 +85,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				@Override
-				public void statusChanged(ClientConnectionStatusEvent event)
+				public void statusChanged(final ClientConnectionStatusEvent event)
 				{
 					taskServerConnectionStatusChanged(event);
 				}
@@ -115,7 +116,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(ClassLoader cl, JPPFTaskBundle header, JPPFJob job) throws Exception
+	public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
 	{
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
 		try
@@ -143,7 +144,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
+	public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
 	{
 		header.setRequestUuid(job.getJobUuid());
 		if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
@@ -177,7 +178,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
-	public void submit(JPPFJob job) throws Exception
+	public void submit(final JPPFJob job) throws Exception
 	{
 		throw new UnsupportedOperationException();
 	}

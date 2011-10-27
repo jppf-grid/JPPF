@@ -43,16 +43,17 @@ public class MatrixTask extends JPPFTask
 	 * Initialize this task with a specified row of values to multiply.
 	 * @param rowValues the values as an array of <code>double</code> values.
 	 */
-	public MatrixTask(double[] rowValues)
+	public MatrixTask(final double[] rowValues)
 	{
 		this.rowValues = rowValues;
 	}
-	
+
 	/**
 	 * Get the result this task's execution, ie a matrix row.
 	 * @return a matrix column as an array of <code>double</code> values.
 	 * @see org.jppf.server.protocol.JPPFTask#getResult()
 	 */
+	@Override
 	public Object getResult()
 	{
 		return result;
@@ -62,6 +63,7 @@ public class MatrixTask extends JPPFTask
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -69,7 +71,7 @@ public class MatrixTask extends JPPFTask
 			Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
 			int size = matrix.getSize();
 			result = new double[size];
-	
+
 			for (int col=0; col<size; col++)
 			{
 				double sum = 0d;

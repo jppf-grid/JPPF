@@ -59,7 +59,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * Default instantiation of this class is not permitted.
 	 * @param owner the client connection which owns this connection delegate.
 	 */
-	protected AbstractClassServerDelegate(JPPFClientConnection owner)
+	protected AbstractClassServerDelegate(final JPPFClientConnection owner)
 	{
 		super(owner);
 	}
@@ -70,7 +70,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @see org.jppf.client.ClassServerDelegate#isClosed()
 	 */
 	@Override
-    public boolean isClosed()
+	public boolean isClosed()
 	{
 		return closed;
 	}
@@ -81,7 +81,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @see org.jppf.client.ClassServerDelegate#getName()
 	 */
 	@Override
-    public String getName()
+	public String getName()
 	{
 		return name;
 	}
@@ -92,7 +92,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @see org.jppf.client.ClassServerDelegate#setName(java.lang.String)
 	 */
 	@Override
-    public void setName(String name)
+	public void setName(final String name)
 	{
 		this.name = name;
 	}
@@ -103,7 +103,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @see org.jppf.client.ClassServerDelegate#initSocketClient()
 	 */
 	@Override
-    public void initSocketClient() throws Exception
+	public void initSocketClient() throws Exception
 	{
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
@@ -128,7 +128,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * @param resource a <code>JPPFResourceWrapper</code> instance.
 	 * @throws Exception if any error is raised.
 	 */
-	protected void writeResource(JPPFResourceWrapper resource) throws Exception
+	protected void writeResource(final JPPFResourceWrapper resource) throws Exception
 	{
 		JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();

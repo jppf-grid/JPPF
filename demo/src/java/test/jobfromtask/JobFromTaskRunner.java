@@ -20,7 +20,7 @@ package test.jobfromtask;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -44,7 +44,7 @@ public class JobFromTaskRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -80,7 +80,7 @@ public class JobFromTaskRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);

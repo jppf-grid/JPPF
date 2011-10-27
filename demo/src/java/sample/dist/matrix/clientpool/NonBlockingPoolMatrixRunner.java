@@ -50,7 +50,7 @@ public class NonBlockingPoolMatrixRunner
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -70,7 +70,7 @@ public class NonBlockingPoolMatrixRunner
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @param size the size of the matrices.
@@ -78,7 +78,7 @@ public class NonBlockingPoolMatrixRunner
 	 * @param nbSubmissions the number of concurrent task submissions for each iteration.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	public void perform(int size, int iterations, int nbSubmissions) throws JPPFException
+	public void perform(final int size, final int iterations, final int nbSubmissions) throws JPPFException
 	{
 		try
 		{
@@ -87,7 +87,7 @@ public class NonBlockingPoolMatrixRunner
 			a.assignRandomValues();
 			Matrix b = new Matrix(size);
 			b.assignRandomValues();
-	
+
 			// perform "iteration" times
 			long totalTime = 0L;
 			for (int iter=0; iter<iterations; iter++)

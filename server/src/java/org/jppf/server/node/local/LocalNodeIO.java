@@ -29,7 +29,7 @@ import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -52,10 +52,10 @@ public class LocalNodeIO extends AbstractNodeIO
 	private LocalNodeChannel channel = null;
 
 	/**
-	 * Initialize this TaskIO with the specified node. 
+	 * Initialize this TaskIO with the specified node.
 	 * @param node - the node who owns this TaskIO.
 	 */
-	public LocalNodeIO(JPPFNode node)
+	public LocalNodeIO(final JPPFNode node)
 	{
 		super(node);
 		this.channel = ((JPPFLocalNode) node).getChannel();
@@ -67,7 +67,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * @see org.jppf.server.node.AbstractNodeIO#handleReload()
 	 */
 	@Override
-    protected void handleReload() throws Exception
+	protected void handleReload() throws Exception
 	{
 		node.setClassLoader(null);
 		node.initHelper();
@@ -77,7 +77,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}.
 	 */
 	@Override
-    protected Object[] deserializeObjects() throws Exception
+	protected Object[] deserializeObjects() throws Exception
 	{
 		channel.setReadyOps(OP_WRITE);
 		if (debugEnabled) log.debug("waiting for next request");
@@ -101,7 +101,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
 	{
 		int count = bundle.getTaskCount();
 		List<Object> list = new ArrayList<Object>(count + 1);
@@ -136,7 +136,7 @@ public class LocalNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception
+	public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
 	{
 		if (debugEnabled) log.debug("writing results");
 		ExecutorService executor = node.getExecutionManager().getExecutor();

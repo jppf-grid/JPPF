@@ -40,13 +40,13 @@ public class GraphActionHandler extends AbstractActionHandler
 	 * Initialize this action manager with the specified JTreeTable component.
 	 * @param graph the graph whose actions are managed.
 	 */
-	public GraphActionHandler(mxGraph graph)
+	public GraphActionHandler(final mxGraph graph)
 	{
 		this.graph = graph;
 		graph.getSelectionModel().addListener(null, new mxEventSource.mxIEventListener()
 		{
 			@Override
-            public void invoke(Object source, mxEventObject event)
+			public void invoke(final Object source, final mxEventObject event)
 			{
 				computeSelectedElements();
 				updateActions();

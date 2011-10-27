@@ -39,7 +39,7 @@ public class HelloWorldPojoConstructor implements Serializable
 	 * @param message a message to print.
 	 * @param number an example primitive argument.
 	 */
-	public HelloWorldPojoConstructor(String message, int number)
+	public HelloWorldPojoConstructor(final String message, final int number)
 	{
 		this.hello = "Hello, World (pojo constructor, " + message + ", " + number + ')';
 		System.out.println(this.hello);
@@ -47,11 +47,11 @@ public class HelloWorldPojoConstructor implements Serializable
 
 	/**
 	 * Get the string resulting from the task execution.
-	 * @return a string. 
+	 * @return a string.
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return hello;
 	}

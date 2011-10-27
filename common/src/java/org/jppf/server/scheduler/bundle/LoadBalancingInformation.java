@@ -59,7 +59,7 @@ public class LoadBalancingInformation implements Serializable
 	 * @param parameters - the algorithm's parameters.
 	 * @param algorithmNames - the names of all available algorithms.
 	 */
-	public LoadBalancingInformation(String algorithm, TypedProperties parameters, List<String> algorithmNames)
+	public LoadBalancingInformation(final String algorithm, final TypedProperties parameters, final List<String> algorithmNames)
 	{
 		this.algorithm = algorithm;
 		this.parameters = parameters;

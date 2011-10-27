@@ -40,7 +40,7 @@ public class DBTask extends JPPFTask
 	 * Initialize this task with the specified sleep time.
 	 * @param sleepTime the time to wait after inserting a row in the database (in milliseconds).
 	 */
-	public DBTask(long sleepTime)
+	public DBTask(final long sleepTime)
 	{
 		this.sleepTime = sleepTime;
 	}
@@ -51,6 +51,7 @@ public class DBTask extends JPPFTask
 	 * This means they are sequentialized and we loose some of the parallelism.
 	 * However, any non DB-related operation can be executed safely in a different thread.
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -95,6 +96,7 @@ public class DBTask extends JPPFTask
 		 * Insert a row into the database.
 		 * @return the number of updated rows, or null if the operation failed.
 		 */
+		@Override
 		public Integer call()
 		{
 			Connection c = null;

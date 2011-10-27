@@ -42,7 +42,7 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.util.Map)
 	 */
 	@Override
-    public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
+	public Object evaluate(final String script, final Map<String, Object> variables) throws JPPFScriptingException
 	{
 		return evaluate(null, script, variables);
 	}
@@ -59,22 +59,22 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
 	 */
 	@Override
-    public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
+	public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException
 	{
 		try
 		{
-		//GroovyShell shell = new GroovyShell(binding);
-		GroovyShell shell = new GroovyShell();
-		Script groovyScript = scriptMap.get(scriptId);
-		if (groovyScript == null)
-		{
-			groovyScript = shell.parse(script);
-			scriptMap.put(scriptId, groovyScript);
-		}
-		Binding binding = new Binding();
-		for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());
-		groovyScript.setBinding(binding);
-		return groovyScript.run();
+			//GroovyShell shell = new GroovyShell(binding);
+			GroovyShell shell = new GroovyShell();
+			Script groovyScript = scriptMap.get(scriptId);
+			if (groovyScript == null)
+			{
+				groovyScript = shell.parse(script);
+				scriptMap.put(scriptId, groovyScript);
+			}
+			Binding binding = new Binding();
+			for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());
+			groovyScript.setBinding(binding);
+			return groovyScript.run();
 		}
 		catch(Exception e)
 		{
@@ -87,7 +87,7 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#init()
 	 */
 	@Override
-    public void init()
+	public void init()
 	{
 	}
 
@@ -96,7 +96,7 @@ public class GroovyScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#cleanup()
 	 */
 	@Override
-    public void cleanup()
+	public void cleanup()
 	{
 	}
 }

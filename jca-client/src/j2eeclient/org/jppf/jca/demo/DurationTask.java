@@ -18,7 +18,7 @@
 
 package org.jppf.jca.demo;
 
-import java.text.*;
+import java.text.DecimalFormat;
 
 import org.jppf.server.protocol.JPPFTask;
 
@@ -31,7 +31,7 @@ public class DurationTask extends JPPFTask
 	/**
 	 * Explicit serialVersionUID.
 	 */
-    private static final long serialVersionUID = -6106765904127535863L;
+	private static final long serialVersionUID = -6106765904127535863L;
 
 	/**
 	 * Counts the number of times this task was run.
@@ -46,11 +46,11 @@ public class DurationTask extends JPPFTask
 	 */
 	private long duration = 1;
 
-    /**
+	/**
 	 * Initialize this task withe specified duration.
 	 * @param duration duration of this task in milliseconds.
 	 */
-	public DurationTask(long duration)
+	public DurationTask(final long duration)
 	{
 		incrementCount();
 		counter = count;
@@ -62,7 +62,7 @@ public class DurationTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		DecimalFormat nf = new DecimalFormat("0.###");
 		String res = nf.format(duration / 1000.0f);

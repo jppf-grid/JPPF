@@ -61,7 +61,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @param client the JPPF client that owns this class server delegate.
 	 * @throws Exception if the connection could not be opended.
 	 */
-	public JcaClassServerDelegate(String name, String uuid, String host, int port, JPPFJcaClient client) throws Exception
+	public JcaClassServerDelegate(final String name, final String uuid, final String host, final int port, final JPPFJcaClient client) throws Exception
 	{
 		super(null);
 		this.clientUuid = client.getUuid();
@@ -78,7 +78,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @see org.jppf.client.ClassServerDelegate#init()
 	 */
 	@Override
-    public final void init() throws Exception
+	public final void init() throws Exception
 	{
 		try
 		{
@@ -116,7 +116,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @see org.jppf.client.ClassServerDelegate#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -225,7 +225,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @see org.jppf.client.ClassServerDelegate#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		if (!closed)
 		{
@@ -249,7 +249,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @return a <code>SocketInitializer</code> instance.
 	 */
 	@Override
-    protected SocketInitializer createSocketInitializer()
+	protected SocketInitializer createSocketInitializer()
 	{
 		return new JcaSocketInitializer();
 	}
@@ -259,7 +259,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @see javax.resource.spi.work.Work#release()
 	 */
 	@Override
-    public void release()
+	public void release()
 	{
 	}
 
@@ -268,7 +268,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @param uuid the uuid of the request from which the class loader was obtained.
 	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
 	 */
-	private ClassLoader getClassLoader(String uuid)
+	private ClassLoader getClassLoader(final String uuid)
 	{
 		return client.getRequestClassLoader(uuid);
 	}

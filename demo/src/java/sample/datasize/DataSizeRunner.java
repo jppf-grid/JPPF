@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -56,7 +56,7 @@ public class DataSizeRunner
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -74,7 +74,7 @@ public class DataSizeRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test.
 	 * @throws Exception if an error is raised during the execution.
@@ -89,7 +89,7 @@ public class DataSizeRunner
 		String unit = config.getString("datasize.unit", "b").toLowerCase();
 		if ("k".equals(unit)) datasize *= KILO;
 		else if ("m".equals(unit)) datasize *= MEGA;
-		
+
 		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks for " + iterations + " iterations");
 		long totalTime = 0;
 		for (int i=1; i<=iterations; i++)
@@ -105,7 +105,7 @@ public class DataSizeRunner
 				if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
 				else System.out.println("task result: " + t.getResult());
 			}
-			*/
+			 */
 			long elapsed = System.nanoTime() - start;
 			totalTime += elapsed;
 			output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
@@ -127,11 +127,11 @@ public class DataSizeRunner
 		String unit = config.getString("datasize.unit", "b").toLowerCase();
 		if ("k".equals(unit)) datasize *= KILO;
 		else if ("m".equals(unit)) datasize *= MEGA;
-		
+
 		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
 		executor.setBatchSize(100);
 		executor.setBatchTimeout(30L);
-		
+
 		output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
 		long totalTime = System.currentTimeMillis();
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
@@ -139,7 +139,7 @@ public class DataSizeRunner
 		for (Future<?> f: futureList)
 		{
 			f.get();
-			Task t = ((JPPFTaskFuture<?>) f).getTask(); 
+			Task t = ((JPPFTaskFuture<?>) f).getTask();
 			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
 			else System.out.println("task result: " + t.getResult());
 		}
@@ -176,7 +176,7 @@ public class DataSizeRunner
 	 * Print a message to the console and/or log file.
 	 * @param message the message to print.
 	 */
-	private static void output(String message)
+	private static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

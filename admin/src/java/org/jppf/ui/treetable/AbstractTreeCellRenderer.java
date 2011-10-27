@@ -132,7 +132,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 * @param font the font to base the result on.
 	 * @return a {@link Font} instance.
 	 */
-	public Font getPlainFont(Font font)
+	public Font getPlainFont(final Font font)
 	{
 		if (plainFont == null)
 		{
@@ -146,7 +146,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 * @param font the font to base the result on.
 	 * @return a {@link Font} instance.
 	 */
-	public Font getItalicFont(Font font)
+	public Font getItalicFont(final Font font)
 	{
 		if (italicFont == null)
 		{
@@ -160,7 +160,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 * @param font the font to base the result on.
 	 * @return a {@link Font} instance.
 	 */
-	public Font getBoldFont(Font font)
+	public Font getBoldFont(final Font font)
 	{
 		if (boldFont == null)
 		{
@@ -174,7 +174,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 * @param font the font to base the result on.
 	 * @return a {@link Font} instance.
 	 */
-	public Font getBoldItalicFont(Font font)
+	public Font getBoldItalicFont(final Font font)
 	{
 		if (boldItalicFont == null)
 		{

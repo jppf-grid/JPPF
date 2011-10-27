@@ -51,7 +51,7 @@ public class SocketPerformance
 	 * Main entry point.
 	 * @param args no used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -124,7 +124,7 @@ public class SocketPerformance
 		 * @see java.lang.Thread#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -163,7 +163,7 @@ public class SocketPerformance
 		 * @param s - the socket to write to.
 		 * @throws Exception if any error occurs.
 		 */
-		public Connection(Socket s) throws Exception
+		public Connection(final Socket s) throws Exception
 		{
 			socketWrapper = new SocketClient(s);
 			setDaemon(true);
@@ -174,7 +174,7 @@ public class SocketPerformance
 		 * @see java.lang.Thread#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -224,6 +224,7 @@ public class SocketPerformance
 		 * Main processing loop.
 		 * @see java.lang.Thread#run()
 		 */
+		@Override
 		public void run()
 		{
 			try

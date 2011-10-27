@@ -58,7 +58,7 @@ public class CrawlerResultCollector implements TaskResultListener
 	 * Initialize this collector with a specified number of tasks.
 	 * @param count the count of submitted tasks.
 	 */
-	public CrawlerResultCollector(int count)
+	public CrawlerResultCollector(final int count)
 	{
 		this.pendingCount = count;
 	}
@@ -68,7 +68,8 @@ public class CrawlerResultCollector implements TaskResultListener
 	 * @param event a notification of completion for a set of submitted tasks.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+	public synchronized void resultsReceived(final TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
@@ -83,6 +84,7 @@ public class CrawlerResultCollector implements TaskResultListener
 		final int n = sum;
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				WebCrawlerRunner.updateProgress(n);

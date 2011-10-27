@@ -48,7 +48,7 @@ public class CommandLineTaskRunner
 	 * Entry point for this class, performs a matrix multiplication a number of times.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -76,10 +76,10 @@ public class CommandLineTaskRunner
 		/*
 		job.addTask(new ListDirectoryTask("/usr/local"));
 		job.addTask(new ListDirectoryTask("C:\\Windows"));
-		*/
+		 */
 		job.addTask(new TestTask("1"));
 		for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000));
-		
+
 		List<JPPFTask> results = jppfClient.submit(job);
 		for (JPPFTask task: results)
 		{

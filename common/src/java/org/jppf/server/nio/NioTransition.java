@@ -46,7 +46,7 @@ public class NioTransition<S extends Enum>
 	 * @param state the state after the transition.
 	 * @param interestOps the new set of interests after the transition.
 	 */
-	public NioTransition(S state, int interestOps)
+	public NioTransition(final S state, final int interestOps)
 	{
 		this.state = state;
 		this.interestOps = interestOps;
@@ -65,7 +65,7 @@ public class NioTransition<S extends Enum>
 	 * Set the set of IO operations the corresponding channel isinterested in after the transition.
 	 * @param interestOps the set of interests as an int value.
 	 */
-	public void setInterestOps(int interestOps)
+	public void setInterestOps(final int interestOps)
 	{
 		this.interestOps = interestOps;
 	}
@@ -83,7 +83,7 @@ public class NioTransition<S extends Enum>
 	 * Set the new state after the transition.
 	 * @param state an <code>NioState</code> instance.
 	 */
-	public void setState(S state)
+	public void setState(final S state)
 	{
 		this.state = state;
 	}

@@ -46,23 +46,23 @@ public abstract class TextOption extends AbstractOption
 	/**
 	 * Initialize this text option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the checkbox.
 	 * @param value the initial value of this component.
 	 */
-	public TextOption(String name, String label, String tooltip, String value)
+	public TextOption(final String name, final String label, final String tooltip, final String value)
 	{
 		this.name = name;
 		this.label = label;
 		setToolTipText(tooltip);
 		this.value = value;
 	}
-	
+
 	/**
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		fieldLabel = new JLabel(label);
 		field = createField();
@@ -90,7 +90,7 @@ public abstract class TextOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		Document doc = field.getDocument();
 		try
@@ -108,7 +108,7 @@ public abstract class TextOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -118,7 +118,7 @@ public abstract class TextOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		field.setEnabled(enabled);
 		fieldLabel.setEnabled(enabled);

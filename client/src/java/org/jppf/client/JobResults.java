@@ -24,7 +24,7 @@ import java.util.*;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Instances of this class hold an dmanage the results of a job. 
+ * Instances of this class hold an dmanage the results of a job.
  * @author Laurent Cohen
  */
 public class JobResults implements Serializable

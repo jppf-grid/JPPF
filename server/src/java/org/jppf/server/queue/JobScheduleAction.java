@@ -44,7 +44,7 @@ class JobScheduleAction implements Runnable
 	 * Initialize this action witht he specified bundle wrapper.
 	 * @param bundleWrapper the bundle wrapper encapsulating the job.
 	 */
-	public JobScheduleAction(ServerJob bundleWrapper)
+	public JobScheduleAction(final ServerJob bundleWrapper)
 	{
 		this.bundleWrapper = bundleWrapper;
 	}
@@ -53,7 +53,7 @@ class JobScheduleAction implements Runnable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		synchronized(bundleWrapper)
 		{

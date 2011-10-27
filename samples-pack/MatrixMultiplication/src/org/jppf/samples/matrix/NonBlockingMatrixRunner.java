@@ -61,7 +61,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -81,14 +81,14 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @param size the size of the matrices.
 	 * @param iterations the number of times the multiplication will be performed.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	public synchronized void perform(int size, int iterations) throws JPPFException
+	public synchronized void perform(final int size, final int iterations) throws JPPFException
 	{
 		try
 		{
@@ -97,7 +97,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 			a.assignRandomValues();
 			Matrix b = new Matrix(size);
 			b.assignRandomValues();
-	
+
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
 			{
@@ -145,7 +145,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 	 * @param iterations the number of times the multiplication will be performed.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	public synchronized void perform2(int size, int iterations) throws JPPFException
+	public synchronized void perform2(final int size, final int iterations) throws JPPFException
 	{
 		try
 		{
@@ -154,7 +154,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 			a.assignRandomValues();
 			Matrix b = new Matrix(size);
 			b.assignRandomValues();
-	
+
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
 			{
@@ -198,10 +198,11 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 
 	/**
 	 * 
-	 * @param event notification that a set of tasks results have been received. 
+	 * @param event notification that a set of tasks results have been received.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+	public synchronized void resultsReceived(final TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		System.out.println("Received results for " + tasks.size() + " tasks ");
@@ -209,7 +210,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
 		count += tasks.size();
 		notify();
 	}
-	
+
 	/**
 	 * Wait until all results of a request have been collected.
 	 */

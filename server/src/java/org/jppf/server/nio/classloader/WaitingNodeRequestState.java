@@ -46,7 +46,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * Initialize this state with a specified NioServer.
 	 * @param server the JPPFNIOServer this state relates to.
 	 */
-	public WaitingNodeRequestState(ClassNioServer server)
+	public WaitingNodeRequestState(final ClassNioServer server)
 	{
 		super(server);
 	}
@@ -59,7 +59,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClassTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
 	{
 		ClassContext context = (ClassContext) channel.getContext();
 		if (context.readMessage(channel))
@@ -98,7 +98,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a pair of an array of bytes and the resulting state transition.
 	 * @throws Exception if any error occurs.
 	 */
-	private ByteTransitionPair processNonDynamic(ChannelWrapper<?> channel, JPPFResourceWrapper resource) throws Exception
+	private ByteTransitionPair processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
 	{
 		byte[] b = null;
 		ClassTransition t = null;
@@ -106,7 +106,7 @@ class WaitingNodeRequestState extends ClassServerState
 		ClassContext context = (ClassContext) channel.getContext();
 		TraversalList<String> uuidPath = resource.getUuidPath();
 
-		String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null; 
+		String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
 		if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null))
 		{
 			if (resource.getData("multiple") != null)
@@ -158,7 +158,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a pair of an array of bytes and the resulting state transition.
 	 * @throws Exception if any error occurs.
 	 */
-	private ByteTransitionPair processDynamic(ChannelWrapper<?> channel, JPPFResourceWrapper resource) throws Exception
+	private ByteTransitionPair processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
 	{
 		byte[] b = null;
 		ClassTransition t = null;
@@ -199,7 +199,7 @@ class WaitingNodeRequestState extends ClassServerState
 	 * @return a <code>SelectableChannel</code> instance.
 	 * @throws Exception if an error occurs while searching for a connection.
 	 */
-	private ChannelWrapper findProviderConnection(String uuid) throws Exception
+	private ChannelWrapper findProviderConnection(final String uuid) throws Exception
 	{
 		ChannelWrapper<?> result = null;
 		List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
@@ -228,7 +228,7 @@ class WaitingNodeRequestState extends ClassServerState
 		 * @param first - an array of bytes.
 		 * @param second - a class transition.
 		 */
-		public ByteTransitionPair(byte[] first, ClassTransition second)
+		public ByteTransitionPair(final byte[] first, final ClassTransition second)
 		{
 			super(first, second);
 		}

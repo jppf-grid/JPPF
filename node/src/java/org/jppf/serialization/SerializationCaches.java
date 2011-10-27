@@ -100,7 +100,7 @@ public class SerializationCaches
 	 * @return a {@link ClassDescriptor} object.
 	 * @throws Exception if nay error occurs.
 	 */
-	ClassDescriptor getClassDescriptor(Class<?> clazz, Map<Class<?>, ClassDescriptor> map) throws Exception
+	ClassDescriptor getClassDescriptor(final Class<?> clazz, final Map<Class<?>, ClassDescriptor> map) throws Exception
 	{
 		return getClassDescriptorGeneric(clazz, classHandleCount, classToDescMap, map);
 	}
@@ -110,7 +110,7 @@ public class SerializationCaches
 	 * @param o the object for which to get a handle.
 	 * @return the handle as an int value.
 	 */
-	int newObjectHandle(Object o)
+	int newObjectHandle(final Object o)
 	{
 		int handle = objectHandleCount.incrementAndGet();
 		objectHandleMap.put(o, handle);
@@ -127,13 +127,13 @@ public class SerializationCaches
 	 * @return a {@link ClassDescriptor} object.
 	 * @throws Exception if nay error occurs.
 	 */
-	static ClassDescriptor getClassDescriptorGeneric(Class<?> clazz, AtomicInteger counter,
-			Map<Class<?>, ClassDescriptor> map, Map<Class<?>, ClassDescriptor> map2) throws Exception
-	{
+	static ClassDescriptor getClassDescriptorGeneric(final Class<?> clazz, final AtomicInteger counter,
+			final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception
+			{
 		ClassDescriptor cd = map.get(clazz);
 		if (cd == null) cd = addClassGeneric(clazz, counter, map, map2);
 		return cd;
-	}
+			}
 
 	/**
 	 * Add a class mapping.
@@ -144,9 +144,9 @@ public class SerializationCaches
 	 * @return the {@link ClassDescriptor} object that was created.
 	 * @throws Exception if any error occurs.
 	 */
-	static ClassDescriptor addClassGeneric(Class<?> clazz, AtomicInteger counter,
-			Map<Class<?>, ClassDescriptor> map, Map<Class<?>, ClassDescriptor> map2) throws Exception
-	{
+	static ClassDescriptor addClassGeneric(final Class<?> clazz, final AtomicInteger counter,
+			final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception
+			{
 		ClassDescriptor cd = new ClassDescriptor(clazz);
 		cd.handle = counter.incrementAndGet();
 		if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
@@ -157,6 +157,6 @@ public class SerializationCaches
 		if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
 		if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
 		return cd;
-	}
+			}
 
 }

@@ -88,7 +88,7 @@ public class JTreeTable extends JTable
 	 * Initialize this tree table with the specified model.
 	 * @param treeTableModel this tree table's model.
 	 */
-	public JTreeTable(TreeTableModel treeTableModel)
+	public JTreeTable(final TreeTableModel treeTableModel)
 	{
 		super();
 
@@ -130,7 +130,7 @@ public class JTreeTable extends JTable
 	 * hierarchy it will never receive this unless we forward it in this manner.
 	 */
 	@Override
-    public void updateUI()
+	public void updateUI()
 	{
 		super.updateUI();
 		if (tree != null)
@@ -149,7 +149,7 @@ public class JTreeTable extends JTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getEditingRow()
+	public int getEditingRow()
 	{
 		return (getColumnClass(editingColumn) == TreeTableModel.class) ? -1 : editingRow;
 	}
@@ -159,7 +159,7 @@ public class JTreeTable extends JTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setRowHeight(int rowHeight)
+	public void setRowHeight(final int rowHeight)
 	{
 		super.setRowHeight(rowHeight);
 		if (tree != null && tree.getRowHeight() != rowHeight)
@@ -182,9 +182,9 @@ public class JTreeTable extends JTable
 	 * @param selectionMode - one of ListSelectionModel.SINGLE_SELECTION, ListSelectionModel.SINGLE_INTERVAL_SELECTION,
 	 * ListSelectionModel.MULTIPLE_INTERVAL_SELECTION.
 	 * @see javax.swing.JTable#setSelectionMode(int)
-   */
+	 */
 	@Override
-    public void setSelectionMode(int selectionMode)
+	public void setSelectionMode(final int selectionMode)
 	{
 		super.setSelectionMode(selectionMode);
 		int treeMode;
@@ -208,7 +208,7 @@ public class JTreeTable extends JTable
 		 * Initialize this renderer with the specified tree model.
 		 * @param model a {@link TreeModel} instance.
 		 */
-		public TreeTableCellRenderer(TreeModel model)
+		public TreeTableCellRenderer(final TreeModel model)
 		{
 			super(model);
 		}
@@ -217,7 +217,7 @@ public class JTreeTable extends JTable
 		 * updateUI is overridden to set the colors of the Tree's renderer to match that of the table.
 		 */
 		@Override
-        public void updateUI()
+		public void updateUI()
 		{
 			super.updateUI();
 			// Make the tree's cell renderer use the table's cell selection
@@ -239,7 +239,7 @@ public class JTreeTable extends JTable
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void setRowHeight(int rowHeight)
+		public void setRowHeight(final int rowHeight)
 		{
 			if (rowHeight > 0)
 			{
@@ -256,7 +256,7 @@ public class JTreeTable extends JTable
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void setBounds(int x, int y, int w, int h)
+		public void setBounds(final int x, final int y, final int w, final int h)
 		{
 			super.setBounds(x, 0, w, JTreeTable.this.getHeight());
 		}
@@ -266,7 +266,7 @@ public class JTreeTable extends JTable
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void paint(Graphics g)
+		public void paint(final Graphics g)
 		{
 			g.translate(0, -visibleRow * getRowHeight());
 			try
@@ -283,8 +283,8 @@ public class JTreeTable extends JTable
 		 * {@inheritDoc}
 		 */
 		@Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-				int row, int column)
+		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus,
+				final int row, final int column)
 		{
 			if (isSelected) setBackground(table.getSelectionBackground());
 			else setBackground(table.getBackground());
@@ -303,7 +303,7 @@ public class JTreeTable extends JTable
 		 * {@inheritDoc}
 		 */
 		@Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int r, int c)
+		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int r, final int c)
 		{
 			return tree;
 		}
@@ -324,7 +324,7 @@ public class JTreeTable extends JTable
 		 * {@inheritDoc}
 		 */
 		@Override
-        public boolean isCellEditable(EventObject e)
+		public boolean isCellEditable(final EventObject e)
 		{
 			if (e instanceof MouseEvent)
 			{
@@ -388,7 +388,7 @@ public class JTreeTable extends JTable
 		 * DefaultTreeSelectionModel alters the ListSelectionModel.
 		 */
 		@Override
-        public void resetRowSelection()
+		public void resetRowSelection()
 		{
 			if (!updatingListSelectionModel)
 			{
@@ -503,7 +503,7 @@ public class JTreeTable extends JTable
 			 * {@inheritDoc}
 			 */
 			@Override
-            public void valueChanged(ListSelectionEvent e)
+			public void valueChanged(final ListSelectionEvent e)
 			{
 				updateSelectedPathsFromSelectedRows();
 			}
@@ -520,7 +520,7 @@ public class JTreeTable extends JTable
 			 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 			 */
 			@Override
-            public void valueChanged(TreeSelectionEvent e)
+			public void valueChanged(final TreeSelectionEvent e)
 			{
 				updateSelectedTableRows();
 			}

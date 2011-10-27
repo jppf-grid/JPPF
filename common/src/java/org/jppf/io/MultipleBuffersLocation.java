@@ -21,7 +21,7 @@ package org.jppf.io;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.streams.*;
 import org.slf4j.*;
 
@@ -58,13 +58,13 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * Index of the current buffer.
 	 */
-	private int currentBufferIndex = 0; 
+	private int currentBufferIndex = 0;
 
 	/**
 	 * Initialize this location with the specified size.
 	 * @param size the total size of the data.
 	 */
-	public MultipleBuffersLocation(int size)
+	public MultipleBuffersLocation(final int size)
 	{
 		list = new ArrayList<JPPFBuffer>();
 		list.add(new JPPFBuffer(new byte[size], size));
@@ -76,7 +76,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * @param list the list of buffers that contain the data.
 	 * @param size the total size of the data.
 	 */
-	public MultipleBuffersLocation(List<JPPFBuffer> list, int size)
+	public MultipleBuffersLocation(final List<JPPFBuffer> list, final int size)
 	{
 		this.list = list;
 		this.size = size;
@@ -86,7 +86,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * Initialize this location from a single buffer.
 	 * @param buffer the buffer that contains the data.
 	 */
-	public MultipleBuffersLocation(JPPFBuffer buffer)
+	public MultipleBuffersLocation(final JPPFBuffer buffer)
 	{
 		this.list = new ArrayList<JPPFBuffer>();
 		this.list.add(buffer);
@@ -97,7 +97,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int transferFrom(InputSource source, boolean blocking) throws Exception
+	public int transferFrom(final InputSource source, final boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{
@@ -131,10 +131,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * Perform a blocking transfer to this data location from the specified input source.
 	 * @param source the input source to transfer from.
-	 * @return the number of bytes actually transferred. 
+	 * @return the number of bytes actually transferred.
 	 * @throws Exception if an IO error occurs.
 	 */
-	private int blockingTransferFrom(InputSource source) throws Exception
+	private int blockingTransferFrom(final InputSource source) throws Exception
 	{
 		//if (debugEnabled) log.debug("blocking transfer: size=" + size);
 		while (count < size)
@@ -154,10 +154,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	/**
 	 * Perform a non-blocking transfer to this data location from the specified input source.
 	 * @param source the input source to transfer from.
-	 * @return the number of bytes actually transferred. 
+	 * @return the number of bytes actually transferred.
 	 * @throws Exception if an IO error occurs.
 	 */
-	private int nonBlockingTransferFrom(InputSource source) throws Exception
+	private int nonBlockingTransferFrom(final InputSource source) throws Exception
 	{
 		int remaining = size - count;
 		//if (debugEnabled) log.debug("blocking transfer: size="+size+", remaining="+remaining);
@@ -175,7 +175,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int transferTo(OutputDestination dest, boolean blocking) throws Exception
+	public int transferTo(final OutputDestination dest, final boolean blocking) throws Exception
 	{
 		if (!transferring)
 		{
@@ -207,7 +207,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * @return the number of bytes that were written.
 	 * @throws Exception if any I/O errro occurs.
 	 */
-	private int blockingTransferTo(OutputDestination dest) throws Exception
+	private int blockingTransferTo(final OutputDestination dest) throws Exception
 	{
 		count = 0;
 		for (JPPFBuffer buf: list)
@@ -233,7 +233,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * @return the number of bytes that were written.
 	 * @throws Exception if any I/O errro occurs.
 	 */
-	private int nonBlockingTransferTo(OutputDestination dest) throws Exception
+	private int nonBlockingTransferTo(final OutputDestination dest) throws Exception
 	{
 		if (currentBuffer == null) return -1;
 		int remaining = currentBuffer.remainingFromPos();
@@ -247,9 +247,9 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 			log.error(e.getMessage(), e);
 		}
 		if (traceEnabled) {
-            log.trace("count/size=" + count + '/' + size + ", n/remaining=" + n + '/' + remaining +
-                    ", currentBufferIndex/listSize=" + currentBufferIndex + '/' + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ')');
-        }
+			log.trace("count/size=" + count + '/' + size + ", n/remaining=" + n + '/' + remaining +
+					", currentBufferIndex/listSize=" + currentBufferIndex + '/' + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ')');
+		}
 		if (n > 0) count += n;
 		if (n < remaining) currentBuffer.pos += n;
 		else
@@ -273,7 +273,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * {@inheritDoc}
 	 */
 	@Override
-    public InputStream getInputStream() throws Exception
+	public InputStream getInputStream() throws Exception
 	{
 		return new MultipleBuffersInputStream(list);
 	}
@@ -282,7 +282,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * {@inheritDoc}
 	 */
 	@Override
-    public OutputStream getOutputStream() throws Exception
+	public OutputStream getOutputStream() throws Exception
 	{
 		return new MultipleBuffersOutputStream(list);
 	}
@@ -291,7 +291,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * {@inheritDoc}
 	 */
 	@Override
-    public DataLocation copy()
+	public DataLocation copy()
 	{
 		List<JPPFBuffer> copyList = new ArrayList<JPPFBuffer>();
 		for (JPPFBuffer buf: list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));

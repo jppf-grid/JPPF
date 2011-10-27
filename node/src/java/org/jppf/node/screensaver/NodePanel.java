@@ -64,7 +64,7 @@ class NodePanel extends JPanel
 	 * Initialize this UI.
 	 * @param activate .
 	 */
-	public NodePanel(boolean activate)
+	public NodePanel(final boolean activate)
 	{
 		this.activate = activate;
 		//this.activate = true;
@@ -85,7 +85,7 @@ class NodePanel extends JPanel
 			String log4jCfg = "log4j-node.properties";
 			System.setProperty("log4j.configuration", log4jCfg);
 			TypedProperties props = JPPFConfiguration.getProperties();
-			props.remove("jppf.policy.file"); 
+			props.remove("jppf.policy.file");
 			createUI();
 			if (activate) nodeState.startNode();
 		}
@@ -102,8 +102,8 @@ class NodePanel extends JPanel
 	{
 		GridBagLayout g = new GridBagLayout();
 		setLayout(g);
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridx = 0;
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
 		setBackground(Color.BLACK);
 		ImageIcon logo = loadImage(IMAGE_PATH + '/' + "jppf-at-home.gif");
 		JLabel logoLabel = new JLabel(logo);
@@ -115,14 +115,14 @@ class NodePanel extends JPanel
 
 	/**
 	 * Create a panel showing the activity of a node.
-	 * @return a panel with some node information about is activity. 
+	 * @return a panel with some node information about is activity.
 	 */
 	private JPanel createNodePanel()
 	{
 		JPanel panel = new JPanel();
 		GridBagLayout g = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    c.gridy = 0;
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridy = 0;
 		panel.setLayout(g);
 		panel.setBackground(Color.BLACK);
 		nodeState = new NodeState();
@@ -149,7 +149,7 @@ class NodePanel extends JPanel
 
 		return panel;
 	}
-	
+
 	/**
 	 * Add a component to a panel with the specified constaints.
 	 * @param panel the panel to add the component to.
@@ -157,19 +157,19 @@ class NodePanel extends JPanel
 	 * @param c the constraints to apply to the component.
 	 * @param comp the component to add.
 	 */
-	private void addLayoutComp(JPanel panel, GridBagLayout g, GridBagConstraints c, Component comp)
+	private void addLayoutComp(final JPanel panel, final GridBagLayout g, final GridBagConstraints c, final Component comp)
 	{
 		g.setConstraints(comp, c);
-    panel.add(comp);
+		panel.add(comp);
 	}
-	
+
 	/**
 	 * Generate a panel display the status of the connection or execution.
 	 * @param statusIdx index of the status to display: 0 for connection, 1 for execution.
 	 * @param text the text to display on the left of the status lights.
 	 * @return a <code>JPanel</code> instance.
 	 */
-	private JPanel makeStatusPanel(int statusIdx, String text)
+	private JPanel makeStatusPanel(final int statusIdx, final String text)
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -204,7 +204,7 @@ class NodePanel extends JPanel
 	 * @param file the file to get the icon from.
 	 * @return an <code>ImageIcon</code> instance.
 	 */
-	public static ImageIcon loadImage(String file)
+	public static ImageIcon loadImage(final String file)
 	{
 		int MAX_IMAGE_SIZE = 15000;
 		int count = 0;
@@ -234,7 +234,7 @@ class NodePanel extends JPanel
 		}
 		return new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
 	}
-	
+
 	/**
 	 * Free resources used by the nodes.
 	 */
@@ -248,17 +248,17 @@ class NodePanel extends JPanel
 		{
 		}
 	}
-	
+
 	/**
 	 * Used to nicely format integer values.
 	 */
 	private static NumberFormat integerFormatter = null;
 	/**
 	 * Tranform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
-	 * @param elapsed the duration to transform, expressed in milliseconds.
+	 * @param duration the duration to transform, expressed in milliseconds.
 	 * @return a string specifiying the duration in terms of hours, minutes, seconds and milliseconds.
 	 */
-	public static String toStringDuration(long elapsed)
+	public static String toStringDuration(final long duration)
 	{
 		if (integerFormatter == null)
 		{
@@ -269,6 +269,7 @@ class NodePanel extends JPanel
 			integerFormatter.setMinimumIntegerDigits(2);
 		}
 
+		long elapsed = duration;
 		StringBuilder sb = new StringBuilder();
 		sb.append(integerFormatter.format(elapsed / 3600000L)).append(" hrs ");
 		elapsed = elapsed % 3600000L;

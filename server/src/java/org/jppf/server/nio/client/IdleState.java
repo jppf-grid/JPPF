@@ -43,7 +43,7 @@ class IdleState extends ClientServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public IdleState(ClientNioServer server)
+	public IdleState(final ClientNioServer server)
 	{
 		super(server);
 	}
@@ -56,7 +56,7 @@ class IdleState extends ClientServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClientTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public ClientTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (debugEnabled) log.debug("exec() for " + wrapper);
 		if (CHECK_CONNECTION && wrapper.isReadable())

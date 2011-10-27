@@ -29,28 +29,28 @@ import javax.resource.cci.*;
 public class JPPFRecordFactory implements RecordFactory
 {
 	/**
-	 * Not supported. 
+	 * Not supported.
 	 * @param name not used.
 	 * @return nothing.
 	 * @throws ResourceException always.
 	 * @see javax.resource.cci.RecordFactory#createIndexedRecord(java.lang.String)
 	 */
 	@Override
-    public IndexedRecord createIndexedRecord(final String name) throws ResourceException
+	public IndexedRecord createIndexedRecord(final String name) throws ResourceException
 	{
-    throw new NotSupportedException("Method not supported");
+		throw new NotSupportedException("Method not supported");
 	}
 
 	/**
-	 * Not supported. 
+	 * Not supported.
 	 * @param name not used.
 	 * @return nothing.
 	 * @throws ResourceException always.
 	 * @see javax.resource.cci.RecordFactory#createMappedRecord(java.lang.String)
 	 */
 	@Override
-    public MappedRecord createMappedRecord(final String name) throws ResourceException
+	public MappedRecord createMappedRecord(final String name) throws ResourceException
 	{
-    throw new NotSupportedException("Method not supported");
-  }
+		throw new NotSupportedException("Method not supported");
+	}
 }

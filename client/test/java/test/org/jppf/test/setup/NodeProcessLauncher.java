@@ -28,7 +28,7 @@ public class NodeProcessLauncher extends GenericProcessLauncher
 	 * Initialize the node launcher with the specified node id.
 	 * @param n the id of the node, used to determine which cnfiguration files to use.
 	 */
-	public NodeProcessLauncher(int n)
+	public NodeProcessLauncher(final int n)
 	{
 		super();
 		setMainClass("org.jppf.node.NodeRunner");

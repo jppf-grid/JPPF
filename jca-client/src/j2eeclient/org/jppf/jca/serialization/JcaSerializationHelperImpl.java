@@ -45,7 +45,7 @@ public class JcaSerializationHelperImpl extends SerializationHelperImpl
 	 * @see org.jppf.utils.SerializationHelper#getSerializer()
 	 */
 	@Override
-    public ObjectSerializer getSerializer() throws Exception
+	public ObjectSerializer getSerializer() throws Exception
 	{
 		if (serializer == null)
 		{

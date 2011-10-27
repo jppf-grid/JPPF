@@ -60,7 +60,7 @@ public abstract class AbstractSocketChannelHandler
 	 * Initialize this socket channel handler.
 	 * @param server the NioServer to which the channel is registred.
 	 */
-	public AbstractSocketChannelHandler(NioServer server)
+	public AbstractSocketChannelHandler(final NioServer server)
 	{
 		this.server = server;
 	}
@@ -71,7 +71,7 @@ public abstract class AbstractSocketChannelHandler
 	 * @param host the remote host to connect to.
 	 * @param port the port to connect to on the remote host.
 	 */
-	public AbstractSocketChannelHandler(NioServer server, String host, int port)
+	public AbstractSocketChannelHandler(final NioServer server, final String host, final int port)
 	{
 		this(server);
 		this.host = host;

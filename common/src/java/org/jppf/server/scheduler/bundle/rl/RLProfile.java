@@ -23,7 +23,7 @@ import org.jppf.server.scheduler.bundle.autotuned.AbstractAutoTuneProfile;
 import org.jppf.utils.*;
 
 /**
- * Parameters profile for a proportional bundler. 
+ * Parameters profile for a proportional bundler.
  * @author Laurent Cohen
  */
 public class RLProfile extends AbstractAutoTuneProfile
@@ -52,7 +52,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * Initialize this profile with values read from the configuration file.
 	 * @param profileName name of the profile in the configuration file.
 	 */
-	public RLProfile(String profileName)
+	public RLProfile(final String profileName)
 	{
 		String prefix = "strategy." + profileName + '.';
 		TypedProperties props = JPPFConfiguration.getProperties();
@@ -65,7 +65,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * Initialize this profile with values read from the specified configuration.
 	 * @param config contains a mapping of the profile parameters to their value.
 	 */
-	public RLProfile(TypedProperties config)
+	public RLProfile(final TypedProperties config)
 	{
 		performanceCacheSize = config.getInt("performanceCacheSize", 2000);
 		performanceVariationThreshold = config.getDouble("performanceVariationThreshold", 0.05);
@@ -78,7 +78,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
 	@Override
-    public LoadBalancingProfile copy()
+	public LoadBalancingProfile copy()
 	{
 		RLProfile other = new RLProfile();
 		other.setPerformanceCacheSize(performanceCacheSize);
@@ -100,7 +100,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * Set the maximum size of the performance samples cache.
 	 * @param performanceCacheSize - the cache size as an int.
 	 */
-	public void setPerformanceCacheSize(int performanceCacheSize)
+	public void setPerformanceCacheSize(final int performanceCacheSize)
 	{
 		this.performanceCacheSize = performanceCacheSize;
 	}
@@ -118,7 +118,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * Get the variation of the mean execution time that triggers a change in bundle size.
 	 * @param performanceVariationThreshold - the variation as a double value.
 	 */
-	public void setPerformanceVariationThreshold(double performanceVariationThreshold)
+	public void setPerformanceVariationThreshold(final double performanceVariationThreshold)
 	{
 		this.performanceVariationThreshold = performanceVariationThreshold;
 	}
@@ -136,7 +136,7 @@ public class RLProfile extends AbstractAutoTuneProfile
 	 * Get the absolute value of the maximum increase of the the bundle size.
 	 * @param maxActionRange - the value as an int.
 	 */
-	public void setMaxActionRange(int maxActionRange)
+	public void setMaxActionRange(final int maxActionRange)
 	{
 		this.maxActionRange = maxActionRange;
 	}

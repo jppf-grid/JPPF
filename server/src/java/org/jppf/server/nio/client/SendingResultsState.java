@@ -48,7 +48,7 @@ class SendingResultsState extends ClientServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendingResultsState(ClientNioServer server)
+	public SendingResultsState(final ClientNioServer server)
 	{
 		super(server);
 	}
@@ -61,7 +61,7 @@ class SendingResultsState extends ClientServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClientTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
 		if (CHECK_CONNECTION && channel.isReadable())

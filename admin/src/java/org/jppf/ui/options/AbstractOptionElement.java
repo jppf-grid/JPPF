@@ -54,7 +54,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @see org.jppf.ui.options.OptionElement#getParent()
 	 */
 	@Override
-    public OptionElement getParent()
+	public OptionElement getParent()
 	{
 		return parent;
 	}
@@ -63,7 +63,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * Set the parent panel for this option.
 	 * @param parent an <code>ElementOption</code> instance.
 	 */
-	public void setParent(OptionElement parent)
+	public void setParent(final OptionElement parent)
 	{
 		this.parent = parent;
 		if (parent == null) root = null;
@@ -71,11 +71,11 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 
 	/**
 	 * Get the root of the option tree this option belongs to.
-	 * @return a <code>OptionElement</code> instance. 
+	 * @return a <code>OptionElement</code> instance.
 	 * @see org.jppf.ui.options.OptionElement#getRoot()
 	 */
 	@Override
-    public OptionElement getRoot()
+	public OptionElement getRoot()
 	{
 		OptionElement elt = this;
 		while (elt.getParent() != null) elt = elt.getParent();
@@ -85,11 +85,11 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 
 	/**
 	 * Get the path of this element in the option tree.
-	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
+	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances.
 	 * @see org.jppf.ui.options.OptionElement#getPath()
 	 */
 	@Override
-    public TreePath getPath()
+	public TreePath getPath()
 	{
 		List<OptionElement> list = new ArrayList<OptionElement>();
 		OptionElement elt = this;
@@ -103,11 +103,11 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 
 	/**
 	 * Get the path of this element in the option tree.
-	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
+	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances.
 	 * @see org.jppf.ui.options.OptionElement#getPath()
 	 */
 	@Override
-    public String getStringPath()
+	public String getStringPath()
 	{
 		List<String> list = new ArrayList<String>();
 		OptionElement elt = this;
@@ -117,7 +117,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 			elt = elt.getParent();
 		}
 		StringBuilder sb = new StringBuilder("/");
-        for (String aList : list) sb.append('/').append(aList);
+		for (String aList : list) sb.append('/').append(aList);
 		return sb.toString();
 	}
 
@@ -125,11 +125,11 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * Find the element with the specified path in the options tree. The path can be absolute,
 	 * in which case it starts with a &quote;/&quote, otherwise it is considered relative to the requesting element.
 	 * @param path the path of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied path. 
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied path.
 	 * @see org.jppf.ui.options.OptionElement#findElement(java.lang.String)
 	 */
 	@Override
-    public OptionElement findElement(String path)
+	public OptionElement findElement(final String path)
 	{
 		if (path == null) return null;
 		else if ("".equals(path)) return this;
@@ -152,7 +152,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @return the child with the specified name, or null if this element is not an option page, or if no child
 	 * was found with the given name.
 	 */
-	protected OptionElement getChildForName(String childName)
+	protected OptionElement getChildForName(final String childName)
 	{
 		if (!(this instanceof OptionsPage)) return null;
 		OptionsPage page = 	(OptionsPage) this;
@@ -169,7 +169,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append('[').append((this instanceof OptionsPage) ? "Page" : "Option").append(" : ");
@@ -181,47 +181,43 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	}
 
 	/**
-	 * Find all the elements with the specified name in the subtree of which this element is the root. 
+	 * Find all the elements with the specified name in the subtree of which this element is the root.
 	 * @param name the name of the elements to find.
 	 * @return a list of <code>OptionElement</code> instances, or null if no element
 	 * could be found with the specfied name. The resulting list can be empty, but never null.
 	 * @see org.jppf.ui.options.OptionElement#findAllWithName(java.lang.String)
 	 */
 	@Override
-    public List<OptionElement> findAllWithName(String name)
+	public List<OptionElement> findAllWithName(final String name)
 	{
-		if (name.startsWith("/"))
-		{
-			name = name.substring(1);
-			return getRoot().findAllWithName(name);
-		}
+		if (name.startsWith("/")) return getRoot().findAllWithName(name.substring(1));
 		List<OptionElement> list = new ArrayList<OptionElement>();
 		findAll(name, list);
 		return list;
 	}
 
 	/**
-	 * Find the first element with the specified name in the subtree of which this element is the root. 
+	 * Find the first element with the specified name in the subtree of which this element is the root.
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
 	 * @see org.jppf.ui.options.OptionElement#findFirstWithName(java.lang.String)
 	 */
 	@Override
-    public OptionElement findFirstWithName(String name)
+	public OptionElement findFirstWithName(final String name)
 	{
 		List<OptionElement> list = findAllWithName(name);
 		return list.isEmpty() ? null : list.get(0);
 	}
 
 	/**
-	 * Find the last element with the specified name in the subtree of which this element is the root. 
-	 * The notion of last element relates to a depth-first search in the tree. 
+	 * Find the last element with the specified name in the subtree of which this element is the root.
+	 * The notion of last element relates to a depth-first search in the tree.
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
 	 * @see org.jppf.ui.options.OptionElement#findLastWithName(java.lang.String)
 	 */
 	@Override
-    public OptionElement findLastWithName(String name)
+	public OptionElement findLastWithName(final String name)
 	{
 		List<OptionElement> list = findAllWithName(name);
 		return list.isEmpty() ? null : list.get(list.size() - 1);
@@ -229,12 +225,12 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 
 	/**
 	 * Find all the elements with the specified name in the subtree of which
-	 * this element is the root. 
+	 * this element is the root.
 	 * @param name the name of the elements to find.
 	 * @param list a list of <code>OptionElement</code> instances, to fill with the elements found.
 	 * could be found with the specfied name. The resulting list can be empty, but never null.
 	 */
-	protected void findAll(String name, List<OptionElement> list)
+	protected void findAll(final String name, final List<OptionElement> list)
 	{
 		if (name.equals(getName())) list.add(this);
 		if (this instanceof OptionsPage)

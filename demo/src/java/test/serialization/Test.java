@@ -37,7 +37,7 @@ public class Test
 	 * Main entry point.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{
@@ -92,7 +92,7 @@ public class Test
 	 * Print a string.
 	 * @param s the string to print.
 	 */
-	private static void print(String s)
+	private static void print(final String s)
 	{
 		System.out.println(s);
 	}
@@ -103,7 +103,7 @@ public class Test
 	 * @return the qseuialized object as a byte array.
 	 * @throws Exception if any error occurs.
 	 */
-	public byte[] serialize(Object o) throws Exception
+	public byte[] serialize(final Object o) throws Exception
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		JPPFObjectOutputStream joos = new JPPFObjectOutputStream(baos);
@@ -117,7 +117,7 @@ public class Test
 	 * @return an Object.
 	 * @throws Exception if any error occurs.
 	 */
-	public Object deserialize(byte[] data) throws Exception
+	public Object deserialize(final byte[] data) throws Exception
 	{
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		JPPFObjectInputStream jois = new JPPFObjectInputStream(bais);

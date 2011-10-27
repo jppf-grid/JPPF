@@ -17,10 +17,10 @@
  */
 package org.jppf.classloader;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -64,7 +64,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 */
 	protected List<String> uuidPath = new ArrayList<String>();
 	/**
-	 * Uuid of the orignal task bundle that triggered a resource loading request. 
+	 * Uuid of the orignal task bundle that triggered a resource loading request.
 	 */
 	protected String requestUuid = null;
 	/**
@@ -80,7 +80,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 * Initialize this class loader with a parent class loader.
 	 * @param parent a ClassLoader instance.
 	 */
-	protected AbstractJPPFClassLoaderLifeCycle(ClassLoader parent)
+	protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent)
 	{
 		super(StringUtils.ZERO_URL, parent);
 		if (parent instanceof AbstractJPPFClassLoaderLifeCycle) dynamic = true;
@@ -91,7 +91,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 * @param parent a ClassLoader instance.
 	 * @param uuidPath unique identifier for the submitting application.
 	 */
-	protected AbstractJPPFClassLoaderLifeCycle(ClassLoader parent, List<String> uuidPath)
+	protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent, final List<String> uuidPath)
 	{
 		this(parent);
 		this.uuidPath = uuidPath;
@@ -102,18 +102,18 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 */
 	protected abstract void init();
 	/**
-	 * Reset and reinitialize the connection ot the server. 
+	 * Reset and reinitialize the connection ot the server.
 	 */
 	public abstract void reset();
 
 	/**
 	 * Load the specified class from a socket connection.
 	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
 	 */
-	protected JPPFResourceWrapper loadResourceData(Map<String, Object> map, boolean asResource) throws ClassNotFoundException
+	protected JPPFResourceWrapper loadResourceData(final Map<String, Object> map, final boolean asResource) throws ClassNotFoundException
 	{
 		JPPFResourceWrapper resource = null;
 		try
@@ -140,11 +140,11 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	/**
 	 * Load the specified class from a socket connection.
 	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
-	protected  JPPFResourceWrapper loadResourceData0(Map<String, Object> map, boolean asResource) throws Exception
+	protected  JPPFResourceWrapper loadResourceData0(final Map<String, Object> map, final boolean asResource) throws Exception
 	{
 		if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "], requestUuid = " + requestUuid);
 		JPPFResourceWrapper resource = loadRemoteData(map, false);
@@ -155,7 +155,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	/**
 	 * Load the specified class from a socket connection.
 	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
@@ -174,16 +174,16 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 * Set the socket client initialization status.
 	 * @param initFlag true if the socket client is being initialized, false otherwise.
 	 */
-	static void setInitializing(boolean initFlag)
+	static void setInitializing(final boolean initFlag)
 	{
 		INITIALIZING.set(initFlag);
 	}
 
 	/**
-	 * Set the uuid for the orignal task bundle that triggered this resource request. 
+	 * Set the uuid for the orignal task bundle that triggered this resource request.
 	 * @param requestUuid the uuid as a string.
 	 */
-	public void setRequestUuid(String requestUuid)
+	public void setRequestUuid(final String requestUuid)
 	{
 		this.requestUuid = requestUuid;
 	}
@@ -208,7 +208,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void addURL(URL url)
+	public void addURL(final URL url)
 	{
 		super.addURL(url);
 	}
@@ -220,7 +220,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	protected abstract class AbstractResourceRequest implements Runnable
 	{
 		/**
-		 * Used to collect any throwable raised during communication with the server. 
+		 * Used to collect any throwable raised during communication with the server.
 		 */
 		protected Throwable throwable = null;
 		/**
@@ -236,13 +236,13 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 		 * Initialize with the specified request.
 		 * @param request the request to send.
 		 */
-		public AbstractResourceRequest(JPPFResourceWrapper request)
+		public AbstractResourceRequest(final JPPFResourceWrapper request)
 		{
 			this.request = request;
 		}
 
 		/**
-		 * Get the throwable eventually raised during communication with the server. 
+		 * Get the throwable eventually raised during communication with the server.
 		 * @return a {@link Throwable} instance.
 		 */
 		public Throwable getThrowable()

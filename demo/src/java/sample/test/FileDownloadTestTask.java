@@ -35,7 +35,7 @@ public class FileDownloadTestTask extends JPPFTestTask
 	 * Initialize this task with the location of a file to download.
 	 * @param location the file URL as a string.
 	 */
-	public FileDownloadTestTask(String location)
+	public FileDownloadTestTask(final String location)
 	{
 		this.location = location;
 	}

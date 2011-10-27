@@ -74,7 +74,7 @@ public class ThumbnailGenerator
 	 * @param width the width of the generated thumbnails.
 	 * @param height the height of the generated thumbnails.
 	 */
-	public ThumbnailGenerator(String path, int width, int height)
+	public ThumbnailGenerator(final String path, final int width, final int height)
 	{
 		this(path, width, height, DEFAULT_INCLUDE_PATH, DEFAULT_ROW_LENGTH);
 	}
@@ -87,7 +87,7 @@ public class ThumbnailGenerator
 	 * @param height the height of the generated thumbnails.
 	 * @param rowLength the number of thumbnails per row.
 	 */
-	public ThumbnailGenerator(String path, int width, int height, int rowLength)
+	public ThumbnailGenerator(final String path, final int width, final int height, final int rowLength)
 	{
 		this(path, width, height, DEFAULT_INCLUDE_PATH, rowLength);
 	}
@@ -101,7 +101,7 @@ public class ThumbnailGenerator
 	 * @param includePath the generated file to include in the screenshots php page.
 	 * @param rowLength the number of thumbnails per row..
 	 */
-	public ThumbnailGenerator(String path, int width, int height, String includePath, int rowLength)
+	public ThumbnailGenerator(final String path, final int width, final int height, final String includePath, final int rowLength)
 	{
 		this.path = path;
 		this.width = width;
@@ -194,7 +194,7 @@ public class ThumbnailGenerator
 	 * @param img the image to scaled.
 	 * @return a scaled version of the input image.
 	 */
-	private BufferedImage scale(BufferedImage img)
+	private BufferedImage scale(final BufferedImage img)
 	{
 		int w = img.getWidth();
 		int h = img.getHeight();
@@ -214,12 +214,12 @@ public class ThumbnailGenerator
 		 * An array of the accepted extensions.
 		 */
 		private String[] extensions = null;
-		
+
 		/**
 		 * Initialize this filter witht he specified extensions.
 		 * @param extensions an array of the accepted extensions.
 		 */
-		public ImageFileFilter(String...extensions)
+		public ImageFileFilter(final String...extensions)
 		{
 			this.extensions = extensions;
 		}
@@ -231,7 +231,7 @@ public class ThumbnailGenerator
 		 * @see java.io.FileFilter#accept(java.io.File)
 		 */
 		@Override
-        public boolean accept(File file)
+		public boolean accept(final File file)
 		{
 			String ext = FileUtils.getFileExtension(file);
 			if (file.getName().startsWith(TH_PREFIX)) return false;
@@ -247,17 +247,17 @@ public class ThumbnailGenerator
 	 * Perform the thumbnail generation.
 	 * @param args contains in that order: root path, thumbnail width, thumbnail height.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
 			String path = args[0];
 			int width = Integer.valueOf(args[1]);
 			int height = Integer.valueOf(args[2]);
-			String includePath = args[3]; 
+			String includePath = args[3];
 			int rowLength = Integer.valueOf(args[4]);
 			System.out.println("Using folder = " + path + ", max width = " + width + ", max height = " + height +
-				", include file path = " + includePath + ", thumbnails per row = " + rowLength);
+					", include file path = " + includePath + ", thumbnails per row = " + rowLength);
 			ThumbnailGenerator tg = new ThumbnailGenerator(path, width, height, includePath, rowLength);
 			tg.generate();
 			System.out.println("finished");

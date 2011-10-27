@@ -29,16 +29,16 @@ public class TextPropertiesTableFormat extends PropertiesTableFormat
 	 * Initialize this formatter with the specified title.
 	 * @param docTitle the title of the whole document.
 	 */
-	public TextPropertiesTableFormat(String docTitle)
+	public TextPropertiesTableFormat(final String docTitle)
 	{
 		super(docTitle);
 	}
-	
+
 	/**
 	 * Write the prologue for the formatted text.
 	 */
 	@Override
-    public void start()
+	public void start()
 	{
 		sb.append(docTitle).append('\n');
 	}
@@ -48,7 +48,7 @@ public class TextPropertiesTableFormat extends PropertiesTableFormat
 	 * @param title the title for the table.
 	 */
 	@Override
-    public void tableStart(String title)
+	public void tableStart(final String title)
 	{
 		sb.append("\n\n").append(title).append("\n\n");
 	}
@@ -57,7 +57,7 @@ public class TextPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the prologue of a table row.
 	 */
 	@Override
-    public void rowEnd()
+	public void rowEnd()
 	{
 		sb.append('\n');
 	}
@@ -66,7 +66,7 @@ public class TextPropertiesTableFormat extends PropertiesTableFormat
 	 * Write the separator between 2 cells.
 	 */
 	@Override
-    public void cellSeparator()
+	public void cellSeparator()
 	{
 		sb.append(" = ");
 	}

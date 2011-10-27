@@ -83,18 +83,18 @@ public class LoadBalancer
 	/**
 	 * Default constructor.
 	 */
-  @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public LoadBalancer()
 	{
 		if (isLocalEnabled()) initLocal();
 	}
 
-  /**
-   * Perform the required initialization for local execution.
-   */
-  private synchronized void initLocal()
-  {
-  	if (localInitialized) return;
+	/**
+	 * Perform the required initialization for local execution.
+	 */
+	private synchronized void initLocal()
+	{
+		if (localInitialized) return;
 		int n = Runtime.getRuntime().availableProcessors();
 		int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
 		log.info("local execution enabled with " + poolSize + " processing threads");
@@ -111,8 +111,8 @@ public class LoadBalancer
 			for (Bundler b: bundlers) b.setup();
 		}
 		localInitialized = true;
-  }
- 
+	}
+
 	/**
 	 * Stop this load-balancer and cleanup any resource it uses.
 	 */
@@ -129,7 +129,7 @@ public class LoadBalancer
 	 * @param localJob determines whether the job will be executed locally, at least partially.
 	 * @throws Exception if an error is raised during execution.
 	 */
-	public void execute(JobSubmission jobSubmission, AbstractJPPFClientConnection connection, boolean localJob) throws Exception
+	public void execute(final JobSubmission jobSubmission, final AbstractJPPFClientConnection connection, final boolean localJob) throws Exception
 	{
 		//if (isLocalEnabled() && !locallyExecuting.get())
 		JPPFJob job = jobSubmission.getJob();
@@ -196,10 +196,10 @@ public class LoadBalancer
 
 	/**
 	 * Compute the sum of the elements of an int array.
-	 * @param array the input array. 
+	 * @param array the input array.
 	 * @return the result sum as an int value.
 	 */
-	private int sum(int[] array)
+	private int sum(final int[] array)
 	{
 		int sum = 0;
 		for (int anArray : array) sum += anArray;
@@ -222,7 +222,7 @@ public class LoadBalancer
 	 * Specifiy whether local execution is enabled on this client.
 	 * @param localEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
 	 */
-	public void setLocalEnabled(boolean localEnabled)
+	public void setLocalEnabled(final boolean localEnabled)
 	{
 		synchronized(this)
 		{
@@ -247,7 +247,7 @@ public class LoadBalancer
 	 * Specify whether this load balancer is currently executing a job locally.
 	 * @param locallyExecuting <code>true</code> if a local job is being executed, <code>false</code> otherwise.
 	 */
-	public void setLocallyExecuting(boolean locallyExecuting)
+	public void setLocallyExecuting(final boolean locallyExecuting)
 	{
 		synchronized(getAvailableConnectionLock())
 		{

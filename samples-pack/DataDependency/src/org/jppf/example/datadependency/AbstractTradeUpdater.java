@@ -27,7 +27,7 @@ import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -54,7 +54,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	 */
 	protected TypedProperties config = JPPFConfiguration.getProperties();
 	/**
-	 * Handles the distributed market data. 
+	 * Handles the distributed market data.
 	 */
 	protected MarketDataHandler marketDataHandler = new MarketDataHandler();
 	/**
@@ -118,7 +118,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		marketDataList = dataFactory.generateDataMarketObjects(config.getInt("nbMarketData", 10));
 		// generate random trades
 		List<Trade> tradeList = dataFactory.generateTradeObjects(config.getInt("nbTrades", 10), marketDataList,
-			config.getInt("minDataPerTrade", 1), config.getInt("maxDataPerTrade", 5));
+				config.getInt("minDataPerTrade", 1), config.getInt("maxDataPerTrade", 5));
 		// initialize the nodes: collect their id and send them the current market data
 		marketDataHandler.populateMarketData(marketDataList);
 		List<String> idList = getNodeIds();
@@ -158,7 +158,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	 * Print a message to the log and to the system standard output.
 	 * @param s the message to print.
 	 */
-	protected void print(String s)
+	protected void print(final String s)
 	{
 		System.out.println(s);
 		log.info(s);
@@ -182,17 +182,17 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * Initialize this task with the specified market data.
 		 * @param marketData the updated market data.
 		 */
-		public SubmissionTask(MarketData...marketData)
+		public SubmissionTask(final MarketData...marketData)
 		{
 			this.marketData = marketData;
 		}
-	
+
 		/**
 		 * Submits a job.
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -240,7 +240,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * @param tradeIdList the list of impacted trades to recompute on the node.
 		 * @throws Exception if any error occurs.
 		 */
-		private void submitOneJobPerNode(String nodeId, List<String> tradeIdList) throws Exception
+		private void submitOneJobPerNode(final String nodeId, final List<String> tradeIdList) throws Exception
 		{
 			JPPFJob job = new JPPFJob();
 			job.setName("Job (" + jobCount.incrementAndGet() + ")");
@@ -262,7 +262,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * @param tardeIdList the list of impacted trades to recompute on the node.
 		 * @throws Exception if any error occurs.
 		 */
-		private void submitOneJobPerTrade(String nodeId, List<String> tardeIdList) throws Exception
+		private void submitOneJobPerTrade(final String nodeId, final List<String> tardeIdList) throws Exception
 		{
 			ExecutionPolicy policy = new Equal("jppf.uuid", false, nodeId);
 			// create a job for each trade
@@ -286,7 +286,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * @param tradeId the trade t recompute.
 		 * @return a new <code>TradeUpdateTask</code> instance.
 		 */
-		private TradeUpdateTask createTask(String tradeId)
+		private TradeUpdateTask createTask(final String tradeId)
 		{
 			TradeUpdateTask task = new TradeUpdateTask(tradeId);
 			task.setTaskDuration(dataFactory.getRandomInt(minTaskDuration, maxTaskDuration));
@@ -313,18 +313,18 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * @param collector the object from which to get the results.
 		 * @param timestamp the event notification timestamp.
 		 */
-		public ResultCollectionTask(JPPFResultCollector collector, long timestamp)
+		public ResultCollectionTask(final JPPFResultCollector collector, final long timestamp)
 		{
 			this.collector = collector;
 			this.timestamp = timestamp;
 		}
-	
+
 		/**
 		 * Process a set of results.
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{

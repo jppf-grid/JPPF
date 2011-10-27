@@ -43,7 +43,7 @@ class SendInitialBundleState extends NodeServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendInitialBundleState(NodeNioServer server)
+	public SendInitialBundleState(final NodeNioServer server)
 	{
 		super(server);
 	}
@@ -56,7 +56,7 @@ class SendInitialBundleState extends NodeServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (CHECK_CONNECTION && wrapper.isReadable())

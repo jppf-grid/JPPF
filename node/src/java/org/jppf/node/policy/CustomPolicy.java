@@ -20,7 +20,7 @@ package org.jppf.node.policy;
 
 
 /**
- * Abstract superclass for all user-defined policies. 
+ * Abstract superclass for all user-defined policies.
  * @author Laurent Cohen
  */
 public abstract class CustomPolicy extends ExecutionPolicy
@@ -38,7 +38,7 @@ public abstract class CustomPolicy extends ExecutionPolicy
 	 * Initialize this policy with the specified arguments.
 	 * @param args the user-defined arguments for this policy.
 	 */
-	public CustomPolicy(String...args)
+	public CustomPolicy(final String...args)
 	{
 		this.args = args;
 	}
@@ -65,7 +65,7 @@ public abstract class CustomPolicy extends ExecutionPolicy
 	 * Set the arguments of this policy.
 	 * @param args the arguments as an array of strings.
 	 */
-	public final void setArgs(String...args)
+	public final void setArgs(final String...args)
 	{
 		this.args = args;
 	}
@@ -76,7 +76,7 @@ public abstract class CustomPolicy extends ExecutionPolicy
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		if (computedToString == null)
 		{

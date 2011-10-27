@@ -70,7 +70,7 @@ public class Reaper
 	 * @param poolSize this reaper's thread pool size.
 	 * @param runInterval the interval between two runs of this reaper.
 	 */
-	public Reaper(RecoveryServer server, int poolSize, long runInterval)
+	public Reaper(final RecoveryServer server, final int poolSize, final long runInterval)
 	{
 		this.server = server;
 		this.poolSize = poolSize;
@@ -89,7 +89,7 @@ public class Reaper
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				connection.run();
 				checkConnection(connection);
@@ -103,7 +103,7 @@ public class Reaper
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add.
 	 */
-	public void addReaperListener(ReaperListener listener)
+	public void addReaperListener(final ReaperListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)
@@ -116,7 +116,7 @@ public class Reaper
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to remove.
 	 */
-	public void removeReaperListener(ReaperListener listener)
+	public void removeReaperListener(final ReaperListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)
@@ -129,7 +129,7 @@ public class Reaper
 	 * Notify all listeners that a connection has failed.
 	 * @param connection the server-side connection that failed.
 	 */
-	private void fireReaperEvent(ServerConnection connection)
+	private void fireReaperEvent(final ServerConnection connection)
 	{
 		ReaperEvent event = new ReaperEvent(connection);
 		synchronized (listeners)
@@ -142,7 +142,7 @@ public class Reaper
 	 * Check a connection after an attempt to reach the remote peer.
 	 * @param connection the conenction to check.
 	 */
-	private void checkConnection(ServerConnection connection)
+	private void checkConnection(final ServerConnection connection)
 	{
 		if (!connection.isOk())
 		{
@@ -165,7 +165,7 @@ public class Reaper
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			ServerConnection[] connections = server.connections();
 			List<Future<?>> futures = new ArrayList<Future<?>>(connections.length);

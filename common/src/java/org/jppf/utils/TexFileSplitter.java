@@ -35,7 +35,7 @@ public class TexFileSplitter
 	 * Split the input text files into output text files according to the specified options.
 	 * @param args specifies the options in the format -&lt;option1&gt; &lt;value1&gt; ... -&lt;optionN&gt; &lt;valueN&gt;.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{
@@ -85,7 +85,7 @@ public class TexFileSplitter
 	 * @param args contains the specified options and their value.
 	 * @throws Exception if any error occurs while parsing the options.
 	 */
-	private static void processArguments(String...args) throws Exception
+	private static void processArguments(final String...args) throws Exception
 	{
 		if ((args == null) || (args.length < 1)) throw new Exception("you must specify at least the input file (-i option)");
 		int i = 0;

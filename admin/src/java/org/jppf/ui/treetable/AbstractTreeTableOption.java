@@ -46,7 +46,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 */
 	protected DefaultMutableTreeNode treeTableRoot = null;
 	/**
-	 * A tree table component displaying the driver and nodes information. 
+	 * A tree table component displaying the driver and nodes information.
 	 */
 	protected JPPFTreeTable treeTable = null;
 	/**
@@ -59,13 +59,13 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * @return a <code>JTreeTableActionHandler</code> instance.
 	 */
 	@Override
-    public JTreeTableActionHandler getActionHandler()
+	public JTreeTableActionHandler getActionHandler()
 	{
 		return actionHandler;
 	}
 
 	/**
-	 * Get the tree table component displaying the driver and nodes information. 
+	 * Get the tree table component displaying the driver and nodes information.
 	 * @return a <code>JPPFTreeTable</code> instance.
 	 */
 	public JPPFTreeTable getTreeTable()
@@ -79,7 +79,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 	}
 
@@ -89,7 +89,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
 	@Override
-    public void setEventsEnabled(boolean enabled)
+	public void setEventsEnabled(final boolean enabled)
 	{
 	}
 
@@ -98,17 +98,17 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
 	/**
 	 * Get a localized message given its unique name and the current locale.
 	 * @param message - the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
+	 * @return a message in the current locale, or the default locale
+	 * if the localization for the current locale is not found.
 	 */
-	protected String localize(String message)
+	protected String localize(final String message)
 	{
 		return LocalizationUtils.getLocalized(BASE, message);
 	}

@@ -47,7 +47,7 @@ public class QueueStats implements Serializable
 	 * Initialize this queue snapshot with a specified title.
 	 * @param title the title for this snapshot.
 	 */
-	public QueueStats(String title)
+	public QueueStats(final String title)
 	{
 		this.title = title;
 		times = new StatsSnapshot(title);
@@ -66,7 +66,7 @@ public class QueueStats implements Serializable
 	 * Set the time snapshot.
 	 * @param sizes a {@link StatsSnapshot} instance.
 	 */
-	public void setSizes(StatsSnapshot sizes)
+	public void setSizes(final StatsSnapshot sizes)
 	{
 		this.sizes = sizes;
 	}
@@ -84,7 +84,7 @@ public class QueueStats implements Serializable
 	 * Set the time snapshot.
 	 * @param times a {@link StatsSnapshot} instance.
 	 */
-	public void setTimes(StatsSnapshot times)
+	public void setTimes(final StatsSnapshot times)
 	{
 		this.times = times;
 	}
@@ -102,7 +102,7 @@ public class QueueStats implements Serializable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(title).append(" queue");

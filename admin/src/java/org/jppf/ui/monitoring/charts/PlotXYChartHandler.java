@@ -42,7 +42,7 @@ public class PlotXYChartHandler implements ChartHandler
 	 * Initialize this chart handler with a specified stats formatter.
 	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public PlotXYChartHandler(StatsHandler statsHandler)
+	public PlotXYChartHandler(final StatsHandler statsHandler)
 	{
 		this.statsHandler = statsHandler;
 	}
@@ -54,14 +54,14 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration createChart(ChartConfiguration config)
+	public ChartConfiguration createChart(final ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		String s = config.name;
 		if (config.unit != null) s += " (" + config.unit + ')';
 		//JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
-			s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+				s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
 		//XYPlot plot = chart.getXYPlot();
 		Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
 		//XYItemRenderer rend = plot.getRenderer();
@@ -71,7 +71,7 @@ public class PlotXYChartHandler implements ChartHandler
 		invokeMethod(rendClass, rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
 		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
 		Object labelGenerator = Proxy.newProxyInstance(
-			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+				getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
 		invokeMethod(rendClass, rend, "setLegendItemLabelGenerator", labelGenerator);
 		//rend.setBaseStroke(new BasicStroke(2f));
 		invokeMethod(rendClass, rend, "setBaseStroke", new BasicStroke(2.0f));
@@ -84,7 +84,7 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private Object createDataset(ChartConfiguration config)
+	private Object createDataset(final ChartConfiguration config)
 	{
 		//XYSeriesCollection ds = new XYSeriesCollection();
 		Object ds = newInstance("org.jfree.data.xy.XYSeriesCollection");
@@ -101,7 +101,7 @@ public class PlotXYChartHandler implements ChartHandler
 		populateDataset(config);
 		return ds;
 	}
-	
+
 	/**
 	 * Populate a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to populate.
@@ -109,7 +109,7 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration populateDataset(ChartConfiguration config)
+	public ChartConfiguration populateDataset(final ChartConfiguration config)
 	{
 		//XYSeriesCollection ds= (XYSeriesCollection) config.dataset;
 		Object ds = config.dataset;
@@ -145,7 +145,7 @@ public class PlotXYChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration updateDataset(ChartConfiguration config)
+	public ChartConfiguration updateDataset(final ChartConfiguration config)
 	{
 		//XYSeriesCollection ds = (XYSeriesCollection) config.dataset;
 		Object ds = config.dataset;
@@ -178,7 +178,7 @@ public class PlotXYChartHandler implements ChartHandler
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
 		@Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
 		{
 			Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getSeriesKey", args[1]);
 			return StringUtils.shortenLabel(key.toString());

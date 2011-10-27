@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.example.datadependency.model.*;
 
 /**
- * Instances of this class generate random MarketData and Trade objects according tot he configuration. 
+ * Instances of this class generate random MarketData and Trade objects according tot he configuration.
  * @author Laurent Cohen
  */
 public abstract class AbstractDataFactory implements DataFactory
@@ -40,11 +40,12 @@ public abstract class AbstractDataFactory implements DataFactory
 	 * @return a pseudo-random number in the specified range.
 	 * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int, int)
 	 */
-	public int getRandomInt(int min, int max)
+	@Override
+	public int getRandomInt(final int min, final int max)
 	{
-		if (max < min) max = min;
-		if (max == min) return min;
-		return min + getRandomInt(max - min + 1);
+		int m = (max < min) ? min : max;
+		if (m == min) return min;
+		return min + getRandomInt(m - min + 1);
 	}
 
 	/**
@@ -54,13 +55,14 @@ public abstract class AbstractDataFactory implements DataFactory
 	 * @return a list of <code>MarketData</code> instances.
 	 * @see org.jppf.example.datadependency.simulation.DataFactory#generateDataMarketObjects(int)
 	 */
-	public List<MarketData> generateDataMarketObjects(int n)
+	@Override
+	public List<MarketData> generateDataMarketObjects(final int n)
 	{
 		List<MarketData> result = new ArrayList<MarketData>();
 		for (int i=1; i<=n; i++) result.add(new MarketData("D" + i));
 		return result;
 	}
-	
+
 	/**
 	 * Generate a list of trade objects with their dependencies.
 	 * Each generated object has an id in the format &quot;Tn&quot; where <i>n</i> is a sequence number.
@@ -73,7 +75,8 @@ public abstract class AbstractDataFactory implements DataFactory
 	 * @return a list of <code>Trade</code> instances.
 	 * @see org.jppf.example.datadependency.simulation.DataFactory#generateTradeObjects(int, java.util.List, int, int)
 	 */
-	public List<Trade> generateTradeObjects(int nbTrades, List<MarketData> dataList, int minData, int maxData)
+	@Override
+	public List<Trade> generateTradeObjects(final int nbTrades, final List<MarketData> dataList, final int minData, final int maxData)
 	{
 		List<Trade> result = new ArrayList<Trade>();
 		for (int i=1; i<nbTrades; i++)

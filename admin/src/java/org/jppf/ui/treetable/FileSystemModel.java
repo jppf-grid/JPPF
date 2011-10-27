@@ -25,16 +25,16 @@
  * conditions are met:
  * 
  * - Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer. 
- *   
+ *   notice, this list of conditions and the following disclaimer.
+ * 
  * - Redistribution in binary form must reproduce the above
  *   copyright notice, this list of conditions and the following
  *   disclaimer in the documentation and/or other materials
- *   provided with the distribution. 
- *   
+ *   provided with the distribution.
+ * 
  * Neither the name of Sun Microsystems, Inc. or the names of
  * contributors may be used to endorse or promote products derived
- * from this software without specific prior written permission.  
+ * from this software without specific prior written permission.
  * 
  * This software is provided "AS IS," without a warranty of any
  * kind. ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND
@@ -43,11 +43,11 @@
  * EXCLUDED. SUN AND ITS LICENSORS SHALL NOT BE LIABLE FOR ANY
  * DAMAGES OR LIABILITIES SUFFERED BY LICENSEE AS A RESULT OF OR
  * RELATING TO USE, MODIFICATION OR DISTRIBUTION OF THIS SOFTWARE OR
- * ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE 
- * FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT,   
- * SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER  
- * CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF 
- * THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF SUN HAS 
+ * ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE
+ * FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT,
+ * SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER
+ * CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF
+ * THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF SUN HAS
  * BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
  * 
  * You acknowledge that this software is not designed, licensed or
@@ -99,7 +99,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * @param node the node to get the file from.
 	 * @return a <code>File</code> instance.
 	 */
-	protected File getFile(Object node)
+	protected File getFile(final Object node)
 	{
 		FileNode fileNode = ((FileNode) node);
 		return fileNode.getFile();
@@ -110,7 +110,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * @param node the node to get the children of.
 	 * @return the children as an array of objects
 	 */
-	protected Object[] getChildren(Object node)
+	protected Object[] getChildren(final Object node)
 	{
 		FileNode fileNode = ((FileNode) node);
 		return fileNode.getChildren();
@@ -124,7 +124,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getChildCount(Object node)
+	public int getChildCount(final Object node)
 	{
 		Object[] children = getChildren(node);
 		return (children == null) ? 0 : children.length;
@@ -134,7 +134,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Object getChild(Object node, int i)
+	public Object getChild(final Object node, final int i)
 	{
 		return getChildren(node)[i];
 	}
@@ -143,7 +143,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean isLeaf(Object node)
+	public boolean isLeaf(final Object node)
 	{
 		// The superclass's implementation would work, but this is more efficient.
 		return getFile(node).isFile();
@@ -157,7 +157,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getColumnCount()
+	public int getColumnCount()
 	{
 		return cNames.length;
 	}
@@ -166,7 +166,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String getColumnName(int column)
+	public String getColumnName(final int column)
 	{
 		return cNames[column];
 	}
@@ -175,7 +175,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Class getColumnClass(int column)
+	public Class getColumnClass(final int column)
 	{
 		return cTypes[column];
 	}
@@ -184,7 +184,7 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Object getValueAt(Object node, int column)
+	public Object getValueAt(final Object node, final int column)
 	{
 		File file = getFile(node);
 		try
@@ -229,7 +229,7 @@ class FileNode
 	 * Initialize this node with thespecified file.
 	 * @param file the referenced file.
 	 */
-	public FileNode(File file)
+	public FileNode(final File file)
 	{
 		this.file = file;
 	}
@@ -238,7 +238,7 @@ class FileNode
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return file.getName();
 	}

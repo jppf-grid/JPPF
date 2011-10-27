@@ -28,28 +28,28 @@ public class PhoneNumber
 	 * Area code.
 	 */
 	private int code;
-  /**
-   * 7 digits number.
-   */
-  private String number;
+	/**
+	 * 7 digits number.
+	 */
+	private String number;
 
-  /**
-   * Default constructor.
-   */
-  public PhoneNumber()
-  {
-  }
- 
-  /**
-   * Initialize this object with the specified parameters.
-   * @param code the area code.
-   * @param number a 7 digits number.
-   */
-  public PhoneNumber(int code, String number)
-  {
-  	this.code = code;
-  	this.number = number;
-  }
+	/**
+	 * Default constructor.
+	 */
+	public PhoneNumber()
+	{
+	}
+
+	/**
+	 * Initialize this object with the specified parameters.
+	 * @param code the area code.
+	 * @param number a 7 digits number.
+	 */
+	public PhoneNumber(final int code, final String number)
+	{
+		this.code = code;
+		this.number = number;
+	}
 
 	/**
 	 * Get the area code.
@@ -64,13 +64,13 @@ public class PhoneNumber
 	 * Set the area code.
 	 * @param code the area code as an int.
 	 */
-	public void setCode(int code)
+	public void setCode(final int code)
 	{
 		this.code = code;
 	}
 
 	/**
-   * Get the 7 digits number.
+	 * Get the 7 digits number.
 	 * @return the number as a string.
 	 */
 	public String getNumber()
@@ -79,10 +79,10 @@ public class PhoneNumber
 	}
 
 	/**
-   * Set the 7 digits number.
+	 * Set the 7 digits number.
 	 * @param number the number as a string.
 	 */
-	public void setNumber(String number)
+	public void setNumber(final String number)
 	{
 		this.number = number;
 	}
@@ -93,7 +93,7 @@ public class PhoneNumber
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return "(" + code + ") " + number;
 	}

@@ -35,7 +35,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean read(ChannelWrapper<?> wrapper) throws Exception
+	public boolean read(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		//while (locations.isEmpty()) ((LocalNodeWrapperHandler) wrapper).goToSleep();
 		InputStream is = locations.get(0).getInputStream();
@@ -50,7 +50,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected synchronized boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
+	protected synchronized boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		return true;
 	}
@@ -59,7 +59,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean write(ChannelWrapper<?> wrapper) throws Exception
+	public boolean write(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		//((LocalNodeWrapperHandler) wrapper).wakeUp();
 		return true;
@@ -69,7 +69,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
+	protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		return true;
 	}

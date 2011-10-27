@@ -47,7 +47,7 @@ public class SimpleTask extends JPPFTask
 	 * Initialize this task.
 	 * @param duration specifies the duration of this task.
 	 */
-	public SimpleTask(long duration)
+	public SimpleTask(final long duration)
 	{
 		this.duration = duration;
 	}
@@ -56,7 +56,7 @@ public class SimpleTask extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

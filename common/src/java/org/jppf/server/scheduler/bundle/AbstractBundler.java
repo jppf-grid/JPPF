@@ -54,7 +54,7 @@ public abstract class AbstractBundler implements Bundler
 	 * Creates a new instance with the specified parameters profile.
 	 * @param profile the parameters of the load-balancing algorithm,
 	 */
-	public AbstractBundler(LoadBalancingProfile profile)
+	public AbstractBundler(final LoadBalancingProfile profile)
 	{
 		this.profile = profile;
 	}
@@ -81,7 +81,7 @@ public abstract class AbstractBundler implements Bundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
 	@Override
-    public void feedback(int bundleSize, double totalTime)
+	public void feedback(final int bundleSize, final double totalTime)
 	{
 	}
 
@@ -92,7 +92,7 @@ public abstract class AbstractBundler implements Bundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
 	 */
 	@Override
-    public long getTimestamp()
+	public long getTimestamp()
 	{
 		return timestamp;
 	}
@@ -111,7 +111,7 @@ public abstract class AbstractBundler implements Bundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#setup()
 	 */
 	@Override
-    public void setup()
+	public void setup()
 	{
 	}
 
@@ -120,7 +120,7 @@ public abstract class AbstractBundler implements Bundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#dispose()
 	 */
 	@Override
-    public void dispose()
+	public void dispose()
 	{
 	}
 
@@ -130,7 +130,7 @@ public abstract class AbstractBundler implements Bundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getProfile()
 	 */
 	@Override
-    public LoadBalancingProfile getProfile()
+	public LoadBalancingProfile getProfile()
 	{
 		return profile;
 	}

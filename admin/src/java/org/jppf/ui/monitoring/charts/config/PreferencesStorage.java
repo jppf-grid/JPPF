@@ -51,7 +51,7 @@ public class PreferencesStorage
 	 * Initialize this preferences storage with a specified chart builder.
 	 * @param chartBuilder the chart builder from which to get the charts.
 	 */
-	public PreferencesStorage(JPPFChartBuilder chartBuilder)
+	public PreferencesStorage(final JPPFChartBuilder chartBuilder)
 	{
 		this.chartBuilder = chartBuilder;
 	}
@@ -82,21 +82,21 @@ public class PreferencesStorage
 			tab.name = child.get("name", "Tab"+cnt);
 			tab.position = child.getInt("position", -1);
 			ChartConfiguration[] configs = loadTabCharts(child);
-            tab.configs.addAll(Arrays.asList(configs));
+			tab.configs.addAll(Arrays.asList(configs));
 			tabs[cnt] = tab;
 			cnt++;
 		}
 		Arrays.sort(tabs, new Comparator<TabConfiguration>()
-		{
+				{
 			@Override
-            public int compare(TabConfiguration o1, TabConfiguration o2)
+			public int compare(final TabConfiguration o1, final TabConfiguration o2)
 			{
 				if (o1 == o2) return 0;
 				if (o1 == null) return -1;
 				if (o2 == null) return 1;
 				return Integer.valueOf(o1.position).compareTo(o2.position);
 			}
-		});
+				});
 
 		for (TabConfiguration tab: tabs)
 		{
@@ -108,13 +108,13 @@ public class PreferencesStorage
 			}
 		}
 	}
-	
+
 	/**
 	 * Load the chart configurations for a tab from a specified tab preferences node.
 	 * @param tabNode the tab preferences node that contains the chart configuration nodes.
 	 * @return an array of <code>ChartConfiguration</code> instances.
 	 */
-	public ChartConfiguration[] loadTabCharts(Preferences tabNode)
+	public ChartConfiguration[] loadTabCharts(final Preferences tabNode)
 	{
 		ChartConfiguration[] result = new ChartConfiguration[0];
 		String[] tabChildrenNames = null;
@@ -138,25 +138,25 @@ public class PreferencesStorage
 			cnt++;
 		}
 		Arrays.sort(result, new Comparator<ChartConfiguration>()
-		{
+				{
 			@Override
-            public int compare(ChartConfiguration o1, ChartConfiguration o2)
+			public int compare(final ChartConfiguration o1, final ChartConfiguration o2)
 			{
 				if (o1 == o2) return 0;
 				if (o1 == null) return -1;
 				if (o2 == null) return 1;
 				return Integer.valueOf(o1.position).compareTo(o2.position);
 			}
-		});
+				});
 		return result;
 	}
-	
+
 	/**
 	 * Load a chart configuration from a preferences node.
 	 * @param child the preferences node to laod the configuration from.
 	 * @return a <code>ChartConfiguration</code> instance.
 	 */
-	public ChartConfiguration loadChartConfiguration(Preferences child)
+	public ChartConfiguration loadChartConfiguration(final Preferences child)
 	{
 		ChartConfiguration config = new ChartConfiguration();
 		config.name = child.get("name", "");
@@ -165,10 +165,10 @@ public class PreferencesStorage
 		String fields = child.get("fields", "");
 		String[] sFields = fields.split("\\|");
 		List<Fields> list = new ArrayList<Fields>();
-        for (String sField : sFields) {
-            Fields f = lookupEnum(sField);
-            if (f != null) list.add(f);
-        }
+		for (String sField : sFields) {
+			Fields f = lookupEnum(sField);
+			if (f != null) list.add(f);
+		}
 		config.fields = list.toArray(new Fields[list.size()]);
 		String type = child.get("type", CHART_PLOTXY.name());
 		try
@@ -188,7 +188,7 @@ public class PreferencesStorage
 	 * @param name the name of the field to find.
 	 * @return a <code>Fields</code>, or null if the field could not be found.
 	 */
-	private static Fields lookupEnum(String name)
+	private static Fields lookupEnum(final String name)
 	{
 		Fields field = null;
 		try
@@ -241,20 +241,20 @@ public class PreferencesStorage
 	 * Save a specified tab configuration in the preferences tree.
 	 * @param tab the tab to save.
 	 */
-	public void saveTabConfiguration(TabConfiguration tab)
+	public void saveTabConfiguration(final TabConfiguration tab)
 	{
 		String tabNodeName = "TabConfiguration"+tab.position;
 		Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName);
 		pref.put("name", tab.name);
 		pref.putInt("position", tab.position);
 	}
-	
+
 	/**
 	 * Save a specified chart configuration in the preferences tree.
 	 * @param tab the tab into which to save the configuration.
 	 * @param config the configuration to save.
 	 */
-	public void saveChartConfiguration(TabConfiguration tab, ChartConfiguration config)
+	public void saveChartConfiguration(final TabConfiguration tab, final ChartConfiguration config)
 	{
 		String tabNodeName = "TabConfiguration"+tab.position;
 		String nodeName = "ChartConfiguration"+config.position;
@@ -272,7 +272,7 @@ public class PreferencesStorage
 		pref.put("fields", sb.toString());
 		pref.putInt("position", config.position);
 	}
-	
+
 	/**
 	 * Remove all tabs and charts configurations from the user preferences.
 	 */

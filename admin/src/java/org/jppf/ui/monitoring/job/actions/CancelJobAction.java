@@ -52,7 +52,7 @@ public class CancelJobAction extends AbstractJobAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-	public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(jobDataArray.length > 0);
@@ -64,12 +64,12 @@ public class CancelJobAction extends AbstractJobAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-	public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				for (JobData data: jobDataArray)
 				{

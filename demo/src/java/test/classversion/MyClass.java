@@ -44,7 +44,7 @@ public class MyClass implements Serializable
 	 * Set the name.
 	 * @param name a string.
 	 */
-	public void setName(String name)
+	public void setName(final String name)
 	{
 		this.name = name;
 	}
@@ -55,7 +55,7 @@ public class MyClass implements Serializable
 	 * @throws IOException if an I/O error occurs.
 	 * @throws ClassNotFoundException if a class cannot be found.
 	 */
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException 
+	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		name = (String) in.readObject();
 		getClass().getClassLoader().loadClass(getClass().getName());
@@ -66,7 +66,7 @@ public class MyClass implements Serializable
 	 * @param out the output stream.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	private void writeObject(ObjectOutputStream out) throws IOException
+	private void writeObject(final ObjectOutputStream out) throws IOException
 	{
 		out.writeObject(name);
 	}

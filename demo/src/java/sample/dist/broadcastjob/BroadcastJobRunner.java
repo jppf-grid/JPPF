@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -48,7 +48,7 @@ public class BroadcastJobRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -69,7 +69,7 @@ public class BroadcastJobRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
 	 * @param nbTasks the number of tasks to send at each iteration.
@@ -77,7 +77,7 @@ public class BroadcastJobRunner
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbTasks, int length, int iterations) throws Exception
+	private static void perform(final int nbTasks, final int length, final int iterations) throws Exception
 	{
 		try
 		{
@@ -120,7 +120,7 @@ public class BroadcastJobRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);

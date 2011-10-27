@@ -35,7 +35,7 @@ public class ByteBufferInputStream extends InputStream
 	 * Initialize this stream to read from the specified byte buffer.
 	 * @param buffer the buffer to read from.
 	 */
-	public ByteBufferInputStream(ByteBuffer buffer)
+	public ByteBufferInputStream(final ByteBuffer buffer)
 	{
 		this(buffer, false);
 	}
@@ -45,20 +45,20 @@ public class ByteBufferInputStream extends InputStream
 	 * @param buffer the buffer to read from.
 	 * @param flip if true, then the buffer is flipped.
 	 */
-	public ByteBufferInputStream(ByteBuffer buffer, boolean flip)
+	public ByteBufferInputStream(final ByteBuffer buffer, final boolean flip)
 	{
 		this.buffer = buffer;
 		if (flip) buffer.flip();
 	}
 
 	/**
-	 * Read one byte from 
+	 * Read one byte from
 	 * @return the next byte of data, or <code>-1</code> if the end of the stream is reached.
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.InputStream#read()
 	 */
 	@Override
-    public int read() throws IOException
+	public int read() throws IOException
 	{
 		if (!buffer.hasRemaining()) return -1;
 		return buffer.get();
@@ -71,7 +71,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#available()
 	 */
 	@Override
-    public int available() throws IOException
+	public int available() throws IOException
 	{
 		return buffer.remaining();
 	}
@@ -82,7 +82,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		super.close();
 	}
@@ -93,7 +93,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#mark(int)
 	 */
 	@Override
-    public synchronized void mark(int readlimit)
+	public synchronized void mark(final int readlimit)
 	{
 		super.mark(readlimit);
 	}
@@ -104,7 +104,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#markSupported()
 	 */
 	@Override
-    public boolean markSupported()
+	public boolean markSupported()
 	{
 		return super.markSupported();
 	}
@@ -119,19 +119,16 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#read(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] b, int off, int len) throws IOException
+	public int read(final byte[] b, final int off, final int len) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
-	    throw new IndexOutOfBoundsException();
+			throw new IndexOutOfBoundsException();
 		else if (len == 0) return 0;
 		else if (buffer.remaining() <= 0) return -1;
-		if (len > buffer.remaining())
-		{
-			len = buffer.remaining();
-		}
-		buffer.get(b, off, len);
-		return len;
+		int length = (len > buffer.remaining()) ? buffer.remaining() : len;
+		buffer.get(b, off, length);
+		return length;
 	}
 
 	/**
@@ -142,7 +139,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#read(byte[])
 	 */
 	@Override
-    public int read(byte[] b) throws IOException
+	public int read(final byte[] b) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		return read(b, 0, b.length);
@@ -154,7 +151,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#reset()
 	 */
 	@Override
-    public synchronized void reset() throws IOException
+	public synchronized void reset() throws IOException
 	{
 		super.reset();
 	}
@@ -167,7 +164,7 @@ public class ByteBufferInputStream extends InputStream
 	 * @see java.io.InputStream#skip(long)
 	 */
 	@Override
-    public long skip(long n) throws IOException
+	public long skip(final long n) throws IOException
 	{
 		if (n < 0) return 0;
 		int pos = buffer.position();

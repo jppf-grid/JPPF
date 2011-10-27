@@ -59,7 +59,7 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 	 * @param taskObject the runnable object to execute.
 	 * @param args the arguments of the method to execute.
 	 */
-	public PojoTaskWrapper(String method, Object taskObject, Object...args)
+	public PojoTaskWrapper(final String method, final Object taskObject, final Object...args)
 	{
 		this.method = method;
 		if (taskObject instanceof Class)
@@ -84,11 +84,11 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
 	 */
 	@Override
-    public Object execute() throws Exception
+	public Object execute() throws Exception
 	{
 		Class clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
 		Object result = null;
-		AbstractPrivilegedAction<Object> action = null; 
+		AbstractPrivilegedAction<Object> action = null;
 		switch(methodType)
 		{
 			case INSTANCE:
@@ -109,11 +109,11 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 
 	/**
 	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static. 
+	 * @return an object or null if the invoked method is static.
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
 	 */
 	@Override
-    public Object getTaskObject()
+	public Object getTaskObject()
 	{
 		return taskObject;
 	}

@@ -45,7 +45,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * Initialize the panel used to display this options page.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		JTabbedPane pane = new JTabbedPane();
 		pane.setDoubleBuffered(true);
@@ -60,7 +60,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		if (UIComponent != null) UIComponent.setEnabled(enabled);
 		for (OptionElement elt: children) elt.setEnabled(enabled);
@@ -72,7 +72,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
 	@Override
-    public void setEventsEnabled(boolean enabled)
+	public void setEventsEnabled(final boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
 	}
@@ -83,7 +83,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
 	 */
 	@Override
-    public void add(OptionElement element)
+	public void add(final OptionElement element)
 	{
 		children.add(element);
 		JTabbedPane pane = (JTabbedPane) UIComponent;
@@ -107,7 +107,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
 	 */
 	@Override
-    public void remove(OptionElement element)
+	public void remove(final OptionElement element)
 	{
 		children.remove(element);
 		UIComponent.remove(element.getUIComponent());
@@ -121,7 +121,7 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
 	 * @see org.jppf.ui.options.OptionsPage#getChildren()
 	 */
 	@Override
-    public List<OptionElement> getChildren()
+	public List<OptionElement> getChildren()
 	{
 		return Collections.unmodifiableList(children);
 	}

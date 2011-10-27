@@ -48,7 +48,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * Initialize this location with the specified type and path.
 	 * @param path the path for this location.
 	 */
-	public AbstractLocation(T path)
+	public AbstractLocation(final T path)
 	{
 		this.path = path;
 	}
@@ -71,7 +71,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#copyTo(org.jppf.server.protocol.Location)
 	 */
 	@Override
-	public void copyTo(Location location) throws Exception
+	public void copyTo(final Location location) throws Exception
 	{
 		InputStream is = getInputStream();
 		OutputStream os = location.getOutputStream();
@@ -117,7 +117,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#addLocationEventListener(org.jppf.server.protocol.LocationEventListener)
 	 */
 	@Override
-	public void addLocationEventListener(LocationEventListener listener)
+	public void addLocationEventListener(final LocationEventListener listener)
 	{
 		if (listener == null) throw new NullPointerException("null listener not accepted");
 		listeners.add(listener);
@@ -131,7 +131,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * @see org.jppf.server.protocol.Location#removeLocationEventListener(org.jppf.server.protocol.LocationEventListener)
 	 */
 	@Override
-	public void removeLocationEventListener(LocationEventListener listener)
+	public void removeLocationEventListener(final LocationEventListener listener)
 	{
 		if (listener == null) throw new NullPointerException("null listener not accepted");
 		listeners.remove(listener);
@@ -142,7 +142,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	 * Notify all listeners that a data transfer has occurred.
 	 * @param n - the size of the data that was transferred.
 	 */
-	protected void fireLocationEvent(int n)
+	protected void fireLocationEvent(final int n)
 	{
 		if (listeners.isEmpty()) return;
 		LocationEvent event = new LocationEvent(this, n);
@@ -150,12 +150,12 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
 	}
 
 	/**
-	 * Copy the data read from the specified input stream to the specified output stream. 
+	 * Copy the data read from the specified input stream to the specified output stream.
 	 * @param is the input stream to read from.
 	 * @param os the output stream to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	private void copyStream(InputStream is, OutputStream os) throws IOException
+	private void copyStream(final InputStream is, final OutputStream os) throws IOException
 	{
 		byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
 		while(true)

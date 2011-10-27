@@ -38,11 +38,11 @@ public class PasswordOption extends TextOption
 	/**
 	 * Initialize this text option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the checkbox.
 	 * @param value the initial value of this component.
 	 */
-	public PasswordOption(String name, String label, String tooltip, String value)
+	public PasswordOption(final String name, final String label, final String tooltip, final String value)
 	{
 		super(name, label, tooltip, value);
 		createUI();
@@ -55,7 +55,7 @@ public class PasswordOption extends TextOption
 	 * @see org.jppf.ui.options.TextOption#createField()
 	 */
 	@Override
-    protected JTextField createField()
+	protected JTextField createField()
 	{
 		field = new JPasswordField((String) value);
 		return field;
@@ -67,7 +67,7 @@ public class PasswordOption extends TextOption
 	 * @see org.jppf.ui.options.TextOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		value = new String(((JPasswordField) field).getPassword());
 		return value;

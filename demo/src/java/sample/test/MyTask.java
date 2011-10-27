@@ -36,7 +36,7 @@ public class MyTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		String str = null;
 

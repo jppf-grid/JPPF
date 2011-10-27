@@ -50,7 +50,7 @@ public class LocalExecutionRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -66,16 +66,16 @@ public class LocalExecutionRunner
 			/*
 			print("run 1 with local execution off");
 			perform(nbTask, length, 1);
-			*/
-			//print("run with local execution on"); 
+			 */
+			//print("run with local execution on");
 			//jppfClient.setLocalExecutionEnabled(true);
 			//perform2(100, 5, 200);
 			perform3();
 			/*
-			print("run 3 with local execution off"); 
+			print("run 3 with local execution off");
 			jppfClient.setLocalExecutionEnabled(false);
 			perform(nbTask, length, 3);
-			*/
+			 */
 		}
 		catch(Exception e)
 		{
@@ -86,7 +86,7 @@ public class LocalExecutionRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
 	 * @param nbTasks the number of tasks to send at each iteration.
@@ -94,7 +94,7 @@ public class LocalExecutionRunner
 	 * @param iter the run number.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbTasks, int length, int iter) throws Exception
+	private static void perform(final int nbTasks, final int length, final int iter) throws Exception
 	{
 		try
 		{
@@ -116,7 +116,7 @@ public class LocalExecutionRunner
 			}
 			long elapsed = System.currentTimeMillis() - start;
 			print("run " + iter + " time: "+StringUtils.toStringDuration(elapsed));
-	
+
 		}
 		catch(Exception e)
 		{
@@ -131,7 +131,7 @@ public class LocalExecutionRunner
 	 * @param nbJobs the number of non-blocking jobs to submit.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform2(int nbTasks, int length, int nbJobs) throws Exception
+	private static void perform2(final int nbTasks, final int length, final int nbJobs) throws Exception
 	{
 		try
 		{
@@ -165,7 +165,7 @@ public class LocalExecutionRunner
 			}
 			long elapsed = System.nanoTime() - start;
 			print("ran " + nbJobs + " in: "+StringUtils.toStringDuration(elapsed/1000000));
-	
+
 		}
 		catch(Exception e)
 		{
@@ -177,7 +177,7 @@ public class LocalExecutionRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);
@@ -217,7 +217,7 @@ public class LocalExecutionRunner
 			}
 			long elapsed = System.nanoTime() - start;
 			print("run time: " + StringUtils.toStringDuration(elapsed/1000000));
-	
+
 		}
 		catch(Exception e)
 		{

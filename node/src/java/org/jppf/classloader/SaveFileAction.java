@@ -17,7 +17,7 @@
  */
 package org.jppf.classloader;
 
-import java.io.*;
+import java.io.File;
 import java.security.PrivilegedAction;
 import java.util.List;
 
@@ -51,7 +51,7 @@ class SaveFileAction implements PrivilegedAction<File>
 	 * @param name the original name of the resource to find.
 	 * @param definition the resource definition to save.
 	 */
-	public SaveFileAction(List<String> tmpDirs, String name, final byte[] definition)
+	public SaveFileAction(final List<String> tmpDirs, final String name, final byte[] definition)
 	{
 		this.tmpDirs = tmpDirs;
 		this.name = name;
@@ -73,7 +73,7 @@ class SaveFileAction implements PrivilegedAction<File>
 	 * @see java.security.PrivilegedAction#run()
 	 */
 	@Override
-    public File run()
+	public File run()
 	{
 		File tmp = null;
 		String fileName = FileUtils.getFileName(name);

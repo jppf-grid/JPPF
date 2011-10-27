@@ -49,7 +49,7 @@ class JobExpirationAction implements Runnable
 	 * Initialize this action witht he specified bundle wrapper.
 	 * @param bundleWrapper the bundle wrapper encapsulating the job.
 	 */
-	public JobExpirationAction(ServerJob bundleWrapper)
+	public JobExpirationAction(final ServerJob bundleWrapper)
 	{
 		this.bundleWrapper = bundleWrapper;
 	}
@@ -59,7 +59,7 @@ class JobExpirationAction implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobId = bundle.getName();

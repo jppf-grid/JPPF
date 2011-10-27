@@ -78,7 +78,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 	 * @param wrapper a <code>SocketWrapper</code> instance.
 	 */
 	@Override
-  public void setSocketWrapper(SocketWrapper wrapper)
+	public void setSocketWrapper(final SocketWrapper wrapper)
 	{
 		this.socketClient = wrapper;
 	}
@@ -112,7 +112,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 	 * Set the total number of tasks executed.
 	 * @param taskCount the number of tasks as an int.
 	 */
-	public synchronized void setTaskCount(int taskCount)
+	public synchronized void setTaskCount(final int taskCount)
 	{
 		this.taskCount = taskCount;
 	}

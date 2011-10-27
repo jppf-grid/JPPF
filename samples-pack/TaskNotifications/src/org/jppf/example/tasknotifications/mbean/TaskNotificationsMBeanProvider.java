@@ -32,6 +32,7 @@ public class TaskNotificationsMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the name as a string.
 	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
 	 */
+	@Override
 	public String getMBeanInterfaceName()
 	{
 		return TaskNotificationsMBean.class.getName();
@@ -43,7 +44,8 @@ public class TaskNotificationsMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the created MBean implementation.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
 	 */
-	public Object createMBean(Node node)
+	@Override
+	public Object createMBean(final Node node)
 	{
 		return new TaskNotifications();
 	}
@@ -53,6 +55,7 @@ public class TaskNotificationsMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the MBean's object name as a string.
 	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
 	 */
+	@Override
 	public String getMBeanName()
 	{
 		return TaskNotificationsMBean.MBEAN_NAME;

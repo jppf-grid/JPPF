@@ -44,14 +44,14 @@ public class JmxHandler extends Handler
 	{
 		LogManager lm = LogManager.getLogManager();
 		mbeanName = lm.getProperty(getClass().getName() + ".mbeanName");
-		notifier = new JmxMessageNotifier(mbeanName); 
+		notifier = new JmxMessageNotifier(mbeanName);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void publish(LogRecord record)
+	public void publish(final LogRecord record)
 	{
 		if (notifier == null) init();
 		Formatter f = getFormatter();
@@ -64,7 +64,7 @@ public class JmxHandler extends Handler
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void flush()
+	public void flush()
 	{
 	}
 
@@ -72,7 +72,7 @@ public class JmxHandler extends Handler
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void close() throws SecurityException
+	public void close() throws SecurityException
 	{
 	}
 }

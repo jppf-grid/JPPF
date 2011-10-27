@@ -21,7 +21,7 @@ package org.jppf.utils.streams;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
 /**
@@ -67,7 +67,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 * Intialize this input stream with the specified buffers.
 	 * @param buffers an array of {@link JPPFBuffer} instances.
 	 */
-	public MultipleBuffersInputStream(JPPFBuffer...buffers)
+	public MultipleBuffersInputStream(final JPPFBuffer...buffers)
 	{
 		list = new ArrayList<JPPFBuffer>(buffers.length);
 		for (JPPFBuffer b: buffers)
@@ -81,7 +81,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 * Intialize this input stream with the specified buffers.
 	 * @param buffers an array of {@link JPPFBuffer} instances.
 	 */
-	public MultipleBuffersInputStream(List<JPPFBuffer> buffers)
+	public MultipleBuffersInputStream(final List<JPPFBuffer> buffers)
 	{
 		list = new ArrayList<JPPFBuffer>(buffers.size());
 		for (JPPFBuffer b: buffers)
@@ -98,7 +98,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 * @see java.io.OutputStream#write(int)
 	 */
 	@Override
-    public int read() throws IOException
+	public int read() throws IOException
 	{
 		if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
 		if (eofReached) return -1;
@@ -118,13 +118,13 @@ public class MultipleBuffersInputStream extends InputStream
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] b, int off, int len) throws IOException
+	public int read(final byte[] b, final int off, final int len) throws IOException
 	{
 		/*
 		if (b == null) throw new NullPointerException("the destination buffer must not be null");
 		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
 			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
-		*/
+		 */
 		if (eofReached) return -1;
 		int count = 0;
 		while (count < len)
@@ -139,7 +139,7 @@ public class MultipleBuffersInputStream extends InputStream
 		/*
 		if (traceEnabled) log.trace("read " + count + " bytes from " + this +
 			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos - count, Math.min(100, count)));
-		*/
+		 */
 		return count;
 	}
 
@@ -151,7 +151,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 * @see java.io.OutputStream#write(byte[])
 	 */
 	@Override
-    public int read(byte[] b) throws IOException
+	public int read(final byte[] b) throws IOException
 	{
 		//if (b == null) throw new NullPointerException("the destination buffer must not be null");
 		return read(b, 0, b.length);
@@ -188,7 +188,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName()).append('[');

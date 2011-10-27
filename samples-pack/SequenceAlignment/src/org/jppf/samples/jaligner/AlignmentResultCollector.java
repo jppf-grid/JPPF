@@ -59,10 +59,10 @@ public class AlignmentResultCollector implements TaskResultListener
 	private List<JPPFTask> results = null;
 
 	/**
-	 * Initialize this collector with a specified number of tasks. 
+	 * Initialize this collector with a specified number of tasks.
 	 * @param count the count of submitted tasks.
 	 */
-	public AlignmentResultCollector(int count)
+	public AlignmentResultCollector(final int count)
 	{
 		this.pendingCount = count;
 		this.initialCount = count;
@@ -73,7 +73,8 @@ public class AlignmentResultCollector implements TaskResultListener
 	 * @param event a notification of completion for a set of submitted tasks.
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
-	public synchronized void resultsReceived(TaskResultEvent event)
+	@Override
+	public synchronized void resultsReceived(final TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
@@ -83,6 +84,7 @@ public class AlignmentResultCollector implements TaskResultListener
 		final int n = (100 * (initialCount-pendingCount)) / initialCount;
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				SequenceAlignmentRunner.updateProgress(n);

@@ -47,7 +47,7 @@ public class ProfilingRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -67,14 +67,14 @@ public class ProfilingRunner
 			System.exit(1);
 		}
 	}
-	
+
 	/**
 	 * Execute the specified number of tasks for the specified number of iterations.
 	 * @param nbTask the number of tasks to send at each iteration.
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbTask, int iterations) throws Exception
+	private static void perform(final int nbTask, final int iterations) throws Exception
 	{
 		// perform "iteration" times
 		for (int iter=0; iter<iterations; iter++)
@@ -90,7 +90,7 @@ public class ProfilingRunner
 		/*
 		JPPFStats stats = jppfClient.requestStatistics();
 		System.out.println("End statistics :\n"+stats.toString());
-		*/
+		 */
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class ProfilingRunner
 	 * @param silent determines whether resuls should be displayed on the console.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void performSequential(int nbTask, boolean silent) throws Exception
+	private static void performSequential(final int nbTask, final boolean silent) throws Exception
 	{
 		long start = System.currentTimeMillis();
 		List<JPPFTask> tasks = new ArrayList<JPPFTask>();

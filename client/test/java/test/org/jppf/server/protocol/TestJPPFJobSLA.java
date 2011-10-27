@@ -35,7 +35,7 @@ import test.org.jppf.test.setup.*;
 /**
  * Unit tests for {@link org.jppf.node.protocol.JobSLA JobSLA}.
  * In this class, we test that the behavior is the expected one, from the client point of view,
- * as specified in the job SLA. 
+ * as specified in the job SLA.
  * @author Laurent Cohen
  */
 public class TestJPPFJobSLA extends Setup1D1N1C
@@ -156,7 +156,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
 	 * @return a {@link JPPFJob} instance.
 	 * @throws JPPFException if an error occurs while creating the job.
 	 */
-	protected synchronized JPPFJob createJob(String id, int nbTasks, long duration) throws JPPFException
+	protected synchronized JPPFJob createJob(final String id, final int nbTasks, final long duration) throws JPPFException
 	{
 		JPPFJob job = new JPPFJob();
 		job.setName(id + '(' + jobCount.incrementAndGet() + ')');

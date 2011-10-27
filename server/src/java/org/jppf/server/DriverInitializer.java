@@ -29,8 +29,8 @@ import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
-import org.jppf.server.peer.*;
 import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.peer.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -48,10 +48,10 @@ public class DriverInitializer
 	 * Determines whether debug-level logging is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-    /**
-     * Constant for JPPF automatic connection discovery
-     */
-    protected static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
+	/**
+	 * Constant for JPPF automatic connection discovery
+	 */
+	protected static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
 	/**
 	 * The instance of the driver.
 	 */
@@ -93,7 +93,7 @@ public class DriverInitializer
 	 * Instantiate this initializer with the specified driver.
 	 * @param driver the driver to initialize.
 	 */
-	public DriverInitializer(JPPFDriver driver)
+	public DriverInitializer(final JPPFDriver driver)
 	{
 		this.driver = driver;
 		config = JPPFConfiguration.getProperties();
@@ -127,8 +127,8 @@ public class DriverInitializer
 	@SuppressWarnings("unchecked")
 	void registerProviderMBeans() throws Exception
 	{
-  	MBeanServer server = getJmxServer().getServer();
-    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
+		MBeanServer server = getJmxServer().getServer();
+		JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
 		List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
 		for (JPPFDriverMBeanProvider provider: list)
 		{
@@ -159,7 +159,7 @@ public class DriverInitializer
 		return connectionInfo;
 	}
 
-    /**
+	/**
 	 * Initialize and start the discovery service.
 	 */
 	void initBroadcaster()
@@ -185,57 +185,57 @@ public class DriverInitializer
 
 	/**
 	 * Initialize this driver's peers.
-     * @param classServer JPPF class server
-     */
+	 * @param classServer JPPF class server
+	 */
 	void initPeers(final ClassNioServer classServer)
 	{
-        boolean initPeers;
+		boolean initPeers;
 		TypedProperties props = JPPFConfiguration.getProperties();
-        if (props.getBoolean("jppf.peer.discovery.enabled", false))
-        {
-            if (debugEnabled) log.debug("starting peers discovery");
-            peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
-                @Override
-                public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-                    new JPPFPeerInitializer(name, info, classServer).start();
-                }
-            }, null, getConnectionInformation());
-            initPeers = false;
-        }
-        else
-        {
-            peerDiscoveryThread = null;
-            initPeers = true;
-        }
+		if (props.getBoolean("jppf.peer.discovery.enabled", false))
+		{
+			if (debugEnabled) log.debug("starting peers discovery");
+			peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
+				@Override
+				public void onNewConnection(final String name, final JPPFConnectionInformation info) {
+					new JPPFPeerInitializer(name, info, classServer).start();
+				}
+			}, null, getConnectionInformation());
+			initPeers = false;
+		}
+		else
+		{
+			peerDiscoveryThread = null;
+			initPeers = true;
+		}
 
-        String discoveryNames = props.getString("jppf.peers");
-        if ((discoveryNames != null) && !"".equals(discoveryNames.trim()))
-        {
-            if (debugEnabled) log.debug("found peers in the configuration");
-            String[] names = discoveryNames.split("\\s");
-            for (String name : names) {
-                initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
-            }
+		String discoveryNames = props.getString("jppf.peers");
+		if ((discoveryNames != null) && !"".equals(discoveryNames.trim()))
+		{
+			if (debugEnabled) log.debug("found peers in the configuration");
+			String[] names = discoveryNames.split("\\s");
+			for (String name : names) {
+				initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
+			}
 
-            if(initPeers)
-            {
-                for (String name : names) {
-                    if(!VALUE_JPPF_DISCOVERY.equals(name))
-                    {
-                        JPPFConnectionInformation info = new JPPFConnectionInformation();
-                        info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
-                        info.serverPorts = new int[] { props.getInt(String.format("jppf.peer.%s.server.port", name), 11111) };
-                        if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
-                        new JPPFPeerInitializer(name, info, classServer).start();
-                    }
-                }
-            }
-        }
+			if(initPeers)
+			{
+				for (String name : names) {
+					if(!VALUE_JPPF_DISCOVERY.equals(name))
+					{
+						JPPFConnectionInformation info = new JPPFConnectionInformation();
+						info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
+						info.serverPorts = new int[] { props.getInt(String.format("jppf.peer.%s.server.port", name), 11111) };
+						if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
+						new JPPFPeerInitializer(name, info, classServer).start();
+					}
+				}
+			}
+		}
 
-        if(peerDiscoveryThread != null)
-        {
-            new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
-        }
+		if(peerDiscoveryThread != null)
+		{
+			new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
+		}
 	}
 
 	/**

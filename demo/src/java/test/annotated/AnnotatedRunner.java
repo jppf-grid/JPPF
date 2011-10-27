@@ -47,7 +47,7 @@ public class AnnotatedRunner
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -63,7 +63,7 @@ public class AnnotatedRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test.
 	 * @throws Exception if an error is raised during the execution.
@@ -72,7 +72,7 @@ public class AnnotatedRunner
 	{
 		int nbJobs = 50;
 		long time = 0L;
-		
+
 		output("Running demo with time = " + time + " for " + nbJobs + " jobs");
 		long totalTime = System.currentTimeMillis();
 		List<JPPFJob> jobs = new ArrayList<JPPFJob>();
@@ -106,7 +106,7 @@ public class AnnotatedRunner
 	{
 		int nbJobs = 1;
 		long time = 0L;
-		
+
 		output("Running demo with time = " + time + " for " + nbJobs + " jobs");
 		File file = new File("../jppftest/bin");
 		URL url = file.toURI().toURL();
@@ -141,7 +141,7 @@ public class AnnotatedRunner
 	 * Print a message to the console and/or log file.
 	 * @param message the message to print.
 	 */
-	private static void output(String message)
+	private static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

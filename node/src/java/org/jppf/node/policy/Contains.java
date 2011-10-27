@@ -50,7 +50,7 @@ public class Contains extends ExecutionPolicy
 	 * @param ignoreCase determines if the comparison should ignore the string case.
 	 * @param a the value to compare with.
 	 */
-	public Contains(String propertyName, boolean ignoreCase, String a)
+	public Contains(final String propertyName, final boolean ignoreCase, final String a)
 	{
 		this.propertyName = propertyName;
 		this.value = a;
@@ -64,7 +64,7 @@ public class Contains extends ExecutionPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		if (value == null) return false;
 		String s = getProperty(info, propertyName);
@@ -79,7 +79,7 @@ public class Contains extends ExecutionPolicy
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		if (computedToString == null)
 		{

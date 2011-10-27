@@ -92,11 +92,12 @@ public class NBodyPanel extends JPanel
 	}
 
 	/**
-	 * Repaint this panel. 
+	 * Repaint this panel.
 	 * @param g the graphics object associated with this panel.
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
 	 */
-	protected void paintComponent(Graphics g)
+	@Override
+	protected void paintComponent(final Graphics g)
 	{
 		//lock.lock();
 		try
@@ -128,7 +129,7 @@ public class NBodyPanel extends JPanel
 	 * @param pos the positions of the bodies to draw.
 	 * @param c the color in which to draw the bodies.
 	 */
-	protected void drawBodies(Graphics g, Vector2d[] pos, Color c)
+	protected void drawBodies(final Graphics g, final Vector2d[] pos, final Color c)
 	{
 		Color tmp = g.getColor();
 		Graphics2D g2 = (Graphics2D) g;
@@ -142,7 +143,7 @@ public class NBodyPanel extends JPanel
 	 * Add an update request.
 	 * @param pos the new positions to display.
 	 */
-	public void updatePositions(Vector2d[] pos)
+	public void updatePositions(final Vector2d[] pos)
 	{
 		if (!isUpdating()) executor.submit(new UpdateRequest(pos));
 	}
@@ -169,7 +170,7 @@ public class NBodyPanel extends JPanel
 		 * Add an update request.
 		 * @param pos the new positions to display.
 		 */
-		public UpdateRequest(Vector2d[] pos)
+		public UpdateRequest(final Vector2d[] pos)
 		{
 			this.pos = pos;
 		}
@@ -178,6 +179,7 @@ public class NBodyPanel extends JPanel
 		 * Do the update request on the component.
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run()
 		{
 			if (updating.get()) return;

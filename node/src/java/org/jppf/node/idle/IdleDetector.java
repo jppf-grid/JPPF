@@ -40,11 +40,11 @@ public class IdleDetector implements Runnable
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * A timer that runs a periodic task that determines whether the computer is idle or not. 
+	 * A timer that runs a periodic task that determines whether the computer is idle or not.
 	 */
 	private Timer timer = null;
 	/**
-	 * A factory that instantiates a platform-specific idle detector.  
+	 * A factory that instantiates a platform-specific idle detector.
 	 */
 	private IdleTimeDetectorFactory factory = null;
 	/**
@@ -68,7 +68,7 @@ public class IdleDetector implements Runnable
 	 * Defautlt constructor.
 	 * @param listener specifies the action to perform upon idle state changes.
 	 */
-	public IdleDetector(IdleStateListener listener)
+	public IdleDetector(final IdleStateListener listener)
 	{
 		this.listener = listener;
 	}
@@ -92,7 +92,7 @@ public class IdleDetector implements Runnable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -100,7 +100,7 @@ public class IdleDetector implements Runnable
 			IdleStateListener tmp = new IdleStateListener()
 			{
 				@Override
-                public void idleStateChanged(IdleStateEvent event)
+				public void idleStateChanged(final IdleStateEvent event)
 				{
 					System.out.println("System is now " + event.getState());
 				}
@@ -119,7 +119,7 @@ public class IdleDetector implements Runnable
 	 * Main entry point.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{
@@ -133,7 +133,7 @@ public class IdleDetector implements Runnable
 			task.addIdleStateListener(new IdleStateListener()
 			{
 				@Override
-                public void idleStateChanged(IdleStateEvent event)
+				public void idleStateChanged(final IdleStateEvent event)
 				{
 					if (IdleState.IDLE.equals(event.getState())) System.out.println("System is now idle !");
 					else System.out.println("System is now busy");

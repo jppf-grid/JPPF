@@ -31,7 +31,7 @@ import org.jppf.utils.FileUtils;
 public class Downloader
 {
 	/**
-	 * A location listener used to show the progress of the download. 
+	 * A location listener used to show the progress of the download.
 	 */
 	private LocationEventListener listener = null;
 
@@ -39,13 +39,13 @@ public class Downloader
 	 * Entry point.
 	 * @param args - not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
 			Downloader donwloader = new Downloader();
 			donwloader.extractFiles("http://downloads.sourceforge.net/jfreechart/jfreechart-1.0.12.zip",
-				"lib", "jfreechart-1.0.12.jar", "jcommon-1.0.15.jar");
+					"lib", "jfreechart-1.0.12.jar", "jcommon-1.0.15.jar");
 			System.out.println("done");
 		}
 		catch(Throwable t)
@@ -68,7 +68,7 @@ public class Downloader
 	 * @param names - the names of the zip entries to extract.
 	 * @throws Exception if any IO error occurs.
 	 */
-	public void extractFiles(String sourceUrl, String destPath, String...names) throws Exception
+	public void extractFiles(final String sourceUrl, final String destPath, final String...names) throws Exception
 	{
 		File tmp = null;
 		try
@@ -88,7 +88,7 @@ public class Downloader
 			{
 				private int count = 0;
 				@Override
-                public void dataTransferred(LocationEvent event)
+				public void dataTransferred(final LocationEvent event)
 				{
 					int oneMB = 1024*1024;
 					int n = event.bytesTransferred();
@@ -131,7 +131,7 @@ public class Downloader
 	 * @param names - the names of the files to lookup.
 	 * @return true if the folder and the files exist.
 	 */
-	public boolean checkFilesPresent(File folder, String...names)
+	public boolean checkFilesPresent(final File folder, final String...names)
 	{
 		if (!folder.exists() || !folder.isDirectory()) return false;
 		File[] files = FileUtils.toFiles(folder, names);
@@ -140,7 +140,7 @@ public class Downloader
 	}
 
 	/**
-	 * Instances of this class serve as data structures to asssociate each zip or jar url with the files to extract from it.  
+	 * Instances of this class serve as data structures to asssociate each zip or jar url with the files to extract from it.
 	 */
 	private static class URLToFiles
 	{
@@ -159,7 +159,7 @@ public class Downloader
 	}
 
 	/**
-	 * Get the location listener used to show the progress of the download. 
+	 * Get the location listener used to show the progress of the download.
 	 * @return a <code>LocationEventListener</code> instance.
 	 */
 	public LocationEventListener getListener()
@@ -168,10 +168,10 @@ public class Downloader
 	}
 
 	/**
-	 * Set the location listener used to show the progress of the download. 
+	 * Set the location listener used to show the progress of the download.
 	 * @param listener - a <code>LocationEventListener</code> instance.
 	 */
-	public void setListener(LocationEventListener listener)
+	public void setListener(final LocationEventListener listener)
 	{
 		this.listener = listener;
 	}

@@ -35,7 +35,7 @@ public class IdleStateEvent extends EventObject
 	 * Initialize this event with the task as source.
 	 * @param task an {@link IdleDetectionTask} instance.
 	 */
-	public IdleStateEvent(IdleDetectionTask task)
+	public IdleStateEvent(final IdleDetectionTask task)
 	{
 		super(task);
 		this.state = task.getState();

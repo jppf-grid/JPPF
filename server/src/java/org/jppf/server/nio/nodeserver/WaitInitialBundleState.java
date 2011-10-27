@@ -47,7 +47,7 @@ class WaitInitialBundleState extends NodeServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public WaitInitialBundleState(NodeNioServer server)
+	public WaitInitialBundleState(final NodeNioServer server)
 	{
 		super(server);
 	}
@@ -60,7 +60,7 @@ class WaitInitialBundleState extends NodeServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);

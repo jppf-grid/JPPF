@@ -28,7 +28,7 @@ public enum ClientState
 	/**
 	 * State of waiting for something to do / sending a set of results to the client.
 	 */
-	SENDING_RESULTS, 
+	SENDING_RESULTS,
 	/**
 	 * State of waiting for the client to send a job.
 	 */

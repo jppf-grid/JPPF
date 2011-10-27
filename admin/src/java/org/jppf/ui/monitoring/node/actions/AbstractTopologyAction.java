@@ -53,7 +53,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-	public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		List<TopologyData> list = new ArrayList<TopologyData>();

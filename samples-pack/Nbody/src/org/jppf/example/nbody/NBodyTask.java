@@ -55,7 +55,7 @@ public class NBodyTask extends JPPFTask
 	 * Initialize this task with the specified parameters.
 	 * @param bodies the bodies to handle.
 	 */
-	public NBodyTask(NBody[] bodies)
+	public NBodyTask(final NBody[] bodies)
 	{
 		this.bodies = bodies;
 	}
@@ -64,6 +64,7 @@ public class NBodyTask extends JPPFTask
 	 * Perform the calculations.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -85,7 +86,7 @@ public class NBodyTask extends JPPFTask
 					temp.multiply(qp_qp / (d*d*d));
 					body.acceleration.add(temp);
 				}
-	
+
 				// Accumulate acceleration on antiproton from magnetic field ==> repulsive force of the trap
 				temp.set(body.velocity).multiply(qp_b).rotate270();
 				body.acceleration.add(temp);
@@ -96,7 +97,7 @@ public class NBodyTask extends JPPFTask
 				body.pos.add(temp.multiply(Math.sqrt(dt)/2d));
 				temp.set(body.acceleration);
 				body.velocity.add(temp.multiply(dt));
-	
+
 				// Clear antiproton's acceleration for the next step.
 				body.acceleration.clear();
 			}
@@ -108,12 +109,12 @@ public class NBodyTask extends JPPFTask
 	}
 
 	/**
-	 * Compute the distance between 2 points represented by vectors. 
+	 * Compute the distance between 2 points represented by vectors.
 	 * @param v1 the first vector.
 	 * @param v2 the second vector.
 	 * @return the distance computed as sqrt((v2.x-v1.x)^2 + (v2.y-v1.y)^2).
 	 */
-	private double distance(Vector2d v1, Vector2d v2)
+	private double distance(final Vector2d v1, final Vector2d v2)
 	{
 		double dx = v2.x - v1.x;
 		double dy = v2.y - v1.y;

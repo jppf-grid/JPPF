@@ -33,7 +33,7 @@ public class DataProviderTestRunner
 	 * Entry point for this class, performs a matrix multiplication a number of times.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		JPPFClient jppfClient = new JPPFClient();
 		try

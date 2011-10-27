@@ -52,7 +52,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	 */
 	public static final char CLIENT = 'C';
 	/**
-	 * Constant used to avoid instantiating new empty arrays. 
+	 * Constant used to avoid instantiating new empty arrays.
 	 */
 	private static final ServerConnection[] EMPTY_CONNECTION_ARRAY = new ServerConnection[0];
 	/**
@@ -96,7 +96,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -167,7 +167,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	 * Add the specified connection to the list of connections handled by this server.
 	 * @param connection the connection to add.
 	 */
-	void addConnection(ServerConnection connection)
+	void addConnection(final ServerConnection connection)
 	{
 		synchronized(connections)
 		{
@@ -179,7 +179,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	 * Remove the specified connection from the list of connections handled by this server.
 	 * @param connection the connection to remove.
 	 */
-	void removeConnection(ServerConnection connection)
+	void removeConnection(final ServerConnection connection)
 	{
 		synchronized(connections)
 		{

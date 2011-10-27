@@ -45,7 +45,7 @@ public class BundlePerformanceSample
 	 * @param mean Mean compute time for server to node round trip.
 	 * @param samples Number of samples used to compute the mean value.
 	 */
-	public BundlePerformanceSample(double mean, long samples)
+	public BundlePerformanceSample(final double mean, final long samples)
 	{
 		this.mean = mean;
 		this.samples = samples;

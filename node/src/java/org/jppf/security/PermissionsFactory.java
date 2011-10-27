@@ -54,7 +54,7 @@ public final class PermissionsFactory
 	 * Permissions granted to the JPPF node code.
 	 */
 	private static JPPFPermissions extendedPermissions = null;
-	
+
 	/**
 	 * Instantiation of this class is not permitted.
 	 */
@@ -70,57 +70,51 @@ public final class PermissionsFactory
 	{
 		permList = null;
 	}
-	
+
 	/**
 	 * Get the set of permissions granted to a node.
 	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 * @return a Permissions object.
 	 * @see java.security.Permissions
 	 */
-	public static synchronized PermissionCollection getPermissions(ClassLoader classLoader)
+	public static synchronized PermissionCollection getPermissions(final ClassLoader classLoader)
 	{
 		if (permList == null)
 		{
-			if (classLoader == null)
-			{
-				classLoader = PermissionsFactory.class.getClassLoader();
-			}
-			createPermissions(classLoader);
+			ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
+			createPermissions(cl);
 			if (debugEnabled) log.debug("created normal permissions");
 		}
 		if (debugEnabled) log.debug("getting normal permissions");
 		return normalPermissions;
 	}
-	
+
 	/**
 	 * Get the set of permissions granted to a node.
 	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 * @return a Permissions object.
 	 * @see java.security.Permissions
 	 */
-	public static synchronized PermissionCollection getExtendedPermissions(ClassLoader classLoader)
+	public static synchronized PermissionCollection getExtendedPermissions(final ClassLoader classLoader)
 	{
 		if (permList == null)
 		{
-			if (classLoader == null)
-			{
-				classLoader = PermissionsFactory.class.getClassLoader();
-			}
-			createPermissions(classLoader);
+			ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
+			createPermissions(cl);
 			if (debugEnabled) log.debug("created extended permissions");
 		}
 		if (debugEnabled) log.debug("getting extended permissions");
 		return extendedPermissions;
 	}
-	
+
 	/**
 	 * Initialize the permissions granted to a node.
 	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 */
-	private static void createPermissions(ClassLoader classLoader)
+	private static void createPermissions(final ClassLoader classLoader)
 	{
 		if (permList != null) return;
-		permList = new ArrayList<Permission>(); 
+		permList = new ArrayList<Permission>();
 		createDynamicPermissions();
 		createManagementPermissions();
 		readStaticPermissions(classLoader);
@@ -187,7 +181,7 @@ public final class PermissionsFactory
 	 * Read the static permissions stored in a policy file, if any is defined.
 	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 */
-	private static void readStaticPermissions(ClassLoader classLoader)
+	private static void readStaticPermissions(final ClassLoader classLoader)
 	{
 		InputStream is = null;
 		LineNumberReader reader = null;
@@ -201,12 +195,12 @@ public final class PermissionsFactory
 			}
 			catch(FileNotFoundException e)
 			{
-				if (debugEnabled) log.debug("jppf policy file '" + file + "' not found locally"); 
+				if (debugEnabled) log.debug("jppf policy file '" + file + "' not found locally");
 			}
 			if (is == null) is = classLoader.getResourceAsStream(file);
 			if (is == null)
 			{
-				if (debugEnabled) log.debug("jppf policy file '" + file + "' not found on the driver side"); 
+				if (debugEnabled) log.debug("jppf policy file '" + file + "' not found on the driver side");
 				return;
 			}
 			reader = new LineNumberReader(new InputStreamReader(is));
@@ -263,12 +257,12 @@ public final class PermissionsFactory
 	 * @param type the type of permission, static, dynamic or mbean.
 	 * @throws Exception if an error is raised when adding the permission.
 	 */
-	private static void addPermission(Permission p, String type) throws Exception
+	private static void addPermission(final Permission p, final String type) throws Exception
 	{
 		if (debugEnabled) log.debug("adding " + type + " permission: " + p);
 		permList.add(p);
 	}
-	
+
 	/**
 	 * Parse a permission entry in the policy file.
 	 * @param source the string containing the permission entry.
@@ -276,7 +270,7 @@ public final class PermissionsFactory
 	 * @param line the line number at which the permission entry is.
 	 * @return a <code>Permission</code> object built from the permission entry.
 	 */
-	private static Permission parsePermission(String source, String file, int line)
+	private static Permission parsePermission(final String source, final String file, final int line)
 	{
 		String className = null;
 		String name = null;
@@ -320,7 +314,7 @@ public final class PermissionsFactory
 		}
 		return instantiatePermission(className, name, actions, file, line);
 	}
-	
+
 	/**
 	 * Instantiate a Permission object given its class name, permission name and actions list.
 	 * @param className the name of the permission class.
@@ -330,7 +324,7 @@ public final class PermissionsFactory
 	 * @param line the line number at which the permission entry is.
 	 * @return a <code>Permission</code> object built from the permission components.
 	 */
-	private static Permission instantiatePermission(String className, String name, String actions, String file, int line)
+	private static Permission instantiatePermission(final String className, final String name, final String actions, final String file, final int line)
 	{
 		Permission permission = null;
 		Class<?> c = null;
@@ -384,13 +378,13 @@ public final class PermissionsFactory
 		if (ex != null)
 		{
 			msg = msg + " permission with class=\"" + className + "\", name=\"" + name + "\", actions=\"" +
-				actions + "\" [" + ex.getMessage() + "]";
+			actions + "\" [" + ex.getMessage() + "]";
 			err(file, line, msg);
 			return null;
 		}
 		return permission;
 	}
-	
+
 	/**
 	 * Expand the properties in a permission name of action list.
 	 * @param source string containing the token.
@@ -398,7 +392,7 @@ public final class PermissionsFactory
 	 * @param line the line number at which the permission entry is.
 	 * @return the token with its properties expanded.
 	 */
-	private static String expandProperties(String source, String file, int line)
+	private static String expandProperties(final String source, final String file, final int line)
 	{
 		StringBuilder sb = new StringBuilder();
 		int length = source.length();
@@ -430,14 +424,14 @@ public final class PermissionsFactory
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Print an error message.
 	 * @param file the policy file in which the error was detected.
 	 * @param line the line number at which the error was detected.
 	 * @param msg the error description.
 	 */
-	private static void err(String file, int line, String msg)
+	private static void err(final String file, final int line, final String msg)
 	{
 		System.err.println("Policy file '"+file+"', line "+line+" : "+msg);
 	}

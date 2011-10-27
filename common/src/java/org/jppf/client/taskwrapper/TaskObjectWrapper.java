@@ -60,7 +60,7 @@ public interface TaskObjectWrapper extends Serializable
 
 	/**
 	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static. 
+	 * @return an object or null if the invoked method is static.
 	 */
 	Object getTaskObject();
 }

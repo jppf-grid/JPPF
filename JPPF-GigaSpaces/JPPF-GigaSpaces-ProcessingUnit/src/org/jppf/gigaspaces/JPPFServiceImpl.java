@@ -49,7 +49,7 @@ public class JPPFServiceImpl implements JPPFService
 	 * @see org.jppf.gigaspaces.JPPFService#submitJob(org.jppf.client.JPPFJob)
 	 */
 	@Override
-    public JPPFJob submitJob(JPPFJob job)
+	public JPPFJob submitJob(final JPPFJob job)
 	{
 		int n = job.getTasks().size();
 		System.out.println("received job with " + n + " task" + (n > 1 ? "s" : ""));
@@ -72,7 +72,7 @@ public class JPPFServiceImpl implements JPPFService
 	 */
 	private static synchronized JPPFClient newJPPFClient()
 	{
-        return new JPPFClient();
+		return new JPPFClient();
 	}
 
 	/**

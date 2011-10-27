@@ -51,7 +51,7 @@ public class TimeoutTimerTask implements Runnable
 	 * @param number the number identifying the task.
 	 * @param task the task to cancel.
 	 */
-	public TimeoutTimerTask(NodeExecutionManagerImpl executionManager, long number, Task task)
+	public TimeoutTimerTask(final NodeExecutionManagerImpl executionManager, final long number, final Task task)
 	{
 		this.executionManager = executionManager;
 		this.number = number;

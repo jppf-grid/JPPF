@@ -33,10 +33,10 @@ public class NodeJobInformation implements Serializable
 	 * Explicit serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1L;
-    /**
-     * Empty array
-     */
-    public static final NodeJobInformation[]    EMPTY_ARRAY = new NodeJobInformation[0];
+	/**
+	 * Empty array
+	 */
+	public static final NodeJobInformation[]    EMPTY_ARRAY = new NodeJobInformation[0];
 	/**
 	 * The information about the node.
 	 */
@@ -51,7 +51,7 @@ public class NodeJobInformation implements Serializable
 	 * @param nodeInfo - the information about the node.
 	 * @param jobInfo - the information about the sub-job.
 	 */
-	public NodeJobInformation(JPPFManagementInfo nodeInfo, JobInformation jobInfo)
+	public NodeJobInformation(final JPPFManagementInfo nodeInfo, final JobInformation jobInfo)
 	{
 		this.nodeInfo = nodeInfo;
 		this.jobInfo = jobInfo;

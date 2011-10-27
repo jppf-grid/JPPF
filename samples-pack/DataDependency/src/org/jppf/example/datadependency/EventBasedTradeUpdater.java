@@ -49,6 +49,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 	/**
 	 * Main loop.
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -57,7 +58,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 			initializeData();
 			// start the ticker
 			Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
-				config.getInt("nbTickerEvents", 0), dataFactory);
+					config.getInt("nbTickerEvents", 0), dataFactory);
 			ticker.addTickerListener(marketDataHandler);
 			ticker.addTickerListener(this);
 			print("starting ticker ...");
@@ -91,7 +92,8 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
 	 * @param event encapsulated the market data update.
 	 * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
 	 */
-	public void marketDataUpdated(TickerEvent event)
+	@Override
+	public void marketDataUpdated(final TickerEvent event)
 	{
 		if (jobExecutor.isShutdown()) return;
 		if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());

@@ -20,11 +20,11 @@ package test.jobfromtask;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 
 /**
- * Instances of this class are defined as tasks with a predefined execution length, specified at their creation. 
+ * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
 public class SourceTask extends JPPFTask
@@ -41,7 +41,7 @@ public class SourceTask extends JPPFTask
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		System.out.println("Starting source task '" + getId() + '\'');
 		print("starting JPPF client");
@@ -84,7 +84,7 @@ public class SourceTask extends JPPFTask
 	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 	 */
 	@Override
-    public void onCancel()
+	public void onCancel()
 	{
 		String s = "task '" + getId() + "' has been cancelled";
 		setResult(s);
@@ -95,7 +95,7 @@ public class SourceTask extends JPPFTask
 	 * Print a message to the log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		//log.info(msg);
 		System.out.println(msg);

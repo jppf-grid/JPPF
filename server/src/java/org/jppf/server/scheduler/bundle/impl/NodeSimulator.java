@@ -66,7 +66,7 @@ public class NodeSimulator
 	 * @param dynamicOverhead dynamic overhead expressed as milliseconds per megabyte of data transferred.
 	 * @param speed relative speed of the node.
 	 */
-	public NodeSimulator(double latency, double dynamicOverhead, double speed)
+	public NodeSimulator(final double latency, final double dynamicOverhead, final double speed)
 	{
 		this.latency = latency;
 		this.dynamicOverhead = dynamicOverhead;
@@ -81,7 +81,7 @@ public class NodeSimulator
 	 * @param nbTasks the number of simulated tasks.
 	 * @param timePerTask the simulated execution time for each task.
 	 */
-	public void run(Bundler bundler, double sizeMB, int nbTasks, long timePerTask)
+	public void run(final Bundler bundler, final double sizeMB, final int nbTasks, final long timePerTask)
 	{
 		try
 		{
@@ -104,7 +104,7 @@ public class NodeSimulator
 	 * Entry point to test this class.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -121,7 +121,7 @@ public class NodeSimulator
 
 			Bundler initialBundler = new SimulatedProportionalBundler(profile, maxTasks);
 			System.out.println("Starting simulation with nbNodes="+nbNodes+", maxTasks="+maxTasks+", size="+size+", dataProviderSize="+dataProviderSize+
-				", timePerTask="+timePerTask+", nbIter="+nbIter);
+					", timePerTask="+timePerTask+", nbIter="+nbIter);
 			threadPool = Executors.newFixedThreadPool(nbNodes);
 			Bundler[] bundlers = new Bundler[nbNodes];
 			NodeSimulator[] nodes = new NodeSimulator[nbNodes];
@@ -132,7 +132,7 @@ public class NodeSimulator
 			}
 			nodes[0] = new NodeSimulator(0.25, 0.5, 3);
 			nodes[1] = new NodeSimulator(2, 10, 1);
-			
+
 			for (int i=0; i<nbIter; i++)
 			{
 				long start = System.currentTimeMillis();
@@ -203,7 +203,7 @@ public class NodeSimulator
 		 * @param timePerTask the simulated execution time for each task.
 		 * @param simulator the node simulator.
 		 */
-		public SimulatorTask(Bundler bundler, double sizeMB, int nbTasks, long timePerTask, NodeSimulator simulator)
+		public SimulatorTask(final Bundler bundler, final double sizeMB, final int nbTasks, final long timePerTask, final NodeSimulator simulator)
 		{
 			this.bundler = bundler;
 			this.sizeMB = sizeMB;
@@ -217,7 +217,7 @@ public class NodeSimulator
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			simulator.run(bundler, sizeMB, nbTasks, timePerTask);
 		}
@@ -239,7 +239,7 @@ public class NodeSimulator
 		 * @param maximumSize the maximum bundle size.
 		 * grouped as a performance analysis profile.
 		 */
-		public SimulatedProportionalBundler(LoadBalancingProfile profile, int maximumSize)
+		public SimulatedProportionalBundler(final LoadBalancingProfile profile, final int maximumSize)
 		{
 			super(profile);
 			this.maximumSize = maximumSize;
@@ -251,18 +251,18 @@ public class NodeSimulator
 		 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 		 */
 		@Override
-        protected int maxSize()
+		protected int maxSize()
 		{
 			return maximumSize;
 		}
 
 		/**
-	 * Make a copy of this bundler
-	 * @return a <code>Bundler</code> instance.
+		 * Make a copy of this bundler
+		 * @return a <code>Bundler</code> instance.
 		 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 		 */
 		@Override
-        public Bundler copy()
+		public Bundler copy()
 		{
 			return new SimulatedProportionalBundler(profile, maximumSize);
 		}

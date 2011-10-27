@@ -41,9 +41,9 @@ public class JPPFStartupLoader
 	/**
 	 * Load all instances found in the class path.
 	 * @param <S> the type of startup SPI.
-	 * @param clazz the type of startup classes to lookup and run. 
+	 * @param clazz the type of startup classes to lookup and run.
 	 */
-	public <S extends JPPFStartup> void load(Class<S> clazz)
+	public <S extends JPPFStartup> void load(final Class<S> clazz)
 	{
 		Iterator<S> it = ServiceFinder.lookupProviders(clazz);
 		while (it.hasNext())

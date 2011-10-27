@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.ClientDataProvider;
 
 
@@ -30,7 +30,7 @@ public class ClassLoaderTest
 {
 	private static JPPFClient jppfClient = null;
 
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -57,7 +57,7 @@ public class ClassLoaderTest
 		}
 	}
 
-	private static void displayResults(String title, List<JPPFTask> results)
+	private static void displayResults(final String title, final List<JPPFTask> results)
 	{
 		System.out.println("***** " + title + " *****");
 		for (JPPFTask t: results)
@@ -67,7 +67,7 @@ public class ClassLoaderTest
 		}
 	}
 
-	private static Map<ByteKey, URL> processJars(String...paths) throws Exception
+	private static Map<ByteKey, URL> processJars(final String...paths) throws Exception
 	{
 		Map<ByteKey, URL> map = new HashMap<ByteKey, URL>();
 		for (String path: paths)

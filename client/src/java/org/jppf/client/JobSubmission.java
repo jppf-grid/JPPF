@@ -28,6 +28,7 @@ public interface JobSubmission extends Runnable
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	void run();
 
 	/**
@@ -49,7 +50,7 @@ public interface JobSubmission extends Runnable
 	boolean isLocallyExecuting();
 
 	/**
-	 * Get the job this submission is for. 
+	 * Get the job this submission is for.
 	 * @return a {@link JPPFJob} instance.
 	 */
 	JPPFJob getJob();

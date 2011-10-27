@@ -37,12 +37,12 @@ public abstract class AbstractJobSubmission implements JobSubmission
 	protected AbstractJPPFClientConnection connection;
 
 	/**
-	 * Initialize this job submission. 
+	 * Initialize this job submission.
 	 * @param job the submitted job.
 	 * @param connection the connection to execute the job on.
 	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
 	 */
-	protected AbstractJobSubmission(JPPFJob job, AbstractJPPFClientConnection connection, boolean locallyExecuting)
+	protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting)
 	{
 		this.job = job;
 		this.connection = connection;
@@ -52,6 +52,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getId()
 	{
 		return job.getJobUuid();
@@ -60,6 +61,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public AbstractJPPFClientConnection getConnection()
 	{
 		return connection;
@@ -68,6 +70,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isLocallyExecuting()
 	{
 		return locallyExecuting;

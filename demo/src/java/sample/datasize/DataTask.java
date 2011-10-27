@@ -44,12 +44,12 @@ public class DataTask extends JPPFTask
 	 * The array is created at construction time and passed on to the node.
 	 * @param datasize the size in byte of the byte array this task owns.
 	 */
-	public DataTask(int datasize)
+	public DataTask(final int datasize)
 	{
 		this.datasize = datasize;
 		data = new byte[datasize];
 	}
-	
+
 	/**
 	 * Initialize this task with a byte array of the psecified size.
 	 * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
@@ -57,19 +57,19 @@ public class DataTask extends JPPFTask
 	 * @param datasize the size in byte of the byte array this task owns.
 	 * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
 	 */
-	public DataTask(int datasize, boolean inNodeOnly)
+	public DataTask(final int datasize, final boolean inNodeOnly)
 	{
 		this.datasize = datasize;
 		this.inNodeOnly = inNodeOnly;
 		if (!inNodeOnly) data = new byte[datasize];
 	}
-	
+
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

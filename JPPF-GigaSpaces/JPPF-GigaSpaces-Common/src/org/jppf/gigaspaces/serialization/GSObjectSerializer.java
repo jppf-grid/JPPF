@@ -44,13 +44,13 @@ public class GSObjectSerializer extends ObjectSerializerImpl
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
 	 */
 	@Override
-    public Object deserialize(InputStream is) throws Exception
+	public Object deserialize(final InputStream is) throws Exception
 	{
 		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-        try {
-            return ois.readObject();
-        } finally {
-            ois.close();
-        }
+		try {
+			return ois.readObject();
+		} finally {
+			ois.close();
+		}
 	}
 }

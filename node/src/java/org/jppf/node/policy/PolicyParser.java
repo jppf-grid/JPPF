@@ -38,7 +38,7 @@ public class PolicyParser
 	 * List of possible rule names.
 	 */
 	private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
-            "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule");
+			"BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule");
 	/**
 	 * The DOM parser used to build the descriptor tree.
 	 */
@@ -55,13 +55,13 @@ public class PolicyParser
 	}
 
 	/**
-	 * Parse an XML document in a file into a tree of option descriptors. 
+	 * Parse an XML document in a file into a tree of option descriptors.
 	 * @param docPath the path to XML document to parse.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
-	public PolicyDescriptor parse(String docPath) throws Exception
+	public PolicyDescriptor parse(final String docPath) throws Exception
 	{
 		InputStream is = FileUtils.getFileInputStream(docPath);
 		if (is == null) return null;
@@ -70,13 +70,13 @@ public class PolicyParser
 	}
 
 	/**
-	 * Parse an XML document in a reader into a tree of option descriptors. 
+	 * Parse an XML document in a reader into a tree of option descriptors.
 	 * @param reader the reader providing the XML document.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
-	public PolicyDescriptor parse(Reader reader) throws Exception
+	public PolicyDescriptor parse(final Reader reader) throws Exception
 	{
 		InputSource is = new InputSource(reader);
 		Document doc = parser.parse(is);
@@ -88,7 +88,7 @@ public class PolicyParser
 	 * @param doc the document whose children are looked up.
 	 * @return a <code>Node</code> instance if one was found, or null otherwise.
 	 */
-	private Node findFirstElement(Document doc)
+	private Node findFirstElement(final Document doc)
 	{
 		NodeList list = doc.getChildNodes();
 		for (int i=0; i<list.getLength(); i++)
@@ -105,7 +105,7 @@ public class PolicyParser
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
 	 */
-	private PolicyDescriptor generateTree(Node node)
+	private PolicyDescriptor generateTree(final Node node)
 	{
 		PolicyDescriptor desc = new PolicyDescriptor();
 		desc.type = node.getNodeName();
@@ -138,7 +138,7 @@ public class PolicyParser
 	 * @param node the node to generate whosde child is a text node.
 	 * @return the text as a string.
 	 */
-	private String getTextNodeValue(Node node)
+	private String getTextNodeValue(final Node node)
 	{
 		NodeList children = node.getChildNodes();
 		for (int j=0; j<children.getLength(); j++)
@@ -157,7 +157,7 @@ public class PolicyParser
 	 * Test of the parser.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -191,7 +191,7 @@ public class PolicyParser
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(String policyContent) throws Exception
+	public static ExecutionPolicy parsePolicy(final String policyContent) throws Exception
 	{
 		return parsePolicy(new StringReader(policyContent));
 	}
@@ -202,7 +202,7 @@ public class PolicyParser
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicyFile(String docPath) throws Exception
+	public static ExecutionPolicy parsePolicyFile(final String docPath) throws Exception
 	{
 		return parsePolicy(FileUtils.getFileReader(docPath));
 	}
@@ -213,7 +213,7 @@ public class PolicyParser
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(File policyFile) throws Exception
+	public static ExecutionPolicy parsePolicy(final File policyFile) throws Exception
 	{
 		return parsePolicy(new BufferedReader(new FileReader(policyFile)));
 	}
@@ -224,7 +224,7 @@ public class PolicyParser
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(InputStream stream) throws Exception
+	public static ExecutionPolicy parsePolicy(final InputStream stream) throws Exception
 	{
 		return parsePolicy(new InputStreamReader(stream));
 	}
@@ -235,7 +235,7 @@ public class PolicyParser
 	 * @return an <code>ExecutionPolicy</code> instance.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static ExecutionPolicy parsePolicy(Reader reader) throws Exception
+	public static ExecutionPolicy parsePolicy(final Reader reader) throws Exception
 	{
 		PolicyDescriptor desc = new PolicyParser().parse(reader);
 		return new PolicyBuilder().buildPolicy(desc.children.get(0));
@@ -248,7 +248,7 @@ public class PolicyParser
 	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
 	 * @throws Exception if an error occurs during the validation.
 	 */
-	public static void validatePolicy(String policyContent) throws JPPFException, Exception
+	public static void validatePolicy(final String policyContent) throws JPPFException, Exception
 	{
 		validatePolicy(FileUtils.getFileReader(policyContent));
 	}
@@ -260,7 +260,7 @@ public class PolicyParser
 	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
 	 * @throws Exception if an error occurs during the validation.
 	 */
-	public static void validatePolicyFile(String docPath) throws JPPFException, Exception
+	public static void validatePolicyFile(final String docPath) throws JPPFException, Exception
 	{
 		validatePolicy(FileUtils.getFileReader(docPath));
 	}
@@ -272,7 +272,7 @@ public class PolicyParser
 	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
 	 * @throws Exception if an error occurs during the validation.
 	 */
-	public static void validatePolicy(File docPath) throws JPPFException, Exception
+	public static void validatePolicy(final File docPath) throws JPPFException, Exception
 	{
 		validatePolicy(new BufferedReader(new FileReader(docPath)));
 	}
@@ -284,7 +284,7 @@ public class PolicyParser
 	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static void validatePolicy(InputStream stream) throws JPPFException, Exception
+	public static void validatePolicy(final InputStream stream) throws JPPFException, Exception
 	{
 		validatePolicy(new InputStreamReader(stream));
 	}
@@ -296,7 +296,7 @@ public class PolicyParser
 	 * @throws JPPFException if there is a validation error. The details of the errors are included in the exception message.
 	 * @throws Exception if an error occurs during the validation or parsing.
 	 */
-	public static void validatePolicy(Reader reader) throws JPPFException, Exception
+	public static void validatePolicy(final Reader reader) throws JPPFException, Exception
 	{
 		JPPFErrorReporter reporter = new JPPFErrorReporter("XML validator");
 		String schemaPath = "org/jppf/schemas/ExecutionPolicy.xsd";

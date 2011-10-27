@@ -53,11 +53,11 @@ public class TradeUpdateTask extends JPPFTask
 	private long taskDuration = 1000L;
 
 	/**
-	 * Initialize this task with the specified trade and ids of updated market data. 
+	 * Initialize this task with the specified trade and ids of updated market data.
 	 * @param tradeId the id of the trade to recompute.
 	 * @param marketDataId the identifiers for the market data that was updated.
 	 */
-	public TradeUpdateTask(String tradeId, String...marketDataId)
+	public TradeUpdateTask(final String tradeId, final String...marketDataId)
 	{
 		this.tradeId = tradeId;
 		this.marketDataId = marketDataId;
@@ -67,13 +67,14 @@ public class TradeUpdateTask extends JPPFTask
 	 * Recompute the trade.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		//String uuid = NodeRunner.getUuid();
 		String msg = "updating trade " + tradeId;
 		long taskStart = System.currentTimeMillis();
 		/*
-		*/
+		 */
 		Trade trade = DataDependencyStartup.getTrade(tradeId);
 		List<MarketData> data = new ArrayList<MarketData>();
 		for (String id: trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
@@ -112,7 +113,7 @@ public class TradeUpdateTask extends JPPFTask
 	 * Set the simulated duration of this task.
 	 * @param taskDuration the duration in milliseconds.
 	 */
-	public void setTaskDuration(long taskDuration)
+	public void setTaskDuration(final long taskDuration)
 	{
 		this.taskDuration = taskDuration;
 	}

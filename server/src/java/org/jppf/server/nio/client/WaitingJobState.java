@@ -29,7 +29,7 @@ import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
 /**
- * This class performs performs the work of reading a task bundle execution response from a node. 
+ * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
 class WaitingJobState extends ClientServerState
@@ -47,7 +47,7 @@ class WaitingJobState extends ClientServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public WaitingJobState(ClientNioServer server)
+	public WaitingJobState(final ClientNioServer server)
 	{
 		super(server);
 	}
@@ -60,7 +60,7 @@ class WaitingJobState extends ClientServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClientTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
 	{
 		ClientContext context = (ClientContext) channel.getContext();
 		if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());

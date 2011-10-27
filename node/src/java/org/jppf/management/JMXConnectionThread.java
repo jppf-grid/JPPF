@@ -52,7 +52,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
 	 * Initialize this thread with the specified connection.
 	 * @param connectionWrapper the connection that holds this thread.
 	 */
-	public JMXConnectionThread(JMXConnectionWrapper connectionWrapper)
+	public JMXConnectionThread(final JMXConnectionWrapper connectionWrapper)
 	{
 		this.connectionWrapper = connectionWrapper;
 	}
@@ -62,7 +62,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		while (!isStopped())
 		{
@@ -146,14 +146,14 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
 	 * Get the connecting state of this connection thread.
 	 * @param connecting true if the connection is established, false otherwise.
 	 */
-	public synchronized void setConnecting(boolean connecting)
+	public synchronized void setConnecting(final boolean connecting)
 	{
 		this.connecting = connecting;
 	}
 
 	/**
 	 * Determines the suspended state of this connection thread.
-	 * @return true if the thread is suspended, false otherwise. 
+	 * @return true if the thread is suspended, false otherwise.
 	 */
 	public synchronized boolean isSuspended()
 	{
@@ -164,7 +164,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
 	 * Set the suspended state of this connection thread.
 	 * @param suspended true if the connection is suspended, false otherwise.
 	 */
-	public synchronized void setSuspended(boolean suspended)
+	public synchronized void setSuspended(final boolean suspended)
 	{
 		this.suspended = suspended;
 	}

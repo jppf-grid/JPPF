@@ -41,7 +41,8 @@ public class ImagePanel extends JPanel
 	 * @param g the graphic context to draw in
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
 	 */
-	protected void paintComponent(Graphics g)
+	@Override
+	protected void paintComponent(final Graphics g)
 	{
 		// Now call the superclass behavior to paint the foreground.
 		super.paintComponent(g);
@@ -61,7 +62,7 @@ public class ImagePanel extends JPanel
 	 * Set the image to draw in this panel.
 	 * @param image an <code>Image</code> instance.
 	 */
-	public void setImage(Image image)
+	public void setImage(final Image image)
 	{
 		this.image = image;
 	}
@@ -71,7 +72,7 @@ public class ImagePanel extends JPanel
 	 * @param imagePath a string specifying the path ot an image file.
 	 * @throws Exception if the image could not be loaded.
 	 */
-	public void setImage(String imagePath) throws Exception
+	public void setImage(final String imagePath) throws Exception
 	{
 		this.image = ImageIO.read(new File(imagePath));
 	}

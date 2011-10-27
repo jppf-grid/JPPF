@@ -42,7 +42,7 @@ public class HelloWorldAnnotatedConstructor implements Serializable
 	 * @param number an example primitive argument.
 	 */
 	@JPPFRunnable
-	public HelloWorldAnnotatedConstructor(String message, int number)
+	public HelloWorldAnnotatedConstructor(final String message, final int number)
 	{
 		this.hello = "Hello, World (annotated constructor, " + message + ", " + number + ')';
 		System.out.println(this.hello);
@@ -50,10 +50,10 @@ public class HelloWorldAnnotatedConstructor implements Serializable
 
 	/**
 	 * Get the string resulting from the task execution.
-	 * @return a string. 
+	 * @return a string.
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return hello;
 	}

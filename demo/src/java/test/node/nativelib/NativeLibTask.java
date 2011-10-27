@@ -53,11 +53,11 @@ public class NativeLibTask extends JPPFTask
 	 * it will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
 	 * <li>otherwise, it will first be wrapped in a {@link org.jppf.JPPFException JPPFException},
 	 * then this <code>JPPFException</code> will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
-	 * </ul> 
+	 * </ul>
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		// write your task code here.
 		System.out.println("Hello, this is the node executing a template JPPF task");

@@ -68,7 +68,7 @@ public class LifeCycleTask extends JPPFTask
 	 * Initialize this task.
 	 * @param duration specifies the duration of this task.
 	 */
-	public LifeCycleTask(long duration)
+	public LifeCycleTask(final long duration)
 	{
 		this.duration = duration;
 	}
@@ -77,7 +77,7 @@ public class LifeCycleTask extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		start = System.currentTimeMillis();
 		try
@@ -97,7 +97,7 @@ public class LifeCycleTask extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void onCancel()
+	public void onCancel()
 	{
 		elapsed = System.currentTimeMillis() - start;
 		cancelled = true;
@@ -108,7 +108,7 @@ public class LifeCycleTask extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void onRestart()
+	public void onRestart()
 	{
 		elapsed = System.currentTimeMillis() - start;
 		restarted = true;
@@ -119,7 +119,7 @@ public class LifeCycleTask extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void onTimeout()
+	public void onTimeout()
 	{
 		elapsed = System.currentTimeMillis() - start;
 		timedout = true;
@@ -130,7 +130,7 @@ public class LifeCycleTask extends JPPFTask
 	 * Log or display a message showing the execution status and elapsed of this task.
 	 * @param message a short message describing the life cycle status.
 	 */
-	private void displayElapsed(String message)
+	private void displayElapsed(final String message)
 	{
 		log.info("task id='" + getId() + "' " + message + ", duration=" + duration + ", result=" + getResult() + ", elapsed=" + elapsed);
 	}

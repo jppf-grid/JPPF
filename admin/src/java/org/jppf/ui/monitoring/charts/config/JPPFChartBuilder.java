@@ -100,11 +100,11 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 				}
 			});
 		}
-		*/
+		 */
 		createInitialCharts();
 		StatsHandler.getInstance().addStatsHandlerListener(this);
 	}
-	
+
 	/**
 	 * Initialize the mapping of chart types to the chart handler used to create and update them.
 	 */
@@ -126,7 +126,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 	 * A negative value means it's simply appended.
 	 * @return the configuration with its created chart set.
 	 */
-	public ChartConfiguration createChart(ChartConfiguration config, boolean preview)
+	public ChartConfiguration createChart(final ChartConfiguration config, final boolean preview)
 	{
 		ChartConfiguration cfg = preview ? new ChartConfiguration(config) : config;
 		ChartHandler handler = handlerMap.get(cfg.type);
@@ -141,19 +141,19 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 	 * Remove a tab from the list of tabs.
 	 * @param tab the configuration information for the tab to remove.
 	 */
-	public void removeTab(TabConfiguration tab)
+	public void removeTab(final TabConfiguration tab)
 	{
 		remove(tab.panel);
 		tabList.remove(tab);
 		tabMap.remove(tab.name);
 		for (int i=0; i<tabList.size(); i++) tabList.get(i).position = i;
 	}
-	
+
 	/**
 	 * Remove a tab from the list of tabs.
 	 * @param tab the configuration information for the tab to remove.
 	 */
-	public void addTab(TabConfiguration tab)
+	public void addTab(final TabConfiguration tab)
 	{
 		tab.panel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
 		if (tab.position < 0)
@@ -170,26 +170,26 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 		for (int i=0; i<tabList.size(); i++) tabList.get(i).position = i;
 		tab.panel.updateUI();
 	}
-	
+
 	/**
 	 * Remove a specified configuration from the list of active configurations.
 	 * @param tab the configuration information for the tab containing the chart.
 	 * @param config the configuration to remove.
 	 */
-	public void removeChart(TabConfiguration tab, ChartConfiguration config)
+	public void removeChart(final TabConfiguration tab, final ChartConfiguration config)
 	{
 		tab.configs.remove(config);
 		JPanel panel = tab.panel;
 		panel.remove(config.chartPanel);
 		panel.updateUI();
 	}
-	
+
 	/**
 	 * Update the data displayed in the charts.
 	 * @param event holds the new stats values.
 	 */
 	@Override
-    public void dataUpdated(final StatsHandlerEvent event)
+	public void dataUpdated(final StatsHandlerEvent event)
 	{
 		for (TabConfiguration tab: tabMap.values())
 		{
@@ -198,7 +198,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					@Override
-                    public void run()
+					public void run()
 					{
 						if (event.getType().equals(StatsHandlerEvent.Type.UPDATE))
 						{
@@ -237,7 +237,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 	 * @param tabName the name of the tab to lookup.
 	 * @return a <code>JPanel</code> instance.
 	 */
-	public JPanel getTabPanel(String tabName)
+	public JPanel getTabPanel(final String tabName)
 	{
 		return tabMap.get(tabName).panel;
 	}
@@ -275,13 +275,13 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
 		addChart(bar, new ChartConfiguration("Queue size (bar chart)", CHART_3DBAR, null, 0, fields));
 		addChart(plot, new ChartConfiguration("Queue size", CHART_PLOTXY, null, 0, fields));
 	}
-	
+
 	/**
 	 * Add a chart to a tab.
 	 * @param tab the tab to add a chart to.
 	 * @param config the chart to add.
 	 */
-	public void addChart(TabConfiguration tab, ChartConfiguration config)
+	public void addChart(final TabConfiguration tab, final ChartConfiguration config)
 	{
 		createChart(config, false);
 		if (config.position < 0)

@@ -78,7 +78,7 @@ public class FileReplacer
 	 * @param searchOnly determines whether only the search is performed (no replacement).
 	 * @throws Exception if an error occurs while performing the replacements.
 	 */
-	public void replace(String rootDir, String srcFile, String destFile, String ext, boolean searchOnly) throws Exception
+	public void replace(final String rootDir, final String srcFile, final String destFile, final String ext, final boolean searchOnly) throws Exception
 	{
 		src = FileUtils.readTextFile(srcFile);
 		dest = FileUtils.readTextFile(destFile);
@@ -97,7 +97,7 @@ public class FileReplacer
 		else replaceFile(f);
 		log.info("Total number of occurences found: " + nbReplacements);
 		log.info("Total number of files" + (searchOnly ? " would have been" : "") +
-			" changed: " + nbFilesChanged);
+				" changed: " + nbFilesChanged);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class FileReplacer
 	 * @param folder the process to visit.
 	 * @throws Exception if an eeror occurs while processing the folder.
 	 */
-	private void replaceFolder(File folder) throws Exception
+	private void replaceFolder(final File folder) throws Exception
 	{
 		if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
 		File[] fileList = folder.listFiles(filter);
@@ -126,7 +126,7 @@ public class FileReplacer
 	 * @param file the file to process.
 	 * @throws Exception if an eeror occurs while processing the folder.
 	 */
-	private void replaceFile(File file) throws Exception
+	private void replaceFile(final File file) throws Exception
 	{
 		String content = FileUtils.readTextFile(file.getPath());
 		Matcher matcher = pattern.matcher(content);
@@ -163,7 +163,7 @@ public class FileReplacer
 	 * args[3] : true to indicate that the replacements should only be simulated (i.e changes preview), false to really peform the replacements.
 	 * @param args defines the text search, the text to replace it with, the file extensions to process, and whether changes are only simulated.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -173,7 +173,7 @@ public class FileReplacer
 			String ext = args[3];
 			boolean searchOnly = Boolean.valueOf(args[4]);
 			FileReplacer replacer = new FileReplacer();
-			replacer.replace(rootFolder, find, replace, ext, searchOnly); 
+			replacer.replace(rootFolder, find, replace, ext, searchOnly);
 		}
 		catch(Exception e)
 		{
@@ -195,10 +195,10 @@ public class FileReplacer
 		 * Initializer this filter with the specified set of file extensions.
 		 * @param ext a comma-separated list of file extensions to process.
 		 */
-		public ReplacerFilter(String ext)
+		public ReplacerFilter(final String ext)
 		{
-			if (ext == null) ext = "";
-			extensions = ext.split(",");
+			String s = (ext == null) ? "" : ext;
+			extensions = s.split(",");
 			for (int i=0; i<extensions.length; i++) extensions[i] = extensions[i].trim();
 		}
 
@@ -209,7 +209,7 @@ public class FileReplacer
 		 * @see java.io.FileFilter#accept(java.io.File)
 		 */
 		@Override
-        public boolean accept(File file)
+		public boolean accept(final File file)
 		{
 			if (file.isDirectory()) return true;
 			String ext = FileUtils.getFileExtension(file);

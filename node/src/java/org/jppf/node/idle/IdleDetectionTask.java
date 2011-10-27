@@ -43,7 +43,7 @@ public class IdleDetectionTask extends TimerTask
 	 */
 	private long idleTimeout = 300000L;
 	/**
-	 * Captures the idle state of the system, as specified by the idle timeout. 
+	 * Captures the idle state of the system, as specified by the idle timeout.
 	 */
 	private IdleState state = BUSY;
 	/**
@@ -65,7 +65,7 @@ public class IdleDetectionTask extends TimerTask
 	 * @param idleTimeout the time of inactivity after which the system is considered idle, in milliseconds.
 	 * @param initialListeners a set of listeners to add to this task at construction time.
 	 */
-	public IdleDetectionTask(IdleTimeDetectorFactory factory, long idleTimeout, IdleStateListener...initialListeners)
+	public IdleDetectionTask(final IdleTimeDetectorFactory factory, final long idleTimeout, final IdleStateListener...initialListeners)
 	{
 		this.idleTimeout = idleTimeout;
 		this.factory = factory;
@@ -80,7 +80,7 @@ public class IdleDetectionTask extends TimerTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		if (detector == null)
 		{
@@ -122,7 +122,7 @@ public class IdleDetectionTask extends TimerTask
 	 * and fire a corresponding state change event.
 	 * @param state an {@link IdleState} enum value.
 	 */
-	private void changeStateTo(IdleState state)
+	private void changeStateTo(final IdleState state)
 	{
 		this.state = state;
 		fireIdleStateEvent();
@@ -132,7 +132,7 @@ public class IdleDetectionTask extends TimerTask
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add.
 	 */
-	public void addIdleStateListener(IdleStateListener listener)
+	public void addIdleStateListener(final IdleStateListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)
@@ -145,7 +145,7 @@ public class IdleDetectionTask extends TimerTask
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to remove.
 	 */
-	public void removeIdleStateListener(IdleStateListener listener)
+	public void removeIdleStateListener(final IdleStateListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)

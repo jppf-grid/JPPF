@@ -59,7 +59,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 * @param channel the channel whose state is changing.
 	 * @param factory the factory for the server that runs this task.
 	 */
-	public StateTransitionTask(ChannelWrapper<?> channel, NioServerFactory<S, T> factory)
+	public StateTransitionTask(final ChannelWrapper<?> channel, final NioServerFactory<S, T> factory)
 	{
 		this.channel = channel;
 		this.factory = factory;
@@ -70,7 +70,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public void run()
 	{
 		synchronized(channel)

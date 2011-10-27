@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.acceptor;
 
-import static org.jppf.server.nio.acceptor.AcceptorState.*;
-import static org.jppf.server.nio.acceptor.AcceptorTransition.*;
+import static org.jppf.server.nio.acceptor.AcceptorState.IDENTIFYING_PEER;
+import static org.jppf.server.nio.acceptor.AcceptorTransition.TO_IDENTIFYING_PEER;
 
 import java.util.*;
 
@@ -36,7 +36,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * Initialize this factory with the specified server.
 	 * @param server the server for which to initialize.
 	 */
-	public AcceptorServerFactory(AcceptorNioServer server)
+	public AcceptorServerFactory(final AcceptorNioServer server)
 	{
 		super(server);
 	}
@@ -47,7 +47,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
 	@Override
-    public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
+	public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
 	{
 		Map<AcceptorState, NioState<AcceptorTransition>> map = new EnumMap<AcceptorState, NioState<AcceptorTransition>>(AcceptorState.class);
 		map.put(IDENTIFYING_PEER, new IdentifyingPeerState((AcceptorNioServer) server));
@@ -61,7 +61,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
 	@Override
-    public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
+	public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
 	{
 		Map<AcceptorTransition, NioTransition<AcceptorState>> map =
 			new EnumMap<AcceptorTransition, NioTransition<AcceptorState>>(AcceptorTransition.class);
@@ -76,7 +76,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 	 * @param ops the operations allowed.
 	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
 	 */
-	private static NioTransition<AcceptorState> transition(AcceptorState state, int ops)
+	private static NioTransition<AcceptorState> transition(final AcceptorState state, final int ops)
 	{
 		return new NioTransition<AcceptorState>(state, ops);
 	}

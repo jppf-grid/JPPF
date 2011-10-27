@@ -58,7 +58,7 @@ class JobDataPanelManager
 	 * Initialize this job data panel manager.
 	 * @param jobPanel the job data panel holding this manager.
 	 */
-	public JobDataPanelManager(JobDataPanel jobPanel)
+	public JobDataPanelManager(final JobDataPanel jobPanel)
 	{
 		this.jobPanel = jobPanel;
 	}
@@ -215,7 +215,7 @@ class JobDataPanelManager
 	 * @param driverName name of the dirver to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	DefaultMutableTreeNode findDriver(String driverName)
+	DefaultMutableTreeNode findDriver(final String driverName)
 	{
 		for (int i=0; i<jobPanel.getTreeTableRoot().getChildCount(); i++)
 		{
@@ -233,7 +233,7 @@ class JobDataPanelManager
 	 * @param jobInfo information about the job to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the job could not be found.
 	 */
-	DefaultMutableTreeNode findJob(DefaultMutableTreeNode driverNode, JobInformation jobInfo)
+	DefaultMutableTreeNode findJob(final DefaultMutableTreeNode driverNode, final JobInformation jobInfo)
 	{
 		for (int i=0; i<driverNode.getChildCount(); i++)
 		{
@@ -250,7 +250,7 @@ class JobDataPanelManager
 	 * @param nodeInfo holds information on the node to which the sub-job was dispatched.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the sub-job could not be found.
 	 */
-	DefaultMutableTreeNode findSubJob(DefaultMutableTreeNode jobNode, JPPFManagementInfo nodeInfo)
+	DefaultMutableTreeNode findSubJob(final DefaultMutableTreeNode jobNode, final JPPFManagementInfo nodeInfo)
 	{
 		if (nodeInfo == null) return null;
 		for (int i=0; i<jobNode.getChildCount(); i++)
@@ -265,11 +265,11 @@ class JobDataPanelManager
 
 	/**
 	 * Find the position at which to insert a driver,
-	 * using the sorted lexical order of driver names. 
+	 * using the sorted lexical order of driver names.
 	 * @param driverName the name of the driver to insert.
 	 * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
 	 */
-	int driverInsertIndex(String driverName)
+	int driverInsertIndex(final String driverName)
 	{
 		DefaultMutableTreeNode root = jobPanel.getTreeTableRoot();
 		int n = root.getChildCount();
@@ -285,12 +285,12 @@ class JobDataPanelManager
 	}
 
 	/**
-	 * Find the position at which to insert a job, using the sorted lexical order of job names. 
+	 * Find the position at which to insert a job, using the sorted lexical order of job names.
 	 * @param driverNode name the parent tree node of the job to insert.
 	 * @param jobInfo information about the job to insert.
 	 * @return the index at which to insert the job, or -1 if the job is already in the tree.
 	 */
-	int jobInsertIndex(DefaultMutableTreeNode driverNode, JobInformation jobInfo)
+	int jobInsertIndex(final DefaultMutableTreeNode driverNode, final JobInformation jobInfo)
 	{
 		int n = driverNode.getChildCount();
 		String jobName = jobInfo.getJobId();
@@ -306,12 +306,12 @@ class JobDataPanelManager
 	}
 
 	/**
-	 * Find the position at which to insert a subjob, using the sorted lexical order of subjob names. 
+	 * Find the position at which to insert a subjob, using the sorted lexical order of subjob names.
 	 * @param jobNode the parent tree node of the subjob to insert.
 	 * @param nodeInfo information about the subjob to insert.
 	 * @return the index at which to insert the subjob, or -1 if the subjob is already in the tree.
 	 */
-	int subJobInsertIndex(DefaultMutableTreeNode jobNode, JPPFManagementInfo nodeInfo)
+	int subJobInsertIndex(final DefaultMutableTreeNode jobNode, final JPPFManagementInfo nodeInfo)
 	{
 		int n = jobNode.getChildCount();
 		String subJobName = nodeInfo.toString();
@@ -341,7 +341,7 @@ class JobDataPanelManager
 		 * Initialize this listener with the specified connection name.
 		 * @param driverName the name of the connection.
 		 */
-		public ConnectionStatusListener(String driverName)
+		public ConnectionStatusListener(final String driverName)
 		{
 			this.driverName = driverName;
 		}
@@ -352,7 +352,7 @@ class JobDataPanelManager
 		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 		 */
 		@Override
-        public void statusChanged(ClientConnectionStatusEvent event)
+		public void statusChanged(final ClientConnectionStatusEvent event)
 		{
 			DefaultMutableTreeNode driverNode = findDriver(driverName);
 			if (driverNode != null) jobPanel.getModel().changeNode(driverNode);

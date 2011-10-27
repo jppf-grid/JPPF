@@ -30,6 +30,7 @@ public class TestDriverStartup implements JPPFDriverStartupSPI
 	 * This is a test of a driver startup class.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		System.out.println("I'm a driver startup class");

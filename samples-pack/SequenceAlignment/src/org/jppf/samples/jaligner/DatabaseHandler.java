@@ -53,16 +53,16 @@ public class DatabaseHandler
 	 * Determiens whether EOF was reached on the sequence database.
 	 */
 	private boolean eof = false;
-	
+
 	/**
-	 * Generate an index file for the specified database. 
+	 * Generate an index file for the specified database.
 	 * @param path the path to the sequence database.
 	 * @param indexPath the path to the index file to generate.
 	 * @param charset name of the charset to use when reading the sequence database.
 	 * If null, the default charset will be used.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public DatabaseHandler(String path, String indexPath, String charset) throws Exception
+	public DatabaseHandler(final String path, final String indexPath, final String charset) throws Exception
 	{
 		this.charset = (charset == null) ? Charset.defaultCharset().name() : charset;
 		dis = new DataInputStream(new BufferedInputStream(new FileInputStream(indexPath)));
@@ -105,7 +105,7 @@ public class DatabaseHandler
 	}
 
 	/**
-	 * Generate an index file for the specified database. 
+	 * Generate an index file for the specified database.
 	 * @param path the path to the sequence database.
 	 * @param indexPath the path to the index file to generate.
 	 * @param charset name of the charset to use when reading the sequence database.
@@ -113,10 +113,11 @@ public class DatabaseHandler
 	 * @return the number of sequences in the database.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public static int generateIndex(String path, String indexPath, String charset) throws Exception
+	public static int generateIndex(final String path, final String indexPath, final String charset) throws Exception
 	{
-		if (charset == null) charset = Charset.defaultCharset().name();
-		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
+		String cs = charset;
+		if (cs == null) cs = Charset.defaultCharset().name();
+		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), cs));
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(indexPath)));
 		boolean end = false;
 		int c = reader.read();

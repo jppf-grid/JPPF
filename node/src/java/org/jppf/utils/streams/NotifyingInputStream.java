@@ -43,7 +43,7 @@ public class NotifyingInputStream extends InputStream
 	 * @param delegate the input stream to which operations are delegated.
 	 * @param callback the callback to notify of stream operations.
 	 */
-	public NotifyingInputStream(InputStream delegate, NotifyingStreamCallback callback)
+	public NotifyingInputStream(final InputStream delegate, final NotifyingStreamCallback callback)
 	{
 		if (delegate == null) throw new IllegalArgumentException("input stream cannot be null");
 		if (callback == null) throw new IllegalArgumentException("the callback cannot be null");
@@ -55,7 +55,7 @@ public class NotifyingInputStream extends InputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int read() throws IOException
+	public int read() throws IOException
 	{
 		int n = delegate.read();
 		if (n >= 0) callback.bytesNotification(1);
@@ -66,7 +66,7 @@ public class NotifyingInputStream extends InputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int read(byte[] b) throws IOException
+	public int read(final byte[] b) throws IOException
 	{
 		return read(b, 0, b.length);
 	}
@@ -75,7 +75,7 @@ public class NotifyingInputStream extends InputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int read(byte[] b, int off, int len) throws IOException
+	public int read(final byte[] b, final int off, final int len) throws IOException
 	{
 		int n = delegate.read(b, off, len);
 		if (n >= 0) callback.bytesNotification(n);
@@ -86,7 +86,7 @@ public class NotifyingInputStream extends InputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public long skip(long n) throws IOException
+	public long skip(final long n) throws IOException
 	{
 		long l = delegate.skip(n);
 		if (l >= 0) callback.bytesNotification(l);
@@ -97,7 +97,7 @@ public class NotifyingInputStream extends InputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		delegate.close();
 	}

@@ -50,7 +50,7 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
 	 * @param panel the node data panel.
 	 * @param driverName the name of the connection.
 	 */
-	public ConnectionStatusListener(NodeDataPanel panel, String driverName)
+	public ConnectionStatusListener(final NodeDataPanel panel, final String driverName)
 	{
 		this.driverName = driverName;
 		this.panel = panel;
@@ -62,7 +62,7 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
 	@Override
-    public void statusChanged(ClientConnectionStatusEvent event)
+	public void statusChanged(final ClientConnectionStatusEvent event)
 	{
 		ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
 		if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());

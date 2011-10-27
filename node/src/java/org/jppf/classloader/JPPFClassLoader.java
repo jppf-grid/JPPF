@@ -56,7 +56,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * Initialize this class loader with a parent class loader.
 	 * @param parent a ClassLoader instance.
 	 */
-	public JPPFClassLoader(ClassLoader parent)
+	public JPPFClassLoader(final ClassLoader parent)
 	{
 		super(parent);
 		init();
@@ -67,7 +67,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	 * @param parent a ClassLoader instance.
 	 * @param uuidPath unique identifier for the submitting application.
 	 */
-	public JPPFClassLoader(ClassLoader parent, List<String> uuidPath)
+	public JPPFClassLoader(final ClassLoader parent, final List<String> uuidPath)
 	{
 		super(parent, uuidPath);
 	}
@@ -85,7 +85,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		socketClient.setHost(host);
 		socketClient.setPort(port);
 	}
-	
+
 	/**
 	 * Initialize the underlying socket connection.
 	 */
@@ -109,7 +109,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 						socketClient = null;
 						throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
 					}
-		
+
 					// we need to do this in order to dramatically simplify the state machine of ClassServer
 					try
 					{
@@ -207,12 +207,12 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * Load the specified class from a socket connection.
 	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
 	@Override
-	protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	protected JPPFResourceWrapper loadRemoteData(final Map<String, Object> map, final boolean asResource) throws Exception
 	{
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -259,7 +259,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		 * @param request the request to send.
 		 * @throws Exception if any error occurs.
 		 */
-		public ResourceRequest(JPPFResourceWrapper request) throws Exception
+		public ResourceRequest(final JPPFResourceWrapper request) throws Exception
 		{
 			super(request);
 			transform = JPPFDataTransformFactory.getInstance();
@@ -272,7 +272,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -291,7 +291,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		 * {@inheritDoc}
 		 */
 		@Override
-        public JPPFResourceWrapper getResponse() throws Exception
+		public JPPFResourceWrapper getResponse() throws Exception
 		{
 			if (response == null)
 			{

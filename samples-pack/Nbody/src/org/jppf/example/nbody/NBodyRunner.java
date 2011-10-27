@@ -38,10 +38,10 @@
 
 package org.jppf.example.nbody;
 
-import java.awt.Dimension;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -86,7 +86,7 @@ public class NBodyRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -102,7 +102,7 @@ public class NBodyRunner
 			jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @throws Exception if an error is raised during the execution.
@@ -162,7 +162,7 @@ public class NBodyRunner
 				if (e != null) throw e;
 			}
 			tasks = results;
-			positions = new Vector2d[nbBodies]; 
+			positions = new Vector2d[nbBodies];
 			for (int i=0; i<nbTasks; i++)
 			{
 				NBody[] bodies = ((NBodyTask) tasks.get(i)).getBodies();
@@ -174,7 +174,7 @@ public class NBodyRunner
 			//log.info(msg);
 		}
 		updateLabel("Total time:  " + StringUtils.toStringDuration(totalTime) + " (" + (totalTime/1000) + " seconds)" +
-			", Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
+				", Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
 	}
 
 	/**
@@ -186,6 +186,7 @@ public class NBodyRunner
 		if (panel.isUpdating()) return;
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				label.setText(text);
@@ -201,9 +202,10 @@ public class NBodyRunner
 	{
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		JFrame frame = new JFrame("N-Body demo");
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
+			@Override
+			public void windowClosing(final WindowEvent e) {
 				System.exit(0);
 			}
 		});
@@ -227,7 +229,7 @@ public class NBodyRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);

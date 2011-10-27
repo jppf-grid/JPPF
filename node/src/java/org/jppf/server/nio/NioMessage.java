@@ -31,7 +31,7 @@ public class NioMessage
 	 */
 	public int length = 0;
 	/**
-	 * Buffer containg the message's data. 
+	 * Buffer containg the message's data.
 	 */
 	public ByteBuffer buffer = null;
 	/**
@@ -45,7 +45,7 @@ public class NioMessage
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder("NioMessage [length = ").append(length).append(", lengthWritten = ").append(lengthWritten);
 		return sb.append(", buffer = ").append(buffer).append(']').toString();

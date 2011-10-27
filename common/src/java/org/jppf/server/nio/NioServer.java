@@ -50,7 +50,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	private static Logger log = LoggerFactory.getLogger(NioServer.class);
 	/**
 	 * Size of the pool of threads for the state transition executor.
-	 * It is defined as the value of the configuration property 
+	 * It is defined as the value of the configuration property
 	 * &quot;transition.thread.pool.size&quot;, with a default value of 1.
 	 */
 	private static final int THREAD_POOL_SIZE = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", 1);
@@ -103,17 +103,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Performs all operations that relate to channel states.
 	 */
 	protected StateTransitionManager<S, T> transitionManager = null;
-    /**
-     * Shutdown requested for this server
-     */
-    private final AtomicBoolean requestShutdown = new AtomicBoolean(false);
+	/**
+	 * Shutdown requested for this server
+	 */
+	private final AtomicBoolean requestShutdown = new AtomicBoolean(false);
 
 	/**
 	 * Initialize this server with a specified port number and name.
 	 * @param name the name given to this thread.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	protected NioServer(String name) throws JPPFException
+	protected NioServer(final String name) throws JPPFException
 	{
 		this(name, false);
 	}
@@ -125,7 +125,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * performed sequentially or through the executor thread pool.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	protected NioServer(String name, boolean sequential) throws JPPFException
+	protected NioServer(final String name, final boolean sequential) throws JPPFException
 	{
 		super(name);
 		factory = createFactory();
@@ -138,7 +138,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @param name the name given to this thread.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public NioServer(int port, String name) throws JPPFException
+	public NioServer(final int port, final String name) throws JPPFException
 	{
 		this(new int[] { port }, name, true);
 	}
@@ -151,7 +151,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * performed sequentially or through the executor thread pool.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public NioServer(final int[] ports, String name, boolean sequential) throws JPPFException
+	public NioServer(final int[] ports, final String name, final boolean sequential) throws JPPFException
 	{
 		this(name, sequential);
 		if (ports != null)
@@ -173,7 +173,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @param ports the port the underlying server listens to.
 	 * @throws JPPFException if the server socket can't be opened on the specified port.
 	 */
-	protected final void init(int[] ports) throws JPPFException
+	protected final void init(final int[] ports) throws JPPFException
 	{
 		Exception e = null;
 		try
@@ -210,11 +210,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
-            while (!isStopped() && !externalStopCondition())
+			while (!isStopped() && !externalStopCondition())
 			{
 				try
 				{
@@ -232,10 +232,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		catch (Throwable t)
 		{
 			log.error(t.getMessage(), t);
-		} finally 
-        {
-            end();
-        }
+		} finally
+		{
+			end();
+		}
 	}
 
 	/**
@@ -249,19 +249,19 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 		return requestShutdown.get();
 	}
 
-    /**
-     * Initiates shutdown of this server.
-     */
-    public void shutdown() {
-        requestShutdown.set(true);
-    }
+	/**
+	 * Initiates shutdown of this server.
+	 */
+	public void shutdown() {
+		requestShutdown.set(true);
+	}
 
 	/**
 	 * Process the keys selected by the selector for IO operations.
 	 * @param selectedKeys the set of keys thast were selected by the latest <code>select()</code> invocation.
 	 * @throws Exception if an error is raised while processing the keys.
 	 */
-	public void go(Set<SelectionKey> selectedKeys) throws Exception
+	public void go(final Set<SelectionKey> selectedKeys) throws Exception
 	{
 		Iterator<SelectionKey> it = selectedKeys.iterator();
 		while (it.hasNext())
@@ -310,7 +310,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @param key the selection key that represents the channel's registration with the selector.
 	 */
 	@SuppressWarnings("unchecked")
-	private void doAccept(SelectionKey key)
+	private void doAccept(final SelectionKey key)
 	{
 		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 		SocketChannel channel;
@@ -333,7 +333,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * @return a wrpaper for the newly registered channel.
 	 */
 	@SuppressWarnings("unchecked")
-	public ChannelWrapper<?> accept(SocketChannel channel)
+	public ChannelWrapper<?> accept(final SocketChannel channel)
 	{
 		try
 		{
@@ -388,7 +388,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * constants definitions.
 	 */
 	public abstract int getInitialInterest();
-	
+
 	/**
 	 * Close the underlying server socket and stop this socket server.
 	 */
@@ -456,7 +456,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	 * Set this server in the specified stopped state.
 	 * @param stopped true if this server is stopped, false otherwise.
 	 */
-	protected void setStopped(boolean stopped)
+	protected void setStopped(final boolean stopped)
 	{
 		this.stopped.set(stopped);
 	}

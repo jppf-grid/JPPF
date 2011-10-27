@@ -43,7 +43,7 @@ class IdleState extends NodeServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public IdleState(NodeNioServer server)
+	public IdleState(final NodeNioServer server)
 	{
 		super(server);
 	}
@@ -56,7 +56,7 @@ class IdleState extends NodeServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (debugEnabled) log.debug("exec() for " + wrapper);
 		if (CHECK_CONNECTION && wrapper.isReadable())
@@ -70,17 +70,9 @@ class IdleState extends NodeServerState
 				int n = channel.read(buf);
 				log.debug("readable channel: read " + n + " bytes");
 			}
-			*/
+			 */
 			if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 		return TO_IDLE;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean autoChangeInterestOps()
-	{
-		return false;
 	}
 }

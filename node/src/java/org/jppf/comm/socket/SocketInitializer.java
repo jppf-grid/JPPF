@@ -43,7 +43,7 @@ public interface SocketInitializer
 	boolean isSuccessfull();
 
 	/**
-	 * Determine whether this socket initializer has been intentionally closed. 
+	 * Determine whether this socket initializer has been intentionally closed.
 	 * @return true if this socket initializer has been intentionally closed, false otherwise.
 	 */
 	boolean isClosed();

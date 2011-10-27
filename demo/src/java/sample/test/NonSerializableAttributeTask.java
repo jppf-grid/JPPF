@@ -37,7 +37,7 @@ public class NonSerializableAttributeTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		ns = new NonSerializable();
 		setResult("execution successfull");

@@ -45,7 +45,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The list of locally-bound multiplexer ports. 
+	 * The list of locally-bound multiplexer ports.
 	 */
 	private Set<String> remoteMultiplexers = new HashSet<String>();
 	/**
@@ -54,7 +54,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	private Map<String, HostPort> remoteMultiplexerMap = new HashMap<String, HostPort>();
 	/**
-	 * The list of application ports this multiplexer listens to. 
+	 * The list of application ports this multiplexer listens to.
 	 */
 	private Set<Integer> boundPorts = new HashSet<Integer>();
 	/**
@@ -62,7 +62,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 */
 	private Map<Integer, String> boundToMultiplexerMap = new HashMap<Integer, String>();
 	/**
-	 * The list of multiplexer ports this multiplexer listens to. 
+	 * The list of multiplexer ports this multiplexer listens to.
 	 */
 	private Set<Integer> multiplexerPorts = new HashSet<Integer>();
 
@@ -83,7 +83,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * @see org.jppf.server.nio.NioServer#createFactory()
 	 */
 	@Override
-    protected NioServerFactory<MultiplexerState, MultiplexerTransition> createFactory()
+	protected NioServerFactory<MultiplexerState, MultiplexerTransition> createFactory()
 	{
 		return new MultiplexerServerFactory(this);
 	}
@@ -144,7 +144,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * {@inheritDoc}
 	 */
 	@Override
-    public NioContext createNioContext()
+	public NioContext createNioContext()
 	{
 		return new MultiplexerContext();
 	}
@@ -153,15 +153,17 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getInitialInterest()
+	public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Called once a connection has been accepted.
+	 * @param key wraps the actual socket channel.
+	 * @param serverChannel the socket server channel that accepted the connection.
 	 */
-	public void postAccept(ChannelWrapper key, ServerSocketChannel serverChannel)
+	public void postAccept(final ChannelWrapper key, final ServerSocketChannel serverChannel)
 	{
 		int port = serverChannel.socket().getLocalPort();
 		if (debugEnabled) log.debug("accepting on port " + port);
@@ -175,7 +177,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void postAccept(ChannelWrapper key)
+	public void postAccept(final ChannelWrapper key)
 	{
 		MultiplexerContext context = (MultiplexerContext) key.getContext();
 		if (context.isApplicationPort())
@@ -195,11 +197,11 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	}
 
 	/**
-	 * Get the outbound remote multiplexer associated with an inbound application port. 
+	 * Get the outbound remote multiplexer associated with an inbound application port.
 	 * @param port the application port to lookup.
 	 * @return a <code>HostPort</code> instannce, or null if no remote multiplexer could be found.
 	 */
-	public HostPort getHostPortForBoundPort(int port)
+	public HostPort getHostPortForBoundPort(final int port)
 	{
 		String name = boundToMultiplexerMap.get(port);
 		if (name == null) return null;
@@ -210,7 +212,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	 * Entry point for the multiplexer application.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

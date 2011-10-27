@@ -43,7 +43,7 @@ public class PolicyRuleTest extends ExecutionPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		boolean result = false;
 		if (info != null)

@@ -18,7 +18,7 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.*;
-import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -61,12 +61,12 @@ public class SystemInformationAction extends AbstractTopologyAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-	public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		String s = null;
 		try
 		{
-			JMXConnectionWrapper connection = (JMXConnectionWrapper) dataArray[0].getJmxWrapper();
+			JMXConnectionWrapper connection = dataArray[0].getJmxWrapper();
 			JPPFSystemInformation info = connection.systemInformation();
 			boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
 			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + connection.getId());
@@ -87,11 +87,11 @@ public class SystemInformationAction extends AbstractTopologyAction
 		}
 		final JFrame frame = new JFrame("Node System Information");
 		frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter()
 		{
 			@Override
-			public void windowClosing(WindowEvent e)
+			public void windowClosing(final WindowEvent e)
 			{
 				frame.dispose();
 			}

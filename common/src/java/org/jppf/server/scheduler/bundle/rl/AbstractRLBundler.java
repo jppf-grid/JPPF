@@ -60,12 +60,12 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * Creates a new instance with the specified parameters profile.
 	 * @param profile the parameters of the algorithm grouped as a performance analysis profile.
 	 */
-	public AbstractRLBundler(LoadBalancingProfile profile)
+	public AbstractRLBundler(final LoadBalancingProfile profile)
 	{
 		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Reinforcement Learning bundle size");
 		log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize +
-			", performanceVariationThreshold = " + ((RLProfile) profile).getPerformanceVariationThreshold());
+				", performanceVariationThreshold = " + ((RLProfile) profile).getPerformanceVariationThreshold());
 		this.dataHolder = new BundleDataHolder(((RLProfile) profile).getPerformanceCacheSize());
 		this.action = ((RLProfile) profile).getMaxActionRange();
 	}
@@ -76,7 +76,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	@Override
-    public int getBundleSize()
+	public int getBundleSize()
 	{
 		return bundleSize;
 	}
@@ -85,7 +85,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * set the current size of bundle.
 	 * @param bundleSize - the bundle size as an int value.
 	 */
-	public void setBundleSize(int bundleSize)
+	public void setBundleSize(final int bundleSize)
 	{
 		this.bundleSize = bundleSize;
 	}
@@ -97,10 +97,10 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
 	@Override
-    public void feedback(int size, double totalTime)
+	public void feedback(final int size, final double totalTime)
 	{
 		if (size <= 0) return;
-		BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / (double) size, size);
+		BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / size, size);
 		dataHolder.addSample(sample);
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
@@ -129,7 +129,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 			sb.append(", ").append(getDataHolder());
 			log.debug(sb.toString());
 		}
-		*/
+		 */
 	}
 
 	/**
@@ -138,10 +138,10 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * @param totalTime the time in milliseconds it took to execute the tasks.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
-	public void feedback2(int size, double totalTime)
+	public void feedback2(final int size, final double totalTime)
 	{
 		if (size <= 0) return;
-		BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / (double) size, size);
+		BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / size, size);
 		dataHolder.addSample(sample);
 
 		double d = dataHolder.getPreviousMean() - dataHolder.getMean();
@@ -180,16 +180,16 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#setup()
 	 */
 	@Override
-    public void setup()
+	public void setup()
 	{
 	}
-	
+
 	/**
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
 	 */
 	@Override
-    public void dispose()
+	public void dispose()
 	{
 		dataHolder = null;
 	}

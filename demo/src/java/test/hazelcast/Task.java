@@ -14,13 +14,13 @@ public class Task extends JPPFTask
 	 */
 	private int id;
 
-	public Task(int id)
+	public Task(final int id)
 	{
 		this.id = id;
 	}
 
 	@Override
-    public void run()
+	public void run()
 	{
 		System.out.println("starting task " + id);
 		Map<Object, Object> map = Hazelcast.getMap("myobjects");

@@ -17,22 +17,16 @@
  */
 package org.jppf.client;
 
-import org.jppf.comm.discovery.IPFilter;
-import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.discovery.JPPFMulticastReceiver;
-import org.jppf.utils.ThreadSynchronization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jppf.comm.discovery.*;
+import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.*;
 
 /**
  * This class listens to information broadcast by JPPF servers on the network and uses it
- * to establish a connection with one or more servers. 
+ * to establish a connection with one or more servers.
  */
 class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable
 {
@@ -58,23 +52,23 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	 */
 	private final boolean acceptMultipleInterfaces;
 
-    private final ConnectionHandler connectionHandler;
-    private final IPFilter ipFilter;
+	private final ConnectionHandler connectionHandler;
+	private final IPFilter ipFilter;
 
-    /**
-     * Initialize this discovery thread with the specified JPPF client.
-     * @param connectionHandler handler for adding new connection
-     * @param ipFilter for accepted IP addresses
-     * @param acceptMultipleInterfaces accept all discovered interfaces for same driver
-     */
+	/**
+	 * Initialize this discovery thread with the specified JPPF client.
+	 * @param connectionHandler handler for adding new connection
+	 * @param ipFilter for accepted IP addresses
+	 * @param acceptMultipleInterfaces accept all discovered interfaces for same driver
+	 */
 	JPPFMulticastReceiverThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final boolean acceptMultipleInterfaces)
 	{
-        if(connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
+		if(connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
 
-        this.connectionHandler = connectionHandler;
-        this.ipFilter = ipFilter;
-        this.acceptMultipleInterfaces = acceptMultipleInterfaces;
-    }
+		this.connectionHandler = connectionHandler;
+		this.ipFilter = ipFilter;
+		this.acceptMultipleInterfaces = acceptMultipleInterfaces;
+	}
 
 	/**
 	 * Lookup server configurations from UDP multicasts.
@@ -111,15 +105,15 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 		}
 	}
 
-    /**
-     * Add a newly found connection.
-     * @param name for the connection
-     * @param info the peer's connection information.
-     */
-    protected synchronized void onNewConnection(final String name, final JPPFConnectionInformation info)
-    {
-        connectionHandler.onNewConnection(name, info);
-    }
+	/**
+	 * Add a newly found connection.
+	 * @param name for the connection
+	 * @param info the peer's connection information.
+	 */
+	protected synchronized void onNewConnection(final String name, final JPPFConnectionInformation info)
+	{
+		connectionHandler.onNewConnection(name, info);
+	}
 
 	/**
 	 * Detrmine whether a connection information object is already discovered.
@@ -152,25 +146,25 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 		set.add(info);
 	}
 
-    /**
-     * Remove a disconnected connection.
-     * @param info connection info of the peer to remove
-     * @return whether connection was successfully removed
-     */
-    public synchronized boolean removeConnectionInformation(final JPPFConnectionInformation info)
-    {
-        if(acceptMultipleInterfaces)
-        {
-            Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
-            return set != null && set.remove(info);
-        } else
-        {
-            return infoMap.remove(info.uuid) != null;
-        }
-    }
+	/**
+	 * Remove a disconnected connection.
+	 * @param info connection info of the peer to remove
+	 * @return whether connection was successfully removed
+	 */
+	public synchronized boolean removeConnectionInformation(final JPPFConnectionInformation info)
+	{
+		if(acceptMultipleInterfaces)
+		{
+			Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
+			return set != null && set.remove(info);
+		} else
+		{
+			return infoMap.remove(info.uuid) != null;
+		}
+	}
 
-    public static interface ConnectionHandler
-    {
-        public void onNewConnection(final String name, final JPPFConnectionInformation info);
-    }
+	public static interface ConnectionHandler
+	{
+		public void onNewConnection(final String name, final JPPFConnectionInformation info);
+	}
 }

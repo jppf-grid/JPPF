@@ -35,7 +35,7 @@ public class WaitTask extends JPPFTask
 	 * Initialize this time with the specified time to wait.
 	 * @param time the time to wait, in milliseconds.
 	 */
-	public WaitTask(long time)
+	public WaitTask(final long time)
 	{
 		this.time = time;
 	}
@@ -45,7 +45,7 @@ public class WaitTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

@@ -32,7 +32,7 @@ public enum MultiplexerTransition
 	/**
 	 * Transition from a state to SENDING.
 	 */
-	TO_SENDING, 
+	TO_SENDING,
 	/**
 	 * Transition from a state to RECEIVING.
 	 */

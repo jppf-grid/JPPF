@@ -51,7 +51,7 @@ public class NodeDataPanelManager
 	 * Initialize this manager.
 	 * @param panel the container for the tree table.
 	 */
-	NodeDataPanelManager(NodeDataPanel panel)
+	NodeDataPanelManager(final NodeDataPanel panel)
 	{
 		this.panel = panel;
 	}
@@ -61,7 +61,7 @@ public class NodeDataPanelManager
 	 * @param driverName the name of the driver to which the node is attached.
 	 * @param nodeName the name of the node to update.
 	 */
-	void nodeDataUpdated(String driverName, String nodeName)
+	void nodeDataUpdated(final String driverName, final String nodeName)
 	{
 		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
@@ -116,7 +116,7 @@ public class NodeDataPanelManager
 	 * @param driverName the name of the driver to remove.
 	 * @param removeNodesOnly true if only the nodes attached to the driver are to be removed.
 	 */
-	void driverRemoved(String driverName, boolean removeNodesOnly)
+	void driverRemoved(final String driverName, final boolean removeNodesOnly)
 	{
 		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (debugEnabled) log.debug("removing driver: " + driverName);
@@ -163,7 +163,7 @@ public class NodeDataPanelManager
 	 * @param driverName the name of the driver to which the node is added.
 	 * @param nodeInfo the object that encapsulates the node addition.
 	 */
-	void nodeAdded(String driverName, JPPFManagementInfo nodeInfo)
+	void nodeAdded(final String driverName, final JPPFManagementInfo nodeInfo)
 	{
 		final DefaultMutableTreeNode driverNode = findDriver(driverName);
 		if (driverNode == null) return;
@@ -175,7 +175,7 @@ public class NodeDataPanelManager
 	 * @param driverNode the driver to which the node is added.
 	 * @param nodeInfo the object that encapsulates the node addition.
 	 */
-	void nodeAdded(DefaultMutableTreeNode driverNode, JPPFManagementInfo nodeInfo)
+	void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo)
 	{
 		String nodeName = nodeInfo.getHost() + ':' + nodeInfo.getPort();
 		if (debugEnabled) log.debug("attempting to add node=" + nodeName + " to driver=" + driverNode);
@@ -208,7 +208,7 @@ public class NodeDataPanelManager
 	 * @param driverName the name of the driver from which the node is removed.
 	 * @param nodeName the name of the node to remove.
 	 */
-	void nodeRemoved(String driverName, String nodeName)
+	void nodeRemoved(final String driverName, final String nodeName)
 	{
 		if (debugEnabled) log.debug("attempting to remove node=" + nodeName + " from driver=" + driverName);
 		DefaultMutableTreeNode driverNode = findDriver(driverName);
@@ -228,7 +228,7 @@ public class NodeDataPanelManager
 	 * @param driverName name of the dirver to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	DefaultMutableTreeNode findDriver(String driverName)
+	DefaultMutableTreeNode findDriver(final String driverName)
 	{
 		for (int i=0; i<panel.getTreeTableRoot().getChildCount(); i++)
 		{
@@ -246,7 +246,7 @@ public class NodeDataPanelManager
 	 * @param nodeName the name of the node to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
-	DefaultMutableTreeNode findNode(DefaultMutableTreeNode driverNode, String nodeName)
+	DefaultMutableTreeNode findNode(final DefaultMutableTreeNode driverNode, final String nodeName)
 	{
 		for (int i=0; i<driverNode.getChildCount(); i++)
 		{
@@ -259,11 +259,11 @@ public class NodeDataPanelManager
 
 	/**
 	 * Find the position at which to insert a driver,
-	 * using the sorted lexical order of driver names. 
+	 * using the sorted lexical order of driver names.
 	 * @param driverName the name of the driver to insert.
 	 * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
 	 */
-	int driverInsertIndex(String driverName)
+	int driverInsertIndex(final String driverName)
 	{
 		int n = panel.getTreeTableRoot().getChildCount();
 		for (int i=0; i<n; i++)
@@ -278,12 +278,12 @@ public class NodeDataPanelManager
 	}
 
 	/**
-	 * Find the position at which to insert a node, using the sorted lexical order of node names. 
+	 * Find the position at which to insert a node, using the sorted lexical order of node names.
 	 * @param driverNode name the parent of the node to insert.
 	 * @param nodeName the name of the node to insert.
 	 * @return the index at which to insert the node, or -1 if the node is already in the tree.
 	 */
-	int nodeInsertIndex(DefaultMutableTreeNode driverNode, String nodeName)
+	int nodeInsertIndex(final DefaultMutableTreeNode driverNode, final String nodeName)
 	{
 		int n = driverNode.getChildCount();
 		for (int i=0; i<n; i++)

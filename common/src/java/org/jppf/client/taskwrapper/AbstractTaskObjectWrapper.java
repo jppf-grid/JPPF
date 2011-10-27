@@ -41,7 +41,7 @@ public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getMethodType()
 	 */
 	@Override
-    public MethodType getMethodType()
+	public MethodType getMethodType()
 	{
 		return null;
 	}

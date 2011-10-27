@@ -39,7 +39,7 @@ public class Pie3DChartHandler implements ChartHandler
 	 * Initialize this chart handler with a specified stats formatter.
 	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public Pie3DChartHandler(StatsHandler statsHandler)
+	public Pie3DChartHandler(final StatsHandler statsHandler)
 	{
 		this.statsHandler = statsHandler;
 	}
@@ -51,12 +51,12 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration createChart(ChartConfiguration config)
+	public ChartConfiguration createChart(final ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		Class[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D", paramTypes,
-			config.name, ds, false, true, false);
+				config.name, ds, false, true, false);
 		config.chart = chart;
 		return config;
 	}
@@ -66,7 +66,7 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	protected Object createDataset(ChartConfiguration config)
+	protected Object createDataset(final ChartConfiguration config)
 	{
 		//PieDataset ds = new DefaultPieDataset();
 		Object ds = newInstance("org.jfree.data.general.DefaultPieDataset");
@@ -74,7 +74,7 @@ public class Pie3DChartHandler implements ChartHandler
 		populateDataset(config);
 		return ds;
 	}
-	
+
 	/**
 	 * Populate a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to populate.
@@ -82,7 +82,7 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration populateDataset(ChartConfiguration config)
+	public ChartConfiguration populateDataset(final ChartConfiguration config)
 	{
 		return updateDataset(config);
 	}
@@ -94,7 +94,7 @@ public class Pie3DChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration updateDataset(ChartConfiguration config)
+	public ChartConfiguration updateDataset(final ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();

@@ -36,7 +36,7 @@ public class LauncherListener extends Thread
 	 * Initialize this LauncherListener with the specified port.
 	 * @param port - the port to listen to.
 	 */
-	public LauncherListener(int port)
+	public LauncherListener(final int port)
 	{
 		super("LauncherListener thread");
 		this.port = port;
@@ -47,7 +47,7 @@ public class LauncherListener extends Thread
 	 * @see java.lang.Thread#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

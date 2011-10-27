@@ -75,7 +75,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * Create an instance of this class and set the parameters of the external process or script to launch.
 	 * @param commands the list of command-line arguments.
 	 */
-	public CommandLineTask(String...commands)
+	public CommandLineTask(final String...commands)
 	{
 		this(null, null, commands);
 	}
@@ -86,7 +86,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * @param startDir the directory to start the command in.
 	 * @param commands the list of command-line arguments.
 	 */
-	public CommandLineTask(Map<String, String> env, String startDir, String...commands)
+	public CommandLineTask(final Map<String, String> env, final String startDir, final String...commands)
 	{
 		if (commands != null)
 		{
@@ -131,7 +131,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * Specifies whether the process output is captured.
 	 * @param captureOutput true if the output is cpatured, false otherwise.
 	 */
-	public void setCaptureOutput(boolean captureOutput)
+	public void setCaptureOutput(final boolean captureOutput)
 	{
 		this.captureOutput = captureOutput;
 	}
@@ -167,7 +167,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * Set the list of command-line arguments.
 	 * @param commandList a list of arguments as strings.
 	 */
-	public void setCommandList(List<String> commandList)
+	public void setCommandList(final List<String> commandList)
 	{
 		this.commandList = commandList;
 	}
@@ -176,7 +176,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * Set the list of command-line arguments.
 	 * @param commands a list of arguments as strings.
 	 */
-	public void setCommandList(String...commands)
+	public void setCommandList(final String...commands)
 	{
 		commandList = CollectionUtils.list(commands);
 	}
@@ -194,7 +194,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * Get the environment variables to set.
 	 * @param env a map of variable names to their corresponding values.
 	 */
-	public void setEnv(Map<String, String> env)
+	public void setEnv(final Map<String, String> env)
 	{
 		this.env = env;
 	}
@@ -212,7 +212,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * Set the directory to start the command in.
 	 * @param startDir the start directory as a string.
 	 */
-	public void setStartDir(String startDir)
+	public void setStartDir(final String startDir)
 	{
 		this.startDir = startDir;
 	}
@@ -223,7 +223,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
 	@Override
-    public void outputStreamAltered(ProcessWrapperEvent event)
+	public void outputStreamAltered(final ProcessWrapperEvent event)
 	{
 		standardOutput.append(event.getContent());
 	}
@@ -234,7 +234,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
 	@Override
-    public void errorStreamAltered(ProcessWrapperEvent event)
+	public void errorStreamAltered(final ProcessWrapperEvent event)
 	{
 		errorOutput.append(event.getContent());
 	}

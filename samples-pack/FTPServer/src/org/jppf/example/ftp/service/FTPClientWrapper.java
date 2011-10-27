@@ -38,12 +38,12 @@ public class FTPClientWrapper
 	/**
 	 * Open a secure ftp connection with the specified parameters.
 	 * @param host the host where the FTP server is running
-	 * @param port the secure FTP port. 
+	 * @param port the secure FTP port.
 	 * @param user username to use.
 	 * @param password the user password.
 	 * @throws Exception if any error occurs.
 	 */
-	public void open(String host, int port, String user, String password) throws Exception
+	public void open(final String host, final int port, final String user, final String password) throws Exception
 	{
 		// create with implicit TLS
 		ftpClient = new FTPSClient(true);
@@ -82,7 +82,7 @@ public class FTPClientWrapper
 	 * @param remotePath the path of the remote file.
 	 * @throws Exception if any error occurs during the file transfer.
 	 */
-	public void download(String localPath, String remotePath) throws Exception
+	public void download(final String localPath, final String remotePath) throws Exception
 	{
 		BufferedOutputStream bos = null;
 		try
@@ -102,7 +102,7 @@ public class FTPClientWrapper
 	 * @param remotePath the path of the resulting remote file.
 	 * @throws Exception if any error occurs during the file transfer.
 	 */
-	public void upload(String localPath, String remotePath) throws Exception
+	public void upload(final String localPath, final String remotePath) throws Exception
 	{
 		BufferedInputStream bis = null;
 		try

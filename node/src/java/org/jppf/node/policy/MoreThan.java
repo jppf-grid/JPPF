@@ -45,7 +45,7 @@ public class MoreThan extends ExecutionPolicy
 	 * @param propertyName the name of the property to compare.
 	 * @param a the value to compare with.
 	 */
-	public MoreThan(String propertyName, double a)
+	public MoreThan(final String propertyName, final double a)
 	{
 		this.propertyName = propertyName;
 		this.numberValue = a;
@@ -58,7 +58,7 @@ public class MoreThan extends ExecutionPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		try
 		{
@@ -77,7 +77,7 @@ public class MoreThan extends ExecutionPolicy
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		if (computedToString == null)
 		{

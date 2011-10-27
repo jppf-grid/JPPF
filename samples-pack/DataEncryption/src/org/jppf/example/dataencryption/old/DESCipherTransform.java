@@ -28,7 +28,7 @@ import org.jppf.data.transform.JPPFDataTransform;
 import org.jppf.utils.FileUtils;
 
 /**
- * Sample data transform that uses the DES cyptographic algorithm with a 56 bits secret key. 
+ * Sample data transform that uses the DES cyptographic algorithm with a 56 bits secret key.
  * @author Laurent Cohen
  */
 public class DESCipherTransform implements JPPFDataTransform
@@ -45,7 +45,8 @@ public class DESCipherTransform implements JPPFDataTransform
 	 * @throws Exception if any error occurs while encrypting the data.
 	 * @see org.jppf.data.transform.JPPFDataTransform#wrap(byte[])
 	 */
-	public void wrap(InputStream source, OutputStream destination) throws Exception
+	@Override
+	public void wrap(final InputStream source, final OutputStream destination) throws Exception
 	{
 		transform(Cipher.ENCRYPT_MODE, source, destination);
 	}
@@ -57,7 +58,8 @@ public class DESCipherTransform implements JPPFDataTransform
 	 * @throws Exception if any error occurs while decrypting the data.
 	 * @see org.jppf.data.transform.JPPFDataTransform#unwrap(byte[])
 	 */
-	public void unwrap(InputStream source, OutputStream destination) throws Exception
+	@Override
+	public void unwrap(final InputStream source, final OutputStream destination) throws Exception
 	{
 		transform(Cipher.DECRYPT_MODE, source, destination);
 	}
@@ -70,7 +72,7 @@ public class DESCipherTransform implements JPPFDataTransform
 	 * @param destination the stream into which the encrypted/decrypted data is written.
 	 * @throws Exception if any error occurs while encrypting or decrypting the data.
 	 */
-	private void transform(int mode, InputStream source, OutputStream destination) throws Exception
+	private void transform(final int mode, final InputStream source, final OutputStream destination) throws Exception
 	{
 		Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 		cipher.init(mode, getSecretKey());

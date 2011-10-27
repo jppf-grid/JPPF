@@ -18,7 +18,7 @@
 package org.jppf.jca.work;
 
 import java.io.ByteArrayInputStream;
-import java.util.*;
+import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.client.event.ClientConnectionStatusEvent;
@@ -56,7 +56,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @param uuid the unique identifier for this local client.
 	 * @param configuration the object holding the JPPF configuration.
 	 */
-	public JPPFJcaClient(String uuid, String configuration)
+	public JPPFJcaClient(final String uuid, final String configuration)
 	{
 		super(uuid, configuration);
 	}
@@ -69,7 +69,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
-	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	public List<JPPFTask> submit(final JPPFJob job) throws Exception
 	{
 		return null;
 	}
@@ -89,7 +89,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
 	@Override
-	public void statusChanged(ClientConnectionStatusEvent event)
+	public void statusChanged(final ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		if (submissionManager != null) submissionManager.wakeUp();
@@ -108,7 +108,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * Set the submission manager for thsi JPPF client.
 	 * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
 	 */
-	public void setSubmissionManager(JcaSubmissionManager submissionManager)
+	public void setSubmissionManager(final JcaSubmissionManager submissionManager)
 	{
 		this.submissionManager = submissionManager;
 	}
@@ -117,7 +117,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
 	{
 		return new JPPFJcaClientConnection(uuid, name, info, this);
 	}
@@ -126,7 +126,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void initConfig(Object configuration)
+	protected void initConfig(final Object configuration)
 	{
 		if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
 		try

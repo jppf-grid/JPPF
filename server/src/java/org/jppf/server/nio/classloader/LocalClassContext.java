@@ -23,7 +23,7 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**
- * Context object associated with a socket channel used by the class server of the JPPF driver. 
+ * Context object associated with a socket channel used by the class server of the JPPF driver.
  * @author Laurent Cohen
  */
 public class LocalClassContext extends ClassContext
@@ -41,7 +41,7 @@ public class LocalClassContext extends ClassContext
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
+	public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
 	{
 	}
 
@@ -49,7 +49,7 @@ public class LocalClassContext extends ClassContext
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFResourceWrapper deserializeResource() throws Exception
+	public JPPFResourceWrapper deserializeResource() throws Exception
 	{
 		return resource;
 	}
@@ -61,7 +61,7 @@ public class LocalClassContext extends ClassContext
 	 * @throws Exception if an error occurs while reading the data.
 	 */
 	@Override
-    public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
+	public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
 		if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
@@ -79,7 +79,7 @@ public class LocalClassContext extends ClassContext
 	 * @throws Exception if an error occurs while writing the data.
 	 */
 	@Override
-    public boolean writeMessage(ChannelWrapper<?> wrapper) throws Exception
+	public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
 		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;

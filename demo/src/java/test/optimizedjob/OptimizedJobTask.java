@@ -42,12 +42,12 @@ public class OptimizedJobTask extends JPPFTask
 	 * @param time .
 	 * @param id .
 	 */
-	public OptimizedJobTask(long time, int id)
+	public OptimizedJobTask(final long time, final int id)
 	{
 		this.time = time;
 		this.id = id;
 	}
-	
+
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()

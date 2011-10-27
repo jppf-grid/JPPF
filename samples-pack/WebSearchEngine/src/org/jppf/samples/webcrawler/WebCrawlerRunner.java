@@ -80,7 +80,7 @@ public class WebCrawlerRunner
 	 * @param option an option used as an entry point to the UI.
 	 * @throws Exception if the computation failed.
 	 */
-	public static void perform(String url, String query, int depth, Option option) throws Exception
+	public static void perform(final String url, final String query, final int depth, final Option option) throws Exception
 	{
 		if (client == null)
 		{
@@ -102,7 +102,7 @@ public class WebCrawlerRunner
 	 * @return a list of URLs to visit.
 	 * @throws Exception if the computation failed.
 	 */
-	public static List<JPPFTask> doPerform(Collection<String> urls, String query, boolean doSearch) throws Exception
+	public static List<JPPFTask> doPerform(final Collection<String> urls, final String query, final boolean doSearch) throws Exception
 	{
 		int n = 0;
 		JPPFJob job = new JPPFJob();
@@ -155,6 +155,7 @@ public class WebCrawlerRunner
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				Dimension d = window.getOwner().getSize();
@@ -176,6 +177,7 @@ public class WebCrawlerRunner
 		//if (window.isVisible()) window.dispose();
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				window.setVisible(false);
@@ -187,7 +189,7 @@ public class WebCrawlerRunner
 	 * Update the progress value of the progress bar.
 	 * @param n the new value to set.
 	 */
-	public static synchronized void updateProgress(int n)
+	public static synchronized void updateProgress(final int n)
 	{
 		urlCount += n;
 		if (progressBar != null)
@@ -221,7 +223,7 @@ public class WebCrawlerRunner
 		 * @param query the name of the substitution matrix to use in the alignments.
 		 * @param depth the path to the databse of sequences.
 		 */
-		public CrawlExecution(String url, String query, int depth)
+		public CrawlExecution(final String url, final String query, final int depth)
 		{
 			this.url = url;
 			this.query = query;
@@ -232,6 +234,7 @@ public class WebCrawlerRunner
 		 * Perform the submission of the computation.
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run()
 		{
 			try

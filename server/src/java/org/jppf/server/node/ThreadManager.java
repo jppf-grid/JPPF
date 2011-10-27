@@ -82,7 +82,7 @@ public class ThreadManager extends ThreadSynchronization
 	 * Set the size of the node's thread pool.
 	 * @param size the size as an int.
 	 */
-	public void setThreadPoolSize(int size)
+	public void setThreadPoolSize(final int size)
 	{
 		if (size <= 0)
 		{
@@ -150,7 +150,7 @@ public class ThreadManager extends ThreadSynchronization
 	 * @param threadId the id of the thread to the cpu time from.
 	 * @return the cpu time as a long value.
 	 */
-	public long getCpuTime(long threadId)
+	public long getCpuTime(final long threadId)
 	{
 		return threadMXBean.getThreadCpuTime(threadId);
 	}
@@ -168,7 +168,7 @@ public class ThreadManager extends ThreadSynchronization
 	 * Update the priority of all execution threads.
 	 * @param newPriority the new priority to set.
 	 */
-	public void updateThreadsPriority(int newPriority)
+	public void updateThreadsPriority(final int newPriority)
 	{
 		threadFactory.updatePriority(newPriority);
 	}
@@ -184,7 +184,7 @@ public class ThreadManager extends ThreadSynchronization
 
 	/**
 	 * Determines wheather the thread cpu time measurement is supported and enabled.
-	 * @return true is cpu time measurement is enabled, false otherwise. 
+	 * @return true is cpu time measurement is enabled, false otherwise.
 	 */
 	public boolean isCpuTimeEnabled()
 	{

@@ -52,7 +52,7 @@ class RemoteExecutionThread extends ExecutionThread
 	 * @param connection the connection to the driver to use.
 	 * @param loadBalancer the load balancer for which this thread is working.
 	 */
-	public RemoteExecutionThread(List<JPPFTask> tasks, JPPFJob job, AbstractJPPFClientConnection connection, LoadBalancer loadBalancer)
+	public RemoteExecutionThread(final List<JPPFTask> tasks, final JPPFJob job, final AbstractJPPFClientConnection connection, final LoadBalancer loadBalancer)
 	{
 		super(tasks, job, loadBalancer);
 		this.connection = connection;
@@ -129,7 +129,7 @@ class RemoteExecutionThread extends ExecutionThread
 	 * @param job the initial job.
 	 * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
 	 */
-	private JPPFJob createNewJob(JPPFJob job)
+	private JPPFJob createNewJob(final JPPFJob job)
 	{
 		JPPFJob newJob = new JPPFJob(job.getJobUuid());
 		newJob.setDataProvider(job.getDataProvider());
@@ -146,7 +146,7 @@ class RemoteExecutionThread extends ExecutionThread
 	 * @param job the job to use as a base.
 	 * @return a JPPFTaskBundle instance.
 	 */
-	private JPPFTaskBundle createBundle(JPPFJob job)
+	private JPPFTaskBundle createBundle(final JPPFJob job)
 	{
 		String requestUuid = job.getJobUuid();
 		JPPFTaskBundle bundle = new JPPFTaskBundle();

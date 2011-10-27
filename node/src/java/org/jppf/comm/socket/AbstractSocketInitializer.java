@@ -43,7 +43,7 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 */
 	protected Random rand = new Random(System.currentTimeMillis());
 	/**
-	 * Determine whether this socket initializer has been intentionally closed. 
+	 * Determine whether this socket initializer has been intentionally closed.
 	 */
 	protected boolean closed = false;
 	/**
@@ -52,12 +52,12 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	protected String name = "";
 
 	/**
-	 * Determine whether this socket initializer has been intentionally closed. 
+	 * Determine whether this socket initializer has been intentionally closed.
 	 * @return true if this socket initializer has been intentionally closed, false otherwise.
 	 * @see org.jppf.comm.socket.SocketInitializer#isClosed()
 	 */
 	@Override
-    public boolean isClosed()
+	public boolean isClosed()
 	{
 		return closed;
 	}
@@ -68,7 +68,7 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @see org.jppf.comm.socket.SocketInitializer#isSuccessfull()
 	 */
 	@Override
-    public boolean isSuccessfull()
+	public boolean isSuccessfull()
 	{
 		return successfull;
 	}
@@ -79,7 +79,7 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @see org.jppf.comm.socket.SocketInitializer#getName()
 	 */
 	@Override
-    public String getName()
+	public String getName()
 	{
 		return name;
 	}
@@ -90,7 +90,7 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 	 * @see org.jppf.comm.socket.SocketInitializer#setName(java.lang.String)
 	 */
 	@Override
-    public void setName(String name)
+	public void setName(final String name)
 	{
 		this.name = name;
 	}

@@ -40,7 +40,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
 	 * Initialize this notifier with the specified node admin mbean.
 	 * @param nodeAdmin the mbean that provides information on the node's state.
 	 */
-	public NodeStatusNotifier(JPPFNodeAdmin nodeAdmin)
+	public NodeStatusNotifier(final JPPFNodeAdmin nodeAdmin)
 	{
 		this.nodeAdmin = nodeAdmin;
 	}
@@ -49,7 +49,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void nodeStarting(NodeLifeCycleEvent event)
+	public void nodeStarting(final NodeLifeCycleEvent event)
 	{
 		synchronized(nodeAdmin)
 		{
@@ -61,7 +61,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void nodeEnding(NodeLifeCycleEvent event)
+	public void nodeEnding(final NodeLifeCycleEvent event)
 	{
 		synchronized(nodeAdmin)
 		{
@@ -73,7 +73,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void jobStarting(NodeLifeCycleEvent event)
+	public void jobStarting(final NodeLifeCycleEvent event)
 	{
 		synchronized(nodeAdmin)
 		{
@@ -85,7 +85,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void jobEnding(NodeLifeCycleEvent event)
+	public void jobEnding(final NodeLifeCycleEvent event)
 	{
 		synchronized(nodeAdmin)
 		{
@@ -105,10 +105,10 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
 	/**
 	 * Get a localized message given its unique name and the current locale.
 	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
+	 * @return a message in the current locale, or the default locale
+	 * if the localization for the current locale is not found.
 	 */
-	private static String localize(String message)
+	private static String localize(final String message)
 	{
 		return LocalizationUtils.getLocalized(I18N_BASE, message);
 	}

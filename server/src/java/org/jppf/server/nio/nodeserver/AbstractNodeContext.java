@@ -21,7 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.util.List;
 
 import org.jppf.io.*;
-import org.jppf.management.*;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
@@ -80,7 +80,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Set the task bundle to send or receive.
 	 * @param bundle a {@link JPPFTaskBundle} instance.
 	 */
-	public void setBundle(ServerJob bundle)
+	public void setBundle(final ServerJob bundle)
 	{
 		this.bundle = bundle;
 	}
@@ -98,7 +98,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Set the bundler used to schedule tasks for the corresponding node.
 	 * @param bundler a {@link Bundler} instance.
 	 */
-	public void setBundler(Bundler bundler)
+	public void setBundler(final Bundler bundler)
 	{
 		this.bundler = bundler;
 	}
@@ -111,7 +111,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * @param serverBundler the bundler to compare with.
 	 * @return true if the bundler is up to date, false if it wasn't and has been updated.
 	 */
-	public boolean checkBundler(Bundler serverBundler)
+	public boolean checkBundler(final Bundler serverBundler)
 	{
 		if (this.bundler.getTimestamp() < serverBundler.getTimestamp())
 		{
@@ -129,7 +129,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * when a node is disconnected while it was executing a task bundle.
 	 * @param bundle the task bundle to resubmit.
 	 */
-	public void resubmitBundle(ServerJob bundle)
+	public void resubmitBundle(final ServerJob bundle)
 	{
 		JPPFDriver.getQueue().addBundle(bundle);
 	}
@@ -138,7 +138,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void handleException(ChannelWrapper<?> channel)
+	public void handleException(final ChannelWrapper<?> channel)
 	{
 		if (getBundler() != null) getBundler().dispose();
 		NodeNioServer.closeNode(channel, this);
@@ -159,7 +159,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * @param wrapper channel wrapper for this context.
 	 * @throws Exception if any error occurs.
 	 */
-	public void serializeBundle(ChannelWrapper<?> wrapper) throws Exception
+	public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		AbstractNodeMessage message = newMessage();
 		message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
@@ -206,7 +206,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * @param nodeMessage a {@link RemoteNodeMessage NodeMessage} instance.
 	 * @param channel reference to the channel.
 	 */
-	public void setNodeMessage(AbstractNodeMessage nodeMessage, ChannelWrapper<?> channel)
+	public void setNodeMessage(final AbstractNodeMessage nodeMessage, final ChannelWrapper<?> channel)
 	{
 		this.nodeMessage = nodeMessage;
 	}
@@ -224,7 +224,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Specifiy whether this context is attached to a peer node.
 	 * @param peer true if the context is to be attached to a peer node, false otherwise.
 	 */
-	public void setPeer(boolean peer)
+	public void setPeer(final boolean peer)
 	{
 		this.peer = peer;
 	}
@@ -242,7 +242,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Set the uuid of the corresponding node.
 	 * @param nodeUuid the uuid as a string.
 	 */
-	public void setNodeUuid(String nodeUuid)
+	public void setNodeUuid(final String nodeUuid)
 	{
 		this.nodeUuid = nodeUuid;
 	}
@@ -251,7 +251,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
 	{
 		if (nodeMessage == null) nodeMessage = newMessage();
 		return getNodeMessage().read(channel);
@@ -261,7 +261,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
 	{
 		return getNodeMessage().write(channel);
 	}
@@ -279,7 +279,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Specify whether the job was canceled.
 	 * @param jobCanceled true if the job was canceled, false otherwise.
 	 */
-	public synchronized void setJobCanceled(boolean jobCanceled)
+	public synchronized void setJobCanceled(final boolean jobCanceled)
 	{
 		this.jobCanceled = jobCanceled;
 	}
@@ -297,7 +297,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	 * Set the node system information.
 	 * @param nodeInfo a {@link JPPFSystemInformation} instance.
 	 */
-	public void setNodeInfo(JPPFSystemInformation nodeInfo)
+	public void setNodeInfo(final JPPFSystemInformation nodeInfo)
 	{
 		this.nodeInfo = nodeInfo;
 	}

@@ -32,31 +32,31 @@ public class Person
 	/**
 	 * The person's last name.
 	 */
-  private String lastname;
+	private String lastname;
 	/**
 	 * The person's phone number.
 	 */
-  private PhoneNumber phone;
+	private PhoneNumber phone;
 
-  /**
-   * Default constructor.
-   */
-  public Person()
-  {
-  }
+	/**
+	 * Default constructor.
+	 */
+	public Person()
+	{
+	}
 
-  /**
-   * Initialize this person with the specified parameters.
-   * @param firstname the person's first name.
-   * @param lastname the person's last name.
-   * @param phone the person's phone number.
-   */
-  public Person(String firstname, String lastname, PhoneNumber phone)
-  {
-  	this.firstname = firstname;
-  	this.lastname = lastname;
-  	this.phone = phone;
-  }
+	/**
+	 * Initialize this person with the specified parameters.
+	 * @param firstname the person's first name.
+	 * @param lastname the person's last name.
+	 * @param phone the person's phone number.
+	 */
+	public Person(final String firstname, final String lastname, final PhoneNumber phone)
+	{
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.phone = phone;
+	}
 
 	/**
 	 * Get the person's first name.
@@ -71,7 +71,7 @@ public class Person
 	 * Set the person's first name.
 	 * @param firstname the first name as a string.
 	 */
-	public void setFirstname(String firstname)
+	public void setFirstname(final String firstname)
 	{
 		this.firstname = firstname;
 	}
@@ -89,7 +89,7 @@ public class Person
 	 * Set the person's last name.
 	 * @param lastname the last name as a streing.
 	 */
-	public void setLastname(String lastname)
+	public void setLastname(final String lastname)
 	{
 		this.lastname = lastname;
 	}
@@ -107,7 +107,7 @@ public class Person
 	 * Set the person's phone number.
 	 * @param phone a <code>PhoneNumber</code> instance.
 	 */
-	public void setPhone(PhoneNumber phone)
+	public void setPhone(final PhoneNumber phone)
 	{
 		this.phone = phone;
 	}
@@ -118,11 +118,11 @@ public class Person
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return
-			"first name = " + firstname +
-			", last name = " + lastname +
-			", phone number = " + phone;
+		"first name = " + firstname +
+		", last name = " + lastname +
+		", phone number = " + phone;
 	}
 }

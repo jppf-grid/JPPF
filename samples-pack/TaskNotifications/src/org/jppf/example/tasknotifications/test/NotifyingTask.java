@@ -30,7 +30,7 @@ public class NotifyingTask extends JPPFTask
 	 * Initialize this task with the specified id.
 	 * @param id the task id.
 	 */
-	public NotifyingTask(String id)
+	public NotifyingTask(final String id)
 	{
 		setId(id);
 	}
@@ -39,6 +39,7 @@ public class NotifyingTask extends JPPFTask
 	 * This method contains the code that will be executed by a node.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try

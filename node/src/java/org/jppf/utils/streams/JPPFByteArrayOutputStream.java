@@ -38,7 +38,7 @@ public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 	 * Instantiate this stream with the specified size.
 	 * @param size the initial size of the underlying buffer.
 	 */
-	public JPPFByteArrayOutputStream(int size)
+	public JPPFByteArrayOutputStream(final int size)
 	{
 		super(size);
 	}
@@ -50,7 +50,7 @@ public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 	 * @see java.io.ByteArrayOutputStream#toByteArray()
 	 */
 	@Override
-    public synchronized byte[] toByteArray()
+	public synchronized byte[] toByteArray()
 	{
 		return buf.length == count ? buf : super.toByteArray();
 	}

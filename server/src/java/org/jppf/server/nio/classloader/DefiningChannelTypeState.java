@@ -52,7 +52,7 @@ class DefiningChannelTypeState extends ClassServerState
 	 * Initialize this state with a specified NioServer.
 	 * @param server the JPPFNIOServer this state relates to.
 	 */
-	public DefiningChannelTypeState(ClassNioServer server)
+	public DefiningChannelTypeState(final ClassNioServer server)
 	{
 		super(server);
 	}
@@ -65,7 +65,7 @@ class DefiningChannelTypeState extends ClassServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		// we don't know yet which whom we are talking, is it a node or a provider?
 		ClassContext context = (ClassContext) wrapper.getContext();
@@ -104,7 +104,7 @@ class DefiningChannelTypeState extends ClassServerState
 				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 				resource.setProviderUuid(driver.getUuid());
 				context.serializeResource(wrapper);
-				
+
 				return TO_SENDING_INITIAL_NODE_RESPONSE;
 			}
 		}

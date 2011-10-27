@@ -29,7 +29,7 @@ public class HostPort extends Pair<String, Integer>
 	 * @param host the host to use.
 	 * @param port the port number.
 	 */
-	public HostPort(String host, Integer port)
+	public HostPort(final String host, final Integer port)
 	{
 		super(host, port);
 	}
@@ -58,7 +58,7 @@ public class HostPort extends Pair<String, Integer>
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return host() + ':' + port();
 	}

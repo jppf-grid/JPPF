@@ -125,7 +125,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void clientConnectionFailed(ClientConnectionEvent event)
+	public void clientConnectionFailed(final ClientConnectionEvent event)
 	{
 		try
 		{

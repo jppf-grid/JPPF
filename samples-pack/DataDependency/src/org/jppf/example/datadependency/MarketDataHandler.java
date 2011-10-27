@@ -25,7 +25,7 @@ import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
 import org.slf4j.*;
 
-import com.hazelcast.core.*;
+import com.hazelcast.core.Hazelcast;
 
 /**
  * 
@@ -55,7 +55,7 @@ public class MarketDataHandler implements TickerListener
 	 * @param marketDataList the initial market data to send to each node.
 	 * @throws Exception if any error is raised.
 	 */
-	public void populateMarketData(List<MarketData> marketDataList) throws Exception
+	public void populateMarketData(final List<MarketData> marketDataList) throws Exception
 	{
 		System.out.println("populating the market data");
 		dataMap = Hazelcast.getMap(ModelConstants.MARKET_DATA_MAP_NAME);
@@ -69,7 +69,7 @@ public class MarketDataHandler implements TickerListener
 	 * Populate the distributed market data in parallel to speed up the process.
 	 * @param marketDataList the list of data to distribute.
 	 */
-	private void populateInParallel(List<MarketData> marketDataList)
+	private void populateInParallel(final List<MarketData> marketDataList)
 	{
 		int nbThreads = 8;
 		ExecutorService tmpExecutor = Executors.newFixedThreadPool(nbThreads);
@@ -94,7 +94,8 @@ public class MarketDataHandler implements TickerListener
 	 * @param event encapsulated the market data update.
 	 * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
 	 */
-	public void marketDataUpdated(TickerEvent event)
+	@Override
+	public void marketDataUpdated(final TickerEvent event)
 	{
 		executor.submit(new NodesUpdateTask(event.getMarketData()));
 	}
@@ -124,14 +125,14 @@ public class MarketDataHandler implements TickerListener
 		 * The data to populate.
 		 */
 		private List<MarketData> marketDataList;
-		
+
 		/**
 		 * Initialize this task with the specified parameters.
 		 * @param offset the offset to use to partition the data.
 		 * @param nbThreads the number of partitions.
 		 * @param marketDataList the data to populate.
 		 */
-		public PopulateTask(int offset, int nbThreads, List<MarketData> marketDataList)
+		public PopulateTask(final int offset, final int nbThreads, final List<MarketData> marketDataList)
 		{
 			this.offset = offset;
 			this.nbThreads = nbThreads;
@@ -142,6 +143,7 @@ public class MarketDataHandler implements TickerListener
 		 * Execute this task.
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run()
 		{
 			for (int i=offset; i<marketDataList.size(); i += nbThreads)
@@ -161,7 +163,7 @@ public class MarketDataHandler implements TickerListener
 		 * The update data to send to the nodes.
 		 */
 		private MarketData data;
-		
+
 		/**
 		 * Initialize this task with the update dmarket data.
 		 * @param data the update ddata.
@@ -175,6 +177,7 @@ public class MarketDataHandler implements TickerListener
 		 * Execute this task.
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run()
 		{
 			dataMap.put(data.getId(), data);

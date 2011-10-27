@@ -28,7 +28,7 @@ public class JPPFUnsupportedOperationException extends Exception
 	 * @param message the message for this exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFUnsupportedOperationException(String message, Throwable cause)
+	public JPPFUnsupportedOperationException(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
@@ -37,7 +37,7 @@ public class JPPFUnsupportedOperationException extends Exception
 	 * Initialize this exception with a specified message.
 	 * @param message the message for this exception.
 	 */
-	public JPPFUnsupportedOperationException(String message)
+	public JPPFUnsupportedOperationException(final String message)
 	{
 		super(message);
 	}
@@ -46,7 +46,7 @@ public class JPPFUnsupportedOperationException extends Exception
 	 * Initialize this exception with a specified cause exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFUnsupportedOperationException(Throwable cause)
+	public JPPFUnsupportedOperationException(final Throwable cause)
 	{
 		super(cause);
 	}

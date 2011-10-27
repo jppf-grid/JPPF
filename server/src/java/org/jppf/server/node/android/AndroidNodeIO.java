@@ -28,7 +28,7 @@ import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -56,13 +56,13 @@ public class AndroidNodeIO extends AbstractNodeIO
 	/**
 	 * The node.
 	 */
-	private JPPFAndroidNode node = null; 
+	private JPPFAndroidNode node = null;
 
 	/**
-	 * Initialize this TaskIO with the specified node. 
+	 * Initialize this TaskIO with the specified node.
 	 * @param node - the node who owns this TaskIO.
 	 */
-	public AndroidNodeIO(JPPFAndroidNode node)
+	public AndroidNodeIO(final JPPFAndroidNode node)
 	{
 		super(null);
 		this.node = node;
@@ -73,7 +73,7 @@ public class AndroidNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}.
 	 */
 	@Override
-    protected Object[] deserializeObjects() throws Exception
+	protected Object[] deserializeObjects() throws Exception
 	{
 		if (debugEnabled) log.debug("waiting for next request");
 		byte[] data = socketWrapper.receiveBytes(0).getBuffer();
@@ -88,7 +88,7 @@ public class AndroidNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
 	{
 		List<Object> list = new LinkedList<Object>();
 		list.add(bundle);
@@ -126,7 +126,7 @@ public class AndroidNodeIO extends AbstractNodeIO
 	 * @see org.jppf.server.node.AbstractNodeIO#handleReload()
 	 */
 	@Override
-    protected void handleReload() throws Exception
+	protected void handleReload() throws Exception
 	{
 		node.setClassLoader(null);
 		node.initHelper();
@@ -141,7 +141,7 @@ public class AndroidNodeIO extends AbstractNodeIO
 	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
 	 */
 	@Override
-    public void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception
+	public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
 	{
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();

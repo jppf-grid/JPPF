@@ -34,11 +34,11 @@ public class DeserializationCaches
 	 */
 	private static Logger log = LoggerFactory.getLogger(DeserializationCaches.class);
 	/**
-	 * Mapping of handles to corresponding class descriptors. 
+	 * Mapping of handles to corresponding class descriptors.
 	 */
 	Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<Integer, ClassDescriptor>();
 	/**
-	 * Mapping of handles to corresponding objects. 
+	 * Mapping of handles to corresponding objects.
 	 */
 	Map<Integer, Object> handleToObjectMap = new HashMap<Integer, Object>();
 
@@ -88,11 +88,11 @@ public class DeserializationCaches
 	}
 
 	/**
-	 * Get the class dezscriptor assocateed with the specified handfe. 
+	 * Get the class dezscriptor assocateed with the specified handfe.
 	 * @param handle the handle to lookup.
 	 * @return a {@link ClassDescriptor} instance.
 	 */
-	ClassDescriptor getDescriptor(int handle)
+	ClassDescriptor getDescriptor(final int handle)
 	{
 		return handleToDescriptorMap.get(handle);
 	}
@@ -103,7 +103,7 @@ public class DeserializationCaches
 	 * @param classloader used to load the classes.
 	 * @throws Exception if any error occurs.
 	 */
-	void initializeDescriptorClasses(Collection<ClassDescriptor> list, ClassLoader classloader) throws Exception
+	void initializeDescriptorClasses(final Collection<ClassDescriptor> list, final ClassLoader classloader) throws Exception
 	{
 		for (ClassDescriptor cd: list)
 		{

@@ -62,7 +62,7 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 	 * @param client the JPPF client that manages connections to the JPPF drivers.
 	 * JPPF submissions.
 	 */
-	public SubmissionManagerImpl(JPPFClient client)
+	public SubmissionManagerImpl(final JPPFClient client)
 	{
 		this.client = client;
 	}
@@ -98,7 +98,8 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 	/**
 	 * {@inheritDoc}
 	 */
-	public String submitJob(JPPFJob job)
+	@Override
+	public String submitJob(final JPPFJob job)
 	{
 		if (debugEnabled) log.debug("adding new submission: jobId=" + job.getName());
 		execQueue.offer(job);
@@ -109,7 +110,8 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 	/**
 	 * {@inheritDoc}
 	 */
-	public String submitJob(JPPFJob job, SubmissionStatusListener listener)
+	@Override
+	public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
 	{
 		return submitJob(job);
 	}
@@ -117,7 +119,8 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 	/**
 	 * {@inheritDoc}
 	 */
-	public String resubmitJob(JPPFJob job)
+	@Override
+	public String resubmitJob(final JPPFJob job)
 	{
 		if (debugEnabled) log.debug("resubmitting job with id=" + job.getName());
 		execQueue.offer(job);

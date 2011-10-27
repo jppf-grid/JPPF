@@ -35,11 +35,11 @@ public class MyTask2 extends AbstractMyTask
 	}
 
 	/**
-	 * Wait for data provided by a <code>MyTask1</code> instance, then add an item to a distributed map for this <code>Mytask1</code>.  
+	 * Wait for data provided by a <code>MyTask1</code> instance, then add an item to a distributed map for this <code>Mytask1</code>.
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		Map<String, String> taskMap = getMap();
 		String s = null;

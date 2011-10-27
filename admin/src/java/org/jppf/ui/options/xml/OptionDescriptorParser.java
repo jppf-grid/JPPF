@@ -32,7 +32,7 @@ import org.xml.sax.InputSource;
 
 /**
  * Instances of this class are used to parse an XML document, describing
- * an options page, into a tree of option descriptors. 
+ * an options page, into a tree of option descriptors.
  * @author Laurent Cohen
  */
 public class OptionDescriptorParser
@@ -61,13 +61,13 @@ public class OptionDescriptorParser
 	}
 
 	/**
-	 * Parse an XML document in a file into a tree of option descriptors. 
+	 * Parse an XML document in a file into a tree of option descriptors.
 	 * @param docPath the path to XML document to parse.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
-	public OptionDescriptor parse(String docPath) throws Exception
+	public OptionDescriptor parse(final String docPath) throws Exception
 	{
 		if (docPath.contains("NodeDataPage"))
 		{
@@ -90,13 +90,13 @@ public class OptionDescriptorParser
 	}
 
 	/**
-	 * Parse an XML document in a reader into a tree of option descriptors. 
+	 * Parse an XML document in a reader into a tree of option descriptors.
 	 * @param reader the reader providing the XML document.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
-	public OptionDescriptor parse(Reader reader) throws Exception
+	public OptionDescriptor parse(final Reader reader) throws Exception
 	{
 		InputSource is = new InputSource(reader);
 		Document doc = parser.parse(is);
@@ -108,7 +108,7 @@ public class OptionDescriptorParser
 	 * @param doc the document whose children are looked up.
 	 * @return a <code>Node</code> instance if one was found, or null otherwise.
 	 */
-	public Node findFirstElement(Document doc)
+	public Node findFirstElement(final Document doc)
 	{
 		NodeList list = doc.getChildNodes();
 		for (int i=0; i<list.getLength(); i++)
@@ -125,7 +125,7 @@ public class OptionDescriptorParser
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
 	 * or null if the docuement could not be parsed.
 	 */
-	public OptionDescriptor generateTree(Node node)
+	public OptionDescriptor generateTree(final Node node)
 	{
 		OptionDescriptor desc = new OptionDescriptor();
 		NamedNodeMap attrMap = node.getAttributes();
@@ -166,7 +166,7 @@ public class OptionDescriptorParser
 	 * @param node the node to generate the listener from.
 	 * @return a <code>ItemDescriptor</code> instance.
 	 */
-	public ItemDescriptor createItemDescriptor(Node node)
+	public ItemDescriptor createItemDescriptor(final Node node)
 	{
 		ItemDescriptor desc = new ItemDescriptor();
 		NamedNodeMap attrMap = node.getAttributes();
@@ -180,7 +180,7 @@ public class OptionDescriptorParser
 	 * @param node the node to generate the listener from.
 	 * @return a <code>ListenerDescriptor</code> instance.
 	 */
-	public ListenerDescriptor createListenerDescriptor(Node node)
+	public ListenerDescriptor createListenerDescriptor(final Node node)
 	{
 		ListenerDescriptor desc = new ListenerDescriptor();
 		NamedNodeMap attrMap = node.getAttributes();
@@ -194,7 +194,7 @@ public class OptionDescriptorParser
 	 * @param node the parent listener node.
 	 * @param desc the listener descriptor whose attributeshave to be set.
 	 */
-	public void setListenerAttributes(Node node, ListenerDescriptor desc)
+	public void setListenerAttributes(final Node node, final ListenerDescriptor desc)
 	{
 		NodeList list = node.getChildNodes();
 		for (int i=0; i<list.getLength(); i++)
@@ -217,7 +217,7 @@ public class OptionDescriptorParser
 	 * @param node the node to generate whosde child is a text node.
 	 * @return the text as a string.
 	 */
-	public String getTextNodeValue(Node node)
+	public String getTextNodeValue(final Node node)
 	{
 		NodeList children = node.getChildNodes();
 		for (int j=0; j<children.getLength(); j++)
@@ -236,7 +236,7 @@ public class OptionDescriptorParser
 	 * @param node the node to generate the listener from.
 	 * @return a <code>ScriptDescriptor</code> instance.
 	 */
-	public ScriptDescriptor createScriptDescriptor(Node node)
+	public ScriptDescriptor createScriptDescriptor(final Node node)
 	{
 		ScriptDescriptor desc = new ScriptDescriptor();
 		NodeList children = node.getChildNodes();
@@ -282,12 +282,12 @@ public class OptionDescriptorParser
 				}
 				if (is != null)
 				{
-                    InputStreamReader reader = new InputStreamReader(is);
-                    try {
-                        desc.content = FileUtils.readTextFile(reader);
-                    } finally {
-                        reader.close();
-                    }
+					InputStreamReader reader = new InputStreamReader(is);
+					try {
+						desc.content = FileUtils.readTextFile(reader);
+					} finally {
+						reader.close();
+					}
 				}
 			}
 			catch(Exception e)
@@ -302,7 +302,7 @@ public class OptionDescriptorParser
 	 * @param desc the option descriptor to add the property to.
 	 * @param node the node to get the property name and value from.
 	 */
-	public void addProperty(OptionDescriptor desc, Node node)
+	public void addProperty(final OptionDescriptor desc, final Node node)
 	{
 		NamedNodeMap attrMap = node.getAttributes();
 		String name = attrMap.getNamedItem("name").getNodeValue();
@@ -315,7 +315,7 @@ public class OptionDescriptorParser
 	 * @param node the node to get the import description from.
 	 * @return a <code>OptionDescriptor</code> instance.
 	 */
-	public OptionDescriptor loadImport(Node node)
+	public OptionDescriptor loadImport(final Node node)
 	{
 		NamedNodeMap attrMap = node.getAttributes();
 		OptionDescriptor desc = new OptionDescriptor();

@@ -59,7 +59,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#addConnectionEventListener(javax.resource.spi.ConnectionEventListener)
 	 */
 	@Override
-    public void addConnectionEventListener(ConnectionEventListener listener)
+	public void addConnectionEventListener(final ConnectionEventListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -70,7 +70,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#removeConnectionEventListener(javax.resource.spi.ConnectionEventListener)
 	 */
 	@Override
-    public void removeConnectionEventListener(ConnectionEventListener listener)
+	public void removeConnectionEventListener(final ConnectionEventListener listener)
 	{
 		listeners.remove(listener);
 	}
@@ -81,7 +81,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @param eventId the type of event.
 	 * @param exception an eventual exception that should be part of the event. May be null.
 	 */
-	public void fireConnectionEvent(JPPFConnection connection, int eventId, Exception exception)
+	public void fireConnectionEvent(final JPPFConnection connection, final int eventId, final Exception exception)
 	{
 		ConnectionEvent event;
 		if (exception == null) event = new ConnectionEvent(this, eventId);
@@ -94,19 +94,19 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 				case ConnectionEvent.CONNECTION_CLOSED:
 					listener.connectionClosed(event);
 					break;
-	
+
 				case ConnectionEvent.CONNECTION_ERROR_OCCURRED:
 					listener.connectionErrorOccurred(event);
 					break;
-	
+
 				case ConnectionEvent.LOCAL_TRANSACTION_COMMITTED:
 					listener.localTransactionCommitted(event);
 					break;
-	
+
 				case ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK:
 					listener.localTransactionRolledback(event);
 					break;
-	
+
 				case ConnectionEvent.LOCAL_TRANSACTION_STARTED:
 					listener.localTransactionStarted(event);
 					break;
@@ -116,13 +116,13 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 
 	/**
 	 * Used by the container to change the association of an application-level connection handle
-	 * with a ManagedConneciton instance. 
+	 * with a ManagedConneciton instance.
 	 * @param conn the new conenction to associate.
 	 * @throws ResourceException if the association raised an error.
 	 * @see javax.resource.spi.ManagedConnection#associateConnection(java.lang.Object)
 	 */
 	@Override
-    public void associateConnection(Object conn) throws ResourceException
+	public void associateConnection(final Object conn) throws ResourceException
 	{
 		connection = (JPPFConnectionImpl) conn;
 		connection.setManagedConnection(this);
@@ -134,7 +134,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#cleanup()
 	 */
 	@Override
-    public void cleanup() throws ResourceException
+	public void cleanup() throws ResourceException
 	{
 	}
 
@@ -144,7 +144,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#destroy()
 	 */
 	@Override
-    public void destroy() throws ResourceException
+	public void destroy() throws ResourceException
 	{
 	}
 
@@ -157,7 +157,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#getConnection(javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
 	 */
 	@Override
-    public Object getConnection(Subject subject, ConnectionRequestInfo cri) throws ResourceException
+	public Object getConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
 	{
 		if (connection == null)
 		{
@@ -175,7 +175,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#getLocalTransaction()
 	 */
 	@Override
-    public LocalTransaction getLocalTransaction() throws ResourceException
+	public LocalTransaction getLocalTransaction() throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -187,7 +187,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#getMetaData()
 	 */
 	@Override
-    public ManagedConnectionMetaData getMetaData() throws ResourceException
+	public ManagedConnectionMetaData getMetaData() throws ResourceException
 	{
 		return new JPPFManagedConnectionMetaData(null);
 	}
@@ -199,13 +199,13 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	 * @see javax.resource.spi.ManagedConnection#getXAResource()
 	 */
 	@Override
-    public XAResource getXAResource() throws ResourceException
+	public XAResource getXAResource() throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
 
 	/**
-	 * Determine whether this managed connection is available and can be reused by the application server. 
+	 * Determine whether this managed connection is available and can be reused by the application server.
 	 * @return true if this managed connection is available, false otherwise.
 	 */
 	public boolean isAvailable()

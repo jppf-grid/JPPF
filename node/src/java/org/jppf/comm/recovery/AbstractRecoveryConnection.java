@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Common abstract super class for a connection dedicated to receovery from hardware fialure of a remote peer.  
+ * Common abstract super class for a connection dedicated to receovery from hardware fialure of a remote peer.
  * @author Laurent Cohen
  */
 public abstract class AbstractRecoveryConnection extends ThreadSynchronization implements Runnable
@@ -91,7 +91,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * @return the message that was received.
 	 * @throws Exception if any error occurs.
 	 */
-	protected String receiveMessage(int maxRetries, int socketReadTimeout) throws Exception
+	protected String receiveMessage(final int maxRetries, final int socketReadTimeout) throws Exception
 	{
 		String message = null;
 		JPPFBuffer buffer = null;
@@ -121,7 +121,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * @param message the message to send.
 	 * @throws Exception if any error occurs while sending the message.
 	 */
-	public void sendMessage(String message) throws Exception
+	public void sendMessage(final String message) throws Exception
 	{
 		JPPFBuffer buffer = new JPPFBuffer(message);
 		socketWrapper.sendBytes(buffer);
@@ -155,7 +155,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * Specifiy whether this connection is ok after is has been checked.
 	 * @param ok true if the connection is ok, false otherwise.
 	 */
-	public synchronized void setOk(boolean ok)
+	public synchronized void setOk(final boolean ok)
 	{
 		this.ok = ok;
 	}
@@ -173,7 +173,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * Specify whether the initial handshake has been performed.
 	 * @param initialized <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
 	 */
-	public synchronized void setInitialized(boolean initialized)
+	public synchronized void setInitialized(final boolean initialized)
 	{
 		this.initialized = initialized;
 	}

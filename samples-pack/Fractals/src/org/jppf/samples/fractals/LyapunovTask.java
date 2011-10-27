@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 public class LyapunovTask extends JPPFTask
 {
 	/**
-	 * The line number, for which to compute the lambda exponent for each point in the line. 
+	 * The line number, for which to compute the lambda exponent for each point in the line.
 	 */
 	private int b = -1;
 
@@ -36,7 +36,7 @@ public class LyapunovTask extends JPPFTask
 	 * Initialize this task with the specified line number.
 	 * @param b the line number as an int value.
 	 */
-	public LyapunovTask(int b)
+	public LyapunovTask(final int b)
 	{
 		this.b = b;
 	}
@@ -45,6 +45,7 @@ public class LyapunovTask extends JPPFTask
 	 * Execute the task.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -53,9 +54,9 @@ public class LyapunovTask extends JPPFTask
 			FractalConfiguration config =
 				(FractalConfiguration) getDataProvider().getValue("config");
 			double[] lambda = new double[config.asize];
-			double bval = (double) config.bmin + 
-				(double) b * (double) (config.bmax - config.bmin) / (double) config.bsize; 
-			double astep = (double) (config.amax - config.amin) / (double) config.asize;
+			double bval = config.bmin +
+			b * (config.bmax - config.bmin) / config.bsize;
+			double astep = (config.amax - config.amin) / config.asize;
 			double aval = config.amin;
 			for (int i=0; i<config.asize; i++)
 			{

@@ -102,7 +102,7 @@ class NodeState implements NodeLifeCycleListener
 		btn[0].addActionListener(new ActionListener()
 		{
 			@Override
-			public void actionPerformed(ActionEvent event)
+			public void actionPerformed(final ActionEvent event)
 			{
 				startNode();
 			}
@@ -112,7 +112,7 @@ class NodeState implements NodeLifeCycleListener
 		btn[1].addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent event)
+			public void actionPerformed(final ActionEvent event)
 			{
 				stopNode();
 			}
@@ -189,12 +189,13 @@ class NodeState implements NodeLifeCycleListener
 				break;
 		}
 	}
-	*/
+	 */
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeStarting(NodeLifeCycleEvent event)
+	@Override
+	public void nodeStarting(final NodeLifeCycleEvent event)
 	{
 		statusLabels[0][0].setIcon(NodePanel.BRIGHT_GREEN);
 		statusLabels[0][1].setIcon(NodePanel.DARK_RED);
@@ -205,7 +206,8 @@ class NodeState implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeEnding(NodeLifeCycleEvent event)
+	@Override
+	public void nodeEnding(final NodeLifeCycleEvent event)
 	{
 		statusLabels[0][0].setIcon(NodePanel.DARK_GREEN);
 		statusLabels[0][1].setIcon(NodePanel.BRIGHT_RED);
@@ -216,7 +218,8 @@ class NodeState implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void jobStarting(NodeLifeCycleEvent event)
+	@Override
+	public void jobStarting(final NodeLifeCycleEvent event)
 	{
 		statusLabels[1][0].setIcon(NodePanel.BRIGHT_GREEN);
 		statusLabels[1][1].setIcon(NodePanel.DARK_RED);
@@ -225,7 +228,8 @@ class NodeState implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void jobEnding(NodeLifeCycleEvent event)
+	@Override
+	public void jobEnding(final NodeLifeCycleEvent event)
 	{
 		statusLabels[1][0].setIcon(NodePanel.DARK_GREEN);
 		statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);

@@ -29,7 +29,7 @@ public class NodeLauncher
 	 * Start this application, then the JPPF driver as a subprocess.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

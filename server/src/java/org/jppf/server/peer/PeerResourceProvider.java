@@ -22,11 +22,11 @@ import java.nio.channels.SocketChannel;
 import java.util.Vector;
 
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
@@ -47,25 +47,25 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	 * The name of the peer in the configuration file.
 	 */
 	private final String peerName;
-    /**
-     * Peer connection information.
-     */
-    private final JPPFConnectionInformation connectionInfo;
+	/**
+	 * Peer connection information.
+	 */
+	private final JPPFConnectionInformation connectionInfo;
 
 	/**
 	 * Initialize this peer provider with the specified configuration name.
 	 * @param peerName the name of the peer in the configuration file.
 	 * @param connectionInfo peer connection information.
-     * @param server the NioServer to which the channel is registred.
+	 * @param server the NioServer to which the channel is registred.
 	 */
 	public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final NioServer server)
 	{
 		super(server);
-        if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-        if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+		if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+		if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
 		this.peerName = peerName;
-        this.connectionInfo = connectionInfo;
+		this.connectionInfo = connectionInfo;
 	}
 
 	/**
@@ -73,7 +73,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	 * @throws Exception if an error is raised during initialization.
 	 */
 	@Override
-    public synchronized void postInit() throws Exception
+	public synchronized void postInit() throws Exception
 	{
 		try
 		{
@@ -111,10 +111,10 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	 * @throws Exception if an error is raised during initialization.
 	 */
 	@Override
-    public SocketChannelClient initSocketChannel() throws Exception
+	public SocketChannelClient initSocketChannel() throws Exception
 	{
-        String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
-        int port = connectionInfo.serverPorts[0];
-        return new SocketChannelClient(host, port, false);
+		String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
+		int port = connectionInfo.serverPorts[0];
+		return new SocketChannelClient(host, port, false);
 	}
 }

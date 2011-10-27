@@ -69,7 +69,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * @param root the root path for this persistence manager, where the persisted jobs are stored.
 	 * @throws IllegalArgumentException if the root path is invalid or could not be created.
 	 */
-	public DefaultFilePersistenceManager(File root)
+	public DefaultFilePersistenceManager(final File root)
 	{
 		this(root, DEFAULT_PREFIX, DEFAULT_EXT);
 	}
@@ -82,7 +82,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * @param ext the extension for the names of the files in the store.
 	 * @throws IllegalArgumentException if the root path is invalid or could not be created.
 	 */
-	public DefaultFilePersistenceManager(File root, String prefix, String ext)
+	public DefaultFilePersistenceManager(final File root, final String prefix, final String ext)
 	{
 		if (root == null) throw new NullPointerException("the root path cannot be null");
 		this.root = initialize(root);
@@ -96,7 +96,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * @param root the root path for this persistence manager, where the persisted jobs are stored.
 	 * @throws IllegalArgumentException if the root path is invalid or could not be created.
 	 */
-	public DefaultFilePersistenceManager(String root)
+	public DefaultFilePersistenceManager(final String root)
 	{
 		this(root, DEFAULT_PREFIX, DEFAULT_EXT);
 	}
@@ -108,7 +108,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * @param ext the extension for the names of the files in the store.
 	 * @throws IllegalArgumentException if the root path is invalid or could not be created.
 	 */
-	public DefaultFilePersistenceManager(String root, String prefix, String ext)
+	public DefaultFilePersistenceManager(final String root, final String prefix, final String ext)
 	{
 		if (root == null) throw new IllegalArgumentException("the root path cannot be null");
 		this.root = initialize(new File(root));
@@ -122,7 +122,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * @return the root path if it is valid.
 	 * @throws IllegalArgumentException if the root path is invalid or could not be created.
 	 */
-	private File initialize(File root)
+	private File initialize(final File root)
 	{
 		if (!root.exists())
 		{
@@ -140,7 +140,8 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	{
 		File files[] = root.listFiles(new FileFilter()
 		{
-			public boolean accept(File path)
+			@Override
+			public boolean accept(final File path)
 			{
 				if (path.isDirectory()) return false;
 				String name = path.getName();
@@ -214,13 +215,13 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * Store the specified job. This implementation serializes the entire job to a file,
 	 * the first time it is called for a job. On subsequent calls, only the deltas are persisted.
 	 * @param key the key allowing to locate the job in the persistence store.
-	 * @param job the job to store. 
+	 * @param job the job to store.
 	 * @param tasks the newly received completed tasks, may be used to only store the delta for better performance.
 	 * @throws JobPersistenceException if any error occurs while storing the job.
 	 * @see org.jppf.client.persistence.JobPersistence#storeJob(Object, JPPFJob, List)
 	 */
 	@Override
-	public synchronized void storeJob(String key, JPPFJob job, List<JPPFTask> tasks) throws JobPersistenceException
+	public synchronized void storeJob(final String key, final JPPFJob job, final List<JPPFTask> tasks) throws JobPersistenceException
 	{
 		OutputStream os = null;
 		try
@@ -263,7 +264,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public synchronized void deleteJob(String key) throws JobPersistenceException
+	public synchronized void deleteJob(final String key) throws JobPersistenceException
 	{
 		File file = fileFromKey(key);
 		if (!file.delete()) throw new JobPersistenceException("could not delete job with key '" + key + '\'');
@@ -274,7 +275,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	 * @param key the job key to use.
 	 * @return a file path built form the given key.
 	 */
-	private File fileFromKey(String key)
+	private File fileFromKey(final String key)
 	{
 		return new File(root, prefix + key + (ext == null ? "" : ext));
 	}
@@ -282,6 +283,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
@@ -296,6 +298,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void close()
 	{
 	}

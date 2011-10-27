@@ -40,7 +40,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The global bundler to which bundle size calculations are delegated. 
+	 * The global bundler to which bundle size calculations are delegated.
 	 */
 	private static AutoTunedBundler simpleBundler = null;
 	/**
@@ -56,7 +56,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the auto-tuning algorithm grouped as a performance analysis profile.
 	 */
-	public AutotunedDelegatingBundler(AnnealingTuneProfile profile)
+	public AutotunedDelegatingBundler(final AnnealingTuneProfile profile)
 	{
 		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
@@ -81,7 +81,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
 	@Override
-    public Bundler copy()
+	public Bundler copy()
 	{
 		return new AutotunedDelegatingBundler(profile);
 	}
@@ -92,7 +92,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	@Override
-    public int getBundleSize()
+	public int getBundleSize()
 	{
 		return simpleBundler.getBundleSize();
 	}
@@ -104,7 +104,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
 	 */
 	@Override
-    public void feedback(int bundleSize, double totalTime)
+	public void feedback(final int bundleSize, final double totalTime)
 	{
 		simpleBundler.feedback(bundleSize, totalTime);
 	}
@@ -115,7 +115,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
 	@Override
-    protected int maxSize()
+	protected int maxSize()
 	{
 		int max = 0;
 		synchronized(simpleBundler)

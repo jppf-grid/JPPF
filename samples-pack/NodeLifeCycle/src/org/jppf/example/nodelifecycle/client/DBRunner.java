@@ -18,7 +18,7 @@
 package org.jppf.example.nodelifecycle.client;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Collection;
 
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
@@ -53,7 +53,7 @@ public class DBRunner
 	 * on the node side. Once the job is complete, we display all the rows in the table.
 	 * @param args the first argument, if any, will be used as the JPPF client's uuid.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -78,7 +78,8 @@ public class DBRunner
 			// customize the result listener to display a message each time a task result is received
 			JPPFResultCollector collector = new JPPFResultCollector(nbTasks)
 			{
-				public synchronized void resultsReceived(TaskResultEvent event)
+				@Override
+				public synchronized void resultsReceived(final TaskResultEvent event)
 				{
 					for (JPPFTask task: event.getTaskList())
 					{
@@ -186,7 +187,7 @@ public class DBRunner
 	 * Print a message to the console and/or log file.
 	 * @param message the message to print.
 	 */
-	private static void output(String message)
+	private static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

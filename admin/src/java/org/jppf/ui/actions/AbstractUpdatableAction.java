@@ -35,7 +35,7 @@ import org.jppf.utils.LocalizationUtils;
 public abstract class AbstractUpdatableAction extends AbstractAction implements UpdatableAction
 {
 	/**
-	 * The base location for internationalized messages. 
+	 * The base location for internationalized messages.
 	 */
 	protected String BASE = null;
 	/**
@@ -43,12 +43,12 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 */
 	protected List<Object> selectedElements = new LinkedList<Object>();
 	/**
-	 * Location at which to display any window or dialog created by this action. 
+	 * Location at which to display any window or dialog created by this action.
 	 */
 	protected Point location = new Point(10, 10);
 
 	/**
-	 * Get the location at which to display any window or dialog created by this action. 
+	 * Get the location at which to display any window or dialog created by this action.
 	 * @return a <code>Point</code> instance.
 	 */
 	public Point getLocation()
@@ -57,10 +57,10 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	}
 
 	/**
-	 * Set the location at which to display any window or dialog created by this action. 
+	 * Set the location at which to display any window or dialog created by this action.
 	 * @param location a <code>Point</code> instance.
 	 */
-	public void setLocation(Point location)
+	public void setLocation(final Point location)
 	{
 		this.location = location;
 	}
@@ -71,7 +71,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * @see org.jppf.ui.actions.UpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		this.selectedElements = selectedElements;
 	}
@@ -82,7 +82,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 	 */
 	@Override
-    public void valueChanged(ValueChangeEvent event)
+	public void valueChanged(final ValueChangeEvent event)
 	{
 		actionPerformed(new ActionEvent(event.getSource(), ActionEvent.ACTION_PERFORMED, ""));
 	}
@@ -91,7 +91,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * Set the icon for this action using the specified image file name.
 	 * @param name  the name of the icon image file.
 	 */
-	protected void setupIcon(String name)
+	protected void setupIcon(final String name)
 	{
 		if (name != null) putValue(Action.SMALL_ICON, GuiUtils.loadIcon(name));
 	}
@@ -100,7 +100,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	 * Set the action name and tooltip text.
 	 * @param name the key to find the name and tooltip in the localized resource bundles.
 	 */
-	protected void setupNameAndTooltip(String name)
+	protected void setupNameAndTooltip(final String name)
 	{
 		putValue(NAME, localize(name + ".label"));
 		putValue(SHORT_DESCRIPTION, localize(name + ".tooltip"));
@@ -109,10 +109,10 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
 	/**
 	 * Get a localized message given its unique name and the current locale.
 	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
+	 * @return a message in the current locale, or the default locale
+	 * if the localization for the current locale is not found.
 	 */
-	protected String localize(String message)
+	protected String localize(final String message)
 	{
 		return LocalizationUtils.getLocalized(BASE, message);
 	}

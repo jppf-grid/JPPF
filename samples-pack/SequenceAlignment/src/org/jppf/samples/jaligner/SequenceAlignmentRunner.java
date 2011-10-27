@@ -78,7 +78,7 @@ public class SequenceAlignmentRunner
 	 * Run the sample.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{
@@ -102,7 +102,7 @@ public class SequenceAlignmentRunner
 	 * @param option an option used as an entry point to the UI.
 	 * @throws Exception if the computation failed.
 	 */
-	public static void perform(String targetSequence, String matrix, String dbPath, Option option) throws Exception
+	public static void perform(final String targetSequence, final String matrix, final String dbPath, final Option option) throws Exception
 	{
 		SequenceAlignmentRunner.option = option;
 		createOrDisplayWaitWindow();
@@ -118,7 +118,7 @@ public class SequenceAlignmentRunner
 	 * @return the task wqith the maximum score.
 	 * @throws Exception if the computation failed.
 	 */
-	public static SequenceAlignmentTask doPerform(String targetSequence, String matrix, String dbPath) throws Exception
+	public static SequenceAlignmentTask doPerform(final String targetSequence, final String matrix, final String dbPath) throws Exception
 	{
 		long start = System.currentTimeMillis();
 		//System.out.println("Target sequence:\n" + targetSequence);
@@ -169,7 +169,7 @@ public class SequenceAlignmentRunner
 		long elapsed = System.currentTimeMillis() - start;
 		log.info("max score is "+maxScore+" for sequence #"+maxTask.getNumber()+" :\n" + maxTask.getSequence());
 		log.info("Total time = " + StringUtils.toStringDuration(elapsed) +
-			", calculation time = " + StringUtils.toStringDuration(elapsed2));
+				", calculation time = " + StringUtils.toStringDuration(elapsed2));
 		hideWaitWindow();
 		return maxTask;
 	}
@@ -180,15 +180,15 @@ public class SequenceAlignmentRunner
 	 * @return sequence the sequence read form the file.
 	 * @throws IOException if an error occrus when reading the file.
 	 */
-	private static String loadSampleSequence(String path) throws IOException
+	private static String loadSampleSequence(final String path) throws IOException
 	{
 		InputStream is = null;
-        StringBuilder buffer = new StringBuilder();
+		StringBuilder buffer = new StringBuilder();
 		try
 		{
 			is = SequenceAlignmentRunner.class.getClassLoader().getResourceAsStream(path);
 			if (is == null) is = new BufferedInputStream(new FileInputStream(path));
-			
+
 			int ch;
 			while ((ch = is.read()) != -1)
 			{
@@ -227,6 +227,7 @@ public class SequenceAlignmentRunner
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				Dimension d = window.getOwner().getSize();
@@ -248,6 +249,7 @@ public class SequenceAlignmentRunner
 		//if (window.isVisible()) window.dispose();
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				window.setVisible(false);
@@ -259,7 +261,7 @@ public class SequenceAlignmentRunner
 	 * Update the progress value of the progress bar.
 	 * @param n the new value to set.
 	 */
-	public static void updateProgress(int n)
+	public static void updateProgress(final int n)
 	{
 		if (progressBar != null) progressBar.setValue(n);
 	}
@@ -293,7 +295,7 @@ public class SequenceAlignmentRunner
 		 * @param matrix the name of the substitution matrix to use in the alignments.
 		 * @param dbPath the path to the databse of sequences.
 		 */
-		public AlignmentExecution(String targetSequence, String matrix, String dbPath)
+		public AlignmentExecution(final String targetSequence, final String matrix, final String dbPath)
 		{
 			this.targetSequence = targetSequence;
 			this.matrix = matrix;
@@ -304,6 +306,7 @@ public class SequenceAlignmentRunner
 		 * Perform the submission of the computation.
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run()
 		{
 			try

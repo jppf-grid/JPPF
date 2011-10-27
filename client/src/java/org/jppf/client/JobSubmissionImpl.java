@@ -46,13 +46,13 @@ public class JobSubmissionImpl extends AbstractJobSubmission
 	protected SubmissionManagerImpl submissionManager;
 
 	/**
-	 * Initialize this job submission. 
+	 * Initialize this job submission.
 	 * @param job the submitted job.
 	 * @param connection the connection to execute the job on.
 	 * @param submissionManager the submission manager.
 	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
 	 */
-	JobSubmissionImpl(JPPFJob job, AbstractJPPFClientConnection connection, SubmissionManagerImpl submissionManager, boolean locallyExecuting)
+	JobSubmissionImpl(final JPPFJob job, final AbstractJPPFClientConnection connection, final SubmissionManagerImpl submissionManager, final boolean locallyExecuting)
 	{
 		super(job, connection, locallyExecuting);
 		this.submissionManager = submissionManager;
@@ -131,7 +131,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
 	 * Set the status of this submission.
 	 * @param status a {@link SubmissionStatus} enumerated value.
 	 */
-	public synchronized void setStatus(SubmissionStatus status)
+	public synchronized void setStatus(final SubmissionStatus status)
 	{
 		if (debugEnabled) log.debug("submission [" + job.getJobUuid() + "] status changing from '" + this.status + "' to '" + status + '\'');
 		this.status = status;

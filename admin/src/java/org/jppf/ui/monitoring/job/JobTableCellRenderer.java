@@ -31,7 +31,7 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer
 {
 	/**
 	 * Returns the default table cell renderer.
-	 * @param table the JTable to which this renderer applies. 
+	 * @param table the JTable to which this renderer applies.
 	 * @param value the value of the rendered cell.
 	 * @param isSelected determines whether the cell is selected.
 	 * @param hasFocus  determines whether the cell has the focus.
@@ -41,8 +41,8 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer
 	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
 	 */
 	@Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-			int row, int column)
+	public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus,
+			final int row, final int column)
 	{
 		DefaultTableCellRenderer renderer =  (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		if (column != 0)

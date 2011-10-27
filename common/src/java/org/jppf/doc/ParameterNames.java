@@ -25,35 +25,35 @@ package org.jppf.doc;
 public enum ParameterNames
 {
 	/**
-	 * Name for the source directory. 
+	 * Name for the source directory.
 	 */
 	SOURCE_DIR,
 	/**
-	 * Name for the destination directory. 
+	 * Name for the destination directory.
 	 */
 	DEST_DIR,
 	/**
-	 * Name for the templates directory. 
+	 * Name for the templates directory.
 	 */
 	TEMPLATES_DIR,
 	/**
-	 * Name for the file includes. 
+	 * Name for the file includes.
 	 */
 	FILE_INCLUDES,
 	/**
-	 * Name for the file excludes. 
+	 * Name for the file excludes.
 	 */
 	FILE_EXCLUDES,
 	/**
-	 * Name for the directory includes. 
+	 * Name for the directory includes.
 	 */
 	DIR_INCLUDES,
 	/**
-	 * Name for the directory excludes. 
+	 * Name for the directory excludes.
 	 */
 	DIR_EXCLUDES,
 	/**
-	 * Name for the recursive directory processing flag. 
+	 * Name for the recursive directory processing flag.
 	 */
 	RECURSIVE
 }

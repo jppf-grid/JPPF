@@ -80,7 +80,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 	}
 
@@ -88,7 +88,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -96,7 +96,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		graph = new JPPFGraph();
 		graphComponent =  new mxGraphComponent(graph);
@@ -111,7 +111,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JComponent getUIComponent()
+	public JComponent getUIComponent()
 	{
 		return graphComponent;
 	}
@@ -176,7 +176,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * Set the corresponding tree view onto this graph.
 	 * @param treeTableOption a {@link AbstractTreeTableOption} instance.
 	 */
-	public void setTreeTableOption(AbstractTreeTableOption treeTableOption)
+	public void setTreeTableOption(final AbstractTreeTableOption treeTableOption)
 	{
 		this.treeTableOption = treeTableOption;
 	}
@@ -194,7 +194,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * Set the current layout.
 	 * @param name the layout name.
 	 */
-	public void setLayout(String name)
+	public void setLayout(final String name)
 	{
 		layout = new LayoutFactory(graph).createLayout(name);
 		layout.execute(graph.getDefaultParent());
@@ -205,7 +205,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * {@inheritDoc}
 	 */
 	@Override
-    public ActionHandler getActionHandler()
+	public ActionHandler getActionHandler()
 	{
 		return actionHandler;
 	}
@@ -238,7 +238,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * Called when a driver was added in the topology.
 	 * @param driver the data representing the driver.
 	 */
-	public void driverAdded(TopologyData driver)
+	public void driverAdded(final TopologyData driver)
 	{
 		String id = driver.getId();
 		Object parent = graph.getDefaultParent();
@@ -262,7 +262,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * Called when a driver was removed from the topology.
 	 * @param driver the data representing the driver.
 	 */
-	public void driverRemoved(TopologyData driver)
+	public void driverRemoved(final TopologyData driver)
 	{
 		String id = driver.getId();
 		mxGraphModel model = (mxGraphModel) graph.getModel();
@@ -293,7 +293,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param driver the driver to which the node is added.
 	 * @param node the data representing the node.
 	 */
-	public void nodeAdded(TopologyData driver, TopologyData node)
+	public void nodeAdded(final TopologyData driver, final TopologyData node)
 	{
 		String id = driver.getId();
 		mxGraphModel model = (mxGraphModel) graph.getModel();
@@ -327,7 +327,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param driver the driver to which the node is added.
 	 * @param node the data representing the node.
 	 */
-	public void nodeRemoved(TopologyData driver, TopologyData node)
+	public void nodeRemoved(final TopologyData driver, final TopologyData node)
 	{
 		mxGraphModel model = (mxGraphModel) graph.getModel();
 		model.beginUpdate();
@@ -358,7 +358,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param driver the driver to which the node is attached.
 	 * @param node the node to update.
 	 */
-	public void nodeDataUpdated(TopologyData driver, TopologyData node)
+	public void nodeDataUpdated(final TopologyData driver, final TopologyData node)
 	{
 	}
 
@@ -367,7 +367,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param driver data for the driver to add.
 	 * @return the new vertex object.
 	 */
-	private mxCell insertDriverVertex(TopologyData driver)
+	private mxCell insertDriverVertex(final TopologyData driver)
 	{
 		StringBuilder style = new StringBuilder();
 		style.append("shape=image;image=/org/jppf/ui/resources/mainframe.gif");
@@ -387,7 +387,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	 * @param node data for the newly added node.
 	 * @return the new vertex object.
 	 */
-	private mxCell insertNodeVertex(mxCell driverVertex, TopologyData node)
+	private mxCell insertNodeVertex(final mxCell driverVertex, final TopologyData node)
 	{
 		mxCell nodeVertex;
 		if (node.getNodeInformation().isDriver())

@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
 
-import com.mxgraph.model.*;
+import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -33,7 +33,7 @@ public class SelectGraphDriversAction extends AbstractGraphSelectionAction
 	 * Initialize this action with the specified tree table panel.
 	 * @param panel the tree table panel to which this action applies.
 	 */
-	public SelectGraphDriversAction(GraphOption panel)
+	public SelectGraphDriversAction(final GraphOption panel)
 	{
 		super(panel);
 		setupIcon("/org/jppf/ui/resources/select_drivers.gif");
@@ -44,7 +44,7 @@ public class SelectGraphDriversAction extends AbstractGraphSelectionAction
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void actionPerformed(ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		synchronized(panel)
 		{

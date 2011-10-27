@@ -21,7 +21,7 @@ package org.jppf.server.protocol;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import org.jppf.io.*;
+import org.jppf.io.ByteBufferOutputStream;
 
 /**
  * Wrapper fro manipulating a file.
@@ -46,7 +46,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * Initialize this location and create a buffer of the specified size.
 	 * @param size the size of the buffer handled by this memory location.
 	 */
-	public MemoryLocation(int size)
+	public MemoryLocation(final int size)
 	{
 		this(new byte[size], 0, size);
 	}
@@ -55,7 +55,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * Initialize this location with the specified buffer.
 	 * @param buffer an array of bytes.
 	 */
-	public MemoryLocation(byte[] buffer)
+	public MemoryLocation(final byte[] buffer)
 	{
 		this(buffer, 0, buffer.length);
 	}
@@ -66,7 +66,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @param offset the start position in the array of bytes.
 	 * @param len the length of the buffer.
 	 */
-	public MemoryLocation(byte[] buffer, int offset, int len)
+	public MemoryLocation(final byte[] buffer, final int offset, final int len)
 	{
 		super(buffer);
 		this.offset = offset;
@@ -80,7 +80,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @see org.jppf.server.protocol.Location#getInputStream()
 	 */
 	@Override
-    public InputStream getInputStream() throws Exception
+	public InputStream getInputStream() throws Exception
 	{
 		return new ByteArrayInputStream(path, offset, len);
 	}
@@ -92,7 +92,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @see org.jppf.server.protocol.Location#getOutputStream()
 	 */
 	@Override
-    public OutputStream getOutputStream() throws Exception
+	public OutputStream getOutputStream() throws Exception
 	{
 		return new ByteBufferOutputStream(ByteBuffer.wrap(path, offset, len));
 	}
@@ -103,7 +103,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @see org.jppf.server.protocol.Location#size()
 	 */
 	@Override
-    public long size()
+	public long size()
 	{
 		return len;
 	}
@@ -116,7 +116,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 	 * @see org.jppf.server.protocol.AbstractLocation#toByteArray()
 	 */
 	@Override
-    public byte[] toByteArray() throws Exception
+	public byte[] toByteArray() throws Exception
 	{
 		return path;
 	}

@@ -65,14 +65,14 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	/**
 	 * The list of idle node channels.
 	 */
-    private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
+	private final List<ChannelWrapper<?>> idleChannels = new ArrayList<ChannelWrapper<?>>();
 	/**
 	 * Reference to the driver.
 	 */
 	private final JPPFDriver driver = JPPFDriver.getInstance();
 
 	/**
-	 * Initialize this task queue checker with the specified node server. 
+	 * Initialize this task queue checker with the specified node server.
 	 * @param server the owner of this queue checker.
 	 */
 	public TaskQueueChecker(final NodeNioServer server)
@@ -82,7 +82,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		this.queueLock = queue.getLock();
 	}
 
-    	/**
+	/**
 	 * Add a channel to the list of idle channels.
 	 * @param channel the channel to add to the list.
 	 */
@@ -94,17 +94,17 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 			idleChannels.add(channel);
 		}
 		wakeUp();
-        driver.getStatsManager().idleNodes(idleChannels.size());
+		driver.getStatsManager().idleNodes(idleChannels.size());
 	}
 
-    public List<ChannelWrapper<?>> getIdleChannels() {
-        synchronized (idleChannels)
-        {
-            return new ArrayList<ChannelWrapper<?>>(idleChannels);
-        }
-    }
+	public List<ChannelWrapper<?>> getIdleChannels() {
+		synchronized (idleChannels)
+		{
+			return new ArrayList<ChannelWrapper<?>>(idleChannels);
+		}
+	}
 
-    /**
+	/**
 	 * Remove a channel from the list of idle channels.
 	 * @param channel the channel to remove from the list.
 	 * @return a reference to the removed channel.
@@ -116,7 +116,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		{
 			idleChannels.remove(channel);
 		}
-        driver.getStatsManager().idleNodes(idleChannels.size());
+		driver.getStatsManager().idleNodes(idleChannels.size());
 		return channel;
 	}
 
@@ -141,7 +141,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 				else log.warn("error removing channel at index " + index + " : " + e.getMessage());
 			}
 		}
-        driver.getStatsManager().idleNodes(idleChannels.size());
+		driver.getStatsManager().idleNodes(idleChannels.size());
 		return channel;
 	}
 
@@ -150,7 +150,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		while (!isStopped())
 		{
@@ -265,8 +265,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 	private int findIdleChannelIndex(final JPPFTaskBundle bundle)
 	{
 		int n = -1;
-        int idleChannelsSize = idleChannels.size();
-        ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
+		int idleChannelsSize = idleChannels.size();
+		ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
 		if (debugEnabled && (rule != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + rule);
 		List<Integer> acceptableChannels = new ArrayList<Integer>(idleChannelsSize);
 		List<Integer> channelsToRemove =  new ArrayList<Integer>(idleChannelsSize);
@@ -308,7 +308,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 			acceptableChannels.add(i);
 		}
 		for (Integer i: channelsToRemove) removeIdleChannel(i);
-        int size = acceptableChannels.size();
+		int size = acceptableChannels.size();
 		if (debugEnabled) log.debug("found " + size + " acceptable channels");
 		if (size > 0)
 		{
@@ -331,8 +331,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		if (debugEnabled)
 		{
 			String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
-				"suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
-				", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
+					"suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
+					", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
 			log.debug(s);
 		}
 		if (sla.isSuspended()) return false;
@@ -359,7 +359,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		context.checkBundler(server.getBundler());
 		if (context.getBundler() instanceof JobAwareness)
 		{
-            JobMetadata metadata = taskBundle.getJobMetadata();
+			JobMetadata metadata = taskBundle.getMetadata();
 			((JobAwareness) context.getBundler()).setJobMetadata(metadata);
 		}
 	}

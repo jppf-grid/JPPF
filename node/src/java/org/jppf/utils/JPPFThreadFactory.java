@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Custom thread factory used mostly to specifiy th enames of created threads. 
+ * Custom thread factory used mostly to specifiy th enames of created threads.
  * @author Laurent Cohen
  */
 public class JPPFThreadFactory implements ThreadFactory
@@ -57,7 +57,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * Initialize this thread factory with the specified name.
 	 * @param name the name used as prefix for the constructed threads name.
 	 */
-	public JPPFThreadFactory(String name)
+	public JPPFThreadFactory(final String name)
 	{
 		this(name, false, Thread.NORM_PRIORITY);
 	}
@@ -67,7 +67,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * @param name the name used as prefix for the constructed threads name.
 	 * @param priority priority assigned to the threads created by this factory.
 	 */
-	public JPPFThreadFactory(String name, int priority)
+	public JPPFThreadFactory(final String name, final int priority)
 	{
 		this(name, false, priority);
 	}
@@ -77,7 +77,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * @param name the name used as prefix for the constructed threads name.
 	 * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
 	 */
-	public JPPFThreadFactory(String name, boolean monitoringEnabled)
+	public JPPFThreadFactory(final String name, final boolean monitoringEnabled)
 	{
 		this(name, monitoringEnabled, Thread.NORM_PRIORITY);
 	}
@@ -88,7 +88,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
 	 * @param priority priority assigned to the threads created by this factory.
 	 */
-	public JPPFThreadFactory(String name, boolean monitoringEnabled, int priority)
+	public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority)
 	{
 		this.name = name == null ? "JPPFThreadFactory" : name;
 		threadGroup = new ThreadGroup(this.name + " thread group");
@@ -104,7 +104,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * @see java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable)
 	 */
 	@Override
-    public synchronized Thread newThread(Runnable r)
+	public synchronized Thread newThread(final Runnable r)
 	{
 		Thread thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
 		if (monitoringEnabled) threadIDs.add(thread.getId());
@@ -136,7 +136,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	 * Update the priority of all threads created by this factory.
 	 * @param newPriority the new priority to set.
 	 */
-	public synchronized void updatePriority(int newPriority)
+	public synchronized void updatePriority(final int newPriority)
 	{
 		if ((newPriority < Thread.MIN_PRIORITY) || (newPriority > Thread.MAX_PRIORITY) || (priority == newPriority)) return;
 		int count = threadGroup.activeCount();

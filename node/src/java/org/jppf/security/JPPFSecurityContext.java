@@ -66,7 +66,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * @param id identifier for the owner of these credentials.
 	 * @param credentials the signature associated with these credentials.
 	 */
-	public JPPFSecurityContext(String uuid, String id, JPPFCredentials credentials)
+	public JPPFSecurityContext(final String uuid, final String id, final JPPFCredentials credentials)
 	{
 		this.uuid = uuid;
 		this.id = id;
@@ -108,7 +108,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * @param credentials the entity's security credentials.
 	 * @return true if the owner can execute the entity's tasks, false otherwise.
 	 */
-	public boolean canExecute(JPPFSecurityContext credentials)
+	public boolean canExecute(final JPPFSecurityContext credentials)
 	{
 		return true;
 	}
@@ -119,7 +119,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * @param credentials the entity's security credentials.
 	 * @return true if the owner can send tasks to the other entity, false otherwise.
 	 */
-	public boolean canSend(JPPFSecurityContext credentials)
+	public boolean canSend(final JPPFSecurityContext credentials)
 	{
 		return true;
 	}
@@ -130,7 +130,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * @param credentials the entity's security credentials.
 	 * @return true if the owner can receive tasks from the other entity, false otherwise.
 	 */
-	public boolean canReceive(JPPFSecurityContext credentials)
+	public boolean canReceive(final JPPFSecurityContext credentials)
 	{
 		return true;
 	}
@@ -141,7 +141,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * @param credentials the entity's security credentials.
 	 * @return true if the owner can administrate the other entity, false otherwise.
 	 */
-	public boolean canAdministrate(JPPFSecurityContext credentials)
+	public boolean canAdministrate(final JPPFSecurityContext credentials)
 	{
 		return true;
 	}
@@ -152,7 +152,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return "JPPF Credentials id=" + id;
 	}
@@ -170,7 +170,7 @@ public final class JPPFSecurityContext implements Serializable
 	 * Set the security domain these credentials relate to.
 	 * @param domain the domain as a string.
 	 */
-	public void setDomain(String domain)
+	public void setDomain(final String domain)
 	{
 		this.domain = domain;
 	}

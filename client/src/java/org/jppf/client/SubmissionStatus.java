@@ -18,7 +18,7 @@
 package org.jppf.client;
 
 /**
- * The status of a submission. 
+ * The status of a submission.
  */
 public enum SubmissionStatus
 {

@@ -30,6 +30,7 @@ public class IdleTimeDetectorFactoryImpl implements IdleTimeDetectorFactory
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IdleTimeDetector newIdleTimeDetector()
 	{
 		if (SystemUtils.isWindows()) return new WindowsIdleTimeDetector();

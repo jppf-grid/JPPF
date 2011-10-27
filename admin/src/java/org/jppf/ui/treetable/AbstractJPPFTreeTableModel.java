@@ -37,7 +37,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * Initialize this model with the specified tree root.
 	 * @param root - the root of the tree.
 	 */
-	public AbstractJPPFTreeTableModel(TreeNode root)
+	public AbstractJPPFTreeTableModel(final TreeNode root)
 	{
 		super(root);
 	}
@@ -50,7 +50,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#isCellEditable(java.lang.Object, int)
 	 */
 	@Override
-    public boolean isCellEditable(Object node, int column)
+	public boolean isCellEditable(final Object node, final int column)
 	{
 		//return false;
 		return super.isCellEditable(node, column);
@@ -64,7 +64,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
 	 */
 	@Override
-    public void setValueAt(Object value, Object node, int column)
+	public void setValueAt(final Object value, final Object node, final int column)
 	{
 	}
 
@@ -76,7 +76,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
 	 */
 	@Override
-    public Object getChild(Object parent, int index)
+	public Object getChild(final Object parent, final int index)
 	{
 		try
 		{
@@ -90,12 +90,12 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 
 	/**
 	 * Get the number of children for the specified node.
-	 * @param parent the node for which to get the number of children. 
+	 * @param parent the node for which to get the number of children.
 	 * @return the number of children as an int.
 	 * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
 	 */
 	@Override
-    public int getChildCount(Object parent)
+	public int getChildCount(final Object parent)
 	{
 		return ((TreeNode) parent).getChildCount();
 	}
@@ -106,7 +106,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @param parent - the node into which to insert the child.
 	 * @param pos - the position at which to insert the node.
 	 */
-	public void insertNodeInto(DefaultMutableTreeNode child, DefaultMutableTreeNode parent, int pos)
+	public void insertNodeInto(final DefaultMutableTreeNode child, final DefaultMutableTreeNode parent, final int pos)
 	{
 		parent.insert(child, pos);
 		fireTreeNodesInserted(parent, parent.getPath(), new int[] { pos }, new Object[] { child } );
@@ -116,7 +116,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * Remove a node from the tree.
 	 * @param node - the node to remove from the parent.
 	 */
-	public void removeNodeFromParent(DefaultMutableTreeNode node)
+	public void removeNodeFromParent(final DefaultMutableTreeNode node)
 	{
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
 		int pos = parent.getIndex(node);
@@ -128,7 +128,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * Handle a node update.
 	 * @param node - the node to update.
 	 */
-	public void changeNode(DefaultMutableTreeNode node)
+	public void changeNode(final DefaultMutableTreeNode node)
 	{
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
 		int pos = parent.getIndex(node);
@@ -142,7 +142,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	 * @see org.jppf.ui.treetable.AbstractTreeTableModel#getColumnClass(int)
 	 */
 	@Override
-    public Class getColumnClass(int column)
+	public Class getColumnClass(final int column)
 	{
 		return (column == 0) ? TreeTableModel.class : String.class;
 	}
@@ -150,10 +150,10 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 	/**
 	 * Get a localized message given its unique name and the current locale.
 	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
+	 * @return a message in the current locale, or the default locale
+	 * if the localization for the current locale is not found.
 	 */
-	protected String localize(String message)
+	protected String localize(final String message)
 	{
 		return LocalizationUtils.getLocalized(BASE, message);
 	}

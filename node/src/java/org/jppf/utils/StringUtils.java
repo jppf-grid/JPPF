@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * This class provides a set of utility methods for manipulating strings. 
+ * This class provides a set of utility methods for manipulating strings.
  * @author Laurent Cohen
  */
 public final class StringUtils
@@ -76,17 +76,17 @@ public final class StringUtils
 	 * @param maxLen the length of the formatted string.
 	 * @return a string formatted to the specified length.
 	 */
-	public static String padLeft(String source, char padChar, int maxLen)
+	public static String padLeft(final String source, final char padChar, final int maxLen)
 	{
 		StringBuilder sb = new StringBuilder();
-		if (source == null) source = "";
-		int length = source.length();
+		String src = (source == null) ? "" : source;
+		int length = src.length();
 		//if (length > maxLen) sb.append(source, length-maxLen, maxLen);
 		if (length > maxLen) return source;
 		else
 		{
 			for (int i=0; i<maxLen-length; i++) sb.append(padChar);
-			sb.append(source);
+			sb.append(src);
 		}
 		return sb.toString();
 	}
@@ -101,7 +101,7 @@ public final class StringUtils
 	 * if its length is greater than the padding length
 	 * @return the padded (or truncated) string
 	 */
-	public static String padRight(String source, char padChar, int maxLen)
+	public static String padRight(final String source, final char padChar, final int maxLen)
 	{
 		String s = source;
 		if (s == null) s = "";
@@ -115,7 +115,7 @@ public final class StringUtils
 	 * An array of char containing the hex digits in ascending order.
 	 */
 	private static char[] hexDigits =
-		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+	{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 	/**
 	 * Convert a part of an array of bytes, into a string of space-separated hexadecimal numbers.<br>
 	 * This method is proposed as a convenience for debugging purposes.
@@ -124,7 +124,7 @@ public final class StringUtils
 	 * @param length the number of bytes to convert in the array.
 	 * @return the converted bytes as a string of space-separated hexadecimal numbers.
 	 */
-	public static String dumpBytes(byte[] bytes, int start, int length)
+	public static String dumpBytes(final byte[] bytes, final int start, final int length)
 	{
 		StringBuilder sb = new StringBuilder();
 		if (length >= 0)
@@ -137,14 +137,14 @@ public final class StringUtils
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Convert a byte value into a 2-digits hexadecimal value. The first digit is 0 if the value is less than 16.<br>
 	 * If a value is negative, its 2-complement value is converted, otherwise the value itself is converted.
 	 * @param b the byte value to convert.
 	 * @return a string containing the 2-digit hexadecimal representation of the byte value.
 	 */
-	public static String toHexString(byte b)
+	public static String toHexString(final byte b)
 	{
 		int n = (b < 0) ? b + 256 : b;
 		StringBuilder sb = new StringBuilder();
@@ -152,13 +152,13 @@ public final class StringUtils
 		sb.append(hexDigits[n % 16]);
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Convert a string of space-separated hexadecimal numbers into an array of bytes.
 	 * @param hexString the string to convert.
 	 * @return the resulting array of bytes.
 	 */
-	public static byte[] toBytes(String hexString)
+	public static byte[] toBytes(final String hexString)
 	{
 		String[] bytes = hexString.split("\\s");
 		List<Byte> list = new ArrayList<Byte>(bytes.length);
@@ -171,14 +171,15 @@ public final class StringUtils
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Tranform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
-	 * @param elapsed the duration to transform, expressed in milliseconds.
+	 * @param duration the duration to transform, expressed in milliseconds.
 	 * @return a string specifiying the duration in terms of hours, minutes, seconds and milliseconds.
 	 */
-	public static String toStringDuration(long elapsed)
+	public static String toStringDuration(final long duration)
 	{
+		long elapsed = duration;
 		StringBuilder sb = new StringBuilder();
 		sb.append(padLeft(""+(elapsed / 3600000L), '0', 2)).append(':');
 		elapsed = elapsed % 3600000L;
@@ -188,19 +189,20 @@ public final class StringUtils
 		sb.append(padLeft(""+(elapsed % 1000L), '0', 3));
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Replace pre-determined keywords in a string, with shorter ones.
 	 * @param key the string to shorten.
 	 * @return the string with its keywords replaced.
 	 */
-	public static String shortenLabel(String key)
+	public static String shortenLabel(final String key)
 	{
+		String result = key;
 		for (int i=0; i<KEYWORDS.length; i++)
 		{
-			if (key.contains(KEYWORDS[i])) key = key.replace(KEYWORDS[i], REPLACEMENTS[i]);
+			if (result.contains(KEYWORDS[i])) result = result.replace(KEYWORDS[i], REPLACEMENTS[i]);
 		}
-		return key;
+		return result;
 	}
 
 	/**
@@ -208,7 +210,7 @@ public final class StringUtils
 	 * @param channel the channel to get the host from.
 	 * @return an IP address as a string.
 	 */
-	public static String getRemoteHost(Channel channel)
+	public static String getRemoteHost(final Channel channel)
 	{
 		StringBuilder sb = new StringBuilder();
 		if (channel instanceof SocketChannel)
@@ -235,7 +237,7 @@ public final class StringUtils
 	 * @param address the address to get the host from.
 	 * @return an IP address as a string.
 	 */
-	public static String getRemoteHost(SocketAddress address)
+	public static String getRemoteHost(final SocketAddress address)
 	{
 		StringBuilder sb = new StringBuilder();
 		//sb.append("[");
@@ -255,7 +257,7 @@ public final class StringUtils
 	 * @param array the array from which to build a string representation.
 	 * @return the array's content as a string.
 	 */
-	public static <T> String arrayToString(T[] array)
+	public static <T> String arrayToString(final T[] array)
 	{
 		return arrayToString(array, ",", "[", "]");
 	}
@@ -269,21 +271,21 @@ public final class StringUtils
 	 * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
 	 * @return the array's content as a string.
 	 */
-	public static <T> String arrayToString(T[] array, String sep, String prefix, String suffix)
+	public static <T> String arrayToString(final T[] array, final String sep, final String prefix, final String suffix)
 	{
-  	StringBuilder sb = new StringBuilder();
-  	if (array == null) sb.append("null");
-  	else
-  	{
-  		if (prefix != null) sb.append(prefix);
-  		for (int i=0; i<array.length; i++)
-  		{
-  			if ((i > 0) && (sep != null)) sb.append(sep);
-  			sb.append(array[i]);
-  		}
-  		if (suffix != null) sb.append(suffix);
-  	}
-  	return sb.toString();
+		StringBuilder sb = new StringBuilder();
+		if (array == null) sb.append("null");
+		else
+		{
+			if (prefix != null) sb.append(prefix);
+			for (int i=0; i<array.length; i++)
+			{
+				if ((i > 0) && (sep != null)) sb.append(sep);
+				sb.append(array[i]);
+			}
+			if (suffix != null) sb.append(suffix);
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -291,7 +293,7 @@ public final class StringUtils
 	 * @param s list of space-separated port numbers
 	 * @return an array of int port numbers.
 	 */
-	public static int[] parseIntValues(String s)
+	public static int[] parseIntValues(final String s)
 	{
 		String[] strPorts = s.split("\\s");
 		int[] ports = new int[strPorts.length];
@@ -315,7 +317,7 @@ public final class StringUtils
 	 * @param ports list of port numbers
 	 * @return a space-separated list of ports.
 	 */
-	public static String buildString(int[] ports)
+	public static String buildString(final int[] ports)
 	{
 		if ((ports == null) || (ports.length == 0)) return "";
 		StringBuilder sb = new StringBuilder();
@@ -332,7 +334,7 @@ public final class StringUtils
 	 * @param s a host:port string.
 	 * @return a <code>Pair&lt;String, Integer&gt;</code> instance.
 	 */
-	public static HostPort parseHostPort(String s)
+	public static HostPort parseHostPort(final String s)
 	{
 		String[] comps = s.split(":");
 		int port = -1;
@@ -353,7 +355,7 @@ public final class StringUtils
 	 * @param t the throwable to get the stack trace from.
 	 * @return the stack trace as astring.
 	 */
-	public static String getStackTrace(Throwable t)
+	public static String getStackTrace(final Throwable t)
 	{
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
@@ -363,11 +365,11 @@ public final class StringUtils
 	}
 
 	/**
-	 * Build a string made of the specified tokens. 
+	 * Build a string made of the specified tokens.
 	 * @param args the tokens composing the string.
 	 * @return the concatenation of the string values of the tokens.
 	 */
-	public static String buildString(Object...args)
+	public static String buildString(final Object...args)
 	{
 		if (args == null) return null;
 		StringBuilder sb = new StringBuilder();
@@ -382,7 +384,7 @@ public final class StringUtils
 	 * @param values the values to match the source with.
 	 * @return true if the source matches one of the values, false otherwise.
 	 */
-	public static boolean startsWithOneOf(String source, boolean ignoreCase, String...values)
+	public static boolean startsWithOneOf(final String source, final boolean ignoreCase, final String...values)
 	{
 		if ((source == null) || (values == null)) return false;
 		String s = ignoreCase ? source.toLowerCase(): source;
@@ -402,7 +404,7 @@ public final class StringUtils
 	 * @param values the values to match the source with.
 	 * @return true if the source matches one of the values, false otherwise.
 	 */
-	public static boolean isOneOf(String source, boolean ignoreCase, String...values)
+	public static boolean isOneOf(final String source, final boolean ignoreCase, final String...values)
 	{
 		if ((source == null) || (values == null)) return false;
 		String s = ignoreCase ? source.toLowerCase(): source;
@@ -420,7 +422,7 @@ public final class StringUtils
 	 * @param addr the source address to convert.
 	 * @return an array of int values, or null if the source could not be parsed.
 	 */
-	public static int[] toIntArray(InetAddress addr)
+	public static int[] toIntArray(final InetAddress addr)
 	{
 		try
 		{
@@ -453,7 +455,7 @@ public final class StringUtils
 	 * @param separatorPattern the values separator, expressed as a regular expression, must comply with the specifications for {@link java.util.regex.Pattern}.
 	 * @return an array of int value, or null if the source cvould not be parsed.
 	 */
-	public static int[] toIntArray(String source, Pattern separatorPattern)
+	public static int[] toIntArray(final String source, final Pattern separatorPattern)
 	{
 		try
 		{
@@ -470,7 +472,7 @@ public final class StringUtils
 
 	/**
 	 * Create an instance of the UTF-8 charset.
-	 * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated. 
+	 * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.
 	 */
 	private static Charset makeUTF8()
 	{

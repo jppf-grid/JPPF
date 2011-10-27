@@ -90,7 +90,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 */
 	private transient List<JobListener> listeners = new LinkedList<JobListener>();
 	/**
-	 * The persistence manager that enables saving aznd restoring the state of this job. 
+	 * The persistence manager that enables saving aznd restoring the state of this job.
 	 */
 	private transient JobPersistence<?> persistenceManager = null;
 
@@ -184,7 +184,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
 	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final JPPFJobMetadata jobMetadata,
-		final boolean blocking, final TaskResultListener resultsListener)
+			final boolean blocking, final TaskResultListener resultsListener)
 	{
 		this();
 		this.dataProvider = dataProvider;
@@ -215,10 +215,10 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 
 	/**
 	 * Set the user-defined display name for this job.
-	 * @param id the display name as a string. 
+	 * @param id the display name as a string.
 	 * @deprecated use {@link #setName(java.lang.String) setName(String)} instead.
 	 */
-	public void setId(String id)
+	public void setId(final String id)
 	{
 		this.name = id;
 	}
@@ -234,7 +234,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 
 	/**
 	 * Set the user-defined display name for this job.
-	 * @param name the display name as a string. 
+	 * @param name the display name as a string.
 	 */
 	public void setName(final String name)
 	{
@@ -357,7 +357,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get the service level agreement between the job and the server.
+	 * @return an instance of {@link JobSLA}.
 	 * @deprecated use {@link #getSLA() getSLA()} instead
 	 */
 	public JPPFJobSLA getJobSLA()
@@ -384,7 +385,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get the user-defined metadata asoociated with this job.
+	 * @return a {@link JobMetadata} instance.
 	 * @deprecated use {@link #getMetadata() getMetadata()} instead
 	 */
 	public JPPFJobMetadata getJobMetadata()
@@ -431,7 +433,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -509,7 +511,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Get the persistence manager that enables saving aznd restoring the state of this job. 
+	 * Get the persistence manager that enables saving aznd restoring the state of this job.
 	 * @return a {@link JobPersistence} instance.
 	 * @param <T> the type of the keys used by the persistence manager.
 	 */
@@ -519,7 +521,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Set the persistence manager that enables saving aznd restoring the state of this job. 
+	 * Set the persistence manager that enables saving aznd restoring the state of this job.
 	 * @param persistenceManager a {@link JobPersistence} instance.
 	 * @param <T> the type of the keys used by the persistence manager.
 	 */

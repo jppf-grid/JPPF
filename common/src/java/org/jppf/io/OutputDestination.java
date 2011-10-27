@@ -46,7 +46,7 @@ public interface OutputDestination extends IO
 
 	/**
 	 * Write an int value to this output destination.
-	 * @param value the value to write. 
+	 * @param value the value to write.
 	 * @throws Exception if an IO error occurs.
 	 */
 	void writeInt(int value) throws Exception;

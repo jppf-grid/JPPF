@@ -36,7 +36,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * Initialize this factory with the specified server.
 	 * @param server the server for which to initialize.
 	 */
-	public NodeServerFactory(NodeNioServer server)
+	public NodeServerFactory(final NodeNioServer server)
 	{
 		super(server);
 	}
@@ -47,7 +47,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
 	 */
 	@Override
-    public Map<NodeState, NioState<NodeTransition>> createStateMap()
+	public Map<NodeState, NioState<NodeTransition>> createStateMap()
 	{
 		Map<NodeState, NioState<NodeTransition>> map = new EnumMap<NodeState, NioState<NodeTransition>>(NodeState.class);
 		map.put(SEND_INITIAL_BUNDLE, new SendInitialBundleState((NodeNioServer) server));
@@ -64,7 +64,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
 	 */
 	@Override
-    public Map<NodeTransition, NioTransition<NodeState>> createTransitionMap()
+	public Map<NodeTransition, NioTransition<NodeState>> createTransitionMap()
 	{
 		Map<NodeTransition, NioTransition<NodeState>> map =
 			new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
@@ -84,7 +84,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 	 * @param ops the operations allowed.
 	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
 	 */
-	private static NioTransition<NodeState> transition(NodeState state, int ops)
+	private static NioTransition<NodeState> transition(final NodeState state, final int ops)
 	{
 		return new NioTransition<NodeState>(state, ops);
 	}

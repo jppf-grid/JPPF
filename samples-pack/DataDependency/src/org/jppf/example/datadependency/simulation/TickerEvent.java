@@ -32,7 +32,7 @@ public class TickerEvent extends EventObject
 	 * Iniitialize this event with a market data id.
 	 * @param source a market data id string.
 	 */
-	public TickerEvent(MarketData source)
+	public TickerEvent(final MarketData source)
 	{
 		super(source);
 	}

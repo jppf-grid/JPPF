@@ -47,7 +47,8 @@ public class JPPFJobMetadata implements Serializable, JobMetadata
 	 * @param key the parameter's key.
 	 * @param value the parameter's value.
 	 */
-	public void setParameter(Object key, Object value)
+	@Override
+	public void setParameter(final Object key, final Object value)
 	{
 		metadata.put(key, value);
 	}
@@ -56,7 +57,7 @@ public class JPPFJobMetadata implements Serializable, JobMetadata
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getParameter(Object key)
+	public Object getParameter(final Object key)
 	{
 		return metadata.get(key);
 	}
@@ -65,7 +66,7 @@ public class JPPFJobMetadata implements Serializable, JobMetadata
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getParameter(Object key, Object def)
+	public Object getParameter(final Object key, final Object def)
 	{
 		Object value = metadata.get(key);
 		return value != null ? value : def;
@@ -76,7 +77,8 @@ public class JPPFJobMetadata implements Serializable, JobMetadata
 	 * @param key the parameter's key.
 	 * @return the removed parameter's value or null if no parameter with the specified key exists.
 	 */
-	public Object removeParameter(Object key)
+	@Override
+	public Object removeParameter(final Object key)
 	{
 		return metadata.remove(key);
 	}

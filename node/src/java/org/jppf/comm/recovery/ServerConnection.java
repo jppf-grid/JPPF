@@ -51,7 +51,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * @param socketReadTimeout the maximum wait time on a response from the remote peer.
 	 * @throws Exception if any error occurs while initializing the socket connection.
 	 */
-	public ServerConnection(Socket socket, int maxRetries, int socketReadTimeout) throws Exception
+	public ServerConnection(final Socket socket, final int maxRetries, final int socketReadTimeout) throws Exception
 	{
 		this.ok = true;
 		this.initialized = false;
@@ -64,7 +64,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * {@inheritDoc}
 	 */
 	@Override
-    public synchronized void run()
+	public synchronized void run()
 	{
 		if (!isOk()) return;
 		if (!initialized) performHandshake();
@@ -101,7 +101,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * @param message the string message to send to the remote peer.
 	 * @return the response as a string.
 	 */
-	private String doSendReceive(String message)
+	private String doSendReceive(final String message)
 	{
 		String response = null;
 		try
@@ -123,7 +123,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * Close this server connection and release the resources it is using.
 	 */
 	@Override
-    public synchronized void close()
+	public synchronized void close()
 	{
 		try
 		{
@@ -145,7 +145,7 @@ public class ServerConnection extends AbstractRecoveryConnection
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return StringUtils.buildString("ServerConnection[socketWrapper=", socketWrapper, ", ok=", ok, ", initialized=", initialized, ", uuid=", uuid, "]");
 	}

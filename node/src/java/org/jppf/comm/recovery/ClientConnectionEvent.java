@@ -30,7 +30,7 @@ public class ClientConnectionEvent extends EventObject
 	 * Initialize this event with the specified client-side connection.
 	 * @param connection the connection to which the event applies.
 	 */
-	public ClientConnectionEvent(ClientConnection connection)
+	public ClientConnectionEvent(final ClientConnection connection)
 	{
 		super(connection);
 	}

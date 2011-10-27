@@ -45,7 +45,7 @@ public class SimpleRunnable implements Runnable, Serializable
 	 * Initialize this task with the specified result object.
 	 * @param result the result to use.
 	 */
-	public SimpleRunnable(Result result)
+	public SimpleRunnable(final Result result)
 	{
 		this.executionResult = result;
 	}
@@ -55,7 +55,7 @@ public class SimpleRunnable implements Runnable, Serializable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
 	}

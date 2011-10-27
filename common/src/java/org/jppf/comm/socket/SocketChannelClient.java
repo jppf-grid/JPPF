@@ -27,7 +27,7 @@ import org.slf4j.*;
 
 /**
  * This SocketWrapper implementation relies on an underlying SocketChannel, in order to allow
- * writing to, and reading from, at the same time from the same socket connection. 
+ * writing to, and reading from, at the same time from the same socket connection.
  * @author Laurent Cohen
  * @author Jeff Rosen
  */
@@ -67,7 +67,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @param blocking true if the socket channel is in blocking mode, false otherwise.
 	 * @throws IOException if the socket channel could not be opened.
 	 */
-	public SocketChannelClient(boolean blocking) throws IOException
+	public SocketChannelClient(final boolean blocking) throws IOException
 	{
 		this.blocking = blocking;
 	}
@@ -79,7 +79,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @param blocking true if the socket channel is in blocking mode, false otherwise.
 	 * @throws IOException if the socket channel could not be opened.
 	 */
-	public SocketChannelClient(String host, int port, boolean blocking) throws IOException
+	public SocketChannelClient(final String host, final int port, final boolean blocking) throws IOException
 	{
 		this(blocking);
 		this.host = host;
@@ -93,7 +93,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#send(java.lang.Object)
 	 */
 	@Override
-    public void send(Object o) throws Exception
+	public void send(final Object o) throws Exception
 	{
 		JPPFBuffer buf = getSerializer().serialize(o);
 		sendBytes(buf);
@@ -106,7 +106,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
 	 */
 	@Override
-    public void sendBytes(JPPFBuffer buf) throws Exception
+	public void sendBytes(final JPPFBuffer buf) throws Exception
 	{
 		int length = buf.getLength();
 		writeInt(length);
@@ -122,7 +122,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
 	 */
 	@Override
-    public void write(byte[] data, int offset, int len) throws Exception
+	public void write(final byte[] data, final int offset, final int len) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
 		for (int count=0; count < len;) count += channel.write(buffer);
@@ -135,7 +135,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
 	 */
 	@Override
-    public void writeInt(int n) throws Exception
+	public void writeInt(final int n) throws Exception
 	{
 		//ByteBuffer buffer = ByteBuffer.wrap(SerializationUtils.writeInt(n));
 		ByteBuffer buffer = ByteBuffer.allocate(4);
@@ -150,7 +150,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#flush()
 	 */
 	@Override
-    public void flush() throws IOException
+	public void flush() throws IOException
 	{
 	}
 
@@ -162,7 +162,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#receive()
 	 */
 	@Override
-    public Object receive() throws Exception
+	public Object receive() throws Exception
 	{
 		return receive(0);
 	}
@@ -176,7 +176,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#receive(int)
 	 */
 	@Override
-    public Object receive(int timeout) throws Exception
+	public Object receive(final int timeout) throws Exception
 	{
 		Object o = null;
 		try
@@ -202,7 +202,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
 	 */
 	@Override
-    public JPPFBuffer receiveBytes(int timeout) throws Exception
+	public JPPFBuffer receiveBytes(final int timeout) throws Exception
 	{
 		int length = readInt();
 		byte[] data = new byte[length];
@@ -222,7 +222,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] data, int offset, int len) throws Exception
+	public int read(final byte[] data, final int offset, final int len) throws Exception
 	{
 		ByteBuffer byteBuffer = ByteBuffer.wrap(data, offset, len);
 		int count = 0;
@@ -237,7 +237,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#readInt()
 	 */
 	@Override
-    public int readInt() throws Exception
+	public int readInt() throws Exception
 	{
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		int count = 0;
@@ -253,7 +253,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#open()
 	 */
 	@Override
-    public void open() throws ConnectException, IOException
+	public void open() throws ConnectException, IOException
 	{
 		channel = SocketChannel.open();
 		channel.socket().setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
@@ -285,7 +285,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#close()
 	 */
 	@Override
-    public void close() throws ConnectException, IOException
+	public void close() throws ConnectException, IOException
 	{
 		if (opened)
 		{
@@ -300,7 +300,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#isOpened()
 	 */
 	@Override
-    public boolean isOpened()
+	public boolean isOpened()
 	{
 		return opened;
 	}
@@ -311,7 +311,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
 	 */
 	@Override
-    public ObjectSerializer getSerializer()
+	public ObjectSerializer getSerializer()
 	{
 		if (serializer == null)
 		{
@@ -343,7 +343,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
 	 */
 	@Override
-    public void setSerializer(ObjectSerializer serializer)
+	public void setSerializer(final ObjectSerializer serializer)
 	{
 		this.serializer = serializer;
 	}
@@ -354,7 +354,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#getHost()
 	 */
 	@Override
-    public String getHost()
+	public String getHost()
 	{
 		return host;
 	}
@@ -365,7 +365,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#setHost(java.lang.String)
 	 */
 	@Override
-    public void setHost(String host)
+	public void setHost(final String host)
 	{
 		this.host = host;
 	}
@@ -376,7 +376,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#getPort()
 	 */
 	@Override
-    public int getPort()
+	public int getPort()
 	{
 		return port;
 	}
@@ -387,7 +387,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#setPort(int)
 	 */
 	@Override
-    public void setPort(int port)
+	public void setPort(final int port)
 	{
 		this.port = port;
 	}
@@ -398,7 +398,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#getSocket()
 	 */
 	@Override
-    public Socket getSocket()
+	public Socket getSocket()
 	{
 		return channel.socket();
 	}
@@ -409,7 +409,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#setSocket(java.net.Socket)
 	 */
 	@Override
-    public void setSocket(Socket socket)
+	public void setSocket(final Socket socket)
 	{
 	}
 
@@ -426,7 +426,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * Set the underlying socket to be used by this socket wrapper.
 	 * @param channel a SocketChannel instance.
 	 */
-	public void setChannel(SocketChannel channel)
+	public void setChannel(final SocketChannel channel)
 	{
 		this.channel = channel;
 	}
@@ -439,7 +439,7 @@ public class SocketChannelClient implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
 	 */
 	@Override
-    public int skip(int n) throws Exception
+	public int skip(final int n) throws Exception
 	{
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
@@ -459,22 +459,22 @@ public class SocketChannelClient implements SocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 * @see org.jppf.comm.socket.SocketChannelClient#write(byte[],int,int)
 	 */
-	public void write(byte[] data) throws Exception
+	public void write(final byte[] data) throws Exception
 	{
 		write(data, 0, data.length);
 	}
 
 	/**
 	 * Returns a timestamp that should reflect the system millisecond counter at the
-	 * last known good usage of the underlying socket.  
+	 * last known good usage of the underlying socket.
 	 * 
 	 * NOTE: In this case we assume that the channel is "known good" and just return
 	 * the current system tick.
-	 *   
-	 * @return the socket usage timestamp  
+	 * 
+	 * @return the socket usage timestamp
 	 */
 	@Override
-    public long getSocketTimestamp() {
+	public long getSocketTimestamp() {
 		return System.currentTimeMillis();
 	}
 }

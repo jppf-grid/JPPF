@@ -55,11 +55,11 @@ public class JobInformation implements Serializable
 	/**
 	 * Determines whether the job is in suspended state.
 	 */
-	private boolean suspended = false; 
+	private boolean suspended = false;
 	/**
 	 * Determines whether the job is waiting to reach its scheduled execution date.
 	 */
-	private boolean pending = false; 
+	private boolean pending = false;
 	/**
 	 * The maximum number of nodes this job can run on.
 	 */
@@ -82,7 +82,7 @@ public class JobInformation implements Serializable
 	 * @param suspended determines whether the job is in suspended state.
 	 * @param pending determines whether the job is waiting to reach its scheduled execution date.
 	 */
-	public JobInformation(String jobUuid, String jobId, int taskCount, int initialTaskCount, int priority, boolean suspended, boolean pending)
+	public JobInformation(final String jobUuid, final String jobId, final int taskCount, final int initialTaskCount, final int priority, final boolean suspended, final boolean pending)
 	{
 		this.jobUuid = jobUuid;
 		this.jobId = jobId;
@@ -106,7 +106,7 @@ public class JobInformation implements Serializable
 	 * Set the user-defined identifier for the job.
 	 * @param id the id as a string.
 	 */
-	public void setJobId(String id)
+	public void setJobId(final String id)
 	{
 		this.jobId = id;
 	}
@@ -124,7 +124,7 @@ public class JobInformation implements Serializable
 	 * Set the current number of tasks in the job.
 	 * @param taskCount the number of tasks as an int.
 	 */
-	public void setTaskCount(int taskCount)
+	public void setTaskCount(final int taskCount)
 	{
 		this.taskCount = taskCount;
 	}
@@ -140,9 +140,9 @@ public class JobInformation implements Serializable
 
 	/**
 	 * Set the priority of the job.
-	 * @param priority the priority as an int. 
+	 * @param priority the priority as an int.
 	 */
-	public void setPriority(int priority)
+	public void setPriority(final int priority)
 	{
 		this.priority = priority;
 	}
@@ -160,7 +160,7 @@ public class JobInformation implements Serializable
 	 * Set the initial task count of the job.
 	 * @param initialTaskCount the task count as an int.
 	 */
-	public void setInitialTaskCount(int initialTaskCount)
+	public void setInitialTaskCount(final int initialTaskCount)
 	{
 		this.initialTaskCount = initialTaskCount;
 	}
@@ -178,7 +178,7 @@ public class JobInformation implements Serializable
 	 * Specify whether the job is in suspended state.
 	 * @param suspended true if the job is suspended, false otherwise.
 	 */
-	public void setSuspended(boolean suspended)
+	public void setSuspended(final boolean suspended)
 	{
 		this.suspended = suspended;
 	}
@@ -196,7 +196,7 @@ public class JobInformation implements Serializable
 	 * Get the maximum number of nodes this job can run on.
 	 * @param maxNodes the number of nodes as an int value.
 	 */
-	public void setMaxNodes(int maxNodes)
+	public void setMaxNodes(final int maxNodes)
 	{
 		this.maxNodes = maxNodes;
 	}
@@ -215,7 +215,7 @@ public class JobInformation implements Serializable
 	 * Set the pending state of the job.
 	 * @param pending specifies whether the job is waiting to reach its scheduled execution date.
 	 */
-	public void setPending(boolean pending)
+	public void setPending(final boolean pending)
 	{
 		this.pending = pending;
 	}
@@ -233,7 +233,7 @@ public class JobInformation implements Serializable
 	 * Set the unique identifier for the job.
 	 * @param jobUuid the uuid as a string.
 	 */
-	public void setJobUuid(String jobUuid)
+	public void setJobUuid(final String jobUuid)
 	{
 		this.jobUuid = jobUuid;
 	}

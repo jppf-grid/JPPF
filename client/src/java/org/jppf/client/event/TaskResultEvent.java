@@ -38,7 +38,7 @@ public class TaskResultEvent extends EventObject
 	 * Initialize this event with a specified list of tasks.
 	 * @param taskList the list of tasks whose results have been received from the server.
 	 */
-	public TaskResultEvent(List<JPPFTask> taskList)
+	public TaskResultEvent(final List<JPPFTask> taskList)
 	{
 		super(taskList);
 	}
@@ -48,7 +48,7 @@ public class TaskResultEvent extends EventObject
 	 * A <code>TaskResultListener</code> can use this information to reset its state before the job is resubmitted.
 	 * @param throwable the throwable that was raised while receiving the results.
 	 */
-	public TaskResultEvent(Throwable throwable)
+	public TaskResultEvent(final Throwable throwable)
 	{
 		super(throwable);
 	}
@@ -61,7 +61,7 @@ public class TaskResultEvent extends EventObject
 	 * @deprecated the startIndex is not used any more to determine each task's position.
 	 * Use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
 	 */
-	public TaskResultEvent(List<JPPFTask> taskList, int startIndex)
+	public TaskResultEvent(final List<JPPFTask> taskList, final int startIndex)
 	{
 		super(taskList);
 		this.startIndex = startIndex;
@@ -72,10 +72,10 @@ public class TaskResultEvent extends EventObject
 	 * To properly order the results, developers should use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} for each task.
 	 * @return a list of <code>JPPFTask</code> instances.
 	 */
-  @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public List<JPPFTask> getTaskList()
 	{
-  	Object o = getSource();
+		Object o = getSource();
 		return (o instanceof Throwable) ? null : (List<JPPFTask>) getSource();
 	}
 
@@ -95,7 +95,7 @@ public class TaskResultEvent extends EventObject
 	 */
 	public Throwable getThrowable()
 	{
-  	Object o = getSource();
+		Object o = getSource();
 		return (o instanceof Throwable) ? (Throwable) o : null;
 	}
 }

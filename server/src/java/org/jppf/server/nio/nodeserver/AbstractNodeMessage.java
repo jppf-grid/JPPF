@@ -61,7 +61,7 @@ public abstract class AbstractNodeMessage
 	 * Add a location to the data locations of this message.
 	 * @param location the location to add.
 	 */
-	public void addLocation(DataLocation location)
+	public void addLocation(final DataLocation location)
 	{
 		locations.add(location);
 	}
@@ -72,7 +72,7 @@ public abstract class AbstractNodeMessage
 	 * @return true if the data has been completely read from the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public boolean read(ChannelWrapper<?> channel) throws Exception
+	public boolean read(final ChannelWrapper<?> channel) throws Exception
 	{
 		if (nbObjects <= 0)
 		{
@@ -102,7 +102,7 @@ public abstract class AbstractNodeMessage
 	 * @return true if the data has been completely written the channel, false otherwise.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public boolean write(ChannelWrapper<?> channel) throws Exception
+	public boolean write(final ChannelWrapper<?> channel) throws Exception
 	{
 		if (nbObjects <= 0)
 		{
@@ -135,7 +135,7 @@ public abstract class AbstractNodeMessage
 
 	/**
 	 * Get the total length of data to send or receive.
-	 * @return the length as an int. 
+	 * @return the length as an int.
 	 */
 	public int getLength()
 	{
@@ -155,7 +155,7 @@ public abstract class AbstractNodeMessage
 	 * Set the latest bundle that was sent or received.
 	 * @param bundle - a <code>JPPFTaskBundle</code> instance.
 	 */
-	public void setBundle(JPPFTaskBundle bundle)
+	public void setBundle(final JPPFTaskBundle bundle)
 	{
 		this.bundle = bundle;
 	}
@@ -164,7 +164,7 @@ public abstract class AbstractNodeMessage
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
 		sb.append("nb locations=").append(locations == null ? -1 : locations.size());

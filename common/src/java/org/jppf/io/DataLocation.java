@@ -40,15 +40,15 @@ public interface DataLocation
 	 * Transfer the content of this data location from the specified input source.
 	 * @param source - the input source to transfer to.
 	 * @param blocking - if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred. 
+	 * @return the number of bytes actually transferred.
 	 * @throws Exception if an IO error occurs.
 	 */
 	int transferFrom(InputSource source, boolean blocking) throws Exception;
 	/**
 	 * Transfer the content of this data location to the specified output destination.
 	 * @param dest - the output destination to transfer to.
-	 * @param blocking - if true, the method will block until the entire content has been transferred. 
-	 * @return the number of bytes actually transferred. 
+	 * @param blocking - if true, the method will block until the entire content has been transferred.
+	 * @return the number of bytes actually transferred.
 	 * @throws Exception if an IO error occurs.
 	 */
 	int transferTo(OutputDestination dest, boolean blocking) throws Exception;

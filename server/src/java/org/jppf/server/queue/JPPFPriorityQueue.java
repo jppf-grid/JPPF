@@ -87,7 +87,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.BundleWrapper)
 	 */
 	@Override
-	public void addBundle(ServerJob bundleWrapper)
+	public void addBundle(final ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		JobSLA sla = bundle.getSLA();
@@ -141,7 +141,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(int)
 	 */
 	@Override
-    public ServerJob nextBundle(int nbTasks)
+	public ServerJob nextBundle(final int nbTasks)
 	{
 		Iterator<ServerJob> it = iterator();
 		return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
@@ -155,7 +155,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(org.jppf.server.protocol.BundleWrapper, int)
 	 */
 	@Override
-	public ServerJob nextBundle(ServerJob bundleWrapper, int nbTasks)
+	public ServerJob nextBundle(final ServerJob bundleWrapper, final int nbTasks)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		ServerJob result = null;
@@ -197,7 +197,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			lock.unlock();
 		}
 		if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " +
-			formatSizeMapInfo("sizeMap", sizeMap));
+				formatSizeMapInfo("sizeMap", sizeMap));
 		JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
 		statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
 		return result;
@@ -246,7 +246,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ServerJob removeBundle(ServerJob bundleWrapper)
+	public ServerJob removeBundle(final ServerJob bundleWrapper)
 	{
 		lock.lock();
 		try
@@ -277,7 +277,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Process the start schedule specified in the job SLA.
 	 * @param bundleWrapper the job to process.
 	 */
-	private void handleStartJobSchedule(ServerJob bundleWrapper)
+	private void handleStartJobSchedule(final ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		JPPFSchedule schedule = bundle.getSLA().getJobSchedule();
@@ -296,7 +296,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				bundle.setParameter(BundleParameter.JOB_PENDING, false);
 				log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() +
-					", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+						", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
 			}
 		}
 		else bundle.setParameter(BundleParameter.JOB_PENDING, false);
@@ -306,7 +306,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * Process the expiration schedule specified in the job SLA.
 	 * @param bundleWrapper the job to process.
 	 */
-	private void handleExpirationJobSchedule(ServerJob bundleWrapper)
+	private void handleExpirationJobSchedule(final ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
@@ -325,7 +325,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 			{
 				bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
 				log.error("Unparseable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-					", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+						", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
 			}
 		}
 	}
@@ -335,7 +335,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * This method should normally only be called when a job has completed.
 	 * @param jobUuid the job uuid.
 	 */
-	public void clearSchedules(String jobUuid)
+	public void clearSchedules(final String jobUuid)
 	{
 		jobScheduleHandler.cancelAction(jobUuid);
 		jobExpirationHandler.cancelAction(jobUuid);
@@ -347,7 +347,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	 * and with an execution policy that enforces its execution ont he designated node only.
 	 * @param bundleWrapper the broadcast job to process.
 	 */
-	private void processBroadcastJob(ServerJob bundleWrapper)
+	private void processBroadcastJob(final ServerJob bundleWrapper)
 	{
 		Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
 		if (uuidMap.isEmpty()) return;
@@ -378,7 +378,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 	}
 
 	/**
-	 * Update the priority of the job with the specified uuid.  
+	 * Update the priority of the job with the specified uuid.
 	 * @param jobUuid the uuid of the job to re-prioritize.
 	 * @param newPriority the new priority of the job.
 	 */

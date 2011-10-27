@@ -38,7 +38,7 @@ public class LocationEvent extends EventObject
 	 * @param source - the location on which the event is occurring.
 	 * @param n - the number of bytes that were transferred to another location.
 	 */
-	public LocationEvent(Location source, int n)
+	public LocationEvent(final Location source, final int n)
 	{
 		super(source);
 		this.n = n;

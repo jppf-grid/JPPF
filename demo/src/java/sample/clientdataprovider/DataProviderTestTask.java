@@ -42,7 +42,7 @@ public class DataProviderTestTask extends JPPFTask
 	 * @param i used as job identifier.
 	 * @param j used as task identifier within a job.
 	 */
-	public DataProviderTestTask(int i, int j)
+	public DataProviderTestTask(final int i, final int j)
 	{
 		this.i = i;
 		this.j = j;
@@ -53,7 +53,7 @@ public class DataProviderTestTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		//System.out.println("this should be on the node side");
 		ClientDataProvider dp = (ClientDataProvider) getDataProvider();
@@ -77,7 +77,7 @@ public class DataProviderTestTask extends JPPFTask
 		 * Initialize this callable wth the specified id.
 		 * @param id the id for this callable.
 		 */
-		public MyCallable(String id)
+		public MyCallable(final String id)
 		{
 			this.id = id;
 		}
@@ -88,7 +88,7 @@ public class DataProviderTestTask extends JPPFTask
 		 * @see java.util.concurrent.Callable#call()
 		 */
 		@Override
-        public byte[] call()
+		public byte[] call()
 		{
 			//String s = "this should be on the client side";
 			//System.out.println(s);

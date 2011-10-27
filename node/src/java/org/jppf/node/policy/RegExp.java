@@ -53,7 +53,7 @@ public class RegExp extends ExecutionPolicy
 	 * @param regExp a regular expression to match the property value against.
 	 * @throws PatternSyntaxException if the syntax of expression is invalid
 	 */
-	public RegExp(String propertyName, String regExp) throws PatternSyntaxException
+	public RegExp(final String propertyName, final String regExp) throws PatternSyntaxException
 	{
 		this.propertyName = propertyName;
 		// compiled at creation time to ensure any syntax problem in the expression
@@ -69,7 +69,7 @@ public class RegExp extends ExecutionPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		if (regExp == null) return false;
 		// the pattern is cached so it doesn't have to be compiled every time.
@@ -85,7 +85,7 @@ public class RegExp extends ExecutionPolicy
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		if (computedToString == null)
 		{

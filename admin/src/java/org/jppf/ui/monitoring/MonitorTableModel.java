@@ -42,7 +42,7 @@ class MonitorTableModel extends AbstractTableModel
 	 * Initialize this table model witht he specified list of fields.
 	 * @param fields the list of fields whose values are displayed in the table.
 	 */
-	MonitorTableModel(Fields[] fields)
+	MonitorTableModel(final Fields[] fields)
 	{
 		this.fields = fields;
 	}
@@ -53,7 +53,7 @@ class MonitorTableModel extends AbstractTableModel
 	 * @see javax.swing.table.TableModel#getColumnCount()
 	 */
 	@Override
-    public int getColumnCount()
+	public int getColumnCount()
 	{
 		return 2;
 	}
@@ -64,7 +64,7 @@ class MonitorTableModel extends AbstractTableModel
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
 	@Override
-    public int getRowCount()
+	public int getRowCount()
 	{
 		return fields.length;
 	}
@@ -77,7 +77,7 @@ class MonitorTableModel extends AbstractTableModel
 	 * @see javax.swing.table.TableModel#getValueAt(int, int)
 	 */
 	@Override
-    public Object getValueAt(int row, int column)
+	public Object getValueAt(final int row, final int column)
 	{
 		Fields name = fields[row];
 		if (column == 0) return name;

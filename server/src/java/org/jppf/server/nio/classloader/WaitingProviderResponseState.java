@@ -44,7 +44,7 @@ class WaitingProviderResponseState extends ClassServerState
 	 * Initialize this state with a specified NioServer.
 	 * @param server the NioServer this state relates to.
 	 */
-	public WaitingProviderResponseState(ClassNioServer server)
+	public WaitingProviderResponseState(final ClassNioServer server)
 	{
 		super(server);
 	}
@@ -57,7 +57,7 @@ class WaitingProviderResponseState extends ClassServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
 		boolean messageRead = false;
@@ -85,8 +85,8 @@ class WaitingProviderResponseState extends ClassServerState
 		}
 		if (messageRead)
 		{
-			if (debugEnabled) log.debug("read response from provider: " + wrapper + " complete, sending to node " + context.getCurrentRequest() + 
-				", resource: " + context.getResource().getName());
+			if (debugEnabled) log.debug("read response from provider: " + wrapper + " complete, sending to node " + context.getCurrentRequest() +
+					", resource: " + context.getResource().getName());
 			JPPFResourceWrapper resource = context.deserializeResource();
 			// putting the definition in cache
 			if ((resource.getDefinition() != null) && (resource.getCallable() == null))
@@ -96,7 +96,7 @@ class WaitingProviderResponseState extends ClassServerState
 			ClassContext destinationContext = (ClassContext) destinationChannel.getContext();
 			// fist ensure the requested channel is in the proper state
 			while (!ClassState.SENDING_NODE_RESPONSE.equals(destinationChannel.getContext().getState()) ||
-				(destinationChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
+					(destinationChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
 			resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 			destinationContext.setResource(resource);
 			destinationContext.serializeResource(destinationChannel);

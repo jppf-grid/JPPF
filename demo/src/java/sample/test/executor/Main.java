@@ -41,7 +41,7 @@ public class Main
 	 * Entry point.
 	 * @param args  not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		logger.info("Starting test");
 		JPPFClient client = new JPPFClient();
@@ -120,7 +120,7 @@ public class Main
 		 * Initialize this task with its number.
 		 * @param number the task number.
 		 */
-		public SimpleCountTask(int number)
+		public SimpleCountTask(final int number)
 		{
 			this.number = number;
 		}
@@ -130,7 +130,7 @@ public class Main
 		 */
 		// @Override
 		@Override
-        public Integer call() throws Exception
+		public Integer call() throws Exception
 		{
 			logger.info("From logger {}", number);
 			logger.info("From stdout " + number);

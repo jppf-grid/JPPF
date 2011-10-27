@@ -36,7 +36,7 @@ public interface JPPFDistributedJob
 
 	/**
 	 * Get the user-defined display name for this job. This is the name displayed in the administration console.
-	 * @return the name as a string. 
+	 * @return the name as a string.
 	 */
 	String getName();
 

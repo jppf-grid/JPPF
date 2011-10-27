@@ -22,7 +22,7 @@ import java.util.*;
 
 /**
  * This class provides a set of utility methods for manipulating and converting
- * collections and arrays. 
+ * collections and arrays.
  * @author Laurent Cohen
  */
 public final class CollectionUtils
@@ -33,14 +33,14 @@ public final class CollectionUtils
 	private CollectionUtils()
 	{
 	}
-	
+
 	/**
 	 * Convert an array into a <code>Set</code>.
 	 * @param <T> the type of the elements in the array.
 	 * @param array the array to convert.
 	 * @return a set of elements with the same type as that of the array element type.
 	 */
-	public static <T> Set<T> set(T...array)
+	public static <T> Set<T> set(final T...array)
 	{
 		Set<T> newSet = new HashSet<T>();
 		for (T element: array) newSet.add(element);
@@ -53,13 +53,13 @@ public final class CollectionUtils
 	 * @param array the array to convert.
 	 * @return a list of elements with the same type as that of the array element type.
 	 */
-	public static <T> List<T> list(T...array)
+	public static <T> List<T> list(final T...array)
 	{
 		List<T> list = new ArrayList<T>(array.length);
 		for (T element: array) list.add(element);
 		return list;
 	}
-	
+
 	/**
 	 * Concatenate a set of array into a single array.
 	 * @param <T> the element type of the arrays to concatenate.
@@ -68,7 +68,7 @@ public final class CollectionUtils
 	 * elements found in all the input arrays.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T[] concatArrays(T[]...arrays)
+	public static <T> T[] concatArrays(final T[]...arrays)
 	{
 		if (arrays == null) return null;
 		int size = 0;
@@ -99,7 +99,7 @@ public final class CollectionUtils
 	 * @param value the value to add.
 	 * @param map the map in which ot add the key/value pair.
 	 */
-	public static <T, U> void putInListMap(T key, U value, Map<T, List<U>> map)
+	public static <T, U> void putInListMap(final T key, final U value, final Map<T, List<U>> map)
 	{
 		List<U> list = map.get(key);
 		if (list == null)
@@ -118,7 +118,7 @@ public final class CollectionUtils
 	 * @param value the value to remove.
 	 * @param map the map from which to remove the key/value pair.
 	 */
-	public static <T, U> void removeFromListMap(T key, U value, Map<T, List<U>> map)
+	public static <T, U> void removeFromListMap(final T key, final U value, final Map<T, List<U>> map)
 	{
 		List<U> list = map.get(key);
 		if (list == null) return;
@@ -133,7 +133,7 @@ public final class CollectionUtils
 	 * @param map the map of which to get the size.
 	 * @return the size of the map as an int value.
 	 */
-	public static <T, U> int sizeOfListMap(Map<T, List<U>> map)
+	public static <T, U> int sizeOfListMap(final Map<T, List<U>> map)
 	{
 		int result = 0;
 		for (Map.Entry<T, List<U>> entry: map.entrySet()) result += entry.getValue().size();
@@ -146,9 +146,9 @@ public final class CollectionUtils
 	 * @param <U> the type of the values in the map.
 	 * @param name an arbitrary name given to the map.
 	 * @param map the map from which to get size information.
-	 * @return a string containing information about the number of elements in the map. 
+	 * @return a string containing information about the number of elements in the map.
 	 */
-	public static <T, U> String formatSizeMapInfo(String name, Map<T, List<U>> map)
+	public static <T, U> String formatSizeMapInfo(final String name, final Map<T, List<U>> map)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(name).append("[shallow size=").append(map.size());
@@ -161,11 +161,11 @@ public final class CollectionUtils
 	 * starting at the specified position in the specified list.
 	 * @param <T> the type of the elements in the list.
 	 * @param source the list from which to get the elements.
-	 * @param start the start position in the source list. 
+	 * @param start the start position in the source list.
 	 * @param size the number of elements to get from the source list.
 	 * @return the resulting list.
 	 */
-	public static <T> List<T> getAllElements(List<T> source, int start, int size)
+	public static <T> List<T> getAllElements(final List<T> source, final int start, final int size)
 	{
 		List<T> result = new ArrayList<T>(size);
 		for (int i=0; i<size; i++) result.add(source.get(i+start));

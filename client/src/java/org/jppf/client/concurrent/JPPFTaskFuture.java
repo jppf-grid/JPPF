@@ -53,7 +53,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * @param collector the collector that receives the results from the server.
 	 * @param position the position of the task in the job.
 	 */
-	public JPPFTaskFuture(FutureResultCollector collector, int position)
+	public JPPFTaskFuture(final FutureResultCollector collector, final int position)
 	{
 		this.collector = collector;
 		this.position = position;
@@ -61,12 +61,12 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 
 	/**
 	 * Returns true if this task completed. Completion may be due to normal termination,
-	 * an exception, or cancellation. In all of these cases, this method will return true. 
+	 * an exception, or cancellation. In all of these cases, this method will return true.
 	 * @return true if the task completed.
 	 * @see org.jppf.client.concurrent.AbstractJPPFFuture#isDone()
 	 */
 	@Override
-    public boolean isDone()
+	public boolean isDone()
 	{
 		//done.compareAndSet(false, collector.isTaskReceived(position));
 		return done.get();
@@ -80,7 +80,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * @see java.util.concurrent.Future#get()
 	 */
 	@Override
-    public V get() throws InterruptedException, ExecutionException
+	public V get() throws InterruptedException, ExecutionException
 	{
 		V v = null;
 		try
@@ -95,8 +95,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	}
 
 	/**
-   * Waits if necessary for at most the given time for the computation
-   * to complete, and then retrieves its result, if available.
+	 * Waits if necessary for at most the given time for the computation
+	 * to complete, and then retrieves its result, if available.
 	 * @param timeout the maximum time to wait.
 	 * @param unit the time unit of the timeout argument.
 	 * @return the computed result.
@@ -106,7 +106,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
 	 */
 	@Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+	public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
 	{
 		long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
 		getResult(millis);
@@ -119,8 +119,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 	 * Wait until the execution is complete, or the specified timeout has expired, whichever happens first.
 	 * @param timeout the maximum time to wait.
 	 */
-  @SuppressWarnings("unchecked")
-	void getResult(long timeout)
+	@SuppressWarnings("unchecked")
+	void getResult(final long timeout)
 	{
 		if (!isDone())
 		{
@@ -138,7 +138,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 				exception = task.getException();
 			}
 		}
-    }
+	}
 
 	/**
 	 * Mark the task as done.

@@ -47,7 +47,7 @@ public class JobEvent extends EventObject
 	 * Initialize this event with the specified job as its source.
 	 * @param source the source of this event.
 	 */
-	public JobEvent(JPPFJob source)
+	public JobEvent(final JPPFJob source)
 	{
 		super(source);
 	}

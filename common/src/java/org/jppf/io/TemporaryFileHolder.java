@@ -22,7 +22,7 @@ import java.io.File;
 
 /**
  * Instances of this class hold a temporary {@link File} and ensure the file
- * is deleted when they are garbage collected. 
+ * is deleted when they are garbage collected.
  * @author Laurent Cohen
  */
 public class TemporaryFileHolder
@@ -36,7 +36,7 @@ public class TemporaryFileHolder
 	 * Initialize this file holder with the specified file.
 	 * @param file the temprary file to handle.
 	 */
-	public TemporaryFileHolder(File file)
+	public TemporaryFileHolder(final File file)
 	{
 		this.file = file;
 	}
@@ -47,14 +47,14 @@ public class TemporaryFileHolder
 	 * @see java.lang.Object#finalize()
 	 */
 	@Override
-    protected void finalize() throws Throwable
+	protected void finalize() throws Throwable
 	{
-        try {
-            if ((file != null) && file.exists()) file.delete();
-        } finally {
-            super.finalize();
-        }
-    }
+		try {
+			if ((file != null) && file.exists()) file.delete();
+		} finally {
+			super.finalize();
+		}
+	}
 
 	/**
 	 * Get the underlying file.

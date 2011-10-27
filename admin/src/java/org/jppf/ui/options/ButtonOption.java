@@ -50,10 +50,10 @@ public class ButtonOption extends AbstractOption
 	/**
 	 * Initialize this text option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the checkbox.
 	 */
-	public ButtonOption(String name, String label, String tooltip)
+	public ButtonOption(final String name, final String label, final String tooltip)
 	{
 		this.name = name;
 		this.label = label;
@@ -65,7 +65,7 @@ public class ButtonOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		JButton button = new JButton();
 		if (label != null) button.setText(label);
@@ -84,13 +84,13 @@ public class ButtonOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 		JButton button = (JButton) UIComponent;
 		button.addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent e)
+			public void actionPerformed(final ActionEvent e)
 			{
 				fireValueChanged();
 			}
@@ -103,7 +103,7 @@ public class ButtonOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		UIComponent.setEnabled(enabled);
 	}
@@ -114,7 +114,7 @@ public class ButtonOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
 	 */
 	@Override
-    public boolean isPersistent()
+	public boolean isPersistent()
 	{
 		return false;
 	}

@@ -59,7 +59,7 @@ public class JPPFSplash extends Window
 	 * Initialize this window with the specified owner.
 	 * @param message - the message to display.
 	 */
-	public JPPFSplash(String message)
+	public JPPFSplash(final String message)
 	{
 		super(new JFrame());
 		images = new ImageIcon[4];
@@ -101,12 +101,12 @@ public class JPPFSplash extends Window
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				/*
 				try { Thread.sleep(2000); }
 				catch(InterruptedException e) {}
-				*/
+				 */
 				setVisible(false);
 				task.cancel();
 				timer.purge();
@@ -133,7 +133,7 @@ public class JPPFSplash extends Window
 		 * @see java.util.TimerTask#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			pos = (pos + 1) % images.length;
 			label.setIcon(images[pos]);

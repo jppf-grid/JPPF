@@ -20,11 +20,11 @@ package org.jppf.server.nio.client;
 
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.NioState;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
- * Common abstract superclass for all states of a client that sends and receives jobs. 
+ * Common abstract superclass for all states of a client that sends and receives jobs.
  * @author Laurent Cohen
  */
 abstract class ClientServerState extends NioState<ClientTransition>
@@ -32,7 +32,7 @@ abstract class ClientServerState extends NioState<ClientTransition>
 	/**
 	 * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
 	 */
-	protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true); 
+	protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
 	/**
 	 * The server that handles this state.
 	 */
@@ -54,7 +54,7 @@ abstract class ClientServerState extends NioState<ClientTransition>
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public ClientServerState(ClientNioServer server)
+	public ClientServerState(final ClientNioServer server)
 	{
 		this.server = server;
 		statsManager = driver.getStatsManager();

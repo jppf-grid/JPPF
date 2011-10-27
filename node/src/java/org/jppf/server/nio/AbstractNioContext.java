@@ -64,7 +64,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * {@inheritDoc}
 	 */
 	@Override
-    public S getState()
+	public S getState()
 	{
 		return state;
 	}
@@ -73,7 +73,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setState(S state)
+	public void setState(final S state)
 	{
 		this.state = state;
 	}
@@ -82,7 +82,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String getUuid()
+	public String getUuid()
 	{
 		return uuid;
 	}
@@ -91,7 +91,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setUuid(String uuid)
+	public void setUuid(final String uuid)
 	{
 		this.uuid = uuid;
 	}
@@ -120,7 +120,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * Set the container for the current message data.
 	 * @param message an <code>NioMessage</code> instance.
 	 */
-	public void setMessage(NioMessage message)
+	public void setMessage(final NioMessage message)
 	{
 		this.message = message;
 	}
@@ -129,7 +129,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * {@inheritDoc}
 	 */
 	@Override
-    public ChannelWrapper<?> getChannel()
+	public ChannelWrapper<?> getChannel()
 	{
 		return channel;
 	}
@@ -138,7 +138,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setChannel(ChannelWrapper<?> channel)
+	public void setChannel(final ChannelWrapper<?> channel)
 	{
 		this.channel = channel;
 	}

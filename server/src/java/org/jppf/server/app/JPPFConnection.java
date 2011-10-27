@@ -68,12 +68,12 @@ abstract class JPPFConnection extends Thread
 	 * @param server the class server that created this connection.
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public JPPFConnection(JPPFServer server, Socket socket) throws JPPFException
+	public JPPFConnection(final JPPFServer server, final Socket socket) throws JPPFException
 	{
 		this.server = server;
 		socketClient = new SocketClient(socket);
 	}
-	
+
 	/**
 	 * Main processing loop for this socket handler. During each loop iteration,
 	 * the following operations are performed:
@@ -87,7 +87,7 @@ abstract class JPPFConnection extends Thread
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -162,7 +162,7 @@ abstract class JPPFConnection extends Thread
 	 * @see java.lang.Thread#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		if (socketClient != null) sb.append(socketClient.getHost()).append(':').append(socketClient.getPort());
@@ -174,7 +174,7 @@ abstract class JPPFConnection extends Thread
 	 * Set the stopped state of this connection.
 	 * @param stopped true if this connection is to be stopped, false otherwise.
 	 */
-	protected synchronized void setStopped(boolean stopped)
+	protected synchronized void setStopped(final boolean stopped)
 	{
 		this.stopped = stopped;
 	}

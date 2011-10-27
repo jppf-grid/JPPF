@@ -63,7 +63,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 * @param profile the parameters of the auto-tuning algorithm,
 	 * grouped as a performance analysis profile.
 	 */
-	public AbstractAutoTunedBundler(AnnealingTuneProfile profile)
+	public AbstractAutoTunedBundler(final AnnealingTuneProfile profile)
 	{
 		super(profile);
 		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
@@ -77,7 +77,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	@Override
-    public int getBundleSize()
+	public int getBundleSize()
 	{
 		return currentSize;
 	}
@@ -97,13 +97,13 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
 	 */
 	@Override
-    public void feedback(int bundleSize, double time)
+	public void feedback(final int bundleSize, final double time)
 	{
 		assert bundleSize > 0;
 		if (debugEnabled)
 		{
 			log.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize="
-				+ bundleSize + " and totalTime=" + time);
+					+ bundleSize + " and totalTime=" + time);
 		}
 
 		// retrieving the record of the bundle size
@@ -132,7 +132,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	}
 
 	/**
-	 * Recompute the bundle size after a performance profile change has been detected. 
+	 * Recompute the bundle size after a performance profile change has been detected.
 	 */
 	private void performAnalysis()
 	{

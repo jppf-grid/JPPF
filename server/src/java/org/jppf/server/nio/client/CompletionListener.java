@@ -55,7 +55,7 @@ public class CompletionListener implements TaskCompletionListener
 	 * Initialize this completion listener with the specified channel.
 	 * @param channel the client channel.
 	 */
-	public CompletionListener(ChannelWrapper<?> channel)
+	public CompletionListener(final ChannelWrapper<?> channel)
 	{
 		this.channel = channel;
 		context = (ClientContext) channel.getContext();
@@ -65,8 +65,8 @@ public class CompletionListener implements TaskCompletionListener
 	 * {@inheritDoc}
 	 */
 	@Override
-  @SuppressWarnings("unchecked")
-	public void taskCompleted(ServerJob result)
+	@SuppressWarnings("unchecked")
+	public void taskCompleted(final ServerJob result)
 	{
 		context.offerCompletedBundle(result);
 		if (ClientState.IDLE.equals(context.getState()))

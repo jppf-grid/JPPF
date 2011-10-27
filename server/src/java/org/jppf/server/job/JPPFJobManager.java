@@ -73,7 +73,7 @@ public class JPPFJobManager implements QueueListener
 	 * @param jobUuid the id of the job.
 	 * @return a list of <code>SelectableChannel</code> instances.
 	 */
-	public synchronized List<ChannelJobPair> getNodesForJob(String jobUuid)
+	public synchronized List<ChannelJobPair> getNodesForJob(final String jobUuid)
 	{
 		if (jobUuid == null) return Collections.emptyList();
 		List<ChannelJobPair> list = jobMap.get(jobUuid);
@@ -94,7 +94,7 @@ public class JPPFJobManager implements QueueListener
 	 * @param jobUuid the id of the job to look for.
 	 * @return a <code>BundleWrapper</code> instance, or null if the job is not queued anymore.
 	 */
-	public synchronized ServerJob getBundleForJob(String jobUuid)
+	public synchronized ServerJob getBundleForJob(final String jobUuid)
 	{
 		return bundleMap.get(jobUuid);
 	}
@@ -104,7 +104,7 @@ public class JPPFJobManager implements QueueListener
 	 * @param bundleWrapper the dispatched job.
 	 * @param channel the node to which the job is dispatched.
 	 */
-	public synchronized void jobDispatched(ServerJob bundleWrapper, ChannelWrapper channel)
+	public synchronized void jobDispatched(final ServerJob bundleWrapper, final ChannelWrapper channel)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
@@ -124,7 +124,7 @@ public class JPPFJobManager implements QueueListener
 	 * @param bundleWrapper the returned job.
 	 * @param channel the node to which the job is dispatched.
 	 */
-	public synchronized void jobReturned(ServerJob bundleWrapper, ChannelWrapper channel)
+	public synchronized void jobReturned(final ServerJob bundleWrapper, final ChannelWrapper channel)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
@@ -143,7 +143,7 @@ public class JPPFJobManager implements QueueListener
 	 * Called when a job is added to the server queue.
 	 * @param bundleWrapper the queued job.
 	 */
-	public synchronized void jobQueued(ServerJob bundleWrapper)
+	public synchronized void jobQueued(final ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		String jobUuid = bundle.getJobUuid();
@@ -158,14 +158,15 @@ public class JPPFJobManager implements QueueListener
 	 * Called when a job is complete and returned to the client.
 	 * @param bundleWrapper the completed job.
 	 */
-	public synchronized void jobEnded(ServerJob bundleWrapper)
+	public synchronized void jobEnded(final ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		long time = System.nanoTime() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
 		String jobUuid = bundle.getJobUuid();
 		jobMap.remove(jobUuid);
 		bundleMap.remove(jobUuid);
-		((JPPFPriorityQueue) JPPFDriver.getInstance().getQueue()).clearSchedules(jobUuid);
+		JPPFDriver.getInstance();
+		((JPPFPriorityQueue) JPPFDriver.getQueue()).clearSchedules(jobUuid);
 		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
 		submitEvent(JobEventType.JOB_ENDED, bundle, null);
 		JPPFDriver.getInstance().getStatsUpdater().jobEnded(time/1000000L);
@@ -175,7 +176,7 @@ public class JPPFJobManager implements QueueListener
 	 * Called when a job is added to the server queue.
 	 * @param bundleWrapper the queued job.
 	 */
-	public synchronized void jobUpdated(ServerJob bundleWrapper)
+	public synchronized void jobUpdated(final ServerJob bundleWrapper)
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' updated");
@@ -188,7 +189,7 @@ public class JPPFJobManager implements QueueListener
 	 * @see org.jppf.server.queue.QueueListener#newBundle(org.jppf.server.queue.QueueEvent)
 	 */
 	@Override
-    public void newBundle(QueueEvent event)
+	public void newBundle(final QueueEvent event)
 	{
 		if (!event.isRequeued()) jobQueued(event.getBundleWrapper());
 		else jobUpdated(event.getBundleWrapper());
@@ -200,7 +201,7 @@ public class JPPFJobManager implements QueueListener
 	 * @param bundle the job data.
 	 * @param channel the id of the job source of the event.
 	 */
-	private void submitEvent(JobEventType eventType, JPPFTaskBundle bundle, ChannelWrapper channel)
+	private void submitEvent(final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
 	{
 		executor.submit(new JobEventTask(this, eventType, bundle, channel));
 	}
@@ -219,7 +220,7 @@ public class JPPFJobManager implements QueueListener
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add to the list.
 	 */
-	public void addJobListener(JobListener listener)
+	public void addJobListener(final JobListener listener)
 	{
 		synchronized(eventListeners)
 		{
@@ -231,7 +232,7 @@ public class JPPFJobManager implements QueueListener
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to rmeove from the list.
 	 */
-	public void removeJobListener(JobListener listener)
+	public void removeJobListener(final JobListener listener)
 	{
 		synchronized(eventListeners)
 		{

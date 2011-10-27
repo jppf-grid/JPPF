@@ -56,7 +56,7 @@ class FieldDescriptor
 	 * @param field the field to initialize from.
 	 * @throws Exception if any error occurs.
 	 */
-	FieldDescriptor(Field field) throws Exception
+	FieldDescriptor(final Field field) throws Exception
 	{
 		this.field = field;
 		name = field.getName();
@@ -68,7 +68,7 @@ class FieldDescriptor
 	 * @param out the stream to write to.
 	 * @throws IOException if any error occurs.
 	 */
-	void write(ObjectOutputStream out) throws IOException
+	void write(final ObjectOutputStream out) throws IOException
 	{
 		out.writeUTF(name);
 		out.writeInt(type.handle);
@@ -79,7 +79,7 @@ class FieldDescriptor
 	 * @param in the stream to read from.
 	 * @throws IOException if any error occurs.
 	 */
-	void read(ObjectInputStream in) throws IOException
+	void read(final ObjectInputStream in) throws IOException
 	{
 		name = in.readUTF();
 		typeHandle = in.readInt();
@@ -89,7 +89,7 @@ class FieldDescriptor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return "FieldDescriptor[name=" + name + ", type=" + type + ", typeHandle=" + typeHandle + ']';
 	}

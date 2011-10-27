@@ -38,7 +38,7 @@ public class ClientConnectionStatusEvent extends EventObject
 	 * @param source the event source.
 	 * @param oldStatus the connection status before the change.
 	 */
-	public ClientConnectionStatusEvent(ClientConnectionStatusHandler source, JPPFClientConnectionStatus oldStatus)
+	public ClientConnectionStatusEvent(final ClientConnectionStatusHandler source, final JPPFClientConnectionStatus oldStatus)
 	{
 		super(source);
 		this.oldStatus = oldStatus;

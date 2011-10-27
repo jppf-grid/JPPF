@@ -39,7 +39,7 @@ public class ListDirectoryTask extends CommandLineTask
 	 * Initialize the script's parameters.
 	 * @param dir directory in which to list the files.
 	 */
-	public ListDirectoryTask(String dir)
+	public ListDirectoryTask(final String dir)
 	{
 		this.dir = dir;
 	}
@@ -49,7 +49,7 @@ public class ListDirectoryTask extends CommandLineTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

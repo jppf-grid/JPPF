@@ -55,7 +55,7 @@ public class ResourceProvider
 	 * @param resName the name of the resource to load.
 	 * @return an array of bytes, or nll if the resource could not be found.
 	 */
-	public byte[] getResourceAsBytes(String resName)
+	public byte[] getResourceAsBytes(final String resName)
 	{
 		return getResourceAsBytes(resName, null);
 	}
@@ -66,11 +66,12 @@ public class ResourceProvider
 	 * - first the search is performed in the order specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
 	 * - if the resource is not found, it will be looked up in the file system <br>
 	 * @param resName the name of the resource to load.
-	 * @param cl the class loader to use to load the request resource.
+	 * @param classLoader the class loader to use to load the request resource.
 	 * @return an array of bytes, or nll if the resource could not be found.
 	 */
-	public byte[] getResourceAsBytes(String resName, ClassLoader cl)
+	public byte[] getResourceAsBytes(final String resName, final ClassLoader classLoader)
 	{
+		ClassLoader cl = classLoader;
 		try
 		{
 			if (cl == null) cl = Thread.currentThread().getContextClassLoader();
@@ -102,7 +103,7 @@ public class ResourceProvider
 	 * @param resName the name of the resource to find.
 	 * @return the content of the resource as an array of bytes.
 	 */
-	public byte[] getResource(String resName)
+	public byte[] getResource(final String resName)
 	{
 		return getResource(resName, null);
 	}
@@ -110,11 +111,12 @@ public class ResourceProvider
 	/**
 	 * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
 	 * @param resName the name of the resource to find.
-	 * @param cl the class loader to use to load the request resource.
+	 * @param classLoader the class loader to use to load the request resource.
 	 * @return the content of the resource as an array of bytes.
 	 */
-	public byte[] getResource(String resName, ClassLoader cl)
+	public byte[] getResource(final String resName, final ClassLoader classLoader)
 	{
+		ClassLoader cl = classLoader;
 		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
 		if (cl == null) cl = getClass().getClassLoader();
 		InputStream is = null;
@@ -143,11 +145,11 @@ public class ResourceProvider
 	}
 
 	/**
-	 * Compute a callable sent through the JPPF class loader. 
+	 * Compute a callable sent through the JPPF class loader.
 	 * @param serializedCallable the callable to execute in serialized form.
 	 * @return the serialized result of the callable's execution, or of an eventually resulting exception.
 	 */
-	public byte[] computeCallable(byte[] serializedCallable)
+	public byte[] computeCallable(final byte[] serializedCallable)
 	{
 		JPPFCallable callable = null;
 		ObjectSerializer ser = new ObjectSerializerImpl();
@@ -184,11 +186,12 @@ public class ResourceProvider
 	/**
 	 * Get all resources asssociated with the specified resource name.
 	 * @param name the name of the resources to look for.
-	 * @param cl the class loader used to load the resources. 
+	 * @param classLoader the class loader used to load the resources.
 	 * @return the content of all found resources as a list of byte arrays.
 	 */
-	public List<byte[]> getMultipleResourcesAsBytes(String name, ClassLoader cl)
+	public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classLoader)
 	{
+		ClassLoader cl = classLoader;
 		List<byte[]> result = null;
 		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
 		if (cl == null) cl = this.getClass().getClassLoader();
@@ -236,7 +239,7 @@ public class ResourceProvider
 	 * @param names the names of all the resources to look for.
 	 * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
 	 */
-	public Map<String, List<byte[]>> getMultipleResourcesAsBytes(ClassLoader cl, String...names)
+	public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader cl, final String...names)
 	{
 		Map<String, List<byte[]>> result = new HashMap<String, List<byte[]>>();
 		for (String name: names)

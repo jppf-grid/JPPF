@@ -30,7 +30,7 @@ public class ReaperEvent extends EventObject
 	 * Initialize this event with the specified connection to a remote peer.
 	 * @param connection the source of this event.
 	 */
-	public ReaperEvent(ServerConnection connection)
+	public ReaperEvent(final ServerConnection connection)
 	{
 		super(connection);
 	}

@@ -55,7 +55,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * Initialize this cliet connection with the specified uuid.
 	 * @param uuid the JPPF node or client uuid.
 	 */
-	public ClientConnection(String uuid)
+	public ClientConnection(final String uuid)
 	{
 		this.uuid = uuid;
 	}
@@ -64,7 +64,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -115,7 +115,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * Close this client and release any resources it is using.
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		setStopped(true);
 		try
@@ -141,7 +141,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add.
 	 */
-	public void addClientConnectionListener(ClientConnectionListener listener)
+	public void addClientConnectionListener(final ClientConnectionListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)
@@ -154,7 +154,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to remove.
 	 */
-	public void removeClientConnectionListener(ClientConnectionListener listener)
+	public void removeClientConnectionListener(final ClientConnectionListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)

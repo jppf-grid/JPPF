@@ -69,7 +69,7 @@ public final class NetworkUtils
 		return getIPAddresses(new InetAddressFilter()
 		{
 			@Override
-            public boolean accepts(InetAddress addr)
+			public boolean accepts(final InetAddress addr)
 			{
 				return addr instanceof Inet4Address;
 			}
@@ -85,10 +85,10 @@ public final class NetworkUtils
 		return getIPAddresses(new InetAddressFilter()
 		{
 			@Override
-            public boolean accepts(InetAddress addr)
+			public boolean accepts(final InetAddress addr)
 			{
 				return (addr instanceof Inet4Address)
-					&& !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
+				&& !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
 			}
 		});
 	}
@@ -102,7 +102,7 @@ public final class NetworkUtils
 		return getIPAddresses(new InetAddressFilter()
 		{
 			@Override
-            public boolean accepts(InetAddress addr)
+			public boolean accepts(final InetAddress addr)
 			{
 				return addr instanceof Inet6Address;
 			}
@@ -118,7 +118,7 @@ public final class NetworkUtils
 		return getIPAddresses(new InetAddressFilter()
 		{
 			@Override
-            public boolean accepts(InetAddress addr)
+			public boolean accepts(final InetAddress addr)
 			{
 				return (addr instanceof Inet6Address) && !(addr.isLoopbackAddress() || "localhost".equals(addr.getHostName()));
 			}
@@ -130,7 +130,7 @@ public final class NetworkUtils
 	 * @param filter filters out unwanted addresses.
 	 * @return a List of <code>InetAddress</code> instances, may be empty but never null.
 	 */
-	private static List<InetAddress> getIPAddresses(InetAddressFilter filter)
+	private static List<InetAddress> getIPAddresses(final InetAddressFilter filter)
 	{
 		List<InetAddress> list = new ArrayList<InetAddress>();
 		try
@@ -200,7 +200,7 @@ public final class NetworkUtils
 	 * @param ip the ip address to resolve.
 	 * @return the corresponding host name, or its IP if the name could not be resolved.
 	 */
-	public static String getHostName(String ip)
+	public static String getHostName(final String ip)
 	{
 		try
 		{
@@ -216,9 +216,9 @@ public final class NetworkUtils
 	/**
 	 * Get the subnet mask length of a given address.
 	 * @param addr the address for which to get the subnet mask.
-	 * @return the length (number of bits set to 1) for the corresponding subnet mask. 
+	 * @return the length (number of bits set to 1) for the corresponding subnet mask.
 	 */
-	public static int getSubnetMaskLength(InetAddress addr)
+	public static int getSubnetMaskLength(final InetAddress addr)
 	{
 		try
 		{
@@ -258,7 +258,7 @@ public final class NetworkUtils
 	 * @param si2 the second IP address to compare.
 	 * @return true if the 2 addreses are on the same subnet, false otherwise.
 	 */
-	public static boolean isSameSubnet(SubnetInformation si1, SubnetInformation si2)
+	public static boolean isSameSubnet(final SubnetInformation si1, final SubnetInformation si2)
 	{
 		if (!(si1.address() instanceof Inet4Address) || !(si2.address() instanceof Inet4Address)) return false;
 		int[] ip = { si1.rawIPAsInt(), si2.rawIPAsInt() };
@@ -270,7 +270,7 @@ public final class NetworkUtils
 	}
 
 	/**
-	 * Filter interface for the methods discovering available IP addresses. 
+	 * Filter interface for the methods discovering available IP addresses.
 	 */
 	private interface InetAddressFilter
 	{
@@ -292,7 +292,7 @@ public final class NetworkUtils
 		 * @param addr the address.
 		 * @param subnetMaskLength the subnet mask length.
 		 */
-		public SubnetInformation(InetAddress addr, Integer subnetMaskLength)
+		public SubnetInformation(final InetAddress addr, final Integer subnetMaskLength)
 		{
 			super(addr, subnetMaskLength);
 		}
@@ -346,7 +346,7 @@ public final class NetworkUtils
 	 * Main entry point.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		System.out.println("This host's ip addresses: " + getNonLocalHostAddress());
 	}

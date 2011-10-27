@@ -31,7 +31,7 @@ public class JobPersistenceException extends JPPFException
 	 * @param message the message for this exception.
 	 * @param cause the cause exception.
 	 */
-	public JobPersistenceException(String message, Throwable cause)
+	public JobPersistenceException(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
@@ -40,7 +40,7 @@ public class JobPersistenceException extends JPPFException
 	 * Initialize this exception with a specified message.
 	 * @param message the message for this exception.
 	 */
-	public JobPersistenceException(String message)
+	public JobPersistenceException(final String message)
 	{
 		super(message);
 	}
@@ -49,7 +49,7 @@ public class JobPersistenceException extends JPPFException
 	 * Initialize this exception with a specified cause exception.
 	 * @param cause the cause exception.
 	 */
-	public JobPersistenceException(Throwable cause)
+	public JobPersistenceException(final Throwable cause)
 	{
 		super(cause);
 	}

@@ -68,17 +68,17 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * Initialize this I/O handler with the specified context.
 	 * @param context the context used as communication channel.
 	 */
-	public AbstractLocalChannelWrapper(T context)
+	public AbstractLocalChannelWrapper(final T context)
 	{
 		super(context);
-		if (traceEnabled) log.trace("created " + this); 
+		if (traceEnabled) log.trace("created " + this);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public NioContext getContext()
+	public NioContext getContext()
 	{
 		return getChannel();
 	}
@@ -87,7 +87,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getKeyOps()
+	public int getKeyOps()
 	{
 		return keyOps.get();
 	}
@@ -96,7 +96,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setKeyOps(int keyOps)
+	public void setKeyOps(final int keyOps)
 	{
 		this.keyOps.set(keyOps);
 		if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
@@ -107,7 +107,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int getReadyOps()
+	public int getReadyOps()
 	{
 		return readyOps.get();
 	}
@@ -116,7 +116,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * Set the operations for which this channel is ready.
 	 * @param readyOps the bitwise operations as an int value.
 	 */
-	public void setReadyOps(int readyOps)
+	public void setReadyOps(final int readyOps)
 	{
 		this.readyOps.set(readyOps);
 		if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
@@ -139,7 +139,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * Set the resource passed to the node.
 	 * @param resource an instance of the resource type used by this channel.
 	 */
-	public void setNodeResource(S resource)
+	public void setNodeResource(final S resource)
 	{
 		synchronized(nodeLock)
 		{
@@ -164,7 +164,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 	 * Set the resource passed to the server.
 	 * @param serverResource an instance of the resource type used by this channel.
 	 */
-	public void setServerResource(S serverResource)
+	public void setServerResource(final S serverResource)
 	{
 		synchronized(serverLock)
 		{

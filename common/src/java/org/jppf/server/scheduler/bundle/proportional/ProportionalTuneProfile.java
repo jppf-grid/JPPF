@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Paremeters profile for a proportional bundler. 
+ * Paremeters profile for a proportional bundler.
  * @author Laurent Cohen
  */
 public class ProportionalTuneProfile extends AbstractAutoTuneProfile
@@ -207,10 +207,10 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("profileName=").append(name); 
-		sb.append(", performanceCacheSize=").append(performanceCacheSize); 
-		sb.append(", proportionalityFactor=").append(proportionalityFactor); 
-		sb.append(", initialSize=").append(initialSize); 
+		sb.append("profileName=").append(name);
+		sb.append(", performanceCacheSize=").append(performanceCacheSize);
+		sb.append(", proportionalityFactor=").append(proportionalityFactor);
+		sb.append(", initialSize=").append(initialSize);
 		return sb.toString();
 	}
 }

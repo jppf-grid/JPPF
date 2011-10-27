@@ -68,7 +68,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param count the number of tasks that have been added to the queue.
 	 */
 	@Override
-	public synchronized void taskInQueue(int count)
+	public synchronized void taskInQueue(final int count)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskInQueue(count);
 	}
@@ -79,11 +79,11 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param time the time the task remained in the queue.
 	 */
 	@Override
-	public synchronized void taskOutOfQueue(int count, long time)
+	public synchronized void taskOutOfQueue(final int count, final long time)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskOutOfQueue(count, time);
 	}
-	
+
 	/**
 	 * Called when a task execution has completed.
 	 * @param count the number of tasks that have been executed.
@@ -92,7 +92,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
 	@Override
-  public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
+	public synchronized void taskExecuted(final int count, final long time, final long remoteTime, final long size)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
 	}
@@ -119,7 +119,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void jobQueued(int nbTasks)
+	public void jobQueued(final int nbTasks)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.jobQueued(nbTasks);
 	}
@@ -128,7 +128,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void jobEnded(long time)
+	public void jobEnded(final long time)
 	{
 		for (JPPFDriverListener listener: eventListeners) listener.jobEnded(time);
 	}

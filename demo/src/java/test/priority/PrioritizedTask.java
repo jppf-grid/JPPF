@@ -35,7 +35,7 @@ public class PrioritizedTask extends JPPFTask
 	 * Initialize this task with the specified priority.
 	 * @param priority the task priority.
 	 */
-	public PrioritizedTask(int priority)
+	public PrioritizedTask(final int priority)
 	{
 		this.priority = priority;
 	}
@@ -45,7 +45,7 @@ public class PrioritizedTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		System.out.println("executing task with priority " + priority);
 	}

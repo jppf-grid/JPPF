@@ -71,10 +71,10 @@ public class JPPFResultCollector implements TaskResultListener
 	}
 
 	/**
-	 * Initialize this collector with the specified job. 
+	 * Initialize this collector with the specified job.
 	 * @param job the job to execute.
 	 */
-	public JPPFResultCollector(JPPFJob job)
+	public JPPFResultCollector(final JPPFJob job)
 	{
 		this.job = job;
 		count = job.getTasks().size() - job.getResults().size();
@@ -82,10 +82,10 @@ public class JPPFResultCollector implements TaskResultListener
 	}
 
 	/**
-	 * Initialize this collector with a specified number of tasks. 
+	 * Initialize this collector with a specified number of tasks.
 	 * @param count the count of submitted tasks.
 	 */
-	public JPPFResultCollector(int count)
+	public JPPFResultCollector(final int count)
 	{
 		this.count = count;
 		this.pendingCount = count;
@@ -98,7 +98,7 @@ public class JPPFResultCollector implements TaskResultListener
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
 	@Override
-	public synchronized void resultsReceived(TaskResultEvent event)
+	public synchronized void resultsReceived(final TaskResultEvent event)
 	{
 		if (event.getThrowable() == null)
 		{
@@ -144,10 +144,10 @@ public class JPPFResultCollector implements TaskResultListener
 	/**
 	 * Wait until all results of a request have been collected, or the timeout has expired,
 	 * whichever happens first.
-	 * @param millis the maximum time to wait, zero meaning an indefinite wait. 
+	 * @param millis the maximum time to wait, zero meaning an indefinite wait.
 	 * @return the list of resulting tasks.
 	 */
-	public synchronized List<JPPFTask> waitForResults(long millis)
+	public synchronized List<JPPFTask> waitForResults(final long millis)
 	{
 		if (millis < 0) throw new IllegalArgumentException("wait time cannot be negative");
 		if (log.isTraceEnabled()) log.trace("timeout = " + millis);

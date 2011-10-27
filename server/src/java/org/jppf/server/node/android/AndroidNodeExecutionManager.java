@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -48,7 +48,7 @@ public class AndroidNodeExecutionManager extends NodeExecutionManagerImpl
 	 * Initialize this execution manager with the specified node.
 	 * @param node the node that uses this excecution manager.
 	 */
-	public AndroidNodeExecutionManager(AbstractJPPFAndroidNode node)
+	public AndroidNodeExecutionManager(final AbstractJPPFAndroidNode node)
 	{
 		super(null);
 		this.node = node;
@@ -61,7 +61,7 @@ public class AndroidNodeExecutionManager extends NodeExecutionManagerImpl
 	 * @throws Exception if the execution failed.
 	 */
 	@Override
-    public void execute(JPPFTaskBundle bundle, List<? extends Task> taskList) throws Exception
+	public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
 		NodeExecutionInfo info = null;

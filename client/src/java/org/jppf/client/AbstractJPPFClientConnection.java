@@ -136,7 +136,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param classServerPort the TCP port the class server is listening to.
 	 * @param priority the assigned to this client connection.
 	 */
-	protected void configure(String uuid, String name, String host, int driverPort, int classServerPort, int priority)
+	protected void configure(final String uuid, final String name, final String host, final int driverPort, final int classServerPort, final int priority)
 	{
 		this.uuid = uuid;
 		this.host = NetworkUtils.getHostName(host);
@@ -159,7 +159,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param job - the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(JPPFJob job) throws Exception
+	public void sendTasks(final JPPFJob job) throws Exception
 	{
 		try
 		{
@@ -183,7 +183,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 */
-	public void sendTasks(JPPFTaskBundle header, JPPFJob job) throws Exception
+	public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
 	{
 		ObjectSerializer ser = makeHelper().getSerializer();
 		int count = job.getTasks().size() - job.getResults().size();
@@ -233,7 +233,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 			{
 				if (SEQUENTIAL_DESERIALIZATION) lock.unlock();
 			}
-	
+
 			int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
 			// if an exception prevented the node from executing the tasks
 			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
@@ -269,7 +269,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param cl the cintext classloader to use to deserialize the results.
 	 * @throws Exception if an error is raised while reading the results from the server.
 	 */
-	public Pair<List<JPPFTask>, Integer> receiveResults(ClassLoader cl) throws Exception
+	public Pair<List<JPPFTask>, Integer> receiveResults(final ClassLoader cl) throws Exception
 	{
 		ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
 		if (cl != null) Thread.currentThread().setContextClassLoader(cl);
@@ -297,14 +297,15 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 
 	/**
 	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
-	 * @param cl the class loader to usew to load the seriaization helper class.
+	 * @param classLoader the class loader to usew to load the seriaization helper class.
 	 * @return a <code>SerializationHelper</code> instance.
 	 * @throws Exception if the serialiozation helper could not be instantiated.
 	 */
-	protected SerializationHelper makeHelper(ClassLoader cl) throws Exception
+	protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception
 	{
+		ClassLoader cl = classLoader;
 		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
-		NonDelegatingClassLoader ndCl = new NonDelegatingClassLoader(null, cl);
+		NonDelegatingClassLoader ndCl = new NonDelegatingClassLoader(null, classLoader);
 		String helperClassName = getSerializationHelperClassName();
 		Class clazz = null;
 		if (cl != null)
@@ -350,7 +351,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Set the priority assigned to this connection.
 	 * @param priority a priority as an int value.
 	 */
-	public void setPriority(int priority)
+	public void setPriority(final int priority)
 	{
 		this.priority = priority;
 	}
@@ -372,7 +373,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
 	@Override
-	public void setStatus(JPPFClientConnectionStatus status)
+	public void setStatus(final JPPFClientConnectionStatus status)
 	{
 		JPPFClientConnectionStatus oldStatus = getStatus();
 		this.status.set(status);
@@ -385,7 +386,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-	public void addClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -399,7 +400,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @see org.jppf.client.JPPFClientConnection#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-	public void removeClientConnectionStatusListener(ClientConnectionStatusListener listener)
+	public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -411,7 +412,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Notify all listeners that the status of this connection has changed.
 	 * @param oldStatus the connection status before the change.
 	 */
-	protected void fireStatusChanged(JPPFClientConnectionStatus oldStatus)
+	protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
 	{
 		ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
 		ClientConnectionStatusListener[] array = null;
@@ -474,7 +475,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Set the object that holds the tasks, data provider and submission mode for the current execution.
 	 * @param currentExecution a <code>ClientExecution</code> instance.
 	 */
-	public void setCurrentJob(JPPFJob currentExecution)
+	public void setCurrentJob(final JPPFJob currentExecution)
 	{
 		this.job = currentExecution;
 	}
@@ -494,7 +495,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void delegateStatusChanged(ClientConnectionStatusEvent event)
+	public void delegateStatusChanged(final ClientConnectionStatusEvent event)
 	{
 		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
 		JPPFClientConnectionStatus s2 = taskServerConnection.getStatus();
@@ -506,7 +507,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param event the event to notify of.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
-	public void taskServerConnectionStatusChanged(ClientConnectionStatusEvent event)
+	public void taskServerConnectionStatusChanged(final ClientConnectionStatusEvent event)
 	{
 		JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
 		JPPFClientConnectionStatus s2 = delegate.getStatus();
@@ -519,7 +520,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * @param delegateStatus status of the class server delegate conneciton.
 	 * @param taskConnectionStatus status of the task server connection.
 	 */
-	protected void processStatusChanged(JPPFClientConnectionStatus delegateStatus, JPPFClientConnectionStatus taskConnectionStatus)
+	protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus)
 	{
 		if (FAILED.equals(delegateStatus)) setStatus(FAILED);
 		else if (ACTIVE.equals(delegateStatus))

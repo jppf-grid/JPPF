@@ -35,7 +35,8 @@ public class CustomLoadBalancerProvider implements JPPFBundlerProvider
 	 * @return an instance of {@link CustomLoadBalancer}.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
 	 */
-	public Bundler createBundler(LoadBalancingProfile profile)
+	@Override
+	public Bundler createBundler(final LoadBalancingProfile profile)
 	{
 		return new CustomLoadBalancer(profile);
 	}
@@ -47,7 +48,8 @@ public class CustomLoadBalancerProvider implements JPPFBundlerProvider
 	 * @return null.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
 	 */
-	public LoadBalancingProfile createProfile(TypedProperties configuration)
+	@Override
+	public LoadBalancingProfile createProfile(final TypedProperties configuration)
 	{
 		return null;
 	}
@@ -57,6 +59,7 @@ public class CustomLoadBalancerProvider implements JPPFBundlerProvider
 	 * @return the algorithm name as a string.
 	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#getAlgorithmName()
 	 */
+	@Override
 	public String getAlgorithmName()
 	{
 		return "customLoadBalancer";

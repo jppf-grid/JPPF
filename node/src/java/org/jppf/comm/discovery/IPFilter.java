@@ -57,7 +57,7 @@ public class IPFilter
 	 * Initialize this filter with the specified configuration.
 	 * @param config the configuration from which to get the include and exclude filters.
 	 */
-	public IPFilter(TypedProperties config)
+	public IPFilter(final TypedProperties config)
 	{
 		this.config = (config == null) ? new TypedProperties() : config;
 		configure();
@@ -75,16 +75,16 @@ public class IPFilter
 	}
 
 	/**
-	 * Parse the IP address patterns specified in the source string. 
+	 * Parse the IP address patterns specified in the source string.
 	 * @param source contains comma or semicomlumn separated patterns.
 	 * @param addToList the list to add the parsed patterns to.
 	 */
-	private void configureIPAddressPatterns(String source, List<AbstractIPAddressPattern> addToList)
+	private void configureIPAddressPatterns(final String source, final List<AbstractIPAddressPattern> addToList)
 	{
 		if (source == null) return;
-		source = source.trim();
-		if ("".equals(source)) return;
-		String[] p = source.split(",|;");
+		String src = source.trim();
+		if ("".equals(src)) return;
+		String[] p = src.split(",|;");
 		if ((p == null) || (p.length == 0)) return;
 		for (String s: p)
 		{
@@ -104,7 +104,7 @@ public class IPFilter
 	 * @param ip the ip to check.
 	 * @return true if the address passes the filters, false otherwise.
 	 */
-	public boolean isAddressAccepted(InetAddress ip)
+	public boolean isAddressAccepted(final InetAddress ip)
 	{
 		int[] ipComps = StringUtils.toIntArray(ip);
 		boolean included = matches(ipComps, includePatterns, true);
@@ -119,7 +119,7 @@ public class IPFilter
 	 * @param defIfEmpty the value to return if the list of patterns is empty.
 	 * @return <code>true</code> if the IP address matches one of the filterz, <code>false</code> otherwise.
 	 */
-	private boolean matches(int[] ipComps, List<AbstractIPAddressPattern> patterns, boolean defIfEmpty)
+	private boolean matches(final int[] ipComps, final List<AbstractIPAddressPattern> patterns, final boolean defIfEmpty)
 	{
 		if ((patterns == null) || patterns.isEmpty()) return defIfEmpty;
 		for (AbstractIPAddressPattern p: patterns)

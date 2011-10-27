@@ -38,7 +38,7 @@ public class ExampleGridRunner {
 	private static Logger log = Logger.getLogger(ExampleGridRunner.class.getName());
 
 	/** @param args */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		JPPFClient client = new JPPFClient("all your base");
 
 		JPPFJob job = new JPPFJob();

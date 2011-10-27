@@ -22,7 +22,7 @@ import org.jppf.server.nio.*;
 import org.slf4j.*;
 
 /**
- * Context obect associated with a socket channel used by the multiplexer. 
+ * Context obect associated with a socket channel used by the multiplexer.
  * @author Laurent Cohen
  */
 public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
@@ -48,7 +48,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleException(ChannelWrapper<?> channel)
+	public void handleException(final ChannelWrapper<?> channel)
 	{
 		try
 		{
@@ -82,9 +82,9 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 
 	/**
 	 * Set the request currently processed.
-	 * @param key a <code>ChannelWrapper</code> instance. 
+	 * @param key a <code>ChannelWrapper</code> instance.
 	 */
-	public synchronized void setLinkedKey(ChannelWrapper<?> key)
+	public synchronized void setLinkedKey(final ChannelWrapper<?> key)
 	{
 		this.linkedKey = key;
 	}
@@ -102,7 +102,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Set the application port to which the channel may be bound.
 	 * @param boundPort the port as an int value, or a negative value if the channel is not bound to an application port.
 	 */
-	public void setBoundPort(int boundPort)
+	public void setBoundPort(final int boundPort)
 	{
 		this.boundPort = boundPort;
 	}
@@ -120,7 +120,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Set the multiplexer port to which the channel may be bound.
 	 * @param multiplexerPort the port as an int value, or a negative value if the channel is not bound to a multiplexer port.
 	 */
-	public void setMultiplexerPort(int multiplexerPort)
+	public void setMultiplexerPort(final int multiplexerPort)
 	{
 		this.multiplexerPort = multiplexerPort;
 	}

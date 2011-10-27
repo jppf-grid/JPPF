@@ -26,7 +26,7 @@ import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
- * This class provides a graphical interface for monitoring the status and health 
+ * This class provides a graphical interface for monitoring the status and health
  * of the JPPF server.<br>
  * It also provides a few customization options, such as setting the interval between 2 server refreshes,
  * and switching the color scheme (skin) for the whole UI.
@@ -47,13 +47,13 @@ public class UILauncher
 	 * Start this UI.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
 			if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
 			String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
-				"com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
+					"com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
 			int n = 3;
 			boolean success = false;
 			String s = System.getProperty("swing.defaultlaf");

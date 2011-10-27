@@ -94,7 +94,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setResult(Object  result)
+	public void setResult(final Object  result)
 	{
 		this.result = result;
 	}
@@ -112,7 +112,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setException(Exception exception)
+	public void setException(final Exception exception)
 	{
 		this.exception = exception;
 	}
@@ -130,7 +130,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setDataProvider(DataProvider dataProvider)
+	public void setDataProvider(final DataProvider dataProvider)
 	{
 		this.dataProvider = dataProvider;
 	}
@@ -147,7 +147,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final void setPosition(int position) {
+	public final void setPosition(final int position) {
 		this.position = position;
 	}
 
@@ -158,7 +158,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * as only the latest notification is kept and processed. In a multithreaded/parallel context,
 	 * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
 	 */
-	public synchronized void addJPPFTaskListener(JPPFTaskListener listener)
+	public synchronized void addJPPFTaskListener(final JPPFTaskListener listener)
 	{
 	}
 
@@ -169,7 +169,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * as only the latest notification is kept and processed. In a multithreaded/parallel context,
 	 * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
 	 */
-	public synchronized void removeJPPFTaskListener(JPPFTaskListener listener)
+	public synchronized void removeJPPFTaskListener(final JPPFTaskListener listener)
 	{
 	}
 
@@ -180,12 +180,13 @@ public abstract class JPPFTask implements Task<Object>
 	 * as only the latest notification is kept and processed. In a multithreaded/parallel context,
 	 * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
 	 */
-	public synchronized void fireNotification(Serializable source)
+	public synchronized void fireNotification(final Serializable source)
 	{
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get the timeout for this task.
+	 * @return the timeout as a long.
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
 	public long getTimeout()
@@ -199,13 +200,14 @@ public abstract class JPPFTask implements Task<Object>
 	 * @param timeout the timeout in milliseconds.
 	 * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
 	 */
-	public void setTimeout(long timeout)
+	public void setTimeout(final long timeout)
 	{
 		timeoutSchedule = new JPPFSchedule(timeout);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get the timeout date for this task.
+	 * @return the datez in string fomrat.
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
 	public String getTimeoutDate()
@@ -215,7 +217,8 @@ public abstract class JPPFTask implements Task<Object>
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Get the format used to express the timeout date.
+	 * @return a fomrat string using the specifications for <code>SimpleDateFormat</code>.
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
 	public String getTimeoutFormat()
@@ -232,7 +235,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * @see java.text.SimpleDateFormat
 	 * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
 	 */
-	public void setTimeoutDate(String timeoutDate, String format)
+	public void setTimeoutDate(final String timeoutDate, final String format)
 	{
 		timeoutSchedule = new JPPFSchedule(timeoutDate, format);
 	}
@@ -250,7 +253,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setId(String id)
+	public void setId(final String id)
 	{
 		this.id = id;
 	}
@@ -301,7 +304,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setTimeoutSchedule(JPPFSchedule timeoutSchedule)
+	public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule)
 	{
 		this.timeoutSchedule = timeoutSchedule;
 	}

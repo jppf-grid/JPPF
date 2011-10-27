@@ -91,7 +91,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * Default constructor.
 	 * @param executor the JPPFExecutorService whose tasks are batched.
 	 */
-	BatchHandler(JPPFExecutorService executor)
+	BatchHandler(final JPPFExecutorService executor)
 	{
 		this.executor = executor;
 		nextJobRef.set(createJob());
@@ -110,7 +110,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * Set the minimum number of tasks that must be submitted before they are sent to the server.
 	 * @param batchSize the batch size as an int.
 	 */
-	synchronized void setBatchSize(int batchSize)
+	synchronized void setBatchSize(final int batchSize)
 	{
 		this.batchSize = batchSize;
 	}
@@ -128,7 +128,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
 	 * @param batchTimeout the timeout as a long.
 	 */
-	synchronized void setBatchTimeout(long batchTimeout)
+	synchronized void setBatchTimeout(final long batchTimeout)
 	{
 		this.batchTimeout = batchTimeout;
 	}
@@ -137,7 +137,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		start = System.currentTimeMillis();
 		while (!isStopped())
@@ -182,7 +182,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * Update the next job to submit if one is ready.
 	 * @param sendSignal true if signal is to be sent, false otherwise.
 	 */
-	private void updateNextJob(boolean sendSignal)
+	private void updateNextJob(final boolean sendSignal)
 	{
 		JPPFJob job = nextJobRef.get();
 		int size = job.getTasks().size();
@@ -217,7 +217,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * @param task the task to submit.
 	 * @return a {@link Future} representing pending completion of the task.
 	 */
-	Future<Object> addTask(JPPFTask task)
+	Future<Object> addTask(final JPPFTask task)
 	{
 		lock.lock();
 		try
@@ -251,7 +251,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * @param task the task to submit.
 	 * @return a {@link Future} representing pending completion of the task.
 	 */
-	<T> Future<T> addTask(Callable<T> task)
+	<T> Future<T> addTask(final Callable<T> task)
 	{
 		lock.lock();
 		try
@@ -283,10 +283,10 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 * Submit a list of tasks for execution.
 	 * @param <T> the type of the results.
 	 * @param tasks the tasks to submit.
-	 * @return a pair representing the result collector used in the current job, along with the position of the first task. 
+	 * @return a pair representing the result collector used in the current job, along with the position of the first task.
 	 */
-  @SuppressWarnings("unchecked")
-	<T> Pair<FutureResultCollector, Integer> addTasks(Collection<? extends Callable<T>> tasks)
+	@SuppressWarnings("unchecked")
+	<T> Pair<FutureResultCollector, Integer> addTasks(final Collection<? extends Callable<T>> tasks)
 	{
 		lock.lock();
 		try

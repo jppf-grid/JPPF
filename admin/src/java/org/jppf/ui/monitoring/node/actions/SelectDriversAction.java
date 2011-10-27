@@ -36,7 +36,7 @@ public class SelectDriversAction extends AbstractSelectionAction
 	 * Initialize this action with the specified tree table panel.
 	 * @param panel the tree table panel to which this action applies.
 	 */
-	public SelectDriversAction(NodeDataPanel panel)
+	public SelectDriversAction(final NodeDataPanel panel)
 	{
 		super(panel);
 		setupIcon("/org/jppf/ui/resources/select_drivers.gif");
@@ -47,7 +47,7 @@ public class SelectDriversAction extends AbstractSelectionAction
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void actionPerformed(ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		synchronized(panel)
 		{

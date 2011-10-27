@@ -52,7 +52,7 @@ public class StatsSnapshot implements Serializable
 	 * The average time.
 	 */
 	private double avg = 0d;
-	
+
 	/**
 	 * Initialize this time snapshot with a blank title.
 	 */
@@ -64,7 +64,7 @@ public class StatsSnapshot implements Serializable
 	 * Initialize this time snapshot with a specified title.
 	 * @param title the title for this snapshot.
 	 */
-	public StatsSnapshot(String title)
+	public StatsSnapshot(final String title)
 	{
 		this.title = title;
 	}
@@ -75,7 +75,7 @@ public class StatsSnapshot implements Serializable
 	 * @param count the unit count to which the time applies.
 	 * @param totalCount the total unit count to which the time applies.
 	 */
-	public void newValues(long time, long count, long totalCount)
+	public void newValues(final long time, final long count, final long totalCount)
 	{
 		total += time;
 		if (count > 0)
@@ -86,13 +86,13 @@ public class StatsSnapshot implements Serializable
 			if (totalCount > 0) avg = (double) total / (double) totalCount;
 		}
 	}
-	
+
 	/**
 	 * Called when a new time has been collected.
 	 * @param updateCount the number of units in the update.
 	 * @param totalUpdates the total number of updates since the start, not including the current update.
 	 */
-	public void newValues(long updateCount, long totalUpdates)
+	public void newValues(final long updateCount, final long totalUpdates)
 	{
 		total += updateCount;
 		latest = updateCount;
@@ -100,7 +100,7 @@ public class StatsSnapshot implements Serializable
 		if (latest < min) min = latest;
 		avg = (double) total / (double) (totalUpdates + 1L);
 	}
-	
+
 	/**
 	 * Make a copy of this time snapshot object.
 	 * @return a <code>TimeSnapshot</code> instance.
@@ -122,7 +122,7 @@ public class StatsSnapshot implements Serializable
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(title).append(" total : ").append(total).append('\n');
@@ -137,7 +137,7 @@ public class StatsSnapshot implements Serializable
 	 * Set the total cumulated time.
 	 * @param total the total time as a long value.
 	 */
-	public void setTotal(long total)
+	public void setTotal(final long total)
 	{
 		this.total = total;
 	}
@@ -155,7 +155,7 @@ public class StatsSnapshot implements Serializable
 	 * Set the most recent time observed.
 	 * @param latest the most recent time as a long value.
 	 */
-	public void setLatest(long latest)
+	public void setLatest(final long latest)
 	{
 		this.latest = latest;
 	}
@@ -173,7 +173,7 @@ public class StatsSnapshot implements Serializable
 	 * Set the smallest time observed.
 	 * @param min the minimum time as a long value.
 	 */
-	public void setMin(long min)
+	public void setMin(final long min)
 	{
 		this.min = min;
 	}
@@ -191,7 +191,7 @@ public class StatsSnapshot implements Serializable
 	 * Set the peak time.
 	 * @param max the maximum time as a long value.
 	 */
-	public void setMax(long max)
+	public void setMax(final long max)
 	{
 		this.max = max;
 	}
@@ -209,7 +209,7 @@ public class StatsSnapshot implements Serializable
 	 * Set the average time.
 	 * @param avg the average time as a double value.
 	 */
-	public void setAvg(double avg)
+	public void setAvg(final double avg)
 	{
 		this.avg = avg;
 	}

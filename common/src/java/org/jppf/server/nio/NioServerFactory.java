@@ -59,7 +59,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 	 * Initialize this factory with the specified server.
 	 * @param server the server for which to initialize.
 	 */
-	protected NioServerFactory(NioServer<S, T> server)
+	protected NioServerFactory(final NioServer<S, T> server)
 	{
 		this.server = server;
 		stateMap = createStateMap();
@@ -83,7 +83,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 	 * @param name the name of the state to lookup.
 	 * @return an <code>NioState</code> instance.
 	 */
-	public NioState<T> getState(S name)
+	public NioState<T> getState(final S name)
 	{
 		return stateMap.get(name);
 	}
@@ -93,7 +93,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 	 * @param name the name of the transition to lookup.
 	 * @return an <code>NioTransition</code> instance.
 	 */
-	public NioTransition<S> getTransition(T name)
+	public NioTransition<S> getTransition(final T name)
 	{
 		return transitionMap.get(name);
 	}

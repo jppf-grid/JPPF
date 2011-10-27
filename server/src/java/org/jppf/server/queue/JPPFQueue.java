@@ -18,7 +18,7 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerJob;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.

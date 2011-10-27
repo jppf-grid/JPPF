@@ -36,7 +36,7 @@ public class ByteBufferOutputStream extends OutputStream
 	 * Initialize this output stream with the specified capacity for the backing ByteBuffer.
 	 * @param capacity the capacity of the backing byte buffer.
 	 */
-	public ByteBufferOutputStream(int capacity)
+	public ByteBufferOutputStream(final int capacity)
 	{
 		buffer = ByteBuffer.allocate(capacity);
 	}
@@ -45,18 +45,18 @@ public class ByteBufferOutputStream extends OutputStream
 	 * Initialize this output stream with the specified backing ByteBuffer.
 	 * @param buffer the backing byte buffer.
 	 */
-	public ByteBufferOutputStream(ByteBuffer buffer)
+	public ByteBufferOutputStream(final ByteBuffer buffer)
 	{
 		this.buffer = buffer;
 	}
 
 	/**
-	 * Close this output stream and releases any system resources associated with it. 
+	 * Close this output stream and releases any system resources associated with it.
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		super.close();
 		buffer = null;
@@ -68,7 +68,7 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @see java.io.OutputStream#flush()
 	 */
 	@Override
-    public void flush() throws IOException
+	public void flush() throws IOException
 	{
 		super.flush();
 	}
@@ -78,11 +78,11 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @param b the data.
 	 * @param off the start offset in the data.
 	 * @param len the number of bytes to write.
-	 * @exception IOException if an I/O error occurs. 
+	 * @exception IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	@Override
-    public void write(byte[] b, int off, int len) throws IOException
+	public void write(final byte[] b, final int off, final int len) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
@@ -100,7 +100,7 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @see java.io.OutputStream#write(byte[])
 	 */
 	@Override
-    public void write(byte[] b) throws IOException
+	public void write(final byte[] b) throws IOException
 	{
 		if (b == null) throw new NullPointerException();
 		write(b, 0, b.length);
@@ -113,7 +113,7 @@ public class ByteBufferOutputStream extends OutputStream
 	 * @see java.io.OutputStream#write(int)
 	 */
 	@Override
-    public void write(int b) throws IOException
+	public void write(final int b) throws IOException
 	{
 		buffer.put((byte) b);
 	}

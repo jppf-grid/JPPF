@@ -21,7 +21,7 @@ package org.jppf.server.queue;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerJob;
 
 /**
  * Iterator that traverses the collection of task bundles in descending order of their priority.
@@ -47,7 +47,7 @@ class BundleIterator implements Iterator<ServerJob>
 	 * @param priorityMap the map of prioritized jobs.
 	 * @param lock used to synchronize with the queue.
 	 */
-	public BundleIterator(TreeMap<JPPFPriority, List<ServerJob>> priorityMap, ReentrantLock lock)
+	public BundleIterator(final TreeMap<JPPFPriority, List<ServerJob>> priorityMap, final ReentrantLock lock)
 	{
 		this.lock = lock;
 		lock.lock();
@@ -68,7 +68,7 @@ class BundleIterator implements Iterator<ServerJob>
 	 * @see java.util.Iterator#hasNext()
 	 */
 	@Override
-    public boolean hasNext()
+	public boolean hasNext()
 	{
 		lock.lock();
 		try
@@ -87,7 +87,7 @@ class BundleIterator implements Iterator<ServerJob>
 	 * @see java.util.Iterator#next()
 	 */
 	@Override
-    public ServerJob next()
+	public ServerJob next()
 	{
 		lock.lock();
 		try
@@ -115,7 +115,7 @@ class BundleIterator implements Iterator<ServerJob>
 	 * @see java.util.Iterator#remove()
 	 */
 	@Override
-    public void remove() throws UnsupportedOperationException
+	public void remove() throws UnsupportedOperationException
 	{
 		throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
 	}

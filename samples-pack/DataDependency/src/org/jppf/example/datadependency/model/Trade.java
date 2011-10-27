@@ -38,7 +38,7 @@ public class Trade implements Serializable
 	/**
 	 * A list of identifiers for the pieces of market data this depends on.
 	 */
-	private SortedSet<String> dataDependencies = new TreeSet<String>(); 
+	private SortedSet<String> dataDependencies = new TreeSet<String>();
 
 	/**
 	 * Default constructor.
@@ -51,7 +51,7 @@ public class Trade implements Serializable
 	 * Iniitialize the trade with the specified identifier.
 	 * @param id the trade identifier.
 	 */
-	public Trade(String id)
+	public Trade(final String id)
 	{
 		this.id = id;
 	}
@@ -69,7 +69,7 @@ public class Trade implements Serializable
 	 * Set the trade identifier.
 	 * @param id the id as a string.
 	 */
-	public void setId(String id)
+	public void setId(final String id)
 	{
 		this.id = id;
 	}
@@ -87,7 +87,7 @@ public class Trade implements Serializable
 	 * Set the list of dependencies for this trade.
 	 * @param dataDependencies a list of market data identifier strings.
 	 */
-	public void setDataDependencies(SortedSet<String> dataDependencies)
+	public void setDataDependencies(final SortedSet<String> dataDependencies)
 	{
 		this.dataDependencies = dataDependencies;
 	}

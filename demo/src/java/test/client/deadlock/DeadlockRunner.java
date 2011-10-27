@@ -49,7 +49,7 @@ public class DeadlockRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -72,7 +72,7 @@ public class DeadlockRunner
 			executor.shutdownNow();
 		}
 	}
-	
+
 	/**
 	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
 	 * @param nbJobs the number of non-blocking jobs to submit.
@@ -81,7 +81,7 @@ public class DeadlockRunner
 	 * @param nanos the execution length of each task (nanos part).
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbJobs, int nbTasks, long millis, int nanos) throws Exception
+	private static void perform(final int nbJobs, final int nbTasks, final long millis, final int nanos) throws Exception
 	{
 		print("submitting the jobs");
 		List<Future<SubmitJob>> futures = new ArrayList<Future<SubmitJob>>();
@@ -109,7 +109,7 @@ public class DeadlockRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);
@@ -133,7 +133,7 @@ public class DeadlockRunner
 		 * Initialize this task.
 		 * @param millis millis part of the wait.
 		 */
-		public Task(long millis)
+		public Task(final long millis)
 		{
 			this.millis = millis;
 		}
@@ -143,7 +143,7 @@ public class DeadlockRunner
 		 * @param millis millis part of the wait.
 		 * @param nanos nanos part of the wait.
 		 */
-		public Task(long millis, int nanos)
+		public Task(final long millis, final int nanos)
 		{
 			this.millis = millis;
 			this.nanos = nanos;
@@ -153,7 +153,7 @@ public class DeadlockRunner
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -201,7 +201,7 @@ public class DeadlockRunner
 		 * @param millis millis part of the wait.
 		 * @param nanos nanos part of the wait.
 		 */
-		public SubmitJob(int jobNumber, int nbTasks, long millis, int nanos)
+		public SubmitJob(final int jobNumber, final int nbTasks, final long millis, final int nanos)
 		{
 			this.jobNumber = jobNumber;
 			this.nbTasks = nbTasks;

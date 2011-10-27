@@ -45,7 +45,7 @@ public final class GuiUtils
 	 * {@link javax.swing.BoxLayout#X_AXIS BoxLayout.X_AXIS}.
 	 * @return a <code>JPanel</code> instance.
 	 */
-	public static JPanel createBoxPanel(int orientation)
+	public static JPanel createBoxPanel(final int orientation)
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, orientation));
@@ -58,7 +58,7 @@ public final class GuiUtils
 	 * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
 	 * could not be loaded.
 	 */
-	public static ImageIcon loadIcon(String path)
+	public static ImageIcon loadIcon(final String path)
 	{
 		return loadIcon(path, true);
 	}
@@ -70,7 +70,7 @@ public final class GuiUtils
 	 * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
 	 * could not be loaded.
 	 */
-	public static ImageIcon loadIcon(String path, boolean useCache)
+	public static ImageIcon loadIcon(final String path, final boolean useCache)
 	{
 		ImageIcon icon = null;
 		if (useCache)
@@ -92,7 +92,7 @@ public final class GuiUtils
 	 * @param height the component's height.
 	 * @return a <code>JComponent</code> instance.
 	 */
-	public static JComponent createFiller(int width, int height)
+	public static JComponent createFiller(final int width, final int height)
 	{
 		JPanel filler = new JPanel();
 		Dimension d = new Dimension(width, height);
@@ -108,7 +108,7 @@ public final class GuiUtils
 	 * @return the input text if it does not contain any line break, otherwise the input text wrapped in
 	 * &lt;html&gt; ... &lt;/html&gt; tags, with the line breaks transformed into &lt;br&gt; tags.
 	 */
-	public static String formatToolTipText(String tooltip)
+	public static String formatToolTipText(final String tooltip)
 	{
 		if (tooltip == null) return null;
 		String s = TOOLTIP_PATTERN.matcher(tooltip).replaceAll("<br>");
@@ -120,7 +120,7 @@ public final class GuiUtils
 	 * @param comp the component whose frame to retrieve.
 	 * @return a {@link Frame} instance if it can be found, null otherwise.
 	 */
-	public static Frame getTopFrame(Component comp)
+	public static Frame getTopFrame(final Component comp)
 	{
 		Component tmp = SwingUtilities.getRoot(comp);
 		return (tmp instanceof Frame) ? (Frame) tmp : null;

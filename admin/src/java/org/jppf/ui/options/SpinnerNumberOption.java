@@ -54,13 +54,13 @@ public class SpinnerNumberOption extends AbstractOption
 	/**
 	 * Initialize this spinner option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the combobox.
 	 * @param value the initial value of this component.
 	 * @param min the minimum value that can be set in the spinner.
 	 * @param max the maximum value that can be set in the spinner.
 	 */
-	public SpinnerNumberOption(String name, String label, String tooltip, Integer value, Integer min, Integer max)
+	public SpinnerNumberOption(final String name, final String label, final String tooltip, final Integer value, final Integer min, final Integer max)
 	{
 		this.name = name;
 		this.label = label;
@@ -75,7 +75,7 @@ public class SpinnerNumberOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		SpinnerNumberModel model =
 			new SpinnerNumberModel(((Integer) value).intValue(), min.intValue(), max.intValue(), 1);
@@ -98,7 +98,7 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		value = spinner.getModel().getValue();
 		return value;
@@ -110,7 +110,7 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object value)
+	public void setValue(final Object value)
 	{
 		if (value instanceof String)
 		{
@@ -136,13 +136,13 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 		SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
 		model.addChangeListener(new ChangeListener()
 		{
 			@Override
-            public void stateChanged(ChangeEvent e)
+			public void stateChanged(final ChangeEvent e)
 			{
 				getValue();
 				fireValueChanged();
@@ -156,7 +156,7 @@ public class SpinnerNumberOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		spinner.setEnabled(enabled);
 		spinnerLabel.setEnabled(enabled);
@@ -175,7 +175,7 @@ public class SpinnerNumberOption extends AbstractOption
 	 * Set the maximum value for the spinner control.
 	 * @param max the value as an Integer value.
 	 */
-	public void setMax(Integer max)
+	public void setMax(final Integer max)
 	{
 		this.max = max;
 	}
@@ -193,7 +193,7 @@ public class SpinnerNumberOption extends AbstractOption
 	 * Set the minimum value for the spinner control.
 	 * @param min the value as an Integer value.
 	 */
-	public void setMin(Integer min)
+	public void setMin(final Integer min)
 	{
 		this.min = min;
 	}

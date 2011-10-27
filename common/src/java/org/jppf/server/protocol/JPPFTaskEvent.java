@@ -37,7 +37,7 @@ public class JPPFTaskEvent extends EventObject
 	 * @param source an object describing the event, must be serializable.
 	 * @deprecated
 	 */
-	public JPPFTaskEvent(Serializable source)
+	public JPPFTaskEvent(final Serializable source)
 	{
 		super(source);
 	}

@@ -21,7 +21,7 @@ package org.jppf.server.nio.multiplexer;
 import org.jppf.server.nio.NioState;
 
 /**
- * Common abstract superclass for all states of a multiplexer connection. 
+ * Common abstract superclass for all states of a multiplexer connection.
  * @author Laurent Cohen
  */
 public abstract class MultiplexerServerState extends NioState<MultiplexerTransition>
@@ -35,7 +35,7 @@ public abstract class MultiplexerServerState extends NioState<MultiplexerTransit
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public MultiplexerServerState(MultiplexerNioServer server)
+	public MultiplexerServerState(final MultiplexerNioServer server)
 	{
 		this.server = server;
 	}

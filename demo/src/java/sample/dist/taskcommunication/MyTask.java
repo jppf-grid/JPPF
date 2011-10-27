@@ -41,7 +41,7 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public void run()
 	{
 		try
@@ -53,7 +53,7 @@ public class MyTask extends JPPFTask implements ItemListener
 			while (!conditionReached.get())
 			{
 				// ... your code here ...
-				
+
 				// if condition is reached by this task
 				//if (<some condition>)
 				{
@@ -95,7 +95,7 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * @see com.hazelcast.core.ItemListener#itemAdded(java.lang.Object)
 	 */
 	@Override
-    public void itemAdded(Object item)
+	public void itemAdded(final Object item)
 	{
 		conditionReached.set(true);
 	}
@@ -106,7 +106,7 @@ public class MyTask extends JPPFTask implements ItemListener
 	 * @see com.hazelcast.core.ItemListener#itemRemoved(java.lang.Object)
 	 */
 	@Override
-    public void itemRemoved(Object item)
+	public void itemRemoved(final Object item)
 	{
 	}
 

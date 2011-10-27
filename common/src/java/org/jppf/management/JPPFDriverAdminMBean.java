@@ -43,7 +43,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 	Collection<JPPFManagementInfo> nodesInformation() throws Exception;
 	/**
 	 * Perform a shutdown or restart of the server.
-	 * @param shutdownDelay the delay before shutting down the server, once the command is received. 
+	 * @param shutdownDelay the delay before shutting down the server, once the command is received.
 	 * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
 	 * @return an acknowledgement message.
 	 * @throws Exception if any error occurs.
@@ -65,7 +65,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 	LoadBalancingInformation loadBalancerInformation() throws Exception;
 	/**
 	 * Reset this server's statistics.
-	 * This method triggers a <code>reset()</code> event via the <code>JPPFDriverStatsManager</code> instance. 
+	 * This method triggers a <code>reset()</code> event via the <code>JPPFDriverStatsManager</code> instance.
 	 * @throws Exception if any error occurs.
 	 */
 	void resetStatistics() throws Exception;

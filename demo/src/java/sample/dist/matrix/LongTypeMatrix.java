@@ -42,17 +42,17 @@ public class LongTypeMatrix implements Serializable
 	 * The values in this matrix.
 	 */
 	private long[][] values = null;
-	
+
 	/**
 	 * Initialize this amtrix with a specified size.
 	 * @param newSize the size of this matrix.
 	 */
-	public LongTypeMatrix(int newSize)
+	public LongTypeMatrix(final int newSize)
 	{
 		this.size = newSize;
 		values = new long[size][size];
 	}
-	
+
 	/**
 	 * Initialize this matrix with random values.
 	 */
@@ -75,46 +75,46 @@ public class LongTypeMatrix implements Serializable
 	{
 		return size;
 	}
-	
+
 	/**
 	 * Get the row a matrix values at the specified index. Provided as a convenience.
 	 * @param row the row index.
 	 * @return the values in the row as an array of <code>double</code> values, or null if the row index is
 	 * greater than the matrix size.
 	 */
-	public long[] getRow(int row)
+	public long[] getRow(final int row)
 	{
 		return (row < size) ? values[row] : null;
 	}
-	
+
 	/**
 	 * Get a value at the specified coordinates.
 	 * @param row the row coordinate.
 	 * @param column the column coordinate.
 	 * @return the specified value as a double.
 	 */
-	public double getValueAt(int row, int column)
+	public double getValueAt(final int row, final int column)
 	{
 		return values[row][column];
 	}
-	
+
 	/**
 	 * Set a value to the specified coordinates.
 	 * @param row the row coordinate.
 	 * @param column the column coordinate.
 	 * @param value the value to set.
 	 */
-	public void setValueAt(int row, int column, long value)
+	public void setValueAt(final int row, final int column, final long value)
 	{
 		values[row][column] = value;
 	}
-	
+
 	/**
 	 * Compute the result of mutiplying this matrix by another: thisMatrix x otherMatrix.
 	 * @param matrix the matrix to multiply this one by.
 	 * @return a new matrix containing the reuslt of the multiplication.
 	 */
-	public LongTypeMatrix multiply(LongTypeMatrix matrix)
+	public LongTypeMatrix multiply(final LongTypeMatrix matrix)
 	{
 		if (matrix.getSize() != size) return null;
 		LongTypeMatrix result = new LongTypeMatrix(size);
@@ -137,7 +137,7 @@ public class LongTypeMatrix implements Serializable
 	 * @param matrix the matrix to multiply by.
 	 * @return a new row represented as an array of <code>double</code> values.
 	 */
-	public double[] multiplyRow(int n, LongTypeMatrix matrix)
+	public double[] multiplyRow(final int n, final LongTypeMatrix matrix)
 	{
 		double[] result = new double[size];
 		for (int col=0; col<size; col++)

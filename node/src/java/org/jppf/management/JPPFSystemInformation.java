@@ -78,11 +78,10 @@ public class JPPFSystemInformation implements Serializable
 	 * Initialize this system information object with the specified uuid.
 	 * @param uuid the uuid of the corresponding JPPF component.
 	 */
-	public JPPFSystemInformation(String uuid)
+	public JPPFSystemInformation(final String uuid)
 	{
-		if (uuid == null) uuid = "";
 		uuidProps = new TypedProperties();
-		uuidProps.setProperty("jppf.uuid", uuid);
+		uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
 	}
 
 	/**
@@ -103,7 +102,7 @@ public class JPPFSystemInformation implements Serializable
 	 * <li>freeMemory = <i>current free heap size in bytes</i></li>
 	 * <li>totalMemory = <i>current total heap size in bytes</i></li>
 	 * <li>maxMemory = <i>maximum heap size in bytes (i.e. as specified by -Xmx JVM option)</i></li>
-	 * </ul> 
+	 * </ul>
 	 * <p>Some or all of these properties may be missing if a security manager is installed
 	 * that does not grant access to the related {@link java.lang.Runtime} APIs.
 	 * @return a <code>TypedProperties</code> instance.
@@ -213,10 +212,10 @@ public class JPPFSystemInformation implements Serializable
 
 	/**
 	 * Parse a list of addresses.
-	 * @param addresses a string containing a space-separated list of host_name|ip_address pairs. 
+	 * @param addresses a string containing a space-separated list of host_name|ip_address pairs.
 	 * @return an array on <code>HostIP</code> instances.
 	 */
-	private HostIP[] parseAddresses(String addresses)
+	private HostIP[] parseAddresses(final String addresses)
 	{
 		String[] pairs = addresses.split("\\s");
 		if ((pairs == null) || (pairs.length <= 0)) return null;
@@ -232,7 +231,7 @@ public class JPPFSystemInformation implements Serializable
 	}
 
 	/**
-	 * Instances of this class represent a hostname / ip address pair. 
+	 * Instances of this class represent a hostname / ip address pair.
 	 */
 	public static class HostIP extends Pair<String, String>
 	{
@@ -241,7 +240,7 @@ public class JPPFSystemInformation implements Serializable
 		 * @param first the host name.
 		 * @param second the corresponnding IP address.
 		 */
-		public HostIP(String first, String second)
+		public HostIP(final String first, final String second)
 		{
 			super(first, second);
 		}

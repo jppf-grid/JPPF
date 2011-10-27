@@ -52,7 +52,7 @@ public class JobNotification extends Notification
 	 * @param nodeInfo - information about the node.
 	 * @param timestamp - the creation timestamp for this event.
 	 */
-	public JobNotification(JobEventType eventType, JobInformation jobInfo, JPPFManagementInfo nodeInfo, long timestamp)
+	public JobNotification(final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp)
 	{
 		super("jobEvent", jobInfo, timestamp);
 		this.eventType = eventType;

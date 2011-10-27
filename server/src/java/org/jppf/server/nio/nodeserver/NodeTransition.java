@@ -28,7 +28,7 @@ public enum NodeTransition
 	/**
 	 * Transition from a state to SENDING_BUNDLE.
 	 */
-	TO_SENDING, 
+	TO_SENDING,
 	/**
 	 * Transition from a state to WAITING_RESULTS.
 	 */

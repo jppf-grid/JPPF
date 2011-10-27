@@ -46,7 +46,7 @@ public interface InputSource extends IO
 
 	/**
 	 * Read an int value from this input source.
-	 * @return the value read, or -1 if an end of file condition was reached. 
+	 * @return the value read, or -1 if an end of file condition was reached.
 	 * @throws Exception if an IO error occurs.
 	 */
 	int readInt() throws Exception;

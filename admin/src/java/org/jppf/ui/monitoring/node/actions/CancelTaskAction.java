@@ -46,7 +46,7 @@ public class CancelTaskAction extends JPPFAbstractNodeAction
 	 * @param taskId id of the task to cancel.
 	 * @param dataArray - the information on the nodes this action applies to.
 	 */
-	public CancelTaskAction(String taskId, TopologyData...dataArray)
+	public CancelTaskAction(final String taskId, final TopologyData...dataArray)
 	{
 		super(dataArray);
 		setupIcon("/org/jppf/ui/resources/stop.gif");
@@ -60,12 +60,12 @@ public class CancelTaskAction extends JPPFAbstractNodeAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				try
 				{

@@ -46,7 +46,7 @@ public class OptimizedJobRunner
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -54,7 +54,7 @@ public class OptimizedJobRunner
 			/*
 			while (!jppfClient.hasAvailableConnection()) Thread.sleep(50L);
 			jppfClient.setLocalExecutionEnabled(true);
-			*/
+			 */
 			perform();
 		}
 		catch(Exception e)
@@ -66,7 +66,7 @@ public class OptimizedJobRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test.
 	 * @throws Exception if an error is raised during the execution.
@@ -76,7 +76,7 @@ public class OptimizedJobRunner
 		int nbJobs = 1;
 		int nbTasks = 10;
 		long time = 2000L;
-		
+
 		output("Running demo with time = " + time + " for " + nbJobs + " jobs");
 		long totalTime = System.currentTimeMillis();
 		List<JPPFJob> jobs = new ArrayList<JPPFJob>();
@@ -84,11 +84,13 @@ public class OptimizedJobRunner
 		{
 			final JPPFJob job = new JPPFJob();
 			job.addJobListener(new JobListener() {
-				public void jobStarted(JobEvent event) {
-					output("Job '" + job.getName() + "' starting"); 
+				@Override
+				public void jobStarted(final JobEvent event) {
+					output("Job '" + job.getName() + "' starting");
 				}
-				public void jobEnded(JobEvent event) {
-					output("Job '" + job.getName() + "' ended"); 
+				@Override
+				public void jobEnded(final JobEvent event) {
+					output("Job '" + job.getName() + "' ended");
 				}
 			});
 			job.setName("demo job " + (i+1));
@@ -115,7 +117,7 @@ public class OptimizedJobRunner
 	 * Print a message to the console and/or log file.
 	 * @param message the message to print.
 	 */
-	private static void output(String message)
+	private static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

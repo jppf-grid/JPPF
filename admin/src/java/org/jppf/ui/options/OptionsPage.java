@@ -20,7 +20,7 @@ package org.jppf.ui.options;
 import java.util.List;
 
 /**
- * Interface for dynamic UI components representing a page (or panel) container. 
+ * Interface for dynamic UI components representing a page (or panel) container.
  * @author Laurent Cohen
  */
 public interface OptionsPage extends OptionElement

@@ -42,7 +42,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 	 * @param urls an array of class path urls.
 	 * @param parent the parent class loader.
 	 */
-	public NonDelegatingClassLoader(URL[] urls, ClassLoader parent)
+	public NonDelegatingClassLoader(final URL[] urls, final ClassLoader parent)
 	{
 		super(urls == null ? StringUtils.ZERO_URL : urls, parent);
 	}
@@ -53,7 +53,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 	 * @return the correpsonding class.
 	 * @throws ClassNotFoundException if the class could not be loaded.
 	 */
-	public Class<?> loadClassDirect(String name) throws ClassNotFoundException
+	public Class<?> loadClassDirect(final String name) throws ClassNotFoundException
 	{
 		Class<?> c = null;
 		try
@@ -74,7 +74,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 	 * @param name the name of the resource to find.
 	 * @return an array of bytes, or null if the resource could not be found.
 	 */
-	private byte[] getResourceBytes(String name)
+	private byte[] getResourceBytes(final String name)
 	{
 		byte[] b = resourceMap.get(name);
 		if (b == null)
@@ -95,7 +95,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 				}
 			}
 		}
-		else if (b.length == 0) b = null; 
+		else if (b.length == 0) b = null;
 		return b;
 	}
 }

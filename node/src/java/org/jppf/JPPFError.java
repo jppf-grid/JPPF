@@ -31,7 +31,7 @@ public class JPPFError extends Error
 	 * @param message the message for this error.
 	 * @param cause the cause exception.
 	 */
-	public JPPFError(String message, Throwable cause)
+	public JPPFError(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
@@ -40,7 +40,7 @@ public class JPPFError extends Error
 	 * Initialize this error with a specified message.
 	 * @param message the message for this error.
 	 */
-	public JPPFError(String message)
+	public JPPFError(final String message)
 	{
 		super(message);
 	}
@@ -49,7 +49,7 @@ public class JPPFError extends Error
 	 * Initialize this error with a specified cause exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFError(Throwable cause)
+	public JPPFError(final Throwable cause)
 	{
 		super(cause);
 	}

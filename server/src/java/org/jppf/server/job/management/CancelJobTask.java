@@ -24,7 +24,7 @@ import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.slf4j.*;
 
 /**
- * Instances of this class are intented to perform job management functions for a specxific node. 
+ * Instances of this class are intented to perform job management functions for a specxific node.
  * @author Laurent Cohen
  */
 class CancelJobTask implements Runnable
@@ -56,7 +56,7 @@ class CancelJobTask implements Runnable
 	 * @param channel the node on which to perform this task.
 	 * @param requeue true if the job should be requeued on the server side, false otherwise.
 	 */
-	public CancelJobTask(String jobUuid, ChannelWrapper channel, boolean requeue)
+	public CancelJobTask(final String jobUuid, final ChannelWrapper channel, final boolean requeue)
 	{
 		this.jobUuid = jobUuid;
 		this.channel = channel;
@@ -68,7 +68,7 @@ class CancelJobTask implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

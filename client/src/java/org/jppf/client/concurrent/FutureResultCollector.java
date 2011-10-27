@@ -49,7 +49,7 @@ class FutureResultCollector extends JPPFResultCollector
 	private String jobUuid = null;
 
 	/**
-	 * Initialize this collector with a specified number of tasks. 
+	 * Initialize this collector with a specified number of tasks.
 	 * @param count the count of submitted tasks.
 	 * @param jobUuid the uuid of the corresponding job.
 	 */
@@ -59,13 +59,13 @@ class FutureResultCollector extends JPPFResultCollector
 		super(count);
 		this.jobUuid = jobUuid;
 	}
-	*/
+	 */
 
 	/**
-	 * Initialize this collector with a specified number of tasks. 
+	 * Initialize this collector with a specified number of tasks.
 	 * @param job the job to execute.
 	 */
-	FutureResultCollector(JPPFJob job)
+	FutureResultCollector(final JPPFJob job)
 	{
 		super(job);
 		this.jobUuid = job.getJobUuid();
@@ -75,7 +75,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * Set the pending tasks count for this result collector.
 	 * @param count the task count ot set.
 	 */
-	synchronized void setTaskCount(int count)
+	synchronized void setTaskCount(final int count)
 	{
 		pendingCount = count;
 	}
@@ -85,7 +85,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @param position the position of the task in the job it is a part of.
 	 * @return the task whose results were received, or null if the results were not received.
 	 */
-	synchronized JPPFTask getTask(int position)
+	synchronized JPPFTask getTask(final int position)
 	{
 		return resultMap.get(position);
 	}
@@ -95,7 +95,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @param position the position of the task in the job it is a part of.
 	 * @return the task whose results were received.
 	 */
-	synchronized JPPFTask waitForTask(int position)
+	synchronized JPPFTask waitForTask(final int position)
 	{
 		return waitForTask(position, Long.MAX_VALUE);
 	}
@@ -106,7 +106,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @param millis maximum number of miliseconds to wait.
 	 * @return the task whose results were received, or null if the tiemout expired before it was received.
 	 */
-	synchronized JPPFTask waitForTask(int position, long millis)
+	synchronized JPPFTask waitForTask(final int position, final long millis)
 	{
 		long start = System.currentTimeMillis();
 		long elapsed = 0;
@@ -133,7 +133,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @param position the position of the task in the job it is a part of.
 	 * @return true if the results of the task have been received, false otherwise.
 	 */
-	boolean isTaskReceived(int position)
+	boolean isTaskReceived(final int position)
 	{
 		return resultMap.get(position) != null;
 	}
@@ -144,7 +144,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * @see org.jppf.client.JPPFResultCollector#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
 	@Override
-    public synchronized void resultsReceived(TaskResultEvent event)
+	public synchronized void resultsReceived(final TaskResultEvent event)
 	{
 		super.resultsReceived(event);
 		if (pendingCount <= 0) fireEvent();
@@ -154,7 +154,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * Register a listener with this results collector.
 	 * @param listener the listener to register.
 	 */
-	synchronized void addListener(FutureResultCollectorListener listener)
+	synchronized void addListener(final FutureResultCollectorListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -163,7 +163,7 @@ class FutureResultCollector extends JPPFResultCollector
 	 * Remove a listener form the list of listners registered this results collector.
 	 * @param listener the listener to remove.
 	 */
-	synchronized void removeListener(FutureResultCollectorListener listener)
+	synchronized void removeListener(final FutureResultCollectorListener listener)
 	{
 		listeners.remove(listener);
 	}

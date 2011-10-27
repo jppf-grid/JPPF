@@ -44,20 +44,22 @@ public class TaskNotifications extends NotificationBroadcasterSupport implements
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendTaskNotification(String message)
+	@Override
+	public void sendTaskNotification(final String message)
 	{
 		Notification notif = new Notification("task.notification", this,
-			sequence.incrementAndGet(), System.currentTimeMillis(), message);
+				sequence.incrementAndGet(), System.currentTimeMillis(), message);
 		sendNotification(notif);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendTaskNotification(String message, Object userData)
+	@Override
+	public void sendTaskNotification(final String message, final Object userData)
 	{
 		Notification notif = new Notification("task.notification", this,
-			sequence.incrementAndGet(), System.currentTimeMillis(), message);
+				sequence.incrementAndGet(), System.currentTimeMillis(), message);
 		// add the user data
 		notif.setUserData(userData);
 		sendNotification(notif);

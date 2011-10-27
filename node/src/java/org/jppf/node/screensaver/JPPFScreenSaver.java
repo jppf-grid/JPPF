@@ -92,7 +92,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	public JPPFScreenSaver()
 	{
 	}
-	
+
 	/**
 	 * Initialize the UI components.
 	 */
@@ -107,7 +107,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 				frame.addWindowListener(new WindowAdapter()
 				{
 					@Override
-                    public void windowClosing(WindowEvent e)
+					public void windowClosing(final WindowEvent e)
 					{
 						destroy();
 						System.exit(0);
@@ -126,10 +126,10 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		for (int i=0; i<nbLogos; i++) data[i] = new ImageData();
 		//parent = (Container) getContext().getComponent();
 		parent.setBackground(Color.BLACK);
-    Dimension fullSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension fullSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 		//boolean activate = getContext().isFullScreen();
-    boolean activate = true;
+		boolean activate = true;
 		if (node == null) node = new NodePanel(activate);
 		node.setDoubleBuffered(true);
 		parent.add(node);
@@ -143,12 +143,12 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			if (n <= 0) n = imgw;
 			data[i].x = rand.nextInt(n);
 			data[i].prevx = data[i].x;
-			data[i].stepX *= 2 * rand.nextInt(2) - 1; 
+			data[i].stepX *= 2 * rand.nextInt(2) - 1;
 			n = dim.height - imgh;
 			if (n <= 0) n = imgh;
 			data[i].y = rand.nextInt(n);
 			data[i].prevy = data[i].y;
-			data[i].stepY *= 2 * rand.nextInt(2) - 1; 
+			data[i].stepY *= 2 * rand.nextInt(2) - 1;
 		}
 		setDoubledBuffering(node);
 		if (timer == null)
@@ -160,9 +160,9 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			TimerTask task = new TimerTask()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
-					
+
 					String s = NodePanel.toStringDuration(System.currentTimeMillis() - node.nodeState.startedAt);
 					node.nodeState.timeLabel.setText("Active for: "+s);
 				}
@@ -184,7 +184,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		props.setProperty("jppf.server.host", settings.getProperty("host"));
 		props.setProperty("jppf.server.port", settings.getProperty("classServerPort"));
 		props.setProperty("processing.threads", settings.getProperty("nbThreads"));
-		*/
+		 */
 		props.setProperty("jppf.management.port", "12010");
 
 		//collisions = settings.getProperty("collisions") != null;
@@ -203,12 +203,12 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		imgw = logo.getIconWidth();
 		imgh = logo.getIconHeight();
 	}
-	
+
 	/**
 	 * Set a hierarchy of Swing components as double buffered.
 	 * @param comp the root of the components hierarchy.
 	 */
-	private static void setDoubledBuffering(JComponent comp)
+	private static void setDoubledBuffering(final JComponent comp)
 	{
 		comp.setDoubleBuffered(true);
 		for (int i=0; i<comp.getComponentCount(); i++)
@@ -217,14 +217,14 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			if (c instanceof JComponent) setDoubledBuffering((JComponent) c);
 		}
 	}
-	
+
 	/**
 	 * Get a screensaver setting as an int value.
 	 * @param name the name of the setting.
 	 * @param defValue the default value to use if the setting is not defined.
 	 * @return the setting as an int value.
 	 */
-	private static int getIntSetting(String name, int defValue)
+	private static int getIntSetting(final String name, final int defValue)
 	{
 		int result = defValue;
 		try
@@ -233,19 +233,19 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			ScreensaverSettings settings = getContext().getSettings();
 			String s = settings.getProperty(name);
 			result = Integer.parseInt(s);
-			*/
+			 */
 		}
 		catch(NumberFormatException e)
 		{
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Called at regular intervals to render the next frame in the screen saver. 
+	 * Called at regular intervals to render the next frame in the screen saver.
 	 * @param g the graphics on which to paint the frame.
 	 */
-	public void paint(Graphics g)
+	public void paint(final Graphics g)
 	{
 	}
 
@@ -262,7 +262,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			node = null;
 		}
 	}
-	
+
 	/**
 	 * Data structure holding the position and direction of a flying logo.
 	 */
@@ -312,7 +312,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 			task = new Runnable()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
 					updateLogos();
 				}
@@ -324,7 +324,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * @see java.util.TimerTask#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			SwingUtilities.invokeLater(task);
 		}
@@ -340,7 +340,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * @see java.util.TimerTask#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			Dimension dim = parent.getSize();
 			for (int i=0; i<data.length; i++)
@@ -376,7 +376,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * @param d2 the position and speed vector data for the second logo.
 		 * @return true if the two logos are colliding, false otherwise.
 		 */
-		public boolean checkColliding(ImageData d1, ImageData d2)
+		public boolean checkColliding(final ImageData d1, final ImageData d2)
 		{
 			int x1 = d1.x + d1.stepX;
 			int x2 = d2.x + d2.stepX;
@@ -450,7 +450,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * @param y2 y coordinate of the top left corner of the second logo.
 		 * @return true if the corner of the first is logo isinside the second, false otherwise.
 		 */
-		public boolean isIn(int x1, int y1, int x2, int y2)
+		public boolean isIn(final int x1, final int y1, final int x2, final int y2)
 		{
 			return (x1 >= x2) && (x1 <= x2 + imgw) && (y1 >= y2) && (y1 <= y2 + imgh);
 		}
@@ -463,11 +463,11 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	public void updateLogos()
 	{
 		Graphics g = parent.getGraphics();
-    if (buffer == null)
-    {
+		if (buffer == null)
+		{
 			buffer = parent.createImage(parent.getWidth(),parent.getHeight());
 			bufferGraphics = buffer.getGraphics();
-    }
+		}
 		Shape clip = bufferGraphics.getClip();
 		for (ImageData d: data)
 		{

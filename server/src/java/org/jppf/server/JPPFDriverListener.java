@@ -58,7 +58,7 @@ public interface JPPFDriverListener extends EventListener
 	 * @param time the time the task remained in the queue.
 	 */
 	void taskOutOfQueue(int count, long time);
-	
+
 	/**
 	 * Called when a task execution has completed.
 	 * @param count the number of tasks that have been executed.

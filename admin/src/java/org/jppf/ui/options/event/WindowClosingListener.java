@@ -38,7 +38,7 @@ public class WindowClosingListener extends WindowAdapter
 	 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
 	 */
 	@Override
-    public void windowClosing(WindowEvent event)
+	public void windowClosing(final WindowEvent event)
 	{
 		Preferences pref = OptionsHandler.getPreferences();
 		List<OptionElement> list = OptionsHandler.getPageList();
@@ -56,7 +56,7 @@ public class WindowClosingListener extends WindowAdapter
 		catch(BackingStoreException e)
 		{
 		}
-		
+
 		System.exit(0);
 	}
 }

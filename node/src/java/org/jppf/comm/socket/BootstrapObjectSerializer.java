@@ -45,7 +45,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
 	@Override
-    public JPPFBuffer serialize(Object o) throws Exception
+	public JPPFBuffer serialize(final Object o) throws Exception
 	{
 		return serialize(o, false);
 	}
@@ -59,12 +59,12 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
 	 */
 	@Override
-    public JPPFBuffer serialize(Object o, boolean noCopy) throws Exception
+	public JPPFBuffer serialize(final Object o, final boolean noCopy) throws Exception
 	{
 		JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		serialize(o, baos);
 		byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();
-        return new JPPFBuffer(data, baos.size());
+		return new JPPFBuffer(data, baos.size());
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
 	 */
 	@Override
-    public void serialize(Object o, OutputStream os) throws Exception
+	public void serialize(final Object o, final OutputStream os) throws Exception
 	{
 		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
 		oos.writeObject(o);
@@ -91,7 +91,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
 	 */
 	@Override
-    public Object deserialize(JPPFBuffer buf) throws Exception
+	public Object deserialize(final JPPFBuffer buf) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(buf.getBuffer()));
 	}
@@ -104,7 +104,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[])
 	 */
 	@Override
-    public Object deserialize(byte[] bytes) throws Exception
+	public Object deserialize(final byte[] bytes) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(bytes));
 	}
@@ -119,7 +119,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(byte[], int, int)
 	 */
 	@Override
-    public Object deserialize(byte[] bytes, int offset, int length) throws Exception
+	public Object deserialize(final byte[] bytes, final int offset, final int length) throws Exception
 	{
 		return deserialize(new ByteArrayInputStream(bytes, offset, length));
 	}
@@ -132,7 +132,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
 	 */
 	@Override
-    public Object deserialize(InputStream is) throws Exception
+	public Object deserialize(final InputStream is) throws Exception
 	{
 		Object o = null;
 		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);

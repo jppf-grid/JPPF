@@ -82,7 +82,7 @@ public final class VersionUtils
 	 * Set the current JPPF build number.
 	 * @param buildNumber the build number to set.
 	 */
-	public static void setBuildNumber(int buildNumber)
+	public static void setBuildNumber(final int buildNumber)
 	{
 		VersionUtils.buildNumber = buildNumber;
 	}

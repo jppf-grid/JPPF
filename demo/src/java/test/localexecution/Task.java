@@ -19,7 +19,7 @@ package test.localexecution;
 
 import java.net.URL;
 
-import org.jppf.classloader.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.CollectionUtils;
 
@@ -50,7 +50,7 @@ public class Task extends JPPFTask
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -77,7 +77,7 @@ public class Task extends JPPFTask
 	 * @param cl the class loader to use to laod the jars.
 	 * @throws Exception if any error occurs.
 	 */
-	private static synchronized void loadJars(AbstractJPPFClassLoader cl) throws Exception
+	private static synchronized void loadJars(final AbstractJPPFClassLoader cl) throws Exception
 	{
 		if (initialized) return;
 		initialized = true;
@@ -86,7 +86,7 @@ public class Task extends JPPFTask
 		URL url = cl.getResource(JAR_PATH);
 		System.out.println("got URL: " + url);
 		if (url != null) cl.addURL(url);
-		*/
+		 */
 		URL[] urls = cl.getMultipleResources(JAR_PATHS);
 		System.out.println("got URLs: " + CollectionUtils.list(urls));
 		for (URL url: urls) if (url != null) cl.addURL(url);

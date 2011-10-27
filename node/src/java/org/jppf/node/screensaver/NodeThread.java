@@ -36,9 +36,9 @@ class NodeThread extends Thread
 
 	/**
 	 * Initialize this node thread with a specified listener.
-	 * @param nodeState receives notifications of events occurring within the node. 
+	 * @param nodeState receives notifications of events occurring within the node.
 	 */
-	public NodeThread(NodeState nodeState)
+	public NodeThread(final NodeState nodeState)
 	{
 		super("NodeThread thread");
 		this.nodeState = nodeState;

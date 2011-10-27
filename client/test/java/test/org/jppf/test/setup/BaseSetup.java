@@ -18,7 +18,6 @@
 
 package test.org.jppf.test.setup;
 
-
 /**
  * Unit tests for {@link JPPFExecutorService}.
  * This class starts and stops a driver and a node before and after

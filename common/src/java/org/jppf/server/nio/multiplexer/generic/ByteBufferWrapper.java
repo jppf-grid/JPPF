@@ -40,7 +40,7 @@ public class ByteBufferWrapper
 	 * @param buffer the actual buffer.
 	 * @param order the creation order of this buffer wrapper instance.
 	 */
-	public ByteBufferWrapper(ByteBuffer buffer, int order)
+	public ByteBufferWrapper(final ByteBuffer buffer, final int order)
 	{
 		this.buffer = buffer;
 		this.order = order;

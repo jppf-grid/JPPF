@@ -22,7 +22,7 @@ import java.util.EventObject;
 
 /**
  * Instances of this class encapsulate an event occurring when a process writes to
- * its output or error stream. 
+ * its output or error stream.
  * @author Laurent Cohen
  */
 public class ProcessWrapperEvent extends EventObject
@@ -31,7 +31,7 @@ public class ProcessWrapperEvent extends EventObject
 	 * Initialize this event with the specified source.
 	 * @param content the source of this event, in effect the content of the corresponding process stream.
 	 */
-	public ProcessWrapperEvent(String content)
+	public ProcessWrapperEvent(final String content)
 	{
 		super(content);
 	}

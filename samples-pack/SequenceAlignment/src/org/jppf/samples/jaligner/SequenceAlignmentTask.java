@@ -48,7 +48,7 @@ public class SequenceAlignmentTask extends JPPFTask
 	 * @param sequence the sequence as a string.
 	 * @param number uniquely identifies this task.
 	 */
-	public SequenceAlignmentTask(String sequence, int number)
+	public SequenceAlignmentTask(final String sequence, final int number)
 	{
 		this.sequence = sequence;
 		setId("" + number);
@@ -58,6 +58,7 @@ public class SequenceAlignmentTask extends JPPFTask
 	 * Perform the sequence alignment.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try

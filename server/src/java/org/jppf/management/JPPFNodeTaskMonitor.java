@@ -80,7 +80,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * Default constructor.
 	 * @param objectName a string representing the MBean object name.
 	 */
-	public JPPFNodeTaskMonitor(String objectName)
+	public JPPFNodeTaskMonitor(final String objectName)
 	{
 		try
 		{
@@ -98,7 +98,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 * @see org.jppf.server.node.TaskExecutionListener#taskExecuted(org.jppf.server.node.TaskExecutionEvent)
 	 */
 	@Override
-	public synchronized void taskExecuted(TaskExecutionEvent event)
+	public synchronized void taskExecuted(final TaskExecutionEvent event)
 	{
 		if (listenerCount <= 0) return;
 		TaskInformation info = event.getTaskInformation();
@@ -109,7 +109,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 		totalCpuTime.addAndGet(info.getCpuTime());
 		totalElapsedTime.addAndGet(info.getElapsedTime());
 		sendNotification(new TaskExecutionNotification(OBJECT_NAME, sequence.getAndIncrement(), info));
-		*/
+		 */
 		taskCount++;
 		if (info.hasError()) taskInErrorCount++;
 		else taskSucessfullCount++;
@@ -181,7 +181,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback)
+	@Override
+	public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback)
 	{
 		super.addNotificationListener(listener, filter, handback);
 		synchronized(this)
@@ -193,7 +194,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException
+	@Override
+	public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException
 	{
 		super.removeNotificationListener(listener);
 		synchronized(this)
@@ -205,7 +207,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws ListenerNotFoundException
+	@Override
+	public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException
 	{
 		super.removeNotificationListener(listener, filter, handback);
 		synchronized(this)

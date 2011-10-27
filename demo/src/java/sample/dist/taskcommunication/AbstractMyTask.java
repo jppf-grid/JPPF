@@ -35,16 +35,16 @@ public abstract class AbstractMyTask extends JPPFTask
 	 * Initialize this task.
 	 * @param id - the task id.
 	 */
-	public AbstractMyTask(String id)
+	public AbstractMyTask(final String id)
 	{
 		setId(id);
 	}
 
 	/**
 	 * Wait for the specified time.
-	 * @param time - the time to wait in milliseconds.  
+	 * @param time - the time to wait in milliseconds.
 	 */
-	protected void doWait(long time)
+	protected void doWait(final long time)
 	{
 		try
 		{

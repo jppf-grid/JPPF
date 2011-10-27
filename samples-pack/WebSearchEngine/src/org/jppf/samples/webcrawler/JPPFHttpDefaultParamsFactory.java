@@ -38,6 +38,7 @@ public class JPPFHttpDefaultParamsFactory extends DefaultHttpParamsFactory
 	 * @return an <code>HttpParams</code> instance.
 	 * @see org.apache.commons.httpclient.params.DefaultHttpParamsFactory#getDefaultParams()
 	 */
+	@Override
 	public synchronized HttpParams getDefaultParams()
 	{
 		HttpParams params = super.getDefaultParams();
@@ -59,14 +60,14 @@ public class JPPFHttpDefaultParamsFactory extends DefaultHttpParamsFactory
 	 * Set the HTTP socket connection timeout in milliseconds.
 	 * @param socketTimeout the timeout as an int.
 	 */
-	public static void setSocketTimeout(int socketTimeout)
+	public static void setSocketTimeout(final int socketTimeout)
 	{
 		JPPFHttpDefaultParamsFactory.socketTimeout = socketTimeout;
 	}
 
 	/**
 	 * Get the maximum number of retries when an HTTP connection fails.
-	 * @return the number of retries as an int. 
+	 * @return the number of retries as an int.
 	 */
 	public static int getMaxConnectionRetries()
 	{
@@ -77,7 +78,7 @@ public class JPPFHttpDefaultParamsFactory extends DefaultHttpParamsFactory
 	 * Set the maximum number of retries when an HTTP connection fails.
 	 * @param maxConnectionRetries the number of retries as an int.
 	 */
-	public static void setMaxConnectionRetries(int maxConnectionRetries)
+	public static void setMaxConnectionRetries(final int maxConnectionRetries)
 	{
 		JPPFHttpDefaultParamsFactory.maxConnectionRetries = maxConnectionRetries;
 	}

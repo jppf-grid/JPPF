@@ -46,7 +46,7 @@ public class FTPRunner
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -105,7 +105,7 @@ public class FTPRunner
 	 * Print a message to the console and/or log file.
 	 * @param message the message to print.
 	 */
-	private static void output(String message)
+	private static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

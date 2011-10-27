@@ -48,7 +48,7 @@ public abstract class ThreadSynchronization
 	 * Cause the current thread to wait until notified or the specified time has passed, whichever comes first.
 	 * @param time the maximum time to wait in milliseconds.
 	 */
-	public synchronized void goToSleep(long time)
+	public synchronized void goToSleep(final long time)
 	{
 		try
 		{
@@ -64,7 +64,7 @@ public abstract class ThreadSynchronization
 	 * @param millis the maximum time to wait in milliseconds.
 	 * @param nanos the additional time to wait in nanoseconds.
 	 */
-	public synchronized void goToSleep(long millis, int nanos)
+	public synchronized void goToSleep(final long millis, final int nanos)
 	{
 		try
 		{
@@ -96,7 +96,7 @@ public abstract class ThreadSynchronization
 	 * Specifiy whether the thread's <code>run()</code> should terminate.
 	 * @param stopped true if the thread is to be stopped, false otherwise.
 	 */
-	public synchronized void setStopped(boolean stopped)
+	public synchronized void setStopped(final boolean stopped)
 	{
 		this.stopped = stopped;
 	}

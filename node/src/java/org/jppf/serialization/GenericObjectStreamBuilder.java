@@ -23,7 +23,7 @@ import java.io.*;
 
 /**
  * This the factory for the JPPF implementation of object streams which allow
- * the serialization and deserialization of objects whose class does not implemnent <code>java.io.Serializable</code>. 
+ * the serialization and deserialization of objects whose class does not implemnent <code>java.io.Serializable</code>.
  * @author Laurent Cohen
  */
 public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
@@ -32,7 +32,7 @@ public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
 	 * {@inheritDoc}
 	 */
 	@Override
-    public ObjectInputStream newObjectInputStream(InputStream in) throws Exception
+	public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
 	{
 		return new JPPFObjectInputStream(in);
 	}
@@ -41,7 +41,7 @@ public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
 	 * {@inheritDoc}
 	 */
 	@Override
-    public ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
+	public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
 	{
 		return new JPPFObjectOutputStream(out);
 	}

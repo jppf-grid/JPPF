@@ -24,7 +24,7 @@ import org.jppf.utils.TraversalList;
 
 /**
  * Instances of this class encapsulate the necessary information used by the network classloader,
- * for sending class definition requests as well as receiving the class definitions. 
+ * for sending class definition requests as well as receiving the class definitions.
  * @author Laurent Cohen
  */
 public class JPPFResourceWrapper implements Serializable
@@ -90,7 +90,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	private String managementId = null;
 	/**
-	 * Uuid of the orignal task bundle that triggered this resource request. 
+	 * Uuid of the orignal task bundle that triggered this resource request.
 	 */
 	private String requestUuid = null;
 	/**
@@ -99,10 +99,10 @@ public class JPPFResourceWrapper implements Serializable
 	private Map<String, Object> data = new HashMap<String, Object>();
 
 	/**
-	 * Add a uuid to the uuid path of this resource wrapper. 
+	 * Add a uuid to the uuid path of this resource wrapper.
 	 * @param uuid - the identifier as a string.
 	 */
-	public void addUuid(String uuid)
+	public void addUuid(final String uuid)
 	{
 		uuidPath.add(uuid);
 	}
@@ -120,7 +120,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set the name of the class whose definition is requested.
 	 * @param name - the class name as a string.
 	 */
-	public void setName(String name)
+	public void setName(final String name)
 	{
 		setData("name", name);
 	}
@@ -138,7 +138,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set the actual definition of the requested class.
 	 * @param definition - the class definition as an array of bytes.
 	 */
-	public void setDefinition(byte[] definition)
+	public void setDefinition(final byte[] definition)
 	{
 		setData("definition", definition);
 	}
@@ -156,7 +156,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set whether the class should be loaded through the network classloader.
 	 * @param dynamic - true if the class should be loaded via the network classloader, false otherwise.
 	 */
-	public void setDynamic(boolean dynamic)
+	public void setDynamic(final boolean dynamic)
 	{
 		this.dynamic = dynamic;
 	}
@@ -174,7 +174,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set the state associated with this resource wrapper.
 	 * @param state - a <code>State</code> typesafe enumerated value.
 	 */
-	public void setState(State state)
+	public void setState(final State state)
 	{
 		this.state = state;
 	}
@@ -194,7 +194,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * and the current position in it.
 	 * @param uuidPath - a traversal list of string elements.
 	 */
-	public void setUuidPath(TraversalList<String> uuidPath)
+	public void setUuidPath(final TraversalList<String> uuidPath)
 	{
 		this.uuidPath = uuidPath;
 	}
@@ -212,7 +212,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set the uuid sent by a node when it first contacts a resource provider.
 	 * @param providerUuid - the uuid as a string.
 	 */
-	public void setProviderUuid(String providerUuid)
+	public void setProviderUuid(final String providerUuid)
 	{
 		this.providerUuid = providerUuid;
 	}
@@ -228,9 +228,9 @@ public class JPPFResourceWrapper implements Serializable
 
 	/**
 	 * Set whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
-	 * @param asResource - true if the resource is loaded using getResource(), false otherwise. 
+	 * @param asResource - true if the resource is loaded using getResource(), false otherwise.
 	 */
-	public void setAsResource(boolean asResource)
+	public void setAsResource(final boolean asResource)
 	{
 		this.asResource = asResource;
 	}
@@ -248,13 +248,13 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set the identifier for the driver's management (JMX) server.
 	 * @param managementId - the identifier as a string.
 	 */
-	public void setManagementId(String managementId)
+	public void setManagementId(final String managementId)
 	{
 		this.managementId = managementId;
 	}
 
 	/**
-	 * Get the uuid for the orignal task bundle that triggered this resource request. 
+	 * Get the uuid for the orignal task bundle that triggered this resource request.
 	 * @return the uuid as a string.
 	 */
 	public String getRequestUuid()
@@ -263,10 +263,10 @@ public class JPPFResourceWrapper implements Serializable
 	}
 
 	/**
-	 * Set the uuid for the orignal task bundle that triggered this resource request. 
+	 * Set the uuid for the orignal task bundle that triggered this resource request.
 	 * @param requestUuid the uuid as a string.
 	 */
-	public void setRequestUuid(String requestUuid)
+	public void setRequestUuid(final String requestUuid)
 	{
 		this.requestUuid = requestUuid;
 	}
@@ -284,7 +284,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * Set the serialized callback to execute code on the client side.
 	 * @param callable - a <code>byte[]</code> instance.
 	 */
-	public void setCallable(byte[] callable)
+	public void setCallable(final byte[] callable)
 	{
 		setData("callable", callable);
 	}
@@ -294,7 +294,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * @param key - the string identifying the metadata.
 	 * @return an object value or null if the metadata could not be found.
 	 */
-	public Object getData(String key)
+	public Object getData(final String key)
 	{
 		return data.get(key);
 	}
@@ -304,7 +304,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * @param key - the string identifying the metadata.
 	 * @param value - the value of the metadata.
 	 */
-	public void setData(String key, Object value)
+	public void setData(final String key, final Object value)
 	{
 		data.put(key, value);
 	}
@@ -313,7 +313,7 @@ public class JPPFResourceWrapper implements Serializable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("JPPFResourceWrapper[");

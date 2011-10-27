@@ -30,6 +30,7 @@ public class TestNodeStartup implements JPPFNodeStartupSPI
 	 * This is a test of a node startup class.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		System.out.println("I'm a node startup class");

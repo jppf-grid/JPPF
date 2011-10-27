@@ -36,7 +36,7 @@ public class URLLocation extends AbstractLocation<URL>
 	 * Initialize this location with the specified file path.
 	 * @param url a URL.
 	 */
-	public URLLocation(URL url)
+	public URLLocation(final URL url)
 	{
 		super(url);
 	}
@@ -46,7 +46,7 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @param url a URL in string format.
 	 * @throws MalformedURLException if the url is malformed.
 	 */
-	public URLLocation(String url) throws MalformedURLException
+	public URLLocation(final String url) throws MalformedURLException
 	{
 		super(new URL(url));
 	}
@@ -58,7 +58,7 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @see org.jppf.server.protocol.Location#getInputStream()
 	 */
 	@Override
-    public InputStream getInputStream() throws Exception
+	public InputStream getInputStream() throws Exception
 	{
 		return path.openStream();
 	}
@@ -70,7 +70,7 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @see org.jppf.server.protocol.Location#getOutputStream()
 	 */
 	@Override
-    public OutputStream getOutputStream() throws Exception
+	public OutputStream getOutputStream() throws Exception
 	{
 		URLConnection conn = path.openConnection();
 		conn.setDoOutput(true);
@@ -83,7 +83,7 @@ public class URLLocation extends AbstractLocation<URL>
 	 * @see org.jppf.server.protocol.Location#size()
 	 */
 	@Override
-    public long size()
+	public long size()
 	{
 		return -1;
 	}

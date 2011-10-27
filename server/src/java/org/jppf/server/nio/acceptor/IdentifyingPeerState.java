@@ -27,7 +27,7 @@ import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
- * This class performs performs the work of reading a task bundle execution response from a node. 
+ * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
 class IdentifyingPeerState extends AcceptorServerState
@@ -49,7 +49,7 @@ class IdentifyingPeerState extends AcceptorServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public IdentifyingPeerState(AcceptorNioServer server)
+	public IdentifyingPeerState(final AcceptorNioServer server)
 	{
 		super(server);
 	}
@@ -62,7 +62,7 @@ class IdentifyingPeerState extends AcceptorServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public AcceptorTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	public AcceptorTransition performTransition(final ChannelWrapper<?> channel) throws Exception
 	{
 		AcceptorContext context = (AcceptorContext) channel.getContext();
 		if (context.readMessage(channel))

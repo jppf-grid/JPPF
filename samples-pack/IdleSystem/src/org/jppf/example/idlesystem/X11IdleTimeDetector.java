@@ -21,8 +21,10 @@ package org.jppf.example.idlesystem;
 import org.jppf.node.idle.IdleTimeDetector;
 
 import com.sun.jna.*;
-import com.sun.jna.platform.unix.X11;
-import com.sun.jna.platform.unix.X11.*;
+import com.sun.jna.platform.unix.*;
+import com.sun.jna.platform.unix.X11.Display;
+import com.sun.jna.platform.unix.X11.Drawable;
+import com.sun.jna.platform.unix.X11.Window;
 
 /**
  * Instances of this class provide the computer idle time on a Linux system with X11.
@@ -55,9 +57,9 @@ public class X11IdleTimeDetector implements IdleTimeDetector
 		 * milliseconds
 		 */
 		public NativeLong idle;
-		 /**
-		  * events
-		  */
+		/**
+		 * events
+		 */
 		public NativeLong event_mask;
 	}
 
@@ -90,6 +92,7 @@ public class X11IdleTimeDetector implements IdleTimeDetector
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public long getIdleTimeMillis()
 	{
 		X11.Window window = null;

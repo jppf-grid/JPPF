@@ -32,6 +32,7 @@ public class AvailableProcessorsMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the name as a string.
 	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
 	 */
+	@Override
 	public String getMBeanInterfaceName()
 	{
 		return "org.jppf.example.mbean.AvailableProcessorsMBean";
@@ -42,6 +43,7 @@ public class AvailableProcessorsMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the created MBean implementation.
 	 * @see org.jppf.management.spi.JPPFDriverMBeanProvider#createMBean()
 	 */
+	@Override
 	public Object createMBean()
 	{
 		return new AvailableProcessors();
@@ -52,6 +54,7 @@ public class AvailableProcessorsMBeanProvider implements JPPFDriverMBeanProvider
 	 * @return the MBean's object name as a string.
 	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
 	 */
+	@Override
 	public String getMBeanName()
 	{
 		return "org.jppf.example.mbean:name=AvailableProcessors,type=driver";

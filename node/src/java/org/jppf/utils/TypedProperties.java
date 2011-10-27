@@ -52,7 +52,7 @@ public class TypedProperties extends Properties
 	 * This will copy into the present object all map entries such that both key and value are strings.
 	 * @param map the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
 	 */
-	public TypedProperties(Map<Object, Object> map)
+	public TypedProperties(final Map<Object, Object> map)
 	{
 		if (map != null)
 		{
@@ -72,40 +72,40 @@ public class TypedProperties extends Properties
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a string, or null if it is not found.
 	 */
-	public String getString(String key)
+	public String getString(final String key)
 	{
 		return getString(key, null);
 	}
-	
+
 	/**
 	 * Get the string value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a string, or the default value if it is not found.
 	 */
-	public String getString(String key, String defValue)
+	public String getString(final String key, final String defValue)
 	{
 		String val = getProperty(key);
 		return (val == null) ? defValue : val;
 	}
-	
+
 	/**
 	 * Get the integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as an int, or zero if it is not found.
 	 */
-	public int getInt(String key)
+	public int getInt(final String key)
 	{
 		return getInt(key, 0);
 	}
-	
+
 	/**
 	 * Get the integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as an int, or the default value if it is not found.
 	 */
-	public int getInt(String key, int defValue)
+	public int getInt(final String key, final int defValue)
 	{
 		int intVal = defValue;
 		String val = getProperty(key, null);
@@ -121,7 +121,7 @@ public class TypedProperties extends Properties
 		}
 		return intVal;
 	}
-	
+
 	/**
 	 * Get the integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
@@ -144,18 +144,18 @@ public class TypedProperties extends Properties
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a long, or zero if it is not found.
 	 */
-	public long getLong(String key)
+	public long getLong(final String key)
 	{
 		return getLong(key, 0L);
 	}
-	
+
 	/**
 	 * Get the long integer value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a long, or the default value if it is not found.
 	 */
-	public long getLong(String key, long defValue)
+	public long getLong(final String key, final long defValue)
 	{
 		long longVal = defValue;
 		String val = getProperty(key, null);
@@ -194,7 +194,7 @@ public class TypedProperties extends Properties
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a float, or zero if it is not found.
 	 */
-	public float getFloat(String key)
+	public float getFloat(final String key)
 	{
 		return getFloat(key, 0.0f);
 	}
@@ -205,7 +205,7 @@ public class TypedProperties extends Properties
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a float, or the default value if it is not found.
 	 */
-	public float getFloat(String key, float defValue)
+	public float getFloat(final String key, final float defValue)
 	{
 		float floatVal = defValue;
 		String val = getProperty(key, null);
@@ -245,18 +245,18 @@ public class TypedProperties extends Properties
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a double, or zero if it is not found.
 	 */
-	public double getDouble(String key)
+	public double getDouble(final String key)
 	{
 		return getDouble(key, 0.0d);
 	}
-	
+
 	/**
 	 * Get the double precision value of a property with a specified name.
 	 * @param key the name of the property to look for.
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a double, or the default value if it is not found.
 	 */
-	public double getDouble(String key, double defValue)
+	public double getDouble(final String key, final double defValue)
 	{
 		double doubleVal = defValue;
 		String val = getProperty(key, null);
@@ -272,7 +272,7 @@ public class TypedProperties extends Properties
 		}
 		return doubleVal;
 	}
-	
+
 	/**
 	 * Get the double precision value of a property with a specified name.
 	 * @param key the name of the property to look for.
@@ -289,14 +289,14 @@ public class TypedProperties extends Properties
 		if (val < min) val = min;
 		return val;
 	}
-	
+
 	/**
 	 * Get the boolean value of a property with a specified name.
 	 * If the key is not found a default value of false is returned.
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a boolean, or <code>false</code> if it is not found.
 	 */
-	public boolean getBoolean(String key)
+	public boolean getBoolean(final String key)
 	{
 		return getBoolean(key, false);
 	}
@@ -307,25 +307,25 @@ public class TypedProperties extends Properties
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a boolean, or the default value if it is not found.
 	 */
-	public boolean getBoolean(String key, boolean defValue)
+	public boolean getBoolean(final String key, final boolean defValue)
 	{
 		boolean booleanVal = defValue;
 		String val = getProperty(key, null);
 		if (val != null) booleanVal = Boolean.valueOf(val.trim()).booleanValue();
 		return booleanVal;
 	}
-	
+
 	/**
 	 * Get the char value of a property with a specified name.
 	 * If the key is not found a default value of ' ' is returned.
 	 * @param key the name of the property to look for.
 	 * @return the value of the property as a char, or the default value ' ' (space character) if it is not found.
 	 */
-	public char getChar(String key)
+	public char getChar(final String key)
 	{
 		return getChar(key, ' ');
 	}
-	
+
 	/**
 	 * Get the char value of a property with a specified name.
 	 * If the value has more than one character, the first one will be used.
@@ -333,21 +333,21 @@ public class TypedProperties extends Properties
 	 * @param defValue a default value to return if the property is not found.
 	 * @return the value of the property as a char, or the default value if it is not found.
 	 */
-	public char getChar(String key, char defValue)
+	public char getChar(final String key, final char defValue)
 	{
 		char charVal = defValue;
 		String val = getProperty(key, null);
 		if ((val != null) && (val.length() > 0)) charVal = val.charAt(0);
 		return charVal;
 	}
-	
+
 	/**
 	 * Get the value of a property with the specified name as a set of a properties.
 	 * @param key the name of the property to look for.
-	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
+	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory.
 	 * @return the value of the property as another set of properties, or null if it is not found.
 	 */
-	public TypedProperties getProperties(String key)
+	public TypedProperties getProperties(final String key)
 	{
 		return getProperties(key, null);
 	}
@@ -355,11 +355,11 @@ public class TypedProperties extends Properties
 	/**
 	 * Get the value of a property with the specified name as a set of properties.
 	 * @param key the name of the property to look for.
-	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory. 
+	 * Its value is the path to another properties file. Relative paths are evaluated against the current application directory.
 	 * @param def a default value to return if the property is not found.
 	 * @return the value of the property as another set of properties, or the default value if it is not found.
 	 */
-	public TypedProperties getProperties(String key, TypedProperties def)
+	public TypedProperties getProperties(final String key, final TypedProperties def)
 	{
 		String path = getString(key);
 		File file = new File(path);
@@ -385,9 +385,9 @@ public class TypedProperties extends Properties
 	/**
 	 * Get the value of a property with the specified name as an {@link InetAddress}.
 	 * @param key the name of the property to retrieve.
-	 * @return the property as an {@link InetAddress} instance, or null if the property is not defined or the host doesn't exist. 
+	 * @return the property as an {@link InetAddress} instance, or null if the property is not defined or the host doesn't exist.
 	 */
-	public InetAddress getInetAddress(String key)
+	public InetAddress getInetAddress(final String key)
 	{
 		return getInetAddress(key, null);
 	}
@@ -396,9 +396,9 @@ public class TypedProperties extends Properties
 	 * Get the value of a property with the specified name as an {@link InetAddress}.
 	 * @param key the name of the property to retrieve.
 	 * @param def the default value to use if the property is not defined.
-	 * @return the property as an {@link InetAddress} instance, or the sdpecified default value if the property is not defined. 
+	 * @return the property as an {@link InetAddress} instance, or the sdpecified default value if the property is not defined.
 	 */
-	public InetAddress getInetAddress(String key, InetAddress def)
+	public InetAddress getInetAddress(final String key, final InetAddress def)
 	{
 		String val = getString(key);
 		if (val == null) return def;
@@ -435,7 +435,7 @@ public class TypedProperties extends Properties
 	 * @param source the string to load from.
 	 * @throws IOException if any error occurs.
 	 */
-	public void loadString(String source) throws IOException
+	public void loadString(final String source) throws IOException
 	{
 		if (source == null) return;
 		ByteArrayInputStream bais = new ByteArrayInputStream(source.getBytes());

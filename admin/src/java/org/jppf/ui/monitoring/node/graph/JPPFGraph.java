@@ -57,7 +57,7 @@ public class JPPFGraph extends mxGraph
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean isCellResizable(Object cell)
+	public boolean isCellResizable(final Object cell)
 	{
 		boolean b = (cell instanceof mxCell) && ((mxCell) cell).isEdge();
 		if (traceEnabled) log.trace("cell=" + cell + ", return=" + b);
@@ -68,7 +68,7 @@ public class JPPFGraph extends mxGraph
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean isDisconnectOnMove()
+	public boolean isDisconnectOnMove()
 	{
 		if (traceEnabled) log.trace("before return false");
 		return false;
@@ -78,7 +78,7 @@ public class JPPFGraph extends mxGraph
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean isAutoSizeCell(Object cell)
+	public boolean isAutoSizeCell(final Object cell)
 	{
 		return isAutoSizeCells();
 	}

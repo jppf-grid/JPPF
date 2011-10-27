@@ -47,7 +47,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * Creates a new instance with the specified parameters profile.
 	 * @param profile the parameters of the load-balancing algorithm.
 	 */
-	public NodeThreadsLoadBalancer(LoadBalancingProfile profile)
+	public NodeThreadsLoadBalancer(final LoadBalancingProfile profile)
 	{
 		super(profile);
 		if (log.isDebugEnabled()) log.debug("creating CustomLoadBalancer #" + this.bundlerNumber);
@@ -59,6 +59,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * @return a new <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
+	@Override
 	public Bundler copy()
 	{
 		return new NodeThreadsLoadBalancer(null);
@@ -69,6 +70,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * @return  the bundle size as an int value.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
+	@Override
 	public int getBundleSize()
 	{
 		return bundleSize;
@@ -79,6 +81,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * @return a {@link JPPFSystemInformation} instance.
 	 * @see org.jppf.server.scheduler.bundle.NodeAwareness#getNodeConfiguration()
 	 */
+	@Override
 	public JPPFSystemInformation getNodeConfiguration()
 	{
 		return nodeConfiguration;
@@ -89,7 +92,8 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
 	 * @see org.jppf.server.scheduler.bundle.NodeAwareness#setNodeConfiguration(org.jppf.management.JPPFSystemInformation)
 	 */
-	public void setNodeConfiguration(JPPFSystemInformation nodeConfiguration)
+	@Override
+	public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration)
 	{
 		this.nodeConfiguration = nodeConfiguration;
 		computeBundleSize();
@@ -101,6 +105,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * @return the bundle size as an int.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
+	@Override
 	protected int maxSize()
 	{
 		return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
@@ -116,7 +121,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 		if (nodeConfig == null) bundleSize = 1;
 		else
 		{
-			// get the number of processing threads in the node 
+			// get the number of processing threads in the node
 			int nbThreads = getNodeConfiguration().getJppf().getInt("processing.threads", -1);
 			// if number of threads is not defined, we assume it is the number of available processors
 			if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
@@ -130,6 +135,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
 	 */
+	@Override
 	public void dispose()
 	{
 		if (log.isDebugEnabled()) log.debug("disposing bundler #" + this.bundlerNumber);

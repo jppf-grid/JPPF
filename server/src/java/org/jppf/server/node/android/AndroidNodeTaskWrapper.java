@@ -46,7 +46,7 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
 	 * @param number the internal number identifying the task for the thread pool.
 	 */
-	public AndroidNodeTaskWrapper(AbstractJPPFAndroidNode node, JPPFTask task, List<String> uuidPath, long number)
+	public AndroidNodeTaskWrapper(final AbstractJPPFAndroidNode node, final JPPFTask task, final List<String> uuidPath, final long number)
 	{
 		super(task, uuidPath, number);
 		this.node = node;
@@ -58,7 +58,7 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		long cpuTime = 0L;
 		long elapsedTime = 0L;

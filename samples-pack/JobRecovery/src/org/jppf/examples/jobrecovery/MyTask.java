@@ -37,7 +37,7 @@ public class MyTask extends JPPFTask
 	 * @param duration the duration in milliseconds.
 	 * @param id an id assigned to this task.
 	 */
-	public MyTask(long duration, int id)
+	public MyTask(final long duration, final int id)
 	{
 		this.duration = duration;
 		setId("" + id);
@@ -46,6 +46,7 @@ public class MyTask extends JPPFTask
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void run()
 	{
 		try

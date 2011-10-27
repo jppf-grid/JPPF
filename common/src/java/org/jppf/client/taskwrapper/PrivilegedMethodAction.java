@@ -20,7 +20,7 @@ package org.jppf.client.taskwrapper;
 import java.lang.reflect.Method;
 
 /**
- * Class used to invoke a method through reflection when a security manager is present. 
+ * Class used to invoke a method through reflection when a security manager is present.
  */
 class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 {
@@ -39,7 +39,7 @@ class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 	 * @param invoker the object on which to invoke the method, or null for static methods.
 	 * @param args the parameters of the method to invoke.
 	 */
-	public PrivilegedMethodAction(Method method, Object invoker, Object[] args)
+	public PrivilegedMethodAction(final Method method, final Object invoker, final Object[] args)
 	{
 		this.method = method;
 		this.invoker = invoker;
@@ -52,7 +52,7 @@ class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 	 * @see java.security.PrivilegedAction#run()
 	 */
 	@Override
-    public Object run()
+	public Object run()
 	{
 		Object result = null;
 		try

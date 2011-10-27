@@ -48,7 +48,7 @@ public abstract class AbstractIPAddressPattern
 	 * @param config the configuration used for this pattern.
 	 * @throws IllegalArgumentException if the pattern is null or invalid.
 	 */
-	public AbstractIPAddressPattern(String source, PatternConfiguration config) throws IllegalArgumentException
+	public AbstractIPAddressPattern(final String source, final PatternConfiguration config) throws IllegalArgumentException
 	{
 		this.config = config;
 		convertSource(source);
@@ -59,7 +59,7 @@ public abstract class AbstractIPAddressPattern
 	 * @param source the source pattern as a string.
 	 * @throws IllegalArgumentException if the pattern is null or invalid.
 	 */
-	protected void convertSource(String source) throws IllegalArgumentException
+	protected void convertSource(final String source) throws IllegalArgumentException
 	{
 		if (source == null) throw new IllegalArgumentException("pattern cannot be null");
 		String src = preProcess(source);
@@ -87,7 +87,7 @@ public abstract class AbstractIPAddressPattern
 	 * @param source the pattern source to process.
 	 * @return a new processed string.
 	 */
-	protected String preProcess(String source)
+	protected String preProcess(final String source)
 	{
 		return source;
 	}
@@ -97,7 +97,7 @@ public abstract class AbstractIPAddressPattern
 	 * @param source the pattern source to process.
 	 * @return a new processed string.
 	 */
-	protected String postProcess(String source)
+	protected String postProcess(final String source)
 	{
 		return source;
 	}
@@ -108,7 +108,7 @@ public abstract class AbstractIPAddressPattern
 	 * @param ip the ip to match as a string.
 	 * @return true if the address matches this pattern, false otherwise.
 	 */
-	public boolean matches(InetAddress ip)
+	public boolean matches(final InetAddress ip)
 	{
 		return matches(toIntArray(ip));
 	}
@@ -119,7 +119,7 @@ public abstract class AbstractIPAddressPattern
 	 * @param values the ip address to match as a array of values representing its components.
 	 * @return true if the address matches this pattern, false otherwise.
 	 */
-	public boolean matches(int[] values)
+	public boolean matches(final int[] values)
 	{
 		try
 		{
@@ -139,7 +139,7 @@ public abstract class AbstractIPAddressPattern
 	 * @return a <code>Range</code> instance, or null if the pattern is invalid.
 	 * @throws IllegalArgumentException if the pattern is invalid.
 	 */
-	private Range<Integer> parseRangePattern(String src) throws IllegalArgumentException
+	private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException
 	{
 		if ((src == null) || "".equals(src)) return config.fullRange;
 		if (src.indexOf('-') < 0) return new Range<Integer>(parseValue(src));
@@ -176,7 +176,7 @@ public abstract class AbstractIPAddressPattern
 	 * @return the value as an int
 	 * @throws IllegalArgumentException if the string is not a valid number format or the value is out of allowed bounds.
 	 */
-	private int parseValue(String src) throws IllegalArgumentException
+	private int parseValue(final String src) throws IllegalArgumentException
 	{
 		try
 		{
@@ -195,7 +195,7 @@ public abstract class AbstractIPAddressPattern
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<ranges.size(); i++)

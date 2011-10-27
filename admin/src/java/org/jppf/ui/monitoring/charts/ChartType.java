@@ -47,7 +47,7 @@ public enum ChartType
 	 * Chart type definition for a plot XY chart.
 	 */
 	CHART_DIFFERENCE("Difference chart");
-	
+
 	/**
 	 * An english-like name for this enum type.
 	 */
@@ -57,7 +57,7 @@ public enum ChartType
 	 * Initialize this enum type with a nice display name.
 	 * @param name the namew as a string.
 	 */
-	ChartType(String name)
+	ChartType(final String name)
 	{
 		this.name = name;
 	}
@@ -68,7 +68,7 @@ public enum ChartType
 	 * @see java.lang.Enum#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return name;
 	}

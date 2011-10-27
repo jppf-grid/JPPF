@@ -186,7 +186,7 @@ public enum Fields
 	 * The base used for resource bundles lookups.
 	 */
 	private static final String BASE = "org.jppf.ui.i18n.StatFields";
-	
+
 	/**
 	 * Initialize an enum item with a localized name.
 	 */

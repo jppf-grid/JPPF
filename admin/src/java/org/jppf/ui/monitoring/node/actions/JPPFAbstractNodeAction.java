@@ -25,7 +25,7 @@ import org.jppf.ui.utils.GuiUtils;
 import org.slf4j.*;
 
 /**
- * Abstract superclass for popup menu actions used in the ui.  
+ * Abstract superclass for popup menu actions used in the ui.
  * @author Laurent Cohen
  */
 public abstract class JPPFAbstractNodeAction extends AbstractAction
@@ -47,7 +47,7 @@ public abstract class JPPFAbstractNodeAction extends AbstractAction
 	 * Initialize this action with the specified JMX connections.
 	 * @param dataArray - the information on the nodes this action applies to.
 	 */
-	protected JPPFAbstractNodeAction(TopologyData...dataArray)
+	protected JPPFAbstractNodeAction(final TopologyData...dataArray)
 	{
 		this.dataArray = dataArray;
 	}
@@ -56,7 +56,7 @@ public abstract class JPPFAbstractNodeAction extends AbstractAction
 	 * Set the icon for this action using the specified image file name.
 	 * @param name the name of the icon image file.
 	 */
-	protected void setupIcon(String name)
+	protected void setupIcon(final String name)
 	{
 		if (name != null) putValue(Action.SMALL_ICON, GuiUtils.loadIcon(name));
 	}

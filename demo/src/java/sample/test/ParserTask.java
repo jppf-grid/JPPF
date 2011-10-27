@@ -38,7 +38,7 @@ public class ParserTask extends JPPFTestTask
 	 * Initialize this task with the specified xml file path.
 	 * @param filePath the client side path of the xml file to parse.
 	 */
-	public ParserTask(String filePath)
+	public ParserTask(final String filePath)
 	{
 		this.filePath = filePath;
 	}
@@ -50,9 +50,9 @@ public class ParserTask extends JPPFTestTask
 	 */
 	public void testParsing() throws Exception
 	{
-		 System.out.println("Started Parser for "+filePath+" ...");
-		 fileParser(filePath);
-		 System.out.println("Finished Parser for "+filePath+" ..."); 
+		System.out.println("Started Parser for "+filePath+" ...");
+		fileParser(filePath);
+		System.out.println("Finished Parser for "+filePath+" ...");
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class ParserTask extends JPPFTestTask
 	 * @param filetoParse path of the file to parse in the cleint file system.
 	 * @throws Exception if parsing fails.
 	 */
-	public void fileParser(String filetoParse) throws Exception
+	public void fileParser(final String filetoParse) throws Exception
 	{
 		InputStream is = getClass().getClassLoader().getResourceAsStream(filetoParse);
 		//InputSource src = new InputSource(is);
@@ -73,6 +73,6 @@ public class ParserTask extends JPPFTestTask
 		reader.setErrorHandler(brsaxParser);
 		// Parsing the XML file
 		reader.parse(src);
-		*/
+		 */
 	}
 }

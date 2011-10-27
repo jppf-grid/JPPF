@@ -51,10 +51,10 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
 	 * @throws Exception if an error occurs while reading the data.
 	 */
 	@Override
-    public boolean readMessage(ChannelWrapper<?> wrapper) throws Exception
+	public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (message == null) 
+		if (message == null)
 		{
 			message = new NioMessage();
 			message.length = 4;
@@ -72,7 +72,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleException(ChannelWrapper<?> channel)
+	public void handleException(final ChannelWrapper<?> channel)
 	{
 		AcceptorNioServer.closeChannel(channel);
 	}

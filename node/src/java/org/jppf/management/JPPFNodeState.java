@@ -51,7 +51,7 @@ public class JPPFNodeState implements Serializable
 	 */
 	private long cpuTime = 0L;
 	/**
-	 * Holder for all latest task notifications issued from multiple execution threads. 
+	 * Holder for all latest task notifications issued from multiple execution threads.
 	 */
 	private transient Map<String, Integer> taskIdMap = new HashMap<String, Integer>();
 	/**
@@ -83,7 +83,7 @@ public class JPPFNodeState implements Serializable
 	 * @param taskEvent the event as an object.
 	 * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
 	 */
-	public synchronized void setTaskEvent(Serializable taskEvent)
+	public synchronized void setTaskEvent(final Serializable taskEvent)
 	{
 	}
 
@@ -100,7 +100,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the number of tasks executed by the node.
 	 * @param nbTasksExecuted the number of tasks as an int.
 	 */
-	public synchronized void setNbTasksExecuted(int nbTasksExecuted)
+	public synchronized void setNbTasksExecuted(final int nbTasksExecuted)
 	{
 		this.nbTasksExecuted = nbTasksExecuted;
 	}
@@ -118,7 +118,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the status of the connection between the node and the server.
 	 * @param connectionStatus a string representing the connection status.
 	 */
-	public synchronized void setConnectionStatus(String connectionStatus)
+	public synchronized void setConnectionStatus(final String connectionStatus)
 	{
 		this.connectionStatus = connectionStatus;
 	}
@@ -136,7 +136,7 @@ public class JPPFNodeState implements Serializable
 	 * Get the latest execution status of the node.
 	 * @param executionStatus a string representing the execution status.
 	 */
-	public synchronized void setExecutionStatus(String executionStatus)
+	public synchronized void setExecutionStatus(final String executionStatus)
 	{
 		this.executionStatus = executionStatus;
 	}
@@ -145,7 +145,7 @@ public class JPPFNodeState implements Serializable
 	 * Notification that a task with the specified id has started.
 	 * @param id the id of the task.
 	 */
-	public synchronized void taskStarted(String id)
+	public synchronized void taskStarted(final String id)
 	{
 		if (id == null) return;
 		Integer n = taskIdMap.get(id);
@@ -159,7 +159,7 @@ public class JPPFNodeState implements Serializable
 	 * Notification that a task with the specified id has ended.
 	 * @param id the id of the task.
 	 */
-	public synchronized void taskEnded(String id)
+	public synchronized void taskEnded(final String id)
 	{
 		if (id == null) return;
 		Integer n = taskIdMap.get(id);
@@ -186,7 +186,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the ids of all currently executing tasks.
 	 * @param taskIdSet the ids as a set of strings.
 	 */
-	public synchronized void setTaskIdSet(Set<String> taskIdSet)
+	public synchronized void setTaskIdSet(final Set<String> taskIdSet)
 	{
 		this.taskIdSet = taskIdSet;
 	}
@@ -204,7 +204,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the size of the node's thread pool.
 	 * @param threadPoolSize the size as an int.
 	 */
-	public void setThreadPoolSize(int threadPoolSize)
+	public void setThreadPoolSize(final int threadPoolSize)
 	{
 		this.threadPoolSize = threadPoolSize;
 	}
@@ -222,7 +222,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the total cpu time used by the task processing threads.
 	 * @param cpuTime the cpu time in milliseconds.
 	 */
-	public synchronized void setCpuTime(long cpuTime)
+	public synchronized void setCpuTime(final long cpuTime)
 	{
 		this.cpuTime = cpuTime;
 	}
@@ -240,7 +240,7 @@ public class JPPFNodeState implements Serializable
 	 * Set the priority of the threads in the pool.
 	 * @param threadPriority the priority as an int value.
 	 */
-	public void setThreadPriority(int threadPriority)
+	public void setThreadPriority(final int threadPriority)
 	{
 		this.threadPriority = threadPriority;
 	}

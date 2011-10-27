@@ -39,7 +39,7 @@ public abstract class PropertiesTableFormat
 	 * Initialize this formatter with the specified title.
 	 * @param docTitle the title of the whole document.
 	 */
-	public PropertiesTableFormat(String docTitle)
+	public PropertiesTableFormat(final String docTitle)
 	{
 		this.docTitle = docTitle;
 	}
@@ -72,7 +72,7 @@ public abstract class PropertiesTableFormat
 	 * @param props the set of properties to format.
 	 * @param title the title of the formatted table.
 	 */
-	public void formatTable(Properties props, String title)
+	public void formatTable(final Properties props, final String title)
 	{
 		Set<String> orderedProps = new TreeSet<String>();
 		Enumeration en = props.propertyNames();
@@ -97,7 +97,7 @@ public abstract class PropertiesTableFormat
 	 * Write the prologue of a table.
 	 * @param title the title for the table.
 	 */
-	public void tableStart(String title)
+	public void tableStart(final String title)
 	{
 	}
 

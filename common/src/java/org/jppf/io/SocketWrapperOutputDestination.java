@@ -39,7 +39,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 * Initialize this output destination with the specified <code>SocketWrapper</code>.
 	 * @param socketWrapper the backing <code>SocketWrapper</code>.
 	 */
-	public SocketWrapperOutputDestination(SocketWrapper socketWrapper)
+	public SocketWrapperOutputDestination(final SocketWrapper socketWrapper)
 	{
 		this.socketWrapper = socketWrapper;
 	}
@@ -54,7 +54,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
 	@Override
-    public int write(byte[] data, int offset, int len) throws Exception
+	public int write(final byte[] data, final int offset, final int len) throws Exception
 	{
 		socketWrapper.write(data, offset, len);
 		//socketWrapper.flush();
@@ -69,7 +69,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
 	@Override
-    public int write(ByteBuffer data) throws Exception
+	public int write(final ByteBuffer data) throws Exception
 	{
 		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 		byte[] buf = tmp.array();
@@ -82,12 +82,12 @@ public class SocketWrapperOutputDestination implements OutputDestination
 
 	/**
 	 * Write an int value to this output destination.
-	 * @param value the value to write. 
+	 * @param value the value to write.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
 	@Override
-    public void writeInt(int value) throws Exception
+	public void writeInt(final int value) throws Exception
 	{
 		socketWrapper.writeInt(value);
 	}
@@ -98,7 +98,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 	}
 }

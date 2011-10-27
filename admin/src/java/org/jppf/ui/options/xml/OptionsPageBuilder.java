@@ -77,7 +77,7 @@ public class OptionsPageBuilder
 	 * @param enableEvents determines if events triggering should be performed
 	 * once the page is built.
 	 */
-	public OptionsPageBuilder(boolean enableEvents)
+	public OptionsPageBuilder(final boolean enableEvents)
 	{
 		this.eventEnabled = enableEvents;
 	}
@@ -89,7 +89,7 @@ public class OptionsPageBuilder
 	 * @return an <code>OptionElement</code> instance, or null if the page could not be build.
 	 * @throws Exception if an error was raised while parsing the xml document or building the page.
 	 */
-	public OptionElement buildPageFromContent(String content, String baseName) throws Exception
+	public OptionElement buildPageFromContent(final String content, final String baseName) throws Exception
 	{
 		this.baseName = baseName;
 		OptionDescriptor desc = new OptionDescriptorParser().parse(new StringReader(content));
@@ -106,7 +106,7 @@ public class OptionsPageBuilder
 	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
 	 * @throws Exception if an error was raised while parsing the xml document or building the page.
 	 */
-	public OptionElement buildPageFromURL(String urlString, String baseName) throws Exception
+	public OptionElement buildPageFromURL(final String urlString, final String baseName) throws Exception
 	{
 		if (urlString == null) return null;
 		URL url = null;
@@ -120,12 +120,12 @@ public class OptionsPageBuilder
 			return null;
 		}
 		Reader reader = new InputStreamReader(url.openStream());
-        try {
-            return buildPageFromContent(FileUtils.readTextFile(reader), baseName);
-        } finally {
-            reader.close();
-        }
-    }
+		try {
+			return buildPageFromContent(FileUtils.readTextFile(reader), baseName);
+		} finally {
+			reader.close();
+		}
+	}
 
 	/**
 	 * Build an option page from the specified XML descriptor.
@@ -134,7 +134,7 @@ public class OptionsPageBuilder
 	 * @return an <code>OptionElement</code> instance, or null if the page could not be build.
 	 * @throws Exception if an error was raised while parsing the xml document or building the page.
 	 */
-	public OptionElement buildPage(String xmlPath, String baseName) throws Exception
+	public OptionElement buildPage(final String xmlPath, final String baseName) throws Exception
 	{
 		if (baseName == null)
 		{
@@ -148,7 +148,7 @@ public class OptionsPageBuilder
 		OptionDescriptor desc = new OptionDescriptorParser().parse(xmlPath);
 		if (desc == null) return null;
 
-        //if (eventEnabled) triggerInitialEvents(page);
+		//if (eventEnabled) triggerInitialEvents(page);
 		return build(desc).get(0);
 	}
 
@@ -178,7 +178,7 @@ public class OptionsPageBuilder
 	 * @param elt the root element of the options on which to trigger the events.
 	 * @param initial true to trigger the initializers, false to trigger the finalizers.
 	 */
-	private static void triggerLifeCycleEvents(final OptionElement elt, boolean initial)
+	private static void triggerLifeCycleEvents(final OptionElement elt, final boolean initial)
 	{
 		if (elt == null) return;
 		final ValueChangeListener listener = initial ? elt.getInitializer() : elt.getFinalizer();
@@ -187,7 +187,7 @@ public class OptionsPageBuilder
 			Runnable r = new Runnable()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
 					listener.valueChanged(new ValueChangeEvent(elt));
 				}
@@ -212,12 +212,12 @@ public class OptionsPageBuilder
 	}
 
 	/**
-	 * Initialize the attributes common to all option elements from an option descriptor. 
+	 * Initialize the attributes common to all option elements from an option descriptor.
 	 * @param elt the element whose attributes are to be initialized.
 	 * @param desc the descriptor to get the attribute values from.
 	 * @throws Exception if an error was raised while building the page.
 	 */
-	public void initCommonAttributes(AbstractOptionElement elt, OptionDescriptor desc) throws Exception
+	public void initCommonAttributes(final AbstractOptionElement elt, final OptionDescriptor desc) throws Exception
 	{
 		elt.setName(desc.name);
 		elt.setLabel(LocalizationUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
@@ -232,12 +232,12 @@ public class OptionsPageBuilder
 	}
 
 	/**
-	 * Initialize the attributes common to all options from an option descriptor. 
+	 * Initialize the attributes common to all options from an option descriptor.
 	 * @param option the option whose attributes are to be initialized.
 	 * @param desc the descriptor to get the attribute values from.
 	 * @throws Exception if an error was raised while building the page.
 	 */
-	public void initCommonOptionAttributes(AbstractOption option, OptionDescriptor desc) throws Exception
+	public void initCommonOptionAttributes(final AbstractOption option, final OptionDescriptor desc) throws Exception
 	{
 		initCommonAttributes(option, desc);
 		//option.setEditable(desc.getBoolean("editable", false));
@@ -255,7 +255,7 @@ public class OptionsPageBuilder
 	 * @return a ValueChangeListener instance.
 	 * @throws Exception if an error was raised while building the page.
 	 */
-	public ValueChangeListener createListener(ListenerDescriptor listenerDesc) throws Exception
+	public ValueChangeListener createListener(final ListenerDescriptor listenerDesc) throws Exception
 	{
 		ValueChangeListener listener = null;
 		if (listenerDesc != null)
@@ -280,7 +280,7 @@ public class OptionsPageBuilder
 	 * @return an OptionElement instance.
 	 * @throws Exception if an error was raised while building the page.
 	 */
-	public List<OptionElement> build(OptionDescriptor desc) throws Exception
+	public List<OptionElement> build(final OptionDescriptor desc) throws Exception
 	{
 		OptionElementFactory f = getFactory();
 		List<OptionElement> list = new ArrayList<OptionElement>();
@@ -334,7 +334,7 @@ public class OptionsPageBuilder
 	 * Set the base name used to localize labels and tooltips.
 	 * @param baseName the base name as a string value.
 	 */
-	public void setBaseName(String baseName)
+	public void setBaseName(final String baseName)
 	{
 		this.baseName = baseName;
 	}

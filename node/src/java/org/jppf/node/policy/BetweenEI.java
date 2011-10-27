@@ -50,7 +50,7 @@ public class BetweenEI extends ExecutionPolicy
 	 * @param a the lower bound.
 	 * @param b the upper bound.
 	 */
-	public BetweenEI(String propertyName, double a, double b)
+	public BetweenEI(final String propertyName, final double a, final double b)
 	{
 		this.propertyName = propertyName;
 		this.a = a;
@@ -64,7 +64,7 @@ public class BetweenEI extends ExecutionPolicy
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
 	@Override
-    public boolean accepts(JPPFSystemInformation info)
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		try
 		{
@@ -87,7 +87,7 @@ public class BetweenEI extends ExecutionPolicy
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		if (computedToString == null)
 		{

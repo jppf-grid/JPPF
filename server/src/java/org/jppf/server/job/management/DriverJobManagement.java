@@ -69,7 +69,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
 	 */
 	@Override
-	public void cancelJob(String jobUuid) throws Exception
+	public void cancelJob(final String jobUuid) throws Exception
 	{
 		cancelJobInNodes(jobUuid, false);
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
@@ -99,7 +99,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
 	 */
 	@Override
-	public void suspendJob(String jobUuid, Boolean requeue) throws Exception
+	public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
@@ -122,7 +122,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
 	 */
 	@Override
-	public void resumeJob(String jobUuid) throws Exception
+	public void resumeJob(final String jobUuid) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
@@ -145,7 +145,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
 	 */
 	@Override
-	public void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception
+	public void updateMaxNodes(final String jobUuid, final Integer maxNodes) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null)
@@ -173,22 +173,22 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	}
 
 	/**
-	 * Get an object describing the job with the specified uuid. 
+	 * Get an object describing the job with the specified uuid.
 	 * @param jobUuid the id of the job to get information about.
 	 * @return an instance of <code>JobInformation</code>.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
 	 */
 	@Override
-	public JobInformation getJobInformation(String jobUuid) throws Exception
+	public JobInformation getJobInformation(final String jobUuid) throws Exception
 	{
 		ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
 		if (bundleWrapper == null) return null;
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 		JobInformation job = new JobInformation(jobUuid, bundle.getName(),
-			bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-			bundle.getSLA().isSuspended(), (pending != null) && pending);
+				bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
+				bundle.getSLA().isSuspended(), (pending != null) && pending);
 		job.setMaxNodes(bundle.getSLA().getMaxNodes());
 		return job;
 	}
@@ -201,7 +201,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
 	 */
 	@Override
-	public NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception
+	public NodeJobInformation[] getNodeInformation(final String jobUuid) throws Exception
 	{
 		List<ChannelJobPair> nodes = getJobManager().getNodesForJob(jobUuid);
 		if (nodes.isEmpty()) return NodeJobInformation.EMPTY_ARRAY;
@@ -212,8 +212,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 			JPPFTaskBundle bundle = (JPPFTaskBundle) nodes.get(i).second().getJob();
 			Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 			JobInformation jobInfo = new JobInformation(jobUuid, bundle.getName(),
-				bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-				bundle.getSLA().isSuspended(), (pending != null) && pending);
+					bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
+					bundle.getSLA().isSuspended(), (pending != null) && pending);
 			jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
 			result[i] = new NodeJobInformation(nodeInfo, jobInfo);
 		}
@@ -222,11 +222,11 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
 	/**
 	 * Cancel all sub-jobs of the job with the specified id, by issuing a cancel command
-	 * to each corresponding node. 
+	 * to each corresponding node.
 	 * @param jobUuid the id of the job to cancel.
 	 * @param requeue specifies whether the sub-jobs should be requeued.
 	 */
-	private void cancelJobInNodes(String jobUuid, boolean requeue)
+	private void cancelJobInNodes(final String jobUuid, final boolean requeue)
 	{
 		List<ChannelJobPair> list = getJobManager().getNodesForJob(jobUuid);
 		if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
@@ -245,7 +245,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	public void updatePriority(final String jobUuid, final Integer newPriority)
 	{
 		if (debugEnabled) log.debug("Updating priority of jobId = '" + jobUuid + "' to: " + newPriority);
-		((JPPFPriorityQueue) driver.getQueue()).updatePriority(jobUuid, newPriority);
+		((JPPFPriorityQueue) JPPFDriver.getQueue()).updatePriority(jobUuid, newPriority);
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @see org.jppf.job.JobListener#jobQueued(org.jppf.job.JobNotification)
 		 */
 		@Override
-		public void jobQueued(JobNotification event)
+		public void jobQueued(final JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -280,7 +280,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @see org.jppf.job.JobListener#jobEnded(org.jppf.job.JobNotification)
 		 */
 		@Override
-		public void jobEnded(JobNotification event)
+		public void jobEnded(final JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -291,7 +291,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @see org.jppf.job.JobListener#jobUpdated(org.jppf.job.JobNotification)
 		 */
 		@Override
-		public void jobUpdated(JobNotification event)
+		public void jobUpdated(final JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -302,7 +302,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @see org.jppf.job.JobListener#jobDispatched(org.jppf.job.JobNotification)
 		 */
 		@Override
-		public void jobDispatched(JobNotification event)
+		public void jobDispatched(final JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -313,7 +313,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		 * @see org.jppf.job.JobListener#jobReturned(org.jppf.job.JobNotification)
 		 */
 		@Override
-		public void jobReturned(JobNotification event)
+		public void jobReturned(final JobNotification event)
 		{
 			sendNotification(event);
 		}
@@ -323,7 +323,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void sendNotification(Notification notification)
+	public void sendNotification(final Notification notification)
 	{
 		if (debugEnabled && (notification instanceof JobNotification))
 		{

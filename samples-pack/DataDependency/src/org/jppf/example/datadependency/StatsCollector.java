@@ -60,7 +60,7 @@ public class StatsCollector
 	 * @param results the results of the job that was processed.
 	 * @param time the job's total processing time.
 	 */
-	public void jobProcessed(List<JPPFTask> results, long time)
+	public void jobProcessed(final List<JPPFTask> results, final long time)
 	{
 		nbJobs.incrementAndGet();
 		nbTasks.addAndGet(results.size());
@@ -107,7 +107,7 @@ public class StatsCollector
 	 * Set the total processing time.
 	 * @param time the total time as a long value.
 	 */
-	public void setTotalTime(long time)
+	public void setTotalTime(final long time)
 	{
 		totalTime.set(time);
 	}
@@ -117,6 +117,7 @@ public class StatsCollector
 	 * @return a string.
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();

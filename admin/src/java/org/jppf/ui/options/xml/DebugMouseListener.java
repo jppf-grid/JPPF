@@ -60,7 +60,7 @@ public class DebugMouseListener extends MouseAdapter
 	 * @param source - determines whether the XML is loaded from a url or file location.
 	 * @param location - where to load the xml descriptor from.
 	 */
-	public DebugMouseListener(OptionElement option, String source, String location)
+	public DebugMouseListener(final OptionElement option, final String source, final String location)
 	{
 		this.option = option;
 		this.source = source;
@@ -72,19 +72,19 @@ public class DebugMouseListener extends MouseAdapter
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
 	@Override
-    public void mousePressed(MouseEvent event)
+	public void mousePressed(final MouseEvent event)
 	{
 		if (event.getButton() != MouseEvent.BUTTON3) return;
 		Component comp = event.getComponent();
 		int x = event.getX();
 		int y = event.getY();
-		
+
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem item = new JMenuItem("Reload");
 		item.addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent ev)
+			public void actionPerformed(final ActionEvent ev)
 			{
 				doReloadPage();
 			}

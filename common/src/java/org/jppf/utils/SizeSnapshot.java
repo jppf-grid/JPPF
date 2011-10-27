@@ -60,7 +60,7 @@ public class SizeSnapshot
 	 * Default constructor.
 	 * @param title the title given to this snapshot.
 	 */
-	public SizeSnapshot(String title)
+	public SizeSnapshot(final String title)
 	{
 		this.title = title;
 	}

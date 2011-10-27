@@ -103,7 +103,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.Option#getLabel()
 	 */
 	@Override
-    public String getLabel()
+	public String getLabel()
 	{
 		return label;
 	}
@@ -112,7 +112,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the label displayed with the UI component.
 	 * @param label the label as a string.
 	 */
-	public void setLabel(String label)
+	public void setLabel(final String label)
 	{
 		this.label = label;
 	}
@@ -123,7 +123,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.Option#getName()
 	 */
 	@Override
-    public String getName()
+	public String getName()
 	{
 		return name;
 	}
@@ -132,7 +132,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the name of this option.
 	 * @param name the name as a string.
 	 */
-	public void setName(String name)
+	public void setName(final String name)
 	{
 		this.name = name;
 	}
@@ -143,7 +143,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.Option#getUIComponent()
 	 */
 	@Override
-    public JComponent getUIComponent()
+	public JComponent getUIComponent()
 	{
 		return UIComponent;
 	}
@@ -152,7 +152,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the UI component for this option.
 	 * @param component a <code>JComponent</code> instance.
 	 */
-	public void setUIComponent(JComponent component)
+	public void setUIComponent(final JComponent component)
 	{
 		UIComponent = component;
 	}
@@ -163,7 +163,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionElement#getToolTipText()
 	 */
 	@Override
-    public String getToolTipText()
+	public String getToolTipText()
 	{
 		return toolTipText;
 	}
@@ -172,12 +172,13 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the tooltip text displayed with the UI component.
 	 * @param tooltip the tooltip as a string.
 	 */
-	public void setToolTipText(String tooltip)
+	public void setToolTipText(final String tooltip)
 	{
-		if (((tooltip == null) || "".equals(tooltip.trim()))) tooltip = null;
+		String html = tooltip;
+		if (((tooltip == null) || "".equals(tooltip.trim()))) html = null;
 		else if (tooltip.contains("\\n"))
-			tooltip = "<html>"+tooltip.replace("\\n", "<br>")+"</html>";
-		this.toolTipText = tooltip;
+			html = "<html>"+tooltip.replace("\\n", "<br>")+"</html>";
+		this.toolTipText = html;
 	}
 
 	/**
@@ -186,7 +187,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionElement#isScrollable()
 	 */
 	@Override
-    public boolean isScrollable()
+	public boolean isScrollable()
 	{
 		return scrollable;
 	}
@@ -195,7 +196,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Determine whether this page should be enclosed within a scroll pane.
 	 * @param scrollable true if the page is to be enclosed in a scroll pane, false otherwise.
 	 */
-	public void setScrollable(boolean scrollable)
+	public void setScrollable(final boolean scrollable)
 	{
 		this.scrollable = scrollable;
 	}
@@ -206,7 +207,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionElement#isBordered()
 	 */
 	@Override
-    public boolean isBordered()
+	public boolean isBordered()
 	{
 		return bordered;
 	}
@@ -215,7 +216,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Determine whether this page has a border around it.
 	 * @param bordered true if the page has a border, false otherwise.
 	 */
-	public void setBordered(boolean bordered)
+	public void setBordered(final boolean bordered)
 	{
 		this.bordered = bordered;
 	}
@@ -226,18 +227,18 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionElement#getScripts()
 	 */
 	@Override
-    public List<ScriptDescriptor> getScripts()
+	public List<ScriptDescriptor> getScripts()
 	{
 		return scripts;
 	}
 
 	/**
 	 * Get the initializer for this option.
-	 * @return a <code>ValueChangeListener</code> instance. 
+	 * @return a <code>ValueChangeListener</code> instance.
 	 * @see org.jppf.ui.options.OptionElement#getInitializer()
 	 */
 	@Override
-    public ValueChangeListener getInitializer()
+	public ValueChangeListener getInitializer()
 	{
 		return initializer;
 	}
@@ -246,18 +247,18 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the initializer for this option.
 	 * @param initializer a <code>ValueChangeListener</code> instance.
 	 */
-	public void setInitializer(ValueChangeListener initializer)
+	public void setInitializer(final ValueChangeListener initializer)
 	{
 		this.initializer = initializer;
 	}
 
 	/**
 	 * Get the finalizer for this option.
-	 * @return a <code>ValueChangeListener</code> instance. 
+	 * @return a <code>ValueChangeListener</code> instance.
 	 * @see org.jppf.ui.options.OptionElement#getFinalizer()
 	 */
 	@Override
-    public ValueChangeListener getFinalizer()
+	public ValueChangeListener getFinalizer()
 	{
 		return finalizer;
 	}
@@ -266,7 +267,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the finalizer for this option.
 	 * @param finalizer a <code>ValueChangeListener</code> instance.
 	 */
-	public void setFinalizer(ValueChangeListener finalizer)
+	public void setFinalizer(final ValueChangeListener finalizer)
 	{
 		this.finalizer = finalizer;
 	}
@@ -276,7 +277,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @return the path as a string.
 	 */
 	@Override
-    public String getIconPath()
+	public String getIconPath()
 	{
 		return iconPath;
 	}
@@ -285,7 +286,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * Set the path to an eventual icon displayed in the button.
 	 * @param iconPath the path as a string.
 	 */
-	public void setIconPath(String iconPath)
+	public void setIconPath(final String iconPath)
 	{
 		this.iconPath = iconPath;
 	}
@@ -296,7 +297,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionElement#isEventsEnabled()
 	 */
 	@Override
-    public boolean isEventsEnabled()
+	public boolean isEventsEnabled()
 	{
 		return eventsEnabled;
 	}
@@ -307,7 +308,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
 	@Override
-    public void setEventsEnabled(boolean enabled)
+	public void setEventsEnabled(final boolean enabled)
 	{
 		eventsEnabled = enabled;
 	}
@@ -318,7 +319,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionProperties#getLayoutConstraints()
 	 */
 	@Override
-    public String getLayoutConstraints()
+	public String getLayoutConstraints()
 	{
 		return layoutConstraints;
 	}
@@ -329,7 +330,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionProperties#setLayoutConstraints(java.lang.String)
 	 */
 	@Override
-    public void setLayoutConstraints(String layoutConstraints)
+	public void setLayoutConstraints(final String layoutConstraints)
 	{
 		this.layoutConstraints = layoutConstraints;
 	}
@@ -340,7 +341,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionProperties#getComponentConstraints()
 	 */
 	@Override
-    public String getComponentConstraints()
+	public String getComponentConstraints()
 	{
 		return componentConstraints;
 	}
@@ -351,7 +352,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * @see org.jppf.ui.options.OptionProperties#setComponentConstraints(java.lang.String)
 	 */
 	@Override
-    public void setComponentConstraints(String componentConstraints)
+	public void setComponentConstraints(final String componentConstraints)
 	{
 		this.componentConstraints = componentConstraints;
 	}
@@ -360,7 +361,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setEditable(boolean editable)
+	public void setEditable(final boolean editable)
 	{
 	}
 }

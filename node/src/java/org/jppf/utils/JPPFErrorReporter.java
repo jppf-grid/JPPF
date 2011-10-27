@@ -47,7 +47,7 @@ public class JPPFErrorReporter
 	 * Initialize this error reporter with the specified name.
 	 * @param name a name used to identify this error reporter.
 	 */
-	public JPPFErrorReporter(String name)
+	public JPPFErrorReporter(final String name)
 	{
 		this.name = name;
 	}
@@ -84,7 +84,7 @@ public class JPPFErrorReporter
 	 * @param list the list to get the messages to concatenate from.
 	 * @return a concatenation of all messages in the list, separated by new lines.
 	 */
-	protected String concatenateMessages(List<String> list)
+	protected String concatenateMessages(final List<String> list)
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<list.size(); i++)
@@ -95,5 +95,5 @@ public class JPPFErrorReporter
 		return sb.toString();
 	}
 
-	//public class 
+	//public class
 }

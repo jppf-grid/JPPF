@@ -24,7 +24,7 @@ import java.util.*;
 import org.slf4j.*;
 
 /**
- * Implementation of node-specific permissions collection. 
+ * Implementation of node-specific permissions collection.
  * @author Laurent Cohen
  */
 public class JPPFPermissions extends PermissionCollection
@@ -48,7 +48,7 @@ public class JPPFPermissions extends PermissionCollection
 	 * @see java.security.PermissionCollection#add(java.security.Permission)
 	 */
 	@Override
-    public synchronized void add(Permission permission)
+	public synchronized void add(final Permission permission)
 	{
 		if (permission == null) return;
 		permissions.add(permission);
@@ -60,7 +60,7 @@ public class JPPFPermissions extends PermissionCollection
 	 * @see java.security.PermissionCollection#elements()
 	 */
 	@Override
-    public synchronized Enumeration<Permission> elements()
+	public synchronized Enumeration<Permission> elements()
 	{
 		return new Enumerator();
 	}
@@ -72,7 +72,7 @@ public class JPPFPermissions extends PermissionCollection
 	 * @see java.security.PermissionCollection#implies(java.security.Permission)
 	 */
 	@Override
-    public synchronized boolean implies(Permission permission)
+	public synchronized boolean implies(final Permission permission)
 	{
 		if (permission instanceof RuntimePermission)
 		{
@@ -93,11 +93,11 @@ public class JPPFPermissions extends PermissionCollection
 
 	/**
 	 * Marks this PermissionCollection object as "readonly". After a PermissionCollection object is marked as readonly,
-	 * no new Permission objects can be added to it using add. 
+	 * no new Permission objects can be added to it using add.
 	 * @see java.security.PermissionCollection#setReadOnly()
 	 */
 	@Override
-    public void setReadOnly()
+	public void setReadOnly()
 	{
 		//super.setReadOnly();
 	}
@@ -135,12 +135,12 @@ public class JPPFPermissions extends PermissionCollection
 		}
 
 		/**
-		 * Test if this enumeration contains more elements. 
+		 * Test if this enumeration contains more elements.
 		 * @return true if and only if this enumeration object contains at least one more element to provide; false otherwise.
 		 * @see java.util.Enumeration#hasMoreElements()
 		 */
 		@Override
-        public boolean hasMoreElements()
+		public boolean hasMoreElements()
 		{
 			return count > index;
 		}
@@ -152,7 +152,7 @@ public class JPPFPermissions extends PermissionCollection
 		 * @see java.util.Enumeration#nextElement()
 		 */
 		@Override
-        public Permission nextElement() throws NoSuchElementException
+		public Permission nextElement() throws NoSuchElementException
 		{
 			if (!hasMoreElements()) throw new NoSuchElementException("no more element in this enumeration");
 			return enumPermissions.get(index++);

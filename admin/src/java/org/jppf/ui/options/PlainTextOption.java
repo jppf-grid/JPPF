@@ -41,11 +41,11 @@ public class PlainTextOption extends TextOption
 	/**
 	 * Initialize this text option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the checkbox.
 	 * @param value the initial value of this component.
 	 */
-	public PlainTextOption(String name, String label, String tooltip, String value)
+	public PlainTextOption(final String name, final String label, final String tooltip, final String value)
 	{
 		super(name, label, tooltip, value);
 		createUI();
@@ -57,7 +57,7 @@ public class PlainTextOption extends TextOption
 	 * @see org.jppf.ui.options.TextOption#createField()
 	 */
 	@Override
-    protected JTextField createField()
+	protected JTextField createField()
 	{
 		return new JTextField((String) value);
 	}
@@ -68,7 +68,7 @@ public class PlainTextOption extends TextOption
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object value)
+	public void setValue(final Object value)
 	{
 		this.value = value;
 		if ((value != null) && (field != null)) field.setText(value.toString());
@@ -87,7 +87,7 @@ public class PlainTextOption extends TextOption
 	 * Set the number of columns displayed in the text field.
 	 * @param columns the number of columns as an int.
 	 */
-	public void setColumns(int columns)
+	public void setColumns(final int columns)
 	{
 		this.columns = columns;
 		if (field != null)

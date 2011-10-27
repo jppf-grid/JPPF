@@ -17,8 +17,8 @@
  */
 package org.jppf.server.peer;
 
-import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.server.nio.classloader.ClassNioServer;
 import org.slf4j.*;
 
 
@@ -37,29 +37,29 @@ public class JPPFPeerInitializer extends Thread
 	 * Name of the peer in the configuration file.
 	 */
 	private final String peerName;
-    /**
-     * Peer connection information.
-     */
-    private final JPPFConnectionInformation connectionInfo;
-    /**
-     * JPPF class server
-     */
-    private final ClassNioServer classServer;
+	/**
+	 * Peer connection information.
+	 */
+	private final JPPFConnectionInformation connectionInfo;
+	/**
+	 * JPPF class server
+	 */
+	private final ClassNioServer classServer;
 
 	/**
 	 * Initialize this peer initializer from a specified peerName.
 	 * @param peerName the name of the peer in the configuration file.
-     * @param connectionInfo peer connection information.
-     * @param classServer JPPF class server
+	 * @param connectionInfo peer connection information.
+	 * @param classServer JPPF class server
 	 */
 	public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer)
 	{
-        if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-        if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+		if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+		if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
 		this.peerName       = peerName;
-        this.connectionInfo = connectionInfo;
-        this.classServer    = classServer;
+		this.connectionInfo = connectionInfo;
+		this.classServer    = classServer;
 		setName("Peer Initializer [" + peerName + ']');
 	}
 
@@ -68,7 +68,7 @@ public class JPPFPeerInitializer extends Thread
 	 * @see java.lang.Thread#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		log.info("start initialization of peer [" + peerName + ']');
 		try
@@ -80,8 +80,8 @@ public class JPPFPeerInitializer extends Thread
 		{
 			log.error(e.getMessage(), e);
 		} finally
-        {
-            log.info("end initialization of peer [" + peerName + ']');
-        }
+		{
+			log.info("end initialization of peer [" + peerName + ']');
+		}
 	}
 }

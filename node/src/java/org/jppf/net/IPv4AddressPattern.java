@@ -58,7 +58,7 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern
 	 * @param source the source pattern as a string.
 	 * @throws IllegalArgumentException if the pattern is null or invalid.
 	 */
-	public IPv4AddressPattern(String source) throws IllegalArgumentException
+	public IPv4AddressPattern(final String source) throws IllegalArgumentException
 	{
 		super(source, PatternConfiguration.IPV4_CONFIGURATION);
 	}
@@ -67,7 +67,7 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean matches(InetAddress ip)
+	public boolean matches(final InetAddress ip)
 	{
 		if (!(ip instanceof Inet4Address)) return false;
 		return super.matches(ip);
@@ -77,12 +77,12 @@ public class IPv4AddressPattern extends AbstractIPAddressPattern
 	 * Main method.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		System.out.println("***** IP v4 *****");
 		String[] ipv4patterns = {
-			"192.168.1.10", "192.168.1.11", "192.168.1", "192.168", "192.168-170.1", "192.168-170.1.1-32",
-			".2.3.4", "1.2..4", "1.2.3.", "1.2.3.4-", "1.2.3.-4", " 1. 2 .  3. 4 - 8 ", "1.-.3.", "1.2.3.-",
+				"192.168.1.10", "192.168.1.11", "192.168.1", "192.168", "192.168-170.1", "192.168-170.1.1-32",
+				".2.3.4", "1.2..4", "1.2.3.", "1.2.3.4-", "1.2.3.-4", " 1. 2 .  3. 4 - 8 ", "1.-.3.", "1.2.3.-",
 		};
 		//String[] patterns = { " 1. 2 .  3. 4 - 8 " };
 		String ip = "192.168.1.11";

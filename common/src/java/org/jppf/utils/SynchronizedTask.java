@@ -41,7 +41,7 @@ public abstract class SynchronizedTask implements Runnable
 	 * Initialize this task with an object to synchronize against.
 	 * @param sync - an object to synchronize against.
 	 */
-	public SynchronizedTask(Object sync)
+	public SynchronizedTask(final Object sync)
 	{
 		this.sync = sync;
 	}
@@ -51,7 +51,7 @@ public abstract class SynchronizedTask implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

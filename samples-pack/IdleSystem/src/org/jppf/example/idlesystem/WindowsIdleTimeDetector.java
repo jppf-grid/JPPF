@@ -58,7 +58,7 @@ public class WindowsIdleTimeDetector implements IdleTimeDetector
 		 * @return BOOL return code.
 		 */
 		int GetLastInputInfo(LastInputInfo info);
-  }
+	}
 
 	/**
 	 * Wrapper for JNI calls to the kernel32 Windows library.
@@ -81,6 +81,7 @@ public class WindowsIdleTimeDetector implements IdleTimeDetector
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public long getIdleTimeMillis()
 	{
 		LastInputInfo lastInputInfo = new LastInputInfo();

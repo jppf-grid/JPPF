@@ -41,7 +41,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public ObjectStreamClass getObjectStreamClass()
+	public ObjectStreamClass getObjectStreamClass()
 	{
 		return null;
 	}
@@ -50,7 +50,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean defaulted(String name) throws IOException
+	public boolean defaulted(final String name) throws IOException
 	{
 		return (primitiveFields.get(name) == null) && (objectFields.get(name) == null);
 	}
@@ -59,7 +59,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean get(String name, boolean val) throws IOException
+	public boolean get(final String name, final boolean val) throws IOException
 	{
 		Boolean r = (Boolean) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -69,7 +69,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public byte get(String name, byte val) throws IOException
+	public byte get(final String name, final byte val) throws IOException
 	{
 		Byte r = (Byte) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -79,7 +79,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public char get(String name, char val) throws IOException
+	public char get(final String name, final char val) throws IOException
 	{
 		Character r = (Character) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -89,7 +89,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public short get(String name, short val) throws IOException
+	public short get(final String name, final short val) throws IOException
 	{
 		Short r = (Short) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -99,7 +99,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int get(String name, int val) throws IOException
+	public int get(final String name, final int val) throws IOException
 	{
 		Integer r = (Integer) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -109,7 +109,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public long get(String name, long val) throws IOException
+	public long get(final String name, final long val) throws IOException
 	{
 		Long r = (Long) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -119,7 +119,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public float get(String name, float val) throws IOException
+	public float get(final String name, final float val) throws IOException
 	{
 		Float r = (Float) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -129,7 +129,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public double get(String name, double val) throws IOException
+	public double get(final String name, final double val) throws IOException
 	{
 		Double r = (Double) primitiveFields.get(name);
 		return r == null ? val : r;
@@ -139,7 +139,7 @@ public class JPPFGetField extends GetField
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Object get(String name, Object val) throws IOException
+	public Object get(final String name, final Object val) throws IOException
 	{
 		Object r = objectFields.get(name);
 		return r == null ? val : r;

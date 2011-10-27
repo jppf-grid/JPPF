@@ -40,31 +40,31 @@ public class JPPFLogFormatter extends Formatter
 	 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
 	 */
 	@Override
-    public String format(LogRecord record)
+	public String format(final LogRecord record)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(sdf.format(new Date(record.getMillis())));
 		sb.append('[');
 		String name = record.getLevel().getName();
 		sb.append(name);
-		// pad to 7 chars 
+		// pad to 7 chars
 		for (int i=0; i<7-name.length(); i++) sb.append(' ');
 		sb.append(']');
 		sb.append('[');
 		/*
 		String s = record.getSourceClassName();
 		if (s != null) sb.append(s);
-		*/
+		 */
 		String s = record.getSourceClassName();
 		String shortName = getShortName(s);
 		StackTraceElement[] elts = new Throwable().getStackTrace();
 		StackTraceElement elt = null;
-        for (StackTraceElement elt1 : elts) {
-            if (getShortName(elt1.getClassName()).equals(shortName)) {
-                elt = elt1;
-                break;
-            }
-        }
+		for (StackTraceElement elt1 : elts) {
+			if (getShortName(elt1.getClassName()).equals(shortName)) {
+				elt = elt1;
+				break;
+			}
+		}
 		if (elt != null)
 		{
 			sb.append(elt.getClassName());
@@ -91,10 +91,10 @@ public class JPPFLogFormatter extends Formatter
 
 	/**
 	 * Get the short name of a class, without the package name.
-	 * @param fqn - the fully qualified name of the class. 
+	 * @param fqn - the fully qualified name of the class.
 	 * @return a string representing the short name of a class.
 	 */
-	private static String getShortName(String fqn)
+	private static String getShortName(final String fqn)
 	{
 		if (fqn == null) return "";
 		int idx = fqn.lastIndexOf('.');

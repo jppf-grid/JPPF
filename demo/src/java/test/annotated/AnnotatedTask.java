@@ -44,18 +44,18 @@ public class AnnotatedTask extends JPPFTask
 	 * @param time .
 	 * @param id .
 	 */
-	public AnnotatedTask(long time, int id)
+	public AnnotatedTask(final long time, final int id)
 	{
 		this.time = time;
 		this.id = id;
 	}
-	
+
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

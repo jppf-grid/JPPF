@@ -63,10 +63,10 @@ public abstract class AbstractNodeIO implements NodeIO
 	protected ObjectSerializer serializer = null;
 
 	/**
-	 * Initialize this TaskIO with the specified node. 
+	 * Initialize this TaskIO with the specified node.
 	 * @param node - the node who owns this TaskIO.
 	 */
-	public AbstractNodeIO(JPPFNode node)
+	public AbstractNodeIO(final JPPFNode node)
 	{
 		this.node = node;
 	}
@@ -84,7 +84,7 @@ public abstract class AbstractNodeIO implements NodeIO
 		currentBundle = (JPPFTaskBundle) result[0];
 		List<Task> taskList = new LinkedList<Task>();
 		if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(currentBundle.getState()) &&
-			(currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null))
+				(currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null))
 		{
 			DataProvider dataProvider = (DataProvider) result[1];
 			for (int i=0; i<currentBundle.getTaskCount(); i++)
@@ -172,7 +172,7 @@ public abstract class AbstractNodeIO implements NodeIO
 		 * @param first the list of buffers.
 		 * @param second the total data length.
 		 */
-		public BufferList(List<JPPFBuffer> first, Integer second)
+		public BufferList(final List<JPPFBuffer> first, final Integer second)
 		{
 			super(first, second);
 		}
@@ -193,7 +193,7 @@ public abstract class AbstractNodeIO implements NodeIO
 		 * Initialize this task with the psecicfied data buffer.
 		 * @param object the object to serialize.
 		 */
-		public ObjectSerializationTask(Object object)
+		public ObjectSerializationTask(final Object object)
 		{
 			this.object = object;
 		}
@@ -204,7 +204,7 @@ public abstract class AbstractNodeIO implements NodeIO
 		 * @see java.util.concurrent.Callable#call()
 		 */
 		@Override
-        public DataLocation call()
+		public DataLocation call()
 		{
 			ObjectSerializer ser = null;
 			DataLocation dl = null;

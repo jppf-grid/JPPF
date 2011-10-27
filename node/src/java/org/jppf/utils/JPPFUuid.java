@@ -43,9 +43,9 @@ public class JPPFUuid implements Serializable
 	public static final String[] ALPHABET_SUPERSET =
 	{
 		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
-	  "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
-	  "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "'", "!", "@", "#",
-	  "$", "%", "^", "&", "*", "(", ")", "_", "+", "|", "{", "}", "[", "]", "-", "=", "/", ",", ".", "?", ":", ";"
+		"m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
+		"I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "'", "!", "@", "#",
+		"$", "%", "^", "&", "*", "(", ")", "_", "+", "|", "{", "}", "[", "]", "-", "=", "/", ",", ".", "?", ":", ";"
 	};
 	/**
 	 * Set of characters used to compose a uuid, including only alphanumeric characters.
@@ -53,24 +53,24 @@ public class JPPFUuid implements Serializable
 	public static final String[] ALPHA_NUM =
 	{
 		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
-	  "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
-	  "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"	  
+		"m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H",
+		"I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
 	};
 	/**
 	 * Set of characters used to compose a uuid, including only hexadecimal digits.
 	 */
 	public static final String[] HEXADECIMAL =
 	{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"	  
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"
 	};
 	/**
 	 * Set of characters used to compose a uuid, including only decimal digits.
 	 */
 	public static final String[] DECIMAL =
 	{
-		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"	  
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
 	};
-  /**
+	/**
 	 * Random number generator, static to ensure generated uuid are unique.
 	 */
 	private static Random rand = new Random(System.nanoTime());
@@ -100,7 +100,7 @@ public class JPPFUuid implements Serializable
 	 * @param codes the set of codes from which to choose randomly to build the uuid.
 	 * @param length number of codes to use to build the uuid.
 	 */
-	public JPPFUuid(String[] codes, int length)
+	public JPPFUuid(final String[] codes, final int length)
 	{
 		if ((codes != null) && (codes.length > 0)) this.codes = codes;
 		if (length > 0) this.length = length;
@@ -118,14 +118,14 @@ public class JPPFUuid implements Serializable
 		for (int i=0; i<length; i++) sb.append(codes[rand.nextInt(len)]);
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Get a string representation of the generated unique identifier.
 	 * @return a string containing the uuid.
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return uuid;
 	}

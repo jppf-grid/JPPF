@@ -85,7 +85,7 @@ public final class StatsFormatter implements StatsConstants
 	 * @param stats the data snapshot to map.
 	 * @return a map of field names to their corresponding string values.
 	 */
-	public static Map<Fields, String> getStringValuesMap(JPPFStats stats)
+	public static Map<Fields, String> getStringValuesMap(final JPPFStats stats)
 	{
 		Map<Fields, String> stringValueMap = new HashMap<Fields, String>();
 		stringValueMap.put(TOTAL_TASKS_EXECUTED, formatInt(stats.getTotalTasksExecuted()));
@@ -130,13 +130,13 @@ public final class StatsFormatter implements StatsConstants
 		stringValueMap.put(JOBS_AVG_TASKS, formatDouble(stats.getJobTasks().getAvg()));
 		return stringValueMap;
 	}
-	
+
 	/**
 	 * Get the map of values represented as double for a specified data snapshot.
 	 * @param stats the data snapshot to map.
 	 * @return a map of field names to their corresponding double values.
 	 */
-	public static Map<Fields, Double> getDoubleValuesMap(JPPFStats stats)
+	public static Map<Fields, Double> getDoubleValuesMap(final JPPFStats stats)
 	{
 		Map<Fields, Double> doubleValueMap = new HashMap<Fields, Double>();
 		doubleValueMap.put(TOTAL_TASKS_EXECUTED, (double) stats.getTotalTasksExecuted());
@@ -175,10 +175,10 @@ public final class StatsFormatter implements StatsConstants
 		doubleValueMap.put(JOBS_MAX, (double) queue.getSizes().getMax());
 		doubleValueMap.put(JOBS_MIN_TIME, (double) queue.getTimes().getMin());
 		doubleValueMap.put(JOBS_MAX_TIME, (double) queue.getTimes().getMax());
-		doubleValueMap.put(JOBS_AVG_TIME, (double) queue.getTimes().getAvg());
+		doubleValueMap.put(JOBS_AVG_TIME, queue.getTimes().getAvg());
 		doubleValueMap.put(JOBS_MIN_TASKS, (double) stats.getJobTasks().getMin());
 		doubleValueMap.put(JOBS_MAX_TASKS, (double) stats.getJobTasks().getMax());
-		doubleValueMap.put(JOBS_AVG_TASKS, (double) stats.getJobTasks().getAvg());
+		doubleValueMap.put(JOBS_AVG_TASKS, stats.getJobTasks().getAvg());
 		return doubleValueMap;
 	}
 
@@ -187,7 +187,7 @@ public final class StatsFormatter implements StatsConstants
 	 * @param value the value to format.
 	 * @return the formatted value as a string.
 	 */
-	private static String formatInt(long value)
+	private static String formatInt(final long value)
 	{
 		return (value == Long.MAX_VALUE) ? "" : integerFormatter.format(value);
 	}
@@ -197,27 +197,27 @@ public final class StatsFormatter implements StatsConstants
 	 * @param value the value to format.
 	 * @return the formatted value as a string.
 	 */
-	private static String formatDouble(double value)
+	private static String formatDouble(final double value)
 	{
 		return doubleFormatter.format(value);
 	}
-	
+
 	/**
 	 * Format a floating point value.
 	 * @param value the value to format.
 	 * @return the formatted value as a string.
 	 */
-	private static String formatDouble(long value)
+	private static String formatDouble(final long value)
 	{
 		return (value == Long.MAX_VALUE) ? "" : doubleFormatter.format(value);
 	}
-	
+
 	/**
 	 * Format a a time (or duration) value in format hh:mm:ss&#46;ms.
 	 * @param value the value to format.
 	 * @return the formatted value as a string.
 	 */
-	private static String formatTime(long value)
+	private static String formatTime(final long value)
 	{
 		return StringUtils.toStringDuration(value);
 	}

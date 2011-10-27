@@ -30,7 +30,7 @@ public class LocalNodeChannel extends AbstractLocalChannelWrapper<LocalNodeMessa
 	 * Initialize this channel wrapper with the specified node context.
 	 * @param context the node context used as channel.
 	 */
-	public LocalNodeChannel(LocalNodeContext context)
+	public LocalNodeChannel(final LocalNodeContext context)
 	{
 		super(context);
 	}

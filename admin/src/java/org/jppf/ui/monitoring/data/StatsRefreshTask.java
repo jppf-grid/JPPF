@@ -38,7 +38,7 @@ public class StatsRefreshTask extends TimerTask
 	 * Initialize this task with a specified client connection.
 	 * @param connection the connection to use to request data.
 	 */
-	public StatsRefreshTask(JPPFClientConnectionImpl connection)
+	public StatsRefreshTask(final JPPFClientConnectionImpl connection)
 	{
 		this.connection = connection;
 	}
@@ -48,7 +48,7 @@ public class StatsRefreshTask extends TimerTask
 	 * @see java.util.TimerTask#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
 			StatsHandler.getInstance().requestUpdate(connection);

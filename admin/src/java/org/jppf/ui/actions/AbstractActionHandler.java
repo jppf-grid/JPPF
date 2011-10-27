@@ -42,7 +42,7 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @see org.jppf.ui.actions.ActionHandler#putAction(java.lang.String, org.jppf.ui.actions.UpdatableAction)
 	 */
 	@Override
-    public void putAction(String name, UpdatableAction action)
+	public void putAction(final String name, final UpdatableAction action)
 	{
 		actionMap.put(name, action);
 	}
@@ -54,7 +54,7 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @see org.jppf.ui.actions.ActionHandler#getAction(java.lang.String)
 	 */
 	@Override
-    public UpdatableAction getAction(String name)
+	public UpdatableAction getAction(final String name)
 	{
 		return actionMap.get(name);
 	}
@@ -65,7 +65,7 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @see org.jppf.ui.actions.ActionHandler#getSelectedElements()
 	 */
 	@Override
-    public synchronized List<Object> getSelectedElements()
+	public synchronized List<Object> getSelectedElements()
 	{
 		return selectedElements;
 	}
@@ -75,7 +75,7 @@ public abstract class AbstractActionHandler implements ActionHandler
 	 * @see org.jppf.ui.actions.ActionHandler#updateActions()
 	 */
 	@Override
-    public synchronized void updateActions()
+	public synchronized void updateActions()
 	{
 		for (UpdatableAction action: actionMap.values()) action.updateState(selectedElements);
 	}

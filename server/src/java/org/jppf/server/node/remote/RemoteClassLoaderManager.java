@@ -49,7 +49,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
 	 * Initialize this class loader manager with the specified node.
 	 * @param node the node that holds this class loader manager.
 	 */
-	RemoteClassLoaderManager(JPPFNode node)
+	RemoteClassLoaderManager(final JPPFNode node)
 	{
 		this.node = node;
 	}
@@ -58,7 +58,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected AbstractJPPFClassLoader createClassLoader()
+	protected AbstractJPPFClassLoader createClassLoader()
 	{
 		if (debugEnabled) log.debug("Initializing classloader");
 		if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
@@ -69,7 +69,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception
+	protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
 	{
 		return new JPPFRemoteContainer(node.getSocketWrapper(), uuidPath, cl);
 	}
@@ -78,12 +78,12 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
+	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
 	{
 		return new Callable<AbstractJPPFClassLoader>()
 		{
 			@Override
-            public AbstractJPPFClassLoader call()
+			public AbstractJPPFClassLoader call()
 			{
 				return new JPPFClassLoader(getClassLoader(), uuidPath);
 			}

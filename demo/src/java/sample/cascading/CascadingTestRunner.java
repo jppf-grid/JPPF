@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.Equal;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -48,7 +48,7 @@ public class CascadingTestRunner
 	 * Entry point for this class, performs a matrix multiplication a number of times.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

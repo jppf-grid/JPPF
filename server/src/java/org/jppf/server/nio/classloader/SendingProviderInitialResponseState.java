@@ -45,7 +45,7 @@ class SendingProviderInitialResponseState extends ClassServerState
 	 * Initialize this state with a specified NioServer.
 	 * @param server the NioServer this state relates to.
 	 */
-	public SendingProviderInitialResponseState(ClassNioServer server)
+	public SendingProviderInitialResponseState(final ClassNioServer server)
 	{
 		super(server);
 	}
@@ -58,7 +58,7 @@ class SendingProviderInitialResponseState extends ClassServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
 		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))

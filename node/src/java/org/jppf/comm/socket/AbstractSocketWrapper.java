@@ -88,8 +88,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @throws ConnectException if the connection fails.
 	 * @throws IOException if there is an issue with the socket streams.
 	 */
-	public AbstractSocketWrapper(String host, int port, ObjectSerializer serializer)
-		throws ConnectException, IOException
+	public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer)
+	throws ConnectException, IOException
 	{
 		this.host = host;
 		this.port = port;
@@ -102,7 +102,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @param socket the underlying socket this socket client wraps around.
 	 * @throws JPPFException if the socket connection fails.
 	 */
-	public AbstractSocketWrapper(Socket socket) throws JPPFException
+	public AbstractSocketWrapper(final Socket socket) throws JPPFException
 	{
 		try
 		{
@@ -125,7 +125,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
 	 */
 	@Override
-    public void sendBytes(JPPFBuffer buf) throws IOException
+	public void sendBytes(final JPPFBuffer buf) throws IOException
 	{
 		checkOpened();
 		dos.writeInt(buf.getLength());
@@ -142,7 +142,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
 	 */
 	@Override
-    public void write(byte[] data, int offset, int len) throws Exception
+	public void write(final byte[] data, final int offset, final int len) throws Exception
 	{
 		checkOpened();
 		dos.write(data, offset, len);
@@ -156,7 +156,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
 	 */
 	@Override
-    public void writeInt(int n) throws Exception
+	public void writeInt(final int n) throws Exception
 	{
 		checkOpened();
 		dos.writeInt(n);
@@ -169,7 +169,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#flush()
 	 */
 	@Override
-    public void flush() throws IOException
+	public void flush() throws IOException
 	{
 		updateSocketTimestamp();
 		dos.flush();
@@ -183,7 +183,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#receive()
 	 */
 	@Override
-    public Object receive() throws Exception
+	public Object receive() throws Exception
 	{
 		return receive(0);
 	}
@@ -197,7 +197,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
 	 */
 	@Override
-    public JPPFBuffer receiveBytes(int timeout) throws IOException
+	public JPPFBuffer receiveBytes(final int timeout) throws IOException
 	{
 		checkOpened();
 		JPPFBuffer buf = null;
@@ -230,7 +230,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] data, int offset, int len) throws IOException
+	public int read(final byte[] data, final int offset, final int len) throws IOException
 	{
 		checkOpened();
 		int count = 0;
@@ -251,7 +251,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#readInt()
 	 */
 	@Override
-    public int readInt() throws Exception
+	public int readInt() throws Exception
 	{
 		int intRead = dis.readInt();
 		updateSocketTimestamp();
@@ -265,7 +265,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#open()
 	 */
 	@Override
-    public final void open() throws ConnectException, IOException
+	public final void open() throws ConnectException, IOException
 	{
 		if (!opened)
 		{
@@ -309,7 +309,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#close()
 	 */
 	@Override
-    public void close() throws ConnectException, IOException
+	public void close() throws ConnectException, IOException
 	{
 		opened = false;
 		if (socket != null) socket.close();
@@ -321,7 +321,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#isOpened()
 	 */
 	@Override
-    public boolean isOpened()
+	public boolean isOpened()
 	{
 		return opened;
 	}
@@ -341,7 +341,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
 	 */
 	@Override
-    public ObjectSerializer getSerializer()
+	public ObjectSerializer getSerializer()
 	{
 		return null;
 	}
@@ -352,7 +352,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
 	 */
 	@Override
-    public void setSerializer(ObjectSerializer serializer)
+	public void setSerializer(final ObjectSerializer serializer)
 	{
 	}
 
@@ -361,7 +361,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @return the host name or ip address as a string.
 	 */
 	@Override
-    public String getHost()
+	public String getHost()
 	{
 		return host;
 	}
@@ -371,7 +371,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @param host the host name or ip address as a string.
 	 */
 	@Override
-    public void setHost(String host)
+	public void setHost(final String host)
 	{
 		this.host = host;
 	}
@@ -381,7 +381,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @return the port number on the remote host.
 	 */
 	@Override
-    public int getPort()
+	public int getPort()
 	{
 		return port;
 	}
@@ -391,7 +391,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @param port the port number on the remote host.
 	 */
 	@Override
-    public void setPort(int port)
+	public void setPort(final int port)
 	{
 		this.port = port;
 	}
@@ -402,7 +402,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#getSocket()
 	 */
 	@Override
-    public Socket getSocket()
+	public Socket getSocket()
 	{
 		return socket;
 	}
@@ -413,7 +413,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#setSocket(java.net.Socket)
 	 */
 	@Override
-    public void setSocket(Socket socket)
+	public void setSocket(final Socket socket)
 	{
 		this.socket = socket;
 	}
@@ -426,7 +426,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
 	 */
 	@Override
-    public int skip(int n) throws Exception
+	public int skip(final int n) throws Exception
 	{
 		if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
 		else if (n == 0) return 0;
@@ -444,16 +444,16 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
 
 	/**
 	 * Returns a timestamp that should reflect the system millisecond counter at the
-	 * last known good usage of the underlying socket. 
-	 * @return the socket usage timestamp  
+	 * last known good usage of the underlying socket.
+	 * @return the socket usage timestamp
 	 */
 	@Override
-    public long getSocketTimestamp() {
+	public long getSocketTimestamp() {
 		return socketTimestamp;
 	}
 
 	/**
-	 * Marks the socket "known good" usage timestamp with the current value of the 
+	 * Marks the socket "known good" usage timestamp with the current value of the
 	 * system millisecond counter.
 	 */
 	protected void updateSocketTimestamp() {

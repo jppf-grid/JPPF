@@ -39,7 +39,7 @@ public class ConnectionInitializerTask implements Runnable
 	 * Instantiate this connection initializer with the specified client connection.
 	 * @param c the client connection to initialize.
 	 */
-	public ConnectionInitializerTask(JPPFClientConnection c)
+	public ConnectionInitializerTask(final JPPFClientConnection c)
 	{
 		this.c = c;
 	}
@@ -49,7 +49,7 @@ public class ConnectionInitializerTask implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		//if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
 		if (c.getStatus().equals(DISCONNECTED)) c.init();

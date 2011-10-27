@@ -29,7 +29,7 @@ import org.jppf.utils.streams.StreamConstants;
 import org.slf4j.*;
 
 /**
- * Context obect associated with a socket channel used by the multiplexer. 
+ * Context obect associated with a socket channel used by the multiplexer.
  * @author Laurent Cohen
  */
 public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
@@ -69,13 +69,13 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	/**
 	 * 
 	 */
-	private int readMessageCount = 0; 
+	private int readMessageCount = 0;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleException(ChannelWrapper channel)
+	public void handleException(final ChannelWrapper channel)
 	{
 		try
 		{
@@ -109,9 +109,9 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 
 	/**
 	 * Set the request currently processed.
-	 * @param key a <code>ChannelWrapper</code> instance. 
+	 * @param key a <code>ChannelWrapper</code> instance.
 	 */
-	public synchronized void setLinkedKey(ChannelWrapper key)
+	public synchronized void setLinkedKey(final ChannelWrapper key)
 	{
 		this.linkedKey = key;
 	}
@@ -129,7 +129,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Set the application port to which the channel may be bound.
 	 * @param boundPort the port as an int value, or a negative value if the channel is not bound to an application port.
 	 */
-	public void setBoundPort(int boundPort)
+	public void setBoundPort(final int boundPort)
 	{
 		this.boundPort = boundPort;
 	}
@@ -147,7 +147,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Set the multiplexer port to which the channel may be bound.
 	 * @param multiplexerPort the port as an int value, or a negative value if the channel is not bound to a multiplexer port.
 	 */
-	public void setMultiplexerPort(int multiplexerPort)
+	public void setMultiplexerPort(final int multiplexerPort)
 	{
 		this.multiplexerPort = multiplexerPort;
 	}
@@ -187,7 +187,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * @return a ByteBuffer containing the data read from the channel, or null if no data was read.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public ByteBuffer readMultiplexerMessage(ChannelWrapper<?> wrapper) throws Exception
+	public ByteBuffer readMultiplexerMessage(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ByteBuffer msg = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
 		int count = 0;
@@ -202,7 +202,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 		if (debugEnabled)
 		{
 			log.debug('[' + getShortClassName() + "] " + "read " + n + " bytes from " +
-				StringUtils.getRemoteHost(channel));
+					StringUtils.getRemoteHost(channel));
 		}
 		if (count < 0) setEof(true);
 		if (msg.position() > 0)
@@ -219,7 +219,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * @return true if the current message was completely written, false otherwise.
 	 * @throws Exception if an error occurs while reading the data.
 	 */
-	public boolean writeMultiplexerMessage(ChannelWrapper<?> wrapper) throws Exception
+	public boolean writeMultiplexerMessage(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ByteBuffer msg = getCurrentMessage();
 		int count = 0;
@@ -232,7 +232,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 		if (debugEnabled)
 		{
 			log.debug('[' + getShortClassName() + "] " + "written " + count + " bytes to " +
-				StringUtils.getRemoteHost(channel));
+					StringUtils.getRemoteHost(channel));
 		}
 		return !msg.hasRemaining();
 	}
@@ -241,7 +241,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Add a message to the list of pending messages.
 	 * @param message the message to add to the list.
 	 */
-	public synchronized void addPendingMessage(ByteBufferWrapper message)
+	public synchronized void addPendingMessage(final ByteBufferWrapper message)
 	{
 		pendingMessages.add(message);
 	}
@@ -277,7 +277,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Set the message currently being sent.
 	 * @param message a <code>ByteBuffer</code> instance.
 	 */
-	public synchronized void setCurrentMessage(ByteBuffer message)
+	public synchronized void setCurrentMessage(final ByteBuffer message)
 	{
 		currentMessage = message;
 	}
@@ -295,7 +295,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	 * Specifiy whether end of stream was reached during the last read operation.
 	 * @param eof true to specify that EOF was reached, false otherwise.
 	 */
-	public void setEof(boolean eof)
+	public void setEof(final boolean eof)
 	{
 		this.eof = eof;
 	}

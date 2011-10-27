@@ -50,7 +50,7 @@ public class SimpleCallable implements Callable<Result>, Serializable
 	 * Initialize this task with the specified position.
 	 * @param position the position of this task.
 	 */
-	public SimpleCallable(int position)
+	public SimpleCallable(final int position)
 	{
 		this.position = position;
 	}
@@ -60,7 +60,7 @@ public class SimpleCallable implements Callable<Result>, Serializable
 	 * @param position the position of this task.
 	 * @param duration the duration of this task.
 	 */
-	public SimpleCallable(int position, long duration)
+	public SimpleCallable(final int position, final long duration)
 	{
 		this.position = position;
 		this.duration = duration;
@@ -72,7 +72,7 @@ public class SimpleCallable implements Callable<Result>, Serializable
 	 * @see java.util.concurrent.Callable#call()
 	 */
 	@Override
-    public Result call()
+	public Result call()
 	{
 		Result executionResult = new Result();
 		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;

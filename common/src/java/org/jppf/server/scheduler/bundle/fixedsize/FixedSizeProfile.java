@@ -43,7 +43,7 @@ public class FixedSizeProfile implements LoadBalancingProfile
 	 * Initialize this profile with values read from the specified configuration.
 	 * @param config contains a mapping of the profile parameters to their value.
 	 */
-	public FixedSizeProfile(TypedProperties config)
+	public FixedSizeProfile(final TypedProperties config)
 	{
 		size = config.getInt("size", 1);
 	}
@@ -54,7 +54,7 @@ public class FixedSizeProfile implements LoadBalancingProfile
 	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
 	@Override
-    public LoadBalancingProfile copy()
+	public LoadBalancingProfile copy()
 	{
 		FixedSizeProfile other = new FixedSizeProfile();
 		other.setSize(size);
@@ -74,7 +74,7 @@ public class FixedSizeProfile implements LoadBalancingProfile
 	 * Set the bundle size.
 	 * @param size - the bundle size as an int.
 	 */
-	public void setSize(int size)
+	public void setSize(final int size)
 	{
 		this.size = size;
 	}

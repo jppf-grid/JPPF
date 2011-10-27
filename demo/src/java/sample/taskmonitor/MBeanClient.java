@@ -48,7 +48,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 	 * Entry point.
 	 * @param args - not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -83,7 +83,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 	 * @param host - the host the server is running on.
 	 * @param port - the RMI port used by the server.
 	 */
-	public MBeanClient(String host, int port)
+	public MBeanClient(final String host, final int port)
 	{
 		super(host, port, JPPFAdminMBean.NODE_SUFFIX);
 	}
@@ -95,7 +95,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
 	 */
 	@Override
-    public void handleNotification(Notification notification, Object handback)
+	public void handleNotification(final Notification notification, final Object handback)
 	{
 		TaskInformation info = ((TaskExecutionNotification) notification).getTaskInformation();
 		int n = taskCount.incrementAndGet();

@@ -39,7 +39,7 @@ public class CallableTaskWrapper extends AbstractTaskObjectWrapper
 	 * Initialize this wrapper with the specified <code>Runnable</code> object.
 	 * @param callable the callable object to execute.
 	 */
-	public CallableTaskWrapper(Callable callable)
+	public CallableTaskWrapper(final Callable callable)
 	{
 		this.callable = callable;
 	}
@@ -51,18 +51,18 @@ public class CallableTaskWrapper extends AbstractTaskObjectWrapper
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
 	 */
 	@Override
-    public Object execute() throws Exception
+	public Object execute() throws Exception
 	{
 		return callable.call();
 	}
 
 	/**
 	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static. 
+	 * @return an object or null if the invoked method is static.
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
 	 */
 	@Override
-    public Object getTaskObject()
+	public Object getTaskObject()
 	{
 		return callable;
 	}

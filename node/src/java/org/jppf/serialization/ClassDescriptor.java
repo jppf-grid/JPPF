@@ -61,7 +61,7 @@ class ClassDescriptor
 	 */
 	boolean hasWriteObject = false;
 	/**
-	 * Bitwise flags associated with the described class. 
+	 * Bitwise flags associated with the described class.
 	 */
 	byte flags = 0;
 	/**
@@ -125,7 +125,7 @@ class ClassDescriptor
 	 * @param clazz the class from which to initialize.
 	 * @throws Exception if any error occurs.
 	 */
-	ClassDescriptor(Class<?> clazz) throws Exception
+	ClassDescriptor(final Class<?> clazz) throws Exception
 	{
 		this.clazz = clazz;
 		primitive = clazz.isPrimitive();
@@ -154,7 +154,7 @@ class ClassDescriptor
 	 * @param out the stream to write to.
 	 * @throws IOException if any error occurs.
 	 */
-	void write(ObjectOutputStream out) throws IOException
+	void write(final ObjectOutputStream out) throws IOException
 	{
 		out.writeInt(handle);
 		out.writeUTF(signature);
@@ -170,7 +170,7 @@ class ClassDescriptor
 		if (!primitive)
 		{
 			out.writeInt(fields.length);
-            for (FieldDescriptor field : fields) field.write(out);
+			for (FieldDescriptor field : fields) field.write(out);
 		}
 	}
 
@@ -179,7 +179,7 @@ class ClassDescriptor
 	 * @param in the stream to read from.
 	 * @throws IOException if any error occurs.
 	 */
-	void read(ObjectInputStream in) throws IOException
+	void read(final ObjectInputStream in) throws IOException
 	{
 		handle = in.readInt();
 		signature = in.readUTF();
@@ -207,7 +207,7 @@ class ClassDescriptor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName()).append('[');

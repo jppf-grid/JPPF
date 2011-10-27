@@ -24,12 +24,12 @@ import org.jppf.example.datadependency.model.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.startup.JPPFNodeStartupSPI;
 
-import com.hazelcast.core.*;
+import com.hazelcast.core.Hazelcast;
 
 /**
  * This startup class initializes the distributed data.
  * It creates a reference to the distributed map holding the market data objects, accessed by the client and all the nodes,
- * as well as a map holding the trades processsed by this node. 
+ * as well as a map holding the trades processsed by this node.
  * @author Laurent Cohen
  */
 public class DataDependencyStartup implements JPPFNodeStartupSPI
@@ -46,10 +46,11 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void run()
 	{
 		//-Dhazelcast.wait.seconds.before.join=1
-		System.setProperty("hazelcast.wait.seconds.before.join", "1"); 
+		System.setProperty("hazelcast.wait.seconds.before.join", "1");
 		System.out.println("Initializing distributed maps");
 		dataMap = Hazelcast.getMap(ModelConstants.MARKET_DATA_MAP_NAME);
 		tradeMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + NodeRunner.getUuid());
@@ -59,9 +60,9 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 	/**
 	 * Get the market data object with the specified id.
 	 * @param id the id of the data to lookup.
-	 * @return a {@link MarketData} instance, or null if none has the specified id. 
+	 * @return a {@link MarketData} instance, or null if none has the specified id.
 	 */
-	public static MarketData getMarketData(String id)
+	public static MarketData getMarketData(final String id)
 	{
 		return dataMap.get(id);
 	}
@@ -69,9 +70,9 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 	/**
 	 * Get the trade object with the specified id.
 	 * @param id the id of the trade to lookup.
-	 * @return a {@link Trade} instance, or null if none has the specified id. 
+	 * @return a {@link Trade} instance, or null if none has the specified id.
 	 */
-	public static Trade getTrade(String id)
+	public static Trade getTrade(final String id)
 	{
 		return tradeMap.get(id);
 	}
@@ -80,7 +81,7 @@ public class DataDependencyStartup implements JPPFNodeStartupSPI
 	 * Update the specified trade object.
 	 * @param trade the trade to update.
 	 */
-	public static void updateTrade(Trade trade)
+	public static void updateTrade(final Trade trade)
 	{
 		tradeMap.put(trade.getId(), trade);
 	}

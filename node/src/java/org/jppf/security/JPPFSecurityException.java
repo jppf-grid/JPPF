@@ -31,7 +31,7 @@ public class JPPFSecurityException extends JPPFException
 	 * @param message the message for this exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFSecurityException(String message, Throwable cause)
+	public JPPFSecurityException(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
@@ -40,7 +40,7 @@ public class JPPFSecurityException extends JPPFException
 	 * Initialize this exception with a specified message.
 	 * @param message the message for this exception.
 	 */
-	public JPPFSecurityException(String message)
+	public JPPFSecurityException(final String message)
 	{
 		super(message);
 	}
@@ -49,7 +49,7 @@ public class JPPFSecurityException extends JPPFException
 	 * Initialize this exception with a specified cause exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFSecurityException(Throwable cause)
+	public JPPFSecurityException(final Throwable cause)
 	{
 		super(cause);
 	}

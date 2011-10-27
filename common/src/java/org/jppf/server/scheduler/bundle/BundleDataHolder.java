@@ -18,7 +18,7 @@
 
 package org.jppf.server.scheduler.bundle;
 
-import java.util.*;
+import java.util.LinkedList;
 
 
 /**

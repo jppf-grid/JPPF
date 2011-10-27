@@ -45,7 +45,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @throws ConnectException if the connection fails.
 	 * @throws IOException if there is an issue with the socket streams.
 	 */
-	public BootstrapSocketClient(String host, int port) throws ConnectException, IOException
+	public BootstrapSocketClient(final String host, final int port) throws ConnectException, IOException
 	{
 		super(host, port, null);
 	}
@@ -55,7 +55,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @param socket the underlying socket this socket client wraps around.
 	 * @throws JPPFException if the socket connection fails.
 	 */
-	public BootstrapSocketClient(Socket socket) throws JPPFException
+	public BootstrapSocketClient(final Socket socket) throws JPPFException
 	{
 		super(socket);
 	}
@@ -66,7 +66,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @throws Exception if the underlying output stream throws an exception.
 	 */
 	@Override
-    public void send(Object o) throws Exception
+	public void send(final Object o) throws Exception
 	{
 		// Remove references kept by the stream, otherwise leads to OutOfMemory.
 		JPPFBuffer buffer = getSerializer().serialize(o);
@@ -81,7 +81,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @throws Exception if the underlying input stream throws an exception.
 	 */
 	@Override
-    public Object receive(int timeout) throws Exception
+	public Object receive(final int timeout) throws Exception
 	{
 		checkOpened();
 		Object o = null;
@@ -105,7 +105,7 @@ public class BootstrapSocketClient extends AbstractSocketWrapper
 	 * @see org.jppf.comm.socket.AbstractSocketWrapper#getSerializer()
 	 */
 	@Override
-    public ObjectSerializer getSerializer()
+	public ObjectSerializer getSerializer()
 	{
 		if (serializer == null) serializer = new BootstrapObjectSerializer();
 		return serializer;

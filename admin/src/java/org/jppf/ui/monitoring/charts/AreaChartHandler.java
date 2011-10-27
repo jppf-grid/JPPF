@@ -41,7 +41,7 @@ public class AreaChartHandler implements ChartHandler
 	 * Initialize this chart handler with a specified stats formatter.
 	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public AreaChartHandler(StatsHandler statsHandler)
+	public AreaChartHandler(final StatsHandler statsHandler)
 	{
 		this.statsHandler = statsHandler;
 	}
@@ -53,15 +53,15 @@ public class AreaChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration createChart(ChartConfiguration config)
+	public ChartConfiguration createChart(final ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		//JFreeChart chart = ChartFactory.createAreaChart(null, null, config.name, ds, PlotOrientation.VERTICAL, true, true, false);
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createAreaChart",
-			(String) null, null, config.name, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+				(String) null, null, config.name, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
 		//CategoryPlot plot = chart.getCategoryPlot();
 		Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
-    //plot.setForegroundAlpha(0.5f);
+		//plot.setForegroundAlpha(0.5f);
 		invokeMethod(plot.getClass(), plot, "setForegroundAlpha", 0.5f);
 		//CategoryAxis axis = plot.getDomainAxis();
 		Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
@@ -71,7 +71,7 @@ public class AreaChartHandler implements ChartHandler
 		Object rend = invokeMethod(plot.getClass(), plot, "getRenderer");
 		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
 		Object labelGenerator = Proxy.newProxyInstance(
-			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategorySeriesLabelGenerator"), new CategorySeriesLabelGeneratorInvocationHandler());
+				getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategorySeriesLabelGenerator"), new CategorySeriesLabelGeneratorInvocationHandler());
 		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
 
 		config.chart = chart;
@@ -83,7 +83,7 @@ public class AreaChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private Object createDataset(ChartConfiguration config)
+	private Object createDataset(final ChartConfiguration config)
 	{
 		//DefaultCategoryDataset ds = new DefaultCategoryDataset();
 		Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
@@ -91,7 +91,7 @@ public class AreaChartHandler implements ChartHandler
 		populateDataset(config);
 		return ds;
 	}
-	
+
 	/**
 	 * Populate a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to populate.
@@ -99,7 +99,7 @@ public class AreaChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration populateDataset(ChartConfiguration config)
+	public ChartConfiguration populateDataset(final ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		//ds.clear();
@@ -124,7 +124,7 @@ public class AreaChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration updateDataset(ChartConfiguration config)
+	public ChartConfiguration updateDataset(final ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
@@ -160,7 +160,7 @@ public class AreaChartHandler implements ChartHandler
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
 		@Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
 		{
 			Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getRowKey", args[1]);
 			return StringUtils.shortenLabel(key.toString());

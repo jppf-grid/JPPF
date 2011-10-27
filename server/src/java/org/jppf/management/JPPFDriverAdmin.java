@@ -102,7 +102,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
 	 */
 	@Override
-	public String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception
+	public String changeLoadBalancerSettings(final String algorithm, final Map<Object, Object> parameters) throws Exception
 	{
 		try
 		{
@@ -124,14 +124,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 
 	/**
 	 * Perform a shutdown or restart of the server.
-	 * @param shutdownDelay the delay before shutting down the server, once the command is received. 
+	 * @param shutdownDelay the delay before shutting down the server, once the command is received.
 	 * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
 	 * @return an acknowledgement message.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
 	 */
 	@Override
-	public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
+	public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
 	{
 		try
 		{
@@ -171,10 +171,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	/**
 	 * Get a localized message given its unique name and the current locale.
 	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale 
-	 * if the localization for the current locale is not found. 
+	 * @return a message in the current locale, or the default locale
+	 * if the localization for the current locale is not found.
 	 */
-	private static String localize(String message)
+	private static String localize(final String message)
 	{
 		return LocalizationUtils.getLocalized(I18N_BASE, message);
 	}
@@ -191,6 +191,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public JPPFSystemInformation systemInformation() throws Exception
 	{
 		JPPFSystemInformation info = new JPPFSystemInformation(driver.getUuid());

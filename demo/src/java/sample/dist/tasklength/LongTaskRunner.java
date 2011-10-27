@@ -53,7 +53,7 @@ public class LongTaskRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -77,7 +77,7 @@ public class LongTaskRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
 	 * @param nbTasks the number of tasks to send at each iteration.
@@ -85,7 +85,7 @@ public class LongTaskRunner
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbTasks, int length, int iterations) throws Exception
+	private static void perform(final int nbTasks, final int length, final int iterations) throws Exception
 	{
 		try
 		{
@@ -130,13 +130,13 @@ public class LongTaskRunner
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform2(int nbTasks, int length, int iterations) throws Exception
+	private static void perform2(final int nbTasks, final int length, final int iterations) throws Exception
 	{
-		
+
 		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
 		//executor.setBatchSize(50);
 		//executor.setBatchTimeout(1000L);
-		
+
 		long totalTime = System.currentTimeMillis();
 		List<Future<?>> futureList = new ArrayList<Future<?>>();
 		for (int i=0; i<nbTasks; i++)
@@ -148,7 +148,7 @@ public class LongTaskRunner
 		for (Future<?> f: futureList)
 		{
 			f.get();
-			JPPFTask t = ((JPPFTaskFuture<?>) f).getTask(); 
+			JPPFTask t = ((JPPFTaskFuture<?>) f).getTask();
 			if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
 			else System.out.println("task result: " + t.getResult());
 		}
@@ -164,9 +164,9 @@ public class LongTaskRunner
 	 * @param iterations the number of times the the tasks will be sent.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform3(int nbTasks, int length, int iterations) throws Exception
+	private static void perform3(final int nbTasks, final int length, final int iterations) throws Exception
 	{
-		
+
 		JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
 		//executor.setBatchSize(50);
 		//executor.setBatchTimeout(1000L);
@@ -185,7 +185,7 @@ public class LongTaskRunner
 			for (Future<?> f: futureList)
 			{
 				f.get();
-				JPPFTask t = ((JPPFTaskFuture<?>) f).getTask(); 
+				JPPFTask t = ((JPPFTaskFuture<?>) f).getTask();
 				if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
 				else System.out.println("task result: " + t.getResult());
 			}
@@ -201,7 +201,7 @@ public class LongTaskRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);
@@ -221,7 +221,7 @@ public class LongTaskRunner
 		 * Initialize this callable with the specified jppf task.
 		 * @param task a <code>JPPFTask</code> instance.
 		 */
-		public JPPFTaskCallable(JPPFTask task)
+		public JPPFTaskCallable(final JPPFTask task)
 		{
 			this.task = task;
 		}
@@ -230,7 +230,7 @@ public class LongTaskRunner
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			task.run();
 			setResult(task.getResult());
@@ -241,7 +241,7 @@ public class LongTaskRunner
 		 * {@inheritDoc}
 		 */
 		@Override
-        public Object call() throws Exception
+		public Object call() throws Exception
 		{
 			run();
 			return getResult();
@@ -280,7 +280,7 @@ public class LongTaskRunner
 		Thread.sleep(3000L);
 		System.out.println("resuming the job");
 		jobManager.resumeJob(job.getJobUuid());
-		*/
+		 */
 		Thread.sleep(2000L);
 		print("restarting the driver");
 		restartDriver();
@@ -313,7 +313,7 @@ public class LongTaskRunner
 		job.setBlocking(false);
 		jppfClient.submit(job);
 		/*
-		*/
+		 */
 		DriverJobManagementMBean jobManager = getJobManagement();
 		Thread.sleep(3000L);
 		System.out.println("cancelling the first job");
@@ -371,7 +371,7 @@ public class LongTaskRunner
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				try
 				{

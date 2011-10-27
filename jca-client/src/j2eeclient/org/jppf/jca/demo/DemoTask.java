@@ -29,7 +29,7 @@ public class DemoTask extends JPPFTask
 	/**
 	 * Explicit serialVersionUID.
 	 */
-    private static final long serialVersionUID = 1441035751363821022L;
+	private static final long serialVersionUID = 1441035751363821022L;
 
 	/**
 	 * Counts the number of times this task was run.
@@ -40,7 +40,7 @@ public class DemoTask extends JPPFTask
 	 */
 	private int counter = 0;
 
-    /**
+	/**
 	 * Default constructor.
 	 */
 	public DemoTask()
@@ -54,7 +54,7 @@ public class DemoTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		String s = "***** Hello JPPF !!! [" + counter + "] *****";
 		System.out.println(s);

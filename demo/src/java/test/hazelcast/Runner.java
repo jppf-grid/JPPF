@@ -2,8 +2,7 @@ package test.hazelcast;
 
 import java.util.Map;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 
 import com.hazelcast.core.Hazelcast;
 
@@ -14,7 +13,7 @@ public class Runner
 	 */
 	private static JPPFClient jppfClient = null;
 
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{

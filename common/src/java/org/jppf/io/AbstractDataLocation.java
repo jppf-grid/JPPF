@@ -43,7 +43,7 @@ public abstract class AbstractDataLocation implements DataLocation
 	 * @see org.jppf.io.DataLocation#getSize()
 	 */
 	@Override
-    public int getSize()
+	public int getSize()
 	{
 		return size;
 	}
@@ -52,7 +52,7 @@ public abstract class AbstractDataLocation implements DataLocation
 	 * Set the size of the data referenced by this data location.
 	 * @param size - the data size as an int.
 	 */
-	public void setSize(int size)
+	public void setSize(final int size)
 	{
 		this.size = size;
 	}

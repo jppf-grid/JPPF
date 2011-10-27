@@ -30,7 +30,7 @@ public class PoolConfigGenerator
 	 * Generate config properties for a connection pool.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

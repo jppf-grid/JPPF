@@ -38,7 +38,7 @@ public class ExceptionTestTask extends JPPFTestTask
 	{
 		throw new NullPointerException();
 	}
-	
+
 	/**
 	 * This method throws an <code>ArrayIndexOutOfBoundsException</code>.
 	 */
@@ -46,7 +46,7 @@ public class ExceptionTestTask extends JPPFTestTask
 	{
 		throw new ArrayIndexOutOfBoundsException();
 	}
-	
+
 	/**
 	 * This method throws a <code>SecurityException</code>.
 	 */

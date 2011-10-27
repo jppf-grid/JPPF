@@ -40,7 +40,7 @@ public class StreamInputSource implements InputSource
 	 * Initialize this stream input source with the specified input stream.
 	 * @param is the input stream to read from.
 	 */
-	public StreamInputSource(InputStream is)
+	public StreamInputSource(final InputStream is)
 	{
 		this.is = is;
 	}
@@ -55,7 +55,7 @@ public class StreamInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] data, int offset, int len) throws Exception
+	public int read(final byte[] data, final int offset, final int len) throws Exception
 	{
 		int n = is.read(data, offset, len);
 		if (n < 0) throw new EOFException();
@@ -70,7 +70,7 @@ public class StreamInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
 	@Override
-    public int read(ByteBuffer buffer) throws Exception
+	public int read(final ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
 		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
@@ -86,12 +86,12 @@ public class StreamInputSource implements InputSource
 
 	/**
 	 * Read an int value from this input source.
-	 * @return the value read, or -1 if an end of file condition was reached. 
+	 * @return the value read, or -1 if an end of file condition was reached.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
 	@Override
-    public int readInt() throws Exception
+	public int readInt() throws Exception
 	{
 		byte[] value = new byte[4];
 		read(value, 0, 4);
@@ -106,7 +106,7 @@ public class StreamInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
 	@Override
-    public int skip(int n) throws Exception
+	public int skip(final int n) throws Exception
 	{
 		return (int) is.skip(n);
 	}
@@ -117,7 +117,7 @@ public class StreamInputSource implements InputSource
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		is.close();
 	}

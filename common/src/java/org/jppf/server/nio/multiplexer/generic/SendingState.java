@@ -42,7 +42,7 @@ public class SendingState extends MultiplexerServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendingState(MultiplexerNioServer server)
+	public SendingState(final MultiplexerNioServer server)
 	{
 		super(server);
 	}
@@ -51,7 +51,7 @@ public class SendingState extends MultiplexerServerState
 	 * {@inheritDoc}
 	 */
 	@Override
-    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
@@ -59,7 +59,7 @@ public class SendingState extends MultiplexerServerState
 			ByteBufferWrapper message = context.nextPendingMessage();
 			context.setCurrentMessage(message.buffer);
 			if (debugEnabled) log.debug(wrapper.toString() + " about to send message #" + message.order +
-				": " + (message.buffer.limit()+1) + " bytes");
+					": " + (message.buffer.limit()+1) + " bytes");
 		}
 		if (context.getCurrentMessage() == null) return TO_SENDING_OR_RECEIVING;
 		if (context.writeMultiplexerMessage(wrapper))

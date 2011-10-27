@@ -36,7 +36,7 @@ public class DriverLauncher
 	 * Start this application, then the JPPF driver a subprocess.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

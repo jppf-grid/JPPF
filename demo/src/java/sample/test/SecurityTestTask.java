@@ -19,6 +19,7 @@ package sample.test;
 
 import java.io.*;
 import java.net.Socket;
+
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -33,7 +34,7 @@ public class SecurityTestTask extends JPPFTestTask
 	public SecurityTestTask()
 	{
 	}
-	
+
 	/**
 	 * Try exiting the JVM through a <code>System.exit(int)</code> call.
 	 * @throws SecurityException if the security manager prevents from exiting the JVM.

@@ -47,7 +47,7 @@ public class ChannelOutputDestination implements OutputDestination
 	 * Initialize this output destination with the specified <code>SocketWrapper</code>.
 	 * @param channel the backing <code>SocketWrapper</code>.
 	 */
-	public ChannelOutputDestination(WritableByteChannel channel)
+	public ChannelOutputDestination(final WritableByteChannel channel)
 	{
 		this.channel = channel;
 	}
@@ -62,7 +62,7 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
 	@Override
-    public int write(byte[] data, int offset, int len) throws Exception
+	public int write(final byte[] data, final int offset, final int len) throws Exception
 	{
 		int cap = StreamConstants.TEMP_BUFFER_SIZE;
 		if (tmpBuffer == null) tmpBuffer = ByteBuffer.allocateDirect(cap);
@@ -91,19 +91,19 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
 	@Override
-    public int write(ByteBuffer data) throws Exception
+	public int write(final ByteBuffer data) throws Exception
 	{
 		return channel.write(data);
 	}
 
 	/**
 	 * Write an int value to this output destination.
-	 * @param value the value to write. 
+	 * @param value the value to write.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
 	@Override
-    public void writeInt(int value) throws Exception
+	public void writeInt(final int value) throws Exception
 	{
 		SerializationUtils.writeInt(channel, value);
 	}
@@ -114,7 +114,7 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 	}
 }

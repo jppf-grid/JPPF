@@ -41,12 +41,12 @@ public class JPPFConnectionMetaData implements ConnectionMetaData
 	}
 
 	/**
-	 * name.Get the product name. 
+	 * name.Get the product name.
 	 * @return the name as a string.
 	 * @see javax.resource.cci.ConnectionMetaData#getEISProductName()
 	 */
 	@Override
-    public String getEISProductName()
+	public String getEISProductName()
 	{
 		return "JPPF";
 	}
@@ -57,7 +57,7 @@ public class JPPFConnectionMetaData implements ConnectionMetaData
 	 * @see javax.resource.cci.ConnectionMetaData#getEISProductVersion()
 	 */
 	@Override
-    public String getEISProductVersion()
+	public String getEISProductVersion()
 	{
 		return "1.0 beta";
 	}
@@ -68,7 +68,7 @@ public class JPPFConnectionMetaData implements ConnectionMetaData
 	 * @see javax.resource.cci.ConnectionMetaData#getUserName()
 	 */
 	@Override
-    public String getUserName()
+	public String getUserName()
 	{
 		return userName;
 	}

@@ -62,7 +62,7 @@ class PeerNodeResultSender extends AbstractResultSender
 	 * @see org.jppf.server.AbstractResultSender#waitForExecution()
 	 */
 	@Override
-    public synchronized void waitForExecution() throws Exception
+	public synchronized void waitForExecution() throws Exception
 	{
 		long start = System.nanoTime();
 		while (getPendingTasksCount() > 0)
@@ -108,7 +108,7 @@ class PeerNodeResultSender extends AbstractResultSender
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
 	@Override
-    public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
+	public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");

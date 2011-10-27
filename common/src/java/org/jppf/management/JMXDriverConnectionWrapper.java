@@ -51,7 +51,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @param host the host the server is running on.
 	 * @param port the RMI port used by the server.
 	 */
-	public JMXDriverConnectionWrapper(String host, int port)
+	public JMXDriverConnectionWrapper(final String host, final int port)
 	{
 		super(host, port, JPPFAdminMBean.DRIVER_SUFFIX);
 		local = false;
@@ -64,7 +64,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
 	 */
 	@Override
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public Collection<JPPFManagementInfo> nodesInformation() throws Exception
 	{
 		return (Collection<JPPFManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
@@ -77,24 +77,24 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
 	 */
 	@Override
-    public JPPFStats statistics() throws Exception
+	public JPPFStats statistics() throws Exception
 	{
-    return (JPPFStats) invoke(DRIVER_MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
+		return (JPPFStats) invoke(DRIVER_MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
 	}
 
 	/**
 	 * Perform a shutdown or restart of the server.
-	 * @param shutdownDelay the delay before shutting down the server, once the command is received. 
+	 * @param shutdownDelay the delay before shutting down the server, once the command is received.
 	 * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
 	 * @return an acknowledgement message.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
 	 */
 	@Override
-    public String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception
+	public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
 	{
 		return (String) invoke(DRIVER_MBEAN_NAME, "restartShutdown",
-			new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
+				new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
 	}
 
 	/**
@@ -106,10 +106,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
 	 */
 	@Override
-    public String changeLoadBalancerSettings(String algorithm, Map parameters) throws Exception
+	public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception
 	{
 		return (String) invoke(DRIVER_MBEAN_NAME, "changeLoadBalancerSettings",
-			new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
+				new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
 	 */
 	@Override
-    public LoadBalancingInformation loadBalancerInformation() throws Exception
+	public LoadBalancingInformation loadBalancerInformation() throws Exception
 	{
 		return (LoadBalancingInformation) invoke(DRIVER_MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
 	}
@@ -130,7 +130,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
 	 */
-	public void cancelJob(String jobId) throws Exception
+	public void cancelJob(final String jobId) throws Exception
 	{
 		invoke(DriverJobManagementMBean.MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
@@ -143,7 +143,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
 	 */
-	public void suspendJob(String jobId, Boolean requeue) throws Exception
+	public void suspendJob(final String jobId, final Boolean requeue) throws Exception
 	{
 		invoke(DriverJobManagementMBean.MBEAN_NAME, "suspendJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
 	}
@@ -154,7 +154,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
 	 */
-	public void resumeJob(String jobId) throws Exception
+	public void resumeJob(final String jobId) throws Exception
 	{
 		invoke(DriverJobManagementMBean.MBEAN_NAME, "resumeJob", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
@@ -166,9 +166,9 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
 	 */
-	public void updateMaxNodes(String jobId, Integer maxNodes) throws Exception
+	public void updateMaxNodes(final String jobId, final Integer maxNodes) throws Exception
 	{
-		invoke(DriverJobManagementMBean.MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" }); 
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" });
 	}
 
 	/**
@@ -178,9 +178,9 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
 	 */
-	public void updateJobPriority(String jobId, Integer newPriority) throws Exception
+	public void updateJobPriority(final String jobId, final Integer newPriority) throws Exception
 	{
-		invoke(DriverJobManagementMBean.MBEAN_NAME, "updatePriority", new Object[] { jobId, newPriority }, new String[] { "java.lang.String", "java.lang.Integer" }); 
+		invoke(DriverJobManagementMBean.MBEAN_NAME, "updatePriority", new Object[] { jobId, newPriority }, new String[] { "java.lang.String", "java.lang.Integer" });
 	}
 
 	/**
@@ -196,13 +196,13 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	}
 
 	/**
-	 * Get an object describing the job with the specified id. 
+	 * Get an object describing the job with the specified id.
 	 * @param jobId the id of the job to get information about.
 	 * @return an instance of <code>JobInformation</code>.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
 	 */
-	public JobInformation getJobInformation(String jobId) throws Exception
+	public JobInformation getJobInformation(final String jobId) throws Exception
 	{
 		return (JobInformation) invoke(DriverJobManagementMBean.MBEAN_NAME, "getJobInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
@@ -214,7 +214,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
 	 */
-	public NodeJobInformation[] getNodeInformation(String jobId) throws Exception
+	public NodeJobInformation[] getNodeInformation(final String jobId) throws Exception
 	{
 		return (NodeJobInformation[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
 	}
@@ -231,6 +231,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public JPPFSystemInformation systemInformation() throws Exception
 	{
 		return (JPPFSystemInformation) invoke(DRIVER_MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);

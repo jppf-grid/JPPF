@@ -48,7 +48,7 @@ public final class ReflectionHelper
 	 * @return the result of the method's invocation, or null if the method's return type is void,
 	 * or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object invokeMethod(Class<?> clazz, Object instance, String methodName, Class<?>[] paramTypes, Object...values)
+	public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Class<?>[] paramTypes, final Object...values)
 	{
 		try
 		{
@@ -72,7 +72,7 @@ public final class ReflectionHelper
 	 * @return the result of the method's invocation, or null if the method's return type is void,
 	 * or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object invokeMethod(Class clazz, Object instance, String methodName, Object...values)
+	public static Object invokeMethod(final Class clazz, final Object instance, final String methodName, final Object...values)
 	{
 		try
 		{
@@ -98,7 +98,7 @@ public final class ReflectionHelper
 	 * @return the result of the method's invocation, or null if the method's return type is void,
 	 * or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object invokeMethod(Class clazz, Object instance, String methodName)
+	public static Object invokeMethod(final Class clazz, final Object instance, final String methodName)
 	{
 		return invokeMethod(clazz, instance, methodName, null, (Object[]) null);
 	}
@@ -108,7 +108,7 @@ public final class ReflectionHelper
 	 * @param className the name of the class to instantiate.
 	 * @return an instance of the class whose name is specified, or a <code>JPPFException</code> if the instantiation failed.
 	 */
-	public static Object newInstance(String className)
+	public static Object newInstance(final String className)
 	{
 		try
 		{
@@ -129,7 +129,7 @@ public final class ReflectionHelper
 	 * @param values the values of the constructor's parameters, may be null if no parameters.
 	 * @return the result of the constructor's invocation, or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object invokeConstructor(Class<?> clazz, Class<?>[] paramTypes, Object...values)
+	public static Object invokeConstructor(final Class<?> clazz, final Class<?>[] paramTypes, final Object...values)
 	{
 		try
 		{
@@ -150,7 +150,7 @@ public final class ReflectionHelper
 	 * @param fieldName the name of the field to get the value  of.
 	 * @return the value of the field, or a <code>JPPFException</code> if the invocation failed.
 	 */
-	public static Object getField(Class clazz, Object instance, String fieldName)
+	public static Object getField(final Class clazz, final Object instance, final String fieldName)
 	{
 		try
 		{
@@ -169,7 +169,7 @@ public final class ReflectionHelper
 	 * @param classNames the names of the classes to find.
 	 * @return n array of <code>Class</code> objects, or null if one of the classes could not be found.
 	 */
-	public static Class[] getClasses(String...classNames)
+	public static Class[] getClasses(final String...classNames)
 	{
 		try
 		{
@@ -192,7 +192,7 @@ public final class ReflectionHelper
 	 * @param className the name of the class to find.
 	 * @return n array of <code>Class</code> objects, or null if one of the classes could not be found.
 	 */
-	public static Class getClass0(String className)
+	public static Class getClass0(final String className)
 	{
 		try
 		{
@@ -206,7 +206,7 @@ public final class ReflectionHelper
 	}
 
 	/**
-	 * Returns the current thread's context class loader, or this class's class loader if it is null. 
+	 * Returns the current thread's context class loader, or this class's class loader if it is null.
 	 * @return a <code>ClassLoader</code> instance.
 	 */
 	public static ClassLoader getCurrentClassLoader()

@@ -46,7 +46,7 @@ public class JPPFFileHandler extends FileHandler
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Formatter getFormatter()
+	public Formatter getFormatter()
 	{
 		return jppfFormatter;
 	}

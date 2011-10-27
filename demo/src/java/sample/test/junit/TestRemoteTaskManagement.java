@@ -88,7 +88,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 	 * @return a <code>JPPFTask</code> instance.
 	 * @throws Exception if the execution failed.
 	 */
-	private JPPFTask execute(JPPFTask task, int command, String id) throws Exception
+	private JPPFTask execute(final JPPFTask task, final int command, final String id) throws Exception
 	{
 		JPPFTask result = null;
 		client = new JPPFClient();
@@ -131,7 +131,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * Initialize this task with the specified time in milliseconds.
 		 * @param time the time in milliseconds for this task to wait before completing normally.
 		 */
-		public ManagementTestTask(long time)
+		public ManagementTestTask(final long time)
 		{
 			this.time = time;
 		}
@@ -141,7 +141,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -158,7 +158,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 		 */
 		@Override
-        public void onCancel()
+		public void onCancel()
 		{
 			setResult("cancelled");
 		}
@@ -168,7 +168,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		 * @see org.jppf.server.protocol.JPPFTask#onRestart()
 		 */
 		@Override
-        public void onRestart()
+		public void onRestart()
 		{
 			setResult("restarted");
 		}

@@ -56,7 +56,7 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		List<JobData> jobList = new ArrayList<JobData>();

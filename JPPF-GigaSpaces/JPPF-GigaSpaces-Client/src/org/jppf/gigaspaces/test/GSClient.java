@@ -44,7 +44,7 @@ public class GSClient implements InitializingBean
 	 * @return the results as a <code>JPPFJob</code> instance.
 	 * @throws Exception if any error occurs.
 	 */
-	public static JPPFJob execute(String jobName, int nbTasks, long taskDuration) throws Exception
+	public static JPPFJob execute(final String jobName, final int nbTasks, final long taskDuration) throws Exception
 	{
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:client.xml");
 		context.start();
@@ -65,19 +65,19 @@ public class GSClient implements InitializingBean
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	@Override
-    public void afterPropertiesSet() throws Exception
+	public void afterPropertiesSet() throws Exception
 	{
 	}
 
 	/**
-	 * Execute a job with the specified parameters, submitting it to the JPPF space. 
+	 * Execute a job with the specified parameters, submitting it to the JPPF space.
 	 * @param jobName the name given to the JPPF job.
 	 * @param nbTasks the number of tasks in the job.
 	 * @param taskDuration the duration in milliseconds of each task in the job.
 	 * @return the results as a <code>JPPFJob</code> instance.
 	 * @throws Exception if any error occurs.
 	 */
-	public JPPFJob runJob(String jobName, int nbTasks, long taskDuration) throws Exception
+	public JPPFJob runJob(final String jobName, final int nbTasks, final long taskDuration) throws Exception
 	{
 		JPPFJob job = new JPPFJob();
 		job.setName(jobName);
@@ -103,7 +103,7 @@ public class GSClient implements InitializingBean
 	 * Set a proxy to the service deployed in a GS space.
 	 * @param service a <code>JPPFService</code> instance.
 	 */
-	public void setJppfService(JPPFService service)
+	public void setJppfService(final JPPFService service)
 	{
 		this.jppfService = service;
 	}

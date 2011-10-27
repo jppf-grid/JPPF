@@ -50,7 +50,7 @@ public class JavaOption extends AbstractOption
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		try
 		{
@@ -79,7 +79,7 @@ public class JavaOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -90,7 +90,7 @@ public class JavaOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 	}
 
@@ -107,7 +107,7 @@ public class JavaOption extends AbstractOption
 	 * Set the fully qualified class name of the UI component to instantiate.
 	 * @param className the clas name as a string.
 	 */
-	public synchronized void setClassName(String className)
+	public synchronized void setClassName(final String className)
 	{
 		this.className = className;
 	}
@@ -135,7 +135,7 @@ public class JavaOption extends AbstractOption
 		 * Set the option on which this listener is set.
 		 * @param option a <code>JavaOption</code> instance.
 		 */
-		public void setOption(JavaOption option)
+		public void setOption(final JavaOption option)
 		{
 			this.option = option;
 		}
@@ -154,7 +154,7 @@ public class JavaOption extends AbstractOption
 	 * Set the class name of the mouseListener to set on this element.
 	 * @param mouseListenerClassName the class name as a string.
 	 */
-	public void setMouseListenerClassName(String mouseListenerClassName)
+	public void setMouseListenerClassName(final String mouseListenerClassName)
 	{
 		this.mouseListenerClassName = mouseListenerClassName;
 	}

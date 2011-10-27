@@ -42,7 +42,7 @@ public class TestTask extends CommandLineTask
 	 * Initialize the script's parameters.
 	 * @param number directory in which to list the files.
 	 */
-	public TestTask(String number)
+	public TestTask(final String number)
 	{
 		this.number = number;
 	}
@@ -52,7 +52,7 @@ public class TestTask extends CommandLineTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -67,7 +67,7 @@ public class TestTask extends CommandLineTask
 			FileLocation fileLoc = new FileLocation("output-" + number + ".txt");
 			FileLocation tmp = new FileLocation("/tmp/somefolder/output-" + number + ".txt");
 			fileLoc.copyTo(tmp);
-			*/
+			 */
 			String outputPath = "/home/lcohen/Downloads/folder1/output.txt";
 			setCommandList("/bin/sh", "-c", "ps -A|grep java > " + outputPath);
 			//setCommandList("/bin/sh", "-c", "cat etc/file|grep -s A > " + "output-"+ number + ".txt");
@@ -83,8 +83,8 @@ public class TestTask extends CommandLineTask
 
 			InputStream is = fileLoc.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);	
-			
+			BufferedReader br = new BufferedReader(isr);
+
 			// Read in the File
 			String line = "";
 			List<String> file = new ArrayList<String>();

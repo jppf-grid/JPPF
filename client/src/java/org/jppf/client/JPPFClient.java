@@ -61,7 +61,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * Initialize this client with an automatically generated application UUID.
 	 * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
 	 */
-	public JPPFClient(ClientListener...listeners)
+	public JPPFClient(final ClientListener...listeners)
 	{
 		this();
 		for (ClientListener listener: listeners) addClientListener(listener);
@@ -71,7 +71,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
 	 */
-	public JPPFClient(String uuid)
+	public JPPFClient(final String uuid)
 	{
 		super(uuid, JPPFConfiguration.getProperties());
 	}
@@ -81,7 +81,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @param uuid the unique identifier for this local client.
 	 * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
 	 */
-	public JPPFClient(String uuid, ClientListener...listeners)
+	public JPPFClient(final String uuid, final ClientListener...listeners)
 	{
 		this(uuid);
 		for (ClientListener listener: listeners) addClientListener(listener);
@@ -92,7 +92,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @param configuration an object holding the JPPF configuration.
 	 */
 	@Override
-	protected void initConfig(Object configuration)
+	protected void initConfig(final Object configuration)
 	{
 		config = (TypedProperties) configuration;
 	}
@@ -105,7 +105,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
 	 */
 	@Override
-	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
+	protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
 	{
 		return new JPPFClientConnectionImpl(this, uuid, name, info);
 	}
@@ -118,7 +118,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
-	public List<JPPFTask> submit(JPPFJob job) throws Exception
+	public List<JPPFTask> submit(final JPPFJob job) throws Exception
 	{
 		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job));
 		//else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
@@ -163,7 +163,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * {@inheritDoc}
 	 */
 	@Override
-  protected void initPools()
+	protected void initPools()
 	{
 		submissionManager = new SubmissionManagerImpl(this);
 		new Thread(submissionManager, "SubmissionManager").start();
@@ -176,7 +176,7 @@ public class JPPFClient extends AbstractGenericClient
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
 	@Override
-  public void statusChanged(ClientConnectionStatusEvent event)
+	public void statusChanged(final ClientConnectionStatusEvent event)
 	{
 		super.statusChanged(event);
 		submissionManager.wakeUp();

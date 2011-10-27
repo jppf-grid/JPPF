@@ -31,7 +31,7 @@ public class TestJMX
 	 * Entry point.
 	 * @param args - not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -86,7 +86,7 @@ public class TestJMX
 		/*
 		System.out.println("*** press any key to terminate ***");
 		System.in.read();
-		*/
+		 */
 	}
 
 	/**
@@ -96,22 +96,22 @@ public class TestJMX
 	 */
 	public int getNumberOfNodes() throws Exception
 	{
-	  // create a JMX connection to the driver
-	  // replace "your_host_address" and "your_port" with the appropriate values for your configuration
-	  JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
-	  // start the connection process and wait until the connection is established
-	  jmxConnection.connectAndWait(1000);
-	  // request the statistics from the driver
-	  JPPFStats stats = jmxConnection.statistics();
-    /*
+		// create a JMX connection to the driver
+		// replace "your_host_address" and "your_port" with the appropriate values for your configuration
+		JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
+		// start the connection process and wait until the connection is established
+		jmxConnection.connectAndWait(1000);
+		// request the statistics from the driver
+		JPPFStats stats = jmxConnection.statistics();
+		/*
 	  while (stats == null)
     {
 	    Thread.currentThread().sleep(50);
     	stats = jmxConnection.statistics();
     }
-    */
-	  jmxConnection.close();
-	  // return the current number of nodes
-	  return (int) stats.getNodes().getLatest();
+		 */
+		jmxConnection.close();
+		// return the current number of nodes
+		return (int) stats.getNodes().getLatest();
 	}
 }

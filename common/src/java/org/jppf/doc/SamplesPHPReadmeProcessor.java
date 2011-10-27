@@ -58,7 +58,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	 * @param template the template file for each Readme.php.
 	 * @throws Exception if any error occurs.
 	 */
-	public SamplesPHPReadmeProcessor(File sourceDir, File destDir, File template) throws Exception
+	public SamplesPHPReadmeProcessor(final File sourceDir, final File destDir, final File template) throws Exception
 	{
 		this.sourceDir = sourceDir;
 		this.destDir = destDir;
@@ -86,7 +86,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -104,7 +104,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	 * @param file the html file to process.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processFile(File file) throws Exception
+	private void processFile(final File file) throws Exception
 	{
 		System.out.println("processing input file " + file);
 		String text = FileUtils.readTextFile(file);
@@ -134,7 +134,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	 * Run this utility with the specified command-line parameters.
 	 * @param args the source and destination directories.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{

@@ -69,7 +69,7 @@ public class Setup1D1N
 		shutdownHook = new Thread()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				stopProcesses();
 			}

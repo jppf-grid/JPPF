@@ -49,7 +49,7 @@ public class CryptoUtils
 	 * Entry pont to test this class.
 	 * @param args no used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -68,7 +68,7 @@ public class CryptoUtils
 			byte[] encrypted = encrypt(data);
 			byte[] decrypted = decrypt(encrypted);
 			System.out.println("Decrypted value: "+new String(decrypted));
-			*/
+			 */
 		}
 		catch(Exception e)
 		{
@@ -112,7 +112,7 @@ public class CryptoUtils
 
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DH");
 		keyGen.initialize(paramSpec);
-    KeyPair pair = keyGen.generateKeyPair();
+		KeyPair pair = keyGen.generateKeyPair();
 
 		PrivateKey privateKey = pair.getPrivate();
 		PublicKey publicKey = pair.getPublic();
@@ -141,7 +141,7 @@ public class CryptoUtils
 	 * @return the encoded key value, as an array of bytes.
 	 * @throws IOException if an exception is raised while readsing the file.
 	 */
-	public static byte[] readKeyFile(String filename) throws IOException
+	public static byte[] readKeyFile(final String filename) throws IOException
 	{
 		InputStream is = null;
 		File file = new File(filename);
@@ -158,12 +158,12 @@ public class CryptoUtils
 	 * @return the digital data signature as an array of bytes.
 	 * @throws Exception if an exception is raised while generating the signature.
 	 */
-	public static byte[] generateSignature(byte[] data) throws Exception
+	public static byte[] generateSignature(final byte[] data) throws Exception
 	{
 		Signature sig = Signature.getInstance("SHA1withDSA");
 		sig.initSign(getPrivateKey());
 		sig.update(data);
-        return sig.sign();
+		return sig.sign();
 	}
 
 	/**
@@ -173,7 +173,7 @@ public class CryptoUtils
 	 * @return the digital data signature as an array of bytes.
 	 * @throws Exception if an exception is raised while generating the signature.
 	 */
-	public static boolean verifySignature(byte[] signature, byte[] data) throws Exception
+	public static boolean verifySignature(final byte[] signature, final byte[] data) throws Exception
 	{
 		Signature sig = Signature.getInstance("SHA1withDSA");
 		sig.initVerify(getPublicKey());
@@ -193,7 +193,7 @@ public class CryptoUtils
 			byte[] priv = readKeyFile("config/PrivateKey.txt");
 			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(priv);
 			KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-	    privateKey = keyFactory.generatePrivate(privKeySpec);
+			privateKey = keyFactory.generatePrivate(privKeySpec);
 		}
 		return privateKey;
 	}
@@ -210,7 +210,7 @@ public class CryptoUtils
 			byte[] pub = readKeyFile("config/PublicKey.txt");
 			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pub);
 			KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-	    publicKey = keyFactory.generatePublic(pubKeySpec);
+			publicKey = keyFactory.generatePublic(pubKeySpec);
 		}
 		return publicKey;
 	}
@@ -238,7 +238,7 @@ public class CryptoUtils
 	 * @return a <code>SecretKey</code> instance.
 	 * @throws Exception if the secret key could not be obtained.
 	 */
-	public static SecretKey getSecretKeyFromEncoded(byte[] encoded) throws Exception
+	public static SecretKey getSecretKeyFromEncoded(final byte[] encoded) throws Exception
 	{
 		KeySpec spec = new DESKeySpec(encoded);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
@@ -251,7 +251,7 @@ public class CryptoUtils
 	 * @return the encrypted data as an array of bytes.
 	 * @throws Exception if the data encryption failed.
 	 */
-	public static byte[] encrypt(byte[] data) throws Exception
+	public static byte[] encrypt(final byte[] data) throws Exception
 	{
 		return encrypt(getSecretKey(), data);
 	}
@@ -263,7 +263,7 @@ public class CryptoUtils
 	 * @return the encrypted data as an array of bytes.
 	 * @throws Exception if the data encryption failed.
 	 */
-	public static byte[] encrypt(SecretKey key, byte[] data) throws Exception
+	public static byte[] encrypt(final SecretKey key, final byte[] data) throws Exception
 	{
 		Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 		cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -276,7 +276,7 @@ public class CryptoUtils
 	 * @return the encrypted data as an array of bytes.
 	 * @throws Exception if the data encryption failed.
 	 */
-	public static byte[] decrypt(byte[] data) throws Exception
+	public static byte[] decrypt(final byte[] data) throws Exception
 	{
 		return decrypt(getSecretKey(), data);
 	}
@@ -288,7 +288,7 @@ public class CryptoUtils
 	 * @return the encrypted data as an array of bytes.
 	 * @throws Exception if the data encryption failed.
 	 */
-	public static byte[] decrypt(SecretKey key, byte[] data) throws Exception
+	public static byte[] decrypt(final SecretKey key, final byte[] data) throws Exception
 	{
 		Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 		cipher.init(Cipher.DECRYPT_MODE, key);

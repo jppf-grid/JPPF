@@ -58,7 +58,7 @@ public interface Task<T> extends Runnable, Serializable
 
 	/**
 	 * Get the provider of shared data for this task.
-	 * @return a <code>DataProvider</code> instance. 
+	 * @return a <code>DataProvider</code> instance.
 	 */
 	DataProvider getDataProvider();
 
@@ -115,7 +115,7 @@ public interface Task<T> extends Runnable, Serializable
 
 	/**
 	 * Get the task timeout schedule configuration.
-	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance. 
+	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance.
 	 */
 	void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
 

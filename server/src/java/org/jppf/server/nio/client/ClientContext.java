@@ -98,7 +98,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the task bundle to send or receive.
 	 * @param bundle a {@link JPPFTaskBundle} instance.
 	 */
-	public void setBundle(ServerJob bundle)
+	public void setBundle(final ServerJob bundle)
 	{
 		this.bundle = bundle;
 	}
@@ -107,7 +107,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleException(ChannelWrapper<?> channel)
+	public void handleException(final ChannelWrapper<?> channel)
 	{
 		ClientNioServer.closeClient(channel);
 		cancelJobOnClose();
@@ -166,7 +166,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the message wrapping the data sent or received over the socket channel.
 	 * @param nodeMessage a {@link ClientMessage NodeMessage} instance.
 	 */
-	public void setClientMessage(ClientMessage nodeMessage)
+	public void setClientMessage(final ClientMessage nodeMessage)
 	{
 		this.clientMessage = nodeMessage;
 	}
@@ -184,7 +184,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the uuid of the corresponding node.
 	 * @param nodeUuid the uuid as a string.
 	 */
-	public void setClientUuid(String nodeUuid)
+	public void setClientUuid(final String nodeUuid)
 	{
 		this.clientUuid = nodeUuid;
 	}
@@ -193,7 +193,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean readMessage(ChannelWrapper<?> channel) throws Exception
+	public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
 	{
 		if (clientMessage == null) clientMessage = newMessage();
 		return getClientMessage().read(channel);
@@ -203,7 +203,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean writeMessage(ChannelWrapper<?> channel) throws Exception
+	public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
 	{
 		return getClientMessage().write(channel);
 	}
@@ -221,7 +221,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Specify whether the job was canceled.
 	 * @param jobCanceled true if the job was canceled, false otherwise.
 	 */
-	public synchronized void setJobCanceled(boolean jobCanceled)
+	public synchronized void setJobCanceled(final boolean jobCanceled)
 	{
 		this.jobCanceled = jobCanceled;
 	}
@@ -230,7 +230,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Add a completed bundle to the queue of bundles to send to the client
 	 * @param bundleWrapper the bundle to add.
 	 */
-	public void offerCompletedBundle(ServerJob bundleWrapper)
+	public void offerCompletedBundle(final ServerJob bundleWrapper)
 	{
 		synchronized(completedBundles)
 		{
@@ -263,7 +263,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the number of tasks that remain to be sent to the client.
 	 * @param pendingTasksCount the number of tasks as an int.
 	 */
-	public void setPendingTasksCount(int pendingTasksCount)
+	public void setPendingTasksCount(final int pendingTasksCount)
 	{
 		this.pendingTasksCount.set(pendingTasksCount);
 	}
@@ -290,7 +290,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the id of the last job submitted via this connection.
 	 * @param currentJobId the id as a string.
 	 */
-	public void setCurrentJobId(String currentJobId)
+	public void setCurrentJobId(final String currentJobId)
 	{
 		this.currentJobId = currentJobId;
 	}
@@ -341,7 +341,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the job as initially submitted by the client.
 	 * @param initialBundleWrapper <code>BundleWrapper</code> instance.
 	 */
-	void setInitialBundleWrapper(ServerJob initialBundleWrapper)
+	void setInitialBundleWrapper(final ServerJob initialBundleWrapper)
 	{
 		this.initialBundleWrapper = initialBundleWrapper;
 	}

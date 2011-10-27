@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.node.*;
+import org.jppf.node.NodeRunner;
 import org.jppf.node.event.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -99,8 +99,8 @@ public class NodeSystemTray implements NodeLifeCycleListener
 			wrapper = new JMXNodeConnectionWrapper();
 			wrapper.connectAndWait(5000);
 			trayIcon.setImage(images[1]);
-		  taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
-		  taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
+			taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
+			taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
 		}
 		catch(Exception e)
 		{
@@ -114,17 +114,17 @@ public class NodeSystemTray implements NodeLifeCycleListener
 	 */
 	private String generateTooltipText()
 	{
-    StringBuilder sb = new StringBuilder();
-    sb.append("Node localhost:").append(JPPFConfiguration.getProperties().getInt("jppf.management.port")).append("\n");
-    if (taskMonitor != null)
-    {
-	    sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
-	    sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
-	    sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
-	    sb.append("CPU time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskCpuTime())).append("\n");
-	    sb.append("Clock time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
-    }
-    return sb.toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append("Node localhost:").append(JPPFConfiguration.getProperties().getInt("jppf.management.port")).append("\n");
+		if (taskMonitor != null)
+		{
+			sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
+			sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
+			sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
+			sb.append("CPU time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskCpuTime())).append("\n");
+			sb.append("Clock time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -138,34 +138,36 @@ public class NodeSystemTray implements NodeLifeCycleListener
 		 * @param handback not used.
 		 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
 		 */
-		public void handleNotification(Notification notification, Object handback)
+		@Override
+		public void handleNotification(final Notification notification, final Object handback)
 		{
-    	if (lock.tryLock())
-    	{
-    		try
-    		{
-		      String s = generateTooltipText();
-	      	trayIcon.setToolTip(s);
-    		}
-    		finally
-    		{
-    			lock.unlock();
-    		}
-    	}
+			if (lock.tryLock())
+			{
+				try
+				{
+					String s = generateTooltipText();
+					trayIcon.setToolTip(s);
+				}
+				finally
+				{
+					lock.unlock();
+				}
+			}
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeStarting(NodeLifeCycleEvent event)
+	@Override
+	public void nodeStarting(final NodeLifeCycleEvent event)
 	{
 		trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
 		lock.lock();
 		try
 		{
 			// node is disconnected, display the green icon
-    	trayIcon.setImage(images[0]);
+			trayIcon.setImage(images[0]);
 		}
 		finally
 		{
@@ -176,14 +178,15 @@ public class NodeSystemTray implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeEnding(NodeLifeCycleEvent event)
+	@Override
+	public void nodeEnding(final NodeLifeCycleEvent event)
 	{
 		trayIcon.displayMessage("JPPF Node disconnected from the server!", "attempting reconnection ...", MessageType.ERROR);
 		lock.lock();
 		try
 		{
 			// node is disconnected, display the red icon
-    	trayIcon.setImage(images[1]);
+			trayIcon.setImage(images[1]);
 		}
 		finally
 		{
@@ -194,14 +197,16 @@ public class NodeSystemTray implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void jobStarting(NodeLifeCycleEvent event)
+	@Override
+	public void jobStarting(final NodeLifeCycleEvent event)
 	{
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void jobEnding(NodeLifeCycleEvent event)
+	@Override
+	public void jobEnding(final NodeLifeCycleEvent event)
 	{
 	}
 }

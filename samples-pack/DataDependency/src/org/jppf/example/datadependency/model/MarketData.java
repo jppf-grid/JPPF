@@ -46,7 +46,7 @@ public class MarketData implements Serializable
 	 * Iniitialize the trade with the specified identifier.
 	 * @param id the market data identifier.
 	 */
-	public MarketData(String id)
+	public MarketData(final String id)
 	{
 		this.id = id;
 	}
@@ -64,7 +64,7 @@ public class MarketData implements Serializable
 	 * Set the market data identifier.
 	 * @param id the id as a string.
 	 */
-	public void setId(String id)
+	public void setId(final String id)
 	{
 		this.id = id;
 	}

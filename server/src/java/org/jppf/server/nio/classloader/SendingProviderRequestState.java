@@ -45,7 +45,7 @@ class SendingProviderRequestState extends ClassServerState
 	 * Initialize this state with a specified NioServer.
 	 * @param server the NioServer this state relates to.
 	 */
-	public SendingProviderRequestState(ClassNioServer server)
+	public SendingProviderRequestState(final ClassNioServer server)
 	{
 		super(server);
 	}
@@ -58,7 +58,7 @@ class SendingProviderRequestState extends ClassServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
 		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
@@ -97,8 +97,8 @@ class SendingProviderRequestState extends ClassServerState
 		}
 		if (context.writeMessage(wrapper))
 		{
-			if (debugEnabled) log.debug("request sent to the provider " + wrapper + " from node " + context.getCurrentRequest() + 
-				", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
+			if (debugEnabled) log.debug("request sent to the provider " + wrapper + " from node " + context.getCurrentRequest() +
+					", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
 			context.setMessage(new NioMessage());
 			return TO_WAITING_PROVIDER_RESPONSE;
 		}

@@ -32,7 +32,8 @@ public class UniformDataFactory extends AbstractDataFactory
 	 * @return a pseudo-random number in the specified range.
 	 * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int)
 	 */
-	public int getRandomInt(int value)
+	@Override
+	public int getRandomInt(final int value)
 	{
 		synchronized(random)
 		{

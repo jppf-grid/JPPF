@@ -30,7 +30,7 @@ public class JPPFTreeTable extends JTreeTable
 	 * Inityialize this tree table with the specified model.
 	 * @param treeTableModel - a tree table model.
 	 */
-	public JPPFTreeTable(AbstractJPPFTreeTableModel treeTableModel)
+	public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel)
 	{
 		super(treeTableModel);
 	}
@@ -40,7 +40,7 @@ public class JPPFTreeTable extends JTreeTable
 	 * @param n the row index for which to get the path.
 	 * @return a <code>TreePath</code> instance.
 	 */
-	public TreePath getPathForRow(int n)
+	public TreePath getPathForRow(final int n)
 	{
 		if (getTree().getRowCount() <= n) return null;
 		return getTree().getPathForRow(n);
@@ -51,7 +51,7 @@ public class JPPFTreeTable extends JTreeTable
 	 * @param node the node for which to get the path.
 	 * @return a <code>TreePath</code> instance.
 	 */
-	public TreePath getPathForNode(DefaultMutableTreeNode node)
+	public TreePath getPathForNode(final DefaultMutableTreeNode node)
 	{
 		return new TreePath(node.getPath());
 	}
@@ -66,16 +66,16 @@ public class JPPFTreeTable extends JTreeTable
 	}
 
 	/**
-	 * Expands the leaves of the specified node. 
+	 * Expands the leaves of the specified node.
 	 * @param node - the node to expand.
 	 */
-	public void expand(DefaultMutableTreeNode node)
+	public void expand(final DefaultMutableTreeNode node)
 	{
 		expand(node, false);
 	}
 
 	/**
-	 * Expands the leaves of the specified node. 
+	 * Expands the leaves of the specified node.
 	 * @param node the node to expand.
 	 * @param recursive specifies whether expansion should rcurse down to the leaf nodes.
 	 */

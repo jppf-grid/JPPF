@@ -42,7 +42,7 @@ public class NativeLibRunner
 	 * @param args by default, we do not use the command line arguments,
 	 * however nothing prevents us from using them if need be.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -63,7 +63,7 @@ public class NativeLibRunner
 				// execute a blocking job
 				runner.executeBlockingJob(job);
 			}
-			// execute a non-blocking job 
+			// execute a non-blocking job
 			//runner.executeNonBlockingJob(job);
 		}
 		catch(Exception e)
@@ -107,7 +107,7 @@ public class NativeLibRunner
 	 * @param job the JPPF job to execute.
 	 * @throws Exception if an error occurs while executing the job.
 	 */
-	public void executeBlockingJob(JPPFJob job) throws Exception
+	public void executeBlockingJob(final JPPFJob job) throws Exception
 	{
 		// set the job in blocking mode.
 		job.setBlocking(true);
@@ -141,7 +141,7 @@ public class NativeLibRunner
 	 * @param job the JPPF job to execute.
 	 * @throws Exception if an error occurs while executing the job.
 	 */
-	public void executeNonBlockingJob(JPPFJob job) throws Exception
+	public void executeNonBlockingJob(final JPPFJob job) throws Exception
 	{
 		// set the job in non-blocking (or asynchronous) mode.
 		job.setBlocking(false);
@@ -155,7 +155,7 @@ public class NativeLibRunner
 		JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
 		job.setResultListener(collector);
 
-		
+
 		// Submit the job. This call returns immediately without waiting for the execution of
 		// the job to complete. As a consequence, the object returned for a non-blocking job is
 		// always null. Note that we are calling the exact same method as in the blocking case.

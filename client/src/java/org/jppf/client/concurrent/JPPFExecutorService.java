@@ -88,7 +88,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Initialize this executor service with the specified JPPF client.
 	 * @param client the {@link JPPFClient} to use for job submission.
 	 */
-	public JPPFExecutorService(JPPFClient client)
+	public JPPFExecutorService(final JPPFClient client)
 	{
 		this.client = client;
 		batchHandler = new BatchHandler(this);
@@ -99,36 +99,36 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Executes the given tasks, returning a list of Futures holding their status and results when all complete.
 	 * @param <T> the type of results returned by the tasks.
 	 * @param tasks the tasks to execute.
-	 * @return a list of Futures representing the tasks, in the same sequential order as produced by the 
-	 * iterator for the given task list, each of which has completed. 
+	 * @return a list of Futures representing the tasks, in the same sequential order as produced by the
+	 * iterator for the given task list, each of which has completed.
 	 * @throws InterruptedException if interrupted while waiting, in which case unfinished tasks are cancelled.
 	 * @throws NullPointerException if tasks or any of its elements are null.
 	 * @throws RejectedExecutionException if any task cannot be scheduled for execution.
 	 * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection)
 	 */
 	@Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException
+	public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks) throws InterruptedException
 	{
 		return invokeAll(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 	}
 
 	/**
-	 * Executes the given tasks, returning a list of Futures holding their status and results 
+	 * Executes the given tasks, returning a list of Futures holding their status and results
 	 * when all complete or the timeout expires, whichever happens first.
 	 * @param <T> the type of results returned by the tasks.
 	 * @param tasks the tasks to execute.
 	 * @param timeout the maximum time to wait.
 	 * @param unit the time unit of the timeout argument.
-	 * @return a list of Futures representing the tasks, in the same sequential order as produced by the 
-	 * iterator for the given task list, each of which has completed. 
+	 * @return a list of Futures representing the tasks, in the same sequential order as produced by the
+	 * iterator for the given task list, each of which has completed.
 	 * @throws InterruptedException if interrupted while waiting, in which case unfinished tasks are cancelled.
 	 * @throws NullPointerException if tasks or any of its elements are null.
 	 * @throws RejectedExecutionException if any task cannot be scheduled for execution.
 	 * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection, long, java.util.concurrent.TimeUnit)
 	 */
-  @Override
-  @SuppressWarnings("unchecked")
-	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException
 	{
 		if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
 		if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");
@@ -156,7 +156,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @param <T> the type of results held by each future.
 	 * @param futureList the list of futures to handle.
 	 */
-	private static <T> void handleFutureList(List<Future<T>> futureList)
+	private static <T> void handleFutureList(final List<Future<T>> futureList)
 	{
 		for (Future<T> f: futureList)
 		{
@@ -175,15 +175,15 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @param <T> the type of results returned by the tasks.
 	 * @param tasks the tasks to execute.
 	 * @return the result returned by one of the tasks.
-	 * @throws InterruptedException if interrupted while waiting. 
-	 * @throws NullPointerException if tasks or any of its elements are null. 
+	 * @throws InterruptedException if interrupted while waiting.
+	 * @throws NullPointerException if tasks or any of its elements are null.
 	 * @throws IllegalArgumentException if tasks empty.
 	 * @throws ExecutionException if no task successfully completes.
 	 * @throws RejectedExecutionException if tasks cannot be scheduled for execution.
 	 * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection)
 	 */
 	@Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException
+	public <T> T invokeAny(final Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException
 	{
 		try
 		{
@@ -203,8 +203,8 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @param timeout the maximum time to wait.
 	 * @param unit the time unit of the timeout argument.
 	 * @return the result returned by one of the tasks.
-	 * @throws InterruptedException if interrupted while waiting. 
-	 * @throws NullPointerException if tasks or any of its elements are null. 
+	 * @throws InterruptedException if interrupted while waiting.
+	 * @throws NullPointerException if tasks or any of its elements are null.
 	 * @throws IllegalArgumentException if tasks empty.
 	 * @throws ExecutionException if no task successfully completes.
 	 * @throws RejectedExecutionException if tasks cannot be scheduled for execution.
@@ -213,8 +213,8 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection, long, java.util.concurrent.TimeUnit)
 	 */
 	@Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-			throws InterruptedException, ExecutionException, TimeoutException
+	public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit)
+	throws InterruptedException, ExecutionException, TimeoutException
 	{
 		List<Future<T>> futureList = invokeAll(tasks, timeout, unit);
 		handleFutureList(futureList);
@@ -226,14 +226,14 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	}
 
 	/**
-	 * Submit a value-returning task for execution and returns a Future representing the pending results of the task. 
+	 * Submit a value-returning task for execution and returns a Future representing the pending results of the task.
 	 * @param <T> the type of result returned by the task.
 	 * @param task the task to execute.
 	 * @return a Future representing pending completion of the task.
 	 * @see java.util.concurrent.ExecutorService#submit(java.util.concurrent.Callable)
 	 */
 	@Override
-    public <T> Future<T> submit(Callable<T> task)
+	public <T> Future<T> submit(final Callable<T> task)
 	{
 		if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
 		return batchHandler.addTask(task);
@@ -246,7 +246,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @see java.util.concurrent.ExecutorService#submit(java.lang.Runnable)
 	 */
 	@Override
-    public Future<?> submit(Runnable task)
+	public Future<?> submit(final Runnable task)
 	{
 		if (task instanceof JPPFTask)
 		{
@@ -261,23 +261,23 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @param <T> the type of result returned by the task.
 	 * @param task the task to execute.
 	 * @param result the result to return .
-	 * @return a Future representing pending completion of the task, and whose get() method will return the given result upon completion. 
+	 * @return a Future representing pending completion of the task, and whose get() method will return the given result upon completion.
 	 * @see java.util.concurrent.ExecutorService#submit(java.lang.Runnable, java.lang.Object)
 	 */
 	@Override
-    public <T> Future<T> submit(Runnable task, T result)
+	public <T> Future<T> submit(final Runnable task, final T result)
 	{
 		return submit(new RunnableWrapper<T>(task, result));
 	}
 
 	/**
 	 * Executes the given command at some time in the future.
-	 * The command may execute in a new thread, in a pooled thread, or in the calling thread, at the discretion of the Executor implementation. 
+	 * The command may execute in a new thread, in a pooled thread, or in the calling thread, at the discretion of the Executor implementation.
 	 * @param command the command to execute.
 	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
 	 */
 	@Override
-    public void execute(Runnable command)
+	public void execute(final Runnable command)
 	{
 		submit(command);
 	}
@@ -292,7 +292,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @see java.util.concurrent.ExecutorService#awaitTermination(long, java.util.concurrent.TimeUnit)
 	 */
 	@Override
-    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException
+	public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
 	{
 		long millis = DateTimeUtils.toMillis(timeout, unit);
 		waitForTerminated(millis);
@@ -305,19 +305,19 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @see java.util.concurrent.ExecutorService#isShutdown()
 	 */
 	@Override
-    public boolean isShutdown()
+	public boolean isShutdown()
 	{
 		return shuttingDown.get();
 	}
 
 	/**
 	 * Determine whether all tasks have completed following shut down.
-	 * Note that isTerminated is never true unless either shutdown or shutdownNow was called first. 
+	 * Note that isTerminated is never true unless either shutdown or shutdownNow was called first.
 	 * @return true if all tasks have completed following shut down.
 	 * @see java.util.concurrent.ExecutorService#isTerminated()
 	 */
 	@Override
-    public boolean isTerminated()
+	public boolean isTerminated()
 	{
 		return terminated.get();
 	}
@@ -340,7 +340,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @see java.util.concurrent.ExecutorService#shutdown()
 	 */
 	@Override
-    public void shutdown()
+	public void shutdown()
 	{
 		shuttingDown.set(true);
 		synchronized(jobMap)
@@ -355,11 +355,11 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Attempts to stop all actively executing tasks, halts the processing of waiting tasks,
 	 * and returns a list of the tasks that were awaiting execution.<br>
 	 * This implementation simply waits for all submitted tasks to terminate, due to the complexity of stopping remote tasks.
-	 * @return a list of tasks that never commenced execution. 
+	 * @return a list of tasks that never commenced execution.
 	 * @see java.util.concurrent.ExecutorService#shutdownNow()
 	 */
 	@Override
-    public List<Runnable> shutdownNow()
+	public List<Runnable> shutdownNow()
 	{
 		shuttingDown.set(true);
 		synchronized(jobMap)
@@ -379,7 +379,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @param job the job to submit.
 	 * @throws Exception if any error occurs.
 	 */
-	void submitJob(JPPFJob job) throws Exception
+	void submitJob(final JPPFJob job) throws Exception
 	{
 		if (debugEnabled) log.debug("submitting job '" + job.getName() + "' with " + job.getTasks().size() + " tasks");
 		client.submit(job);
@@ -393,7 +393,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Wait until this executor has terminated, or the specified timeout has expired, whichever happens first.
 	 * @param timeout the maximum time to wait, zero means indefinite time.
 	 */
-	private void waitForTerminated(long timeout)
+	private void waitForTerminated(final long timeout)
 	{
 		long elapsed = 0L;
 		long start = System.currentTimeMillis();
@@ -420,7 +420,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * @see org.jppf.client.concurrent.FutureResultCollectorListener#resultsComplete(org.jppf.client.concurrent.FutureResultCollectorEvent)
 	 */
 	@Override
-    public void resultsComplete(FutureResultCollectorEvent event)
+	public void resultsComplete(final FutureResultCollectorEvent event)
 	{
 		String jobUuid = event.getCollector().getJobUuid();
 		synchronized(jobMap)
@@ -443,7 +443,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Set the minimum number of tasks that must be submitted before they are sent to the server.
 	 * @param batchSize the batch size as an int.
 	 */
-	public void setBatchSize(int batchSize)
+	public void setBatchSize(final int batchSize)
 	{
 		batchHandler.setBatchSize(batchSize);
 	}
@@ -461,7 +461,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
 	 * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
 	 * @param batchTimeout the timeout as a long.
 	 */
-	public void setBatchTimeout(long batchTimeout)
+	public void setBatchTimeout(final long batchTimeout)
 	{
 		batchHandler.setBatchTimeout(batchTimeout);
 	}

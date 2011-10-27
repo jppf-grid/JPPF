@@ -42,7 +42,7 @@ public class JPPFInteractionSpec implements InteractionSpec
 	 * Initialize this interaction spec with the specified function.
 	 * @param functionName the name of the function.
 	 */
-	public JPPFInteractionSpec(String functionName)
+	public JPPFInteractionSpec(final String functionName)
 	{
 		this.functionName = functionName;
 	}
@@ -51,7 +51,7 @@ public class JPPFInteractionSpec implements InteractionSpec
 	 * Add a property change listener.
 	 * @param listener the lsitener to add.
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener)
+	public void addPropertyChangeListener(final PropertyChangeListener listener)
 	{
 		support.addPropertyChangeListener(listener);
 	}
@@ -60,7 +60,7 @@ public class JPPFInteractionSpec implements InteractionSpec
 	 * Remove a property change listener.
 	 * @param listener the lsitener to add.
 	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener)
+	public void removePropertyChangeListener(final PropertyChangeListener listener)
 	{
 		support.removePropertyChangeListener(listener);
 	}
@@ -78,7 +78,7 @@ public class JPPFInteractionSpec implements InteractionSpec
 	 * Set the name of the function associated with this interaction spec.
 	 * @param newFunctionName the function name as a string.
 	 */
-	public void setFunctionName(String newFunctionName)
+	public void setFunctionName(final String newFunctionName)
 	{
 		final String oldFunctionName = functionName;
 		functionName = newFunctionName;

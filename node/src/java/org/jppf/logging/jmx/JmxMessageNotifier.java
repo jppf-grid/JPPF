@@ -64,7 +64,7 @@ public class JmxMessageNotifier
 	 * Initialize this notifier with the name of the MBean that will send the notifications.
 	 * @param name the name of MBean, following the conventions specified in {@link ObjectName}.
 	 */
-	public JmxMessageNotifier(String name)
+	public JmxMessageNotifier(final String name)
 	{
 		//initializeJmx(name == null ? JmxLogger.DEFAULT_MBEAN_NAME : name);
 		initializeJmx(JmxLogger.DEFAULT_MBEAN_NAME);
@@ -74,14 +74,14 @@ public class JmxMessageNotifier
 	 * Send the specified message via JMX.
 	 * @param message the message to send.
 	 */
-	public void sendMessage(String message)
+	public void sendMessage(final String message)
 	{
 		if (jmxLogger == null) return;
 		jmxLogger.log(message);
 	}
 
 	/**
-	 * Retrieve the node JMX logger. 
+	 * Retrieve the node JMX logger.
 	 * @return a {@link JmxLogger} instance.
 	 */
 	private JmxLogger getJmxLogger()
@@ -90,10 +90,10 @@ public class JmxMessageNotifier
 	}
 
 	/**
-	 * Retrieve the JMX logger if it is already registered with the MBean server. 
+	 * Retrieve the JMX logger if it is already registered with the MBean server.
 	 * @param name the name of the registered mbean to find.
 	 */
-	private void initializeJmx(String name)
+	private void initializeJmx(final String name)
 	{
 		initObjectName(name);
 		if (objectName == null) return;
@@ -103,10 +103,10 @@ public class JmxMessageNotifier
 	}
 
 	/**
-	 * Initialize the object name of the MBean. 
+	 * Initialize the object name of the MBean.
 	 * @param name the name of the mbean.
 	 */
-	private void initObjectName(String name)
+	private void initObjectName(final String name)
 	{
 		try
 		{
@@ -122,12 +122,12 @@ public class JmxMessageNotifier
 			catch (Exception e2)
 			{
 				System.out.println("Failed to initialize jmx based logging with default MBean name:" + e2.getMessage());
-            }
+			}
 		}
 	}
 
 	/**
-	 * Retrieve the JMX logger if it is already registered with the MBean server. 
+	 * Retrieve the JMX logger if it is already registered with the MBean server.
 	 */
 	private void initializeProxy()
 	{
@@ -164,7 +164,7 @@ public class JmxMessageNotifier
 			catch (Exception e)
 			{
 				System.out.println("Error registering the JMX logger MBean '" + objectName + "' : " + e.getMessage());
-            }
+			}
 		}
 		finally
 		{

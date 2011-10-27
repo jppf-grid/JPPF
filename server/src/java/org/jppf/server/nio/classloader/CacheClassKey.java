@@ -37,7 +37,7 @@ public class CacheClassKey
 	 * @param uuid the provider uuid.
 	 * @param res string describing the cached resource.
 	 */
-	public CacheClassKey(String uuid, String res)
+	public CacheClassKey(final String uuid, final String res)
 	{
 		this.uuid = uuid;
 		this.res = res;
@@ -50,7 +50,7 @@ public class CacheClassKey
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (obj instanceof CacheClassKey)
 		{
@@ -66,7 +66,7 @@ public class CacheClassKey
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-    public int hashCode()
+	public int hashCode()
 	{
 		return uuid.hashCode() + 13*res.hashCode();
 	}
@@ -75,7 +75,7 @@ public class CacheClassKey
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return "CacheClassKey[uuid=" + uuid + ", res=" + res + ']';
 	}

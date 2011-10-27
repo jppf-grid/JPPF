@@ -30,38 +30,38 @@ import org.jppf.jca.work.JPPFJcaClient;
  */
 public abstract class JPPFAccessorImpl implements JPPFAccessor
 {
-  /**
-   * The JPPF client used to submit tasks.
-   */
-  protected transient JPPFJcaClient jppfClient = null;
-  /**
-   * The log writer for this object.
-   */
-  protected PrintWriter logWriter = null;
-
-  /**
-   * Default constructor.
-   */
-  protected JPPFAccessorImpl()
-  {
-  }
- 
 	/**
-   * Get the JPPF client used to submit tasks.
+	 * The JPPF client used to submit tasks.
+	 */
+	protected transient JPPFJcaClient jppfClient = null;
+	/**
+	 * The log writer for this object.
+	 */
+	protected PrintWriter logWriter = null;
+
+	/**
+	 * Default constructor.
+	 */
+	protected JPPFAccessorImpl()
+	{
+	}
+
+	/**
+	 * Get the JPPF client used to submit tasks.
 	 * @return a <code>JPPFJcaClient</code> instance.
 	 */
 	@Override
-    public JPPFJcaClient getJppfClient()
+	public JPPFJcaClient getJppfClient()
 	{
 		return jppfClient;
 	}
 
 	/**
-   * Set the JPPF client used to submit tasks.
+	 * Set the JPPF client used to submit tasks.
 	 * @param jppfClient a <code>JPPFJcaClient</code> instance.
 	 */
 	@Override
-    public void setJppfClient(JPPFJcaClient jppfClient)
+	public void setJppfClient(final JPPFJcaClient jppfClient)
 	{
 		this.jppfClient = jppfClient;
 	}
@@ -73,7 +73,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
 	 * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
 	 */
 	@Override
-    public PrintWriter getLogWriter() throws ResourceException
+	public PrintWriter getLogWriter() throws ResourceException
 	{
 		return logWriter;
 	}
@@ -85,7 +85,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
 	 * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
 	 */
 	@Override
-    public void setLogWriter(PrintWriter writer) throws ResourceException
+	public void setLogWriter(final PrintWriter writer) throws ResourceException
 	{
 		this.logWriter = writer;
 	}

@@ -74,7 +74,7 @@ public abstract class JPPFContainer
 	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
+	public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
 	{
 		if (debugEnabled) log.debug("bew JPPFContainer with uuidPath=" + uuidPath + ", classLoader=" + classLoader);
 		this.uuidPath = uuidPath;
@@ -90,7 +90,7 @@ public abstract class JPPFContainer
 	{
 		initHelper();
 	}
-	
+
 	/**
 	 * Deserialize a number of objects from the I/O channel.
 	 * @param list a list holding the resulting deserialized objects.
@@ -107,7 +107,7 @@ public abstract class JPPFContainer
 	 * @return the new position in the source data after deserialization.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public Object deserializeObject(byte[] data) throws Exception
+	public Object deserializeObject(final byte[] data) throws Exception
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try
@@ -129,7 +129,7 @@ public abstract class JPPFContainer
 	{
 		return classLoader;
 	}
-	
+
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
 	 * @throws Exception if an error occcurs while instantiating the class loader.
@@ -140,7 +140,7 @@ public abstract class JPPFContainer
 		Object o = c.newInstance();
 		helper = (SerializationHelper) o;
 	}
-	
+
 	/**
 	 * Get the unique identifier for the submitting application.
 	 * @return the application uuid as a string.
@@ -154,7 +154,7 @@ public abstract class JPPFContainer
 	 * Set the unique identifier for the submitting application.
 	 * @param uuidPath the application uuid as a string.
 	 */
-	public void setUuidPath(List<String> uuidPath)
+	public void setUuidPath(final List<String> uuidPath)
 	{
 		this.uuidPath = uuidPath;
 	}
@@ -179,7 +179,7 @@ public abstract class JPPFContainer
 		 * @param dl the data read from the network connection, stored in a meomory-sensitive location.
 		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */
-		public ObjectDeserializationTask(DataLocation dl, int index)
+		public ObjectDeserializationTask(final DataLocation dl, final int index)
 		{
 			this.dl = dl;
 			this.index = index;
@@ -191,7 +191,7 @@ public abstract class JPPFContainer
 		 * @see java.util.concurrent.Callable#call()
 		 */
 		@Override
-        public Object call()
+		public Object call()
 		{
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			try

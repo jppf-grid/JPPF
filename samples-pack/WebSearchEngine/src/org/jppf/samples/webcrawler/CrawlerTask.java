@@ -40,7 +40,7 @@ import com.torunski.crawler.parser.httpclient.SimpleHttpClientParser;
  * Instances of this class implement the 2 phases of the web search process.<br>
  * The first phase is made of one or several JPPF invocations (one for each search depth level) and
  * consists in following the links up to the specified search depth.<br>
- * In the second phase, all gathered links are downloaded, indexed and matched with the user-specified query. 
+ * In the second phase, all gathered links are downloaded, indexed and matched with the user-specified query.
  * @author Laurent Cohen
  */
 public class CrawlerTask extends JPPFTask
@@ -81,7 +81,7 @@ public class CrawlerTask extends JPPFTask
 	 * @param number uniquely identifies this task.
 	 * @param doSearch determines whether the search should also be done.
 	 */
-	public CrawlerTask(String url, String query, int number, boolean doSearch)
+	public CrawlerTask(final String url, final String query, final int number, final boolean doSearch)
 	{
 		this.url = url;
 		this.query = query;
@@ -93,6 +93,7 @@ public class CrawlerTask extends JPPFTask
 	 * Perform the web crawling, or the indexed search, depending on the value of <code>doSearch</code>.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -107,7 +108,7 @@ public class CrawlerTask extends JPPFTask
 	}
 
 	/**
-	 * Crawl to find all links in the current page. 
+	 * Crawl to find all links in the current page.
 	 * @throws Exception if an error occurs.
 	 */
 	private void crawl() throws Exception
@@ -121,19 +122,20 @@ public class CrawlerTask extends JPPFTask
 		start = "/" + start;
 		if (u.getQuery() != null) start += "?" + u.getQuery();
 
-    int depth = 1;
+		int depth = 1;
 
-    Crawler crawler = new Crawler();
-    ILinkFilter filter = new ServerFilter(server);
-    ILinkFilter filter2 = new FileExtensionFilter(
-    	new String[] {".png", ".jpg", ".gif", ".pdf", ".mpg", ".avi", ".wmv", ".swf", });
-    filter2 = LinkFilterUtil.not(filter2);
-    filter = LinkFilterUtil.and(filter, filter2);
-    crawler.setLinkFilter(filter);
-    crawler.setModel(new MaxDepthModel(depth));
+		Crawler crawler = new Crawler();
+		ILinkFilter filter = new ServerFilter(server);
+		ILinkFilter filter2 = new FileExtensionFilter(
+				new String[] {".png", ".jpg", ".gif", ".pdf", ".mpg", ".avi", ".wmv", ".swf", });
+		filter2 = LinkFilterUtil.not(filter2);
+		filter = LinkFilterUtil.and(filter, filter2);
+		crawler.setLinkFilter(filter);
+		crawler.setModel(new MaxDepthModel(depth));
 		crawler.addParserListener(new IParserEventListener()
 		{
-			public void parse(ParserEvent event)
+			@Override
+			public void parse(final ParserEvent event)
 			{
 				String url = event.getLink().getURI();
 				if (!toVisit.contains(url)) toVisit.add(url);
@@ -170,7 +172,7 @@ public class CrawlerTask extends JPPFTask
 			matchedLinks.add(new LinkMatch(url, relevance));
 		}
 	}
-	
+
 	/**
 	 * Get the sequence number of this task.
 	 * @return the sequence number as an int.

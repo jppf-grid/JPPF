@@ -32,14 +32,14 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 */
 	private String userName;
 
-  /**
-   * Initialize this metadata with a specified user name.
-   * @param userName the name of the user of the connection.
-   */
-  public JPPFManagedConnectionMetaData(final String userName)
-  {
-    this.userName = userName;
-  }
+	/**
+	 * Initialize this metadata with a specified user name.
+	 * @param userName the name of the user of the connection.
+	 */
+	public JPPFManagedConnectionMetaData(final String userName)
+	{
+		this.userName = userName;
+	}
 
 	/**
 	 * Get the name of the product.
@@ -48,7 +48,7 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductName()
 	 */
 	@Override
-    public String getEISProductName() throws ResourceException
+	public String getEISProductName() throws ResourceException
 	{
 		return "JPPF";
 	}
@@ -60,7 +60,7 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductVersion()
 	 */
 	@Override
-    public String getEISProductVersion() throws ResourceException
+	public String getEISProductVersion() throws ResourceException
 	{
 		return "JPPF 1.0 beta";
 	}
@@ -72,7 +72,7 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getMaxConnections()
 	 */
 	@Override
-    public int getMaxConnections() throws ResourceException
+	public int getMaxConnections() throws ResourceException
 	{
 		return 10;
 	}
@@ -84,7 +84,7 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getUserName()
 	 */
 	@Override
-    public String getUserName() throws ResourceException
+	public String getUserName() throws ResourceException
 	{
 		return userName;
 	}

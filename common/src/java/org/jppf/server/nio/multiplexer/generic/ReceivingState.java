@@ -46,7 +46,7 @@ public class ReceivingState extends MultiplexerServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public ReceivingState(MultiplexerNioServer server)
+	public ReceivingState(final MultiplexerNioServer server)
 	{
 		super(server);
 	}
@@ -55,7 +55,7 @@ public class ReceivingState extends MultiplexerServerState
 	 * {@inheritDoc}
 	 */
 	@Override
-    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
 		if (debugEnabled) log.debug("exec() for " + wrapper);

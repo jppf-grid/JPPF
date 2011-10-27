@@ -108,22 +108,22 @@ public class JPPFObjectStreamFactory
 
 	/**
 	 * Obtain an input stream used for deserializing objects.
-   * @param	in input stream to read from.
+	 * @param	in input stream to read from.
 	 * @return an <code>ObjectInputStream</code>
 	 * @throws Exception if an error is raised while creating the stream.
 	 */
-	public static ObjectInputStream newObjectInputStream(InputStream in) throws Exception
+	public static ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
 	{
 		return builder.newObjectInputStream(in);
 	}
 
 	/**
 	 * Obtain an Output stream used for serializing objects.
-   * @param	out output stream to write to.
+	 * @param	out output stream to write to.
 	 * @return an <code>ObjectOutputStream</code>
 	 * @throws Exception if an error is raised while creating the stream.
 	 */
-	public static ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception
+	public static ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
 	{
 		return builder.newObjectOutputStream(out);
 	}

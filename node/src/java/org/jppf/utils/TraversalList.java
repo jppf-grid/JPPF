@@ -51,7 +51,7 @@ public class TraversalList<E> implements Serializable
 	 * Initialize this traversal list with a specified list with the same element type.
 	 * @param list a list with the same element type as this traversal list.
 	 */
-	public TraversalList(List<E> list)
+	public TraversalList(final List<E> list)
 	{
 		this.list = list;
 	}
@@ -60,7 +60,7 @@ public class TraversalList<E> implements Serializable
 	 * Add a new element to the list.
 	 * @param element the element to add.
 	 */
-	public void add(E element)
+	public void add(final E element)
 	{
 		list.add(element);
 	}
@@ -108,7 +108,7 @@ public class TraversalList<E> implements Serializable
 	}
 
 	/**
-	 * Get the list of elements of this traversal list. 
+	 * Get the list of elements of this traversal list.
 	 * @return an unmodifiable copy of the list.
 	 */
 	public List<E> getList()
@@ -129,7 +129,7 @@ public class TraversalList<E> implements Serializable
 	 * Set the current position in the list.
 	 * @param pos the position as an int value, -1 if the lsit is empty.
 	 */
-	public void setPosition(int pos)
+	public void setPosition(final int pos)
 	{
 		if (list.isEmpty()) throw new IndexOutOfBoundsException("list is empty");
 		else if (pos < 0) throw new IndexOutOfBoundsException("value "+pos+" is negative");
@@ -160,7 +160,7 @@ public class TraversalList<E> implements Serializable
 	 * @param element the element to lookup.
 	 * @return true if this list contains the element, false otherwise.
 	 */
-	public boolean contains(E element)
+	public boolean contains(final E element)
 	{
 		return list.contains(element);
 	}

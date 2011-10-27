@@ -19,7 +19,6 @@
 package org.jppf.server.scheduler.bundle;
 
 import org.jppf.node.protocol.JobMetadata;
-import org.jppf.server.protocol.*;
 
 /**
  * Bundler implementations should implement this interface if they wish to have access to a job's metadata.

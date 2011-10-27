@@ -27,11 +27,11 @@ import java.io.Serializable;
 public interface JPPFAdminMBean extends Serializable
 {
 	/**
-	 * RMI registry namespace suffix for drivers. 
+	 * RMI registry namespace suffix for drivers.
 	 */
 	String DRIVER_SUFFIX = "/jppf/driver";
 	/**
-	 * RMI registry namespace suffix for nodes. 
+	 * RMI registry namespace suffix for nodes.
 	 */
 	String NODE_SUFFIX = "/jppf/node";
 	/**

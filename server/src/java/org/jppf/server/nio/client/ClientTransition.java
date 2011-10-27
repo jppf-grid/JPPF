@@ -28,7 +28,7 @@ public enum ClientTransition
 	/**
 	 * Transition from a state to SENDING_RESULTS.
 	 */
-	TO_SENDING_RESULTS, 
+	TO_SENDING_RESULTS,
 	/**
 	 * Transition from a state to WAITING_JOB.
 	 */

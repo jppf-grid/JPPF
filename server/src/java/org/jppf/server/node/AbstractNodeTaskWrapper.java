@@ -47,7 +47,7 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
 	 */
 	protected NodeExecutionManager executionManager = null;
 	/**
-	 * Set if the node must reconnect to the driver. 
+	 * Set if the node must reconnect to the driver.
 	 */
 	protected JPPFNodeReconnectionNotification reconnectionNotification = null;
 
@@ -57,7 +57,7 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
 	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
 	 * @param number the internal number identifying the task for the thread pool.
 	 */
-	public AbstractNodeTaskWrapper(Task task, List<String> uuidPath, long number)
+	public AbstractNodeTaskWrapper(final Task task, final List<String> uuidPath, final long number)
 	{
 		this.task = task;
 		this.uuidPath = uuidPath;

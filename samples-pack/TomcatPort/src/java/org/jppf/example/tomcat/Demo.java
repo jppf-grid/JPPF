@@ -61,7 +61,7 @@ public class Demo
 	 * @param taskDuration the duration in milliseconds of each task in the job.
 	 * @return the job result as a string message.
 	 */
-	public String submitJob(String jobName, int nbTasks, long taskDuration)
+	public String submitJob(final String jobName, final int nbTasks, final long taskDuration)
 	{
 		long start = System.currentTimeMillis();
 		JPPFJob job = null;

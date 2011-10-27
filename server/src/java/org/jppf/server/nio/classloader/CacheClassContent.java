@@ -32,7 +32,7 @@ public class CacheClassContent
 	 * Initialize this content with the specified data.
 	 * @param content the data as an array of bytes.
 	 */
-	public CacheClassContent(byte[] content)
+	public CacheClassContent(final byte[] content)
 	{
 		super();
 		this.content = content;

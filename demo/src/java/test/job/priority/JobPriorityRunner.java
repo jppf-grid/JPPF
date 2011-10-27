@@ -23,7 +23,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -52,7 +52,7 @@ public class JobPriorityRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -71,7 +71,7 @@ public class JobPriorityRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
 	 * @throws Exception if an error is raised during the execution.
@@ -131,7 +131,7 @@ public class JobPriorityRunner
 	 * Print a message tot he log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);
@@ -162,7 +162,7 @@ public class JobPriorityRunner
 			jmx = c.getJmxConnection();
 			boolean b = jmx.isConnected();
 			if (!b) jmx.connect();
-			*/
+			 */
 			jmx = new JMXDriverConnectionWrapper("localhost", 11198);
 			jmx.connect();
 			while (!jmx.isConnected()) Thread.sleep(10L);
@@ -214,7 +214,7 @@ public class JobPriorityRunner
 		{
 			this.job = job;
 		}
-	
+
 		/**
 		 * {@inheritDoc}
 		 */

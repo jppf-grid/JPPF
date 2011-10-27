@@ -25,7 +25,7 @@ import org.jppf.node.protocol.JPPFDistributedJob;
 
 /**
  * This class wraps a task bundle to express it in terms of {@link org.jppf.io.DataLocation DataLocation}.
- * This allows the tasks data to be processed with the same semantics no matter where it is stored, comes from or goes to. 
+ * This allows the tasks data to be processed with the same semantics no matter where it is stored, comes from or goes to.
  * @author Laurent Cohen
  */
 public class BundleWrapper implements ServerJob
@@ -54,7 +54,7 @@ public class BundleWrapper implements ServerJob
 	 * Initialize this bundle wrapper with the specified task bundle.
 	 * @param bundle the underlying task bundle for this wrapper.
 	 */
-	public BundleWrapper(JPPFTaskBundle bundle)
+	public BundleWrapper(final JPPFTaskBundle bundle)
 	{
 		this.job = bundle;
 	}
@@ -63,7 +63,7 @@ public class BundleWrapper implements ServerJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public JPPFDistributedJob getJob()
+	public JPPFDistributedJob getJob()
 	{
 		return job;
 	}
@@ -72,7 +72,7 @@ public class BundleWrapper implements ServerJob
 	 * Set the underlying task bundle.
 	 * @param job a <code>JPPFTaskBundle</code> instance.
 	 */
-	public void setJob(JPPFTaskBundle job)
+	public void setJob(final JPPFTaskBundle job)
 	{
 		this.job = job;
 	}
@@ -81,7 +81,7 @@ public class BundleWrapper implements ServerJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public DataLocation getDataProvider()
+	public DataLocation getDataProvider()
 	{
 		return dataProvider;
 	}
@@ -90,7 +90,7 @@ public class BundleWrapper implements ServerJob
 	 * Get the location of the data provider.
 	 * @param dataProvider a <code>JPPFTaskBundle</code> instance.
 	 */
-	public void setDataProvider(DataLocation dataProvider)
+	public void setDataProvider(final DataLocation dataProvider)
 	{
 		this.dataProvider = dataProvider;
 	}
@@ -99,7 +99,7 @@ public class BundleWrapper implements ServerJob
 	 * Add a task to this bundle wrapper.
 	 * @param task the task to add.
 	 */
-	public void addTask(DataLocation task)
+	public void addTask(final DataLocation task)
 	{
 		tasks.add(task);
 	}
@@ -108,7 +108,7 @@ public class BundleWrapper implements ServerJob
 	 * {@inheritDoc}
 	 */
 	@Override
-    public List<DataLocation> getTasks()
+	public List<DataLocation> getTasks()
 	{
 		return tasks;
 	}
@@ -117,7 +117,7 @@ public class BundleWrapper implements ServerJob
 	 * Set the list of locations of the tasks.
 	 * @param tasks a list of <code>DataLocation</code> instances.
 	 */
-	public void setTasks(List<DataLocation> tasks)
+	public void setTasks(final List<DataLocation> tasks)
 	{
 		this.tasks = tasks;
 	}
@@ -143,7 +143,7 @@ public class BundleWrapper implements ServerJob
 	 * @param nbTasks the number of tasks to include in the copy.
 	 * @return a new <code>BundleWrapper</code> instance.
 	 */
-	public BundleWrapper copy(int nbTasks)
+	public BundleWrapper copy(final int nbTasks)
 	{
 		BundleWrapper wrapper = null;
 		synchronized(this)
@@ -161,7 +161,7 @@ public class BundleWrapper implements ServerJob
 	 * @param other the wrapper to merge with.
 	 * @param after determines whether the tasks from other should be added first or last.
 	 */
-	public void merge(ServerJob other, boolean after)
+	public void merge(final ServerJob other, final boolean after)
 	{
 		int n = ((JPPFTaskBundle) other.getJob()).getTaskCount();
 		job.setTaskCount(job.getTaskCount() + n);

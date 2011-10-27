@@ -48,7 +48,7 @@ public class NodeConnectionEventHandler
 	 * Add a listener to the list of listeners.
 	 * @param listener a {@link NodeConnectionListener} instance.
 	 */
-	public void addNodeConnectionListener(NodeConnectionListener listener)
+	public void addNodeConnectionListener(final NodeConnectionListener listener)
 	{
 		if (listener == null) return;
 		synchronized(listeners)
@@ -61,7 +61,7 @@ public class NodeConnectionEventHandler
 	 * Remove a listener from the list of listeners.
 	 * @param listener a {@link NodeConnectionListener} instance.
 	 */
-	public void removeNodeConnectionListener(NodeConnectionListener listener)
+	public void removeNodeConnectionListener(final NodeConnectionListener listener)
 	{
 		if (listener == null) return;
 		synchronized(listeners)
@@ -74,7 +74,7 @@ public class NodeConnectionEventHandler
 	 * Notify all listeners that a node is connected tot he server.
 	 * @param info encapsulates the information about the node.
 	 */
-	public void fireNodeConnected(JPPFManagementInfo info)
+	public void fireNodeConnected(final JPPFManagementInfo info)
 	{
 		NodeConnectionEvent event = new NodeConnectionEvent(info);
 		synchronized(listeners)
@@ -87,7 +87,7 @@ public class NodeConnectionEventHandler
 	 * Notify all listeners that a node is disconnected from the server.
 	 * @param info encapsulates the information about the node.
 	 */
-	public void fireNodeDisconnected(JPPFManagementInfo info)
+	public void fireNodeDisconnected(final JPPFManagementInfo info)
 	{
 		NodeConnectionEvent event = new NodeConnectionEvent(info);
 		synchronized(listeners)

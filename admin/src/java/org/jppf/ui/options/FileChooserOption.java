@@ -73,12 +73,12 @@ public class FileChooserOption extends AbstractOption
 	/**
 	 * Initialize this combo box option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the combobox.
 	 * @param value the initially selected value of this component.
 	 * @param dialogType determines the type of file chooser dialog, either open or save.
 	 */
-	public FileChooserOption(String name, String label, String tooltip, String value, int dialogType)
+	public FileChooserOption(final String name, final String label, final String tooltip, final String value, final int dialogType)
 	{
 		this.name = name;
 		this.label = label;
@@ -93,7 +93,7 @@ public class FileChooserOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOptionElement#createUI()
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		button = new JButton();
 		if ((label != null) && !"".equals(label.trim())) button.setText(label);
@@ -109,7 +109,7 @@ public class FileChooserOption extends AbstractOption
 		button.addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent event)
+			public void actionPerformed(final ActionEvent event)
 			{
 				doChooseFile();
 			}
@@ -123,7 +123,7 @@ public class FileChooserOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -133,7 +133,7 @@ public class FileChooserOption extends AbstractOption
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		if (button != null) button.setEnabled(enabled);
 	}
@@ -175,7 +175,7 @@ public class FileChooserOption extends AbstractOption
 	 * Set the type of the file chooser dialog.
 	 * @param dialogType the type as an int value.
 	 */
-	public void setDialogType(int dialogType)
+	public void setDialogType(final int dialogType)
 	{
 		this.dialogType = dialogType;
 	}
@@ -195,7 +195,7 @@ public class FileChooserOption extends AbstractOption
 	 * @param extensions the extensions as a string with the format
 	 * <i>ext1</i>; <i>desc1</i> | ... | <i>extN</i>; <i>descN</i>.
 	 */
-	public void setExtensions(String extensions)
+	public void setExtensions(final String extensions)
 	{
 		filters.clear();
 		if ((extensions == null) || "".equals(extensions.trim()))
@@ -239,7 +239,7 @@ public class FileChooserOption extends AbstractOption
 		 * @param ext the extensions of the file to allow.
 		 * @param desc the description shown in the file chooser dialog.
 		 */
-		public Filter(String ext, String desc)
+		public Filter(final String ext, final String desc)
 		{
 			this.ext = (ext == null) ? "*" : ext.trim();
 			this.desc = (desc == null) ? "" : desc.trim();
@@ -252,7 +252,7 @@ public class FileChooserOption extends AbstractOption
 		 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
 		 */
 		@Override
-        public boolean accept(File f)
+		public boolean accept(final File f)
 		{
 			if (f == null) return false;
 			if (f.isDirectory()) return true;
@@ -269,7 +269,7 @@ public class FileChooserOption extends AbstractOption
 		 * @see javax.swing.filechooser.FileFilter#getDescription()
 		 */
 		@Override
-        public String getDescription()
+		public String getDescription()
 		{
 			return desc;
 		}

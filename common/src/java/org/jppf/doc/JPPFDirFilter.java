@@ -17,7 +17,7 @@
  */
 package org.jppf.doc;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * Filter that only accepts directories.
@@ -31,7 +31,7 @@ public class JPPFDirFilter extends AbstractFileFilter
 	static final String[] DEFAULT_EXCLUDES = { "CVS", ".svn" };
 
 	/**
-	 * Initialize a filter accepting all directory names except those excluded by default. 
+	 * Initialize a filter accepting all directory names except those excluded by default.
 	 */
 	public JPPFDirFilter()
 	{
@@ -43,7 +43,7 @@ public class JPPFDirFilter extends AbstractFileFilter
 	 * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_EXCLUDES DEFAULT_EXCLUDES}.
 	 * @param includes the included directory names; if null all are included. Null values are ignored.
 	 */
-	public JPPFDirFilter(String[] includes)
+	public JPPFDirFilter(final String[] includes)
 	{
 		this.includes = includes;
 		this.excludes = DEFAULT_EXCLUDES;
@@ -54,7 +54,7 @@ public class JPPFDirFilter extends AbstractFileFilter
 	 * @param includes the included directory names; if null all are included. Null values are ignored.
 	 * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
 	 */
-	public JPPFDirFilter(String[] includes, String[] excludes)
+	public JPPFDirFilter(final String[] includes, final String[] excludes)
 	{
 		this.includes = includes;
 		this.excludes = excludes;
@@ -67,7 +67,7 @@ public class JPPFDirFilter extends AbstractFileFilter
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
 	@Override
-    public boolean accept(File path)
+	public boolean accept(final File path)
 	{
 		if (!path.isDirectory()) return false;
 		String name = path.getName();

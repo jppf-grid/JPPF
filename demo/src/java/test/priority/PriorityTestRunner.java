@@ -21,7 +21,7 @@ package test.priority;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * 
@@ -38,7 +38,7 @@ public class PriorityTestRunner
 	 * Entry point into the test.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -68,7 +68,7 @@ public class PriorityTestRunner
 		int n = 10;
 		List<JPPFJob> jobList = new ArrayList<JPPFJob>();
 		jobList.add(createJob(new WaitTask(2000L), 0));
-		for (int i=1; i<=n; i++) jobList.add(createJob(new PrioritizedTask(i), i)); 
+		for (int i=1; i<=n; i++) jobList.add(createJob(new PrioritizedTask(i), i));
 		for (JPPFJob job: jobList) client.submit(job);
 		for (JPPFJob job: jobList) ((JPPFResultCollector) job.getResultListener()).waitForResults();
 	}
@@ -106,7 +106,7 @@ public class PriorityTestRunner
 	 * @return a JPPFJob instance.
 	 * @throws Exception if any error occurs.
 	 */
-	private static JPPFJob createJob(JPPFTask task, int priority) throws Exception
+	private static JPPFJob createJob(final JPPFTask task, final int priority) throws Exception
 	{
 		JPPFJob job = new JPPFJob();
 		job.addTask(task);

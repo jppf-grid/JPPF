@@ -25,7 +25,7 @@ import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 import org.slf4j.Logger;
 
 /**
- * This class provides a set of utility methods for reading, writing and manipulating files. 
+ * This class provides a set of utility methods for reading, writing and manipulating files.
  * @author Laurent Cohen
  */
 public final class FileUtils
@@ -48,7 +48,7 @@ public final class FileUtils
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static String readTextFile(Reader aReader) throws IOException
+	public static String readTextFile(final Reader aReader) throws IOException
 	{
 		BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
 		StringBuilder sb = new StringBuilder();
@@ -67,7 +67,7 @@ public final class FileUtils
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static List<String> textFileAsLines(Reader aReader) throws IOException
+	public static List<String> textFileAsLines(final Reader aReader) throws IOException
 	{
 		List<String> lines = new ArrayList<String>();
 		BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
@@ -86,7 +86,7 @@ public final class FileUtils
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static String readTextFile(File file) throws IOException
+	public static String readTextFile(final File file) throws IOException
 	{
 		Reader reader = new FileReader(file);
 		String result = readTextFile(reader);
@@ -100,7 +100,7 @@ public final class FileUtils
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static String readTextFile(String filename) throws IOException
+	public static String readTextFile(final String filename) throws IOException
 	{
 		Reader reader = null;
 		File f = new File(filename);
@@ -122,7 +122,7 @@ public final class FileUtils
 	 * @param content the content to wwrite into the file.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static void writeTextFile(String filename, String content) throws IOException
+	public static void writeTextFile(final String filename, final String content) throws IOException
 	{
 		writeTextFile(new FileWriter(filename), content);
 	}
@@ -133,7 +133,7 @@ public final class FileUtils
 	 * @param content the content to wwrite into the file.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static void writeTextFile(File file, String content) throws IOException
+	public static void writeTextFile(final File file, final String content) throws IOException
 	{
 		writeTextFile(new FileWriter(file), content);
 	}
@@ -144,7 +144,7 @@ public final class FileUtils
 	 * @param content the content to wwrite into the file.
 	 * @throws IOException if the file can't be found or read.
 	 */
-	public static void writeTextFile(Writer dest, String content) throws IOException
+	public static void writeTextFile(final Writer dest, final String content) throws IOException
 	{
 		BufferedReader reader = new BufferedReader(new StringReader(content));
 		Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest);
@@ -168,7 +168,7 @@ public final class FileUtils
 	 * @return a <code>InputStream</code> instance, or null if the file could not be found.
 	 * @throws IOException if an IO error occurs while looking up the file.
 	 */
-	public static InputStream getFileInputStream(String path) throws IOException
+	public static InputStream getFileInputStream(final String path) throws IOException
 	{
 		InputStream is = null;
 		File file = new File(path);
@@ -187,7 +187,7 @@ public final class FileUtils
 	 * @return an <code>OutputStream</code> instance, or null if the file could not be created.
 	 * @throws IOException if an IO error occurs while looking up the file.
 	 */
-	public static OutputStream getFileOutputStream(String path) throws IOException
+	public static OutputStream getFileOutputStream(final String path) throws IOException
 	{
 		return new BufferedOutputStream(new FileOutputStream(path));
 	}
@@ -200,7 +200,7 @@ public final class FileUtils
 	 * @return a <code>Reader</code> instance, or null if the schema file could not be found.
 	 * @throws IOException if an IO error occurs while looking up the file.
 	 */
-	public static Reader getFileReader(String path) throws IOException
+	public static Reader getFileReader(final String path) throws IOException
 	{
 		InputStream is = getFileInputStream(path);
 		if (is == null) return null;
@@ -213,7 +213,7 @@ public final class FileUtils
 	 * @return the file paths as a lst of strings.
 	 * @throws IOException if an error occurs while looking up or reading the file.
 	 */
-	public static List<String> getFilePathList(String fileListPath) throws IOException
+	public static List<String> getFilePathList(final String fileListPath) throws IOException
 	{
 		InputStream is = getFileInputStream(fileListPath);
 		String content = readTextFile(new BufferedReader(new InputStreamReader(is)));
@@ -234,7 +234,7 @@ public final class FileUtils
 	 * @param filePath the file from which to get the extension.
 	 * @return the file extension, or null if it si not a file or does not have an extension.
 	 */
-	public static String getFileExtension(String filePath)
+	public static String getFileExtension(final String filePath)
 	{
 		return getFileExtension(new File(filePath));
 	}
@@ -244,7 +244,7 @@ public final class FileUtils
 	 * @param file the file from which to get the extension.
 	 * @return the file extension, or null if it si not a file or does not have an extension.
 	 */
-	public static String getFileExtension(File file)
+	public static String getFileExtension(final File file)
 	{
 		if ((file == null) || !file.exists() || !file.isFile()) return null;
 		String filePath = file.getPath();
@@ -258,7 +258,7 @@ public final class FileUtils
 	 * @param filePath the file from which to get the file name.
 	 * @return the file name without path information.
 	 */
-	public static String getFileName(String filePath)
+	public static String getFileName(final String filePath)
 	{
 		int idx = getLastFileSeparatorPosition(filePath);
 		return idx >= 0 ? filePath.substring(idx + 1) : filePath;
@@ -269,7 +269,7 @@ public final class FileUtils
 	 * @param filePath the path from which to get the parent path.
 	 * @return the parent folder path.
 	 */
-	public static String getParentFolder(String filePath)
+	public static String getParentFolder(final String filePath)
 	{
 		int idx = getLastFileSeparatorPosition(filePath);
 		return idx >= 0 ? filePath.substring(0, idx) : filePath;
@@ -280,12 +280,12 @@ public final class FileUtils
 	 * @param path the path to parse.
 	 * @return the position as an positive integer, or -1 if no separator was found.
 	 */
-	private static int getLastFileSeparatorPosition(String path)
+	private static int getLastFileSeparatorPosition(final String path)
 	{
 		int idx1 = path.lastIndexOf('/');
 		int idx2 = path.lastIndexOf('\\');
 		if ((idx1 < 0) && (idx2 < 0)) return -1;
-        return idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
+		return idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
 	}
 
 	/**
@@ -294,7 +294,7 @@ public final class FileUtils
 	 * @param splitSize the maximum number of lines of each resulting file.
 	 * @throws IOException if an IO error occurs.
 	 */
-	public static void splitTextFile(String file, int splitSize) throws IOException
+	public static void splitTextFile(final String file, final int splitSize) throws IOException
 	{
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		StringBuilder sb = new StringBuilder();
@@ -324,7 +324,7 @@ public final class FileUtils
 	 * Entry point for the splitTextFile() method.
 	 * @param args contains the arguments for the splitTextFile() method.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -344,7 +344,7 @@ public final class FileUtils
 	 * @return a byte array.
 	 * @throws IOException if an IO error occurs.
 	 */
-	public static byte[] getFileAsByte(String path) throws IOException
+	public static byte[] getFileAsByte(final String path) throws IOException
 	{
 		return getFileAsByte(new File(path));
 	}
@@ -355,7 +355,7 @@ public final class FileUtils
 	 * @return a byte array.
 	 * @throws IOException if an IO error occurs.
 	 */
-	public static byte[] getFileAsByte(File file) throws IOException
+	public static byte[] getFileAsByte(final File file) throws IOException
 	{
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
 		byte[] data = getInputStreamAsByte(is);
@@ -369,7 +369,7 @@ public final class FileUtils
 	 * @return a byte array.
 	 * @throws IOException if an IO error occurs.
 	 */
-	public static byte[] getInputStreamAsByte(InputStream is) throws IOException
+	public static byte[] getInputStreamAsByte(final InputStream is) throws IOException
 	{
 		byte[] buffer = new byte[TEMP_BUFFER_SIZE];
 		byte[] result = null;
@@ -389,12 +389,12 @@ public final class FileUtils
 	}
 
 	/**
-	 * Copy the data read from the specified input stream to the specified output stream. 
+	 * Copy the data read from the specified input stream to the specified output stream.
 	 * @param is the input stream to read from.
 	 * @param os the output stream to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public static void copyStream(InputStream is, OutputStream os) throws IOException
+	public static void copyStream(final InputStream is, final OutputStream os) throws IOException
 	{
 		byte[] bytes = new byte[TEMP_BUFFER_SIZE];
 		while(true)
@@ -411,7 +411,7 @@ public final class FileUtils
 	 * @param names the name part of each file (not the full path)
 	 * @return an array of <code>File</code> objects.
 	 */
-	public static File[] toFiles(File dir, String...names)
+	public static File[] toFiles(final File dir, final String...names)
 	{
 		int len = names.length;
 		File[] files = new File[len];
@@ -424,7 +424,7 @@ public final class FileUtils
 	 * @param files the files whose path is to be converted to a URL.
 	 * @return an array of <code>URL</code> objects.
 	 */
-	public static URL[] toURLs(File...files)
+	public static URL[] toURLs(final File...files)
 	{
 		URL[] urls = new URL[files.length];
 		for (int i=0; i<files.length; i++)
@@ -446,7 +446,7 @@ public final class FileUtils
 	 * @param os the output stream to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public static void writeBytesToStream(byte[] data, OutputStream os) throws IOException
+	public static void writeBytesToStream(final byte[] data, final OutputStream os) throws IOException
 	{
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		copyStream(bais, os);
@@ -459,7 +459,7 @@ public final class FileUtils
 	 * @param path the path to the file to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public static void writeBytesToFile(byte[] data, String path) throws IOException
+	public static void writeBytesToFile(final byte[] data, final String path) throws IOException
 	{
 		writeBytesToFile(data, new File(path));
 	}
@@ -470,7 +470,7 @@ public final class FileUtils
 	 * @param path the path to the file to write to.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public static void writeBytesToFile(byte[] data, File path) throws IOException
+	public static void writeBytesToFile(final byte[] data, final File path) throws IOException
 	{
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		OutputStream os = new BufferedOutputStream(new FileOutputStream(path));
@@ -485,7 +485,7 @@ public final class FileUtils
 	 * @param is the input stream to close.
 	 * @param log the logger to use; if null no logging occurs.
 	 */
-	public static void closeInputStream(InputStream is, Logger log)
+	public static void closeInputStream(final InputStream is, final Logger log)
 	{
 		if (is != null)
 		{
@@ -509,7 +509,7 @@ public final class FileUtils
 	 * @param path the path to delete.
 	 * @return true if the folder and all contained files and subfolders were deleted, false otherwise.
 	 */
-	public static boolean deletePath(File path)
+	public static boolean deletePath(final File path)
 	{
 		if ((path == null) || !path.exists()) return false;
 		boolean success = true;
@@ -517,11 +517,11 @@ public final class FileUtils
 		{
 			if (path.isDirectory())
 			{
-                File[] files = path.listFiles();
-                if(files != null)
-                {
-                    for (File child: files) success &= deletePath(child);
-                }
+				File[] files = path.listFiles();
+				if(files != null)
+				{
+					for (File child: files) success &= deletePath(child);
+				}
 			}
 			success &= path.delete();
 		}

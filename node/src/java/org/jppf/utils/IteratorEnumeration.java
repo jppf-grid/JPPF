@@ -34,30 +34,30 @@ public class IteratorEnumeration<T> implements Enumeration<T>
 	 * Initialize this enumeration with the specified iterator.
 	 * @param iterator the iterator to wrap as an enumeration.
 	 */
-	public IteratorEnumeration(Iterator<T> iterator)
+	public IteratorEnumeration(final Iterator<T> iterator)
 	{
 		this.iterator = iterator;
 	}
 
 	/**
-   * Tests if this enumeration contains more elements.
-   * @return true if and only if this enumeration object contains at least one more element to provide, false otherwise.
+	 * Tests if this enumeration contains more elements.
+	 * @return true if and only if this enumeration object contains at least one more element to provide, false otherwise.
 	 * @see java.util.Enumeration#hasMoreElements()
 	 */
 	@Override
-    public boolean hasMoreElements()
+	public boolean hasMoreElements()
 	{
 		return iterator.hasNext();
 	}
 
 	/**
-   * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
-   * @return the next element of this enumeration.
-   * @exception NoSuchElementException if no more elements exist.
+	 * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
+	 * @return the next element of this enumeration.
+	 * @exception NoSuchElementException if no more elements exist.
 	 * @see java.util.Enumeration#nextElement()
 	 */
 	@Override
-    public T nextElement()
+	public T nextElement()
 	{
 		if (!iterator.hasNext()) throw new NoSuchElementException("this enumeration has no more element to provide");
 		return iterator.next();

@@ -64,7 +64,7 @@ public class ConsoleLoader
 	 * Start the console UI, optionally with the charting components.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -159,7 +159,7 @@ public class ConsoleLoader
 		yesBtn.addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent event)
+			public void actionPerformed(final ActionEvent event)
 			{
 				doDownload = true;
 				closeDialog(dialog);
@@ -168,7 +168,7 @@ public class ConsoleLoader
 		noBtn.addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent event)
+			public void actionPerformed(final ActionEvent event)
 			{
 				closeDialog(dialog);
 			}
@@ -180,7 +180,7 @@ public class ConsoleLoader
 		SwingUtilities.invokeAndWait(new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				dialog.pack();
 				dialog.setVisible(true);
@@ -198,7 +198,7 @@ public class ConsoleLoader
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				if (d != null)
 				{
@@ -266,10 +266,10 @@ public class ConsoleLoader
 		 * @see org.jppf.server.protocol.LocationEventListener#dataTransferred(org.jppf.server.protocol.LocationEvent)
 		 */
 		@Override
-        public void dataTransferred(LocationEvent event)
+		public void dataTransferred(final LocationEvent event)
 		{
 			count += event.bytesTransferred();
-			label.setText(nf.format((double) count / max));
+			label.setText(nf.format(count / max));
 		}
 	}
 
@@ -283,7 +283,7 @@ public class ConsoleLoader
 		 * @param urls - the initial URLs.
 		 * @param cl - the parent class loader.
 		 */
-		public ConsoleClassLoader(URL[] urls, ClassLoader cl)
+		public ConsoleClassLoader(final URL[] urls, final ClassLoader cl)
 		{
 			super(urls == null ? new URL[0] : urls, cl);
 		}
@@ -294,7 +294,7 @@ public class ConsoleLoader
 		 * @see java.net.URLClassLoader#addURL(java.net.URL)
 		 */
 		@Override
-        public void addURL(URL url)
+		public void addURL(final URL url)
 		{
 			super.addURL(url);
 		}

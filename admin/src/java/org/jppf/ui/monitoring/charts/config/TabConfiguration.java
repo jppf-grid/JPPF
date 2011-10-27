@@ -56,7 +56,7 @@ public class TabConfiguration
 	 * @param name the name of the tab to create.
 	 * @param position the position of the tab in the list of tabs.
 	 */
-	public TabConfiguration(String name, int position)
+	public TabConfiguration(final String name, final int position)
 	{
 		this.name = name;
 		this.position = position;
@@ -68,7 +68,7 @@ public class TabConfiguration
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return name == null ? "unnamed tab" : name;
 	}

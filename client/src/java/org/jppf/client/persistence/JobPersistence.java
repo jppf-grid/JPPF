@@ -30,7 +30,7 @@ import org.jppf.server.protocol.JPPFTask;
  * <p>The state of a job is essentially made of the tasks initially submitted, associated with the list
  * of tasks that completed, such as captured by the job's <code>TaskResultListener</code>.
  * The class {@link org.jppf.client.JPPFResultCollector JPPFResultCollector} does that automatically,
- * and it is recommended to use it or a subclass that calls <code>super.resultsReceived()</code> in its implementation. 
+ * and it is recommended to use it or a subclass that calls <code>super.resultsReceived()</code> in its implementation.
  * @param <K> the type of the keys used to idenfify and locate jobs in the persistence store.
  * @author Laurent Cohen
  */
@@ -54,7 +54,7 @@ public interface JobPersistence<K>
 	/**
 	 * Store the specified tasks of the specified job with the specified key.
 	 * @param key the key allowing to locate the job in the persistence store.
-	 * @param job the job to store. 
+	 * @param job the job to store.
 	 * @param tasks the newly received completed tasks, may be used to only store the delta for better performance.
 	 * @throws JobPersistenceException if any error occurs while storing the job.
 	 */

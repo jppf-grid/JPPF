@@ -28,7 +28,7 @@ import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -55,10 +55,10 @@ public class RemoteNodeIO extends AbstractNodeIO
 	private SocketWrapper socketWrapper = null;
 
 	/**
-	 * Initialize this TaskIO with the specified node. 
+	 * Initialize this TaskIO with the specified node.
 	 * @param node - the node who owns this TaskIO.
 	 */
-	public RemoteNodeIO(JPPFNode node)
+	public RemoteNodeIO(final JPPFNode node)
 	{
 		super(node);
 		this.socketWrapper = node.getSocketWrapper();
@@ -83,7 +83,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception
+	protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
 	{
 		bundle.setNodeExecutionTime(System.nanoTime());
 		int count = bundle.getTaskCount();
@@ -135,7 +135,7 @@ public class RemoteNodeIO extends AbstractNodeIO
 	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
 	 */
 	@Override
-	public void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception
+	public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
 	{
 		ExecutorService executor = node.getExecutionManager().getExecutor();
 		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();

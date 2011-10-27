@@ -37,7 +37,7 @@ public class TaskVersion extends JPPFTask
 	public TaskVersion()
 	{
 	}
-	
+
 	/**
 	 * Initialize this task with a byte array of the psecified size.
 	 * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
@@ -45,16 +45,16 @@ public class TaskVersion extends JPPFTask
 	 * @param datasize the size in byte of the byte array this task owns.
 	 * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
 	 */
-	public TaskVersion(int datasize, boolean inNodeOnly)
+	public TaskVersion(final int datasize, final boolean inNodeOnly)
 	{
 	}
-	
+
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

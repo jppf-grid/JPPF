@@ -42,7 +42,7 @@ public class TaskExecutionEvent extends EventObject
 	 * @param elapsedTime the wall clock time taken by the task.
 	 * @param error determines whether the task had an exception.
 	 */
-	public TaskExecutionEvent(Task task, String jobId, long cpuTime, long elapsedTime, boolean error)
+	public TaskExecutionEvent(final Task task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
 	{
 		super(task);
 		this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);

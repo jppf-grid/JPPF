@@ -59,7 +59,7 @@ public class JPPFRemoteContainer extends JPPFContainer
 	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
 	 */
-	public JPPFRemoteContainer(SocketWrapper socketClient, List<String> uuidPath, AbstractJPPFClassLoader classLoader) throws Exception
+	public JPPFRemoteContainer(final SocketWrapper socketClient, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
 	{
 		super(uuidPath, classLoader);
 		this.socketClient = socketClient;
@@ -75,7 +75,7 @@ public class JPPFRemoteContainer extends JPPFContainer
 	 * @throws Throwable if an error occurs while deserializing.
 	 */
 	@Override
-    public int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable
+	public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Throwable
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try

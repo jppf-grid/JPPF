@@ -36,7 +36,7 @@ public abstract class EventEmitter<S extends EventListener>
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add to the list.
 	 */
-	public void addListener(S listener)
+	public void addListener(final S listener)
 	{
 		synchronized(eventListeners)
 		{
@@ -48,7 +48,7 @@ public abstract class EventEmitter<S extends EventListener>
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to rmeove from the list.
 	 */
-	public void removeListener(S listener)
+	public void removeListener(final S listener)
 	{
 		synchronized(eventListeners)
 		{

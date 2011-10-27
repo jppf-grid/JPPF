@@ -84,7 +84,7 @@ class ApplicationConnection extends JPPFConnection
 	 * which responses are sent.
 	 * @throws JPPFException if this socket handler can't be initialized.
 	 */
-	public ApplicationConnection(JPPFServer server, Socket socket) throws JPPFException
+	public ApplicationConnection(final JPPFServer server, final Socket socket) throws JPPFException
 	{
 		super(server, socket);
 		is = new SocketWrapperInputSource(socketClient);
@@ -110,7 +110,7 @@ class ApplicationConnection extends JPPFConnection
 	 * @see org.jppf.server.app.JPPFConnection#perform()
 	 */
 	@Override
-    public void perform() throws Exception
+	public void perform() throws Exception
 	{
 		if (debugEnabled) log.debug("before reading header");
 		// Read the request header - with tasks count information
@@ -171,14 +171,14 @@ class ApplicationConnection extends JPPFConnection
 		}
 		else resultSender.sendPartialResults(headerWrapper);
 		jobEnded();
-    }
+	}
 
 	/**
 	 * Close this application connection.
 	 * @see org.jppf.server.app.JPPFConnection#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		if (debugEnabled) log.debug("closing " + this);
 		cancelJobOnClose();
@@ -229,7 +229,7 @@ class ApplicationConnection extends JPPFConnection
 	 * @see org.jppf.server.app.JPPFConnection#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return "application connection : " + super.toString();
 	}

@@ -74,13 +74,13 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 
 	/**
 	 * Start this resource adapater with the specified bootstrap context.
-	 * This method is invoked by the application server exactly once for each resource adapter instance. 
+	 * This method is invoked by the application server exactly once for each resource adapter instance.
 	 * @param ctx bootstrap context provided by the application server.
 	 * @throws ResourceAdapterInternalException if an error occurred while starting this resource adapter.
 	 * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
 	 */
 	@Override
-	public void start(BootstrapContext ctx) throws ResourceAdapterInternalException
+	public void start(final BootstrapContext ctx) throws ResourceAdapterInternalException
 	{
 		this.ctx = ctx;
 		log.info("Starting JPPF resource adapter");
@@ -118,7 +118,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#endpointActivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
 	@Override
-	public void endpointActivation(MessageEndpointFactory arg0, ActivationSpec arg1) throws ResourceException
+	public void endpointActivation(final MessageEndpointFactory arg0, final ActivationSpec arg1) throws ResourceException
 	{
 		throw new NotSupportedException("Method not supported");
 	}
@@ -130,7 +130,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#endpointDeactivation(javax.resource.spi.endpoint.MessageEndpointFactory, javax.resource.spi.ActivationSpec)
 	 */
 	@Override
-	public void endpointDeactivation(MessageEndpointFactory arg0, ActivationSpec arg1) 
+	public void endpointDeactivation(final MessageEndpointFactory arg0, final ActivationSpec arg1)
 	{
 	}
 
@@ -142,7 +142,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
 	 */
 	@Override
-	public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException
+	public XAResource[] getXAResources(final ActivationSpec[] arg0) throws ResourceException
 	{
 		return null;
 	}
@@ -159,17 +159,17 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 
 	/**
 	 * Set the host name or IP address for the JPPF driver.
-	 * @param serverHost the host as a string. 
+	 * @param serverHost the host as a string.
 	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
-	public void setServerHost(String serverHost)
+	public void setServerHost(final String serverHost)
 	{
 		this.serverHost = serverHost;
 	}
 
 	/**
 	 * Get the port for the class server in the driver.
-	 * @return the port number as an int. 
+	 * @return the port number as an int.
 	 * @deprecated use {@link #getClientConfiguration() getClientConfiguration()} instead.
 	 */
 	public Integer getClassServerPort()
@@ -179,17 +179,17 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 
 	/**
 	 * Set the port for the class server in the driver.
-	 * @param classServerPort the port number as an int. 
+	 * @param classServerPort the port number as an int.
 	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
-	public void setClassServerPort(Integer classServerPort)
+	public void setClassServerPort(final Integer classServerPort)
 	{
 		this.classServerPort = classServerPort;
 	}
 
 	/**
 	 * Get the port for the client application server in the driver.
-	 * @return the port number as an int. 
+	 * @return the port number as an int.
 	 * @deprecated use {@link #getClientConfiguration() getClientConfiguration()} instead.
 	 */
 	public Integer getAppServerPort()
@@ -202,7 +202,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @param appServerPort the port number as an int.
 	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
-	public void setAppServerPort(Integer appServerPort)
+	public void setAppServerPort(final Integer appServerPort)
 	{
 		this.appServerPort = appServerPort;
 	}
@@ -222,7 +222,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * @param connectionPoolSize the number of connections as an int.
 	 * @deprecated use {@link #setClientConfiguration(java.lang.String) setClientConfiguration(String)} instead.
 	 */
-	public void setConnectionPoolSize(Integer connectionPoolSize)
+	public void setConnectionPoolSize(final Integer connectionPoolSize)
 	{
 		this.connectionPoolSize = connectionPoolSize;
 	}
@@ -240,7 +240,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	 * Set the string holding the client configuration.
 	 * @param clientConfiguration the configuration as a stirng.
 	 */
-	public void setClientConfiguration(String clientConfiguration)
+	public void setClientConfiguration(final String clientConfiguration)
 	{
 		this.clientConfiguration = clientConfiguration;
 	}

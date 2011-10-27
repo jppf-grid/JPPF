@@ -100,7 +100,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param port the port this socket server is listening to.
 	 * @throws Exception if the underlying server socket can't be opened.
 	 */
-	public NodeNioServer(int port) throws Exception
+	public NodeNioServer(final int port) throws Exception
 	{
 		this(new int[] { port });
 	}
@@ -110,7 +110,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param ports the ports this socket server is listening to.
 	 * @throws Exception if the underlying server socket can't be opened.
 	 */
-	public NodeNioServer(int[] ports) throws Exception
+	public NodeNioServer(final int[] ports) throws Exception
 	{
 		super(ports, NODE_SERVER, false);
 		taskQueueChecker = new TaskQueueChecker(this);
@@ -120,7 +120,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 		((JPPFPriorityQueue) getQueue()).addQueueListener(new QueueListener()
 		{
 			@Override
-			public void newBundle(QueueEvent event)
+			public void newBundle(final QueueEvent event)
 			{
 				selector.wakeup();
 				taskQueueChecker.wakeUp();
@@ -133,7 +133,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * Initialize the local channel connection.
 	 * @param localChannel the local channel to use.
 	 */
-	public void initLocalChannel(ChannelWrapper<?> localChannel)
+	public void initLocalChannel(final ChannelWrapper<?> localChannel)
 	{
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
 		{
@@ -146,12 +146,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 			postAccept(localChannel);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected NioServerFactory<NodeState, NodeTransition> createFactory()
+	protected NioServerFactory<NodeState, NodeTransition> createFactory()
 	{
 		return new NodeServerFactory(this);
 	}
@@ -160,7 +160,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void postAccept(ChannelWrapper channel)
+	public void postAccept(final ChannelWrapper channel)
 	{
 		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
 		driver.getStatsManager().newNodeConnection();
@@ -181,10 +181,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * Add a channel to the list of idle channels.
 	 * @param channel the channel to add to the list.
 	 */
-	public void addIdleChannel(ChannelWrapper<?> channel)
+	public void addIdleChannel(final ChannelWrapper<?> channel)
 	{
 		if (traceEnabled) log.trace("Adding idle channel " + channel);
-        taskQueueChecker.addIdleChannel(channel);
+		taskQueueChecker.addIdleChannel(channel);
 	}
 
 	/**
@@ -192,10 +192,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param channel the channel to remove from the list.
 	 * @return a reference to the removed channel.
 	 */
-	public ChannelWrapper<?> removeIdleChannel(ChannelWrapper<?> channel)
+	public ChannelWrapper<?> removeIdleChannel(final ChannelWrapper<?> channel)
 	{
 		if (traceEnabled) log.trace("Removing idle channel " + channel);
-        return taskQueueChecker.removeIdleChannel(channel);
+		return taskQueueChecker.removeIdleChannel(channel);
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @see org.jppf.server.nio.NioServer#createNioContext()
 	 */
 	@Override
-    public NioContext createNioContext()
+	public NioContext createNioContext()
 	{
 		return new RemoteNodeContext();
 	}
@@ -216,7 +216,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
 	 */
 	@Override
-    public int getInitialInterest()
+	public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}
@@ -263,7 +263,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
 	 * @param context the context data associated with the channel.
 	 */
-	public static void closeNode(ChannelWrapper<?> channel, AbstractNodeContext context)
+	public static void closeNode(final ChannelWrapper<?> channel, final AbstractNodeContext context)
 	{
 		if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, NODE_SERVER);
 		try
@@ -311,7 +311,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * Set the algorithm that dynamically computes the task bundle size.
 	 * @param bundler a <code>Bundler</code> instance.
 	 */
-	public void setBundler(Bundler bundler)
+	public void setBundler(final Bundler bundler)
 	{
 		bundlerRef.set(bundler);
 	}
@@ -350,14 +350,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 */
 	public List<ChannelWrapper<?>> getIdleChannels()
 	{
-        return taskQueueChecker.getIdleChannels();
+		return taskQueueChecker.getIdleChannels();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void connectionFailed(ReaperEvent event)
+	public void connectionFailed(final ReaperEvent event)
 	{
 		ServerConnection c = event.getConnection();
 		if (!c.isOk())
@@ -383,7 +383,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param uuid the uuid key to look up in the the map.
 	 * @return channel the corresponding channel.
 	 */
-	ChannelWrapper<?> getChannelFromUuid(String uuid)
+	ChannelWrapper<?> getChannelFromUuid(final String uuid)
 	{
 		synchronized(uuidMap)
 		{
@@ -396,7 +396,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param uuid the uuid key to add to the map.
 	 * @param channel the corresponding channel.
 	 */
-	void putUuid(String uuid, ChannelWrapper<?> channel)
+	void putUuid(final String uuid, final ChannelWrapper<?> channel)
 	{
 		synchronized(uuidMap)
 		{
@@ -409,7 +409,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 	 * @param uuid the uuid key to remove from the map.
 	 * @return channel the corresponding channel.
 	 */
-	ChannelWrapper<?> removeUuid(String uuid)
+	ChannelWrapper<?> removeUuid(final String uuid)
 	{
 		synchronized(uuidMap)
 		{

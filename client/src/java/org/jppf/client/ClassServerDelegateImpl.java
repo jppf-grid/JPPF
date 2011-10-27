@@ -58,7 +58,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @param port the TCP port the class server is listening to.
 	 * @throws Exception if the connection could not be opened.
 	 */
-	public ClassServerDelegateImpl(JPPFClientConnection owner, String uuid, String host, int port) throws Exception
+	public ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception
 	{
 		super(owner);
 		this.clientUuid = uuid;
@@ -73,7 +73,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @see org.jppf.client.ClassServerDelegate#init()
 	 */
 	@Override
-    public final void init() throws Exception
+	public final void init() throws Exception
 	{
 		try
 		{
@@ -109,7 +109,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @see org.jppf.client.ClassServerDelegate#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -198,7 +198,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @see org.jppf.client.ClassServerDelegate#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		if (!closed)
 		{
@@ -222,7 +222,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @return a <code>SocketInitializer</code> instance.
 	 */
 	@Override
-    protected SocketInitializer createSocketInitializer()
+	protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
 	}
@@ -232,7 +232,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * @param uuid the uuid of the request from which the class loader was obtained.
 	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
 	 */
-	private ClassLoader getClassLoader(String uuid)
+	private ClassLoader getClassLoader(final String uuid)
 	{
 		return ((JPPFClientConnectionImpl) owner).getClient().getRequestClassLoader(uuid);
 	}

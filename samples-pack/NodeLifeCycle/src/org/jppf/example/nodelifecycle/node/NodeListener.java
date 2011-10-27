@@ -23,13 +23,13 @@ import java.util.Properties;
 import java.util.concurrent.*;
 
 import javax.sql.DataSource;
-import javax.transaction.*;
+import javax.transaction.Status;
 
 import org.jppf.node.event.*;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
-import com.atomikos.icatch.jta.*;
+import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
 
@@ -61,7 +61,8 @@ public class NodeListener implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeStarting(NodeLifeCycleEvent event)
+	@Override
+	public void nodeStarting(final NodeLifeCycleEvent event)
 	{
 		output("node ready to process jobs");
 		// start a transaction to activate recovery
@@ -74,7 +75,8 @@ public class NodeListener implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeEnding(NodeLifeCycleEvent event)
+	@Override
+	public void nodeEnding(final NodeLifeCycleEvent event)
 	{
 		output("node ending");
 		endTransaction(true);
@@ -83,7 +85,8 @@ public class NodeListener implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void jobStarting(NodeLifeCycleEvent event)
+	@Override
+	public void jobStarting(final NodeLifeCycleEvent event)
 	{
 		output("node starting job '" + event.getJob().getName() + "'");
 		startTransaction(false);
@@ -92,7 +95,8 @@ public class NodeListener implements NodeLifeCycleListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void jobEnding(NodeLifeCycleEvent event)
+	@Override
+	public void jobEnding(final NodeLifeCycleEvent event)
 	{
 		output("node finished job '" + event.getJob().getName() + "'");
 		endTransaction(false);
@@ -124,7 +128,7 @@ public class NodeListener implements NodeLifeCycleListener
 		props.setProperty("port", "3306");
 		props.setProperty("databaseName", "jppf_samples");
 		props.setProperty("pinGlobalTxToPhysicalConnection", "true");
-		*/
+		 */
 		// H2 Properties
 		ds.setXaDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
 		props.setProperty("user", "jppf");
@@ -152,7 +156,7 @@ public class NodeListener implements NodeLifeCycleListener
 		// MySQL Properties
 		ds.setDriverClassName("com.mysql.jdbc.Driver");
 		ds.setUrl("jdbc:mysql://localhost:3306/jppf_samples");
-		*/
+		 */
 		// H2 Properties
 		ds.setDriverClassName("org.h2.Driver");
 		ds.setUrl("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC");
@@ -177,7 +181,7 @@ public class NodeListener implements NodeLifeCycleListener
 	}
 
 	/**
-	 * Utility method to get a connection. The connection is obtained from the transaction thread. 
+	 * Utility method to get a connection. The connection is obtained from the transaction thread.
 	 * @return Connection the connection.
 	 * @throws Exception if any error occurs.
 	 */
@@ -190,7 +194,7 @@ public class NodeListener implements NodeLifeCycleListener
 	 * Utility method to start a transaction.
 	 * The transaction is created/started from the transaction thread.
 	 * @param rollbackOnly determines whether the transaction should be in rollback only mode.
-	 * This is used to discard logged transactions that would remain after a node crash. 
+	 * This is used to discard logged transactions that would remain after a node crash.
 	 */
 	public static void startTransaction(final boolean rollbackOnly)
 	{
@@ -216,7 +220,7 @@ public class NodeListener implements NodeLifeCycleListener
 	 * @param callable the task to execute.
 	 * @return the task's result.
 	 */
-	public static <T> T submit(Callable<T> callable)
+	public static <T> T submit(final Callable<T> callable)
 	{
 		T result = null;
 		try
@@ -247,7 +251,7 @@ public class NodeListener implements NodeLifeCycleListener
 		 * Initialize this task with the specified error flag.
 		 * @param rollbackOnly rollack / commit flag.
 		 */
-		public StartTransactionTask(boolean rollbackOnly)
+		public StartTransactionTask(final boolean rollbackOnly)
 		{
 			this.rollbackOnly = rollbackOnly;
 		}
@@ -256,6 +260,7 @@ public class NodeListener implements NodeLifeCycleListener
 		 * Terminate the transaction and return an exception if any occurred.
 		 * @return Exception if any error occurred.
 		 */
+		@Override
 		public Exception call()
 		{
 			try
@@ -293,7 +298,7 @@ public class NodeListener implements NodeLifeCycleListener
 		 * Initialize this task with the specified error flag.
 		 * @param rollback rollack / commit flag.
 		 */
-		public EndTransactionTask(boolean rollback)
+		public EndTransactionTask(final boolean rollback)
 		{
 			this.rollback = rollback;
 		}
@@ -302,6 +307,7 @@ public class NodeListener implements NodeLifeCycleListener
 		 * Terminate the transaction and return an exception if any occurred.
 		 * @return Exception if any error occurred.
 		 */
+		@Override
 		public Exception call()
 		{
 			try
@@ -327,7 +333,7 @@ public class NodeListener implements NodeLifeCycleListener
 	 * Print a message to the console and/or log file.
 	 * @param message - the message to print.
 	 */
-	public static void output(String message)
+	public static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

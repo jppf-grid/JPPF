@@ -35,25 +35,25 @@ public interface OptionElement extends OptionProperties
 	OptionElement getParent();
 	/**
 	 * Get the root of the option tree this option belongs to.
-	 * @return a <code>OptionElement</code> instance. 
+	 * @return a <code>OptionElement</code> instance.
 	 */
-    @Override
-    OptionElement getRoot();
+	@Override
+	OptionElement getRoot();
 	/**
 	 * Get the path of this element in the option tree.
-	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
+	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances.
 	 */
 	TreePath getPath();
 	/**
 	 * Get the path of this element in the option tree, represented as a string.
 	 * The string path is a sequence of element names separted by slashes.
-	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances. 
+	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances.
 	 */
 	String getStringPath();
 	/**
 	 * Find the first element with the specified name in the subtree of which
 	 * this element is the root.
-	 * The notion of first element relates to a depth-first search in the tree. 
+	 * The notion of first element relates to a depth-first search in the tree.
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element
 	 * could be found with the specfied name.
@@ -61,8 +61,8 @@ public interface OptionElement extends OptionProperties
 	OptionElement findFirstWithName(String name);
 	/**
 	 * Find the last element with the specified name in the subtree of which
-	 * this element is the root. 
-	 * The notion of last element relates to a depth-first search in the tree. 
+	 * this element is the root.
+	 * The notion of last element relates to a depth-first search in the tree.
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element
 	 * could be found with the specfied name.
@@ -70,10 +70,10 @@ public interface OptionElement extends OptionProperties
 	OptionElement findLastWithName(String name);
 	/**
 	 * Find all the elements with the specified name in the subtree of which
-	 * this element is the root. 
+	 * this element is the root.
 	 * @param name the name of the elements to find.
 	 * @return a list of <code>OptionElement</code> instances, or null if no element
-	 * could be found with the specfied name. 
+	 * could be found with the specfied name.
 	 */
 	List<OptionElement> findAllWithName(String name);
 	/**
@@ -82,7 +82,7 @@ public interface OptionElement extends OptionProperties
 	 * is considered relative to the requesting element.
 	 * @param path the path of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element could be found with
-	 * the specified path. 
+	 * the specified path.
 	 */
 	OptionElement findElement(String path);
 }

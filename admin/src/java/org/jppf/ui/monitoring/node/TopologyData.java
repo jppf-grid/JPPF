@@ -49,7 +49,7 @@ public class TopologyData
 	 */
 	private JPPFClientConnection clientConnection = null;
 	/**
-	 * Wrapper holding the connection to the JMX server on a driver or a node. 
+	 * Wrapper holding the connection to the JMX server on a driver or a node.
 	 */
 	private JMXConnectionWrapper jmxWrapper = null;
 	/**
@@ -65,7 +65,7 @@ public class TopologyData
 	 * Initialize topology job data with the specified type.
 	 * @param type the type of this job data object as a <code>JobDataType</code> enum value.
 	 */
-	protected TopologyData(TopologyDataType type)
+	protected TopologyData(final TopologyDataType type)
 	{
 		this.type = type;
 	}
@@ -74,7 +74,7 @@ public class TopologyData
 	 * Initialize this topology data as a driver related object.
 	 * @param clientConnection a reference to the driver connection.
 	 */
-	public TopologyData(JPPFClientConnection clientConnection)
+	public TopologyData(final JPPFClientConnection clientConnection)
 	{
 		this(TopologyDataType.DRIVER);
 		this.clientConnection = clientConnection;
@@ -85,7 +85,7 @@ public class TopologyData
 	 * Initialize this topology data as holding information about a node.
 	 * @param nodeInformation information on the JPPF node.
 	 */
-	public TopologyData(JPPFManagementInfo nodeInformation)
+	public TopologyData(final JPPFManagementInfo nodeInformation)
 	{
 		this(TopologyDataType.NODE);
 		this.nodeInformation = nodeInformation;
@@ -108,7 +108,7 @@ public class TopologyData
 	}
 
 	/**
-	 * Get the wrapper holding the connection to the JMX server on a driver or node. 
+	 * Get the wrapper holding the connection to the JMX server on a driver or node.
 	 * @return a <code>JMXDriverConnectionWrapper</code> instance.
 	 */
 	public JMXConnectionWrapper getJmxWrapper()
@@ -131,7 +131,7 @@ public class TopologyData
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return jmxWrapper.getId();
 	}
@@ -149,7 +149,7 @@ public class TopologyData
 	 * Set the object describing the current state of a node.
 	 * @param nodeState a <code>JPPFNodeState</code> instance.
 	 */
-	public void setNodeState(JPPFNodeState nodeState)
+	public void setNodeState(final JPPFNodeState nodeState)
 	{
 		this.nodeState = nodeState;
 	}
@@ -196,7 +196,7 @@ public class TopologyData
 	 * Set the status of the node.
 	 * @param status the node status.
 	 */
-	public void setStatus(TopologyDataStatus status)
+	public void setStatus(final TopologyDataStatus status)
 	{
 		this.status = status;
 	}

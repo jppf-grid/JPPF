@@ -35,7 +35,7 @@ public class FileLocation extends AbstractLocation<File>
 	 * Initialize this location with the specified file path.
 	 * @param file an abstract file path.
 	 */
-	public FileLocation(File file)
+	public FileLocation(final File file)
 	{
 		super(file);
 	}
@@ -44,7 +44,7 @@ public class FileLocation extends AbstractLocation<File>
 	 * Initialize this location with the specified file path.
 	 * @param file an abstract file path.
 	 */
-	public FileLocation(String file)
+	public FileLocation(final String file)
 	{
 		super(new File(file));
 	}
@@ -56,7 +56,7 @@ public class FileLocation extends AbstractLocation<File>
 	 * @see org.jppf.server.protocol.Location#getInputStream()
 	 */
 	@Override
-    public InputStream getInputStream() throws Exception
+	public InputStream getInputStream() throws Exception
 	{
 		return new BufferedInputStream(new FileInputStream(path));
 	}
@@ -68,7 +68,7 @@ public class FileLocation extends AbstractLocation<File>
 	 * @see org.jppf.server.protocol.Location#getOutputStream()
 	 */
 	@Override
-    public OutputStream getOutputStream() throws Exception
+	public OutputStream getOutputStream() throws Exception
 	{
 		return new BufferedOutputStream(new FileOutputStream(path));
 	}
@@ -79,7 +79,7 @@ public class FileLocation extends AbstractLocation<File>
 	 * @see org.jppf.server.protocol.Location#size()
 	 */
 	@Override
-    public long size()
+	public long size()
 	{
 		if ((path != null) && path.exists()) return path.length();
 		return -1;

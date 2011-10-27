@@ -109,7 +109,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	{
 		if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
 		if (size <= 0) return;
-		BundlePerformanceSample sample = new BundlePerformanceSample(time / (double) size, size);
+		BundlePerformanceSample sample = new BundlePerformanceSample(time / size, size);
 		synchronized(BUNDLERS)
 		{
 			dataHolder.addSample(sample);
@@ -129,7 +129,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 			BUNDLERS.add(this);
 		}
 	}
-	
+
 	/**
 	 * Release the resources used by this bundler.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
@@ -223,6 +223,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 		for (int i=0; i<((ProportionalTuneProfile) profile).getProportionalityFactor(); i++) r *= x;
 		return 1.0d /r;
 		/*
-		*/
+		 */
 	}
 }

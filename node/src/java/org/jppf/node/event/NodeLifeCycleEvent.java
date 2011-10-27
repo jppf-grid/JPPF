@@ -33,7 +33,7 @@ public class NodeLifeCycleEvent extends EventObject
 	 * Initialize this event with the specified execution manager.
 	 * @param executionManager the execution that handles the execution of tasks by a node.
 	 */
-	public NodeLifeCycleEvent(NodeExecutionManager executionManager)
+	public NodeLifeCycleEvent(final NodeExecutionManager executionManager)
 	{
 		super(executionManager);
 	}

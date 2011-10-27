@@ -30,7 +30,7 @@ public class LocalClassLoaderChannel extends AbstractLocalChannelWrapper<JPPFRes
 	 * Initialize this I/O handler with the specified context.
 	 * @param context the context used as communication channel.
 	 */
-	public LocalClassLoaderChannel(AbstractNioContext context)
+	public LocalClassLoaderChannel(final AbstractNioContext context)
 	{
 		super(context);
 	}

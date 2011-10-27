@@ -58,7 +58,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	private ServerSocket processServer = null;
 	/**
 	 * The port number the erver socket listens to.
-	 */ 
+	 */
 	private int processPort = 0;
 	/**
 	 * The fully qualified name of the main class of the subprocess to launch.
@@ -83,9 +83,9 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 
 	/**
 	 * Initialize this process launcher.
-	 * @param mainClass the fully qualified name of the main class of the sub process to launch. 
+	 * @param mainClass the fully qualified name of the main class of the sub process to launch.
 	 */
-	public ProcessLauncher(String mainClass)
+	public ProcessLauncher(final String mainClass)
 	{
 		this.mainClass = mainClass;
 	}
@@ -94,7 +94,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * Start the socket listener and the subprocess.
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		idleMode = JPPFConfiguration.getProperties().getBoolean("jppf.idle.mode.enabled", false);
 		boolean end = false;
@@ -190,7 +190,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * @param p the process whose output is to be captured.
 	 * @return a <code>ProcessWrapper</code> instance.
 	 */
-	private ProcessWrapper createProcessWrapper(Process p)
+	private ProcessWrapper createProcessWrapper(final Process p)
 	{
 		ProcessWrapper wrapper = new ProcessWrapper(process);
 		wrapper.addListener(this);
@@ -204,7 +204,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * @param n the exit value of the subprocess.
 	 * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
 	 */
-	private boolean onProcessExit(int n)
+	private boolean onProcessExit(final int n)
 	{
 		String s = getOutput(process, "std").trim();
 		if (s.length() > 0)
@@ -230,7 +230,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 		Runnable hook = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				if (process != null) process.destroy();
 			}
@@ -257,7 +257,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 			Runnable r = new Runnable()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
 					while (true)
 					{
@@ -290,14 +290,14 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 		}
 		return processPort;
 	}
-	
+
 	/**
 	 * Get the output of the driver process.
 	 * @param process the process to get the standard or error output from.
 	 * @param streamType detrmines whether to obtain the standard or error output.
 	 * @return the output as a string.
 	 */
-	public String getOutput(Process process, String streamType)
+	public String getOutput(final Process process, final String streamType)
 	{
 		StringBuilder sb = new StringBuilder();
 		try
@@ -331,7 +331,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
 	@Override
-    public void errorStreamAltered(ProcessWrapperEvent event)
+	public void errorStreamAltered(final ProcessWrapperEvent event)
 	{
 		System.err.print(event.getContent());
 	}
@@ -342,7 +342,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
 	 */
 	@Override
-    public void outputStreamAltered(ProcessWrapperEvent event)
+	public void outputStreamAltered(final ProcessWrapperEvent event)
 	{
 		System.out.print(event.getContent());
 	}
@@ -351,7 +351,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void idleStateChanged(IdleStateEvent event)
+	public void idleStateChanged(final IdleStateEvent event)
 	{
 		IdleState state = event.getState();
 		if (IdleState.BUSY.equals(state))

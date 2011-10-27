@@ -28,7 +28,7 @@ public class TestObject implements Serializable
 {
 	private String id = "";
 
-	public TestObject(String id)
+	public TestObject(final String id)
 	{
 		this.id = id;
 	}

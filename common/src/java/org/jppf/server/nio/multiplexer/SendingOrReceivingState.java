@@ -43,7 +43,7 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendingOrReceivingState(MultiplexerNioServer server)
+	public SendingOrReceivingState(final MultiplexerNioServer server)
 	{
 		super(server);
 	}
@@ -52,7 +52,7 @@ public class SendingOrReceivingState extends MultiplexerServerState
 	 * {@inheritDoc}
 	 */
 	@Override
-    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
 		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();

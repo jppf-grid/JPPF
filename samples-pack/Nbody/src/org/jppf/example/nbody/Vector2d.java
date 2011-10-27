@@ -71,7 +71,7 @@ public class Vector2d implements Serializable
 	 * @param x x coordinate.
 	 * @param y y coordinate.
 	 */
-	public Vector2d(double x, double y)
+	public Vector2d(final double x, final double y)
 	{
 		this.x = x;
 		this.y = y;
@@ -82,7 +82,7 @@ public class Vector2d implements Serializable
 	 * @param other the other vector.
 	 * @return this vector.
 	 */
-	public Vector2d set(Vector2d other)
+	public Vector2d set(final Vector2d other)
 	{
 		x = other.x;
 		y = other.y;
@@ -94,7 +94,7 @@ public class Vector2d implements Serializable
 	 * @param other the other vector.
 	 * @return this vector.
 	 */
-	public Vector2d add(Vector2d other)
+	public Vector2d add(final Vector2d other)
 	{
 		x += other.x;
 		y += other.y;
@@ -106,7 +106,7 @@ public class Vector2d implements Serializable
 	 * @param other the other vector.
 	 * @return this vector.
 	 */
-	public Vector2d subtract(Vector2d other)
+	public Vector2d subtract(final Vector2d other)
 	{
 		x -= other.x;
 		y -= other.y;
@@ -118,7 +118,7 @@ public class Vector2d implements Serializable
 	 * @param value the value to multiply by.
 	 * @return this vector.
 	 */
-	public Vector2d multiply(double value)
+	public Vector2d multiply(final double value)
 	{
 		x *= value;
 		y *= value;

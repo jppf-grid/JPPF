@@ -43,7 +43,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * Initialize this chart handler with a specified stats formatter.
 	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public DifferenceChartHandler(StatsHandler statsHandler)
+	public DifferenceChartHandler(final StatsHandler statsHandler)
 	{
 		this.statsHandler = statsHandler;
 	}
@@ -55,26 +55,26 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration createChart(ChartConfiguration config)
+	public ChartConfiguration createChart(final ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		String s = config.name;
 		if (config.unit != null) s += " (" + config.unit+ ')';
 		//JFreeChart chart = ChartFactory.createXYLineChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createXYLineChart",
-			s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
+				s, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "VERTICAL"), true, true, false);
 		//XYPlot plot = chart.getXYPlot();
 		Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
 		//XYDifferenceRenderer rend = new XYDifferenceRenderer(Color.green, Color.red, false);
 		Object rend = invokeConstructor(getClass0("org.jfree.chart.renderer.xy.XYDifferenceRenderer"),
-			new Class[] {Paint.class, Paint.class, Boolean.TYPE}, Color.green, Color.red, false);
+				new Class[] {Paint.class, Paint.class, Boolean.TYPE}, Color.green, Color.red, false);
 		//plot.setRenderer(rend);
 		invokeMethod(plot.getClass(), plot, "setRenderer", new Class[] {getClass0("org.jfree.chart.renderer.xy.XYItemRenderer")}, rend);
 		//rend.setBaseSeriesVisibleInLegend(true);
 		invokeMethod(rend.getClass(), rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
 		//rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
 		Object labelGenerator = Proxy.newProxyInstance(
-			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
+				getCurrentClassLoader(), getClasses("org.jfree.chart.labels.XYSeriesLabelGenerator"), new LegendLabelGeneratorInvocationHandler());
 		invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
 		//rend.setBaseStroke(new BasicStroke(2f));
 		invokeMethod(rend.getClass(), rend, "setBaseStroke", new Class[] {Stroke.class}, new BasicStroke(2.0f));
@@ -87,7 +87,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private Object createDataset(ChartConfiguration config)
+	private Object createDataset(final ChartConfiguration config)
 	{
 		//XYSeriesCollection ds = new XYSeriesCollection();
 		Object ds = newInstance("org.jfree.data.xy.XYSeriesCollection");
@@ -108,7 +108,7 @@ public class DifferenceChartHandler implements ChartHandler
 		populateDataset(config);
 		return ds;
 	}
-	
+
 	/**
 	 * Populate a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to populate.
@@ -116,7 +116,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration populateDataset(ChartConfiguration config)
+	public ChartConfiguration populateDataset(final ChartConfiguration config)
 	{
 		if (config.fields == null) return config;
 		int len = config.fields.length;
@@ -152,7 +152,7 @@ public class DifferenceChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration updateDataset(ChartConfiguration config)
+	public ChartConfiguration updateDataset(final ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();

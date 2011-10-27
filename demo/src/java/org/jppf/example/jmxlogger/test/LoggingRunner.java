@@ -65,7 +65,7 @@ public class LoggingRunner implements NotificationListener
 	 * @param args by default, we do not use the command line arguments,
 	 * however nothing prevents us from using them if need be.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -129,7 +129,7 @@ public class LoggingRunner implements NotificationListener
 	 * @param job the JPPF job to execute.
 	 * @throws Exception if an error occurs while executing the job.
 	 */
-	public void executeBlockingJob(JPPFJob job) throws Exception
+	public void executeBlockingJob(final JPPFJob job) throws Exception
 	{
 		// set the job in blocking mode.
 		job.setBlocking(true);
@@ -168,42 +168,42 @@ public class LoggingRunner implements NotificationListener
 		JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
 		// get its jmx connection to the driver MBean server
 		JMXDriverConnectionWrapper jmxDriver = connection.getJmxConnection();
-	  jmxDriver.connectAndWait(5000L);
-	  JmxLogger driverProxy = jmxDriver.getProxy(name, JmxLogger.class);
-	  // used as handback object so we know where the log messages comes from.
-	  String source = "driver " + jmxDriver.getHost() + ':' + jmxDriver.getPort();
-	  // subbscribe to all notifications from the MBean
-	  driverProxy.addNotificationListener(this, null, source);
-	  /*
-	  */
-	  // collect the information to connect to the nodes' mbean servers 
-	  Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
-	  for (JPPFManagementInfo node: nodes)
-	  {
-	  	try
-	  	{
+		jmxDriver.connectAndWait(5000L);
+		JmxLogger driverProxy = jmxDriver.getProxy(name, JmxLogger.class);
+		// used as handback object so we know where the log messages comes from.
+		String source = "driver " + jmxDriver.getHost() + ':' + jmxDriver.getPort();
+		// subbscribe to all notifications from the MBean
+		driverProxy.addNotificationListener(this, null, source);
+		/*
+		 */
+		// collect the information to connect to the nodes' mbean servers
+		Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
+		for (JPPFManagementInfo node: nodes)
+		{
+			try
+			{
 				// get a jmx connection to the node MBean server
-		  	JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
-			  JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
-			 
-			  // used as handback object so we know where the log messages comes from.
-			  source = "node   " + jmxNode.getHost() + ':' + jmxNode.getPort();
-			  // subbscribe to all notifications from the MBean
-			  nodeProxy.addNotificationListener(this, null, source);
-			  jmxConnections.add(jmxNode);
-	  	}
-	  	catch(Exception e)
-	  	{
-	  		log.error(e.getMessage());
-	  	}
-	  }
+				JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
+				JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
+
+				// used as handback object so we know where the log messages comes from.
+				source = "node   " + jmxNode.getHost() + ':' + jmxNode.getPort();
+				// subbscribe to all notifications from the MBean
+				nodeProxy.addNotificationListener(this, null, source);
+				jmxConnections.add(jmxNode);
+			}
+			catch(Exception e)
+			{
+				log.error(e.getMessage());
+			}
+		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleNotification(Notification notification, final Object handback)
+	public void handleNotification(final Notification notification, final Object handback)
 	{
 		// to smoothe the throughput of notfications processing,
 		// we submit each notification to a queue instead of handling it directly
@@ -211,7 +211,7 @@ public class LoggingRunner implements NotificationListener
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				String s = handback.toString() + ": " + message;
 				// process the notification; here we simply display the message

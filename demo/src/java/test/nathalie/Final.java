@@ -6,14 +6,14 @@ public class Final extends JPPFTask
 {
 	int res = 0;
 	int c = 0;
-	
-	public Final(int c)
+
+	public Final(final int c)
 	{
 		this.c = c;
 	}
 
 	@Override
-    public void run()
+	public void run()
 	{
 		System.out.println("in Final(" + c + ')');
 		res = (int) (c * Math.sin(c + 10));

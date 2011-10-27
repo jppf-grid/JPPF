@@ -49,7 +49,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	 * @param selector the channel selector associated with this thread.
 	 * @param server the nio server that own this thread.
 	 */
-	public ChannelSelectorThread(ChannelSelector selector, NioServer<?, ?> server)
+	public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server)
 	{
 		this.selector = selector;
 		this.server = server;
@@ -60,7 +60,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		while (!isStopped())
 		{

@@ -27,7 +27,7 @@ import org.jppf.server.scheduler.bundle.*;
 import org.slf4j.*;
 
 /**
- * This class performs performs the work of reading a task bundle execution response from a node. 
+ * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
 class WaitingResultsState extends NodeServerState
@@ -45,7 +45,7 @@ class WaitingResultsState extends NodeServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public WaitingResultsState(NodeNioServer server)
+	public WaitingResultsState(final NodeNioServer server)
 	{
 		super(server);
 	}
@@ -58,7 +58,7 @@ class WaitingResultsState extends NodeServerState
 	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
 	 */
 	@Override
-    public NodeTransition performTransition(ChannelWrapper<?> channel) throws Exception
+	public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
 	{
 		AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
 		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), channel);

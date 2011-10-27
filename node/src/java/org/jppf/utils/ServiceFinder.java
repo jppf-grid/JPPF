@@ -49,7 +49,7 @@ public class ServiceFinder
 	 * @return a list of concrete providers of the specified type.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> List<T> findProviders(Class<T> providerClass, ClassLoader cl)
+	public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl)
 	{
 		if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
 		if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
@@ -90,7 +90,7 @@ public class ServiceFinder
 	 * @param providerClass the provider class.
 	 * @return a list of concrete providers of the specified type.
 	 */
-	public <T> List<T> findProviders(Class<T> providerClass)
+	public <T> List<T> findProviders(final Class<T> providerClass)
 	{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if (cl == null) cl = getClass().getClassLoader();
@@ -98,12 +98,12 @@ public class ServiceFinder
 	}
 
 	/**
-	 * Get a list of resources with the specified path found in the classpath. 
+	 * Get a list of resources with the specified path found in the classpath.
 	 * @param path the path of the resources to find.
 	 * @param cl the class loader to user for the lookup.
 	 * @return a list of URLs.
 	 */
-	private List<URL> resourcesList(String path, ClassLoader cl)
+	private List<URL> resourcesList(final String path, final ClassLoader cl)
 	{
 		List<URL> urls = new ArrayList<URL>();
 		try
@@ -122,10 +122,10 @@ public class ServiceFinder
 	/**
 	 * Find all service definitions in the classpath, that match the specified path.
 	 * @param path the path to the definition files to find.
-	 * @param cl the class loader to use for classpath lookup. 
+	 * @param cl the class loader to use for classpath lookup.
 	 * @return the defintions found as a list of strings.
 	 */
-	public List<String> findServiceDefinitions(String path, ClassLoader cl)
+	public List<String> findServiceDefinitions(final String path, final ClassLoader cl)
 	{
 		List<String> lines = new ArrayList<String>();
 		try
@@ -167,7 +167,7 @@ public class ServiceFinder
 	 * @param cl the class loader to user for the lookup.
 	 * @return an iterator over concrete providers of the specified type.
 	 */
-	public static <T> Iterator<T> lookupProviders(Class<T> providerClass, ClassLoader cl)
+	public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl)
 	{
 		return new ServiceFinder().findProviders(providerClass, cl).iterator();
 	}
@@ -178,7 +178,7 @@ public class ServiceFinder
 	 * @param providerClass the provider class.
 	 * @return an iterator over concrete providers of the specified type.
 	 */
-	public static <T> Iterator<T> lookupProviders(Class<T> providerClass)
+	public static <T> Iterator<T> lookupProviders(final Class<T> providerClass)
 	{
 		return new ServiceFinder().findProviders(providerClass).iterator();
 	}

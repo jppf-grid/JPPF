@@ -39,7 +39,7 @@ public class StreamOutputDestination implements OutputDestination
 	 * Initialize this input source with the specified data.
 	 * @param os the output stream to write to.
 	 */
-	public StreamOutputDestination(OutputStream os)
+	public StreamOutputDestination(final OutputStream os)
 	{
 		this.os = os;
 	}
@@ -54,7 +54,7 @@ public class StreamOutputDestination implements OutputDestination
 	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
 	@Override
-    public int write(byte[] buffer, int offset, int len) throws Exception
+	public int write(final byte[] buffer, final int offset, final int len) throws Exception
 	{
 		os.write(buffer, offset, len);
 		return len;
@@ -68,7 +68,7 @@ public class StreamOutputDestination implements OutputDestination
 	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
 	@Override
-    public int write(ByteBuffer buffer) throws Exception
+	public int write(final ByteBuffer buffer) throws Exception
 	{
 		int pos = buffer.position();
 		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
@@ -86,12 +86,12 @@ public class StreamOutputDestination implements OutputDestination
 
 	/**
 	 * Write an int value to this output destination.
-	 * @param value the value to write. 
+	 * @param value the value to write.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
 	@Override
-    public void writeInt(int value) throws Exception
+	public void writeInt(final int value) throws Exception
 	{
 		byte[] bytes = SerializationUtils.writeInt(value);
 		os.write(bytes);
@@ -103,7 +103,7 @@ public class StreamOutputDestination implements OutputDestination
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		os.close();
 	}

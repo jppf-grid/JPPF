@@ -57,7 +57,7 @@ public class NioObject
 	 * @param size the size of the internal buffer.
 	 * @param blocking specfifes whether the I/O performed by this object are blocking.
 	 */
-	public NioObject(int size, boolean blocking)
+	public NioObject(final int size, final boolean blocking)
 	{
 		//this(new ByteBufferLocation(size), blocking);
 		this(new MultipleBuffersLocation(size), blocking);
@@ -75,14 +75,14 @@ public class NioObject
 	{
 		this(new ByteBufferLocation(data, offset, len), blocking);
 	}
-	*/
+	 */
 
 	/**
 	 * Initialize this NioObject with the specified size.
 	 * @param data the location of the data to read from or write to.
 	 * @param blocking specfifes whether the I/O performed by this object are blocking.
 	 */
-	public NioObject(DataLocation data, boolean blocking)
+	public NioObject(final DataLocation data, final boolean blocking)
 	{
 		this.size = data.getSize();
 		this.data = data;
@@ -95,7 +95,7 @@ public class NioObject
 	 * @return true if the frame has been read fully, false otherwise.
 	 * @throws Exception if any error occurs.
 	 */
-	public boolean read(InputSource source) throws Exception
+	public boolean read(final InputSource source) throws Exception
 	{
 		if (count >= size) return true;
 		int n = data.transferFrom(source, blocking);
@@ -116,7 +116,7 @@ public class NioObject
 	 * @return true if the data has been written fully, false otherwise.
 	 * @throws Exception if any error occurs.
 	 */
-	public boolean write(OutputDestination dest) throws Exception
+	public boolean write(final OutputDestination dest) throws Exception
 	{
 		if (count >= size) return true;
 		int n = data.transferTo(dest, blocking);

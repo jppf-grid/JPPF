@@ -35,7 +35,7 @@ public class SelectGraphNodesAction extends AbstractGraphSelectionAction
 	 * Initialize this action with the specified tree table panel.
 	 * @param panel the tree table panel to which this action applies.
 	 */
-	public SelectGraphNodesAction(GraphOption panel)
+	public SelectGraphNodesAction(final GraphOption panel)
 	{
 		super(panel);
 		setupIcon("/org/jppf/ui/resources/select_drivers.gif");
@@ -46,7 +46,7 @@ public class SelectGraphNodesAction extends AbstractGraphSelectionAction
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void actionPerformed(ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		synchronized(panel)
 		{
@@ -62,7 +62,7 @@ public class SelectGraphNodesAction extends AbstractGraphSelectionAction
 				for (Object o: drivers)
 				{
 					mxCell driver = (mxCell) o;
-					allNodes[count++] = model.getChildVertices(model, driver);
+					allNodes[count++] = mxGraphModel.getChildVertices(model, driver);
 				}
 				graph.setSelectionCells(CollectionUtils.concatArrays(allNodes));
 			}

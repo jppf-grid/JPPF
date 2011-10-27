@@ -33,37 +33,37 @@ import org.jppf.jca.util.JPPFAccessorImpl;
  */
 public class JPPFConnectionFactory extends JPPFAccessorImpl implements ConnectionFactory
 {
-  /**
-   * The default managed factory.
-   */
-  private JPPFManagedConnectionFactory factory = new JPPFManagedConnectionFactory();
-  /**
-   * The default connection manager.
-   */
-  private ConnectionManager manager = new JPPFConnectionManager();
-  /**
-   * 
-   */
-  private Reference ref;
+	/**
+	 * The default managed factory.
+	 */
+	private JPPFManagedConnectionFactory factory = new JPPFManagedConnectionFactory();
+	/**
+	 * The default connection manager.
+	 */
+	private ConnectionManager manager = new JPPFConnectionManager();
+	/**
+	 * 
+	 */
+	private Reference ref;
 
-  /**
-   * Default constructor.
-   */
-  public JPPFConnectionFactory()
-  {
-  }
+	/**
+	 * Default constructor.
+	 */
+	public JPPFConnectionFactory()
+	{
+	}
 
-  /**
-   * Initialize this connection factorywith a specified managed connection factory and connection manager..
-   * @param factory the managed factory to use.
-   * @param manager the connection manager to use.
-   */
-  public JPPFConnectionFactory(JPPFManagedConnectionFactory factory, ConnectionManager manager)
-  {
-    this.factory = factory;
-    if (factory.getJppfClient() == null) setJppfClient(factory.getJppfClient());
-    this.manager = manager;
-  }
+	/**
+	 * Initialize this connection factorywith a specified managed connection factory and connection manager..
+	 * @param factory the managed factory to use.
+	 * @param manager the connection manager to use.
+	 */
+	public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager)
+	{
+		this.factory = factory;
+		if (factory.getJppfClient() == null) setJppfClient(factory.getJppfClient());
+		this.manager = manager;
+	}
 	/**
 	 * Get a connection through the application server.
 	 * @return a <code>Connection</code> instance.
@@ -71,7 +71,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @see javax.resource.cci.ConnectionFactory#getConnection()
 	 */
 	@Override
-    public Connection getConnection() throws ResourceException
+	public Connection getConnection() throws ResourceException
 	{
 		JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
 		if (conn == null) return null;
@@ -88,7 +88,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @see javax.resource.cci.ConnectionFactory#getConnection(javax.resource.cci.ConnectionSpec)
 	 */
 	@Override
-    public Connection getConnection(ConnectionSpec spec) throws ResourceException
+	public Connection getConnection(final ConnectionSpec spec) throws ResourceException
 	{
 		throw new NotSupportedException("getConnection(ConnectionSpec) is not supported");
 	}
@@ -100,7 +100,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @see javax.resource.cci.ConnectionFactory#getMetaData()
 	 */
 	@Override
-    public ResourceAdapterMetaData getMetaData() throws ResourceException
+	public ResourceAdapterMetaData getMetaData() throws ResourceException
 	{
 		return new JPPFResourceAdapterMetaData();
 	}
@@ -112,7 +112,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @see javax.resource.cci.ConnectionFactory#getRecordFactory()
 	 */
 	@Override
-    public RecordFactory getRecordFactory() throws ResourceException
+	public RecordFactory getRecordFactory() throws ResourceException
 	{
 		return new JPPFRecordFactory();
 	}
@@ -123,7 +123,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @see javax.resource.Referenceable#setReference(javax.naming.Reference)
 	 */
 	@Override
-    public void setReference(Reference ref)
+	public void setReference(final Reference ref)
 	{
 		this.ref = ref;
 	}
@@ -135,7 +135,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 	 * @see javax.naming.Referenceable#getReference()
 	 */
 	@Override
-    public Reference getReference() throws NamingException
+	public Reference getReference() throws NamingException
 	{
 		return ref;
 	}

@@ -49,7 +49,7 @@ public class JobNotificationListener implements NotificationListener
 	 * @param driverName - a string identifying the driver that sends the notifications.
 	 * @param jobDataPanel - the panel to which the notifications are delegated.
 	 */
-	public JobNotificationListener(JobDataPanel jobDataPanel, String driverName)
+	public JobNotificationListener(final JobDataPanel jobDataPanel, final String driverName)
 	{
 		this.driverName = driverName;
 		this.jobDataPanel = jobDataPanel;
@@ -62,7 +62,7 @@ public class JobNotificationListener implements NotificationListener
 	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
 	 */
 	@Override
-    public void handleNotification(Notification notification, Object handback)
+	public void handleNotification(final Notification notification, final Object handback)
 	{
 		if (!(notification instanceof JobNotification)) return;
 		JobNotification notif = (JobNotification) notification;

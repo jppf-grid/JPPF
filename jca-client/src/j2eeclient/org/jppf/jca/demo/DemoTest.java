@@ -46,7 +46,7 @@ public class DemoTest
 	 * Initialize this test object with a specified jndi location for the connection factory.
 	 * @param jndiBinding JNDI name of the JPPFConnectionFactory.
 	 */
-	public DemoTest(String jndiBinding)
+	public DemoTest(final String jndiBinding)
 	{
 		this.jndiBinding = jndiBinding;
 	}
@@ -57,7 +57,7 @@ public class DemoTest
 	 * @return a string reporting either the task execution result or an error message.
 	 * @throws Exception if the call to JPPF failed.
 	 */
-	public String testConnector(int duration) throws Exception
+	public String testConnector(final int duration) throws Exception
 	{
 		JPPFConnection connection = null;
 		String id = null;
@@ -72,7 +72,7 @@ public class DemoTest
 			// submit with an execution policy
 			ExecutionPolicy policy = PolicyParser.parsePolicy("ExecutionPolicy.xml");
 			id = connection.submitNonBlocking(policy, list, null, null);
-			*/
+			 */
 
 			/*
 			id = connection.submitNonBlocking(job, new SubmissionStatusListener()
@@ -82,7 +82,7 @@ public class DemoTest
 					System.out.println("*** 1 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
 				}
 			});
-			
+
 			connection.addSubmissionStatusListener(id, new SubmissionStatusListener()
 			{
 				public void submissionStatusChanged(SubmissionStatusEvent event)
@@ -104,7 +104,7 @@ public class DemoTest
 					}
 				}
 			});
-			*/
+			 */
 		}
 		finally
 		{
@@ -121,7 +121,7 @@ public class DemoTest
 	 * @return a string reporting either the task execution result or an error message.
 	 * @throws Exception if the call to JPPF failed.
 	 */
-	public String testConnector(String jobId, long duration, int nbTasks) throws Exception
+	public String testConnector(final String jobId, final long duration, final int nbTasks) throws Exception
 	{
 		JPPFConnection connection = null;
 		String id = null;
@@ -154,7 +154,7 @@ public class DemoTest
 	 * @return a string reporting either the task execution result or an error message.
 	 * @throws Exception if the call to JPPF failed.
 	 */
-	public String testConnectorBlocking(String jobId, long duration, int nbTasks) throws Exception
+	public String testConnectorBlocking(final String jobId, final long duration, final int nbTasks) throws Exception
 	{
 		JPPFConnection connection = null;
 		String id = null;
@@ -224,7 +224,7 @@ public class DemoTest
 	 * @return a string reporting either the task execution result or an error message.
 	 * @throws Exception if the call to JPPF failed.
 	 */
-	public String getMessage(String id) throws Exception
+	public String getMessage(final String id) throws Exception
 	{
 		JPPFConnection connection = null;
 		String msg = null;
@@ -235,7 +235,7 @@ public class DemoTest
 			if (results == null) msg = "submission is not in queue anymore";
 			else
 			{
-                StringBuilder sb = new StringBuilder();
+				StringBuilder sb = new StringBuilder();
 				for (JPPFTask task: results)
 				{
 					if (task.getException() == null) sb.append(task.getResult());

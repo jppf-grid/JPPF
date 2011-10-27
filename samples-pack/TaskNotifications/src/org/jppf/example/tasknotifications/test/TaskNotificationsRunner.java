@@ -55,7 +55,7 @@ public class TaskNotificationsRunner implements NotificationListener
 	 * @param args by default, we do not use the command line arguments,
 	 * however nothing prevents us from using them if need be.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -122,7 +122,7 @@ public class TaskNotificationsRunner implements NotificationListener
 	 * @param job the JPPF job to execute.
 	 * @throws Exception if an error occurs while executing the job.
 	 */
-	public void executeBlockingJob(JPPFJob job) throws Exception
+	public void executeBlockingJob(final JPPFJob job) throws Exception
 	{
 		// set the job in blocking mode.
 		job.setBlocking(true);
@@ -164,36 +164,37 @@ public class TaskNotificationsRunner implements NotificationListener
 		while ((connection.getJmxConnection() == null) || !connection.getJmxConnection().isConnected()) Thread.sleep(100L);
 		// get its jmx connection to the driver MBean server
 		JMXDriverConnectionWrapper jmxDriver = connection.getJmxConnection();
-	  // collect the information to connect to the nodes' mbean servers
-	  Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
-	  ObjectName objectName = new ObjectName(TaskNotificationsMBean.MBEAN_NAME);
-	  for (JPPFManagementInfo node: nodes)
-	  {
+		// collect the information to connect to the nodes' mbean servers
+		Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
+		ObjectName objectName = new ObjectName(TaskNotificationsMBean.MBEAN_NAME);
+		for (JPPFManagementInfo node: nodes)
+		{
 			// get a jmx connection to the node MBean server
-	  	JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
-		  jmxNode.connectAndWait(5000L);
+			JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
+			jmxNode.connectAndWait(5000L);
 
-		  // obtain a proxy to the task notifications MBean
-		  MBeanServerConnection mbsc = jmxNode.getMbeanConnection();
-		  TaskNotificationsMBean proxy = (TaskNotificationsMBean)
-		    MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, TaskNotificationsMBean.class, true);
+			// obtain a proxy to the task notifications MBean
+			MBeanServerConnection mbsc = jmxNode.getMbeanConnection();
+			TaskNotificationsMBean proxy = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, TaskNotificationsMBean.class, true);
 
-		  // subbscribe to all notifications from the MBean
-		  proxy.addNotificationListener(this, null, null);
-		  nodeConnections.add(jmxNode);
-	  }
+			// subbscribe to all notifications from the MBean
+			proxy.addNotificationListener(this, null, null);
+			nodeConnections.add(jmxNode);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void handleNotification(Notification notification, Object handback)
+	@Override
+	public void handleNotification(final Notification notification, final Object handback)
 	{
 		// to smoothe the throughput of notfications processing,
 		// we submit each notification to a queue instead of handling it directly
 		final String message = notification.getMessage();
 		Runnable r = new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				// process the notification

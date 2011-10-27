@@ -46,7 +46,7 @@ class LocalExecutionThread extends ExecutionThread
 	 * @param job the execution to perform.
 	 * @param loadBalancer the load balancer for which this thread is working.
 	 */
-	public LocalExecutionThread(List<JPPFTask> tasks, JPPFJob job, LoadBalancer loadBalancer)
+	public LocalExecutionThread(final List<JPPFTask> tasks, final JPPFJob job, final LoadBalancer loadBalancer)
 	{
 		super(tasks, job, loadBalancer);
 		setName("LocalExecution");
@@ -76,7 +76,7 @@ class LocalExecutionThread extends ExecutionThread
 			{
 				Future<JPPFTask> f = futures.peek();
 				while ((f != null) && f.isDone() &&
-					((count == 0) || ((System.nanoTime() - start < accTimeNanos) && (count < accSize))))
+						((count == 0) || ((System.nanoTime() - start < accTimeNanos) && (count < accSize))))
 				{
 					results.add(futures.poll().get());
 					count++;

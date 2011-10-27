@@ -41,7 +41,7 @@ public class XstreamTask extends JPPFTask
 	 * Intiialize this task with the specified person.
 	 * @param person a <code>Person</code> instance.
 	 */
-	public XstreamTask(Person person)
+	public XstreamTask(final Person person)
 	{
 		try
 		{
@@ -61,7 +61,7 @@ public class XstreamTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

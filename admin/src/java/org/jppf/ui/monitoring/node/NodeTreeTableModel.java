@@ -53,7 +53,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * Initialize this model witht he specified tree.
 	 * @param node the root of the tree.
 	 */
-	public NodeTreeTableModel(TreeNode node)
+	public NodeTreeTableModel(final TreeNode node)
 	{
 		super(node);
 		BASE = "org.jppf.ui.i18n.NodeDataPage";
@@ -78,7 +78,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
 	 */
 	@Override
-	public Object getValueAt(Object node, int column)
+	public Object getValueAt(final Object node, final int column)
 	{
 		Object res = "";
 		if (node instanceof DefaultMutableTreeNode)
@@ -131,7 +131,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
 	 */
 	@Override
-    public String getColumnName(int column)
+	public String getColumnName(final int column)
 	{
 		String res = "";
 		switch (column)

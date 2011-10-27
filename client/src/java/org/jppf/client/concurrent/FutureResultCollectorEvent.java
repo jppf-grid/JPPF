@@ -30,7 +30,7 @@ class FutureResultCollectorEvent extends EventObject
 	 * Initialize this event with the specified source.
 	 * @param collector the source of this event.
 	 */
-	public FutureResultCollectorEvent(FutureResultCollector collector)
+	public FutureResultCollectorEvent(final FutureResultCollector collector)
 	{
 		super(collector);
 	}

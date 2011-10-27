@@ -31,7 +31,7 @@ import org.jppf.utils.Range;
  * <li>1080:0:0:0:8:800:200C:417A represents a single IPv6 address</li>
  * <li>1080:0:0:0:8:800:200C represents all IPv6 addresses in the range 1080:0:0:0:8:800:200C:0 - 1080:0:0:0:8:800:200C:FFFF</li>
  * <li>1080:0:0:0:8:800 represents all IPv6 addresses in the range 1080:0:0:0:8:800:0:0 - 1080:0:0:0:8:800:FFFF:FFFF</li>
- * <li>1080:0:0:0:8:800:200C-20FF represents all IP addresses where the first component is equal to 1080, the second to 0, ..., the 7th component in the range 200C - 200FF, and the 8th in the range 0 - FFFF 
+ * <li>1080:0:0:0:8:800:200C-20FF represents all IP addresses where the first component is equal to 1080, the second to 0, ..., the 7th component in the range 200C - 200FF, and the 8th in the range 0 - FFFF
  * (equivalent to 1080:0:0:0:8:800:200C-20FF:0-FFFF)</li>
  * </ul>
  * <p>Syntax rules:
@@ -59,7 +59,7 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
 	 * @param source the source pattern as a string.
 	 * @throws IllegalArgumentException if the pattern is null or invalid.
 	 */
-	public IPv6AddressPattern(String source) throws IllegalArgumentException
+	public IPv6AddressPattern(final String source) throws IllegalArgumentException
 	{
 		super(source, PatternConfiguration.IPV6_CONFIGURATION);
 	}
@@ -68,7 +68,7 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean matches(InetAddress ip)
+	public boolean matches(final InetAddress ip)
 	{
 		if (!(ip instanceof Inet6Address)) return false;
 		return super.matches(ip);
@@ -78,7 +78,7 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<ranges.size(); i++)
@@ -95,7 +95,7 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
 	 * Main method.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		System.out.println("***** IP v6 *****");
 		String[] ipv6patterns = { "1080:0:0:0:8:800:200C:417A", ":0::::::", "0:0:aa-bbcc:0:0:0:0:0", "1:2:3:4:5-:6:7:8", };

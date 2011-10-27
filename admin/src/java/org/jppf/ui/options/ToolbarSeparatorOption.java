@@ -42,7 +42,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * @param width the filler's width
 	 * @param height the filler's height.
 	 */
-	public ToolbarSeparatorOption(int width, int height)
+	public ToolbarSeparatorOption(final int width, final int height)
 	{
 		this(" ", width, height);
 	}
@@ -53,7 +53,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * @param width the filler's width
 	 * @param height the filler's height.
 	 */
-	public ToolbarSeparatorOption(String labelText, int width, int height)
+	public ToolbarSeparatorOption(final String labelText, final int width, final int height)
 	{
 		//UIComponent = new JToolBar.Separator();
 		UIComponent = new JLabel(labelText);
@@ -70,7 +70,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 	}
 
@@ -80,7 +80,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		return null;
 	}
@@ -90,7 +90,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -100,7 +100,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 	}
 
@@ -110,7 +110,7 @@ public class ToolbarSeparatorOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
 	 */
 	@Override
-    public boolean isPersistent()
+	public boolean isPersistent()
 	{
 		return false;
 	}

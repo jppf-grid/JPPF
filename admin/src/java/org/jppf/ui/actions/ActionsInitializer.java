@@ -44,7 +44,7 @@ public class ActionsInitializer implements Runnable
 	 * @param mainPanel the panel to which the actions apply.
 	 * @param btnContainerName the container for the buttons associated with the actions (toolbar).
 	 */
-	public ActionsInitializer(OptionElement mainPanel, String btnContainerName)
+	public ActionsInitializer(final OptionElement mainPanel, final String btnContainerName)
 	{
 		this(mainPanel, (ActionHolder) mainPanel, btnContainerName);
 	}
@@ -55,7 +55,7 @@ public class ActionsInitializer implements Runnable
 	 * @param actionHolder the panel to which the actions apply.
 	 * @param btnContainerName the container for the buttons associated with the actions (toolbar).
 	 */
-	public ActionsInitializer(OptionElement mainPanel, ActionHolder actionHolder, String btnContainerName)
+	public ActionsInitializer(final OptionElement mainPanel, final ActionHolder actionHolder, final String btnContainerName)
 	{
 		this.mainPanel = mainPanel;
 		this.actionHolder = actionHolder;
@@ -67,18 +67,18 @@ public class ActionsInitializer implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		OptionsPage page = null;
 		while (page == null)
 		{
-			OptionElement parent = mainPanel.getParent();
+			final OptionElement parent = mainPanel.getParent();
 			if (parent != null) page = (OptionsPage) mainPanel.findFirstWithName(btnContainerName);
 			try
 			{
 				Thread.sleep(100L);
 			}
-			catch(InterruptedException e)
+			catch(final InterruptedException e)
 			{
 			}
 			if (page != null)
@@ -86,8 +86,8 @@ public class ActionsInitializer implements Runnable
 				for (OptionElement elt: page.getChildren())
 				{
 					if (!(elt.getUIComponent() instanceof JButton)) continue;
-					JButton button = (JButton) elt.getUIComponent();
-					UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
+					final JButton button = (JButton) elt.getUIComponent();
+					final UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
 					if (action == null) continue;
 					button.setAction(action);
 					button.setText("");

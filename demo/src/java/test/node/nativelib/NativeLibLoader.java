@@ -32,7 +32,7 @@ public class NativeLibLoader
 		String path = System.getProperty("java.library.path");
 		System.out.println("library path = " + path);
 		//System.setProperty("java.library.path", path);
-		*/
+		 */
 		System.loadLibrary("moved_AltTab");
 		System.out.println("after loading the library");
 	}

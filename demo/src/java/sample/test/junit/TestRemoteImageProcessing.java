@@ -115,7 +115,7 @@ public class TestRemoteImageProcessing extends TestCase implements Serializable
 		 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 		 */
 		@Override
-        public void onCancel()
+		public void onCancel()
 		{
 			setResult("cancelled");
 		}
@@ -125,7 +125,7 @@ public class TestRemoteImageProcessing extends TestCase implements Serializable
 		 * @see org.jppf.server.protocol.JPPFTask#onRestart()
 		 */
 		@Override
-        public void onRestart()
+		public void onRestart()
 		{
 			setResult("restarted");
 		}

@@ -55,7 +55,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 	 * @param args the arguments of the method to execute.
 	 * @throws JPPFException if an error is raised while initializing this task wrapper.
 	 */
-	public AnnotatedTaskWrapper(Object taskObject, Object...args) throws JPPFException
+	public AnnotatedTaskWrapper(final Object taskObject, final Object...args) throws JPPFException
 	{
 		boolean isClass = taskObject instanceof Class;
 		Class clazz = isClass ? (Class) taskObject : taskObject.getClass();
@@ -89,11 +89,11 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
 	 */
 	@Override
-    public Object execute() throws Exception
+	public Object execute() throws Exception
 	{
 		Class clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
 		Object result = null;
-		AbstractPrivilegedAction<?> action = null; 
+		AbstractPrivilegedAction<?> action = null;
 		switch(methodType)
 		{
 			case INSTANCE:
@@ -114,11 +114,11 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 
 	/**
 	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static. 
+	 * @return an object or null if the invoked method is static.
 	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
 	 */
 	@Override
-    public Object getTaskObject()
+	public Object getTaskObject()
 	{
 		return taskObject;
 	}

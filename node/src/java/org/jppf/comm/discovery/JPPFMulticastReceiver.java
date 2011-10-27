@@ -86,7 +86,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	 * Default constructor.
 	 * @param ipFilter handles include and exclude IP filters.
 	 */
-	public JPPFMulticastReceiver(IPFilter ipFilter)
+	public JPPFMulticastReceiver(final IPFilter ipFilter)
 	{
 		group = config.getString("jppf.discovery.group", "230.0.0.1");
 		port = config.getInt("jppf.discovery.port", 11111);
@@ -100,7 +100,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	 * @param port the multicast port to listen to.
 	 * @param timeout the timeout for UDP socket read operations.
 	 */
-	public JPPFMulticastReceiver(String group, int port, int timeout)
+	public JPPFMulticastReceiver(final String group, final int port, final int timeout)
 	{
 		this.group = group;
 		this.port = port;
@@ -153,7 +153,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 	 * If the connection information already exists, nothing is added.
 	 * @param info the connection information to add.
 	 */
-	private synchronized void addConnectionInfo(JPPFConnectionInformation info)
+	private synchronized void addConnectionInfo(final JPPFConnectionInformation info)
 	{
 		try
 		{
@@ -212,7 +212,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 		 * @param addr address the multicast socket is bound to.
 		 * @param port port the multicast socket listens to.
 		 */
-		public Receiver(InetAddress addr, int port)
+		public Receiver(final InetAddress addr, final int port)
 		{
 			super("Receiver@" + addr.getHostAddress() + ':' + port);
 			this.addr = addr;
@@ -224,7 +224,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			MulticastSocket socket = null;
 			try

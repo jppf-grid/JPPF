@@ -179,13 +179,13 @@ public interface SocketWrapper
 	 * @param port the port number on the remote host.
 	 */
 	void setPort(int port);
-	
+
 	/**
 	 * Get the underlying socket used by this socket wrapper.
 	 * @return a Socket instance.
 	 */
 	Socket getSocket();
-	
+
 	/**
 	 * Set the underlying socket to be used by this socket wrapper.
 	 * @param socket a Socket instance.
@@ -194,8 +194,8 @@ public interface SocketWrapper
 
 	/**
 	 * Returns a timestamp that should reflect the system millisecond counter at the
-	 * last known good usage of the underlying socket. 
-	 * @return the socket usage timestamp  
+	 * last known good usage of the underlying socket.
+	 * @return the socket usage timestamp
 	 */
 	long getSocketTimestamp();
 }

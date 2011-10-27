@@ -31,7 +31,7 @@ public class HelloWorld extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		String hello = "Hello, World";
 		System.out.println(hello);

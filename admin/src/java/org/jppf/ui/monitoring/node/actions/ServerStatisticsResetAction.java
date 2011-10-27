@@ -50,7 +50,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		this.selectedElements = selectedElements;
 		for (Object o: selectedElements)
@@ -72,7 +72,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		try
 		{
@@ -86,7 +86,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
 			}
 			Runnable r = new Runnable() {
 				@Override
-                public void run() {
+				public void run() {
 					for (JMXDriverConnectionWrapper jmx: driverConnections) {
 						try {
 							jmx.resetStatistics();

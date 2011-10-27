@@ -29,7 +29,7 @@ import org.slf4j.*;
 
 /**
  * Collection of utility methods used as a convenience for retrieving
- * JVM-level or System-level information. 
+ * JVM-level or System-level information.
  * @author Laurent Cohen
  */
 public final class SystemUtils
@@ -83,7 +83,7 @@ public final class SystemUtils
 	}
 
 	/**
-	 * Return a set of properties guaranteed to always be part of those returned by 
+	 * Return a set of properties guaranteed to always be part of those returned by
 	 * {@link java.lang.System#getProperties() System.getProperties()}.
 	 * @return the properties as a <code>TypedProperties</code> instance.
 	 */
@@ -102,20 +102,20 @@ public final class SystemUtils
 	 * Add system properties whose name is not known in advance.
 	 * @param props the TypedProperties instance to add the system properties to.
 	 */
-	private static void addOtherSystemProperties(TypedProperties props)
+	private static void addOtherSystemProperties(final TypedProperties props)
 	{
 		try
 		{
 			// run as priviledged so we don't have to set write access on all propeorties
-			// in the security policy file. 
+			// in the security policy file.
 			Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
-			{
+					{
 				@Override
-                public Properties run()
+				public Properties run()
 				{
 					return System.getProperties();
 				}
-			});
+					});
 			Enumeration en = sysProps.propertyNames();
 			while (en.hasMoreElements())
 			{
@@ -207,7 +207,7 @@ public final class SystemUtils
 				props.setProperty(prefix + ".name", s);
 				if (!atLeastJdk16) continue;
 				long space = (Long) totalSpaceMethod.invoke(roots[i]);
-                props.setProperty(prefix + ".space.total", Long.toString(space));
+				props.setProperty(prefix + ".space.total", Long.toString(space));
 				space = (Long) freeSpaceMethod.invoke(roots[i]);
 				props.setProperty(prefix + ".space.free", Long.toString(space));
 				space = (Long) usableSpaceMethod.invoke(roots[i]);
@@ -219,7 +219,7 @@ public final class SystemUtils
 				else log.info(e.getMessage());
 			}
 		}
-		props.setProperty("host.roots.names", sb.toString());		
+		props.setProperty("host.roots.names", sb.toString());
 		return props;
 	}
 
@@ -277,9 +277,9 @@ public final class SystemUtils
 	 * @param addresses a List of <code>InetAddress</code> instances.
 	 * @return a string containing a space-separated list of <i>hostname</i>|<i>ip_address</i> pairs.
 	 */
-	private static String formatAddresses(List<? extends InetAddress> addresses)
+	private static String formatAddresses(final List<? extends InetAddress> addresses)
 	{
-        StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		for (InetAddress addr: addresses)
 		{
 			String name = addr.getHostName();
@@ -291,7 +291,7 @@ public final class SystemUtils
 	}
 
 	/**
-	 * Compute the maximum memory currently available for the Java heap. 
+	 * Compute the maximum memory currently available for the Java heap.
 	 * @return the maximum number of free bytes in the heap.
 	 */
 	public static long maxFreeHeap()
@@ -306,13 +306,13 @@ public final class SystemUtils
 	 * @return an int value indentifying the type of OS.
 	 */
 	private static int determineOSType()
-  {
-    String name = System.getProperty("os.name");
-    if (StringUtils.startsWithOneOf(name, true, "Linux", "SunOS", "Solaris", "FreeBSD", "OpenBSD")) return X11_OS; 
-    else if (StringUtils.startsWithOneOf(name, true, "Mac", "Darwin")) return MAC_OS;
-    else if (name.startsWith("Windows") && !name.startsWith("Windows CE")) return WINDOWS_OS;
-    return UNKNOWN_OS;
-  }
+	{
+		String name = System.getProperty("os.name");
+		if (StringUtils.startsWithOneOf(name, true, "Linux", "SunOS", "Solaris", "FreeBSD", "OpenBSD")) return X11_OS;
+		else if (StringUtils.startsWithOneOf(name, true, "Mac", "Darwin")) return MAC_OS;
+		else if (name.startsWith("Windows") && !name.startsWith("Windows CE")) return WINDOWS_OS;
+		return UNKNOWN_OS;
+	}
 
 	/**
 	 * Determine whether the current OS is Windows.

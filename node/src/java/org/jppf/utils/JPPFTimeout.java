@@ -33,7 +33,7 @@ public class JPPFTimeout extends Pair<TimeUnit, Long>
 	 * @param value the value expressed in <code>timeUnit</code> units.
 	 * @throws IllegalArgumentException if the time unit is null, the value is null or the value is less than zero.
 	 */
-	public JPPFTimeout(TimeUnit unit, Long value)
+	public JPPFTimeout(final TimeUnit unit, final Long value)
 	{
 		super(unit, value);
 		if (unit == null) throw new IllegalArgumentException("Time unit cannot be null");
@@ -52,7 +52,7 @@ public class JPPFTimeout extends Pair<TimeUnit, Long>
 
 	/**
 	 * Get the value expressed in <code>getUnit()</code> units.
-	 * @return the timeout value as a <code>Long</code>. 
+	 * @return the timeout value as a <code>Long</code>.
 	 */
 	public Long value()
 	{

@@ -22,9 +22,7 @@ import java.util.Timer;
 import org.jppf.JPPFException;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.recovery.RecoveryServer;
-import org.jppf.comm.recovery.ReaperListener;
-import org.jppf.comm.recovery.Reaper;
+import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
 import org.jppf.server.job.JPPFJobManager;
@@ -43,7 +41,7 @@ import org.slf4j.*;
  * This class serves as an initializer for the entire JPPF server. It follows the singleton pattern and provides access,
  * accross the JVM, to the tasks execution queue.
  * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server
- * to handle requests to and from remote class loaders. 
+ * to handle requests to and from remote class loaders.
  * @author Laurent Cohen
  */
 public class JPPFDriver
@@ -150,7 +148,7 @@ public class JPPFDriver
 		clientNioServer = startServer(recoveryServer, new ClientNioServer(null), null);
 		nodeNioServer = startServer(recoveryServer, new NodeNioServer(null), null);
 		acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts), info.serverPorts);
-		
+
 		if (config.getBoolean("jppf.local.node.enabled", false))
 		{
 			LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
@@ -160,7 +158,7 @@ public class JPPFDriver
 			nodeNioServer.initLocalChannel(localNodeChannel);
 			new Thread(node, "Local node").start();
 		}
-		
+
 		initializer.initJmxServer();
 
 		initializer.initBroadcaster();
@@ -185,7 +183,7 @@ public class JPPFDriver
 	{
 		return getInstance().taskQueue;
 	}
-	
+
 	/**
 	 * Get the JPPF client server.
 	 * @return a <code>ClientNioServer</code> instance.
@@ -249,24 +247,23 @@ public class JPPFDriver
 	 * @param restart determines whether the server should restart after shutdown is complete.
 	 * If set to false, then the JVM will exit.
 	 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
-	 * A value of 0 or less means the server is restarted immediately after the shutdown is complete. 
+	 * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
 	 */
-	public void initiateShutdownRestart(long shutdownDelay, boolean restart, long restartDelay)
+	public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay)
 	{
 		log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
-        shuttingDown = true;
+		shuttingDown = true;
 
-        if(classServer != null) classServer.shutdown();
-        if(nodeNioServer != null) nodeNioServer.shutdown();
-        if(clientNioServer != null) clientNioServer.shutdown();
-        if(acceptorServer != null) acceptorServer.shutdown();
+		if(classServer != null) classServer.shutdown();
+		if(nodeNioServer != null) nodeNioServer.shutdown();
+		if(clientNioServer != null) clientNioServer.shutdown();
+		if(acceptorServer != null) acceptorServer.shutdown();
 
-		if (shutdownDelay <= 0L) shutdownDelay = 0L;
 		Timer timer = new Timer();
 		ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay);
-		timer.schedule(task, shutdownDelay);
+		timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
 	}
-	
+
 	/**
 	 * Shutdown this server and all its components.
 	 */
@@ -348,7 +345,7 @@ public class JPPFDriver
 	 * Start the JPPF server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -376,45 +373,45 @@ public class JPPFDriver
 		}
 	}
 
-    /**
-     * Start server, register it to recovery server if requested and print initialization message.
-     * @param recoveryServer Recovery server for nioServers that implements ReaperListener
-     * @param nioServer starting nio server
-     * @param ports ports for initialization message
-     * @param <T> the type of the server to start
-     * @return started nioServer
-     */
-    protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports) {
-        if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
-        if(recoveryServer != null && nioServer instanceof ReaperListener) {
-            Reaper reaper = recoveryServer.getReaper();
-            reaper.addReaperListener((ReaperListener) nioServer);
-        }
-        nioServer.start();
-        printInitializedMessage(ports, nioServer.getName());
-        return nioServer;
-    }
+	/**
+	 * Start server, register it to recovery server if requested and print initialization message.
+	 * @param recoveryServer Recovery server for nioServers that implements ReaperListener
+	 * @param nioServer starting nio server
+	 * @param ports ports for initialization message
+	 * @param <T> the type of the server to start
+	 * @return started nioServer
+	 */
+	protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports) {
+		if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
+		if(recoveryServer != null && nioServer instanceof ReaperListener) {
+			Reaper reaper = recoveryServer.getReaper();
+			reaper.addReaperListener((ReaperListener) nioServer);
+		}
+		nioServer.start();
+		printInitializedMessage(ports, nioServer.getName());
+		return nioServer;
+	}
 
-    /**
+	/**
 	 * Print a message to the console to signify that the initialization of a server was succesfull.
-     * @param ports the ports on which the server is listening.
-     * @param name the name to use for the server.
-     */
-    protected static void printInitializedMessage(final int[] ports, final String name)
-    {
-        StringBuilder sb = new StringBuilder();
-        if (name != null)
-        {
-            sb.append(name);
-            sb.append(" initialized");
-        }
-        if (ports != null)
-        {
-            if (name != null) sb.append(" - ");
-            sb.append("accepting connections on port");
-            if (ports.length > 1) sb.append('s');
-            for (int n: ports) sb.append(' ').append(n);
-        }
-        System.out.println(sb.toString());
-    }
+	 * @param ports the ports on which the server is listening.
+	 * @param name the name to use for the server.
+	 */
+	protected static void printInitializedMessage(final int[] ports, final String name)
+	{
+		StringBuilder sb = new StringBuilder();
+		if (name != null)
+		{
+			sb.append(name);
+			sb.append(" initialized");
+		}
+		if (ports != null)
+		{
+			if (name != null) sb.append(" - ");
+			sb.append("accepting connections on port");
+			if (ports.length > 1) sb.append('s');
+			for (int n: ports) sb.append(' ').append(n);
+		}
+		System.out.println(sb.toString());
+	}
 }

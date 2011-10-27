@@ -28,11 +28,11 @@ import org.jppf.server.protocol.JPPFTask;
 public class LotsOfOutputTask extends JPPFTask
 {
 	/**
-	 * Number of ouptut lines to print. 
+	 * Number of ouptut lines to print.
 	 */
 	private int nbLines = 0;
 	/**
-	 * Length in chars of each output line. 
+	 * Length in chars of each output line.
 	 */
 	private int lineLength = 0;
 
@@ -41,7 +41,7 @@ public class LotsOfOutputTask extends JPPFTask
 	 * @param nbLines - the number of ouptut lines to print.
 	 * @param lineLength - the length in chars of each output line.
 	 */
-	public LotsOfOutputTask(int nbLines, int lineLength)
+	public LotsOfOutputTask(final int nbLines, final int lineLength)
 	{
 		this.nbLines = nbLines;
 		this.lineLength = lineLength;
@@ -52,7 +52,7 @@ public class LotsOfOutputTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (int i=0; i<lineLength; i++) sb.append('X');

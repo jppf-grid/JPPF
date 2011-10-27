@@ -62,12 +62,12 @@ public abstract class JPPFOptimizedTask extends JPPFTask
 	 * Serialize this task.
 	 * The first time it is serialized, all the non-static and non-transient fields will be serialized.
 	 * Upon subsequent serializations, only <code>getResult()</code> and <code>getException()</code> will be serialized.
-	 * <p>This method is to be called only from the <code>writeObject(ObjectOutputStream)</code> method of a subclass. 
+	 * <p>This method is to be called only from the <code>writeObject(ObjectOutputStream)</code> method of a subclass.
 	 * @param out the object output stream to write to.
 	 * @throws IOException if any error occurs.
 	 * @see java.io.Serializable
 	 */
-	protected void serialize(ObjectOutputStream out) throws IOException
+	protected void serialize(final ObjectOutputStream out) throws IOException
 	{
 		int count = serializationCount;
 		out.write(++serializationCount);
@@ -89,13 +89,13 @@ public abstract class JPPFOptimizedTask extends JPPFTask
 	/**
 	 * Deserialize this task.
 	 * The first time it is deserialized, all the non-static and non-transient fields will be deserialized.
-	 * Upon subsequent deserializations, only <code>getResult()</code> and <code>getException()</code> will be deserialized. 
-	 * <p> This method is to be called only from the <code>readObject(ObjectInputStream)</code> method of a subclass. 
+	 * Upon subsequent deserializations, only <code>getResult()</code> and <code>getException()</code> will be deserialized.
+	 * <p> This method is to be called only from the <code>readObject(ObjectInputStream)</code> method of a subclass.
 	 * @param in the stream to read from.
 	 * @throws IOException if any I/O error occurs.
 	 * @throws ClassNotFoundException if a class could not be found.
 	 */
-	protected void deserialize(ObjectInputStream in) throws IOException, ClassNotFoundException
+	protected void deserialize(final ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		serializationCount = (byte) in.read();
 		deserializationCount = (byte) in.read();

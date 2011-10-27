@@ -48,7 +48,7 @@ class ApplicationResultSender extends AbstractResultSender
 	 * Initialize this result sender with a specified socket client.
 	 * @param socketClient the socket client used to send results back.
 	 */
-	public ApplicationResultSender(SocketWrapper socketClient)
+	public ApplicationResultSender(final SocketWrapper socketClient)
 	{
 		super(socketClient, true);
 		destination = new SocketWrapperOutputDestination(socketClient);
@@ -60,7 +60,7 @@ class ApplicationResultSender extends AbstractResultSender
 	 * @throws Exception if an IO exception occurred while sending the results back.
 	 */
 	@Override
-    public void sendPartialResults(ServerJob bundleWrapper) throws Exception
+	public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
 	{
 		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
 		if (debugEnabled)

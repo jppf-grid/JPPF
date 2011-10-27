@@ -23,14 +23,12 @@
 				jppf.drivers = driver1 driver2
 
 				driver1.jppf.server.host = localhost
-				driver1.class.server.port = 11111
-				driver1.app.server.port = 11112
+				driver1.jppf.server.port = 11111
 				driver1.priority = 10
 				driver1.jppf.pool.size = 5
 
 				driver2.jppf.server.host = localhost
-				driver2.class.server.port = 11121
-				driver2.app.server.port = 11122
+				driver2.jppf.server.port = 11121
 				driver2.priority = 10
 				driver2.jppf.pool.size = 5
 
@@ -53,34 +51,6 @@
 				#jppf.data.transform.class = org.jppf.data.transform.DESCipherTransform
 				#jppf.object.stream.builder = org.jppf.serialization.XstreamObjectStreamBuilder
 			</config-property-value>
-		</config-property>
-
-		<!-- Host name or IP address of the JPPF driver -->
-		<config-property>
-			<config-property-name>ServerHost</config-property-name>
-			<config-property-type>java.lang.String</config-property-type>
-			<config-property-value>localhost</config-property-value>
-		</config-property>
-
-		<!-- Port on which to connect for the JPPF driver class loader -->
-		<config-property>
-			<config-property-name>ClassServerPort</config-property-name>
-			<config-property-type>java.lang.Integer</config-property-type>
-			<config-property-value>11111</config-property-value>
-		</config-property>
-
-		<!-- Port on which to connect to submit tasks to the JPPF driver -->
-		<config-property>
-			<config-property-name>AppServerPort</config-property-name>
-			<config-property-type>java.lang.Integer</config-property-type>
-			<config-property-value>11112</config-property-value>
-		</config-property>
-
-		<!-- Number of connections to the JPPF driver -->
-		<config-property>
-			<config-property-name>ConnectionPoolSize</config-property-name>
-			<config-property-type>java.lang.Integer</config-property-type>
-			<config-property-value>5</config-property-value>
 		</config-property>
 
 		<outbound-resourceadapter>

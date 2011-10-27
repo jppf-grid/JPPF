@@ -64,7 +64,7 @@ public final class JPPFIdentifiers
 	 * @param id the id to lookup.
 	 * @return a readable string for the id.
 	 */
-	public static String asString(int id)
+	public static String asString(final int id)
 	{
 		String s = idMap.get(id);
 		return s == null ? "UNKNOWN" : s;

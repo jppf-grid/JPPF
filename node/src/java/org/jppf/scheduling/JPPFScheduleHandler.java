@@ -73,7 +73,7 @@ public class JPPFScheduleHandler
 	 * Initialize this schedule handler with the specified name.
 	 * @param name the name given to this schedule handler.
 	 */
-	public JPPFScheduleHandler(String name)
+	public JPPFScheduleHandler(final String name)
 	{
 		this.name = name;
 		createExecutor();
@@ -86,7 +86,7 @@ public class JPPFScheduleHandler
 	 * @param action the action to perform when the schedule date is reached.
 	 * @throws ParseException if the schedule date could not be parsed
 	 */
-	public void scheduleAction(Object key, JPPFSchedule schedule, Runnable action) throws ParseException
+	public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action) throws ParseException
 	{
 		scheduleAction(key, schedule, action, System.currentTimeMillis());
 	}
@@ -99,7 +99,7 @@ public class JPPFScheduleHandler
 	 * @param start the start time to use if the schedule is expressed as a duration.
 	 * @throws ParseException if the schedule date could not be parsed
 	 */
-	public void scheduleAction(Object key, JPPFSchedule schedule, Runnable action, long start) throws ParseException
+	public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action, final long start) throws ParseException
 	{
 		if (debugEnabled)
 		{
@@ -124,7 +124,7 @@ public class JPPFScheduleHandler
 	 * Cancel the scheduled action identified by the specified key.
 	 * @param key the key associated with the action.
 	 */
-	public void cancelAction(Object key)
+	public void cancelAction(final Object key)
 	{
 		if (key == null) return;
 		ScheduledFuture<?> future = futureMap.remove(key);
@@ -143,7 +143,7 @@ public class JPPFScheduleHandler
 	 * Shutdown this schedule handler.
 	 * @param shutdown flag indicating whether this scehdule handler should be shutdown.
 	 */
-	public void clear(boolean shutdown)
+	public void clear(final boolean shutdown)
 	{
 		executor.shutdownNow();
 		futureMap.clear();

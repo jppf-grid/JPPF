@@ -25,13 +25,13 @@ import org.jppf.utils.*;
 
 
 /**
- * This class implements the basis of a profile based on simulated annealing 
+ * This class implements the basis of a profile based on simulated annealing
  * strategy. The possible move from the best known solution get smaller each
  * time it make a move.
- * This strategy let the algorithm explore the universe of bundle size with 
+ * This strategy let the algorithm explore the universe of bundle size with
  * an almost known end. Check method getDecreaseRatio about the maximum number
  * of changes.
- *  
+ * 
  * @author Domingos Creado
  */
 public class AnnealingTuneProfile extends AbstractAutoTuneProfile
@@ -45,12 +45,12 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 */
 	protected long minSamplesToAnalyse = 500L;
 	/**
-	 * The minimum number of samples to be collected before checking if the performance profile has changed. 
+	 * The minimum number of samples to be collected before checking if the performance profile has changed.
 	 */
 	protected long minSamplesToCheckConvergence = 300L;
 	/**
-	 * The percentage of deviation of the current mean to the mean 
-	 * when the system was considered stable. 
+	 * The percentage of deviation of the current mean to the mean
+	 * when the system was considered stable.
 	 */
 	protected double maxDeviation = 0.2d;
 	/**
@@ -64,8 +64,8 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 */
 	protected float sizeRatioDeviation = 1.5f;
 	/**
-	 * This parameter defines how fast does it will stop generating random numbers. 
-	 * This is essential to define what is the size of the universe will be explored. 
+	 * This parameter defines how fast does it will stop generating random numbers.
+	 * This is essential to define what is the size of the universe will be explored.
 	 * Greater numbers make the algorithm stop sooner.
 	 * Just as example, if the best solution is between 0-100, the following might
 	 * occur:
@@ -92,7 +92,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Initialize this profile with values read from the configuration file.
 	 * @param profileName name of the profile in the configuration file.
 	 */
-	public AnnealingTuneProfile(String profileName)
+	public AnnealingTuneProfile(final String profileName)
 	{
 		String prefix = "strategy." + profileName + '.';
 		TypedProperties props = JPPFConfiguration.getProperties();
@@ -108,7 +108,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Initialize this profile with values read from the configuration file.
 	 * @param config contains a mapping of the profile parameters to their value.
 	 */
-	public AnnealingTuneProfile(TypedProperties config)
+	public AnnealingTuneProfile(final TypedProperties config)
 	{
 		minSamplesToAnalyse = config.getInt("minSamplesToAnalyse", 500);
 		minSamplesToCheckConvergence = config.getInt("minSamplesToCheckConvergence", 300);
@@ -127,13 +127,13 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	{
 		return sizeRatioDeviation;
 	}
-	
+
 	/**
 	 * Set the multiplicity used to define the range available to
 	 * random generator, as the maximum.
 	 * @param sizeRatioDeviation the multiplicity as a float value.
 	 */
-	public void setSizeRatioDeviation(float sizeRatioDeviation)
+	public void setSizeRatioDeviation(final float sizeRatioDeviation)
 	{
 		this.sizeRatioDeviation = sizeRatioDeviation;
 	}
@@ -146,12 +146,12 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	{
 		return decreaseRatio;
 	}
-	
+
 	/**
 	 * Set the decrease rate for this profile.
 	 * @param decreaseRatio the decrease rate as a float value.
 	 */
-	public void setDecreaseRatio(float decreaseRatio)
+	public void setDecreaseRatio(final float decreaseRatio)
 	{
 		this.decreaseRatio = decreaseRatio;
 	}
@@ -163,13 +163,13 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * @param rnd a pseudo-random number generator.
 	 * @return an always positive diff to be applied to bundle size
 	 */
-	public int createDiff(int bestSize, int collectedSamples, Random rnd)
+	public int createDiff(final int bestSize, final int collectedSamples, final Random rnd)
 	{
 		double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation()- 1.0f)), 1);
 		if (max < 1.0d) return 1;
 		return rnd.nextInt((int) max) + 1;
 	}
-	
+
 	/**
 	 * This method implements the always decreasing policy of the algorithm.
 	 * The ratio define how fast this instance will stop generating random
@@ -180,7 +180,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * @param x a randomly generated bundle size increment.
 	 * @return an int value.
 	 */
-	protected double expDist(long max, long x)
+	protected double expDist(final long max, final long x)
 	{
 		//return max * Math.exp(-x * getDecreaseRatio());
 		return (double) max / (double) (x * decreaseRatio);
@@ -199,15 +199,15 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * Set the minimum number of samples that must be collected before an analysis is triggered.
 	 * @param minSamplesToAnalyse the number of samples as a long value.
 	 */
-	public void setMinSamplesToAnalyse(long minSamplesToAnalyse)
+	public void setMinSamplesToAnalyse(final long minSamplesToAnalyse)
 	{
 		this.minSamplesToAnalyse = minSamplesToAnalyse;
 	}
 
 	/**
 	 * Get the the minimum number of samples to be collected before
-	 * checking if the performance profile has changed. 
-	 * @return the number of samples as a long value. 
+	 * checking if the performance profile has changed.
+	 * @return the number of samples as a long value.
 	 */
 	public long getMinSamplesToCheckConvergence()
 	{
@@ -216,17 +216,17 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 
 	/**
 	 * Set the the minimum number of samples to be collected before
-	 * checking if the performance profile has changed. 
+	 * checking if the performance profile has changed.
 	 * @param minSamplesToCheckConvergence the number of samples as a long value.
 	 */
-	public void setMinSamplesToCheckConvergence(long minSamplesToCheckConvergence)
+	public void setMinSamplesToCheckConvergence(final long minSamplesToCheckConvergence)
 	{
 		this.minSamplesToCheckConvergence = minSamplesToCheckConvergence;
 	}
 
 	/**
-	 * Get the percentage of deviation of the current mean to the mean 
-	 * when the system was considered stable. 
+	 * Get the percentage of deviation of the current mean to the mean
+	 * when the system was considered stable.
 	 * @return the percentage of deviation as a double value.
 	 */
 	public double getMaxDeviation()
@@ -235,11 +235,11 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	}
 
 	/**
-	 * Set the percentage of deviation of the current mean to the mean 
-	 * when the system was considered stable. 
+	 * Set the percentage of deviation of the current mean to the mean
+	 * when the system was considered stable.
 	 * @param maxDeviation the percentage of deviation as a double value.
 	 */
-	public void setMaxDeviation(double maxDeviation)
+	public void setMaxDeviation(final double maxDeviation)
 	{
 		this.maxDeviation = maxDeviation;
 	}
@@ -259,7 +259,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * for the algorithm to consider the current best solution stable.
 	 * @param maxGuessToStable the number of guesses as an int value.
 	 */
-	public void setMaxGuessToStable(int maxGuessToStable)
+	public void setMaxGuessToStable(final int maxGuessToStable)
 	{
 		this.maxGuessToStable = maxGuessToStable;
 	}
@@ -270,7 +270,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
 	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
 	 */
 	@Override
-    public LoadBalancingProfile copy()
+	public LoadBalancingProfile copy()
 	{
 		AnnealingTuneProfile p = new AnnealingTuneProfile();
 		p.minSamplesToAnalyse = minSamplesToAnalyse;

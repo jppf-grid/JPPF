@@ -58,7 +58,7 @@ public class SerializationHelperImpl implements SerializationHelper
 	 * @see org.jppf.utils.SerializationHelper#getSerializer()
 	 */
 	@Override
-    public ObjectSerializer getSerializer() throws Exception
+	public ObjectSerializer getSerializer() throws Exception
 	{
 		if (serializer == null)
 		{
@@ -66,17 +66,17 @@ public class SerializationHelperImpl implements SerializationHelper
 			if (cl instanceof AbstractJPPFClassLoader)
 			{
 				serializer = (ObjectSerializer)
-					((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+				((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
 			}
 			else if (cl instanceof NonDelegatingClassLoader)
 			{
 				serializer = (ObjectSerializer)
-					((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
+				((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
 			}
 			else
 			{
 				serializer = (ObjectSerializer)
-					cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+				cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
 			}
 		}
 		return serializer;

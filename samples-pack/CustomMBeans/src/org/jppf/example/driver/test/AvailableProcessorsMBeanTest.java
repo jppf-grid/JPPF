@@ -31,7 +31,7 @@ public class AvailableProcessorsMBeanTest
 	 * @param args not used.
 	 * @throws Exception if any error occurs.
 	 */
-	public static void main(String...args) throws Exception
+	public static void main(final String...args) throws Exception
 	{
 		// we assume the node is on localhost and uses the management port 11198
 		JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper("localhost", 11198);

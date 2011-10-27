@@ -48,7 +48,7 @@ public class HelloJPPF implements Serializable
 		 * Constructor with a sequence number argument.
 		 * @param cnt this task's sequence number.
 		 */
-		InnerTask(int cnt)
+		InnerTask(final int cnt)
 		{
 			count = cnt;
 		}
@@ -67,12 +67,12 @@ public class HelloJPPF implements Serializable
 	 * The main procedure.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{
-		HelloJPPF h = new HelloJPPF();
-		h.testInnerTask();
+			HelloJPPF h = new HelloJPPF();
+			h.testInnerTask();
 		}
 		catch(Exception e)
 		{

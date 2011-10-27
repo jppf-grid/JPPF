@@ -20,7 +20,7 @@ package org.jppf.server.scheduler.bundle.impl;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.proportional.*;
+import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler;
 import org.slf4j.*;
 
 /**
@@ -49,7 +49,7 @@ public class ProportionalBundler extends AbstractProportionalBundler
 	 * Creates a new instance with the initial size of bundle as the start size.
 	 * @param profile the parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
 	 */
-	public ProportionalBundler(LoadBalancingProfile profile)
+	public ProportionalBundler(final LoadBalancingProfile profile)
 	{
 		super(profile);
 	}

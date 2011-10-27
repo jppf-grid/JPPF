@@ -49,7 +49,7 @@ public final class CompressionUtils
 	 * @return the compressed bytes as an array of bytes.
 	 * @throws Exception if an error occurs while compressing.
 	 */
-	public static byte[] zip(byte[] bytes, int start, int length) throws Exception
+	public static byte[] zip(final byte[] bytes, final int start, final int length) throws Exception
 	{
 		/*
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
@@ -64,7 +64,7 @@ public final class CompressionUtils
 		dos.close();
 		//if (debugEnabled) log.debug("compressed "+length+" bytes into "+baos.size());
 		return baos.toByteArray();
-		*/
+		 */
 		return bytes;
 	}
 
@@ -76,7 +76,7 @@ public final class CompressionUtils
 	 * @return the uncompressed bytes as an array.
 	 * @throws Exception if an error occurs while uncompressing.
 	 */
-	public static byte[] unzip(byte[] bytes, int start, int length) throws Exception
+	public static byte[] unzip(final byte[] bytes, final int start, final int length) throws Exception
 	{
 		/*
 		int count = 0;
@@ -98,7 +98,7 @@ public final class CompressionUtils
 		dis.close();
 		//if (debugEnabled) log.debug("uncompressed " + length + " bytes into " + len);
 		return result;
-		*/
+		 */
 		return bytes;
 	}
 }

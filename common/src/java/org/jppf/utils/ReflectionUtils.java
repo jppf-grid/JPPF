@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package org.jppf.utils;
+package org.jppf.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -36,7 +36,7 @@ public class ReflectionUtils
 	 * @return a string with the classname, hashcode, and the value of
 	 * each attribute that has a corresponding getter.
 	 */
-	public static String dumpObject(Object o)
+	public static String dumpObject(final Object o)
 	{
 		return dumpObject(o, "\n");
 	}
@@ -48,7 +48,7 @@ public class ReflectionUtils
 	 * @return a string with the classname, hashcode, and the value of
 	 * each attribute that has a corresponding getter.
 	 */
-	public static String dumpObject(Object o, String separator)
+	public static String dumpObject(final Object o, final String separator)
 	{
 		//String separator = "\n";
 		if (o == null) return "null";
@@ -60,23 +60,23 @@ public class ReflectionUtils
 		Method getter = null;
 		// we want the attributes in ascending alphabetical order
 		SortedMap<String, Object> attrMap = new TreeMap<String, Object>();
-        for (Method method : methods) {
-            if (isGetter(method)) {
-                getter = method;
-                String attrName = null;
-                attrName = getter.getName().substring(getter.getName().startsWith("get") ? 3 : 2);
-                attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
-                Object value = null;
-                try {
-                    value = getter.invoke(o, (Object[]) null);
-                    if (value == null) value = "null";
-                }
-                catch (Exception e) {
-                    value = "*Error: " + e.getMessage() + '*';
-                }
-                attrMap.put(attrName, value);
-            }
-        }
+		for (Method method : methods) {
+			if (isGetter(method)) {
+				getter = method;
+				String attrName = null;
+				attrName = getter.getName().substring(getter.getName().startsWith("get") ? 3 : 2);
+				attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
+				Object value = null;
+				try {
+					value = getter.invoke(o, (Object[]) null);
+					if (value == null) value = "null";
+				}
+				catch (Exception e) {
+					value = "*Error: " + e.getMessage() + '*';
+				}
+				attrMap.put(attrName, value);
+			}
+		}
 		Iterator<Map.Entry<String, Object>> it = attrMap.entrySet().iterator();
 		while (it.hasNext())
 		{
@@ -92,7 +92,7 @@ public class ReflectionUtils
 	 * @param meth the method to analyse.
 	 * @return true if the method is a getter, false otherwise.
 	 */
-	public static boolean isGetter(Method meth)
+	public static boolean isGetter(final Method meth)
 	{
 		Class type = meth.getReturnType();
 		if (Void.TYPE.equals(type)) return false;
@@ -102,22 +102,22 @@ public class ReflectionUtils
 			if (!Boolean.class.equals(type) && !Boolean.TYPE.equals(type)) return false;
 		}
 		Class[] paramTypes = meth.getParameterTypes();
-        return !((paramTypes != null) && (paramTypes.length > 0));
-    }
+		return !((paramTypes != null) && (paramTypes.length > 0));
+	}
 
 	/**
 	 * Determines whether a method is a setter (mutator), according to Sun's naming conventions.
 	 * @param meth the method to analyse.
 	 * @return true if the method is a setter, false otherwise.
 	 */
-	public static boolean isSetter(Method meth)
+	public static boolean isSetter(final Method meth)
 	{
 		Class type = meth.getReturnType();
 		if (!Void.TYPE.equals(type)) return false;
 		if (!meth.getName().startsWith("set")) return false;
 		Class[] paramTypes = meth.getParameterTypes();
-        return !((paramTypes == null) || (paramTypes.length != 1));
-    }
+		return !((paramTypes == null) || (paramTypes.length != 1));
+	}
 
 	/**
 	 * Get a getter with a given name from a class.
@@ -125,16 +125,16 @@ public class ReflectionUtils
 	 * @param name the name of the getter to look for.
 	 * @return a <code>Method</code> object, or null if the class has no getter with the specfied name.
 	 */
-	public static Method getGetter(Class clazz, String name)
+	public static Method getGetter(final Class clazz, final String name)
 	{
 		Method[] methods = clazz.getMethods();
 		Method getter = null;
-        for (Method method : methods) {
-            if (isGetter(method) && name.equals(method.getName())) {
-                getter = method;
-                break;
-            }
-        }
+		for (Method method : methods) {
+			if (isGetter(method) && name.equals(method.getName())) {
+				getter = method;
+				break;
+			}
+		}
 		return getter;
 	}
 
@@ -144,16 +144,16 @@ public class ReflectionUtils
 	 * @param name the name of the setter to look for.
 	 * @return a <code>Method</code> object, or null if the class has no setter with the specfied name.
 	 */
-	public static Method getSetter(Class clazz, String name)
+	public static Method getSetter(final Class clazz, final String name)
 	{
 		Method[] methods = clazz.getMethods();
 		Method setter = null;
-        for (Method method : methods) {
-            if (isSetter(method) && name.equals(method.getName())) {
-                setter = method;
-                break;
-            }
-        }
+		for (Method method : methods) {
+			if (isSetter(method) && name.equals(method.getName())) {
+				setter = method;
+				break;
+			}
+		}
 		return setter;
 	}
 
@@ -164,7 +164,7 @@ public class ReflectionUtils
 	 * @return a <code>Method</code> object, or null if the class has no getter for the specfied
 	 * instance variable name.
 	 */
-	public static Method getGetterForAttribute(Class clazz, String attrName)
+	public static Method getGetterForAttribute(final Class clazz, final String attrName)
 	{
 		String basename =
 			attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
@@ -180,20 +180,20 @@ public class ReflectionUtils
 	 * @return a <code>Method</code> object, or null if the class has no setter for the specfied
 	 * instance variable name.
 	 */
-	public static Method getSetterForAttribute(Class clazz, String attrName)
+	public static Method getSetterForAttribute(final Class clazz, final String attrName)
 	{
 		String basename =
 			attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
 		return getSetter(clazz, "set"+basename);
 	}
-	
+
 	/**
 	 * Obtain all the getters or setters of a specified class.
 	 * @param clazz the class to get the methods from.
 	 * @param getters if true, indicates that the getters should be looked up, otherwise it should be the setters.
 	 * @return an array of <code>Method</code> instances.
 	 */
-	public static Method[] getAllBeanMethods(Class clazz, boolean getters)
+	public static Method[] getAllBeanMethods(final Class clazz, final boolean getters)
 	{
 		List<Method> methodList = new ArrayList<Method>();
 		Method[] allMethods = clazz.getMethods();
@@ -213,7 +213,7 @@ public class ReflectionUtils
 	 * @param o the object to copy.
 	 * @return an object whose state is a copy of that of the input object.
 	 */
-	public static Object deepCopy(Object o)
+	public static Object deepCopy(final Object o)
 	{
 		return null;
 	}
@@ -223,7 +223,7 @@ public class ReflectionUtils
 	 * @param clazz the class to check.
 	 * @return true if the class can be executed as a task, false otherwise.
 	 */
-	public static boolean isJPPFAnnotated(Class<?> clazz)
+	public static boolean isJPPFAnnotated(final Class<?> clazz)
 	{
 		return getJPPFAnnotatedElement(clazz) != null;
 	}
@@ -233,7 +233,7 @@ public class ReflectionUtils
 	 * @param clazz the class to check.
 	 * @return true if the class can be executed as a task, false otherwise.
 	 */
-	public static AnnotatedElement getJPPFAnnotatedElement(Class<?> clazz)
+	public static AnnotatedElement getJPPFAnnotatedElement(final Class<?> clazz)
 	{
 		if (clazz == null) return null;
 		for (Method m: clazz.getDeclaredMethods())
@@ -252,7 +252,7 @@ public class ReflectionUtils
 	 * @param annotatedElement the method to check.
 	 * @return true if the method can be executed as a task, false otherwise.
 	 */
-	public static boolean isJPPFAnnotated(AnnotatedElement annotatedElement)
+	public static boolean isJPPFAnnotated(final AnnotatedElement annotatedElement)
 	{
 		if (annotatedElement == null) return false;
 		//Annotation[] annotations = annotatedElement.getDeclaredAnnotations();
@@ -272,7 +272,7 @@ public class ReflectionUtils
 	 * @param args the argments of the method.
 	 * @return a matching <code>Method</code> instance, or null if no match could be found.
 	 */
-	public static Method getMatchingMethod(Class clazz, String name, Object[] args)
+	public static Method getMatchingMethod(final Class clazz, final String name, final Object[] args)
 	{
 		Class[] argTypes = createTypeArray(args);
 		Method[] methods = clazz.getDeclaredMethods();
@@ -291,7 +291,7 @@ public class ReflectionUtils
 	 * @param args the argments of the method.
 	 * @return a matching <code>Constructor</code> instance, or null if no match could be found.
 	 */
-	public static Constructor getMatchingConstructor(Class clazz, Object[] args)
+	public static Constructor getMatchingConstructor(final Class clazz, final Object[] args)
 	{
 		Class[] argTypes = createTypeArray(args);
 		Constructor[] constructors = clazz.getDeclaredConstructors();
@@ -305,10 +305,10 @@ public class ReflectionUtils
 	/**
 	 * Determine whether a set of (possibly null) types looseley matches another set of types.
 	 * @param argTypes the types to match, null values are considered wildcards (matching any type).
-	 * @param types the set of types to match. 
+	 * @param types the set of types to match.
 	 * @return true if the methods match, false otherwise.
 	 */
-	public static boolean matchingTypes(Class<?>[] argTypes, Class<?>[] types)
+	public static boolean matchingTypes(final Class<?>[] argTypes, final Class<?>[] types)
 	{
 		if (argTypes.length != types.length) return false;
 		for (int i=0; i<types.length; i++)
@@ -327,7 +327,7 @@ public class ReflectionUtils
 	 * @param type a primtive type.
 	 * @return a <code>Class</code> instance.
 	 */
-	public static Class mapPrimitveType(Class type)
+	public static Class mapPrimitveType(final Class type)
 	{
 		if (Boolean.TYPE.equals(type)) return Boolean.class;
 		else if (Character.TYPE.equals(type)) return Character.class;
@@ -346,7 +346,7 @@ public class ReflectionUtils
 	 * @param args the arguments to get the types from.
 	 * @return an array of <code>Class</code> instances.
 	 */
-	public static Class[] createTypeArray(Object[] args)
+	public static Class[] createTypeArray(final Object[] args)
 	{
 		if ((args == null) || (args.length == 0)) return new Class[0];
 		Class[] argTypes = new Class[args.length];

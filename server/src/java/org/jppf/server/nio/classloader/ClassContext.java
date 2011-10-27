@@ -30,7 +30,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Context object associated with a socket channel used by the class server of the JPPF driver. 
+ * Context object associated with a socket channel used by the class server of the JPPF driver.
  * @author Laurent Cohen
  */
 public class ClassContext extends SimpleNioContext<ClassState>
@@ -60,7 +60,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 */
 	protected ChannelWrapper<?> currentRequest = null;
 	/**
-	 * Determines whether this context relates to a provider or node connection. 
+	 * Determines whether this context relates to a provider or node connection.
 	 */
 	protected boolean provider = false;
 
@@ -84,7 +84,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * @param wrapper the channel through which the resource is sent.
 	 * @throws Exception if an error occurs while serializing.
 	 */
-	public void serializeResource(ChannelWrapper<?> wrapper) throws Exception
+	public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		ObjectSerializer serializer = new ObjectSerializerImpl();
 		byte[] data = serializer.serialize(resource).getBuffer();
@@ -99,7 +99,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void handleException(ChannelWrapper<?> channel)
+	public void handleException(final ChannelWrapper<?> channel)
 	{
 		ClassNioServer.closeConnection(channel);
 	}
@@ -117,17 +117,17 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 * Set the resource read from or written to the associated channel.
 	 * @param resource a <code>JPPFResourceWrapper</code> instance.
 	 */
-	public void setResource(JPPFResourceWrapper resource)
+	public void setResource(final JPPFResourceWrapper resource)
 	{
 		this.resource = resource;
 	}
 
 	/**
 	 * Add a new pending request to this resource provider.
-	 * @param request the request as a <code>SelectionKey</code> instance. 
+	 * @param request the request as a <code>SelectionKey</code> instance.
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void addRequest(ChannelWrapper<?> request)
+	public synchronized void addRequest(final ChannelWrapper<?> request)
 	{
 		pendingRequests.add(request);
 		if (ClassState.IDLE_PROVIDER.equals(state))
@@ -148,16 +148,16 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
 	/**
 	 * Set the request currently processed.
-	 * @param currentRequest a <code>SelectionKey</code> instance. 
+	 * @param currentRequest a <code>SelectionKey</code> instance.
 	 */
-	public synchronized void setCurrentRequest(ChannelWrapper<?> currentRequest)
+	public synchronized void setCurrentRequest(final ChannelWrapper<?> currentRequest)
 	{
 		this.currentRequest = currentRequest;
 	}
 
 	/**
 	 * Get the number of pending resource requests for a resource provider.
-	 * @return a the number of requests as an int. 
+	 * @return a the number of requests as an int.
 	 */
 	public synchronized int getNbPendingRequests()
 	{
@@ -167,7 +167,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
 	/**
 	 * Get the list of pending resource requests for a resource provider.
-	 * @return a <code>List</code> of <code>SelectionKey</code> instances. 
+	 * @return a <code>List</code> of <code>SelectionKey</code> instances.
 	 */
 	public synchronized List<ChannelWrapper<?>> getPendingRequests()
 	{
@@ -176,15 +176,15 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
 	/**
 	 * Set the list of pending resource requests for a resource provider.
-	 * @param pendingRequests a <code>List</code> of <code>SelectionKey</code> instances. 
+	 * @param pendingRequests a <code>List</code> of <code>SelectionKey</code> instances.
 	 */
-	public synchronized void setPendingRequests(List<ChannelWrapper<?>> pendingRequests)
+	public synchronized void setPendingRequests(final List<ChannelWrapper<?>> pendingRequests)
 	{
 		this.pendingRequests = pendingRequests;
 	}
 
 	/**
-	 * Determine whether this context relates to a provider or node connection. 
+	 * Determine whether this context relates to a provider or node connection.
 	 * @return true if this is a provider context, false otherwise.
 	 */
 	public boolean isProvider()
@@ -193,10 +193,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	}
 
 	/**
-	 * Specify whether this context relates to a provider or node connection. 
+	 * Specify whether this context relates to a provider or node connection.
 	 * @param provider true if this is a provider context, false otherwise.
 	 */
-	public void setProvider(boolean provider)
+	public void setProvider(final boolean provider)
 	{
 		this.provider = provider;
 	}

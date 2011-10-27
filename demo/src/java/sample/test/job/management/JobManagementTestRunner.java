@@ -73,7 +73,7 @@ public class JobManagementTestRunner
 	 * Entry point.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

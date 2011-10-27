@@ -60,7 +60,7 @@ public class JobEventTask implements Runnable
 	 * @param bundle - the job data.
 	 * @param channel - the id of the job source of the event.
 	 */
-	public JobEventTask(JPPFJobManager jobManager, JobEventType eventType, JPPFTaskBundle bundle, ChannelWrapper channel)
+	public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
 	{
 		this.jobManager = jobManager;
 		this.eventType = eventType;
@@ -78,7 +78,7 @@ public class JobEventTask implements Runnable
 		JobSLA sla = bundle.getSLA();
 		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
 		JobInformation jobInfo = new JobInformation(bundle.getJobUuid(), bundle.getName(), bundle.getTaskCount(),
-			bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
+				bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
 		jobInfo.setMaxNodes(sla.getMaxNodes());
 		JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);

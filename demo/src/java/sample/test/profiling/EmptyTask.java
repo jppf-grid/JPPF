@@ -21,7 +21,7 @@ import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Instances of this class do nothing and are intented for node profiling purposes,
- * to analyse the JPPF overhead for task execution. 
+ * to analyse the JPPF overhead for task execution.
  * @author Laurent Cohen
  */
 public class EmptyTask extends JPPFTask
@@ -38,7 +38,7 @@ public class EmptyTask extends JPPFTask
 	 * Initialize with the specified data size.
 	 * @param dataSize the data size in bytes.
 	 */
-	public EmptyTask(int dataSize)
+	public EmptyTask(final int dataSize)
 	{
 		this.dataSize = dataSize;
 		data = new byte[dataSize];
@@ -49,7 +49,7 @@ public class EmptyTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 	}
 }

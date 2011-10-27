@@ -33,7 +33,7 @@ public class ClientEvent extends EventObject
 	 * Initialize this event with the specified client connection.
 	 * @param c the client connection on which the event occurs.
 	 */
-	public ClientEvent(JPPFClientConnection c)
+	public ClientEvent(final JPPFClientConnection c)
 	{
 		super(c);
 	}

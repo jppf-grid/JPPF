@@ -30,7 +30,7 @@ import org.jppf.utils.LocalizationUtils;
 import org.slf4j.*;
 
 /**
- * This class provides a graphical interface for monitoring the status and health 
+ * This class provides a graphical interface for monitoring the status and health
  * of the JPPF server.<br>
  * It also provides a few customization options, such as setting the interval between 2 server refreshes,
  * and switching the color scheme (skin) fot the whole UI.
@@ -76,38 +76,38 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 	 * @param fields the fields displayed in the table.
 	 * @param label the reference to the localized title of the table.
 	 */
-	private void addTablePanel(Fields[] fields, String label)
+	private void addTablePanel(final Fields[] fields, final String label)
 	{
 		add(makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label)), "grow");
 	}
-	
+
 	/**
 	 * Called when new stats have been received from the server.
 	 * @param event holds the new stats values.
 	 */
 	@Override
-    public void dataUpdated(StatsHandlerEvent event)
+	public void dataUpdated(final StatsHandlerEvent event)
 	{
 		for (final MonitorTableModel model: tableModels)
 		{
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
 					model.fireTableDataChanged();
 				}
 			});
 		}
 	}
-	
+
 	/**
 	 * Create a chartPanel displaying a group of values.
 	 * @param props the names of the values to display.
 	 * @param title the title of the chartPanel.
 	 * @return a <code>JComponent</code> instance.
 	 */
-	private JComponent makeTablePanel(Fields[] props, String title)
+	private JComponent makeTablePanel(final Fields[] props, final String title)
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new MigLayout("fill"));
@@ -115,7 +115,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		JTable table = new JTable()
 		{
 			@Override
-            public boolean isCellEditable(int row, int column)
+			public boolean isCellEditable(final int row, final int column)
 			{
 				return false;
 			}
@@ -124,14 +124,14 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 		table.setModel(model);
 		table.setOpaque(true);
 		DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
-		rend1.setHorizontalAlignment(JLabel.RIGHT);
+		rend1.setHorizontalAlignment(SwingConstants.RIGHT);
 		rend1.setOpaque(true);
 		table.getColumnModel().getColumn(1).setCellRenderer(rend1);
 		DefaultTableCellRenderer rend0 = new DefaultTableCellRenderer();
-		rend0.setHorizontalAlignment(JLabel.LEFT);
+		rend0.setHorizontalAlignment(SwingConstants.LEFT);
 		rend0.setOpaque(true);
 		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-	  for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
+		for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
 		tableModels.add(model);
 		panel.add(table, "growx, pushx");
 		table.setShowGrid(false);

@@ -26,7 +26,7 @@ import org.jppf.classloader.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
-import org.jppf.node.event.*;
+import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;
@@ -77,7 +77,7 @@ public abstract class JPPFNode extends AbstractNode
 	 */
 	private JPPFMBeanProviderManager providerManager = null;
 	/**
-	 * Manages the class loaders and how they are used. 
+	 * Manages the class loaders and how they are used.
 	 */
 	protected AbstractClassLoaderManager classLoaderManager = null;
 	/**
@@ -167,7 +167,7 @@ public abstract class JPPFNode extends AbstractNode
 	 * and prepare a specific response if it is.
 	 * @param bundle - the bundle to check.
 	 */
-	private void checkInitialBundle(JPPFTaskBundle bundle)
+	private void checkInitialBundle(final JPPFTaskBundle bundle)
 	{
 		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
@@ -192,12 +192,12 @@ public abstract class JPPFNode extends AbstractNode
 	}
 
 	/**
-	 * Send the results back to the server and perform final checks for the current execution. 
+	 * Send the results back to the server and perform final checks for the current execution.
 	 * @param bundle - the bundle that contains the tasks and header information.
 	 * @param taskList - the tasks results.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processResults(JPPFTaskBundle bundle, List<Task> taskList) throws Exception
+	private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
 		if (executionManager.checkConfigChanged())
@@ -283,7 +283,7 @@ public abstract class JPPFNode extends AbstractNode
 	 * Set the main classloader for the node.
 	 * @param cl the class loader to set.
 	 */
-	public void setClassLoader(JPPFClassLoader cl)
+	public void setClassLoader(final JPPFClassLoader cl)
 	{
 		classLoaderManager.setClassLoader(cl);
 	}
@@ -330,7 +330,7 @@ public abstract class JPPFNode extends AbstractNode
 	 * Set the administration and monitoring MBean for this node.
 	 * @param nodeAdmin a <code>JPPFNodeAdmin</code>m instance.
 	 */
-	public synchronized void setNodeAdmin(JPPFNodeAdmin nodeAdmin)
+	public synchronized void setNodeAdmin(final JPPFNodeAdmin nodeAdmin)
 	{
 		this.nodeAdmin = nodeAdmin;
 	}
@@ -346,7 +346,7 @@ public abstract class JPPFNode extends AbstractNode
 
 	/**
 	 * Determines whether JMX management and monitoring is enabled for this node.
-	 * @return true if JMX is enabled, false otherwise. 
+	 * @return true if JMX is enabled, false otherwise.
 	 */
 	boolean isJmxEnabled()
 	{
@@ -370,7 +370,7 @@ public abstract class JPPFNode extends AbstractNode
 	 * Shutdown and evenetually restart the node.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	public void shutdown(boolean restart)
+	public void shutdown(final boolean restart)
 	{
 		lifeCycleEventHandler.fireNodeEnding();
 		NodeRunner.shutdown(this, restart);
@@ -417,7 +417,7 @@ public abstract class JPPFNode extends AbstractNode
 	 * Set the action executed when the node exits the main loop.
 	 * @param exitAction the action to execute.
 	 */
-	public synchronized void setExitAction(Runnable exitAction)
+	public synchronized void setExitAction(final Runnable exitAction)
 	{
 		this.exitAction = exitAction;
 	}
@@ -430,12 +430,12 @@ public abstract class JPPFNode extends AbstractNode
 	private void registerProviderMBeans() throws Exception
 	{
 		ClassLoader cl = getClass().getClassLoader();
-    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
-  	MBeanServer server = getJmxServer().getServer();
-  	if (providerManager == null) providerManager = new JPPFMBeanProviderManager<JPPFNodeMBeanProvider>(JPPFNodeMBeanProvider.class, server); 
-    try
-    {
-	    Thread.currentThread().setContextClassLoader(cl);
+		ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+		MBeanServer server = getJmxServer().getServer();
+		if (providerManager == null) providerManager = new JPPFMBeanProviderManager<JPPFNodeMBeanProvider>(JPPFNodeMBeanProvider.class, server);
+		try
+		{
+			Thread.currentThread().setContextClassLoader(cl);
 			List<JPPFNodeMBeanProvider> list = providerManager.getAllProviders(cl);
 			for (JPPFNodeMBeanProvider provider: list)
 			{
@@ -444,11 +444,11 @@ public abstract class JPPFNode extends AbstractNode
 				boolean b = providerManager.registerProviderMBean(o, inf, provider.getMBeanName());
 				if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + ']');
 			}
-    }
-    finally
-    {
-	    Thread.currentThread().setContextClassLoader(tmp);
-    }
+		}
+		finally
+		{
+			Thread.currentThread().setContextClassLoader(tmp);
+		}
 	}
 
 	/**
@@ -474,6 +474,7 @@ public abstract class JPPFNode extends AbstractNode
 	 * Get the object that handles the firing of node life cycle events and the listeners that subscribe to these events.
 	 * @return an instance of <code>LifeCycleEventHandler</code>.
 	 */
+	@Override
 	public LifeCycleEventHandler getLifeCycleEventHandler()
 	{
 		return lifeCycleEventHandler;

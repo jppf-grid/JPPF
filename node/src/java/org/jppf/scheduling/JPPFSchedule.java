@@ -55,7 +55,7 @@ public class JPPFSchedule implements Serializable
 	 * Initialize this schedule configuration with the specified duration.
 	 * @param duration the duration in milliseconds.
 	 */
-	public JPPFSchedule(long duration)
+	public JPPFSchedule(final long duration)
 	{
 		this.duration = duration;
 		this.date = null;
@@ -69,7 +69,7 @@ public class JPPFSchedule implements Serializable
 	 * @param format the format in which the date is expressed (including locale and time zone information),
 	 * as specified in the description of {@link SimpleDateFormat}.
 	 */
-	public JPPFSchedule(String date, String format)
+	public JPPFSchedule(final String date, final String format)
 	{
 		this.duration = 0L;
 		this.date = date;
@@ -80,7 +80,7 @@ public class JPPFSchedule implements Serializable
 	/**
 	 * Get the duration for this configuration.
 	 * The time at which the duration starts dependends on who is using it.
-	 * For instance, for scheduling a job, it starts when the job is inserted into the job queue by the server. 
+	 * For instance, for scheduling a job, it starts when the job is inserted into the job queue by the server.
 	 * @return the timeout in milliseconds.
 	 */
 	public long getDuration()
@@ -112,7 +112,7 @@ public class JPPFSchedule implements Serializable
 	 * @return this schedule expressed as a {@link Date}.
 	 * @throws ParseException if parsing using the simple date format fails.
 	 */
-	public Date toDate(long startDate) throws ParseException
+	public Date toDate(final long startDate) throws ParseException
 	{
 		Date dt = null;
 		if ((date == null) || (format == null)) dt = new Date(startDate + duration);
@@ -126,7 +126,7 @@ public class JPPFSchedule implements Serializable
 	 * @return this schedule expressed as a long.
 	 * @throws ParseException if parsing using the simple date format fails.
 	 */
-	public long toLong(long startDate) throws ParseException
+	public long toLong(final long startDate) throws ParseException
 	{
 		long result = 0L;
 		if ((date == null) || (format == null)) result = startDate + duration;

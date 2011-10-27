@@ -45,7 +45,7 @@ public class ListOption extends AbstractOption
 	protected int selMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
 	/**
 	 * Selection listener set on the list and used to propagate selection
-	 * changes as value change events. 
+	 * changes as value change events.
 	 */
 	protected transient ListSelectionListener selectionListener = null;
 
@@ -59,16 +59,16 @@ public class ListOption extends AbstractOption
 	/**
 	 * Initialize this combo box option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the combobox.
 	 * @param value the initially selected value of this component.
 	 * @param items the initial list of items in the combo box.
 	 * @param selMode the mode of selection for the list, can be either
 	 * {@link javax.swing.ListSelectionModel#SINGLE_SELECTION SINGLE_SELECTION} or
-	 * {@link javax.swing.ListSelectionModel#MULTIPLE_INTERVAL_SELECTION MULTIPLE_INTERVAL_SELECTION}. 
+	 * {@link javax.swing.ListSelectionModel#MULTIPLE_INTERVAL_SELECTION MULTIPLE_INTERVAL_SELECTION}.
 	 */
-	public ListOption(String name, String label, String tooltip, List<Object> value, List<Object> items,
-			int selMode)
+	public ListOption(final String name, final String label, final String tooltip, final List<Object> value, final List<Object> items,
+			final int selMode)
 	{
 		this.name = name;
 		this.label = label;
@@ -85,16 +85,16 @@ public class ListOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 		selectionListener = new ListSelectionListener()
 		{
 			@Override
-            public void valueChanged(ListSelectionEvent e)
+			public void valueChanged(final ListSelectionEvent e)
 			{
 				if (e.getValueIsAdjusting()) return;
 				List<Object> sel = new ArrayList<Object>();
-                sel.addAll(Arrays.asList(list.getSelectedValues()));
+				sel.addAll(Arrays.asList(list.getSelectedValues()));
 				value = sel;
 				fireValueChanged();
 			}
@@ -107,7 +107,7 @@ public class ListOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOptionElement#createUI()
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		list = new JList();
 		if (toolTipText != null) list.setToolTipText(toolTipText);
@@ -183,7 +183,7 @@ public class ListOption extends AbstractOption
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		list.setEnabled(enabled);
 	}
@@ -194,7 +194,7 @@ public class ListOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object value)
+	public void setValue(final Object value)
 	{
 		this.value = value;
 		populateList();
@@ -214,7 +214,7 @@ public class ListOption extends AbstractOption
 	 * Set the items in the list.
 	 * @param items a list of <code>Object</code> instances.
 	 */
-	public void setItems(List items)
+	public void setItems(final List items)
 	{
 		this.items = items;
 		populateList();
@@ -234,7 +234,7 @@ public class ListOption extends AbstractOption
 	 * Set the selection mode for the list.
 	 * @param selMode the selection mode as an int value.
 	 */
-	public void setSelMode(int selMode)
+	public void setSelMode(final int selMode)
 	{
 		this.selMode = selMode;
 	}

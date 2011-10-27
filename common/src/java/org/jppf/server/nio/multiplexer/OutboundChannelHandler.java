@@ -52,7 +52,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	 * @param port the port to connect to on the remote host.
 	 * @param initialKey the key associated with the initial connection.
 	 */
-	public OutboundChannelHandler(NioServer server, String host, int port, ChannelWrapper initialKey)
+	public OutboundChannelHandler(final NioServer server, final String host, final int port, final ChannelWrapper initialKey)
 	{
 		super(server, host, port);
 		this.initialKey = initialKey;
@@ -65,7 +65,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#initSocketChannel()
 	 */
 	@Override
-    protected SocketChannelClient initSocketChannel() throws Exception
+	protected SocketChannelClient initSocketChannel() throws Exception
 	{
 		return new SocketChannelClient(host, port, false);
 	}
@@ -76,7 +76,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#postInit()
 	 */
 	@Override
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	protected void postInit() throws Exception
 	{
 		SocketChannel channel = socketClient.getChannel();
@@ -85,16 +85,16 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 		context.setLinkedKey(initialKey);
 		context.setState(MultiplexerState.SENDING_OR_RECEIVING);
 		server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ, context,
-			new StateTransitionManager.ChannelRegistrationAction()
+				new StateTransitionManager.ChannelRegistrationAction()
+		{
+			@Override
+			public void run()
 			{
-				@Override
-                public void run()
-				{
-					MultiplexerContext initialContext = (MultiplexerContext ) initialKey.getContext();
-					initialContext.setLinkedKey(key);
-					server.getTransitionManager().transitionChannel(initialKey, MultiplexerTransition.TO_SENDING_OR_RECEIVING);
-				}
+				MultiplexerContext initialContext = (MultiplexerContext ) initialKey.getContext();
+				initialContext.setLinkedKey(key);
+				server.getTransitionManager().transitionChannel(initialKey, MultiplexerTransition.TO_SENDING_OR_RECEIVING);
 			}
+		}
 		);
 		if (debugEnabled) log.debug("registered outbound channel " + StringUtils.getRemoteHost(channel));
 	}

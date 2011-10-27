@@ -20,7 +20,7 @@ package test.jobfromtask;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Instances of this class are defined as tasks with a predefined execution length, specified at their creation. 
+ * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
 public class DestinationTask extends JPPFTask
@@ -37,12 +37,12 @@ public class DestinationTask extends JPPFTask
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		System.out.println("Starting destination task '" + getId() + '\'');
 		String s = "task '" + getId() + "' completed";
 		System.out.println(s);
-		setResult(s); 
+		setResult(s);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class DestinationTask extends JPPFTask
 	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 	 */
 	@Override
-    public void onCancel()
+	public void onCancel()
 	{
 		String s = "task '" + getId() + "' has been cancelled";
 		setResult(s);

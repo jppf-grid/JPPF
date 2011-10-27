@@ -39,7 +39,7 @@ public class FillerOption extends AbstractOption
 	 * @param width the filler's width
 	 * @param height the filler's height.
 	 */
-	public FillerOption(int width, int height)
+	public FillerOption(final int width, final int height)
 	{
 		UIComponent = GuiUtils.createFiller(width, height);
 	}
@@ -48,7 +48,7 @@ public class FillerOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 	}
 
@@ -58,7 +58,7 @@ public class FillerOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		return null;
 	}
@@ -68,7 +68,7 @@ public class FillerOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -78,7 +78,7 @@ public class FillerOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 	}
 
@@ -88,7 +88,7 @@ public class FillerOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
 	 */
 	@Override
-    public boolean isPersistent()
+	public boolean isPersistent()
 	{
 		return false;
 	}

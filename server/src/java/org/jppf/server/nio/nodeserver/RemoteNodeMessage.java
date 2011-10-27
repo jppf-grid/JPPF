@@ -50,7 +50,7 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	 * @throws Exception if an IO error occurs.
 	 */
 	@Override
-    protected boolean readNextObject(ChannelWrapper<?> wrapper) throws Exception
+	protected boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
 		if (currentLengthObject == null)
@@ -87,7 +87,7 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	 * @throws Exception if an IO error occurs.
 	 */
 	@Override
-    protected boolean writeNextObject(ChannelWrapper<?> wrapper) throws Exception
+	protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		SocketChannel channel = (SocketChannel) ((SelectionKey) wrapper.getChannel()).channel();
 		if (currentLengthObject == null)
@@ -114,7 +114,7 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
 		sb.append("nb locations=").append(locations == null ? -1 : locations.size());

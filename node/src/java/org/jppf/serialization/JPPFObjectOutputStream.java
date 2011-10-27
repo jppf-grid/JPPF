@@ -63,7 +63,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * @param out the stream to write objects to.
 	 * @throws IOException if any error occurs.
 	 */
-	public JPPFObjectOutputStream(OutputStream out) throws IOException
+	public JPPFObjectOutputStream(final OutputStream out) throws IOException
 	{
 		super();
 		this.out = new DataOutputStream(out);
@@ -74,7 +74,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected final void writeObjectOverride(Object obj) throws IOException
+	protected final void writeObjectOverride(final Object obj) throws IOException
 	{
 		boolean alreadyWriting = writingObject;
 		try
@@ -107,7 +107,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void write(int val) throws IOException
+	public void write(final int val) throws IOException
 	{
 		out.write(val);
 	}
@@ -116,7 +116,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void write(byte[] buf) throws IOException
+	public void write(final byte[] buf) throws IOException
 	{
 		out.write(buf);
 	}
@@ -125,7 +125,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void write(byte[] buf, int off, int len) throws IOException
+	public void write(final byte[] buf, final int off, final int len) throws IOException
 	{
 		out.write(buf, off, len);
 	}
@@ -134,7 +134,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeBoolean(boolean val) throws IOException
+	public void writeBoolean(final boolean val) throws IOException
 	{
 		out.writeBoolean(val);
 	}
@@ -143,7 +143,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeByte(int val) throws IOException
+	public void writeByte(final int val) throws IOException
 	{
 		out.writeByte(val);
 	}
@@ -152,7 +152,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeShort(int val) throws IOException
+	public void writeShort(final int val) throws IOException
 	{
 		out.writeShort(val);
 	}
@@ -161,7 +161,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeChar(int val) throws IOException
+	public void writeChar(final int val) throws IOException
 	{
 		out.writeChar(val);
 	}
@@ -170,7 +170,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeInt(int val) throws IOException
+	public void writeInt(final int val) throws IOException
 	{
 		SerializationUtils.writeInt(val, buf, 0);
 		out.write(buf, 0, 4);
@@ -181,7 +181,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeLong(long val) throws IOException
+	public void writeLong(final long val) throws IOException
 	{
 		out.writeLong(val);
 	}
@@ -190,7 +190,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeFloat(float val) throws IOException
+	public void writeFloat(final float val) throws IOException
 	{
 		out.writeFloat(val);
 	}
@@ -199,7 +199,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeDouble(double val) throws IOException
+	public void writeDouble(final double val) throws IOException
 	{
 		//out.writeDouble(val);
 		out.writeLong(Double.doubleToLongBits(val));
@@ -209,7 +209,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeBytes(String str) throws IOException
+	public void writeBytes(final String str) throws IOException
 	{
 		out.writeBytes(str);
 	}
@@ -218,7 +218,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeChars(String str) throws IOException
+	public void writeChars(final String str) throws IOException
 	{
 		out.writeChars(str);
 	}
@@ -227,7 +227,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeUTF(String str) throws IOException
+	public void writeUTF(final String str) throws IOException
 	{
 		out.writeUTF(str);
 	}
@@ -236,7 +236,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void defaultWriteObject() throws IOException
+	public void defaultWriteObject() throws IOException
 	{
 		try
 		{
@@ -253,7 +253,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void flush() throws IOException
+	public void flush() throws IOException
 	{
 		out.flush();
 	}
@@ -262,7 +262,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 		out.close();
 	}
@@ -271,7 +271,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public PutField putFields() throws IOException
+	public PutField putFields() throws IOException
 	{
 		//return super.putFields();
 		if (currentPutField == null) currentPutField = new JPPFPutField(this);
@@ -282,7 +282,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void writeFields() throws IOException
+	public void writeFields() throws IOException
 	{
 		//super.writeFields();
 		try
@@ -303,7 +303,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
 	 * @param map the map containing fields names and values.
 	 * @throws Exception if any error occurs.
 	 */
-	private void writeFields0(Map<String, Object> map) throws Exception
+	private void writeFields0(final Map<String, Object> map) throws Exception
 	{
 		int n = map.size();
 		String[] names = new String[n];

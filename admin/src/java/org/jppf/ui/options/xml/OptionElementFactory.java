@@ -40,7 +40,7 @@ public class OptionElementFactory
 	 * Initialize this factory.
 	 * @param builder the builder using this factory.
 	 */
-	public OptionElementFactory(OptionsPageBuilder builder)
+	public OptionElementFactory(final OptionsPageBuilder builder)
 	{
 		this.builder = builder;
 	}
@@ -50,7 +50,7 @@ public class OptionElementFactory
 	 * @param i18n the path for localized resource bundles.
 	 * @return an {@link OptionsPageBuilder} instance.
 	 */
-	private OptionsPageBuilder getOrCreateBuilder(String i18n)
+	private OptionsPageBuilder getOrCreateBuilder(final String i18n)
 	{
 		if ((i18n == null) || "".equals(i18n.trim()) || i18n.equals(builder.getBaseName())) return this.builder;
 		OptionsPageBuilder newBuilder = new OptionsPageBuilder(builder.isEventEnabled());
@@ -64,7 +64,7 @@ public class OptionElementFactory
 	 * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
 	 * @throws Exception if an error was raised while building the page.
 	 */
-	public OptionElement buildPage(OptionDescriptor desc) throws Exception
+	public OptionElement buildPage(final OptionDescriptor desc) throws Exception
 	{
 		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
 		OptionPanel page = new OptionPanel();
@@ -85,7 +85,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public OptionElement buildSplitPane(OptionDescriptor desc) throws Exception
+	public OptionElement buildSplitPane(final OptionDescriptor desc) throws Exception
 	{
 		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
 		SplitPaneOption option = new SplitPaneOption();
@@ -108,7 +108,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public OptionElement buildToolbar(OptionDescriptor desc) throws Exception
+	public OptionElement buildToolbar(final OptionDescriptor desc) throws Exception
 	{
 		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
 		ToolbarOption option = new ToolbarOption();
@@ -129,7 +129,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public OptionElement buildTabbedPane(OptionDescriptor desc) throws Exception
+	public OptionElement buildTabbedPane(final OptionDescriptor desc) throws Exception
 	{
 		OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
 		TabbedPaneOption option = new TabbedPaneOption();
@@ -150,7 +150,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildButton(OptionDescriptor desc) throws Exception
+	public Option buildButton(final OptionDescriptor desc) throws Exception
 	{
 		ButtonOption option = new ButtonOption();
 		option.setEventsEnabled(false);
@@ -167,7 +167,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildLabel(OptionDescriptor desc) throws Exception
+	public Option buildLabel(final OptionDescriptor desc) throws Exception
 	{
 		LabelOption option = new LabelOption();
 		option.setEventsEnabled(false);
@@ -185,7 +185,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildTextArea(OptionDescriptor desc) throws Exception
+	public Option buildTextArea(final OptionDescriptor desc) throws Exception
 	{
 		TextAreaOption option = new TextAreaOption();
 		option.setEventsEnabled(false);
@@ -203,7 +203,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildPassword(OptionDescriptor desc) throws Exception
+	public Option buildPassword(final OptionDescriptor desc) throws Exception
 	{
 		PasswordOption option = new PasswordOption();
 		option.setEventsEnabled(false);
@@ -220,7 +220,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildPlainText(OptionDescriptor desc) throws Exception
+	public Option buildPlainText(final OptionDescriptor desc) throws Exception
 	{
 		PlainTextOption option = new PlainTextOption();
 		option.setEventsEnabled(false);
@@ -238,7 +238,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildFormattedNumber(OptionDescriptor desc) throws Exception
+	public Option buildFormattedNumber(final OptionDescriptor desc) throws Exception
 	{
 		FormattedNumberOption option = new FormattedNumberOption();
 		option.setEventsEnabled(false);
@@ -257,7 +257,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildSpinnerNumber(OptionDescriptor desc) throws Exception
+	public Option buildSpinnerNumber(final OptionDescriptor desc) throws Exception
 	{
 		SpinnerNumberOption option = new SpinnerNumberOption();
 		option.setEventsEnabled(false);
@@ -276,7 +276,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildBoolean(OptionDescriptor desc) throws Exception
+	public Option buildBoolean(final OptionDescriptor desc) throws Exception
 	{
 		BooleanOption option = new BooleanOption();
 		option.setEventsEnabled(false);
@@ -293,7 +293,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildRadio(OptionDescriptor desc) throws Exception
+	public Option buildRadio(final OptionDescriptor desc) throws Exception
 	{
 		RadioButtonOption option = new RadioButtonOption();
 		option.setEventsEnabled(false);
@@ -310,7 +310,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildComboBox(OptionDescriptor desc) throws Exception
+	public Option buildComboBox(final OptionDescriptor desc) throws Exception
 	{
 		ComboBoxOption option = new ComboBoxOption();
 		option.setEventsEnabled(false);
@@ -330,7 +330,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildList(OptionDescriptor desc) throws Exception
+	public Option buildList(final OptionDescriptor desc) throws Exception
 	{
 		ListOption option = new ListOption();
 		option.setEventsEnabled(false);
@@ -338,7 +338,7 @@ public class OptionElementFactory
 		List<Object> items = new ArrayList<Object>();
 		for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
 		int selMode = "single".equals(desc.getProperty("selection"))
-			? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+		? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
 		option.setSelMode(selMode);
 		option.setItems(items);
 		option.setValue(new ArrayList<Object>());
@@ -353,11 +353,11 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildFiller(OptionDescriptor desc) throws Exception
+	public Option buildFiller(final OptionDescriptor desc) throws Exception
 	{
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
-        return new FillerOption(width, height);
+		return new FillerOption(width, height);
 	}
 
 	/**
@@ -366,12 +366,12 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildToolbarSeparator(OptionDescriptor desc) throws Exception
+	public Option buildToolbarSeparator(final OptionDescriptor desc) throws Exception
 	{
 		int width = desc.getInt("width", 1);
 		int height = desc.getInt("height", 1);
 		String text = desc.getString("text", " ");
-        return new ToolbarSeparatorOption(text, width, height);
+		return new ToolbarSeparatorOption(text, width, height);
 	}
 
 	/**
@@ -380,7 +380,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildFileChooser(OptionDescriptor desc) throws Exception
+	public Option buildFileChooser(final OptionDescriptor desc) throws Exception
 	{
 		FileChooserOption option = new FileChooserOption();
 		builder.initCommonOptionAttributes(option, desc);
@@ -399,7 +399,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public List<OptionElement> loadImport(OptionDescriptor desc) throws Exception
+	public List<OptionElement> loadImport(final OptionDescriptor desc) throws Exception
 	{
 		OptionsPageBuilder builder = new OptionsPageBuilder(true);
 		List<OptionElement> list = new ArrayList<OptionElement>();
@@ -434,12 +434,12 @@ public class OptionElementFactory
 	 * @param source - determines whether the XML is loaded from a url or file location.
 	 * @param location - where to load the xml descriptor from.
 	 */
-	public void addDebugComp(OptionElement elt, String source, String location)
+	public void addDebugComp(final OptionElement elt, final String source, final String location)
 	{
 		JLabel label = new JLabel("X")
 		{
 			@Override
-            public java.awt.Color getBackground()
+			public java.awt.Color getBackground()
 			{
 				return java.awt.Color.red;
 			}
@@ -458,7 +458,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildJavaOption(OptionDescriptor desc) throws Exception
+	public Option buildJavaOption(final OptionDescriptor desc) throws Exception
 	{
 		JavaOption option = new JavaOption();
 		builder.initCommonOptionAttributes(option, desc);
@@ -474,7 +474,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildNodeDataPanel(OptionDescriptor desc) throws Exception
+	public Option buildNodeDataPanel(final OptionDescriptor desc) throws Exception
 	{
 		//NodeDataPanel option = new NodeDataPanel();
 		Class clazz = Class.forName("org.jppf.ui.monitoring.node.NodeDataPanel");
@@ -489,7 +489,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildJobDataPanel(OptionDescriptor desc) throws Exception
+	public Option buildJobDataPanel(final OptionDescriptor desc) throws Exception
 	{
 		//JobDataPanel option = new JobDataPanel();
 		Class clazz = Class.forName("org.jppf.ui.monitoring.job.JobDataPanel");
@@ -504,7 +504,7 @@ public class OptionElementFactory
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.
 	 */
-	public Option buildCustomOption(OptionDescriptor desc) throws Exception
+	public Option buildCustomOption(final OptionDescriptor desc) throws Exception
 	{
 		String className = desc.getString("impl.class");
 		Class clazz = Class.forName(className);

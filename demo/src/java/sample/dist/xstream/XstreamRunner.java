@@ -37,7 +37,7 @@ public class XstreamRunner
 	 * Entry point for this class, submits the tasks to the JPPF grid.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{

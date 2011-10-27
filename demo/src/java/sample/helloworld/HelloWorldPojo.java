@@ -35,7 +35,7 @@ public class HelloWorldPojo implements Serializable
 	 * @param number an example primitive argument.
 	 * @return a string hello message.
 	 */
-	public String helloPojoMethod(String message, int number)
+	public String helloPojoMethod(final String message, final int number)
 	{
 		String hello = "Hello, World (pojo, " + message + ", " + number + ')';
 		System.out.println(hello);

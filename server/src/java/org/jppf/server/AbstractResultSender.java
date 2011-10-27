@@ -68,7 +68,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * @param asynch determines whether results can be sent asynchronously,
 	 * or if it must wait until all tasks have been completed.
 	 */
-	public AbstractResultSender(SocketWrapper socketClient, boolean asynch)
+	public AbstractResultSender(final SocketWrapper socketClient, final boolean asynch)
 	{
 		this.socketClient = socketClient;
 		this.asynch = asynch;
@@ -79,7 +79,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * @param count the number of tasks that must be executed.
 	 * @throws Exception if an error occurs while sending one or more task bundles.
 	 */
-	public void run(int count) throws Exception
+	public void run(final int count) throws Exception
 	{
 		if (debugEnabled) log.debug("Pending tasks: "+count);
 		setResultList(new ArrayList<ServerJob>());
@@ -145,7 +145,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * @param result the result of the task's execution.
 	 */
 	@Override
-    public synchronized void taskCompleted(ServerJob result)
+	public synchronized void taskCompleted(final ServerJob result)
 	{
 		JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
 		setPendingTasksCount(getPendingTasksCount() - resultJob.getTaskCount());
@@ -160,9 +160,9 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 
 	/**
 	 * Set the number of tasks that haven't yet been executed.
-	 * @param pendingTasksCount the number of tasks as an int. 
+	 * @param pendingTasksCount the number of tasks as an int.
 	 */
-	protected void setPendingTasksCount(int pendingTasksCount)
+	protected void setPendingTasksCount(final int pendingTasksCount)
 	{
 		this.pendingTasksCount.set(pendingTasksCount);
 	}
@@ -180,7 +180,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	 * Set the list of task bundles whose execution has been completed.
 	 * @param resultList a list of <code>BundleWrapper</code> instances.
 	 */
-	protected void setResultList(List<ServerJob> resultList)
+	protected void setResultList(final List<ServerJob> resultList)
 	{
 		this.resultList.set(resultList);
 	}

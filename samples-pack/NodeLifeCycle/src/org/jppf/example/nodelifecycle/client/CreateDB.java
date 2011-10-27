@@ -20,7 +20,7 @@ package org.jppf.example.nodelifecycle.client;
 
 import java.sql.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.FileUtils;
 
 /**
  * Create the H2 database.
@@ -32,7 +32,7 @@ public class CreateDB
 	 * Create the H2 database.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{

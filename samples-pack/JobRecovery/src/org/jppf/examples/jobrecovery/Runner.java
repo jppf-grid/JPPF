@@ -29,7 +29,7 @@ import org.jppf.utils.*;
 
 /**
  * Demonstration of the job persistence API to implement jobs failover and recovery
- * in the use case of an application crash before it completes. 
+ * in the use case of an application crash before it completes.
  * @author Laurent Cohen
  */
 public class Runner
@@ -43,7 +43,7 @@ public class Runner
 	 * Entry point.
 	 * @param args not used.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		JobPersistence<String> persistenceManager = null;
 		try
@@ -57,7 +57,7 @@ public class Runner
 			persistenceManager = new DefaultFilePersistenceManager("./job_store");
 			Collection<String> keys = persistenceManager.allKeys();
 			// if there is no job in the persistent store,
-			// we submit a job normally and simulate an application crash 
+			// we submit a job normally and simulate an application crash
 			if (keys.isEmpty())
 			{
 				int nbTasks = 10 * nbNodes;
@@ -70,6 +70,7 @@ public class Runner
 				job.setPersistenceManager(persistenceManager);
 				// the application will exit after 6 seconds (simulated crash)
 				Runnable quit = new Runnable() {
+					@Override
 					public void run() {
 						try {
 							Thread.sleep(6000L);

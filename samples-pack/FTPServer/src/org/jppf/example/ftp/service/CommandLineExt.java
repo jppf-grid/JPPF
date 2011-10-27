@@ -23,7 +23,7 @@ import org.apache.ftpserver.main.CommandLine;
 
 /**
  * This class extends the Apache <code>CommandLine</code> class to enable access to the ftp server
- * while keeping the convenience of the XML configuration file. 
+ * while keeping the convenience of the XML configuration file.
  * @author Laurent Cohen
  */
 public class CommandLineExt extends CommandLine
@@ -37,7 +37,7 @@ public class CommandLineExt extends CommandLine
 	 * Initialize this object with the specified configuration file.
 	 * @param configFile the path to an ftpd XML configuration file.
 	 */
-	public CommandLineExt(String configFile)
+	public CommandLineExt(final String configFile)
 	{
 		super();
 		this.configFile = configFile;

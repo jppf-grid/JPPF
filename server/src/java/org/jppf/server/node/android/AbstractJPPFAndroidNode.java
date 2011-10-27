@@ -23,7 +23,7 @@ import org.jppf.JPPFError;
 import org.jppf.classloader.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.*;
-import org.jppf.node.event.*;
+import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
@@ -63,7 +63,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 */
 	private LifeCycleEventHandler lifeCycleEventHandler = null;
 	/**
-	 * Manages the class loaders and how they are used. 
+	 * Manages the class loaders and how they are used.
 	 */
 	protected AbstractClassLoaderManager classLoaderManager = null;
 
@@ -165,7 +165,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 * and prepare a specific response if it is.
 	 * @param bundle - the bundle to check.
 	 */
-	private void checkInitialBundle(JPPFTaskBundle bundle)
+	private void checkInitialBundle(final JPPFTaskBundle bundle)
 	{
 		if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
 		{
@@ -176,12 +176,12 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	}
 
 	/**
-	 * Send the results back to the server and perform final checks for the current execution. 
+	 * Send the results back to the server and perform final checks for the current execution.
 	 * @param bundle - the bundle that contains the tasks and header information.
 	 * @param taskList - the tasks results.
 	 * @throws Exception if any error occurs.
 	 */
-	private void processResults(JPPFTaskBundle bundle, List<Task> taskList) throws Exception
+	private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
 		if (executionManager.checkConfigChanged())
@@ -239,7 +239,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 * Set the main classloader for the node.
 	 * @param cl the class loader to set.
 	 */
-	public void setClassLoader(JPPFClassLoader cl)
+	public void setClassLoader(final JPPFClassLoader cl)
 	{
 		classLoaderManager.setClassLoader(cl);
 	}
@@ -308,7 +308,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 * Shutdown and evenetually restart the node.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	public void shutdown(boolean restart)
+	public void shutdown(final boolean restart)
 	{
 		lifeCycleEventHandler.fireNodeEnding();
 		NodeRunner.shutdown(this, restart);
@@ -318,7 +318,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 * Set the action executed when the node exits the main loop.
 	 * @param exitAction the action to execute.
 	 */
-	public synchronized void setExitAction(Runnable exitAction)
+	public synchronized void setExitAction(final Runnable exitAction)
 	{
 		this.exitAction = exitAction;
 	}
@@ -327,6 +327,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 * Get the object that handles the firing of node life cycle events and the listeners that subscribe to these events.
 	 * @return an instance of <code>LifeCycleEventHandler</code>.
 	 */
+	@Override
 	public LifeCycleEventHandler getLifeCycleEventHandler()
 	{
 		return lifeCycleEventHandler;

@@ -48,21 +48,21 @@ public class JPPFBuffer
 
 	/**
 	 * Initialize this buffer with the specified String, using UTF-8 encoding.
-	 * @param str the string whose contents will be put into this buffer. 
+	 * @param str the string whose contents will be put into this buffer.
 	 */
-	public JPPFBuffer(String str)
+	public JPPFBuffer(final String str)
 	{
 		this.buffer = str.getBytes(StringUtils.UTF_8);
 		this.length = buffer.length;
 	}
 
-	
+
 	/**
 	 * Initialize this buffer with a specified buffer and buffer length.
 	 * @param buffer the buffer to use.
 	 * @param length the number of bytes to use in the buffer.
 	 */
-	public JPPFBuffer(byte[] buffer, int length)
+	public JPPFBuffer(final byte[] buffer, final int length)
 	{
 		this.buffer = buffer;
 		this.length = length;
@@ -72,7 +72,7 @@ public class JPPFBuffer
 	 * Set the buffered data.
 	 * @param buffer an array of bytes containing the data.
 	 */
-	public void setBuffer(byte[] buffer)
+	public void setBuffer(final byte[] buffer)
 	{
 		this.buffer = buffer;
 	}
@@ -85,16 +85,16 @@ public class JPPFBuffer
 	{
 		return buffer;
 	}
-	
+
 	/**
 	 * Set the length of the buffered data.
 	 * @param length the length as an int.
 	 */
-	public void setLength(int length)
+	public void setLength(final int length)
 	{
 		this.length = length;
 	}
-	
+
 	/**
 	 * Get the length of the buffered data.
 	 * @return the length as an int.

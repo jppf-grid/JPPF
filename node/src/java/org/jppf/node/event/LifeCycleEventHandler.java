@@ -53,7 +53,7 @@ public class LifeCycleEventHandler
 	 * Initialize this event handler witht he specified execution manager.
 	 * @param executionManager the object that manages the job executions for the node.
 	 */
-	public LifeCycleEventHandler(NodeExecutionManager executionManager)
+	public LifeCycleEventHandler(final NodeExecutionManager executionManager)
 	{
 		this.executionManager = executionManager;
 	}
@@ -62,7 +62,7 @@ public class LifeCycleEventHandler
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add.
 	 */
-	public void addNodeLifeCycleListener(NodeLifeCycleListener listener)
+	public void addNodeLifeCycleListener(final NodeLifeCycleListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)
@@ -75,7 +75,7 @@ public class LifeCycleEventHandler
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to remove.
 	 */
-	public void removeNodeLifeCycleListener(NodeLifeCycleListener listener)
+	public void removeNodeLifeCycleListener(final NodeLifeCycleListener listener)
 	{
 		if (listener == null) return;
 		synchronized (listeners)

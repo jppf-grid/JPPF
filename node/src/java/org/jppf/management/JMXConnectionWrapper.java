@@ -80,13 +80,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * A string representing this connection, used for logging purposes.
 	 */
 	protected String idString = null;
-  /**
-   * Determines whether the connection to the JMX server has been established.
-   */
+	/**
+	 * Determines whether the connection to the JMX server has been established.
+	 */
 	protected AtomicBoolean connected = new AtomicBoolean(false);
-  /**
-   * Determines whether the connection to the JMX server has been established.
-   */
+	/**
+	 * Determines whether the connection to the JMX server has been established.
+	 */
 	protected boolean local = false;
 
 	/**
@@ -101,9 +101,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * Initialize the connection to the remote MBean server.
 	 * @param host the host the server is running on.
 	 * @param port the RMI port used by the server.
-	 * @param rmiSuffix	RMI registry namespace suffix. 
+	 * @param rmiSuffix	RMI registry namespace suffix.
 	 */
-	public JMXConnectionWrapper(String host, int port, String rmiSuffix)
+	public JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
 	{
 		this.host = host;
 		this.port = port;
@@ -112,7 +112,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 		{
 			idString = host + ':' + port;
 			String s = !JMXServerFactory.isUsingRMIConnector() && JMXServerFactory.isJMXMPPresent()
-				? "service:jmx:jmxmp://" + idString : "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
+			? "service:jmx:jmxmp://" + idString : "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
 			url = new JMXServiceURL(s);
 		}
 		catch(Exception e)
@@ -146,7 +146,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * @param timeout the maximum time to wait for, a value of zero means no timeout and
 	 * this method just waits until the connection is established.
 	 */
-	public void connectAndWait(long timeout)
+	public void connectAndWait(final long timeout)
 	{
 		if (isConnected()) return;
 		long start = System.currentTimeMillis();
@@ -156,7 +156,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 		/*
 		if (isConnected()) return;
 		goToSleep(timeout);
-		*/
+		 */
 	}
 
 	/**
@@ -166,10 +166,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	void performConnection() throws Exception
 	{
 		setConnectedStatus(false);
-    Map<String, Object> env = new HashMap<String, Object>();
-    jmxc = JMXConnectorFactory.connect(url, env);
-  	mbeanConnection.set(jmxc.getMBeanServerConnection());
-  	setConnectedStatus(true);
+		Map<String, Object> env = new HashMap<String, Object>();
+		jmxc = JMXConnectorFactory.connect(url, env);
+		mbeanConnection.set(jmxc.getMBeanServerConnection());
+		setConnectedStatus(true);
 		if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
 	}
 
@@ -180,7 +180,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	public void close() throws Exception
 	{
 		if (connectionThread.get() != null) connectionThread.get().close();
-    if (jmxc != null) jmxc.close();
+		if (jmxc != null) jmxc.close();
 	}
 
 	/**
@@ -192,21 +192,21 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * @return an object or null.
 	 * @throws Exception if the invocation failed.
 	 */
-	public synchronized Object invoke(String name, String methodName, Object[] params, String[] signature) throws Exception
+	public synchronized Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
 	{
 		if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
 		Object result = null;
 		try
 		{
-	    ObjectName mbeanName = new ObjectName(name);
-  		result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+			ObjectName mbeanName = new ObjectName(name);
+			result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
 		}
 		catch(IOException e)
 		{
 			setConnectedStatus(false);
 			try
 			{
-		    if (jmxc != null) jmxc.close();
+				if (jmxc != null) jmxc.close();
 			}
 			catch(Exception e2)
 			{
@@ -225,21 +225,21 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * @return an object or null.
 	 * @throws Exception if the invocation failed.
 	 */
-	public synchronized Object getAttribute(String name, String attribute) throws Exception
+	public synchronized Object getAttribute(final String name, final String attribute) throws Exception
 	{
 		if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
 		Object result = null;
 		try
 		{
-	    ObjectName mbeanName = new ObjectName(name);
-  		result = getMbeanConnection().getAttribute(mbeanName, attribute);
+			ObjectName mbeanName = new ObjectName(name);
+			result = getMbeanConnection().getAttribute(mbeanName, attribute);
 		}
 		catch(IOException e)
 		{
 			setConnectedStatus(false);
 			try
 			{
-		    if (jmxc != null) jmxc.close();
+				if (jmxc != null) jmxc.close();
 			}
 			catch(Exception e2)
 			{
@@ -300,15 +300,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * Set the connected state of this conenction wrapper.
 	 * @param status true if the jmx connection is established, false otherwise.
 	 */
-	protected void setConnectedStatus(boolean status)
+	protected void setConnectedStatus(final boolean status)
 	{
 		boolean changed = status == connected.get();
-  	connected.set(status);
-  	if (changed) wakeUp();
+		connected.set(status);
+		if (changed) wakeUp();
 	}
 
 	/**
-   * Determines whether the connection to the JMX server has been established.
+	 * Determines whether the connection to the JMX server has been established.
 	 * @return true if the connection is established, false otherwise.
 	 */
 	public boolean isConnected()
@@ -324,11 +324,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * @return an instance of the specified proxy interface.
 	 * @throws Exception if any error occurs.
 	 */
-	public <T> T getProxy(String name, Class<T> inf) throws Exception
+	public <T> T getProxy(final String name, final Class<T> inf) throws Exception
 	{
-	  return getProxy(new ObjectName(name), inf);
+		return getProxy(new ObjectName(name), inf);
 	}
-	
+
 	/**
 	 * Obtain a proxy to the soecified remote MBean.
 	 * @param <T> the type of the MBean (must be an interface).
@@ -337,19 +337,20 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	 * @return an instance of the specified proxy interface.
 	 * @throws Exception if any error occurs.
 	 */
-	public <T> T getProxy(ObjectName objectName, Class<T> inf) throws Exception
+	public <T> T getProxy(final ObjectName objectName, final Class<T> inf) throws Exception
 	{
 		// if the connection is not yet established, then connect
 		if (!isConnected()) connectAndWait(5000L);
 		// obtain a connection to the remote MBean server
-	  MBeanServerConnection mbsc = getMbeanConnection();
-	  // finally obtain and return a proxy to the specified remote MBean
-	  return (T) MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
+		MBeanServerConnection mbsc = getMbeanConnection();
+		// finally obtain and return a proxy to the specified remote MBean
+		return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public JPPFSystemInformation systemInformation() throws Exception
 	{
 		throw new JPPFException("this method is not implemented");

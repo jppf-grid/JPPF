@@ -46,7 +46,7 @@ public class RestartTaskAction extends JPPFAbstractNodeAction
 	 * @param taskId id of the task to cancel.
 	 * @param dataArray - the information on the nodes this action applies to.
 	 */
-	public RestartTaskAction(String taskId, TopologyData...dataArray)
+	public RestartTaskAction(final String taskId, final TopologyData...dataArray)
 	{
 		super(dataArray);
 		setupIcon("/org/jppf/ui/resources/restart.gif");
@@ -60,14 +60,14 @@ public class RestartTaskAction extends JPPFAbstractNodeAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		try
 		{
 			Runnable r = new Runnable()
 			{
 				@Override
-                public void run()
+				public void run()
 				{
 					try
 					{

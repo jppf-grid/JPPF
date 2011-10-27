@@ -27,7 +27,7 @@ public class JPPFNodeReloadNotification extends JPPFError
 	 * Initialize this notification with a specified message.
 	 * @param message a text message indicating the reason for this notification.
 	 */
-	public JPPFNodeReloadNotification(String message)
+	public JPPFNodeReloadNotification(final String message)
 	{
 		super(message);
 	}

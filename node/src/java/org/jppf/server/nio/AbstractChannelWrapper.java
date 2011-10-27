@@ -47,12 +47,12 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * The selctor for this channel.
 	 */
 	protected ChannelSelector selector = null;
-	
+
 	/**
 	 * Initialize this channel wrapper with the specified channel.
 	 * @param channel the channel to wrap.
 	 */
-	public AbstractChannelWrapper(S channel)
+	public AbstractChannelWrapper(final S channel)
 	{
 		this.channel = channel;
 	}
@@ -61,7 +61,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * {@inheritDoc}
 	 */
 	@Override
-    public S getChannel()
+	public S getChannel()
 	{
 		return channel;
 	}
@@ -71,7 +71,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#close()
 	 */
 	@Override
-    public void close() throws Exception
+	public void close() throws Exception
 	{
 	}
 
@@ -79,13 +79,13 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * {@inheritDoc}
 	 */
 	@Override
-    public abstract NioContext getContext();
+	public abstract NioContext getContext();
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean isOpen()
+	public boolean isOpen()
 	{
 		return true;
 	}
@@ -94,7 +94,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int hashCode()
+	public int hashCode()
 	{
 		return ((channel == null) ? 0 : channel.hashCode());
 	}
@@ -106,7 +106,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -120,7 +120,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * {@inheritDoc}
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		//return getClass().getSimpleName() + "[id=" + getId() + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
 		StringBuilder sb = new StringBuilder();
@@ -139,7 +139,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#getKeyOps()
 	 */
 	@Override
-    public int getKeyOps()
+	public int getKeyOps()
 	{
 		return 0;
 	}
@@ -149,7 +149,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#setKeyOps(int)
 	 */
 	@Override
-    public void setKeyOps(int keyOps)
+	public void setKeyOps(final int keyOps)
 	{
 	}
 
@@ -158,14 +158,14 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @return the operations as an int value.
 	 */
 	@Override
-    public abstract int getReadyOps();
+	public abstract int getReadyOps();
 
 	/**
 	 * {@inheritDoc}
 	 * @see org.jppf.server.nio.ChannelWrapper#isReadable()
 	 */
 	@Override
-    public boolean isReadable()
+	public boolean isReadable()
 	{
 		return (getReadyOps() & OP_READ) != 0;
 	}
@@ -175,7 +175,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#isWritable()
 	 */
 	@Override
-    public boolean isWritable()
+	public boolean isWritable()
 	{
 		return (getReadyOps() & OP_WRITE) != 0;
 	}
@@ -185,7 +185,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#isAcceptable()
 	 */
 	@Override
-    public boolean isAcceptable()
+	public boolean isAcceptable()
 	{
 		return (getReadyOps() & OP_ACCEPT) != 0;
 	}
@@ -195,7 +195,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#isConnectable()
 	 */
 	@Override
-    public boolean isConnectable()
+	public boolean isConnectable()
 	{
 		return (getReadyOps() & OP_CONNECT) != 0;
 	}
@@ -206,7 +206,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#getSelector()
 	 */
 	@Override
-    public ChannelSelector getSelector()
+	public ChannelSelector getSelector()
 	{
 		return selector;
 	}
@@ -218,7 +218,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @see org.jppf.server.nio.ChannelWrapper#setSelector(org.jppf.server.nio.ChannelSelector)
 	 */
 	@Override
-    public void setSelector(ChannelSelector selector)
+	public void setSelector(final ChannelSelector selector)
 	{
 		this.selector = selector;
 	}

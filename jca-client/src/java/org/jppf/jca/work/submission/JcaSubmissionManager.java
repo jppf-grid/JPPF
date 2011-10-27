@@ -18,7 +18,7 @@
 
 package org.jppf.jca.work.submission;
 
-import static org.jppf.client.SubmissionStatus.*;
+import static org.jppf.client.SubmissionStatus.PENDING;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -71,7 +71,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * @param workManager the work manager provided by the applications server, used to submit asynchronous
 	 * JPPF submissions.
 	 */
-	public JcaSubmissionManager(JPPFJcaClient client, WorkManager workManager)
+	public JcaSubmissionManager(final JPPFJcaClient client, final WorkManager workManager)
 	{
 		this.client = client;
 		this.workManager = workManager;
@@ -81,6 +81,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * Stop this submission manager.
 	 * @see javax.resource.spi.work.Work#release()
 	 */
+	@Override
 	public void release()
 	{
 		setStopped(true);
@@ -92,6 +93,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * when the queue has one and a connnection is available.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		while (!isStopped())
@@ -119,7 +121,8 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * @param job encapsulation of the execution data.
 	 * @return the unique id of the submission.
 	 */
-	public String submitJob(JPPFJob job)
+	@Override
+	public String submitJob(final JPPFJob job)
 	{
 		return submitJob(job, null);
 	}
@@ -130,7 +133,8 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the unique id of the submission.
 	 */
-	public String submitJob(JPPFJob job, SubmissionStatusListener listener)
+	@Override
+	public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
 	{
 		int count = job.getTasks().size();
 		JcaSubmissionResult submission = new JcaSubmissionResult(job);
@@ -149,7 +153,8 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * @param job encapsulation of the execution data.
 	 * @return the unique id of the submission.
 	 */
-	public String resubmitJob(JPPFJob job)
+	@Override
+	public String resubmitJob(final JPPFJob job)
 	{
 		JcaSubmissionResult submission = (JcaSubmissionResult) job.getResultListener();
 		//submission.reset();
@@ -165,7 +170,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */
-	public JcaSubmissionResult peekSubmission(String id)
+	public JcaSubmissionResult peekSubmission(final String id)
 	{
 		return submissionMap.get(id);
 	}
@@ -175,7 +180,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * @param id the id of the submission to find.
 	 * @return the submisison corresponding to the id, or null if the submission could not be found.
 	 */
-	public JcaSubmissionResult pollSubmission(String id)
+	public JcaSubmissionResult pollSubmission(final String id)
 	{
 		return submissionMap.remove(id);
 	}

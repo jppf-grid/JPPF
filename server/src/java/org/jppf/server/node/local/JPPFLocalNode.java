@@ -42,7 +42,7 @@ public class JPPFLocalNode extends JPPFNode
 	 * @param channel the I/O handler for this node.
 	 * @param classLoaderHandler the I/O handler for the class loader.
 	 */
-	public JPPFLocalNode(LocalNodeChannel channel, LocalClassLoaderChannel classLoaderHandler)
+	public JPPFLocalNode(final LocalNodeChannel channel, final LocalClassLoaderChannel classLoaderHandler)
 	{
 		this.channel = channel;
 		this.classLoaderHandler = classLoaderHandler;
@@ -53,7 +53,7 @@ public class JPPFLocalNode extends JPPFNode
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected void initDataChannel() throws Exception
+	protected void initDataChannel() throws Exception
 	{
 		nodeIO = new LocalNodeIO(this);
 	}
@@ -62,7 +62,7 @@ public class JPPFLocalNode extends JPPFNode
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected void closeDataChannel() throws Exception
+	protected void closeDataChannel() throws Exception
 	{
 	}
 

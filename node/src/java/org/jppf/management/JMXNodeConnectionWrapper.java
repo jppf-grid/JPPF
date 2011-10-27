@@ -43,7 +43,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @param host the host the server is running on.
 	 * @param port the RMI port used by the server.
 	 */
-	public JMXNodeConnectionWrapper(String host, int port)
+	public JMXNodeConnectionWrapper(final String host, final int port)
 	{
 		super(host, port, JPPFAdminMBean.NODE_SUFFIX);
 		local = false;
@@ -56,9 +56,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
 	 */
 	@Override
-    public void cancelTask(String id) throws Exception
+	public void cancelTask(final String id) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelTask",	new Object[] { id }, new String[] { "java.lang.String" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelTask",	new Object[] { id }, new String[] { "java.lang.String" });
 	}
 
 	/**
@@ -69,9 +69,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
 	 */
 	@Override
-    public void restartTask(String id) throws Exception
+	public void restartTask(final String id) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restartTask", new Object[] { id }, new String[] { "java.lang.String" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restartTask", new Object[] { id }, new String[] { "java.lang.String" });
 	}
 
 	/**
@@ -81,9 +81,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#state()
 	 */
 	@Override
-    public JPPFNodeState state() throws Exception
+	public JPPFNodeState state() throws Exception
 	{
-		return (JPPFNodeState) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,	"state", (Object[]) null, (String[]) null); 
+		return (JPPFNodeState) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,	"state", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -93,9 +93,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#notification()
 	 */
 	@Override
-    public Serializable notification() throws Exception
+	public Serializable notification() throws Exception
 	{
-		return (Serializable) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "notification", (Object[]) null, (String[]) null); 
+		return (Serializable) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "notification", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -105,9 +105,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
 	 */
 	@Override
-    public void updateThreadPoolSize(Integer size) throws Exception
+	public void updateThreadPoolSize(final Integer size) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize", new Object[] { size }, new String[] { "java.lang.Integer" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadPoolSize", new Object[] { size }, new String[] { "java.lang.Integer" });
 	}
 
 	/**
@@ -118,9 +118,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
 	 */
 	@Override
-    public JPPFSystemInformation systemInformation() throws Exception
+	public JPPFSystemInformation systemInformation() throws Exception
 	{
-		return (JPPFSystemInformation) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,	"systemInformation", (Object[]) null, (String[]) null); 
+		return (JPPFSystemInformation) invoke(JPPFAdminMBean.NODE_MBEAN_NAME,	"systemInformation", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -129,9 +129,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
 	 */
 	@Override
-    public void shutdown() throws Exception
+	public void shutdown() throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "shutdown", (Object[]) null, (String[]) null); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "shutdown", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -140,20 +140,20 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#restart()
 	 */
 	@Override
-    public void restart() throws Exception
+	public void restart() throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restart", (Object[]) null, (String[]) null); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "restart", (Object[]) null, (String[]) null);
 	}
 
 	/**
-	 * Reset the node's executed tasks counter to zero. 
+	 * Reset the node's executed tasks counter to zero.
 	 * @throws Exception if an error is raised when invoking the node mbean.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
 	 */
 	@Override
-    public void resetTaskCounter() throws Exception
+	public void resetTaskCounter() throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "resetTaskCounter", (Object[]) null, (String[]) null); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "resetTaskCounter", (Object[]) null, (String[]) null);
 	}
 
 	/**
@@ -163,9 +163,9 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
 	 */
 	@Override
-    public void setTaskCounter(Integer n) throws Exception
+	public void setTaskCounter(final Integer n) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setTaskCounter", new Object[] { n }, new String[] { "java.lang.Integer" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setTaskCounter", new Object[] { n }, new String[] { "java.lang.Integer" });
 	}
 
 	/**
@@ -175,23 +175,23 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
 	 */
 	@Override
-    public void updateThreadsPriority(Integer newPriority) throws Exception
+	public void updateThreadsPriority(final Integer newPriority) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadsPriority", new Object[] { newPriority }, new String[] { "java.lang.Integer" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateThreadsPriority", new Object[] { newPriority }, new String[] { "java.lang.Integer" });
 	}
 
 	/**
-	 * Update the configuration properties of the node. 
+	 * Update the configuration properties of the node.
 	 * @param config the set of properties to update.
 	 * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if an error is raised when invoking the node mbean.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
 	@Override
-    public void updateConfiguration(Map config, Boolean reconnect) throws Exception
+	public void updateConfiguration(final Map config, final Boolean reconnect) throws Exception
 	{
 		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "updateConfiguration",
-			new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" }); 
+				new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" });
 	}
 
 	/**
@@ -202,26 +202,26 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)
 	 */
 	@Override
-    public void cancelJob(String jobId, Boolean requeue) throws Exception
+	public void cancelJob(final String jobId, final Boolean requeue) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId, requeue }, new String[] { "java.util.String", "java.util.Boolean" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobId, requeue }, new String[] { "java.util.String", "java.util.Boolean" });
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public DelegationModel getDelegationModel() throws Exception
+	public DelegationModel getDelegationModel() throws Exception
 	{
-		return (DelegationModel) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "getDelegationModel", (Object[]) null, (String[]) null); 
+		return (DelegationModel) invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "getDelegationModel", (Object[]) null, (String[]) null);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void setDelegationModel(DelegationModel model) throws Exception
+	public void setDelegationModel(final DelegationModel model) throws Exception
 	{
-		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setDelegationModel", new Object[] { model }, new String[] { "org.jppf.classloader.DelegationModel" }); 
+		invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "setDelegationModel", new Object[] { model }, new String[] { "org.jppf.classloader.DelegationModel" });
 	}
 }

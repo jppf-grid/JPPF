@@ -30,7 +30,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * The object that holds the stats.
 	 */
 	private JPPFStats stats = new JPPFStats();
-	
+
 	/**
 	 * Called to notify that a new client is connected to he JPPF server.
 	 */
@@ -79,7 +79,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param count the number of tasks that have been added to the queue.
 	 */
 	@Override
-	public synchronized void taskInQueue(int count)
+	public synchronized void taskInQueue(final int count)
 	{
 		QueueStats queue = stats.getTaskQueue();
 		StatsSnapshot sizes = queue.getSizes();
@@ -94,7 +94,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param time the time the task remained in the queue.
 	 */
 	@Override
-	public synchronized void taskOutOfQueue(int count, long time)
+	public synchronized void taskOutOfQueue(final int count, final long time)
 	{
 		QueueStats queue = stats.getTaskQueue();
 		StatsSnapshot sizes = queue.getSizes();
@@ -102,7 +102,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 		sizes.setTotal(sizes.getTotal() + count);
 		queue.getTimes().newValues(time, count, sizes.getTotal());
 	}
-	
+
 	/**
 	 * Called when a task execution has completed.
 	 * @param count the number of tasks that have been executed.
@@ -111,7 +111,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	 * @param size the size in bytes of the bundle that was sent to the node.
 	 */
 	@Override
-	public synchronized void taskExecuted(int count, long time, long remoteTime, long size)
+	public synchronized void taskExecuted(final int count, final long time, final long remoteTime, final long size)
 	{
 		stats.setTotalTasksExecuted(stats.getTotalTasksExecuted() + count);
 		stats.getExecution().newValues(time, count, stats.getTotalTasksExecuted());
@@ -151,10 +151,11 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized void jobQueued(final int nbTasks)
 	{
 		StatsSnapshot sizes = stats.getJobQueue().getSizes();
-		long n = sizes.getLatest() + 1; 
+		long n = sizes.getLatest() + 1;
 		StatsSnapshot jobTasks = stats.getJobTasks();
 		jobTasks.newValues(nbTasks, sizes.getTotal());
 		sizes.setLatest(n);
@@ -165,6 +166,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized void jobEnded(final long time)
 	{
 		StatsSnapshot sizes = stats.getJobQueue().getSizes();

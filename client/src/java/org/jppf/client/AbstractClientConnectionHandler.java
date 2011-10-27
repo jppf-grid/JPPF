@@ -76,12 +76,12 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * Initialize this connection with the specified owner.
 	 * @param owner the client connection which owns this connection handler.
 	 */
-	protected AbstractClientConnectionHandler(JPPFClientConnection owner)
+	protected AbstractClientConnectionHandler(final JPPFClientConnection owner)
 	{
 		this.owner = owner;
 		if (owner != null) this.name = owner.getName();
 		long configSocketIdle = JPPFConfiguration.getProperties().getLong("jppf.socket.max-idle", -1L);
-		maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L; 
+		maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
 	}
 
 	/**
@@ -90,7 +90,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @see org.jppf.client.ClientConnectionHandler#getStatus()
 	 */
 	@Override
-    public JPPFClientConnectionStatus getStatus()
+	public JPPFClientConnectionStatus getStatus()
 	{
 		return status.get();
 	}
@@ -101,10 +101,10 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @see org.jppf.client.ClientConnectionHandler#setStatus(org.jppf.client.JPPFClientConnectionStatus)
 	 */
 	@Override
-    public void setStatus(JPPFClientConnectionStatus newStatus)
+	public void setStatus(final JPPFClientConnectionStatus newStatus)
 	{
-        JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
-        if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
+		JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
+		if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @see org.jppf.client.ClientConnectionHandler#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-    public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
+	public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -127,7 +127,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @see org.jppf.client.ClientConnectionHandler#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
 	 */
 	@Override
-    public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
+	public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -162,11 +162,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
 	 * @throws Exception if any error occurs.
 	 */
 	@Override
-    public SocketWrapper getSocketClient() throws Exception
+	public SocketWrapper getSocketClient() throws Exception
 	{
 		// If the socket has been idle too long, recycle the connection.
-		if ((maxSocketIdleMillis > 10000L) 
-			&& (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
+		if ((maxSocketIdleMillis > 10000L)
+				&& (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
 		{
 			close();
 			init();

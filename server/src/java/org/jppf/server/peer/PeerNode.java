@@ -18,8 +18,8 @@
 package org.jppf.server.peer;
 
 import org.jppf.JPPFException;
-import org.jppf.comm.socket.SocketClient;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.AbstractNode;
@@ -51,10 +51,10 @@ class PeerNode extends AbstractNode
 	 * The name of the peer in the configuration file.
 	 */
 	private final String peerName;
-    /**
-     * Peer connection information.
-     */
-    private final JPPFConnectionInformation connectionInfo;
+	/**
+	 * Peer connection information.
+	 */
+	private final JPPFConnectionInformation connectionInfo;
 	/**
 	 * Input source for the socket client.
 	 */
@@ -71,15 +71,15 @@ class PeerNode extends AbstractNode
 	/**
 	 * Initialize this peer node with the specified configuration name.
 	 * @param peerName the name of the peer int he configuration file.
-     * @param connectionInfo peer connection information.
+	 * @param connectionInfo peer connection information.
 	 */
 	public PeerNode(final String peerName, final JPPFConnectionInformation connectionInfo)
 	{
-        if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-        if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+		if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+		if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
 		this.peerName = peerName;
-        this.connectionInfo = connectionInfo;
+		this.connectionInfo = connectionInfo;
 		//this.uuid = new JPPFUuid().toString();
 		this.uuid = driver.getUuid();
 		this.helper = new SerializationHelperImpl();
@@ -90,7 +90,7 @@ class PeerNode extends AbstractNode
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		stopped = false;
 		if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
@@ -104,7 +104,7 @@ class PeerNode extends AbstractNode
 			{
 				setStopped(true);
 				if (socketInitializer != null) socketInitializer.close();
-                driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
+				driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
 				if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
 			}
 			if (!isStopped())
@@ -231,8 +231,8 @@ class PeerNode extends AbstractNode
 	public void initSocketClient() throws Exception
 	{
 		if (debugEnabled) log.debug(getName() + "initializing socket client");
-        String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
-        int port = connectionInfo.serverPorts[0];
+		String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
+		int port = connectionInfo.serverPorts[0];
 		socketClient = new SocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);
@@ -245,7 +245,7 @@ class PeerNode extends AbstractNode
 	private void initCredentials()
 	{
 	}
-	
+
 	/**
 	 * Perform the deserialization of the objects received through the socket connection.
 	 * @return an array of deserialized objects.

@@ -18,8 +18,8 @@
 
 package org.jppf.server.job;
 
-import org.jppf.server.nio.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.protocol.ServerJob;
 import org.jppf.utils.Pair;
 
 /**
@@ -33,7 +33,7 @@ public class ChannelJobPair extends Pair<ChannelWrapper<?>, ServerJob>
 	 * @param first - the first object of this pair.
 	 * @param second - the second object of this pair.
 	 */
-	public ChannelJobPair(ChannelWrapper<?> first, ServerJob second)
+	public ChannelJobPair(final ChannelWrapper<?> first, final ServerJob second)
 	{
 		super(first, second);
 	}
@@ -45,7 +45,7 @@ public class ChannelJobPair extends Pair<ChannelWrapper<?>, ServerJob>
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (obj == null) return false;
 		if (!obj.getClass().equals(this.getClass())) return false;

@@ -31,7 +31,7 @@ public class FixedSizeBundler extends AbstractBundler
 	 * Initialize this bundler.
 	 * @param profile - contains the parameters for this bundler.
 	 */
-	public FixedSizeBundler(LoadBalancingProfile profile)
+	public FixedSizeBundler(final LoadBalancingProfile profile)
 	{
 		super(profile);
 	}
@@ -42,7 +42,7 @@ public class FixedSizeBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
 	 */
 	@Override
-    public int getBundleSize()
+	public int getBundleSize()
 	{
 		return ((FixedSizeProfile) profile).getSize();
 	}
@@ -53,7 +53,7 @@ public class FixedSizeBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
 	@Override
-    public Bundler copy()
+	public Bundler copy()
 	{
 		return new FixedSizeBundler(profile.copy());
 	}
@@ -64,7 +64,7 @@ public class FixedSizeBundler extends AbstractBundler
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
 	 */
 	@Override
-    protected int maxSize()
+	protected int maxSize()
 	{
 		return -1;
 	}

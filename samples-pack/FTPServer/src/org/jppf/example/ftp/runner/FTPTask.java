@@ -44,15 +44,16 @@ public class FTPTask extends JPPFTask
 	 * @param inFile the file to download from the driver.
 	 * @param outFile the place where to store the downloaded file.
 	 */
-	public FTPTask(String inFile, String outFile)
+	public FTPTask(final String inFile, final String outFile)
 	{
 		this.inFile = inFile;
 		this.outFile = outFile;
 	}
-	
+
 	/**
 	 * Download a text file from the driver, process it, store the result in an HTML file and upload it to the driver.
 	 */
+	@Override
 	public void run()
 	{
 		try

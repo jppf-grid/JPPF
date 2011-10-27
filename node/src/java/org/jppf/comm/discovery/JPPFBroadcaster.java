@@ -58,7 +58,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	 * Initialize this broadcaster using the server configuration information.
 	 * @param info holds the driver connection information to broadcast.
 	 */
-	public JPPFBroadcaster(JPPFConnectionInformation info)
+	public JPPFBroadcaster(final JPPFConnectionInformation info)
 	{
 		this.info = info;
 	}

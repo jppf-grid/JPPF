@@ -42,7 +42,7 @@ public class Bar3DChartHandler implements ChartHandler
 	 * Initialize this chart handler with a specified stats formatter.
 	 * @param statsHandler the stats formatter that provides the data.
 	 */
-	public Bar3DChartHandler(StatsHandler statsHandler)
+	public Bar3DChartHandler(final StatsHandler statsHandler)
 	{
 		this.statsHandler = statsHandler;
 	}
@@ -54,15 +54,15 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration createChart(ChartConfiguration config)
+	public ChartConfiguration createChart(final ChartConfiguration config)
 	{
 		Object ds = createDataset(config);
 		//JFreeChart chart = ChartFactory.createBarChart3D(null, null, config.name, ds, PlotOrientation.HORIZONTAL, false, true, false);
 		Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createBarChart3D",
-			config.name, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "HORIZONTAL"), false, true, false);
+				config.name, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "HORIZONTAL"), false, true, false);
 		//CategoryPlot plot = chart.getCategoryPlot();
 		Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
-    //plot.setForegroundAlpha(1.0f);
+		//plot.setForegroundAlpha(1.0f);
 		invokeMethod(plot.getClass(), plot, "setForegroundAlpha", 1.0f);
 		//CategoryAxis axis = plot.getDomainAxis();
 		Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
@@ -84,27 +84,27 @@ public class Bar3DChartHandler implements ChartHandler
 		invokeMethod(rend.getClass(), rend, "setSeriesPaint", new Class[] {Integer.TYPE, Paint.class}, 0, c1);
 		//rend.setBaseItemLabelGenerator(new LabelGenerator(config.unit, config.precision));
 		Object labelGenerator = Proxy.newProxyInstance(
-			getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategoryItemLabelGenerator"),
-			new CategoryItemLabelGeneratorInvocationHandler(config.unit, config.precision));
+				getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategoryItemLabelGenerator"),
+				new CategoryItemLabelGeneratorInvocationHandler(config.unit, config.precision));
 		invokeMethod(rend.getClass(), rend, "setBaseItemLabelGenerator", labelGenerator);
 
-    //ItemLabelPosition labelPos = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_CENTER);
+		//ItemLabelPosition labelPos = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_CENTER);
 		Class itemLabelAnchorClass = getClass0("org.jfree.chart.labels.ItemLabelAnchor");
 		Class textAnchorClass = getClass0("org.jfree.ui.TextAnchor");
-    Object labelPos = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
-    	new Class[] {itemLabelAnchorClass, textAnchorClass},
-    	getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_CENTER"));
+		Object labelPos = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
+				new Class[] {itemLabelAnchorClass, textAnchorClass},
+				getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_CENTER"));
 		//rend.setBasePositiveItemLabelPosition(labelPos);
-    Class labelPositionClass = getClass0("org.jfree.chart.labels.ItemLabelPosition");
-    invokeMethod(rend.getClass(), rend, "setBasePositiveItemLabelPosition", new Class[] {labelPositionClass}, labelPos);
-    //ItemLabelPosition labelPos2 = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_LEFT);
-    Object labelPos2 = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
-    	new Class[] {itemLabelAnchorClass, textAnchorClass},
-    	getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_LEFT"));
+		Class labelPositionClass = getClass0("org.jfree.chart.labels.ItemLabelPosition");
+		invokeMethod(rend.getClass(), rend, "setBasePositiveItemLabelPosition", new Class[] {labelPositionClass}, labelPos);
+		//ItemLabelPosition labelPos2 = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_LEFT);
+		Object labelPos2 = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
+				new Class[] {itemLabelAnchorClass, textAnchorClass},
+				getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_LEFT"));
 		//rend.setPositiveItemLabelPositionFallback(labelPos2);
-    invokeMethod(rend.getClass(), rend, "setPositiveItemLabelPositionFallback", new Class[] {labelPositionClass}, labelPos2);
+		invokeMethod(rend.getClass(), rend, "setPositiveItemLabelPositionFallback", new Class[] {labelPositionClass}, labelPos2);
 		//rend.setBaseItemLabelsVisible(true);
-    invokeMethod(rend.getClass(), rend, "setBaseItemLabelsVisible", new Class[] {Boolean.class}, true);
+		invokeMethod(rend.getClass(), rend, "setBaseItemLabelsVisible", new Class[] {Boolean.class}, true);
 		config.chart = chart;
 		return config;
 	}
@@ -114,7 +114,7 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @param config the names of the fields whose values populate the dataset.
 	 * @return a <code>DefaultCategoryDataset</code> instance.
 	 */
-	private Object createDataset(ChartConfiguration config)
+	private Object createDataset(final ChartConfiguration config)
 	{
 		//DefaultCategoryDataset ds = new DefaultCategoryDataset();
 		Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
@@ -122,7 +122,7 @@ public class Bar3DChartHandler implements ChartHandler
 		populateDataset(config);
 		return ds;
 	}
-	
+
 	/**
 	 * Populate a dataset based on a chart configuration.
 	 * @param config the chart configuration containing the dataset to populate.
@@ -130,7 +130,7 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration populateDataset(ChartConfiguration config)
+	public ChartConfiguration populateDataset(final ChartConfiguration config)
 	{
 		//((DefaultCategoryDataset) config.dataset).clear();
 		invokeMethod(config.dataset.getClass(), config.dataset, "clear");
@@ -144,7 +144,7 @@ public class Bar3DChartHandler implements ChartHandler
 	 * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
 	 */
 	@Override
-    public ChartConfiguration updateDataset(ChartConfiguration config)
+	public ChartConfiguration updateDataset(final ChartConfiguration config)
 	{
 		Object ds = config.dataset;
 		Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
@@ -178,11 +178,11 @@ public class Bar3DChartHandler implements ChartHandler
 		private Object stdGenerator = newInstance("org.jfree.chart.labels.StandardCategoryItemLabelGenerator");
 
 		/**
-		 * Initialize this label generator by configuring the NumberFormat instance it uses. 
+		 * Initialize this label generator by configuring the NumberFormat instance it uses.
 		 * @param unit the unit to display for the values.
 		 * @param precision the number of fraction digits to display for the values.
 		 */
-		public CategoryItemLabelGeneratorInvocationHandler(String unit, int precision)
+		public CategoryItemLabelGeneratorInvocationHandler(final String unit, final int precision)
 		{
 			this.unit = unit;
 			nf.setGroupingUsed(true);
@@ -201,7 +201,7 @@ public class Bar3DChartHandler implements ChartHandler
 		 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 		 */
 		@Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
 		{
 			if ("".equals(method.getName()))
 			{

@@ -40,7 +40,7 @@ public class SimpleData implements Serializable
 	 * Initialize with a String.
 	 * @param str the string to init with.
 	 */
-	public SimpleData(String str)
+	public SimpleData(final String str)
 	{
 		this.str = str;
 	}

@@ -36,7 +36,7 @@ public final class ScriptRunnerFactory
 	 * @return A <code>ScriptRunner</code> instance, or null if no known sciprt runner
 	 * exists for the specified language.
 	 */
-	public static ScriptRunner makeScriptRunner(String language)
+	public static ScriptRunner makeScriptRunner(final String language)
 	{
 		if ("javascript".equalsIgnoreCase(language)) return new RhinoScriptRunner();
 		else if ("groovy".equalsIgnoreCase(language)) return new GroovyScriptRunner();

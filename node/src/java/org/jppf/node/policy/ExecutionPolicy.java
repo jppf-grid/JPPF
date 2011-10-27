@@ -54,7 +54,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 * @param rules rules to combine this one with.
 	 * @return an execution policy that combines the this policy with the operand in an "AND" operation.
 	 */
-	public ExecutionPolicy and(ExecutionPolicy...rules)
+	public ExecutionPolicy and(final ExecutionPolicy...rules)
 	{
 		return new AndRule(makeRuleArray(this, rules));
 	}
@@ -64,7 +64,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 * @param rules rules to combine this one with.
 	 * @return an execution policy that combines the this policy with the operand in an "OR" operation.
 	 */
-	public ExecutionPolicy or(ExecutionPolicy...rules)
+	public ExecutionPolicy or(final ExecutionPolicy...rules)
 	{
 		return new OrRule(makeRuleArray(this, rules));
 	}
@@ -74,7 +74,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 * @param rules rules to combine this one with.
 	 * @return an execution policy that combines the this policy with the operand in an "XOR" operation.
 	 */
-	public ExecutionPolicy xor(ExecutionPolicy...rules)
+	public ExecutionPolicy xor(final ExecutionPolicy...rules)
 	{
 		return new XorRule(makeRuleArray(this, rules));
 	}
@@ -89,12 +89,12 @@ public abstract class ExecutionPolicy implements Serializable
 	}
 
 	/**
-	 * Generate  new array with size +1 and the specified rule as first element. 
+	 * Generate  new array with size +1 and the specified rule as first element.
 	 * @param rule the rule to set as first element.
 	 * @param ruleArray the array of other rules.
 	 * @return an array of <code>ExceutionPolicy</code> instances.
 	 */
-	private static ExecutionPolicy[] makeRuleArray(ExecutionPolicy rule, ExecutionPolicy[] ruleArray)
+	private static ExecutionPolicy[] makeRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray)
 	{
 		ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
 		int count = 0;
@@ -109,7 +109,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 * @param name the name of the proeprty to look for.
 	 * @return the value of the property, or null if it could not be found.
 	 */
-	public String getProperty(JPPFSystemInformation info, String name)
+	public String getProperty(final JPPFSystemInformation info, final String name)
 	{
 		for (TypedProperties props: info.getPropertiesArray())
 		{
@@ -144,7 +144,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * Initialize this binary logical operator with the specified operands.
 		 * @param rules the first operand.
 		 */
-		public LogicalRule(ExecutionPolicy...rules)
+		public LogicalRule(final ExecutionPolicy...rules)
 		{
 			this.rules = rules;
 		}
@@ -155,7 +155,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
-        public String toString()
+		public String toString()
 		{
 			synchronized(ExecutionPolicy.class)
 			{
@@ -181,7 +181,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * Initialize this AND operator with the specified operands.
 		 * @param rules the rules to combine.
 		 */
-		public AndRule(ExecutionPolicy...rules)
+		public AndRule(final ExecutionPolicy...rules)
 		{
 			super(rules);
 		}
@@ -193,7 +193,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
 		@Override
-        public boolean accepts(JPPFSystemInformation info)
+		public boolean accepts(final JPPFSystemInformation info)
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = true;
@@ -207,7 +207,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
-        public String toString()
+		public String toString()
 		{
 			if (computedToString == null)
 			{
@@ -229,7 +229,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * Initialize this OR operator with the specified operands.
 		 * @param rules the rules to combine.
 		 */
-		public OrRule(ExecutionPolicy...rules)
+		public OrRule(final ExecutionPolicy...rules)
 		{
 			super(rules);
 		}
@@ -241,7 +241,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
 		@Override
-        public boolean accepts(JPPFSystemInformation info)
+		public boolean accepts(final JPPFSystemInformation info)
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = false;
@@ -255,7 +255,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
-        public String toString()
+		public String toString()
 		{
 			if (computedToString == null)
 			{
@@ -277,7 +277,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * Initialize this OR operator with the specified operands.
 		 * @param rules the rules to combine.
 		 */
-		public XorRule(ExecutionPolicy...rules)
+		public XorRule(final ExecutionPolicy...rules)
 		{
 			super(rules);
 		}
@@ -289,7 +289,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
 		@Override
-        public boolean accepts(JPPFSystemInformation info)
+		public boolean accepts(final JPPFSystemInformation info)
 		{
 			if ((rules == null) || (rules.length <= 0)) return true;
 			boolean b = rules[0].accepts(info);
@@ -303,7 +303,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
-        public String toString()
+		public String toString()
 		{
 			if (computedToString == null)
 			{
@@ -330,7 +330,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * Initialize this binary logical operator with the specified operands.
 		 * @param rule the operand.
 		 */
-		public NotRule(ExecutionPolicy rule)
+		public NotRule(final ExecutionPolicy rule)
 		{
 			this.rule = rule;
 		}
@@ -342,7 +342,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 		 */
 		@Override
-        public boolean accepts(JPPFSystemInformation info)
+		public boolean accepts(final JPPFSystemInformation info)
 		{
 			return !rule.accepts(info);
 		}
@@ -353,7 +353,7 @@ public abstract class ExecutionPolicy implements Serializable
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
-        public String toString()
+		public String toString()
 		{
 			if (computedToString == null)
 			{

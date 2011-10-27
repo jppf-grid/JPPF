@@ -70,7 +70,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String script, java.util.Map)
 	 */
 	@Override
-    public Object evaluate(String script, Map<String, Object> variables) throws JPPFScriptingException
+	public Object evaluate(final String script, final Map<String, Object> variables) throws JPPFScriptingException
 	{
 		return evaluate(null, script, variables);
 	}
@@ -87,7 +87,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
 	 */
 	@Override
-    public Object evaluate(String scriptId, String script, Map<String, Object> variables) throws JPPFScriptingException
+	public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException
 	{
 		init();
 		errorHandler.errors.clear();
@@ -137,7 +137,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#init()
 	 */
 	@Override
-    public void init()
+	public void init()
 	{
 		context = new ContextFactory().enterContext();
 		//scope = context.initStandardObjects(null);
@@ -150,7 +150,7 @@ public class RhinoScriptRunner implements ScriptRunner
 	 * @see org.jppf.scripting.ScriptRunner#cleanup()
 	 */
 	@Override
-    public void cleanup()
+	public void cleanup()
 	{
 		Context.exit();
 	}
@@ -166,53 +166,53 @@ public class RhinoScriptRunner implements ScriptRunner
 		public List<String> errors = new LinkedList<String>();
 
 		/**
-     * Report an error.
-     * If execution has not yet begun, the JavaScript engine is free to
-     * find additional errors rather than terminating the translation.
-     * It will not execute a script that had errors, however.
-     * @param message a String describing the error
-     * @param sourceName a String describing the JavaScript source
-     * where the error occured; typically a filename or URL
-     * @param line the line number associated with the error
-     * @param lineSource the text of the line (may be null)
-     * @param lineOffset the offset into lineSource where problem was detected
+		 * Report an error.
+		 * If execution has not yet begun, the JavaScript engine is free to
+		 * find additional errors rather than terminating the translation.
+		 * It will not execute a script that had errors, however.
+		 * @param message a String describing the error
+		 * @param sourceName a String describing the JavaScript source
+		 * where the error occured; typically a filename or URL
+		 * @param line the line number associated with the error
+		 * @param lineSource the text of the line (may be null)
+		 * @param lineOffset the offset into lineSource where problem was detected
 		 * @see org.mozilla.javascript.ErrorReporter#error(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
 		@Override
-		public void error(String message, String sourceName, int line, String lineSource, int lineOffset)
+		public void error(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset)
 		{
 			errors.add(makeErrorString(message, sourceName, line, lineSource, lineOffset));
 		}
 
 		/**
-     * Report a warning.
-     * @param message a String describing the warning
-     * @param sourceName a String describing the JavaScript source
-     * where the warning occured; typically a filename or URL
-     * @param line the line number associated with the warning
-     * @param lineSource the text of the line (may be null)
-     * @param lineOffset the offset into lineSource where problem was detected
+		 * Report a warning.
+		 * @param message a String describing the warning
+		 * @param sourceName a String describing the JavaScript source
+		 * where the warning occured; typically a filename or URL
+		 * @param line the line number associated with the warning
+		 * @param lineSource the text of the line (may be null)
+		 * @param lineOffset the offset into lineSource where problem was detected
 		 * @see org.mozilla.javascript.ErrorReporter#warning(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
 		@Override
-		public void warning(String message, String sourceName, int line, String lineSource, int lineOffset)
+		public void warning(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset)
 		{
 		}
-	
+
 		/**
-     * Creates an EvaluatorException that may be thrown.
-     * runtimeErrors, unlike errors, will always terminate the current script.
-     * @param message a String describing the error
-     * @param sourceName a String describing the JavaScript source
-     * where the error occured; typically a filename or URL
-     * @param line the line number associated with the error
-     * @param lineSource the text of the line (may be null)
-     * @param lineOffset the offset into lineSource where problem was detected
-     * @return an EvaluatorException that will be thrown.
+		 * Creates an EvaluatorException that may be thrown.
+		 * runtimeErrors, unlike errors, will always terminate the current script.
+		 * @param message a String describing the error
+		 * @param sourceName a String describing the JavaScript source
+		 * where the error occured; typically a filename or URL
+		 * @param line the line number associated with the error
+		 * @param lineSource the text of the line (may be null)
+		 * @param lineOffset the offset into lineSource where problem was detected
+		 * @return an EvaluatorException that will be thrown.
 		 * @see org.mozilla.javascript.ErrorReporter#runtimeError(java.lang.String, java.lang.String, int, java.lang.String, int)
 		 */
 		@Override
-		public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset)
+		public EvaluatorException runtimeError(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset)
 		{
 			String s = makeErrorString(message, sourceName, line, lineSource, lineOffset);
 			errors.add(s);
@@ -221,15 +221,15 @@ public class RhinoScriptRunner implements ScriptRunner
 
 		/**
 		 * Generate a single string form the parametrs of an error or warning.
-     * @param message a String describing the warning
-     * @param sourceName a String describing the JavaScript source
-     * where the warning occured; typically a filename or URL
-     * @param line the line number associated with the warning
-     * @param lineSource the text of the line (may be null)
-     * @param lineOffset the offset into lineSource where problem was detected
+		 * @param message a String describing the warning
+		 * @param sourceName a String describing the JavaScript source
+		 * where the warning occured; typically a filename or URL
+		 * @param line the line number associated with the warning
+		 * @param lineSource the text of the line (may be null)
+		 * @param lineOffset the offset into lineSource where problem was detected
 		 * @return a string containing the information about the error.
 		 */
-		private static String makeErrorString(String message, String sourceName, int line, String lineSource, int lineOffset)
+		private static String makeErrorString(final String message, final String sourceName, final int line, final String lineSource, final int lineOffset)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append(message).append(" at ").append(line).append(':').append(lineOffset).append(":\n");

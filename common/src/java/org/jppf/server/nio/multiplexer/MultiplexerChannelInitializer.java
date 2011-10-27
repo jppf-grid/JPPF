@@ -25,7 +25,7 @@ import org.slf4j.*;
  * Instances of this class act as a separate thread wrapper around a channel handler.
  * @author Laurent Cohen
  */
-public class MultiplexerChannelInitializer implements Runnable 
+public class MultiplexerChannelInitializer implements Runnable
 {
 	/**
 	 * Logger for this class.
@@ -40,7 +40,7 @@ public class MultiplexerChannelInitializer implements Runnable
 	 * Instantiate this initializer with the specified parameters.
 	 * @param channelHandler wrapper for the new connection to establish.
 	 */
-	public MultiplexerChannelInitializer(AbstractSocketChannelHandler channelHandler)
+	public MultiplexerChannelInitializer(final AbstractSocketChannelHandler channelHandler)
 	{
 		this.channelHandler = channelHandler;
 	}
@@ -50,7 +50,7 @@ public class MultiplexerChannelInitializer implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

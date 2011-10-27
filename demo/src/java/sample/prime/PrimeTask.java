@@ -33,18 +33,18 @@ public class PrimeTask extends JPPFTask
 	 * BigInteger representation of 0.
 	 */
 	private static final BigInteger ZERO = BigInteger.ZERO;
-  /**
+	/**
 	 * BigInteger representation of 1.
-   */
-  private static final BigInteger ONE = BigInteger.ONE;
-  /**
+	 */
+	private static final BigInteger ONE = BigInteger.ONE;
+	/**
 	 * BigInteger representation of 2.
-   */
-  private static final BigInteger TWO = new BigInteger("2");
-  /**
+	 */
+	private static final BigInteger TWO = new BigInteger("2");
+	/**
 	 * BigInteger representation of 4.
-   */
-  private static final BigInteger FOUR = new BigInteger("4");
+	 */
+	private static final BigInteger FOUR = new BigInteger("4");
 	/**
 	 * The exponent for the number to test. That number is 2^exponent - 1.
 	 */
@@ -58,7 +58,7 @@ public class PrimeTask extends JPPFTask
 	 * Initialize this task with a specified row of values to multiply.
 	 * @param exponent the values as an array of <code>double</code> values.
 	 */
-	public PrimeTask(int exponent)
+	public PrimeTask(final int exponent)
 	{
 		this.exponent = exponent;
 		//System.out.println("initializing mersenne");
@@ -67,7 +67,7 @@ public class PrimeTask extends JPPFTask
 		mersenne = TWO.pow(exponent).subtract(ONE);
 		elapsed1 = System.currentTimeMillis() - elapsed1;
 		System.out.println("elapsed1 = " + elapsed1);
-		*/
+		 */
 		long elapsed2 = System.currentTimeMillis();
 		int n1 = exponent / 8;
 		int n2 = exponent % 8;
@@ -86,13 +86,13 @@ public class PrimeTask extends JPPFTask
 		//System.out.println("elapsed2 = " + elapsed2);
 		//System.out.println("mersenne initialized");
 	}
-	
+
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

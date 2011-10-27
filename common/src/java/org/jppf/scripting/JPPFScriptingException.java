@@ -30,7 +30,7 @@ public class JPPFScriptingException extends JPPFException
 	 * @param message the message for this exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFScriptingException(String message, Throwable cause)
+	public JPPFScriptingException(final String message, final Throwable cause)
 	{
 		super(message, cause);
 	}
@@ -39,7 +39,7 @@ public class JPPFScriptingException extends JPPFException
 	 * Initialize this exception with a specified message.
 	 * @param message the message for this exception.
 	 */
-	public JPPFScriptingException(String message)
+	public JPPFScriptingException(final String message)
 	{
 		super(message);
 	}
@@ -48,7 +48,7 @@ public class JPPFScriptingException extends JPPFException
 	 * Initialize this exception with a specified cause exception.
 	 * @param cause the cause exception.
 	 */
-	public JPPFScriptingException(Throwable cause)
+	public JPPFScriptingException(final Throwable cause)
 	{
 		super(cause);
 	}

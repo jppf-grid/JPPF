@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 import org.slf4j.*;
 
 /**
- * Utility methods to localize messages in the JPPF components. 
+ * Utility methods to localize messages in the JPPF components.
  * @author Laurent Cohen
  */
 public final class LocalizationUtils
@@ -43,7 +43,7 @@ public final class LocalizationUtils
 	 * it could not be localized.
 	 * @see java.util.ResourceBundle
 	 */
-	public static String getLocalized(String baseName, String key)
+	public static String getLocalized(final String baseName, final String key)
 	{
 		return getLocalized(baseName, key, key);
 	}
@@ -58,7 +58,7 @@ public final class LocalizationUtils
 	 * it could not be localized.
 	 * @see java.util.ResourceBundle
 	 */
-	public static String getLocalized(String baseName, String key, String def)
+	public static String getLocalized(final String baseName, final String key, final String def)
 	{
 		if (baseName == null) return def;
 		ResourceBundle bundle = null;
@@ -89,7 +89,7 @@ public final class LocalizationUtils
 	 * @param filename the filename from which to get the resource bundle name.
 	 * @return the complete path to a resource bundle.
 	 */
-	public static String getLocalisationBase(String base, String filename)
+	public static String getLocalisationBase(final String base, final String filename)
 	{
 		String result = null;
 		try

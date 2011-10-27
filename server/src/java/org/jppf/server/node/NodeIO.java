@@ -21,7 +21,7 @@ package org.jppf.server.node;
 import java.util.List;
 
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.Pair;
 
 /**

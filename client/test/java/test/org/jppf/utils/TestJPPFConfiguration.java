@@ -65,7 +65,7 @@ public class TestJPPFConfiguration
 		 * {@inheritDoc}
 		 */
 		@Override
-        public InputStream getPropertyStream() throws IOException
+		public InputStream getPropertyStream() throws IOException
 		{
 			String props = "jppf.config.source.origin = string";
 			JPPFBuffer buffer = new JPPFBuffer(props);

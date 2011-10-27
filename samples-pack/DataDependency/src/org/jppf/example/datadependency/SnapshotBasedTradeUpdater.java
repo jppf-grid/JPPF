@@ -42,7 +42,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Used to synchronize access to pending updates. 
+	 * Used to synchronize access to pending updates.
 	 */
 	private ReentrantLock lock = new ReentrantLock();
 	/**
@@ -68,6 +68,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 	/**
 	 * Main loop.
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -76,7 +77,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 			initializeData();
 			// start the ticker
 			Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
-				config.getInt("nbTickerEvents", 0), dataFactory);
+					config.getInt("nbTickerEvents", 0), dataFactory);
 			ticker.addTickerListener(marketDataHandler);
 			ticker.addTickerListener(this);
 			long snapshotInterval = config.getLong("snapshotInterval", 1000L);
@@ -124,7 +125,8 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 	 * @param event encapsulated the market data update.
 	 * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
 	 */
-	public void marketDataUpdated(TickerEvent event)
+	@Override
+	public void marketDataUpdated(final TickerEvent event)
 	{
 		if (jobExecutor.isShutdown()) return;
 		if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());
@@ -150,6 +152,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 		 * Process all pending updates.
 		 * @see java.util.TimerTask#run()
 		 */
+		@Override
 		public void run()
 		{
 			if (jobExecutor.isTerminated())

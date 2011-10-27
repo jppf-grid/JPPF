@@ -39,6 +39,7 @@ public class TaskNotifier implements JPPFNodeStartupSPI
 	 * This is a test of a node startup class.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		System.out.println("Initializing the tasks notifier");
@@ -53,7 +54,7 @@ public class TaskNotifier implements JPPFNodeStartupSPI
 		// Get a reference ot the local MBean server
 		JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper();
 		jmxWrapper.connectAndWait(3000L);
-		if (!jmxWrapper.isConnected()) 
+		if (!jmxWrapper.isConnected())
 		{
 			System.out.println("Error: could not connect to the local MBean server");
 			return;
@@ -63,10 +64,10 @@ public class TaskNotifier implements JPPFNodeStartupSPI
 		{
 			ObjectName objectName = new ObjectName(TaskNotificationsMBean.MBEAN_NAME);
 			//obtain the MBean server connection
-		  MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
-		  // create the proxy instance
-		  mbean = (TaskNotificationsMBean) MBeanServerInvocationHandler.newProxyInstance(
-		  	mbsc, objectName, TaskNotificationsMBean.class, true);
+			MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
+			// create the proxy instance
+			mbean = MBeanServerInvocationHandler.newProxyInstance(
+					mbsc, objectName, TaskNotificationsMBean.class, true);
 			System.out.println("  task notifier successfully initialized");
 		}
 		catch(Exception e)
@@ -79,7 +80,7 @@ public class TaskNotifier implements JPPFNodeStartupSPI
 	 * Send a notification message to all registered listeners.
 	 * @param message the message to send to all registered listeners.
 	 */
-	public static void addNotification(String message)
+	public static void addNotification(final String message)
 	{
 		if (mbean == null) return;
 		mbean.sendTaskNotification(message);
@@ -90,7 +91,7 @@ public class TaskNotifier implements JPPFNodeStartupSPI
 	 * @param message the message to send to all registered listeners.
 	 * @param userData additional (non trivial) data that may additionally be sent with the message.
 	 */
-	public static void addNotification(String message, Object userData)
+	public static void addNotification(final String message, final Object userData)
 	{
 		if (mbean == null) return;
 		mbean.sendTaskNotification(message, userData);

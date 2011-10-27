@@ -65,7 +65,7 @@ public final class IOHelper
 	 * or on another medium, depending on the available memory.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public static DataLocation createDataLocationMemorySensitive(int size) throws Exception
+	public static DataLocation createDataLocationMemorySensitive(final int size) throws Exception
 	{
 		if (fitsInMemory(size))
 		{
@@ -89,7 +89,7 @@ public final class IOHelper
 	 * @return A data location containing the data provider or task data.
 	 * @throws Exception if an error occurs while deserializing.
 	 */
-	public static DataLocation readData(InputSource source) throws Exception
+	public static DataLocation readData(final InputSource source) throws Exception
 	{
 		int n = source.readInt();
 		if (traceEnabled) log.trace("read data size = " + n);
@@ -104,7 +104,7 @@ public final class IOHelper
 	 * @return the created <code>File</code>.
 	 * @throws Exception if an IO error occurs.
 	 */
-	public static File createTempFile(int size) throws Exception
+	public static File createTempFile(final int size) throws Exception
 	{
 		File file = File.createTempFile("jppf", ".tmp");
 		if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + size);
@@ -117,7 +117,7 @@ public final class IOHelper
 	 * @param size the data size to check.
 	 * @return true if the data would fit in memory, false otherwise.
 	 */
-	public static boolean fitsInMemory(int size)
+	public static boolean fitsInMemory(final int size)
 	{
 		long freeMem = SystemUtils.maxFreeHeap();
 		if (traceEnabled) log.trace("free mem / requested size : " + freeMem + '/' + size);
@@ -131,7 +131,7 @@ public final class IOHelper
 	 * @return the transformed result as an object.
 	 * @throws Exception if an error occurs while preparing the data.
 	 */
-	public static Object unwrappedData(SocketWrapper socketWrapper, ObjectSerializer ser) throws Exception
+	public static Object unwrappedData(final SocketWrapper socketWrapper, final ObjectSerializer ser) throws Exception
 	{
 		if (traceEnabled) log.trace("unwrapping from network connection");
 		InputSource sis = new SocketWrapperInputSource(socketWrapper);
@@ -146,7 +146,7 @@ public final class IOHelper
 	 * @return the transformed result as an object.
 	 * @throws Exception if an error occurs while preparing the data.
 	 */
-	public static Object unwrappedData(DataLocation dl, ObjectSerializer ser) throws Exception
+	public static Object unwrappedData(final DataLocation dl, final ObjectSerializer ser) throws Exception
 	{
 		if (traceEnabled) log.trace("unwrapping " + dl);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
@@ -160,13 +160,13 @@ public final class IOHelper
 	}
 
 	/**
-	 * Apply a {@link JPPFDataTransform} to the specified source and store the results in memory. 
+	 * Apply a {@link JPPFDataTransform} to the specified source and store the results in memory.
 	 * @param transform the {@link JPPFDataTransform} to apply.
 	 * @param source the source data to transform.
 	 * @return the transformed data as an <code>InputStream</code>.
 	 * @throws Exception if an error occurs while preparing the data.
 	 */
-	public static InputStream unwrapData(JPPFDataTransform transform, DataLocation source) throws Exception
+	public static InputStream unwrapData(final JPPFDataTransform transform, final DataLocation source) throws Exception
 	{
 		if (traceEnabled) log.trace("unwrapping to memory " + source);
 		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
@@ -175,13 +175,13 @@ public final class IOHelper
 	}
 
 	/**
-	 * Apply a {@link JPPFDataTransform} to the specified source and store the results in a temporary file. 
+	 * Apply a {@link JPPFDataTransform} to the specified source and store the results in a temporary file.
 	 * @param transform the {@link JPPFDataTransform} to apply.
 	 * @param source the source data to transform.
 	 * @return the transformed data as a <code>File</code>.
 	 * @throws Exception if an error occurs while preparing the data.
 	 */
-	public static InputStream unwrapDataToFile(JPPFDataTransform transform, DataLocation source) throws Exception
+	public static InputStream unwrapDataToFile(final JPPFDataTransform transform, final DataLocation source) throws Exception
 	{
 		if (traceEnabled) log.trace("unwrapping to file " + source);
 		File file = IOHelper.createTempFile(-1);
@@ -197,7 +197,7 @@ public final class IOHelper
 	 * @param ser the object serializer.
 	 * @throws Exception if any error occurs.
 	 */
-	public static void sendData(SocketWrapper socketWrapper, Object o, ObjectSerializer ser) throws Exception
+	public static void sendData(final SocketWrapper socketWrapper, final Object o, final ObjectSerializer ser) throws Exception
 	{
 		DataLocation dl = null;
 		if (traceEnabled) log.trace("sending object " + o);
@@ -221,7 +221,7 @@ public final class IOHelper
 	 * @return a {@link DataLocation} instance.
 	 * @throws Exception if any error occurs.
 	 */
-	public static DataLocation serializeData(Object o, ObjectSerializer ser) throws Exception
+	public static DataLocation serializeData(final Object o, final ObjectSerializer ser) throws Exception
 	{
 		if (traceEnabled) log.trace("serializing object " + o);
 		DataLocation dl = null;
@@ -243,7 +243,7 @@ public final class IOHelper
 	 * @return an instance of {@link MultipleBuffersOutputStream}.
 	 * @throws Exception if any error occurs.
 	 */
-	public static DataLocation serializeDataToMemory(Object o, ObjectSerializer ser) throws Exception
+	public static DataLocation serializeDataToMemory(final Object o, final ObjectSerializer ser) throws Exception
 	{
 		if (traceEnabled) log.trace("serializing object to memory " + o);
 		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
@@ -265,7 +265,7 @@ public final class IOHelper
 	 * @return an instance of {@link FileDataLocation}.
 	 * @throws Exception if any error occurs.
 	 */
-	public static DataLocation serializeDataToFile(Object o, ObjectSerializer ser) throws Exception
+	public static DataLocation serializeDataToFile(final Object o, final ObjectSerializer ser) throws Exception
 	{
 		if (traceEnabled) log.trace("serializing object to file " + o);
 		File file = IOHelper.createTempFile(-1);

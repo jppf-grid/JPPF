@@ -39,7 +39,7 @@ public class SocketWrapperInputSource implements InputSource
 	 * Initialize this input source with the specified <code>SocketWrapper</code>.
 	 * @param socketWrapper the backing <code>SocketWrapper</code>.
 	 */
-	public SocketWrapperInputSource(SocketWrapper socketWrapper)
+	public SocketWrapperInputSource(final SocketWrapper socketWrapper)
 	{
 		this.socketWrapper = socketWrapper;
 	}
@@ -54,7 +54,7 @@ public class SocketWrapperInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
 	@Override
-    public int read(byte[] data, int offset, int len) throws Exception
+	public int read(final byte[] data, final int offset, final int len) throws Exception
 	{
 		int n = socketWrapper.read(data, offset, len);
 		if (n < 0) throw new EOFException();
@@ -69,7 +69,7 @@ public class SocketWrapperInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
 	@Override
-    public int read(ByteBuffer data) throws Exception
+	public int read(final ByteBuffer data) throws Exception
 	{
 		byte[] buf = new byte[StreamConstants.TEMP_BUFFER_SIZE];
 		int size = Math.min(buf.length, data.remaining());
@@ -80,12 +80,12 @@ public class SocketWrapperInputSource implements InputSource
 
 	/**
 	 * Read an int value from this input source.
-	 * @return the value read, or -1 if an end of file condition was reached. 
+	 * @return the value read, or -1 if an end of file condition was reached.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
 	@Override
-    public int readInt() throws Exception
+	public int readInt() throws Exception
 	{
 		return socketWrapper.readInt();
 	}
@@ -98,7 +98,7 @@ public class SocketWrapperInputSource implements InputSource
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
 	@Override
-    public int skip(int n) throws Exception
+	public int skip(final int n) throws Exception
 	{
 		return socketWrapper.skip(n);
 	}
@@ -109,7 +109,7 @@ public class SocketWrapperInputSource implements InputSource
 	 * @see java.io.Closeable#close()
 	 */
 	@Override
-    public void close() throws IOException
+	public void close() throws IOException
 	{
 	}
 }

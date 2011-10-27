@@ -83,7 +83,7 @@ public class ChartConfiguration
 	 * @param precision the precision of the number to display in items and tooltip labels.
 	 * @param fields the list of fields charted in this chart.
 	 */
-	public ChartConfiguration(String name, ChartType type, String unit, int precision, Fields[] fields)
+	public ChartConfiguration(final String name, final ChartType type, final String unit, final int precision, final Fields[] fields)
 	{
 		this.name = name;
 		this.type = type;
@@ -91,12 +91,12 @@ public class ChartConfiguration
 		this.precision = precision;
 		this.fields = fields;
 	}
-	
+
 	/**
 	 * Create a configuration from another configuration (copy constructor).
 	 * @param cfg the configuration to copy from.
 	 */
-	public ChartConfiguration(ChartConfiguration cfg)
+	public ChartConfiguration(final ChartConfiguration cfg)
 	{
 		this.name = cfg.name;
 		this.type = cfg.type;
@@ -104,14 +104,14 @@ public class ChartConfiguration
 		this.precision = cfg.precision;
 		this.fields = cfg.fields;
 	}
-	
+
 	/**
 	 * Get a string representation of this chart configuration.
 	 * @return a string containg this configuration's name.
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		return name == null ? "no name" : name;
 	}

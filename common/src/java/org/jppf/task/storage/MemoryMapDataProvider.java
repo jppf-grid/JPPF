@@ -34,7 +34,7 @@ public class MemoryMapDataProvider implements DataProvider
 	 * The actual store implementation for the shared data.
 	 */
 	private Map<Object, Object> store = new HashMap<Object, Object>();
-	
+
 	/**
 	 * Get a value specified by its key.
 	 * @param key the key identifying the value to retrieve in the store.
@@ -42,11 +42,11 @@ public class MemoryMapDataProvider implements DataProvider
 	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
 	 */
 	@Override
-    public Object getValue(Object key)
+	public Object getValue(final Object key)
 	{
 		return store.get(key);
 	}
-	
+
 	/**
 	 * Set a value specified by its key in the store.
 	 * @param key the key identifying the value to retrieve in the store.
@@ -54,7 +54,7 @@ public class MemoryMapDataProvider implements DataProvider
 	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object key, Object value)
+	public void setValue(final Object key, final Object value)
 	{
 		store.put(key, value);
 	}

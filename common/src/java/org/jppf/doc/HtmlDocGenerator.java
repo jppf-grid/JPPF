@@ -87,7 +87,7 @@ public class HtmlDocGenerator
 	 * @param templateFolder the location of the templates.
 	 * @throws Exception if any error occurs while reading, parsing or writing any of the files.
 	 */
-	public void generatePage(String source, String target, String templateFolder) throws Exception
+	public void generatePage(final String source, final String target, final String templateFolder) throws Exception
 	{
 		System.out.println("Processing source file " + source);
 		String s = FileUtils.readTextFile(source);
@@ -106,8 +106,8 @@ public class HtmlDocGenerator
 	 * been replaced with parameter values.
 	 * @throws Exception if an error occurs while parsing the template or building its instance.
 	 */
-	private String processTemplates(Map<String, String> parameterMap, String content, String templateFolder)
-		throws Exception
+	private String processTemplates(final Map<String, String> parameterMap, final String content, final String templateFolder)
+	throws Exception
 	{
 		StringBuilder sb = new StringBuilder();
 		boolean end = false;
@@ -144,7 +144,7 @@ public class HtmlDocGenerator
 	 * replaced with actual content.
 	 * @throws Exception if an error occurs while parsing the template.
 	 */
-	private String processTemplateCall(String templateCall, Map<String, String> callerMap, String templateFolder) throws Exception
+	private String processTemplateCall(final String templateCall, final Map<String, String> callerMap, final String templateFolder) throws Exception
 	{
 		int pos = TEMPLATE_START.length();
 		int index = pos;
@@ -186,11 +186,11 @@ public class HtmlDocGenerator
 				break;
 			}
 		}
-		if (!templateFolder.endsWith("/")) templateFolder += "/";
-		String templateFile = templateFolder + parameterMap.get("name") + ".html";
+		String tf = !templateFolder.endsWith("/") ? templateFolder + "/" : templateFolder;
+		String templateFile = tf + parameterMap.get("name") + ".html";
 		if (!(new File(templateFile).exists())) throw new Exception("Could not find template file " + templateFile);
 		String content = FileUtils.readTextFile(templateFile);
-		content = processTemplates(parameterMap, content, templateFolder);
+		content = processTemplates(parameterMap, content, tf);
 		content = processParameters(parameterMap, content);
 		return content;
 	}
@@ -203,7 +203,7 @@ public class HtmlDocGenerator
 	 * been replaced with parameter values, and all nested template calls with corresponding instances.
 	 * @throws Exception if an error occurs while parsing the template or building its instance.
 	 */
-	private static String processParameters(Map<String, String> parameterMap, String content) throws Exception
+	private static String processParameters(final Map<String, String> parameterMap, final String content) throws Exception
 	{
 		LineNumberReader reader = new LineNumberReader(new StringReader(content));
 		StringBuilder sb = new StringBuilder();
@@ -231,7 +231,7 @@ public class HtmlDocGenerator
 	 * Test this class.
 	 * @param args the options to use.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -262,7 +262,7 @@ public class HtmlDocGenerator
 	 * @param parameters the options to use.
 	 * @throws Exception if any error occurs.
 	 */
-	private static void generateDocRecursive(File sourceDir, File destDir, File templateDir, Map<ParameterNames, Object> parameters) throws Exception
+	private static void generateDocRecursive(final File sourceDir, final File destDir, final File templateDir, final Map<ParameterNames, Object> parameters) throws Exception
 	{
 		generateDoc(sourceDir, destDir, templateDir, parameters);
 		List<File> allSourceDirs = new ArrayList<File>();
@@ -285,7 +285,7 @@ public class HtmlDocGenerator
 	 * @param parameters the options to use.
 	 * @throws Exception if any error occurs.
 	 */
-	private static void generateDoc(File sourceDir, File destDir, File templateDir, Map<ParameterNames, Object> parameters) throws Exception
+	private static void generateDoc(final File sourceDir, final File destDir, final File templateDir, final Map<ParameterNames, Object> parameters) throws Exception
 	{
 		HtmlDocGenerator docGen = new HtmlDocGenerator();
 		for (File file: sourceDir.listFiles(new JPPFFileFilter((String[]) parameters.get(FILE_INCLUDES), (String[]) parameters.get(FILE_EXCLUDES))))
@@ -305,7 +305,7 @@ public class HtmlDocGenerator
 	 * @param parameters the options to use.
 	 * @throws Exception if any error occurs.
 	 */
-	private static void allDirsRecursive(File root, List<File> list, Map<ParameterNames, Object> parameters) throws Exception
+	private static void allDirsRecursive(final File root, final List<File> list, final Map<ParameterNames, Object> parameters) throws Exception
 	{
 		for (File file: root.listFiles(new JPPFDirFilter((String[]) parameters.get(DIR_INCLUDES), (String[]) parameters.get(DIR_EXCLUDES))))
 		{
@@ -318,7 +318,7 @@ public class HtmlDocGenerator
 	 * Give a brief explanation of the comand-line parameters.
 	 * @param msg text to display before usage text.
 	 */
-	private static void showUsageAndExit(String msg)
+	private static void showUsageAndExit(final String msg)
 	{
 		System.err.println(msg);
 		System.err.println("HtmlDocGenerator usage: java " + HtmlDocGenerator.class.getName() + " -s sourceDir -d destDir -t templatesDir");

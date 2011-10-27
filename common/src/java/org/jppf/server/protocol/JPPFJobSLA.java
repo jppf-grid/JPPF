@@ -26,7 +26,7 @@ import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This class represents the Service Level Agreement Between a JPPF job and a server.
- * It determines the state, conditions and order in which a job will be executed. 
+ * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
 public class JPPFJobSLA implements Serializable, JobSLA
@@ -80,7 +80,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * Initialize this job SLA with the specified execution policy.
 	 * @param policy the tasks execution policy.
 	 */
-	public JPPFJobSLA(ExecutionPolicy policy)
+	public JPPFJobSLA(final ExecutionPolicy policy)
 	{
 		this(policy, 0, Integer.MAX_VALUE, false);
 	}
@@ -90,7 +90,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * @param policy the tasks execution policy.
 	 * @param priority the priority of this job.
 	 */
-	public JPPFJobSLA(ExecutionPolicy policy, int priority)
+	public JPPFJobSLA(final ExecutionPolicy policy, final int priority)
 	{
 		this(policy, priority, Integer.MAX_VALUE, false);
 	}
@@ -102,7 +102,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * @param maxNodes the maximum number of nodes this job can run on. A value <= 0 means no limit on the number of nodes.
 	 * @param suspended determines whether this job is initially suspended.
 	 */
-	public JPPFJobSLA(ExecutionPolicy policy, int priority, int maxNodes, boolean suspended)
+	public JPPFJobSLA(final ExecutionPolicy policy, final int priority, final int maxNodes, final boolean suspended)
 	{
 		this.executionPolicy = policy;
 		this.priority = priority;
@@ -123,7 +123,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setExecutionPolicy(ExecutionPolicy executionPolicy)
+	public void setExecutionPolicy(final ExecutionPolicy executionPolicy)
 	{
 		this.executionPolicy = executionPolicy;
 	}
@@ -141,7 +141,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setPriority(int priority)
+	public void setPriority(final int priority)
 	{
 		this.priority = priority;
 	}
@@ -159,7 +159,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setMaxNodes(int maxNodes)
+	public void setMaxNodes(final int maxNodes)
 	{
 		this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
 	}
@@ -177,7 +177,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setSuspended(boolean suspended)
+	public void setSuspended(final boolean suspended)
 	{
 		this.suspended = suspended;
 	}
@@ -195,7 +195,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setJobSchedule(JPPFSchedule jobSchedule)
+	public void setJobSchedule(final JPPFSchedule jobSchedule)
 	{
 		this.jobSchedule = jobSchedule;
 	}
@@ -213,7 +213,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule)
+	public void setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule)
 	{
 		this.jobExpirationSchedule = jobExpirationSchedule;
 	}
@@ -231,7 +231,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setBroadcastJob(boolean broadcastJob)
+	public void setBroadcastJob(final boolean broadcastJob)
 	{
 		this.broadcastJob = broadcastJob;
 	}
@@ -249,7 +249,7 @@ public class JPPFJobSLA implements Serializable, JobSLA
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect)
+	public void setCancelUponClientDisconnect(final boolean cancelUponClientDisconnect)
 	{
 		this.cancelUponClientDisconnect = cancelUponClientDisconnect;
 	}

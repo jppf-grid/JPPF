@@ -33,6 +33,7 @@ public class AvailableProcessorsMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the name as a string.
 	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
 	 */
+	@Override
 	public String getMBeanInterfaceName()
 	{
 		return "org.jppf.example.mbean.AvailableProcessorsMBean";
@@ -44,7 +45,8 @@ public class AvailableProcessorsMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the created MBean implementation.
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
 	 */
-	public Object createMBean(Node node)
+	@Override
+	public Object createMBean(final Node node)
 	{
 		return new AvailableProcessors();
 	}
@@ -54,6 +56,7 @@ public class AvailableProcessorsMBeanProvider implements JPPFNodeMBeanProvider
 	 * @return the MBean's object name as a string.
 	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
 	 */
+	@Override
 	public String getMBeanName()
 	{
 		return "org.jppf.example.mbean:name=AvailableProcessors,type=node";

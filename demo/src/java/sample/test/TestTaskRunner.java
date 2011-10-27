@@ -49,7 +49,7 @@ public class TestTaskRunner
 	 * Entry point for this class, performs a matrix multiplication a number of times.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -72,7 +72,7 @@ public class TestTaskRunner
 			performOutOfMemoryTest();
 			performLargeDataTest();
 			performAnnotatedTaskTest();
-			*/
+			 */
 		}
 		catch(Exception e)
 		{
@@ -83,7 +83,7 @@ public class TestTaskRunner
 			jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the test.
 	 * @throws JPPFException if an error is raised during the execution.
@@ -222,7 +222,7 @@ public class TestTaskRunner
 			System.out.println("Constant tasks testing complete.");
 		}
 	}
-	
+
 	/**
 	 * Check that correct results are returned by the framework.
 	 * @throws JPPFException if an error is raised during the execution.
@@ -305,7 +305,7 @@ public class TestTaskRunner
 		for (int i=0; i<n; i++) tasks[i] = new DB2LoadingTask();
 		singleTest("DB2 Loading task", null, tasks);
 	}
-	
+
 	/**
 	 * Check that correct results are returned by the framework.
 	 * @throws JPPFException if an error is raised during the execution.
@@ -317,7 +317,7 @@ public class TestTaskRunner
 		for (int i=0; i<n; i++) tasks[i] = new ParserTask("build.xml");
 		singleTest("XML parsing task", null, tasks);
 	}
-	
+
 	/**
 	 * Check that correct results are returned by the framework.
 	 * @throws Exception if an error is raised during the execution.
@@ -325,11 +325,11 @@ public class TestTaskRunner
 	static void performMyTaskTest() throws Exception
 	{
 		DataProvider dataProvider = new MemoryMapDataProvider();
-		dataProvider.setValue("DATA", new SimpleData("Data and more data"));			
+		dataProvider.setValue("DATA", new SimpleData("Data and more data"));
 		JPPFJob job = new JPPFJob(dataProvider);
 		singleTest("my task", dataProvider, new MyTask());
 	}
-	
+
 	/**
 	 * Check that correct results are returned by the framework.
 	 * @throws JPPFException if an error is raised during the execution.
@@ -425,7 +425,7 @@ public class TestTaskRunner
 	 * @param tasks the task to execute.
 	 * @throws JPPFException if an error is raised during the execution.
 	 */
-	static void singleTest(String title, DataProvider dp, Object...tasks) throws JPPFException
+	static void singleTest(final String title, final DataProvider dp, final Object...tasks) throws JPPFException
 	{
 		System.out.println(banner);
 		System.out.println("Starting " + title + " test ...");

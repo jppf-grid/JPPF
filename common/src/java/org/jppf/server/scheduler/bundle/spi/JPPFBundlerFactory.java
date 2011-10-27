@@ -27,7 +27,7 @@ import org.slf4j.*;
 
 /**
  * Factory class for JPPF load-balancing algorithms defined through the {@link org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider JPPFBundlerProvider}
- * service provider interface. 
+ * service provider interface.
  * @author Laurent Cohen
  */
 public class JPPFBundlerFactory
@@ -52,7 +52,7 @@ public class JPPFBundlerFactory
 	 * @return a new <code>Bundler</code> instance.
 	 * @throws Exception if the bundler could not be created.
 	 */
-	public Bundler createBundler(String name, TypedProperties configuration) throws Exception
+	public Bundler createBundler(final String name, final TypedProperties configuration) throws Exception
 	{
 		JPPFBundlerProvider provider = getBundlerProvider(name);
 		if (provider == null) throw new JPPFException("Provider '" + name + "' could not be found");
@@ -85,7 +85,7 @@ public class JPPFBundlerFactory
 	 * @return a <code>JPPFBundlerProvider</code> instance or null if the provider could not be found.
 	 * @throws Exception if any error occurs while loading the providers.
 	 */
-	public JPPFBundlerProvider getBundlerProvider(String name) throws Exception
+	public JPPFBundlerProvider getBundlerProvider(final String name) throws Exception
 	{
 		if (providerMap == null) loadProviders();
 		return providerMap.get(name);
@@ -99,7 +99,7 @@ public class JPPFBundlerFactory
 	public List<String> getBundlerProviderNames() throws Exception
 	{
 		if (providerMap == null) loadProviders();
-        return new ArrayList<String>(providerMap.keySet());
+		return new ArrayList<String>(providerMap.keySet());
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class JPPFBundlerFactory
 	 * @param configuration - the JPPF configuration to extract from.
 	 * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
 	 */
-	public TypedProperties convertJPPFConfiguration(String profileName, TypedProperties configuration)
+	public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration)
 	{
 		TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
 		String prefix = "strategy." + profileName + '.';
@@ -142,12 +142,12 @@ public class JPPFBundlerFactory
 	}
 
 	/**
-	 * Extract the JPPF-prefixed load-balancing parameters from the specified configuration and based on the specified profile name. 
+	 * Extract the JPPF-prefixed load-balancing parameters from the specified configuration and based on the specified profile name.
 	 * @param profileName - the name of the profile to extract.
 	 * @param configuration - the JPPF configuration to extract from.
 	 * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
 	 */
-	public TypedProperties extractJPPFConfiguration(String profileName, TypedProperties configuration)
+	public TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration)
 	{
 		TypedProperties profile = new TypedProperties();
 		String prefix = "strategy." + profileName + '.';

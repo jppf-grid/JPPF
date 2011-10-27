@@ -32,12 +32,12 @@ import org.jppf.utils.FileUtils;
  */
 public final class Helper
 {
-  /**
-   * The keystore password.
-   * This variable will be assigned the password value in clear,
-   * after it has been read from a file and decoded from Base64 encoding.
-   */
-  private static char[] some_chars = null; 
+	/**
+	 * The keystore password.
+	 * This variable will be assigned the password value in clear,
+	 * after it has been read from a file and decoded from Base64 encoding.
+	 */
+	private static char[] some_chars = null;
 
 	/**
 	 * Instanciation of this class is not permitted.
@@ -54,7 +54,7 @@ public final class Helper
 	 * in clear is ever deployed.
 	 * @param args the first argument must be the keystore password in clear.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -70,15 +70,15 @@ public final class Helper
 	 * Generate a keystore with a default password.
 	 * @throws Exception if any error occurs.
 	 */
-	private static void generateKeyStore(String pwd) throws Exception
+	private static void generateKeyStore(final String pwd) throws Exception
 	{
 		byte[] passwordBytes = pwd.getBytes();
 		// encode the password in Base64
 		byte[] encodedBytes = Base64.encodeBytesToBytes(passwordBytes);
 		// store the encoded password to a file
-	  FileOutputStream fos = new FileOutputStream(getPasswordFilename());
-	  fos.write(encodedBytes);
-	  fos.flush();
+		FileOutputStream fos = new FileOutputStream(getPasswordFilename());
+		fos.write(encodedBytes);
+		fos.flush();
 		fos.close();
 		char[] password = pwd.toCharArray();
 		KeyStore ks = KeyStore.getInstance(getProvider());

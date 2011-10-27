@@ -42,7 +42,7 @@ public class LinkMatch implements Serializable
 	 * @param url the url of the link matching the query.
 	 * @param relevance the relevance score of this match.
 	 */
-	public LinkMatch(String url, float relevance)
+	public LinkMatch(final String url, final float relevance)
 	{
 		this.url = url;
 		this.relevance = relevance;
@@ -53,18 +53,20 @@ public class LinkMatch implements Serializable
 	 * @return the hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode()
 	{
 		return (url == null) ? 0 : url.hashCode();
 	}
 
 	/**
-	 * Determine whether this object is equal to another. 
+	 * Determine whether this object is equal to another.
 	 * @param obj the object to compare with.
 	 * @return true if the objects are equa, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj)
+	@Override
+	public boolean equals(final Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -92,7 +94,8 @@ public class LinkMatch implements Serializable
 		 * a positive value if it is more, 0 otherwise.
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(LinkMatch lm1, LinkMatch lm2)
+		@Override
+		public int compare(final LinkMatch lm1, final LinkMatch lm2)
 		{
 			if (lm1 == null) return (lm2 == null) ? 0 : -1;
 			else if (lm2 == null) return 1;

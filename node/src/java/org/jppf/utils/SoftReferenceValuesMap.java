@@ -47,7 +47,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * The underlying map that backs this soft map.
 	 */
-	private Map<K, SoftValue<K, V>> map; 
+	private Map<K, SoftValue<K, V>> map;
 
 	/**
 	 * Default constructor.
@@ -62,7 +62,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public int size()
+	public int size()
 	{
 		cleanup();
 		return map.size();
@@ -72,7 +72,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean isEmpty()
+	public boolean isEmpty()
 	{
 		cleanup();
 		return map.isEmpty();
@@ -82,7 +82,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public V get(Object key)
+	public V get(final Object key)
 	{
 		cleanup();
 		SoftReference<V> ref = map.get(key);
@@ -93,8 +93,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 * {@inheritDoc}
 	 */
 	@Override
-    @SuppressWarnings("unchecked")
-	public V put(K key, V value)
+	@SuppressWarnings("unchecked")
+	public V put(final K key, final V value)
 	{
 		cleanup();
 		SoftReference<V> ref = map.put(key, new SoftValue(key, value, refQueue));
@@ -105,7 +105,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public V remove(Object key)
+	public V remove(final Object key)
 	{
 		cleanup();
 		SoftReference<V> ref = map.remove(key);
@@ -116,7 +116,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Set<Map.Entry<K, V>> entrySet()
+	public Set<Map.Entry<K, V>> entrySet()
 	{
 		throw new UnsupportedOperationException("This operation is not implemented");
 	}
@@ -124,7 +124,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 	/**
 	 * Cleanup the reference queue, by removing entries whose value was garbage collected.
 	 */
-  @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	private void cleanup()
 	{
 		SoftValue<K, V> ref;
@@ -158,7 +158,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 		 * @param value the value.
 		 * @param queue the reference queue to use.
 		 */
-		public SoftValue(K key, V value, ReferenceQueue<V> queue)
+		public SoftValue(final K key, final V value, final ReferenceQueue<V> queue)
 		{
 			super(value, queue);
 			this.key = key;

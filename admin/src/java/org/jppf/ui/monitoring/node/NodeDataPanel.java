@@ -92,7 +92,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		populateTreeTableModel();
 		refreshNodeStates();
 		refreshHandler = new NodeRefreshHandler(this);
-		*/
+		 */
 		createUI();
 	}
 
@@ -119,12 +119,12 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Create, initialize and layout the GUI components displayed in this panel.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
-	  treeTable = new JPPFTreeTable(model);
-	  treeTable.getTree().setLargeModel(true);
-	  treeTable.getTree().setRootVisible(false);
-	  treeTable.getTree().setShowsRootHandles(true);
+		treeTable = new JPPFTreeTable(model);
+		treeTable.getTree().setLargeModel(true);
+		treeTable.getTree().setRootVisible(false);
+		treeTable.getTree().setShowsRootHandles(true);
 		treeTable.expandAll();
 		treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
 		treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -147,7 +147,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				manager.nodeDataUpdated(driverName, nodeName);
 			}
@@ -164,7 +164,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				manager.driverAdded(connection);
 			}
@@ -182,7 +182,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				manager.driverRemoved(driverName, removeNodesOnly);
 			}
@@ -195,7 +195,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param driverName the name of the driver to which the node is added.
 	 * @param nodeInfo the object that encapsulates the node addition.
 	 */
-	public void nodeAdded(String driverName, JPPFManagementInfo nodeInfo)
+	public void nodeAdded(final String driverName, final JPPFManagementInfo nodeInfo)
 	{
 		final DefaultMutableTreeNode driverNode = manager.findDriver(driverName);
 		if (driverNode == null) return;
@@ -212,7 +212,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				manager.nodeAdded(driverNode, nodeInfo);
 			}
@@ -230,7 +230,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				manager.nodeRemoved(driverName, nodeName);
 			}
@@ -246,7 +246,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		executor.submit(new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				manager.repaintTreeTable();
 			}
@@ -323,7 +323,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */
 	@Override
-    public synchronized void newConnection(ClientEvent event)
+	public synchronized void newConnection(final ClientEvent event)
 	{
 		driverAdded(event.getConnection());
 	}
@@ -333,7 +333,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * @param name the name of the field to update.
 	 * @param n the number of servers to add or subtract.
 	 */
-	void updateStatusBar(String name, int n)
+	void updateStatusBar(final String name, final int n)
 	{
 		try
 		{
@@ -382,7 +382,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void connectionFailed(ClientEvent event)
+	public void connectionFailed(final ClientEvent event)
 	{
 		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
 		driverRemoved(c.getJmxConnection().getId(), false);
@@ -401,7 +401,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 	 * Set the graph view of the topology.
 	 * @param graphOption a {@link GraphOption} instance.
 	 */
-	public void setGraphOption(GraphOption graphOption)
+	public void setGraphOption(final GraphOption graphOption)
 	{
 		if (debugEnabled) log.debug("start");
 		if (this.graphOption == null)

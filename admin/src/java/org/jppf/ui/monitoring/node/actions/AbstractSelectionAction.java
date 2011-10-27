@@ -44,7 +44,7 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
 	 * Initialize this action with the specified tree table panel.
 	 * @param panel the tree table panel to which this action applies.
 	 */
-	public AbstractSelectionAction(NodeDataPanel panel)
+	public AbstractSelectionAction(final NodeDataPanel panel)
 	{
 		this.panel = panel;
 		setEnabled(true);

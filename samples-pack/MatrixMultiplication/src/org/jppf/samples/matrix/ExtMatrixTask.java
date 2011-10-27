@@ -39,15 +39,16 @@ public class ExtMatrixTask extends JPPFTask
 	 * Initialize this task with the specified matrix rows to multiply.
 	 * @param rowValues the values as an array of <code>double</code> values.
 	 */
-	public ExtMatrixTask(double[][] rowValues)
+	public ExtMatrixTask(final double[][] rowValues)
 	{
 		this.rowValues = rowValues;
 	}
-	
+
 	/**
 	 * Perform the multiplication of a matrix row by another matrix.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -55,7 +56,7 @@ public class ExtMatrixTask extends JPPFTask
 			final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
 			final int size = matrix.getSize();
 			final double[][] computeResult = new double[rowValues.length][size];
-	
+
 			// for each row of matrix a
 			for (int n=0; n<rowValues.length; n++)
 			{

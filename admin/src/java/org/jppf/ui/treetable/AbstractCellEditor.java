@@ -65,24 +65,24 @@ public abstract class AbstractCellEditor implements CellEditor
 	protected EventListenerList listenerList = new EventListenerList();
 
 	/**
-   * Returns the value contained in the editor. This method always returns null.
-   * @return <code>null</code>.
+	 * Returns the value contained in the editor. This method always returns null.
+	 * @return <code>null</code>.
 	 * @see javax.swing.CellEditor#getCellEditorValue()
 	 */
 	@Override
-    public Object getCellEditorValue()
+	public Object getCellEditorValue()
 	{
 		return null;
 	}
 
 	/**
-   * Asks the editor if it can start editing using <code>anEvent</code>. This method always returns true.
-   * @param	event	the event the editor should use to consider whether to begin editing or not.
-   * @return <code>true</code>.
+	 * Asks the editor if it can start editing using <code>anEvent</code>. This method always returns true.
+	 * @param	event	the event the editor should use to consider whether to begin editing or not.
+	 * @return <code>true</code>.
 	 * @see javax.swing.CellEditor#isCellEditable(java.util.EventObject)
 	 */
 	@Override
-    public boolean isCellEditable(EventObject event)
+	public boolean isCellEditable(final EventObject event)
 	{
 		return true;
 	}
@@ -91,7 +91,7 @@ public abstract class AbstractCellEditor implements CellEditor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean shouldSelectCell(EventObject anEvent)
+	public boolean shouldSelectCell(final EventObject anEvent)
 	{
 		return false;
 	}
@@ -100,7 +100,7 @@ public abstract class AbstractCellEditor implements CellEditor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public boolean stopCellEditing()
+	public boolean stopCellEditing()
 	{
 		return true;
 	}
@@ -109,7 +109,7 @@ public abstract class AbstractCellEditor implements CellEditor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void cancelCellEditing()
+	public void cancelCellEditing()
 	{
 	}
 
@@ -117,7 +117,7 @@ public abstract class AbstractCellEditor implements CellEditor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void addCellEditorListener(CellEditorListener l)
+	public void addCellEditorListener(final CellEditorListener l)
 	{
 		listenerList.add(CellEditorListener.class, l);
 	}
@@ -126,7 +126,7 @@ public abstract class AbstractCellEditor implements CellEditor
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void removeCellEditorListener(CellEditorListener l)
+	public void removeCellEditorListener(final CellEditorListener l)
 	{
 		listenerList.remove(CellEditorListener.class, l);
 	}

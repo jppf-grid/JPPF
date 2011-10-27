@@ -62,7 +62,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	 * @param clazz the class object for the provider interface.
 	 * @param server the MBean server on which to register.
 	 */
-	public JPPFMBeanProviderManager(Class<S> clazz, MBeanServer server)
+	public JPPFMBeanProviderManager(final Class<S> clazz, final MBeanServer server)
 	{
 		this.providerClass = clazz;
 		this.server = server;
@@ -82,7 +82,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	 * @param cl the class loader to use for class lookup.
 	 * @return a list of <code>S</code> instances.
 	 */
-	public List<S> getAllProviders(ClassLoader cl)
+	public List<S> getAllProviders(final ClassLoader cl)
 	{
 		if (providerList == null)
 		{
@@ -101,7 +101,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
 	 * @param name the MBean name.
 	 * @return true if the registration succeeded, false otherwise.
 	 */
-	public <T> boolean registerProviderMBean(T impl, Class<T> intf, String name)
+	public <T> boolean registerProviderMBean(final T impl, final Class<T> intf, final String name)
 	{
 		try
 		{

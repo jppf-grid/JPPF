@@ -66,7 +66,7 @@ public class CrawlerTest
 	 * Entry point.
 	 * @param args not used.
 	 */
-	public static void main(String... args)
+	public static void main(final String... args)
 	{
 		try
 		{
@@ -92,7 +92,8 @@ public class CrawlerTest
 
 		crawler.addParserListener(new IParserEventListener()
 		{
-			public void parse(ParserEvent event)
+			@Override
+			public void parse(final ParserEvent event)
 			{
 				print("Parsing link: "+event.getLink());
 			}
@@ -120,36 +121,37 @@ public class CrawlerTest
 	 */
 	public static void luceneIndex() throws Exception
 	{
-    // setting default parameters
-    int depth = 3;
+		// setting default parameters
+		int depth = 3;
 
-    // create Lucene index writer
-    IndexWriter writer = new IndexWriter(index, new StandardAnalyzer(), true);
-    writer.setUseCompoundFile(true);
-    writer.setMaxFieldLength(1000000);
+		// create Lucene index writer
+		IndexWriter writer = new IndexWriter(index, new StandardAnalyzer(), true);
+		writer.setUseCompoundFile(true);
+		writer.setMaxFieldLength(1000000);
 
-    // common crawler settings
-    Crawler crawler = new Crawler();
-    crawler.setLinkFilter(new ServerFilter(server));
-    crawler.setModel(new MaxDepthModel(depth));
+		// common crawler settings
+		Crawler crawler = new Crawler();
+		crawler.setLinkFilter(new ServerFilter(server));
+		crawler.setModel(new MaxDepthModel(depth));
 		crawler.addParserListener(new IParserEventListener()
 		{
-			public void parse(ParserEvent event)
+			@Override
+			public void parse(final ParserEvent event)
 			{
 				print("Parsing link: "+event.getLink());
 			}
 		});
 
-    // create Lucene parsing listener and add it
-    LuceneParserEventListener listener = new LuceneParserEventListener(writer);
-    crawler.addParserListener(listener);
+		// create Lucene parsing listener and add it
+		LuceneParserEventListener listener = new LuceneParserEventListener(writer);
+		crawler.addParserListener(listener);
 
-    // start crawler
+		// start crawler
 		crawler.start(server, startPage);
 
-    // Optimizing Lucene index
-    writer.optimize();
-    writer.close();
+		// Optimizing Lucene index
+		writer.optimize();
+		writer.close();
 	}
 
 	/**
@@ -158,7 +160,7 @@ public class CrawlerTest
 	 * @param max the maximum number ofresults to show.
 	 * @throws Exception if an error is thrown while executing.
 	 */
-	public static void luceneSearch(String search, int max) throws Exception
+	public static void luceneSearch(final String search, final int max) throws Exception
 	{
 		print("Searching for: " + search);
 		print("  max results: " + max);
@@ -185,7 +187,7 @@ public class CrawlerTest
 	 * Print a string to the standard output and the log.
 	 * @param s the string to print.
 	 */
-	private static void print(String s)
+	private static void print(final String s)
 	{
 		System.out.println(s);
 		log.info(s);

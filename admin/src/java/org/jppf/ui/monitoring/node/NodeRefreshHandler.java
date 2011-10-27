@@ -30,7 +30,7 @@ import org.slf4j.*;
 
 /**
  * Instances of this class hold information about the associations between JPPF drivers and
- * their attached nodes, for management and monitoring purposes. 
+ * their attached nodes, for management and monitoring purposes.
  * @author Laurent Cohen
  */
 public class NodeRefreshHandler
@@ -48,7 +48,7 @@ public class NodeRefreshHandler
 	 */
 	private JPPFClient jppfClient = null;
 	/**
-	 * Timer used to query the driver management data. 
+	 * Timer used to query the driver management data.
 	 */
 	private Timer refreshTimer = null;
 	/**
@@ -72,7 +72,7 @@ public class NodeRefreshHandler
 	 * Initialize this node handler.
 	 * @param nodeDataPanel - the panel to refresh.
 	 */
-	public NodeRefreshHandler(NodeDataPanel nodeDataPanel)
+	public NodeRefreshHandler(final NodeDataPanel nodeDataPanel)
 	{
 		this.nodeDataPanel = nodeDataPanel;
 		this.jppfClient = StatsHandler.getInstance().getJppfClient(null);
@@ -132,7 +132,7 @@ public class NodeRefreshHandler
 		}
 		for (String name: driversToProcess)
 		{
-			if (debugEnabled) log.debug("removing driver " + name); 
+			if (debugEnabled) log.debug("removing driver " + name);
 			nodeDataPanel.driverRemoved(name, false);
 		}
 
@@ -145,7 +145,7 @@ public class NodeRefreshHandler
 		}
 		for (String name: driversToProcess)
 		{
-			if (debugEnabled) log.debug("adding driver " + name); 
+			if (debugEnabled) log.debug("adding driver " + name);
 			nodeDataPanel.driverAdded(map.get(name));
 		}
 		nodeDataPanel.refreshNodeStates();
@@ -156,7 +156,7 @@ public class NodeRefreshHandler
 	 * Refresh the nodes currently attached to the specified driver.
 	 * @param driverName the name of the driver.
 	 */
-	private synchronized void refreshNodes(String driverName)
+	private synchronized void refreshNodes(final String driverName)
 	{
 		DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverName);
 		//if (debugEnabled) log.debug("driverNode = " + driverNode);
@@ -202,7 +202,7 @@ public class NodeRefreshHandler
 		}
 		for (String name: nodesToProcess)
 		{
-			if (debugEnabled) log.debug("adding node " + name); 
+			if (debugEnabled) log.debug("adding node " + name);
 			nodeDataPanel.nodeAdded(driverName, actualMap.get(name));
 		}
 	}
@@ -230,7 +230,7 @@ public class NodeRefreshHandler
 		TimerTask task = new TimerTask()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				refresh();
 			}

@@ -35,7 +35,7 @@ public class LoggingTask extends JPPFTask
 	 * Initialize this task with the specified id.
 	 * @param id the task id.
 	 */
-	public LoggingTask(String id)
+	public LoggingTask(final String id)
 	{
 		setId(id);
 	}
@@ -45,7 +45,7 @@ public class LoggingTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		log.info("task " + getId() + " has started");
 		try

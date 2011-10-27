@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -51,7 +51,7 @@ public class MatrixRunner
 	 * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
 	 * @param args - not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -73,7 +73,7 @@ public class MatrixRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @param size - the size of the matrices.
@@ -81,7 +81,7 @@ public class MatrixRunner
 	 * @param nbRows - number of rows of matrix a per task.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int size, int iterations, int nbRows) throws Exception
+	private static void perform(final int size, final int iterations, final int nbRows) throws Exception
 	{
 		try
 		{
@@ -92,7 +92,7 @@ public class MatrixRunner
 			b.assignRandomValues();
 			if (size <= 500) performSequentialMultiplication(a, b);
 			long totalIterationTime = 0L;
-	
+
 			// determine whether an execution policy should be used
 			ExecutionPolicy policy = null;
 			String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
@@ -115,7 +115,7 @@ public class MatrixRunner
 				JPPFStats stats = jppfClient.requestStatistics();
 				output("End statistics :\n" + stats.toString());
 			}
-			*/
+			 */
 		}
 		catch(Exception e)
 		{
@@ -132,7 +132,7 @@ public class MatrixRunner
 	 * @return the elapsed time for the computation.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static long performParallelMultiplication(Matrix a, Matrix b, int nbRows, ExecutionPolicy policy) throws Exception
+	private static long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy) throws Exception
 	{
 		long start = System.currentTimeMillis();
 		int size = a.getSize();
@@ -178,7 +178,7 @@ public class MatrixRunner
 	 * @param a - the left-hand matrix.
 	 * @param b - the right-hand matrix.
 	 */
-	private static void performSequentialMultiplication(Matrix a, Matrix b)
+	private static void performSequentialMultiplication(final Matrix a, final Matrix b)
 	{
 		long start = System.currentTimeMillis();
 		Matrix c = a.multiply(b);
@@ -190,7 +190,7 @@ public class MatrixRunner
 	 * Print a message to the console and/or log file.
 	 * @param message - the message to print.
 	 */
-	private static void output(String message)
+	private static void output(final String message)
 	{
 		System.out.println(message);
 		log.info(message);

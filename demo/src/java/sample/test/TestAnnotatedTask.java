@@ -40,7 +40,7 @@ public class TestAnnotatedTask implements Serializable
 	 * @return the result as a string.
 	 */
 	@JPPFRunnable
-	public String someMethod(int intArg, String stringArg)
+	public String someMethod(final int intArg, final String stringArg)
 	{
 		String s = "int arg = " + intArg + ", string arg = \"" + stringArg + '\"';
 		System.out.println(s);

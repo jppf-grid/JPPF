@@ -27,7 +27,7 @@ import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
- * Instances of this class manage the node's class loader and associated operations. 
+ * Instances of this class manage the node's class loader and associated operations.
  * @author Laurent Cohen
  */
 public abstract class AbstractClassLoaderManager
@@ -81,7 +81,7 @@ public abstract class AbstractClassLoaderManager
 	 * Set the main classloader for the node.
 	 * @param cl the class loader to set.
 	 */
-	public void setClassLoader(JPPFClassLoader cl)
+	public void setClassLoader(final JPPFClassLoader cl)
 	{
 		classLoader = cl;
 	}
@@ -103,9 +103,9 @@ public abstract class AbstractClassLoaderManager
 			{
 				if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
 				AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
-				{
+						{
 					@Override
-                    public AbstractJPPFClassLoader run()
+					public AbstractJPPFClassLoader run()
 					{
 						try
 						{
@@ -117,7 +117,7 @@ public abstract class AbstractClassLoaderManager
 						}
 						return null;
 					}
-				});
+						});
 				container = newJPPFContainer(uuidPath, cl);
 				if (containerList.size() >= maxContainers)
 				{

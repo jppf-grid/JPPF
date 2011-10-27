@@ -42,7 +42,7 @@ public class Probe
 	 * Main entry point.
 	 * @param args - not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -80,7 +80,7 @@ public class Probe
 		 * @param host - the host to connect to.
 		 * @param ports - the ports to connect to.
 		 */
-		public ProbeTask(String host, Integer... ports)
+		public ProbeTask(final String host, final Integer... ports)
 		{
 			this.host = host;
 			this.ports = ports;
@@ -91,7 +91,7 @@ public class Probe
 		 * @see java.util.TimerTask#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			for (int n: ports)
 			{

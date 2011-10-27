@@ -54,7 +54,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
 	 * @param statsHandler the {@link StatsHandler}.
 	 * @param c the new connection that was created.
 	 */
-	public NewConnectionTask(StatsHandler statsHandler, JPPFClientConnection c)
+	public NewConnectionTask(final StatsHandler statsHandler, final JPPFClientConnection c)
 	{
 		this.statsHandler = statsHandler;
 		this.c = c;
@@ -65,7 +65,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		synchronized(statsHandler)
 		{

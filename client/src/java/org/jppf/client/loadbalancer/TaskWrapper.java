@@ -34,7 +34,7 @@ public class TaskWrapper implements Runnable
 	 * Initialize this task wrapper with the specified JPPF task.
 	 * @param task the JPPF task to execute.
 	 */
-	public TaskWrapper(JPPFTask task)
+	public TaskWrapper(final JPPFTask task)
 	{
 		this.task = task;
 	}
@@ -44,7 +44,7 @@ public class TaskWrapper implements Runnable
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{

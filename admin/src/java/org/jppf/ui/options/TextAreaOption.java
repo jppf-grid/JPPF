@@ -49,11 +49,11 @@ public class TextAreaOption extends AbstractOption
 	/**
 	 * Initialize this text area option with the specified parameters.
 	 * @param name - this component's name.
-	 * @param label - the label displayed with the text area. 
+	 * @param label - the label displayed with the text area.
 	 * @param tooltip - the tooltip associated with the text area.
 	 * @param value - the initial value of this component.
 	 */
-	public TextAreaOption(String name, String label, String tooltip, String value)
+	public TextAreaOption(final String name, final String label, final String tooltip, final String value)
 	{
 		this.name = name;
 		this.label = label;
@@ -66,7 +66,7 @@ public class TextAreaOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		textArea = new JTextArea((String) value);
 		textArea.setBorder(BorderFactory.createEmptyBorder());
@@ -95,7 +95,7 @@ public class TextAreaOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		value = textArea.getText();
 		return value;
@@ -107,17 +107,17 @@ public class TextAreaOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object value)
+	public void setValue(final Object value)
 	{
 		this.value = value;
 		SwingUtilities.invokeLater( new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				textArea.setText((String) TextAreaOption.this.value);
 			}
-		});		
+		});
 	}
 
 	/**
@@ -130,11 +130,11 @@ public class TextAreaOption extends AbstractOption
 		SwingUtilities.invokeLater( new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				textArea.append(value);
 			}
-		});		
+		});
 	}
 
 	/**
@@ -142,25 +142,25 @@ public class TextAreaOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 		Document doc = textArea.getDocument();
 		doc.addDocumentListener(new DocumentListener()
 		{
 			@Override
-            public void changedUpdate(DocumentEvent e)
+			public void changedUpdate(final DocumentEvent e)
 			{
 				fireValueChanged();
 			}
 
 			@Override
-            public void insertUpdate(DocumentEvent e)
+			public void insertUpdate(final DocumentEvent e)
 			{
 				fireValueChanged();
 			}
 
 			@Override
-            public void removeUpdate(DocumentEvent e)
+			public void removeUpdate(final DocumentEvent e)
 			{
 				fireValueChanged();
 			}
@@ -181,7 +181,7 @@ public class TextAreaOption extends AbstractOption
 	 * @param editable true if the text area is editable, false otherwise.
 	 */
 	@Override
-    public void setEditable(boolean editable)
+	public void setEditable(final boolean editable)
 	{
 		this.editable = editable;
 		if (textArea != null) textArea.setEditable(editable);
@@ -193,7 +193,7 @@ public class TextAreaOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		textArea.setEnabled(enabled);
 	}

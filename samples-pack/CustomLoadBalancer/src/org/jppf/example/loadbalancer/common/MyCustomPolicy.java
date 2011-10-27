@@ -37,7 +37,7 @@ public class MyCustomPolicy extends CustomPolicy
 	 * Initialize this policy with the specified parameter.
 	 * @param minimumSizePerThreadStr the minimum available heap size per node processing thread.
 	 */
-	public MyCustomPolicy(String minimumSizePerThreadStr)
+	public MyCustomPolicy(final String minimumSizePerThreadStr)
 	{
 		super(minimumSizePerThreadStr);
 		this.minimumSizePerThread = Long.valueOf(minimumSizePerThreadStr);
@@ -49,7 +49,8 @@ public class MyCustomPolicy extends CustomPolicy
 	 * @return true if the node is accepted, false otherwise.
 	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
 	 */
-	public boolean accepts(JPPFSystemInformation info)
+	@Override
+	public boolean accepts(final JPPFSystemInformation info)
 	{
 		// get the number of processing threads in the node
 		long nbThreads = info.getJppf().getLong("processing.threads");

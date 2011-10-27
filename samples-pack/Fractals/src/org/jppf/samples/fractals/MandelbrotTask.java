@@ -21,14 +21,14 @@ package org.jppf.samples.fractals;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Instances of this task compute the Mandelbrot algorithm (number of iterations to escape the 
+ * Instances of this task compute the Mandelbrot algorithm (number of iterations to escape the
  * Mandelbrot set) for each point of a line in the resulting image.
  * @author Laurent Cohen
  */
 public class MandelbrotTask extends JPPFTask
 {
 	/**
-	 * The line number, for which to compute the escape value for each point in the line. 
+	 * The line number, for which to compute the escape value for each point in the line.
 	 */
 	private int b = -1;
 	/**
@@ -40,7 +40,7 @@ public class MandelbrotTask extends JPPFTask
 	 * Initialize this task with the specified line number.
 	 * @param b the line number as an int value.
 	 */
-	public MandelbrotTask(int b)
+	public MandelbrotTask(final int b)
 	{
 		this.b = b;
 	}
@@ -49,6 +49,7 @@ public class MandelbrotTask extends JPPFTask
 	 * Execute the task.
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run()
 	{
 		try
@@ -59,8 +60,8 @@ public class MandelbrotTask extends JPPFTask
 			int[] iter = new int[config.asize];
 			colors = new int[config.asize];
 			double bval = config.bmin +
-				(double) b * (config.bmax - config.bmin) / (double) config.bsize; 
-			double astep = (config.amax - config.amin) / (double) config.asize;
+			b * (config.bmax - config.bmin) / config.bsize;
+			double astep = (config.amax - config.amin) / config.asize;
 			double aval = config.amin;
 			for (int i=0; i<config.asize; i++)
 			{
@@ -90,16 +91,16 @@ public class MandelbrotTask extends JPPFTask
 	}
 
 	/**
-	 * Compute a RGB value for a specific poitn. 
+	 * Compute a RGB value for a specific poitn.
 	 * @param value the escape time value for the point.
 	 * @param max the max escapte time value.
 	 * @return an int value representing the rgb components for the point.
 	 */
-	private int computeRGB(int value, int max)
+	private int computeRGB(final int value, final int max)
 	{
 		if (value >= max) return 0;
 		double x, y, z, t;
-		t = 2 * Math.PI * (double) value / max;
+		t = 2 * Math.PI * value / max;
 		x = 2 * t * (Math.cos(value) + 1);
 		y = 2 * t * (Math.sin(t) + 1);
 		z = t;
@@ -148,5 +149,5 @@ public class MandelbrotTask extends JPPFTask
 			// ...
 		}
 	}
-	*/
+	 */
 }

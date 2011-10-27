@@ -34,7 +34,7 @@ public interface DataProvider extends Serializable
 	 * @throws Exception if an error occured while retrieving the data.
 	 */
 	Object getValue(Object key) throws Exception;
-	
+
 	/**
 	 * Set a value specified by its key in the store.
 	 * @param key the key identifying the value to retrieve in the store.

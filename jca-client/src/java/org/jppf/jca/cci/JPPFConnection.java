@@ -37,7 +37,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
 	/**
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution. 
+	 * The returned id is used to later retieve the results and sttaus of the execution.
 	 * @param job - the job to execute.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
 	 * @throws Exception if an error occurs while submitting the request.
@@ -47,7 +47,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
 	/**
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution. 
+	 * The returned id is used to later retieve the results and sttaus of the execution.
 	 * @param job the job to execute.
 	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
@@ -58,7 +58,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
 	/**
 	 * Wait until all results for the specfied job submission have been received.
 	 * @param submissionId the id of the job submission.
-	 * @return the results as a list of {@link JPPFTask} instances. 
+	 * @return the results as a list of {@link JPPFTask} instances.
 	 * @throws Exception if any error occurs.
 	 */
 	List<JPPFTask> waitForResults(String submissionId) throws Exception;

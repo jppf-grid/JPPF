@@ -50,7 +50,7 @@ abstract class ExecutionThread extends Thread
 	 * @param job the execution to perform.
 	 * @param loadBalancer the load balancer for which this thread is working.
 	 */
-	public ExecutionThread(List<JPPFTask> tasks, JPPFJob job, LoadBalancer loadBalancer)
+	public ExecutionThread(final List<JPPFTask> tasks, final JPPFJob job, final LoadBalancer loadBalancer)
 	{
 		this.tasks = tasks;
 		this.job = job;

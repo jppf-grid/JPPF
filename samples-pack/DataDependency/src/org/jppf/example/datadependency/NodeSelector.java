@@ -50,7 +50,7 @@ public class NodeSelector
 	 * @param trades the list of trades to distribute among the nodes.
 	 * @param nodeIdList the list of node ids.
 	 */
-	public NodeSelector(List<Trade> trades, List<String> nodeIdList)
+	public NodeSelector(final List<Trade> trades, final List<String> nodeIdList)
 	{
 		System.out.println("populating the trades");
 		this.nodeIdList = nodeIdList;
@@ -86,7 +86,7 @@ public class NodeSelector
 	 * @param tradeId the id of the trade for which to determine a processing node.
 	 * @return the id of the node as a string.
 	 */
-	public String getNodeId(String tradeId)
+	public String getNodeId(final String tradeId)
 	{
 		return tradeToNodeMap.get(tradeId);
 	}
@@ -102,10 +102,10 @@ public class NodeSelector
 
 	/**
 	 * Get the trades porcessed by the specified node.
-	 * @param nodeId the uuid pf the node. 
+	 * @param nodeId the uuid pf the node.
 	 * @return a mapping of trade ids to the corresponding trade objects.
 	 */
-	public Map<String, Trade> getTradesForNode(String nodeId)
+	public Map<String, Trade> getTradesForNode(final String nodeId)
 	{
 		return nodeToHazelcastMap.get(nodeId);
 	}
@@ -139,7 +139,7 @@ public class NodeSelector
 		 * @param nbNodes the number of nodes.
 		 * @param hazelcastMap the distributed map to populate.
 		 */
-		public PopulateTradesTask(Trade[] tradeArray, int offset, int nbNodes, Map<String, Trade> hazelcastMap)
+		public PopulateTradesTask(final Trade[] tradeArray, final int offset, final int nbNodes, final Map<String, Trade> hazelcastMap)
 		{
 			this.tradeArray = tradeArray;
 			this.offset = offset;
@@ -150,6 +150,7 @@ public class NodeSelector
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public void run()
 		{
 			String nodeId = nodeIdList.get(offset);

@@ -51,7 +51,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * @param ioHandler wraps the communication channel with the driver.
 	 * @param parent a ClassLoader instance.
 	 */
-	public JPPFLocalClassLoader(LocalClassLoaderChannel ioHandler, ClassLoader parent)
+	public JPPFLocalClassLoader(final LocalClassLoaderChannel ioHandler, final ClassLoader parent)
 	{
 		super(parent);
 		channel = ioHandler;
@@ -63,7 +63,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * @param parent a ClassLoader instance.
 	 * @param uuidPath unique identifier for the submitting application.
 	 */
-	public JPPFLocalClassLoader(ClassLoader parent, List<String> uuidPath)
+	public JPPFLocalClassLoader(final ClassLoader parent, final List<String> uuidPath)
 	{
 		super(parent, uuidPath);
 	}
@@ -72,7 +72,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * Initialize the underlying socket connection.
 	 */
 	@Override
-    protected void init()
+	protected void init()
 	{
 		LOCK.lock();
 		try
@@ -123,7 +123,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void reset()
+	public void reset()
 	{
 		init();
 	}
@@ -133,7 +133,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 		LOCK.lock();
 		try
@@ -154,7 +154,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	 * @throws ClassNotFoundException if the class could not be found
 	 */
 	@Override
-    public synchronized Class<?> loadJPPFClass(String name) throws ClassNotFoundException
+	public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
 	{
 		if (debugEnabled) log.debug("looking up resource [" + name + ']');
 		Class<?> c = findLoadedClass(name);
@@ -199,12 +199,12 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 	/**
 	 * Load the specified class from a socket connection.
 	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise. 
+	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
 	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
 	 * @throws Exception if the connection was lost and could not be reestablished.
 	 */
 	@Override
-    protected JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception
+	protected JPPFResourceWrapper loadRemoteData(final Map<String, Object> map, final boolean asResource) throws Exception
 	{
 		JPPFResourceWrapper resource = new JPPFResourceWrapper();
 		resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -238,7 +238,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		 * Initialize with the specified request.
 		 * @param request the request to send.
 		 */
-		public ResourceRequest(JPPFResourceWrapper request)
+		public ResourceRequest(final JPPFResourceWrapper request)
 		{
 			super(request);
 		}
@@ -247,7 +247,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			try
 			{
@@ -257,7 +257,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 					channel.setReadyOps(SelectionKey.OP_READ);
 				}
 				while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
-				
+
 				channel.setReadyOps(SelectionKey.OP_WRITE);
 				while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
 				response = channel.getNodeResource();

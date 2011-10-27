@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import org.jppf.utils.Range;
 
 /**
- * Instances of this class represent the configuration parameters for a specific IP address pattern impelmentation. 
+ * Instances of this class represent the configuration parameters for a specific IP address pattern impelmentation.
  * @author Laurent Cohen
  */
 final class PatternConfiguration
@@ -81,7 +81,7 @@ final class PatternConfiguration
 	 * @param compSeparator the separator for the components of an address.
 	 * @param valuePrefix the prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0X" for hexadecimal.
 	 */
-	private PatternConfiguration(int nbComponents, int minValue, int maxValue, char compSeparator, String valuePrefix)
+	private PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix)
 	{
 		this.nbComponents = nbComponents;
 		this.minValue = minValue;

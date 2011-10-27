@@ -35,11 +35,11 @@ public class JPPFApplicationServer extends JPPFServer
 	 * @param port the port this socket server is listening to.
 	 * @throws JPPFException if the underlying server socket can't be opened.
 	 */
-	public JPPFApplicationServer(int port) throws JPPFException
+	public JPPFApplicationServer(final int port) throws JPPFException
 	{
 		super(port, "Application Server Thread on port " + port);
 	}
-	
+
 	/**
 	 * Instanciate a wrapper for the socket connection opened by this socket server.
 	 * Subclasses must implement this method.
@@ -49,7 +49,7 @@ public class JPPFApplicationServer extends JPPFServer
 	 * @throws JPPFException if an exception is raised while creating the socket handler.
 	 */
 	@Override
-    protected JPPFConnection createConnection(Socket socket) throws JPPFException
+	protected JPPFConnection createConnection(final Socket socket) throws JPPFException
 	{
 		return new ApplicationConnection(this, socket);
 	}

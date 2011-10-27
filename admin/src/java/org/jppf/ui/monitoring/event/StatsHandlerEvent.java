@@ -37,7 +37,7 @@ public class StatsHandlerEvent extends EventObject
 		 */
 		UPDATE,
 		/**
-		 * The whole dataset shall be reset. 
+		 * The whole dataset shall be reset.
 		 */
 		RESET
 	}
@@ -51,12 +51,12 @@ public class StatsHandlerEvent extends EventObject
 	 * @param source the stats formatter whose data has changed.
 	 * @param type the type of this event.
 	 */
-	public StatsHandlerEvent(StatsHandler source, Type type)
+	public StatsHandlerEvent(final StatsHandler source, final Type type)
 	{
 		super(source);
 		this.type = type;
 	}
-	
+
 	/**
 	 * Get the <code>StatsHandler</code> source of this event.
 	 * @return a <code>StatsHandler</code> instance.

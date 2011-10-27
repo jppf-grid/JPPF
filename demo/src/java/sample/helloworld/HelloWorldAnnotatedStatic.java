@@ -38,7 +38,7 @@ public class HelloWorldAnnotatedStatic implements Serializable
 	 * @return a string hello message.
 	 */
 	@JPPFRunnable
-	public static String helloStaticMethod(String message, int number)
+	public static String helloStaticMethod(final String message, final int number)
 	{
 		String hello = "Hello, World (annotated static, " + message + ", " + number + ')';
 		System.out.println(hello);

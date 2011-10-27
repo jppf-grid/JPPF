@@ -32,7 +32,7 @@ public class NodeConnectionEvent extends EventObject
 	 * Initialize this event with the specified source.
 	 * @param nodeInfo a {@link JPPFManagementInfo} instance.
 	 */
-	public NodeConnectionEvent(JPPFManagementInfo nodeInfo)
+	public NodeConnectionEvent(final JPPFManagementInfo nodeInfo)
 	{
 		super(nodeInfo);
 	}

@@ -54,7 +54,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 */
 	private OptionElement panel = null;
 	/**
-	 * Location at which to display the entry dialog. 
+	 * Location at which to display the entry dialog.
 	 */
 	private Point location = null;
 
@@ -73,7 +73,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(dataArray.length > 0);
@@ -85,7 +85,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		try
 		{
@@ -102,7 +102,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 			okBtn.addActionListener(new ActionListener()
 			{
 				@Override
-                public void actionPerformed(ActionEvent event)
+				public void actionPerformed(final ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -112,7 +112,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 			cancelBtn.addActionListener(new ActionListener()
 			{
 				@Override
-                public void actionPerformed(ActionEvent event)
+				public void actionPerformed(final ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -141,7 +141,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				try
 				{
@@ -178,27 +178,27 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	 * @param source - the text from which to read the properties.
 	 * @return a map of string keys to string values.
 	 */
-	private static Map<String, String> getPropertiesAsMap(String source)
+	private static Map<String, String> getPropertiesAsMap(final String source)
 	{
 		try
 		{
 			Map<String, String> map = new HashMap<String, String>();
 			BufferedReader reader = new BufferedReader(new StringReader(source));
-            try {
-                while (true)
-                {
-                    String s = reader.readLine();
-                    if (s == null) break;
-                    int idx = s.indexOf('=');
-                    if (idx < 0) idx = s.indexOf(' ');
-                    if (idx < 0) continue;
-                    String key = s.substring(0, idx).trim();
-                    String value = s.substring(idx+1).trim();
-                    map.put(key, value);
-                }
-            } finally {
-                reader.close();
-            }
+			try {
+				while (true)
+				{
+					String s = reader.readLine();
+					if (s == null) break;
+					int idx = s.indexOf('=');
+					if (idx < 0) idx = s.indexOf(' ');
+					if (idx < 0) continue;
+					String key = s.substring(0, idx).trim();
+					String value = s.substring(idx+1).trim();
+					map.put(key, value);
+				}
+			} finally {
+				reader.close();
+			}
 			return map;
 		}
 		catch(Exception e)

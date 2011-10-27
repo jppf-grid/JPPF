@@ -39,7 +39,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 */
 	public static final int DRIVER = 0;
 	/**
-	 * Node information type. 
+	 * Node information type.
 	 */
 	public static final int NODE = 1;
 	/**
@@ -51,7 +51,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 */
 	private int port = 11198;
 	/**
-	 * Unique id for the node. 
+	 * Unique id for the node.
 	 */
 	private String id = null;
 	/**
@@ -69,7 +69,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @param port the port on which the node's JMX server is listening.
 	 * @param id unique id for the node's mbean server.
 	 */
-	public JPPFManagementInfo(String host, int port, String id)
+	public JPPFManagementInfo(final String host, final int port, final String id)
 	{
 		this(host, port, id, NODE);
 	}
@@ -81,7 +81,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @param id unique id for the node's mbean server.
 	 * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
 	 */
-	public JPPFManagementInfo(String host, int port, String id, int type)
+	public JPPFManagementInfo(final String host, final int port, final String id, final int type)
 	{
 		this.host = NetworkUtils.getHostName(host);
 		this.port = port;
@@ -113,7 +113,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-    public int hashCode()
+	public int hashCode()
 	{
 		return (id == null) ? 0 : id.hashCode();
 	}
@@ -125,7 +125,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -142,7 +142,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-    public int compareTo(JPPFManagementInfo o)
+	public int compareTo(final JPPFManagementInfo o)
 	{
 		if (o == null) return 1;
 		if (this.equals(o)) return 0;
@@ -150,8 +150,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 		int n = -1 * host.compareTo(o.getHost());
 		if (n != 0) return n;
 
-        if(port > o.getPort()) return +1;
-        if(port < o.getPort()) return -1;
+		if(port > o.getPort()) return +1;
+		if(port < o.getPort()) return -1;
 		return 0;
 	}
 
@@ -161,7 +161,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(host).append(':').append(port);
@@ -183,13 +183,13 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 	 * Set the system information associated with the node at the time of the initial connection.
 	 * @param systemInfo a <code>JPPFSystemInformation</code> instance.
 	 */
-	public synchronized void setSystemInfo(JPPFSystemInformation systemInfo)
+	public synchronized void setSystemInfo(final JPPFSystemInformation systemInfo)
 	{
 		this.systemInfo = systemInfo;
 	}
 
 	/**
-	 * Get the unique id for the node's mbean server. 
+	 * Get the unique id for the node's mbean server.
 	 * @return the id as a string.
 	 */
 	public String getId()

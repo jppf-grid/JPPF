@@ -35,11 +35,11 @@ public class SubmissionStatusEvent extends EventObject
 	private SubmissionStatus status = null;
 
 	/**
-	 * Initialize this event with the specified submission id and status. 
+	 * Initialize this event with the specified submission id and status.
 	 * @param submissionId the id of the submission whose status has changed.
 	 * @param status the new status of the submission.
 	 */
-	public SubmissionStatusEvent(String submissionId, SubmissionStatus status)
+	public SubmissionStatusEvent(final String submissionId, final SubmissionStatus status)
 	{
 		super(submissionId);
 		this.status = status;

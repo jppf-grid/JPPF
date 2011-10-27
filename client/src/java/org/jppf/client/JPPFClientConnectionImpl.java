@@ -73,7 +73,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @param name configuration name for this local client.
 	 * @param info the connection properties for this connection.
 	 */
-	public JPPFClientConnectionImpl(JPPFClient client, String uuid, String name, JPPFConnectionInformation info)
+	public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info)
 	{
 		this.client = client;
 		//classServerPort = info.classServerPorts[0];
@@ -89,7 +89,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
 	@Override
-    public void init()
+	public void init()
 	{
 		try
 		{
@@ -97,7 +97,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				@Override
-                public void statusChanged(ClientConnectionStatusEvent event)
+				public void statusChanged(final ClientConnectionStatusEvent event)
 				{
 					delegateStatusChanged(event);
 				}
@@ -105,7 +105,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				@Override
-                public void statusChanged(ClientConnectionStatusEvent event)
+				public void statusChanged(final ClientConnectionStatusEvent event)
 				{
 					taskServerConnectionStatusChanged(event);
 				}
@@ -185,7 +185,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
 	 */
 	@Override
-    public void submit(JPPFJob job) throws Exception
+	public void submit(final JPPFJob job) throws Exception
 	{
 		throw new JPPFUnsupportedOperationException("this operation is not supported");
 	}
@@ -196,7 +196,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.JPPFClientConnection#close()
 	 */
 	@Override
-    public List<JPPFJob> close()
+	public List<JPPFJob> close()
 	{
 		if (!isShutdown)
 		{
@@ -222,7 +222,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
 	 */
 	@Override
-    protected SocketInitializer createSocketInitializer()
+	protected SocketInitializer createSocketInitializer()
 	{
 		return new SocketInitializerImpl();
 	}

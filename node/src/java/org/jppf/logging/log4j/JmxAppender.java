@@ -57,7 +57,7 @@ public class JmxAppender extends AppenderSkeleton
 	 */
 	private void init()
 	{
-		notifier = new JmxMessageNotifier(mbeanName); 
+		notifier = new JmxMessageNotifier(mbeanName);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class JmxAppender extends AppenderSkeleton
 	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
 	 */
 	@Override
-    protected void append(LoggingEvent event)
+	protected void append(final LoggingEvent event)
 	{
 		if (notifier == null) init();
 		Layout layout = getLayout();
@@ -85,7 +85,7 @@ public class JmxAppender extends AppenderSkeleton
 	 * @see org.apache.log4j.Appender#close()
 	 */
 	@Override
-    public void close()
+	public void close()
 	{
 	}
 
@@ -95,7 +95,7 @@ public class JmxAppender extends AppenderSkeleton
 	 * @see org.apache.log4j.Appender#requiresLayout()
 	 */
 	@Override
-    public boolean requiresLayout()
+	public boolean requiresLayout()
 	{
 		return true;
 	}
@@ -113,7 +113,7 @@ public class JmxAppender extends AppenderSkeleton
 	 * Set the name of the mbean that sends messages as JMX notifications.
 	 * @param mbeanName the mbean name as a string.
 	 */
-	public void setMbeanName(String mbeanName)
+	public void setMbeanName(final String mbeanName)
 	{
 		this.mbeanName = mbeanName;
 	}

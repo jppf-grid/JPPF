@@ -82,7 +82,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param port the port number as an int value.
 	 * @throws JPPFException if this server could not be initialized.
 	 */
-	public ClassNioServer(int port) throws JPPFException
+	public ClassNioServer(final int port) throws JPPFException
 	{
 		this(new int[] { port });
 	}
@@ -102,7 +102,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * Initialize the local channel connection.
 	 * @param localChannel the local channel to use.
 	 */
-	public void initLocalChannel(ChannelWrapper<?> localChannel)
+	public void initLocalChannel(final ChannelWrapper<?> localChannel)
 	{
 		if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
 		{
@@ -115,7 +115,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 			postAccept(localChannel);
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -147,7 +147,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void postAccept(ChannelWrapper<?> wrapper)
+	public void postAccept(final ChannelWrapper<?> wrapper)
 	{
 		((ClassContext) wrapper.getContext()).setState(DEFINING_TYPE);
 	}
@@ -185,7 +185,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void addProviderConnection(String uuid, ChannelWrapper<?> channel)
+	public void addProviderConnection(final String uuid, final ChannelWrapper<?> channel)
 	{
 		if (debugEnabled) log.debug("adding provider connection: uuid=" + uuid + ", channel=" + channel);
 		synchronized(providerConnections)
@@ -205,7 +205,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param uuid the provider uuid as a string.
 	 * @param channel the provider's communication channel.
 	 */
-	public void removeProviderConnection(String uuid, ChannelWrapper channel)
+	public void removeProviderConnection(final String uuid, final ChannelWrapper channel)
 	{
 		if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
 		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
@@ -222,7 +222,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param uuid the uuid of the client for which to get connections.
 	 * @return a list of connection channels.
 	 */
-	public List<ChannelWrapper<?>> getProviderConnections(String uuid)
+	public List<ChannelWrapper<?>> getProviderConnections(final String uuid)
 	{
 		synchronized(providerConnections)
 		{
@@ -238,7 +238,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param name name of the resource.
 	 * @param content content of the resource.
 	 */
-	public void setCacheContent(String uuid, String name, byte[] content)
+	public void setCacheContent(final String uuid, final String name, final byte[] content)
 	{
 		if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + ']');
 		CacheClassContent cacheContent = new CacheClassContent(content);
@@ -255,7 +255,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param name name of the resource.
 	 * @return the content of the resource as an array of bytes.
 	 */
-	public byte[] getCacheContent(String uuid, String name)
+	public byte[] getCacheContent(final String uuid, final String name)
 	{
 		if (traceEnabled) log.trace("looking up key=[" + uuid + ", " + name + ']');
 		CacheClassContent content;
@@ -271,7 +271,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param uuid the uuid key to look up in the the map.
 	 * @return channel the corresponding channel.
 	 */
-	ChannelWrapper<?> getNodeConnection(String uuid)
+	ChannelWrapper<?> getNodeConnection(final String uuid)
 	{
 		synchronized(nodeConnections)
 		{
@@ -284,7 +284,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param uuid the uuid key to add to the map.
 	 * @param channel the corresponding channel.
 	 */
-	void addNodeConnection(String uuid, ChannelWrapper<?> channel)
+	void addNodeConnection(final String uuid, final ChannelWrapper<?> channel)
 	{
 		if (debugEnabled) log.debug("adding node connection: uuid=" + uuid + ", channel=" + channel);
 		synchronized(nodeConnections)
@@ -298,7 +298,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * @param uuid the uuid key to remove from the map.
 	 * @return channel the corresponding channel.
 	 */
-	ChannelWrapper<?> removeNodeConnection(String uuid)
+	ChannelWrapper<?> removeNodeConnection(final String uuid)
 	{
 		if (debugEnabled) log.debug("removing node connection: uuid=" + uuid);
 		synchronized(nodeConnections)
@@ -313,7 +313,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * Close the specified connection.
 	 * @param channel the channel representing the connection.
 	 */
-	static void closeConnection(ChannelWrapper<?> channel)
+	static void closeConnection(final ChannelWrapper<?> channel)
 	{
 		if (channel == null)
 		{
@@ -343,7 +343,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void connectionFailed(ReaperEvent event)
+	public void connectionFailed(final ReaperEvent event)
 	{
 		ServerConnection c = event.getConnection();
 		if (!c.isOk())

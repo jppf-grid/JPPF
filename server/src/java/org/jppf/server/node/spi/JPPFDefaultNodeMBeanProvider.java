@@ -21,7 +21,7 @@ package org.jppf.server.node.spi;
 import org.jppf.management.*;
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
 import org.jppf.node.Node;
-import org.jppf.server.node.*;
+import org.jppf.server.node.JPPFNode;
 
 /**
  * Provider for the default JPPF node management and monitoring features.
@@ -48,7 +48,7 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
 	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
 	 */
 	@Override
-	public Object createMBean(Node node)
+	public Object createMBean(final Node node)
 	{
 		return new JPPFNodeAdmin((JPPFNode) node);
 	}

@@ -52,12 +52,12 @@ public class ComboBoxOption extends AbstractOption
 	/**
 	 * Initialize this combo box option with the specified parameters.
 	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox. 
+	 * @param label the label displayed with the checkbox.
 	 * @param tooltip the tooltip associated with the combobox.
 	 * @param value the initially selected value of this component.
 	 * @param items the initial list of items in the combo box.
 	 */
-	public ComboBoxOption(String name, String label, String tooltip, Object value, List<Object> items)
+	public ComboBoxOption(final String name, final String label, final String tooltip, final Object value, final List<Object> items)
 	{
 		this.name = name;
 		this.label = label;
@@ -71,7 +71,7 @@ public class ComboBoxOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		combo = new JComboBox();
 		if (items != null)
@@ -96,7 +96,7 @@ public class ComboBoxOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#getValue()
 	 */
 	@Override
-    public Object getValue()
+	public Object getValue()
 	{
 		value = combo.getSelectedItem();
 		return value;
@@ -108,21 +108,22 @@ public class ComboBoxOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object value)
+	public void setValue(final Object value)
 	{
+		Object val = value;
 		if (value instanceof String)
 		{
 			for (Object o: items)
 			{
 				if (value.equals(o.toString()))
 				{
-					value = o;
+					val = o;
 					break;
 				}
 			}
 		}
-		this.value = value;
-		if (combo != null) combo.setSelectedItem(value);
+		this.value = val;
+		if (combo != null) combo.setSelectedItem(val);
 	}
 
 	/**
@@ -130,12 +131,12 @@ public class ComboBoxOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 		combo.addActionListener(new ActionListener()
 		{
 			@Override
-            public void actionPerformed(ActionEvent event)
+			public void actionPerformed(final ActionEvent event)
 			{
 				getValue();
 				fireValueChanged();
@@ -149,7 +150,7 @@ public class ComboBoxOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		combo.setEnabled(enabled);
 		comboLabel.setEnabled(enabled);
@@ -168,7 +169,7 @@ public class ComboBoxOption extends AbstractOption
 	 * Set the list of items in the combo box.
 	 * @param items a list of <code>Object</code> instances.
 	 */
-	public void setItems(List items)
+	public void setItems(final List items)
 	{
 		this.items = items;
 		if (combo != null)

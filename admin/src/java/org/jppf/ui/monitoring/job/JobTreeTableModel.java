@@ -57,7 +57,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * Initialize this model with the specified tree root.
 	 * @param node - the root of the tree.
 	 */
-	public JobTreeTableModel(TreeNode node)
+	public JobTreeTableModel(final TreeNode node)
 	{
 		super(node);
 		BASE = "org.jppf.ui.i18n.JobDataPage";
@@ -69,7 +69,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
 	 */
 	@Override
-    public int getColumnCount()
+	public int getColumnCount()
 	{
 		return 6;
 	}
@@ -82,7 +82,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
 	 */
 	@Override
-    public Object getValueAt(Object node, int column)
+	public Object getValueAt(final Object node, final int column)
 	{
 		Object res = "";
 		if (node instanceof DefaultMutableTreeNode)
@@ -138,7 +138,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
 	 */
 	@Override
-    public String getColumnName(int column)
+	public String getColumnName(final int column)
 	{
 		String res = "";
 		switch (column)

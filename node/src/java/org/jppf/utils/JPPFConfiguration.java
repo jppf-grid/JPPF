@@ -71,7 +71,7 @@ public class JPPFConfiguration
 	/**
 	 * Reset and reload the JPPF configuration.
 	 * This allows reloading the configuration from a different source or file
-	 * (after changing the values of the related system properties for instance). 
+	 * (after changing the values of the related system properties for instance).
 	 */
 	public static void reset()
 	{

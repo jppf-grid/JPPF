@@ -37,7 +37,7 @@ public class GenericRunner
 	 * @param args not used.
 	 * @throws Exception if any error occurs.
 	 */
-	public static void main(String[] args) throws Exception
+	public static void main(final String[] args) throws Exception
 	{
 		JPPFClient client = null;
 		try
@@ -52,7 +52,7 @@ public class GenericRunner
 			JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size())
 			{
 				@Override
-                public synchronized void resultsReceived(TaskResultEvent event)
+				public synchronized void resultsReceived(final TaskResultEvent event)
 				{
 					System.out.println("received " + event.getTaskList().size() + " tasks");
 					super.resultsReceived(event);
@@ -92,7 +92,7 @@ public class GenericRunner
 	 * @param job the job to add the tasks to.
 	 * @throws Exception if any IO error occurs.
 	 */
-	private static void addConfiguredTasks(JPPFJob job) throws Exception
+	private static void addConfiguredTasks(final JPPFJob job) throws Exception
 	{
 		String path = JPPFConfiguration.getProperties().getString("task.list.file", null);
 		if (path == null) return;

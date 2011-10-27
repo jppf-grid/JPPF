@@ -75,7 +75,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		for (Object o: selectedElements)
@@ -97,7 +97,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-    public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		final List<JMXDriverConnectionWrapper> list = new ArrayList<JMXDriverConnectionWrapper>();
 		for (Object o: selectedElements)
@@ -122,7 +122,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 			okBtn.addActionListener(new ActionListener()
 			{
 				@Override
-                public void actionPerformed(ActionEvent event)
+				public void actionPerformed(final ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -132,7 +132,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 			cancelBtn.addActionListener(new ActionListener()
 			{
 				@Override
-                public void actionPerformed(ActionEvent event)
+				public void actionPerformed(final ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -169,7 +169,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
 		Runnable r = new Runnable()
 		{
 			@Override
-            public void run()
+			public void run()
 			{
 				for (JMXDriverConnectionWrapper jmx: driverConnections)
 				{

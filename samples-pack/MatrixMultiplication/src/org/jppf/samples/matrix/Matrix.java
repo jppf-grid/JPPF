@@ -42,17 +42,17 @@ public class Matrix implements Serializable
 	 * The values in this matrix.
 	 */
 	public double[][] values;
-	
+
 	/**
 	 * Initialize this matrix with a specified size.
 	 * @param newSize the size of this matrix.
 	 */
-	public Matrix(int newSize)
+	public Matrix(final int newSize)
 	{
 		this.size = newSize;
 		values = new double[size][size];
 	}
-	
+
 	/**
 	 * Initialize this matrix with random values.
 	 */
@@ -75,46 +75,46 @@ public class Matrix implements Serializable
 	{
 		return size;
 	}
-	
+
 	/**
 	 * Get the row of matrix values at the specified index. Provided as a convenience.
 	 * @param row the row index.
 	 * @return the values in the row as an array of <code>double</code> values, or null if the row index is
 	 * greater than the matrix size.
 	 */
-	public double[] getRow(int row)
+	public double[] getRow(final int row)
 	{
 		return (row < size) ? values[row] : null;
 	}
-	
+
 	/**
 	 * Get a value at the specified coordinates.
 	 * @param row the row coordinate.
 	 * @param column the column coordinate.
 	 * @return the specified value as a double.
 	 */
-	public double getValueAt(int row, int column)
+	public double getValueAt(final int row, final int column)
 	{
 		return values[row][column];
 	}
-	
+
 	/**
 	 * Set a value to the specified coordinates.
 	 * @param row the row coordinate.
 	 * @param column the column coordinate.
 	 * @param value the value to set.
 	 */
-	public void setValueAt(int row, int column, double value)
+	public void setValueAt(final int row, final int column, final double value)
 	{
 		values[row][column] = value;
 	}
-	
+
 	/**
 	 * Compute the result of mutiplying this matrix by another: thisMatrix x otherMatrix.
 	 * @param matrix the matrix to multiply this one by.
 	 * @return a new matrix containing the reuslt of the multiplication.
 	 */
-	public Matrix multiply(Matrix matrix)
+	public Matrix multiply(final Matrix matrix)
 	{
 		if (matrix.getSize() != size) return null;
 		Matrix result = new Matrix(size);
@@ -137,7 +137,7 @@ public class Matrix implements Serializable
 	 * @param matrix the matrix to multiply by.
 	 * @return a new row represented as an array of <code>double</code> values.
 	 */
-	public double[] multiplyRow(int n, Matrix matrix)
+	public double[] multiplyRow(final int n, final Matrix matrix)
 	{
 		double[] result = new double[size];
 		for (int col=0; col<size; col++)

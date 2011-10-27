@@ -31,7 +31,7 @@ public interface Bundler
 	 * @return  the bundle size as an int value.
 	 */
 	int getBundleSize();
-	
+
 	/**
 	 * Feedback the bundler with the result of using the bundle with the specified size.
 	 * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.

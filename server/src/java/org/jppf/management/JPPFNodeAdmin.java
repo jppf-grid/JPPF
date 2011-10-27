@@ -63,7 +63,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * Initialize this node management bean with the specified node.
 	 * @param node the node whose state is monitored.
 	 */
-	public JPPFNodeAdmin(JPPFNode node)
+	public JPPFNodeAdmin(final JPPFNode node)
 	{
 		if (debugEnabled) log.debug("instantiating JPPNodeAdmin");
 		this.node = node;
@@ -106,7 +106,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
 	 */
 	@Override
-	public void cancelTask(String id) throws Exception
+	public void cancelTask(final String id) throws Exception
 	{
 		node.getExecutionManager().cancelTask(id);
 	}
@@ -119,7 +119,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
 	 */
 	@Override
-	public void restartTask(String id) throws Exception
+	public void restartTask(final String id) throws Exception
 	{
 		node.getExecutionManager().restartTask(id);
 	}
@@ -131,7 +131,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
 	 */
 	@Override
-	public void updateThreadPoolSize(Integer size) throws Exception
+	public void updateThreadPoolSize(final Integer size) throws Exception
 	{
 		node.getExecutionManager().setThreadPoolSize(size);
 		nodeState.setThreadPoolSize(size);
@@ -176,7 +176,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	}
 
 	/**
-	 * Reset the node's executed tasks counter to zero. 
+	 * Reset the node's executed tasks counter to zero.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
 	 */
@@ -193,7 +193,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
 	 */
 	@Override
-	public synchronized void setTaskCounter(Integer n) throws Exception
+	public synchronized void setTaskCounter(final Integer n) throws Exception
 	{
 		node.setTaskCount(n);
 		nodeState.setNbTasksExecuted(n);
@@ -206,21 +206,21 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
 	 */
 	@Override
-	public void updateThreadsPriority(Integer newPriority) throws Exception
+	public void updateThreadsPriority(final Integer newPriority) throws Exception
 	{
 		node.getExecutionManager().updateThreadsPriority(newPriority);
 		nodeState.setThreadPriority(newPriority);
 	}
 
 	/**
-	 * Update the configuration properties of the node. 
+	 * Update the configuration properties of the node.
 	 * @param config the set of properties to update.
 	 * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
 	 */
 	@Override
-	public void updateConfiguration(Map<Object, Object> config, Boolean reconnect) throws Exception
+	public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception
 	{
 		if (config == null) return;
 		JPPFConfiguration.getProperties().putAll(config);
@@ -257,7 +257,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * Notification that a task with the specified id has started.
 	 * @param id the id of the task.
 	 */
-	public void taskStarted(String id)
+	public void taskStarted(final String id)
 	{
 		//if (debugEnabled) log.debug("task id#" + id + " started");
 		nodeState.taskStarted(id);
@@ -267,7 +267,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * Notification that a task with the specified id has ended.
 	 * @param id the id of the task.
 	 */
-	public void taskEnded(String id)
+	public void taskEnded(final String id)
 	{
 		//if (debugEnabled) log.debug("task id#" + id + " ended");
 		nodeState.taskEnded(id);
@@ -281,7 +281,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)
 	 */
 	@Override
-	public void cancelJob(String jobId, Boolean requeue) throws Exception
+	public void cancelJob(final String jobId, final Boolean requeue) throws Exception
 	{
 		if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "', requeue = " + requeue);
 		if (jobId == null) return;
@@ -305,7 +305,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setDelegationModel(DelegationModel model) throws Exception
+	public void setDelegationModel(final DelegationModel model) throws Exception
 	{
 		if (model != null) AbstractJPPFClassLoader.setDelegationModel(model);
 	}

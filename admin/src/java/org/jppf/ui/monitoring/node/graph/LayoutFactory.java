@@ -38,7 +38,7 @@ class LayoutFactory
 	 * Create a factory instance for the specified graph.
 	 * @param graph the graph for which to create layouts.
 	 */
-	LayoutFactory(mxGraph graph)
+	LayoutFactory(final mxGraph graph)
 	{
 		this.graph = graph;
 	}
@@ -48,7 +48,7 @@ class LayoutFactory
 	 * @param name the name of the layout to create.
 	 * @return a <code>mxIGraphLayout</code> instance.
 	 */
-	mxIGraphLayout createLayout(String name)
+	mxIGraphLayout createLayout(final String name)
 	{
 		mxIGraphLayout layout;
 		if ("Circle".equals(name)) layout = newCircleLayout();
@@ -83,7 +83,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newCircleLayout()
 	{
-        return new mxCircleLayout(graph);
+		return new mxCircleLayout(graph);
 	}
 
 	/**
@@ -92,7 +92,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newEdgeLabelLayout()
 	{
-        return new mxEdgeLabelLayout(graph);
+		return new mxEdgeLabelLayout(graph);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newFastOrganicLayout()
 	{
-        return new mxFastOrganicLayout(graph);
+		return new mxFastOrganicLayout(graph);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newHierarchicalLayout()
 	{
-        return new mxHierarchicalLayout(graph);
+		return new mxHierarchicalLayout(graph);
 	}
 
 	/**
@@ -120,13 +120,13 @@ class LayoutFactory
 	private mxIGraphLayout newOrganicLayout()
 	{
 		mxOrganicLayout layout = new mxOrganicLayout(graph);
-    layout.setRadiusScaleFactor(1.0);
-    layout.setApproxNodeDimensions(false);
-    layout.setEdgeCrossingCostFactor(8000.0);
-    layout.setNodeDistributionCostFactor(layout.getNodeDistributionCostFactor() * 5.0);
-	  layout.setEdgeDistanceCostFactor(layout.getEdgeDistanceCostFactor() * 5.0);
-	  layout.setEdgeLengthCostFactor(layout.getEdgeLengthCostFactor() / 1000.0);
-	  return layout;
+		layout.setRadiusScaleFactor(1.0);
+		layout.setApproxNodeDimensions(false);
+		layout.setEdgeCrossingCostFactor(8000.0);
+		layout.setNodeDistributionCostFactor(layout.getNodeDistributionCostFactor() * 5.0);
+		layout.setEdgeDistanceCostFactor(layout.getEdgeDistanceCostFactor() * 5.0);
+		layout.setEdgeLengthCostFactor(layout.getEdgeLengthCostFactor() / 1000.0);
+		return layout;
 	}
 
 	/**
@@ -135,7 +135,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newOrthogonalLayout()
 	{
-        return new mxOrthogonalLayout(graph);
+		return new mxOrthogonalLayout(graph);
 	}
 
 	/**
@@ -144,7 +144,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newParallelEdgeLayout()
 	{
-        return new mxParallelEdgeLayout(graph);
+		return new mxParallelEdgeLayout(graph);
 	}
 
 	/**
@@ -153,7 +153,7 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newPartitionLayout()
 	{
-        return new mxPartitionLayout(graph, false, 10);
+		return new mxPartitionLayout(graph, false, 10);
 	}
 
 	/**
@@ -162,6 +162,6 @@ class LayoutFactory
 	 */
 	private mxIGraphLayout newStackLayout()
 	{
-        return new mxStackLayout(graph);
+		return new mxStackLayout(graph);
 	}
 }

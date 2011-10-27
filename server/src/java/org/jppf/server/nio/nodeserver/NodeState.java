@@ -28,15 +28,15 @@ public enum NodeState
 	/**
 	 * State of sending the initial bundle to the node.
 	 */
-	SEND_INITIAL_BUNDLE, 
+	SEND_INITIAL_BUNDLE,
 	/**
 	 * State of waiting for the initial bundle from the node.
 	 */
-	WAIT_INITIAL_BUNDLE, 
+	WAIT_INITIAL_BUNDLE,
 	/**
 	 * State of waiting for something to do / sending a task bundle to the node.
 	 */
-	SENDING_BUNDLE, 
+	SENDING_BUNDLE,
 	/**
 	 * State of waiting for the execution result of a task bundle.
 	 */

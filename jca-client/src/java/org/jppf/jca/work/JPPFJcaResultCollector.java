@@ -51,7 +51,7 @@ public class JPPFJcaResultCollector implements TaskResultListener
 	private List<JPPFTask> results = null;
 
 	/**
-	 * Initialize this collector. 
+	 * Initialize this collector.
 	 */
 	public JPPFJcaResultCollector()
 	{
@@ -63,7 +63,7 @@ public class JPPFJcaResultCollector implements TaskResultListener
 	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
 	 */
 	@Override
-	public void resultsReceived(TaskResultEvent event)
+	public void resultsReceived(final TaskResultEvent event)
 	{
 		List<JPPFTask> tasks = event.getTaskList();
 		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks ");

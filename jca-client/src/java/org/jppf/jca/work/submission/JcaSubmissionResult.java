@@ -52,10 +52,10 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	private List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
 
 	/**
-	 * Initialize this collector. 
+	 * Initialize this collector.
 	 * @param job the job to execute.
 	 */
-	JcaSubmissionResult(JPPFJob job)
+	JcaSubmissionResult(final JPPFJob job)
 	{
 		super(job);
 		this.id = job.getJobUuid();
@@ -74,7 +74,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	 * Set the status of this submission.
 	 * @param status a {@link SubmissionStatus} enumerated value.
 	 */
-	public synchronized void setStatus(SubmissionStatus status)
+	public synchronized void setStatus(final SubmissionStatus status)
 	{
 		if (debugEnabled) log.debug("submission [" + id + "] status changing from '" + this.status + "' to '" + status + "'");
 		this.status = status;
@@ -94,7 +94,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	 * Add a listener to the list of status listeners.
 	 * @param listener the listener to add.
 	 */
-	public void addSubmissionStatusListener(SubmissionStatusListener listener)
+	public void addSubmissionStatusListener(final SubmissionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -107,7 +107,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	 * Remove a listener from the list of status listeners.
 	 * @param listener the listener to remove.
 	 */
-	public void removeSubmissionStatusListener(SubmissionStatusListener listener)
+	public void removeSubmissionStatusListener(final SubmissionStatusListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -134,7 +134,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	}
 
 	/**
-	 * Reset this submission result for new submission of the same tasks. 
+	 * Reset this submission result for new submission of the same tasks.
 	 */
 	/*
 	synchronized void reset()
@@ -144,5 +144,5 @@ public class JcaSubmissionResult extends JPPFResultCollector
 		count = job.getTasks().size() - job.getResultMap().size();
 		pendingCount = count;
 	}
-	*/
+	 */
 }

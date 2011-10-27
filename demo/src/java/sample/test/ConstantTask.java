@@ -29,7 +29,7 @@ public class ConstantTask extends JPPFTestTask
 	 * Initialize this task with a specfied returned result.
 	 * @param n the task result as an integer value.
 	 */
-	public ConstantTask(int n)
+	public ConstantTask(final int n)
 	{
 		setResult(Integer.valueOf(n));
 	}

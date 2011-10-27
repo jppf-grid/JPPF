@@ -75,7 +75,7 @@ public class JPPFDataTransformFactory
 	}
 
 	/**
-	 * Transform the specified data using the specified data transformation. 
+	 * Transform the specified data using the specified data transformation.
 	 * @param transform the data transformation to use.
 	 * @param normal true to wrap the data, false to unwrap it.
 	 * @param data the data to transform.
@@ -84,7 +84,7 @@ public class JPPFDataTransformFactory
 	 * @return the result of the transformation as an array of bytes.
 	 * @throws Exception if any error occurs while transforming the data.
 	 */
-	public static byte[] transform(JPPFDataTransform transform, boolean normal, byte[] data, int offset, int len) throws Exception
+	public static byte[] transform(final JPPFDataTransform transform, final boolean normal, final byte[] data, final int offset, final int len) throws Exception
 	{
 		InputStream is = new ByteArrayInputStream(data, offset, len);
 		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
@@ -94,14 +94,14 @@ public class JPPFDataTransformFactory
 	}
 
 	/**
-	 * Transform the specified data using the specified data transformation. 
+	 * Transform the specified data using the specified data transformation.
 	 * @param transform the data transformation to use.
 	 * @param normal true to wrap the data, false to unwrap it.
 	 * @param data the data to transform.
 	 * @return the result of the transformation as an array of bytes.
 	 * @throws Exception if any error occurs while transforming the data.
 	 */
-	public static byte[] transform(JPPFDataTransform transform, boolean normal, byte[] data) throws Exception
+	public static byte[] transform(final JPPFDataTransform transform, final boolean normal, final byte[] data) throws Exception
 	{
 		return transform(transform, normal, data, 0, data.length);
 	}
@@ -116,7 +116,7 @@ public class JPPFDataTransformFactory
 	 * @throws Exception if any error occurs while transforming the data.
 	 * @throws Exception if any error occurs while tranforming the data.
 	 */
-	public static byte[] transform(boolean normal, byte[] data, int offset, int len) throws Exception
+	public static byte[] transform(final boolean normal, final byte[] data, final int offset, final int len) throws Exception
 	{
 		JPPFDataTransform dataTransform = createInstance();
 		return dataTransform == null ? data : transform(dataTransform, normal, data, offset, len);
@@ -129,7 +129,7 @@ public class JPPFDataTransformFactory
 	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
 	 * @throws Exception if any error occurs while transforming the data.
 	 */
-	public static byte[] transform(boolean normal, byte[] data) throws Exception
+	public static byte[] transform(final boolean normal, final byte[] data) throws Exception
 	{
 		JPPFDataTransform dataTransform = createInstance();
 		return dataTransform == null ? data : transform(dataTransform, normal, data, 0, data.length);
@@ -142,7 +142,7 @@ public class JPPFDataTransformFactory
 	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
 	 * @throws Exception if any error occurs while transforming the data.
 	 */
-	public static byte[] transform(boolean normal, InputStream is) throws Exception
+	public static byte[] transform(final boolean normal, final InputStream is) throws Exception
 	{
 		JPPFDataTransform dataTransform = createInstance();
 		if (dataTransform == null) return FileUtils.getInputStreamAsByte(is);

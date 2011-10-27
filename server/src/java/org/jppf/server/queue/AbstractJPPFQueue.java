@@ -59,7 +59,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * Add a listener to the list of listeners.
 	 * @param listener the listener to add to the list.
 	 */
-	public void addQueueListener(QueueListener listener)
+	public void addQueueListener(final QueueListener listener)
 	{
 		synchronized(queueListeners)
 		{
@@ -71,7 +71,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * Remove a listener from the list of listeners.
 	 * @param listener the listener to rmeove from the list.
 	 */
-	public void removeQueueListener(QueueListener listener)
+	public void removeQueueListener(final QueueListener listener)
 	{
 		synchronized(queueListeners)
 		{
@@ -94,7 +94,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * @param bundleWrapper the bundle to get the size from.
 	 * @return the bundle size as an int.
 	 */
-	protected int getSize(ServerJob bundleWrapper)
+	protected int getSize(final ServerJob bundleWrapper)
 	{
 		//return bundle.getTaskCount();
 		return ((JPPFTaskBundle) bundleWrapper.getJob()).getInitialTaskCount();
@@ -104,7 +104,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 * Notify all queue listeners of an event.
 	 * @param event - the event to notify of.
 	 */
-	protected void fireQueueEvent(QueueEvent event)
+	protected void fireQueueEvent(final QueueEvent event)
 	{
 		synchronized(getQueueListeners())
 		{

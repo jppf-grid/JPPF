@@ -61,7 +61,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	protected String uuid = null;
 	/**
-	 * A list of all the connections initially created. 
+	 * A list of all the connections initially created.
 	 */
 	private final List<JPPFClientConnection> allConnections = new LinkedList<JPPFClientConnection>();
 	/**
@@ -81,7 +81,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * Initialize this client with a specified application UUID.
 	 * @param uuid the unique identifier for this local client.
 	 */
-	protected AbstractJPPFClient(String uuid)
+	protected AbstractJPPFClient(final String uuid)
 	{
 		this.uuid = uuid;
 		if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + uuid);
@@ -94,40 +94,40 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	protected abstract void initPools();
 
 	/**
-	 * Get all the client connections handled by this JPPFClient. 
+	 * Get all the client connections handled by this JPPFClient.
 	 * @return a list of <code>JPPFClientConnection</code> instances.
 	 */
 	public List<JPPFClientConnection> getAllConnections()
 	{
-        synchronized (pools)
-        {
-		    return Collections.unmodifiableList(new ArrayList<JPPFClientConnection>(allConnections));
-        }
+		synchronized (pools)
+		{
+			return Collections.unmodifiableList(new ArrayList<JPPFClientConnection>(allConnections));
+		}
 	}
 
-    /**
-     * Get count of all client connections handled by this JPPFClient.
-     * @return count of <code>JPPFClientConnection</code> instances.
-     */
-    protected int getAllConnectionsCount() {
-        synchronized (pools)
-        {
-            return allConnections.size();
-        }
-    }
+	/**
+	 * Get count of all client connections handled by this JPPFClient.
+	 * @return count of <code>JPPFClientConnection</code> instances.
+	 */
+	protected int getAllConnectionsCount() {
+		synchronized (pools)
+		{
+			return allConnections.size();
+		}
+	}
 
 	/**
-	 * Get the names of all the client connections handled by this JPPFClient. 
+	 * Get the names of all the client connections handled by this JPPFClient.
 	 * @return a list of connection names as strings.
 	 */
 	public List<String> getAllConnectionNames()
 	{
-        List<String> names;
-        synchronized (pools)
-        {
-		    names = new LinkedList<String>();
-		    for (JPPFClientConnection c: allConnections) names.add(c.getName());
-        }
+		List<String> names;
+		synchronized (pools)
+		{
+			names = new LinkedList<String>();
+			for (JPPFClientConnection c: allConnections) names.add(c.getName());
+		}
 		return names;
 	}
 
@@ -136,15 +136,15 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param name the name of the connection to find.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
-	public JPPFClientConnection getClientConnection(String name)
+	public JPPFClientConnection getClientConnection(final String name)
 	{
-        synchronized (pools)
-        {
-            for (JPPFClientConnection c: allConnections)
-            {
-                if (c.getName().equals(name)) return c;
-            }
-        }
+		synchronized (pools)
+		{
+			for (JPPFClientConnection c: allConnections)
+			{
+				if (c.getName().equals(name)) return c;
+			}
+		}
 		return null;
 	}
 
@@ -164,7 +164,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * This enables the excution to be performed locally if the client is not connected to a server.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
-	public JPPFClientConnection getClientConnection(boolean oneAttempt)
+	public JPPFClientConnection getClientConnection(final boolean oneAttempt)
 	{
 		return getClientConnection(oneAttempt, false);
 	}
@@ -174,7 +174,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @param oneAttempt determines whether this method should wait until a connection
 	 * becomes available (ACTIVE status) or fail immeditately if no available connection is found.<br>
 	 * This enables the execution to be performed locally if the client is not connected to a server.
-	 * @param anyState specifies whether this method should look for an active connection or not care about the connection state. 
+	 * @param anyState specifies whether this method should look for an active connection or not care about the connection state.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
 	public JPPFClientConnection getClientConnection(final boolean oneAttempt, final boolean anyState)
@@ -184,10 +184,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		{
 			while ((connection == null) && !pools.isEmpty())
 			{
-                Iterator<Map.Entry<Integer, ClientPool>> poolIterator = pools.entrySet().iterator();
+				Iterator<Map.Entry<Integer, ClientPool>> poolIterator = pools.entrySet().iterator();
 				while ((connection == null) && poolIterator.hasNext())
 				{
-                    Map.Entry<Integer, ClientPool> entry = poolIterator.next();
+					Map.Entry<Integer, ClientPool> entry = poolIterator.next();
 					ClientPool pool = entry.getValue();
 					int count = 0;
 					while ((connection == null) && (count < pool.size()))
@@ -201,7 +201,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 								break;
 							case FAILED:
 								pool.remove(c);
-                                if(pool.isEmpty()) poolIterator.remove();
+								if(pool.isEmpty()) poolIterator.remove();
 								break;
 							default:
 								if (anyState) connection = c;
@@ -240,7 +240,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */
 	@Override
-    public void statusChanged(final ClientConnectionStatusEvent event)
+	public void statusChanged(final ClientConnectionStatusEvent event)
 	{
 		JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
 		if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED)) connectionFailed(c);
@@ -253,51 +253,51 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	protected void connectionFailed(final JPPFClientConnection c)
 	{
 		log.info("Connection [" + c.getName() + "] failed");
-        removeClientConnection(c);
-        fireConnectionFailed(c);
+		removeClientConnection(c);
+		fireConnectionFailed(c);
 	}
 
-    protected void addClientConnection(final JPPFClientConnection connection) {
-        if(connection == null) throw new IllegalArgumentException("connection is null");
+	protected void addClientConnection(final JPPFClientConnection connection) {
+		if(connection == null) throw new IllegalArgumentException("connection is null");
 
-        connection.addClientConnectionStatusListener(this);
-        connection.setStatus(JPPFClientConnectionStatus.NEW);
-        int priority = connection.getPriority();
-        synchronized(pools)
-        {
-            ClientPool pool = pools.get(priority);
-            if (pool == null)
-            {
-                pool = new ClientPool(priority);
-                pools.put(priority, pool);
-            }
-            pool.add(connection);
-            allConnections.add(connection);
-        }
-    }
+		connection.addClientConnectionStatusListener(this);
+		connection.setStatus(JPPFClientConnectionStatus.NEW);
+		int priority = connection.getPriority();
+		synchronized(pools)
+		{
+			ClientPool pool = pools.get(priority);
+			if (pool == null)
+			{
+				pool = new ClientPool(priority);
+				pools.put(priority, pool);
+			}
+			pool.add(connection);
+			allConnections.add(connection);
+		}
+	}
 
-    protected void removeClientConnection(final JPPFClientConnection connection) {
-        if(connection == null) throw new IllegalArgumentException("connection is null");
+	protected void removeClientConnection(final JPPFClientConnection connection) {
+		if(connection == null) throw new IllegalArgumentException("connection is null");
 
 		connection.removeClientConnectionStatusListener(this);
 		int priority = connection.getPriority();
-        synchronized (pools) {
-            ClientPool pool = pools.get(priority);
-            boolean emptyPools = false;
-            if (pool != null)
-            {
-                pool.remove(connection);
-                if (pool.isEmpty()) pools.remove(priority);
-                allConnections.remove(connection);
-                //if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-                if (pools.isEmpty())
-                {
-                    log.error("FATAL ERROR: No more driver connection available for this client");
-                    emptyPools = true;
-                }
-            }
-        }
-    }
+		synchronized (pools) {
+			ClientPool pool = pools.get(priority);
+			boolean emptyPools = false;
+			if (pool != null)
+			{
+				pool.remove(connection);
+				if (pool.isEmpty()) pools.remove(priority);
+				allConnections.remove(connection);
+				//if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
+				if (pools.isEmpty())
+				{
+					log.error("FATAL ERROR: No more driver connection available for this client");
+					emptyPools = true;
+				}
+			}
+		}
+	}
 
 	/**
 	 * Close this client and release all the resources it is using.
@@ -342,27 +342,27 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		}
 	}
 
-    protected void fireConnectionFailed(final JPPFClientConnection c)
-    {
-        ClientEvent event = new ClientEvent(c);
-        synchronized (listeners) {
-            for (ClientListener listener : listeners) {
-                listener.connectionFailed(event);
-            }
-        }
-    }
+	protected void fireConnectionFailed(final JPPFClientConnection c)
+	{
+		ClientEvent event = new ClientEvent(c);
+		synchronized (listeners) {
+			for (ClientListener listener : listeners) {
+				listener.connectionFailed(event);
+			}
+		}
+	}
 
-    protected void fireNewConnection(final JPPFClientConnection c)
-    {
-        ClientEvent event = new ClientEvent(c);
-        synchronized(listeners)
+	protected void fireNewConnection(final JPPFClientConnection c)
+	{
+		ClientEvent event = new ClientEvent(c);
+		synchronized(listeners)
 		{
-            for (ClientListener listener: listeners)
-            {
-                listener.newConnection(event);
-            }
-        }
-    }
+			for (ClientListener listener: listeners)
+			{
+				listener.newConnection(event);
+			}
+		}
+	}
 
 	/**
 	 * Notify all listeners that a new connection was created.
@@ -370,10 +370,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	 */
 	public void newConnection(final JPPFClientConnection c)
 	{
-        fireNewConnection(c);
-    }
+		fireNewConnection(c);
+	}
 
-    /**
+	/**
 	 * Get the unique universal identifier for this JPPF client.
 	 * @return the uuid as a string.
 	 */
@@ -400,11 +400,11 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		@Override
-        public int compare(final Integer o1, final Integer o2)
+		public int compare(final Integer o1, final Integer o2)
 		{
-            if(o1 < o2) return 1;
-            if(o1 > o2) return -1;
-            return 0;
+			if(o1 < o2) return 1;
+			if(o1 > o2) return -1;
+			return 0;
 		}
 	}
 }

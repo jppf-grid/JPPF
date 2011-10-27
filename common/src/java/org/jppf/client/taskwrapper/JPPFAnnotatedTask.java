@@ -41,12 +41,12 @@ public class JPPFAnnotatedTask extends JPPFTask
 
 	/**
 	 * Initialize this task with an object whose class is either annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable},
-	 * an instance of {@link java.lang.Runnable Runnable} or  an instance of {@link java.util.concurrent.Callable Callable}. 
+	 * an instance of {@link java.lang.Runnable Runnable} or  an instance of {@link java.util.concurrent.Callable Callable}.
 	 * @param taskObject an object that encapsulates the task to execute.
 	 * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
 	 * @throws JPPFException if an error is raised while initializing this task.
 	 */
-	public JPPFAnnotatedTask(Object taskObject, Object...args) throws JPPFException
+	public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException
 	{
 		if (taskObject instanceof Runnable) taskObjectWrapper = new RunnableTaskWrapper((Runnable) taskObject);
 		else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable) taskObject);
@@ -54,13 +54,13 @@ public class JPPFAnnotatedTask extends JPPFTask
 	}
 
 	/**
-	 * Initialize this task from a POJO, given a method and its arguments to execute it. 
+	 * Initialize this task from a POJO, given a method and its arguments to execute it.
 	 * @param taskObject either an instance of the POJO class if the method is non-static, or a class object if the method is static.
 	 * @param method the name of the method to execute.
 	 * @param args the arguments for the method to execute.
 	 * @throws JPPFException if an error is raised while initializing this task.
 	 */
-	public JPPFAnnotatedTask(Object taskObject, String method, Object...args) throws JPPFException
+	public JPPFAnnotatedTask(final Object taskObject, final String method, final Object...args) throws JPPFException
 	{
 		taskObjectWrapper = new PojoTaskWrapper(method, taskObject, args);
 	}
@@ -70,7 +70,7 @@ public class JPPFAnnotatedTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		try
 		{
@@ -89,7 +89,7 @@ public class JPPFAnnotatedTask extends JPPFTask
 	 * @see org.jppf.server.protocol.JPPFTask#getTaskObject()
 	 */
 	@Override
-    public Object getTaskObject()
+	public Object getTaskObject()
 	{
 		return taskObjectWrapper.getTaskObject();
 	}

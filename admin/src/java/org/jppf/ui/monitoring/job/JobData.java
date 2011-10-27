@@ -49,7 +49,7 @@ public class JobData
 	 */
 	private JPPFClientConnection clientConnection = null;
 	/**
-	 * Wrapper holding the connection to the JMX server on a driver. 
+	 * Wrapper holding the connection to the JMX server on a driver.
 	 */
 	private JMXDriverConnectionWrapper jmxWrapper = null;
 	/**
@@ -73,7 +73,7 @@ public class JobData
 	 * Initialize this job data with the specified type.
 	 * @param type - the type of this job data object as a <code>JobDataType</code> enum value.
 	 */
-	protected JobData(JobDataType type)
+	protected JobData(final JobDataType type)
 	{
 		this.type = type;
 	}
@@ -82,7 +82,7 @@ public class JobData
 	 * Initialize this job data as a driver related object.
 	 * @param clientConnection - a reference to the driver connection.
 	 */
-	public JobData(JPPFClientConnection clientConnection)
+	public JobData(final JPPFClientConnection clientConnection)
 	{
 		this(JobDataType.DRIVER);
 		this.clientConnection = clientConnection;
@@ -93,7 +93,7 @@ public class JobData
 	 * Initialize this job data as a holding information about a job submitted to a driver.
 	 * @param jobInformation - information on the job in a JPPF driver.
 	 */
-	public JobData(JobInformation jobInformation)
+	public JobData(final JobInformation jobInformation)
 	{
 		this(JobDataType.JOB);
 		this.jobInformation = jobInformation;
@@ -104,7 +104,7 @@ public class JobData
 	 * @param jobInformation - information on the job in a JPPF driver.
 	 * @param nodeInformation - information on the JPPF node in which part of a job is executing.
 	 */
-	public JobData(JobInformation jobInformation, JPPFManagementInfo nodeInformation)
+	public JobData(final JobInformation jobInformation, final JPPFManagementInfo nodeInformation)
 	{
 		this(JobDataType.SUB_JOB);
 		this.jobInformation = jobInformation;
@@ -121,7 +121,7 @@ public class JobData
 	}
 
 	/**
-	 * Get the wrapper holding the connection to the JMX server on a driver. 
+	 * Get the wrapper holding the connection to the JMX server on a driver.
 	 * @return a <code>JMXDriverConnectionWrapper</code> instance.
 	 */
 	public JMXDriverConnectionWrapper getJmxWrapper()
@@ -130,10 +130,10 @@ public class JobData
 	}
 
 	/**
-	 * Set the wrapper holding the connection to the JMX server on a driver. 
+	 * Set the wrapper holding the connection to the JMX server on a driver.
 	 * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
 	 */
-	public void setJmxWrapper(JMXDriverConnectionWrapper jmxWrapper)
+	public void setJmxWrapper(final JMXDriverConnectionWrapper jmxWrapper)
 	{
 		this.jmxWrapper = jmxWrapper;
 	}
@@ -184,7 +184,7 @@ public class JobData
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		String s = "";
 		switch(type)
@@ -217,7 +217,7 @@ public class JobData
 	 * @param listener a <code>NotificationListener</code> instance.
 	 * @throws Exception if any error occurs.
 	 */
-	public void changeNotificationListener(NotificationListener listener) throws Exception
+	public void changeNotificationListener(final NotificationListener listener) throws Exception
 	{
 		if (notificationListener != null)
 		{

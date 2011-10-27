@@ -76,7 +76,7 @@ public final class OptionsHandler
 	 * @param name the name of the page to retrieve.
 	 * @return an <code>OptionsPage</code> instance.
 	 */
-	public static synchronized OptionElement getPage(String name)
+	public static synchronized OptionElement getPage(final String name)
 	{
 		return pageMap.get(name);
 	}
@@ -86,7 +86,7 @@ public final class OptionsHandler
 	 * @param page an <code>OptionsPage</code> instance.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionElement addPage(OptionElement page)
+	public static synchronized OptionElement addPage(final OptionElement page)
 	{
 		pageList.add(page);
 		try
@@ -106,7 +106,7 @@ public final class OptionsHandler
 	 * Remove a page from the list of pages managed by this handler.
 	 * @param page an <code>OptionsPage</code> instance.
 	 */
-	public static synchronized void removePage(OptionsPage page)
+	public static synchronized void removePage(final OptionsPage page)
 	{
 		pageList.remove(page);
 		pageMap.remove(page.getName());
@@ -117,7 +117,7 @@ public final class OptionsHandler
 	 * @param xmlPath the path to the xml document.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionElement loadPageFromXml(String xmlPath)
+	public static synchronized OptionElement loadPageFromXml(final String xmlPath)
 	{
 		try
 		{
@@ -135,7 +135,7 @@ public final class OptionsHandler
 	 * @param xmlPath the path to the xml document.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionElement addPageFromXml(String xmlPath)
+	public static synchronized OptionElement addPageFromXml(final String xmlPath)
 	{
 		return addPage(loadPageFromXml(xmlPath));
 	}
@@ -146,7 +146,7 @@ public final class OptionsHandler
 	 * @param baseName base name for resource bundle lookup.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionElement loadPageFromURL(String xmlPath, String baseName)
+	public static synchronized OptionElement loadPageFromURL(final String xmlPath, final String baseName)
 	{
 		try
 		{
@@ -165,7 +165,7 @@ public final class OptionsHandler
 	 * @param baseName base name for resource bundle lookup.
 	 * @return the page that was added.
 	 */
-	public static synchronized OptionElement addPageFromURL(String xmlPath, String baseName)
+	public static synchronized OptionElement addPageFromURL(final String xmlPath, final String baseName)
 	{
 		return addPage(loadPageFromURL(xmlPath, baseName));
 	}
@@ -195,7 +195,7 @@ public final class OptionsHandler
 	 * @param node the root of the options subtree to save.
 	 * @param prefs the preferences node in which to save the vaues.
 	 */
-	public static void savePreferences(OptionNode node, Preferences prefs)
+	public static void savePreferences(final OptionNode node, final Preferences prefs)
 	{
 		if (!node.children.isEmpty())
 		{
@@ -226,7 +226,7 @@ public final class OptionsHandler
 	 * @param node the root of the options subtree to save.
 	 * @param prefs the preferences node in which to save the vaues.
 	 */
-	public static void loadPreferences(OptionNode node, Preferences prefs)
+	public static void loadPreferences(final OptionNode node, final Preferences prefs)
 	{
 		//if (node == null) return;
 		if (!node.children.isEmpty())
@@ -257,7 +257,7 @@ public final class OptionsHandler
 	 * @param elt the root of the current subgraph.
 	 * @return an <code>OptionNode</code> instance.
 	 */
-	public static OptionNode buildPersistenceGraph(OptionElement elt)
+	public static OptionNode buildPersistenceGraph(final OptionElement elt)
 	{
 		OptionNode node = null;
 		if (elt instanceof OptionsPage)
@@ -294,7 +294,7 @@ public final class OptionsHandler
 	 * Set the root of the preferences subtree in which the chart configurations are saved.
 	 * @param preferences a {@link Preferences} instance.
 	 */
-	public static synchronized void setPreferences(Preferences preferences)
+	public static synchronized void setPreferences(final Preferences preferences)
 	{
 		OptionsHandler.preferences = preferences;
 	}
@@ -303,7 +303,7 @@ public final class OptionsHandler
 	 * Load the application's main window state from the preferences store.
 	 * @param pref the preferences node from where the attributes are loaded.
 	 */
-	public static void loadMainWindowAttributes(Preferences pref)
+	public static void loadMainWindowAttributes(final Preferences pref)
 	{
 		loadFrameAttributes(mainWindow, pref);
 	}
@@ -312,7 +312,7 @@ public final class OptionsHandler
 	 * Save the application's main window state to the preferences store.
 	 * @param pref the preferences node where the attributes are saved.
 	 */
-	public static void saveMainWindowAttributes(Preferences pref)
+	public static void saveMainWindowAttributes(final Preferences pref)
 	{
 		saveFrameAttributes(mainWindow, pref);
 	}
@@ -322,7 +322,7 @@ public final class OptionsHandler
 	 * @param frame the frame for which the attributes are retieved.
 	 * @param pref the preferences node from where the attributes are loaded.
 	 */
-	public static void loadFrameAttributes(Frame frame, Preferences pref)
+	public static void loadFrameAttributes(final Frame frame, final Preferences pref)
 	{
 		int x = pref.getInt("locationx", 0);
 		int y = pref.getInt("locationy", 0);
@@ -339,7 +339,7 @@ public final class OptionsHandler
 	 * @param frame the frame for which the attributes are saved.
 	 * @param pref the preferences node where the attributes are saved.
 	 */
-	public static void saveFrameAttributes(Frame frame, Preferences pref)
+	public static void saveFrameAttributes(final Frame frame, final Preferences pref)
 	{
 		int state = frame.getExtendedState();
 		boolean maximized = (state & Frame.MAXIMIZED_BOTH) > 0;
@@ -362,7 +362,7 @@ public final class OptionsHandler
 	}
 
 	/**
-	 * A graph of the persistent options. 
+	 * A graph of the persistent options.
 	 */
 	public static class OptionNode
 	{
@@ -379,7 +379,7 @@ public final class OptionsHandler
 		 * Initilaize this node.
 		 * @param elt the correponding option element.
 		 */
-		public OptionNode(OptionElement elt)
+		public OptionNode(final OptionElement elt)
 		{
 			this.elt = elt;
 		}
@@ -398,7 +398,7 @@ public final class OptionsHandler
 	 * Set the main window of the application.
 	 * @param mainWindow a {@link JFrame} instance.
 	 */
-	public static void setMainWindow(JFrame mainWindow)
+	public static void setMainWindow(final JFrame mainWindow)
 	{
 		OptionsHandler.mainWindow = mainWindow;
 	}

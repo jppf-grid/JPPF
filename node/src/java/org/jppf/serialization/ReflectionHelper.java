@@ -91,7 +91,7 @@ public final class ReflectionHelper
 	 * @return an array of {@link Field} objects.
 	 * @throws Exception if any error occurs.
 	 */
-	public static Field[] getNonTransientFields(Class<?> clazz) throws Exception
+	public static Field[] getNonTransientFields(final Class<?> clazz) throws Exception
 	{
 		Field[] allFields = clazz.getDeclaredFields();
 		if (allFields.length <= 0) return allFields;
@@ -99,18 +99,18 @@ public final class ReflectionHelper
 		for (Field f: allFields)
 		{
 			int mod = f.getModifiers();
-			if (!Modifier.isTransient(mod) && !Modifier.isStatic(mod)) fields.add(f); 
+			if (!Modifier.isTransient(mod) && !Modifier.isStatic(mod)) fields.add(f);
 		}
 		return fields.toArray(new Field[fields.size()]);
 	}
 
 	/**
-	 * Get a unique string representation for the specified type. 
+	 * Get a unique string representation for the specified type.
 	 * @param clazz the type from which to get the signature.
 	 * @return a string representing the ytpe.
 	 * @throws Exception if any error occurs.
 	 */
-	public static String getSignatureFromType(Class<?> clazz) throws Exception
+	public static String getSignatureFromType(final Class<?> clazz) throws Exception
 	{
 		StringBuilder sb =  new StringBuilder();
 		Class<?> tmp = clazz;
@@ -138,7 +138,7 @@ public final class ReflectionHelper
 	 * @return a {@link Class} object.
 	 * @throws Exception if any error occurs.
 	 */
-	public static Class<?> getNonArrayTypeFromSignature(String signature, ClassLoader cl) throws Exception
+	public static Class<?> getNonArrayTypeFromSignature(final String signature, final ClassLoader cl) throws Exception
 	{
 		switch(signature.charAt(0))
 		{
@@ -150,7 +150,7 @@ public final class ReflectionHelper
 			case 'D': return Double.TYPE;
 			case 'C': return Character.TYPE;
 			case 'Z': return Boolean.TYPE;
-			case 'L': 
+			case 'L':
 				String s = signature.substring(1);
 				if ("void".equals(s)) return Void.TYPE;
 				return cl.loadClass(s);
@@ -164,7 +164,7 @@ public final class ReflectionHelper
 	 * @return true if the class has a writeObject() method, false otherwise.
 	 * @throws Exception if any error occurs.
 	 */
-	public static Method getWriteObjectMethod(Class<?> clazz) throws Exception
+	public static Method getWriteObjectMethod(final Class<?> clazz) throws Exception
 	{
 		Method m = null;
 		try
@@ -186,7 +186,7 @@ public final class ReflectionHelper
 	 * @return true if the class has a writeObject() method, false otherwise.
 	 * @throws Exception if any error occurs.
 	 */
-	public static Method getReadObjectMethod(Class<?> clazz) throws Exception
+	public static Method getReadObjectMethod(final Class<?> clazz) throws Exception
 	{
 		Method m = null;
 		try
@@ -233,9 +233,9 @@ public final class ReflectionHelper
 	}
 
 	/**
-	 * Initialize the reflection factory. The reflection factory is an internal JDK class in a sun.* package. 
+	 * Initialize the reflection factory. The reflection factory is an internal JDK class in a sun.* package.
 	 * It may not be available on JVM implementations that are not based on Sun's. We use purely reflective calls
-	 * to create it, to avoid static dependencies on internal APIs. 
+	 * to create it, to avoid static dependencies on internal APIs.
 	 * @return a <code>sun.reflect.ReflectionFactory.ReflectionFactory</code> if it can be created, null otherwise.
 	 */
 	private static Object initializeRF()
@@ -253,9 +253,9 @@ public final class ReflectionHelper
 	}
 
 	/**
-	 * Initialize the reflection factory. The reflection factory is an internal JDK class in a sun.* package. 
+	 * Initialize the reflection factory. The reflection factory is an internal JDK class in a sun.* package.
 	 * It may not be available on JVM implementations that are not based on Sun's. We use purely reflective calls
-	 * to create it, to avoid static dependencies on internal APIs. 
+	 * to create it, to avoid static dependencies on internal APIs.
 	 * @return a <code>sun.reflect.ReflectionFactory.ReflectionFactory</code> if it can be created, null otherwise.
 	 */
 	private static Method initializeRFMethod()
@@ -282,7 +282,7 @@ public final class ReflectionHelper
 	 * @return the newly created object.
 	 * @throws Exception if any error occurs.
 	 */
-	static Object create(Class<?> clazz) throws Exception
+	static Object create(final Class<?> clazz) throws Exception
 	{
 		//return createFromConstructor(clazz);
 		if (rfMethod == null) return createFromConstructor(clazz);
@@ -291,13 +291,13 @@ public final class ReflectionHelper
 
 	/**
 	 * Create an object without calling any of its class constructors,
-	 * and calling the superclass no-arg constructor. 
+	 * and calling the superclass no-arg constructor.
 	 * @param clazz the object's class.
 	 * @param parent the object's super class.
 	 * @return the newly created object.
 	 * @throws Exception if any error occurs.
 	 */
-	static Object create(Class<?> clazz, Class<?> parent) throws Exception
+	static Object create(final Class<?> clazz, final Class<?> parent) throws Exception
 	{
 		try
 		{
@@ -341,7 +341,7 @@ public final class ReflectionHelper
 	 * @return an instance of the specified class.
 	 * @throws Exception if any error occurs.
 	 */
-	static Object createFromConstructor(Class<?> clazz) throws Exception
+	static Object createFromConstructor(final Class<?> clazz) throws Exception
 	{
 		ConstructorWithParameters cwp = null;
 		synchronized(DEFAULT_CONSTRUCTOR_MAP)
@@ -387,7 +387,7 @@ public final class ReflectionHelper
 		 * {@inheritDoc}
 		 */
 		@Override
-        public int compare(Constructor<?> c1, Constructor<?> c2)
+		public int compare(final Constructor<?> c1, final Constructor<?> c2)
 		{
 			int n1 = c1.getParameterTypes().length;
 			int n2 = c2.getParameterTypes().length;
@@ -401,11 +401,11 @@ public final class ReflectionHelper
 	private static class ConstructorWithParameters extends Pair<Constructor<?>, Object[]>
 	{
 		/**
-		 * Initialize this object with the specified constructors and parameters. 
+		 * Initialize this object with the specified constructors and parameters.
 		 * @param constructor the constructor.
 		 * @param params the array of parameters, may be null or empty.
 		 */
-		ConstructorWithParameters(Constructor<?> constructor, Object...params)
+		ConstructorWithParameters(final Constructor<?> constructor, final Object...params)
 		{
 			super(constructor, params);
 		}
@@ -416,16 +416,16 @@ public final class ReflectionHelper
 	 * @param c the type for which to get a value.
 	 * @return a valid default value for the type.
 	 */
-	private static Object defaultValue(Class<?> c)
+	private static Object defaultValue(final Class<?> c)
 	{
-		if ((c == Byte.TYPE) || (c == Byte.class)) return DEFAULT_BYTE; 
-		else if ((c == Short.TYPE) || (c == Short.class)) return DEFAULT_SHORT; 
-		else if ((c == Integer.TYPE) || (c == Integer.class)) return DEFAULT_INT; 
-		else if ((c == Long.TYPE) || (c == Long.class)) return DEFAULT_LONG; 
-		else if ((c == Float.TYPE) || (c == Float.class)) return DEFAULT_FLOAT; 
-		else if ((c == Double.TYPE) || (c == Double.class)) return DEFAULT_DOUBLE; 
-		else if ((c == Character.TYPE) || (c == Character.class)) return DEFAULT_CHAR; 
-		else if ((c == Boolean.TYPE) || (c == Boolean.class)) return DEFAULT_BOOLEAN; 
+		if ((c == Byte.TYPE) || (c == Byte.class)) return DEFAULT_BYTE;
+		else if ((c == Short.TYPE) || (c == Short.class)) return DEFAULT_SHORT;
+		else if ((c == Integer.TYPE) || (c == Integer.class)) return DEFAULT_INT;
+		else if ((c == Long.TYPE) || (c == Long.class)) return DEFAULT_LONG;
+		else if ((c == Float.TYPE) || (c == Float.class)) return DEFAULT_FLOAT;
+		else if ((c == Double.TYPE) || (c == Double.class)) return DEFAULT_DOUBLE;
+		else if ((c == Character.TYPE) || (c == Character.class)) return DEFAULT_CHAR;
+		else if ((c == Boolean.TYPE) || (c == Boolean.class)) return DEFAULT_BOOLEAN;
 		return DEFAULT_REF;
 	}
 }

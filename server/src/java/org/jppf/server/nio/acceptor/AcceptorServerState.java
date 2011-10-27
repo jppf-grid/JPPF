@@ -20,10 +20,10 @@ package org.jppf.server.nio.acceptor;
 
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.NioState;
 
 /**
- * Common abstract superclass for all states of a client that sends and receives jobs. 
+ * Common abstract superclass for all states of a client that sends and receives jobs.
  * @author Laurent Cohen
  */
 abstract class AcceptorServerState extends NioState<AcceptorTransition>
@@ -49,7 +49,7 @@ abstract class AcceptorServerState extends NioState<AcceptorTransition>
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public AcceptorServerState(AcceptorNioServer server)
+	public AcceptorServerState(final AcceptorNioServer server)
 	{
 		this.server = server;
 		statsManager = driver.getStatsManager();

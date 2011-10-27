@@ -67,7 +67,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @return a list of file paths, or null if the resource is not found in the cache.
 	 */
-	public synchronized List<String> getResourcesLocations(String name)
+	public synchronized List<String> getResourcesLocations(final String name)
 	{
 		return cache.get(name);
 	}
@@ -77,7 +77,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @return a file path, or null if the resource is not found in the cache.
 	 */
-	public synchronized String getResourceLocation(String name)
+	public synchronized String getResourceLocation(final String name)
 	{
 		List<String> locations = cache.get(name);
 		if ((locations == null) || locations.isEmpty()) return null;
@@ -89,7 +89,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @param locations a list of file paths.
 	 */
-	public synchronized void setResourcesLocations(String name, List<String> locations)
+	public synchronized void setResourcesLocations(final String name, final List<String> locations)
 	{
 		cache.put(name, locations);
 	}
@@ -99,7 +99,7 @@ class ResourceCache
 	 * @param name the name of the resource to lookup.
 	 * @param location a file path.
 	 */
-	public synchronized void setResourceLocation(String name, String location)
+	public synchronized void setResourceLocation(final String name, final String location)
 	{
 		List<String> list = new LinkedList<String>();
 		list.add(location);
@@ -112,7 +112,7 @@ class ResourceCache
 	 * @param definitions a list of byte array definitions.
 	 * @throws Exception if any I/O error occurs.
 	 */
-	public synchronized void registerResources(String name, List<byte[]> definitions) throws Exception
+	public synchronized void registerResources(final String name, final List<byte[]> definitions) throws Exception
 	{
 		if (isAbsolutePath(name)) return;
 		List<String> locations = new LinkedList<String>();
@@ -156,7 +156,7 @@ class ResourceCache
 	 * @param name the name of the resource to find.
 	 * @return resource location expressed as a URL.
 	 */
-	public URL getResourceURL(String name)
+	public URL getResourceURL(final String name)
 	{
 		String path = getResourceLocation(name);
 		if (path == null) return null;
@@ -168,7 +168,7 @@ class ResourceCache
 	 * @param path the path to transform.
 	 * @return the path expressed as a URL.
 	 */
-	public URL getURLFromPath(String path)
+	public URL getURLFromPath(final String path)
 	{
 		File file = new File(path);
 		try
@@ -213,15 +213,15 @@ class ResourceCache
 	 * Find an index that doesn't exist for the folder suffix.
 	 * @param folder the folder to which the new folder will belong.
 	 * @param base the new folder name prefix.
-	 * @return the maximum existing index + 1, or 0 if no such folder already exists. 
+	 * @return the maximum existing index + 1, or 0 if no such folder already exists.
 	 */
-	private int findFolderIndex(String folder, final String base)
+	private int findFolderIndex(final String folder, final String base)
 	{
 		File dir = new File(folder);
 		File[] subdirs = dir.listFiles(new FileFilter()
 		{
 			@Override
-            public boolean accept(File path)
+			public boolean accept(final File path)
 			{
 				return path.isDirectory() && path.getName().startsWith(base);
 			}
@@ -247,7 +247,7 @@ class ResourceCache
 	 * @param path the path to verify.
 	 * @return true if the path is absolute, false otherwise
 	 */
-	private boolean isAbsolutePath(String path)
+	private boolean isAbsolutePath(final String path)
 	{
 		if (path.startsWith("/") || path.startsWith("\\")) return true;
 		if (path.length() < 3) return false;
@@ -266,7 +266,7 @@ class ResourceCache
 		 * {@inheritDoc}
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
 		}
@@ -276,22 +276,22 @@ class ResourceCache
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected void finalize() throws Throwable
+	protected void finalize() throws Throwable
 	{
-        try {
-            Runnable r = new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    String[] paths = tempFolders.toArray(new String[tempFolders.size()]);
-                    tempFolders.clear();
-                    for (String path: paths) FileUtils.deletePath(new File(path));
-                }
-            };
-            new Thread(r).start();
-        } finally {
-            super.finalize();
-        }
-    }
+		try {
+			Runnable r = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					String[] paths = tempFolders.toArray(new String[tempFolders.size()]);
+					tempFolders.clear();
+					for (String path: paths) FileUtils.deletePath(new File(path));
+				}
+			};
+			new Thread(r).start();
+		} finally {
+			super.finalize();
+		}
+	}
 }

@@ -47,13 +47,13 @@ public abstract class JPPFTestTask extends JPPFTask
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		runTestMethods();
 	}
 
 	/**
-	 * Execute the test methods and generate an execution report for each. 
+	 * Execute the test methods and generate an execution report for each.
 	 */
 	protected void runTestMethods()
 	{
@@ -71,7 +71,7 @@ public abstract class JPPFTestTask extends JPPFTask
 			}
 			catch(Throwable e)
 			{
-				Throwable t = e.getCause() == null ? e : e.getCause(); 
+				Throwable t = e.getCause() == null ? e : e.getCause();
 				report.description = t.getMessage();
 				StringWriter sw = new StringWriter();
 				PrintWriter writer = new PrintWriter(sw);
@@ -82,7 +82,7 @@ public abstract class JPPFTestTask extends JPPFTask
 			reports.add(report);
 		}
 	}
-	
+
 	/**
 	 * Determine whether a method is a test method.
 	 * The method must:
@@ -96,7 +96,7 @@ public abstract class JPPFTestTask extends JPPFTask
 	 * @param m the method to check.
 	 * @return true if the method is a test method, false otherwise.
 	 */
-	protected boolean isTestMethod(Method m)
+	protected boolean isTestMethod(final Method m)
 	{
 		if (m == null) return false;
 		if (!m.getName().startsWith("test")) return false;
@@ -123,7 +123,7 @@ public abstract class JPPFTestTask extends JPPFTask
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (ExecutionReport r: reports)

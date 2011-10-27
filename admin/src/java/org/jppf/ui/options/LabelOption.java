@@ -39,7 +39,7 @@ public class LabelOption extends AbstractOption
 	 * Create the UI components for this option.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		JLabel lab = new JLabel();
 		lab.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -59,7 +59,7 @@ public class LabelOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
 	 */
 	@Override
-    public void setValue(Object value)
+	public void setValue(final Object value)
 	{
 		this.value = value;
 		if (UIComponent != null) ((JLabel) UIComponent).setText((String) value);
@@ -70,7 +70,7 @@ public class LabelOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
 	 */
 	@Override
-    protected void setupValueChangeNotifications()
+	protected void setupValueChangeNotifications()
 	{
 	}
 
@@ -80,7 +80,7 @@ public class LabelOption extends AbstractOption
 	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		UIComponent.setEnabled(enabled);
 	}
@@ -91,7 +91,7 @@ public class LabelOption extends AbstractOption
 	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
 	 */
 	@Override
-    public boolean isPersistent()
+	public boolean isPersistent()
 	{
 		return false;
 	}

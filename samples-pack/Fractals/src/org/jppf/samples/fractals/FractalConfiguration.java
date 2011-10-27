@@ -75,7 +75,7 @@ public class FractalConfiguration implements Serializable
 	public boolean[] sequence = transformSequence("BBBBBBAAAAAA");
 
 	/**
-	 * Initialize this configuration with default parameters. 
+	 * Initialize this configuration with default parameters.
 	 */
 	public FractalConfiguration()
 	{
@@ -93,8 +93,8 @@ public class FractalConfiguration implements Serializable
 	 * @param nmax definition (also called N).
 	 * @param seq sequence of As and Bs, used only for Lyapunov algorithm.
 	 */
-	public FractalConfiguration(double amin, double amax, double bmin, double bmax,
-		int asize, int bsize, int nmax, String seq)
+	public FractalConfiguration(final double amin, final double amax, final double bmin, final double bmax,
+			final int asize, final int bsize, final int nmax, final String seq)
 	{
 		this.amin = amin;
 		this.amax = amax;
@@ -107,7 +107,7 @@ public class FractalConfiguration implements Serializable
 	}
 
 	/**
-	 * Initialize this configuration with the specified parameters. 
+	 * Initialize this configuration with the specified parameters.
 	 * This constructor is used for Mandelbrot fractals.
 	 * @param xcenter image center x coordinate.
 	 * @param ycenter image center y coordinate.
@@ -116,7 +116,7 @@ public class FractalConfiguration implements Serializable
 	 * @param bsize image height
 	 * @param nmax number of iterations.
 	 */
-	public FractalConfiguration(double xcenter, double ycenter, double diameter, int asize, int bsize, int nmax)
+	public FractalConfiguration(final double xcenter, final double ycenter, final double diameter, final int asize, final int bsize, final int nmax)
 	{
 		double r = diameter/2;
 		this.amin = xcenter - r;
@@ -133,7 +133,7 @@ public class FractalConfiguration implements Serializable
 	 * @param seq sequence of As and Bs.
 	 * @return an array of boolean values, of same length as the initial sequence.
 	 */
-	public static boolean[] transformSequence(String seq)
+	public static boolean[] transformSequence(final String seq)
 	{
 		boolean[] booleanSequence = null;
 		if (seq != null)

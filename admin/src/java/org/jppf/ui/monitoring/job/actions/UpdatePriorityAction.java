@@ -69,7 +69,7 @@ public class UpdatePriorityAction extends AbstractJobAction
 	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
 	 */
 	@Override
-    public void updateState(List<Object> selectedElements)
+	public void updateState(final List<Object> selectedElements)
 	{
 		super.updateState(selectedElements);
 		setEnabled(jobDataArray.length > 0);
@@ -81,7 +81,7 @@ public class UpdatePriorityAction extends AbstractJobAction
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-	public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
 		AbstractButton btn = (AbstractButton) event.getSource();
 		if (btn.isShowing()) location = btn.getLocationOnScreen();
@@ -104,7 +104,7 @@ public class UpdatePriorityAction extends AbstractJobAction
 			okBtn.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent event)
+				public void actionPerformed(final ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();
@@ -114,7 +114,7 @@ public class UpdatePriorityAction extends AbstractJobAction
 			cancelBtn.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent event)
+				public void actionPerformed(final ActionEvent event)
 				{
 					frame.setVisible(false);
 					frame.dispose();

@@ -52,7 +52,7 @@ public class Deserializer
 	 */
 	ClassLoader classloader = initClassLoader();
 	/**
-	 * Handle of thez object being read. 
+	 * Handle of thez object being read.
 	 */
 	int currentHandle;
 	/**
@@ -73,7 +73,7 @@ public class Deserializer
 	 * @param in the stream from which objects are read.
 	 * @throws IOException if an error occurs while reading the header.
 	 */
-	Deserializer(ObjectInputStream in) throws IOException
+	Deserializer(final ObjectInputStream in) throws IOException
 	{
 		this.in = in;
 		byte[] header = new byte[4];
@@ -112,8 +112,8 @@ public class Deserializer
 	 * @param handle the handle of the object to read.
 	 * @throws Exception if any error occurs.
 	 */
-  @SuppressWarnings("unchecked")
-	private void readObject(int handle) throws Exception
+	@SuppressWarnings("unchecked")
+	private void readObject(final int handle) throws Exception
 	{
 		int cdHandle = in.readInt();
 		ClassDescriptor cd = caches.getDescriptor(cdHandle);
@@ -149,7 +149,7 @@ public class Deserializer
 	 * @return the class object whose handle was read.
 	 * @throws Exception if any error occurs.
 	 */
-  @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	private Object readClassObject() throws Exception
 	{
 		int cdHandle = in.readInt();
@@ -163,7 +163,7 @@ public class Deserializer
 	 * @param obj the object to set the fields on.
 	 * @throws Exception if any error occurs.
 	 */
-	void readFields(ClassDescriptor cd, Object obj) throws Exception
+	void readFields(final ClassDescriptor cd, final Object obj) throws Exception
 	{
 		ClassDescriptor tmpDesc = cd;
 		while (tmpDesc != null)
@@ -179,8 +179,8 @@ public class Deserializer
 	 * @param obj the object ot set the field values on.
 	 * @throws Exception if any error occurs.
 	 */
-  @SuppressWarnings("unchecked")
-	private void readDeclaredFields(ClassDescriptor cd, Object obj) throws Exception
+	@SuppressWarnings("unchecked")
+	private void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception
 	{
 		for (int i=0; i<cd.fields.length; i++)
 		{
@@ -225,8 +225,8 @@ public class Deserializer
 	 * @param cd the class descriptor for the array's class.
 	 * @throws Exception if any error occurs.
 	 */
-  @SuppressWarnings("unchecked")
-	private void readArray(int handle, ClassDescriptor cd) throws Exception
+	@SuppressWarnings("unchecked")
+	private void readArray(final int handle, final ClassDescriptor cd) throws Exception
 	{
 		int len = in.readInt();
 		if (traceEnabled) try { log.trace("reading array with signature=" + cd.signature + ", length=" + len); } catch(Exception e) {}
@@ -252,7 +252,7 @@ public class Deserializer
 				case 'D': double[] darray = new double[len];   obj = darray; for (int i=0; i<len; i++) darray[i] = in.readDouble(); break;
 				case 'C': char[] carray = new char[len];       obj = carray; for (int i=0; i<len; i++) carray[i] = in.readChar(); break;
 				case 'Z': boolean[] zarray = new boolean[len]; obj = zarray; for (int i=0; i<len; i++) zarray[i] = in.readBoolean(); break;
-				*/
+				 */
 			}
 			caches.handleToObjectMap.put(handle, obj);
 		}
@@ -316,7 +316,7 @@ public class Deserializer
 	 * @return a new instance of the class.
 	 * @throws Exception if any error occurs.
 	 */
-	private Object newInstance(ClassDescriptor cd) throws Exception
+	private Object newInstance(final ClassDescriptor cd) throws Exception
 	{
 		/*
 		Constructor<?>[] constructors = cd.clazz.getDeclaredConstructors();
@@ -330,7 +330,7 @@ public class Deserializer
 			}
 		}
 		return null;
-		*/
+		 */
 		return ReflectionHelper.create(cd.clazz);
 	}
 
@@ -340,7 +340,7 @@ public class Deserializer
 	 * @return a boolean[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private boolean[] readBooleanArray(int len) throws Exception
+	private boolean[] readBooleanArray(final int len) throws Exception
 	{
 		boolean[] array = new boolean[len];
 		for (int count=0; count<len;)
@@ -359,7 +359,7 @@ public class Deserializer
 	 * @return a char[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private char[] readCharArray(int len) throws Exception
+	private char[] readCharArray(final int len) throws Exception
 	{
 		char[] array = new char[len];
 		for (int count=0; count<len;)
@@ -378,7 +378,7 @@ public class Deserializer
 	 * @return a short[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private short[] readShortArray(int len) throws Exception
+	private short[] readShortArray(final int len) throws Exception
 	{
 		short[] array = new short[len];
 		for (int count=0; count<len;)
@@ -397,7 +397,7 @@ public class Deserializer
 	 * @return a int[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private int[] readIntArray(int len) throws Exception
+	private int[] readIntArray(final int len) throws Exception
 	{
 		int[] array = new int[len];
 		for (int count=0; count<len;)
@@ -416,7 +416,7 @@ public class Deserializer
 	 * @return a long[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private long[] readLongArray(int len) throws Exception
+	private long[] readLongArray(final int len) throws Exception
 	{
 		long[] array = new long[len];
 		for (int count=0; count<len;)
@@ -435,7 +435,7 @@ public class Deserializer
 	 * @return a float[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private float[] readFloatArray(int len) throws Exception
+	private float[] readFloatArray(final int len) throws Exception
 	{
 		float[] array = new float[len];
 		for (int count=0; count<len;)
@@ -454,7 +454,7 @@ public class Deserializer
 	 * @return a double[] of the specified length.
 	 * @throws Exception if any error occurs.
 	 */
-	private double[] readDoubleArray(int len) throws Exception
+	private double[] readDoubleArray(final int len) throws Exception
 	{
 		double[] array = new double[len];
 		for (int count=0; count<len;)

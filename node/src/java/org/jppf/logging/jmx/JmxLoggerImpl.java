@@ -49,7 +49,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
 	 * @param message the message to log.
 	 */
 	@Override
-    public void log(String message)
+	public void log(final String message)
 	{
 		Notification notif = new Notification("JmxLogNotification", OBJECT_NAME, sequence.incrementAndGet(), message);
 		sendNotification(notif);

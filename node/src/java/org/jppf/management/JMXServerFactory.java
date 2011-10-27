@@ -47,7 +47,7 @@ public class JMXServerFactory
 	 * @return an instance of {@link JMXServer}.
 	 * @throws Exception if the server could not be created.
 	 */
-	public static JMXServer createServer(String uuid, String suffix) throws Exception
+	public static JMXServer createServer(final String uuid, final String suffix) throws Exception
 	{
 		JMXServer server = !usingRMIConnector && isJMXMPPresent() ? new JMXMPServer(uuid) : new JMXServerImpl(suffix, uuid);
 		if (debugEnabled) log.debug("created JMX server: " + server);

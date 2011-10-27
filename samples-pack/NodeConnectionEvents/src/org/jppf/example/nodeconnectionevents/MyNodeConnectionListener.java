@@ -38,7 +38,8 @@ public class MyNodeConnectionListener implements NodeConnectionListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeConnected(NodeConnectionEvent event)
+	@Override
+	public void nodeConnected(final NodeConnectionEvent event)
 	{
 		System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is now connected ***");
 	}
@@ -46,7 +47,8 @@ public class MyNodeConnectionListener implements NodeConnectionListener
 	/**
 	 * {@inheritDoc}
 	 */
-	public void nodeDisconnected(NodeConnectionEvent event)
+	@Override
+	public void nodeDisconnected(final NodeConnectionEvent event)
 	{
 		System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is disconnected ***");
 	}
@@ -56,7 +58,7 @@ public class MyNodeConnectionListener implements NodeConnectionListener
 	 * @param info the inforamtion from which to extract the identifier segments.
 	 * @return a string in the format 'management_host:management_port'.
 	 */
-	private String computeIdentifier(JPPFManagementInfo info)
+	private String computeIdentifier(final JPPFManagementInfo info)
 	{
 		JPPFSystemInformation systemInfo = info.getSystemInfo();
 		String host = info.getHost();

@@ -52,7 +52,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * @param port the port this socket server is listening to.
 	 * @throws Exception if the underlying server socket can't be opened.
 	 */
-	public ClientNioServer(int port) throws Exception
+	public ClientNioServer(final int port) throws Exception
 	{
 		this(new int[] { port });
 	}
@@ -62,7 +62,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * @param ports the ports this socket server is listening to.
 	 * @throws Exception if the underlying server socket can't be opened.
 	 */
-	public ClientNioServer(int[] ports) throws Exception
+	public ClientNioServer(final int[] ports) throws Exception
 	{
 		super(ports, CLIENT_SERVER, false);
 		this.selectTimeout = 1L;
@@ -72,7 +72,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * {@inheritDoc}
 	 */
 	@Override
-    protected NioServerFactory<ClientState, ClientTransition> createFactory()
+	protected NioServerFactory<ClientState, ClientTransition> createFactory()
 	{
 		return new ClientServerFactory(this);
 	}
@@ -81,7 +81,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * {@inheritDoc}
 	 */
 	@Override
-    public void postAccept(ChannelWrapper channel)
+	public void postAccept(final ChannelWrapper channel)
 	{
 		ClientContext context = (ClientContext) channel.getContext();
 		try
@@ -102,7 +102,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * @see org.jppf.server.nio.NioServer#createNioContext()
 	 */
 	@Override
-    public NioContext createNioContext()
+	public NioContext createNioContext()
 	{
 		return new ClientContext();
 	}
@@ -114,7 +114,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * @see org.jppf.server.nio.NioServer#getInitialInterest()
 	 */
 	@Override
-    public int getInitialInterest()
+	public int getInitialInterest()
 	{
 		return SelectionKey.OP_READ;
 	}
@@ -123,7 +123,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	 * Close a connection to a node.
 	 * @param channel a <code>SocketChannel</code> that encapsulates the connection.
 	 */
-	public static void closeClient(ChannelWrapper<?> channel)
+	public static void closeClient(final ChannelWrapper<?> channel)
 	{
 		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, CLIENT_SERVER);
 		try

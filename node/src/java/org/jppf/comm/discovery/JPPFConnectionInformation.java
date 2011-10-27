@@ -22,7 +22,7 @@ import java.io.*;
 
 /**
  * This class encapsulates the connection information for a JPPF driver.
- * The information includes the host, class server, application and node server ports. 
+ * The information includes the host, class server, application and node server ports.
  * @author Laurent Cohen
  */
 public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>, Cloneable
@@ -36,7 +36,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 */
 	public String host = null;
 	/**
-	 * The ports on which the server is listening. 
+	 * The ports on which the server is listening.
 	 */
 	public int[] serverPorts = null;
 	/**
@@ -74,7 +74,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-    public int compareTo(JPPFConnectionInformation ci)
+	public int compareTo(final JPPFConnectionInformation ci)
 	{
 		if ((ci == null) || (ci.uuid == null)) return 1;
 		if (uuid == null) return -1;
@@ -87,7 +87,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
-    public int hashCode()
+	public int hashCode()
 	{
 		return managementPort + (host == null ? 0 : host.hashCode());
 		//return (uuid == null) ? 0 : uuid.hashCode();
@@ -100,7 +100,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-    public boolean equals(Object obj)
+	public boolean equals(final Object obj)
 	{
 		if (obj == null) return false;
 		if (this == obj) return true;
@@ -116,7 +116,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * {@inheritDoc}
 	 */
 	@Override
-    public Object clone() throws CloneNotSupportedException
+	public Object clone() throws CloneNotSupportedException
 	{
 		return super.clone();
 	}
@@ -127,7 +127,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-    public String toString()
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName()).append('[');
@@ -145,7 +145,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @return a <code>DriverConnectionInformation</code> instance.
 	 * @throws Exception if an error is raised while deserializing.
 	 */
-	public static JPPFConnectionInformation fromBytes(byte[] bytes) throws Exception
+	public static JPPFConnectionInformation fromBytes(final byte[] bytes) throws Exception
 	{
 		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
 		JPPFConnectionInformation info = (JPPFConnectionInformation) ois.readObject();
@@ -159,7 +159,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 	 * @return an array of bytes.
 	 * @throws Exception if an error is raised while serializing.
 	 */
-	public static byte[] toBytes(JPPFConnectionInformation info) throws Exception
+	public static byte[] toBytes(final JPPFConnectionInformation info) throws Exception
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);

@@ -67,7 +67,7 @@ public interface DriverJobManagementMBean extends NotificationEmitter
 	 */
 	String[] getAllJobIds() throws Exception;
 	/**
-	 * Get an object describing the job with the specified id. 
+	 * Get an object describing the job with the specified id.
 	 * @param jobId the id of the job to get information about.
 	 * @return an instance of <code>JobInformation</code>.
 	 * @throws Exception if any error occurs.

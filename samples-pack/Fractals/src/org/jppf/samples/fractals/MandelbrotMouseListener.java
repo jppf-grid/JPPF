@@ -36,7 +36,8 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 	 * @param event the mouse event to process
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent event)
+	@Override
+	public void mousePressed(final MouseEvent event)
 	{
 		Component comp = event.getComponent();
 		if (!(comp instanceof ImagePanel)) return;
@@ -50,9 +51,9 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 			double centerY = getDoubleValue("/centerY");
 			double d = getDoubleValue("/diameter");
 			double minX = centerX - d/2;
-			double x = (double) mouseX * d/800d + minX;
+			double x = mouseX * d/800d + minX;
 			double minY = centerY - d/2;
-			double y = (double) (600 - mouseY - 1) * d/600d + minY;
+			double y = (600 - mouseY - 1) * d/600d + minY;
 			int f = getIntValue("/mandelbrotZoomFactor");
 
 			d = (button == MouseEvent.BUTTON1) ? d/f : d * f;
@@ -76,7 +77,7 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 	 * @param name the name of the option to look for.
 	 * @return a double value.
 	 */
-	protected double getDoubleValue(String name)
+	protected double getDoubleValue(final String name)
 	{
 		Option o = (Option) option.findFirstWithName(name);
 		return ((Number) o.getValue()).doubleValue();
@@ -87,7 +88,7 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 	 * @param name the name of the option to look for.
 	 * @param value the value to set as a double.
 	 */
-	protected void setDoubleValue(String name, double value)
+	protected void setDoubleValue(final String name, final double value)
 	{
 		AbstractOption o = (AbstractOption) option.findFirstWithName("/"+name);
 		o.setValue(value);
@@ -98,7 +99,7 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 	 * @param name the name of the option to look for.
 	 * @return an int value.
 	 */
-	protected int getIntValue(String name)
+	protected int getIntValue(final String name)
 	{
 		Option o = (Option) option.findFirstWithName("/"+name);
 		return ((Number) o.getValue()).intValue();
@@ -109,7 +110,7 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
 	 * @param name the name of the option to look for.
 	 * @param value the value to set as an int.
 	 */
-	protected void setIntValue(String name, int value)
+	protected void setIntValue(final String name, final int value)
 	{
 		AbstractOption o = (AbstractOption) option.findFirstWithName("/"+name);
 		o.setValue(value);

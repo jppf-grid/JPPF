@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import org.jppf.client.event.*;
+import org.jppf.client.event.ClientConnectionStatusHandler;
 import org.jppf.comm.socket.SocketWrapper;
 
 /**

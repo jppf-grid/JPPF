@@ -112,7 +112,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	/**
 	 * {@inheritDoc}
 	 */
-	public void clientConnectionFailed(ClientConnectionEvent event)
+	public void clientConnectionFailed(final ClientConnectionEvent event)
 	{
 		try
 		{

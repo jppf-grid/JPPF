@@ -59,7 +59,7 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @see java.util.concurrent.Future#cancel(boolean)
 	 */
 	@Override
-    public boolean cancel(boolean mayInterruptIfRunning)
+	public boolean cancel(final boolean mayInterruptIfRunning)
 	{
 		return false;
 	}
@@ -72,14 +72,14 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @see java.util.concurrent.Future#get()
 	 */
 	@Override
-    public V get() throws InterruptedException, ExecutionException
+	public V get() throws InterruptedException, ExecutionException
 	{
 		return null;
 	}
 
 	/**
-   * Waits if necessary for at most the given time for the computation
-   * to complete, and then retrieves its result, if available.
+	 * Waits if necessary for at most the given time for the computation
+	 * to complete, and then retrieves its result, if available.
 	 * @param timeout the maximum time to wait.
 	 * @param unit the time unit of the timeout argument.
 	 * @return the computed result.
@@ -89,30 +89,30 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
 	 */
 	@Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+	public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
 	{
 		return null;
 	}
 
 	/**
-	 * Determine whether this task was cancelled before it completed normally. 
+	 * Determine whether this task was cancelled before it completed normally.
 	 * @return true if this task was cancelled before it completed normally.
 	 * @see java.util.concurrent.Future#isCancelled()
 	 */
 	@Override
-    public boolean isCancelled()
+	public boolean isCancelled()
 	{
 		return cancelled.get();
 	}
 
 	/**
 	 * Returns true if this task completed. Completion may be due to normal termination,
-	 * an exception, or cancellation. In all of these cases, this method will return true. 
+	 * an exception, or cancellation. In all of these cases, this method will return true.
 	 * @return true if the task completed.
 	 * @see java.util.concurrent.Future#isDone()
 	 */
 	@Override
-    public boolean isDone()
+	public boolean isDone()
 	{
 		return done.get();
 	}

@@ -46,7 +46,7 @@ public class ManyJobsRunner
 	 * Entry point for this class, submits the tasks with a set duration to the server.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		try
 		{
@@ -71,7 +71,7 @@ public class ManyJobsRunner
 			if (jppfClient != null) jppfClient.close();
 		}
 	}
-	
+
 	/**
 	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
 	 * @param nbTask the number of tasks to send at each iteration.
@@ -79,7 +79,7 @@ public class ManyJobsRunner
 	 * @param nbJobs the of jobs to submit.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	private static void perform(int nbTask, int length, int nbJobs) throws Exception
+	private static void perform(final int nbTask, final int length, final int nbJobs) throws Exception
 	{
 		try
 		{
@@ -103,7 +103,7 @@ public class ManyJobsRunner
 				JPPFSchedule schedule = new JPPFSchedule(5000L);
 				job.getJobSLA().setJobSchedule(schedule);
 				job.getJobSLA().setSuspended(true);
-				*/
+				 */
 				// submit the tasks for execution
 				JPPFResultCollector collector = new JPPFResultCollector(nbTask);
 				jobs[n].setResultListener(collector);
@@ -127,7 +127,7 @@ public class ManyJobsRunner
 	 * Print a message to the log and to the console.
 	 * @param msg the message to print.
 	 */
-	private static void print(String msg)
+	private static void print(final String msg)
 	{
 		log.info(msg);
 		System.out.println(msg);

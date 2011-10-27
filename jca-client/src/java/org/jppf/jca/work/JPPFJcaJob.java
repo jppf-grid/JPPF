@@ -46,18 +46,18 @@ public class JPPFJcaJob implements Work
 	 * @param tasks the tasks to run periodically.
 	 * @param period length of time between to executions of the job.
 	 */
-	public JPPFJcaJob(List<Runnable> tasks, long period)
+	public JPPFJcaJob(final List<Runnable> tasks, final long period)
 	{
 		this.tasks = tasks;
 		this.period = period;
 	}
 
 	/**
-	 * Run all the tasks in sequence. 
+	 * Run all the tasks in sequence.
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		while (!isStopped())
 		{
@@ -80,7 +80,7 @@ public class JPPFJcaJob implements Work
 	 * @see javax.resource.spi.work.Work#release()
 	 */
 	@Override
-    public void release()
+	public void release()
 	{
 		setStopped(true);
 		tasks = null;
@@ -99,7 +99,7 @@ public class JPPFJcaJob implements Work
 	 * Set the flag that determines whether this job should be stopped or not.
 	 * @param stop true if the job be stopped, false otherwise.
 	 */
-	private synchronized void setStopped(boolean stop)
+	private synchronized void setStopped(final boolean stop)
 	{
 		this.stop = stop;
 	}

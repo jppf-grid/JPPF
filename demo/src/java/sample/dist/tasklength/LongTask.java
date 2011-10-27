@@ -21,7 +21,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 /**
- * Instances of this class are defined as tasks with a predefined execution length, specified at their creation. 
+ * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
 public class LongTask extends JPPFTask
@@ -40,7 +40,7 @@ public class LongTask extends JPPFTask
 	private long taskStart = 0L;
 	/**
 	 * Determines this task's behavior: false if it should just sleep during its allocated time, or true if it should
-	 * do some make-do work that uses the cpu.   
+	 * do some make-do work that uses the cpu.
 	 */
 	private boolean useCPU = false;
 
@@ -56,7 +56,7 @@ public class LongTask extends JPPFTask
 	 * @param taskLength - determines how long this task will run.
 	 * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
 	 */
-	public LongTask(long taskLength, boolean useCPU)
+	public LongTask(final long taskLength, final boolean useCPU)
 	{
 		this.taskLength = taskLength;
 		this.useCPU = useCPU;
@@ -66,7 +66,7 @@ public class LongTask extends JPPFTask
 	 * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
 	 * @param taskLength determines how long this task will run.
 	 */
-	public LongTask(long taskLength)
+	public LongTask(final long taskLength)
 	{
 		this(taskLength, false);
 	}
@@ -76,7 +76,7 @@ public class LongTask extends JPPFTask
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override
-    public void run()
+	public void run()
 	{
 		//System.out.println("Starting task " + getId());
 		taskStart = System.currentTimeMillis();
@@ -111,7 +111,7 @@ public class LongTask extends JPPFTask
 	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
 	 */
 	@Override
-    public void onCancel()
+	public void onCancel()
 	{
 		String s = "task " + getId() + " has been cancelled";
 		setResult(s);

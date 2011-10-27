@@ -67,13 +67,13 @@ public class FractalRunner
 	 * @param option the option holding the image.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	public static synchronized void perform(boolean doMandelbrot, FractalConfiguration config, Option option)
-		throws Exception
+	public static synchronized void perform(final boolean doMandelbrot, final FractalConfiguration config, final Option option)
+	throws Exception
 	{
-			FractalRunner.option = option;
-			createOrDisplayWaitWindow();
-			FractalExecution exec = new FractalExecution(doMandelbrot, config);
-			executor.submit(exec);
+		FractalRunner.option = option;
+		createOrDisplayWaitWindow();
+		FractalExecution exec = new FractalExecution(doMandelbrot, config);
+		executor.submit(exec);
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class FractalRunner
 	 * @return a generated image that can be displayed in a UI or saved as a file.
 	 * @throws Exception if an error is raised during the execution.
 	 */
-	public static synchronized Image doPerform(boolean doMandelbrot, FractalConfiguration config) throws Exception
+	public static synchronized Image doPerform(final boolean doMandelbrot, final FractalConfiguration config) throws Exception
 	{
 		if (jppfClient == null) jppfClient = new JPPFClient();
 		/*
@@ -98,7 +98,7 @@ public class FractalRunner
 		{
 			config = new FractalConfiguration(3.4, 4, 2.5, 3.4, 768, 1024, 400, "BBBBBBAAAAAA");
 		}
-		*/
+		 */
 		int nbTask = config.bsize;
 		log.info("Executing " + nbTask + " tasks");
 		DataProvider dp = new MemoryMapDataProvider();
@@ -113,10 +113,11 @@ public class FractalRunner
 		log.info("Computation performed in "+StringUtils.toStringDuration(elapsed));
 		//JPPFStats stats = jppfClient.requestStatistics();
 		//if (stats != null) log.info("End statistics :\n"+stats.toString());
-		
+
 		final Image image = doMandelbrot ? generateMandelbrotImage(results, config) : generateLyapunovImage(results, config);
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				ImagePanel panel = (ImagePanel) option.getUIComponent();
@@ -137,7 +138,7 @@ public class FractalRunner
 	 * @return an <code>Image</code> instance.
 	 * @throws Exception if an error is raised during the image generation.
 	 */
-	public static Image generateLyapunovImage(List<JPPFTask> taskList, FractalConfiguration config) throws Exception
+	public static Image generateLyapunovImage(final List<JPPFTask> taskList, final FractalConfiguration config) throws Exception
 	{
 		double min = 0d;
 		double max = 0d;
@@ -176,7 +177,7 @@ public class FractalRunner
 	 * @return an <code>Image</code> instance.
 	 * @throws Exception if an error is raised during the image generation.
 	 */
-	public static Image generateMandelbrotImage(List<JPPFTask> taskList, FractalConfiguration config) throws Exception
+	public static Image generateMandelbrotImage(final List<JPPFTask> taskList, final FractalConfiguration config) throws Exception
 	{
 		int max = config.nmax;
 
@@ -206,21 +207,21 @@ public class FractalRunner
 	 * @param max the maximum lambda value found.
 	 * @return an RGB value represented as an int.
 	 */
-	private static int computeLyapunovRGB(double lambda, double min, double max)
+	private static int computeLyapunovRGB(final double lambda, final double min, final double max)
 	{
 		double[] rgb_f = new double[3];
 		if (lambda > 0)
 		{
-      rgb_f[0] = 0d;
-      rgb_f[1] = 0d;
-      rgb_f[2] = lambda/max;
-    }
+			rgb_f[0] = 0d;
+			rgb_f[1] = 0d;
+			rgb_f[2] = lambda/max;
+		}
 		else
 		{
-      rgb_f[0] = 1d - Math.pow(lambda/min, 2d/3.0d);
-      rgb_f[1] = 1d - Math.pow(lambda/min, 1d/3.0d);
-      rgb_f[2] = 0d;
-    }
+			rgb_f[0] = 1d - Math.pow(lambda/min, 2d/3.0d);
+			rgb_f[1] = 1d - Math.pow(lambda/min, 1d/3.0d);
+			rgb_f[2] = 0d;
+		}
 		int result = 0;
 		for (int i=0; i<3; i++)
 		{
@@ -228,7 +229,7 @@ public class FractalRunner
 			n = n < 0 ? 0 : (n > 255 ? 255 : n);
 			result = 256 * result + n;
 		}
-    return result;
+		return result;
 	}
 
 	/**
@@ -265,6 +266,7 @@ public class FractalRunner
 		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				Dimension d = window.getOwner().getSize();
@@ -285,6 +287,7 @@ public class FractalRunner
 		//if (window.isVisible()) window.dispose();
 		SwingUtilities.invokeLater(new Runnable()
 		{
+			@Override
 			public void run()
 			{
 				window.setVisible(false);
@@ -316,7 +319,7 @@ public class FractalRunner
 		 * @param doMandelbrot determines the type of fractal to generate.
 		 * @param config the algorithm parameters.
 		 */
-		public FractalExecution(boolean doMandelbrot, FractalConfiguration config)
+		public FractalExecution(final boolean doMandelbrot, final FractalConfiguration config)
 		{
 			this.doMandelbrot = doMandelbrot;
 			this.config = config;
@@ -326,6 +329,7 @@ public class FractalRunner
 		 * Perform the submission of the computation.
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run()
 		{
 			try

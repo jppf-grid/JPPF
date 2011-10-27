@@ -29,13 +29,13 @@ public interface JMXServer
 	/**
 	 * Start the MBean server and associated resources.
 	 * @param cl - the default classloader to be used by the JMX remote connector.
-	 * @throws Exception if an error occurs when starting the server or one of its components. 
+	 * @throws Exception if an error occurs when starting the server or one of its components.
 	 */
 	void start(ClassLoader cl) throws Exception;
 
 	/**
 	 * Stop the MBean server and associated resources.
-	 * @throws Exception if an error occurs when stopping the server or one of its components. 
+	 * @throws Exception if an error occurs when stopping the server or one of its components.
 	 */
 	void stop() throws Exception;
 

@@ -77,7 +77,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * Initialize the panel used to display this options page.
 	 */
 	@Override
-    public void createUI()
+	public void createUI()
 	{
 		JSplitPane pane = new JSplitPane();
 		if (orientation == HORIZONTAL)
@@ -104,7 +104,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
 	 */
 	@Override
-    public void setEnabled(boolean enabled)
+	public void setEnabled(final boolean enabled)
 	{
 		if (UIComponent != null) UIComponent.setEnabled(enabled);
 		for (OptionElement elt: children) elt.setEnabled(enabled);
@@ -116,7 +116,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */
 	@Override
-    public void setEventsEnabled(boolean enabled)
+	public void setEventsEnabled(final boolean enabled)
 	{
 		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
 	}
@@ -127,7 +127,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
 	 */
 	@Override
-    public void add(OptionElement element)
+	public void add(final OptionElement element)
 	{
 		JSplitPane pane = (JSplitPane) UIComponent;
 		if (FILLER1 == children.get(0))
@@ -159,7 +159,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
 	 */
 	@Override
-    public void remove(OptionElement element)
+	public void remove(final OptionElement element)
 	{
 		int idx = children.indexOf(element);
 		if (idx < 0) return;
@@ -186,7 +186,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * @see org.jppf.ui.options.OptionsPage#getChildren()
 	 */
 	@Override
-    public List<OptionElement> getChildren()
+	public List<OptionElement> getChildren()
 	{
 		return Collections.unmodifiableList(children);
 	}
@@ -204,7 +204,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * Set the split pane's divider width.
 	 * @param dividerWidth the divider width as an int value.
 	 */
-	public void setDividerWidth(int dividerWidth)
+	public void setDividerWidth(final int dividerWidth)
 	{
 		this.dividerWidth = dividerWidth;
 	}
@@ -222,7 +222,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * Set the split pane's resize weight.
 	 * @param resizeWeight the resize weight as a double value.
 	 */
-	public void setResizeWeight(double resizeWeight)
+	public void setResizeWeight(final double resizeWeight)
 	{
 		this.resizeWeight = resizeWeight;
 	}
@@ -240,7 +240,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
 	 * Set the orientation of the split.
 	 * @param orientation - one of {@link #VERTICAL} or {@link #HORIZONTAL}.
 	 */
-	public void setOrientation(int orientation)
+	public void setOrientation(final int orientation)
 	{
 		this.orientation = orientation;
 	}

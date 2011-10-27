@@ -46,7 +46,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 	 * Initialize this state.
 	 * @param server the server that handles this state.
 	 */
-	public SendingMultiplexingInfoState(MultiplexerNioServer server)
+	public SendingMultiplexingInfoState(final MultiplexerNioServer server)
 	{
 		super(server);
 	}
@@ -55,7 +55,7 @@ public class SendingMultiplexingInfoState extends MultiplexerServerState
 	 * {@inheritDoc}
 	 */
 	@Override
-    public MultiplexerTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
+	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (wrapper.isReadable())
 		{
