@@ -18,7 +18,7 @@
 package org.jppf.node;
 
 import java.security.*;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.*;
@@ -70,11 +70,11 @@ public class NodeRunner
 	/**
 	 * Task used to shutdown the node.
 	 */
-	private static final ShutdownOrRestart SHUTDOWN_TASK = new ShutdownOrRestart(false); 
+	private static final ShutdownOrRestart SHUTDOWN_TASK = new ShutdownOrRestart(false);
 	/**
 	 * Task used to restart the node.
 	 */
-	private static final ShutdownOrRestart RESTART_TASK = new ShutdownOrRestart(true); 
+	private static final ShutdownOrRestart RESTART_TASK = new ShutdownOrRestart(true);
 	/**
 	 * The JPPF node.
 	 */
@@ -91,18 +91,24 @@ public class NodeRunner
 	 * Handles include and exclude IP filters.
 	 */
 	private static IPFilter ipFilter = new IPFilter(JPPFConfiguration.getProperties());
+	/**
+	 * The initial configuration, such as read from the config file.
+	 * The JPPF config is modified by the discovery mechanism, so we want to store the initial values somewhere.
+	 */
+	private static TypedProperties initialConfig = null;
 
 	/**
 	 * Run a node as a standalone application.
 	 * @param args not used.
 	 */
-	public static void main(String...args)
+	public static void main(final String...args)
 	{
 		node = null;
 		try
 		{
 			// initialize the jmx logger
 			new JmxMessageNotifier();
+			initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
 			if (debugEnabled) log.debug("launching the JPPF node");
 			if ((args == null) || (args.length <= 0))
 				throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
@@ -151,7 +157,7 @@ public class NodeRunner
 	 * Run a node as a standalone application.
 	 * @param args not used.
 	 */
-	public static void start(String...args)
+	public static void start(final String...args)
 	{
 		main(args);
 		serviceLock.goToSleep();
@@ -161,13 +167,13 @@ public class NodeRunner
 	 * Run a node as a standalone application.
 	 * @param args not used.
 	 */
-	public static void stop(String...args)
+	public static void stop(final String...args)
 	{
 		serviceLock.wakeUp();
 		System.exit(0);
 	}
 
-		/**
+	/**
 	 * Start the node.
 	 * @return the node that was started, as a <code>MonitoredNode</code> instance.
 	 * @throws Exception if the node failed to run or couldn't connect to the server.
@@ -188,7 +194,7 @@ public class NodeRunner
 	 * Automatically discover the server connection information using a datagram multicast.
 	 * Upon receiving the connection information, the JPPF configuration is modified to take into
 	 * account the discovered information. If no information could be received, the node relies on
-	 * the static information in the configuration file. 
+	 * the static information in the configuration file.
 	 */
 	public static void discoverDriver()
 	{
@@ -198,6 +204,7 @@ public class NodeRunner
 		if (info == null)
 		{
 			if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
+			restoreInitialConfig();
 			return;
 		}
 		if (debugEnabled) log.debug("Discovered driver: " + info);
@@ -208,9 +215,23 @@ public class NodeRunner
 		if (info.recoveryPort >= 0)
 		{
 			config.setProperty("jppf.recovery.server.port", "" + info.recoveryPort);
-			//config.setProperty("jppf.recovery.enabled", "true");
 		}
 		else config.setProperty("jppf.recovery.enabled", "false");
+	}
+
+	/**
+	 * Restore the configuration from the sna^shot taken at startup time.
+	 */
+	private static void restoreInitialConfig()
+	{
+		TypedProperties config = JPPFConfiguration.getProperties();
+		for (Map.Entry<Object, Object> entry: initialConfig.entrySet())
+		{
+			if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
+			{
+				config.setProperty((String) entry.getKey(), (String) entry.getValue());
+			}
+		}
 	}
 
 	/**
@@ -245,14 +266,14 @@ public class NodeRunner
 		{
 			if (debugEnabled) log.debug("un-setting security");
 			AccessController.doPrivileged(new PrivilegedAction<Object>()
-			{
+					{
 				@Override
-                public Object run()
+				public Object run()
 				{
 					System.setSecurityManager(null);
 					return null;
 				}
-			});
+					});
 			securityManagerSet = false;
 		}
 	}
@@ -268,13 +289,13 @@ public class NodeRunner
 			if (classLoader == null)
 			{
 				classLoader = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
-				{
+						{
 					@Override
-                    public JPPFClassLoader run()
+					public JPPFClassLoader run()
 					{
-                        return new JPPFClassLoader(NodeRunner.class.getClassLoader());
+						return new JPPFClassLoader(NodeRunner.class.getClassLoader());
 					}
-				});
+						});
 				Thread.currentThread().setContextClassLoader(classLoader);
 			}
 			return classLoader;
@@ -286,7 +307,7 @@ public class NodeRunner
 	 * @param key the key associated with the object's value.
 	 * @param value the object to persist.
 	 */
-	public static synchronized void setPersistentData(Object key, Object value)
+	public static synchronized void setPersistentData(final Object key, final Object value)
 	{
 		persistentData.put(key, value);
 	}
@@ -296,7 +317,7 @@ public class NodeRunner
 	 * @param key the key used to retrieve the persistent object.
 	 * @return the value associated with the key.
 	 */
-	public static synchronized Object getPersistentData(Object key)
+	public static synchronized Object getPersistentData(final Object key)
 	{
 		return persistentData.get(key);
 	}
@@ -306,7 +327,7 @@ public class NodeRunner
 	 * @param key the key associated with the object to remove.
 	 * @return the value associated with the key, or null if the key was not found.
 	 */
-	public static synchronized Object removePersistentData(Object key)
+	public static synchronized Object removePersistentData(final Object key)
 	{
 		return persistentData.remove(key);
 	}
@@ -325,7 +346,7 @@ public class NodeRunner
 	 * @param node the node to shutdown or restart.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
-	public static void shutdown(Node node, final boolean restart)
+	public static void shutdown(final Node node, final boolean restart)
 	{
 		//node.stopNode(true);
 		executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);
@@ -345,7 +366,7 @@ public class NodeRunner
 		 * Initialize this task.
 		 * @param restart true if the node is to be restarted, false to only shut it down.
 		 */
-		public ShutdownOrRestart(boolean restart)
+		public ShutdownOrRestart(final boolean restart)
 		{
 			this.restart = restart;
 		}
@@ -355,17 +376,17 @@ public class NodeRunner
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
-        public void run()
+		public void run()
 		{
 			AccessController.doPrivileged(new PrivilegedAction<Object>()
-			{
+					{
 				@Override
-                public Object run()
+				public Object run()
 				{
 					System.exit(restart ? 2 : 0);
 					return null;
 				}
-			});
+					});
 		}
 	}
 
