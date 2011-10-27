@@ -18,7 +18,7 @@
 package org.jppf.node;
 
 import java.security.*;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.*;
@@ -91,6 +91,11 @@ public class NodeRunner
 	 * Handles include and exclude IP filters.
 	 */
 	private static IPFilter ipFilter = new IPFilter(JPPFConfiguration.getProperties());
+	/**
+	 * The initial configuration, such as read from the config file.
+	 * The JPPF config is modified by the discovery mechanism, so we want to store the initial values somewhere.
+	 */
+	private static TypedProperties initialConfig = null;
 
 	/**
 	 * Run a node as a standalone application.
@@ -103,6 +108,7 @@ public class NodeRunner
 		{
 			// initialize the jmx logger
 			new JmxMessageNotifier();
+			initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
 			if (debugEnabled) log.debug("launching the JPPF node");
 			if ((args == null) || (args.length <= 0))
 				throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
@@ -198,6 +204,7 @@ public class NodeRunner
 		if (info == null)
 		{
 			if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
+			restoreInitialConfig();
 			return;
 		}
 		if (debugEnabled) log.debug("Discovered driver: " + info);
@@ -212,6 +219,21 @@ public class NodeRunner
 			//config.setProperty("jppf.recovery.enabled", "true");
 		}
 		else config.setProperty("jppf.recovery.enabled", "false");
+	}
+
+	/**
+	 * Restore the configuration from the sna^shot taken at startup time.
+	 */
+	private static void restoreInitialConfig()
+	{
+		TypedProperties config = JPPFConfiguration.getProperties();
+		for (Map.Entry<Object, Object> entry: initialConfig.entrySet())
+		{
+			if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
+			{
+				config.setProperty((String) entry.getKey(), (String) entry.getValue());
+			}
+		}
 	}
 
 	/**
