@@ -442,4 +442,50 @@ public class TypedProperties extends Properties
 		load(bais);
 		bais.close();
 	}
+
+	/**
+	 * Get an int value from the first specified property if it exists, or from the specified second one if it doesn't.
+	 * If the first property does not exist, it will be created with the value of the second. If <code>doRemove</code> is true,
+	 * then the second property will be removed. This method is essentially used for backward compatibility with previous versions
+	 * of JPPF configuration files.
+	 * @param name1 the name of the first property.
+	 * @param name2 the name of the second property.
+	 * @param def the default value to use if neither the first nor the second properties are defined.
+	 * @param doRemove <code>true</code> to force the remove of the second property, <code>false</code> otherwise.
+	 * @return the value of the first property, or the value of the second if it is not found, or the default value.
+	 */
+	public int getAndReplaceInt(final String name1, final String name2, final int def, final boolean doRemove)
+	{
+		int value = getInt(name1, -1);
+		if (value < 0)
+		{
+			value = getInt(name2, def);
+			setProperty(name1, "" + value);
+		}
+		if (doRemove) remove(name2);
+		return value;
+	}
+
+	/**
+	 * Get a String value from the first specified property if it exists, or from the specified second one if it doesn't.
+	 * If the first property does not exist, it will be created with the value of the second. If <code>doRemove</code> is true,
+	 * then the second property will be removed. This method is essentially used for backward compatibility with previous versions
+	 * of JPPF configuration files.
+	 * @param name1 the name of the first property.
+	 * @param name2 the name of the second property.
+	 * @param def the default value to use if neither the first nor the second properties are defined.
+	 * @param doRemove <code>true</code> to force the remove of the second property, <code>false</code> otherwise.
+	 * @return the value of the first property, or the value of the second if it is not found, or the default value.
+	 */
+	public String getAndReplaceString(final String name1, final String name2, final String def, final boolean doRemove)
+	{
+		String value = getString(name1, null);
+		if (value == null)
+		{
+			value = getString(name2, def);
+			setProperty(name1, "" + value);
+		}
+		if (doRemove) remove(name2);
+		return value;
+	}
 }

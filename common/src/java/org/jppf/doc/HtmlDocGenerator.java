@@ -189,7 +189,8 @@ public class HtmlDocGenerator
 		String tf = !templateFolder.endsWith("/") ? templateFolder + "/" : templateFolder;
 		String templateFile = tf + parameterMap.get("name") + ".html";
 		if (!(new File(templateFile).exists())) throw new Exception("Could not find template file " + templateFile);
-		String content = FileUtils.readTextFile(templateFile);
+		//String content = FileUtils.readTextFile(templateFile);
+		String content = readTextFileStripComments(templateFile);
 		content = processTemplates(parameterMap, content, tf);
 		content = processParameters(parameterMap, content);
 		return content;
@@ -205,26 +206,47 @@ public class HtmlDocGenerator
 	 */
 	private static String processParameters(final Map<String, String> parameterMap, final String content) throws Exception
 	{
-		LineNumberReader reader = new LineNumberReader(new StringReader(content));
-		StringBuilder sb = new StringBuilder();
-		String s = "";
-
-		while (s != null)
-		{
-			s = reader.readLine();
-			if (s == null) break;
-			String s2 = s.trim();
-			if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
-			sb.append(s).append('\n');
-		}
-		reader.close();
-		String template = sb.toString();
+		String template = readTextStripComments(new StringReader(content));
 		for (Map.Entry<String, String> entry: parameterMap.entrySet())
 		{
 			String param = PARAM_START + entry.getKey() + PARAM_END;
 			template = template.replace(param, entry.getValue());
 		}
 		return template;
+	}
+
+	/**
+	 * Read a text file into a string and strip all the comment lines it contains.
+	 * @param path the path to the text file to read.
+	 * @return a string holding the file content, from which all comments have been stripped.
+	 * @throws Exception if an error occurs while parsing the template or building its instance.
+	 */
+	private static String readTextFileStripComments(final String path) throws Exception
+	{
+		return readTextStripComments(new FileReader(path));
+	}
+
+	/**
+	 * Read a text content from a <code>Reader</code> into a string and strip all the comment lines it contains.
+	 * @param reader the from which to read the text content.
+	 * @return a string holding the file content, from which all comments have been stripped.
+	 * @throws Exception if an error occurs while parsing the template or building its instance.
+	 */
+	private static String readTextStripComments(final Reader reader) throws Exception
+	{
+		BufferedReader bufferedReader = new BufferedReader(reader);
+		StringBuilder sb = new StringBuilder();
+		String s = "";
+		while (s != null)
+		{
+			s = bufferedReader.readLine();
+			if (s == null) break;
+			String s2 = s.trim();
+			if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
+			sb.append(s).append('\n');
+		}
+		bufferedReader.close();
+		return sb.toString();
 	}
 
 	/**

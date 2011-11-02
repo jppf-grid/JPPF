@@ -80,7 +80,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		if (debugEnabled) log.debug("initializing socket connection");
 		TypedProperties props = JPPFConfiguration.getProperties();
 		String host = props.getString("jppf.server.host", "localhost");
-		int port = props.getInt("jppf.server.port", 11111);
+		// for backward compatibility with v2.x configurations
+		int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", -1, false);
 		socketClient = new BootstrapSocketClient();
 		socketClient.setHost(host);
 		socketClient.setPort(port);

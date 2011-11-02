@@ -26,7 +26,7 @@ import java.util.*;
  * JPPF implementation of the GetField API.
  * @author Laurent Cohen
  */
-public class JPPFGetField extends GetField
+class JPPFGetField extends GetField
 {
 	/**
 	 * Map of names to primitive values.

@@ -109,10 +109,10 @@ public class MultipleBuffersInputStream extends InputStream
 	}
 
 	/**
-	 * Writes len bytes from the specified byte array starting at offset off to this output stream.
-	 * @param b the data.
-	 * @param off the start offset in the data.
-	 * @param len the number of bytes to write.
+	 * Read from this input stream into the specified byte array.
+	 * @param b buffer that receives the data read form this stream.
+	 * @param off the start offset in the buffer.
+	 * @param len the number of bytes to read.
 	 * @return the number of bytes read from the stream, or -1 if end of file was reached.
 	 * @throws IOException if any error occurs.
 	 * @see java.io.OutputStream#write(byte[], int, int)
@@ -144,8 +144,8 @@ public class MultipleBuffersInputStream extends InputStream
 	}
 
 	/**
-	 * Writes the specified byte array to this output stream.
-	 * @param b the data to write.
+	 * Read from this input stream into the specified byte array.
+	 * @param b buffer that receives the data read form this stream.
 	 * @return the number of bytes read from the stream, or -1 if end of file was reached.
 	 * @throws IOException if any error occurs.
 	 * @see java.io.OutputStream#write(byte[])

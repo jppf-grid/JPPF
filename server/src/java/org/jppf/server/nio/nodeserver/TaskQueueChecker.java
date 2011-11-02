@@ -97,6 +97,10 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		driver.getStatsManager().idleNodes(idleChannels.size());
 	}
 
+	/**
+	 * Get the list of idle channels.
+	 * @return a new copy of the underlying list of idle channels. 
+	 */
 	public List<ChannelWrapper<?>> getIdleChannels() {
 		synchronized (idleChannels)
 		{

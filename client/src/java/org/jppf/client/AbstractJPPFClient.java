@@ -257,6 +257,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		fireConnectionFailed(c);
 	}
 
+	/**
+	 * Add a new connection to the set of connections handled by this client.
+	 * @param connection the connection to add.
+	 */
 	protected void addClientConnection(final JPPFClientConnection connection) {
 		if(connection == null) throw new IllegalArgumentException("connection is null");
 
@@ -276,6 +280,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		}
 	}
 
+	/**
+	 * Remove a connection from the set of connections handled by this client.
+	 * @param connection the connection to remove.
+	 */
 	protected void removeClientConnection(final JPPFClientConnection connection) {
 		if(connection == null) throw new IllegalArgumentException("connection is null");
 
@@ -342,6 +350,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		}
 	}
 
+	/**
+	 * Notify all listeners to this client that a connection failed.
+	 * @param c the connection that triggered the event.
+	 */
 	protected void fireConnectionFailed(final JPPFClientConnection c)
 	{
 		ClientEvent event = new ClientEvent(c);
@@ -352,6 +364,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 		}
 	}
 
+	/**
+	 * Notify all listeners to this client that a new connection was added.
+	 * @param c the connection that was added.
+	 */
 	protected void fireNewConnection(final JPPFClientConnection c)
 	{
 		ClientEvent event = new ClientEvent(c);

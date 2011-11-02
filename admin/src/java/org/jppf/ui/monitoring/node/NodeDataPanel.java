@@ -406,10 +406,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 		if (debugEnabled) log.debug("start");
 		if (this.graphOption == null)
 		{
-			graphOption.setTreeTableOption(this);
+			if (graphOption != null) graphOption.setTreeTableOption(this);
 			populateTreeTableModel();
 			refreshNodeStates();
-			graphOption.populate();
+			if (graphOption != null) graphOption.populate();
 			refreshHandler = new NodeRefreshHandler(this);
 		}
 		this.graphOption = graphOption;

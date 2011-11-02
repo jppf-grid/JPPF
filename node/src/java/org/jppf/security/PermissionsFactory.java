@@ -138,7 +138,8 @@ public final class PermissionsFactory
 		{
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
-			int port = props.getInt("jppf.server.port", 11111);
+			// for backward compatibility with v2.x configurations
+			int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", -1, false);
 			addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
 			host = props.getString("jppf.discovery.group", "230.0.0.1");
 			//port = props.getInt("jppf.discovery.port", 11111);

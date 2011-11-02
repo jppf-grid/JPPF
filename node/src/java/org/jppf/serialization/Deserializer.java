@@ -29,7 +29,7 @@ import org.slf4j.*;
  * Instances of this class are intended to deserialize object graphs from an underlying input stream.
  * @author Laurent Cohen
  */
-public class Deserializer
+class Deserializer
 {
 	/**
 	 * Logger for this class.

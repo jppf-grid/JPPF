@@ -85,6 +85,7 @@ public class BooleanOption extends AbstractOption
 	{
 		Boolean val = (Boolean) this.value;
 		if (value instanceof String) val = "true".equalsIgnoreCase((String) value);
+		else if (value instanceof Boolean) val = (Boolean) value;
 		super.setValue(val);
 		if (UIComponent != null)
 		{

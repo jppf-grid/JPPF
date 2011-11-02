@@ -149,7 +149,7 @@ public class DriverInitializer
 		{
 			connectionInfo = new JPPFConnectionInformation();
 			connectionInfo.uuid = driver.getUuid();
-			String s = config.getString("jppf.server.port", "11111");
+			String s = config.getAndReplaceString("jppf.server.port", "class.server.port", "11111", false);
 			connectionInfo.serverPorts = StringUtils.parseIntValues(s);
 			connectionInfo.host = NetworkUtils.getManagementHost();
 			if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
@@ -224,7 +224,9 @@ public class DriverInitializer
 					{
 						JPPFConnectionInformation info = new JPPFConnectionInformation();
 						info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
-						info.serverPorts = new int[] { props.getInt(String.format("jppf.peer.%s.server.port", name), 11111) };
+						// to keep backward compatibility with v2.x configurations
+						String s = props.getAndReplaceString(String.format("jppf.peer.%s.server.port", name), String.format("class.peer.%s.server.port", name), "11111", false);
+						info.serverPorts = StringUtils.parseIntValues(s);
 						if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
 						new JPPFPeerInitializer(name, info, classServer).start();
 					}
@@ -234,7 +236,7 @@ public class DriverInitializer
 
 		if(peerDiscoveryThread != null)
 		{
-			new Thread(peerDiscoveryThread, "PeerDiscoveryThread").start();
+			new Thread(peerDiscoveryThread, "PeerDiscovery").start();
 		}
 	}
 

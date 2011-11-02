@@ -38,6 +38,10 @@ class ClientPool
 	 */
 	private final List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
 
+	/**
+	 * Initialize this pool with the specified priority.
+	 * @param priority the priority assigned to the connections n the pool.
+	 */
 	public ClientPool(final int priority) {
 		this.priority = priority;
 	}
@@ -53,6 +57,10 @@ class ClientPool
 		return clientList.get(getLastUsedIndex());
 	}
 
+	/**
+	 * Deter;ine zhether this pool is e;pty.
+	 * @return <code>true</code> if this pool is empty, <code>false</code> otherwise.
+	 */
 	public boolean isEmpty() {
 		return clientList.isEmpty();
 	}
@@ -66,10 +74,20 @@ class ClientPool
 		return clientList.size();
 	}
 
+	/**
+	 * Add a driver connection to this pool.
+	 * @param client the connection too add.
+	 * @return true if the unerlying list of connections changed as a result of calling this method.
+	 */
 	public boolean add(final JPPFClientConnection client) {
 		return clientList.add(client);
 	}
 
+	/**
+	 * Remove a driver connection from this pool.
+	 * @param client the connection too remove.
+	 * @return true if the unerlying list of connections changed as a result of calling this method.
+	 */
 	public boolean remove(final JPPFClientConnection client) {
 		if(clientList.remove(client)) {
 			if(lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;

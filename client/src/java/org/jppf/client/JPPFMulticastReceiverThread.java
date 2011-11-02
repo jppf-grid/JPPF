@@ -51,8 +51,13 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 	 * or if we only use the first one that is discovered.
 	 */
 	private final boolean acceptMultipleInterfaces;
-
+	/**
+	 * Defines a callback for objects wishing to be notified of discovery events.
+	 */
 	private final ConnectionHandler connectionHandler;
+	/**
+	 * Holds a set of filters to include or exclude sets of IP addresses in the discovery process.
+	 */
 	private final IPFilter ipFilter;
 
 	/**
@@ -163,8 +168,16 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 		}
 	}
 
+	/**
+	 * Defines a callback for objects wishing to be notified of discovery events.
+	 */
 	public static interface ConnectionHandler
 	{
-		public void onNewConnection(final String name, final JPPFConnectionInformation info);
+		/**
+		 * Called when a new connection is discovered.
+		 * @param name the name assigned tothe connection.
+		 * @param info the informationr required to connect to the driver.
+		 */
+		void onNewConnection(final String name, final JPPFConnectionInformation info);
 	}
 }

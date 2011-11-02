@@ -85,7 +85,7 @@ public class SystemInformationAction extends AbstractTopologyAction
 		{
 			s = StringUtils.getStackTrace(e).replace("\n", "<br>");
 		}
-		final JFrame frame = new JFrame("Node System Information");
+		final JFrame frame = new JFrame("System Information");
 		frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
 		frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter()

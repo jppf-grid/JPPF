@@ -172,7 +172,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 					{
 						JPPFConnectionInformation info = new JPPFConnectionInformation();
 						info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
-						info.serverPorts = new int[] { props.getInt(String.format("%s.jppf.server.port", name), 11111) };
+						// for backward compatibility with v2.x configurations
+						int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), -1, false);
+						info.serverPorts = new int[] { port };
 						info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
 						int priority = props.getInt(String.format("%s.priority", name), 0);
 						if(receiverThread != null) receiverThread.addConnectionInformation(info);
@@ -194,6 +196,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 		}
 	}
 
+	/**
+	 * Called when a new connection is read from the configuration (as opposed to discovered from the network).
+	 * @param name the name assigned to the connection.
+	 * @param info the information required for the ocnnection toconenct to the driver.
+	 * @param priority the priority assigned to the connection.
+	 */
 	protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority) {
 		int n = config.getInt("jppf.pool.size", 1);
 		if (n < 1) n = 1;

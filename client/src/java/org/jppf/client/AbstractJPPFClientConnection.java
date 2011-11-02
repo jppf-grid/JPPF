@@ -305,7 +305,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		ClassLoader cl = classLoader;
 		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
-		NonDelegatingClassLoader ndCl = new NonDelegatingClassLoader(null, classLoader);
+		if (cl == null) cl = getClass().getClassLoader();
+		NonDelegatingClassLoader ndCl = new NonDelegatingClassLoader(null, cl);
 		String helperClassName = getSerializationHelperClassName();
 		Class clazz = null;
 		if (cl != null)

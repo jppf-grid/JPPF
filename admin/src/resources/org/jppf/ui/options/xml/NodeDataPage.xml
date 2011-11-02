@@ -51,8 +51,13 @@
 				<script language="groovy"><![CDATA[
 					def b = option.getValue().booleanValue();
 					def handler = option.findFirstWithName("/NodeTreeTable").getRefreshHandler();
-					if (b) handler.startRefreshTimer();
-					else handler.stopRefreshTimer();
+					if (handler != null)
+					{
+						if (b) handler.startRefreshTimer();
+						else handler.stopRefreshTimer();
+					}
+					//if (b) handler.startRefreshTimer();
+					//else handler.stopRefreshTimer();
 				]]></script>
 			</listener>
 		</child>
@@ -101,6 +106,7 @@
 					option.setupTableColumns();
 					option.refreshStatusBar();
 					option.setupActions();
+					option.setGraphOption(null);
 				</script>
 			</initializer>
 			<finalizer type="script">

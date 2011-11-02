@@ -53,7 +53,13 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	 */
 	private final JPPFConnectionInformation localInfo;
 
+	/**
+	 * Defines a callback for objects wishing to be notified of discovery events.
+	 */
 	private final ConnectionHandler connectionHandler;
+	/**
+	 * Holds a set of filters to include or exclude sets of IP addresses in the discovery process.
+	 */
 	private final IPFilter ipFilter;
 
 	/**
@@ -165,8 +171,16 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 		return false;
 	}
 
+	/**
+	 * Defines a callback for objects wishing to be notified of discovery events.
+	 */
 	public static interface ConnectionHandler
 	{
-		public void onNewConnection(final String name, final JPPFConnectionInformation info);
+		/**
+		 * Called when a new connection is discovered.
+		 * @param name the name assigned tothe connection.
+		 * @param info the informationr required to connect to the driver.
+		 */
+		void onNewConnection(final String name, final JPPFConnectionInformation info);
 	}
 }

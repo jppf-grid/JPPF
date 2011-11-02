@@ -64,7 +64,8 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 			if (debugEnabled) log.debug("Initializing socket");
 			TypedProperties props = JPPFConfiguration.getProperties();
 			String host = props.getString("jppf.server.host", "localhost");
-			int port = props.getInt("jppf.server.port", 11111);
+			// for backward compatibility with v2.x configurations
+			int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", -1, false);
 			socketClient = new SocketClient();
 			//socketClient = new SocketConnectorWrapper();
 			socketClient.setHost(host);
@@ -110,7 +111,8 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Called by the rescovery mechanism when it detects that the connection to the server is broken. 
+	 * @param event encapsulates information about the connection.
 	 */
 	public void clientConnectionFailed(final ClientConnectionEvent event)
 	{

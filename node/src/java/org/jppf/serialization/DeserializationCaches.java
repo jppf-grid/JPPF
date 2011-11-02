@@ -27,7 +27,7 @@ import org.slf4j.*;
  * Instances of this class handle the caching and lookup of class descriptors and objects during deserialization.
  * @author Laurent Cohen
  */
-public class DeserializationCaches
+class DeserializationCaches
 {
 	/**
 	 * Logger for this class.

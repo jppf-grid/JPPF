@@ -26,10 +26,11 @@ import org.slf4j.*;
  * <p>The configuration file path is set through the system property {@link org.jppf.utils#CONFIG_PROPERTY CONFIG_PROPERTY},
  * whose value is &quot;jppf.config&quot;.<br>
  * As an example, it can be configured by adding the JVM argument &quot;<i>-Djppf.config=jppf-config.properties</i>&quot;.
+ * <p>Modified to allow users to get configuration properties from an alternate source. Any user-provided class that
+ * implements {@link ConfigurationSource} and returns a stream with the same configuration values provided in the properties file.
+ * <br>The configuration source must then configured via the system property <i>-Djppf.config.plugin = mypackage.MyConfigurationSource</i>&quot;
  * @author Laurent Cohen
  * @author Jonathan Newbrough
- * <br>Modified to allow users to get configuration properties from an alternate source. Any user-provided class that
- * implements {@link ConfigurationSource} and returns a stream with the same configuration values provided in the properties file.
  */
 public class JPPFConfiguration
 {
