@@ -109,7 +109,11 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 		}
 		finally
 		{
-			if (receiver != null) receiver.setStopped(true);
+			if (receiver != null)
+			{
+				receiver.setStopped(true);
+				receiver.wakeUp();
+			}
 		}
 	}
 

@@ -254,9 +254,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 */
 	public void close()
 	{
-		super.close();
 		if (receiverThread != null) receiverThread.setStopped(true);
 		if (executor != null) executor.shutdownNow();
+		super.close();
 	}
 
 	/**

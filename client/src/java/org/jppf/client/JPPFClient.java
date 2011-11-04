@@ -146,13 +146,13 @@ public class JPPFClient extends AbstractGenericClient
 	 */
 	public void close()
 	{
-		super.close();
 		if (loadBalancer != null) loadBalancer.stop();
 		if (submissionManager != null)
 		{
 			submissionManager.setStopped(true);
 			submissionManager.wakeUp();
 		}
+		super.close();
 	}
 
 	/**
