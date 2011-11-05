@@ -118,11 +118,14 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * The returned id is used to later retieve the results and sttaus of the execution.
 	 * @param job the job to execute.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
+	 * @throws IllegalArgumentException if the job is null or empty.
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	@Override
 	public String submitNonBlocking(final JPPFJob job) throws Exception
 	{
+		if (job == null) throw new IllegalArgumentException("job cannot be null");
+		if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
 		return getJppfClient().getSubmissionManager().submitJob(job);
 	}
 
@@ -133,11 +136,14 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	 * @param job the job to execute.
 	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
+	 * @throws IllegalArgumentException if the job is null or empty.
 	 * @throws Exception if an error occurs while submitting the request.
 	 */
 	@Override
 	public String submitNonBlocking(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
 	{
+		if (job == null) throw new IllegalArgumentException("job cannot be null");
+		if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
 		job.setBlocking(false);
 		return getJppfClient().getSubmissionManager().submitJob(job, listener);
 	}

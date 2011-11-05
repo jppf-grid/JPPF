@@ -114,12 +114,15 @@ public class JPPFClient extends AbstractGenericClient
 	 * Submit a job execution request.
 	 * @param job the job to execute.
 	 * @return the list of executed tasks with their results.
+	 * @throws IllegalArgumentException if the job is null or empty.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
 	 */
 	@Override
 	public List<JPPFTask> submit(final JPPFJob job) throws Exception
 	{
+		if (job == null) throw new IllegalArgumentException("job cannot be null");
+		if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
 		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job));
 		//else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
 		submissionManager.submitJob(job);
