@@ -83,11 +83,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	/**
 	 * List of listeners to task execution events.
 	 */
-	protected List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
-	/**
-	 * 
-	 */
-	protected TaskExecutionListener listenerArray[] = new TaskExecutionListener[0];
+	private final List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
 	/**
 	 * Determines whether the number of threads or their priority has changed.
 	 */
@@ -116,13 +112,18 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
-		NodeExecutionInfo info = null;
-		if (isCpuTimeEnabled()) info = computeExecutionInfo();
+		NodeExecutionInfo info;
+		if (isCpuTimeEnabled())
+        {
+            info = computeExecutionInfo();
+        } else {
+            info = null;
+        }
 		setup(bundle, taskList);
 		for (Task task : taskList) performTask(task);
 		waitForResults();
 		cleanup();
-		if (isCpuTimeEnabled())
+		if (info != null)
 		{
 			NodeExecutionInfo info2 = computeExecutionInfo();
 			info2.cpuTime -= info.cpuTime;
@@ -363,12 +364,12 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	{
 		TaskExecutionEvent event = new TaskExecutionEvent(taskMap.get(taskNumber), getCurrentJobId(), cpuTime, elapsedTime, hasError);
 		removeFuture(taskNumber);
-		TaskExecutionListener tmp[];
+		TaskExecutionListener[] tmp;
 		synchronized(taskExecutionListeners)
 		{
-			tmp = listenerArray;
-		}
-		for (TaskExecutionListener listener: tmp) listener.taskExecuted(event);
+			tmp = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
+        }
+		for (TaskExecutionListener listener : tmp) listener.taskExecuted(event);
 	}
 
 	/**
@@ -417,7 +418,6 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		synchronized(taskExecutionListeners)
 		{
 			taskExecutionListeners.add(listener);
-			listenerArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
 		}
 	}
 
@@ -430,7 +430,6 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		synchronized(taskExecutionListeners)
 		{
 			taskExecutionListeners.remove(listener);
-			listenerArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
 		}
 	}
 
@@ -467,7 +466,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 */
 	public synchronized void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification)
 	{
-		if (this.reconnectionNotification != null) return;
+		if (this.reconnectionNotification == null) return;
 		this.reconnectionNotification = reconnectionNotification;
 	}
 }
