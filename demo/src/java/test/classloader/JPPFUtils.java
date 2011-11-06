@@ -19,10 +19,12 @@ public class JPPFUtils {
 	protected static final int BUFFER_SIZE = 2048;
 
 	/**
-	 *
-	 * @param client
+	 * Pre-initialize all connected nodes to client. By creating broadcast job that download all JARs (except JPPF)
+     * on classpath to node. This speed up first job execution time.
+     *
+	 * @param client JPPF client to initialize
 	 * @param baseURL - JAR base directory
-	 * @throws Exception
+     * @throws Exception if any error occurs while pre-initializing client.
 	 */
 	public static void preInit(final JPPFClient client, final URL baseURL) throws Exception {
 		if(client == null) throw new IllegalArgumentException("client is null");

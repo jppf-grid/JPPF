@@ -68,7 +68,8 @@ public final class Helper
 
 	/**
 	 * Generate a keystore with a default password.
-	 * @throws Exception if any error occurs.
+	 * @param pwd default keystore password
+     * @throws Exception if any error occurs.
 	 */
 	private static void generateKeyStore(final String pwd) throws Exception
 	{

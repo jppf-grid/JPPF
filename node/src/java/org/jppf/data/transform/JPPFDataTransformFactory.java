@@ -114,7 +114,6 @@ public class JPPFDataTransformFactory
 	 * @param len the number of bytes to process, starting at the offset, in the data.
 	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
 	 * @throws Exception if any error occurs while transforming the data.
-	 * @throws Exception if any error occurs while tranforming the data.
 	 */
 	public static byte[] transform(final boolean normal, final byte[] data, final int offset, final int len) throws Exception
 	{
