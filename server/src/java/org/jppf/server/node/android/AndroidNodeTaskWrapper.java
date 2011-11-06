@@ -37,7 +37,7 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
 	/**
 	 * The execution manager.
 	 */
-	private AndroidNodeExecutionManager executionManager = null;
+	private final AndroidNodeExecutionManager executionManager;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.

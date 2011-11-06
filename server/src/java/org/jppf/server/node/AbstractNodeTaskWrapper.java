@@ -43,10 +43,6 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
 	 */
 	protected final long number;
 	/**
-	 * The execution manager.
-	 */
-	protected NodeExecutionManager executionManager = null;
-	/**
 	 * Set if the node must reconnect to the driver.
 	 */
 	protected JPPFNodeReconnectionNotification reconnectionNotification = null;

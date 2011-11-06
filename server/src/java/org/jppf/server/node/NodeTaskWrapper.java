@@ -34,6 +34,10 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	 * The JPPF node that runs this task.
 	 */
 	private final JPPFNode node;
+    /**
+     * The execution manager.
+     */
+    private final NodeExecutionManagerImpl executionManager;
 
 	/**
 	 * Initialize this task wrapper with a specified JPPF task.
@@ -57,8 +61,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	public void run()
 	{
 		JPPFNodeAdmin nodeAdmin = null;
-		NodeExecutionManagerImpl em = (NodeExecutionManagerImpl) executionManager;
-		long cpuTime = 0L;
+        long cpuTime = 0L;
 		long elapsedTime = 0L;
 		try
 		{
@@ -72,14 +75,14 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 			}
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			long id = Thread.currentThread().getId();
-			em.processTaskTimeout(task, number);
+			executionManager.processTaskTimeout(task, number);
 			long startTime = System.currentTimeMillis();
-			long startCpuTime = em.getCpuTime(id);
+			long startCpuTime = executionManager.getCpuTime(id);
 			task.run();
 			try
 			{
 				// convert cpu time from nanoseconds to milliseconds
-				cpuTime = (em.getCpuTime(id) - startCpuTime) / 1000000L;
+				cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
 				elapsedTime = System.currentTimeMillis() - startTime;
 			}
 			catch(Throwable ignore)
@@ -102,7 +105,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 				try
 				{
 					if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
-					em.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
 				}
 				catch(JPPFNodeReconnectionNotification t)
 				{
@@ -111,19 +114,9 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 			}
 			if (reconnectionNotification != null)
 			{
-				em.setReconnectionNotification(reconnectionNotification);
-				em.wakeUp();
+				executionManager.setReconnectionNotification(reconnectionNotification);
+				executionManager.wakeUp();
 			}
 		}
-	}
-
-	/**
-	 * Get the task this wrapper executes within a try/catch block.
-	 * @return the task as a <code>JPPFTask</code> instance.
-	 */
-	@Override
-	public Task getTask()
-	{
-		return task;
 	}
 }
