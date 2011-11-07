@@ -34,7 +34,7 @@ class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 	private Object invoker = null;
 
 	/**
-	 * Initialize this priviledged action with the specified method, invoker object and parameters.
+	 * Initialize this privileged action with the specified method, invoker object and parameters.
 	 * @param method the method to invoke.
 	 * @param invoker the object on which to invoke the method, or null for static methods.
 	 * @param args the parameters of the method to invoke.

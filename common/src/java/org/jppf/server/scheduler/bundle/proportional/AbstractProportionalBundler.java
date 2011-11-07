@@ -24,7 +24,7 @@ import org.jppf.server.scheduler.bundle.*;
 import org.slf4j.*;
 
 /**
- * This bundler implementation computes bundle sizes propertional to the mean execution
+ * This bundler implementation computes bundle sizes proportional to the mean execution
  * time for each node to the power of n, where n is an integer value specified in the configuration file as "proportionality factor".<br>
  * The scope of this bundler is all nodes, which means that it computes the size for all nodes,
  * unless an override is specified by the nodes.<br>
@@ -118,7 +118,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
 	}
 
 	/**
-	 * Perform context-independant initializations.
+	 * Perform context-independent initializations.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#setup()
 	 */
 	@Override

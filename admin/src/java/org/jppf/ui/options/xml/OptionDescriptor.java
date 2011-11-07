@@ -42,7 +42,7 @@ public class OptionDescriptor extends TypedProperties
 	 * <li>&quot;TextArea&quot; for a text area option</li>
 	 * <li>&quot;Boolean&quot; for a checkbox option</li>
 	 * <li>&quot;ComboBox&quot; for dropdown lists</li>
-	 * <li>&quot;PlainText&quot; for a simple, sligle-line text field</li>
+	 * <li>&quot;PlainText&quot; for a simple, single-line text field</li>
 	 * <li>&quot;Button&quot; for a button</li>
 	 * <li>&quot;Password&quot; for a password field</li>
 	 * </ul>
@@ -124,7 +124,7 @@ public class OptionDescriptor extends TypedProperties
 		 */
 		public String content = null;
 		/**
-		 * The language in which the script is written, for instancew JavaScript, Groovy, etc.
+		 * The language in which the script is written, for instance JavaScript, Groovy, etc.
 		 */
 		public String language = null;
 		/**

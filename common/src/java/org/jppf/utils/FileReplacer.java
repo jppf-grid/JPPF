@@ -95,7 +95,7 @@ public class FileReplacer
 		nbReplacements = 0;
 		if (f.isDirectory()) replaceFolder(f);
 		else replaceFile(f);
-		log.info("Total number of occurences found: " + nbReplacements);
+		log.info("Total number of occurrences found: " + nbReplacements);
 		log.info("Total number of files" + (searchOnly ? " would have been" : "") +
 				" changed: " + nbFilesChanged);
 	}
@@ -103,7 +103,7 @@ public class FileReplacer
 	/**
 	 * Recursively process a folder.
 	 * @param folder the process to visit.
-	 * @throws Exception if an eeror occurs while processing the folder.
+	 * @throws Exception if an error occurs while processing the folder.
 	 */
 	private void replaceFolder(final File folder) throws Exception
 	{
@@ -124,7 +124,7 @@ public class FileReplacer
 	/**
 	 * Recursively process a single file.
 	 * @param file the file to process.
-	 * @throws Exception if an eeror occurs while processing the folder.
+	 * @throws Exception if an error occurs while processing the folder.
 	 */
 	private void replaceFile(final File file) throws Exception
 	{
@@ -160,7 +160,7 @@ public class FileReplacer
 	 * args[0] : the file containing the text to search for<br/>
 	 * args[1] : the file containing the replacement text<br/>
 	 * args[2] : a list of comma-separated file extensions, without dots and no spaces allowed (e.g. "java,xml")<br/>
-	 * args[3] : true to indicate that the replacements should only be simulated (i.e changes preview), false to really peform the replacements.
+	 * args[3] : true to indicate that the replacements should only be simulated (i.e changes preview), false to really perform the replacements.
 	 * @param args defines the text search, the text to replace it with, the file extensions to process, and whether changes are only simulated.
 	 */
 	public static void main(final String...args)

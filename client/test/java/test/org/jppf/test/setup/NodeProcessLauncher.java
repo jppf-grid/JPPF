@@ -26,7 +26,7 @@ public class NodeProcessLauncher extends GenericProcessLauncher
 {
 	/**
 	 * Initialize the node launcher with the specified node id.
-	 * @param n the id of the node, used to determine which cnfiguration files to use.
+	 * @param n the id of the node, used to determine which configuration files to use.
 	 */
 	public NodeProcessLauncher(final int n)
 	{

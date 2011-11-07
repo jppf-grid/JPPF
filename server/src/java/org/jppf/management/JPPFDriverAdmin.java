@@ -135,7 +135,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 	{
 		try
 		{
-			if (debugEnabled) log.debug("request to restart/shutdonw this driver, shutdownDelay=" + shutdownDelay + ", restartDelay=" + restartDelay);
+			if (debugEnabled) log.debug("request to restart/shutdown this driver, shutdownDelay=" + shutdownDelay + ", restartDelay=" + restartDelay);
 			boolean restart = restartDelay >= 0;
 			driver.initiateShutdownRestart(shutdownDelay, restart, restartDelay);
 			return localize("request.acknowledged");

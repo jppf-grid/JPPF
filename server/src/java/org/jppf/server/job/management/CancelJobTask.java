@@ -24,7 +24,7 @@ import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.slf4j.*;
 
 /**
- * Instances of this class are intented to perform job management functions for a specxific node.
+ * Instances of this class are intended to perform job management functions for a specific node.
  * @author Laurent Cohen
  */
 class CancelJobTask implements Runnable

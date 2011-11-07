@@ -40,7 +40,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 	 */
 	private static Logger log = LoggerFactory.getLogger(ClassContext.class);
 	/**
-	 * Determines whther DEBUG logging level is enabled.
+	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**

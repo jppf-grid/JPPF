@@ -32,7 +32,7 @@ import org.jppf.ui.treetable.*;
 public abstract class AbstractSelectionAction extends AbstractTopologyAction
 {
 	/**
-	 * COnstant for an empty <code>TreePath</code>.
+	 * Constant for an empty <code>TreePath</code>.
 	 */
 	protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
 	/**

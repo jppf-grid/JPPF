@@ -33,7 +33,7 @@ public class LocalClassContext extends ClassContext
 	 */
 	private static Logger log = LoggerFactory.getLogger(LocalClassContext.class);
 	/**
-	 * Determines whther DEBUG logging level is enabled.
+	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 

@@ -22,7 +22,7 @@ import org.jppf.comm.socket.*;
 import org.slf4j.*;
 
 /**
- * Socket intializer for the JPPF resource adapter.
+ * Socket initializer for the JPPF resource adapter.
  * This implementation does not rely on its own threads or timers to not interfere with the application server.
  * @author Laurent Cohen
  */

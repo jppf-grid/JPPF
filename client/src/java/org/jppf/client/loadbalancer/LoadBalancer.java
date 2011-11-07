@@ -33,7 +33,7 @@ import org.slf4j.*;
 
 /**
  * This class is used to balance the number of tasks in an execution between local and remote execution.
- * It uses the proportional bundling alogrithm, which is also used by the JPPF Driver.
+ * It uses the proportional bundling algorithm, which is also used by the JPPF Driver.
  * @see org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler
  * @author Laurent Cohen
  */
@@ -219,7 +219,7 @@ public class LoadBalancer
 	}
 
 	/**
-	 * Specifiy whether local execution is enabled on this client.
+	 * Specify whether local execution is enabled on this client.
 	 * @param localEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
 	 */
 	public void setLocalEnabled(final boolean localEnabled)

@@ -177,7 +177,7 @@ public class TextAreaOption extends AbstractOption
 	}
 
 	/**
-	 * Specifiy whether the text area is editable.
+	 * Specify whether the text area is editable.
 	 * @param editable true if the text area is editable, false otherwise.
 	 */
 	@Override

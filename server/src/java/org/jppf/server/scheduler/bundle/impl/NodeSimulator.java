@@ -170,7 +170,7 @@ public class NodeSimulator
 	}
 
 	/**
-	 * Instances of this class enable testing a load-balancing alogrithm on a simulated node.
+	 * Instances of this class enable testing a load-balancing algorithm on a simulated node.
 	 */
 	public static class SimulatorTask implements Runnable
 	{
@@ -224,7 +224,7 @@ public class NodeSimulator
 	}
 
 	/**
-	 * Used in simulations of proportianl bundlers.
+	 * Used in simulations of proportional bundlers.
 	 */
 	public static class SimulatedProportionalBundler extends AbstractProportionalBundler
 	{

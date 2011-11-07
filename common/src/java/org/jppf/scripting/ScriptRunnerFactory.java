@@ -33,7 +33,7 @@ public final class ScriptRunnerFactory
 	/**
 	 * Instantiate a script runner based on the specified script language.
 	 * @param language the name of the script language to use.
-	 * @return A <code>ScriptRunner</code> instance, or null if no known sciprt runner
+	 * @return A <code>ScriptRunner</code> instance, or null if no known script runner
 	 * exists for the specified language.
 	 */
 	public static ScriptRunner makeScriptRunner(final String language)

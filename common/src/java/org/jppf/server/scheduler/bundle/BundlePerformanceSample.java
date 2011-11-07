@@ -41,7 +41,7 @@ public class BundlePerformanceSample
 	}
 
 	/**
-	 * Initialize this sample witht he specified mean execute time and number of samples.
+	 * Initialize this sample with the specified mean execute time and number of samples.
 	 * @param mean Mean compute time for server to node round trip.
 	 * @param samples Number of samples used to compute the mean value.
 	 */

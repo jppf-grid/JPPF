@@ -52,7 +52,7 @@ public class JPPFLocalContainer extends JPPFContainer
 
 	/**
 	 * Initialize this container with a specified application uuid.
-	 * @param channel the I/O channelof the node.
+	 * @param channel the I/O channel of the node.
 	 * @param uuidPath the unique identifier of a submitting application.
 	 * @param classLoader the class loader for this container.
 	 * @throws Exception if an error occurs while initializing.
@@ -110,7 +110,7 @@ public class JPPFLocalContainer extends JPPFContainer
 		private int index = 0;
 
 		/**
-		 * Initialize this task with the specicfied data buffer.
+		 * Initialize this task with the specified data buffer.
 		 * @param location the data read from the network connection.
 		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */

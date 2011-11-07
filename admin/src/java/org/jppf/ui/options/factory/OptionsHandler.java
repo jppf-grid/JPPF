@@ -193,7 +193,7 @@ public final class OptionsHandler
 	/**
 	 * Save the value of all persistent options in the preferences store.
 	 * @param node the root of the options subtree to save.
-	 * @param prefs the preferences node in which to save the vaues.
+	 * @param prefs the preferences node in which to save the values.
 	 */
 	public static void savePreferences(final OptionNode node, final Preferences prefs)
 	{
@@ -224,7 +224,7 @@ public final class OptionsHandler
 	/**
 	 * Save the value of all persistent options in the preferences store.
 	 * @param node the root of the options subtree to save.
-	 * @param prefs the preferences node in which to save the vaues.
+	 * @param prefs the preferences node in which to save the values.
 	 */
 	public static void loadPreferences(final OptionNode node, final Preferences prefs)
 	{
@@ -319,7 +319,7 @@ public final class OptionsHandler
 
 	/**
 	 * Load the specified frame state from the preferences store.
-	 * @param frame the frame for which the attributes are retieved.
+	 * @param frame the frame for which the attributes are retrieved.
 	 * @param pref the preferences node from where the attributes are loaded.
 	 */
 	public static void loadFrameAttributes(final Frame frame, final Preferences pref)
@@ -376,8 +376,8 @@ public final class OptionsHandler
 		public List<OptionNode> children = new ArrayList<OptionNode>();
 
 		/**
-		 * Initilaize this node.
-		 * @param elt the correponding option element.
+		 * Initialize this node.
+		 * @param elt the corresponding option element.
 		 */
 		public OptionNode(final OptionElement elt)
 		{

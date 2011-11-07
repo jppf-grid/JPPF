@@ -27,7 +27,7 @@ import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 
 /**
- * This class performs cleanup and preferences stroign actions when the admin console is closed.
+ * This class performs cleanup and preferences storing actions when the admin console is closed.
  * @author Laurent Cohen
  */
 public class WindowClosingListener extends WindowAdapter

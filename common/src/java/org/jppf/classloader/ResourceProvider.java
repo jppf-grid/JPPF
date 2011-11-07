@@ -184,7 +184,7 @@ public class ResourceProvider
 	}
 
 	/**
-	 * Get all resources asssociated with the specified resource name.
+	 * Get all resources associated with the specified resource name.
 	 * @param name the name of the resources to look for.
 	 * @param classLoader the class loader used to load the resources.
 	 * @return the content of all found resources as a list of byte arrays.
@@ -234,7 +234,7 @@ public class ResourceProvider
 	}
 
 	/**
-	 * Get all resources asssociated with each specified resource name.
+	 * Get all resources associated with each specified resource name.
 	 * @param cl the class loader used to load the resources.
 	 * @param names the names of all the resources to look for.
 	 * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.

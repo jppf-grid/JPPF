@@ -32,7 +32,7 @@ import com.mxgraph.view.mxGraph;
 public abstract class AbstractGraphSelectionAction extends AbstractTopologyAction
 {
 	/**
-	 * COnstant for an empty <code>TreePath</code>.
+	 * Constant for an empty <code>TreePath</code>.
 	 */
 	protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
 	/**

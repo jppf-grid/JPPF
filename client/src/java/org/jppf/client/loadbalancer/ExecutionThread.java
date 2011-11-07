@@ -45,7 +45,7 @@ abstract class ExecutionThread extends Thread
 	protected LoadBalancer loadBalancer = null;
 
 	/**
-	 * Initialize this execution thread for remote excution.
+	 * Initialize this execution thread for remote execution.
 	 * @param tasks the tasks to execute.
 	 * @param job the execution to perform.
 	 * @param loadBalancer the load balancer for which this thread is working.

@@ -201,7 +201,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
 	/**
 	 * Get the outbound remote multiplexer associated with an inbound application port.
 	 * @param port the application port to lookup.
-	 * @return a <code>HostPort</code> instannce, or null if no remote multiplexer could be found.
+	 * @return a <code>HostPort</code> instance, or null if no remote multiplexer could be found.
 	 */
 	public HostPort getHostPortForBoundPort(final int port)
 	{

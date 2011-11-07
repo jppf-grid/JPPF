@@ -195,7 +195,7 @@ class WaitingNodeRequestState extends ClassServerState
 
 	/**
 	 * Find a provider connection for the specified provider uuid.
-	 * @param uuid the uuid for which to find a conenction.
+	 * @param uuid the uuid for which to find a connection.
 	 * @return a <code>SelectableChannel</code> instance.
 	 * @throws Exception if an error occurs while searching for a connection.
 	 */

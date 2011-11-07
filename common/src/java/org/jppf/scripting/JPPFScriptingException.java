@@ -20,7 +20,7 @@ package org.jppf.scripting;
 import org.jppf.JPPFException;
 
 /**
- * Exception thrown when an error occurs while executring a script.
+ * Exception thrown when an error occurs while executing a script.
  * @author Laurent Cohen
  */
 public class JPPFScriptingException extends JPPFException

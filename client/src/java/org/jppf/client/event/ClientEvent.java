@@ -39,7 +39,7 @@ public class ClientEvent extends EventObject
 	}
 
 	/**
-	 * Get the client connection on which the event occured.
+	 * Get the client connection on which the event occurred.
 	 * @return a <code>JPPFClientConnection</code> instance.
 	 */
 	public JPPFClientConnection getConnection()

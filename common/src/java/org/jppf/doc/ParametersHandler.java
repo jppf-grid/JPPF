@@ -31,7 +31,7 @@ public class ParametersHandler
 	/**
 	 * Convert the command line arguments into a parameters map.
 	 * @param args the arguments to convert.
-	 * @return a mmaping of parameter names to object values.
+	 * @return a mapping of parameter names to object values.
 	 * @throws Exception if an error occurs while parsing the arguments.
 	 */
 	public Map<ParameterNames, Object> parseArguments(final String...args) throws Exception

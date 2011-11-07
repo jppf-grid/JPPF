@@ -48,7 +48,7 @@ public class ClientDataProvider extends MemoryMapDataProvider
 	private enum SpecialValue
 	{
 		/**
-		 * Specififies a null value.
+		 * Specifies a null value.
 		 */
 		NULL_VALUE
 	}

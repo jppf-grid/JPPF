@@ -207,7 +207,7 @@ public abstract class JPPFTask implements Task<Object>
 
 	/**
 	 * Get the timeout date for this task.
-	 * @return the datez in string fomrat.
+	 * @return the dates in string format.
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
 	public String getTimeoutDate()
@@ -218,7 +218,7 @@ public abstract class JPPFTask implements Task<Object>
 
 	/**
 	 * Get the format used to express the timeout date.
-	 * @return a fomrat string using the specifications for <code>SimpleDateFormat</code>.
+	 * @return a format string using the specifications for <code>SimpleDateFormat</code>.
 	 * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
 	 */
 	public String getTimeoutFormat()
@@ -231,7 +231,7 @@ public abstract class JPPFTask implements Task<Object>
 	 * Set the timeout date for this task.<br>
 	 * Calling this method will reset the timeout value, as both timeout duration and timeout date are mutually exclusive.
 	 * @param timeoutDate the date to set in string representation.
-	 * @param format the format of of the date to set, as described in the specfication for {@link SimpleDateFormat}.
+	 * @param format the format of of the date to set, as described in the specification for {@link SimpleDateFormat}.
 	 * @see java.text.SimpleDateFormat
 	 * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
 	 */

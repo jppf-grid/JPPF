@@ -140,7 +140,7 @@ public class DriverInitializer
 	}
 
 	/**
-	 * Read configuration for the host name and ports used to conenct to this driver.
+	 * Read configuration for the host name and ports used to connect to this driver.
 	 * @return a <code>DriverConnectionInformation</code> instance.
 	 */
 	public JPPFConnectionInformation getConnectionInformation()

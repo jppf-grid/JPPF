@@ -64,13 +64,13 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 	 */
 	private TopologyData[] data = null;
 	/**
-	 * The object that handles tollbar and menu actions.
+	 * The object that handles toolbar and menu actions.
 	 */
 	private JTreeTableActionHandler actionHandler = null;
 
 	/**
 	 * Initialize this mouse listener.
-	 * @param actionHandler the object that handles tollbar and menu actions.
+	 * @param actionHandler the object that handles toolbar and menu actions.
 	 */
 	public NodeTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
 	{

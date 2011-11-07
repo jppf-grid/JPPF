@@ -83,7 +83,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
 	 */
 	public static final Color DIMMED_FOREGROUND = Color.GRAY;
 	/**
-	 * FOreground color for non-managed nodes.
+	 * Foreground color for non-managed nodes.
 	 */
 	public static final Color UNMANAGED_COLOR = new Color(255, 28, 28);
 	/**

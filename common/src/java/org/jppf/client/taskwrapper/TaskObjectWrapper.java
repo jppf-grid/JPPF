@@ -36,7 +36,7 @@ public interface TaskObjectWrapper extends Serializable
 		 */
 		INSTANCE,
 		/**
-		 * Contructor type.
+		 * Constructor type.
 		 */
 		CONSTRUCTOR,
 		/**

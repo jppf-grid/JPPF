@@ -38,7 +38,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The mbrean object name sent with the notifications.
+	 * The mbean object name sent with the notifications.
 	 */
 	private ObjectName OBJECT_NAME;
 	/**
@@ -54,7 +54,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	/**
 	 * The current count of tasks executed.
 	 */
-	//private AtomicInteger taskSucessfullCount = new AtomicInteger(0);
+	//private AtomicInteger taskSuccessfulCount = new AtomicInteger(0);
 	private int taskSucessfullCount = 0;
 	/**
 	 * The current count of tasks executed.
@@ -166,14 +166,14 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
 	}
 
 	/**
-	 * The total number of tasks that executed sucessfully.
+	 * The total number of tasks that executed successfully.
 	 * @return the number as an integer value.
 	 * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksSucessfull()
 	 */
 	@Override
 	public synchronized Integer getTotalTasksSucessfull()
 	{
-		//return taskSucessfullCount.get();
+		//return taskSuccessfulCount.get();
 		return taskSucessfullCount;
 	}
 

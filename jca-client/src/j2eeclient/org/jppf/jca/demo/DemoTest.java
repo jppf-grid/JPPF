@@ -92,7 +92,7 @@ public class DemoTest
 					switch(status)
 					{
 						case COMPLETE:
-							// process successfull completion
+							// process successful completion
 							break;
 						case FAILED:
 							// process failure
@@ -253,7 +253,7 @@ public class DemoTest
 	}
 
 	/**
-	 * Obtain a JPPF connection from the resource adaper's connection pool.
+	 * Obtain a JPPF connection from the resource adapter's connection pool.
 	 * The obtained connection must be closed by the caller of this method, once it is done using it.
 	 * @return a <code>JPPFConnection</code> instance.
 	 * @throws Exception if the connection could not be obtained.

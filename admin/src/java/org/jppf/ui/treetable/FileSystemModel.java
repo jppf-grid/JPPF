@@ -226,7 +226,7 @@ class FileNode
 	Object[] children;
 
 	/**
-	 * Initialize this node with thespecified file.
+	 * Initialize this node with the specified file.
 	 * @param file the referenced file.
 	 */
 	public FileNode(final File file)

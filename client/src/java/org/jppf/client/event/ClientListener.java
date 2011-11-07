@@ -27,12 +27,12 @@ import java.util.EventListener;
 public interface ClientListener extends EventListener
 {
 	/**
-	 * Notifiy this listener that a new driver connection was created.
+	 * Notify this listener that a new driver connection was created.
 	 * @param event the event to notify this listener of.
 	 */
 	void newConnection(ClientEvent event);
 	/**
-	 * Notifiy this listener that a driver connection has failed.
+	 * Notify this listener that a driver connection has failed.
 	 * @param event the event to notify this listener of.
 	 */
 	void connectionFailed(ClientEvent event);

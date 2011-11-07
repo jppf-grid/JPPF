@@ -115,7 +115,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 	}
 
 	/**
-	 * Invocation of <code>JPPFExecutorService.invokdeAll(List&lt;Callable&gt;)</code>.
+	 * Invocation of <code>JPPFExecutorService.invokeAll(List&lt;Callable&gt;)</code>.
 	 * @throws Exception if any error occurs
 	 */
 	@Test
@@ -165,7 +165,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 	}
 
 	/**
-	 * Invocation of <code>JPPFExecutorService.invokdeAny(List&lt;Callable&gt;)</code>.
+	 * Invocation of <code>JPPFExecutorService.invokeAny(List&lt;Callable&gt;)</code>.
 	 * @throws Exception if any error occurs
 	 */
 	@Test

@@ -110,7 +110,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 
 	/**
 	 * Get the content at this location as an array of bytes. This method is
-	 * overriden from {@link org.jppf.server.protocol.AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
+	 * overridden from {@link org.jppf.server.protocol.AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
 	 * @return a byte array.
 	 * @throws Exception if an I/O error occurs.
 	 * @see org.jppf.server.protocol.AbstractLocation#toByteArray()

@@ -96,7 +96,7 @@ public class JavaOption extends AbstractOption
 
 	/**
 	 * Get the fully qualified class name of the UI component to instantiate.
-	 * @return the clas name as a string.
+	 * @return the class name as a string.
 	 */
 	public synchronized String getClassName()
 	{
@@ -105,7 +105,7 @@ public class JavaOption extends AbstractOption
 
 	/**
 	 * Set the fully qualified class name of the UI component to instantiate.
-	 * @param className the clas name as a string.
+	 * @param className the class name as a string.
 	 */
 	public synchronized void setClassName(final String className)
 	{

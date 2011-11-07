@@ -38,7 +38,7 @@ public class JPPFLocalNode extends JPPFNode
 	private LocalClassLoaderChannel classLoaderHandler = null;
 
 	/**
-	 * Initialize this local node with the specfied I/O handler.
+	 * Initialize this local node with the specified I/O handler.
 	 * @param channel the I/O handler for this node.
 	 * @param classLoaderHandler the I/O handler for the class loader.
 	 */

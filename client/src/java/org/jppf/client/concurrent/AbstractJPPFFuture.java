@@ -37,7 +37,7 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 */
 	protected AtomicBoolean cancelled = new AtomicBoolean(false);
 	/**
-	 * TDetrmines whether the task execution timed out.
+	 * Determines whether the task execution timed out.
 	 */
 	protected AtomicBoolean timedout = new AtomicBoolean(false);
 	/**
@@ -45,7 +45,7 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
 	 */
 	protected V result = null;
 	/**
-	 * An exception that may be rasied by the execution of the task.
+	 * An exception that may be raised by the execution of the task.
 	 */
 	protected Exception exception = null;
 

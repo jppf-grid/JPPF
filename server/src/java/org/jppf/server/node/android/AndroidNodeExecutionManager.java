@@ -40,13 +40,13 @@ public class AndroidNodeExecutionManager extends NodeExecutionManagerImpl
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The node that uses this excecution manager.
+	 * The node that uses this execution manager.
 	 */
 	private AbstractJPPFAndroidNode node = null;
 
 	/**
 	 * Initialize this execution manager with the specified node.
-	 * @param node the node that uses this excecution manager.
+	 * @param node the node that uses this execution manager.
 	 */
 	public AndroidNodeExecutionManager(final AbstractJPPFAndroidNode node)
 	{

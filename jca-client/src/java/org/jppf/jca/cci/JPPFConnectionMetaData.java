@@ -27,7 +27,7 @@ import javax.resource.cci.ConnectionMetaData;
 public class JPPFConnectionMetaData implements ConnectionMetaData
 {
 	/**
-	 * Name of the user fo a conenction
+	 * Name of the user fo a connection
 	 */
 	private String userName;
 

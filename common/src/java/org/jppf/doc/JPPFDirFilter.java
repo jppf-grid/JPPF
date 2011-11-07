@@ -50,7 +50,7 @@ public class JPPFDirFilter extends AbstractFileFilter
 	}
 
 	/**
-	 * Initialize a filter accepting the specified directory names and excluding the specifiied ones.
+	 * Initialize a filter accepting the specified directory names and excluding the specified ones.
 	 * @param includes the included directory names; if null all are included. Null values are ignored.
 	 * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
 	 */

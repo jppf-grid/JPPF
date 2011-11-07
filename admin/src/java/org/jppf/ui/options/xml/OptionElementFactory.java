@@ -26,7 +26,7 @@ import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
 import org.jppf.utils.*;
 
 /**
- * Factory class used to build UI eleemnts from XML descriptors.
+ * Factory class used to build UI elements from XML descriptors.
  * @author Laurent Cohen
  */
 public class OptionElementFactory
@@ -288,7 +288,7 @@ public class OptionElementFactory
 	}
 
 	/**
-	 * Build a radsio button option from the specified option descriptor.
+	 * Build a radio button option from the specified option descriptor.
 	 * @param desc the descriptor to get the page properties from.
 	 * @return an <code>Option</code> instance, or null if the option could not be build.
 	 * @throws Exception if an error was raised while building the option.

@@ -36,7 +36,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
 	 */
 	private static Logger log = LoggerFactory.getLogger(AcceptorContext.class);
 	/**
-	 * Determines whther TRACE logging level is enabled.
+	 * Determines whether TRACE logging level is enabled.
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 	/**

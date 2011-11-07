@@ -157,7 +157,7 @@ public class JobData
 	}
 
 	/**
-	 * Get a reference to the procy to the job management mbean.
+	 * Get a reference to the proxy to the job management mbean.
 	 * @return a DriverJobManagementMBean instance.
 	 */
 	public DriverJobManagementMBean getProxy()
@@ -179,7 +179,7 @@ public class JobData
 	}
 
 	/**
-	 * Get a string representaiton of this object.
+	 * Get a string representation of this object.
 	 * @return a string representing this object.
 	 * @see java.lang.Object#toString()
 	 */
@@ -190,7 +190,7 @@ public class JobData
 		switch(type)
 		{
 			case DRIVER:
-				s = (jmxWrapper == null) ? "unkown" : jmxWrapper.getId();
+				s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getId();
 				break;
 			case JOB:
 				s = jobInformation.getJobId();

@@ -27,7 +27,7 @@ import java.util.EventListener;
 public interface ClientConnectionStatusListener extends EventListener
 {
 	/**
-	 * Invoked to notify of a status chnage event on a client connection.
+	 * Invoked to notify of a status change event on a client connection.
 	 * @param event the event to notify of.
 	 */
 	void statusChanged(ClientConnectionStatusEvent event);

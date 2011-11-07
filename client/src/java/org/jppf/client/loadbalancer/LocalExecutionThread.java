@@ -41,7 +41,7 @@ class LocalExecutionThread extends ExecutionThread
 	private boolean debugEnabled = log.isDebugEnabled();
 
 	/**
-	 * Initialize this execution thread for local excution.
+	 * Initialize this execution thread for local execution.
 	 * @param tasks the tasks to execute.
 	 * @param job the execution to perform.
 	 * @param loadBalancer the load balancer for which this thread is working.
@@ -115,7 +115,7 @@ class LocalExecutionThread extends ExecutionThread
 
 	/**
 	 * Retrieve the accumulation time and convert it to nanoseconds.
-	 * @return the accumulation time in nanoseconods.
+	 * @return the accumulation time in nanoseconds.
 	 */
 	private long getAccTime()
 	{

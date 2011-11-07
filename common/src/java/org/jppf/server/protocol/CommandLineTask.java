@@ -65,7 +65,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 	private boolean captureOutput = false;
 
 	/**
-	 * Default condtructor.
+	 * Default constructor.
 	 */
 	public CommandLineTask()
 	{
@@ -120,7 +120,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 
 	/**
 	 * Determines whether the process output is captured.
-	 * @return true if the output is cpatured, false otherwise.
+	 * @return true if the output is captured, false otherwise.
 	 */
 	public boolean isCaptureOutput()
 	{
@@ -129,7 +129,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 
 	/**
 	 * Specifies whether the process output is captured.
-	 * @param captureOutput true if the output is cpatured, false otherwise.
+	 * @param captureOutput true if the output is captured, false otherwise.
 	 */
 	public void setCaptureOutput(final boolean captureOutput)
 	{

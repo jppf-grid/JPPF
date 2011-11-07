@@ -69,7 +69,7 @@ public class ThumbnailGenerator
 	private Map<File, File> fileMap = new TreeMap<File, File>();
 
 	/**
-	 * Initialize this thumbnail generator with the psecified root dir, width and height.
+	 * Initialize this thumbnail generator with the specified root dir, width and height.
 	 * @param path the path to the directory in which to find the images.
 	 * @param width the width of the generated thumbnails.
 	 * @param height the height of the generated thumbnails.
@@ -80,7 +80,7 @@ public class ThumbnailGenerator
 	}
 
 	/**
-	 * Initialize this thumbnail generator with the psecified root dir, width, height
+	 * Initialize this thumbnail generator with the specified root dir, width, height
 	 * and default number of thumbnails per row.
 	 * @param path the path to the directory in which to find the images.
 	 * @param width the width of the generated thumbnails.
@@ -93,7 +93,7 @@ public class ThumbnailGenerator
 	}
 
 	/**
-	 * Initialize this thumbnail generator with the psecified root dir, width, height
+	 * Initialize this thumbnail generator with the specified root dir, width, height
 	 * and default number of thumbnails per row.
 	 * @param path the path to the directory in which to find the images.
 	 * @param width the width of the generated thumbnails.
@@ -136,7 +136,7 @@ public class ThumbnailGenerator
 	}
 
 	/**
-	 * Henerate the file to include in the screenshots php page.
+	 * Generate the file to include in the screenshots php page.
 	 * @throws Exception if an IO error is raised.
 	 */
 	private void generateIncludeFile() throws Exception
@@ -216,7 +216,7 @@ public class ThumbnailGenerator
 		private String[] extensions = null;
 
 		/**
-		 * Initialize this filter witht he specified extensions.
+		 * Initialize this filter width he specified extensions.
 		 * @param extensions an array of the accepted extensions.
 		 */
 		public ImageFileFilter(final String...extensions)

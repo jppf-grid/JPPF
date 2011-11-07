@@ -51,7 +51,7 @@ public interface InputSource extends IO
 	 */
 	int readInt() throws Exception;
 	/**
-	 * Skip <cpde>n</copde> bytes of data form this input source.
+	 * Skip <code>n</code> bytes of data form this input source.
 	 * @param n the number of bytes to skip.
 	 * @return the number of bytes actually skipped.
 	 * @throws Exception if an IO error occurs.

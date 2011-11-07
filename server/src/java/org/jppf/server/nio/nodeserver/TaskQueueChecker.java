@@ -207,7 +207,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
 		}
 		catch (Exception ex)
 		{
-			log.error("An error occured while preparing for bundle creation and dispatching.", ex);
+			log.error("An error occurred while preparing for bundle creation and dispatching.", ex);
 		}
 		return dispatched;
 	}

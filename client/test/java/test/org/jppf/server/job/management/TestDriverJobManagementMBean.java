@@ -61,7 +61,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	/**
-	 * We test a job with 1 task, and attemt to cancel it after it has completed.
+	 * We test a job with 1 task, and attempt to cancel it after it has completed.
 	 * @throws Exception if any error occurs.
 	 */
 	@Test
@@ -105,7 +105,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
 	/**
 	 * Get a proxy ot the job management MBean.
 	 * @return an instance of <code>DriverJobManagementMBean</code>.
-	 * @throws Exception if th eproxy could not be obtained.
+	 * @throws Exception if the proxy could not be obtained.
 	 */
 	protected DriverJobManagementMBean getProxy() throws Exception
 	{

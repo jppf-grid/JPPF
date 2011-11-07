@@ -24,7 +24,7 @@ import org.jppf.client.SubmissionStatus;
 
 
 /**
- * Instances of this class represent a status chage notification for a jppf submission.
+ * Instances of this class represent a status change notification for a jppf submission.
  * @author Laurent Cohen
  */
 public class SubmissionStatusEvent extends EventObject

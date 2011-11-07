@@ -83,7 +83,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	 */
 	private ReentrantLock lock = new ReentrantLock(true);
 	/**
-	 * Represents a condtion to await for and corresponding to when <code>currentJobRef</code> is not null.
+	 * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
 	 */
 	private Condition jobReady = lock.newCondition();
 

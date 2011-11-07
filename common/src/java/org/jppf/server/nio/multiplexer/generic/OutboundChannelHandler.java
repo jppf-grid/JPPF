@@ -47,7 +47,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 
 	/**
 	 * Initialize the channel with the specified host and port.
-	 * @param server the NioServer to which the channel is registred.
+	 * @param server the NioServer to which the channel is registered.
 	 * @param host the remote host to connect to.
 	 * @param port the port to connect to on the remote host.
 	 * @param initialKey the key associated with the initial connection.
@@ -71,7 +71,7 @@ public class OutboundChannelHandler extends AbstractSocketChannelHandler
 	}
 
 	/**
-	 * This method is called after the channel is successfully conntected.
+	 * This method is called after the channel is successfully connected.
 	 * @throws Exception if an error is raised while performing the initialization.
 	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#postInit()
 	 */

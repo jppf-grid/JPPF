@@ -22,7 +22,7 @@ import java.io.Serializable;
 import org.jppf.utils.*;
 
 /**
- * Instances of this class hold server-wide statitics and settings.
+ * Instances of this class hold server-wide statistics and settings.
  * @author Laurent Cohen
  */
 public class JPPFStats implements Serializable
@@ -64,7 +64,7 @@ public class JPPFStats implements Serializable
 	 */
 	private QueueStats jobQueue = new QueueStats("job");
 	/**
-	 * Statistics for the of takss in the jobs.
+	 * Statistics for the of tasks in the jobs.
 	 */
 	private StatsSnapshot jobTasks = new StatsSnapshot("job stats");
 	/**

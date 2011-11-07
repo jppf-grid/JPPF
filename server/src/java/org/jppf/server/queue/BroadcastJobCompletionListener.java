@@ -55,12 +55,12 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
 	 */
 	private boolean done = false;
 	/**
-	 * This map keeps the number of unexecuted tasks for each node uuid.
+	 * This map keeps the number of not executed tasks for each node uuid.
 	 */
 	private Map<String, Integer> completionMap = new HashMap<String, Integer>();
 
 	/**
-	 * Initialize this completion listener with the specified bradcast job and set of node uuids.
+	 * Initialize this completion listener with the specified broadcast job and set of node uuids.
 	 * @param bundleWrapper the broadcast job to dispatch ot each node.
 	 * @param nodeUuids the uuids of the nodes to which the job will be dispatched.
 	 */

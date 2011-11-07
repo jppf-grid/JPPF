@@ -90,7 +90,7 @@ public abstract class AbstractClassLoaderManager
 	 * Get a reference to the JPPF container associated with an application uuid.
 	 * @param uuidPath the uuid path containing the key to the container.
 	 * @return a <code>JPPFContainer</code> instance.
-	 * @throws Exception if an error occcurs while getting the container.
+	 * @throws Exception if an error occurs while getting the container.
 	 */
 	public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
 	{

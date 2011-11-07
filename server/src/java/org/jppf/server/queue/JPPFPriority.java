@@ -37,7 +37,7 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	private int value = 0;
 
 	/**
-	 * Initialize this priority witht he specified object.
+	 * Initialize this priority with the specified object.
 	 * @param value the object used as priority.
 	 */
 	public JPPFPriority(final int value)
@@ -70,7 +70,7 @@ public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 	}
 
 	/**
-	 * Indcates whether some object is "equal" to this one.
+	 * Indicates whether some object is "equal" to this one.
 	 * @param obj the object ot compare with.
 	 * @return true if the 2 objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)

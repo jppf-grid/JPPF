@@ -130,7 +130,7 @@ class LayoutFactory
 	}
 
 	/**
-	 * Create an othogonal layout for the graph.
+	 * Create an orthogonal layout for the graph.
 	 * @return the layout as a <code>mxIGraphLayout</code> instance.
 	 */
 	private mxIGraphLayout newOrthogonalLayout()

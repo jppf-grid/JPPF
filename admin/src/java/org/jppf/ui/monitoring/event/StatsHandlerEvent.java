@@ -33,7 +33,7 @@ public class StatsHandlerEvent extends EventObject
 	public enum Type
 	{
 		/**
-		 * Update with a new data snapashot.
+		 * Update with a new data snapshot.
 		 */
 		UPDATE,
 		/**

@@ -64,14 +64,14 @@ public class OptionDescriptorParser
 	 * Parse an XML document in a file into a tree of option descriptors.
 	 * @param docPath the path to XML document to parse.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
-	 * or null if the docuement could not be parsed.
+	 * or null if the document could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
 	public OptionDescriptor parse(final String docPath) throws Exception
 	{
 		if (docPath.contains("NodeDataPage"))
 		{
-			log.info("loading doc from paht = " + docPath);
+			log.info("loading doc from path = " + docPath);
 		}
 		InputStream is = FileUtils.getFileInputStream(docPath);
 		//if (is == null) is = this.getClass().getClassLoader().getResourceAsStream(docPath);
@@ -93,7 +93,7 @@ public class OptionDescriptorParser
 	 * Parse an XML document in a reader into a tree of option descriptors.
 	 * @param reader the reader providing the XML document.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
-	 * or null if the docuement could not be parsed.
+	 * or null if the document could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
 	public OptionDescriptor parse(final Reader reader) throws Exception
@@ -104,7 +104,7 @@ public class OptionDescriptorParser
 	}
 
 	/**
-	 * Find the first node in a docuemnt that is an element node.
+	 * Find the first node in a document that is an element node.
 	 * @param doc the document whose children are looked up.
 	 * @return a <code>Node</code> instance if one was found, or null otherwise.
 	 */
@@ -123,7 +123,7 @@ public class OptionDescriptorParser
 	 * Generate an <code>OptionDescriptor</code> tree from a DOM subtree.
 	 * @param node the document to generate the tree from.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
-	 * or null if the docuement could not be parsed.
+	 * or null if the document could not be parsed.
 	 */
 	public OptionDescriptor generateTree(final Node node)
 	{
@@ -192,7 +192,7 @@ public class OptionDescriptorParser
 	/**
 	 * Set the attributes of a listener descriptor.
 	 * @param node the parent listener node.
-	 * @param desc the listener descriptor whose attributeshave to be set.
+	 * @param desc the listener descriptor whose attributes have to be set.
 	 */
 	public void setListenerAttributes(final Node node, final ListenerDescriptor desc)
 	{
@@ -214,7 +214,7 @@ public class OptionDescriptorParser
 
 	/**
 	 * Get the value of a node's text subelement.
-	 * @param node the node to generate whosde child is a text node.
+	 * @param node the node to generate whose child is a text node.
 	 * @return the text as a string.
 	 */
 	public String getTextNodeValue(final Node node)

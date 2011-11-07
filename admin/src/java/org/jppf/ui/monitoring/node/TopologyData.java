@@ -23,7 +23,7 @@ import org.jppf.management.*;
 import org.slf4j.*;
 
 /**
- * Instances of this class represent the state of a node in the Yopology panel tree.
+ * Instances of this class represent the state of a node in the Topology panel tree.
  * @author Laurent Cohen
  */
 public class TopologyData
@@ -126,7 +126,7 @@ public class TopologyData
 	}
 
 	/**
-	 * Get a string reprensation of this object.
+	 * Get a string representation of this object.
 	 * @return a string displaying the host and port of the underlying jmx connection.
 	 * @see java.lang.Object#toString()
 	 */

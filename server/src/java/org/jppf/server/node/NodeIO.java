@@ -42,7 +42,7 @@ public interface NodeIO
 	 * Write the execution results to the socket stream.
 	 * @param bundle the task wrapper to send along.
 	 * @param tasks the list of tasks with their result field updated.
-	 * @throws Exception if an error occurs while writtng to the socket stream.
+	 * @throws Exception if an error occurs while writing to the socket stream.
 	 */
 	void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
 

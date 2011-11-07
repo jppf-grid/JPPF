@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * This class maanges the thread for the node's execution manager.
+ * This class manages the thread for the node's execution manager.
  * @author Laurent Cohen
  */
 public class ThreadManager extends ThreadSynchronization
@@ -52,7 +52,7 @@ public class ThreadManager extends ThreadSynchronization
 	 */
 	private ThreadMXBean threadMXBean = null;
 	/**
-	 * Determines wheather the thread cpu time measurement is supported and enabled.
+	 * Determines whether the thread cpu time measurement is supported and enabled.
 	 */
 	private boolean cpuTimeEnabled = false;
 
@@ -183,7 +183,7 @@ public class ThreadManager extends ThreadSynchronization
 	}
 
 	/**
-	 * Determines wheather the thread cpu time measurement is supported and enabled.
+	 * Determines whether the thread cpu time measurement is supported and enabled.
 	 * @return true is cpu time measurement is enabled, false otherwise.
 	 */
 	public boolean isCpuTimeEnabled()

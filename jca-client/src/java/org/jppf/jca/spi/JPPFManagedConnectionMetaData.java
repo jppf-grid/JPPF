@@ -79,8 +79,8 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 
 	/**
 	 * Get the name of the user of the connection.
-	 * @return the name as a stirng.
-	 * @throws ResourceException if the name could not be obrained.
+	 * @return the name as a string.
+	 * @throws ResourceException if the name could not be obtained.
 	 * @see javax.resource.spi.ManagedConnectionMetaData#getUserName()
 	 */
 	@Override

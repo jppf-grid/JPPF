@@ -46,7 +46,7 @@ public final class JPPFExceptionResult extends JPPFTask
 	private String className = null;
 
 	/**
-	 * Initialize this task with the spepcifed error context.
+	 * Initialize this task with the specified error context.
 	 * @param throwable the throwable that is to be captured.
 	 * @param object the object on which the throwable applies.
 	 */

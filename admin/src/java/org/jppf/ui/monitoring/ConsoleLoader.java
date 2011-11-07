@@ -145,7 +145,7 @@ public class ConsoleLoader
 
 	/**
 	 * Shows a dialog asking the user whether to download the charting libs or not.
-	 * @return true if th euser accepted automatic dialog.
+	 * @return true if the user accepted automatic dialog.
 	 * @throws Exception if any error occurs.
 	 */
 	private static boolean showDownloadDialog() throws Exception
@@ -190,7 +190,7 @@ public class ConsoleLoader
 	}
 
 	/**
-	 * Close the opend dialog.
+	 * Close the opened dialog.
 	 * @param d - the dialog to close.
 	 */
 	private static void closeDialog(final JDialog d)
@@ -227,7 +227,7 @@ public class ConsoleLoader
 		 */
 		private Window window = null;
 		/**
-		 * Contains the displayed progess text.
+		 * Contains the displayed progress text.
 		 */
 		private JLabel label = null;
 		/**
@@ -262,7 +262,7 @@ public class ConsoleLoader
 
 		/**
 		 * Notification that some data was transferred from a source to a destination.
-		 * @param event - the event that encapsulates the transfer informaiton.
+		 * @param event - the event that encapsulates the transfer information.
 		 * @see org.jppf.server.protocol.LocationEventListener#dataTransferred(org.jppf.server.protocol.LocationEvent)
 		 */
 		@Override

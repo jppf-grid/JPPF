@@ -202,10 +202,10 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	}
 
 	/**
-	 * Write the data to the specified destination in a blocvking way.
+	 * Write the data to the specified destination in a blocking way.
 	 * @param dest the destination to write to.
 	 * @return the number of bytes that were written.
-	 * @throws Exception if any I/O errro occurs.
+	 * @throws Exception if any I/O error occurs.
 	 */
 	private int blockingTransferTo(final OutputDestination dest) throws Exception
 	{
@@ -231,7 +231,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
 	 * Write the data to the specified destination in a non-blocking way.
 	 * @param dest the destination to write to.
 	 * @return the number of bytes that were written.
-	 * @throws Exception if any I/O errro occurs.
+	 * @throws Exception if any I/O error occurs.
 	 */
 	private int nonBlockingTransferTo(final OutputDestination dest) throws Exception
 	{

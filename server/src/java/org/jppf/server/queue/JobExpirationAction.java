@@ -39,14 +39,14 @@ class JobExpirationAction implements Runnable
 	/**
 	 * Proxy to the job management MBean.
 	 */
-	private static DriverJobManagementMBean jobManagamentMBean = createJobManagementProxy();
+	private static DriverJobManagementMBean jobManagementMBean = createJobManagementProxy();
 	/**
 	 * The bundle wrapper encapsulating the job.
 	 */
 	private ServerJob bundleWrapper = null;
 
 	/**
-	 * Initialize this action witht he specified bundle wrapper.
+	 * Initialize this action with the specified bundle wrapper.
 	 * @param bundleWrapper the bundle wrapper encapsulating the job.
 	 */
 	public JobExpirationAction(final ServerJob bundleWrapper)
@@ -72,7 +72,7 @@ class JobExpirationAction implements Runnable
 				if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 			}
 			String jobUuid = bundleWrapper.getJob().getJobUuid();
-			jobManagamentMBean.cancelJob(jobUuid);
+			jobManagementMBean.cancelJob(jobUuid);
 		}
 		catch (Exception e)
 		{

@@ -157,9 +157,9 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 	}
 
 	/**
-	 * Obtain the JPPF ocnfiguration as a string, one property per line.
+	 * Obtain the JPPF configuration as a string, one property per line.
 	 * @return the properties as a string.
-	 * @throws Exception if an error occurs whileattempting to obtain the JPPF properties.
+	 * @throws Exception if an error occurs while attempting to obtain the JPPF properties.
 	 */
 	private String getPropertiesAsString() throws Exception
 	{

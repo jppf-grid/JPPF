@@ -23,7 +23,7 @@ import java.util.List;
 import javax.resource.spi.work.Work;
 
 /**
- * Instances of this class run a set of tasks rpeatedly, with a delay between each set of executions.
+ * Instances of this class run a set of tasks repeatedly, with a delay between each set of executions.
  * @author Laurent Cohen
  */
 public class JPPFJcaJob implements Work
@@ -42,7 +42,7 @@ public class JPPFJcaJob implements Work
 	private boolean stop = false;
 
 	/**
-	 * Create a connection iniitializer job with the specified tasks, delay and period.
+	 * Create a connection initializer job with the specified tasks, delay and period.
 	 * @param tasks the tasks to run periodically.
 	 * @param period length of time between to executions of the job.
 	 */

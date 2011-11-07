@@ -41,7 +41,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements Tre
 	 */
 	static final int INITIAL_TASK_COUNT = 2;
 	/**
-	 * Column number for the disptached job's task count.
+	 * Column number for the dispatched job's task count.
 	 */
 	static final int TASK_COUNT = 3;
 	/**

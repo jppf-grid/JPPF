@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes supporting the core functionality of the JPPF asynchronous comunication model.
+ * Classes supporting the core functionality of the JPPF asynchronous communication model.
  */
 package org.jppf.server;

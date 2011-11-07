@@ -251,7 +251,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 
 	/**
 	 * Get a resource definition from the resource cache.
-	 * @param uuid uuid of the reosurce provider.
+	 * @param uuid uuid of the resource provider.
 	 * @param name name of the resource.
 	 * @return the content of the resource as an array of bytes.
 	 */

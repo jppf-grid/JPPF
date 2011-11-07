@@ -41,7 +41,7 @@ class JobScheduleAction implements Runnable
 	private ServerJob bundleWrapper = null;
 
 	/**
-	 * Initialize this action witht he specified bundle wrapper.
+	 * Initialize this action with the specified bundle wrapper.
 	 * @param bundleWrapper the bundle wrapper encapsulating the job.
 	 */
 	public JobScheduleAction(final ServerJob bundleWrapper)

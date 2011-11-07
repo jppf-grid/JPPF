@@ -132,7 +132,7 @@ public abstract class JPPFContainer
 
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-	 * @throws Exception if an error occcurs while instantiating the class loader.
+	 * @throws Exception if an error occurs while instantiating the class loader.
 	 */
 	protected void initHelper() throws Exception
 	{
@@ -176,7 +176,7 @@ public abstract class JPPFContainer
 
 		/**
 		 * Initialize this task with the specified data buffer.
-		 * @param dl the data read from the network connection, stored in a meomory-sensitive location.
+		 * @param dl the data read from the network connection, stored in a memory-sensitive location.
 		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
 		 */
 		public ObjectDeserializationTask(final DataLocation dl, final int index)

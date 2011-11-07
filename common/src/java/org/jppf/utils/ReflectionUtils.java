@@ -123,7 +123,7 @@ public class ReflectionUtils
 	 * Get a getter with a given name from a class.
 	 * @param clazz the class enclosing the getter.
 	 * @param name the name of the getter to look for.
-	 * @return a <code>Method</code> object, or null if the class has no getter with the specfied name.
+	 * @return a <code>Method</code> object, or null if the class has no getter with the specified name.
 	 */
 	public static Method getGetter(final Class clazz, final String name)
 	{
@@ -142,7 +142,7 @@ public class ReflectionUtils
 	 * Get a setter with a given name from a class.
 	 * @param clazz the class enclosing the setter.
 	 * @param name the name of the setter to look for.
-	 * @return a <code>Method</code> object, or null if the class has no setter with the specfied name.
+	 * @return a <code>Method</code> object, or null if the class has no setter with the specified name.
 	 */
 	public static Method getSetter(final Class clazz, final String name)
 	{
@@ -161,7 +161,7 @@ public class ReflectionUtils
 	 * Get a getter corresponding to a specified instance variable name from a class.
 	 * @param clazz the class enclosing the instance variable.
 	 * @param attrName the name of the instance variable to look for.
-	 * @return a <code>Method</code> object, or null if the class has no getter for the specfied
+	 * @return a <code>Method</code> object, or null if the class has no getter for the specified
 	 * instance variable name.
 	 */
 	public static Method getGetterForAttribute(final Class clazz, final String attrName)
@@ -177,7 +177,7 @@ public class ReflectionUtils
 	 * Get a setter corresponding to a specified instance variable name from a class.
 	 * @param clazz the class enclosing the instance variable.
 	 * @param attrName the name of the instance variable to look for.
-	 * @return a <code>Method</code> object, or null if the class has no setter for the specfied
+	 * @return a <code>Method</code> object, or null if the class has no setter for the specified
 	 * instance variable name.
 	 */
 	public static Method getSetterForAttribute(final Class clazz, final String attrName)
@@ -269,7 +269,7 @@ public class ReflectionUtils
 	 * the number, order and types of the specified arguments.
 	 * @param clazz the class in which to look for the method.
 	 * @param name the name of the method to look for.
-	 * @param args the argments of the method.
+	 * @param args the arguments of the method.
 	 * @return a matching <code>Method</code> instance, or null if no match could be found.
 	 */
 	public static Method getMatchingMethod(final Class clazz, final String name, final Object[] args)
@@ -287,8 +287,8 @@ public class ReflectionUtils
 	/**
 	 * Get the constructor with in the specified declaring class, that matches
 	 * the number, order and types of the specified arguments.
-	 * @param clazz the class in which to look for the contructor.
-	 * @param args the argments of the method.
+	 * @param clazz the class in which to look for the constructor.
+	 * @param args the arguments of the method.
 	 * @return a matching <code>Constructor</code> instance, or null if no match could be found.
 	 */
 	public static Constructor getMatchingConstructor(final Class clazz, final Object[] args)
@@ -303,7 +303,7 @@ public class ReflectionUtils
 	}
 
 	/**
-	 * Determine whether a set of (possibly null) types looseley matches another set of types.
+	 * Determine whether a set of (possibly null) types loosely matches another set of types.
 	 * @param argTypes the types to match, null values are considered wildcards (matching any type).
 	 * @param types the set of types to match.
 	 * @return true if the methods match, false otherwise.
@@ -324,7 +324,7 @@ public class ReflectionUtils
 
 	/**
 	 * Map a primitive type to its corresponding wrapper type.
-	 * @param type a primtive type.
+	 * @param type a primitive type.
 	 * @return a <code>Class</code> instance.
 	 */
 	public static Class mapPrimitveType(final Class type)

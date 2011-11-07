@@ -66,7 +66,7 @@ public class JobNotificationListener implements NotificationListener
 	{
 		if (!(notification instanceof JobNotification)) return;
 		JobNotification notif = (JobNotification) notification;
-		if (traceEnabled) log.trace("received notIfication: " + notif);
+		if (traceEnabled) log.trace("received notification: " + notif);
 		switch(notif.getEventType())
 		{
 			case JOB_QUEUED:

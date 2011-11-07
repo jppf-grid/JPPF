@@ -46,7 +46,7 @@ public class JPPFResultCollector implements TaskResultListener
 	 */
 	protected int count;
 	/**
-	 * Count of results notr yet received.
+	 * Count of results not yet received.
 	 */
 	protected int pendingCount = 0;
 	/**

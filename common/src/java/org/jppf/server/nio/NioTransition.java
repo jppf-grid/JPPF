@@ -30,7 +30,7 @@ public class NioTransition<S extends Enum>
 	 */
 	private S state = null;
 	/**
-	 * The set of IO operations the corresponding channel isinterested in after the transition.
+	 * The set of IO operations the corresponding channel is interested in after the transition.
 	 */
 	private int interestOps = 0;
 
@@ -53,7 +53,7 @@ public class NioTransition<S extends Enum>
 	}
 
 	/**
-	 * Get the set of IO operations the corresponding channel isinterested in after the transition.
+	 * Get the set of IO operations the corresponding channel is interested in after the transition.
 	 * @return the set of interests as an int value.
 	 */
 	public int getInterestOps()
@@ -62,7 +62,7 @@ public class NioTransition<S extends Enum>
 	}
 
 	/**
-	 * Set the set of IO operations the corresponding channel isinterested in after the transition.
+	 * Set the set of IO operations the corresponding channel is interested in after the transition.
 	 * @param interestOps the set of interests as an int value.
 	 */
 	public void setInterestOps(final int interestOps)

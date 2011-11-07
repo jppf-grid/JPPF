@@ -43,9 +43,9 @@ public class Downloader
 	{
 		try
 		{
-			Downloader donwloader = new Downloader();
-			donwloader.extractFiles("http://downloads.sourceforge.net/jfreechart/jfreechart-1.0.12.zip",
-					"lib", "jfreechart-1.0.12.jar", "jcommon-1.0.15.jar");
+			Downloader downloader = new Downloader();
+			downloader.extractFiles("http://downloads.sourceforge.net/jfreechart/jfreechart-1.0.12.zip",
+                    "lib", "jfreechart-1.0.12.jar", "jcommon-1.0.15.jar");
 			System.out.println("done");
 		}
 		catch(Throwable t)
@@ -64,7 +64,7 @@ public class Downloader
 	/**
 	 * Extract the specified files from the specified archive.
 	 * @param sourceUrl - the URL pointing to the archive to download.
-	 * @param destPath - the oflder in which to extract the files.
+	 * @param destPath - the folder in which to extract the files.
 	 * @param names - the names of the zip entries to extract.
 	 * @throws Exception if any IO error occurs.
 	 */
@@ -140,7 +140,7 @@ public class Downloader
 	}
 
 	/**
-	 * Instances of this class serve as data structures to asssociate each zip or jar url with the files to extract from it.
+	 * Instances of this class serve as data structures to associate each zip or jar url with the files to extract from it.
 	 */
 	private static class URLToFiles
 	{

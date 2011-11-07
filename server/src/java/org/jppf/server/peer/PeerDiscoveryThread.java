@@ -121,7 +121,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	}
 
 	/**
-	 * Detrmine whether a connection information object is already discovered.
+	 * Determine whether a connection information object is already discovered.
 	 * @param info the connection information to lookup.
 	 * @return true if the connection information is in the map, false otherwise.
 	 */
@@ -178,8 +178,8 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
 	{
 		/**
 		 * Called when a new connection is discovered.
-		 * @param name the name assigned tothe connection.
-		 * @param info the informationr required to connect to the driver.
+		 * @param name the name assigned to the connection.
+		 * @param info the information required to connect to the driver.
 		 */
 		void onNewConnection(final String name, final JPPFConnectionInformation info);
 	}

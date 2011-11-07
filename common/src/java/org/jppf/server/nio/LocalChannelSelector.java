@@ -88,7 +88,7 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
 
 	/**
 	 * Determine whether the channel should be set as selected.
-	 * @return tre if the channel is selected, false otherwisze.
+	 * @return tre if the channel is selected, false otherwise.
 	 */
 	private boolean channelSelected()
 	{

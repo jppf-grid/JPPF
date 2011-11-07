@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes for an API that enbles persistence of jobs and their state.
+ * Classes for an API that enables persistence of jobs and their state.
  */
 package org.jppf.client.persistence;

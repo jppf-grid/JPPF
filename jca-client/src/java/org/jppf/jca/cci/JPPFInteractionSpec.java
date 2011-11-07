@@ -49,7 +49,7 @@ public class JPPFInteractionSpec implements InteractionSpec
 
 	/**
 	 * Add a property change listener.
-	 * @param listener the lsitener to add.
+	 * @param listener the listener to add.
 	 */
 	public void addPropertyChangeListener(final PropertyChangeListener listener)
 	{
@@ -58,7 +58,7 @@ public class JPPFInteractionSpec implements InteractionSpec
 
 	/**
 	 * Remove a property change listener.
-	 * @param listener the lsitener to add.
+	 * @param listener the listener to add.
 	 */
 	public void removePropertyChangeListener(final PropertyChangeListener listener)
 	{

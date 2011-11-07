@@ -115,7 +115,7 @@ public class GridMonitor
 	}
 
 	/**
-	 * Initialize this grid monitor with the specified JPPF client and the default (1 second) snpashot interval.
+	 * Initialize this grid monitor with the specified JPPF client and the default (1 second) snapshot interval.
 	 * @param jppfClient the JPPF client from which to get the JMX connections.
 	 * @throws Exception if any error occurs during initialization.
 	 */
@@ -126,7 +126,7 @@ public class GridMonitor
 	}
 
 	/**
-	 * Initialize this grid monitor with the specified JPPF client and snpashot interval.
+	 * Initialize this grid monitor with the specified JPPF client and snapshot interval.
 	 * @param jppfClient the JPPF client from which to get the JMX connections.
 	 * @param snapshotInterval the interval at which memory usage snapshots are taken.
 	 * @throws Exception if any error occurs during initialization.
@@ -139,7 +139,7 @@ public class GridMonitor
 	}
 
 	/**
-	 * Obtain a JMX conection to each node using the driver's management MBean
+	 * Obtain a JMX connection to each node using the driver's management MBean
 	 * @throws Exception if any error occurs.
 	 * @see org.jppf.management.JMXDriverConnectionWrapper
 	 * @see org.jppf.management.JMXNodeConnectionWrapper
@@ -212,7 +212,7 @@ public class GridMonitor
 	}
 
 	/**
-	 * Close this monitpr and release the resources it uses.
+	 * Close this monitor and release the resources it uses.
 	 * @throws Exception if any error occurs.
 	 */
 	public void close() throws Exception
@@ -251,7 +251,7 @@ public class GridMonitor
 	public static class NodeData
 	{
 		/**
-		 * Date and time (on the client) at wich this snapshot is taken.
+		 * Date and time (on the client) at which this snapshot is taken.
 		 */
 		public long timestamp;
 		/**
@@ -350,7 +350,7 @@ public class GridMonitor
 		try
 		{
 			File dir = new File(folder);
-			// create the folders if they don't exst
+			// create the folders if they don't exist
 			if (!dir.exists()) dir.mkdirs();
 			int nodeCount = 1;
 			for (Map.Entry<String, List<NodeData>> entry: dataMap.entrySet())
@@ -359,9 +359,9 @@ public class GridMonitor
 				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, "node-" + nodeCount + ".csv")));
 				// write the node name or ip
 				writer.write("node:," + entry.getKey() + '\n');
-				// write the comumn names
+				// write the column names
 				writer.write(NodeData.getHeader() + '\n');
-				// write each sdapshot as a CSV-formatted row
+				// write each snapshot as a CSV-formatted row
 				for (NodeData data: entry.getValue()) writer.write(data.toCSV() + '\n');
 				writer.flush();
 				writer.close();

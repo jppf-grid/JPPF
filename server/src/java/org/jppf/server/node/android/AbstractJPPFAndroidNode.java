@@ -93,7 +93,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 				init();
 				if (!initialized)
 				{
-					System.out.println("Node sucessfully initialized");
+					System.out.println("Node successfully initialized");
 					initialized = true;
 				}
 				perform();
@@ -246,7 +246,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 
 	/**
 	 * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-	 * @throws Exception if an error occcurs while instantiating the class loader.
+	 * @throws Exception if an error occurs while instantiating the class loader.
 	 */
 	public void initHelper() throws Exception
 	{
@@ -266,7 +266,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	 * Get a reference to the JPPF container associated with an application uuid.
 	 * @param uuidPath the uuid path containing the key to the container.
 	 * @return a <code>JPPFContainer</code> instance.
-	 * @throws Exception if an error occcurs while getting the container.
+	 * @throws Exception if an error occurs while getting the container.
 	 */
 	public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
 	{
@@ -305,7 +305,7 @@ public abstract class AbstractJPPFAndroidNode extends AbstractNode
 	}
 
 	/**
-	 * Shutdown and evenetually restart the node.
+	 * Shutdown and eventually restart the node.
 	 * @param restart determines whether this node should be restarted by the node launcher.
 	 */
 	public void shutdown(final boolean restart)

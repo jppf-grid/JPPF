@@ -39,7 +39,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 	 */
 	public static final int R = SelectionKey.OP_READ;
 	/**
-	 * A short name for wirte channel operations.
+	 * A short name for write channel operations.
 	 */
 	public static final int W = SelectionKey.OP_WRITE;
 	/**

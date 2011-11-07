@@ -58,7 +58,7 @@ class ClientPool
 	}
 
 	/**
-	 * Deter;ine zhether this pool is e;pty.
+	 * Determine whether this pool is empty.
 	 * @return <code>true</code> if this pool is empty, <code>false</code> otherwise.
 	 */
 	public boolean isEmpty() {
@@ -77,7 +77,7 @@ class ClientPool
 	/**
 	 * Add a driver connection to this pool.
 	 * @param client the connection too add.
-	 * @return true if the unerlying list of connections changed as a result of calling this method.
+	 * @return true if the underlying list of connections changed as a result of calling this method.
 	 */
 	public boolean add(final JPPFClientConnection client) {
 		return clientList.add(client);
@@ -86,7 +86,7 @@ class ClientPool
 	/**
 	 * Remove a driver connection from this pool.
 	 * @param client the connection too remove.
-	 * @return true if the unerlying list of connections changed as a result of calling this method.
+	 * @return true if the underlying list of connections changed as a result of calling this method.
 	 */
 	public boolean remove(final JPPFClientConnection client) {
 		if(clientList.remove(client)) {

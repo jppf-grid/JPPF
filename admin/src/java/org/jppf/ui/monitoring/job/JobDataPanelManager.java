@@ -212,7 +212,7 @@ class JobDataPanelManager
 
 	/**
 	 * Find the driver tree node with the specified driver name.
-	 * @param driverName name of the dirver to find.
+	 * @param driverName name of the driver to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
 	DefaultMutableTreeNode findDriver(final String driverName)
@@ -347,7 +347,7 @@ class JobDataPanelManager
 		}
 
 		/**
-		 * Invoked when thew conneciton status has changed.
+		 * Invoked when thew connection status has changed.
 		 * @param event the connection status event.
 		 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 		 */

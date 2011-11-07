@@ -23,7 +23,7 @@ import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler
 import org.slf4j.*;
 
 /**
- * Implementation of the &quot;proportional&quot; load-balancing algortihm, dedicated to
+ * Implementation of the &quot;proportional&quot; load-balancing algorithm, dedicated to
  * balancing the load between local and remote execution, when local execution is enabled in the client.
  * @author Laurent Cohen
  */

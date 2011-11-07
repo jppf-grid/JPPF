@@ -44,7 +44,7 @@ public class FileDataLocation extends AbstractDataLocation
 	 */
 	private int count = 0;
 	/**
-	 * The file channel used to wrte to or read from the underlying file.
+	 * The file channel used to write to or read from the underlying file.
 	 */
 	private FileChannel fileChannel = null;
 	/**
@@ -298,7 +298,7 @@ public class FileDataLocation extends AbstractDataLocation
 	}
 
 	/**
-	 * Perfoorm a non-blocking from this data location to the specified output destination.
+	 * Perform a non-blocking from this data location to the specified output destination.
 	 * @param dest the output destination to transfer to.
 	 * @return the number of bytes actually transferred.
 	 * @throws Exception if an IO error occurs.

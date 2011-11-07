@@ -160,8 +160,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	/**
 	 * Get an available connection with the highest possible priority.
 	 * @param oneAttempt determines whether this method should wait until a connection
-	 * becomes available (ACTIVE status) or fail immeditately if no available connection is found.<br>
-	 * This enables the excution to be performed locally if the client is not connected to a server.
+	 * becomes available (ACTIVE status) or fail immediately if no available connection is found.<br>
+	 * This enables the execution to be performed locally if the client is not connected to a server.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
 	 */
 	public JPPFClientConnection getClientConnection(final boolean oneAttempt)
@@ -172,7 +172,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	/**
 	 * Get an available connection with the highest possible priority.
 	 * @param oneAttempt determines whether this method should wait until a connection
-	 * becomes available (ACTIVE status) or fail immeditately if no available connection is found.<br>
+	 * becomes available (ACTIVE status) or fail immediately if no available connection is found.<br>
 	 * This enables the execution to be performed locally if the client is not connected to a server.
 	 * @param anyState specifies whether this method should look for an active connection or not care about the connection state.
 	 * @return a <code>JPPFClientConnection</code> with the highest possible priority.
@@ -399,7 +399,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 	}
 
 	/**
-	 * This comparator defines a decending value order for integers.
+	 * This comparator defines a descending value order for integers.
 	 */
 	static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
 	{

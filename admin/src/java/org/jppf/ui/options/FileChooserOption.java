@@ -246,7 +246,7 @@ public class FileChooserOption extends AbstractOption
 		}
 
 		/**
-		 * Determines whther a file can be selected.
+		 * Determines whether a file can be selected.
 		 * @param f the file to lookup.
 		 * @return true if the file is accepted, false otherwise.
 		 * @see javax.swing.filechooser.FileFilter#accept(java.io.File)

@@ -103,8 +103,8 @@ class FutureResultCollector extends JPPFResultCollector
 	/**
 	 * Wait for the execution results of the specified task to be received.
 	 * @param position the position of the task in the job it is a part of.
-	 * @param millis maximum number of miliseconds to wait.
-	 * @return the task whose results were received, or null if the tiemout expired before it was received.
+	 * @param millis maximum number of milliseconds to wait.
+	 * @return the task whose results were received, or null if the timeout expired before it was received.
 	 */
 	synchronized JPPFTask waitForTask(final int position, final long millis)
 	{
@@ -160,7 +160,7 @@ class FutureResultCollector extends JPPFResultCollector
 	}
 
 	/**
-	 * Remove a listener form the list of listners registered this results collector.
+	 * Remove a listener form the list of listeners registered this results collector.
 	 * @param listener the listener to remove.
 	 */
 	synchronized void removeListener(final FutureResultCollectorListener listener)

@@ -81,7 +81,7 @@ public class TexFileSplitter
 	}
 
 	/**
-	 * Process the command-line otpions
+	 * Process the command-line options
 	 * @param args contains the specified options and their value.
 	 * @throws Exception if any error occurs while parsing the options.
 	 */

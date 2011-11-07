@@ -73,7 +73,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 	private transient BootstrapContext ctx = null;
 
 	/**
-	 * Start this resource adapater with the specified bootstrap context.
+	 * Start this resource adapter with the specified bootstrap context.
 	 * This method is invoked by the application server exactly once for each resource adapter instance.
 	 * @param ctx bootstrap context provided by the application server.
 	 * @throws ResourceAdapterInternalException if an error occurred while starting this resource adapter.
@@ -229,7 +229,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 
 	/**
 	 * Get the string holding the client configuration.
-	 * @return the configuration as a stirng.
+	 * @return the configuration as a string.
 	 */
 	public String getClientConfiguration()
 	{
@@ -238,7 +238,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 
 	/**
 	 * Set the string holding the client configuration.
-	 * @param clientConfiguration the configuration as a stirng.
+	 * @param clientConfiguration the configuration as a string.
 	 */
 	public void setClientConfiguration(final String clientConfiguration)
 	{

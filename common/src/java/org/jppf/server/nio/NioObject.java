@@ -55,7 +55,7 @@ public class NioObject
 	/**
 	 * Initialize this NioObject with the specified size.
 	 * @param size the size of the internal buffer.
-	 * @param blocking specfifes whether the I/O performed by this object are blocking.
+	 * @param blocking specifies whether the I/O performed by this object are blocking.
 	 */
 	public NioObject(final int size, final boolean blocking)
 	{
@@ -80,7 +80,7 @@ public class NioObject
 	/**
 	 * Initialize this NioObject with the specified size.
 	 * @param data the location of the data to read from or write to.
-	 * @param blocking specfifes whether the I/O performed by this object are blocking.
+	 * @param blocking specifies whether the I/O performed by this object are blocking.
 	 */
 	public NioObject(final DataLocation data, final boolean blocking)
 	{

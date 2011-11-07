@@ -49,7 +49,7 @@ public abstract class AbstractNodeMessage
 	 */
 	protected int position = 0;
 	/**
-	 * The number of objects toread or write.
+	 * The number of objects to read or write.
 	 */
 	protected int nbObjects = -1;
 	/**

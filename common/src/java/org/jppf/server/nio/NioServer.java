@@ -240,7 +240,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 
 	/**
 	 * Determine whether a stop condition external to this server has been reached.
-	 * The default implementation always returns wheter shutdown was requested.<br>
+	 * The default implementation always returns whether shutdown was requested.<br>
 	 * Subclasses may override this behavior.
 	 * @return true if this server should be stopped, false otherwise.
 	 */
@@ -258,7 +258,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 
 	/**
 	 * Process the keys selected by the selector for IO operations.
-	 * @param selectedKeys the set of keys thast were selected by the latest <code>select()</code> invocation.
+	 * @param selectedKeys the set of keys that were selected by the latest <code>select()</code> invocation.
 	 * @throws Exception if an error is raised while processing the keys.
 	 */
 	public void go(final Set<SelectionKey> selectedKeys) throws Exception
@@ -328,9 +328,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 	}
 
 	/**
-	 * Register an incoming connection witht his server's selector.
+	 * Register an incoming connection with his server's selector.
 	 * @param channel the socket channel representing the connection.
-	 * @return a wrpaper for the newly registered channel.
+	 * @return a wrapper for the newly registered channel.
 	 */
 	@SuppressWarnings("unchecked")
 	public ChannelWrapper<?> accept(final SocketChannel channel)

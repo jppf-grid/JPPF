@@ -30,7 +30,7 @@ import org.jppf.utils.*;
  * Java serialization to a file for each job, and uses the jobs uuids as keys to retrieve them.
  * <p>The underlying datastore is a file folder with a flat structure, where each file
  * represents a serialized job.
- * <p>This implementation will use the serialiation scheme, if any, that is configured for the JPPF client.
+ * <p>This implementation will use the serialisation scheme, if any, that is configured for the JPPF client.
  * <p>Note that this implementation is very naive and has a sub-optimal performance,
  * as it stores jobs data in a synchronous, blocking way.
  * @author Laurent Cohen
@@ -102,7 +102,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
 	}
 
 	/**
-	 * Initialize this persistence manager with the psecified root path.
+	 * Initialize this persistence manager with the specified root path.
 	 * @param root the root path for this persistence manager, where the persisted jobs are stored.
 	 * @param prefix the prefix for the names of the files in the store.
 	 * @param ext the extension for the names of the files in the store.

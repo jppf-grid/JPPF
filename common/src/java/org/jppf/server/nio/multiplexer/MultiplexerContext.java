@@ -22,7 +22,7 @@ import org.jppf.server.nio.*;
 import org.slf4j.*;
 
 /**
- * Context obect associated with a socket channel used by the multiplexer.
+ * Context object associated with a socket channel used by the multiplexer.
  * @author Laurent Cohen
  */
 public class MultiplexerContext extends SimpleNioContext<MultiplexerState>

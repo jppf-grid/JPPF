@@ -63,7 +63,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	private String scriptText = null;
 
 	/**
-	 * Initialize this listener with a specified scriot alnguage and script source.
+	 * Initialize this listener with a specified script language and script source.
 	 * @param language the name of the scripting language to use.
 	 * @param content the actual source of the script to execute.
 	 */
@@ -77,7 +77,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
 	/**
 	 * Method called when the value of an option has changed.
 	 * This method actually executes the script that is specified in the XML document
-	 * fropm which the UI component was built.
+	 * from which the UI component was built.
 	 * @param event the event encapsulating the source of the event.
 	 * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
 	 */

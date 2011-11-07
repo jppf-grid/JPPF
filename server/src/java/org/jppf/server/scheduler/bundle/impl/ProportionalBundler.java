@@ -24,7 +24,7 @@ import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler
 import org.slf4j.*;
 
 /**
- * This bundler implementation computes bundle sizes propertional to the mean execution
+ * This bundler implementation computes bundle sizes proportional to the mean execution
  * time for each node to the power of n, where n is an integer value specified in the configuration file as "proportionality factor".<br>
  * The scope of this bundler is all nodes, which means that it computes the size for all nodes.<br>
  * The mean execution time is computed as a moving average over a number of tasks, specified in the bundling

@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Paremeters profile for a proportional bundler.
+ * Parameters profile for a proportional bundler.
  * @author Laurent Cohen
  */
 public class ProportionalTuneProfile extends AbstractAutoTuneProfile
@@ -44,7 +44,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 */
 	private static AtomicReference<ProportionalTuneProfile> defaultProfile = new AtomicReference<ProportionalTuneProfile>(new ProportionalTuneProfile());
 	/**
-	 * The maximum szie of the performance samples cache.
+	 * The maximum size of the performance samples cache.
 	 */
 	private int performanceCacheSize = 2000;
 	/**
@@ -52,7 +52,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
 	 */
 	private int proportionalityFactor = 2;
 	/**
-	 * The initial bundle size to use when the performance cache is empty, to botsdtrap the algorithm.
+	 * The initial bundle size to use when the performance cache is empty, to bootstrap the algorithm.
 	 */
 	private int initialSize = 1;
 	/**

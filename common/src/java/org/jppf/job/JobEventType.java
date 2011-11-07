@@ -25,7 +25,7 @@ package org.jppf.job;
 public enum JobEventType
 {
 	/**
-	 * A new job was submmitted to the JPPF driver queue.
+	 * A new job was submitted to the JPPF driver queue.
 	 */
 	JOB_QUEUED,
 	/**

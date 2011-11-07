@@ -125,7 +125,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * Find the element with the specified path in the options tree. The path can be absolute,
 	 * in which case it starts with a &quote;/&quote, otherwise it is considered relative to the requesting element.
 	 * @param path the path of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied path.
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specified path.
 	 * @see org.jppf.ui.options.OptionElement#findElement(java.lang.String)
 	 */
 	@Override
@@ -165,7 +165,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 
 	/**
 	 * Get a string representation of this element.
-	 * @return a strign providing information about this option element.
+	 * @return a string providing information about this option element.
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -184,7 +184,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * Find all the elements with the specified name in the subtree of which this element is the root.
 	 * @param name the name of the elements to find.
 	 * @return a list of <code>OptionElement</code> instances, or null if no element
-	 * could be found with the specfied name. The resulting list can be empty, but never null.
+	 * could be found with the specified name. The resulting list can be empty, but never null.
 	 * @see org.jppf.ui.options.OptionElement#findAllWithName(java.lang.String)
 	 */
 	@Override
@@ -199,7 +199,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	/**
 	 * Find the first element with the specified name in the subtree of which this element is the root.
 	 * @param name the name of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specified name.
 	 * @see org.jppf.ui.options.OptionElement#findFirstWithName(java.lang.String)
 	 */
 	@Override
@@ -213,7 +213,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * Find the last element with the specified name in the subtree of which this element is the root.
 	 * The notion of last element relates to a depth-first search in the tree.
 	 * @param name the name of the element to find.
-	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specfied name.
+	 * @return an <code>OptionElement</code> instance, or null if no element could be found with the specified name.
 	 * @see org.jppf.ui.options.OptionElement#findLastWithName(java.lang.String)
 	 */
 	@Override
@@ -228,7 +228,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
 	 * this element is the root.
 	 * @param name the name of the elements to find.
 	 * @param list a list of <code>OptionElement</code> instances, to fill with the elements found.
-	 * could be found with the specfied name. The resulting list can be empty, but never null.
+	 * could be found with the specified name. The resulting list can be empty, but never null.
 	 */
 	protected void findAll(final String name, final List<OptionElement> list)
 	{

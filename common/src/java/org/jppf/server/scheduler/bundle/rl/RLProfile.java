@@ -29,7 +29,7 @@ import org.jppf.utils.*;
 public class RLProfile extends AbstractAutoTuneProfile
 {
 	/**
-	 * The maximum szie of the performance samples cache.
+	 * The maximum size of the performance samples cache.
 	 */
 	private int performanceCacheSize = 2000;
 	/**

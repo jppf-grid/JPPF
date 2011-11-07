@@ -50,23 +50,23 @@ public enum Fields
 	 */
 	AVG_EXECUTION_TIME,
 	/**
-	 * Name for the total tansport time for all tasks.
+	 * Name for the total transport time for all tasks.
 	 */
 	TOTAL_TRANSPORT_TIME,
 	/**
-	 * Name for the execution time of the last tansported task.
+	 * Name for the execution time of the last transported task.
 	 */
 	LATEST_TRANSPORT_TIME,
 	/**
-	 * Name for the minimum task tansport time.
+	 * Name for the minimum task transport time.
 	 */
 	MIN_TRANSPORT_TIME,
 	/**
-	 * Name for the maximum task tansport time.
+	 * Name for the maximum task transport time.
 	 */
 	MAX_TRANSPORT_TIME,
 	/**
-	 * Name for the average task tansport time.
+	 * Name for the average task transport time.
 	 */
 	AVG_TRANSPORT_TIME,
 	/**
@@ -197,7 +197,7 @@ public enum Fields
 
 	/**
 	 * Return a localized version of this item name.
-	 * @return the localized nbame as a string.
+	 * @return the localized name as a string.
 	 * @see java.lang.Enum#toString()
 	 */
 	@Override

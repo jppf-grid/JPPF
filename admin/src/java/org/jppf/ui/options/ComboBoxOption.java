@@ -37,7 +37,7 @@ public class ComboBoxOption extends AbstractOption
 	 */
 	protected JLabel comboLabel = null;
 	/**
-	 * The items in the drop dwon list.
+	 * The items in the drop down list.
 	 */
 	protected List items = null;
 

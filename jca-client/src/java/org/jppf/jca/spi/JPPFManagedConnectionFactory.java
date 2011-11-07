@@ -83,7 +83,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	}
 
 	/**
-	 * Create a managed conneciton.
+	 * Create a managed connection.
 	 * @param subject not used.
 	 * @param cri not used.
 	 * @return a <code>JPPFManagedConnection</code> instance.
@@ -152,7 +152,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 	}
 
 	/**
-	 * Get this managed conncetion factory's hashcode.
+	 * Get this managed connection factory's hashcode.
 	 * @return the hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */

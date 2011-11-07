@@ -237,7 +237,7 @@ public final class IOHelper
 	}
 
 	/**
-	 * Serialize an object to a bugffer in memory.
+	 * Serialize an object to a buffer in memory.
 	 * @param o the object to serialize.
 	 * @param ser the object serializer.
 	 * @return an instance of {@link MultipleBuffersOutputStream}.

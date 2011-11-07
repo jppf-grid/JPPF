@@ -84,7 +84,7 @@ public class GenericProcessLauncher
 	 */
 	private ProcessWrapper wrapper = null;
 	/**
-	 * Fully qualifie name of the main class.
+	 * Fully qualified name of the main class.
 	 */
 	private String mainClass = null;
 	/**
@@ -92,7 +92,7 @@ public class GenericProcessLauncher
 	 */
 	private ServerSocket processServer = null;
 	/**
-	 * The port number the erver socket listens to.
+	 * The port number the server socket listens to.
 	 */
 	private int processPort = 0;
 
@@ -273,7 +273,7 @@ public class GenericProcessLauncher
 	}
 
 	/**
-	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shtutdown properly,
+	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shutdown properly,
 	 * when this driver is killed, by a way other than the API (ie CTRL-C or killing the process through the OS shell).<br>
 	 * The port the server socket listens to is dynamically attributed, which is obtained by using the constructor
 	 * <code>new ServerSocket(0)</code>.<br>

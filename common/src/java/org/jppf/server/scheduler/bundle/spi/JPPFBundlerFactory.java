@@ -48,7 +48,7 @@ public class JPPFBundlerFactory
 	/**
 	 * Create an instance of the bundler with the specified name and parameters.
 	 * @param name the name of the bundler's algorithm, such as specified in the bundler provider and in the configuration.
-	 * @param configuration a map of alogrithm parameters to their value.
+	 * @param configuration a map of algorithm parameters to their value.
 	 * @return a new <code>Bundler</code> instance.
 	 * @throws Exception if the bundler could not be created.
 	 */
@@ -120,7 +120,7 @@ public class JPPFBundlerFactory
 	}
 
 	/**
-	 * Convert a JPPF confgiguration map to a profile configuration by extracting the properties related to the specified profile
+	 * Convert a JPPF configuration map to a profile configuration by extracting the properties related to the specified profile
 	 * and removing the JPPF-specific prefix from their name.
 	 * @param profileName - the name of the profile to extract.
 	 * @param configuration - the JPPF configuration to extract from.

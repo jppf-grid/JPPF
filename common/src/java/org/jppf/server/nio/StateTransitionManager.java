@@ -122,7 +122,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 			context.setState(s2);
 			channel.setKeyOps(t.getInterestOps());
 			//setKeyOps(channel, t.getInterestOps());
-			if (debugEnabled && (s1 != s2)) log.debug("transitionned " + channel + " from " + s1 + " to " + s2);
+			if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2);
 		}
 		finally
 		{

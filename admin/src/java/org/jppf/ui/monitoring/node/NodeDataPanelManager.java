@@ -225,7 +225,7 @@ public class NodeDataPanelManager
 
 	/**
 	 * Find the driver tree node with the specified driver name.
-	 * @param driverName name of the dirver to find.
+	 * @param driverName name of the driver to find.
 	 * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
 	 */
 	DefaultMutableTreeNode findDriver(final String driverName)

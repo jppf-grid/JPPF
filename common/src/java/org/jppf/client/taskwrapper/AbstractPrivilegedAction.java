@@ -20,14 +20,14 @@ package org.jppf.client.taskwrapper;
 import java.security.PrivilegedAction;
 
 /**
- * Abstract superclass for priviledged actions  used to invoke a method or constructor through reflection when a security manager is present.
+ * Abstract superclass for privileged actions  used to invoke a method or constructor through reflection when a security manager is present.
  * @param <T> the type of value returned y the action.
  * @author Laurent Cohen
  */
 public abstract class AbstractPrivilegedAction<T> implements PrivilegedAction<T>
 {
 	/**
-	 * Used to capture an exception resulting from the method or constructore invocation.
+	 * Used to capture an exception resulting from the method or constructor invocation.
 	 */
 	protected Exception exception = null;
 	/**
@@ -36,7 +36,7 @@ public abstract class AbstractPrivilegedAction<T> implements PrivilegedAction<T>
 	protected Object[] args = null;
 
 	/**
-	 * Get the exception resulting from the method or constructore invocation.
+	 * Get the exception resulting from the method or constructor invocation.
 	 * @return an <code>Exception</code> instance.
 	 */
 	public Exception getException()

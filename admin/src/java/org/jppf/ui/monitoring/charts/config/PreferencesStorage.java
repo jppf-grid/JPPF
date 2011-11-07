@@ -153,7 +153,7 @@ public class PreferencesStorage
 
 	/**
 	 * Load a chart configuration from a preferences node.
-	 * @param child the preferences node to laod the configuration from.
+	 * @param child the preferences node to load the configuration from.
 	 * @return a <code>ChartConfiguration</code> instance.
 	 */
 	public ChartConfiguration loadChartConfiguration(final Preferences child)

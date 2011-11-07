@@ -257,7 +257,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
 	 * @param source the source of the event.
 	 * @param path the path of the parent node whose children have changed.
 	 * @param childIndices the indices of the children that have changed.
-	 * @param children an array of the children that chnaged.
+	 * @param children an array of the children that changed.
 	 * @see EventListenerList
 	 */
 	protected void fireTreeStructureChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children)

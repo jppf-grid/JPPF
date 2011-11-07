@@ -50,7 +50,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
 	static final int NB_TASKS = 4;
 
 	/**
-	 * Initialize this model witht he specified tree.
+	 * Initialize this model with the specified tree.
 	 * @param node the root of the tree.
 	 */
 	public NodeTreeTableModel(final TreeNode node)

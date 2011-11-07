@@ -45,7 +45,7 @@ public class CacheClassKey
 
 	/**
 	 * Determine whether this key is equal to another one.
-	 * @param obj the other key to compre with.
+	 * @param obj the other key to compare with.
 	 * @return true if the 2 keys a re equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -61,7 +61,7 @@ public class CacheClassKey
 	}
 
 	/**
-	 * Calculate the ahsh code of this key.
+	 * Calculate the hash code of this key.
 	 * @return the hashcode as an int value.
 	 * @see java.lang.Object#hashCode()
 	 */

@@ -176,7 +176,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
 	}
 
 	/**
-	 * Perform context-independant initializations.
+	 * Perform context-independent initializations.
 	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#setup()
 	 */
 	@Override

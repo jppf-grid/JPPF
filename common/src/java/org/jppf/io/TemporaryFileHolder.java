@@ -34,7 +34,7 @@ public class TemporaryFileHolder
 
 	/**
 	 * Initialize this file holder with the specified file.
-	 * @param file the temprary file to handle.
+	 * @param file the temporary file to handle.
 	 */
 	public TemporaryFileHolder(final File file)
 	{

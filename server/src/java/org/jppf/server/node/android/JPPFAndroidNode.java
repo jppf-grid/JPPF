@@ -38,7 +38,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Connection to the revoery server.
+	 * Connection to the recovery server.
 	 */
 	private ClientConnection recoveryConnection = null;
 
@@ -111,7 +111,7 @@ public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 	}
 
 	/**
-	 * Called by the rescovery mechanism when it detects that the connection to the server is broken. 
+	 * Called by the recovery mechanism when it detects that the connection to the server is broken.
 	 * @param event encapsulates information about the connection.
 	 */
 	public void clientConnectionFailed(final ClientConnectionEvent event)

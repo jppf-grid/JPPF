@@ -43,7 +43,7 @@ public interface Bundler
 
 	/**
 	 * Make a copy of this bundler.
-	 * Wich parts are actually copied depends on the implementation.
+	 * Which parts are actually copied depends on the implementation.
 	 * @return a new <code>Bundler</code> instance.
 	 */
 	Bundler copy();
@@ -61,7 +61,7 @@ public interface Bundler
 	void dispose();
 
 	/**
-	 * Perform context-independant initializations.
+	 * Perform context-independent initializations.
 	 */
 	void setup();
 

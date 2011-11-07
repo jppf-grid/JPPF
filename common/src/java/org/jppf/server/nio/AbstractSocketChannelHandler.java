@@ -36,7 +36,7 @@ public abstract class AbstractSocketChannelHandler
 	 */
 	private boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The NioServer to which the channel is registred.
+	 * The NioServer to which the channel is registered.
 	 */
 	protected NioServer server = null;
 	/**
@@ -58,7 +58,7 @@ public abstract class AbstractSocketChannelHandler
 
 	/**
 	 * Initialize this socket channel handler.
-	 * @param server the NioServer to which the channel is registred.
+	 * @param server the NioServer to which the channel is registered.
 	 */
 	public AbstractSocketChannelHandler(final NioServer server)
 	{
@@ -67,7 +67,7 @@ public abstract class AbstractSocketChannelHandler
 
 	/**
 	 * Initialize the channel with the specified host and port.
-	 * @param server the NioServer to which the channel is registred.
+	 * @param server the NioServer to which the channel is registered.
 	 * @param host the remote host to connect to.
 	 * @param port the port to connect to on the remote host.
 	 */
@@ -92,7 +92,7 @@ public abstract class AbstractSocketChannelHandler
 	}
 
 	/**
-	 * This method is called after the channel is successfully conntected.
+	 * This method is called after the channel is successfully connected.
 	 * @throws Exception if an error is raised while performing the initialization.
 	 */
 	protected abstract void postInit() throws Exception;

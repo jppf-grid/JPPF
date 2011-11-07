@@ -173,7 +173,7 @@ public class OptionsPageBuilder
 	}
 
 	/**
-	 * Trigger all events listeners for all options, immeidately after the page has been built.
+	 * Trigger all events listeners for all options, immediately after the page has been built.
 	 * This ensures the consistence of the UI's initial state.
 	 * @param elt the root element of the options on which to trigger the events.
 	 * @param initial true to trigger the initializers, false to trigger the finalizers.

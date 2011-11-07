@@ -56,7 +56,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
 	 * Initialize this peer provider with the specified configuration name.
 	 * @param peerName the name of the peer in the configuration file.
 	 * @param connectionInfo peer connection information.
-	 * @param server the NioServer to which the channel is registred.
+	 * @param server the NioServer to which the channel is registered.
 	 */
 	public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final NioServer server)
 	{

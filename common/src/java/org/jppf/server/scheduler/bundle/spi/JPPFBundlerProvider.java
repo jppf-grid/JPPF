@@ -28,7 +28,7 @@ import org.jppf.utils.TypedProperties;
  * <ul>
  * <li>At one of the classpath roots, ensure that there is a folder named META-INF/services</li>
  * <li>In this folder, create or edit a file named {@link org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider}</li>
- * <li>In this file, add a line containing the fully qualifed name of the class implementing the <code>JPPFBundlerProvider</code> interface</li>
+ * <li>In this file, add a line containing the fully qualified name of the class implementing the <code>JPPFBundlerProvider</code> interface</li>
  * </ul>
  * @author Laurent Cohen
  */

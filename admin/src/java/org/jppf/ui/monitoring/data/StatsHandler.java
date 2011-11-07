@@ -92,7 +92,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	 */
 	private OptionElement serverListOption = null;
 	/**
-	 * Thread pool used to process new conneciton events.
+	 * Thread pool used to process new connection events.
 	 */
 	private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("StasHandler"));
 
@@ -149,7 +149,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	}
 
 	/**
-	 * Request an update from the current server conenction.
+	 * Request an update from the current server connection.
 	 */
 	public void requestUpdate()
 	{
@@ -399,7 +399,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
 	/**
 	 * Get the number of data updates so far.
-	 * @return the nuber of updates as an int.
+	 * @return the number of updates as an int.
 	 */
 	public int getTickCount()
 	{
@@ -442,7 +442,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	}
 
 	/**
-	 * JPPF client used to submit data udpate and administration requests.
+	 * JPPF client used to submit data update and administration requests.
 	 * @param clientListener a listener to register with the JPPF client.
 	 * @return a <code>JPPFClient</code> instance.
 	 */
@@ -456,7 +456,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
 	}
 
 	/**
-	 * Notifiy this listener that a new driver connection was created.
+	 * Notify this listener that a new driver connection was created.
 	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */

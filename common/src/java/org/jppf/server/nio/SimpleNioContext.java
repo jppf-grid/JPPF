@@ -36,7 +36,7 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
 	 */
 	private static Logger log = LoggerFactory.getLogger(SimpleNioContext.class);
 	/**
-	 * Determines whther TRACE logging level is enabled.
+	 * Determines whether TRACE logging level is enabled.
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 

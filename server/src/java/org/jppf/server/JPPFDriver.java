@@ -39,7 +39,7 @@ import org.slf4j.*;
 
 /**
  * This class serves as an initializer for the entire JPPF server. It follows the singleton pattern and provides access,
- * accross the JVM, to the tasks execution queue.
+ * across the JVM, to the tasks execution queue.
  * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server
  * to handle requests to and from remote class loaders.
  * @author Laurent Cohen
@@ -91,11 +91,11 @@ public class JPPFDriver
 	 */
 	private JPPFDriverStatsUpdater statsUpdater = new JPPFDriverStatsUpdater();
 	/**
-	 * Generates the statistcs events of which all related listeners are notified.
+	 * Generates the statistics events of which all related listeners are notified.
 	 */
 	private JPPFDriverStatsManager statsManager = new JPPFDriverStatsManager();
 	/**
-	 * Manages and monitors the jobs thoughout their processing within this driver.
+	 * Manages and monitors the jobs throughout their processing within this driver.
 	 */
 	private JPPFJobManager jobManager = null;
 	/**
@@ -315,7 +315,7 @@ public class JPPFDriver
 	}
 
 	/**
-	 * Get the object that manages and monitors the jobs thoughout their processing within this driver.
+	 * Get the object that manages and monitors the jobs throughout their processing within this driver.
 	 * @return an instance of <code>JPPFJobManager</code>.
 	 */
 	public JPPFJobManager getJobManager()
@@ -393,7 +393,7 @@ public class JPPFDriver
 	}
 
 	/**
-	 * Print a message to the console to signify that the initialization of a server was succesfull.
+	 * Print a message to the console to signify that the initialization of a server was successful.
 	 * @param ports the ports on which the server is listening.
 	 * @param name the name to use for the server.
 	 */

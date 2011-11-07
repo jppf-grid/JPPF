@@ -55,7 +55,7 @@ public enum ChartType
 
 	/**
 	 * Initialize this enum type with a nice display name.
-	 * @param name the namew as a string.
+	 * @param name the name as a string.
 	 */
 	ChartType(final String name)
 	{

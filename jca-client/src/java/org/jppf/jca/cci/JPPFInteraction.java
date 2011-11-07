@@ -33,7 +33,7 @@ public class JPPFInteraction implements Interaction
 	private JPPFConnectionImpl conn;
 
 	/**
-	 * Intialize this interaction with a specified connection.
+	 * Initialize this interaction with a specified connection.
 	 * @param conn a <code>Connection</code> instance.
 	 */
 	public JPPFInteraction(final JPPFConnectionImpl conn)

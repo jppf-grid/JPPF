@@ -43,13 +43,13 @@ public class JobTreeTableMouseListener extends MouseAdapter
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The object that handles tollbar and menu actions.
+	 * The object that handles toolbar and menu actions.
 	 */
 	private JTreeTableActionHandler actionHandler = null;
 
 	/**
 	 * Initialize this mouse listener.
-	 * @param actionHandler - the object that handles tollbar and menu actions.
+	 * @param actionHandler - the object that handles toolbar and menu actions.
 	 */
 	public JobTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
 	{

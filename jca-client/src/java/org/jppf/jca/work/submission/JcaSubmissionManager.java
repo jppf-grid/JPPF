@@ -90,7 +90,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 
 	/**
 	 * Run the loop of this submission manager, watching for the queue and starting a job
-	 * when the queue has one and a connnection is available.
+	 * when the queue has one and a connection is available.
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
@@ -166,9 +166,9 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	}
 
 	/**
-	 * Get a submission given its id, without removing it from this submissison manager.
+	 * Get a submission given its id, without removing it from this submission manager.
 	 * @param id the id of the submission to find.
-	 * @return the submisison corresponding to the id, or null if the submission could not be found.
+	 * @return the submission corresponding to the id, or null if the submission could not be found.
 	 */
 	public JcaSubmissionResult peekSubmission(final String id)
 	{
@@ -176,9 +176,9 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	}
 
 	/**
-	 * Get a submission given its id, and remove it from this submissison manager.
+	 * Get a submission given its id, and remove it from this submission manager.
 	 * @param id the id of the submission to find.
-	 * @return the submisison corresponding to the id, or null if the submission could not be found.
+	 * @return the submission corresponding to the id, or null if the submission could not be found.
 	 */
 	public JcaSubmissionResult pollSubmission(final String id)
 	{

@@ -184,7 +184,7 @@ public class JPPFJobManager implements QueueListener
 	}
 
 	/**
-	 * Called when a queue event occurrs.
+	 * Called when a queue event occurs.
 	 * @param event a queue event.
 	 * @see org.jppf.server.queue.QueueListener#newBundle(org.jppf.server.queue.QueueEvent)
 	 */
@@ -230,7 +230,7 @@ public class JPPFJobManager implements QueueListener
 
 	/**
 	 * Remove a listener from the list of listeners.
-	 * @param listener the listener to rmeove from the list.
+	 * @param listener the listener to remove from the list.
 	 */
 	public void removeJobListener(final JobListener listener)
 	{
@@ -241,8 +241,8 @@ public class JPPFJobManager implements QueueListener
 	}
 
 	/**
-	 * return a list of all the registered listee ners.
-	 * This list is not thread safe and must bmanually synchronized against concurrent modifications.
+	 * return a list of all the registered listeners.
+	 * This list is not thread safe and must be manually synchronized against concurrent modifications.
 	 * @return a list of listener instances.
 	 */
 	public List<JobListener> getJobListeners()

@@ -183,7 +183,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 
 	/**
 	 * Determine whether this page should be enclosed within a scroll pane.
-	 * @return true if the page is to be enclosed in a scroll pabe, false otherwise.
+	 * @return true if the page is to be enclosed in a scroll page, false otherwise.
 	 * @see org.jppf.ui.options.OptionElement#isScrollable()
 	 */
 	@Override
@@ -303,7 +303,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
 	}
 
 	/**
-	 * Enable or disable the events firing in this otpion and/or its children.
+	 * Enable or disable the events firing in this option and/or its children.
 	 * @param enabled true to enable the events, false to disable them.
 	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
 	 */

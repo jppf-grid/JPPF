@@ -28,7 +28,7 @@ import org.jppf.utils.FileUtils;
  * This class generates an HTML doc based on HTML templates and text files for the content.<br><br>
  * The goal is to programmatically realize something like a client-side include for HTML documents.
  * The templates are place holders inserted within the HTML code. They can hold parameters to make
- * them more generic and resusable.<br>
+ * them more generic and reusable.<br>
  * A template can be nested within another template.<br><br>
  *
  * Rationale: HTML docs often contain more code for the visual rendering of the content than
@@ -337,7 +337,7 @@ public class HtmlDocGenerator
 	}
 
 	/**
-	 * Give a brief explanation of the comand-line parameters.
+	 * Give a brief explanation of the command-line parameters.
 	 * @param msg text to display before usage text.
 	 */
 	private static void showUsageAndExit(final String msg)

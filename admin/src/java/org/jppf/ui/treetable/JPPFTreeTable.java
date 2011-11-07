@@ -27,7 +27,7 @@ import javax.swing.tree.*;
 public class JPPFTreeTable extends JTreeTable
 {
 	/**
-	 * Inityialize this tree table with the specified model.
+	 * Initialize this tree table with the specified model.
 	 * @param treeTableModel - a tree table model.
 	 */
 	public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel)
@@ -77,7 +77,7 @@ public class JPPFTreeTable extends JTreeTable
 	/**
 	 * Expands the leaves of the specified node.
 	 * @param node the node to expand.
-	 * @param recursive specifies whether expansion should rcurse down to the leaf nodes.
+	 * @param recursive specifies whether expansion should recurse down to the leaf nodes.
 	 */
 	public void expand(final DefaultMutableTreeNode node, final boolean recursive)
 	{

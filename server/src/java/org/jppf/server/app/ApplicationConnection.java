@@ -100,8 +100,8 @@ class ApplicationConnection extends JPPFConnection
 	 * The main flow is as follows:
 	 * <ul>
 	 * <li>receive an execution request</li>
-	 * <li>extract the execution tasks and addd them to the execution queue</li>
-	 * <li>wait until all tasks completion notifcations have been received</li>
+	 * <li>extract the execution tasks and add them to the execution queue</li>
+	 * <li>wait until all tasks completion notifications have been received</li>
 	 * <li>recompose the tasks results in the same order as they were received</li>
 	 * <li><send results back to the client/li>
 	 * </ul>

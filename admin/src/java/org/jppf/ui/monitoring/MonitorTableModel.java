@@ -39,7 +39,7 @@ class MonitorTableModel extends AbstractTableModel
 	private Fields[] fields = null;
 
 	/**
-	 * Initialize this table model witht he specified list of fields.
+	 * Initialize this table model with the specified list of fields.
 	 * @param fields the list of fields whose values are displayed in the table.
 	 */
 	MonitorTableModel(final Fields[] fields)

@@ -66,7 +66,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	}
 
 	/**
-	 * Get the list of all Readme.html files in the smaples pack.
+	 * Get the list of all Readme.html files in the samples pack.
 	 * @return a list of files.
 	 * @throws Exception if any error occurs.
 	 */
@@ -100,7 +100,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 	}
 
 	/**
-	 * Process the sspecified html file into an equivalent php file.
+	 * Process the specified html file into an equivalent php file.
 	 * @param file the html file to process.
 	 * @throws Exception if any error occurs.
 	 */

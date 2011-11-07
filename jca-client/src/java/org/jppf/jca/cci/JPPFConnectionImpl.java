@@ -115,7 +115,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	/**
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution.
+	 * The returned id is used to later retrieve the results and status of the execution.
 	 * @param job the job to execute.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.
 	 * @throws IllegalArgumentException if the job is null or empty.
@@ -132,7 +132,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	/**
 	 * Submit an asynchronous execution request to the JPPF client.<br>
 	 * This method exits immediately after adding the request to the requests queue.<br>
-	 * The returned id is used to later retieve the results and sttaus of the execution.
+	 * The returned id is used to later retrieve the results and status of the execution.
 	 * @param job the job to execute.
 	 * @param listener an optional listener to receive submission status change notifications, may be null.
 	 * @return the id of the submission, to use for later retrieval of the results and status of the submission.

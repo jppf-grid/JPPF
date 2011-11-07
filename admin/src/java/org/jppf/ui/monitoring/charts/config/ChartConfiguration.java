@@ -49,7 +49,7 @@ public class ChartConfiguration
 	 */
 	public Fields[] fields = null;
 	/**
-	 * The dataset associated witht the chart.
+	 * The dataset associated with the chart.
 	 */
 	public Object dataset = null;
 	//public Dataset dataset = null;
@@ -107,7 +107,7 @@ public class ChartConfiguration
 
 	/**
 	 * Get a string representation of this chart configuration.
-	 * @return a string containg this configuration's name.
+	 * @return a string containing this configuration's name.
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

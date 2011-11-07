@@ -60,7 +60,7 @@ import javax.swing.event.*;
 public abstract class AbstractCellEditor implements CellEditor
 {
 	/**
-	 * The list of listners for this cell editor.
+	 * The list of listeners for this cell editor.
 	 */
 	protected EventListenerList listenerList = new EventListenerList();
 

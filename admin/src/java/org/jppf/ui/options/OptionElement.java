@@ -46,7 +46,7 @@ public interface OptionElement extends OptionProperties
 	TreePath getPath();
 	/**
 	 * Get the path of this element in the option tree, represented as a string.
-	 * The string path is a sequence of element names separted by slashes.
+	 * The string path is a sequence of element names separated by slashes.
 	 * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances.
 	 */
 	String getStringPath();
@@ -56,7 +56,7 @@ public interface OptionElement extends OptionProperties
 	 * The notion of first element relates to a depth-first search in the tree.
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element
-	 * could be found with the specfied name.
+	 * could be found with the specified name.
 	 */
 	OptionElement findFirstWithName(String name);
 	/**
@@ -65,7 +65,7 @@ public interface OptionElement extends OptionProperties
 	 * The notion of last element relates to a depth-first search in the tree.
 	 * @param name the name of the element to find.
 	 * @return an <code>OptionElement</code> instance, or null if no element
-	 * could be found with the specfied name.
+	 * could be found with the specified name.
 	 */
 	OptionElement findLastWithName(String name);
 	/**
@@ -73,7 +73,7 @@ public interface OptionElement extends OptionProperties
 	 * this element is the root.
 	 * @param name the name of the elements to find.
 	 * @return a list of <code>OptionElement</code> instances, or null if no element
-	 * could be found with the specfied name.
+	 * could be found with the specified name.
 	 */
 	List<OptionElement> findAllWithName(String name);
 	/**

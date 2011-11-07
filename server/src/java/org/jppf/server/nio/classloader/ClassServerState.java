@@ -24,7 +24,7 @@ import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
- * ABstract superclass for all possible states of a class server connection.
+ * Abstract superclass for all possible states of a class server connection.
  * @author Laurent Cohen
  */
 abstract class ClassServerState extends NioState<ClassTransition>

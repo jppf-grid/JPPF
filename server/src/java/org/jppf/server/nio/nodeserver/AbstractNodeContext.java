@@ -221,7 +221,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 	}
 
 	/**
-	 * Specifiy whether this context is attached to a peer node.
+	 * Specify whether this context is attached to a peer node.
 	 * @param peer true if the context is to be attached to a peer node, false otherwise.
 	 */
 	public void setPeer(final boolean peer)

@@ -75,7 +75,7 @@ public abstract class AbstractBundler implements Bundler
 	protected abstract int maxSize();
 
 	/**
-	 * This method does nothing and should be overriden in subclasses.
+	 * This method does nothing and should be overridden in subclasses.
 	 * @param bundleSize not used.
 	 * @param totalTime not used.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
@@ -107,7 +107,7 @@ public abstract class AbstractBundler implements Bundler
 	}
 
 	/**
-	 * Perform context-independant initializations.
+	 * Perform context-independent initializations.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#setup()
 	 */
 	@Override

@@ -117,14 +117,14 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	}
 
 	/**
-	 * Notify all listeners of a change of status for this submision.
+	 * Notify all listeners of a change of status for this submission.
 	 */
 	protected void fireStatusChangeEvent()
 	{
 		synchronized(listeners)
 		{
 			if (listeners.isEmpty()) return;
-			if (debugEnabled) log.debug("submission [" + id + "] firng status changed event for '" + status + "'");
+			if (debugEnabled) log.debug("submission [" + id + "] fire status changed event for '" + status + "'");
 			SubmissionStatusEvent event = new SubmissionStatusEvent(id, status);
 			for (SubmissionStatusListener listener: listeners)
 			{

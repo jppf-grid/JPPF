@@ -29,7 +29,7 @@ import net.miginfocom.swing.MigLayout;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
- * This class handles the splash screen displaed while starting the admin console.
+ * This class handles the splash screen displayed while starting the admin console.
  * @author Laurent Cohen
  */
 public class JPPFSplash extends Window

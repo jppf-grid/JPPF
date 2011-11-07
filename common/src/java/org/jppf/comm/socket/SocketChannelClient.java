@@ -58,7 +58,7 @@ public class SocketChannelClient implements SocketWrapper
 	 */
 	private boolean opened = false;
 	/**
-	 * Determines whther the socket channel must be in blocking or non-blocking mode.
+	 * Determines whether the socket channel must be in blocking or non-blocking mode.
 	 */
 	private boolean blocking = false;
 
@@ -432,9 +432,9 @@ public class SocketChannelClient implements SocketWrapper
 	}
 
 	/**
-	 * Skip <code>n</code> bytes of data from the sokcet of channel input stream.
+	 * Skip <code>n</code> bytes of data from the socket of channel input stream.
 	 * @param n the number of bytes to skip.
-	 * @return the actual number of bytes skipped, or -1 if the end of sream is reached.
+	 * @return the actual number of bytes skipped, or -1 if the end of stream is reached.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.comm.socket.SocketWrapper#skip(int)
 	 */

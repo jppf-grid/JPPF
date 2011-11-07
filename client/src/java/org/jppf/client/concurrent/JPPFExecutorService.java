@@ -47,7 +47,7 @@ import org.slf4j.*;
  * will be reset as well, and the timeout counting will start from 0 again</li>
  * <li>When a collection of tasks is submitted via one of the <code>invokeXXX()</code> methods, they are guaranteed
  * to be all sent together in the same JPPF job. This is the one exception to the batch size threshold.</li>
- * <li>If one of the treshold is changed while tasks are still pending execution, the behavior is unspecified</li>
+ * <li>If one of the threshold is changed while tasks are still pending execution, the behavior is unspecified</li>
  * </ul>
  * @see org.jppf.client.concurrent.JPPFExecutorService#setBatchSize(int)
  * @see org.jppf.client.concurrent.JPPFExecutorService#setBatchTimeout(long)

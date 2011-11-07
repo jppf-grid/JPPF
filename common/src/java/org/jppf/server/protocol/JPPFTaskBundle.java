@@ -43,7 +43,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	public enum State
 	{
 		/**
-		 * Means the bundle is used for handshake with the server (inital bundle).
+		 * Means the bundle is used for handshake with the server (initial bundle).
 		 */
 		INITIAL_BUNDLE,
 		/**
@@ -290,7 +290,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 	 * <b>Note:</b> <i>this class has a natural ordering that is inconsistent with equals.</i>
 	 * @param bundle the bundle compare this one to.
 	 * @return a positive int if this bundle is greater, 0 if both are equal,
-	 * or a negative int if this bundless is less than the other.
+	 * or a negative int if this bundle is less than the other.
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override

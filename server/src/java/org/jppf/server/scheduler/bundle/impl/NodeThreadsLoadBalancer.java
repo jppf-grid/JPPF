@@ -55,7 +55,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
 
 	/**
 	 * Make a copy of this bundler.
-	 * Wich parts are actually copied depends on the implementation.
+	 * Which parts are actually copied depends on the implementation.
 	 * @return a new <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */

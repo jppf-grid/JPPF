@@ -41,7 +41,7 @@ public class JPPFApplicationServer extends JPPFServer
 	}
 
 	/**
-	 * Instanciate a wrapper for the socket connection opened by this socket server.
+	 * Instantiate a wrapper for the socket connection opened by this socket server.
 	 * Subclasses must implement this method.
 	 * @param socket the socket connection obtained through a call to
 	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.

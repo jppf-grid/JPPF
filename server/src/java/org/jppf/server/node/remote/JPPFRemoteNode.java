@@ -39,7 +39,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Connection to the revoery server.
+	 * Connection to the recovery server.
 	 */
 	private ClientConnection recoveryConnection = null;
 

@@ -29,7 +29,7 @@ import org.jppf.utils.streams.StreamConstants;
 import org.slf4j.*;
 
 /**
- * Context obect associated with a socket channel used by the multiplexer.
+ * Context object associated with a socket channel used by the multiplexer.
  * @author Laurent Cohen
  */
 public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
@@ -292,7 +292,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	}
 
 	/**
-	 * Specifiy whether end of stream was reached during the last read operation.
+	 * Specify whether end of stream was reached during the last read operation.
 	 * @param eof true to specify that EOF was reached, false otherwise.
 	 */
 	public void setEof(final boolean eof)
@@ -301,7 +301,7 @@ public class MultiplexerContext extends SimpleNioContext<MultiplexerState>
 	}
 
 	/**
-	 * Generate a new read meessage count value.
+	 * Generate a new read message count value.
 	 * @return the read message count incremented by one.
 	 */
 	public synchronized int newReadMessageCount()

@@ -29,16 +29,16 @@ import org.jppf.server.JPPFStats;
 public class ConnectionDataHolder
 {
 	/**
-	 * The list of all snapshots kept in memory. the size of this list is alway equal to or less than
+	 * The list of all snapshots kept in memory. the size of this list is always equal to or less than
 	 * the rollover position.
 	 */
 	private List<JPPFStats> dataList = new Vector<JPPFStats>();
 	/**
-	 * Cache of the data snapashots fields maps to their corresponding string values.
+	 * Cache of the data snapshots fields maps to their corresponding string values.
 	 */
 	private List<Map<Fields, String>> stringValuesMaps = new Vector<Map<Fields, String>>();
 	/**
-	 * Cache of the data snapashots fields maps to their corresponding double values.
+	 * Cache of the data snapshots fields maps to their corresponding double values.
 	 */
 	private List<Map<Fields, Double>> doubleValuesMaps = new Vector<Map<Fields, Double>>();
 
@@ -52,7 +52,7 @@ public class ConnectionDataHolder
 	}
 
 	/**
-	 * Get a cache of the data snapashots fields maps to their corresponding double values.
+	 * Get a cache of the data snapshots fields maps to their corresponding double values.
 	 * @return a list of maps of field names to double values.
 	 */
 	public List<Map<Fields, Double>> getDoubleValuesMaps()
@@ -61,7 +61,7 @@ public class ConnectionDataHolder
 	}
 
 	/**
-	 * Get a cache of the data snapashots fields maps to their corresponding string values.
+	 * Get a cache of the data snapshots fields maps to their corresponding string values.
 	 * @return a list of maps of field names to string values.
 	 */
 	public List<Map<Fields, String>> getStringValuesMaps()

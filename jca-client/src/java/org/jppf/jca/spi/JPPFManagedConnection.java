@@ -116,8 +116,8 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 
 	/**
 	 * Used by the container to change the association of an application-level connection handle
-	 * with a ManagedConneciton instance.
-	 * @param conn the new conenction to associate.
+	 * with a ManagedConnection instance.
+	 * @param conn the new connection to associate.
 	 * @throws ResourceException if the association raised an error.
 	 * @see javax.resource.spi.ManagedConnection#associateConnection(java.lang.Object)
 	 */
@@ -181,7 +181,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
 	}
 
 	/**
-	 * Get this maaged conenction's metadata.
+	 * Get this managed connection's metadata.
 	 * @return a <code>JPPFManagedConnectionMetaData</code> instance.
 	 * @throws ResourceException if the metadata could not be obtained.
 	 * @see javax.resource.spi.ManagedConnection#getMetaData()

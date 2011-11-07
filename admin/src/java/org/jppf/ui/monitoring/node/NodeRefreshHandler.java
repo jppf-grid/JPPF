@@ -89,7 +89,7 @@ public class NodeRefreshHandler
 	}
 
 	/**
-	 * Refresh the tree structure asynchonously (not in the AWT event thread).
+	 * Refresh the tree structure asynchronously (not in the AWT event thread).
 	 */
 	public void refresh()
 	{

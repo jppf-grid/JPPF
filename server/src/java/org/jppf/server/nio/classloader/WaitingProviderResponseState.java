@@ -91,7 +91,7 @@ class WaitingProviderResponseState extends ClassServerState
 			// putting the definition in cache
 			if ((resource.getDefinition() != null) && (resource.getCallable() == null))
 				server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
-			// fowarding it to channel that requested
+			// forwarding it to channel that requested
 			ChannelWrapper<?> destinationChannel = context.getCurrentRequest();
 			ClassContext destinationContext = (ClassContext) destinationChannel.getContext();
 			// fist ensure the requested channel is in the proper state

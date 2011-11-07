@@ -156,7 +156,7 @@ public abstract class AbstractNodeIO implements NodeIO
 	 * Write the execution results to the socket stream.
 	 * @param bundle the task wrapper to send along.
 	 * @param tasks the list of tasks with their result field updated.
-	 * @throws Exception if an error occurs while writtng to the socket stream.
+	 * @throws Exception if an error occurs while writing to the socket stream.
 	 * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
 	 */
 	@Override
@@ -168,7 +168,7 @@ public abstract class AbstractNodeIO implements NodeIO
 	protected static class BufferList extends Pair<List<JPPFBuffer>, Integer>
 	{
 		/**
-		 * Iitialize this pairing with the specified list of buffers and length.
+		 * Initialize this pairing with the specified list of buffers and length.
 		 * @param first the list of buffers.
 		 * @param second the total data length.
 		 */
@@ -190,7 +190,7 @@ public abstract class AbstractNodeIO implements NodeIO
 		private Object object = null;
 
 		/**
-		 * Initialize this task with the psecicfied data buffer.
+		 * Initialize this task with the specified data buffer.
 		 * @param object the object to serialize.
 		 */
 		public ObjectSerializationTask(final Object object)

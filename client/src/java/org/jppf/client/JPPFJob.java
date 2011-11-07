@@ -74,7 +74,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 */
 	private JobSLA jobSLA = new JPPFJobSLA();
 	/**
-	 * The user-defined metadata asoociated with this job.
+	 * The user-defined metadata associated with this job.
 	 */
 	private JobMetadata jobMetadata = new JPPFJobMetadata();
 	/**
@@ -90,7 +90,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	 */
 	private transient List<JobListener> listeners = new LinkedList<JobListener>();
 	/**
-	 * The persistence manager that enables saving aznd restoring the state of this job.
+	 * The persistence manager that enables saving and restoring the state of this job.
 	 */
 	private transient JobPersistence<?> persistenceManager = null;
 
@@ -126,7 +126,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * Initialize a blocking job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param jobSLA sevice level agreement between job and server.
+	 * @param jobSLA service level agreement between job and server.
 	 */
 	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA)
 	{
@@ -155,7 +155,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * Initialize a non-blocking job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param jobSLA sevice level agreement between job and server.
+	 * @param jobSLA service level agreement between job and server.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
 	public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final TaskResultListener resultsListener)
@@ -166,7 +166,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * Initialize a job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param jobSLA sevice level agreement between job and server.
+	 * @param jobSLA service level agreement between job and server.
 	 * @param blocking determines whether this job is blocking.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
 	 */
@@ -178,7 +178,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	/**
 	 * Initialize a job with the specified parameters.
 	 * @param dataProvider the container for data shared between tasks.
-	 * @param jobSLA sevice level agreement between job and server.
+	 * @param jobSLA service level agreement between job and server.
 	 * @param jobMetadata the user-defined job metadata.
 	 * @param blocking determines whether this job is blocking.
 	 * @param resultsListener the listener that receives notifications of completed tasks.
@@ -385,7 +385,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Get the user-defined metadata asoociated with this job.
+	 * Get the user-defined metadata associated with this job.
 	 * @return a {@link JobMetadata} instance.
 	 * @deprecated use {@link #getMetadata() getMetadata()} instead
 	 */
@@ -413,8 +413,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Compute the hascode of this job.
-	 * @return th hascode as an int.
+	 * Compute the hashcode of this job.
+	 * @return th hashcode as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -511,7 +511,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Get the persistence manager that enables saving aznd restoring the state of this job.
+	 * Get the persistence manager that enables saving and restoring the state of this job.
 	 * @return a {@link JobPersistence} instance.
 	 * @param <T> the type of the keys used by the persistence manager.
 	 */
@@ -521,7 +521,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 	}
 
 	/**
-	 * Set the persistence manager that enables saving aznd restoring the state of this job.
+	 * Set the persistence manager that enables saving and restoring the state of this job.
 	 * @param persistenceManager a {@link JobPersistence} instance.
 	 * @param <T> the type of the keys used by the persistence manager.
 	 */

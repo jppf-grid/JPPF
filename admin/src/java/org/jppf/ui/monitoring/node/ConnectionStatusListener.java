@@ -57,7 +57,7 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
 	}
 
 	/**
-	 * Invoked when thew conneciton status has changed.
+	 * Invoked when thew connection status has changed.
 	 * @param event the connection status event.
 	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
 	 */

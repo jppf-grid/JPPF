@@ -66,7 +66,7 @@ public final class GuiUtils
 	/**
 	 * Load and cache an icon from the file system or classpath.
 	 * @param path - the path to the icon.
-	 * @param useCache - specifiies whether the icon should be retrieved from and/or put in the icon cache.
+	 * @param useCache - specifies whether the icon should be retrieved from and/or put in the icon cache.
 	 * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
 	 * could not be loaded.
 	 */

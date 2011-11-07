@@ -77,7 +77,7 @@ public class RhinoScriptRunner implements ScriptRunner
 
 	/**
 	 * Evaluate the script specified as input and get the evaluation result.
-	 * @param scriptId - a unique identifer for the script, to be used if the engine generates compiled code
+	 * @param scriptId - a unique identifier for the script, to be used if the engine generates compiled code
 	 * which can be later retrieved through this id.
 	 * @param script - a string containing the script to evaluate.
 	 * @param variables - a mapping of objects to variable names, added within the scope of the script.
@@ -172,7 +172,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		 * It will not execute a script that had errors, however.
 		 * @param message a String describing the error
 		 * @param sourceName a String describing the JavaScript source
-		 * where the error occured; typically a filename or URL
+		 * where the error occurred typically a filename or URL
 		 * @param line the line number associated with the error
 		 * @param lineSource the text of the line (may be null)
 		 * @param lineOffset the offset into lineSource where problem was detected
@@ -188,7 +188,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		 * Report a warning.
 		 * @param message a String describing the warning
 		 * @param sourceName a String describing the JavaScript source
-		 * where the warning occured; typically a filename or URL
+		 * where the warning occurred typically a filename or URL
 		 * @param line the line number associated with the warning
 		 * @param lineSource the text of the line (may be null)
 		 * @param lineOffset the offset into lineSource where problem was detected
@@ -204,7 +204,7 @@ public class RhinoScriptRunner implements ScriptRunner
 		 * runtimeErrors, unlike errors, will always terminate the current script.
 		 * @param message a String describing the error
 		 * @param sourceName a String describing the JavaScript source
-		 * where the error occured; typically a filename or URL
+		 * where the error occurred typically a filename or URL
 		 * @param line the line number associated with the error
 		 * @param lineSource the text of the line (may be null)
 		 * @param lineOffset the offset into lineSource where problem was detected
@@ -220,10 +220,10 @@ public class RhinoScriptRunner implements ScriptRunner
 		}
 
 		/**
-		 * Generate a single string form the parametrs of an error or warning.
+		 * Generate a single string form the parameters of an error or warning.
 		 * @param message a String describing the warning
 		 * @param sourceName a String describing the JavaScript source
-		 * where the warning occured; typically a filename or URL
+		 * where the warning occurred typically a filename or URL
 		 * @param line the line number associated with the warning
 		 * @param lineSource the text of the line (may be null)
 		 * @param lineOffset the offset into lineSource where problem was detected

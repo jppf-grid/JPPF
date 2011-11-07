@@ -69,7 +69,7 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 
 	/**
 	 * Run the loop of this submission manager, watching for the queue and starting a job
-	 * when the queue has one and a connnection is available.
+	 * when the queue has one and a connection is available.
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
@@ -86,7 +86,7 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
 			synchronized(this)
 			{
 				JPPFJob job = execQueue.poll();
-				if (debugEnabled) log.debug("submiting jobId=" + job.getName());
+				if (debugEnabled) log.debug("submitting jobId=" + job.getName());
 				JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection(true);
 				if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
 				JobSubmission submission = new JobSubmissionImpl(job, c, this, execFlags.second());

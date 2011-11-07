@@ -262,7 +262,7 @@ public class JTreeTable extends JTable
 		}
 
 		/**
-		 * Sublcassed to translate the graphics such that the last visible row will be drawn at 0,0.
+		 * Subclassed to translate the graphics such that the last visible row will be drawn at 0,0.
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -364,7 +364,7 @@ public class JTreeTable extends JTable
 		protected boolean updatingTreeSelectionModel;
 
 		/**
-		 * Initialize this selction model.
+		 * Initialize this selection model.
 		 */
 		public ListToTreeSelectionModelWrapper()
 		{
@@ -495,7 +495,7 @@ public class JTreeTable extends JTable
 		}
 
 		/**
-		 * Class responsible for calling updateSelectedPathsFromSelectedRows when the selection of the list changse.
+		 * Class responsible for calling updateSelectedPathsFromSelectedRows when the selection of the list changes.
 		 */
 		class ListSelectionHandler implements ListSelectionListener
 		{

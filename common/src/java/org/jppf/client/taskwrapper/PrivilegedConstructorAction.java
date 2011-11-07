@@ -30,7 +30,7 @@ class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
 	private Constructor constructor = null;
 
 	/**
-	 * Initialize this priviledged action with the specified constructor and parameters.
+	 * Initialize this privileged action with the specified constructor and parameters.
 	 * @param constructor the constructor to invoke.
 	 * @param args the parameters of the constructor to invoke.
 	 */

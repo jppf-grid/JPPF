@@ -295,7 +295,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 	}
 
 	/**
-	 * Notifiy this listener that a new driver connection was created.
+	 * Notify this listener that a new driver connection was created.
 	 * @param event the event to notify this listener of.
 	 * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
 	 */

@@ -40,7 +40,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 	protected TopologyData[] dataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
 
 	/**
-	 * Iniitialize this action.
+	 * Initialize this action.
 	 */
 	protected AbstractTopologyAction()
 	{

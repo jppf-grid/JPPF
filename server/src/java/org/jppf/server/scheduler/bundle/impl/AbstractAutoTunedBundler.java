@@ -45,7 +45,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The currrent bundle size.
+	 * The current bundle size.
 	 */
 	protected int currentSize = 1;
 	/**
@@ -54,7 +54,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	 */
 	protected Random rnd = new Random(System.currentTimeMillis());
 	/**
-	 * A map of performance samples, aorted by increasing bundle size.
+	 * A map of performance samples, sorted by increasing bundle size.
 	 */
 	protected Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<Integer, BundlePerformanceSample>();
 

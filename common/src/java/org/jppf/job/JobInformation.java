@@ -76,7 +76,7 @@ public class JobInformation implements Serializable
 	 * Initialize this object with the specified parameters.
 	 * @param jobUuid the universal unique id of this job.
 	 * @param jobId the user-defined id of this job.
-	 * @param taskCount tne number of tasks in thsi job.
+	 * @param taskCount the number of tasks in this job.
 	 * @param initialTaskCount the initial number of tasks in the job submitted by the JPPF client.
 	 * @param priority the priority of this job.
 	 * @param suspended determines whether the job is in suspended state.

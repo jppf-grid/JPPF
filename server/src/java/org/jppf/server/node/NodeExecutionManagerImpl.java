@@ -56,7 +56,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 */
 	protected Map<String, List<Long>> idMap = new Hashtable<String, List<Long>>();
 	/**
-	 * Mapping of internal number to the coresponding tasks.
+	 * Mapping of internal number to the corresponding tasks.
 	 */
 	protected Map<Long, Task> taskMap = new Hashtable<Long, Task>();
 	/**
@@ -95,7 +95,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 
 	/**
 	 * Initialize this execution manager with the specified node.
-	 * @param node the node that uses this excecution manager.
+	 * @param node the node that uses this execution manager.
 	 */
 	public NodeExecutionManagerImpl(final JPPFNode node)
 	{
@@ -346,7 +346,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 
 	/**
 	 * Increment the current task count and return the new value.
-	 * @return the new valueas a long.
+	 * @return the new values a long.
 	 */
 	private long incTaskCount()
 	{
