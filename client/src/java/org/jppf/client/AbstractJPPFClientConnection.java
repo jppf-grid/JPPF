@@ -185,7 +185,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
 	{
-		ObjectSerializer ser = makeHelper().getSerializer();
+		JPPFTask t = job.getTasks().get(0);
+		ObjectSerializer ser = makeHelper(t.getClass().getClassLoader()).getSerializer();
 		int count = job.getTasks().size() - job.getResults().size();
 		TraversalList<String> uuidPath = new TraversalList<String>();
 		uuidPath.add(client.getUuid());
