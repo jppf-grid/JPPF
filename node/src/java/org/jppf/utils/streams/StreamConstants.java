@@ -27,7 +27,7 @@ public final class StreamConstants
 	/**
 	 * Size of temporary buffers used in I/O transfers.
 	 */
-	public static final int TEMP_BUFFER_SIZE = 1 * 1024;
+	public static final int TEMP_BUFFER_SIZE = 4 * 1024;
 	/**
 	 * A definition of an empty byte array.
 	 */
