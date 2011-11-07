@@ -46,28 +46,22 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The JPPF client that owns this class server delegate.
-	 */
-	private JPPFJcaClient client = null;
+	private static boolean debugEnabled = log.isDebugEnabled();
 
 	/**
-	 * Initialize class server delegate with a spceified application uuid.
-	 * @param name the name given to this this delegate.
-	 * @param uuid the unique identifier for the local JPPF client.
-	 * @param host the name or IP address of the host the class server is running on.
-	 * @param port the TCP port the class server is listening to.
-	 * @param client the JPPF client that owns this class server delegate.
-	 * @throws Exception if the connection could not be opended.
+	 * Initialize class server delegate with a specified application uuid.
+     * @param name the name given to this this delegate.
+     * @param uuid the unique identifier for the local JPPF client.
+     * @param host the name or IP address of the host the class server is running on.
+     * @param port the TCP port the class server is listening to.
+     * @throws Exception if the connection could not be opened.
 	 */
-	public JcaClassServerDelegate(final String name, final String uuid, final String host, final int port, final JPPFJcaClient client) throws Exception
+	public JcaClassServerDelegate(final String name, final String uuid, final String host, final int port) throws Exception
 	{
 		super(null);
-		this.clientUuid = client.getUuid();
+		this.clientUuid = uuid;
 		this.host = host;
 		this.port = port;
-		this.client = client;
 		setName(name);
 		socketInitializer.setName("[" + getName() + " - delegate] ");
 	}
@@ -84,18 +78,18 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 		{
 			setStatus(CONNECTING);
 			if (socketClient == null) initSocketClient();
-			if (debugEnabled) log.debug("[client: "+getName()+"] Attempting connection to the class server");
+			if (debugEnabled) log.debug("[client: " + getName() + "] Attempting connection to the class server");
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isClosed())
 			{
 				if (socketInitializer.isSuccessfull())
 				{
-					log.info("[client: "+getName()+"] Reconnected to the class server");
+					log.info("[client: " + getName() + "] Reconnected to the class server");
 					setStatus(ACTIVE);
 				}
 				else
 				{
-					throw new JPPFException("["+getName()+"] Could not reconnect to the class server");
+					throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
 				}
 			}
 			else
@@ -130,7 +124,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						boolean found = true;
 						JPPFResourceWrapper resource = readResource();
 						String name = resource.getName();
-						if  (debugEnabled) log.debug("["+this.getName()+"] resource requested: " + name);
+						if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name);
 
 						String requestUuid = resource.getRequestUuid();
 						ClassLoader cl = getClassLoader(requestUuid);
@@ -148,7 +142,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 						}
 						else
 						{
-							byte[] b = null;
+							byte[] b;
 							byte[] callable = resource.getCallable();
 							if (callable != null) b = resourceProvider.computeCallable(callable);
 							else
@@ -161,8 +155,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 							else resource.setCallable(b);
 							if (debugEnabled)
 							{
-								if (found) log.debug("["+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-								else log.debug("["+this.getName()+"] resource not found: " + name);
+								if (found) log.debug('[' +this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+								else log.debug('[' +this.getName()+"] resource not found: " + name);
 							}
 						}
 						resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
@@ -177,7 +171,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 				{
 					if (!closed)
 					{
-						if (debugEnabled) log.debug("["+getName()+"] caught " + e + ", will re-initialise ...", e);
+						if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
 						setStatus(DISCONNECTED);
 						//init();
 					}
@@ -186,30 +180,30 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 		}
 		catch (Exception e)
 		{
-			log.error("["+getName()+"] "+e.getMessage(), e);
+			log.error('[' +getName()+"] "+e.getMessage(), e);
 			close();
 		}
 	}
 
 	/**
-	 * Establish a connection and perform the inital shakedown with the JPPF driver.
-	 * @throws Exception if the conenction could not be established.
+	 * Establish a connection and perform the initial shakedown with the JPPF driver.
+	 * @throws Exception if the connection could not be established.
 	 */
 	public void performConnection() throws Exception
 	{
 		try
 		{
 			init();
-			if  (debugEnabled) log.debug("[" + getName() + "] : sending channel identifier");
+			if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
 			socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
-			if  (debugEnabled) log.debug("[" + getName() + "] : sending initial resource");
+			if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
 			JPPFResourceWrapper resource = new JPPFResourceWrapper();
 			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 			resource.addUuid(clientUuid);
 			writeResource(resource);
 			// receive the initial response from the server.
 			readResource();
-			if  (debugEnabled) log.debug("[" + getName() + "] : server handshake done");
+			if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
 		}
 		finally
 		{
@@ -239,7 +233,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 			}
 			catch (Exception e)
 			{
-				log.error("["+getName()+"] "+e.getMessage(), e);
+				log.error('[' + getName() + "] "+e.getMessage(), e);
 			}
 		}
 	}
@@ -264,12 +258,12 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	}
 
 	/**
-	 * Retrieve the class laoder to use form the submission manager.
+	 * Retrieve the class loader to use form the submission manager.
 	 * @param uuid the uuid of the request from which the class loader was obtained.
 	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
 	 */
 	private ClassLoader getClassLoader(final String uuid)
 	{
-		return client.getRequestClassLoader(uuid);
+		return getRequestClassLoader(uuid);
 	}
 }

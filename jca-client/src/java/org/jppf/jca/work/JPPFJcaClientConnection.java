@@ -19,6 +19,7 @@
 package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
+import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
 import java.util.*;
 
@@ -51,21 +52,21 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 
 	/**
 	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 * @param name configuration name for this local client.
-	 * @param info the connection properties for this connection.
-	 * @param client the JPPF client that owns this connection.
-	 */
-	public JPPFJcaClientConnection(final String uuid, final String name, final JPPFConnectionInformation info, final JPPFJcaClient client)
+     * @param client the JPPF client that owns this connection.
+     * @param uuid the unique identifier for this local client.
+     * @param name configuration name for this local client.
+     * @param info the connection properties for this connection.
+     */
+	public JPPFJcaClientConnection(final JPPFJcaClient client, final String uuid, final String name, final JPPFConnectionInformation info)
 	{
-		configure(uuid, name, info.host, info.serverPorts[0], info.serverPorts[0], 0);
-		status.set(DISCONNECTED);
-		classServerPort = info.serverPorts[0];
-		this.client = client;
+        this.client = client;
+        classServerPort = info.serverPorts[0];
+        configure(uuid, name, info.host, info.serverPorts[0], classServerPort, 0);
+        status.set(DISCONNECTED);
 	}
 
 	/**
-	 * Initialize this connection
+	 * Initialize this client connection.
 	 * @see org.jppf.client.JPPFClientConnection#init()
 	 */
 	@Override
@@ -73,7 +74,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			delegate = new JcaClassServerDelegate(name, uuid, host, classServerPort, (JPPFJcaClient) client);
+			delegate = new JcaClassServerDelegate(name, client.getUuid(), host, classServerPort);
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				@Override
@@ -90,26 +91,37 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 					taskServerConnectionStatusChanged(event);
 				}
 			});
-			((JcaClassServerDelegate) delegate).performConnection();
-			if (!delegate.isClosed())
-			{
-				Thread t = new Thread(delegate);
-				t.setName("[" + delegate.getName() + " : class delegate]");
-				t.start();
-				taskServerConnection.init();
-			}
+            connect();
 		}
 		catch(Exception e)
 		{
-			log.debug(e.getMessage());
+			log.error(e.getMessage(), e);
+            setStatus(FAILED);
 		}
 		catch(JPPFError e)
 		{
+            setStatus(FAILED);
 			throw e;
 		}
 	}
 
-	/**
+    /**
+     * Connect to the driver.
+     * @throws Exception if connection failed.
+     */
+    protected void connect() throws Exception
+    {
+        ((JcaClassServerDelegate) delegate).performConnection();
+        if (!delegate.isClosed())
+        {
+            Thread t = new Thread(delegate);
+            t.setName('[' + delegate.getName() + " : class delegate]");
+            t.start();
+            taskServerConnection.init();
+        }
+    }
+
+    /**
 	 * Send tasks to the server for execution.
 	 * @param cl classloader used for serialization.
 	 * @param header the task bundle to send to the driver.
@@ -172,10 +184,11 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Submit a JPPFJob for execution.
-	 * @param job the job to execute.
-	 * @throws Exception if an error occurs while sending the job for execution.
+	 * Submit the request to the server.
+	 * @param job the job to execute remotely.
+	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
+	 * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
 	 */
 	@Override
 	public void submit(final JPPFJob job) throws Exception
@@ -213,35 +226,12 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			}
 			catch(Exception e)
 			{
-				log.error('[' + name + "] "+ e.getMessage(), e);
+                if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
+				else log.error('[' + name + "] "+ e.getMessage());
 			}
-			List<JPPFJob> result = new ArrayList<JPPFJob>();
-			if (job != null) result.add(job);
-			return result;
+			if (job != null) return Collections.singletonList(job);
 		}
 		return Collections.emptyList();
-	}
-
-	/**
-	 * Get the name assigned tothis client connection.
-	 * @return the name as a string.
-	 * @see org.jppf.client.JPPFClientConnection#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 * Get a string representation of this client connection.
-	 * @return a string representing this connection.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return name + " : " + status;
 	}
 
 	/**

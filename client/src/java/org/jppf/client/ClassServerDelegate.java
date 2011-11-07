@@ -49,4 +49,24 @@ public interface ClassServerDelegate extends Runnable, ClientConnectionHandler
 	 */
 	void setName(String name);
 
+    /**
+     * Add a request uuid to class loader mapping to this submission manager.
+     * @param uuid the uuid of the request.
+     * @param cl the class loader for the request.
+     */
+    void addRequestClassLoader(final String uuid, final ClassLoader cl);
+
+    /**
+     * Add a request uuid to class loader mapping to this submission manager.
+     * @param uuid the uuid of the request.
+     */
+    void removeRequestClassLoader(final String uuid);
+
+    /**
+     * Get a class loader from its request uuid.
+     * @param uuid the uuid of the request.
+     * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+     */
+    public ClassLoader getRequestClassLoader(final String uuid);
+
 }

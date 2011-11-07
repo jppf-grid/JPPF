@@ -52,7 +52,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
 		{
 			Task task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
-			connection.getClient().addRequestClassLoader(requestUuid, cl);
+			connection.getDelegate().addRequestClassLoader(requestUuid, cl);
 			if (JcaSubmissionManager.log.isDebugEnabled()) JcaSubmissionManager.log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
 		}
 		try
@@ -64,7 +64,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
 			}
 			connection.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
 			result.waitForResults(0);
-			connection.getClient().removeRequestClassLoader(requestUuid);
+			connection.getDelegate().removeRequestClassLoader(requestUuid);
 			result.setStatus(COMPLETE);
 		}
 		catch (Exception e)
@@ -77,14 +77,5 @@ public class JcaJobSubmission extends AbstractJobSubmission
 			if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
 			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId()
-	{
-		return job.getJobUuid();
 	}
 }

@@ -87,11 +87,11 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isSuccessfull() && !socketInitializer.isClosed())
 			{
-				throw new JPPFException('[' +getName()+"] Could not reconnect to the class server");
+				throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
 			}
 			if (!socketInitializer.isClosed())
 			{
-				msg = "[client: "+getName()+"] Reconnected to the class server";
+				msg = "[client: " + getName() + "] Reconnected to the class server";
 				System.out.println(msg);
 				log.info(msg);
 				setStatus(ACTIVE);
@@ -113,17 +113,16 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	{
 		try
 		{
-			JPPFResourceWrapper resource;
 			while (!stop)
 			{
 				try
 				{
 					if (!handshakeDone) handshake();
 					boolean found = true;
-					resource = readResource();
+					JPPFResourceWrapper resource = readResource();
 					String name = resource.getName();
 					ClassLoader cl = getClassLoader(resource.getRequestUuid());
-					if  (debugEnabled) log.debug('['+this.getName()+"] resource requested: " + name + " using classloader=" + cl);
+					if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
 					if (resource.getData("multiple") != null)
 					{
 						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
@@ -137,7 +136,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 					}
 					else
 					{
-						byte[] b = null;
+						byte[] b;
 						byte[] callable = resource.getCallable();
 						if (callable != null) b = resourceProvider.computeCallable(callable);
 						else
@@ -148,10 +147,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 						if (b == null) found = false;
 						if (callable == null) resource.setDefinition(b);
 						else resource.setCallable(b);
-						if  (debugEnabled)
+						if (debugEnabled)
 						{
-							if (found) log.debug('['+this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-							else log.debug('['+this.getName()+"] resource not found: " + name);
+							if (found) log.debug('[' +this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+							else log.debug('[' +this.getName()+"] resource not found: " + name);
 						}
 					}
 					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
@@ -161,16 +160,16 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 				{
 					if (!closed)
 					{
-						log.warn('['+getName()+"] caught " + e + ", will re-initialise ...", e);
+						log.warn('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
 						init();
-						if  (debugEnabled) log.debug('['+this.getName()+"] : successfully iniitalized");
+						if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
 					}
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			log.error('['+getName()+"] "+e.getMessage(), e);
+			log.error('[' +getName()+"] "+e.getMessage(), e);
 			close();
 		}
 	}
@@ -212,7 +211,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			}
 			catch (Exception e)
 			{
-				log.error('['+getName()+"] "+e.getMessage(), e);
+				log.error('[' + getName() + "] "+e.getMessage(), e);
 			}
 		}
 	}
@@ -228,12 +227,12 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	}
 
 	/**
-	 * Retrieve the class laoder to use from the client.
+	 * Retrieve the class loader to use from the client.
 	 * @param uuid the uuid of the request from which the class loader was obtained.
 	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
 	 */
 	private ClassLoader getClassLoader(final String uuid)
 	{
-		return ((JPPFClientConnectionImpl) owner).getClient().getRequestClassLoader(uuid);
+		return getRequestClassLoader(uuid);
 	}
 }

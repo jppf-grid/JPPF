@@ -96,7 +96,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	}
 
 	/**
-	 * Get the submission manager for thsi JPPF client.
+	 * Get the submission manager for this JPPF client.
 	 * @return a <code>JPPFSubmissionManager</code> instance.
 	 */
 	public JcaSubmissionManager getSubmissionManager()
@@ -105,7 +105,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	}
 
 	/**
-	 * Set the submission manager for thsi JPPF client.
+	 * Set the submission manager for this JPPF client.
 	 * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
 	 */
 	public void setSubmissionManager(final JcaSubmissionManager submissionManager)
@@ -119,7 +119,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	@Override
 	protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
 	{
-		return new JPPFJcaClientConnection(uuid, name, info, this);
+		return new JPPFJcaClientConnection(this, uuid, name, info);
 	}
 
 	/**

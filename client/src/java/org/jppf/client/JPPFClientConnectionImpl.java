@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -50,7 +51,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Used to synchronize request submissions performed by mutliple threads.
+	 * Used to synchronize request submissions performed by multiple threads.
 	 */
 	private ReentrantLock lock = new ReentrantLock();
 	/**
@@ -126,35 +127,23 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 
 	/**
 	 * Connect to the driver.
-	 */
-	public void connect()
+     * @throws Exception if connection failed.
+     */
+	protected void connect() throws Exception
 	{
-		try
-		{
-			delegate.init();
-			if (!delegate.isClosed())
-			{
-				Thread t = new Thread(delegate);
-				t.setName('[' + delegate.getName() + " : class delegate]");
-				t.start();
-				taskServerConnection.init();
-				//setStatus(delegate.getStatus());
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			setStatus(FAILED);
-		}
-		catch(JPPFError e)
-		{
-			setStatus(FAILED);
-			throw e;
-		}
+        delegate.init();
+        if (!delegate.isClosed())
+        {
+            Thread t = new Thread(delegate);
+            t.setName('[' + delegate.getName() + " : class delegate]");
+            t.start();
+            taskServerConnection.init();
+            //setStatus(delegate.getStatus());
+        }
 	}
 
 	/**
-	 * Initialize the jmx connection using the specifed jmx server id.
+	 * Initialize the jmx connection using the specified jmx server id.
 	 */
 	public void initializeJmxConnection()
 	{
@@ -187,7 +176,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	@Override
 	public void submit(final JPPFJob job) throws Exception
 	{
-		throw new JPPFUnsupportedOperationException("this operation is not supported");
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -213,7 +202,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 				else log.error('[' + name + "] "+ e.getMessage());
 			}
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -228,7 +217,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 	}
 
 	/**
-	 * Get the lock used to synchronize request submissions performed by mutliple threads.
+	 * Get the lock used to synchronize request submissions performed by multiple threads.
 	 * @return  a <code>ReentrantLock</code> instance.
 	 */
 	public ReentrantLock getLock()

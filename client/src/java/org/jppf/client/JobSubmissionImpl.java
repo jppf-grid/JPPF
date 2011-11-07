@@ -136,14 +136,4 @@ public class JobSubmissionImpl extends AbstractJobSubmission
 		if (debugEnabled) log.debug("submission [" + job.getJobUuid() + "] status changing from '" + this.status + "' to '" + status + '\'');
 		this.status = status;
 	}
-
-	/**
-	 * Get the unique id of this submission.
-	 * @return the id as a string.
-	 */
-	@Override
-	public String getId()
-	{
-		return job.getJobUuid();
-	}
 }

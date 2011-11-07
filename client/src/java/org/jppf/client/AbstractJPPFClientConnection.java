@@ -267,7 +267,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 * Receive results of tasks execution.
 	 * @return a pair of objects representing the executed tasks results, and the index
 	 * of the first result within the initial task execution request.
-	 * @param cl the cintext classloader to use to deserialize the results.
+	 * @param cl the context classloader to use to deserialize the results.
 	 * @throws Exception if an error is raised while reading the results from the server.
 	 */
 	public Pair<List<JPPFTask>, Integer> receiveResults(final ClassLoader cl) throws Exception
@@ -289,7 +289,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
 	 * @return a <code>SerializationHelper</code> instance.
-	 * @throws Exception if the serialiozation helper could not be instantiated.
+	 * @throws Exception if the serialization helper could not be instantiated.
 	 */
 	protected SerializationHelper makeHelper() throws Exception
 	{
@@ -298,9 +298,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 
 	/**
 	 * Instantiate a <code>SerializationHelper</code> using the current context class loader.
-	 * @param classLoader the class loader to usew to load the seriaization helper class.
+	 * @param classLoader the class loader to use to load the serialization helper class.
 	 * @return a <code>SerializationHelper</code> instance.
-	 * @throws Exception if the serialiozation helper could not be instantiated.
+	 * @throws Exception if the serialization helper could not be instantiated.
 	 */
 	protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception
 	{
@@ -437,7 +437,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public abstract List<JPPFJob> close();
 
 	/**
-	 * Get the name assigned tothis client connection.
+	 * Get the name assigned to this client connection.
 	 * @return the name as a string.
 	 * @see org.jppf.client.JPPFClientConnection#getName()
 	 */
@@ -519,7 +519,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	/**
 	 * Handle a status change from either the class server delegate or the task server connection
 	 * and determine whether it triggers a status change for the client connection.
-	 * @param delegateStatus status of the class server delegate conneciton.
+	 * @param delegateStatus status of the class server delegate connection.
 	 * @param taskConnectionStatus status of the task server connection.
 	 */
 	protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus)
@@ -543,6 +543,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	}
 
 	/**
+     * Get the class server delegate that loads local classes onto remote nodes
+     * @return a {@link ClassServerDelegate} instance.
+     */
+    public ClassServerDelegate getDelegate() {
+        return delegate;
+    }
+
+    /**
 	 * Get the load balancer that distributes the load between local and remote execution.
 	 * @return a {@link LoadBalancer} instance.
 	 */

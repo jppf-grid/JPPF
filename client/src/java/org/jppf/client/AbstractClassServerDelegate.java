@@ -24,6 +24,9 @@ import org.jppf.data.transform.*;
 import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 /**
  * Abstract implementation of the client end of the JPPF distributed class loader.
  * @author Laurent Cohen
@@ -54,6 +57,10 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * Unique identifier for this class server delegate, obtained from the local JPPF client.
 	 */
 	protected String clientUuid = null;
+    /**
+     * Mapping of class loader to requests uuids.
+     */
+    private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -137,4 +144,33 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		socketClient.flush();
 	}
+
+    /**
+     * Add a request uuid to class loader mapping to this submission manager.
+     * @param uuid the uuid of the request.
+     * @param cl the class loader for the request.
+     */
+    public void addRequestClassLoader(final String uuid, final ClassLoader cl)
+    {
+        classLoaderMap.put(uuid, cl);
+    }
+
+    /**
+     * Add a request uuid to class loader mapping to this submission manager.
+     * @param uuid the uuid of the request.
+     */
+    public void removeRequestClassLoader(final String uuid)
+    {
+        classLoaderMap.remove(uuid);
+    }
+
+    /**
+     * Get a class loader from its request uuid.
+     * @param uuid the uuid of the request.
+     * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+     */
+    public ClassLoader getRequestClassLoader(final String uuid)
+    {
+        return classLoaderMap.get(uuid);
+    }
 }

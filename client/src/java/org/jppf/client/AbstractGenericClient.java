@@ -70,11 +70,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	 */
 	protected LoadBalancer loadBalancer = null;
 	/**
-	 * Mapping of class laoder to requests uuids.
-	 */
-	private Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
-	/**
-	 * Keeps a list of the valid connections not currently executring tasks.
+	 * Keeps a list of the valid connections not currently executing tasks.
 	 */
 	protected Vector<JPPFClientConnection> availableConnections;
 
@@ -199,7 +195,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	/**
 	 * Called when a new connection is read from the configuration (as opposed to discovered from the network).
 	 * @param name the name assigned to the connection.
-	 * @param info the information required for the ocnnection toconenct to the driver.
+	 * @param info the information required for the connection to connect to the driver.
 	 * @param priority the priority assigned to the connection.
 	 */
 	protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority) {
@@ -291,7 +287,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
 	/**
 	 * Get the JPPF configuration properties.
-	 * @return the configurationa as a {@link TypedProperties} instance.
+	 * @return the configuration as a {@link TypedProperties} instance.
 	 */
 	public TypedProperties getConfig()
 	{
@@ -329,35 +325,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * Add a request uuid to class loader mapping to this submission manager.
-	 * @param uuid the uuid of the request.
-	 * @param cl the class loader for the request.
-	 */
-	public void addRequestClassLoader(final String uuid, final ClassLoader cl)
-	{
-		classLoaderMap.put(uuid, cl);
-	}
-
-	/**
-	 * Add a request uuid to class loader mapping to this submission manager.
-	 * @param uuid the uuid of the request.
-	 */
-	public void removeRequestClassLoader(final String uuid)
-	{
-		classLoaderMap.remove(uuid);
-	}
-
-	/**
-	 * Get a class loader from its request uuid.
-	 * @param uuid the uuid of the request.
-	 * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
-	 */
-	public ClassLoader getRequestClassLoader(final String uuid)
-	{
-		return classLoaderMap.get(uuid);
-	}
-
-	/**
 	 * Determine whether local execution is enabled on this client.
 	 * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
 	 */
@@ -367,7 +334,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 	}
 
 	/**
-	 * Specifiy whether local execution is enabled on this client.
+	 * Specify whether local execution is enabled on this client.
 	 * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
 	 */
 	public void setLocalExecutionEnabled(final boolean localExecutionEnabled)
@@ -386,7 +353,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 			StringBuilder sb = new StringBuilder();
 			sb.append("available connections: ").append(getAvailableConnections().size()).append(", ");
 			sb.append("local execution enabled: ").append(loadBalancer.isLocalEnabled()).append(", ");
-			sb.append("localy executing: ").append(loadBalancer.isLocallyExecuting());
+			sb.append("locally executing: ").append(loadBalancer.isLocallyExecuting());
 			log.trace(sb.toString());
 		}
 		return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
