@@ -43,7 +43,7 @@ public class MarketData implements Serializable
 	}
 
 	/**
-	 * Iniitialize the trade with the specified identifier.
+	 * Initialize the trade with the specified identifier.
 	 * @param id the market data identifier.
 	 */
 	public MarketData(final String id)

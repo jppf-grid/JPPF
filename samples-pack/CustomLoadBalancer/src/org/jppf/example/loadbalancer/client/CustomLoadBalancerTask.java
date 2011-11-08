@@ -20,7 +20,7 @@ package org.jppf.example.loadbalancer.client;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * This task is used to test our custom load-blancer.
+ * This task is used to test our custom load-balancer.
  * Its execution depends on 2 parameters:<br>
  * - a data size, used to instantiate an array of bytes of the specified size, and corresponding
  * approximately to the task memory footprint specified in the job metadata<br>

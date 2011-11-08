@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 public class LotsOfOutputTask extends JPPFTask
 {
 	/**
-	 * Number of ouptut lines to print.
+	 * Number of output lines to print.
 	 */
 	private int nbLines = 0;
 	/**
@@ -38,7 +38,7 @@ public class LotsOfOutputTask extends JPPFTask
 
 	/**
 	 * Initialize this task with the specified number of lines and line length.
-	 * @param nbLines - the number of ouptut lines to print.
+	 * @param nbLines - the number of output lines to print.
 	 * @param lineLength - the length in chars of each output line.
 	 */
 	public LotsOfOutputTask(final int nbLines, final int lineLength)

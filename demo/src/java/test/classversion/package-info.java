@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes used to test the dyanmic class loading.
+ * Classes used to test the dynamic class loading.
  */
 package test.classversion;

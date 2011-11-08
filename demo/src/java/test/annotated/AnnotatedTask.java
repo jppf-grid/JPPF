@@ -23,7 +23,7 @@ import org.jppf.server.protocol.JPPFTask;
 
 
 /**
- * This task is for testing the netwrok transfer of task with various data sizes.
+ * This task is for testing the network transfer of task with various data sizes.
  * @author Laurent Cohen
  */
 public class AnnotatedTask extends JPPFTask
@@ -39,7 +39,7 @@ public class AnnotatedTask extends JPPFTask
 	private int id = 0;
 
 	/**
-	 * Initialize this task with a byte array of the psecified size.
+	 * Initialize this task with a byte array of the specified size.
 	 * The array is created at construction time and passed on to the node.
 	 * @param time .
 	 * @param id .

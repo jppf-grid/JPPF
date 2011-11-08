@@ -96,7 +96,7 @@ public class ProfilingRunner
 	/**
 	 * Execute the specified number of tasks for the specified number of iterations.
 	 * @param nbTask the number of tasks to send at each iteration.
-	 * @param silent determines whether resuls should be displayed on the console.
+	 * @param silent determines whether results should be displayed on the console.
 	 * @throws Exception if an error is raised during the execution.
 	 */
 	private static void performSequential(final int nbTask, final boolean silent) throws Exception

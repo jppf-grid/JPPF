@@ -36,7 +36,7 @@ public class TimeoutTask extends JPPFTestTask
 	}
 
 	/**
-	 * Execute ther task
+	 * Execute the task
 	 * @see java.lang.Runnable#run()
 	 */
 	public void test()

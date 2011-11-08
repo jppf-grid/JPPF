@@ -40,7 +40,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
 	 */
 	private AtomicLong cpuTime = new AtomicLong(0L);
 	/**
-	 * Total elpased time on the node(s).
+	 * Total elapsed time on the node(s).
 	 */
 	private AtomicLong elapsedTime = new AtomicLong(0L);
 

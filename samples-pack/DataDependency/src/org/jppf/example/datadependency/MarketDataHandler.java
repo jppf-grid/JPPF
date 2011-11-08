@@ -165,8 +165,8 @@ public class MarketDataHandler implements TickerListener
 		private MarketData data;
 
 		/**
-		 * Initialize this task with the update dmarket data.
-		 * @param data the update ddata.
+		 * Initialize this task with the update market data.
+		 * @param data the update data.
 		 */
 		public NodesUpdateTask(final MarketData data)
 		{

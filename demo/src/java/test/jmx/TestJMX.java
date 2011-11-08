@@ -91,7 +91,7 @@ public class TestJMX
 
 	/**
 	 * Retrieve the number of nodes from the server.
-	 * @return the numbe rof nodes as an int.
+	 * @return the number rof nodes as an int.
 	 * @throws Exception if any error occurs.
 	 */
 	public int getNumberOfNodes() throws Exception

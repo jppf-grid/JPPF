@@ -28,13 +28,13 @@ import org.jppf.data.transform.JPPFDataTransform;
 import org.jppf.utils.FileUtils;
 
 /**
- * Sample data transform that uses the DES cyptographic algorithm with a 56 bits secret key.
+ * Sample data transform that uses the DES cryptographic algorithm with a 56 bits secret key.
  * @author Laurent Cohen
  */
 public class DESCipherTransform implements JPPFDataTransform
 {
 	/**
-	 * Secret (symetric) key used for encryption and decryption.
+	 * Secret (symmetric) key used for encryption and decryption.
 	 */
 	private static SecretKey secretKey = getSecretKey();
 
@@ -66,7 +66,7 @@ public class DESCipherTransform implements JPPFDataTransform
 
 	/**
 	 * Transform the specified input source and write it into the specified destination.<br>
-	 * The transformation is either encrytion or decryption, depeding on how the cipher was initilized.
+	 * The transformation is either encryption or decryption, depending on how the cipher was initialized.
 	 * @param mode the cipher mode to use for encryption/decryption.
 	 * @param source the input stream of data to encrypt/decrypt.
 	 * @param destination the stream into which the encrypted/decrypted data is written.

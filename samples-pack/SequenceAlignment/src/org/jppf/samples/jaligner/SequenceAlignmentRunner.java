@@ -98,7 +98,7 @@ public class SequenceAlignmentRunner
 	 * Run the sample.
 	 * @param targetSequence the sequence to compare those in the database with.
 	 * @param matrix the name of the substitution matrix to use in the alignments.
-	 * @param dbPath the path to the databse of sequences.
+	 * @param dbPath the path to the database of sequences.
 	 * @param option an option used as an entry point to the UI.
 	 * @throws Exception if the computation failed.
 	 */
@@ -114,8 +114,8 @@ public class SequenceAlignmentRunner
 	 * Run the sample.
 	 * @param targetSequence the sequence to compare those in the database with.
 	 * @param matrix the name of the substitution matrix to use in the alignments.
-	 * @param dbPath the path to the databse of sequences.
-	 * @return the task wqith the maximum score.
+	 * @param dbPath the path to the database of sequences.
+	 * @return the task with the maximum score.
 	 * @throws Exception if the computation failed.
 	 */
 	public static SequenceAlignmentTask doPerform(final String targetSequence, final String matrix, final String dbPath) throws Exception
@@ -175,10 +175,10 @@ public class SequenceAlignmentRunner
 	}
 
 	/**
-	 * Load a sequence from the speicfied file path.
+	 * Load a sequence from the specified file path.
 	 * @param path location of the sequence.
 	 * @return sequence the sequence read form the file.
-	 * @throws IOException if an error occrus when reading the file.
+	 * @throws IOException if an error occurs when reading the file.
 	 */
 	private static String loadSampleSequence(final String path) throws IOException
 	{
@@ -281,7 +281,7 @@ public class SequenceAlignmentRunner
 		 */
 		private String matrix = null;
 		/**
-		 * the path to the databse of sequences.
+		 * the path to the database of sequences.
 		 */
 		private String dbPath = null;
 		/**
@@ -293,7 +293,7 @@ public class SequenceAlignmentRunner
 		 * Initialize this task with the specified parameters.
 		 * @param targetSequence the sequence to compare those in the database with.
 		 * @param matrix the name of the substitution matrix to use in the alignments.
-		 * @param dbPath the path to the databse of sequences.
+		 * @param dbPath the path to the database of sequences.
 		 */
 		public AlignmentExecution(final String targetSequence, final String matrix, final String dbPath)
 		{

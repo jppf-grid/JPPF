@@ -35,7 +35,7 @@ public class TestObject implements Serializable
 
 	/**
 	 * Get the id.
-	 * @return the id a s astring.
+	 * @return the id as a string.
 	 */
 	public String getId()
 	{

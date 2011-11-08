@@ -91,7 +91,7 @@ public class MandelbrotTask extends JPPFTask
 	}
 
 	/**
-	 * Compute a RGB value for a specific poitn.
+	 * Compute a RGB value for a specific point.
 	 * @param value the escape time value for the point.
 	 * @param max the max escapte time value.
 	 * @return an int value representing the rgb components for the point.

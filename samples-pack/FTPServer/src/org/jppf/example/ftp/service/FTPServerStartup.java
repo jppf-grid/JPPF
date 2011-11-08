@@ -69,7 +69,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI
 	}
 
 	/**
-	 * Start the FTP server using the configuration file whose path is specified in the driver's ocnfiguration.
+	 * Start the FTP server using the configuration file whose path is specified in the driver's configuration.
 	 * @throws Exception if an error occurs while reading the configuration.
 	 */
 	public void start() throws Exception

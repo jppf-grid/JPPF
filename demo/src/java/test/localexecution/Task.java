@@ -74,7 +74,7 @@ public class Task extends JPPFTask
 
 	/**
 	 * Load the required jars and add them to the classpath.
-	 * @param cl the class loader to use to laod the jars.
+	 * @param cl the class loader to use to load the jars.
 	 * @throws Exception if any error occurs.
 	 */
 	private static synchronized void loadJars(final AbstractJPPFClassLoader cl) throws Exception

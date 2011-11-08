@@ -114,7 +114,7 @@ public class Vector2d implements Serializable
 	}
 
 	/**
-	 * Multiply the coordinates of this vector by  the sepecified value.
+	 * Multiply the coordinates of this vector by  the specified value.
 	 * @param value the value to multiply by.
 	 * @return this vector.
 	 */

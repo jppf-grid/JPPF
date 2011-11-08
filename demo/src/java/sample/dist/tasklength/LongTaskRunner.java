@@ -46,7 +46,7 @@ public class LongTaskRunner
 	 */
 	private static JPPFClient jppfClient = null;
 	/**
-	 * JMX conenction to the driver.
+	 * JMX connection to the driver.
 	 */
 	private static JMXDriverConnectionWrapper jmx = null;
 	/**
@@ -249,7 +249,7 @@ public class LongTaskRunner
 	}
 
 	/**
-	 * This test submits a job and suspends, then resumes it using the maangement APIs.
+	 * This test submits a job and suspends, then resumes it using the management APIs.
 	 * @throws Exception if an error is raised during the execution.
 	 */
 	private static void perform4() throws Exception
@@ -296,7 +296,7 @@ public class LongTaskRunner
 	}
 
 	/**
-	 * This test submits a job and suspends, then resumes it using the maangement APIs.
+	 * This test submits a job and suspends, then resumes it using the management APIs.
 	 * @throws Exception if an error is raised during the execution.
 	 */
 	private static void perform5() throws Exception

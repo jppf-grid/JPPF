@@ -76,7 +76,7 @@ public class TimeoutTask extends JPPFTask
 	}
 
 	/**
-	 * Invokifthis tas times out.
+	 * Invoke if this has times out.
 	 * @see org.jppf.server.protocol.JPPFTask#onTimeout()
 	 */
 	@Override

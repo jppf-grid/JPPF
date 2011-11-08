@@ -44,7 +44,7 @@ public class LongTypeMatrix implements Serializable
 	private long[][] values = null;
 
 	/**
-	 * Initialize this amtrix with a specified size.
+	 * Initialize this matrix with a specified size.
 	 * @param newSize the size of this matrix.
 	 */
 	public LongTypeMatrix(final int newSize)
@@ -110,9 +110,9 @@ public class LongTypeMatrix implements Serializable
 	}
 
 	/**
-	 * Compute the result of mutiplying this matrix by another: thisMatrix x otherMatrix.
+	 * Compute the result of multiplying this matrix by another: thisMatrix x otherMatrix.
 	 * @param matrix the matrix to multiply this one by.
-	 * @return a new matrix containing the reuslt of the multiplication.
+	 * @return a new matrix containing the result of the multiplication.
 	 */
 	public LongTypeMatrix multiply(final LongTypeMatrix matrix)
 	{

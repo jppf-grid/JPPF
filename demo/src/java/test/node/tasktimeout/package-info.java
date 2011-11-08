@@ -17,6 +17,6 @@
  */
 
 /**
- * Test of timeout funtionality for one or more tasks.
+ * Test of timeout functionality for one or more tasks.
  */
 package test.node.tasktimeout;

@@ -36,7 +36,7 @@ public class ImagePanel extends JPanel
 	private transient Image image = null;
 
 	/**
-	 * Paints this panel. Overriden to allow for a color gradient in the background and
+	 * Paints this panel. Overridden to allow for a color gradient in the background and
 	 * rounded corners.
 	 * @param g the graphic context to draw in
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)

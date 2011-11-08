@@ -26,7 +26,7 @@ package sample.test;
 public class ConstantTask extends JPPFTestTask
 {
 	/**
-	 * Initialize this task with a specfied returned result.
+	 * Initialize this task with a specified returned result.
 	 * @param n the task result as an integer value.
 	 */
 	public ConstantTask(final int n)

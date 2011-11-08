@@ -50,7 +50,7 @@ public class PrimeTask extends JPPFTask
 	 */
 	private int exponent = 0;
 	/**
-	 * initialsed when this object is ocnstructed.
+	 * Initialised when this object is constructed.
 	 */
 	private BigInteger mersenne = null;
 

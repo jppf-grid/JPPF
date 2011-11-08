@@ -60,7 +60,7 @@ public class LongTask extends JPPFTask
 	}
 
 	/**
-	 * Perform the excution of this task.
+	 * Perform the execution of this task.
 	 * @see sample.BaseDemoTask#doWork()
 	 */
 	@Override

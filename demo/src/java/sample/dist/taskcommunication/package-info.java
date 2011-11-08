@@ -19,6 +19,6 @@
 /**
  * Classes for the task communication sample.<br>
  * <p>This sample illustrates a way for tasks to communicate with each other using the <a href="http://www.hazelcast.com">Hazelcast</a> framework.<br>
- * In this sample a task MyTask1 sends a message to another task MyTask2, using a distributed Map, and waits for a response from MyTask2, sent throught the same distributed Map.
+ * In this sample a task MyTask1 sends a message to another task MyTask2, using a distributed Map, and waits for a response from MyTask2, sent thorough the same distributed Map.
  */
 package sample.dist.taskcommunication;

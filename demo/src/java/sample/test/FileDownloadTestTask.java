@@ -27,7 +27,7 @@ import org.jppf.server.protocol.URLLocation;
 public class FileDownloadTestTask extends JPPFTestTask
 {
 	/**
-	 * The URL of a file to downlod as a string.
+	 * The URL of a file to download as a string.
 	 */
 	protected String location = null;
 

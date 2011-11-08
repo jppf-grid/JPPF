@@ -21,7 +21,7 @@ import org.jppf.server.protocol.JPPFTask;
 
 
 /**
- * This task is for testing the netwrok transfer of task with various data sizes.
+ * This task is for testing the network transfer of task with various data sizes.
  * @author Laurent Cohen
  */
 public class TaskVersion extends JPPFTask
@@ -39,7 +39,7 @@ public class TaskVersion extends JPPFTask
 	}
 
 	/**
-	 * Initialize this task with a byte array of the psecified size.
+	 * Initialize this task with a byte array of the specified size.
 	 * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
 	 * depending on the inNodeOnly flag.
 	 * @param datasize the size in byte of the byte array this task owns.

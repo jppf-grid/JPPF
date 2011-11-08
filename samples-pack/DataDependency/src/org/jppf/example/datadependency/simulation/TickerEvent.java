@@ -29,7 +29,7 @@ import org.jppf.example.datadependency.model.MarketData;
 public class TickerEvent extends EventObject
 {
 	/**
-	 * Iniitialize this event with a market data id.
+	 * Initialize this event with a market data id.
 	 * @param source a market data id string.
 	 */
 	public TickerEvent(final MarketData source)

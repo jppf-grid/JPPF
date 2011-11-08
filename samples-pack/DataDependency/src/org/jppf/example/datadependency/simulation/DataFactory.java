@@ -55,7 +55,7 @@ public interface DataFactory
 	/**
 	 * Generate a list of trade objects with their dependencies.
 	 * Each generated object has an id in the format &quot;Tn&quot; where <i>n</i> is a sequence number.
-	 * The dependencies are randomly chosen from the specified list of data amrket objects.
+	 * The dependencies are randomly chosen from the specified list of data market objects.
 	 * and their number varies between the specified min and max values.
 	 * @param nbTrades the number of trade objects to generate.
 	 * @param dataList the list of market data objects to create the dependencies from.

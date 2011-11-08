@@ -100,7 +100,7 @@ public class Test
 	/**
 	 * Serialize an object.
 	 * @param o the object to serialize.
-	 * @return the qseuialized object as a byte array.
+	 * @return the serialized object as a byte array.
 	 * @throws Exception if any error occurs.
 	 */
 	public byte[] serialize(final Object o) throws Exception
@@ -112,7 +112,7 @@ public class Test
 	}
 
 	/**
-	 * Desrialize an object.
+	 * Deserialize an object.
 	 * @param data the byte array to deserialize from.
 	 * @return an Object.
 	 * @throws Exception if any error occurs.

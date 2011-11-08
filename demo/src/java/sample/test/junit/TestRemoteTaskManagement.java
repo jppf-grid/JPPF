@@ -84,7 +84,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 	 * Execute a single JPPF task and return the results.
 	 * @param task the task to execute.
 	 * @param command the command to execute, cancel or restart.
-	 * @param id theid of the task to execute.
+	 * @param id the id of the task to execute.
 	 * @return a <code>JPPFTask</code> instance.
 	 * @throws Exception if the execution failed.
 	 */

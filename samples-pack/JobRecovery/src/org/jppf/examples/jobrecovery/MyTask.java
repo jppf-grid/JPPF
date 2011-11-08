@@ -52,7 +52,7 @@ public class MyTask extends JPPFTask
 		try
 		{
 			Thread.sleep(duration);
-			System.out.println("task " + getId() + " completed sucessfully");
+			System.out.println("task " + getId() + " completed successfully");
 			setResult("successful completion");
 		}
 		catch (Exception e)

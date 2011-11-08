@@ -20,7 +20,7 @@ package sample.test.profiling;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Instances of this class do nothing and are intented for node profiling purposes,
+ * Instances of this class do nothing and are intended for node profiling purposes,
  * to analyse the JPPF overhead for task execution.
  * @author Laurent Cohen
  */
@@ -45,7 +45,7 @@ public class EmptyTask extends JPPFTask
 	}
 
 	/**
-	 * Perform the excution of this task.
+	 * Perform the execution of this task.
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override

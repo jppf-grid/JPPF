@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * Reresentation of large positive integers.
+ * Representation of large positive integers.
  * @author Laurent Cohen
  */
 public class LargeInt implements Serializable
@@ -84,7 +84,7 @@ public class LargeInt implements Serializable
 	 * Multiply by an int no larger than 127.
 	 * @param operand the number to multiply by.
 	 * @param position the position from which to start in the array.
-	 * @return the reuslt of the multiplication.
+	 * @return the result of the multiplication.
 	 */
 	private byte[] multiply(final int operand, final int position)
 	{

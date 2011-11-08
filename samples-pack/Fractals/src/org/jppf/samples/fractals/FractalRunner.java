@@ -63,7 +63,7 @@ public class FractalRunner
 	/**
 	 * Execute for the specified number of iterations.
 	 * @param doMandelbrot determines whether to generate a Mandelbrot (true) or Lyapunov (false) fractal.
-	 * @param config holds the fractal alogrithm parameters required for the computation.
+	 * @param config holds the fractal algorithm parameters required for the computation.
 	 * @param option the option holding the image.
 	 * @throws Exception if an error is raised during the execution.
 	 */
@@ -79,7 +79,7 @@ public class FractalRunner
 	/**
 	 * Execute for the specified number of iterations.
 	 * @param doMandelbrot determines whether to generate a Mandelbrot (true) or Lyapunov (false) fractal.
-	 * @param config holds the fractal alogrithm parameters required for the computation.
+	 * @param config holds the fractal algorithm parameters required for the computation.
 	 * @return a generated image that can be displayed in a UI or saved as a file.
 	 * @throws Exception if an error is raised during the execution.
 	 */

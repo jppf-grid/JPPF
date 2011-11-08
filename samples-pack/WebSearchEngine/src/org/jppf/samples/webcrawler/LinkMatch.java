@@ -49,8 +49,8 @@ public class LinkMatch implements Serializable
 	}
 
 	/**
-	 * Get the hashcode for this object.
-	 * @return the hashcode as an int.
+	 * Get the hash code for this object.
+	 * @return the hash code as an int.
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -62,7 +62,7 @@ public class LinkMatch implements Serializable
 	/**
 	 * Determine whether this object is equal to another.
 	 * @param obj the object to compare with.
-	 * @return true if the objects are equa, false otherwise.
+	 * @return true if the objects are equal, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

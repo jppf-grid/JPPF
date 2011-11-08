@@ -147,7 +147,7 @@ public class Runner
 		if (lbi == null) return 1;
 		TypedProperties props = lbi.parameters;
 		props.setProperty("size", "1");
-		// set load-balancing alogrithm to "manual" with a size of 1
+		// set load-balancing algorithm to "manual" with a size of 1
 		jmxDriver.changeLoadBalancerSettings("manual", props);
 		// return the current number of nodes
 		return (int) jmxDriver.statistics().getNodes().getLatest();

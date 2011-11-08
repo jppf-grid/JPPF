@@ -45,7 +45,7 @@ public class JobPriorityRunner
 	 */
 	private static JPPFClient jppfClient = null;
 	/**
-	 * JMX conenction to the driver.
+	 * JMX connection to the driver.
 	 */
 	private static JMXDriverConnectionWrapper jmx = null;
 	/**
@@ -103,10 +103,10 @@ public class JobPriorityRunner
 	}
 
 	/**
-	 * Ceate a non-blocking job with the specified name and priority.
+	 * Create a non-blocking job with the specified name and priority.
 	 * @param name the job's name.
 	 * @param priority the job priority.
-	 * @param nbTasks number of tasdks in the job.
+	 * @param nbTasks number of tasks in the job.
 	 * @param length the length of each task in milliseconds.
 	 * @return the created job.
 	 * @throws Exception if an error is raised during the job creation.
@@ -207,7 +207,7 @@ public class JobPriorityRunner
 		private final JPPFJob job;
 
 		/**
-		 * Initialize this job runneer.
+		 * Initialize this job runner.
 		 * @param job the job to execute.
 		 */
 		public JobRunner(final JPPFJob job)

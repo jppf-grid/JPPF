@@ -78,7 +78,7 @@ public class NBodyPanel extends JPanel
 	 */
 	private Vector2d[] newPositions = null;
 	/**
-	 * determines wheher the display is being updated.
+	 * determines whether the display is being updated.
 	 */
 	private AtomicBoolean updating = new AtomicBoolean(false);
 

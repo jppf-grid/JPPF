@@ -65,7 +65,7 @@ public class FTPTask extends JPPFTask
 			// this is just for demonstration purposes, the password should never be exposed like this!
 			client.open(host, 12222, "admin", "admin");
 
-			// dowload the input text file
+			// download the input text file
 			client.download(inFile, inFile);
 			String text = FileUtils.readTextFile(inFile);
 			// transform double line breaks into paragraphs

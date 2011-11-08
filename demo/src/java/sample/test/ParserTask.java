@@ -57,7 +57,7 @@ public class ParserTask extends JPPFTestTask
 
 	/**
 	 * Parse the file.
-	 * @param filetoParse path of the file to parse in the cleint file system.
+	 * @param filetoParse path of the file to parse in the client file system.
 	 * @throws Exception if parsing fails.
 	 */
 	public void fileParser(final String filetoParse) throws Exception

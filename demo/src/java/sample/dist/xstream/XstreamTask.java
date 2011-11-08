@@ -38,7 +38,7 @@ public class XstreamTask extends JPPFTask
 	private String personXml = null;
 
 	/**
-	 * Intiialize this task with the specified person.
+	 * Initialize this task with the specified person.
 	 * @param person a <code>Person</code> instance.
 	 */
 	public XstreamTask(final Person person)
@@ -82,7 +82,7 @@ public class XstreamTask extends JPPFTask
 	 * Instantiates an <code>XStream</code> instance through reflection.
 	 * This avoids compile errors if the XStream jars are not in the classpath.
 	 * @return an XStream object.
-	 * @throws Exception if an insantiation error occurs or the required classes are not in the classpath.
+	 * @throws Exception if an instantiation error occurs or the required classes are not in the classpath.
 	 */
 	private Object instantiateXStream() throws Exception
 	{

@@ -21,7 +21,7 @@ package sample;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * This task implementation encapsulates base functionality for demonstration tasks, such as strat and end event notifications.
+ * This task implementation encapsulates base functionality for demonstration tasks, such as start and end event notifications.
  * @author Laurent Cohen
  */
 public abstract class BaseDemoTask extends JPPFTask

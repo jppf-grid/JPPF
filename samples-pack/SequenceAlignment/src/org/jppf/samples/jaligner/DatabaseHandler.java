@@ -50,7 +50,7 @@ public class DatabaseHandler
 	 */
 	private String charset = null;
 	/**
-	 * Determiens whether EOF was reached on the sequence database.
+	 * Determines whether EOF was reached on the sequence database.
 	 */
 	private boolean eof = false;
 

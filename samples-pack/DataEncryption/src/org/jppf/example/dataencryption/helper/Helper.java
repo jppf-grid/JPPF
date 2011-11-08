@@ -40,7 +40,7 @@ public final class Helper
 	private static char[] some_chars = null;
 
 	/**
-	 * Instanciation of this class is not permitted.
+	 * Instantiation of this class is not permitted.
 	 */
 	private Helper()
 	{
@@ -179,7 +179,7 @@ public final class Helper
 	}
 
 	/**
-	 * Get the name of the cryptographic transformation used when ecrypting or decrypting data.
+	 * Get the name of the cryptographic transformation used when encrypting or decrypting data.
 	 * @return the transformation as a string.
 	 */
 	public static String getTransformation()

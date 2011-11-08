@@ -78,7 +78,7 @@ public class Person
 
 	/**
 	 * Get the person's last name.
-	 * @return the last name as a streing.
+	 * @return the last name as a string.
 	 */
 	public String getLastname()
 	{
@@ -87,7 +87,7 @@ public class Person
 
 	/**
 	 * Set the person's last name.
-	 * @param lastname the last name as a streing.
+	 * @param lastname the last name as a string.
 	 */
 	public void setLastname(final String lastname)
 	{

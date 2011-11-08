@@ -149,7 +149,7 @@ public class TaskNotificationsRunner implements NotificationListener
 
 	/**
 	 * Subscribe to notifications from all the nodes.
-	 * @throws Exception if any error ocurs.
+	 * @throws Exception if any error occurs.
 	 */
 	public void registerToMBeans() throws Exception
 	{
@@ -177,7 +177,7 @@ public class TaskNotificationsRunner implements NotificationListener
 			MBeanServerConnection mbsc = jmxNode.getMbeanConnection();
 			TaskNotificationsMBean proxy = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, TaskNotificationsMBean.class, true);
 
-			// subbscribe to all notifications from the MBean
+			// subscribe to all notifications from the MBean
 			proxy.addNotificationListener(this, null, null);
 			nodeConnections.add(jmxNode);
 		}
@@ -189,7 +189,7 @@ public class TaskNotificationsRunner implements NotificationListener
 	@Override
 	public void handleNotification(final Notification notification, final Object handback)
 	{
-		// to smoothe the throughput of notfications processing,
+		// to smoothe the throughput of notifications processing,
 		// we submit each notification to a queue instead of handling it directly
 		final String message = notification.getMessage();
 		Runnable r = new Runnable()

@@ -81,7 +81,7 @@ public class JPPFTaskPreInit extends JPPFTask {
 			setException(new JPPFException(t));
 		}  finally {
 			totalDur = System.nanoTime() - totalDur;
-			System.out.printf("FINSIHED in: %s\t downloaded: %d\t - loaded: %s, registered: %s%n", (totalDur / 1000000.0), size, loadCount, count);
+			System.out.printf("FINISHED in: %s\t downloaded: %d\t - loaded: %s, registered: %s%n", (totalDur / 1000000.0), size, loadCount, count);
 		}
 	}
 

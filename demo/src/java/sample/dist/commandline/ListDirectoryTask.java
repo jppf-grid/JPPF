@@ -73,7 +73,7 @@ public class ListDirectoryTask extends CommandLineTask
 				setResult("OS '" + os + "' not recognized");
 				return;
 			}
-			// set wehether the script output is captured
+			// set whether the script output is captured
 			setCaptureOutput(false);
 			// execute the script/command
 			launchProcess();

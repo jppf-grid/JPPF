@@ -54,8 +54,8 @@ public class MyNodeConnectionListener implements NodeConnectionListener
 	}
 
 	/**
-	 * Build a node identifier based on its manageent host and port.
-	 * @param info the inforamtion from which to extract the identifier segments.
+	 * Build a node identifier based on its management host and port.
+	 * @param info the information from which to extract the identifier segments.
 	 * @return a string in the format 'management_host:management_port'.
 	 */
 	private String computeIdentifier(final JPPFManagementInfo info)

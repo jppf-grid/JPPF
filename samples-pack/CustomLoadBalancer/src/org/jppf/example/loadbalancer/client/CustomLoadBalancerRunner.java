@@ -123,7 +123,7 @@ public class CustomLoadBalancerRunner
 		// Give this job a readable unique id that we can use to monitor and manage it.
 		job.setName(jobName);
 
-		// Specifiy the job metadata.
+		// Specify the job metadata.
 		JPPFJobMetadata metadata = (JPPFJobMetadata) job.getMetadata();
 		metadata.setParameter("task.memory", "" + size);
 		metadata.setParameter("task.time", "" + duration);
@@ -143,7 +143,7 @@ public class CustomLoadBalancerRunner
 		// Assign an execution policy to the job.
 		job.getSLA().setExecutionPolicy(policy);
 
-		// Set the job in non-blocking (asynchonous) mode.
+		// Set the job in non-blocking (asynchronous) mode.
 		job.setBlocking(false);
 		// For an asynchronous job, we need a TaskResultListener to collect the
 		// execution results, hence we define a JPPFResultCollector.

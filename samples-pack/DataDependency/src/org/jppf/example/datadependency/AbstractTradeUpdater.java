@@ -62,7 +62,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	 */
 	protected NodeSelector nodeSelector = null;
 	/**
-	 * The generated list of market fata objects.
+	 * The generated list of market data objects.
 	 */
 	protected List<MarketData> marketDataList = null;
 	/**
@@ -141,7 +141,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 	/**
 	 * Get the uuids of all nodes using the management APIs.
 	 * @return the ids as a list of strings.
-	 * @throws Exception if azny error occurs.
+	 * @throws Exception if any error occurs.
 	 */
 	protected List<String> getNodeIds() throws Exception
 	{
@@ -259,14 +259,14 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 		 * This method submits one job per trade, each job comprising a single task
 		 * that recomputes a single trade.
 		 * @param nodeId the id of the node on which to execute the job.
-		 * @param tardeIdList the list of impacted trades to recompute on the node.
+		 * @param tradeIdList the list of impacted trades to recompute on the node.
 		 * @throws Exception if any error occurs.
 		 */
-		private void submitOneJobPerTrade(final String nodeId, final List<String> tardeIdList) throws Exception
+		private void submitOneJobPerTrade(final String nodeId, final List<String> tradeIdList) throws Exception
 		{
 			ExecutionPolicy policy = new Equal("jppf.uuid", false, nodeId);
 			// create a job for each trade
-			for (String tradeId: tardeIdList)
+			for (String tradeId: tradeIdList)
 			{
 				JPPFJob job = new JPPFJob();
 				job.setName("[Node id=" + nodeId + "] trade=" + tradeId + " (" + jobCount.incrementAndGet() + ")");

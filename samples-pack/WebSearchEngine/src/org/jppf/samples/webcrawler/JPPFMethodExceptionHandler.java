@@ -29,13 +29,13 @@ import org.apache.commons.httpclient.*;
 public class JPPFMethodExceptionHandler implements HttpMethodRetryHandler
 {
 	/**
-	 * the max retry counnt to use.
+	 * the max retry count to use.
 	 */
 	private int maxRetry = 1;
 
 	/**
 	 * Initialize this exception handler with the specified maximum retry count.
-	 * @param maxRetry the max retry counnt to use.
+	 * @param maxRetry the max retry count to use.
 	 */
 	public JPPFMethodExceptionHandler(final int maxRetry)
 	{
@@ -44,7 +44,7 @@ public class JPPFMethodExceptionHandler implements HttpMethodRetryHandler
 
 	/**
 	 * Determine whether a request should be resent.
-	 * @param method the hhtp method for which the exception occurred.
+	 * @param method the http method for which the exception occurred.
 	 * @param e the exception that occurred.
 	 * @param retryCount number of times the request was resent.
 	 * @return true if the request should be resent, false otherwise.

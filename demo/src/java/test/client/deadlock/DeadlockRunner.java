@@ -195,7 +195,7 @@ public class DeadlockRunner
 		public JPPFJob job = null;
 
 		/**
-		 * Intiialize this tasks.
+		 * Initialize this tasks.
 		 * @param jobNumber the id for the job.
 		 * @param nbTasks number of tasks in the job.
 		 * @param millis millis part of the wait.

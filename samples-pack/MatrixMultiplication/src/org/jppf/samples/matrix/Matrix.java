@@ -110,9 +110,9 @@ public class Matrix implements Serializable
 	}
 
 	/**
-	 * Compute the result of mutiplying this matrix by another: thisMatrix x otherMatrix.
+	 * Compute the result of multiplying this matrix by another: thisMatrix x otherMatrix.
 	 * @param matrix the matrix to multiply this one by.
-	 * @return a new matrix containing the reuslt of the multiplication.
+	 * @return a new matrix containing the result of the multiplication.
 	 */
 	public Matrix multiply(final Matrix matrix)
 	{

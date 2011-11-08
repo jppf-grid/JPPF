@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 /**
- * Result collector that updates the progess bar's value during the computation.
+ * Result collector that updates the progress bar's value during the computation.
  */
 public class AlignmentResultCollector implements TaskResultListener
 {
@@ -41,7 +41,7 @@ public class AlignmentResultCollector implements TaskResultListener
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * Totak number of expected results.
+	 * Total number of expected results.
 	 */
 	private int initialCount = 0;
 	/**

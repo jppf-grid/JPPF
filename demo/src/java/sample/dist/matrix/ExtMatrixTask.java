@@ -21,7 +21,7 @@ import org.jppf.server.protocol.JPPFTask;
 
 
 /**
- * This task performs the multiplication of one or more matrixs rows by another matrix, as part of
+ * This task performs the multiplication of one or more matrix rows by another matrix, as part of
  * the multiplication of 2 whole square matrices.
  * @author Laurent Cohen
  */

@@ -23,7 +23,7 @@ import java.net.Socket;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
- * Thnis task is intended for testing the framework only.
+ * This task is intended for testing the framework only.
  * @author Laurent Cohen
  */
 public class SecurityTestTask extends JPPFTestTask

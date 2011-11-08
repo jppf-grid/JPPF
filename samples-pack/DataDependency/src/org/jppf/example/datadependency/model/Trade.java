@@ -48,7 +48,7 @@ public class Trade implements Serializable
 	}
 
 	/**
-	 * Iniitialize the trade with the specified identifier.
+	 * Initialize the trade with the specified identifier.
 	 * @param id the trade identifier.
 	 */
 	public Trade(final String id)

@@ -68,7 +68,7 @@ public class NBody implements Serializable
 	public int number = 0;
 
 	/**
-	 * Initialize this body with the spceified position.
+	 * Initialize this body with the specified position.
 	 * @param number the body's order number.
 	 * @param position the body's position.
 	 */

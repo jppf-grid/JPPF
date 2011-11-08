@@ -112,7 +112,7 @@ public class NodeListener implements NodeLifeCycleListener
 		Properties props = ds.getXaProperties();
 		/*
 		// PostgreSQL Properties
-		// !!! on PostgreSQL, the serveur configuration property "maxPreparedConnections"
+		// !!! on PostgreSQL, the server configuration property "maxPreparedConnections"
 		// must be set to a value > 0
 		ds.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
 		props.setProperty("user", "jppf");
@@ -215,7 +215,7 @@ public class NodeListener implements NodeLifeCycleListener
 	}
 
 	/**
-	 * Submit a task for execution by the excutor.
+	 * Submit a task for execution by the exceutor.
 	 * @param <T> the type of result returned by the task.
 	 * @param callable the task to execute.
 	 * @return the task's result.
@@ -249,7 +249,7 @@ public class NodeListener implements NodeLifeCycleListener
 
 		/**
 		 * Initialize this task with the specified error flag.
-		 * @param rollbackOnly rollack / commit flag.
+		 * @param rollbackOnly rollback / commit flag.
 		 */
 		public StartTransactionTask(final boolean rollbackOnly)
 		{
@@ -296,7 +296,7 @@ public class NodeListener implements NodeLifeCycleListener
 
 		/**
 		 * Initialize this task with the specified error flag.
-		 * @param rollback rollack / commit flag.
+		 * @param rollback rollback / commit flag.
 		 */
 		public EndTransactionTask(final boolean rollback)
 		{

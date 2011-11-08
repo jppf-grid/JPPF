@@ -157,7 +157,7 @@ public class CrawlerTest
 	/**
 	 * Test searching with Lucene.
 	 * @param search the Lucene query text.
-	 * @param max the maximum number ofresults to show.
+	 * @param max the maximum number of results to show.
 	 * @throws Exception if an error is thrown while executing.
 	 */
 	public static void luceneSearch(final String search, final int max) throws Exception

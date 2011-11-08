@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 /**
- * Result collector that updates the progess bar's value during the computation.
+ * Result collector that updates the progress bar's value during the computation.
  */
 public class CrawlerResultCollector implements TaskResultListener
 {

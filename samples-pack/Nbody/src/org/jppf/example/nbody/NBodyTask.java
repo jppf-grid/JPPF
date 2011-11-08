@@ -47,7 +47,7 @@ import org.jppf.server.protocol.JPPFTask;
 public class NBodyTask extends JPPFTask
 {
 	/**
-	 * The bodies for whihc this task computes the position.
+	 * The bodies for which this task computes the position.
 	 */
 	private NBody[] bodies = null;
 

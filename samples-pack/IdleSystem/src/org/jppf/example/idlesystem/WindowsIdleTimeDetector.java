@@ -54,7 +54,7 @@ public class WindowsIdleTimeDetector implements IdleTimeDetector
 		User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class);
 		/**
 		 * Query the time of last activity.
-		 * @param info the structure in which the last acitvity time is stored.
+		 * @param info the structure in which the last activity time is stored.
 		 * @return BOOL return code.
 		 */
 		int GetLastInputInfo(LastInputInfo info);

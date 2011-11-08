@@ -29,7 +29,7 @@ import com.hazelcast.core.Hazelcast;
 /**
  * This startup class initializes the distributed data.
  * It creates a reference to the distributed map holding the market data objects, accessed by the client and all the nodes,
- * as well as a map holding the trades processsed by this node.
+ * as well as a map holding the trades processed by this node.
  * @author Laurent Cohen
  */
 public class DataDependencyStartup implements JPPFNodeStartupSPI

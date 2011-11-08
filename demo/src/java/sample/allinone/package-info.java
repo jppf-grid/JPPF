@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes demosntrating how to run multiple JPPF components in the same JVM.
+ * Classes demonstrating how to run multiple JPPF components in the same JVM.
  */
 package sample.allinone;

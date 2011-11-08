@@ -34,7 +34,7 @@ import org.slf4j.*;
 
 /**
  * Example of a workflow to visit a web ste starting from a given page, and matching the visited
- * pages with a user-specified search quey.
+ * pages with a user-specified search query.
  * @author Laurent Cohen
  */
 public class WebCrawlerRunner
@@ -74,7 +74,7 @@ public class WebCrawlerRunner
 
 	/**
 	 * Run the sample.
-	 * @param url the start url, spcecified in the UI.
+	 * @param url the start url, specified in the UI.
 	 * @param query the search query specified by the user.
 	 * @param depth the links depth to search.
 	 * @param option an option used as an entry point to the UI.
@@ -119,7 +119,7 @@ public class WebCrawlerRunner
 	}
 
 	/**
-	 * Initialize htpp connection settings from the configuration file.
+	 * Initialize http connection settings from the configuration file.
 	 */
 	private static void init()
 	{
@@ -221,7 +221,7 @@ public class WebCrawlerRunner
 		 * Initialize this task with the specified parameters.
 		 * @param url the sequence to compare those in the database with.
 		 * @param query the name of the substitution matrix to use in the alignments.
-		 * @param depth the path to the databse of sequences.
+		 * @param depth the path to the database of sequences.
 		 */
 		public CrawlExecution(final String url, final String query, final int depth)
 		{

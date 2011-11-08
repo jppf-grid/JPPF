@@ -49,7 +49,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 	 */
 	private JPPFSystemInformation nodeConfiguration = null;
 	/**
-	 * Holds metadata about the cuirrent job being dispatched.
+	 * Holds metadata about the current job being dispatched.
 	 */
 	private JobMetadata jobMetadata = null;
 	/**
@@ -69,7 +69,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 
 	/**
 	 * Make a copy of this bundler.
-	 * Wich parts are actually copied depends on the implementation.
+	 * Which parts are actually copied depends on the implementation.
 	 * @return a new <code>Bundler</code> instance.
 	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
 	 */
@@ -180,7 +180,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 		int maxTasks = (int) (nodeMemory / (2 * taskMemory));
 		// the maximum time needed to execute maxTasks tasks on nbThreads parallel threads
 		long maxTime = taskTime * maxTasks / nbThreads;
-		// if maxTime is not a multiple of nbThreads, make the adjustement
+		// if maxTime is not a multiple of nbThreads, make the adjustment
 		if ((maxTasks % nbThreads) != 0) maxTime += taskTime;
 		// if max time is longer than the allowed time, reduce the number of tasks by the appropriate amount
 		if (maxTime > allowedTime)

@@ -20,7 +20,7 @@ package sample.helloworld;
 import java.io.Serializable;
 
 /**
- * A simple hello world JPPF task impleemnted as a POJO with an instance method.
+ * A simple hello world JPPF task implemented as a POJO with an instance method.
  * @author Laurent Cohen
  */
 public class HelloWorldPojo implements Serializable
