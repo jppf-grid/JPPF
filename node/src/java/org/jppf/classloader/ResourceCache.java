@@ -189,10 +189,14 @@ class ResourceCache
 		try
 		{
 			String base = JPPFConfiguration.getProperties().getString("jppf.resource.cache.dir", null);
-			if (base == null) base = System.getProperty("java.io.tmpdir");
-			if (base == null) base = System.getProperty("user.home");
-			if (base == null) base = System.getProperty("user.dir");
-			if (base == null) base = ".";
+			if (base == null)
+			{
+				base = System.getProperty("java.io.tmpdir");
+				if (base == null) base = System.getProperty("user.home");
+				if (base == null) base = System.getProperty("user.dir");
+				if (base != null) base += "/.jppf";
+			}
+			if (base == null) base = "./.jppf";
 			//String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
 			//String s = base + File.separator + "jppf_" + uuid;
 			int n = findFolderIndex(base, "jppf_");
@@ -218,10 +222,12 @@ class ResourceCache
 	private int findFolderIndex(String folder, final String base)
 	{
 		File dir = new File(folder);
+		if (!dir.exists()) dir.mkdirs();
 		File[] subdirs = dir.listFiles(new FileFilter()
 		{
 			public boolean accept(File path)
 			{
+				if (traceEnabled) log.trace("checking '" + path.getName() + '\'');
 				return path.isDirectory() && path.getName().startsWith(base);
 			}
 		});
