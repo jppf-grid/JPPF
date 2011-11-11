@@ -172,11 +172,15 @@ class ResourceCache
 				base = System.getProperty("java.io.tmpdir");
 				if (base == null) base = System.getProperty("user.home");
 				if (base == null) base = System.getProperty("user.dir");
-				if (base != null) base += ROOT_NAME;
+				if (base != null)
+				{
+					if (!base.endsWith(File.separator)) base += File.separator;
+					base += ROOT_NAME;
+				}
 			}
 			if (base == null) base = "." + File.separator + ROOT_NAME;
-			int n = findFolderIndex(base);
 			if (traceEnabled) log.trace("base = " + base);
+			int n = findFolderIndex(base);
 			String s = base + File.separator + n;
 			File baseDir = new File(s + File.separator);
 			if (!baseDir.exists()) baseDir.mkdirs();
