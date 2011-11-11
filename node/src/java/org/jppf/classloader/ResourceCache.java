@@ -45,6 +45,10 @@ class ResourceCache
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
+	 * Name of the resource cache root.
+	 */
+	private static String ROOT_NAME = ".jppf";
+	/**
 	 * Map of resource names to temporary file names to which their content is stored.
 	 */
 	private Map<String, List<String>> cache = new Hashtable<String, List<String>>();
@@ -95,18 +99,6 @@ class ResourceCache
 	}
 
 	/**
-	 * Set the location for the resource with the specified name.
-	 * @param name the name of the resource to lookup.
-	 * @param location a file path.
-	 */
-	public synchronized void setResourceLocation(String name, String location)
-	{
-		List<String> list = new LinkedList<String>();
-		list.add(location);
-		cache.put(name, list);
-	}
-
-	/**
 	 * Save the definitions for a resource to temporary files, and register their location with this cache.
 	 * @param name the name of the resource to register.
 	 * @param definitions a list of byte array definitions.
@@ -119,20 +111,6 @@ class ResourceCache
 		//for (byte[] def: definitions) locations.add(saveToTempFile(def));
 		for (byte[] def: definitions) locations.add(saveToTempFile(name, def));
 		if (!locations.isEmpty()) setResourcesLocations(name, locations);
-	}
-
-	/**
-	 * Save the specified reosurce definition to a temporary file.
-	 * @param definition the definition to save, specified as a byte array.
-	 * @return the path to the created file.
-	 * @throws Exception if any I/O error occurs.
-	 */
-	private String saveToTempFile(final byte[] definition) throws Exception
-	{
-		SaveFileAction action = new SaveFileAction(definition);
-		File file = (File) AccessController.doPrivileged(action);
-		if (action.getException() != null) throw action.getException();
-		return file.getCanonicalPath();
 	}
 
 	/**
@@ -194,32 +172,29 @@ class ResourceCache
 				base = System.getProperty("java.io.tmpdir");
 				if (base == null) base = System.getProperty("user.home");
 				if (base == null) base = System.getProperty("user.dir");
-				if (base != null) base += "/.jppf";
+				if (base != null) base += ROOT_NAME;
 			}
-			if (base == null) base = "./.jppf";
-			//String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
-			//String s = base + File.separator + "jppf_" + uuid;
-			int n = findFolderIndex(base, "jppf_");
-			String s = base + File.separator + "jppf_" + n;
+			if (base == null) base = "." + File.separator + ROOT_NAME;
+			int n = findFolderIndex(base);
+			if (traceEnabled) log.trace("base = " + base);
+			String s = base + File.separator + n;
 			File baseDir = new File(s + File.separator);
 			if (!baseDir.exists()) baseDir.mkdirs();
-			//baseDir.deleteOnExit();
 			tempFolders.add(s);
 			if (traceEnabled) log.trace("added temp folder " + s);
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * Find an index that doesn't exist for the folder suffix.
 	 * @param folder the folder to which the new folder will belong.
-	 * @param base the new folder name prefix.
 	 * @return the maximum existing index + 1, or 0 if no such folder already exists. 
 	 */
-	private int findFolderIndex(String folder, final String base)
+	private int findFolderIndex(String folder)
 	{
 		File dir = new File(folder);
 		if (!dir.exists()) dir.mkdirs();
@@ -227,8 +202,8 @@ class ResourceCache
 		{
 			public boolean accept(File path)
 			{
-				if (traceEnabled) log.trace("checking '" + path.getName() + '\'');
-				return path.isDirectory() && path.getName().startsWith(base);
+				if (traceEnabled) log.trace("checking '" + path.getPath() + '\'');
+				return path.isDirectory();
 			}
 		});
 		int max = -1;
@@ -236,7 +211,7 @@ class ResourceCache
 		{
 			try
 			{
-				int n = Integer.valueOf(f.getName().substring(base.length()));
+				int n = Integer.valueOf(f.getName());
 				if (n > max) max = n;
 			}
 			catch(Exception e)
