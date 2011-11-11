@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.pooling;
 
 import java.nio.ByteBuffer;
 
-import org.jppf.utils.pooling.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Static factory for a bool of direct byte buffers.
  * @author Laurent Cohen
  */
 public class DirectBufferPool

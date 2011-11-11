@@ -66,6 +66,7 @@ public class DirectBufferPoolQueue implements ObjectPool<ByteBuffer>
 	}
 
 	/**
+	 * Use this method with precaution, as its performance is in O(n).<br/>
 	 * {@inheritDoc}
 	 */
 	@Override

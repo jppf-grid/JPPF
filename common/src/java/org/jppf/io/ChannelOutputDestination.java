@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
 import org.jppf.utils.*;
+import org.jppf.utils.pooling.DirectBufferPool;
 
 /**
  * Output destination backed by a {@link java.nio.channels.WritableByteChannel WritableByteChannel}.

@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
 import org.jppf.utils.*;
+import org.jppf.utils.pooling.DirectBufferPool;
 
 /**
  * Input source backed by a {@link java.nio.channels.ReadableByteChannel ReadableByteChannel}.
