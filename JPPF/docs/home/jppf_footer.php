@@ -1,5 +1,4 @@
-	<!--<div align="center" style="width: 100%; border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">-->
-		<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
 			<tr><td colspan="*" style="height: 10px"></td></tr>
 			<tr>
 				<td align="center" style="font-size: 9pt; color: #6D78B6">

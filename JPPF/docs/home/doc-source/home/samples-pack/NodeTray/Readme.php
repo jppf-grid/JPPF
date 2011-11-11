@@ -33,8 +33,8 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					JPPF Node startup class implementation: please refer to the related documentation in the
-					<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#Node_startup_classes">Extending and Customizing JPPF &gt; Node startup classes</a> section.<br>
+					JPPF node life cycle notifications: please refer to the related documentation in the
+					<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#Receiving_notifications_of_node_life_cycle_events">Extending and Customizing JPPF &gt; Receiving notifications of node life cycle events</a> section.<br>
 					Subscribing to task-level JMX notifications: please refer to the
 					<a href="http://www.jppf.org/wiki/index.php?title=Management_and_monitoring#Subscribing_to_MBean_notifications">Management and monitoring &gt; Subscribing to MBean notifications</a> section of the documentation.<br>
 

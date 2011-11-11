@@ -1,23 +1,22 @@
 #-----------------------------------#
 #         template start            #
 #-----------------------------------#
-			<?php
-			$itemClass = "";
-			if ($currentPage == "${label}")
-			{
-			?>
-			<td class="headerMenuItem2" style="background: transparent url('/images/buttons/btn_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="${url}" class="headerMenuItem2">${label}</a>&nbsp;</td>
-			<?php
-			}
-			else
-			{
-			?>
-			<td class="headerMenuItem" style="background: transparent url('/images/buttons/tab_active_main.gif') repeat-x scroll left bottom;">&nbsp;<a href="${url}" class="headerMenuItem">${label}</a>&nbsp;</td>
-			<?php
-			}
-			?>
-			<td style="width: 1px"></td>
-						
+<?php
+if ($currentPage == "${label}")
+{
+?>
+<td class="headerMenuItem2">&nbsp;<a href="${url}" class="headerMenuItem2">${label}</a>&nbsp;</td>
+<?php
+}
+else
+{
+?>
+<td class="headerMenuItem">&nbsp;<a href="${url}" class="headerMenuItem">${label}</a>&nbsp;</td>
+<?php
+}
+?>
+								<td style="width: 1px"></td>
+
 #-----------------------------------#
 #          template end             #
 #-----------------------------------#

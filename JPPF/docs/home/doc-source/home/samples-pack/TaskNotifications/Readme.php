@@ -1,5 +1,5 @@
 <?php $currentPage="Samples" ?>
-$template{name="samples-page-header" title="Custom MBeans sample"}$
+$template{name="samples-page-header" title="Tasks Notifications sample"}$
 
 <div align="justify">
 

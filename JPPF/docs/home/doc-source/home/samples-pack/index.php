@@ -22,6 +22,8 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 	<li><a href="NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
 	<li><a href="Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a  magnetic field</a></li>
 	<li><a href="FTPServer/Readme.php">How to embed and use an FTP server in JPPF</a></li>
+	<li><a href="NodeConnectionEvents/Readme.php">How to receive notifications of nodes connecting and disconnecting on the server</a></li>
+	<li><a href="JobRecovery/Readme.php">Job recovery after an application crash</a></li>
 </ul>
 <br>
 
