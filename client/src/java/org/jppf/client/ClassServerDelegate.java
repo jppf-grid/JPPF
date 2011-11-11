@@ -67,6 +67,6 @@ public interface ClassServerDelegate extends Runnable, ClientConnectionHandler
      * @param uuid the uuid of the request.
      * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
      */
-    public ClassLoader getRequestClassLoader(final String uuid);
+    ClassLoader getRequestClassLoader(final String uuid);
 
 }
