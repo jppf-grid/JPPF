@@ -20,7 +20,6 @@ package org.jppf.server.node;
 import java.util.List;
 
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.node.NodeExecutionManager;
 import org.jppf.node.protocol.Task;
 
 /**
