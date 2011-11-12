@@ -33,7 +33,7 @@ public class DirectBufferPoolQueue implements ObjectPool<ByteBuffer>
 	/**
 	 * The pool of {@link ByteBuffer}.
 	 */
-	private static Queue<ByteBuffer> queue = new ConcurrentLinkedQueue<ByteBuffer>();
+	private final Queue<ByteBuffer> queue = new ConcurrentLinkedQueue<ByteBuffer>();
 
 	/**
 	 * {@inheritDoc}

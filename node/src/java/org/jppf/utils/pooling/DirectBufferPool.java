@@ -52,7 +52,7 @@ public class DirectBufferPool
 	}
 
 	/**
-	 * Release abuffer into the pool and make it available.
+	 * Release a buffer into the pool and make it available.
 	 * @param buffer the buffer to release.
 	 */
 	public static void releaseBuffer(final ByteBuffer buffer)

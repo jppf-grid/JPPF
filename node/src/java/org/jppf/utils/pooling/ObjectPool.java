@@ -32,7 +32,7 @@ public interface ObjectPool<E>
 	E get();
 
 	/**
-	 * Release an object into this pool, and make it availble.
+	 * Release an object into this pool, and make it available.
 	 * @param content the object to release.
 	 */
 	void put(E content);

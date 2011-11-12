@@ -31,7 +31,7 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 	/**
 	 * The pool of {@link ByteBuffer}.
 	 */
-	private LinkedData<ByteBuffer> data = new LinkedData<ByteBuffer>();
+	private final LinkedData<ByteBuffer> data = new LinkedData<ByteBuffer>();
 
 	/**
 	 * {@inheritDoc}
@@ -59,10 +59,7 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 	@Override
 	public boolean isEmpty()
 	{
-		synchronized(data)
-		{
-			return data.head == null;
-		}
+        return data.isEmpty();
 	}
 
 	/**
@@ -71,10 +68,7 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 	@Override
 	public int size()
 	{
-		synchronized(data)
-		{
-			return data.size;
-		}
+        return data.size();
 	}
 
 
@@ -102,7 +96,7 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 		 */
 		public void put(final E content)
 		{
-			LinkedNode node = new LinkedNode(content);
+			LinkedNode<E> node = new LinkedNode<E>(content);
 			synchronized(this)
 			{
 				if (tail != null)
@@ -117,8 +111,8 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 		}
 
 		/**
-		 * 
-		 * @return the head obect or null.
+		 * Get the head object or null when queue is empty;
+		 * @return the head object or null.
 		 */
 		public synchronized E get()
 		{
@@ -142,10 +136,19 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 		 * Get the size of this queue.
 		 * @return the size of this queue.
 		 */
-		private synchronized int size()
+		synchronized int size()
 		{
 			return size;
 		}
+
+        /**
+         * Determine whether this queue is empty
+         * @return whether this queue is empty
+         */
+        synchronized boolean isEmpty()
+        {
+            return head == null;
+        }
 	}
 
 	/**
@@ -167,8 +170,8 @@ public class DirectBufferPoolImpl implements ObjectPool<ByteBuffer>
 		LinkedNode<E> next = null;
 
 		/**
-		 * Initialize this node with the psecified content.
-		 * @param content the node'sx content.
+		 * Initialize this node with the specified content.
+		 * @param content the node's content.
 		 */
 		LinkedNode(final E content)
 		{
