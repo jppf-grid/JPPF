@@ -43,7 +43,7 @@ public class MultipleBuffersInputStream extends InputStream
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
-	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
+	 * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
 	private List<JPPFBuffer> list;
 	/**
@@ -64,7 +64,7 @@ public class MultipleBuffersInputStream extends InputStream
 	private boolean eofReached = false;
 
 	/**
-	 * Intialize this input stream with the specified buffers.
+	 * Initialize this input stream with the specified buffers.
 	 * @param buffers an array of {@link JPPFBuffer} instances.
 	 */
 	public MultipleBuffersInputStream(final JPPFBuffer...buffers)
@@ -78,7 +78,7 @@ public class MultipleBuffersInputStream extends InputStream
 	}
 
 	/**
-	 * Intialize this input stream with the specified buffers.
+	 * Initialize this input stream with the specified buffers.
 	 * @param buffers an array of {@link JPPFBuffer} instances.
 	 */
 	public MultipleBuffersInputStream(final List<JPPFBuffer> buffers)

@@ -79,7 +79,7 @@ public class JPPFSchedule implements Serializable
 
 	/**
 	 * Get the duration for this configuration.
-	 * The time at which the duration starts dependends on who is using it.
+	 * The time at which the duration starts dependants on who is using it.
 	 * For instance, for scheduling a job, it starts when the job is inserted into the job queue by the server.
 	 * @return the timeout in milliseconds.
 	 */

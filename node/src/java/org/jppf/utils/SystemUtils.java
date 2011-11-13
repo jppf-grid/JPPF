@@ -106,7 +106,7 @@ public final class SystemUtils
 	{
 		try
 		{
-			// run as priviledged so we don't have to set write access on all propeorties
+			// run as privileged so we don't have to set write access on all properties
 			// in the security policy file.
 			Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
 					{
@@ -303,7 +303,7 @@ public final class SystemUtils
 	/**
 	 * Determine the type of this host's operating system, based on the value
 	 * of the system property &quot;os.name&quot;.
-	 * @return an int value indentifying the type of OS.
+	 * @return an int value identifying the type of OS.
 	 */
 	private static int determineOSType()
 	{

@@ -49,7 +49,7 @@ class ClassDescriptor
 	 */
 	static final byte HAS_WRITE_OBJECT = 8;
 	/**
-	 * Indicates the class implements the Exeternalizable interface.
+	 * Indicates the class implements the Externalizable interface.
 	 */
 	static final byte EXTERNALIZABLE = 16;
 	/**

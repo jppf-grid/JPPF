@@ -49,7 +49,7 @@ public final class SerializationUtils
 	 * Serialize an int value into an array of bytes.
 	 * @param value the int value to serialize.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
 	public static byte[] writeBoolean(final boolean value, final byte[] data, final int offset)
@@ -62,7 +62,7 @@ public final class SerializationUtils
 	 * Serialize an int value into an array of bytes.
 	 * @param value the int value to serialize.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
 	public static byte[] writeChar(final char value, final byte[] data, final int offset)
@@ -77,7 +77,7 @@ public final class SerializationUtils
 	 * Serialize an int value into an array of bytes.
 	 * @param value the int value to serialize.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
 	public static byte[] writeShort(final short value, final byte[] data, final int offset)
@@ -92,7 +92,7 @@ public final class SerializationUtils
 	 * Serialize an int value into an array of bytes.
 	 * @param value the int value to serialize.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
 	public static byte[] writeInt(final int value, final byte[] data, final int offset)
@@ -109,7 +109,7 @@ public final class SerializationUtils
 	 * Serialize a long value into an array of bytes.
 	 * @param value the int value to serialize.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return an array of bytes filled with the value's representation, starting at the specified offset.
 	 */
 	public static byte[] writeLong(final long value, final byte[] data, final int offset)
@@ -141,7 +141,7 @@ public final class SerializationUtils
 	}
 
 	/**
-	 * Wrtie an integer value to a channel.
+	 * Write an integer value to a channel.
 	 * @param channel the channel to write to.
 	 * @param value the value to write.
 	 * @throws IOException if an error occurs while writing the data.
@@ -185,7 +185,7 @@ public final class SerializationUtils
 	/**
 	 * Deserialize an int value from an array of bytes.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return the int value read from the array of bytes
 	 */
 	public static boolean readBoolean(final byte[] data, final int offset)
@@ -196,7 +196,7 @@ public final class SerializationUtils
 	/**
 	 * Deserialize an int value from an array of bytes.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return the int value read from the array of bytes
 	 */
 	public static char readChar(final byte[] data, final int offset)
@@ -210,7 +210,7 @@ public final class SerializationUtils
 	/**
 	 * Deserialize an int value from an array of bytes.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return the int value read from the array of bytes
 	 */
 	public static short readShort(final byte[] data, final int offset)
@@ -224,7 +224,7 @@ public final class SerializationUtils
 	/**
 	 * Deserialize an int value from an array of bytes.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return the int value read from the array of bytes
 	 */
 	public static int readInt(final byte[] data, final int offset)
@@ -240,7 +240,7 @@ public final class SerializationUtils
 	/**
 	 * Deserialize an int value from an array of bytes.
 	 * @param data the array of bytes into which to serialize the value.
-	 * @param offset the position in the array of byte at which the serializatrion should start.
+	 * @param offset the position in the array of byte at which the serialization should start.
 	 * @return the int value read from the array of bytes
 	 */
 	public static long readLong(final byte[] data, final int offset)

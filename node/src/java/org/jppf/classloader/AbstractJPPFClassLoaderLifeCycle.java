@@ -64,7 +64,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	 */
 	protected List<String> uuidPath = new ArrayList<String>();
 	/**
-	 * Uuid of the orignal task bundle that triggered a resource loading request.
+	 * Uuid of the original task bundle that triggered a resource loading request.
 	 */
 	protected String requestUuid = null;
 	/**
@@ -180,7 +180,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 	}
 
 	/**
-	 * Set the uuid for the orignal task bundle that triggered this resource request.
+	 * Set the uuid for the original task bundle that triggered this resource request.
 	 * @param requestUuid the uuid as a string.
 	 */
 	public void setRequestUuid(final String requestUuid)

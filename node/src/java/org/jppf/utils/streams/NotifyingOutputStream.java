@@ -21,7 +21,7 @@ package org.jppf.utils.streams;
 import java.io.*;
 
 /**
- * Output stream that delegates writeoperations to an underlying stream,
+ * Output stream that delegates write operations to an underlying stream,
  * and sends notifications of how many bytes were written via a callback.
  * @see org.jppf.utils.streams.NotifyingStreamCallback
  * @see org.jppf.utils.streams.NotifyingOutputStream

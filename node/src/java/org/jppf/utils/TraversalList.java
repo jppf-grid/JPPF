@@ -118,7 +118,7 @@ public class TraversalList<E> implements Serializable
 
 	/**
 	 * Get the current position in the list.
-	 * @return the position as an int value, -1 if the lsit is empty.
+	 * @return the position as an int value, -1 if the list is empty.
 	 */
 	public int getPosition()
 	{
@@ -127,7 +127,7 @@ public class TraversalList<E> implements Serializable
 
 	/**
 	 * Set the current position in the list.
-	 * @param pos the position as an int value, -1 if the lsit is empty.
+	 * @param pos the position as an int value, -1 if the list is empty.
 	 */
 	public void setPosition(final int pos)
 	{

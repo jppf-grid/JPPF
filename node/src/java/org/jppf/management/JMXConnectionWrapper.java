@@ -297,7 +297,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	}
 
 	/**
-	 * Set the connected state of this conenction wrapper.
+	 * Set the connected state of this connection wrapper.
 	 * @param status true if the jmx connection is established, false otherwise.
 	 */
 	protected void setConnectedStatus(final boolean status)
@@ -317,7 +317,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	}
 
 	/**
-	 * Obtain a proxy to the soecified remote MBean.
+	 * Obtain a proxy to the specified remote MBean.
 	 * @param <T> the type of the MBean (must be an interface).
 	 * @param name the name of the mbean to retrieve.
 	 * @param inf the class of the MBean interface.
@@ -330,7 +330,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	}
 
 	/**
-	 * Obtain a proxy to the soecified remote MBean.
+	 * Obtain a proxy to the specified remote MBean.
 	 * @param <T> the type of the MBean (must be an interface).
 	 * @param objectName the name of the mbean to retrieve.
 	 * @param inf the class of the MBean interface.

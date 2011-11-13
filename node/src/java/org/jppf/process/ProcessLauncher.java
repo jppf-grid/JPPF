@@ -57,7 +57,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	 */
 	private ServerSocket processServer = null;
 	/**
-	 * The port number the erver socket listens to.
+	 * The port number the server socket listens to.
 	 */
 	private int processPort = 0;
 	/**
@@ -138,7 +138,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 
 	/**
 	 * Start the JPPF driver subprocess.
-	 * @return A reference to the {@link Process} object representing the JPPF driver suprocess.
+	 * @return A reference to the {@link Process} object representing the JPPF driver subprocess.
 	 * @throws Exception if the process failed to start.
 	 */
 	public Process buildProcess() throws Exception
@@ -239,7 +239,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	}
 
 	/**
-	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shtutdown properly,
+	 * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shutdown properly,
 	 * when this driver is killed, by a way other than the API (ie CTRL-C or killing the process through the OS shell).<br>
 	 * The port the server socket listens to is dynamically attributed, which is obtained by using the constructor
 	 * <code>new ServerSocket(0)</code>.<br>
@@ -294,7 +294,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
 	/**
 	 * Get the output of the driver process.
 	 * @param process the process to get the standard or error output from.
-	 * @param streamType detrmines whether to obtain the standard or error output.
+	 * @param streamType determines whether to obtain the standard or error output.
 	 * @return the output as a string.
 	 */
 	public String getOutput(final Process process, final String streamType)

@@ -36,19 +36,19 @@ class NodePanel extends JPanel
 	 */
 	public static final String IMAGE_PATH = "/org/jppf/node";
 	/**
-	 * Image dispalying a bright green traffic light.
+	 * Image displaying a bright green traffic light.
 	 */
 	static final ImageIcon BRIGHT_GREEN = loadImage(IMAGE_PATH + '/' + "active_greenlight.gif");
 	/**
-	 * Image dispalying a dark green traffic light.
+	 * Image displaying a dark green traffic light.
 	 */
 	static final ImageIcon DARK_GREEN = loadImage(IMAGE_PATH + '/' + "inactive_greenlight.gif");
 	/**
-	 * Image dispalying a bright red traffic light.
+	 * Image displaying a bright red traffic light.
 	 */
 	static final ImageIcon BRIGHT_RED = loadImage(IMAGE_PATH + '/' + "active_redlight.gif");
 	/**
-	 * Image dispalying a dark red traffic light.
+	 * Image displaying a dark red traffic light.
 	 */
 	static final ImageIcon DARK_RED = loadImage(IMAGE_PATH + '/' + "inactive_redlight.gif");
 	/**
@@ -74,7 +74,7 @@ class NodePanel extends JPanel
 	/**
 	 * Initialize this applet.
 	 * This method get the applet parameters for the JPPF config file and the log4j config file,
-	 * then creates the UI components, then starts the node in a separate thred, so that the
+	 * then creates the UI components, then starts the node in a separate thread, so that the
 	 * applet is not stuck in the <code>init()</code> method.
 	 * @see java.applet.Applet#init()
 	 */
@@ -151,7 +151,7 @@ class NodePanel extends JPanel
 	}
 
 	/**
-	 * Add a component to a panel with the specified constaints.
+	 * Add a component to a panel with the specified constraints.
 	 * @param panel the panel to add the component to.
 	 * @param g the <code>GridBagLayout</code> set on the panel.
 	 * @param c the constraints to apply to the component.
@@ -254,9 +254,9 @@ class NodePanel extends JPanel
 	 */
 	private static NumberFormat integerFormatter = null;
 	/**
-	 * Tranform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
+	 * Transform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
 	 * @param duration the duration to transform, expressed in milliseconds.
-	 * @return a string specifiying the duration in terms of hours, minutes, seconds and milliseconds.
+	 * @return a string specifying the duration in terms of hours, minutes, seconds and milliseconds.
 	 */
 	public static String toStringDuration(final long duration)
 	{

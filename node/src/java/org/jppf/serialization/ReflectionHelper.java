@@ -87,7 +87,7 @@ public final class ReflectionHelper
 
 	/**
 	 * Get all declared non-transient fields of the given class.
-	 * @param clazz the class object from whch to extract the fields.
+	 * @param clazz the class object from which to extract the fields.
 	 * @return an array of {@link Field} objects.
 	 * @throws Exception if any error occurs.
 	 */
@@ -107,7 +107,7 @@ public final class ReflectionHelper
 	/**
 	 * Get a unique string representation for the specified type.
 	 * @param clazz the type from which to get the signature.
-	 * @return a string representing the ytpe.
+	 * @return a string representing the type.
 	 * @throws Exception if any error occurs.
 	 */
 	public static String getSignatureFromType(final Class<?> clazz) throws Exception
@@ -132,9 +132,9 @@ public final class ReflectionHelper
 	}
 
 	/**
-	 * Lookup or load the non-array class based on the sepcified signature.
+	 * Lookup or load the non-array class based on the specified signature.
 	 * @param signature the class signature.
-	 * @param cl the class laoder used to load the class.
+	 * @param cl the class loader used to load the class.
 	 * @return a {@link Class} object.
 	 * @throws Exception if any error occurs.
 	 */
@@ -207,7 +207,7 @@ public final class ReflectionHelper
 	 */
 	private static Class<?> rfClass = null;
 	/**
-	 * A reflection factory instance, used to cretae instances of deserialized classes without calling a constructor.
+	 * A reflection factory instance, used to create instances of deserialized classes without calling a constructor.
 	 * If it cannot be created (for example on non Sun-based JVMs), then we lookup the constructors of the class until we
 	 * find one that doesn't throw an exception upon invocation. Default values are used if the constructor has parameters.
 	 */
@@ -336,8 +336,8 @@ public final class ReflectionHelper
 
 	/**
 	 * Instantiate an object from one of its class' existing constructor.
-	 * The constructors of the class are looked up, until we can find one whose invocation with default paremeter values doesn't fail.
-	 * @param clazz the class for the objec to create.
+	 * The constructors of the class are looked up, until we can find one whose invocation with default parameter values doesn't fail.
+	 * @param clazz the class for the object to create.
 	 * @return an instance of the specified class.
 	 * @throws Exception if any error occurs.
 	 */
@@ -412,7 +412,7 @@ public final class ReflectionHelper
 	}
 
 	/**
-	 * Get a default value for the psecified type.
+	 * Get a default value for the specified type.
 	 * @param c the type for which to get a value.
 	 * @return a valid default value for the type.
 	 */

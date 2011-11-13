@@ -40,7 +40,7 @@ public class PolicyDescriptor
 	 */
 	public String ignoreCase = null;
 	/**
-	 * The fullyqualified class name of a custom policy class.
+	 * The fully qualified class name of a custom policy class.
 	 */
 	public String className = null;
 	/**

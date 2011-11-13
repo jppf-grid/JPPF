@@ -123,7 +123,7 @@ public class ServiceFinder
 	 * Find all service definitions in the classpath, that match the specified path.
 	 * @param path the path to the definition files to find.
 	 * @param cl the class loader to use for classpath lookup.
-	 * @return the defintions found as a list of strings.
+	 * @return the definitions found as a list of strings.
 	 */
 	public List<String> findServiceDefinitions(final String path, final ClassLoader cl)
 	{

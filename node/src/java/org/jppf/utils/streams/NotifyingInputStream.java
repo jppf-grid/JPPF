@@ -21,7 +21,7 @@ package org.jppf.utils.streams;
 import java.io.*;
 
 /**
- * Input stream that delegates read aand skip operations to an underlying stream,
+ * Input stream that delegates read and skip operations to an underlying stream,
  * and sends notifications of how many bytes were read or skipped via a callback.
  * @see org.jppf.utils.streams.NotifyingStreamCallback
  * @see org.jppf.utils.streams.NotifyingOutputStream

@@ -44,7 +44,7 @@ public final class FileUtils
 
 	/**
 	 * Read the content of a specified reader into a string.
-	 * @param aReader the reader to read the vcontent from.
+	 * @param aReader the reader to read the content from.
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
@@ -63,7 +63,7 @@ public final class FileUtils
 
 	/**
 	 * Read the content of a specified reader into a string.
-	 * @param aReader the reader to read the vcontent from.
+	 * @param aReader the reader to read the content from.
 	 * @return the content of the file as a string.
 	 * @throws IOException if the file can't be found or read.
 	 */
@@ -119,7 +119,7 @@ public final class FileUtils
 	/**
 	 * Write the content of a string into a specified file.
 	 * @param filename the location of the file to write to.
-	 * @param content the content to wwrite into the file.
+	 * @param content the content to write into the file.
 	 * @throws IOException if the file can't be found or read.
 	 */
 	public static void writeTextFile(final String filename, final String content) throws IOException
@@ -130,7 +130,7 @@ public final class FileUtils
 	/**
 	 * Write the content of a string into a specified file.
 	 * @param file the location of the file to write to.
-	 * @param content the content to wwrite into the file.
+	 * @param content the content to write into the file.
 	 * @throws IOException if the file can't be found or read.
 	 */
 	public static void writeTextFile(final File file, final String content) throws IOException
@@ -141,7 +141,7 @@ public final class FileUtils
 	/**
 	 * Write the content of a string into a specified file.
 	 * @param dest the file to write to.
-	 * @param content the content to wwrite into the file.
+	 * @param content the content to write into the file.
 	 * @throws IOException if the file can't be found or read.
 	 */
 	public static void writeTextFile(final Writer dest, final String content) throws IOException
@@ -290,7 +290,7 @@ public final class FileUtils
 
 	/**
 	 * Split a file into multiple files whose size is as close as possible to the specified split size.
-	 * @param file the etxt file to split.
+	 * @param file the text file to split.
 	 * @param splitSize the maximum number of lines of each resulting file.
 	 * @throws IOException if an IO error occurs.
 	 */

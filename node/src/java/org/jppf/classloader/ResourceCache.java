@@ -114,7 +114,7 @@ class ResourceCache
 	}
 
 	/**
-	 * Save the specified reosurce definition to a temporary file.
+	 * Save the specified resource definition to a temporary file.
 	 * @param name the original name of the resource to save.
 	 * @param definition the definition to save, specified as a byte array.
 	 * @return the path to the created file.
@@ -228,7 +228,7 @@ class ResourceCache
 	}
 
 	/**
-	 * Determine wether the specified path is absolute, in a system-independant way.
+	 * Determine whether the specified path is absolute, in a system-independent way.
 	 * @param path the path to verify.
 	 * @return true if the path is absolute, false otherwise
 	 */

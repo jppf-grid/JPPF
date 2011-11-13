@@ -23,7 +23,7 @@ import java.io.*;
 /**
  * This is the interface for arbitrary transformation and reverse-transformation of blocks of data that transit through the network.
  * <p>Among others, this permits encryption of the data, allowing a measure of security on the grid.
- * <p>Tranformations are transparent to the JPPF user, as they are only applied just before data is sent to the network,
+ * <p>Transformations are transparent to the JPPF user, as they are only applied just before data is sent to the network,
  * and right after it is read by the remote peer.
  * @see org.jppf.data.transform.JPPFDataTransformFactory
  * @author Laurent Cohen

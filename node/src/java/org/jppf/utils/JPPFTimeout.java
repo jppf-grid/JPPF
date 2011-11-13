@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class JPPFTimeout extends Pair<TimeUnit, Long>
 {
 	/**
-	 * Initialize this timeout with the specfied time unit and value.
+	 * Initialize this timeout with the specified time unit and value.
 	 * @param unit the time unit to use to measure the time.
 	 * @param value the value expressed in <code>timeUnit</code> units.
 	 * @throws IllegalArgumentException if the time unit is null, the value is null or the value is less than zero.
@@ -38,7 +38,7 @@ public class JPPFTimeout extends Pair<TimeUnit, Long>
 		super(unit, value);
 		if (unit == null) throw new IllegalArgumentException("Time unit cannot be null");
 		if (value == null) throw new IllegalArgumentException("Value cannot be null");
-		if (value < 0L) throw new IllegalArgumentException("Time value canot be negative");
+		if (value < 0L) throw new IllegalArgumentException("Time value cannot be negative");
 	}
 
 	/**

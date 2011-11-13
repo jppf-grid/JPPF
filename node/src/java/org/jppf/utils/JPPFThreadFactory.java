@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Custom thread factory used mostly to specifiy th enames of created threads.
+ * Custom thread factory used mostly to specify the names of created threads.
  * @author Laurent Cohen
  */
 public class JPPFThreadFactory implements ThreadFactory
@@ -124,7 +124,7 @@ public class JPPFThreadFactory implements ThreadFactory
 	}
 
 	/**
-	 * Increment and return the vreated thread count.
+	 * Increment and return the created thread count.
 	 * @return the created thread count.
 	 */
 	private int incrementCount()

@@ -21,7 +21,7 @@ package org.jppf.process.event;
 import java.util.EventListener;
 
 /**
- * Listener interface for receiving veent notifications from a process wrapper.
+ * Listener interface for receiving event notifications from a process wrapper.
  * @author Laurent Cohen
  */
 public interface ProcessWrapperEventListener extends EventListener

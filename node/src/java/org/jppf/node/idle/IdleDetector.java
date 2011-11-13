@@ -65,7 +65,7 @@ public class IdleDetector implements Runnable
 	private IdleStateListener listener = null;
 
 	/**
-	 * Defautlt constructor.
+	 * Default constructor.
 	 * @param listener specifies the action to perform upon idle state changes.
 	 */
 	public IdleDetector(final IdleStateListener listener)

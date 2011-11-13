@@ -116,7 +116,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 	}
 
 	/**
-	 * Initialize this server's parameters from the JPPF ocnfiguration.
+	 * Initialize this server's parameters from the JPPF configuration.
 	 */
 	private void configure()
 	{
@@ -152,7 +152,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
 
 	/**
 	 * Get a list of all connections currently handled by this server.
-	 * The resulting array is independant from the original collection: changes to one has no effect on the other.
+	 * The resulting array is independent from the original collection: changes to one has no effect on the other.
 	 * @return an array of {@link ServerConnection} instances.
 	 */
 	ServerConnection[] connections()

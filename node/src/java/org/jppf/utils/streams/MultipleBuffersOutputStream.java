@@ -48,7 +48,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	private int defaultLength = 4096;
 	//private int defaultLength = 32768;
 	/**
-	 * Contains the data written to this ouptput stream, as a sequence of {@link JPPFBuffer} instances.
+	 * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
 	 */
 	private final List<JPPFBuffer> list;
 	/**
@@ -64,12 +64,12 @@ public class MultipleBuffersOutputStream extends OutputStream
 	 */
 	private boolean hasInitialBuffers = false;
 	/**
-	 * Current position in th elist of buffers.
+	 * Current position in the list of buffers.
 	 */
 	private int bufferIndex = 0;
 
 	/**
-	 * Intialize this output stream with a default buffer length of 32768.
+	 * Initialize this output stream with a default buffer length of 32768.
 	 */
 	public MultipleBuffersOutputStream()
 	{
@@ -77,7 +77,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	}
 
 	/**
-	 * Intialize this output stream with a default buffer length of 32768.
+	 * Initialize this output stream with a default buffer length of 32768.
 	 * @param initialList contains the data that is written to this output stream.
 	 */
 	public MultipleBuffersOutputStream(final List<JPPFBuffer> initialList)
@@ -88,7 +88,7 @@ public class MultipleBuffersOutputStream extends OutputStream
 	}
 
 	/**
-	 * Intialize this output stream with the specified default buffer length.
+	 * Initialize this output stream with the specified default buffer length.
 	 * @param defaultLength the default buffer length to use, must be strictly greater than 0.
 	 * @throws IllegalArgumentException if the specified default length is less than 1.
 	 */

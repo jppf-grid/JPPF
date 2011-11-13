@@ -39,7 +39,7 @@ public final class VersionUtils
 	 */
 	private static int buildNumber = -1;
 	/**
-	 * IP addresse of the current host.
+	 * IP address of the current host.
 	 */
 	private static String ip = getLocalIpAddress();
 

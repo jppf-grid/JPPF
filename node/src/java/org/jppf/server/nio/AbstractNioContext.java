@@ -32,7 +32,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 */
 	private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
 	/**
-	 * Determines whther DEBUG logging level is enabled.
+	 * Determines whether DEBUG logging level is enabled.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**

@@ -43,7 +43,7 @@ public interface JobMetadata
 
 	/**
 	 * Set a parameter in the metadata.
-	 * If a parameter with the same key already exists, its value is replaced witht he new one.
+	 * If a parameter with the same key already exists, its value is replaced with the new one.
 	 * @param key the parameter's key.
 	 * @param value the parameter's value.
 	 */

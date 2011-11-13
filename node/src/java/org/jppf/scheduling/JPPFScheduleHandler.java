@@ -41,7 +41,7 @@ public class JPPFScheduleHandler
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * The sceduled executor used for scheduling actions.
+	 * The scheduled executor used for scheduling actions.
 	 */
 	private ScheduledExecutorService executor;
 	/**
@@ -141,7 +141,7 @@ public class JPPFScheduleHandler
 
 	/**
 	 * Shutdown this schedule handler.
-	 * @param shutdown flag indicating whether this scehdule handler should be shutdown.
+	 * @param shutdown flag indicating whether this schedule handler should be shutdown.
 	 */
 	public void clear(final boolean shutdown)
 	{
@@ -151,7 +151,7 @@ public class JPPFScheduleHandler
 	}
 
 	/**
-	 * Cretae the executor used for task scheduliing.
+	 * Create the executor used for task scheduling.
 	 */
 	private void createExecutor()
 	{

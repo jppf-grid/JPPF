@@ -23,7 +23,7 @@ import java.io.*;
 
 /**
  * This the factory for the JPPF implementation of object streams which allow
- * the serialization and deserialization of objects whose class does not implemnent <code>java.io.Serializable</code>.
+ * the serialization and deserialization of objects whose class does not implement <code>java.io.Serializable</code>.
  * @author Laurent Cohen
  */
 public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder

@@ -53,7 +53,7 @@ public interface JPPFDistributedJob
 	JobSLA getSLA();
 
 	/**
-	 * Get the user-defined metadata asoociated with this job.
+	 * Get the user-defined metadata associated with this job.
 	 * @return a {@link JobMetadata} instance.
 	 */
 	JobMetadata getMetadata();

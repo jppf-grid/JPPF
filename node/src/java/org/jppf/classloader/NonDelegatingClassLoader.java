@@ -50,7 +50,7 @@ public class NonDelegatingClassLoader extends URLClassLoader
 	/**
 	 * Attempts to load a class directly from the parent.
 	 * @param name the name of the class to load.
-	 * @return the correpsonding class.
+	 * @return the corresponding class.
 	 * @throws ClassNotFoundException if the class could not be loaded.
 	 */
 	public Class<?> loadClassDirect(final String name) throws ClassNotFoundException

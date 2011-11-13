@@ -50,7 +50,7 @@ public class LifeCycleEventHandler
 	private NodeExecutionManager executionManager = null;
 
 	/**
-	 * Initialize this event handler witht he specified execution manager.
+	 * Initialize this event handler with the specified execution manager.
 	 * @param executionManager the object that manages the job executions for the node.
 	 */
 	public LifeCycleEventHandler(final NodeExecutionManager executionManager)

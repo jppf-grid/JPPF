@@ -42,7 +42,7 @@ import org.jppf.utils.Range;
  * <li>1:2:3:4:5:6:7: is equivalent to 1:2:3:4:5:6:7 and to 1:2:3:4:5:6:7:0-FFFF</li>
  * </ul>
  * <p>2. Ranges with missing bounds but still including the &quot;-&quot; sign are interpreted as a range with the lower bound
- * equal to zero for a missing lower bound, and an upper bound equal to 0xFFFF if the uper bound is missing. Examples:
+ * equal to zero for a missing lower bound, and an upper bound equal to 0xFFFF if the upper bound is missing. Examples:
  * <ul>
  * <li>-128 is equivalent to 0-128</li>
  * <li>12- is equivalent to 12-FFFF</li>

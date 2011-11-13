@@ -28,13 +28,13 @@ public interface NodeLifeCycleListener extends EventListener
 {
 	/**
 	 * Called when the node has finished initializing, and before it starts processing jobs.
-	 * @param event encapsulates inforation about the node.
+	 * @param event encapsulates information about the node.
 	 */
 	void nodeStarting(NodeLifeCycleEvent event);
 
 	/**
 	 * Called when the node is terminating.
-	 * @param event encapsulates inforation about the node.
+	 * @param event encapsulates information about the node.
 	 */
 	void nodeEnding(NodeLifeCycleEvent event);
 

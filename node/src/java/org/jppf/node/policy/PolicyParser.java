@@ -58,7 +58,7 @@ public class PolicyParser
 	 * Parse an XML document in a file into a tree of option descriptors.
 	 * @param docPath the path to XML document to parse.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
-	 * or null if the docuement could not be parsed.
+	 * or null if the document could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
 	public PolicyDescriptor parse(final String docPath) throws Exception
@@ -73,7 +73,7 @@ public class PolicyParser
 	 * Parse an XML document in a reader into a tree of option descriptors.
 	 * @param reader the reader providing the XML document.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
-	 * or null if the docuement could not be parsed.
+	 * or null if the document could not be parsed.
 	 * @throws Exception if an error occurs while parsing the document.
 	 */
 	public PolicyDescriptor parse(final Reader reader) throws Exception
@@ -84,7 +84,7 @@ public class PolicyParser
 	}
 
 	/**
-	 * Find the first node in a docuemnt that is an element node.
+	 * Find the first node in a document that is an element node.
 	 * @param doc the document whose children are looked up.
 	 * @return a <code>Node</code> instance if one was found, or null otherwise.
 	 */
@@ -103,7 +103,7 @@ public class PolicyParser
 	 * Generate an <code>PolicyDescriptor</code> tree from a DOM subtree.
 	 * @param node the document to generate the tree from.
 	 * @return an <code>OptionDescriptor</code> instance, root of the generated tree,
-	 * or null if the docuement could not be parsed.
+	 * or null if the document could not be parsed.
 	 */
 	private PolicyDescriptor generateTree(final Node node)
 	{
@@ -135,7 +135,7 @@ public class PolicyParser
 
 	/**
 	 * Get the value of a node's text subelement.
-	 * @param node the node to generate whosde child is a text node.
+	 * @param node the node to generate whose child is a text node.
 	 * @return the text as a string.
 	 */
 	private String getTextNodeValue(final Node node)
@@ -177,7 +177,7 @@ public class PolicyParser
 			PolicyParser parser = new PolicyParser();
 			PolicyDescriptor desc = parser.parse(docPath);
 			ExecutionPolicy policy = new PolicyBuilder().buildPolicy(desc.children.get(0));
-			System.out.println("Sucessfully build policy object:\n" + policy);
+			System.out.println("Successfully build policy object:\n" + policy);
 		}
 		catch(Exception e)
 		{

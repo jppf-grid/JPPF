@@ -42,7 +42,7 @@ public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter
 	 */
 	Integer getTotalTasksInError();
 	/**
-	 * The total number of tasks that executed sucessfully.
+	 * The total number of tasks that executed successfully.
 	 * @return the number as an integer value.
 	 */
 	Integer getTotalTasksSucessfull();

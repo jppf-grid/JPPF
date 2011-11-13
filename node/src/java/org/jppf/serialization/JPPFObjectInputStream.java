@@ -55,7 +55,7 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	private final byte[] buf = new byte[8];
 
 	/**
-	 * Initialize this object input stream witht he specified stream.
+	 * Initialize this object input stream with the specified stream.
 	 * @param in the stream to read data from.
 	 * @throws IOException if an I/O error occurs.
 	 */

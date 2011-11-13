@@ -396,7 +396,7 @@ public class TypedProperties extends Properties
 	 * Get the value of a property with the specified name as an {@link InetAddress}.
 	 * @param key the name of the property to retrieve.
 	 * @param def the default value to use if the property is not defined.
-	 * @return the property as an {@link InetAddress} instance, or the sdpecified default value if the property is not defined.
+	 * @return the property as an {@link InetAddress} instance, or the specified default value if the property is not defined.
 	 */
 	public InetAddress getInetAddress(final String key, final InetAddress def)
 	{

@@ -61,7 +61,7 @@ public final class JPPFSecurityContext implements Serializable
 	}
 
 	/**
-	 * Create a JPPF signature witht he specified parameters.
+	 * Create a JPPF signature with he specified parameters.
 	 * @param uuid uuid for the owner of these credentials.
 	 * @param id identifier for the owner of these credentials.
 	 * @param credentials the signature associated with these credentials.

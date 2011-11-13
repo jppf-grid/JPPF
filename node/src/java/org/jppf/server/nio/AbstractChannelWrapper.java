@@ -44,7 +44,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 */
 	protected S channel;
 	/**
-	 * The selctor for this channel.
+	 * The selector for this channel.
 	 */
 	protected ChannelSelector selector = null;
 

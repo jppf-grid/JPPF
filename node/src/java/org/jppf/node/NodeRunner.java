@@ -32,7 +32,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Bootstrap class for lauching a JPPF node. The node class is dynamically loaded from a remote server.
+ * Bootstrap class for launching a JPPF node. The node class is dynamically loaded from a remote server.
  * @author Laurent Cohen
  */
 public class NodeRunner

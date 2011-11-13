@@ -46,7 +46,7 @@ public class CryptoUtils
 	private static SecretKey secretKey = null;
 
 	/**
-	 * Entry pont to test this class.
+	 * Entry point to test this class.
 	 * @param args no used.
 	 */
 	public static void main(final String...args)
@@ -126,7 +126,7 @@ public class CryptoUtils
 	/**
 	 * Generate a secret key.
 	 * @return a <code>SecretKey</code> instance.
-	 * @throws Exception if th ekey could not be generated.
+	 * @throws Exception if the key could not be generated.
 	 */
 	public static SecretKey generateSecretKey() throws Exception
 	{
@@ -139,7 +139,7 @@ public class CryptoUtils
 	 * Read a public or private key from a file.
 	 * @param filename the name of the file to read the key from.
 	 * @return the encoded key value, as an array of bytes.
-	 * @throws IOException if an exception is raised while readsing the file.
+	 * @throws IOException if an exception is raised while read sing the file.
 	 */
 	public static byte[] readKeyFile(final String filename) throws IOException
 	{
@@ -257,7 +257,7 @@ public class CryptoUtils
 	}
 
 	/**
-	 * Encrypt some data using athe specified key.
+	 * Encrypt some data using the specified key.
 	 * @param key the key to use for encryption.
 	 * @param data the data as an array of bytes.
 	 * @return the encrypted data as an array of bytes.

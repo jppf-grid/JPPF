@@ -41,11 +41,11 @@ public class IPFilter
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * List of accepted IP adress patterns.
+	 * List of accepted IP address patterns.
 	 */
 	private List<AbstractIPAddressPattern> includePatterns = new ArrayList<AbstractIPAddressPattern>();
 	/**
-	 * List of rejected IP adress patterns.
+	 * List of rejected IP address patterns.
 	 */
 	private List<AbstractIPAddressPattern> excludePatterns = new ArrayList<AbstractIPAddressPattern>();
 	/**
@@ -76,7 +76,7 @@ public class IPFilter
 
 	/**
 	 * Parse the IP address patterns specified in the source string.
-	 * @param source contains comma or semicomlumn separated patterns.
+	 * @param source contains comma or semicolumn separated patterns.
 	 * @param addToList the list to add the parsed patterns to.
 	 */
 	private void configureIPAddressPatterns(final String source, final List<AbstractIPAddressPattern> addToList)
@@ -117,7 +117,7 @@ public class IPFilter
 	 * @param ipComps the IP address to check.
 	 * @param patterns the IP list of patterns to check the address against.
 	 * @param defIfEmpty the value to return if the list of patterns is empty.
-	 * @return <code>true</code> if the IP address matches one of the filterz, <code>false</code> otherwise.
+	 * @return <code>true</code> if the IP address matches one of the filter, <code>false</code> otherwise.
 	 */
 	private boolean matches(final int[] ipComps, final List<AbstractIPAddressPattern> patterns, final boolean defIfEmpty)
 	{

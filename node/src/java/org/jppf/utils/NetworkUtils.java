@@ -237,7 +237,7 @@ public final class NetworkUtils
 	}
 
 	/**
-	 * Get a {@link SubnetInformation} object for each non local address of the currrent host.
+	 * Get a {@link SubnetInformation} object for each non local address of the current host.
 	 * @return a list of {@link SubnetInformation} instance. This list may be empty, but never null.
 	 */
 	public static List<SubnetInformation> getAllNonLocalSubnetInfo()
@@ -256,7 +256,7 @@ public final class NetworkUtils
 	 * Determine whether the 2 specified IP addresses are on the same subnet.
 	 * @param si1 the first IP address to compare.
 	 * @param si2 the second IP address to compare.
-	 * @return true if the 2 addreses are on the same subnet, false otherwise.
+	 * @return true if the 2 addresses are on the same subnet, false otherwise.
 	 */
 	public static boolean isSameSubnet(final SubnetInformation si1, final SubnetInformation si2)
 	{
@@ -288,7 +288,7 @@ public final class NetworkUtils
 	public static class SubnetInformation extends Pair<InetAddress, Integer>
 	{
 		/**
-		 * Initialze this pair with the specified InetAddress and subnet mask length.
+		 * Initialize this pair with the specified InetAddress and subnet mask length.
 		 * @param addr the address.
 		 * @param subnetMaskLength the subnet mask length.
 		 */
@@ -331,7 +331,7 @@ public final class NetworkUtils
 
 		/**
 		 * Get the subnet mask for this subnet information.
-		 * @return the subnet amsk as an int value.
+		 * @return the subnet mask as an int value.
 		 */
 		public int subnetMask()
 		{

@@ -106,7 +106,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	/**
 	 * Find a class in this class loader's classpath.
 	 * @param name binary name of the resource to find.
-	 * @param lookupClasspath specifies whtehr the class should be looked up in the URL classpath as well.
+	 * @param lookupClasspath specifies whether the class should be looked up in the URL classpath as well.
 	 * @return a defined <code>Class</code> instance.
 	 * @throws ClassNotFoundException if the class could not be loaded.
 	 * @see java.lang.ClassLoader#findClass(java.lang.String)
@@ -155,7 +155,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("callable", callable);
 		byte[] b = loadRemoteData(map, false).getCallable();
-		if (debugEnabled) log.debug("remote definition for collable resource "+ (b==null ? "not " : "") + "found");
+		if (debugEnabled) log.debug("remote definition for callable resource "+ (b==null ? "not " : "") + "found");
 		return b;
 	}
 
@@ -222,7 +222,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
 	/**
 	 * Find all resources with the specified name.
-	 * @param name name of the resources to find in the clas loader's classpath.
+	 * @param name name of the resources to find in the class loader's classpath.
 	 * @return An enumeration of URLs pointing to the resources found.
 	 * @throws IOException if an error occurs.
 	 * @see java.lang.ClassLoader#findResources(java.lang.String)
@@ -272,7 +272,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	}
 
 	/**
-	 * Get multiple reources, specified by their names, from the classpath.
+	 * Get multiple resources, specified by their names, from the classpath.
 	 * This method functions like #getResource(String), except that it look up and returns multiple URLs.
 	 * @param names the names of te resources to find.
 	 * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
@@ -314,15 +314,15 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 			map.put("multiple.resources.names", namesToLookup);
 			JPPFResourceWrapper resource = loadResourceData(map, true);
 			Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
-			for (Integer indice : indices) {
-				String name = names[indice];
+			for (Integer index : indices) {
+				String name = names[index];
 				List<byte[]> dataList = dataMap.get(name);
 				boolean found = (dataList != null) && !dataList.isEmpty();
 				if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
 				if (found) {
 					cache.registerResources(name, dataList);
 					URL url = cache.getResourceURL(name);
-					results[indice] = url;
+					results[index] = url;
 					if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
 				}
 			}
@@ -335,7 +335,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	}
 
 	/**
-	 * Get multiple reources, specified by their names, from the classpath.
+	 * Get multiple resources, specified by their names, from the classpath.
 	 * This method functions like #getResource(String), except that it looks up and returns multiple URLs.
 	 * @param names the names of te resources to find.
 	 * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
@@ -482,7 +482,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 	}
 
 	/**
-	 * Specifiy the class loading delegation model to use.
+	 * Specify the class loading delegation model to use.
 	 * @param model an int value, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
 	 * If any other value is specified then calling this method has no effect.
 	 */

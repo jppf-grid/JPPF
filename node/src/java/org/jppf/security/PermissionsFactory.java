@@ -253,8 +253,8 @@ public final class PermissionsFactory
 	}
 
 	/**
-	 * Convenience method used to log information when permission are added tothe list of permissions
-	 * @param p the oermission to add.
+	 * Convenience method used to log information when permission are added to the list of permissions
+	 * @param p the permission to add.
 	 * @param type the type of permission, static, dynamic or mbean.
 	 * @throws Exception if an error is raised when adding the permission.
 	 */

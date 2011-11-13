@@ -31,7 +31,7 @@ public class NioMessage
 	 */
 	public int length = 0;
 	/**
-	 * Buffer containg the message's data.
+	 * Buffer containing the message's data.
 	 */
 	public ByteBuffer buffer = null;
 	/**

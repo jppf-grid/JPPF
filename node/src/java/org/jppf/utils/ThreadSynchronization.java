@@ -93,7 +93,7 @@ public abstract class ThreadSynchronization
 	}
 
 	/**
-	 * Specifiy whether the thread's <code>run()</code> should terminate.
+	 * Specify whether the thread's <code>run()</code> should terminate.
 	 * @param stopped true if the thread is to be stopped, false otherwise.
 	 */
 	public synchronized void setStopped(final boolean stopped)

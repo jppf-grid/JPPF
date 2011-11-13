@@ -88,7 +88,7 @@ public class JPPFUuid implements Serializable
 	private int length = 16;
 
 	/**
-	 * Instanciate this JPPFUuid with a generated unique identifier.
+	 * Instantiate this JPPFUuid with a generated unique identifier.
 	 */
 	public JPPFUuid()
 	{
@@ -96,7 +96,7 @@ public class JPPFUuid implements Serializable
 	}
 
 	/**
-	 * Instanciate this JPPFUuid with a generated unique identifier.
+	 * Instantiate this JPPFUuid with a generated unique identifier.
 	 * @param codes the set of codes from which to choose randomly to build the uuid.
 	 * @param length number of codes to use to build the uuid.
 	 */

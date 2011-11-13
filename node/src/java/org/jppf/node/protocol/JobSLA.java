@@ -120,7 +120,7 @@ public interface JobSLA
 	boolean isCancelUponClientDisconnect();
 
 	/**
-	 * Specifiy whether the job should be canceled by the driver if the client gets disconnected.
+	 * Specify whether the job should be canceled by the driver if the client gets disconnected.
 	 * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
 	 */
 	void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect);

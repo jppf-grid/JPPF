@@ -92,7 +92,7 @@ public abstract class ExecutionPolicy implements Serializable
 	 * Generate  new array with size +1 and the specified rule as first element.
 	 * @param rule the rule to set as first element.
 	 * @param ruleArray the array of other rules.
-	 * @return an array of <code>ExceutionPolicy</code> instances.
+	 * @return an array of <code>ExecutionPolicy</code> instances.
 	 */
 	private static ExecutionPolicy[] makeRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray)
 	{
@@ -106,7 +106,7 @@ public abstract class ExecutionPolicy implements Serializable
 	/**
 	 * Get the value of the specified property in the specified set of system information.
 	 * @param info the system information in which to lookup the property.
-	 * @param name the name of the proeprty to look for.
+	 * @param name the name of the property to look for.
 	 * @return the value of the property, or null if it could not be found.
 	 */
 	public String getProperty(final JPPFSystemInformation info, final String name)

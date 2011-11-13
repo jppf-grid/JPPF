@@ -52,7 +52,7 @@ public interface JMXServer
 	boolean isStopped();
 
 	/**
-	 * Get a unique identifier for this management server. This id must be unique accross JPPF nodes and servers.
+	 * Get a unique identifier for this management server. This id must be unique across JPPF nodes and servers.
 	 * @return the id as a string.
 	 */
 	String getId();

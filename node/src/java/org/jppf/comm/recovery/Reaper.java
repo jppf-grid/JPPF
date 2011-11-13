@@ -82,7 +82,7 @@ public class Reaper
 
 	/**
 	 * Submit a new connection for immediate check and get the corresponding node or client uuid.
-	 * @param connection the conenction to check.
+	 * @param connection the connection to check.
 	 */
 	void newConnection(final ServerConnection connection)
 	{
@@ -140,7 +140,7 @@ public class Reaper
 
 	/**
 	 * Check a connection after an attempt to reach the remote peer.
-	 * @param connection the conenction to check.
+	 * @param connection the connection to check.
 	 */
 	private void checkConnection(final ServerConnection connection)
 	{

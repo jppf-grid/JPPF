@@ -122,7 +122,7 @@ class SerializationCaches
 	 * Get the descriptor for the specified class, and create it if needed.
 	 * @param clazz the class for which to get a descriptor.
 	 * @param counter the handle as an auto-incrementing counter.
-	 * @param map the map that contains the handle to class descrioptor associations.
+	 * @param map the map that contains the handle to class descriptor associations.
 	 * @param map2 a temporary association map.
 	 * @return a {@link ClassDescriptor} object.
 	 * @throws Exception if nay error occurs.
@@ -139,7 +139,7 @@ class SerializationCaches
 	 * Add a class mapping.
 	 * @param clazz the class to map to a descriptor.
 	 * @param counter the handle as an auto-incrementing counter.
-	 * @param map the map that contains the handle to class descrioptor associations.
+	 * @param map the map that contains the handle to class descriptor associations.
 	 * @param map2 a temporary association map.
 	 * @return the {@link ClassDescriptor} object that was created.
 	 * @throws Exception if any error occurs.

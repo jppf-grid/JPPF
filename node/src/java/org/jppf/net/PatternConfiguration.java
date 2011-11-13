@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import org.jppf.utils.Range;
 
 /**
- * Instances of this class represent the configuration parameters for a specific IP address pattern impelmentation.
+ * Instances of this class represent the configuration parameters for a specific IP address pattern implementation.
  * @author Laurent Cohen
  */
 final class PatternConfiguration

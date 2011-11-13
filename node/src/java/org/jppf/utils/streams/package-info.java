@@ -17,6 +17,6 @@
  */
 
 /**
- * COllection of stream utility classes.
+ * Collection of stream utility classes.
  */
 package org.jppf.utils.streams;

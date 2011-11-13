@@ -64,7 +64,7 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
 
 	/**
 	 * Determine whether any connection attempt succeeded.
-	 * @return true if any attempt was successfull, false otherwise.
+	 * @return true if any attempt was successful, false otherwise.
 	 * @see org.jppf.comm.socket.SocketInitializer#isSuccessfull()
 	 */
 	@Override

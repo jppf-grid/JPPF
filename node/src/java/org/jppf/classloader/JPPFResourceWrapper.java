@@ -90,7 +90,7 @@ public class JPPFResourceWrapper implements Serializable
 	 */
 	private String managementId = null;
 	/**
-	 * Uuid of the orignal task bundle that triggered this resource request.
+	 * Uuid of the original task bundle that triggered this resource request.
 	 */
 	private String requestUuid = null;
 	/**
@@ -254,7 +254,7 @@ public class JPPFResourceWrapper implements Serializable
 	}
 
 	/**
-	 * Get the uuid for the orignal task bundle that triggered this resource request.
+	 * Get the uuid for the original task bundle that triggered this resource request.
 	 * @return the uuid as a string.
 	 */
 	public String getRequestUuid()
@@ -263,7 +263,7 @@ public class JPPFResourceWrapper implements Serializable
 	}
 
 	/**
-	 * Set the uuid for the orignal task bundle that triggered this resource request.
+	 * Set the uuid for the original task bundle that triggered this resource request.
 	 * @param requestUuid the uuid as a string.
 	 */
 	public void setRequestUuid(final String requestUuid)

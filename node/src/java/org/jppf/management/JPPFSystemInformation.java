@@ -193,7 +193,7 @@ public class JPPFSystemInformation implements Serializable
 	 */
 	private HostIP[] parseIPV4Addresses()
 	{
-		String s = getNetwork().getString("ipv4.adresses");
+		String s = getNetwork().getString("ipv4.addresses");
 		if ((s == null) || "".equals(s.trim())) return null;
 		return parseAddresses(s);
 	}
@@ -205,7 +205,7 @@ public class JPPFSystemInformation implements Serializable
 	 */
 	private HostIP[] parseIPV6Addresses()
 	{
-		String s = getNetwork().getString("ipv6.adresses");
+		String s = getNetwork().getString("ipv6.addresses");
 		if ((s == null) || "".equals(s.trim())) return null;
 		return parseAddresses(s);
 	}
@@ -236,9 +236,9 @@ public class JPPFSystemInformation implements Serializable
 	public static class HostIP extends Pair<String, String>
 	{
 		/**
-		 * Initialize this HostIP object with the specified host name and IP addresse.
+		 * Initialize this HostIP object with the specified host name and IP address.
 		 * @param first the host name.
-		 * @param second the corresponnding IP address.
+		 * @param second the corresponding IP address.
 		 */
 		public HostIP(final String first, final String second)
 		{
@@ -274,7 +274,7 @@ public class JPPFSystemInformation implements Serializable
 	}
 
 	/**
-	 * Get all the proeprties as an array.
+	 * Get all the properties as an array.
 	 * @return an array of all the sets of properties.
 	 */
 	public TypedProperties[] getPropertiesArray()

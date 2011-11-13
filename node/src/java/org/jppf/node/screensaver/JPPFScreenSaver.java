@@ -78,7 +78,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	 */
 	private Image logoImg = null;
 	/**
-	 * Buffer used for offline rpainting of the background and drawing of the logos.
+	 * Buffer used for offline repainting of the background and drawing of the logos.
 	 */
 	private Image buffer = null;
 	/**
@@ -250,7 +250,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	}
 
 	/**
-	 * Invoked whne the screen saver terminates, to free the resources used by the node.
+	 * Invoked when the screen saver terminates, to free the resources used by the node.
 	 */
 	protected void destroy()
 	{
@@ -448,7 +448,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 		 * @param y1 y coordinate of the corner of the first logo.
 		 * @param x2 x coordinate of the top left corner of the second logo.
 		 * @param y2 y coordinate of the top left corner of the second logo.
-		 * @return true if the corner of the first is logo isinside the second, false otherwise.
+		 * @return true if the corner of the first is logo is inside the second, false otherwise.
 		 */
 		public boolean isIn(final int x1, final int y1, final int x2, final int y2)
 		{
@@ -457,7 +457,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 	}
 
 	/**
-	 * Peforms the repainting of the flying logo images, as well as that of the areas they were
+	 * Performs the repainting of the flying logo images, as well as that of the areas they were
 	 * occupying within the underlying components.
 	 */
 	public void updateLogos()

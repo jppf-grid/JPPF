@@ -20,7 +20,7 @@ package org.jppf.node;
 import org.jppf.process.ProcessLauncher;
 
 /**
- * Bootstrap class for lauching a JPPF node. The node class is dynamically loaded from a remote server.
+ * Bootstrap class for launching a JPPF node. The node class is dynamically loaded from a remote server.
  * @author Laurent Cohen
  */
 public class NodeLauncher

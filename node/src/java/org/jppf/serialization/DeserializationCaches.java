@@ -88,7 +88,7 @@ class DeserializationCaches
 	}
 
 	/**
-	 * Get the class dezscriptor assocateed with the specified handfe.
+	 * Get the class descriptor associated with the specified handle.
 	 * @param handle the handle to lookup.
 	 * @return a {@link ClassDescriptor} instance.
 	 */

@@ -103,7 +103,7 @@ public interface Task<T> extends Runnable, Serializable
 
 	/**
 	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
-	 * @return an objet or class that is JPPF-annotated.
+	 * @return an object or class that is JPPF-annotated.
 	 */
 	Object getTaskObject();
 

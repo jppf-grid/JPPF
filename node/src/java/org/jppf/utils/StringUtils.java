@@ -69,7 +69,7 @@ public final class StringUtils
 
 	/**
 	 * Format a string so that it fits into a string of specified length.<br>
-	 * If the string is longer than the specified length, then characters on the left are truncated, ortherwise
+	 * If the string is longer than the specified length, then characters on the left are truncated, otherwise
 	 * the specified character is appended to the result on the left  to obtain the appropriate length.
 	 * @param source the string to format; if null, it is considered an empty string.
 	 * @param padChar the character used to fill the result up to the specified length.
@@ -92,8 +92,8 @@ public final class StringUtils
 	}
 
 	/**
-	 * Padds a string on the right side with a given character
-	 * If the string is longer than the specified length, then characters on the right are truncated, ortherwise
+	 * Pads a string on the right side with a given character
+	 * If the string is longer than the specified length, then characters on the right are truncated, otherwise
 	 * the specified character is appended to the result on the right  to obtain the appropriate length.
 	 * @param source the string to pad to the right
 	 * @param padChar the character used for padding
@@ -173,9 +173,9 @@ public final class StringUtils
 	}
 
 	/**
-	 * Tranform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
+	 * Transform a duration in milliseconds into a string with hours, minutes, seconds and milliseconds..
 	 * @param duration the duration to transform, expressed in milliseconds.
-	 * @return a string specifiying the duration in terms of hours, minutes, seconds and milliseconds.
+	 * @return a string specifying the duration in terms of hours, minutes, seconds and milliseconds.
 	 */
 	public static String toStringDuration(final long duration)
 	{
@@ -353,7 +353,7 @@ public final class StringUtils
 	/**
 	 * Get a throwable's stack trace.
 	 * @param t the throwable to get the stack trace from.
-	 * @return the stack trace as astring.
+	 * @return the stack trace as a string.
 	 */
 	public static String getStackTrace(final Throwable t)
 	{
@@ -453,7 +453,7 @@ public final class StringUtils
 	 * Convert a string with <code>separator</code>-separated values into an int array.
 	 * @param source the source string to convert.
 	 * @param separatorPattern the values separator, expressed as a regular expression, must comply with the specifications for {@link java.util.regex.Pattern}.
-	 * @return an array of int value, or null if the source cvould not be parsed.
+	 * @return an array of int value, or null if the source could not be parsed.
 	 */
 	public static int[] toIntArray(final String source, final Pattern separatorPattern)
 	{

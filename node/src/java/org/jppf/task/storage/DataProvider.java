@@ -31,7 +31,7 @@ public interface DataProvider extends Serializable
 	 * Get a value specified by its key.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @return the value as an <code>Object</code>.
-	 * @throws Exception if an error occured while retrieving the data.
+	 * @throws Exception if an error occurred while retrieving the data.
 	 */
 	Object getValue(Object key) throws Exception;
 
@@ -39,7 +39,7 @@ public interface DataProvider extends Serializable
 	 * Set a value specified by its key in the store.
 	 * @param key the key identifying the value to retrieve in the store.
 	 * @param value the value to store, associated with the key.
-	 * @throws Exception if an error occured setting the data.
+	 * @throws Exception if an error occurred setting the data.
 	 */
 	void setValue(Object key, Object value) throws Exception;
 }

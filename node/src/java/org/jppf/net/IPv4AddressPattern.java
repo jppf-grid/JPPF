@@ -41,7 +41,7 @@ import java.net.*;
  * <li>1.2.3. is equivalent to 1.2.3 and to 1.2.3.0-255</li>
  * </ul>
  * <p>2. Ranges with missing bounds but still including the &quot;-&quot; sign are interpreted as a range with the lower bound
- * equal to zero for a missing lower bound, and an upper bound equal to 255 if the uper bound is missing. Examples:
+ * equal to zero for a missing lower bound, and an upper bound equal to 255 if the upper bound is missing. Examples:
  * <ul>
  * <li>-128 is equivalent to 0-128</li>
  * <li>12- is equivalent to 12-255</li>

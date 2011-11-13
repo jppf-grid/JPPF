@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Common abstract super class for a connection dedicated to receovery from hardware fialure of a remote peer.
+ * Common abstract super class for a connection dedicated to recovery from hardware failure of a remote peer.
  * @author Laurent Cohen
  */
 public abstract class AbstractRecoveryConnection extends ThreadSynchronization implements Runnable
@@ -86,7 +86,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	 * While receiving the message, this method also waits for {@link #socketReadTimeout} specified
 	 * in the configuration. If the timeout expires {@link #maxRetries} times in a row, the connection
 	 * is also considered broken.
-	 * @param maxRetries maximum number of attempts to read a response form the rmeote peer.
+	 * @param maxRetries maximum number of attempts to read a response form the remote peer.
 	 * @param socketReadTimeout timeout for each attempt.
 	 * @return the message that was received.
 	 * @throws Exception if any error occurs.
@@ -152,7 +152,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
 	}
 
 	/**
-	 * Specifiy whether this connection is ok after is has been checked.
+	 * Specify whether this connection is ok after is has been checked.
 	 * @param ok true if the connection is ok, false otherwise.
 	 */
 	public synchronized void setOk(final boolean ok)

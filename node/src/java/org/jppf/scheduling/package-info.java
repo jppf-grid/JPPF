@@ -17,6 +17,6 @@
  */
 
 /**
- * Support for time-sceduling actions.
+ * Support for time-scheduling actions.
  */
 package org.jppf.scheduling;

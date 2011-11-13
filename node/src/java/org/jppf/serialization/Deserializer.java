@@ -40,7 +40,7 @@ class Deserializer
 	 */
 	private static boolean traceEnabled = log.isTraceEnabled();
 	/**
-	 * The underlyng input stream.
+	 * The underlying input stream.
 	 */
 	ObjectInputStream in;
 	/**
@@ -52,7 +52,7 @@ class Deserializer
 	 */
 	ClassLoader classloader = initClassLoader();
 	/**
-	 * Handle of thez object being read.
+	 * Handle of the object being read.
 	 */
 	int currentHandle;
 	/**
@@ -158,8 +158,8 @@ class Deserializer
 	}
 
 	/**
-	 * Read all tthe fields for the specified object.
-	 * @param cd the class descritpor for the object.
+	 * Read all the fields for the specified object.
+	 * @param cd the class descriptor for the object.
 	 * @param obj the object to set the fields on.
 	 * @throws Exception if any error occurs.
 	 */
@@ -282,7 +282,7 @@ class Deserializer
 	}
 
 	/**
-	 * Read all the class descriptors availablke in the input stream.
+	 * Read all the class descriptors available in the input stream.
 	 * @throws Exception if any error occurs.
 	 */
 	private void readClassDescriptors() throws Exception
@@ -301,7 +301,7 @@ class Deserializer
 	}
 
 	/**
-	 * Initialize the class laoder to use.
+	 * Initialize the class loader to use.
 	 * @return a {@link ClassLoader} instance.
 	 */
 	private ClassLoader initClassLoader()

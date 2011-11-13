@@ -21,7 +21,7 @@ package org.jppf.process;
 import java.net.Socket;
 
 /**
- * Instances of this class isten to a socket connection setup in the ProcessLauncher, to handle the situation when the Launcher dies unexpectedly.<br>
+ * Instances of this class listen to a socket connection setup in the ProcessLauncher, to handle the situation when the Launcher dies unexpectedly.<br>
  * In that situation, the connection is broken and this process knows that it must exit.
  * @author Laurent Cohen
  */
@@ -43,7 +43,7 @@ public class LauncherListener extends Thread
 	}
 
 	/**
-	 * Create a socket connection and listen to it, and exit this process when the conneciton is broken.
+	 * Create a socket connection and listen to it, and exit this process when the connection is broken.
 	 * @see java.lang.Thread#run()
 	 */
 	@Override

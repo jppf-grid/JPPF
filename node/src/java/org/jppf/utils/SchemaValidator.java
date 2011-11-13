@@ -28,7 +28,7 @@ import org.xml.sax.*;
 
 
 /**
- * Utility class to validate an XML docuement against an XML schema.
+ * Utility class to validate an XML document against an XML schema.
  * @author Laurent Cohen
  */
 public class SchemaValidator
@@ -154,7 +154,7 @@ public class SchemaValidator
 	 * Validate an XML document in a file against an XML schema.
 	 * @param docPath the path to the XML document.
 	 * @param schemaPath the path to the XML schema.
-	 * @return true if the XML docuement is valid, false otherwise.
+	 * @return true if the XML document is valid, false otherwise.
 	 * @throws IOException if an IO error occurs while looking up one of the files.
 	 * @throws SAXException if an error occurs while loading the schema or validating the document.
 	 */
@@ -167,7 +167,7 @@ public class SchemaValidator
 	 * Validate an XML document from a reader against an XML schema.
 	 * @param docReader the reader used to access the document.
 	 * @param schemaReader the path to the XML schema.
-	 * @return true if the XML docuement is valid, false otherwise.
+	 * @return true if the XML document is valid, false otherwise.
 	 * @throws IOException if an IO error occurs while looking up one of the files.
 	 * @throws SAXException if an error occurs while loading the schema or validating the document.
 	 */

@@ -101,7 +101,7 @@ class Serializer
 
 	/**
 	 * Write the specified object to the output stream.
-	 * @param obj ther object to write.
+	 * @param obj the object to write.
 	 * @throws Exception if any error occurs.
 	 */
 	void writeObject(final Object obj) throws Exception
@@ -126,7 +126,7 @@ class Serializer
 
 	/**
 	 * Write the specified object to the output stream.
-	 * @param obj ther object to write.
+	 * @param obj the object to write.
 	 * @param handle the object's handle
 	 * @throws Exception if any error occurs.
 	 */
@@ -191,7 +191,7 @@ class Serializer
 	}
 
 	/**
-	 * Write the fields for the specified object and class decriptor.
+	 * Write the fields for the specified object and class descriptor.
 	 * @param obj the object whose fields are to be written.
 	 * @param cd the object's class descriptor.
 	 * @throws Exception if any error occurs.

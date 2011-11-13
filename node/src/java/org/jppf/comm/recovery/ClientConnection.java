@@ -39,7 +39,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
 	/**
-	 * COnstant for an empty azrray of <code>ClientConnectionListener</code>.
+	 * Constant for an empty array of <code>ClientConnectionListener</code>.
 	 */
 	private static final ClientConnectionListener[] ZERO_CONNECTION_LISTENER = new ClientConnectionListener[0];
 	/**
@@ -52,7 +52,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 	private final List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
 
 	/**
-	 * Initialize this cliet connection with the specified uuid.
+	 * Initialize this client connection with the specified uuid.
 	 * @param uuid the JPPF node or client uuid.
 	 */
 	public ClientConnection(final String uuid)

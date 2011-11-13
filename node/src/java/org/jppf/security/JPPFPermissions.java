@@ -108,7 +108,7 @@ public class JPPFPermissions extends PermissionCollection
 	private class Enumerator implements Enumeration<Permission>
 	{
 		/**
-		 * Index of the current enumrated element.
+		 * Index of the current enumerated element.
 		 */
 		private int index = 0;
 		/**

@@ -63,7 +63,7 @@ public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListen
 
 	/**
 	 * Set the process to handle.
-	 * If the process has already been set through this setter or the corresponding contructor, this method does nothing.
+	 * If the process has already been set through this setter or the corresponding constructor, this method does nothing.
 	 * @param process - a <code>Process</code> instance.
 	 */
 	public void setProcess(final Process process)
@@ -78,7 +78,7 @@ public final class ProcessWrapper extends EventEmitter<ProcessWrapperEventListen
 
 	/**
 	 * Notify all listeners that a stream event has occurred.
-	 * @param output true if the event is for the outpuit stream, false if it is for the error stream.
+	 * @param output true if the event is for the output stream, false if it is for the error stream.
 	 * @param content the text that written to the stream.
 	 */
 	protected synchronized void fireStreamEvent(final boolean output, final String content)
