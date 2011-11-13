@@ -53,7 +53,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	/**
 	 * The list of registered listeners.
 	 */
-	protected List<QueueListener> queueListeners = new ArrayList<QueueListener>();
+	private final List<QueueListener> queueListeners = new ArrayList<QueueListener>();
 
 	/**
 	 * Add a listener to the list of listeners.
@@ -80,16 +80,6 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	}
 
 	/**
-	 * return a list of all the registered listeners.
-	 * This list is not thread safe and must be manually synchronized against concurrent modifications.
-	 * @return a list of listener instances.
-	 */
-	public List<QueueListener> getQueueListeners()
-	{
-		return queueListeners;
-	}
-
-	/**
 	 * Get the bundle size to use for bundle size tuning.
 	 * @param bundleWrapper the bundle to get the size from.
 	 * @return the bundle size as an int.
@@ -106,9 +96,9 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
 	 */
 	protected void fireQueueEvent(final QueueEvent event)
 	{
-		synchronized(getQueueListeners())
+		synchronized(queueListeners)
 		{
-			for (QueueListener listener : getQueueListeners()) listener.newBundle(event);
+			for (QueueListener listener : queueListeners) listener.newBundle(event);
 		}
 	}
 

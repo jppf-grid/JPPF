@@ -63,7 +63,7 @@ class SendingResultsState extends ClientServerState
 	@Override
 	public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
 	{
-		//if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
+		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
 		if (CHECK_CONNECTION && channel.isReadable())
 		{
 			throw new ConnectException("client " + channel + " has been disconnected");
@@ -90,7 +90,7 @@ class SendingResultsState extends ClientServerState
 				context.jobEnded();
 				return TO_WAITING_JOB;
 			}
-			else if (context.getCompletedBundles().isEmpty()) return TO_IDLE;
+			else if (context.isCompletedBundlesEmpty()) return TO_IDLE;
 			return TO_SENDING_RESULTS;
 		}
 		//if (traceEnabled) log.trace("part yet to send to client " + channel);

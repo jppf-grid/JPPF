@@ -56,7 +56,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
 	/**
 	 * A map of performance samples, sorted by increasing bundle size.
 	 */
-	protected Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<Integer, BundlePerformanceSample>();
+	protected final Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<Integer, BundlePerformanceSample>();
 
 	/**
 	 * Creates a new instance with the initial size of bundle as the start size.

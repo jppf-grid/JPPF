@@ -275,5 +275,7 @@ class ResourceCache
 			}
 		};
 		new Thread(r).start();
+
+        super.finalize();
 	}
 }

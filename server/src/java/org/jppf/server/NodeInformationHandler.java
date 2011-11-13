@@ -41,11 +41,11 @@ public class NodeInformationHandler
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<ChannelWrapper<?>, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper<?>, JPPFManagementInfo>();
+	private final Map<ChannelWrapper<?>, JPPFManagementInfo> nodeInfo = new HashMap<ChannelWrapper<?>, JPPFManagementInfo>();
 	/**
 	 * A list of objects containing the information required to connect to the nodes JMX servers.
 	 */
-	private Map<String, JPPFManagementInfo> uuidMap = new HashMap<String, JPPFManagementInfo>();
+	private final Map<String, JPPFManagementInfo> uuidMap = new HashMap<String, JPPFManagementInfo>();
 
 	/**
 	 * Add a node information object to the map of node information.

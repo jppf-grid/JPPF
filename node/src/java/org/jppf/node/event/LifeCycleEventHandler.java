@@ -42,7 +42,7 @@ public class LifeCycleEventHandler
 	/**
 	 * The list of listeners to this object's events.
 	 */
-	private List<NodeLifeCycleListener> listeners = new ArrayList<NodeLifeCycleListener>();
+	private final List<NodeLifeCycleListener> listeners = new ArrayList<NodeLifeCycleListener>();
 
 	/**
 	 * The object that manages the job executions for the node.

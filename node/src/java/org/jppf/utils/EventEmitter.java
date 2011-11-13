@@ -30,7 +30,7 @@ public abstract class EventEmitter<S extends EventListener>
 	/**
 	 * The list of registered listeners.
 	 */
-	protected List<S> eventListeners = new ArrayList<S>();
+	protected final List<S> eventListeners = new ArrayList<S>();
 
 	/**
 	 * Add a listener to the list of listeners.

@@ -46,19 +46,19 @@ public class JPPFJobManager implements QueueListener
 	/**
 	 * Mapping of jobs to the nodes they are executing on.
 	 */
-	private Map<String, List<ChannelJobPair>> jobMap = new HashMap<String, List<ChannelJobPair>>();
+	private final Map<String, List<ChannelJobPair>> jobMap = new HashMap<String, List<ChannelJobPair>>();
 	/**
 	 * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
 	 */
-	private Map<String, ServerJob> bundleMap = new HashMap<String, ServerJob>();
+	private final Map<String, ServerJob> bundleMap = new HashMap<String, ServerJob>();
 	/**
 	 * Processes the event queue asynchronously.
 	 */
-	private ExecutorService executor = null;
+	private final ExecutorService executor;
 	/**
 	 * The list of registered listeners.
 	 */
-	protected List<JobListener> eventListeners = new ArrayList<JobListener>();
+	private final List<JobListener> eventListeners = new ArrayList<JobListener>();
 
 	/**
 	 * Default constructor.
@@ -240,13 +240,41 @@ public class JPPFJobManager implements QueueListener
 		}
 	}
 
-	/**
-	 * return a list of all the registered listeners.
-	 * This list is not thread safe and must be manually synchronized against concurrent modifications.
-	 * @return a list of listener instances.
-	 */
-	public List<JobListener> getJobListeners()
-	{
-		return eventListeners;
-	}
+    /**
+     * Fire job listener event.
+     * @param event the event to be fired.
+     */
+    public void fireJobEvent(final JobNotification event)
+    {
+        if(event == null) throw new IllegalArgumentException("event is null");
+
+        synchronized(eventListeners)
+        {
+            switch (event.getEventType())
+            {
+                case JOB_QUEUED:
+                    for (JobListener listener: eventListeners) listener.jobQueued(event);
+                    break;
+
+                case JOB_ENDED:
+                    for (JobListener listener: eventListeners) listener.jobEnded(event);
+                    break;
+
+                case JOB_UPDATED:
+                    for (JobListener listener: eventListeners) listener.jobUpdated(event);
+                    break;
+
+                case JOB_DISPATCHED:
+                    for (JobListener listener: eventListeners) listener.jobDispatched(event);
+                    break;
+
+                case JOB_RETURNED:
+                    for (JobListener listener: eventListeners) listener.jobReturned(event);
+                    break;
+
+                default:
+                    throw new IllegalStateException("Unsupported event type: " + event.getEventType());
+            }
+        }
+    }
 }

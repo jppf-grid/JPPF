@@ -17,8 +17,6 @@
  */
 package org.jppf.server.job;
 
-import java.util.List;
-
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
@@ -35,19 +33,19 @@ public class JobEventTask implements Runnable
 	/**
 	 * The job manager that submits the events.
 	 */
-	private JPPFJobManager jobManager = null;
+	private final JPPFJobManager jobManager;
 	/**
 	 * The type of event to generate.
 	 */
-	private JobEventType eventType = null;
+	private final JobEventType eventType;
 	/**
 	 * The node, if any, for which the event happened.
 	 */
-	private ChannelWrapper channel = null;
+	private final ChannelWrapper channel;
 	/**
 	 * The job data.
 	 */
-	private JPPFTaskBundle bundle = null;
+	private final JPPFTaskBundle bundle;
 	/**
 	 * Creation timestamp for this task.
 	 */
@@ -82,33 +80,12 @@ public class JobEventTask implements Runnable
 		jobInfo.setMaxNodes(sla.getMaxNodes());
 		JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
 		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
-		List<JobListener> listeners = jobManager.getJobListeners();
-		synchronized(listeners)
-		{
-			switch (eventType)
-			{
-				case JOB_QUEUED:
-					for (JobListener listener: listeners) listener.jobQueued(event);
-					break;
+        if(eventType == JobEventType.JOB_UPDATED)
+        {
+            Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
+            if (n != null) jobInfo.setTaskCount(n);
+        }
 
-				case JOB_ENDED:
-					for (JobListener listener: listeners) listener.jobEnded(event);
-					break;
-
-				case JOB_UPDATED:
-					Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
-					if (n != null) jobInfo.setTaskCount(n);
-					for (JobListener listener: listeners) listener.jobUpdated(event);
-					break;
-
-				case JOB_DISPATCHED:
-					for (JobListener listener: listeners) listener.jobDispatched(event);
-					break;
-
-				case JOB_RETURNED:
-					for (JobListener listener: listeners) listener.jobReturned(event);
-					break;
-			}
-		}
+        jobManager.fireJobEvent(event);
 	}
 }

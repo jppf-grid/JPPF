@@ -35,7 +35,7 @@ public abstract class SynchronizedTask implements Runnable
 	/**
 	 * An object to synchronize against.
 	 */
-	Object sync = null;
+	final Object sync;
 
 	/**
 	 * Initialize this task with an object to synchronize against.
@@ -43,6 +43,8 @@ public abstract class SynchronizedTask implements Runnable
 	 */
 	public SynchronizedTask(final Object sync)
 	{
+        if(sync == null) throw new IllegalArgumentException("sync is null");
+
 		this.sync = sync;
 	}
 

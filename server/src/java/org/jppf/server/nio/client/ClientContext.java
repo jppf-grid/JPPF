@@ -71,7 +71,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	/**
 	 * List of completed bundles to send to the client.
 	 */
-	protected LinkedList<ServerJob> completedBundles = new LinkedList<ServerJob>();
+	protected final LinkedList<ServerJob> completedBundles = new LinkedList<ServerJob>();
 	/**
 	 * Number of tasks that remain to be sent to the client.
 	 */
@@ -269,14 +269,28 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	}
 
 	/**
-	 * Get the list of completed bundles to send to the client.
+	 * Get the list copy of completed bundles to send to the client.
 	 * @return a linked list of <code>ServerJob</code> instances.
 	 */
 	public LinkedList<ServerJob> getCompletedBundles()
 	{
-		return completedBundles;
+        synchronized (completedBundles)
+        {
+		    return new LinkedList<ServerJob>(completedBundles);
+        }
 	}
 
+    /**
+     * Determine whether list of completed bundles is empty.
+     * @return whether list of <code>ServerJob</code> instances is empty.
+     */
+    public boolean isCompletedBundlesEmpty()
+    {
+        synchronized (completedBundles)
+        {
+            return completedBundles.isEmpty();
+        }
+    }
 	/**
 	 * Get the id of the last job submitted via this connection.
 	 * @return the id as a string.

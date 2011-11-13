@@ -49,7 +49,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	/**
 	 * List of listeners registered to receive this submission's status change notifications.
 	 */
-	private List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
+	private final List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
 
 	/**
 	 * Initialize this collector.
@@ -78,7 +78,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
 	{
 		if (debugEnabled) log.debug("submission [" + id + "] status changing from '" + this.status + "' to '" + status + "'");
 		this.status = status;
-		fireStatusChangeEvent();
+		fireStatusChangeEvent(this.id, this.status);
 	}
 
 	/**
@@ -118,8 +118,10 @@ public class JcaSubmissionResult extends JPPFResultCollector
 
 	/**
 	 * Notify all listeners of a change of status for this submission.
-	 */
-	protected void fireStatusChangeEvent()
+     * @param id the id for submission event.
+     * @param status the status for submission event.
+     */
+	protected void fireStatusChangeEvent(final String id, final SubmissionStatus status)
 	{
 		synchronized(listeners)
 		{
