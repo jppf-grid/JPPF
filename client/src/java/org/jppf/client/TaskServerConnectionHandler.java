@@ -79,7 +79,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 			System.out.println(msg);
 			if (debugEnabled) log.debug(msg);
 			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull())
+			if (!socketInitializer.isSuccessful())
 			{
 				throw new JPPFException('[' +name+"] Could not reconnect to the JPPF task server");
 			}

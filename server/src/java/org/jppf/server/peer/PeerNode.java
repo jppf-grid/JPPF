@@ -216,7 +216,7 @@ class PeerNode extends AbstractNode
 			if (debugEnabled) log.debug(getName() + "initializing socket");
 			System.out.println(getName() + "Attempting connection to the peer node server");
 			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
+			if (!socketInitializer.isSuccessful()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
 			System.out.println(getName() + "Reconnected to the peer node server");
 			if (debugEnabled) log.debug("sending channel identifier");
 			socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);

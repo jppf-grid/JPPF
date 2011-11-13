@@ -40,7 +40,7 @@ public interface SocketInitializer
 	 * Determine whether any connection attempt succeeded.
 	 * @return true if any attempt was successful, false otherwise.
 	 */
-	boolean isSuccessfull();
+	boolean isSuccessful();
 
 	/**
 	 * Determine whether this socket initializer has been intentionally closed.

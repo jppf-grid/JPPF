@@ -119,7 +119,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
 			}
 			timer.cancel();
 			timer.purge();
-			if (!isSuccessfull() && !closed)
+			if (!isSuccessful() && !closed)
 			{
 				if (debugEnabled) log.debug(name + errMsg);
 				System.err.println(name + errMsg);

@@ -75,7 +75,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
 			if (debugEnabled) log.debug("start socket initializer");
 			System.out.println("Attempting connection to the node server at " + host + ':' + port);
 			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessfull())
+			if (!socketInitializer.isSuccessful())
 			{
 				if (debugEnabled) log.debug("socket initializer failed");
 				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");

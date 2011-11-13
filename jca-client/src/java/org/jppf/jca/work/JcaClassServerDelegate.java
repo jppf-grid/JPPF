@@ -82,7 +82,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 			socketInitializer.initializeSocket(socketClient);
 			if (!socketInitializer.isClosed())
 			{
-				if (socketInitializer.isSuccessfull())
+				if (socketInitializer.isSuccessful())
 				{
 					log.info("[client: " + getName() + "] Reconnected to the class server");
 					setStatus(ACTIVE);

@@ -72,7 +72,7 @@ public class ClientConnection extends AbstractRecoveryConnection
 			if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
 			socketInitializer = new SocketInitializerImpl();
 			socketInitializer.initializeSocket(socketWrapper);
-			if (!socketInitializer.isSuccessfull())
+			if (!socketInitializer.isSuccessful())
 			{
 				log.error("Could not initialize recovery client connection " + socketWrapper);
 				close();
