@@ -22,8 +22,8 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
-import org.jppf.utils.SerializationUtils;
-import org.jppf.utils.streams.StreamConstants;
+import org.jppf.utils.*;
+import org.jppf.utils.pooling.DirectBufferPool;
 
 /**
  * Input source backed by a {@link java.nio.channels.ReadableByteChannel ReadableByteChannel}.
@@ -35,16 +35,12 @@ public class ChannelInputSource implements InputSource
 	 * The backing <code>ReadableByteChannel</code>.
 	 */
 	protected ReadableByteChannel channel = null;
-	/**
-	 * 
-	 */
-	protected ByteBuffer tmpDirectBuffer = null;
 
 	/**
 	 * Initialize this input source with the specified <code>SocketWrapper</code>.
 	 * @param channel the backing <code>SocketWrapper</code>.
 	 */
-	public ChannelInputSource(ReadableByteChannel channel)
+	public ChannelInputSource(final ReadableByteChannel channel)
 	{
 		this.channel = channel;
 	}
@@ -58,7 +54,7 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(byte[], int, int)
 	 */
-	public int read(byte[] data, int offset, int len) throws Exception
+	public int read(final byte[] data, final int offset, final int len) throws Exception
 	{
 		ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
 		return read(buffer);
@@ -67,7 +63,7 @@ public class ChannelInputSource implements InputSource
 	/**
 	 * Read data from this input source into a byte buffer.
 	 * <p><b>Implementation details</b>:<br/>
-	 * We read the data by small chunks of max 32768 bytes wrapped in a direct ByteBuffer,
+	 * We read the data by small chunks of max {@link StreamConstants#TEMP_BUFFER_SIZE StreamConstants.TEMP_BUFFER_SIZE} bytes wrapped in a direct ByteBuffer,
 	 * to work around the fact that Sun NIO implementation of SocketChannelImpl.read()
 	 * attempts to allocate a direct buffer of the requested data size (i.e. <code>data</code>.remaining() in our case),
 	 * <i>if the destination ByteBuffer is not direct</i>.<br/>
@@ -78,32 +74,45 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
 	 */
-	public int read(ByteBuffer data) throws Exception
+	public int read(final ByteBuffer data) throws Exception
 	{
-		if (tmpDirectBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
-		else tmpDirectBuffer.clear();
-		int remaining = data.remaining();
-		int count = 0;
-		while (count < remaining)
+		ByteBuffer tmpBuffer = null;
+		try
 		{
-			if (data.remaining() < tmpDirectBuffer.remaining()) tmpDirectBuffer.limit(data.remaining());
-			int n = channel.read(tmpDirectBuffer);
-			if (n < 0) throw new EOFException();
-			else if (n == 0) break;
-			else
+			//if (tmpBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
+			//else tmpBuffer.clear();
+			tmpBuffer = DirectBufferPool.provideBuffer();
+			int remaining = data.remaining();
+			int count = 0;
+			while (count < remaining)
 			{
-				count += n;
-				tmpDirectBuffer.flip();
-				data.put(tmpDirectBuffer);
-				tmpDirectBuffer.clear();
+				if (data.remaining() < tmpBuffer.remaining()) tmpBuffer.limit(data.remaining());
+				int n = channel.read(tmpBuffer);
+				if (n < 0) throw new EOFException();
+				else if (n == 0) break;
+				else
+				{
+					count += n;
+					tmpBuffer.flip();
+					data.put(tmpBuffer);
+					tmpBuffer.clear();
+				}
+			}
+			return count;
+		}
+		finally
+		{
+			if (tmpBuffer != null)
+			{
+				DirectBufferPool.releaseBuffer(tmpBuffer);
+				tmpBuffer = null;
 			}
 		}
-		return count;
 	}
 
 	/**
 	 * Read an int value from this input source.
-	 * @return the value read, or -1 if an end of file condition was reached. 
+	 * @return the value read, or -1 if an end of file condition was reached.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#readInt()
 	 */
@@ -119,7 +128,7 @@ public class ChannelInputSource implements InputSource
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.InputSource#skip(int)
 	 */
-	public int skip(int n) throws Exception
+	public int skip(final int n) throws Exception
 	{
 		ByteBuffer buf = ByteBuffer.allocate(n);
 		read(buf);

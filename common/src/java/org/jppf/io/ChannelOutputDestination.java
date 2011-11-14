@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
-import org.jppf.utils.SerializationUtils;
-import org.jppf.utils.streams.StreamConstants;
+import org.jppf.utils.*;
+import org.jppf.utils.pooling.DirectBufferPool;
 
 /**
  * Output destination backed by a {@link java.nio.channels.WritableByteChannel WritableByteChannel}.
@@ -35,19 +35,12 @@ public class ChannelOutputDestination implements OutputDestination
 	 * The backing <code>WritableByteChannel</code>.
 	 */
 	protected WritableByteChannel channel = null;
-	/**
-	 * Temp buffer allocated with {@link ByteBuffer#allocateDirect(int) ByteBuffer.allocateDirect(int)} to workaround
-	 * the issue in the SocketChannel code, which causes it to allocate a direct buffer for each socket write,
-	 * and can lead to OutOfMemoryError: Direct buffer memory. If a direct buffer is provided to the socket write(),
-	 * then it is used and no new one is allocated. This allows us to limit the size of the direct buffer to use.
-	 */
-	protected ByteBuffer tmpBuffer = null;
 
 	/**
 	 * Initialize this output destination with the specified <code>SocketWrapper</code>.
 	 * @param channel the backing <code>SocketWrapper</code>.
 	 */
-	public ChannelOutputDestination(WritableByteChannel channel)
+	public ChannelOutputDestination(final WritableByteChannel channel)
 	{
 		this.channel = channel;
 	}
@@ -61,25 +54,39 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
 	 */
-	public int write(byte[] data, int offset, int len) throws Exception
+	public int write(final byte[] data, final int offset, final int len) throws Exception
 	{
-		int cap = StreamConstants.TEMP_BUFFER_SIZE;
-		if (tmpBuffer == null) tmpBuffer = ByteBuffer.allocateDirect(cap);
-		boolean end = false;
-		int count = 0;
-		while (count < len)
+		ByteBuffer tmpBuffer = null;
+		try
 		{
-			tmpBuffer.clear();
-			int size = Math.min(cap, len - count);
-			tmpBuffer.put(data, offset + count, size);
-			tmpBuffer.flip();
-			int n = channel.write(tmpBuffer);
-			if (n <= 0) break;
-			count += n;
-			if (n < size) break;
+			//int cap = StreamConstants.TEMP_BUFFER_SIZE;
+			//if (tmpBuffer == null) tmpBuffer = ByteBuffer.allocateDirect(cap);
+			tmpBuffer = DirectBufferPool.provideBuffer();
+			int cap = tmpBuffer.capacity();
+			boolean end = false;
+			int count = 0;
+			while (count < len)
+			{
+				tmpBuffer.clear();
+				int size = Math.min(cap, len - count);
+				tmpBuffer.put(data, offset + count, size);
+				tmpBuffer.flip();
+				int n = channel.write(tmpBuffer);
+				if (n <= 0) break;
+				count += n;
+				if (n < size) break;
+			}
+			//if (count >= len) tmpBuffer = null;
+			return count;
 		}
-		if (count >= len) tmpBuffer = null;
-		return count;
+		finally
+		{
+			if (tmpBuffer != null)
+			{
+				DirectBufferPool.releaseBuffer(tmpBuffer);
+				tmpBuffer = null;
+			}
+		}
 	}
 
 	/**
@@ -89,18 +96,18 @@ public class ChannelOutputDestination implements OutputDestination
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
 	 */
-	public int write(ByteBuffer data) throws Exception
+	public int write(final ByteBuffer data) throws Exception
 	{
 		return channel.write(data);
 	}
 
 	/**
 	 * Write an int value to this output destination.
-	 * @param value the value to write. 
+	 * @param value the value to write.
 	 * @throws Exception if an IO error occurs.
 	 * @see org.jppf.io.OutputDestination#writeInt(int)
 	 */
-	public void writeInt(int value) throws Exception
+	public void writeInt(final int value) throws Exception
 	{
 		SerializationUtils.writeInt(channel, value);
 	}
