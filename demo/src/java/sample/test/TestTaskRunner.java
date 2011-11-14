@@ -54,7 +54,8 @@ public class TestTaskRunner
 		try
 		{
 			jppfClient = new JPPFClient();
-			performNonSerializableAttributeTest();
+			//performNonSerializableAttributeTest();
+			emptyJobTest();
 			/*
 			performBasicTest();
 			performSecurityTest();
@@ -445,6 +446,28 @@ public class TestTaskRunner
 		finally
 		{
 			System.out.println(title + " test complete.");
+		}
+	}
+
+	/**
+	 * Test an empty job.
+	 */
+	static void emptyJobTest()
+	{
+		System.out.println(banner);
+		System.out.println("Starting empty job test...");
+		try
+		{
+			JPPFJob job = new JPPFJob();
+			List<JPPFTask> results = jppfClient.submit(job);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			System.out.println("annotation testing complete.");
 		}
 	}
 }

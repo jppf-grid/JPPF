@@ -30,7 +30,7 @@
 	<property name="web.inf.dir"     value="${docroot.dir}/WEB-INF"/>
 	<property name="war.prefix"      value="jppftest"/>
 	<property name="war.file"        value="${war.prefix}.war"/>
-	<property name="tomcat.home"     value="C:/Tools/apache/apache-tomcat-7.0.0"/>
+	<property name="tomcat.home"     value="C:/Tools/apache/apache-tomcat-6.0.32"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->

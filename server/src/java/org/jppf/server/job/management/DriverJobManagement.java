@@ -27,7 +27,6 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -161,7 +160,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 	public String[] getAllJobIds() throws Exception
 	{
 		Set<String> set = getJobManager().getAllJobIds();
-		return set.toArray(StringUtils.ZERO_STRING);
+		return set.toArray(new String[set.size()]);
 	}
 
 	/**
