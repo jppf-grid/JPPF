@@ -76,7 +76,7 @@ public class TaskResultEvent extends EventObject
 	public List<JPPFTask> getTaskList()
 	{
 		Object o = getSource();
-		return (o instanceof Throwable) ? null : (List<JPPFTask>) getSource();
+        return (o instanceof List) ? (List<JPPFTask>) getSource() : Collections.<JPPFTask>emptyList();
 	}
 
 	/**
