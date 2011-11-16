@@ -53,7 +53,9 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 	 */
 	public void close() throws Exception
 	{
-		getChannel().channel().close();
+		SelectionKey key = getChannel();
+		key.cancel();
+		key.channel().close();
 	}
 
 	/**

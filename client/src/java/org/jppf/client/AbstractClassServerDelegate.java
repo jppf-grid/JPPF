@@ -54,6 +54,10 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 	 * Unique identifier for this class server delegate, obtained from the local JPPF client.
 	 */
 	protected String appUuid = null;
+	/**
+	 * Determines if the handshake with the server has been performed.
+	 */
+	protected boolean handshakeDone = false;
 
 	/**
 	 * Default instantiation of this class is not permitted.
@@ -132,5 +136,20 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
 		if (debugEnabled) log.debug("sending " + data.length + " bytes to the server");
 		socketClient.sendBytes(new JPPFBuffer(data, data.length));
 		socketClient.flush();
+	}
+
+	/**
+	 * Perform the handshake with the server.
+	 * @throws Exception if any error occurs.
+	 */
+	protected void handshake() throws Exception
+	{
+		JPPFResourceWrapper resource = new JPPFResourceWrapper();
+		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
+		resource.addUuid(appUuid);
+		resource.setData("connection.uuid", ((AbstractJPPFClientConnection) owner).getConnectionUuid());
+		writeResource(resource);
+		resource = readResource();
+		handshakeDone = true;
 	}
 }

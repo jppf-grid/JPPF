@@ -26,7 +26,7 @@ import org.jppf.io.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.nio.classloader.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -80,6 +80,14 @@ class ApplicationConnection extends JPPFConnection
 	 * The id of the last job submitted via this connection.
 	 */
 	private String currentJobId = null;
+	/**
+	 * Unique ID for the connection.
+	 */
+	private String connectionUuid = null;
+	/**
+	 * Unique ID for the connection.
+	 */
+	private String clientUuid = null;
 
 	/**
 	 * Initialize this connection with an open socket connection to a remote client.
@@ -125,6 +133,7 @@ class ApplicationConnection extends JPPFConnection
 		if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS) == null)
 			header.setParameter(BundleParameter.JOB_RECEIVED_TIME_MILLIS, System.currentTimeMillis());
 		headerWrapper = new BundleWrapper(header);
+		if (connectionUuid == null) connectionUuid = (String) header.getParameter("connection.uuid");
 		executeTasks();
 	}
 
@@ -137,6 +146,7 @@ class ApplicationConnection extends JPPFConnection
 		JPPFTaskBundle header = headerWrapper.getBundle();
 		header.getUuidPath().incPosition();
 		String uuid = header.getUuidPath().getCurrentElement();
+		if (clientUuid == null) clientUuid = uuid;
 		ClassNioServer classServer = JPPFDriver.getInstance().getClassServer();
 		List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
 		while ((list == null) || list.isEmpty())
@@ -184,6 +194,23 @@ class ApplicationConnection extends JPPFConnection
 	public void close()
 	{
 		if (debugEnabled) log.debug("closing " + this);
+		if (clientUuid != null)
+		{
+			ClassNioServer classServer = JPPFDriver.getInstance().getClassServer();
+			List<ChannelWrapper<?>> list = classServer.getProviderConnections(clientUuid);
+			if ((list != null) && !list.isEmpty())
+			{
+				for (ChannelWrapper<?> channel: list)
+				{
+					ClassContext ctx = (ClassContext) channel.getContext();
+					if (ctx.getConnectionUuid().equals(connectionUuid))
+					{
+						ClassNioServer.closeConnection(channel);
+						break;
+					}
+				}
+			}
+		}
 		cancelJobOnClose();
 		super.close();
 		driver.getStatsManager().clientConnectionClosed();

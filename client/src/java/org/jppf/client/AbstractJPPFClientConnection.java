@@ -79,6 +79,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	 */
 	protected String appUuid = null;
 	/**
+	 * Unique ID for this connection and its two channels.
+	 */
+	protected final String connectionUuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
+	/**
 	 * The name or IP address of the host the JPPF driver is running on.
 	 */
 	protected String host = null;
@@ -181,8 +185,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	{
 		try
 		{
-			JPPFTaskBundle bundle = new JPPFTaskBundle();
-			sendTasks(bundle, job);
+			sendTasks(new JPPFTaskBundle(), job);
 		}
 		catch(Exception e)
 		{
@@ -217,6 +220,7 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		header.setParameter(BundleParameter.JOB_UUID, job.getJobUuid());
 		header.setJobSLA(job.getJobSLA());
 		header.setParameter(BundleParameter.JOB_METADATA, job.getJobMetadata());
+		header.setParameter("connection.uuid", connectionUuid);
 
 		SocketWrapper socketClient = taskServerConnection.getSocketClient();
 		IOHelper.sendData(socketClient, header, ser);
@@ -567,5 +571,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 	public AbstractGenericClient getClient()
 	{
 		return client;
+	}
+
+	/**
+	 * Get the unique ID for this connection and its two channels.
+	 * @return the id as a string.
+	 */
+	public String getConnectionUuid()
+	{
+		return connectionUuid;
 	}
 }

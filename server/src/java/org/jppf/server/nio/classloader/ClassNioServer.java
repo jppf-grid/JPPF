@@ -321,13 +321,14 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 * Close the specified connection.
 	 * @param channel the channel representing the connection.
 	 */
-	static void closeConnection(ChannelWrapper<?> channel)
+	public static void closeConnection(ChannelWrapper<?> channel)
 	{
 		if (channel == null)
 		{
 			log.warn("attempt to close null channel - skipping this step");
 			return;
 		}
+		if (debugEnabled) log.debug("closing channel " + channel);
 		ClassNioServer server = JPPFDriver.getInstance().getClassServer();
 		ClassContext context = (ClassContext) channel.getContext();
 		String uuid = context.getUuid();

@@ -44,10 +44,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
 	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines if the handshake with the server has been performed.
-	 */
-	private boolean handshakeDone = false;
 
 	/**
 	 * Initialize class server delegate with a specified application uuid.
@@ -170,20 +166,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 			log.error("["+getName()+"] "+e.getMessage(), e);
 			close();
 		}
-	}
-
-	/**
-	 * Perform the handshake with the server.
-	 * @throws Exception if any error occurs.
-	 */
-	private void handshake() throws Exception
-	{
-		JPPFResourceWrapper resource = new JPPFResourceWrapper();
-		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-		resource.addUuid(appUuid);
-		writeResource(resource);
-		resource = readResource();
-		handshakeDone = true;
 	}
 
 	/**

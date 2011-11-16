@@ -76,6 +76,8 @@ class DefiningChannelTypeState extends ClassServerState
 			{
 				context.setProvider(true);
 				if (debugEnabled) log.debug("initiating provider: " + wrapper);
+				String connectionUuid = (String) resource.getData("connection.uuid");
+				context.setConnectionUuid(connectionUuid);
 				String uuid = resource.getUuidPath().getFirst();
 				// it is a provider
 				server.addProviderConnection(uuid, wrapper);

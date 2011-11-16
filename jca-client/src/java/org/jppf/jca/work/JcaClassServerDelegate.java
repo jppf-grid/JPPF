@@ -197,12 +197,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 		try
 		{
 			init();
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-			resource.addUuid(appUuid);
-			writeResource(resource);
-			// receive the initial response from the server.
-			readResource();
+			handshake();
 		}
 		finally
 		{

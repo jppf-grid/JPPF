@@ -40,9 +40,13 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	 */
 	protected S state = null;
 	/**
-	 * Uuid for this node context.
+	 * Uuid for this context.
 	 */
 	protected String uuid = null;
+	/**
+	 * Unique ID for the corresponding connection on the remote peer.
+	 */
+	protected String connectionUuid = null;
 	/**
 	 * Container for the current message data.
 	 */
@@ -135,5 +139,23 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
 	public void setChannel(ChannelWrapper<?> channel)
 	{
 		this.channel = channel;
+	}
+
+	/**
+	 * Get the nique ID for the corresponding connection on the remote peer.
+	 * @return the id as a string.
+	 */
+	public String getConnectionUuid()
+	{
+		return connectionUuid;
+	}
+
+	/**
+	 * Set the nique ID for the corresponding connection on the remote peer.
+	 * @param connectionUuid the id as a string.
+	 */
+	public void setConnectionUuid(String connectionUuid)
+	{
+		this.connectionUuid = connectionUuid;
 	}
 }
