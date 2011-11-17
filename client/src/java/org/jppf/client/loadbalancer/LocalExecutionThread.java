@@ -20,6 +20,7 @@ package org.jppf.client.loadbalancer;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
@@ -102,10 +103,17 @@ class LocalExecutionThread extends ExecutionThread
 				else if (f != null) f.get();
 			}
 		}
-		catch(Exception e)
+		catch(Throwable t)
 		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			exception = e;
+			if (debugEnabled) log.debug(t.getMessage(), t);
+			exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+            if (job.getResultListener() != null)
+            {
+                synchronized(job.getResultListener())
+                {
+                    job.getResultListener().resultsReceived(new TaskResultEvent(t));
+                }
+            }
 		}
 		finally
 		{
