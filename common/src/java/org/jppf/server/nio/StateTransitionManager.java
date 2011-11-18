@@ -112,7 +112,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	@SuppressWarnings("unchecked")
 	public void transitionChannel(final ChannelWrapper<?> channel, final T transition)
 	{
-		server.getLock().lock();
+		Lock lock = server.getLock();
+		lock.lock();
 		try
 		{
 			NioContext<S> context = (NioContext<S>) channel.getContext();
@@ -126,7 +127,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		}
 		finally
 		{
-			server.getLock().unlock();
+			lock.unlock();
 		}
 	}
 
@@ -145,7 +146,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		SelectionKey key = null;
 		try
 		{
-			server.getLock().lock();
+			Lock lock = server.getLock();
+			lock.lock();
 			try
 			{
 				server.getSelector().wakeup();
@@ -160,7 +162,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 			}
 			finally
 			{
-				server.getLock().unlock();
+				lock.unlock();
 			}
 		}
 		catch (ClosedChannelException e)

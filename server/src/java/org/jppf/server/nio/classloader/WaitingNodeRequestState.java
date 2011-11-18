@@ -69,14 +69,12 @@ class WaitingNodeRequestState extends ClassServerState
 			TraversalList<String> uuidPath = resource.getUuidPath();
 			boolean dynamic = resource.isDynamic();
 			String name = resource.getName();
-			byte[] b = null;
 			String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
 			ByteTransitionPair p = null;
 			if (!dynamic || (resource.getRequestUuid() == null))
 			{
 				p = processNonDynamic(channel, resource);
 				if (p.second() != null) return p.second();
-				b = p.first();
 			}
 			else
 			{

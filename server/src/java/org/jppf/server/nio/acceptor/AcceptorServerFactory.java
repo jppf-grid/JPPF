@@ -69,15 +69,4 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
 		return map;
 	}
 
-
-	/**
-	 * Create a transition to the specified state for the specified IO operations.
-	 * @param state resulting state of the transition.
-	 * @param ops the operations allowed.
-	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
-	 */
-	private static NioTransition<AcceptorState> transition(final AcceptorState state, final int ops)
-	{
-		return new NioTransition<AcceptorState>(state, ops);
-	}
 }

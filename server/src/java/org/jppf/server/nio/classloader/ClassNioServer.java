@@ -290,6 +290,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 		synchronized(nodeConnections)
 		{
 			nodeConnections.put(uuid, channel);
+			if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().addChannel(channel, getName());
 		}
 	}
 

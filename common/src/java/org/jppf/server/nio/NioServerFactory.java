@@ -106,4 +106,15 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
 	{
 		return server;
 	}
+
+	/**
+	 * Create a transition to the specified state for the specified IO operations.
+	 * @param state resulting state of the transition.
+	 * @param ops the operations allowed.
+	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
+	 */
+	protected NioTransition<S> transition(final S state, final int ops)
+	{
+		return new NioTransition<S>(state, ops);
+	}
 }

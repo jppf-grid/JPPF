@@ -111,7 +111,7 @@ public final class PermissionsFactory
 	 * Initialize the permissions granted to a node.
 	 * @param classLoader the ClassLoader used to retrieve the policy file.
 	 */
-	private static void createPermissions(final ClassLoader classLoader)
+	private static synchronized void createPermissions(final ClassLoader classLoader)
 	{
 		if (permList != null) return;
 		permList = new ArrayList<Permission>();

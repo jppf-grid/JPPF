@@ -224,7 +224,7 @@ public class JPPFStats implements Serializable
 	/**
 	 * Reset all fields of this <code>JPPFStats</code> object to their initial values.
 	 */
-	public synchronized void reset()
+	public void reset()
 	{
 		totalTasksExecuted = 0;
 		execution = new StatsSnapshot("execution");

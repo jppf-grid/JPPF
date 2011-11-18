@@ -236,7 +236,7 @@ class Deserializer
 		{
 			switch(eltDesc.signature.charAt(0))
 			{
-				case 'B': byte[] barray = new byte[len];       obj = barray; in.read(barray, 0, len); break;
+				case 'B': byte[] barray = new byte[len]; obj = barray; in.read(barray, 0, len); break;
 				case 'S': obj = readShortArray(len); break;
 				case 'I': obj = readIntArray(len); break;
 				case 'J': obj = readLongArray(len); break;

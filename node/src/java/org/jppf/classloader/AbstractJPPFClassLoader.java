@@ -347,7 +347,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 		int length = names.length;
 		URL[] results = new URL[length];
 		for (int i=0; i<length; i++) results[i] = null;
-		List<URL[]> resultList = new ArrayList<URL[]>();
 		try
 		{
 			ClassLoader parent = getParent();

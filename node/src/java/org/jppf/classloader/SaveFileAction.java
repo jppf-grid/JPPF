@@ -76,7 +76,6 @@ class SaveFileAction implements PrivilegedAction<File>
 	public File run()
 	{
 		File tmp = null;
-		String fileName = FileUtils.getFileName(name);
 		try
 		{
 			for (String s: tmpDirs)

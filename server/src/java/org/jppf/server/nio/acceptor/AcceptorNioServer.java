@@ -83,7 +83,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
 	@Override
 	public void postAccept(final ChannelWrapper channel)
 	{
-		AcceptorContext context = (AcceptorContext) channel.getContext();
 		try
 		{
 			transitionManager.transitionChannel(channel, AcceptorTransition.TO_IDENTIFYING_PEER);

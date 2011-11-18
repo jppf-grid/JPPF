@@ -83,15 +83,4 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
 		map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, R));
 		return map;
 	}
-
-	/**
-	 * Create a transition to the specified state for the specified IO operations.
-	 * @param state resulting state of the transition.
-	 * @param ops the operations allowed.
-	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
-	 */
-	private NioTransition<ClassState> transition(final ClassState state, final int ops)
-	{
-		return new NioTransition<ClassState>(state, ops);
-	}
 }

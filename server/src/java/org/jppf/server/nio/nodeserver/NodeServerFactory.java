@@ -76,16 +76,4 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
 		//map.put(TO_IDLE, transition(SENDING_BUNDLE, R));
 		return map;
 	}
-
-
-	/**
-	 * Create a transition to the specified state for the specified IO operations.
-	 * @param state resulting state of the transition.
-	 * @param ops the operations allowed.
-	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
-	 */
-	private static NioTransition<NodeState> transition(final NodeState state, final int ops)
-	{
-		return new NioTransition<NodeState>(state, ops);
-	}
 }

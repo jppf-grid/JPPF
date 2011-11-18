@@ -80,15 +80,4 @@ extends NioServerFactory<MultiplexerState, MultiplexerTransition>
 		map.put(TO_IDLE, transition(IDLE, 0));
 		return map;
 	}
-
-	/**
-	 * Create a transition to the specified state for the specified IO operations.
-	 * @param state resulting state of the transition.
-	 * @param ops the operations allowed.
-	 * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
-	 */
-	private static NioTransition<MultiplexerState> transition(final MultiplexerState state, final int ops)
-	{
-		return new NioTransition<MultiplexerState>(state, ops);
-	}
 }

@@ -105,6 +105,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 	 * @return true if this object is equal to the other one, false otherwise.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	/*
 	@Override
 	public boolean equals(final Object obj)
 	{
@@ -115,6 +116,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 		if (channel == null) return (other.channel == null);
 		return channel.equals(other.channel);
 	}
+	*/
 
 	/**
 	 * {@inheritDoc}

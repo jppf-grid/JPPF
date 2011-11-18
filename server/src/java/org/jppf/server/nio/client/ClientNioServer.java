@@ -83,7 +83,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 	@Override
 	public void postAccept(final ChannelWrapper channel)
 	{
-		ClientContext context = (ClientContext) channel.getContext();
 		try
 		{
 			transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_JOB);

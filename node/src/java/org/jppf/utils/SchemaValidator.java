@@ -189,10 +189,13 @@ public class SchemaValidator
 	 */
 	public SchemaFactory getSchemaFactory()
 	{
-		if (sf == null)
+		synchronized(SchemaValidator.class)
 		{
-			sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-			sf.setErrorHandler(new ValidatorErrorHandler(null));
+			if (sf == null)
+			{
+				sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+				sf.setErrorHandler(new ValidatorErrorHandler(null));
+			}
 		}
 		return sf;
 	}
