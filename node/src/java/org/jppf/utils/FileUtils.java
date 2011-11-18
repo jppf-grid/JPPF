@@ -21,8 +21,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.utils.streams.JPPFByteArrayOutputStream;
-import org.slf4j.Logger;
+import org.jppf.utils.streams.*;
 
 /**
  * This class provides a set of utility methods for reading, writing and manipulating files.
@@ -30,11 +29,6 @@ import org.slf4j.Logger;
  */
 public final class FileUtils
 {
-	/**
-	 * Maximum buffer size for reading class files.
-	 */
-	private static final int TEMP_BUFFER_SIZE = 32*1024;
-
 	/**
 	 * Instantiation of this class is not permitted.
 	 */
@@ -371,7 +365,7 @@ public final class FileUtils
 	 */
 	public static byte[] getInputStreamAsByte(final InputStream is) throws IOException
 	{
-		byte[] buffer = new byte[TEMP_BUFFER_SIZE];
+		byte[] buffer = new byte[StreamConstants.TEMP_BUFFER_SIZE];
 		byte[] result = null;
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		boolean end = false;
@@ -396,7 +390,7 @@ public final class FileUtils
 	 */
 	public static void copyStream(final InputStream is, final OutputStream os) throws IOException
 	{
-		byte[] bytes = new byte[TEMP_BUFFER_SIZE];
+		byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
 		while(true)
 		{
 			int n = is.read(bytes);
@@ -478,30 +472,6 @@ public final class FileUtils
 		bais.close();
 		os.flush();
 		os.close();
-	}
-
-	/**
-	 * Attempt to close the specified input stream and log any eventual error.
-	 * @param is the input stream to close.
-	 * @param log the logger to use; if null no logging occurs.
-	 */
-	public static void closeInputStream(final InputStream is, final Logger log)
-	{
-		if (is != null)
-		{
-			try
-			{
-				is.close();
-			}
-			catch (Exception e)
-			{
-				if (log != null)
-				{
-					if (log.isDebugEnabled()) log.debug("unable to close input stream", e);
-					else log.warn("unable to close input stream: " + e.getClass().getName() + ": " + e.getMessage());
-				}
-			}
-		}
 	}
 
 	/**

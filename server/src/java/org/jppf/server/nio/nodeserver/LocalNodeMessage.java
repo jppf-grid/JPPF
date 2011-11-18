@@ -24,6 +24,7 @@ import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * Node message implementation for an in-VM node.
@@ -37,9 +38,16 @@ public class LocalNodeMessage extends AbstractNodeMessage
 	@Override
 	public boolean read(final ChannelWrapper<?> wrapper) throws Exception
 	{
-		//while (locations.isEmpty()) ((LocalNodeWrapperHandler) wrapper).goToSleep();
 		InputStream is = locations.get(0).getInputStream();
-		byte[] data = FileUtils.getInputStreamAsByte(is);
+		byte[] data = null;
+		try
+		{
+			data = FileUtils.getInputStreamAsByte(is);
+		}
+		finally
+		{
+			StreamUtils.close(is);
+		}
 		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 		SerializationHelper helper = new SerializationHelperImpl();
 		bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);

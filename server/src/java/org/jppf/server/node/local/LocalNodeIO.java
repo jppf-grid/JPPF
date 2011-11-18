@@ -21,6 +21,7 @@ package org.jppf.server.node.local;
 import static java.nio.channels.SelectionKey.*;
 import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -30,6 +31,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -89,7 +91,16 @@ public class LocalNodeIO extends AbstractNodeIO
 		message = channel.getNodeResource();
 		DataLocation location = message.getLocations().get(0);
 		if (debugEnabled) log.debug("got bundle");
-		byte[] data = JPPFDataTransformFactory.transform(false, location.getInputStream());
+		byte[] data = null;
+		InputStream is = location.getInputStream();
+		try
+		{
+			data = JPPFDataTransformFactory.transform(false, is);
+		}
+		finally
+		{
+			StreamUtils.close(is);
+		}
 		JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
 		Object[] result = deserializeObjects(bundle);
 		channel.setNodeResource(null);

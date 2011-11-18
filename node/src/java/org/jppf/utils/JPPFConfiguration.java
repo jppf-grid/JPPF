@@ -19,6 +19,7 @@ package org.jppf.utils;
 
 import java.io.*;
 
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -97,7 +98,7 @@ public class JPPFConfiguration
 		}
 		finally
 		{
-			FileUtils.closeInputStream(is, log);
+			StreamUtils.close(is, log);
 		}
 	}
 

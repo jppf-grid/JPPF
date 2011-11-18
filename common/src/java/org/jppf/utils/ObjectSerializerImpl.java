@@ -93,9 +93,15 @@ public class ObjectSerializerImpl implements ObjectSerializer
 	public static void serialize(final Object o, final DataLocation location) throws Exception
 	{
 		ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(location.getOutputStream());
-		oos.writeObject(o);
-		oos.flush();
-		oos.close();
+		try
+		{
+			oos.writeObject(o);
+			oos.flush();
+		}
+		finally
+		{
+			oos.close();
+		}
 	}
 
 	/**

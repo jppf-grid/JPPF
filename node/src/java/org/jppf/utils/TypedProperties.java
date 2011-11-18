@@ -22,6 +22,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -377,7 +378,7 @@ public class TypedProperties extends Properties
 		}
 		finally
 		{
-			FileUtils.closeInputStream(is, log);
+			StreamUtils.close(is, log);
 		}
 		return res;
 	}

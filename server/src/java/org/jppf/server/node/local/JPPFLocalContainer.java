@@ -26,6 +26,7 @@ import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.DataLocation;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFContainer;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -133,8 +134,16 @@ public class JPPFLocalContainer extends JPPFContainer
 			{
 				Thread.currentThread().setContextClassLoader(getClassLoader());
 				InputStream is = location.getInputStream();
-				if (traceEnabled) log.debug("deserializing object index = " + index);
-				byte[] buffer = JPPFDataTransformFactory.transform(false, is);
+				byte[] buffer = null;
+				try
+				{
+					if (traceEnabled) log.debug("deserializing object index = " + index);
+					buffer = JPPFDataTransformFactory.transform(false, is);
+				}
+				finally
+				{
+					StreamUtils.close(is);
+				}
 				Object o = helper.getSerializer().deserialize(buffer);
 				if (traceEnabled) log.debug("deserialized object index = " + index);
 				return o;

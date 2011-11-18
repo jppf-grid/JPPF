@@ -17,6 +17,7 @@
  */
 package org.jppf.server.app;
 
+import java.io.InputStream;
 import java.net.*;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -59,7 +61,7 @@ class ApplicationConnection extends JPPFConnection
 	/**
 	 * Input source for the socket client.
 	 */
-	private InputSource is = null;
+	private InputSource source = null;
 	/**
 	 * Total number of tasks submitted to this application connection.
 	 */
@@ -87,7 +89,7 @@ class ApplicationConnection extends JPPFConnection
 	public ApplicationConnection(final JPPFServer server, final Socket socket) throws JPPFException
 	{
 		super(server, socket);
-		is = new SocketWrapperInputSource(socketClient);
+		source = new SocketWrapperInputSource(socketClient);
 		resultSender = new ApplicationResultSender(socketClient);
 		InetAddress addr = socket.getInetAddress();
 		setName("appl [" + addr.getHostAddress() + ':' + socket.getPort() + ']');
@@ -114,8 +116,17 @@ class ApplicationConnection extends JPPFConnection
 	{
 		if (debugEnabled) log.debug("before reading header");
 		// Read the request header - with tasks count information
-		DataLocation dl = IOHelper.readData(is);
-		byte[] data = FileUtils.getInputStreamAsByte(dl.getInputStream());
+		DataLocation dl = IOHelper.readData(source);
+		InputStream is = dl.getInputStream();
+		byte[] data;
+		try
+		{
+			data = FileUtils.getInputStreamAsByte(is);
+		}
+		finally
+		{
+			StreamUtils.close(is);
+		}
 		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
 		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
 		if (debugEnabled) log.debug("received header from client, data length = " + data.length);
@@ -146,7 +157,7 @@ class ApplicationConnection extends JPPFConnection
 
 		for (int i=0; i<count+1; i++)
 		{
-			DataLocation dl = IOHelper.readData(is);
+			DataLocation dl = IOHelper.readData(source);
 			if (i == 0)
 			{
 				headerWrapper.setDataProvider(dl);

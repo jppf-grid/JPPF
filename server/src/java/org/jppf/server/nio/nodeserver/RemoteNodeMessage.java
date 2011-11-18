@@ -18,11 +18,13 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.io.*;
 import java.nio.channels.*;
 
 import org.jppf.io.*;
 import org.jppf.server.nio.*;
 import org.jppf.utils.SerializationUtils;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * Representation of a message sent or received by a remote node.
@@ -57,12 +59,19 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 		{
 			currentLengthObject = new NioObject(4, false);
 		}
-		InputSource is = new ChannelInputSource(channel);
-		if (!currentLengthObject.read(is)) return false;
+		InputSource source = new ChannelInputSource(channel);
+		if (!currentLengthObject.read(source)) return false;
 		if (currentLength <= 0)
 		{
-			//currentLength = ((ByteBufferLocation) currentLengthObject.getData()).buffer().getInt();
-			currentLength = SerializationUtils.readInt(currentLengthObject.getData().getInputStream());
+			InputStream is = currentLengthObject.getData().getInputStream();
+			try
+			{
+			currentLength = SerializationUtils.readInt(is);
+			}
+			finally
+			{
+				StreamUtils.close(is);
+			}
 			count += 4;
 		}
 		if (currentObject == null)
@@ -70,7 +79,7 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 			DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
 			currentObject = new NioObject(location, false);
 		}
-		if (!currentObject.read(is)) return false;
+		if (!currentObject.read(source)) return false;
 		count += currentLength;
 		locations.add(currentObject.getData());
 		currentLengthObject = null;
@@ -93,16 +102,24 @@ public class RemoteNodeMessage extends AbstractNodeMessage
 		if (currentLengthObject == null)
 		{
 			currentLengthObject = new NioObject(4, false);
-			SerializationUtils.writeInt(locations.get(position).getSize(), currentLengthObject.getData().getOutputStream());
+			OutputStream os = currentLengthObject.getData().getOutputStream();
+			try
+			{
+				SerializationUtils.writeInt(locations.get(position).getSize(), os);
+			}
+			finally
+			{
+				StreamUtils.close(os);
+			}
 		}
-		OutputDestination od = new ChannelOutputDestination(channel);
-		if (!currentLengthObject.write(od)) return false;
+		OutputDestination dest = new ChannelOutputDestination(channel);
+		if (!currentLengthObject.write(dest)) return false;
 		if (currentObject == null)
 		{
 			DataLocation loc = locations.get(position);
 			currentObject = new NioObject(loc.copy(), false);
 		}
-		if (!currentObject.write(od)) return false;
+		if (!currentObject.write(dest)) return false;
 		count += 4 + locations.get(position).getSize();
 		position++;
 		currentLengthObject = null;

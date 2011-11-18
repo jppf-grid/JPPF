@@ -156,7 +156,14 @@ public final class IOHelper
 			is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
 		}
 		else is = dl.getInputStream();
-		return ser.deserialize(is);
+		try
+		{
+			return ser.deserialize(is);
+		}
+		finally
+		{
+			StreamUtils.close(is);
+		}
 	}
 
 	/**
@@ -170,7 +177,15 @@ public final class IOHelper
 	{
 		if (traceEnabled) log.trace("unwrapping to memory " + source);
 		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-		transform.unwrap(source.getInputStream(), mbos);
+		InputStream is = source.getInputStream();
+		try
+		{
+			transform.unwrap(is, mbos);
+		}
+		finally
+		{
+			StreamUtils.close(is);
+		}
 		return new MultipleBuffersInputStream(mbos.toBufferList());
 	}
 
@@ -186,7 +201,15 @@ public final class IOHelper
 		if (traceEnabled) log.trace("unwrapping to file " + source);
 		File file = IOHelper.createTempFile(-1);
 		OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-		transform.unwrap(source.getInputStream(), os);
+		InputStream is = source.getInputStream();
+		try
+		{
+			transform.unwrap(source.getInputStream(), os);
+		}
+		finally
+		{
+			StreamUtils.close(is);
+		}
 		return new BufferedInputStream(new FileInputStream(file));
 	}
 

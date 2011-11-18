@@ -122,8 +122,7 @@ public class ServerDebug implements ServerDebugMBean
 	 */
 	public void addChannel(final ChannelWrapper<?> channel, final String serverName)
 	{
-		Set<ChannelWrapper<?>> set = NioServer.CLASS_SERVER.equals(serverName) ? classLoaderSet
-				: NioServer.NODE_SERVER.equals(serverName) ? nodeSet : clientSet;
+		Set<ChannelWrapper<?>> set = findSetFromName(serverName);
 		synchronized(set)
 		{
 			set.add(channel);
@@ -137,11 +136,23 @@ public class ServerDebug implements ServerDebugMBean
 	 */
 	public void removeChannel(final ChannelWrapper<?> channel, final String serverName)
 	{
-		Set<ChannelWrapper<?>> set = NioServer.CLASS_SERVER.equals(serverName) ? classLoaderSet
-				: NioServer.NODE_SERVER.equals(serverName) ? nodeSet : clientSet;
+		Set<ChannelWrapper<?>> set = findSetFromName(serverName);
 		synchronized(set)
 		{
 			set.remove(channel);
 		}
+	}
+
+	/**
+	 * Get the set of channels for the specified server name.
+	 * @param name the name of the server for which to get the channels.
+	 * @return a set of <code>ChannelWrapper</code> instances.
+	 */
+	private Set<ChannelWrapper<?>> findSetFromName(final String name)
+	{
+		if (NioServer.CLASS_SERVER.equals(name)) return classLoaderSet;
+		else if (NioServer.NODE_SERVER.equals(name)) return nodeSet;
+		else if (NioServer.CLIENT_SERVER.equals(name)) return clientSet;
+		return acceptorSet;
 	}
 }

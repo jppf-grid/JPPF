@@ -20,6 +20,7 @@ package org.jppf.utils;
 import java.io.InputStream;
 import java.net.*;
 
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -72,7 +73,7 @@ public final class VersionUtils
 			}
 			finally
 			{
-				FileUtils.closeInputStream(is, log);
+				StreamUtils.close(is, log);
 			}
 		}
 		return buildNumber;
