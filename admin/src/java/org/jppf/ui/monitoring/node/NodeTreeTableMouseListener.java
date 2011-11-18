@@ -27,9 +27,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.ui.actions.*;
-import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
-import org.jppf.ui.utils.GuiUtils;
 import org.slf4j.*;
 
 /**
@@ -134,34 +132,6 @@ public class NodeTreeTableMouseListener extends MouseAdapter
 		menu.add(createMenuItem(actionHandler.getAction("show.information"), p));
 		menu.add(createMenuItem(actionHandler.getAction("update.configuration"), p));
 		menu.add(createMenuItem(actionHandler.getAction("update.threads"), p));
-		boolean singleSelection = data.length == 1;
-		JMenu cancel = new JMenu("Cancel task");
-		cancel.setIcon(GuiUtils.loadIcon(CANCEL_ICON));
-		JMenu restart = new JMenu("Restart task");
-		restart.setIcon(GuiUtils.loadIcon(RESTART_ICON));
-		if (singleSelection)
-		{
-			if (data[0].getNodeState() != null)
-			{
-				Set<String> idSet = data[0].getNodeState().getAllTaskIds();
-				if (debugEnabled) log.debug("set of ids: " + idSet);
-				if (!idSet.isEmpty())
-				{
-					for (String id: idSet)
-					{
-						cancel.add(new JMenuItem(new CancelTaskAction(id, data[0])));
-						restart.add(new JMenuItem(new RestartTaskAction(id, data[0])));
-					}
-				}
-			}
-		}
-		if (restart.getItemCount() <= 0)
-		{
-			cancel.setEnabled(false);
-			restart.setEnabled(false);
-		}
-		menu.add(cancel);
-		menu.add(restart);
 		menu.add(createMenuItem(actionHandler.getAction("restart.node"), p));
 		menu.add(createMenuItem(actionHandler.getAction("shutdown.node"), p));
 		menu.add(createMenuItem(actionHandler.getAction("reset.counter"), p));

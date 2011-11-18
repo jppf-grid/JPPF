@@ -85,6 +85,10 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 	 */
 	private final List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
 	/**
+	 * Temporary array of listeners used for faster access.
+	 */
+	private TaskExecutionListener[] listenersArray = new TaskExecutionListener[0];
+	/**
 	 * Determines whether the number of threads or their priority has changed.
 	 */
 	protected AtomicBoolean configChanged = new AtomicBoolean(true);
@@ -327,7 +331,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		}
 		if (getReconnectionNotification() != null)
 		{
-			cancelAllTasks(false, false);
+			cancelAllTasks(true, false);
 			throw reconnectionNotification;
 		}
 	}
@@ -367,8 +371,8 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		TaskExecutionListener[] tmp;
 		synchronized(taskExecutionListeners)
 		{
-			tmp = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
-        }
+			tmp = listenersArray;
+    }
 		for (TaskExecutionListener listener : tmp) listener.taskExecuted(event);
 	}
 
@@ -418,6 +422,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		synchronized(taskExecutionListeners)
 		{
 			taskExecutionListeners.add(listener);
+			listenersArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
 		}
 	}
 
@@ -430,6 +435,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
 		synchronized(taskExecutionListeners)
 		{
 			taskExecutionListeners.remove(listener);
+			listenersArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
 		}
 	}
 

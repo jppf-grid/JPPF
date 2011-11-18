@@ -61,18 +61,10 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 	public void run()
 	{
 		JPPFNodeAdmin nodeAdmin = null;
-        long cpuTime = 0L;
+		long cpuTime = 0L;
 		long elapsedTime = 0L;
 		try
 		{
-			if (node.isJmxEnabled())
-			{
-				nodeAdmin = node.getNodeAdmin();
-				if (nodeAdmin != null)
-				{
-					nodeAdmin.taskStarted(task.getId());
-				}
-			}
 			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
 			long id = Thread.currentThread().getId();
 			executionManager.processTaskTimeout(task, number);
@@ -104,7 +96,6 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 			{
 				try
 				{
-					if (nodeAdmin != null) nodeAdmin.taskEnded(task.getId());
 					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
 				}
 				catch(JPPFNodeReconnectionNotification t)

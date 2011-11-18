@@ -19,7 +19,6 @@
 package org.jppf.management;
 
 import java.io.Serializable;
-import java.util.*;
 
 import org.jppf.utils.LocalizationUtils;
 
@@ -50,14 +49,6 @@ public class JPPFNodeState implements Serializable
 	 * The total cpu time used by the task processing threads.
 	 */
 	private long cpuTime = 0L;
-	/**
-	 * Holder for all latest task notifications issued from multiple execution threads.
-	 */
-	private transient Map<String, Integer> taskIdMap = new HashMap<String, Integer>();
-	/**
-	 * List of the ids of all tasks currently executing.
-	 */
-	private Set<String> taskIdSet = new HashSet<String>();
 	/**
 	 * Size of the node's thread pool.
 	 */
@@ -142,56 +133,6 @@ public class JPPFNodeState implements Serializable
 	}
 
 	/**
-	 * Notification that a task with the specified id has started.
-	 * @param id the id of the task.
-	 */
-	public synchronized void taskStarted(final String id)
-	{
-		if (id == null) return;
-		Integer n = taskIdMap.get(id);
-		if (n == null) n = 1;
-		else n = n + 1;
-		if (!taskIdSet.contains(id)) taskIdSet.add(id);
-		taskIdMap.put(id, n);
-	}
-
-	/**
-	 * Notification that a task with the specified id has ended.
-	 * @param id the id of the task.
-	 */
-	public synchronized void taskEnded(final String id)
-	{
-		if (id == null) return;
-		Integer n = taskIdMap.get(id);
-		if (n == null) return;
-		n = n - 1;
-		if (n <= 0)
-		{
-			taskIdMap.remove(id);
-			taskIdSet.remove(id);
-		}
-		else taskIdMap.put(id, n);
-	}
-
-	/**
-	 * Get the ids of all currently executing tasks.
-	 * @return the ids as a set of strings.
-	 */
-	public synchronized Set<String> getAllTaskIds()
-	{
-		return Collections.unmodifiableSet(taskIdSet);
-	}
-
-	/**
-	 * Set the ids of all currently executing tasks.
-	 * @param taskIdSet the ids as a set of strings.
-	 */
-	public synchronized void setTaskIdSet(final Set<String> taskIdSet)
-	{
-		this.taskIdSet = taskIdSet;
-	}
-
-	/**
 	 * Get the size of the node's thread pool.
 	 * @return the size as an int.
 	 */
@@ -255,7 +196,6 @@ public class JPPFNodeState implements Serializable
 		s.setNbTasksExecuted(getNbTasksExecuted());
 		s.setConnectionStatus(getConnectionStatus());
 		s.setExecutionStatus(getExecutionStatus());
-		s.setTaskIdSet(getAllTaskIds());
 		s.setThreadPoolSize(getThreadPoolSize());
 		s.setThreadPriority(getThreadPriority());
 		s.setCpuTime(getCpuTime());

@@ -254,26 +254,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 	}
 
 	/**
-	 * Notification that a task with the specified id has started.
-	 * @param id the id of the task.
-	 */
-	public void taskStarted(final String id)
-	{
-		//if (debugEnabled) log.debug("task id#" + id + " started");
-		nodeState.taskStarted(id);
-	}
-
-	/**
-	 * Notification that a task with the specified id has ended.
-	 * @param id the id of the task.
-	 */
-	public void taskEnded(final String id)
-	{
-		//if (debugEnabled) log.debug("task id#" + id + " ended");
-		nodeState.taskEnded(id);
-	}
-
-	/**
 	 * Cancel the job with the specified id.
 	 * @param jobId the id of the job to cancel.
 	 * @param requeue true if the job should be requeued on the server side, false otherwise.
@@ -287,8 +267,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
 		if (jobId == null) return;
 		if (jobId.equals(node.getExecutionManager().getCurrentJobId()))
 		{
-			//node.getExecutionManager().cancelAllTasks(false, requeue);
-			node.getExecutionManager().cancelAllTasks(false, requeue);
+			node.getExecutionManager().cancelAllTasks(true, requeue);
 		}
 	}
 
