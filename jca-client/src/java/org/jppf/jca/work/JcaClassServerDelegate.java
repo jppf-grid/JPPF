@@ -50,15 +50,16 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 
 	/**
 	 * Initialize class server delegate with a specified application uuid.
-     * @param name the name given to this this delegate.
-     * @param uuid the unique identifier for the local JPPF client.
-     * @param host the name or IP address of the host the class server is running on.
-     * @param port the TCP port the class server is listening to.
-     * @throws Exception if the connection could not be opened.
+	 * @param name the name given to this this delegate.
+	 * @param uuid the unique identifier for the local JPPF client.
+	 * @param host the name or IP address of the host the class server is running on.
+	 * @param port the TCP port the class server is listening to.
+	 * @param owner the connection that owns this class server delegate.
+	 * @throws Exception if the connection could not be opened.
 	 */
-	public JcaClassServerDelegate(final String name, final String uuid, final String host, final int port) throws Exception
+	public JcaClassServerDelegate(final String name, final String uuid, final String host, final int port, final JPPFJcaClientConnection owner) throws Exception
 	{
-		super(null);
+		super(owner);
 		this.clientUuid = uuid;
 		this.host = host;
 		this.port = port;

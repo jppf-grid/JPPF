@@ -35,6 +35,10 @@ public abstract class AbstractJobSubmission implements JobSubmission
 	 * The connection to execute the job on.
 	 */
 	protected AbstractJPPFClientConnection connection;
+	/**
+	 * The submission manager.
+	 */
+	protected SubmissionManager submissionManager;
 
 	/**
 	 * Initialize this job submission.

@@ -21,7 +21,7 @@ package org.jppf.client;
 import org.jppf.client.event.SubmissionStatusListener;
 
 /**
- * 
+ * Interface for an asynchronous job submission manager.
  * @author Laurent Cohen
  */
 public interface SubmissionManager extends Runnable

@@ -74,7 +74,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			delegate = new JcaClassServerDelegate(name, client.getUuid(), host, classServerPort);
+			delegate = new JcaClassServerDelegate(name, client.getUuid(), host, classServerPort, this);
 			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
 			{
 				@Override
@@ -91,16 +91,16 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 					taskServerConnectionStatusChanged(event);
 				}
 			});
-            connect();
+      connect();
 		}
 		catch(Exception e)
 		{
 			log.error(e.getMessage(), e);
-            setStatus(FAILED);
+			setStatus(FAILED);
 		}
 		catch(JPPFError e)
 		{
-            setStatus(FAILED);
+			setStatus(FAILED);
 			throw e;
 		}
 	}
@@ -188,7 +188,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	 * @param job the job to execute remotely.
 	 * @throws Exception if an error occurs while sending the request.
 	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
-	 * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
+	 * @deprecated job submissions should be performed via {@link JPPFClient#submit(JPPFJob)} directly.
 	 */
 	@Override
 	public void submit(final JPPFJob job) throws Exception

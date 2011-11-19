@@ -21,6 +21,7 @@ import static org.jppf.client.SubmissionStatus.*;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
+import org.slf4j.*;
 
 /**
  * Wrapper for submitting a job.
@@ -28,14 +29,25 @@ import org.jppf.node.protocol.Task;
 public class JcaJobSubmission extends AbstractJobSubmission
 {
 	/**
+	 * Logger for this class.
+	 */
+	static Logger log = LoggerFactory.getLogger(JcaJobSubmission.class);
+	/**
+	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+	 */
+	private static boolean debugEnabled = log.isDebugEnabled();
+
+	/**
 	 * Initialize this job submission.
 	 * @param job the submitted job.
 	 * @param connection the connection to execute the job on.
+	 * @param submissionManager the submission manager.
 	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
 	 */
-	JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting)
+	JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
 	{
 		super(job, connection, locallyExecuting);
+		this.submissionManager = submissionManager;
 	}
 
 	/**
@@ -53,7 +65,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
 			Task task = job.getTasks().get(0);
 			cl = task.getClass().getClassLoader();
 			connection.getDelegate().addRequestClassLoader(requestUuid, cl);
-			if (JcaSubmissionManager.log.isDebugEnabled()) JcaSubmissionManager.log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+			if (debugEnabled) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
 		}
 		try
 		{
@@ -70,7 +82,8 @@ public class JcaJobSubmission extends AbstractJobSubmission
 		catch (Exception e)
 		{
 			result.setStatus(FAILED);
-			JcaSubmissionManager.log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
+			submissionManager.resubmitJob(job);
 		}
 		finally
 		{

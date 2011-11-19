@@ -40,10 +40,6 @@ public class JobSubmissionImpl extends AbstractJobSubmission
 	 * The status of this submission.
 	 */
 	protected SubmissionStatus status = SubmissionStatus.SUBMITTED;
-	/**
-	 * The submission manager.
-	 */
-	protected SubmissionManagerImpl submissionManager;
 
 	/**
 	 * Initialize this job submission.
@@ -71,7 +67,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
 			if (connection != null) connection.setCurrentJob(job);
 			try
 			{
-				submissionManager.client.getLoadBalancer().execute(this, connection, locallyExecuting);
+				((SubmissionManagerImpl) submissionManager).client.getLoadBalancer().execute(this, connection, locallyExecuting);
 			}
 			catch(NotSerializableException e)
 			{

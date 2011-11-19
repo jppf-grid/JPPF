@@ -42,7 +42,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	/**
 	 * Logger for this class.
 	 */
-	static Logger log = LoggerFactory.getLogger(JcaSubmissionManager.class);
+	private static Logger log = LoggerFactory.getLogger(JcaSubmissionManager.class);
 	/**
 	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
 	 */
@@ -59,22 +59,14 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	 * The JPPF client that manages connections to the JPPF drivers.
 	 */
 	private JPPFJcaClient client = null;
-	/**
-	 * The work manager provided by the applications server, used to submit asynchronous
-	 * JPPF submissions.
-	 */
-	private WorkManager workManager = null;
 
 	/**
 	 * Initialize this submission worker with the specified JPPF client.
 	 * @param client the JPPF client that manages connections to the JPPF drivers.
-	 * @param workManager the work manager provided by the applications server, used to submit asynchronous
-	 * JPPF submissions.
 	 */
-	public JcaSubmissionManager(final JPPFJcaClient client, final WorkManager workManager)
+	public JcaSubmissionManager(final JPPFJcaClient client)
 	{
 		this.client = client;
-		this.workManager = workManager;
 	}
 
 	/**
@@ -110,7 +102,7 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 				JPPFJcaClientConnection c = null;
 				c = (JPPFJcaClientConnection) client.getClientConnection();
 				if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
-				JobSubmission submission = new JcaJobSubmission(job, c, execFlags.second());
+				JobSubmission submission = new JcaJobSubmission(job, c, execFlags.second(), this);
 				client.getExecutor().submit(submission);
 			}
 		}
@@ -157,7 +149,6 @@ public class JcaSubmissionManager extends ThreadSynchronization implements Work,
 	public String resubmitJob(final JPPFJob job)
 	{
 		JcaSubmissionResult submission = (JcaSubmissionResult) job.getResultListener();
-		//submission.reset();
 		submission.setStatus(PENDING);
 		execQueue.add(job);
 		submissionMap.put(submission.getId(), submission);
