@@ -98,7 +98,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
 			job.addTask(task);
 		}
 		job.setBlocking(blocking);
-		if (!blocking) job.setResultListener(new JPPFResultCollector(nbTasks));
+		if (!blocking) job.setResultListener(new JPPFResultCollector(job));
 		return job;
 	}
 

@@ -49,7 +49,7 @@ public class GenericRunner
 			client = new JPPFClient();
 			List<JPPFTask> results = null;
 			//results = client.submit(job);
-			JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size())
+			JPPFResultCollector collector = new JPPFResultCollector(job)
 			{
 				@Override
 				public synchronized void resultsReceived(final TaskResultEvent event)

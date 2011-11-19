@@ -144,13 +144,13 @@ public class LocalExecutionRunner
 				JPPFJob job = new JPPFJob();
 				job.setName("job " + i);
 				job.setBlocking(false);
-				job.setResultListener(new JPPFResultCollector(nbTasks));
 				for (int j=0; j<nbTasks; j++)
 				{
 					JPPFTask task = new LongTask(length, false);
 					task.setId("task " + i + ':' + j);
 					job.addTask(task);
 				}
+				job.setResultListener(new JPPFResultCollector(job));
 				jobs.add(job);
 			}
 			long start = System.nanoTime();

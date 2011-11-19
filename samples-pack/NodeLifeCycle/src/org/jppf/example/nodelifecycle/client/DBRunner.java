@@ -76,7 +76,7 @@ public class DBRunner
 			}
 			job.setBlocking(false);
 			// customize the result listener to display a message each time a task result is received
-			JPPFResultCollector collector = new JPPFResultCollector(nbTasks)
+			JPPFResultCollector collector = new JPPFResultCollector(job)
 			{
 				@Override
 				public synchronized void resultsReceived(final TaskResultEvent event)

@@ -48,15 +48,15 @@ public class JobManagementTestRunner
 		int nbTasks = props.getInt("job.management.nbTasks", 2);
 		long duration = props.getLong("job.management.duration", 1000L);
 		String jobId = "test1";
-		JPPFResultCollector collector = new JPPFResultCollector(nbTasks);
 		JPPFJob job = new JPPFJob();
 		job.setName(jobId);
 		job.setBlocking(false);
-		job.setResultListener(collector);
 		for (int i=0; i<nbTasks; i++)
 		{
 			job.addTask(new LongTask(duration));
 		}
+		JPPFResultCollector collector = new JPPFResultCollector(job);
+		job.setResultListener(collector);
 		client.submit(job);
 		JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
 		driver.connect();

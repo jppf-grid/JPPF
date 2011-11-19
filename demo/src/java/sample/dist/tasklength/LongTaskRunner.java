@@ -267,7 +267,7 @@ public class LongTaskRunner
 		LongTask task = new LongTask(10000L, false);
 		task.setId("1");
 		job.addTask(task);
-		JPPFResultCollector collector = new JPPFResultCollector(1);
+		JPPFResultCollector collector = new JPPFResultCollector(job);
 		job.setResultListener(collector);
 		job.setBlocking(false);
 		jppfClient.submit(job);
@@ -308,7 +308,7 @@ public class LongTaskRunner
 		LongTask task = new LongTask(6000L, false);
 		task.setId("1");
 		job.addTask(task);
-		JPPFResultCollector collector = new JPPFResultCollector(1);
+		JPPFResultCollector collector = new JPPFResultCollector(job);
 		job.setResultListener(collector);
 		job.setBlocking(false);
 		jppfClient.submit(job);
@@ -321,7 +321,7 @@ public class LongTaskRunner
 		List<JPPFTask> results = collector.waitForResults();
 		System.out.println("job cancelled");
 		job.setName("Long task job 2");
-		collector = new JPPFResultCollector(1);
+		collector = new JPPFResultCollector(job);
 		job.setResultListener(collector);
 		System.out.println("submitting the second job");
 		jppfClient.submit(job);

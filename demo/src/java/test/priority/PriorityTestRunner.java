@@ -81,7 +81,7 @@ public class PriorityTestRunner
 	{
 		JPPFJob job = new JPPFJob();
 		job.addTask(new PrioritizedTask(0));
-		JPPFResultCollector collector = new JPPFResultCollector(1);
+		JPPFResultCollector collector = new JPPFResultCollector(job);
 		job.setResultListener(collector);
 		job.setBlocking(false);
 		client.submit(job);
@@ -112,7 +112,7 @@ public class PriorityTestRunner
 		job.addTask(task);
 		job.getSLA().setPriority(priority);
 		job.setBlocking(false);
-		job.setResultListener(new JPPFResultCollector(1));
+		job.setResultListener(new JPPFResultCollector(job));
 		return job;
 	}
 }

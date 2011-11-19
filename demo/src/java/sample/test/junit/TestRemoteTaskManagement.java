@@ -95,7 +95,7 @@ public class TestRemoteTaskManagement extends TestCase implements Serializable
 		JPPFJob job = new JPPFJob();
 		job.addTask(task);
 		job.setBlocking(false);
-		JPPFResultCollector c = new JPPFResultCollector(1);
+		JPPFResultCollector c = new JPPFResultCollector(job);
 		job.setResultListener(c);
 		client.submit(job);
 		Thread.sleep(1000L);

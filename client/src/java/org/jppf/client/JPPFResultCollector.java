@@ -84,6 +84,7 @@ public class JPPFResultCollector implements TaskResultListener
 	/**
 	 * Initialize this collector with a specified number of tasks.
 	 * @param count the count of submitted tasks.
+	 * @deprecated use {@link #JPPFResultCollector(JPPFJob) JPPFResultCollector(JPPFJob)} instead.
 	 */
 	public JPPFResultCollector(final int count)
 	{

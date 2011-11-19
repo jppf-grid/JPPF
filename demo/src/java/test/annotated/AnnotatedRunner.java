@@ -81,7 +81,7 @@ public class AnnotatedRunner
 			JPPFJob job = new JPPFJob();
 			job.setName("demo job " + (i+1));
 			job.addTask(new AnnotatedTask(time, (i+1)));
-			JPPFResultCollector collector = new JPPFResultCollector(1);
+			JPPFResultCollector collector = new JPPFResultCollector(job);
 			job.setResultListener(collector);
 			job.setBlocking(false);
 			jobs.add(job);
@@ -120,7 +120,7 @@ public class AnnotatedRunner
 			job.setName("demo job " + (i+1));
 			JPPFTask task = (JPPFTask) cl.loadClass("test.TestClass").newInstance();
 			job.addTask(task);
-			JPPFResultCollector collector = new JPPFResultCollector(1);
+			JPPFResultCollector collector = new JPPFResultCollector(job);
 			job.setResultListener(collector);
 			job.setBlocking(false);
 			jobs.add(job);

@@ -105,7 +105,7 @@ public class ManyJobsRunner
 				job.getJobSLA().setSuspended(true);
 				 */
 				// submit the tasks for execution
-				JPPFResultCollector collector = new JPPFResultCollector(nbTask);
+				JPPFResultCollector collector = new JPPFResultCollector(jobs[n]);
 				jobs[n].setResultListener(collector);
 				jppfClient.submit(jobs[n]);
 			}

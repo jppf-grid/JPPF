@@ -220,13 +220,13 @@ public class DeadlockRunner
 				job = new JPPFJob();
 				job.setName("job " + jobNumber);
 				job.setBlocking(false);
-				job.setResultListener(new JPPFResultCollector(nbTasks));
 				for (int j=0; j<nbTasks; j++)
 				{
 					JPPFTask task = new Task(length, nanos);
 					task.setId("task " + jobNumber + ':' + j);
 					job.addTask(task);
 				}
+				job.setResultListener(new JPPFResultCollector(job));
 				jppfClient.submit(job);
 			}
 			catch (Exception e)

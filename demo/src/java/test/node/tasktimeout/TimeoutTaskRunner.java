@@ -153,7 +153,7 @@ public class TimeoutTaskRunner
 		// Here, we use an instance of JPPFResultCollector, conveniently provided by the JPPF API.
 		// JPPFResultCollector implements TaskResultListener and has a constructor that takes
 		// the number of tasks in the job as a parameter.
-		JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
+		JPPFResultCollector collector = new JPPFResultCollector(job);
 		job.setResultListener(collector);
 
 
