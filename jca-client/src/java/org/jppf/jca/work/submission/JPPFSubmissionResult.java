@@ -89,12 +89,24 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	 */
 	public synchronized void resultsReceived(TaskResultEvent event)
 	{
-		List<JPPFTask> tasks = event.getTaskList();
-		int n = tasks.size();
-		pendingCount -= n;
-		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, " + pendingCount + " pending tasks remain" +  (n > 0 ? ", first position=" + tasks.get(0).getPosition() : ""));
-		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-		wakeUp();
+		if (event.getThrowable() == null)
+		{
+			List<JPPFTask> tasks = event.getTaskList();
+			int n = tasks.size();
+			pendingCount -= n;
+			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, " + pendingCount + " pending tasks remain" +  (n > 0 ? ", first position=" + tasks.get(0).getPosition() : ""));
+			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+			wakeUp();
+		}
+		else
+		{
+			Throwable t = event.getThrowable();
+			if (debugEnabled) log.debug("received throwable '" + t.getClass().getName() + ": " + t.getMessage() + "', resetting this result collector");
+			// reset this object's state to prepare for job resubmission
+			pendingCount = taskCount;
+			resultMap = new TreeMap<Integer, JPPFTask>();
+			results = null;
+		}
 	}
 
 	/**

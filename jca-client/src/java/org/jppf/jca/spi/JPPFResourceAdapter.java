@@ -86,7 +86,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
 		WorkManager workManager = ctx.getWorkManager();
 		jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), getClientConfiguration());
 		log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
-		JPPFSubmissionManager submissionManager = new JPPFSubmissionManager(jppfClient, workManager);
+		JPPFSubmissionManager submissionManager = new JPPFSubmissionManager(jppfClient);
 		jppfClient.setSubmissionManager(submissionManager);
 		try
 		{

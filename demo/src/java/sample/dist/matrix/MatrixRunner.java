@@ -28,6 +28,7 @@ import org.jppf.client.utils.GridMonitor;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.MemoryMapDataProvider;
@@ -130,8 +131,9 @@ public class MatrixRunner implements NotificationListener
 			String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
 			if (s != null)
 			{
-				PolicyParser.validatePolicy(s);
-				policy = PolicyParser.parsePolicy(s);
+				String text = FileUtils.readTextFile(s);
+				PolicyParser.validatePolicy(text);
+				policy = PolicyParser.parsePolicy(text);
 			}
 			// perform "iteration" times
 			for (int iter=0; iter<iterations; iter++)
@@ -190,6 +192,7 @@ public class MatrixRunner implements NotificationListener
 		job.setDataProvider(new MemoryMapDataProvider());
 		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
 		job.getJobSLA().setExecutionPolicy(policy);
+		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(3000L));
 		//job.getJobSLA().setMaxNodes(8);
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(job);

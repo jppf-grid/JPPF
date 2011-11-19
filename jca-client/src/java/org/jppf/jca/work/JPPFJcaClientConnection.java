@@ -73,7 +73,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 	{
 		try
 		{
-			delegate = new JcaClassServerDelegate(name, appUuid, host, classServerPort, (JPPFJcaClient) client);
+			delegate = new JcaClassServerDelegate(name, appUuid, host, classServerPort, (JPPFJcaClient) client, this);
 			//setStatus(CONNECTING);
 			initCredentials();
 			//taskServerConnection.init();
@@ -88,6 +88,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 			{
 				public void statusChanged(ClientConnectionStatusEvent event)
 				{
+					if (debugEnabled) log.debug("" + this + " task server connection status changed from " + event.getOldStatus() + " to " + taskServerConnection.getStatus());
 					taskServerConnectionStatusChanged(event);
 				}
 			});
@@ -104,7 +105,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 		}
 		catch(Exception e)
 		{
-			log.debug(e.getMessage());
+			if (debugEnabled) log.debug(e.getMessage(), e);
 			//setStatus(DISCONNECTED);
 		}
 		catch(JPPFError e)

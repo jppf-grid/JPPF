@@ -59,22 +59,14 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	 * The JPPF client that manages connections to the JPPF drivers.
 	 */
 	private JPPFJcaClient client = null;
-	/**
-	 * The work manager provided by the applications server, used to submit asynchronous
-	 * JPPF submissions.
-	 */
-	private WorkManager workManager = null;
 
 	/**
 	 * Initialize this submission worker with the specified JPPF client.
 	 * @param client the JPPF client that manages connections to the JPPF drivers.
-	 * @param workManager the work manager provided by the applications server, used to submit asynchronous
-	 * JPPF submissions.
 	 */
-	public JPPFSubmissionManager(JPPFJcaClient client, WorkManager workManager)
+	public JPPFSubmissionManager(JPPFJcaClient client)
 	{
 		this.client = client;
-		this.workManager = workManager;
 	}
 
 	/**
@@ -105,12 +97,11 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 			synchronized(client)
 			{
 				JPPFJob job = execQueue.poll();
-				JPPFJcaClientConnection c = null;
-					c = (JPPFJcaClientConnection) client.getClientConnection();
-					if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
+				AbstractJPPFClientConnection c = null;
+				c = (AbstractJPPFClientConnection) client.getClientConnection();
+				if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
 				JobSubmission submission = new JobSubmission(job, c, execFlags.second());
 				client.getExecutor().submit(submission);
-				//submission.run();
 			}
 		}
 	}
@@ -153,6 +144,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 	public String addExistingSubmission(JPPFJob job)
 	{
 		JPPFSubmissionResult submission = (JPPFSubmissionResult) job.getResultListener();
+		if (debugEnabled) log.debug("resubmitting: jobId=" + job.getId() + ", nbTasks=" + job.getTasks().size() + ", submission id=" + submission.getId());
 		submission.reset();
 		submission.setStatus(PENDING);
 		execQueue.add(job);
@@ -253,6 +245,7 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 			{
 				result.setStatus(FAILED);
 				log.error(e.getMessage(), e);
+				addExistingSubmission(job);
 			}
 			finally
 			{

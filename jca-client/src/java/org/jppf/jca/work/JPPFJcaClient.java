@@ -117,6 +117,7 @@ public class JPPFJcaClient extends AbstractGenericClient
 	protected AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info)
 	{
 		return new JPPFJcaClientConnection(uuid, name, info, this);
+		//return new JPPFClientConnectionImpl(uuid, name, info, this);
 	}
 
 	/**

@@ -58,11 +58,12 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
 	 * @param host the name or IP address of the host the class server is running on.
 	 * @param port the TCP port the class server is listening to.
 	 * @param client the JPPF client that owns this class server delegate.
+	 * @param owner the connection that owns this class server delegate.
 	 * @throws Exception if the connection could not be opended.
 	 */
-	public JcaClassServerDelegate(String name, String uuid, String host, int port, JPPFJcaClient client) throws Exception
+	public JcaClassServerDelegate(String name, String uuid, String host, int port, JPPFJcaClient client, JPPFJcaClientConnection owner) throws Exception
 	{
-		super(null);
+		super(owner);
 		this.appUuid = uuid;
 		this.host = host;
 		this.port = port;
