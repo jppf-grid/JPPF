@@ -18,6 +18,7 @@
 
 package org.jppf.server.node.remote;
 
+import java.security.*;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -85,7 +86,14 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
 			@Override
 			public AbstractJPPFClassLoader call()
 			{
-				return new JPPFClassLoader(getClassLoader(), uuidPath);
+				PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+				{
+					public AbstractJPPFClassLoader run()
+					{
+						return new JPPFClassLoader(getClassLoader(), uuidPath);
+					}
+				};
+				return AccessController.doPrivileged(pa);
 			}
 		};
 	}

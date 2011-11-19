@@ -18,6 +18,7 @@
 
 package org.jppf.server.node.local;
 
+import java.security.*;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -50,7 +51,17 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
 	@Override
 	protected AbstractJPPFClassLoader createClassLoader()
 	{
-		if (classLoader == null) classLoader = new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
+		if (classLoader == null)
+		{
+			PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+			{
+				public AbstractJPPFClassLoader run()
+				{
+					return new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
+				}
+			};
+			classLoader = AccessController.doPrivileged(pa);
+		}
 		return classLoader;
 	}
 
@@ -74,7 +85,14 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
 			@Override
 			public AbstractJPPFClassLoader call()
 			{
-				return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
+				PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+				{
+					public AbstractJPPFClassLoader run()
+					{
+						return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
+					}
+				};
+				return AccessController.doPrivileged(pa);
 			}
 		};
 	}
