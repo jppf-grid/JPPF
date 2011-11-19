@@ -295,7 +295,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Get the id of the last job submitted via this connection.
 	 * @return the id as a string.
 	 */
-	public String getCurrentJobId()
+	public synchronized String getCurrentJobId()
 	{
 		return currentJobId;
 	}
@@ -304,7 +304,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the id of the last job submitted via this connection.
 	 * @param currentJobId the id as a string.
 	 */
-	public void setCurrentJobId(final String currentJobId)
+	public synchronized void setCurrentJobId(final String currentJobId)
 	{
 		this.currentJobId = currentJobId;
 	}
@@ -355,7 +355,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 	 * Set the job as initially submitted by the client.
 	 * @param initialBundleWrapper <code>BundleWrapper</code> instance.
 	 */
-	void setInitialBundleWrapper(final ServerJob initialBundleWrapper)
+	synchronized void setInitialBundleWrapper(final ServerJob initialBundleWrapper)
 	{
 		this.initialBundleWrapper = initialBundleWrapper;
 	}

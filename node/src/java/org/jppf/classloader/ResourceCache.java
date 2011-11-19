@@ -183,7 +183,10 @@ class ResourceCache
 			int n = findFolderIndex(base);
 			String s = base + File.separator + n;
 			File baseDir = new File(s + File.separator);
-			if (!baseDir.exists()) baseDir.mkdirs();
+			if (!baseDir.exists())
+			{
+				if (!baseDir.mkdirs())  throw new IOException("could not create folder " + baseDir);
+			}
 			tempFolders.add(s);
 			if (traceEnabled) log.trace("added temp folder " + s);
 		}
@@ -197,11 +200,15 @@ class ResourceCache
 	 * Find an index that doesn't exist for the folder suffix.
 	 * @param folder the folder to which the new folder will belong.
 	 * @return the maximum existing index + 1, or 0 if no such folder already exists.
+	 * @throws Exception if any error occurs.
 	 */
-	private int findFolderIndex(final String folder)
+	private int findFolderIndex(final String folder) throws Exception
 	{
 		File dir = new File(folder);
-		if (!dir.exists()) dir.mkdirs();
+		if (!dir.exists())
+		{
+			if (!dir.mkdirs()) throw new IOException("could not create folder " + dir);
+		}
 		File[] subdirs = dir.listFiles(new FileFilter()
 		{
 			@Override
@@ -271,11 +278,9 @@ class ResourceCache
 				String[] paths = tempFolders.toArray(StringUtils.ZERO_STRING);
 				tempFolders.clear();
 				for (String path: paths) FileUtils.deletePath(new File(tempFolders.remove(0)));
-				paths = null;
 			}
 		};
 		new Thread(r).start();
-
-        super.finalize();
+		super.finalize();
 	}
 }

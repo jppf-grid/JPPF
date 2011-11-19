@@ -60,7 +60,6 @@ public class MyNodeConnectionListener implements NodeConnectionListener
 	 */
 	private String computeIdentifier(final JPPFManagementInfo info)
 	{
-		JPPFSystemInformation systemInfo = info.getSystemInfo();
 		String host = info.getHost();
 		int port = info.getPort();
 		return host + ':' + port;

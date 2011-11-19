@@ -82,11 +82,14 @@ public class WebCrawlerRunner
 	 */
 	public static void perform(final String url, final String query, final int depth, final Option option) throws Exception
 	{
-		if (client == null)
+		synchronized(WebCrawlerRunner.class)
 		{
-			client = new JPPFClient();
-			init();
+			if (client == null)
+			{
+				client = new JPPFClient();
+			}
 		}
+		init();
 		WebCrawlerRunner.option = option;
 		urlCount = 0;
 		createOrDisplayWaitWindow();

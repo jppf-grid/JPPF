@@ -82,7 +82,7 @@ public class LongTask extends JPPFTask
 			{
 				Thread.sleep(taskLength);
 				elapsed = System.currentTimeMillis() - taskStart;
-				setResult("task has run for " + taskLength + " ms");
+				setResult("task has run for " + elapsed + " ms");
 			}
 			catch(InterruptedException e)
 			{

@@ -69,8 +69,6 @@ public class FTPRunner
 	 */
 	private static void perform() throws Exception
 	{
-		TypedProperties config = JPPFConfiguration.getProperties();
-
 		output("Running FTP demo");
 		long totalTime = System.nanoTime();
 		JPPFJob job = new JPPFJob();

@@ -145,11 +145,11 @@ class SerializationCaches
 	 * @throws Exception if any error occurs.
 	 */
 	static ClassDescriptor addClassGeneric(final Class<?> clazz, final AtomicInteger counter,
-			final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception
-			{
+		final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception
+	{
 		ClassDescriptor cd = new ClassDescriptor(clazz);
 		cd.handle = counter.incrementAndGet();
-		if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
+		//if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
 		map.put(clazz, cd);
 		if (map2 != null) map2.put(clazz, cd);
 		for (FieldDescriptor fd: cd.fields) fd.type = getClassDescriptorGeneric(fd.field.getType(), counter, map, map2);
@@ -157,6 +157,5 @@ class SerializationCaches
 		if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
 		if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
 		return cd;
-			}
-
+	}
 }

@@ -40,7 +40,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener
+public final class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener
 {
 	/**
 	 * Logger for this class.

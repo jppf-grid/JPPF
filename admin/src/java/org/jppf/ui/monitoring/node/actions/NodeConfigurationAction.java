@@ -168,7 +168,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 		JPPFSystemInformation info = wrapper.systemInformation();
 		TypedProperties props = info.getJppf();
 		Set<String> keys = new TreeSet<String>();
-		for (Object o: props.keySet()) keys.add((String) o);
+		for (Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
 		for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
 		return sb.toString();
 	}

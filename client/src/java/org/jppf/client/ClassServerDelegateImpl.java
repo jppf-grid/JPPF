@@ -187,7 +187,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
 		resource.addUuid(clientUuid);
 		writeResource(resource);
-		resource = readResource();
+		// read the server response
+		readResource();
 		handshakeDone = true;
 		if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
 	}

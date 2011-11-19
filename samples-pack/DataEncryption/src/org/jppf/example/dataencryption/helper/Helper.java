@@ -24,6 +24,7 @@ import java.security.KeyStore;
 import javax.crypto.*;
 
 import org.jppf.utils.FileUtils;
+import org.jppf.utils.base64.*;
 
 /**
  * This class provides helper methods to provide a cipher and its parameters,
@@ -75,7 +76,7 @@ public final class Helper
 	{
 		byte[] passwordBytes = pwd.getBytes();
 		// encode the password in Base64
-		byte[] encodedBytes = Base64.encodeBytesToBytes(passwordBytes);
+		byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
 		// store the encoded password to a file
 		FileOutputStream fos = new FileOutputStream(getPasswordFilename());
 		fos.write(encodedBytes);
@@ -112,7 +113,7 @@ public final class Helper
 				// read the encoded password
 				byte[] encodedBytes = FileUtils.getInputStreamAsByte(is);
 				// decode the password from Base64
-				byte[] passwordBytes = Base64.decode(encodedBytes);
+				byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
 				some_chars = new String(passwordBytes).toCharArray();
 			}
 			catch(Exception e)

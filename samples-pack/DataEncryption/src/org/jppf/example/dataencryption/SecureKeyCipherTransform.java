@@ -98,7 +98,13 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
 		int keyLength = dis.readInt();
 		// read the encrypted key
 		byte[] keyBytes = new byte[keyLength];
-		dis.read(keyBytes);
+		int count = 0;
+		while (count < keyLength)
+		{
+			int n = dis.read(keyBytes, count, keyLength - count);
+			if (n > 0) count += n;
+			else throw new EOFException("could only read " + count + " bytes of the key, out of " + keyLength);
+		}
 		// decrypt the key using the initial key stored in the keystore
 		Cipher cipher = Cipher.getInstance(Helper.getTransformation());
 		cipher.init(Cipher.UNWRAP_MODE, getSecretKey());

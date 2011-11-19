@@ -254,10 +254,8 @@ class PeerNode extends AbstractNode
 	private BundleWrapper readBundle() throws Exception
 	{
 		// Read the request header - with tasks count information
-		byte[] bytes = socketClient.receiveBytes(0).getBuffer();
-		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(bytes);
-		if (debugEnabled) log.debug("received header from peer driver, data length = " + bytes.length);
-		bytes = null;
+		JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(socketClient.receiveBytes(0).getBuffer());
+		if (debugEnabled) log.debug("received header from peer driver");
 		BundleWrapper headerWrapper = new BundleWrapper(header);
 
 		int count = header.getTaskCount();

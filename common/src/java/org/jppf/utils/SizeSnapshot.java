@@ -18,12 +18,18 @@
 
 package org.jppf.utils;
 
+import java.io.Serializable;
+
 /**
  * Utility class for collecting size statistics.
  * @author Laurent Cohen
  */
-public class SizeSnapshot
+public class SizeSnapshot implements Serializable
 {
+	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * The title given to this snapshot.
 	 */

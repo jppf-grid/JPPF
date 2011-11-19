@@ -71,10 +71,6 @@ public class GridMonitor
 	 */
 	private Timer timer = null;
 	/**
-	 * The timer task that takes the snapshots.
-	 */
-	private DataUpdateTask dataUpdateTask = null;
-	/**
 	 * Holds the memory usage snapshots for all the nodes.
 	 */
 	private final Map<String, List<NodeData>> dataMap = new TreeMap<String, List<NodeData>>();
@@ -351,7 +347,10 @@ public class GridMonitor
 		{
 			File dir = new File(folder);
 			// create the folders if they don't exist
-			if (!dir.exists()) dir.mkdirs();
+			if (!dir.exists())
+			{
+				if (!dir.mkdirs()) throw new IOException("could not create folder " + dir);
+			}
 			int nodeCount = 1;
 			for (Map.Entry<String, List<NodeData>> entry: dataMap.entrySet())
 			{

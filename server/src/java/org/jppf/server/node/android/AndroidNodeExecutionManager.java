@@ -64,8 +64,8 @@ public class AndroidNodeExecutionManager extends NodeExecutionManagerImpl
 	public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
 	{
 		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
-		NodeExecutionInfo info = null;
-		if (isCpuTimeEnabled()) info = computeExecutionInfo();
+		//NodeExecutionInfo info = null;
+		//if (isCpuTimeEnabled()) info = computeExecutionInfo();
 		setup(bundle, taskList);
 		for (Task task : taskList) performTask(task);
 		waitForResults();

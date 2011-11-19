@@ -64,9 +64,12 @@ public class AutotunedDelegatingBundler extends AbstractBundler
 		lock.lock();
 		try
 		{
-			if (simpleBundler == null)
+			synchronized(AutotunedDelegatingBundler.class)
 			{
-				simpleBundler = new AutoTunedBundler(profile);
+				if (simpleBundler == null)
+				{
+					simpleBundler = new AutoTunedBundler(profile);
+				}
 			}
 		}
 		finally

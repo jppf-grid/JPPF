@@ -44,6 +44,10 @@ import com.mxgraph.view.mxGraph;
 public class GraphOption extends AbstractOption implements ActionHolder
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Logger for this class.
 	 */
 	private static Logger log = LoggerFactory.getLogger(GraphOption.class);
@@ -54,7 +58,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	/**
 	 * The graph to display.
 	 */
-	protected mxGraph graph = null;
+	protected transient mxGraph graph = null;
 	/**
 	 * The graph component.
 	 */
@@ -66,11 +70,11 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	/**
 	 * The graph layout.
 	 */
-	protected mxIGraphLayout layout = null;
+	protected transient mxIGraphLayout layout = null;
 	/**
 	 * Manages the actions for this graph.
 	 */
-	protected ActionHandler actionHandler = null;
+	protected transient ActionHandler actionHandler = null;
 	/**
 	 * 
 	 */
@@ -241,7 +245,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	public void driverAdded(final TopologyData driver)
 	{
 		String id = driver.getId();
-		Object parent = graph.getDefaultParent();
 		graph.getModel().beginUpdate();
 		try
 		{
@@ -297,7 +300,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
 	{
 		String id = driver.getId();
 		mxGraphModel model = (mxGraphModel) graph.getModel();
-		Object parent = graph.getDefaultParent();
 		model.beginUpdate();
 		try
 		{
@@ -393,7 +395,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
 		if (node.getNodeInformation().isDriver())
 		{
 			nodeVertex = (mxCell) ((mxGraphModel) graph.getModel()).getCell(node.getId());
-			mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
+			graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
 		}
 		else
 		{

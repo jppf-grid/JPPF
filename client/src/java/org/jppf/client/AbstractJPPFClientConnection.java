@@ -21,12 +21,13 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.nio.channels.AsynchronousCloseException;
+import java.security.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
-import org.jppf.classloader.NonDelegatingClassLoader;
+import org.jppf.classloader.*;
 import org.jppf.client.event.*;
 import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.socket.*;
@@ -307,7 +308,15 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
 		ClassLoader cl = classLoader;
 		if (cl == null) cl = Thread.currentThread().getContextClassLoader();
 		if (cl == null) cl = getClass().getClassLoader();
-		NonDelegatingClassLoader ndCl = new NonDelegatingClassLoader(null, cl);
+		final ClassLoader parent = cl;
+		PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>()
+		{
+			public NonDelegatingClassLoader run()
+			{
+				return new NonDelegatingClassLoader(null, parent);
+			}
+		};
+		NonDelegatingClassLoader ndCl = AccessController.doPrivileged(pa);
 		String helperClassName = getSerializationHelperClassName();
 		Class clazz = null;
 		if (cl != null)

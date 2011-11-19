@@ -70,7 +70,7 @@ public class LoadBalancer
 	/**
 	 * The bundlers used to split the tasks between local and remote execution.
 	 */
-	private Bundler[] bundlers = null;
+	private final Bundler[] bundlers = new ClientProportionalBundler[2];
 	/**
 	 * Determines whether this load balancer is currently executing tasks locally.
 	 */
@@ -92,7 +92,7 @@ public class LoadBalancer
 	/**
 	 * Perform the required initialization for local execution.
 	 */
-	private synchronized void initLocal()
+	private void initLocal()
 	{
 		if (localInitialized) return;
 		int n = Runtime.getRuntime().availableProcessors();
@@ -100,12 +100,11 @@ public class LoadBalancer
 		log.info("local execution enabled with " + poolSize + " processing threads");
 		LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
 		threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("LocalExec"));
-		if (bundlers == null)
+		ProportionalTuneProfile profile = new ProportionalTuneProfile();
+		profile.setPerformanceCacheSize(1000);
+		profile.setProportionalityFactor(1);
+		synchronized(bundlers)
 		{
-			ProportionalTuneProfile profile = new ProportionalTuneProfile();
-			profile.setPerformanceCacheSize(1000);
-			profile.setProportionalityFactor(1);
-			bundlers = new ClientProportionalBundler[2];
 			bundlers[LOCAL] = new ClientProportionalBundler(profile);
 			bundlers[REMOTE] = new ClientProportionalBundler(profile);
 			for (Bundler b: bundlers) b.setup();
@@ -116,7 +115,7 @@ public class LoadBalancer
 	/**
 	 * Stop this load-balancer and cleanup any resource it uses.
 	 */
-	public void stop()
+	public synchronized void stop()
 	{
 		if (threadPool != null) threadPool.shutdownNow();
 		localInitialized = false;
@@ -191,7 +190,7 @@ public class LoadBalancer
 			job.fireJobEvent(Type.JOB_END);
 			if (remoteThread.getException() != null) throw remoteThread.getException();
 		}
-		else throw new JPPFException("Null driver connection and local executor is "  + (localEnabled ? "busy" : "disabled"));
+		else throw new JPPFException("Null driver connection and local executor is "  + (isLocalEnabled() ? "busy" : "disabled"));
 	}
 
 	/**
@@ -278,7 +277,7 @@ public class LoadBalancer
 	 * Get the bundlers used to split the tasks between local and remote execution.
 	 * @return an array of {@link Bundler} instances.
 	 */
-	public Bundler[] getBundlers()
+	public synchronized Bundler[] getBundlers()
 	{
 		return bundlers;
 	}

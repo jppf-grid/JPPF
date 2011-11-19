@@ -35,7 +35,7 @@ public class X11IdleTimeDetector implements IdleTimeDetector
 	/**
 	 * Structure providing info on the XScreensaver.
 	 */
-	public class XScreenSaverInfo extends Structure
+	public static class XScreenSaverInfo extends Structure
 	{
 		/**
 		 * screen saver window

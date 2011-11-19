@@ -233,7 +233,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 				//socket = new MulticastSocket(new InetSocketAddress(addr, port));
 				socket = new MulticastSocket(port);
 				socket.setInterface(addr);
-				socket.joinGroup(groupInetAddress);
+				socket.joinGroup(getGroupInetAddress());
 				socket.setSoTimeout(timeout);
 				byte[] buf = new byte[512];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -262,7 +262,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 						if (System.currentTimeMillis() - start < t) Thread.sleep(50L);
 					}
 				}
-				socket.leaveGroup(groupInetAddress);
+				socket.leaveGroup(getGroupInetAddress());
 			}
 			catch(Exception e)
 			{
@@ -279,5 +279,23 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
 		{
 			return info;
 		}
+	}
+
+	/**
+	 * Get the multicast group to join.
+	 * @return an {@link InetAddress} instance.
+	 */
+	private synchronized InetAddress getGroupInetAddress()
+	{
+		return groupInetAddress;
+	}
+
+	/**
+	 * Set the multicast group to join.
+	 * @param groupInetAddress an {@link InetAddress} instance.
+	 */
+	private synchronized void setGroupInetAddress(final InetAddress groupInetAddress)
+	{
+		this.groupInetAddress = groupInetAddress;
 	}
 }

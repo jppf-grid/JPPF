@@ -132,7 +132,6 @@ class Serializer
 	 */
 	private void writeObject(final Object obj, final int handle) throws Exception
 	{
-		//Map<Class<?>, ClassDescriptor> map = new IdentityHashMap<Class<?>, ClassDescriptor>(64);
 		Map<Class<?>, ClassDescriptor> map = new HashMap<Class<?>, ClassDescriptor>();
 		ClassDescriptor cd = caches.getClassDescriptor(obj.getClass(), map);
 		currentObject = obj;
@@ -152,7 +151,7 @@ class Serializer
 		else if (cd.array) writeArray(obj, cd);
 		else if (cd.enumType)
 		{
-			String name = (obj == null) ? null : ((Enum) obj).name();
+			String name = ((Enum) obj).name();
 			writeObject(name);
 		}
 		else writeFields(obj, cd);
@@ -201,7 +200,7 @@ class Serializer
 		for (int i=0; i<cd.fields.length; i++)
 		{
 			FieldDescriptor fd = cd.fields[i];
-			if (traceEnabled) try { log.trace("writing field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
+			//if (traceEnabled) try { log.trace("writing field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
 			if (!fd.field.isAccessible()) fd.field.setAccessible(true);
 			Object val = fd.field.get(obj);
 			if (fd.type.primitive)

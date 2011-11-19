@@ -17,7 +17,7 @@
  */
 package org.jppf.classloader;
 
-import java.io.File;
+import java.io.*;
 import java.security.PrivilegedAction;
 import java.util.List;
 
@@ -93,13 +93,13 @@ class SaveFileAction implements PrivilegedAction<File>
 				File f = new File(dir + File.separator);
 				if (!f.exists())
 				{
-					f.mkdirs();
+					if (!f.mkdirs()) throw new IOException("could not create folder " + f);
 					f.deleteOnExit();
 				}
 				tmp = new File(f, name);
 				tmpDirs.add(dir);
 			}
-			tmp.getParentFile().mkdirs();
+			if (!tmp.getParentFile().mkdirs()) throw new IOException("could not create folder " + tmp.getParentFile());
 			tmp.deleteOnExit();
 			FileUtils.writeBytesToFile(definition, tmp);
 		}

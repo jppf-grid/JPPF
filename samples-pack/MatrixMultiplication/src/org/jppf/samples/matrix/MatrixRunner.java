@@ -181,7 +181,7 @@ public class MatrixRunner
 	private static void performSequentialMultiplication(final Matrix a, final Matrix b)
 	{
 		long start = System.currentTimeMillis();
-		Matrix c = a.multiply(b);
+		a.multiply(b);
 		long elapsed = System.currentTimeMillis() - start;
 		output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed));
 	}

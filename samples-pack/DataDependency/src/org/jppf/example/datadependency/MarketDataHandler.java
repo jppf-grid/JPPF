@@ -157,7 +157,7 @@ public class MarketDataHandler implements TickerListener
 	/**
 	 * Performs the nodes updates.
 	 */
-	public class NodesUpdateTask implements Runnable
+	public static class NodesUpdateTask implements Runnable
 	{
 		/**
 		 * The update data to send to the nodes.

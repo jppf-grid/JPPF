@@ -167,8 +167,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	{
 		setConnectedStatus(false);
 		Map<String, Object> env = new HashMap<String, Object>();
-		jmxc = JMXConnectorFactory.connect(url, env);
-		mbeanConnection.set(jmxc.getMBeanServerConnection());
+		synchronized(this)
+		{
+			jmxc = JMXConnectorFactory.connect(url, env);
+			mbeanConnection.set(jmxc.getMBeanServerConnection());
+		}
 		setConnectedStatus(true);
 		if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
 	}
@@ -180,7 +183,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 	public void close() throws Exception
 	{
 		if (connectionThread.get() != null) connectionThread.get().close();
-		if (jmxc != null) jmxc.close();
+		synchronized(this)
+		{
+			if (jmxc != null) jmxc.close();
+		}
 	}
 
 	/**

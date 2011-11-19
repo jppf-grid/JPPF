@@ -88,7 +88,7 @@ public class FTPClientWrapper
 		try
 		{
 			bos = new BufferedOutputStream(new FileOutputStream(localPath));
-			boolean ret = ftpClient.retrieveFile(remotePath, bos);
+			ftpClient.retrieveFile(remotePath, bos);
 		}
 		finally
 		{
@@ -108,7 +108,7 @@ public class FTPClientWrapper
 		try
 		{
 			bis = new BufferedInputStream(new FileInputStream(localPath));
-			boolean ret = ftpClient.storeFile(remotePath, bis);
+			ftpClient.storeFile(remotePath, bis);
 		}
 		finally
 		{

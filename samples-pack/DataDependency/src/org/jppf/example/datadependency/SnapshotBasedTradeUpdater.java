@@ -160,10 +160,10 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
 				cancel();
 				return;
 			}
-			lock.lock();
 			log.info("processing new snapshot: " + pendingUpdates.size() + " updates");
 			try
 			{
+				lock.lock();
 				processingUpdates = pendingUpdates;
 				pendingUpdates = new HashSet<MarketData>();
 			}

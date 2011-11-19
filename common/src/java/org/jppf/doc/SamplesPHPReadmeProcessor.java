@@ -18,7 +18,7 @@
 
 package org.jppf.doc;
 
-import java.io.File;
+import java.io.*;
 import java.util.*;
 
 import org.jppf.JPPFException;
@@ -125,7 +125,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
 		if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
 		s += "/Readme.php";
 		File outFile = new File(destDir, s);
-		outFile.getParentFile().mkdirs();
+		if (!outFile.getParentFile().mkdirs()) throw new IOException("could not create folder " + outFile.getParentFile());
 		FileUtils.writeTextFile(outFile, result);
 		System.out.println("writing output file " + outFile);
 	}

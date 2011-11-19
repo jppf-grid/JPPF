@@ -49,7 +49,7 @@ public class NodeSystemTray implements NodeLifeCycleListener
 	/**
 	 * The icons displayed.
 	 */
-	private static Image[] images = null;
+	private static Image[] images = initializeImages();
 	/**
 	 * The wrapper used to access management functionalities.
 	 */
@@ -71,9 +71,6 @@ public class NodeSystemTray implements NodeLifeCycleListener
 		try
 		{
 			SystemTray tray = SystemTray.getSystemTray();
-			images = new Image[2];
-			images[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_green.gif"));
-			images[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_red.gif"));
 			TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
 			if (oldTrayIcon != null) tray.remove(oldTrayIcon);
 			trayIcon = new TrayIcon(images[1]);
@@ -208,5 +205,17 @@ public class NodeSystemTray implements NodeLifeCycleListener
 	@Override
 	public void jobEnding(final NodeLifeCycleEvent event)
 	{
+	}
+
+	/**
+	 * Initialize the icons used in the tray panel.
+	 * @return an array of {@link Image} objects.
+	 */
+	private static Image[] initializeImages()
+	{
+		Image[] img = new Image[2];
+		img[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_green.gif"));
+		img[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_red.gif"));
+		return img;
 	}
 }

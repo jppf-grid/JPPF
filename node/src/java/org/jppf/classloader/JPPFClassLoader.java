@@ -98,7 +98,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		{
 			if (INITIALIZING.compareAndSet(false, true))
 			{
-				if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
+				synchronized(AbstractJPPFClassLoaderLifeCycle.class)
+				{
+					if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
+				}
 				try
 				{
 					if (debugEnabled) log.debug("initializing connection");
@@ -161,7 +164,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		LOCK.lock();
 		try
 		{
-			socketClient = null;
+			synchronized(JPPFClassLoader.class)
+			{
+				JPPFClassLoader.socketClient = null;
+			}
 			init();
 		}
 		finally
@@ -180,23 +186,29 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 		LOCK.lock();
 		try
 		{
-			if (executor != null)
+			synchronized(AbstractJPPFClassLoaderLifeCycle.class)
 			{
-				executor.shutdownNow();
-				executor = null;
+				if (executor != null)
+				{
+					executor.shutdownNow();
+					executor = null;
+				}
 			}
-			if (socketInitializer != null) socketInitializer.close();
-			if (socketClient != null)
+			synchronized(JPPFClassLoader.class)
 			{
-				try
+				if (socketInitializer != null) socketInitializer.close();
+				if (socketClient != null)
 				{
-					socketClient.close();
+					try
+					{
+						socketClient.close();
+					}
+					catch(Exception e)
+					{
+						if (debugEnabled) log.debug(e.getMessage(), e);
+					}
+					socketClient = null;
 				}
-				catch(Exception e)
-				{
-					if (debugEnabled) log.debug(e.getMessage(), e);
-				}
-				socketClient = null;
 			}
 		}
 		finally

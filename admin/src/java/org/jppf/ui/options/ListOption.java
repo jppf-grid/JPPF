@@ -32,6 +32,10 @@ import org.jppf.ui.utils.GuiUtils;
 public class ListOption extends AbstractOption
 {
 	/**
+	 * Explicit serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The underlying JList component.
 	 */
 	protected JList list = null;

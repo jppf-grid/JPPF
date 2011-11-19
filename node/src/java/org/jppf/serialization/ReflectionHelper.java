@@ -381,7 +381,7 @@ public final class ReflectionHelper
 	/**
 	 * Compares two constructors based on their number of parameters.
 	 */
-	private static class ConstructorComparator implements Comparator<Constructor<?>>
+	private static class ConstructorComparator implements Comparator<Constructor<?>>, Serializable
 	{
 		/**
 		 * {@inheritDoc}

@@ -219,7 +219,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
 	public void testShutdownNow() throws Exception
 	{
 		executor.submit(new SimpleRunnable());
-		List<Runnable> res = executor.shutdownNow();
+		executor.shutdownNow();
 		assertTrue(executor.isShutdown());
 		assertTrue(executor.isTerminated());
 	}

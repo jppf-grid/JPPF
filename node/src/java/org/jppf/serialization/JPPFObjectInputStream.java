@@ -21,8 +21,6 @@ package org.jppf.serialization;
 import java.io.*;
 import java.util.Map;
 
-import org.jppf.utils.SerializationUtils;
-
 /**
  * Implementation of {@link ObjectInputStream} that reads objects without regards to whether
  * they implement {@link Serializable} or not. This allows using non-serializable classes in
@@ -159,9 +157,8 @@ public class JPPFObjectInputStream extends ObjectInputStream
 	@Override
 	public int readInt() throws IOException
 	{
-		in.read(buf, 0, 4);
-		//return in.readInt();
-		return SerializationUtils.readInt(buf, 0);
+		return in.readInt();
+		//return SerializationUtils.readInt(buf, 0);
 	}
 
 	/**
