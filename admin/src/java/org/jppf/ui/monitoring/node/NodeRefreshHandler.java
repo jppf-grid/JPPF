@@ -185,7 +185,7 @@ public class NodeRefreshHandler
     Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
     //for (JPPFManagementInfo info: nodesInfo) actualMap.put(NetworkUtils.getHostName(info.getHost()) + ":" + info.getPort(), info);
     for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getHost() + ':' + info.getPort(), info);
-    List<String> nodesToProcess = new ArrayList<String>();
+    List<String> nodesToProcess = new ArrayList<String>(panelNames.size());
     for (String name: panelNames)
     {
       if (!actualMap.containsKey(name)) nodesToProcess.add(name);
@@ -195,6 +195,7 @@ public class NodeRefreshHandler
       if (debugEnabled) log.debug("removing node " + name);
       nodeDataPanel.nodeRemoved(driverName, name);
     }
+    /*
     nodesToProcess = new ArrayList<String>();
     for (String name: actualMap.keySet())
     {
@@ -204,6 +205,15 @@ public class NodeRefreshHandler
     {
       if (debugEnabled) log.debug("adding node " + name);
       nodeDataPanel.nodeAdded(driverName, actualMap.get(name));
+    }
+    */
+    for (Map.Entry<String, JPPFManagementInfo> entry: actualMap.entrySet())
+    {
+      if (!panelNames.contains(entry.getKey()))
+      {
+        if (debugEnabled) log.debug("adding node " + entry.getKey());
+        nodeDataPanel.nodeAdded(driverName, entry.getValue());
+      }
     }
   }
 
