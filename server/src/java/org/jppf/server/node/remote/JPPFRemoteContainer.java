@@ -35,73 +35,73 @@ import org.slf4j.*;
  */
 public class JPPFRemoteContainer extends JPPFContainer
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFRemoteContainer.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * The socket connection wrapper.
-	 */
-	private SocketWrapper socketClient = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFRemoteContainer.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * The socket connection wrapper.
+   */
+  private SocketWrapper socketClient = null;
 
-	/**
-	 * Initialize this container with a specified application uuid.
-	 * @param socketClient the socket connection wrapper.
-	 * @param uuidPath the unique identifier of a submitting application.
-	 * @param classLoader the class loader for this container.
-	 * @throws Exception if an error occurs while initializing.
-	 */
-	public JPPFRemoteContainer(final SocketWrapper socketClient, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
-	{
-		super(uuidPath, classLoader);
-		this.socketClient = socketClient;
-		//init();
-	}
+  /**
+   * Initialize this container with a specified application uuid.
+   * @param socketClient the socket connection wrapper.
+   * @param uuidPath the unique identifier of a submitting application.
+   * @param classLoader the class loader for this container.
+   * @throws Exception if an error occurs while initializing.
+   */
+  public JPPFRemoteContainer(final SocketWrapper socketClient, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
+  {
+    super(uuidPath, classLoader);
+    this.socketClient = socketClient;
+    //init();
+  }
 
-	/**
-	 * Deserialize a number of objects from a socket client.
-	 * @param list a list holding the resulting deserialized objects.
-	 * @param count the number of objects to deserialize.
-	 * @param executor the number of objects to deserialize.
-	 * @return the new position in the source data after deserialization.
-	 * @throws Throwable if an error occurs while deserializing.
-	 */
-	@Override
-	public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Throwable
-	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		try
-		{
-			Thread.currentThread().setContextClassLoader(classLoader);
-			List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
-			InputSource is = new SocketWrapperInputSource(socketClient);
-			for (int i=0; i<count; i++)
-			{
-				DataLocation dl = IOHelper.readData(is);
-				if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
-				futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
-			}
-			Throwable t = null;
-			for (Future<Object> f: futureList)
-			{
-				Object o = f.get();
-				if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
-				if (t == null) list.add(o);
-			}
-			if (t != null) throw t;
-			return 0;
-		}
-		finally
-		{
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-	}
+  /**
+   * Deserialize a number of objects from a socket client.
+   * @param list a list holding the resulting deserialized objects.
+   * @param count the number of objects to deserialize.
+   * @param executor the number of objects to deserialize.
+   * @return the new position in the source data after deserialization.
+   * @throws Throwable if an error occurs while deserializing.
+   */
+  @Override
+  public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Throwable
+  {
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    try
+    {
+      Thread.currentThread().setContextClassLoader(classLoader);
+      List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
+      InputSource is = new SocketWrapperInputSource(socketClient);
+      for (int i=0; i<count; i++)
+      {
+        DataLocation dl = IOHelper.readData(is);
+        if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
+        futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
+      }
+      Throwable t = null;
+      for (Future<Object> f: futureList)
+      {
+        Object o = f.get();
+        if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
+        if (t == null) list.add(o);
+      }
+      if (t != null) throw t;
+      return 0;
+    }
+    finally
+    {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
+  }
 }

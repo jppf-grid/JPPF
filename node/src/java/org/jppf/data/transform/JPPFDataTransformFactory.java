@@ -33,121 +33,121 @@ import org.slf4j.*;
  */
 public class JPPFDataTransformFactory
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFDataTransformFactory.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFDataTransformFactory.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Create the singleton data transform instance.
-	 * @return an instance of <code>JPPFDataTransform</code>.
-	 */
-	private static JPPFDataTransform createInstance()
-	{
-		JPPFDataTransform result = null;
-		String s = JPPFConfiguration.getProperties().getString("jppf.data.transform.class", null);
-		if (s != null)
-		{
-			try
-			{
-				Class clazz = Class.forName(s);
-				result = (JPPFDataTransform) clazz.newInstance();
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-		}
-		return result;
-	}
+  /**
+   * Create the singleton data transform instance.
+   * @return an instance of <code>JPPFDataTransform</code>.
+   */
+  private static JPPFDataTransform createInstance()
+  {
+    JPPFDataTransform result = null;
+    String s = JPPFConfiguration.getProperties().getString("jppf.data.transform.class", null);
+    if (s != null)
+    {
+      try
+      {
+        Class clazz = Class.forName(s);
+        result = (JPPFDataTransform) clazz.newInstance();
+      }
+      catch(Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+    return result;
+  }
 
-	/**
-	 * Get an instance of the configured data transform. This method creates a new instance every time it is invoked.
-	 * @return an instance of <code>JPPFDataTransform</code>.
-	 */
-	public static JPPFDataTransform getInstance()
-	{
-		return createInstance();
-	}
+  /**
+   * Get an instance of the configured data transform. This method creates a new instance every time it is invoked.
+   * @return an instance of <code>JPPFDataTransform</code>.
+   */
+  public static JPPFDataTransform getInstance()
+  {
+    return createInstance();
+  }
 
-	/**
-	 * Transform the specified data using the specified data transformation.
-	 * @param transform the data transformation to use.
-	 * @param normal true to wrap the data, false to unwrap it.
-	 * @param data the data to transform.
-	 * @param offset the position to start a in the data.
-	 * @param len the number of bytes to process, starting at the offset, in the data.
-	 * @return the result of the transformation as an array of bytes.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	public static byte[] transform(final JPPFDataTransform transform, final boolean normal, final byte[] data, final int offset, final int len) throws Exception
-	{
-		InputStream is = new ByteArrayInputStream(data, offset, len);
-		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-		if (normal) transform.wrap(is, mbos);
-		else transform.unwrap(is, mbos);
-		return mbos.toByteArray();
-	}
+  /**
+   * Transform the specified data using the specified data transformation.
+   * @param transform the data transformation to use.
+   * @param normal true to wrap the data, false to unwrap it.
+   * @param data the data to transform.
+   * @param offset the position to start a in the data.
+   * @param len the number of bytes to process, starting at the offset, in the data.
+   * @return the result of the transformation as an array of bytes.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  public static byte[] transform(final JPPFDataTransform transform, final boolean normal, final byte[] data, final int offset, final int len) throws Exception
+  {
+    InputStream is = new ByteArrayInputStream(data, offset, len);
+    MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+    if (normal) transform.wrap(is, mbos);
+    else transform.unwrap(is, mbos);
+    return mbos.toByteArray();
+  }
 
-	/**
-	 * Transform the specified data using the specified data transformation.
-	 * @param transform the data transformation to use.
-	 * @param normal true to wrap the data, false to unwrap it.
-	 * @param data the data to transform.
-	 * @return the result of the transformation as an array of bytes.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	public static byte[] transform(final JPPFDataTransform transform, final boolean normal, final byte[] data) throws Exception
-	{
-		return transform(transform, normal, data, 0, data.length);
-	}
+  /**
+   * Transform the specified data using the specified data transformation.
+   * @param transform the data transformation to use.
+   * @param normal true to wrap the data, false to unwrap it.
+   * @param data the data to transform.
+   * @return the result of the transformation as an array of bytes.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  public static byte[] transform(final JPPFDataTransform transform, final boolean normal, final byte[] data) throws Exception
+  {
+    return transform(transform, normal, data, 0, data.length);
+  }
 
-	/**
-	 * Transform the specified data using a new data transformation instance.
-	 * @param normal true to wrap the data, false to unwrap it.
-	 * @param data the data to transform.
-	 * @param offset the position to start a in the data.
-	 * @param len the number of bytes to process, starting at the offset, in the data.
-	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	public static byte[] transform(final boolean normal, final byte[] data, final int offset, final int len) throws Exception
-	{
-		JPPFDataTransform dataTransform = createInstance();
-		return dataTransform == null ? data : transform(dataTransform, normal, data, offset, len);
-	}
+  /**
+   * Transform the specified data using a new data transformation instance.
+   * @param normal true to wrap the data, false to unwrap it.
+   * @param data the data to transform.
+   * @param offset the position to start a in the data.
+   * @param len the number of bytes to process, starting at the offset, in the data.
+   * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  public static byte[] transform(final boolean normal, final byte[] data, final int offset, final int len) throws Exception
+  {
+    JPPFDataTransform dataTransform = createInstance();
+    return dataTransform == null ? data : transform(dataTransform, normal, data, offset, len);
+  }
 
-	/**
-	 * Transform the specified data using a new data transformation instance.
-	 * @param normal true to wrap the data, false to unwrap it.
-	 * @param data the data to transform.
-	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	public static byte[] transform(final boolean normal, final byte[] data) throws Exception
-	{
-		JPPFDataTransform dataTransform = createInstance();
-		return dataTransform == null ? data : transform(dataTransform, normal, data, 0, data.length);
-	}
+  /**
+   * Transform the specified data using a new data transformation instance.
+   * @param normal true to wrap the data, false to unwrap it.
+   * @param data the data to transform.
+   * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  public static byte[] transform(final boolean normal, final byte[] data) throws Exception
+  {
+    JPPFDataTransform dataTransform = createInstance();
+    return dataTransform == null ? data : transform(dataTransform, normal, data, 0, data.length);
+  }
 
-	/**
-	 * Transform the specified data using a new data transformation instance.
-	 * @param normal true to wrap the data, false to unwrap it.
-	 * @param is the data to transform.
-	 * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	public static byte[] transform(final boolean normal, final InputStream is) throws Exception
-	{
-		JPPFDataTransform dataTransform = createInstance();
-		if (dataTransform == null) return FileUtils.getInputStreamAsByte(is);
-		MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-		if (normal) dataTransform.wrap(is, mbos);
-		else dataTransform.unwrap(is, mbos);
-		return mbos.toByteArray();
-	}
+  /**
+   * Transform the specified data using a new data transformation instance.
+   * @param normal true to wrap the data, false to unwrap it.
+   * @param is the data to transform.
+   * @return the result of the transformation as an array of bytes, or the original data if no data transform is configured.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  public static byte[] transform(final boolean normal, final InputStream is) throws Exception
+  {
+    JPPFDataTransform dataTransform = createInstance();
+    if (dataTransform == null) return FileUtils.getInputStreamAsByte(is);
+    MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
+    if (normal) dataTransform.wrap(is, mbos);
+    else dataTransform.unwrap(is, mbos);
+    return mbos.toByteArray();
+  }
 }

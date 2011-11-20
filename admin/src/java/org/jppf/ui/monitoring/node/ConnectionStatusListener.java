@@ -28,45 +28,45 @@ import org.slf4j.*;
  */
 class ConnectionStatusListener implements ClientConnectionStatusListener
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(ConnectionStatusListener.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The name of the connection.
-	 */
-	String driverName = null;
-	/**
-	 * The node data panel.
-	 */
-	NodeDataPanel panel = null;
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(ConnectionStatusListener.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The name of the connection.
+   */
+  String driverName = null;
+  /**
+   * The node data panel.
+   */
+  NodeDataPanel panel = null;
 
-	/**
-	 * Initialize this listener with the specified connection name.
-	 * @param panel the node data panel.
-	 * @param driverName the name of the connection.
-	 */
-	public ConnectionStatusListener(final NodeDataPanel panel, final String driverName)
-	{
-		this.driverName = driverName;
-		this.panel = panel;
-	}
+  /**
+   * Initialize this listener with the specified connection name.
+   * @param panel the node data panel.
+   * @param driverName the name of the connection.
+   */
+  public ConnectionStatusListener(final NodeDataPanel panel, final String driverName)
+  {
+    this.driverName = driverName;
+    this.panel = panel;
+  }
 
-	/**
-	 * Invoked when thew connection status has changed.
-	 * @param event the connection status event.
-	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-	 */
-	@Override
-	public void statusChanged(final ClientConnectionStatusEvent event)
-	{
-		ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
-		if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
-		DefaultMutableTreeNode driverNode = panel.getManager().findDriver(driverName);
-		if (driverNode != null) panel.getModel().changeNode(driverNode);
-	}
+  /**
+   * Invoked when thew connection status has changed.
+   * @param event the connection status event.
+   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+   */
+  @Override
+  public void statusChanged(final ClientConnectionStatusEvent event)
+  {
+    ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
+    if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
+    DefaultMutableTreeNode driverNode = panel.getManager().findDriver(driverName);
+    if (driverNode != null) panel.getModel().changeNode(driverNode);
+  }
 }

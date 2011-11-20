@@ -27,89 +27,89 @@ import org.jppf.utils.LocalizationUtils;
  */
 public class NodeStatusNotifier implements NodeLifeCycleListener
 {
-	/**
-	 * Base name used for localization lookups.
-	 */
-	private static final String I18N_BASE = "org.jppf.server.i18n.messages";
-	/**
-	 * The mbean that provides information on the node's state.
-	 */
-	private final JPPFNodeAdmin nodeAdmin;
+  /**
+   * Base name used for localization lookups.
+   */
+  private static final String I18N_BASE = "org.jppf.server.i18n.messages";
+  /**
+   * The mbean that provides information on the node's state.
+   */
+  private final JPPFNodeAdmin nodeAdmin;
 
-	/**
-	 * Initialize this notifier with the specified node admin mbean.
-	 * @param nodeAdmin the mbean that provides information on the node's state.
-	 */
-	public NodeStatusNotifier(final JPPFNodeAdmin nodeAdmin)
-	{
-		this.nodeAdmin = nodeAdmin;
-	}
+  /**
+   * Initialize this notifier with the specified node admin mbean.
+   * @param nodeAdmin the mbean that provides information on the node's state.
+   */
+  public NodeStatusNotifier(final JPPFNodeAdmin nodeAdmin)
+  {
+    this.nodeAdmin = nodeAdmin;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void nodeStarting(final NodeLifeCycleEvent event)
-	{
-		synchronized(nodeAdmin)
-		{
-			nodeAdmin.getNodeState().setConnectionStatus(localize("node.connected"));
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void nodeStarting(final NodeLifeCycleEvent event)
+  {
+    synchronized(nodeAdmin)
+    {
+      nodeAdmin.getNodeState().setConnectionStatus(localize("node.connected"));
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void nodeEnding(final NodeLifeCycleEvent event)
-	{
-		synchronized(nodeAdmin)
-		{
-			nodeAdmin.getNodeState().setConnectionStatus(localize("node.disconnected"));
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void nodeEnding(final NodeLifeCycleEvent event)
+  {
+    synchronized(nodeAdmin)
+    {
+      nodeAdmin.getNodeState().setConnectionStatus(localize("node.disconnected"));
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void jobStarting(final NodeLifeCycleEvent event)
-	{
-		synchronized(nodeAdmin)
-		{
-			nodeAdmin.getNodeState().setExecutionStatus(localize("node.executing"));
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void jobStarting(final NodeLifeCycleEvent event)
+  {
+    synchronized(nodeAdmin)
+    {
+      nodeAdmin.getNodeState().setExecutionStatus(localize("node.executing"));
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void jobEnding(final NodeLifeCycleEvent event)
-	{
-		synchronized(nodeAdmin)
-		{
-			nodeAdmin.getNodeState().setExecutionStatus(localize("node.idle"));
-			int n = event.getTasks().size() + nodeAdmin.getNodeState().getNbTasksExecuted();
-			try
-			{
-				nodeAdmin.setTaskCounter(n);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void jobEnding(final NodeLifeCycleEvent event)
+  {
+    synchronized(nodeAdmin)
+    {
+      nodeAdmin.getNodeState().setExecutionStatus(localize("node.idle"));
+      int n = event.getTasks().size() + nodeAdmin.getNodeState().getNbTasksExecuted();
+      try
+      {
+        nodeAdmin.setTaskCounter(n);
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
+  }
 
-	/**
-	 * Get a localized message given its unique name and the current locale.
-	 * @param message the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale
-	 * if the localization for the current locale is not found.
-	 */
-	private static String localize(final String message)
-	{
-		return LocalizationUtils.getLocalized(I18N_BASE, message);
-	}
+  /**
+   * Get a localized message given its unique name and the current locale.
+   * @param message the unique name of the localized message.
+   * @return a message in the current locale, or the default locale
+   * if the localization for the current locale is not found.
+   */
+  private static String localize(final String message)
+  {
+    return LocalizationUtils.getLocalized(I18N_BASE, message);
+  }
 }

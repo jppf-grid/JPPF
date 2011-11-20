@@ -26,120 +26,120 @@ import java.util.*;
  */
 public abstract class PropertiesTableFormat
 {
-	/**
-	 * Contains the formatted text.
-	 */
-	protected StringBuffer sb = new StringBuffer();
-	/**
-	 * The title of the whole document.
-	 */
-	protected String docTitle = null;
+  /**
+   * Contains the formatted text.
+   */
+  protected StringBuffer sb = new StringBuffer();
+  /**
+   * The title of the whole document.
+   */
+  protected String docTitle = null;
 
-	/**
-	 * Initialize this formatter with the specified title.
-	 * @param docTitle the title of the whole document.
-	 */
-	public PropertiesTableFormat(final String docTitle)
-	{
-		this.docTitle = docTitle;
-	}
+  /**
+   * Initialize this formatter with the specified title.
+   * @param docTitle the title of the whole document.
+   */
+  public PropertiesTableFormat(final String docTitle)
+  {
+    this.docTitle = docTitle;
+  }
 
-	/**
-	 * Get the formatted text.
-	 * @return the text as a string.
-	 */
-	public String getText()
-	{
-		return sb.toString();
-	}
+  /**
+   * Get the formatted text.
+   * @return the text as a string.
+   */
+  public String getText()
+  {
+    return sb.toString();
+  }
 
-	/**
-	 * Write the prologue for the formatted text.
-	 */
-	public void start()
-	{
-	}
+  /**
+   * Write the prologue for the formatted text.
+   */
+  public void start()
+  {
+  }
 
-	/**
-	 * Write the epilogue for the formatted text.
-	 */
-	public void end()
-	{
-	}
+  /**
+   * Write the epilogue for the formatted text.
+   */
+  public void end()
+  {
+  }
 
-	/**
-	 * Generate the formatted text for a set of properties.
-	 * @param props the set of properties to format.
-	 * @param title the title of the formatted table.
-	 */
-	public void formatTable(final Properties props, final String title)
-	{
-		Set<String> orderedProps = new TreeSet<String>();
-		Enumeration en = props.propertyNames();
-		while (en.hasMoreElements()) orderedProps.add((String) en.nextElement());
-		tableStart(title);
-		for (String name: orderedProps)
-		{
-			rowStart();
-			cellStart();
-			sb.append(name);
-			cellEnd();
-			cellSeparator();
-			cellStart();
-			sb.append(props.getProperty(name));
-			cellEnd();
-			rowEnd();
-		}
-		tableEnd();
-	}
+  /**
+   * Generate the formatted text for a set of properties.
+   * @param props the set of properties to format.
+   * @param title the title of the formatted table.
+   */
+  public void formatTable(final Properties props, final String title)
+  {
+    Set<String> orderedProps = new TreeSet<String>();
+    Enumeration en = props.propertyNames();
+    while (en.hasMoreElements()) orderedProps.add((String) en.nextElement());
+    tableStart(title);
+    for (String name: orderedProps)
+    {
+      rowStart();
+      cellStart();
+      sb.append(name);
+      cellEnd();
+      cellSeparator();
+      cellStart();
+      sb.append(props.getProperty(name));
+      cellEnd();
+      rowEnd();
+    }
+    tableEnd();
+  }
 
-	/**
-	 * Write the prologue of a table.
-	 * @param title the title for the table.
-	 */
-	public void tableStart(final String title)
-	{
-	}
+  /**
+   * Write the prologue of a table.
+   * @param title the title for the table.
+   */
+  public void tableStart(final String title)
+  {
+  }
 
-	/**
-	 * Write the prologue of a table.
-	 */
-	public void tableEnd()
-	{
-	}
+  /**
+   * Write the prologue of a table.
+   */
+  public void tableEnd()
+  {
+  }
 
-	/**
-	 * Write the prologue of a table row.
-	 */
-	public void rowStart()
-	{
-	}
+  /**
+   * Write the prologue of a table row.
+   */
+  public void rowStart()
+  {
+  }
 
-	/**
-	 * Write the prologue of a table row.
-	 */
-	public void rowEnd()
-	{
-	}
+  /**
+   * Write the prologue of a table row.
+   */
+  public void rowEnd()
+  {
+  }
 
-	/**
-	 * Write the prologue of a table cell.
-	 */
-	public void cellStart()
-	{
-	}
+  /**
+   * Write the prologue of a table cell.
+   */
+  public void cellStart()
+  {
+  }
 
-	/**
-	 * Write the prologue of a table cell.
-	 */
-	public void cellEnd()
-	{
-	}
+  /**
+   * Write the prologue of a table cell.
+   */
+  public void cellEnd()
+  {
+  }
 
-	/**
-	 * Write the separator between 2 cells.
-	 */
-	public void cellSeparator()
-	{
-	}
+  /**
+   * Write the separator between 2 cells.
+   */
+  public void cellSeparator()
+  {
+  }
 }

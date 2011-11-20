@@ -24,12 +24,12 @@ package org.jppf.node.idle;
  */
 public enum IdleState
 {
-	/**
-	 * The system is idle.
-	 */
-	IDLE,
-	/**
-	 * The system is busy.
-	 */
-	BUSY
+  /**
+   * The system is idle.
+   */
+  IDLE,
+  /**
+   * The system is busy.
+   */
+  BUSY
 }

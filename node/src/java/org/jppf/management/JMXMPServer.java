@@ -33,83 +33,83 @@ import org.slf4j.*;
  */
 public class JMXMPServer extends AbstractJMXServer
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JMXMPServer.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JMXMPServer.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this JMX server.
-	 */
-	public JMXMPServer()
-	{
-		this(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
-	}
+  /**
+   * Initialize this JMX server.
+   */
+  public JMXMPServer()
+  {
+    this(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+  }
 
-	/**
-	 * Initialize this JMX server with the specified uuid.
-	 * @param id the unique id of the driver or node holding this jmx server.
-	 */
-	public JMXMPServer(final String id)
-	{
-		this.id = id;
-	}
+  /**
+   * Initialize this JMX server with the specified uuid.
+   * @param id the unique id of the driver or node holding this jmx server.
+   */
+  public JMXMPServer(final String id)
+  {
+    this.id = id;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void start(final ClassLoader cl) throws Exception
-	{
-		if (debugEnabled) log.debug("starting remote connector server");
-		ClassLoader tmp = Thread.currentThread().getContextClassLoader();
-		lock.lock();
-		try
-		{
-			Thread.currentThread().setContextClassLoader(cl);
-			server = ManagementFactory.getPlatformMBeanServer();
-			TypedProperties props = JPPFConfiguration.getProperties();
-			String host = NetworkUtils.getManagementHost();
-			int port = props.getInt("jppf.management.port", 11198);
-			boolean found = false;
-			JMXServiceURL url = null;
-			while (!found)
-			{
-				try
-				{
-					InetAddress addr = InetAddress.getByName(host);
-					url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + port);
-					Map<String, Object> env = new HashMap<String, Object>();
-					env.put("jmx.remote.default.class.loader", cl);
-					env.put("jmx.remote.protocol.provider.class.loader", cl);
-					connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
-					connectorServer.start();
-					found = true;
-				}
-				catch(Exception e)
-				{
-					String s = e.getMessage();
-					if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
-					{
-						if (port >= 65530) port = 1024;
-						port++;
-					}
-					else throw e;
-				}
-			}
-			props.setProperty("jppf.management.port", Integer.toString(port));
-			//if (debugEnabled) log.debug("starting connector server with port = " + port);
-			stopped = false;
-			if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
-		}
-		finally
-		{
-			lock.unlock();
-			Thread.currentThread().setContextClassLoader(tmp);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void start(final ClassLoader cl) throws Exception
+  {
+    if (debugEnabled) log.debug("starting remote connector server");
+    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+    lock.lock();
+    try
+    {
+      Thread.currentThread().setContextClassLoader(cl);
+      server = ManagementFactory.getPlatformMBeanServer();
+      TypedProperties props = JPPFConfiguration.getProperties();
+      String host = NetworkUtils.getManagementHost();
+      int port = props.getInt("jppf.management.port", 11198);
+      boolean found = false;
+      JMXServiceURL url = null;
+      while (!found)
+      {
+        try
+        {
+          InetAddress addr = InetAddress.getByName(host);
+          url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + port);
+          Map<String, Object> env = new HashMap<String, Object>();
+          env.put("jmx.remote.default.class.loader", cl);
+          env.put("jmx.remote.protocol.provider.class.loader", cl);
+          connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
+          connectorServer.start();
+          found = true;
+        }
+        catch(Exception e)
+        {
+          String s = e.getMessage();
+          if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
+          {
+            if (port >= 65530) port = 1024;
+            port++;
+          }
+          else throw e;
+        }
+      }
+      props.setProperty("jppf.management.port", Integer.toString(port));
+      //if (debugEnabled) log.debug("starting connector server with port = " + port);
+      stopped = false;
+      if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
+    }
+    finally
+    {
+      lock.unlock();
+      Thread.currentThread().setContextClassLoader(tmp);
+    }
+  }
 }

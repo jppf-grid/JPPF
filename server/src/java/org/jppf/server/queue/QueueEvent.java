@@ -28,66 +28,66 @@ import org.jppf.server.protocol.*;
  */
 public class QueueEvent extends EventObject
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Represents part or the totality of a job that was submitted.
-	 */
-	private transient ServerJob bundleWrapper = null;
-	/**
-	 * Determines if the event is a requeued bundle, following a node failure for instance.
-	 */
-	private boolean requeued = false;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Represents part or the totality of a job that was submitted.
+   */
+  private transient ServerJob bundleWrapper = null;
+  /**
+   * Determines if the event is a requeued bundle, following a node failure for instance.
+   */
+  private boolean requeued = false;
 
-	/**
-	 * Initialize this event with the specified queue and bundle.
-	 * @param queue - the queue this event originates from.
-	 * @param bundleWrapper - represents part or the totality of a job that was submitted.
-	 */
-	public QueueEvent(final JPPFQueue queue, final BundleWrapper bundleWrapper)
-	{
-		this(queue, bundleWrapper, false);
-	}
+  /**
+   * Initialize this event with the specified queue and bundle.
+   * @param queue - the queue this event originates from.
+   * @param bundleWrapper - represents part or the totality of a job that was submitted.
+   */
+  public QueueEvent(final JPPFQueue queue, final BundleWrapper bundleWrapper)
+  {
+    this(queue, bundleWrapper, false);
+  }
 
-	/**
-	 * Initialize this event with the specified queue and bundle.
-	 * @param queue - the queue this event originates from.
-	 * @param bundleWrapper - represents part or the totality of a job that was submitted.
-	 * @param requeue - determines if the event is a requeued bundle, following a node failure for instance.
-	 */
-	public QueueEvent(final JPPFQueue queue, final ServerJob bundleWrapper, final boolean requeue)
-	{
-		super(queue);
-		this.bundleWrapper = bundleWrapper;
-		this.requeued = requeue;
-	}
+  /**
+   * Initialize this event with the specified queue and bundle.
+   * @param queue - the queue this event originates from.
+   * @param bundleWrapper - represents part or the totality of a job that was submitted.
+   * @param requeue - determines if the event is a requeued bundle, following a node failure for instance.
+   */
+  public QueueEvent(final JPPFQueue queue, final ServerJob bundleWrapper, final boolean requeue)
+  {
+    super(queue);
+    this.bundleWrapper = bundleWrapper;
+    this.requeued = requeue;
+  }
 
-	/**
-	 * Get the queue this event originates from.
-	 * @return an instance of <code>JPPFQueue</code>.
-	 */
-	public JPPFQueue getQueue()
-	{
-		return (JPPFQueue) getSource();
-	}
+  /**
+   * Get the queue this event originates from.
+   * @return an instance of <code>JPPFQueue</code>.
+   */
+  public JPPFQueue getQueue()
+  {
+    return (JPPFQueue) getSource();
+  }
 
-	/**
-	 * Get the task bundle that is the cause of the event.
-	 * @return  an instance of <code>BundleWrapper</code>.
-	 */
-	public ServerJob getBundleWrapper()
-	{
-		return bundleWrapper;
-	}
+  /**
+   * Get the task bundle that is the cause of the event.
+   * @return  an instance of <code>BundleWrapper</code>.
+   */
+  public ServerJob getBundleWrapper()
+  {
+    return bundleWrapper;
+  }
 
-	/**
-	 * Determine if this event is a requeued bundle, following a node failure for instance.
-	 * @return true if a bundle was requeued, false otherwise.
-	 */
-	public boolean isRequeued()
-	{
-		return requeued;
-	}
+  /**
+   * Determine if this event is a requeued bundle, following a node failure for instance.
+   * @return true if a bundle was requeued, false otherwise.
+   */
+  public boolean isRequeued()
+  {
+    return requeued;
+  }
 }

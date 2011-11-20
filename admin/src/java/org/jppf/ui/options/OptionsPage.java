@@ -25,19 +25,19 @@ import java.util.List;
  */
 public interface OptionsPage extends OptionElement
 {
-	/**
-	 * Add an element to this options page.
-	 * @param element the element to add.
-	 */
-	void add(OptionElement element);
-	/**
-	 * Remove an element from this options page.
-	 * @param element the element to remove.
-	 */
-	void remove(OptionElement element);
-	/**
-	 * Get the options in this page.
-	 * @return a list of <code>Option</code> instances.
-	 */
-	List<OptionElement> getChildren();
+  /**
+   * Add an element to this options page.
+   * @param element the element to add.
+   */
+  void add(OptionElement element);
+  /**
+   * Remove an element from this options page.
+   * @param element the element to remove.
+   */
+  void remove(OptionElement element);
+  /**
+   * Get the options in this page.
+   * @return a list of <code>Option</code> instances.
+   */
+  List<OptionElement> getChildren();
 }

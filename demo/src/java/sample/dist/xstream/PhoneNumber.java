@@ -24,77 +24,77 @@ package sample.dist.xstream;
  */
 public class PhoneNumber
 {
-	/**
-	 * Area code.
-	 */
-	private int code;
-	/**
-	 * 7 digits number.
-	 */
-	private String number;
+  /**
+   * Area code.
+   */
+  private int code;
+  /**
+   * 7 digits number.
+   */
+  private String number;
 
-	/**
-	 * Default constructor.
-	 */
-	public PhoneNumber()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public PhoneNumber()
+  {
+  }
 
-	/**
-	 * Initialize this object with the specified parameters.
-	 * @param code the area code.
-	 * @param number a 7 digits number.
-	 */
-	public PhoneNumber(final int code, final String number)
-	{
-		this.code = code;
-		this.number = number;
-	}
+  /**
+   * Initialize this object with the specified parameters.
+   * @param code the area code.
+   * @param number a 7 digits number.
+   */
+  public PhoneNumber(final int code, final String number)
+  {
+    this.code = code;
+    this.number = number;
+  }
 
-	/**
-	 * Get the area code.
-	 * @return the area code as an int.
-	 */
-	public int getCode()
-	{
-		return code;
-	}
+  /**
+   * Get the area code.
+   * @return the area code as an int.
+   */
+  public int getCode()
+  {
+    return code;
+  }
 
-	/**
-	 * Set the area code.
-	 * @param code the area code as an int.
-	 */
-	public void setCode(final int code)
-	{
-		this.code = code;
-	}
+  /**
+   * Set the area code.
+   * @param code the area code as an int.
+   */
+  public void setCode(final int code)
+  {
+    this.code = code;
+  }
 
-	/**
-	 * Get the 7 digits number.
-	 * @return the number as a string.
-	 */
-	public String getNumber()
-	{
-		return number;
-	}
+  /**
+   * Get the 7 digits number.
+   * @return the number as a string.
+   */
+  public String getNumber()
+  {
+    return number;
+  }
 
-	/**
-	 * Set the 7 digits number.
-	 * @param number the number as a string.
-	 */
-	public void setNumber(final String number)
-	{
-		this.number = number;
-	}
+  /**
+   * Set the 7 digits number.
+   * @param number the number as a string.
+   */
+  public void setNumber(final String number)
+  {
+    this.number = number;
+  }
 
-	/**
-	 * Get a string representation of this phone number.
-	 * @return this phone number as a string.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return "(" + code + ") " + number;
-	}
+  /**
+   * Get a string representation of this phone number.
+   * @return this phone number as a string.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return "(" + code + ") " + number;
+  }
 }

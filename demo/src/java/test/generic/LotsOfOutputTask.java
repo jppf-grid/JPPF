@@ -27,36 +27,36 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LotsOfOutputTask extends JPPFTask
 {
-	/**
-	 * Number of output lines to print.
-	 */
-	private int nbLines = 0;
-	/**
-	 * Length in chars of each output line.
-	 */
-	private int lineLength = 0;
+  /**
+   * Number of output lines to print.
+   */
+  private int nbLines = 0;
+  /**
+   * Length in chars of each output line.
+   */
+  private int lineLength = 0;
 
-	/**
-	 * Initialize this task with the specified number of lines and line length.
-	 * @param nbLines - the number of output lines to print.
-	 * @param lineLength - the length in chars of each output line.
-	 */
-	public LotsOfOutputTask(final int nbLines, final int lineLength)
-	{
-		this.nbLines = nbLines;
-		this.lineLength = lineLength;
-	}
+  /**
+   * Initialize this task with the specified number of lines and line length.
+   * @param nbLines - the number of output lines to print.
+   * @param lineLength - the length in chars of each output line.
+   */
+  public LotsOfOutputTask(final int nbLines, final int lineLength)
+  {
+    this.nbLines = nbLines;
+    this.lineLength = lineLength;
+  }
 
-	/**
-	 * Output <i>nbLines</i> of length <i>lineLength</i> to the console.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<lineLength; i++) sb.append('X');
-		String s = sb.toString();
-		for (int i=0; i<nbLines; i++) System.out.println(s);
-	}
+  /**
+   * Output <i>nbLines</i> of length <i>lineLength</i> to the console.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<lineLength; i++) sb.append('X');
+    String s = sb.toString();
+    for (int i=0; i<nbLines; i++) System.out.println(s);
+  }
 }

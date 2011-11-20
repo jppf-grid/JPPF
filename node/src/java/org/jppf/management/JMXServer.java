@@ -26,34 +26,34 @@ import javax.management.MBeanServer;
  */
 public interface JMXServer
 {
-	/**
-	 * Start the MBean server and associated resources.
-	 * @param cl - the default classloader to be used by the JMX remote connector.
-	 * @throws Exception if an error occurs when starting the server or one of its components.
-	 */
-	void start(ClassLoader cl) throws Exception;
+  /**
+   * Start the MBean server and associated resources.
+   * @param cl - the default classloader to be used by the JMX remote connector.
+   * @throws Exception if an error occurs when starting the server or one of its components.
+   */
+  void start(ClassLoader cl) throws Exception;
 
-	/**
-	 * Stop the MBean server and associated resources.
-	 * @throws Exception if an error occurs when stopping the server or one of its components.
-	 */
-	void stop() throws Exception;
+  /**
+   * Stop the MBean server and associated resources.
+   * @throws Exception if an error occurs when stopping the server or one of its components.
+   */
+  void stop() throws Exception;
 
-	/**
-	 * Get a reference to the MBean server.
-	 * @return an <code>MBeanServer</code> instance.
-	 */
-	MBeanServer getServer();
+  /**
+   * Get a reference to the MBean server.
+   * @return an <code>MBeanServer</code> instance.
+   */
+  MBeanServer getServer();
 
-	/**
-	 * Determine whether this JMX server is stopped.
-	 * @return <code>true</code> if this JMX server is stopped, <code>false</code> otherwise.
-	 */
-	boolean isStopped();
+  /**
+   * Determine whether this JMX server is stopped.
+   * @return <code>true</code> if this JMX server is stopped, <code>false</code> otherwise.
+   */
+  boolean isStopped();
 
-	/**
-	 * Get a unique identifier for this management server. This id must be unique across JPPF nodes and servers.
-	 * @return the id as a string.
-	 */
-	String getId();
+  /**
+   * Get a unique identifier for this management server. This id must be unique across JPPF nodes and servers.
+   * @return the id as a string.
+   */
+  String getId();
 }

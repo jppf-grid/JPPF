@@ -27,66 +27,66 @@ import javax.resource.spi.ManagedConnectionMetaData;
  */
 public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
 {
-	/**
-	 * Name of the user of the connection.
-	 */
-	private String userName;
+  /**
+   * Name of the user of the connection.
+   */
+  private String userName;
 
-	/**
-	 * Initialize this metadata with a specified user name.
-	 * @param userName the name of the user of the connection.
-	 */
-	public JPPFManagedConnectionMetaData(final String userName)
-	{
-		this.userName = userName;
-	}
+  /**
+   * Initialize this metadata with a specified user name.
+   * @param userName the name of the user of the connection.
+   */
+  public JPPFManagedConnectionMetaData(final String userName)
+  {
+    this.userName = userName;
+  }
 
-	/**
-	 * Get the name of the product.
-	 * @return the product name as a string.
-	 * @throws ResourceException if the product name could not be obtained.
-	 * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductName()
-	 */
-	@Override
-	public String getEISProductName() throws ResourceException
-	{
-		return "JPPF";
-	}
+  /**
+   * Get the name of the product.
+   * @return the product name as a string.
+   * @throws ResourceException if the product name could not be obtained.
+   * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductName()
+   */
+  @Override
+  public String getEISProductName() throws ResourceException
+  {
+    return "JPPF";
+  }
 
-	/**
-	 * Get the version of the product.
-	 * @return the version as a string.
-	 * @throws ResourceException if the version could not be obtained.
-	 * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductVersion()
-	 */
-	@Override
-	public String getEISProductVersion() throws ResourceException
-	{
-		return "JPPF 1.0 beta";
-	}
+  /**
+   * Get the version of the product.
+   * @return the version as a string.
+   * @throws ResourceException if the version could not be obtained.
+   * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductVersion()
+   */
+  @Override
+  public String getEISProductVersion() throws ResourceException
+  {
+    return "JPPF 1.0 beta";
+  }
 
-	/**
-	 * Get the maximum number of connections.
-	 * @return the number of connections as an int.
-	 * @throws ResourceException if the number of connections could not be obtained.
-	 * @see javax.resource.spi.ManagedConnectionMetaData#getMaxConnections()
-	 */
-	@Override
-	public int getMaxConnections() throws ResourceException
-	{
-		return 10;
-	}
+  /**
+   * Get the maximum number of connections.
+   * @return the number of connections as an int.
+   * @throws ResourceException if the number of connections could not be obtained.
+   * @see javax.resource.spi.ManagedConnectionMetaData#getMaxConnections()
+   */
+  @Override
+  public int getMaxConnections() throws ResourceException
+  {
+    return 10;
+  }
 
-	/**
-	 * Get the name of the user of the connection.
-	 * @return the name as a string.
-	 * @throws ResourceException if the name could not be obtained.
-	 * @see javax.resource.spi.ManagedConnectionMetaData#getUserName()
-	 */
-	@Override
-	public String getUserName() throws ResourceException
-	{
-		return userName;
-	}
+  /**
+   * Get the name of the user of the connection.
+   * @return the name as a string.
+   * @throws ResourceException if the name could not be obtained.
+   * @see javax.resource.spi.ManagedConnectionMetaData#getUserName()
+   */
+  @Override
+  public String getUserName() throws ResourceException
+  {
+    return userName;
+  }
 
 }

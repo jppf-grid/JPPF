@@ -35,168 +35,168 @@ import org.slf4j.*;
  */
 public class ClientMessage extends AbstractNodeMessage
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ClientMessage.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The length of the location at the current position.
-	 */
-	protected int currentLength = 0;
-	/**
-	 * Object storing the length of the object currently being read or written.
-	 */
-	protected NioObject currentLengthObject = null;
-	/**
-	 * Object storing the object currently being read or written.
-	 */
-	protected NioObject currentObject = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ClientMessage.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The length of the location at the current position.
+   */
+  protected int currentLength = 0;
+  /**
+   * Object storing the length of the object currently being read or written.
+   */
+  protected NioObject currentLengthObject = null;
+  /**
+   * Object storing the object currently being read or written.
+   */
+  protected NioObject currentObject = null;
 
-	/**
-	 * Read data from the channel.
-	 * @param wrapper the channel to read from.
-	 * @return true if the data has been completely read from the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	@Override
-	public boolean read(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (nbObjects <= 0)
-		{
-			if (position != 0) position = 0;
-			if (!readNextObject(wrapper)) return false;
-			bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
-			nbObjects = bundle.getTaskCount() + 2;
-			if (debugEnabled) log.debug("received header from client, data length = " + locations.get(0).getSize());
-		}
-		while (position < nbObjects)
-		{
-			if (!readNextObject(wrapper)) return false;
-		}
-		return true;
-	}
+  /**
+   * Read data from the channel.
+   * @param wrapper the channel to read from.
+   * @return true if the data has been completely read from the channel, false otherwise.
+   * @throws Exception if an IO error occurs.
+   */
+  @Override
+  public boolean read(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (nbObjects <= 0)
+    {
+      if (position != 0) position = 0;
+      if (!readNextObject(wrapper)) return false;
+      bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
+      nbObjects = bundle.getTaskCount() + 2;
+      if (debugEnabled) log.debug("received header from client, data length = " + locations.get(0).getSize());
+    }
+    while (position < nbObjects)
+    {
+      if (!readNextObject(wrapper)) return false;
+    }
+    return true;
+  }
 
-	/**
-	 * Read data from the channel.
-	 * @param wrapper the channel to write to.
-	 * @return true if the data has been completely written the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	@Override
-	public boolean write(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (nbObjects <= 0)
-		{
-			nbObjects = bundle.getTaskCount() + 1;
-			position = 0;
-		}
-		while (position < nbObjects)
-		{
-			if (!writeNextObject(wrapper)) return false;
-		}
-		return true;
-	}
+  /**
+   * Read data from the channel.
+   * @param wrapper the channel to write to.
+   * @return true if the data has been completely written the channel, false otherwise.
+   * @throws Exception if an IO error occurs.
+   */
+  @Override
+  public boolean write(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (nbObjects <= 0)
+    {
+      nbObjects = bundle.getTaskCount() + 1;
+      position = 0;
+    }
+    while (position < nbObjects)
+    {
+      if (!writeNextObject(wrapper)) return false;
+    }
+    return true;
+  }
 
-	/**
-	 * Read the next serializable object from the specified channel.
-	 * @param wrapper the channel to read from.
-	 * @return true if the object has been completely read from the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	@Override
-	protected boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (currentLengthObject == null)
-		{
-			currentLengthObject = new NioObject(4, false);
-		}
-		InputSource source = new ChannelInputSource(channel);
-		if (!currentLengthObject.read(source)) return false;
-		if (currentLength <= 0)
-		{
-			InputStream is = currentLengthObject.getData().getInputStream();
-			try
-			{
-				currentLength = SerializationUtils.readInt(is);
-			}
-			finally
-			{
-				StreamUtils.close(is);
-			}
-			count += 4;
-		}
-		if (currentObject == null)
-		{
-			DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-			currentObject = new NioObject(location, false);
-		}
-		if (!currentObject.read(source)) return false;
-		count += currentLength;
-		locations.add(currentObject.getData());
-		currentLengthObject = null;
-		currentObject = null;
-		currentLength = 0;
-		position++;
-		return true;
-	}
+  /**
+   * Read the next serializable object from the specified channel.
+   * @param wrapper the channel to read from.
+   * @return true if the object has been completely read from the channel, false otherwise.
+   * @throws Exception if an IO error occurs.
+   */
+  @Override
+  protected boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
+    if (currentLengthObject == null)
+    {
+      currentLengthObject = new NioObject(4, false);
+    }
+    InputSource source = new ChannelInputSource(channel);
+    if (!currentLengthObject.read(source)) return false;
+    if (currentLength <= 0)
+    {
+      InputStream is = currentLengthObject.getData().getInputStream();
+      try
+      {
+        currentLength = SerializationUtils.readInt(is);
+      }
+      finally
+      {
+        StreamUtils.close(is);
+      }
+      count += 4;
+    }
+    if (currentObject == null)
+    {
+      DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
+      currentObject = new NioObject(location, false);
+    }
+    if (!currentObject.read(source)) return false;
+    count += currentLength;
+    locations.add(currentObject.getData());
+    currentLengthObject = null;
+    currentObject = null;
+    currentLength = 0;
+    position++;
+    return true;
+  }
 
-	/**
-	 * Write the next object to the specified channel.
-	 * @param wrapper the channel to write to.
-	 * @return true if the object has been completely written the channel, false otherwise.
-	 * @throws Exception if an IO error occurs.
-	 */
-	@Override
-	protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		SocketChannel channel = (SocketChannel) ((SelectionKey) wrapper.getChannel()).channel();
-		if (currentLengthObject == null)
-		{
-			currentLengthObject = new NioObject(4, false);
-			OutputStream os = currentLengthObject.getData().getOutputStream();
-			try
-			{
-				SerializationUtils.writeInt(locations.get(position).getSize(), os);
-			}
-			finally
-			{
-				StreamUtils.close(os);
-			}
-		}
-		OutputDestination dest = new ChannelOutputDestination(channel);
-		if (!currentLengthObject.write(dest)) return false;
-		if (currentObject == null)
-		{
-			DataLocation loc = locations.get(position);
-			currentObject = new NioObject(loc.copy(), false);
-		}
-		if (!currentObject.write(dest)) return false;
-		count += 4 + locations.get(position).getSize();
-		position++;
-		currentLengthObject = null;
-		currentObject = null;
-		return true;
-	}
+  /**
+   * Write the next object to the specified channel.
+   * @param wrapper the channel to write to.
+   * @return true if the object has been completely written the channel, false otherwise.
+   * @throws Exception if an IO error occurs.
+   */
+  @Override
+  protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    SocketChannel channel = (SocketChannel) ((SelectionKey) wrapper.getChannel()).channel();
+    if (currentLengthObject == null)
+    {
+      currentLengthObject = new NioObject(4, false);
+      OutputStream os = currentLengthObject.getData().getOutputStream();
+      try
+      {
+        SerializationUtils.writeInt(locations.get(position).getSize(), os);
+      }
+      finally
+      {
+        StreamUtils.close(os);
+      }
+    }
+    OutputDestination dest = new ChannelOutputDestination(channel);
+    if (!currentLengthObject.write(dest)) return false;
+    if (currentObject == null)
+    {
+      DataLocation loc = locations.get(position);
+      currentObject = new NioObject(loc.copy(), false);
+    }
+    if (!currentObject.write(dest)) return false;
+    count += 4 + locations.get(position).getSize();
+    position++;
+    currentLengthObject = null;
+    currentObject = null;
+    return true;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-		sb.append("nb locations=").append(locations == null ? -1 : locations.size());
-		sb.append(", position=").append(position);
-		sb.append(", nbObjects=").append(nbObjects);
-		sb.append(", length=").append(length);
-		sb.append(", count=").append(count);
-		sb.append(", currentLength=").append(currentLength);
-		sb.append(']');
-		return sb.toString();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("nb locations=").append(locations == null ? -1 : locations.size());
+    sb.append(", position=").append(position);
+    sb.append(", nbObjects=").append(nbObjects);
+    sb.append(", length=").append(length);
+    sb.append(", count=").append(count);
+    sb.append(", currentLength=").append(currentLength);
+    sb.append(']');
+    return sb.toString();
+  }
 }

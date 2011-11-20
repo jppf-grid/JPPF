@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface IdleStateListener extends EventListener
 {
-	/**
-	 * Called when the idle state of the system has changed.
-	 * @param event the event encapsulating the state change.
-	 */
-	void idleStateChanged(IdleStateEvent event);
+  /**
+   * Called when the idle state of the system has changed.
+   * @param event the event encapsulating the state change.
+   */
+  void idleStateChanged(IdleStateEvent event);
 }

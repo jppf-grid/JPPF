@@ -31,88 +31,88 @@ import org.jppf.ui.options.JavaOption.JavaOptionMouseListener;
  */
 public class MandelbrotMouseListener extends JavaOptionMouseListener
 {
-	/**
-	 * Processes left-click and right-click events to zoom-in or zoom-out the image.
-	 * @param event the mouse event to process
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mousePressed(final MouseEvent event)
-	{
-		Component comp = event.getComponent();
-		if (!(comp instanceof ImagePanel)) return;
+  /**
+   * Processes left-click and right-click events to zoom-in or zoom-out the image.
+   * @param event the mouse event to process
+   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+   */
+  @Override
+  public void mousePressed(final MouseEvent event)
+  {
+    Component comp = event.getComponent();
+    if (!(comp instanceof ImagePanel)) return;
 
-		int button = event.getButton();
-		if ((button == MouseEvent.BUTTON1) || (button == MouseEvent.BUTTON3))
-		{
-			int mouseX = event.getX();
-			int mouseY = event.getY();
-			double centerX = getDoubleValue("/centerX");
-			double centerY = getDoubleValue("/centerY");
-			double d = getDoubleValue("/diameter");
-			double minX = centerX - d/2;
-			double x = mouseX * d/800d + minX;
-			double minY = centerY - d/2;
-			double y = (600 - mouseY - 1) * d/600d + minY;
-			int f = getIntValue("/mandelbrotZoomFactor");
+    int button = event.getButton();
+    if ((button == MouseEvent.BUTTON1) || (button == MouseEvent.BUTTON3))
+    {
+      int mouseX = event.getX();
+      int mouseY = event.getY();
+      double centerX = getDoubleValue("/centerX");
+      double centerY = getDoubleValue("/centerY");
+      double d = getDoubleValue("/diameter");
+      double minX = centerX - d/2;
+      double x = mouseX * d/800d + minX;
+      double minY = centerY - d/2;
+      double y = (600 - mouseY - 1) * d/600d + minY;
+      int f = getIntValue("/mandelbrotZoomFactor");
 
-			d = (button == MouseEvent.BUTTON1) ? d/f : d * f;
-			setDoubleValue("/centerX", x);
-			setDoubleValue("/centerY", y);
-			setDoubleValue("/diameter", d);
-			int iter = getIntValue("/iterations");
-			try
-			{
-				FractalRunner.perform(true, new FractalConfiguration(x, y, d, 800, 600, iter), getOption());
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
+      d = (button == MouseEvent.BUTTON1) ? d/f : d * f;
+      setDoubleValue("/centerX", x);
+      setDoubleValue("/centerY", y);
+      setDoubleValue("/diameter", d);
+      int iter = getIntValue("/iterations");
+      try
+      {
+        FractalRunner.perform(true, new FractalConfiguration(x, y, d, 800, 600, iter), getOption());
+      }
+      catch(Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
+  }
 
-	/**
-	 * Get the value of the option with the specified name as a double.
-	 * @param name the name of the option to look for.
-	 * @return a double value.
-	 */
-	protected double getDoubleValue(final String name)
-	{
-		Option o = (Option) option.findFirstWithName(name);
-		return ((Number) o.getValue()).doubleValue();
-	}
+  /**
+   * Get the value of the option with the specified name as a double.
+   * @param name the name of the option to look for.
+   * @return a double value.
+   */
+  protected double getDoubleValue(final String name)
+  {
+    Option o = (Option) option.findFirstWithName(name);
+    return ((Number) o.getValue()).doubleValue();
+  }
 
-	/**
-	 * Set the value of the option with the specified name as a double.
-	 * @param name the name of the option to look for.
-	 * @param value the value to set as a double.
-	 */
-	protected void setDoubleValue(final String name, final double value)
-	{
-		AbstractOption o = (AbstractOption) option.findFirstWithName("/"+name);
-		o.setValue(value);
-	}
+  /**
+   * Set the value of the option with the specified name as a double.
+   * @param name the name of the option to look for.
+   * @param value the value to set as a double.
+   */
+  protected void setDoubleValue(final String name, final double value)
+  {
+    AbstractOption o = (AbstractOption) option.findFirstWithName("/"+name);
+    o.setValue(value);
+  }
 
-	/**
-	 * Get the value of the option with the specified name as an int.
-	 * @param name the name of the option to look for.
-	 * @return an int value.
-	 */
-	protected int getIntValue(final String name)
-	{
-		Option o = (Option) option.findFirstWithName("/"+name);
-		return ((Number) o.getValue()).intValue();
-	}
+  /**
+   * Get the value of the option with the specified name as an int.
+   * @param name the name of the option to look for.
+   * @return an int value.
+   */
+  protected int getIntValue(final String name)
+  {
+    Option o = (Option) option.findFirstWithName("/"+name);
+    return ((Number) o.getValue()).intValue();
+  }
 
-	/**
-	 * Set the value of the option with the specified name as a int.
-	 * @param name the name of the option to look for.
-	 * @param value the value to set as an int.
-	 */
-	protected void setIntValue(final String name, final int value)
-	{
-		AbstractOption o = (AbstractOption) option.findFirstWithName("/"+name);
-		o.setValue(value);
-	}
+  /**
+   * Set the value of the option with the specified name as a int.
+   * @param name the name of the option to look for.
+   * @param value the value to set as an int.
+   */
+  protected void setIntValue(final String name, final int value)
+  {
+    AbstractOption o = (AbstractOption) option.findFirstWithName("/"+name);
+    o.setValue(value);
+  }
 }

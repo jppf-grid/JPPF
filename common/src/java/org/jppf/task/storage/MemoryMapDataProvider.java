@@ -26,36 +26,36 @@ import java.util.*;
  */
 public class MemoryMapDataProvider implements DataProvider
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The actual store implementation for the shared data.
-	 */
-	private Map<Object, Object> store = new HashMap<Object, Object>();
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The actual store implementation for the shared data.
+   */
+  private Map<Object, Object> store = new HashMap<Object, Object>();
 
-	/**
-	 * Get a value specified by its key.
-	 * @param key the key identifying the value to retrieve in the store.
-	 * @return the value as an <code>Object</code>.
-	 * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
-	 */
-	@Override
-	public Object getValue(final Object key)
-	{
-		return store.get(key);
-	}
+  /**
+   * Get a value specified by its key.
+   * @param key the key identifying the value to retrieve in the store.
+   * @return the value as an <code>Object</code>.
+   * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
+   */
+  @Override
+  public Object getValue(final Object key)
+  {
+    return store.get(key);
+  }
 
-	/**
-	 * Set a value specified by its key in the store.
-	 * @param key the key identifying the value to retrieve in the store.
-	 * @param value the value to store, associated with the key.
-	 * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	public void setValue(final Object key, final Object value)
-	{
-		store.put(key, value);
-	}
+  /**
+   * Set a value specified by its key in the store.
+   * @param key the key identifying the value to retrieve in the store.
+   * @param value the value to store, associated with the key.
+   * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
+   */
+  @Override
+  public void setValue(final Object key, final Object value)
+  {
+    store.put(key, value);
+  }
 }

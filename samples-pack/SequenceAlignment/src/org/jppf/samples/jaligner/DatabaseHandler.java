@@ -29,142 +29,142 @@ import java.nio.charset.Charset;
  */
 public class DatabaseHandler
 {
-	/**
-	 * Data Input Stream from which to read the length of the sequences.
-	 */
-	private DataInputStream dis = null;
-	/**
-	 * Reader from which to read the sequences.
-	 */
-	private Reader reader = null;
-	/**
-	 * Initial read buffer size.
-	 */
-	private int buffSize = 8192;
-	/**
-	 * Sequence read buffer.
-	 */
-	private char[] buffer = new char[buffSize];
-	/**
-	 * name of the charset to use when reading the sequence database.
-	 */
-	private String charset = null;
-	/**
-	 * Determines whether EOF was reached on the sequence database.
-	 */
-	private boolean eof = false;
+  /**
+   * Data Input Stream from which to read the length of the sequences.
+   */
+  private DataInputStream dis = null;
+  /**
+   * Reader from which to read the sequences.
+   */
+  private Reader reader = null;
+  /**
+   * Initial read buffer size.
+   */
+  private int buffSize = 8192;
+  /**
+   * Sequence read buffer.
+   */
+  private char[] buffer = new char[buffSize];
+  /**
+   * name of the charset to use when reading the sequence database.
+   */
+  private String charset = null;
+  /**
+   * Determines whether EOF was reached on the sequence database.
+   */
+  private boolean eof = false;
 
-	/**
-	 * Generate an index file for the specified database.
-	 * @param path the path to the sequence database.
-	 * @param indexPath the path to the index file to generate.
-	 * @param charset name of the charset to use when reading the sequence database.
-	 * If null, the default charset will be used.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public DatabaseHandler(final String path, final String indexPath, final String charset) throws Exception
-	{
-		this.charset = (charset == null) ? Charset.defaultCharset().name() : charset;
-		dis = new DataInputStream(new BufferedInputStream(new FileInputStream(indexPath)));
-		reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), this.charset));
-	}
+  /**
+   * Generate an index file for the specified database.
+   * @param path the path to the sequence database.
+   * @param indexPath the path to the index file to generate.
+   * @param charset name of the charset to use when reading the sequence database.
+   * If null, the default charset will be used.
+   * @throws Exception if an IO error occurs.
+   */
+  public DatabaseHandler(final String path, final String indexPath, final String charset) throws Exception
+  {
+    this.charset = (charset == null) ? Charset.defaultCharset().name() : charset;
+    dis = new DataInputStream(new BufferedInputStream(new FileInputStream(indexPath)));
+    reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), this.charset));
+  }
 
-	/**
-	 * Read the next sequence from the sequences database.
-	 * @return the sequence as a string or null if end of file was reached.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public String nextSequence() throws Exception
-	{
-		if (eof) return null;
-		int length = 0;
-		try
-		{
-			length = dis.readInt();
-		}
-		catch(EOFException e)
-		{
-			eof = true;
-			dis.close();
-			reader.close();
-			return null;
-		}
-		if (length > buffSize)
-		{
-			buffSize = length;
-			buffer = new char[buffSize];
-		}
-		int count = 0;
-		while (count < length)
-		{
-			int n = reader.read(buffer, 0, length);
-			if (n < 0) break;
-			count += n;
-		}
-		return new String(buffer, 0, length);
-	}
+  /**
+   * Read the next sequence from the sequences database.
+   * @return the sequence as a string or null if end of file was reached.
+   * @throws Exception if an IO error occurs.
+   */
+  public String nextSequence() throws Exception
+  {
+    if (eof) return null;
+    int length = 0;
+    try
+    {
+      length = dis.readInt();
+    }
+    catch(EOFException e)
+    {
+      eof = true;
+      dis.close();
+      reader.close();
+      return null;
+    }
+    if (length > buffSize)
+    {
+      buffSize = length;
+      buffer = new char[buffSize];
+    }
+    int count = 0;
+    while (count < length)
+    {
+      int n = reader.read(buffer, 0, length);
+      if (n < 0) break;
+      count += n;
+    }
+    return new String(buffer, 0, length);
+  }
 
-	/**
-	 * Generate an index file for the specified database.
-	 * @param path the path to the sequence database.
-	 * @param indexPath the path to the index file to generate.
-	 * @param charset name of the charset to use when reading the sequence database.
-	 * If null, the default charset will be used.
-	 * @return the number of sequences in the database.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public static int generateIndex(final String path, final String indexPath, final String charset) throws Exception
-	{
-		String cs = charset;
-		if (cs == null) cs = Charset.defaultCharset().name();
-		Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), cs));
-		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(indexPath)));
-		boolean end = false;
-		int c = reader.read();
-		int nbSequences = 0;
-		while (!end)
-		{
-			int length = 0;
-			if (c == '>')
-			{
-				length++;
-				boolean lineEnd = false;
-				while (!lineEnd)
-				{
-					c = reader.read();
-					if (c == -1)
-					{
-						lineEnd = true;
-						end = true;
-					}
-					else
-					{
-						length++;
-						if (c == '\n') lineEnd = true;
-					}
-				}
-				boolean sequenceEnd = false;
-				while (!sequenceEnd)
-				{
-					c = reader.read();
-					if ((c == '>') || (c == -1))
-					{
-						sequenceEnd = true;
-						dos.writeInt(length);
-						nbSequences++;
-						//if (nbSequences % 100 == 0) System.out.println("indexed "+nbSequences+" sequences");
-						if (c == -1)
-						{
-							end = true;
-						}
-					}
-					else length++;
-				}
-			}
-		}
-		dos.flush();
-		dos.close();
-		reader.close();
-		return nbSequences;
-	}
+  /**
+   * Generate an index file for the specified database.
+   * @param path the path to the sequence database.
+   * @param indexPath the path to the index file to generate.
+   * @param charset name of the charset to use when reading the sequence database.
+   * If null, the default charset will be used.
+   * @return the number of sequences in the database.
+   * @throws Exception if an IO error occurs.
+   */
+  public static int generateIndex(final String path, final String indexPath, final String charset) throws Exception
+  {
+    String cs = charset;
+    if (cs == null) cs = Charset.defaultCharset().name();
+    Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), cs));
+    DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(indexPath)));
+    boolean end = false;
+    int c = reader.read();
+    int nbSequences = 0;
+    while (!end)
+    {
+      int length = 0;
+      if (c == '>')
+      {
+        length++;
+        boolean lineEnd = false;
+        while (!lineEnd)
+        {
+          c = reader.read();
+          if (c == -1)
+          {
+            lineEnd = true;
+            end = true;
+          }
+          else
+          {
+            length++;
+            if (c == '\n') lineEnd = true;
+          }
+        }
+        boolean sequenceEnd = false;
+        while (!sequenceEnd)
+        {
+          c = reader.read();
+          if ((c == '>') || (c == -1))
+          {
+            sequenceEnd = true;
+            dos.writeInt(length);
+            nbSequences++;
+            //if (nbSequences % 100 == 0) System.out.println("indexed "+nbSequences+" sequences");
+            if (c == -1)
+            {
+              end = true;
+            }
+          }
+          else length++;
+        }
+      }
+    }
+    dos.flush();
+    dos.close();
+    reader.close();
+    return nbSequences;
+  }
 }

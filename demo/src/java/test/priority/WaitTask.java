@@ -26,35 +26,35 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class WaitTask extends JPPFTask
 {
-	/**
-	 * The time to wait.
-	 */
-	private long time = 0L;
+  /**
+   * The time to wait.
+   */
+  private long time = 0L;
 
-	/**
-	 * Initialize this time with the specified time to wait.
-	 * @param time the time to wait, in milliseconds.
-	 */
-	public WaitTask(final long time)
-	{
-		this.time = time;
-	}
+  /**
+   * Initialize this time with the specified time to wait.
+   * @param time the time to wait, in milliseconds.
+   */
+  public WaitTask(final long time)
+  {
+    this.time = time;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			Thread.sleep(time);
-			System.out.println("waited " + time + " ms");
-		}
-		catch(InterruptedException e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      Thread.sleep(time);
+      System.out.println("waited " + time + " ms");
+    }
+    catch(InterruptedException e)
+    {
+      setException(e);
+    }
+  }
 }

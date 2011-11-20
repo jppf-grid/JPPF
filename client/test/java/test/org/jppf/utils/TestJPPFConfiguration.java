@@ -31,45 +31,45 @@ import org.junit.Test;
  */
 public class TestJPPFConfiguration
 {
-	/**
-	 * Invocation of the <code>JPPFClient()</code> constructor.
-	 * @throws Exception if any error occurs
-	 */
-	@Test
-	public void testAlternateConfigurationSource() throws Exception
-	{
-		JPPFConfiguration.ConfigurationSource source  = new TestConfigurationSource();
-		System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
-		System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
-		JPPFConfiguration.reset();
-		TypedProperties config = JPPFConfiguration.getProperties();
-		assertNotNull(config);
-		String s  = config.getString("jppf.config.source.origin", null);
-		assertNotNull(s);
-		assertEquals(s, "string");
-	}
+  /**
+   * Invocation of the <code>JPPFClient()</code> constructor.
+   * @throws Exception if any error occurs
+   */
+  @Test
+  public void testAlternateConfigurationSource() throws Exception
+  {
+    JPPFConfiguration.ConfigurationSource source  = new TestConfigurationSource();
+    System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
+    System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
+    JPPFConfiguration.reset();
+    TypedProperties config = JPPFConfiguration.getProperties();
+    assertNotNull(config);
+    String s  = config.getString("jppf.config.source.origin", null);
+    assertNotNull(s);
+    assertEquals(s, "string");
+  }
 
-	/**
-	 * Test implementation of alternate configuration source.
-	 */
-	public static class TestConfigurationSource implements JPPFConfiguration.ConfigurationSource
-	{
-		/**
-		 * Public noargs constructor.
-		 */
-		public TestConfigurationSource()
-		{
-		}
+  /**
+   * Test implementation of alternate configuration source.
+   */
+  public static class TestConfigurationSource implements JPPFConfiguration.ConfigurationSource
+  {
+    /**
+     * Public noargs constructor.
+     */
+    public TestConfigurationSource()
+    {
+    }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public InputStream getPropertyStream() throws IOException
-		{
-			String props = "jppf.config.source.origin = string";
-			JPPFBuffer buffer = new JPPFBuffer(props);
-			return new ByteArrayInputStream(buffer.getBuffer());
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream getPropertyStream() throws IOException
+    {
+      String props = "jppf.config.source.origin = string";
+      JPPFBuffer buffer = new JPPFBuffer(props);
+      return new ByteArrayInputStream(buffer.getBuffer());
+    }
+  }
 }

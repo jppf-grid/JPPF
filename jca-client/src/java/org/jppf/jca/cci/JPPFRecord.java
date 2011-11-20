@@ -27,57 +27,57 @@ import javax.resource.cci.Record;
  */
 public class JPPFRecord implements Record
 {
-	/**
-	 * Get this record's name.
-	 * @return null.
-	 * @see javax.resource.cci.Record#getRecordName()
-	 */
-	@Override
-	public String getRecordName()
-	{
-		return null;
-	}
+  /**
+   * Get this record's name.
+   * @return null.
+   * @see javax.resource.cci.Record#getRecordName()
+   */
+  @Override
+  public String getRecordName()
+  {
+    return null;
+  }
 
-	/**
-	 * Set this record's name.
-	 * @param name the name of the record.
-	 * @see javax.resource.cci.Record#setRecordName(java.lang.String)
-	 */
-	@Override
-	public void setRecordName(final String name)
-	{
-	}
+  /**
+   * Set this record's name.
+   * @param name the name of the record.
+   * @see javax.resource.cci.Record#setRecordName(java.lang.String)
+   */
+  @Override
+  public void setRecordName(final String name)
+  {
+  }
 
-	/**
-	 * Get a short description of this record.
-	 * @return null.
-	 * @see javax.resource.cci.Record#getRecordShortDescription()
-	 */
-	@Override
-	public String getRecordShortDescription()
-	{
-		return null;
-	}
+  /**
+   * Get a short description of this record.
+   * @return null.
+   * @see javax.resource.cci.Record#getRecordShortDescription()
+   */
+  @Override
+  public String getRecordShortDescription()
+  {
+    return null;
+  }
 
-	/**
-	 * Set a short description of this record.
-	 * @param desc this record's short description.
-	 * @see javax.resource.cci.Record#setRecordShortDescription(java.lang.String)
-	 */
-	@Override
-	public void setRecordShortDescription(final String desc)
-	{
-	}
+  /**
+   * Set a short description of this record.
+   * @param desc this record's short description.
+   * @see javax.resource.cci.Record#setRecordShortDescription(java.lang.String)
+   */
+  @Override
+  public void setRecordShortDescription(final String desc)
+  {
+  }
 
-	/**
-	 * Not supported.
-	 * @return nothing.
-	 * @throws CloneNotSupportedException is always thrown.
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	public Object clone() throws CloneNotSupportedException
-	{
-		throw new CloneNotSupportedException();
-	}
+  /**
+   * Not supported.
+   * @return nothing.
+   * @throws CloneNotSupportedException is always thrown.
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Object clone() throws CloneNotSupportedException
+  {
+    throw new CloneNotSupportedException();
+  }
 }

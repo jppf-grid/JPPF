@@ -28,62 +28,62 @@ import org.slf4j.*;
  */
 public class CancelJobAction extends AbstractJobAction
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(CancelJobAction.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(CancelJobAction.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this action.
-	 */
-	public CancelJobAction()
-	{
-		setupIcon("/org/jppf/ui/resources/terminate.gif");
-		putValue(NAME, localize("job.terminate.label"));
-	}
+  /**
+   * Initialize this action.
+   */
+  public CancelJobAction()
+  {
+    setupIcon("/org/jppf/ui/resources/terminate.gif");
+    putValue(NAME, localize("job.terminate.label"));
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		super.updateState(selectedElements);
-		setEnabled(jobDataArray.length > 0);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements - a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    super.updateState(selectedElements);
+    setEnabled(jobDataArray.length > 0);
+  }
 
-	/**
-	 * Perform the action.
-	 * @param event not used.
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent event)
-	{
-		Runnable r = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				for (JobData data: jobDataArray)
-				{
-					try
-					{
-						data.getJmxWrapper().cancelJob(data.getJobInformation().getJobUuid());
-					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
-				}
-			}
-		};
-		new Thread(r).start();
-	}
+  /**
+   * Perform the action.
+   * @param event not used.
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    Runnable r = new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        for (JobData data: jobDataArray)
+        {
+          try
+          {
+            data.getJmxWrapper().cancelJob(data.getJobInformation().getJobUuid());
+          }
+          catch(Exception e)
+          {
+            log.error(e.getMessage(), e);
+          }
+        }
+      }
+    };
+    new Thread(r).start();
+  }
 }

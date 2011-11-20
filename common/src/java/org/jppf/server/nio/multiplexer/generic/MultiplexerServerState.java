@@ -26,17 +26,17 @@ import org.jppf.server.nio.NioState;
  */
 public abstract class MultiplexerServerState extends NioState<MultiplexerTransition>
 {
-	/**
-	 * The server that handles this state.
-	 */
-	protected MultiplexerNioServer server = null;
+  /**
+   * The server that handles this state.
+   */
+  protected MultiplexerNioServer server = null;
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public MultiplexerServerState(final MultiplexerNioServer server)
-	{
-		this.server = server;
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public MultiplexerServerState(final MultiplexerNioServer server)
+  {
+    this.server = server;
+  }
 }

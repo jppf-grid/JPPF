@@ -26,60 +26,60 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DataTask extends JPPFTask
 {
-	/**
-	 * The data this task owns.
-	 */
-	private byte[] data = null;
-	/**
-	 * If true, the array is created at execution time, otherwise at construction time.
-	 */
-	private boolean inNodeOnly = false;
-	/**
-	 * The size in byte of the byte array this task owns.
-	 */
-	private int datasize = 0;
+  /**
+   * The data this task owns.
+   */
+  private byte[] data = null;
+  /**
+   * If true, the array is created at execution time, otherwise at construction time.
+   */
+  private boolean inNodeOnly = false;
+  /**
+   * The size in byte of the byte array this task owns.
+   */
+  private int datasize = 0;
 
-	/**
-	 * Initialize this task with a byte array of the specified size.
-	 * The array is created at construction time and passed on to the node.
-	 * @param datasize the size in byte of the byte array this task owns.
-	 */
-	public DataTask(final int datasize)
-	{
-		this.datasize = datasize;
-		data = new byte[datasize];
-	}
+  /**
+   * Initialize this task with a byte array of the specified size.
+   * The array is created at construction time and passed on to the node.
+   * @param datasize the size in byte of the byte array this task owns.
+   */
+  public DataTask(final int datasize)
+  {
+    this.datasize = datasize;
+    data = new byte[datasize];
+  }
 
-	/**
-	 * Initialize this task with a byte array of the specified size.
-	 * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
-	 * depending on the inNodeOnly flag.
-	 * @param datasize the size in byte of the byte array this task owns.
-	 * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
-	 */
-	public DataTask(final int datasize, final boolean inNodeOnly)
-	{
-		this.datasize = datasize;
-		this.inNodeOnly = inNodeOnly;
-		if (!inNodeOnly) data = new byte[datasize];
-	}
+  /**
+   * Initialize this task with a byte array of the specified size.
+   * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
+   * depending on the inNodeOnly flag.
+   * @param datasize the size in byte of the byte array this task owns.
+   * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
+   */
+  public DataTask(final int datasize, final boolean inNodeOnly)
+  {
+    this.datasize = datasize;
+    this.inNodeOnly = inNodeOnly;
+    if (!inNodeOnly) data = new byte[datasize];
+  }
 
-	/**
-	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			if (inNodeOnly) data = new byte[datasize];
-			setResult("execution successful");
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Perform the multiplication of a matrix row by another matrix.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      if (inNodeOnly) data = new byte[datasize];
+      setResult("execution successful");
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }
 

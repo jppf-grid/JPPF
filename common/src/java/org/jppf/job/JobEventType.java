@@ -24,24 +24,24 @@ package org.jppf.job;
  */
 public enum JobEventType
 {
-	/**
-	 * A new job was submitted to the JPPF driver queue.
-	 */
-	JOB_QUEUED,
-	/**
-	 * A job was completed and sent back to the client.
-	 */
-	JOB_ENDED,
-	/**
-	 * A sub-job was dispatched to a node.
-	 */
-	JOB_DISPATCHED,
-	/**
-	 * A sub-job returned from a node.
-	 */
-	JOB_RETURNED,
-	/**
-	 * The current number of tasks in a job was updated.
-	 */
-	JOB_UPDATED
+  /**
+   * A new job was submitted to the JPPF driver queue.
+   */
+  JOB_QUEUED,
+  /**
+   * A job was completed and sent back to the client.
+   */
+  JOB_ENDED,
+  /**
+   * A sub-job was dispatched to a node.
+   */
+  JOB_DISPATCHED,
+  /**
+   * A sub-job returned from a node.
+   */
+  JOB_RETURNED,
+  /**
+   * The current number of tasks in a job was updated.
+   */
+  JOB_UPDATED
 }

@@ -32,65 +32,65 @@ import org.jppf.node.protocol.JobMetadata;
  */
 public class JPPFJobMetadata implements Serializable, JobMetadata
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The metadata map.
-	 */
-	private final Map<Object, Object> metadata = new HashMap<Object, Object>();
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The metadata map.
+   */
+  private final Map<Object, Object> metadata = new HashMap<Object, Object>();
 
-	/**
-	 * Set a parameter in the metadata.
-	 * If a parameter with the same key already exists, its value is replaced with he new one.
-	 * @param key the parameter's key.
-	 * @param value the parameter's value.
-	 */
-	@Override
-	public void setParameter(final Object key, final Object value)
-	{
-		metadata.put(key, value);
-	}
+  /**
+   * Set a parameter in the metadata.
+   * If a parameter with the same key already exists, its value is replaced with he new one.
+   * @param key the parameter's key.
+   * @param value the parameter's value.
+   */
+  @Override
+  public void setParameter(final Object key, final Object value)
+  {
+    metadata.put(key, value);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object getParameter(final Object key)
-	{
-		return metadata.get(key);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object getParameter(final Object key)
+  {
+    return metadata.get(key);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object getParameter(final Object key, final Object def)
-	{
-		Object value = metadata.get(key);
-		return value != null ? value : def;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object getParameter(final Object key, final Object def)
+  {
+    Object value = metadata.get(key);
+    return value != null ? value : def;
+  }
 
-	/**
-	 * Remove a parameter from the metadata.
-	 * @param key the parameter's key.
-	 * @return the removed parameter's value or null if no parameter with the specified key exists.
-	 */
-	@Override
-	public Object removeParameter(final Object key)
-	{
-		return metadata.remove(key);
-	}
+  /**
+   * Remove a parameter from the metadata.
+   * @param key the parameter's key.
+   * @return the removed parameter's value or null if no parameter with the specified key exists.
+   */
+  @Override
+  public Object removeParameter(final Object key)
+  {
+    return metadata.remove(key);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Map<Object, Object> getAll()
-	{
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		map.putAll(metadata);
-		return map;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Map<Object, Object> getAll()
+  {
+    Map<Object, Object> map = new HashMap<Object, Object>();
+    map.putAll(metadata);
+    return map;
+  }
 }

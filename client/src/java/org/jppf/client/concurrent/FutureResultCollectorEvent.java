@@ -26,21 +26,21 @@ import java.util.EventObject;
  */
 class FutureResultCollectorEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified source.
-	 * @param collector the source of this event.
-	 */
-	public FutureResultCollectorEvent(final FutureResultCollector collector)
-	{
-		super(collector);
-	}
+  /**
+   * Initialize this event with the specified source.
+   * @param collector the source of this event.
+   */
+  public FutureResultCollectorEvent(final FutureResultCollector collector)
+  {
+    super(collector);
+  }
 
-	/**
-	 * Get the FutureResultCollector source of this event.
-	 * @return a {@link FutureResultCollector} instance.
-	 */
-	FutureResultCollector getCollector()
-	{
-		return (FutureResultCollector) getSource();
-	}
+  /**
+   * Get the FutureResultCollector source of this event.
+   * @return a {@link FutureResultCollector} instance.
+   */
+  FutureResultCollector getCollector()
+  {
+    return (FutureResultCollector) getSource();
+  }
 }

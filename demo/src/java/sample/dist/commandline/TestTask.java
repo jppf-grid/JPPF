@@ -29,35 +29,35 @@ import org.jppf.server.protocol.*;
  */
 public class TestTask extends CommandLineTask
 {
-	/**
-	 * Directory in which to list the files.
-	 */
-	private String number = null;
-	/**
-	 * Determines whether this task should run on a linux or windows host.
-	 */
-	private boolean linux = true;
+  /**
+   * Directory in which to list the files.
+   */
+  private String number = null;
+  /**
+   * Determines whether this task should run on a linux or windows host.
+   */
+  private boolean linux = true;
 
-	/**
-	 * Initialize the script's parameters.
-	 * @param number directory in which to list the files.
-	 */
-	public TestTask(final String number)
-	{
-		this.number = number;
-	}
+  /**
+   * Initialize the script's parameters.
+   * @param number directory in which to list the files.
+   */
+  public TestTask(final String number)
+  {
+    this.number = number;
+  }
 
-	/**
-	 * Execute the script.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			//setCommandList("cat", "etc/file |", "grep -s A", ">", "output-"+ number +".txt");
-			/*
+  /**
+   * Execute the script.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      //setCommandList("cat", "etc/file |", "grep -s A", ">", "output-"+ number +".txt");
+      /*
 			setCommandList("cat", "etc/file", "|", "grep", "-s", "A", ">", "output-"+ number +".txt");
 			StringBuilder sb = new StringBuilder();
 			for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
@@ -67,42 +67,42 @@ public class TestTask extends CommandLineTask
 			FileLocation fileLoc = new FileLocation("output-" + number + ".txt");
 			FileLocation tmp = new FileLocation("/tmp/somefolder/output-" + number + ".txt");
 			fileLoc.copyTo(tmp);
-			 */
-			String outputPath = "/home/lcohen/Downloads/folder1/output.txt";
-			setCommandList("/bin/sh", "-c", "ps -A|grep java > " + outputPath);
-			//setCommandList("/bin/sh", "-c", "cat etc/file|grep -s A > " + "output-"+ number + ".txt");
-			//setCommandList("/bin/sh", "-c", "cat /etc/file|grep -s A > " + outputPath);
-			StringBuilder sb = new StringBuilder();
-			for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
-			System.out.println("command to run: " + sb);
-			setCaptureOutput(true);
-			launchProcess();
-			FileLocation fileLoc = new FileLocation(outputPath);
-			FileLocation tmp = new FileLocation("/home/lcohen/Downloads/folder2/output.txt");
-			fileLoc.copyTo(tmp);
+       */
+      String outputPath = "/home/lcohen/Downloads/folder1/output.txt";
+      setCommandList("/bin/sh", "-c", "ps -A|grep java > " + outputPath);
+      //setCommandList("/bin/sh", "-c", "cat etc/file|grep -s A > " + "output-"+ number + ".txt");
+      //setCommandList("/bin/sh", "-c", "cat /etc/file|grep -s A > " + outputPath);
+      StringBuilder sb = new StringBuilder();
+      for (String cmd: this.getCommandList()) sb.append(cmd).append(' ');
+      System.out.println("command to run: " + sb);
+      setCaptureOutput(true);
+      launchProcess();
+      FileLocation fileLoc = new FileLocation(outputPath);
+      FileLocation tmp = new FileLocation("/home/lcohen/Downloads/folder2/output.txt");
+      fileLoc.copyTo(tmp);
 
-			InputStream is = fileLoc.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
+      InputStream is = fileLoc.getInputStream();
+      InputStreamReader isr = new InputStreamReader(is);
+      BufferedReader br = new BufferedReader(isr);
 
-			// Read in the File
-			String line = "";
-			List<String> file = new ArrayList<String>();
-			List<String> bFile = new ArrayList<String>();
-			while ((line = br.readLine()) != null) file.add(line);
-			// "Process" the File
-			for (int i = file.size()-1; i >= 0; i--) bFile.add(file.get(i));
-			// "Write" out the File
-			for (String l : file) System.out.println(l);
+      // Read in the File
+      String line = "";
+      List<String> file = new ArrayList<String>();
+      List<String> bFile = new ArrayList<String>();
+      while ((line = br.readLine()) != null) file.add(line);
+      // "Process" the File
+      for (int i = file.size()-1; i >= 0; i--) bFile.add(file.get(i));
+      // "Write" out the File
+      for (String l : file) System.out.println(l);
 
-			setResult(getStandardOutput());
-		}
-		catch(Exception e)
-		{
-			setResult("an exception was raised: " +e);
-			setException(e);
-		}
-		System.out.println("std output:\n" + getStandardOutput());
-		System.out.println("err output:\n" + getErrorOutput());
-	}
+      setResult(getStandardOutput());
+    }
+    catch(Exception e)
+    {
+      setResult("an exception was raised: " +e);
+      setException(e);
+    }
+    System.out.println("std output:\n" + getStandardOutput());
+    System.out.println("err output:\n" + getErrorOutput());
+  }
 }

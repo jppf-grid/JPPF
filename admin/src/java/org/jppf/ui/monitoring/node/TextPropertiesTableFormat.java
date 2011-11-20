@@ -25,49 +25,49 @@ package org.jppf.ui.monitoring.node;
  */
 public class TextPropertiesTableFormat extends PropertiesTableFormat
 {
-	/**
-	 * Initialize this formatter with the specified title.
-	 * @param docTitle the title of the whole document.
-	 */
-	public TextPropertiesTableFormat(final String docTitle)
-	{
-		super(docTitle);
-	}
+  /**
+   * Initialize this formatter with the specified title.
+   * @param docTitle the title of the whole document.
+   */
+  public TextPropertiesTableFormat(final String docTitle)
+  {
+    super(docTitle);
+  }
 
-	/**
-	 * Write the prologue for the formatted text.
-	 */
-	@Override
-	public void start()
-	{
-		sb.append(docTitle).append('\n');
-	}
+  /**
+   * Write the prologue for the formatted text.
+   */
+  @Override
+  public void start()
+  {
+    sb.append(docTitle).append('\n');
+  }
 
-	/**
-	 * Write the prologue of a table.
-	 * @param title the title for the table.
-	 */
-	@Override
-	public void tableStart(final String title)
-	{
-		sb.append("\n\n").append(title).append("\n\n");
-	}
+  /**
+   * Write the prologue of a table.
+   * @param title the title for the table.
+   */
+  @Override
+  public void tableStart(final String title)
+  {
+    sb.append("\n\n").append(title).append("\n\n");
+  }
 
-	/**
-	 * Write the prologue of a table row.
-	 */
-	@Override
-	public void rowEnd()
-	{
-		sb.append('\n');
-	}
+  /**
+   * Write the prologue of a table row.
+   */
+  @Override
+  public void rowEnd()
+  {
+    sb.append('\n');
+  }
 
-	/**
-	 * Write the separator between 2 cells.
-	 */
-	@Override
-	public void cellSeparator()
-	{
-		sb.append(" = ");
-	}
+  /**
+   * Write the separator between 2 cells.
+   */
+  @Override
+  public void cellSeparator()
+  {
+    sb.append(" = ");
+  }
 }

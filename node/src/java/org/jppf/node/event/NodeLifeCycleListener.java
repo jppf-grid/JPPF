@@ -26,27 +26,27 @@ import java.util.EventListener;
  */
 public interface NodeLifeCycleListener extends EventListener
 {
-	/**
-	 * Called when the node has finished initializing, and before it starts processing jobs.
-	 * @param event encapsulates information about the node.
-	 */
-	void nodeStarting(NodeLifeCycleEvent event);
+  /**
+   * Called when the node has finished initializing, and before it starts processing jobs.
+   * @param event encapsulates information about the node.
+   */
+  void nodeStarting(NodeLifeCycleEvent event);
 
-	/**
-	 * Called when the node is terminating.
-	 * @param event encapsulates information about the node.
-	 */
-	void nodeEnding(NodeLifeCycleEvent event);
+  /**
+   * Called when the node is terminating.
+   * @param event encapsulates information about the node.
+   */
+  void nodeEnding(NodeLifeCycleEvent event);
 
-	/**
-	 * Called before the node starts processing a job.
-	 * @param event encapsulates information about the job.
-	 */
-	void jobStarting(NodeLifeCycleEvent event);
+  /**
+   * Called before the node starts processing a job.
+   * @param event encapsulates information about the job.
+   */
+  void jobStarting(NodeLifeCycleEvent event);
 
-	/**
-	 * Called after the node finishes processing a job.
-	 * @param event encapsulates information about the job.
-	 */
-	void jobEnding(NodeLifeCycleEvent event);
+  /**
+   * Called after the node finishes processing a job.
+   * @param event encapsulates information about the job.
+   */
+  void jobEnding(NodeLifeCycleEvent event);
 }

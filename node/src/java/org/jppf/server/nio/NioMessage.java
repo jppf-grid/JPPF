@@ -26,28 +26,28 @@ import java.nio.ByteBuffer;
  */
 public class NioMessage
 {
-	/**
-	 * Total length of the message to read.
-	 */
-	public int length = 0;
-	/**
-	 * Buffer containing the message's data.
-	 */
-	public ByteBuffer buffer = null;
-	/**
-	 * Determines whether the buffer length has already been sent.
-	 */
-	public boolean lengthWritten = false;
+  /**
+   * Total length of the message to read.
+   */
+  public int length = 0;
+  /**
+   * Buffer containing the message's data.
+   */
+  public ByteBuffer buffer = null;
+  /**
+   * Determines whether the buffer length has already been sent.
+   */
+  public boolean lengthWritten = false;
 
-	/**
-	 * Get a string representation of this message.
-	 * @return a string representing this <code>NioMessage</code> instance.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder("NioMessage [length = ").append(length).append(", lengthWritten = ").append(lengthWritten);
-		return sb.append(", buffer = ").append(buffer).append(']').toString();
-	}
+  /**
+   * Get a string representation of this message.
+   * @return a string representing this <code>NioMessage</code> instance.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder("NioMessage [length = ").append(length).append(", lengthWritten = ").append(lengthWritten);
+    return sb.append(", buffer = ").append(buffer).append(']').toString();
+  }
 }

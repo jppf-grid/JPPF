@@ -28,76 +28,76 @@ import org.slf4j.*;
  */
 class ShutdownRestartTask extends TimerTask
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(ShutdownRestartTask.class);
-	/**
-	 * Determines whether the server should restart after shutdown is complete.
-	 */
-	private boolean restart = true;
-	/**
-	 * Delay, starting from shutdown completion, after which the server is restarted.
-	 */
-	private long restartDelay = 0L;
-	/**
-	 * The timer used to schedule this task, and eventually the restart operation.
-	 */
-	private Timer timer = null;
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(ShutdownRestartTask.class);
+  /**
+   * Determines whether the server should restart after shutdown is complete.
+   */
+  private boolean restart = true;
+  /**
+   * Delay, starting from shutdown completion, after which the server is restarted.
+   */
+  private long restartDelay = 0L;
+  /**
+   * The timer used to schedule this task, and eventually the restart operation.
+   */
+  private Timer timer = null;
 
-	/**
-	 * Initialize this task with the specified parameters.<br>
-	 * The shutdown is initiated after the specified shutdown delay has expired.<br>
-	 * If the restart parameter is set to false then the JVM exits after the shutdown is complete.
-	 * @param timer the timer used to schedule this task, and eventually the restart operation.
-	 * @param restart determines whether the server should restart after shutdown is complete.
-	 * If set to false, then the JVM will exit.
-	 * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
-	 * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
-	 */
-	public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay)
-	{
-		this.timer = timer;
-		this.restart = restart;
-		this.restartDelay = restartDelay;
-	}
+  /**
+   * Initialize this task with the specified parameters.<br>
+   * The shutdown is initiated after the specified shutdown delay has expired.<br>
+   * If the restart parameter is set to false then the JVM exits after the shutdown is complete.
+   * @param timer the timer used to schedule this task, and eventually the restart operation.
+   * @param restart determines whether the server should restart after shutdown is complete.
+   * If set to false, then the JVM will exit.
+   * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
+   * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
+   */
+  public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay)
+  {
+    this.timer = timer;
+    this.restart = restart;
+    this.restartDelay = restartDelay;
+  }
 
-	/**
-	 * Perform the actual shutdown, and eventually restart, as specified in the constructor.
-	 * @see java.util.TimerTask#run()
-	 */
-	@Override
-	public void run()
-	{
-		log.info("Initiating shutdown");
-		JPPFDriver.getInstance().shutdown();
-		if (!restart)
-		{
-			log.info("Performing requested exit");
-			System.exit(0);
-		}
-		else
-		{
-			TimerTask task = new TimerTask()
-			{
-				@Override
-				public void run()
-				{
-					try
-					{
-						log.info("Initiating restart");
-						cancel();
-						System.exit(2);
-					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-						throw new JPPFError("Could not restart the JPPFDriver");
-					}
-				}
-			};
-			cancel();
-			timer.schedule(task, restartDelay);
-		}
-	}
+  /**
+   * Perform the actual shutdown, and eventually restart, as specified in the constructor.
+   * @see java.util.TimerTask#run()
+   */
+  @Override
+  public void run()
+  {
+    log.info("Initiating shutdown");
+    JPPFDriver.getInstance().shutdown();
+    if (!restart)
+    {
+      log.info("Performing requested exit");
+      System.exit(0);
+    }
+    else
+    {
+      TimerTask task = new TimerTask()
+      {
+        @Override
+        public void run()
+        {
+          try
+          {
+            log.info("Initiating restart");
+            cancel();
+            System.exit(2);
+          }
+          catch(Exception e)
+          {
+            log.error(e.getMessage(), e);
+            throw new JPPFError("Could not restart the JPPFDriver");
+          }
+        }
+      };
+      cancel();
+      timer.schedule(task, restartDelay);
+    }
+  }
 }

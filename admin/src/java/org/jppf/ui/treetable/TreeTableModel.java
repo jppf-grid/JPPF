@@ -62,47 +62,47 @@ import javax.swing.tree.TreeModel;
  */
 public interface TreeTableModel extends TreeModel
 {
-	/**
-	 * Returns the number ofs available columns.
-	 * @return the number of columns.
-	 */
-	int getColumnCount();
+  /**
+   * Returns the number ofs available columns.
+   * @return the number of columns.
+   */
+  int getColumnCount();
 
-	/**
-	 * Returns the name for column number <code>column</code>.
-	 * @param column the column number.
-	 * @return the name of the column as a string.
-	 */
-	String getColumnName(int column);
+  /**
+   * Returns the name for column number <code>column</code>.
+   * @param column the column number.
+   * @return the name of the column as a string.
+   */
+  String getColumnName(int column);
 
-	/**
-	 * Returns the type for column number <code>column</code>.
-	 * @param column the column number.
-	 * @return the type of the column.
-	 */
-	Class getColumnClass(int column);
+  /**
+   * Returns the type for column number <code>column</code>.
+   * @param column the column number.
+   * @return the type of the column.
+   */
+  Class getColumnClass(int column);
 
-	/**
-	 * Returns the value to be displayed for node <code>node</code>, at column number <code>column</code>.
-	 * @param node the node for which to get the value.
-	 * @param column the column where the value is.
-	 * @return the value for the specified node and column.
-	 */
-	Object getValueAt(Object node, int column);
+  /**
+   * Returns the value to be displayed for node <code>node</code>, at column number <code>column</code>.
+   * @param node the node for which to get the value.
+   * @param column the column where the value is.
+   * @return the value for the specified node and column.
+   */
+  Object getValueAt(Object node, int column);
 
-	/**
-	 * Indicates whether the the value for node <code>node</code>, at column number <code>column</code> is editable.
-	 * @param node the node to check.
-	 * @param column the column where the value is.
-	 * @return true if the cell is editable, false otherwise.
-	 */
-	boolean isCellEditable(Object node, int column);
+  /**
+   * Indicates whether the the value for node <code>node</code>, at column number <code>column</code> is editable.
+   * @param node the node to check.
+   * @param column the column where the value is.
+   * @return true if the cell is editable, false otherwise.
+   */
+  boolean isCellEditable(Object node, int column);
 
-	/**
-	 * Sets the value for node <code>node</code>, at column number <code>column</code>.
-	 * @param aValue the value to set.
-	 * @param node the node for which to set the value.
-	 * @param column the column where the value is to be set.
-	 */
-	void setValueAt(Object aValue, Object node, int column);
+  /**
+   * Sets the value for node <code>node</code>, at column number <code>column</code>.
+   * @param aValue the value to set.
+   * @param node the node for which to set the value.
+   * @param column the column where the value is to be set.
+   */
+  void setValueAt(Object aValue, Object node, int column);
 }

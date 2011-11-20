@@ -31,60 +31,60 @@ import org.slf4j.*;
  */
 public class CommandLineTaskRunner
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(CommandLineTaskRunner.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
-	/**
-	 * Separator for each test.
-	 */
-	private static String banner = '\n' + StringUtils.padLeft("", '-', 80) + '\n';
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(CommandLineTaskRunner.class);
+  /**
+   * JPPF client used to submit execution requests.
+   */
+  private static JPPFClient jppfClient = null;
+  /**
+   * Separator for each test.
+   */
+  private static String banner = '\n' + StringUtils.padLeft("", '-', 80) + '\n';
 
-	/**
-	 * Entry point for this class, performs a matrix multiplication a number of times.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			jppfClient = new JPPFClient();
-			performCommand();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			jppfClient.close();
-		}
-		System.exit(0);
-	}
+  /**
+   * Entry point for this class, performs a matrix multiplication a number of times.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      jppfClient = new JPPFClient();
+      performCommand();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      jppfClient.close();
+    }
+    System.exit(0);
+  }
 
-	/**
-	 * .
-	 * @throws Exception .
-	 */
-	private static void performCommand() throws Exception
-	{
-		JPPFJob job = new JPPFJob();
-		/*
+  /**
+   * .
+   * @throws Exception .
+   */
+  private static void performCommand() throws Exception
+  {
+    JPPFJob job = new JPPFJob();
+    /*
 		job.addTask(new ListDirectoryTask("/usr/local"));
 		job.addTask(new ListDirectoryTask("C:\\Windows"));
-		 */
-		job.addTask(new TestTask("1"));
-		for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000));
+     */
+    job.addTask(new TestTask("1"));
+    for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000));
 
-		List<JPPFTask> results = jppfClient.submit(job);
-		for (JPPFTask task: results)
-		{
-			if (task.getException() != null) task.getException().printStackTrace();
-			System.out.println("result: " + task.getResult());
-		}
-	}
+    List<JPPFTask> results = jppfClient.submit(job);
+    for (JPPFTask task: results)
+    {
+      if (task.getException() != null) task.getException().printStackTrace();
+      System.out.println("result: " + task.getResult());
+    }
+  }
 }

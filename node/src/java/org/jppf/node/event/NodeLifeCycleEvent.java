@@ -29,30 +29,30 @@ import org.jppf.node.protocol.*;
  */
 public class NodeLifeCycleEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified execution manager.
-	 * @param executionManager the execution that handles the execution of tasks by a node.
-	 */
-	public NodeLifeCycleEvent(final NodeExecutionManager executionManager)
-	{
-		super(executionManager);
-	}
+  /**
+   * Initialize this event with the specified execution manager.
+   * @param executionManager the execution that handles the execution of tasks by a node.
+   */
+  public NodeLifeCycleEvent(final NodeExecutionManager executionManager)
+  {
+    super(executionManager);
+  }
 
-	/**
-	 * Get the job currently being executed.
-	 * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
-	 */
-	public JPPFDistributedJob getJob()
-	{
-		return ((NodeExecutionManager) getSource()).getCurrentJob();
-	}
+  /**
+   * Get the job currently being executed.
+   * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
+   */
+  public JPPFDistributedJob getJob()
+  {
+    return ((NodeExecutionManager) getSource()).getCurrentJob();
+  }
 
-	/**
-	 * Get the tasks currently being executed.
-	 * @return a list of {@link Task} instances, or null if the node is idle.
-	 */
-	public List<Task> getTasks()
-	{
-		return ((NodeExecutionManager) getSource()).getTasks();
-	}
+  /**
+   * Get the tasks currently being executed.
+   * @return a list of {@link Task} instances, or null if the node is idle.
+   */
+  public List<Task> getTasks()
+  {
+    return ((NodeExecutionManager) getSource()).getTasks();
+  }
 }

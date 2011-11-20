@@ -25,38 +25,38 @@ import java.io.Serializable;
  */
 public class SimpleRunnable implements Runnable, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The result of executing this task.
-	 */
-	private Result executionResult = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The result of executing this task.
+   */
+  private Result executionResult = null;
 
-	/**
-	 * Default constructor.
-	 */
-	public SimpleRunnable()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public SimpleRunnable()
+  {
+  }
 
-	/**
-	 * Initialize this task with the specified result object.
-	 * @param result the result to use.
-	 */
-	public SimpleRunnable(final Result result)
-	{
-		this.executionResult = result;
-	}
+  /**
+   * Initialize this task with the specified result object.
+   * @param result the result to use.
+   */
+  public SimpleRunnable(final Result result)
+  {
+    this.executionResult = result;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
-	}
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
+  }
 }

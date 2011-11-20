@@ -32,31 +32,31 @@ import org.jppf.ui.options.xml.OptionsPageBuilder;
  */
 public class WindowClosingListener extends WindowAdapter
 {
-	/**
-	 * Process the closing of the main frame.
-	 * @param event the event we're interested in.
-	 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowClosing(final WindowEvent event)
-	{
-		Preferences pref = OptionsHandler.getPreferences();
-		List<OptionElement> list = OptionsHandler.getPageList();
-		if (!list.isEmpty())
-		{
-			OptionElement elt = list.get(0);
-			OptionsPageBuilder builder = new OptionsPageBuilder();
-			builder.triggerFinalEvents(elt);
-		}
+  /**
+   * Process the closing of the main frame.
+   * @param event the event we're interested in.
+   * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+   */
+  @Override
+  public void windowClosing(final WindowEvent event)
+  {
+    Preferences pref = OptionsHandler.getPreferences();
+    List<OptionElement> list = OptionsHandler.getPageList();
+    if (!list.isEmpty())
+    {
+      OptionElement elt = list.get(0);
+      OptionsPageBuilder builder = new OptionsPageBuilder();
+      builder.triggerFinalEvents(elt);
+    }
 
-		try
-		{
-			pref.flush();
-		}
-		catch(BackingStoreException e)
-		{
-		}
+    try
+    {
+      pref.flush();
+    }
+    catch(BackingStoreException e)
+    {
+    }
 
-		System.exit(0);
-	}
+    System.exit(0);
+  }
 }

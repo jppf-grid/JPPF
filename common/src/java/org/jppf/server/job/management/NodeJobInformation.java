@@ -29,31 +29,31 @@ import org.jppf.management.JPPFManagementInfo;
  */
 public class NodeJobInformation implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Empty array
-	 */
-	public static final NodeJobInformation[]    EMPTY_ARRAY = new NodeJobInformation[0];
-	/**
-	 * The information about the node.
-	 */
-	public final JPPFManagementInfo nodeInfo;
-	/**
-	 * The information about the sub-job.
-	 */
-	public final JobInformation jobInfo;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Empty array
+   */
+  public static final NodeJobInformation[]    EMPTY_ARRAY = new NodeJobInformation[0];
+  /**
+   * The information about the node.
+   */
+  public final JPPFManagementInfo nodeInfo;
+  /**
+   * The information about the sub-job.
+   */
+  public final JobInformation jobInfo;
 
-	/**
-	 * 
-	 * @param nodeInfo - the information about the node.
-	 * @param jobInfo - the information about the sub-job.
-	 */
-	public NodeJobInformation(final JPPFManagementInfo nodeInfo, final JobInformation jobInfo)
-	{
-		this.nodeInfo = nodeInfo;
-		this.jobInfo = jobInfo;
-	}
+  /**
+   * 
+   * @param nodeInfo - the information about the node.
+   * @param jobInfo - the information about the sub-job.
+   */
+  public NodeJobInformation(final JPPFManagementInfo nodeInfo, final JobInformation jobInfo)
+  {
+    this.nodeInfo = nodeInfo;
+    this.jobInfo = jobInfo;
+  }
 }

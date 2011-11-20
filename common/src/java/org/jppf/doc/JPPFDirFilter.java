@@ -25,56 +25,56 @@ import java.io.File;
  */
 public class JPPFDirFilter extends AbstractFileFilter
 {
-	/**
-	 * Default excluded directory names.
-	 */
-	static final String[] DEFAULT_EXCLUDES = { "CVS", ".svn" };
+  /**
+   * Default excluded directory names.
+   */
+  static final String[] DEFAULT_EXCLUDES = { "CVS", ".svn" };
 
-	/**
-	 * Initialize a filter accepting all directory names except those excluded by default.
-	 */
-	public JPPFDirFilter()
-	{
-		includes = null;
-		excludes = DEFAULT_EXCLUDES;
-	}
+  /**
+   * Initialize a filter accepting all directory names except those excluded by default.
+   */
+  public JPPFDirFilter()
+  {
+    includes = null;
+    excludes = DEFAULT_EXCLUDES;
+  }
 
-	/**
-	 * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_EXCLUDES DEFAULT_EXCLUDES}.
-	 * @param includes the included directory names; if null all are included. Null values are ignored.
-	 */
-	public JPPFDirFilter(final String[] includes)
-	{
-		this.includes = includes;
-		this.excludes = DEFAULT_EXCLUDES;
-	}
+  /**
+   * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_EXCLUDES DEFAULT_EXCLUDES}.
+   * @param includes the included directory names; if null all are included. Null values are ignored.
+   */
+  public JPPFDirFilter(final String[] includes)
+  {
+    this.includes = includes;
+    this.excludes = DEFAULT_EXCLUDES;
+  }
 
-	/**
-	 * Initialize a filter accepting the specified directory names and excluding the specified ones.
-	 * @param includes the included directory names; if null all are included. Null values are ignored.
-	 * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
-	 */
-	public JPPFDirFilter(final String[] includes, final String[] excludes)
-	{
-		this.includes = includes;
-		this.excludes = excludes;
-	}
+  /**
+   * Initialize a filter accepting the specified directory names and excluding the specified ones.
+   * @param includes the included directory names; if null all are included. Null values are ignored.
+   * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
+   */
+  public JPPFDirFilter(final String[] includes, final String[] excludes)
+  {
+    this.includes = includes;
+    this.excludes = excludes;
+  }
 
-	/**
-	 * Determine if a file is accepted.
-	 * @param path the file path to check.
-	 * @return true if the file is a directory, false otherwise.
-	 * @see java.io.FileFilter#accept(java.io.File)
-	 */
-	@Override
-	public boolean accept(final File path)
-	{
-		if (!path.isDirectory()) return false;
-		String name = path.getName();
-		if ("CVS".equals(name))
-		{
-			int breakpoint = 0;
-		}
-		return included(name, true) && !excluded(name, true);
-	}
+  /**
+   * Determine if a file is accepted.
+   * @param path the file path to check.
+   * @return true if the file is a directory, false otherwise.
+   * @see java.io.FileFilter#accept(java.io.File)
+   */
+  @Override
+  public boolean accept(final File path)
+  {
+    if (!path.isDirectory()) return false;
+    String name = path.getName();
+    if ("CVS".equals(name))
+    {
+      int breakpoint = 0;
+    }
+    return included(name, true) && !excluded(name, true);
+  }
 }

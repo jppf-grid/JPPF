@@ -27,54 +27,54 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class ExtMatrixTask extends JPPFTask
 {
-	/**
-	 * Data provider key mapping to the second matrix operand in the multiplication.
-	 */
-	public static final String DATA_KEY = "matrix";
-	/**
-	 * The row of values to multiply by a matrix.
-	 */
-	private double[][] rowValues = null;
+  /**
+   * Data provider key mapping to the second matrix operand in the multiplication.
+   */
+  public static final String DATA_KEY = "matrix";
+  /**
+   * The row of values to multiply by a matrix.
+   */
+  private double[][] rowValues = null;
 
-	/**
-	 * Initialize this task with a specified row of values to multiply.
-	 * @param rowValues the values as an array of <code>double</code> values.
-	 */
-	public ExtMatrixTask(final double[][] rowValues)
-	{
-		this.rowValues = rowValues;
-	}
+  /**
+   * Initialize this task with a specified row of values to multiply.
+   * @param rowValues the values as an array of <code>double</code> values.
+   */
+  public ExtMatrixTask(final double[][] rowValues)
+  {
+    this.rowValues = rowValues;
+  }
 
-	/**
-	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	//public void doWork()
-	@Override
-	public void run()
-	{
-		try
-		{
-			final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
-			final int size = matrix.getSize();
-			final double[][] computeResult = new double[rowValues.length][size];
+  /**
+   * Perform the multiplication of a matrix row by another matrix.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  //public void doWork()
+  @Override
+  public void run()
+  {
+    try
+    {
+      final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+      final int size = matrix.getSize();
+      final double[][] computeResult = new double[rowValues.length][size];
 
-			// for each row of matrix a
-			for (int n=0; n<rowValues.length; n++)
-			{
-				// for each column of matrix b
-				for (int col=0; col<size; col++)
-				{
-					double sum = 0.0d;
-					for (int row=0; row<size; row++)
-					{
-						sum += matrix.getValueAt(row, col) * rowValues[n][row];
-						//matrix.valueAt(row, col);
-					}
-					computeResult[n][col] = sum;
-				}
-			}
-			/*
+      // for each row of matrix a
+      for (int n=0; n<rowValues.length; n++)
+      {
+        // for each column of matrix b
+        for (int col=0; col<size; col++)
+        {
+          double sum = 0.0d;
+          for (int row=0; row<size; row++)
+          {
+            sum += matrix.getValueAt(row, col) * rowValues[n][row];
+            //matrix.valueAt(row, col);
+          }
+          computeResult[n][col] = sum;
+        }
+      }
+      /*
 			for (int n=0; n<rowValues.length; n++)
 			{
 				double count = 0d;
@@ -87,40 +87,40 @@ public class ExtMatrixTask extends JPPFTask
 					computeResult[n][i] = count;
 				}
 			}
-			 */
-			/*
+       */
+      /*
 			long stop = System.currentTimeMillis() + 5L;
 			long count = 0L;
 			while (System.currentTimeMillis() < stop) count++;
-			 */
-			setResult(computeResult);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+       */
+      setResult(computeResult);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * Serialize this task.
-	 * @param out the object output stream to write to.
-	 * @throws IOException if any error occurs.
-	 * @see java.io.Serializable
+  /**
+   * Serialize this task.
+   * @param out the object output stream to write to.
+   * @throws IOException if any error occurs.
+   * @see java.io.Serializable
 	private void writeObject(ObjectOutputStream out) throws IOException
 	{
 		serialize(out);
 	}
-	 */
+   */
 
-	/**
-	 * Deserialize this task.
-	 * @param in the stream to read from.
-	 * @throws IOException if any I/O error occurs.
-	 * @throws ClassNotFoundException if a class could not be found.
-	 * @see java.io.Serializable
+  /**
+   * Deserialize this task.
+   * @param in the stream to read from.
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if a class could not be found.
+   * @see java.io.Serializable
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		deserialize(in);
 	}
-	 */
+   */
 }

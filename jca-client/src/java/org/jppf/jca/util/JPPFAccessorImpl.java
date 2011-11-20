@@ -30,63 +30,63 @@ import org.jppf.jca.work.JPPFJcaClient;
  */
 public abstract class JPPFAccessorImpl implements JPPFAccessor
 {
-	/**
-	 * The JPPF client used to submit tasks.
-	 */
-	protected transient JPPFJcaClient jppfClient = null;
-	/**
-	 * The log writer for this object.
-	 */
-	protected PrintWriter logWriter = null;
+  /**
+   * The JPPF client used to submit tasks.
+   */
+  protected transient JPPFJcaClient jppfClient = null;
+  /**
+   * The log writer for this object.
+   */
+  protected PrintWriter logWriter = null;
 
-	/**
-	 * Default constructor.
-	 */
-	protected JPPFAccessorImpl()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  protected JPPFAccessorImpl()
+  {
+  }
 
-	/**
-	 * Get the JPPF client used to submit tasks.
-	 * @return a <code>JPPFJcaClient</code> instance.
-	 */
-	@Override
-	public JPPFJcaClient getJppfClient()
-	{
-		return jppfClient;
-	}
+  /**
+   * Get the JPPF client used to submit tasks.
+   * @return a <code>JPPFJcaClient</code> instance.
+   */
+  @Override
+  public JPPFJcaClient getJppfClient()
+  {
+    return jppfClient;
+  }
 
-	/**
-	 * Set the JPPF client used to submit tasks.
-	 * @param jppfClient a <code>JPPFJcaClient</code> instance.
-	 */
-	@Override
-	public void setJppfClient(final JPPFJcaClient jppfClient)
-	{
-		this.jppfClient = jppfClient;
-	}
+  /**
+   * Set the JPPF client used to submit tasks.
+   * @param jppfClient a <code>JPPFJcaClient</code> instance.
+   */
+  @Override
+  public void setJppfClient(final JPPFJcaClient jppfClient)
+  {
+    this.jppfClient = jppfClient;
+  }
 
-	/**
-	 * Get the log writer for this object.
-	 * @return a <code>PrintWriter</code> instance.
-	 * @throws ResourceException if the log writer could not be obtained.
-	 * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
-	 */
-	@Override
-	public PrintWriter getLogWriter() throws ResourceException
-	{
-		return logWriter;
-	}
+  /**
+   * Get the log writer for this object.
+   * @return a <code>PrintWriter</code> instance.
+   * @throws ResourceException if the log writer could not be obtained.
+   * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
+   */
+  @Override
+  public PrintWriter getLogWriter() throws ResourceException
+  {
+    return logWriter;
+  }
 
-	/**
-	 * Set the log writer for this object.
-	 * @param writer a <code>PrintWriter</code> instance.
-	 * @throws ResourceException if the log writer could not be set.
-	 * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
-	 */
-	@Override
-	public void setLogWriter(final PrintWriter writer) throws ResourceException
-	{
-		this.logWriter = writer;
-	}
+  /**
+   * Set the log writer for this object.
+   * @param writer a <code>PrintWriter</code> instance.
+   * @throws ResourceException if the log writer could not be set.
+   * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
+   */
+  @Override
+  public void setLogWriter(final PrintWriter writer) throws ResourceException
+  {
+    this.logWriter = writer;
+  }
 }

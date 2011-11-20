@@ -26,11 +26,11 @@ package org.jppf.server.nio;
  */
 public abstract class NioState<T extends Enum<T>>
 {
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param channel the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 */
-	public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
+  /**
+   * Execute the action associated with this channel state.
+   * @param channel the selection key corresponding to the channel and selector for this state.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if an error occurs while transitioning to another state.
+   */
+  public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
 }

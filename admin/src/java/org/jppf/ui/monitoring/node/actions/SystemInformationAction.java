@@ -31,80 +31,80 @@ import org.jppf.utils.StringUtils;
  */
 public class SystemInformationAction extends AbstractTopologyAction
 {
-	/**
-	 * Initialize this action.
-	 */
-	public SystemInformationAction()
-	{
-		setupIcon("/org/jppf/ui/resources/info.gif");
-		setupNameAndTooltip("show.information");
-	}
+  /**
+   * Initialize this action.
+   */
+  public SystemInformationAction()
+  {
+    setupIcon("/org/jppf/ui/resources/info.gif");
+    setupNameAndTooltip("show.information");
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		this.selectedElements = selectedElements;
-		dataArray = new TopologyData[selectedElements.size()];
-		int count = 0;
-		for (Object o: selectedElements) dataArray[count++] = (TopologyData) o;
-		setEnabled(dataArray.length > 0);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    this.selectedElements = selectedElements;
+    dataArray = new TopologyData[selectedElements.size()];
+    int count = 0;
+    for (Object o: selectedElements) dataArray[count++] = (TopologyData) o;
+    setEnabled(dataArray.length > 0);
+  }
 
-	/**
-	 * Perform the action.
-	 * @param event not used.
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent event)
-	{
-		String s = null;
-		try
-		{
-			JMXConnectionWrapper connection = dataArray[0].getJmxWrapper();
-			JPPFSystemInformation info = connection.systemInformation();
-			boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
-			PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + connection.getId());
-			format.start();
-			format.formatTable(info.getUuid(), "UUID");
-			format.formatTable(info.getSystem(), "System Properties");
-			format.formatTable(info.getEnv(), "Environment Variables");
-			format.formatTable(info.getRuntime(), "Runtime Information");
-			format.formatTable(info.getJppf(), "JPPF configuration");
-			format.formatTable(info.getNetwork(), "Network configuration");
-			format.formatTable(info.getStorage(), "Storage Information");
-			format.end();
-			s = format.getText();
-		}
-		catch(Exception e)
-		{
-			s = StringUtils.getStackTrace(e).replace("\n", "<br>");
-		}
-		final JFrame frame = new JFrame("System Information");
-		frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
-		frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter()
-		{
-			@Override
-			public void windowClosing(final WindowEvent e)
-			{
-				frame.dispose();
-			}
-		});
-		JEditorPane textArea = new JEditorPane("text/html", s);
-		AbstractButton btn = (AbstractButton) event.getSource();
-		if (btn.isShowing()) location = btn.getLocationOnScreen();
-		textArea.setEditable(false);
-		textArea.setOpaque(false);
-		frame.getContentPane().add(new JScrollPane(textArea));
-		frame.setLocationRelativeTo(null);
-		frame.setLocation(location);
-		frame.setSize(400, 400);
-		frame.setVisible(true);
-	}
+  /**
+   * Perform the action.
+   * @param event not used.
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    String s = null;
+    try
+    {
+      JMXConnectionWrapper connection = dataArray[0].getJmxWrapper();
+      JPPFSystemInformation info = connection.systemInformation();
+      boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
+      PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + connection.getId());
+      format.start();
+      format.formatTable(info.getUuid(), "UUID");
+      format.formatTable(info.getSystem(), "System Properties");
+      format.formatTable(info.getEnv(), "Environment Variables");
+      format.formatTable(info.getRuntime(), "Runtime Information");
+      format.formatTable(info.getJppf(), "JPPF configuration");
+      format.formatTable(info.getNetwork(), "Network configuration");
+      format.formatTable(info.getStorage(), "Storage Information");
+      format.end();
+      s = format.getText();
+    }
+    catch(Exception e)
+    {
+      s = StringUtils.getStackTrace(e).replace("\n", "<br>");
+    }
+    final JFrame frame = new JFrame("System Information");
+    frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
+    frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+    frame.addWindowListener(new WindowAdapter()
+    {
+      @Override
+      public void windowClosing(final WindowEvent e)
+      {
+        frame.dispose();
+      }
+    });
+    JEditorPane textArea = new JEditorPane("text/html", s);
+    AbstractButton btn = (AbstractButton) event.getSource();
+    if (btn.isShowing()) location = btn.getLocationOnScreen();
+    textArea.setEditable(false);
+    textArea.setOpaque(false);
+    frame.getContentPane().add(new JScrollPane(textArea));
+    frame.setLocationRelativeTo(null);
+    frame.setLocation(location);
+    frame.setSize(400, 400);
+    frame.setVisible(true);
+  }
 }

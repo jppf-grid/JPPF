@@ -25,35 +25,35 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class TaskWrapper implements Runnable
 {
-	/**
-	 * The JPPF task to run.
-	 */
-	private JPPFTask task = null;
+  /**
+   * The JPPF task to run.
+   */
+  private JPPFTask task = null;
 
-	/**
-	 * Initialize this task wrapper with the specified JPPF task.
-	 * @param task the JPPF task to execute.
-	 */
-	public TaskWrapper(final JPPFTask task)
-	{
-		this.task = task;
-	}
+  /**
+   * Initialize this task wrapper with the specified JPPF task.
+   * @param task the JPPF task to execute.
+   */
+  public TaskWrapper(final JPPFTask task)
+  {
+    this.task = task;
+  }
 
-	/**
-	 * Run the task and handle uncaught exceptions.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			task.run();
-		}
-		catch(Throwable t)
-		{
-			if (t instanceof Exception) task.setException((Exception) t);
-			else task.setException(new JPPFException(t));
-		}
-	}
+  /**
+   * Run the task and handle uncaught exceptions.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      task.run();
+    }
+    catch(Throwable t)
+    {
+      if (t instanceof Exception) task.setException((Exception) t);
+      else task.setException(new JPPFException(t));
+    }
+  }
 }

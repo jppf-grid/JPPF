@@ -27,58 +27,58 @@ import org.slf4j.*;
  */
 public class JMXServerFactory
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JMXServerFactory.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determine whether we should use the RMI or JMXMP connector.
-	 */
-	private static boolean usingRMIConnector = "rmi".equalsIgnoreCase(JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp"));
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JMXServerFactory.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determine whether we should use the RMI or JMXMP connector.
+   */
+  private static boolean usingRMIConnector = "rmi".equalsIgnoreCase(JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp"));
 
-	/**
-	 * Create a JMXServer instance based on the specified parameters.
-	 * @param uuid the server's unique identifier.
-	 * @param suffix the suffix to use int he JMX service URL, only used with the RMI connector
-	 * @return an instance of {@link JMXServer}.
-	 * @throws Exception if the server could not be created.
-	 */
-	public static JMXServer createServer(final String uuid, final String suffix) throws Exception
-	{
-		JMXServer server = !usingRMIConnector && isJMXMPPresent() ? new JMXMPServer(uuid) : new JMXServerImpl(suffix, uuid);
-		if (debugEnabled) log.debug("created JMX server: " + server);
-		return server;
-	}
+  /**
+   * Create a JMXServer instance based on the specified parameters.
+   * @param uuid the server's unique identifier.
+   * @param suffix the suffix to use int he JMX service URL, only used with the RMI connector
+   * @return an instance of {@link JMXServer}.
+   * @throws Exception if the server could not be created.
+   */
+  public static JMXServer createServer(final String uuid, final String suffix) throws Exception
+  {
+    JMXServer server = !usingRMIConnector && isJMXMPPresent() ? new JMXMPServer(uuid) : new JMXServerImpl(suffix, uuid);
+    if (debugEnabled) log.debug("created JMX server: " + server);
+    return server;
+  }
 
-	/**
-	 * Determine whether JMXMP classes are in the classpath.
-	 * @return true if JMXMP is in the classpath, false otherwise.
-	 */
-	public static boolean isJMXMPPresent()
-	{
-		try
-		{
-			Class c = JMXServerFactory.class.getClassLoader().loadClass("javax.management.remote.jmxmp.JMXMPConnectorServer");
-			if (debugEnabled) log.debug("jmxmp classes are present in the classpath");
-			return true;
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug("jmxmp classes are not present in the classpath");
-		}
-		return false;
-	}
+  /**
+   * Determine whether JMXMP classes are in the classpath.
+   * @return true if JMXMP is in the classpath, false otherwise.
+   */
+  public static boolean isJMXMPPresent()
+  {
+    try
+    {
+      Class c = JMXServerFactory.class.getClassLoader().loadClass("javax.management.remote.jmxmp.JMXMPConnectorServer");
+      if (debugEnabled) log.debug("jmxmp classes are present in the classpath");
+      return true;
+    }
+    catch(Exception e)
+    {
+      if (debugEnabled) log.debug("jmxmp classes are not present in the classpath");
+    }
+    return false;
+  }
 
-	/**
-	 * Determine whether we should use the RMI connector.
-	 * @return true if the RMI connector should be used, false otherwise.
-	 */
-	public static boolean isUsingRMIConnector()
-	{
-		return usingRMIConnector;
-	}
+  /**
+   * Determine whether we should use the RMI connector.
+   * @return true if the RMI connector should be used, false otherwise.
+   */
+  public static boolean isUsingRMIConnector()
+  {
+    return usingRMIConnector;
+  }
 }

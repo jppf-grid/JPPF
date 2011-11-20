@@ -26,19 +26,19 @@ import java.io.Serializable;
  */
 public interface ServerDebugMBean extends Serializable
 {
-	/**
-	 * Get the states of the class loader channels.
-	 * @return the states as as an array of strings.
-	 */
-	String[] classLoaderChannels();
-	/**
-	 * Get the states of the node data channels.
-	 * @return the states as as an array of strings.
-	 */
-	String[] nodeDataChannels();
-	/**
-	 * Get the states of the client data channels.
-	 * @return the states as as an array of strings.
-	 */
-	String[] clientDataChannels();
+  /**
+   * Get the states of the class loader channels.
+   * @return the states as as an array of strings.
+   */
+  String[] classLoaderChannels();
+  /**
+   * Get the states of the node data channels.
+   * @return the states as as an array of strings.
+   */
+  String[] nodeDataChannels();
+  /**
+   * Get the states of the client data channels.
+   * @return the states as as an array of strings.
+   */
+  String[] clientDataChannels();
 }

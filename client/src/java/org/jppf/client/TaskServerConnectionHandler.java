@@ -31,100 +31,100 @@ import org.slf4j.*;
  */
 public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(TaskServerConnectionHandler.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TaskServerConnectionHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this connection with the specified owner.
-	 * @param owner the client connection which owns this connection handler.
-	 * @param host the host to connect to.
-	 * @param port the port to connect to on the host.
-	 */
-	public TaskServerConnectionHandler(final JPPFClientConnection owner, final String host, final int port)
-	{
-		super(owner);
-		this.host = host;
-		this.port = port;
-	}
+  /**
+   * Initialize this connection with the specified owner.
+   * @param owner the client connection which owns this connection handler.
+   * @param host the host to connect to.
+   * @param port the port to connect to on the host.
+   */
+  public TaskServerConnectionHandler(final JPPFClientConnection owner, final String host, final int port)
+  {
+    super(owner);
+    this.host = host;
+    this.port = port;
+  }
 
-	/**
-	 * Create a socket initializer for this connection handler.
-	 * @return a <code>SocketInitializer</code> instance.
-	 * @see org.jppf.client.AbstractClientConnectionHandler#createSocketInitializer()
-	 */
-	@Override
-	protected SocketInitializer createSocketInitializer()
-	{
-		return new SocketInitializerImpl();
-	}
+  /**
+   * Create a socket initializer for this connection handler.
+   * @return a <code>SocketInitializer</code> instance.
+   * @see org.jppf.client.AbstractClientConnectionHandler#createSocketInitializer()
+   */
+  @Override
+  protected SocketInitializer createSocketInitializer()
+  {
+    return new SocketInitializerImpl();
+  }
 
-	/**
-	 * Initialize the connection.
-	 * @throws Exception if an error is raised while initializing the connection.
-	 */
-	@Override
-	public void init() throws Exception
-	{
-		try
-		{
-			setStatus(CONNECTING);
-			if (socketClient == null) initSocketClient();
-			String msg = "[client: "+name+"] Attempting connection to the JPPF task server at " + host + ':' + port;
-			System.out.println(msg);
-			if (debugEnabled) log.debug(msg);
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessful())
-			{
-				throw new JPPFException('[' +name+"] Could not reconnect to the JPPF task server");
-			}
-			if (debugEnabled) log.debug("sending JPPF identifier");
-			socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
-			msg = "[client: "+name+"] Reconnected to the JPPF task server";
-			System.out.println(msg);
-			if (debugEnabled) log.debug(msg);
-			setStatus(ACTIVE);
-		}
-		catch(Exception e)
-		{
-			setStatus(FAILED);
-			throw e;
-		}
-	}
+  /**
+   * Initialize the connection.
+   * @throws Exception if an error is raised while initializing the connection.
+   */
+  @Override
+  public void init() throws Exception
+  {
+    try
+    {
+      setStatus(CONNECTING);
+      if (socketClient == null) initSocketClient();
+      String msg = "[client: "+name+"] Attempting connection to the JPPF task server at " + host + ':' + port;
+      System.out.println(msg);
+      if (debugEnabled) log.debug(msg);
+      socketInitializer.initializeSocket(socketClient);
+      if (!socketInitializer.isSuccessful())
+      {
+        throw new JPPFException('[' +name+"] Could not reconnect to the JPPF task server");
+      }
+      if (debugEnabled) log.debug("sending JPPF identifier");
+      socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
+      msg = "[client: "+name+"] Reconnected to the JPPF task server";
+      System.out.println(msg);
+      if (debugEnabled) log.debug(msg);
+      setStatus(ACTIVE);
+    }
+    catch(Exception e)
+    {
+      setStatus(FAILED);
+      throw e;
+    }
+  }
 
-	/**
-	 * Initialize the underlying socket connection of this connection handler.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.client.AbstractClientConnectionHandler#initSocketClient()
-	 */
-	@Override
-	public void initSocketClient() throws Exception
-	{
-		socketClient = new SocketClient();
-		socketClient.setHost(host);
-		socketClient.setPort(port);
-	}
+  /**
+   * Initialize the underlying socket connection of this connection handler.
+   * @throws Exception if an error is raised during initialization.
+   * @see org.jppf.client.AbstractClientConnectionHandler#initSocketClient()
+   */
+  @Override
+  public void initSocketClient() throws Exception
+  {
+    socketClient = new SocketClient();
+    socketClient.setHost(host);
+    socketClient.setPort(port);
+  }
 
-	/**
-	 * Close and cleanup this connection handler.
-	 * @see org.jppf.client.ClientConnectionHandler#close()
-	 */
-	@Override
-	public void close()
-	{
-		try
-		{
-			if (socketInitializer != null) socketInitializer.close();
-			if (socketClient != null) socketClient.close();
-		}
-		catch(Exception e)
-		{
-			log.error('[' + name + "] "+ e.getMessage(), e);
-		}
-	}
+  /**
+   * Close and cleanup this connection handler.
+   * @see org.jppf.client.ClientConnectionHandler#close()
+   */
+  @Override
+  public void close()
+  {
+    try
+    {
+      if (socketInitializer != null) socketInitializer.close();
+      if (socketClient != null) socketClient.close();
+    }
+    catch(Exception e)
+    {
+      log.error('[' + name + "] "+ e.getMessage(), e);
+    }
+  }
 }

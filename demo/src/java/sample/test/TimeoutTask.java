@@ -27,36 +27,36 @@ import org.jppf.scheduling.JPPFSchedule;
  */
 public class TimeoutTask extends JPPFTestTask
 {
-	/**
-	 * Initialize this task.
-	 */
-	public TimeoutTask()
-	{
-		setTimeoutSchedule(new JPPFSchedule(2000L));
-	}
+  /**
+   * Initialize this task.
+   */
+  public TimeoutTask()
+  {
+    setTimeoutSchedule(new JPPFSchedule(2000L));
+  }
 
-	/**
-	 * Execute the task
-	 * @see java.lang.Runnable#run()
-	 */
-	public void test()
-	{
-		try
-		{
-			Thread.sleep(5000L);
-		}
-		catch(InterruptedException e)
-		{
-		}
-	}
+  /**
+   * Execute the task
+   * @see java.lang.Runnable#run()
+   */
+  public void test()
+  {
+    try
+    {
+      Thread.sleep(5000L);
+    }
+    catch(InterruptedException e)
+    {
+    }
+  }
 
-	/**
-	 * Called when this task times out.
-	 * @see org.jppf.server.protocol.JPPFTask#onTimeout()
-	 */
-	@Override
-	public void onTimeout()
-	{
-		setResult("this task timed out");
-	}
+  /**
+   * Called when this task times out.
+   * @see org.jppf.server.protocol.JPPFTask#onTimeout()
+   */
+  @Override
+  public void onTimeout()
+  {
+    setResult("this task timed out");
+  }
 }

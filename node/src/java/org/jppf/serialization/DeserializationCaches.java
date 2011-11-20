@@ -29,108 +29,108 @@ import org.slf4j.*;
  */
 class DeserializationCaches
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(DeserializationCaches.class);
-	/**
-	 * Mapping of handles to corresponding class descriptors.
-	 */
-	Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<Integer, ClassDescriptor>();
-	/**
-	 * Mapping of handles to corresponding objects.
-	 */
-	Map<Integer, Object> handleToObjectMap = new HashMap<Integer, Object>();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(DeserializationCaches.class);
+  /**
+   * Mapping of handles to corresponding class descriptors.
+   */
+  Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<Integer, ClassDescriptor>();
+  /**
+   * Mapping of handles to corresponding objects.
+   */
+  Map<Integer, Object> handleToObjectMap = new HashMap<Integer, Object>();
 
-	/**
-	 * Default constructor.
-	 */
-	DeserializationCaches()
-	{
-		Set<Map.Entry<Class<?>, ClassDescriptor>> entries = SerializationCaches.globalTypesMap.entrySet();
-		List<ClassDescriptor> list = new ArrayList<ClassDescriptor>(entries.size());
-		for (Map.Entry<Class<?>, ClassDescriptor> entry: entries)
-		{
-			ClassDescriptor cd = entry.getValue();
-			ClassDescriptor cd2 = new ClassDescriptor();
-			cd2.signature = cd.signature;
-			cd2.primitive = cd.primitive;
-			cd2.array = cd.array;
-			cd2.externalizable = cd.externalizable;
-			cd2.hasWriteObject = cd.hasWriteObject;
-			cd2.enumType = cd.enumType;
-			cd2.handle = cd.handle;
-			if (cd.superClass != null) cd2.superClassHandle = cd.superClass.handle;
-			if (cd.componentType != null) cd2.componentTypeHandle = cd.componentType.handle;
-			if (cd.fields.length > 0)
-			{
-				cd2.fields = new FieldDescriptor[cd.fields.length];
-				for (int i=0; i<cd.fields.length; i++)
-				{
-					FieldDescriptor fd = cd.fields[i];
-					FieldDescriptor fd2 = new FieldDescriptor();
-					fd2.name = fd.name;
-					if (fd.type != null) fd2.typeHandle = fd.type.handle;
-					cd2.fields[i] = fd2;
-				}
-			}
-			handleToDescriptorMap.put(cd2.handle, cd2);
-			list.add(cd2);
-		}
-		try
-		{
-			initializeDescriptorClasses(list, getClass().getClassLoader());
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Default constructor.
+   */
+  DeserializationCaches()
+  {
+    Set<Map.Entry<Class<?>, ClassDescriptor>> entries = SerializationCaches.globalTypesMap.entrySet();
+    List<ClassDescriptor> list = new ArrayList<ClassDescriptor>(entries.size());
+    for (Map.Entry<Class<?>, ClassDescriptor> entry: entries)
+    {
+      ClassDescriptor cd = entry.getValue();
+      ClassDescriptor cd2 = new ClassDescriptor();
+      cd2.signature = cd.signature;
+      cd2.primitive = cd.primitive;
+      cd2.array = cd.array;
+      cd2.externalizable = cd.externalizable;
+      cd2.hasWriteObject = cd.hasWriteObject;
+      cd2.enumType = cd.enumType;
+      cd2.handle = cd.handle;
+      if (cd.superClass != null) cd2.superClassHandle = cd.superClass.handle;
+      if (cd.componentType != null) cd2.componentTypeHandle = cd.componentType.handle;
+      if (cd.fields.length > 0)
+      {
+        cd2.fields = new FieldDescriptor[cd.fields.length];
+        for (int i=0; i<cd.fields.length; i++)
+        {
+          FieldDescriptor fd = cd.fields[i];
+          FieldDescriptor fd2 = new FieldDescriptor();
+          fd2.name = fd.name;
+          if (fd.type != null) fd2.typeHandle = fd.type.handle;
+          cd2.fields[i] = fd2;
+        }
+      }
+      handleToDescriptorMap.put(cd2.handle, cd2);
+      list.add(cd2);
+    }
+    try
+    {
+      initializeDescriptorClasses(list, getClass().getClassLoader());
+    }
+    catch (Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 
-	/**
-	 * Get the class descriptor associated with the specified handle.
-	 * @param handle the handle to lookup.
-	 * @return a {@link ClassDescriptor} instance.
-	 */
-	ClassDescriptor getDescriptor(final int handle)
-	{
-		return handleToDescriptorMap.get(handle);
-	}
+  /**
+   * Get the class descriptor associated with the specified handle.
+   * @param handle the handle to lookup.
+   * @return a {@link ClassDescriptor} instance.
+   */
+  ClassDescriptor getDescriptor(final int handle)
+  {
+    return handleToDescriptorMap.get(handle);
+  }
 
-	/**
-	 * Initialize the class object for each recently loaded class descriptor, including array types.
-	 * @param list the list of class descriptor to process.
-	 * @param classloader used to load the classes.
-	 * @throws Exception if any error occurs.
-	 */
-	void initializeDescriptorClasses(final Collection<ClassDescriptor> list, final ClassLoader classloader) throws Exception
-	{
-		for (ClassDescriptor cd: list)
-		{
-			if (cd.clazz != null) continue;
-			if (cd.array)
-			{
-				List<ClassDescriptor> types = new ArrayList<ClassDescriptor>();
-				ClassDescriptor tmp = cd;
-				while (tmp != null)
-				{
-					types.add(tmp);
-					tmp = tmp.array ? getDescriptor(tmp.componentTypeHandle) : null;
-				}
-				for (int i=types.size()-1; i>=0; i--)
-				{
-					tmp = types.get(i);
-					if (tmp.clazz != null) continue;
-					if (!tmp.array) tmp.clazz = ReflectionHelper.getNonArrayTypeFromSignature(tmp.signature, classloader);
-					else
-					{
-						Class<?> clazz = types.get(i+1).clazz;
-						Object array = Array.newInstance(clazz, 0);
-						tmp.clazz = array.getClass();
-					}
-				}
-			}
-			else cd.clazz = ReflectionHelper.getNonArrayTypeFromSignature(cd.signature, classloader);
-		}
-	}
+  /**
+   * Initialize the class object for each recently loaded class descriptor, including array types.
+   * @param list the list of class descriptor to process.
+   * @param classloader used to load the classes.
+   * @throws Exception if any error occurs.
+   */
+  void initializeDescriptorClasses(final Collection<ClassDescriptor> list, final ClassLoader classloader) throws Exception
+  {
+    for (ClassDescriptor cd: list)
+    {
+      if (cd.clazz != null) continue;
+      if (cd.array)
+      {
+        List<ClassDescriptor> types = new ArrayList<ClassDescriptor>();
+        ClassDescriptor tmp = cd;
+        while (tmp != null)
+        {
+          types.add(tmp);
+          tmp = tmp.array ? getDescriptor(tmp.componentTypeHandle) : null;
+        }
+        for (int i=types.size()-1; i>=0; i--)
+        {
+          tmp = types.get(i);
+          if (tmp.clazz != null) continue;
+          if (!tmp.array) tmp.clazz = ReflectionHelper.getNonArrayTypeFromSignature(tmp.signature, classloader);
+          else
+          {
+            Class<?> clazz = types.get(i+1).clazz;
+            Object array = Array.newInstance(clazz, 0);
+            tmp.clazz = array.getClass();
+          }
+        }
+      }
+      else cd.clazz = ReflectionHelper.getNonArrayTypeFromSignature(cd.signature, classloader);
+    }
+  }
 }

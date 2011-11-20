@@ -25,73 +25,73 @@ import org.jppf.node.*;
  */
 class NodeThread extends Thread
 {
-	/**
-	 * Reference to the underlying JPPF node.
-	 */
-	private Node node = null;
-	/**
-	 * Receives event notifications from the node.
-	 */
-	private NodeState nodeState = null;
+  /**
+   * Reference to the underlying JPPF node.
+   */
+  private Node node = null;
+  /**
+   * Receives event notifications from the node.
+   */
+  private NodeState nodeState = null;
 
-	/**
-	 * Initialize this node thread with a specified listener.
-	 * @param nodeState receives notifications of events occurring within the node.
-	 */
-	public NodeThread(final NodeState nodeState)
-	{
-		super("NodeThread thread");
-		this.nodeState = nodeState;
-	}
+  /**
+   * Initialize this node thread with a specified listener.
+   * @param nodeState receives notifications of events occurring within the node.
+   */
+  public NodeThread(final NodeState nodeState)
+  {
+    super("NodeThread thread");
+    this.nodeState = nodeState;
+  }
 
-	/**
-	 * Launch a JPPF node.
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			while (true)
-			{
-				node = NodeRunner.createNode();
-				node.getLifeCycleEventHandler().addNodeLifeCycleListener(nodeState);
-				while (true)
-				{
-					node.run();
-					//goToSleep();
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+  /**
+   * Launch a JPPF node.
+   * @see java.lang.Thread#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      while (true)
+      {
+        node = NodeRunner.createNode();
+        node.getLifeCycleEventHandler().addNodeLifeCycleListener(nodeState);
+        while (true)
+        {
+          node.run();
+          //goToSleep();
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
 
-	/**
-	 * Wakeup this thread.
-	 */
-	public synchronized void startNode()
-	{
-		notify();
-	}
+  /**
+   * Wakeup this thread.
+   */
+  public synchronized void startNode()
+  {
+    notify();
+  }
 
-	/**
-	 * Stop the underlying node.
-	 */
-	public void stopNode()
-	{
-		if (node != null) node.stopNode();
-	}
+  /**
+   * Stop the underlying node.
+   */
+  public void stopNode()
+  {
+    if (node != null) node.stopNode();
+  }
 
-	/**
-	 * Get a reference to the underlying JPPF node.
-	 * @return a <code>MonitoredNode</code> instance.
-	 */
-	public Node getNode()
-	{
-		return node;
-	}
+  /**
+   * Get a reference to the underlying JPPF node.
+   * @return a <code>MonitoredNode</code> instance.
+   */
+  public Node getNode()
+  {
+    return node;
+  }
 }

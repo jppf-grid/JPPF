@@ -24,34 +24,34 @@ package sample.test;
  */
 public class ExceptionTestTask extends JPPFTestTask
 {
-	/**
-	 * Default constructor - the method that throws an NPE will be invoked.
-	 */
-	public ExceptionTestTask()
-	{
-	}
+  /**
+   * Default constructor - the method that throws an NPE will be invoked.
+   */
+  public ExceptionTestTask()
+  {
+  }
 
-	/**
-	 * This method throws a <code>NullPointerException</code>.
-	 */
-	protected void testThrowNPE()
-	{
-		throw new NullPointerException();
-	}
+  /**
+   * This method throws a <code>NullPointerException</code>.
+   */
+  protected void testThrowNPE()
+  {
+    throw new NullPointerException();
+  }
 
-	/**
-	 * This method throws an <code>ArrayIndexOutOfBoundsException</code>.
-	 */
-	protected void testThrowArrayIndexOutOfBoundsException()
-	{
-		throw new ArrayIndexOutOfBoundsException();
-	}
+  /**
+   * This method throws an <code>ArrayIndexOutOfBoundsException</code>.
+   */
+  protected void testThrowArrayIndexOutOfBoundsException()
+  {
+    throw new ArrayIndexOutOfBoundsException();
+  }
 
-	/**
-	 * This method throws a <code>SecurityException</code>.
-	 */
-	protected void testThrowSecurityException()
-	{
-		System.getProperty("throw.security.exception");
-	}
+  /**
+   * This method throws a <code>SecurityException</code>.
+   */
+  protected void testThrowSecurityException()
+  {
+    System.getProperty("throw.security.exception");
+  }
 }

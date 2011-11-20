@@ -27,72 +27,72 @@ import org.jppf.ui.utils.GuiUtils;
  */
 public class LabelOption extends AbstractOption
 {
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public LabelOption()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public LabelOption()
+  {
+  }
 
-	/**
-	 * Create the UI components for this option.
-	 */
-	@Override
-	public void createUI()
-	{
-		JLabel lab = new JLabel();
-		lab.setHorizontalAlignment(SwingConstants.RIGHT);
-		if (value != null) lab.setText((String) value);
-		if (iconPath != null)
-		{
-			ImageIcon icon = GuiUtils.loadIcon(iconPath);
-			if (icon != null) lab.setIcon(icon);
-		}
-		if (toolTipText != null) lab.setToolTipText(toolTipText);
-		UIComponent = lab;
-	}
+  /**
+   * Create the UI components for this option.
+   */
+  @Override
+  public void createUI()
+  {
+    JLabel lab = new JLabel();
+    lab.setHorizontalAlignment(SwingConstants.RIGHT);
+    if (value != null) lab.setText((String) value);
+    if (iconPath != null)
+    {
+      ImageIcon icon = GuiUtils.loadIcon(iconPath);
+      if (icon != null) lab.setIcon(icon);
+    }
+    if (toolTipText != null) lab.setToolTipText(toolTipText);
+    UIComponent = lab;
+  }
 
-	/**
-	 * Set the value of this option.
-	 * @param value the value as an <code>Object</code> instance.
-	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
-	 */
-	@Override
-	public void setValue(final Object value)
-	{
-		this.value = value;
-		if (UIComponent != null) ((JLabel) UIComponent).setText((String) value);
-	}
+  /**
+   * Set the value of this option.
+   * @param value the value as an <code>Object</code> instance.
+   * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+   */
+  @Override
+  public void setValue(final Object value)
+  {
+    this.value = value;
+    if (UIComponent != null) ((JLabel) UIComponent).setText((String) value);
+  }
 
-	/**
-	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-	}
+  /**
+   * Propagate the state changes of the underlying checkbox to the listeners to this option.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-		UIComponent.setEnabled(enabled);
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.Option#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+    UIComponent.setEnabled(enabled);
+  }
 
-	/**
-	 * This method always returns false, since labels have no value to persist.
-	 * @return false.
-	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
-	 */
-	@Override
-	public boolean isPersistent()
-	{
-		return false;
-	}
+  /**
+   * This method always returns false, since labels have no value to persist.
+   * @return false.
+   * @see org.jppf.ui.options.AbstractOption#isPersistent()
+   */
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
 }

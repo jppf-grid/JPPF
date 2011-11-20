@@ -25,9 +25,9 @@ package org.jppf.server.protocol;
  */
 public interface TaskCompletionListener
 {
-	/**
-	 * Callback method invoked when the execution of a task has completed.
-	 * @param result the result of the task's execution.
-	 */
-	void taskCompleted(ServerJob result);
+  /**
+   * Callback method invoked when the execution of a task has completed.
+   * @param result the result of the task's execution.
+   */
+  void taskCompleted(ServerJob result);
 }

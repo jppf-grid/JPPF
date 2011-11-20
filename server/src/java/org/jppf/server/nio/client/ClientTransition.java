@@ -25,16 +25,16 @@ package org.jppf.server.nio.client;
  */
 public enum ClientTransition
 {
-	/**
-	 * Transition from a state to SENDING_RESULTS.
-	 */
-	TO_SENDING_RESULTS,
-	/**
-	 * Transition from a state to WAITING_JOB.
-	 */
-	TO_WAITING_JOB,
-	/**
-	 * Transition from a state to IDLE.
-	 */
-	TO_IDLE
+  /**
+   * Transition from a state to SENDING_RESULTS.
+   */
+  TO_SENDING_RESULTS,
+  /**
+   * Transition from a state to WAITING_JOB.
+   */
+  TO_WAITING_JOB,
+  /**
+   * Transition from a state to IDLE.
+   */
+  TO_IDLE
 }

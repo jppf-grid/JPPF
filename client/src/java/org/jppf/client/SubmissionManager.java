@@ -26,25 +26,25 @@ import org.jppf.client.event.SubmissionStatusListener;
  */
 public interface SubmissionManager extends Runnable
 {
-	/**
-	 * Add a task submission to the execution queue.
-	 * @param job encapsulation of the execution data.
-	 * @return the unique id of the submission.
-	 */
-	String submitJob(JPPFJob job);
+  /**
+   * Add a task submission to the execution queue.
+   * @param job encapsulation of the execution data.
+   * @return the unique id of the submission.
+   */
+  String submitJob(JPPFJob job);
 
-	/**
-	 * Add a task submission to the execution queue.
-	 * @param job encapsulation of the execution data.
-	 * @param listener an optional listener to receive submission status change notifications, may be null.
-	 * @return the unique id of the submission.
-	 */
-	String submitJob(JPPFJob job, SubmissionStatusListener listener);
+  /**
+   * Add a task submission to the execution queue.
+   * @param job encapsulation of the execution data.
+   * @param listener an optional listener to receive submission status change notifications, may be null.
+   * @return the unique id of the submission.
+   */
+  String submitJob(JPPFJob job, SubmissionStatusListener listener);
 
-	/**
-	 * Add an existing submission back into the execution queue.
-	 * @param job encapsulation of the execution data.
-	 * @return the unique id of the submission.
-	 */
-	String resubmitJob(JPPFJob job);
+  /**
+   * Add an existing submission back into the execution queue.
+   * @param job encapsulation of the execution data.
+   * @return the unique id of the submission.
+   */
+  String resubmitJob(JPPFJob job);
 }

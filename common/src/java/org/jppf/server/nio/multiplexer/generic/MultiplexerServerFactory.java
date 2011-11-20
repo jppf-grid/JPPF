@@ -33,51 +33,51 @@ import org.jppf.server.nio.*;
 public final class MultiplexerServerFactory
 extends NioServerFactory<MultiplexerState, MultiplexerTransition>
 {
-	/**
-	 * Initialize this factory with the specified server.
-	 * @param server the server for which to initialize.
-	 */
-	public MultiplexerServerFactory(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this factory with the specified server.
+   * @param server the server for which to initialize.
+   */
+  public MultiplexerServerFactory(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Create the map of all possible states.
-	 * @return a mapping of the states enumeration to the corresponding NioState instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
-	 */
-	@Override
-	public Map<MultiplexerState, NioState<MultiplexerTransition>> createStateMap()
-	{
-		MultiplexerNioServer server = (MultiplexerNioServer) this.server;
-		Map<MultiplexerState, NioState<MultiplexerTransition>> map =
-			new EnumMap<MultiplexerState, NioState<MultiplexerTransition>>(MultiplexerState.class);
-		map.put(SENDING_OR_RECEIVING, new SendingOrReceivingState(server));
-		map.put(SENDING, new SendingState(server));
-		map.put(IDLE, new IdleState(server));
-		map.put(RECEIVING, new ReceivingState(server));
-		map.put(IDENTIFYING_INBOUND_CHANNEL, new IdentifyingInboundChannelState(server));
-		map.put(SENDING_MULTIPLEXING_INFO, new SendingMultiplexingInfoState(server));
-		return map;
-	}
+  /**
+   * Create the map of all possible states.
+   * @return a mapping of the states enumeration to the corresponding NioState instances.
+   * @see org.jppf.server.nio.NioServerFactory#createStateMap()
+   */
+  @Override
+  public Map<MultiplexerState, NioState<MultiplexerTransition>> createStateMap()
+  {
+    MultiplexerNioServer server = (MultiplexerNioServer) this.server;
+    Map<MultiplexerState, NioState<MultiplexerTransition>> map =
+      new EnumMap<MultiplexerState, NioState<MultiplexerTransition>>(MultiplexerState.class);
+    map.put(SENDING_OR_RECEIVING, new SendingOrReceivingState(server));
+    map.put(SENDING, new SendingState(server));
+    map.put(IDLE, new IdleState(server));
+    map.put(RECEIVING, new ReceivingState(server));
+    map.put(IDENTIFYING_INBOUND_CHANNEL, new IdentifyingInboundChannelState(server));
+    map.put(SENDING_MULTIPLEXING_INFO, new SendingMultiplexingInfoState(server));
+    return map;
+  }
 
-	/**
-	 * Create the map of all possible transitions.
-	 * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
-	 */
-	@Override
-	public Map<MultiplexerTransition, NioTransition<MultiplexerState>> createTransitionMap()
-	{
-		Map<MultiplexerTransition, NioTransition<MultiplexerState>> map =
-			new EnumMap<MultiplexerTransition, NioTransition<MultiplexerState>>(MultiplexerTransition.class);
-		map.put(TO_SENDING_OR_RECEIVING, transition(SENDING_OR_RECEIVING, R));
-		map.put(TO_SENDING, transition(SENDING, RW));
-		map.put(TO_RECEIVING, transition(RECEIVING, R));
-		map.put(TO_IDENTIFYING_INBOUND_CHANNEL, transition(IDENTIFYING_INBOUND_CHANNEL, R));
-		map.put(TO_SENDING_MULTIPLEXING_INFO, transition(SENDING_MULTIPLEXING_INFO, RW));
-		map.put(TO_IDLE, transition(IDLE, 0));
-		return map;
-	}
+  /**
+   * Create the map of all possible transitions.
+   * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
+   * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
+   */
+  @Override
+  public Map<MultiplexerTransition, NioTransition<MultiplexerState>> createTransitionMap()
+  {
+    Map<MultiplexerTransition, NioTransition<MultiplexerState>> map =
+      new EnumMap<MultiplexerTransition, NioTransition<MultiplexerState>>(MultiplexerTransition.class);
+    map.put(TO_SENDING_OR_RECEIVING, transition(SENDING_OR_RECEIVING, R));
+    map.put(TO_SENDING, transition(SENDING, RW));
+    map.put(TO_RECEIVING, transition(RECEIVING, R));
+    map.put(TO_IDENTIFYING_INBOUND_CHANNEL, transition(IDENTIFYING_INBOUND_CHANNEL, R));
+    map.put(TO_SENDING_MULTIPLEXING_INFO, transition(SENDING_MULTIPLEXING_INFO, RW));
+    map.put(TO_IDLE, transition(IDLE, 0));
+    return map;
+  }
 }

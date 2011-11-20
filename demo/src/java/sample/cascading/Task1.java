@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.Equal;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * This task submits a JPPF job.
@@ -31,33 +31,33 @@ import org.jppf.server.protocol.*;
 public class Task1 extends JPPFTask
 {
 
-	/**
-	 * Run this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-    public void run()
-	{
-		JPPFClient client = null;
-		try
-		{
-			System.out.println("Hello, this is Task1, about to submit Task2");
-			client = new JPPFClient();
-			JPPFJob job = new JPPFJob();
-			job.addTask(new Task2());
-			job.getSLA().setExecutionPolicy(new Equal("id", 2));
-			List<JPPFTask> results = client.submit(job);
-			System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
-			setResult("Task1 executed successfully");
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			setException(e);
-		}
-		finally
-		{
-			if (client != null) client.close();
-		}
-	}
+  /**
+   * Run this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    JPPFClient client = null;
+    try
+    {
+      System.out.println("Hello, this is Task1, about to submit Task2");
+      client = new JPPFClient();
+      JPPFJob job = new JPPFJob();
+      job.addTask(new Task2());
+      job.getSLA().setExecutionPolicy(new Equal("id", 2));
+      List<JPPFTask> results = client.submit(job);
+      System.out.println("Result of Task2: [" + results.get(0).getResult() + ']');
+      setResult("Task1 executed successfully");
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+      setException(e);
+    }
+    finally
+    {
+      if (client != null) client.close();
+    }
+  }
 }

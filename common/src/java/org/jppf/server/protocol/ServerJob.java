@@ -29,21 +29,21 @@ import org.jppf.node.protocol.JPPFDistributedJob;
  */
 public interface ServerJob
 {
-	/**
-	 * Get the underlying task bundle.
-	 * @return a <code>JPPFTaskBundle</code> instance.
-	 */
-	JPPFDistributedJob getJob();
+  /**
+   * Get the underlying task bundle.
+   * @return a <code>JPPFTaskBundle</code> instance.
+   */
+  JPPFDistributedJob getJob();
 
-	/**
-	 * Get the location of the data provider.
-	 * @return a <code>JPPFTaskBundle</code> instance.
-	 */
-	DataLocation getDataProvider();
+  /**
+   * Get the location of the data provider.
+   * @return a <code>JPPFTaskBundle</code> instance.
+   */
+  DataLocation getDataProvider();
 
-	/**
-	 * Get the list of locations of the tasks.
-	 * @return a list of <code>DataLocation</code> instances.
-	 */
-	List<DataLocation> getTasks();
+  /**
+   * Get the list of locations of the tasks.
+   * @return a list of <code>DataLocation</code> instances.
+   */
+  List<DataLocation> getTasks();
 }

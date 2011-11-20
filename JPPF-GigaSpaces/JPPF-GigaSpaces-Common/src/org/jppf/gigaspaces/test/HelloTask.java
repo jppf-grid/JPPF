@@ -26,58 +26,58 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class HelloTask extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = -3172628037383355176L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = -3172628037383355176L;
 
-	/**
-	 * Duration of this task in milliseconds.
-	 */
-	private long duration = 0L;
+  /**
+   * Duration of this task in milliseconds.
+   */
+  private long duration = 0L;
 
-	/**
-	 * Default constructor.
-	 */
-	public HelloTask()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public HelloTask()
+  {
+  }
 
-	/**
-	 * Initialize this task with the specified duration.
-	 * @param duration duration of this task in milliseconds.
-	 */
-	public HelloTask(final long duration)
-	{
-		this.duration = duration;
-	}
+  /**
+   * Initialize this task with the specified duration.
+   * @param duration duration of this task in milliseconds.
+   */
+  public HelloTask(final long duration)
+  {
+    this.duration = duration;
+  }
 
-	/**
-	 * Execute the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		String s;
-		try
-		{
-			if (duration <= 0L)
-			{
-				s = "Hello World";
-			}
-			else
-			{
-				Thread.sleep(duration);
-				s = "successfully executed for " + duration + " milliseconds";
-			}
-		}
-		catch(Exception e)
-		{
-			setException(e);
-			s = "execution failed with exception message: " + e.getMessage();
-		}
-		System.out.println(s);
-		setResult(s);
-	}
+  /**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    String s;
+    try
+    {
+      if (duration <= 0L)
+      {
+        s = "Hello World";
+      }
+      else
+      {
+        Thread.sleep(duration);
+        s = "successfully executed for " + duration + " milliseconds";
+      }
+    }
+    catch(Exception e)
+    {
+      setException(e);
+      s = "execution failed with exception message: " + e.getMessage();
+    }
+    System.out.println(s);
+    setResult(s);
+  }
 }

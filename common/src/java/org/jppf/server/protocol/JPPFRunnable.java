@@ -28,9 +28,9 @@ import java.lang.annotation.*;
 @Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
 public @interface JPPFRunnable
 {
-	/**
-	 * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-	 * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
-     */
-	int value() default 0;
+  /**
+   * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
+   * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+   */
+  int value() default 0;
 }

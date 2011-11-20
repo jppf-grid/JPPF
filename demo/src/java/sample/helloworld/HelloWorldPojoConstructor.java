@@ -25,34 +25,34 @@ import java.io.Serializable;
  */
 public class HelloWorldPojoConstructor implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The string resulting from the task execution.
-	 */
-	private String hello = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The string resulting from the task execution.
+   */
+  private String hello = null;
 
-	/**
-	 * Execute the task.
-	 * @param message a message to print.
-	 * @param number an example primitive argument.
-	 */
-	public HelloWorldPojoConstructor(final String message, final int number)
-	{
-		this.hello = "Hello, World (pojo constructor, " + message + ", " + number + ')';
-		System.out.println(this.hello);
-	}
+  /**
+   * Execute the task.
+   * @param message a message to print.
+   * @param number an example primitive argument.
+   */
+  public HelloWorldPojoConstructor(final String message, final int number)
+  {
+    this.hello = "Hello, World (pojo constructor, " + message + ", " + number + ')';
+    System.out.println(this.hello);
+  }
 
-	/**
-	 * Get the string resulting from the task execution.
-	 * @return a string.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return hello;
-	}
+  /**
+   * Get the string resulting from the task execution.
+   * @return a string.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return hello;
+  }
 }

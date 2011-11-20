@@ -26,30 +26,30 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class EmptyTask extends JPPFTask
 {
-	/**
-	 * The data size in KB.
-	 */
-	private int dataSize = 0;
-	/**
-	 * The data in this task.
-	 */
-	private byte[] data = null;
-	/**
-	 * Initialize with the specified data size.
-	 * @param dataSize the data size in bytes.
-	 */
-	public EmptyTask(final int dataSize)
-	{
-		this.dataSize = dataSize;
-		data = new byte[dataSize];
-	}
+  /**
+   * The data size in KB.
+   */
+  private int dataSize = 0;
+  /**
+   * The data in this task.
+   */
+  private byte[] data = null;
+  /**
+   * Initialize with the specified data size.
+   * @param dataSize the data size in bytes.
+   */
+  public EmptyTask(final int dataSize)
+  {
+    this.dataSize = dataSize;
+    data = new byte[dataSize];
+  }
 
-	/**
-	 * Perform the execution of this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-	}
+  /**
+   * Perform the execution of this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+  }
 }

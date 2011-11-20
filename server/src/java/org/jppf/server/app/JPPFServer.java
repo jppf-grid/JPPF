@@ -33,193 +33,193 @@ import org.slf4j.*;
  */
 abstract class JPPFServer extends Thread
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFServer.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Server socket listening for requests on the configured port.
-	 */
-	protected ServerSocket server = null;
-	/**
-	 * Flag indicating that this socket server is closed.
-	 */
-	private boolean stopped = false;
-	/**
-	 * The port this socket server is listening to.
-	 */
-	protected int port = -1;
-	/**
-	 * The list of connections accepted by this server.
-	 */
-	protected List<JPPFConnection> connections = new ArrayList<JPPFConnection>();
-	/**
-	 * Reference to the driver.
-	 */
-	private JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFServer.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Server socket listening for requests on the configured port.
+   */
+  protected ServerSocket server = null;
+  /**
+   * Flag indicating that this socket server is closed.
+   */
+  private boolean stopped = false;
+  /**
+   * The port this socket server is listening to.
+   */
+  protected int port = -1;
+  /**
+   * The list of connections accepted by this server.
+   */
+  protected List<JPPFConnection> connections = new ArrayList<JPPFConnection>();
+  /**
+   * Reference to the driver.
+   */
+  private JPPFDriver driver = JPPFDriver.getInstance();
 
-	/**
-	 * Initialize this socket server with a specified execution service and port number.
-	 * @param port the port this socket server is listening to.
-	 * @param name the name given to the thread in which this server runs.
-	 * @throws JPPFException if the underlying server socket can't be opened.
-	 */
-	public JPPFServer(final int port, final String name) throws JPPFException
-	{
-		super(name);
-		this.port = port;
-		init(port);
-	}
+  /**
+   * Initialize this socket server with a specified execution service and port number.
+   * @param port the port this socket server is listening to.
+   * @param name the name given to the thread in which this server runs.
+   * @throws JPPFException if the underlying server socket can't be opened.
+   */
+  public JPPFServer(final int port, final String name) throws JPPFException
+  {
+    super(name);
+    this.port = port;
+    init(port);
+  }
 
-	/**
-	 * Start the underlying server socket by making it accept incoming connections.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			while (!isStopped() && !driver.isShuttingDown())
-			{
-				Socket socket = server.accept();
-				if (driver.isShuttingDown())
-				{
-					socket.close();
-					break;
-				}
-				serve(socket);
-			}
-			end();
-		}
-		catch (Throwable t)
-		{
-			log.error(t.getMessage(), t);
-			end();
-		}
-	}
+  /**
+   * Start the underlying server socket by making it accept incoming connections.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      while (!isStopped() && !driver.isShuttingDown())
+      {
+        Socket socket = server.accept();
+        if (driver.isShuttingDown())
+        {
+          socket.close();
+          break;
+        }
+        serve(socket);
+      }
+      end();
+    }
+    catch (Throwable t)
+    {
+      log.error(t.getMessage(), t);
+      end();
+    }
+  }
 
-	/**
-	 * Start serving a new incoming connection.
-	 * @param socket the socket connecting with this socket server.
-	 * @throws Exception if the new connection can't be initialized.
-	 */
-	protected void serve(final Socket socket) throws Exception
-	{
-		//socket.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-		if (debugEnabled) log.debug("Server " + server + " serving new socket: " + socket);
-		JPPFConnection connection = createConnection(socket);
-		connections.add(connection);
-		connection.start();
-	}
+  /**
+   * Start serving a new incoming connection.
+   * @param socket the socket connecting with this socket server.
+   * @throws Exception if the new connection can't be initialized.
+   */
+  protected void serve(final Socket socket) throws Exception
+  {
+    //socket.setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+    if (debugEnabled) log.debug("Server " + server + " serving new socket: " + socket);
+    JPPFConnection connection = createConnection(socket);
+    connections.add(connection);
+    connection.start();
+  }
 
-	/**
-	 * Instantiate a wrapper for the socket connection opened by this socket server.
-	 * Subclasses must implement this method.
-	 * @param socket the socket connection obtained through a call to
-	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
-	 * @return a <code>JPPFServerConnection</code> instance.
-	 * @throws JPPFException if an exception is raised while creating the socket handler.
-	 */
-	protected abstract JPPFConnection createConnection(Socket socket) throws JPPFException;
+  /**
+   * Instantiate a wrapper for the socket connection opened by this socket server.
+   * Subclasses must implement this method.
+   * @param socket the socket connection obtained through a call to
+   * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
+   * @return a <code>JPPFServerConnection</code> instance.
+   * @throws JPPFException if an exception is raised while creating the socket handler.
+   */
+  protected abstract JPPFConnection createConnection(Socket socket) throws JPPFException;
 
-	/**
-	 * Initialize the underlying server socket with a specified port.
-	 * @param port the port the underlying server listens to.
-	 * @throws JPPFException if the server socket can't be opened on the specified port.
-	 */
-	protected void init(final int port) throws JPPFException
-	{
-		Exception e = null;
-		try
-		{
-			server = new ServerSocket();
-			InetSocketAddress addr = new InetSocketAddress(port);
-			server.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-			server.bind(addr);
-		}
-		catch(IllegalArgumentException iae)
-		{
-			e = iae;
-		}
-		catch(IOException ioe)
-		{
-			e = ioe;
-		}
-		if (e != null)
-		{
-			throw new JPPFException(e.getMessage(), e);
-		}
-	}
+  /**
+   * Initialize the underlying server socket with a specified port.
+   * @param port the port the underlying server listens to.
+   * @throws JPPFException if the server socket can't be opened on the specified port.
+   */
+  protected void init(final int port) throws JPPFException
+  {
+    Exception e = null;
+    try
+    {
+      server = new ServerSocket();
+      InetSocketAddress addr = new InetSocketAddress(port);
+      server.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+      server.bind(addr);
+    }
+    catch(IllegalArgumentException iae)
+    {
+      e = iae;
+    }
+    catch(IOException ioe)
+    {
+      e = ioe;
+    }
+    if (e != null)
+    {
+      throw new JPPFException(e.getMessage(), e);
+    }
+  }
 
-	/**
-	 * Close the underlying server socket and stop this socket server.
-	 */
-	public synchronized void end()
-	{
-		if (!isStopped())
-		{
-			try
-			{
-				setStopped(true);
-				if (!server.isClosed()) server.close();
-				removeAllConnections();
-			}
-			catch(IOException ioe)
-			{
-				log.error(ioe.getMessage(), ioe);
-			}
-		}
-	}
+  /**
+   * Close the underlying server socket and stop this socket server.
+   */
+  public synchronized void end()
+  {
+    if (!isStopped())
+    {
+      try
+      {
+        setStopped(true);
+        if (!server.isClosed()) server.close();
+        removeAllConnections();
+      }
+      catch(IOException ioe)
+      {
+        log.error(ioe.getMessage(), ioe);
+      }
+    }
+  }
 
-	/**
-	 * Remove the specified connection from the list of active connections of this server.
-	 * @param connection the connection to remove.
-	 */
-	public synchronized void removeConnection(final JPPFConnection connection)
-	{
-		connections.remove(connection);
-	}
+  /**
+   * Remove the specified connection from the list of active connections of this server.
+   * @param connection the connection to remove.
+   */
+  public synchronized void removeConnection(final JPPFConnection connection)
+  {
+    connections.remove(connection);
+  }
 
-	/**
-	 * Close and remove all connections accepted by this server.
-	 */
-	public synchronized void removeAllConnections()
-	{
-		if (!isStopped()) return;
-		for (JPPFConnection connection: connections)
-		{
-			try
-			{
-				connection.setClosed();
-			}
-			catch(Exception e)
-			{
-				log.error('['+connection.toString()+"] "+e.getMessage(), e);
-			}
-		}
-		connections.clear();
-	}
+  /**
+   * Close and remove all connections accepted by this server.
+   */
+  public synchronized void removeAllConnections()
+  {
+    if (!isStopped()) return;
+    for (JPPFConnection connection: connections)
+    {
+      try
+      {
+        connection.setClosed();
+      }
+      catch(Exception e)
+      {
+        log.error('['+connection.toString()+"] "+e.getMessage(), e);
+      }
+    }
+    connections.clear();
+  }
 
-	/**
-	 * Set this server in the specified stopped state.
-	 * @param stopped true if this server is stopped, false otherwise.
-	 */
-	protected synchronized void setStopped(final boolean stopped)
-	{
-		this.stopped = stopped;
-	}
+  /**
+   * Set this server in the specified stopped state.
+   * @param stopped true if this server is stopped, false otherwise.
+   */
+  protected synchronized void setStopped(final boolean stopped)
+  {
+    this.stopped = stopped;
+  }
 
-	/**
-	 * Get the stopped state of this server.
-	 * @return  true if this server is stopped, false otherwise.
-	 */
-	protected synchronized boolean isStopped()
-	{
-		return stopped;
-	}
+  /**
+   * Get the stopped state of this server.
+   * @return  true if this server is stopped, false otherwise.
+   */
+  protected synchronized boolean isStopped()
+  {
+    return stopped;
+  }
 }

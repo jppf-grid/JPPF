@@ -27,72 +27,72 @@ import org.jppf.management.JPPFSystemInformation;
  */
 public class MoreThan extends ExecutionPolicy
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The name of the property to compare.
-	 */
-	private String propertyName = null;
-	/**
-	 * A numeric value to compare with.
-	 */
-	private Number numberValue = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The name of the property to compare.
+   */
+  private String propertyName = null;
+  /**
+   * A numeric value to compare with.
+   */
+  private Number numberValue = null;
 
-	/**
-	 * Define a comparison between the numeric value of a property and another numeric value.
-	 * @param propertyName the name of the property to compare.
-	 * @param a the value to compare with.
-	 */
-	public MoreThan(final String propertyName, final double a)
-	{
-		this.propertyName = propertyName;
-		this.numberValue = a;
-	}
+  /**
+   * Define a comparison between the numeric value of a property and another numeric value.
+   * @param propertyName the name of the property to compare.
+   * @param a the value to compare with.
+   */
+  public MoreThan(final String propertyName, final double a)
+  {
+    this.propertyName = propertyName;
+    this.numberValue = a;
+  }
 
-	/**
-	 * Determines whether this policy accepts the specified node.
-	 * @param info system information for the node on which the tasks will run if accepted.
-	 * @return true if the node is accepted, false otherwise.
-	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
-	 */
-	@Override
-	public boolean accepts(final JPPFSystemInformation info)
-	{
-		try
-		{
-			String s = getProperty(info, propertyName);
-			if (numberValue != null) return Double.valueOf(s).doubleValue() > numberValue.doubleValue();
-		}
-		catch(Exception e)
-		{
-		}
-		return false;
-	}
+  /**
+   * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.
+   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
+   */
+  @Override
+  public boolean accepts(final JPPFSystemInformation info)
+  {
+    try
+    {
+      String s = getProperty(info, propertyName);
+      if (numberValue != null) return Double.valueOf(s).doubleValue() > numberValue.doubleValue();
+    }
+    catch(Exception e)
+    {
+    }
+    return false;
+  }
 
-	/**
-	 * Print this object to a string.
-	 * @return an XML string representation of this object
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (computedToString == null)
-		{
-			synchronized(ExecutionPolicy.class)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append(indent()).append("<MoreThan>\n");
-				toStringIndent++;
-				sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-				sb.append(indent()).append("<Value>").append(numberValue).append("</Value>\n");
-				toStringIndent--;
-				sb.append(indent()).append("</MoreThan>\n");
-				computedToString = sb.toString();
-			}
-		}
-		return computedToString;
-	}
+  /**
+   * Print this object to a string.
+   * @return an XML string representation of this object
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    if (computedToString == null)
+    {
+      synchronized(ExecutionPolicy.class)
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent()).append("<MoreThan>\n");
+        toStringIndent++;
+        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
+        sb.append(indent()).append("<Value>").append(numberValue).append("</Value>\n");
+        toStringIndent--;
+        sb.append(indent()).append("</MoreThan>\n");
+        computedToString = sb.toString();
+      }
+    }
+    return computedToString;
+  }
 }

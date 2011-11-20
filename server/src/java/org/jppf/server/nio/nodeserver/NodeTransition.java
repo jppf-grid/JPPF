@@ -25,24 +25,24 @@ package org.jppf.server.nio.nodeserver;
  */
 public enum NodeTransition
 {
-	/**
-	 * Transition from a state to SENDING_BUNDLE.
-	 */
-	TO_SENDING,
-	/**
-	 * Transition from a state to WAITING_RESULTS.
-	 */
-	TO_WAITING,
-	/**
-	 * Transition from a state to SEND_INITIAL_BUNDLE.
-	 */
-	TO_SEND_INITIAL,
-	/**
-	 * Transition from a state to WAIT_INITIAL_BUNDLE.
-	 */
-	TO_WAIT_INITIAL,
-	/**
-	 * Transition from a state to IDLE.
-	 */
-	TO_IDLE
+  /**
+   * Transition from a state to SENDING_BUNDLE.
+   */
+  TO_SENDING,
+  /**
+   * Transition from a state to WAITING_RESULTS.
+   */
+  TO_WAITING,
+  /**
+   * Transition from a state to SEND_INITIAL_BUNDLE.
+   */
+  TO_SEND_INITIAL,
+  /**
+   * Transition from a state to WAIT_INITIAL_BUNDLE.
+   */
+  TO_WAIT_INITIAL,
+  /**
+   * Transition from a state to IDLE.
+   */
+  TO_IDLE
 }

@@ -23,16 +23,16 @@ package org.jppf.ui.monitoring.job;
  */
 public enum JobDataType
 {
-	/**
-	 * Driver.
-	 */
-	DRIVER,
-	/**
-	 * A job submitted to a driver
-	 */
-	JOB,
-	/**
-	 * A part of a job submitted to a node.
-	 */
-	SUB_JOB
+  /**
+   * Driver.
+   */
+  DRIVER,
+  /**
+   * A job submitted to a driver
+   */
+  JOB,
+  /**
+   * A part of a job submitted to a node.
+   */
+  SUB_JOB
 }

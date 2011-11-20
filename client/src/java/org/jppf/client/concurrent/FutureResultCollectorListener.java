@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 interface FutureResultCollectorListener extends EventListener
 {
-	/**
-	 * Called when all results from a job have been received.
-	 * @param event the event object.
-	 */
-	void resultsComplete(FutureResultCollectorEvent event);
+  /**
+   * Called when all results from a job have been received.
+   * @param event the event object.
+   */
+  void resultsComplete(FutureResultCollectorEvent event);
 }

@@ -30,110 +30,110 @@ import org.jppf.utils.*;
  */
 public abstract class AbstractNode extends ThreadSynchronization implements Node, Runnable
 {
-	/**
-	 * Utility for deserialization and serialization.
-	 */
-	protected SerializationHelper helper = null;
-	/**
-	 * Utility for deserialization and serialization.
-	 */
-	protected ObjectSerializer serializer = null;
-	/**
-	 * Wrapper around the underlying server connection.
-	 */
-	protected SocketWrapper socketClient = null;
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	protected SocketInitializer socketInitializer = new SocketInitializerImpl();
-	/**
-	 * This flag is true if there is at least one listener, and false otherwise.
-	 */
-	protected boolean notifying = false;
-	/**
-	 * Total number of tasks executed.
-	 */
-	private int taskCount = 0;
-	/**
-	 * This node's universal identifier.
-	 */
-	protected String uuid = null;
-	/**
-	 * Holds the count of currently executing tasks. Used to determine when this node is busy or idle.
-	 */
-	protected AtomicInteger executingCount = new AtomicInteger(0);
+  /**
+   * Utility for deserialization and serialization.
+   */
+  protected SerializationHelper helper = null;
+  /**
+   * Utility for deserialization and serialization.
+   */
+  protected ObjectSerializer serializer = null;
+  /**
+   * Wrapper around the underlying server connection.
+   */
+  protected SocketWrapper socketClient = null;
+  /**
+   * Used to synchronize access to the underlying socket from multiple threads.
+   */
+  protected SocketInitializer socketInitializer = new SocketInitializerImpl();
+  /**
+   * This flag is true if there is at least one listener, and false otherwise.
+   */
+  protected boolean notifying = false;
+  /**
+   * Total number of tasks executed.
+   */
+  private int taskCount = 0;
+  /**
+   * This node's universal identifier.
+   */
+  protected String uuid = null;
+  /**
+   * Holds the count of currently executing tasks. Used to determine when this node is busy or idle.
+   */
+  protected AtomicInteger executingCount = new AtomicInteger(0);
 
-	/**
-	 * Get the underlying socket wrapper used by this node.
-	 * @return a <code>SocketWrapper</code> instance.
-	 */
-	@Override
-	public SocketWrapper getSocketWrapper()
-	{
-		return socketClient;
-	}
+  /**
+   * Get the underlying socket wrapper used by this node.
+   * @return a <code>SocketWrapper</code> instance.
+   */
+  @Override
+  public SocketWrapper getSocketWrapper()
+  {
+    return socketClient;
+  }
 
-	/**
-	 * Get the underlying socket wrapper used by this node.
-	 * @param wrapper a <code>SocketWrapper</code> instance.
-	 */
-	@Override
-	public void setSocketWrapper(final SocketWrapper wrapper)
-	{
-		this.socketClient = wrapper;
-	}
+  /**
+   * Get the underlying socket wrapper used by this node.
+   * @param wrapper a <code>SocketWrapper</code> instance.
+   */
+  @Override
+  public void setSocketWrapper(final SocketWrapper wrapper)
+  {
+    this.socketClient = wrapper;
+  }
 
-	/**
-	 * Determine whether this node has at least one listener to notify of internal events.
-	 * @return true if there is at least one listener, and false otherwise.
-	 */
-	public boolean isNotifying()
-	{
-		return notifying;
-	}
+  /**
+   * Determine whether this node has at least one listener to notify of internal events.
+   * @return true if there is at least one listener, and false otherwise.
+   */
+  public boolean isNotifying()
+  {
+    return notifying;
+  }
 
-	/**
-	 * Stop this node and release the resources it is using.
-	 * @see org.jppf.node.Node#stopNode()
-	 */
-	@Override
-	public abstract void stopNode();
+  /**
+   * Stop this node and release the resources it is using.
+   * @see org.jppf.node.Node#stopNode()
+   */
+  @Override
+  public abstract void stopNode();
 
-	/**
-	 * Get the total number of tasks executed.
-	 * @return the number of tasks as an int.
-	 */
-	public synchronized int getTaskCount()
-	{
-		return taskCount;
-	}
+  /**
+   * Get the total number of tasks executed.
+   * @return the number of tasks as an int.
+   */
+  public synchronized int getTaskCount()
+  {
+    return taskCount;
+  }
 
-	/**
-	 * Set the total number of tasks executed.
-	 * @param taskCount the number of tasks as an int.
-	 */
-	public synchronized void setTaskCount(final int taskCount)
-	{
-		this.taskCount = taskCount;
-	}
+  /**
+   * Set the total number of tasks executed.
+   * @param taskCount the number of tasks as an int.
+   */
+  public synchronized void setTaskCount(final int taskCount)
+  {
+    this.taskCount = taskCount;
+  }
 
-	/**
-	 * Get the utility for deserialization and serialization.
-	 * @return a <code>SerializationHelper</code> instance.
-	 */
-	public SerializationHelper getHelper()
-	{
-		return helper;
-	}
+  /**
+   * Get the utility for deserialization and serialization.
+   * @return a <code>SerializationHelper</code> instance.
+   */
+  public SerializationHelper getHelper()
+  {
+    return helper;
+  }
 
-	/**
-	 * Default implementation
-	 * @return this method always returns null.
-	 * @see org.jppf.node.Node#getLifeCycleEventHandler()
-	 */
-	@Override
-	public LifeCycleEventHandler getLifeCycleEventHandler()
-	{
-		return null;
-	}
+  /**
+   * Default implementation
+   * @return this method always returns null.
+   * @see org.jppf.node.Node#getLifeCycleEventHandler()
+   */
+  @Override
+  public LifeCycleEventHandler getLifeCycleEventHandler()
+  {
+    return null;
+  }
 }

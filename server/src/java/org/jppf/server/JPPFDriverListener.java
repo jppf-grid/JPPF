@@ -26,67 +26,67 @@ import java.util.EventListener;
  */
 public interface JPPFDriverListener extends EventListener
 {
-	/**
-	 * Called to notify that a new client is connected to he JPPF server.
-	 */
-	void newClientConnection();
+  /**
+   * Called to notify that a new client is connected to he JPPF server.
+   */
+  void newClientConnection();
 
-	/**
-	 * Called to notify that a new client has disconnected from he JPPF server.
-	 */
-	void clientConnectionClosed();
+  /**
+   * Called to notify that a new client has disconnected from he JPPF server.
+   */
+  void clientConnectionClosed();
 
-	/**
-	 * Called to notify that a new node is connected to he JPPF server.
-	 */
-	void newNodeConnection();
+  /**
+   * Called to notify that a new node is connected to he JPPF server.
+   */
+  void newNodeConnection();
 
-	/**
-	 * Called to notify that a new node is connected to he JPPF server.
-	 */
-	void nodeConnectionClosed();
+  /**
+   * Called to notify that a new node is connected to he JPPF server.
+   */
+  void nodeConnectionClosed();
 
-	/**
-	 * Called to notify that a task was added to the queue.
-	 * @param count the number of tasks that have been added to the queue.
-	 */
-	void taskInQueue(int count);
+  /**
+   * Called to notify that a task was added to the queue.
+   * @param count the number of tasks that have been added to the queue.
+   */
+  void taskInQueue(int count);
 
-	/**
-	 * Called to notify that a task was removed from the queue.
-	 * @param count the number of tasks that have been removed from the queue.
-	 * @param time the time the task remained in the queue.
-	 */
-	void taskOutOfQueue(int count, long time);
+  /**
+   * Called to notify that a task was removed from the queue.
+   * @param count the number of tasks that have been removed from the queue.
+   * @param time the time the task remained in the queue.
+   */
+  void taskOutOfQueue(int count, long time);
 
-	/**
-	 * Called when a task execution has completed.
-	 * @param count the number of tasks that have been executed.
-	 * @param time the time it took to execute the task, including transport to and from the node.
-	 * @param remoteTime the time it took to execute the in the node only.
-	 * @param size the size in bytes of the bundle that was sent to the node.
-	 */
-	void taskExecuted(int count, long time, long remoteTime, long size);
+  /**
+   * Called when a task execution has completed.
+   * @param count the number of tasks that have been executed.
+   * @param time the time it took to execute the task, including transport to and from the node.
+   * @param remoteTime the time it took to execute the in the node only.
+   * @param size the size in bytes of the bundle that was sent to the node.
+   */
+  void taskExecuted(int count, long time, long remoteTime, long size);
 
-	/**
-	 * Called when a node becomes idle or busy.
-	 * @param nbIdleNodes the number of currently idle nodes.
-	 */
-	void idleNodes(int nbIdleNodes);
+  /**
+   * Called when a node becomes idle or busy.
+   * @param nbIdleNodes the number of currently idle nodes.
+   */
+  void idleNodes(int nbIdleNodes);
 
-	/**
-	 * Called when a job is added to the job queue.
-	 * @param nbTasks the number of tasks in the job at the time it is queued.
-	 */
-	void jobQueued(int nbTasks);
-	/**
-	 * Called when a job is completes.
-	 * @param time the total execution time of the job.
-	 */
-	void jobEnded(long time);
+  /**
+   * Called when a job is added to the job queue.
+   * @param nbTasks the number of tasks in the job at the time it is queued.
+   */
+  void jobQueued(int nbTasks);
+  /**
+   * Called when a job is completes.
+   * @param time the total execution time of the job.
+   */
+  void jobEnded(long time);
 
-	/**
-	 * Notification that a reset of this server's statistics has been requested.
-	 */
-	void reset();
+  /**
+   * Notification that a reset of this server's statistics has been requested.
+   */
+  void reset();
 }

@@ -26,23 +26,23 @@ import java.nio.ByteBuffer;
  */
 public class ByteBufferWrapper
 {
-	/**
-	 * The actual buffer.
-	 */
-	public ByteBuffer buffer = null;
-	/**
-	 * The creation order of this buffer wrapper instance.
-	 */
-	public int order = -1;
+  /**
+   * The actual buffer.
+   */
+  public ByteBuffer buffer = null;
+  /**
+   * The creation order of this buffer wrapper instance.
+   */
+  public int order = -1;
 
-	/**
-	 * Create a byte buffer wrapper with the specified buffer and count.
-	 * @param buffer the actual buffer.
-	 * @param order the creation order of this buffer wrapper instance.
-	 */
-	public ByteBufferWrapper(final ByteBuffer buffer, final int order)
-	{
-		this.buffer = buffer;
-		this.order = order;
-	}
+  /**
+   * Create a byte buffer wrapper with the specified buffer and count.
+   * @param buffer the actual buffer.
+   * @param order the creation order of this buffer wrapper instance.
+   */
+  public ByteBufferWrapper(final ByteBuffer buffer, final int order)
+  {
+    this.buffer = buffer;
+    this.order = order;
+  }
 }

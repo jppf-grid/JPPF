@@ -33,176 +33,176 @@ import org.jppf.utils.Range;
  */
 public abstract class AbstractIPAddressPattern
 {
-	/**
-	 * The list of ranges constituting this address pattern.
-	 */
-	List<Range<Integer>> ranges = new ArrayList<Range<Integer>>();
-	/**
-	 * The configuration used for this pattern.
-	 */
-	PatternConfiguration config = null;
+  /**
+   * The list of ranges constituting this address pattern.
+   */
+  List<Range<Integer>> ranges = new ArrayList<Range<Integer>>();
+  /**
+   * The configuration used for this pattern.
+   */
+  PatternConfiguration config = null;
 
-	/**
-	 * Initialize this object with the specified string pattern.
-	 * @param source the source pattern as a string.
-	 * @param config the configuration used for this pattern.
-	 * @throws IllegalArgumentException if the pattern is null or invalid.
-	 */
-	public AbstractIPAddressPattern(final String source, final PatternConfiguration config) throws IllegalArgumentException
-	{
-		this.config = config;
-		convertSource(source);
-	}
+  /**
+   * Initialize this object with the specified string pattern.
+   * @param source the source pattern as a string.
+   * @param config the configuration used for this pattern.
+   * @throws IllegalArgumentException if the pattern is null or invalid.
+   */
+  public AbstractIPAddressPattern(final String source, final PatternConfiguration config) throws IllegalArgumentException
+  {
+    this.config = config;
+    convertSource(source);
+  }
 
-	/**
-	 * Convert the specified source into an IP pattern.
-	 * @param source the source pattern as a string.
-	 * @throws IllegalArgumentException if the pattern is null or invalid.
-	 */
-	protected void convertSource(final String source) throws IllegalArgumentException
-	{
-		if (source == null) throw new IllegalArgumentException("pattern cannot be null");
-		String src = preProcess(source);
-		src = SPACES_PATTERN.matcher(src).replaceAll("");
-		src = postProcess(src);
-		String[] rangeArray = config.compSeparatorPattern.split(src);
-		if ((rangeArray == null) || (rangeArray.length == 0)) throw new IllegalArgumentException("invalid empty pattern");
-		if (rangeArray.length > config.nbComponents) throw new IllegalArgumentException("pattern describes more than " + config.nbComponents + " components : \"" + source + '\"');
-		try
-		{
-			for (String s: rangeArray) ranges.add(parseRangePattern(s));
-			if (rangeArray.length < config.nbComponents)
-			{
-				for (int i=rangeArray.length; i<config.nbComponents; i++) ranges.add(config.fullRange);
-			}
-		}
-		catch(IllegalArgumentException e)
-		{
-			throw new IllegalArgumentException(buildString("error in pattern \"", source, "\" : ", e.getMessage()));
-		}
-	}
+  /**
+   * Convert the specified source into an IP pattern.
+   * @param source the source pattern as a string.
+   * @throws IllegalArgumentException if the pattern is null or invalid.
+   */
+  protected void convertSource(final String source) throws IllegalArgumentException
+  {
+    if (source == null) throw new IllegalArgumentException("pattern cannot be null");
+    String src = preProcess(source);
+    src = SPACES_PATTERN.matcher(src).replaceAll("");
+    src = postProcess(src);
+    String[] rangeArray = config.compSeparatorPattern.split(src);
+    if ((rangeArray == null) || (rangeArray.length == 0)) throw new IllegalArgumentException("invalid empty pattern");
+    if (rangeArray.length > config.nbComponents) throw new IllegalArgumentException("pattern describes more than " + config.nbComponents + " components : \"" + source + '\"');
+    try
+    {
+      for (String s: rangeArray) ranges.add(parseRangePattern(s));
+      if (rangeArray.length < config.nbComponents)
+      {
+        for (int i=rangeArray.length; i<config.nbComponents; i++) ranges.add(config.fullRange);
+      }
+    }
+    catch(IllegalArgumentException e)
+    {
+      throw new IllegalArgumentException(buildString("error in pattern \"", source, "\" : ", e.getMessage()));
+    }
+  }
 
-	/**
-	 * Perform pre-processing of the source string before applying common transformations.
-	 * @param source the pattern source to process.
-	 * @return a new processed string.
-	 */
-	protected String preProcess(final String source)
-	{
-		return source;
-	}
+  /**
+   * Perform pre-processing of the source string before applying common transformations.
+   * @param source the pattern source to process.
+   * @return a new processed string.
+   */
+  protected String preProcess(final String source)
+  {
+    return source;
+  }
 
-	/**
-	 * Perform post-processing of the source string before applying common transformations.
-	 * @param source the pattern source to process.
-	 * @return a new processed string.
-	 */
-	protected String postProcess(final String source)
-	{
-		return source;
-	}
+  /**
+   * Perform post-processing of the source string before applying common transformations.
+   * @param source the pattern source to process.
+   * @return a new processed string.
+   */
+  protected String postProcess(final String source)
+  {
+    return source;
+  }
 
-	/**
-	 * Determine whether the specified IP address matches this pattern.
-	 * No check is made to verify that the IP address is valid.
-	 * @param ip the ip to match as a string.
-	 * @return true if the address matches this pattern, false otherwise.
-	 */
-	public boolean matches(final InetAddress ip)
-	{
-		return matches(toIntArray(ip));
-	}
+  /**
+   * Determine whether the specified IP address matches this pattern.
+   * No check is made to verify that the IP address is valid.
+   * @param ip the ip to match as a string.
+   * @return true if the address matches this pattern, false otherwise.
+   */
+  public boolean matches(final InetAddress ip)
+  {
+    return matches(toIntArray(ip));
+  }
 
-	/**
-	 * Determine whether the specified IP address matches this pattern.
-	 * No check is made to verify that the IP address is valid.
-	 * @param values the ip address to match as a array of values representing its components.
-	 * @return true if the address matches this pattern, false otherwise.
-	 */
-	public boolean matches(final int[] values)
-	{
-		try
-		{
-			if ((values == null) || (values.length != ranges.size())) return false;
-			for (int i=0; i<values.length; i++) if (!ranges.get(i).isValueInRange(values[i])) return false;
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-		return true;
-	}
+  /**
+   * Determine whether the specified IP address matches this pattern.
+   * No check is made to verify that the IP address is valid.
+   * @param values the ip address to match as a array of values representing its components.
+   * @return true if the address matches this pattern, false otherwise.
+   */
+  public boolean matches(final int[] values)
+  {
+    try
+    {
+      if ((values == null) || (values.length != ranges.size())) return false;
+      for (int i=0; i<values.length; i++) if (!ranges.get(i).isValueInRange(values[i])) return false;
+    }
+    catch (Exception e)
+    {
+      return false;
+    }
+    return true;
+  }
 
-	/**
-	 * Parse the specified string into a <code>Range</code> object.
-	 * @param src the range pattern string to parse.
-	 * @return a <code>Range</code> instance, or null if the pattern is invalid.
-	 * @throws IllegalArgumentException if the pattern is invalid.
-	 */
-	private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException
-	{
-		if ((src == null) || "".equals(src)) return config.fullRange;
-		if (src.indexOf('-') < 0) return new Range<Integer>(parseValue(src));
-		String[] vals = MINUS_PATTERN.split(src);
-		if ((vals == null) || vals.length == 0) return config.fullRange;
-		if (vals.length > 2) throw new IllegalArgumentException(buildString("invalid range pattern (pattern: ", src, ")"));
-		int lower = 0;
-		int upper = 0;
-		if (vals.length == 1)
-		{
-			if (src.startsWith("-"))
-			{
-				lower = config.minValue;
-				upper = parseValue(vals[0]);
-			}
-			else
-			{
-				lower = parseValue(vals[0]);
-				upper = config.maxValue;
-			}
-		}
-		else
-		{
-			lower = "".equals(vals[0]) ? config.minValue : parseValue(vals[0]);
-			upper = "".equals(vals[1]) ? config.maxValue : parseValue(vals[1]);
-		}
-		if (upper < lower) throw new IllegalArgumentException(buildString("lower bound must be <= upper bound (pattern: ", src, ")"));
-		return new Range<Integer>(lower, upper);
-	}
+  /**
+   * Parse the specified string into a <code>Range</code> object.
+   * @param src the range pattern string to parse.
+   * @return a <code>Range</code> instance, or null if the pattern is invalid.
+   * @throws IllegalArgumentException if the pattern is invalid.
+   */
+  private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException
+  {
+    if ((src == null) || "".equals(src)) return config.fullRange;
+    if (src.indexOf('-') < 0) return new Range<Integer>(parseValue(src));
+    String[] vals = MINUS_PATTERN.split(src);
+    if ((vals == null) || vals.length == 0) return config.fullRange;
+    if (vals.length > 2) throw new IllegalArgumentException(buildString("invalid range pattern (pattern: ", src, ")"));
+    int lower = 0;
+    int upper = 0;
+    if (vals.length == 1)
+    {
+      if (src.startsWith("-"))
+      {
+        lower = config.minValue;
+        upper = parseValue(vals[0]);
+      }
+      else
+      {
+        lower = parseValue(vals[0]);
+        upper = config.maxValue;
+      }
+    }
+    else
+    {
+      lower = "".equals(vals[0]) ? config.minValue : parseValue(vals[0]);
+      upper = "".equals(vals[1]) ? config.maxValue : parseValue(vals[1]);
+    }
+    if (upper < lower) throw new IllegalArgumentException(buildString("lower bound must be <= upper bound (pattern: ", src, ")"));
+    return new Range<Integer>(lower, upper);
+  }
 
-	/**
-	 * Parse the specified string into an int value.
-	 * @param src the string to parse.
-	 * @return the value as an int
-	 * @throws IllegalArgumentException if the string is not a valid number format or the value is out of allowed bounds.
-	 */
-	private int parseValue(final String src) throws IllegalArgumentException
-	{
-		try
-		{
-			int value = Integer.decode(config.valuePrefix + src.toLowerCase());
-			if ((value < config.minValue) || (value > config.maxValue))
-				throw new IllegalArgumentException(buildString("value must be in [" , config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
-			return value;
-		}
-		catch(NumberFormatException e)
-		{
-			throw new IllegalArgumentException(buildString("invalid value format (value: ", src, ")"));
-		}
-	}
+  /**
+   * Parse the specified string into an int value.
+   * @param src the string to parse.
+   * @return the value as an int
+   * @throws IllegalArgumentException if the string is not a valid number format or the value is out of allowed bounds.
+   */
+  private int parseValue(final String src) throws IllegalArgumentException
+  {
+    try
+    {
+      int value = Integer.decode(config.valuePrefix + src.toLowerCase());
+      if ((value < config.minValue) || (value > config.maxValue))
+        throw new IllegalArgumentException(buildString("value must be in [" , config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
+      return value;
+    }
+    catch(NumberFormatException e)
+    {
+      throw new IllegalArgumentException(buildString("invalid value format (value: ", src, ")"));
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<ranges.size(); i++)
-		{
-			if (i > 0) sb.append(config.compSeparator);
-			sb.append(ranges.get(i));
-		}
-		return sb.toString();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<ranges.size(); i++)
+    {
+      if (i > 0) sb.append(config.compSeparator);
+      sb.append(ranges.get(i));
+    }
+    return sb.toString();
+  }
 }

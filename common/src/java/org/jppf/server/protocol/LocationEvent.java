@@ -28,37 +28,37 @@ import java.util.EventObject;
  */
 public class LocationEvent extends EventObject
 {
-	/**
-	 * The number of bytes that were transferred to another location.
-	 */
-	private int n = 0;
+  /**
+   * The number of bytes that were transferred to another location.
+   */
+  private int n = 0;
 
-	/**
-	 * Initialize this event with its source location.
-	 * @param source - the location on which the event is occurring.
-	 * @param n - the number of bytes that were transferred to another location.
-	 */
-	public LocationEvent(final Location source, final int n)
-	{
-		super(source);
-		this.n = n;
-	}
+  /**
+   * Initialize this event with its source location.
+   * @param source - the location on which the event is occurring.
+   * @param n - the number of bytes that were transferred to another location.
+   */
+  public LocationEvent(final Location source, final int n)
+  {
+    super(source);
+    this.n = n;
+  }
 
-	/**
-	 * Get the number of bytes transferred during this event.
-	 * @return the number of bytes as an int.
-	 */
-	public int bytesTransferred()
-	{
-		return n ;
-	}
+  /**
+   * Get the number of bytes transferred during this event.
+   * @return the number of bytes as an int.
+   */
+  public int bytesTransferred()
+  {
+    return n ;
+  }
 
-	/**
-	 * Get the source location, on which the event occurred.
-	 * @return the source as a <code>Location</code> instance.
-	 */
-	public Location getSourceLocation()
-	{
-		return (Location) getSource();
-	}
+  /**
+   * Get the source location, on which the event occurred.
+   * @return the source as a <code>Location</code> instance.
+   */
+  public Location getSourceLocation()
+  {
+    return (Location) getSource();
+  }
 }

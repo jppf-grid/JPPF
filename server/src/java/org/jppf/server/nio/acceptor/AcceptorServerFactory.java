@@ -32,41 +32,41 @@ import org.jppf.server.nio.*;
  */
 final class AcceptorServerFactory extends NioServerFactory<AcceptorState, AcceptorTransition>
 {
-	/**
-	 * Initialize this factory with the specified server.
-	 * @param server the server for which to initialize.
-	 */
-	public AcceptorServerFactory(final AcceptorNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this factory with the specified server.
+   * @param server the server for which to initialize.
+   */
+  public AcceptorServerFactory(final AcceptorNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Create the map of all possible states.
-	 * @return a mapping of the states enumeration to the corresponding NioState instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
-	 */
-	@Override
-	public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
-	{
-		Map<AcceptorState, NioState<AcceptorTransition>> map = new EnumMap<AcceptorState, NioState<AcceptorTransition>>(AcceptorState.class);
-		map.put(IDENTIFYING_PEER, new IdentifyingPeerState((AcceptorNioServer) server));
-		//map.put(IDLE, new IdleState((AcceptorNioServer) server));
-		return map;
-	}
+  /**
+   * Create the map of all possible states.
+   * @return a mapping of the states enumeration to the corresponding NioState instances.
+   * @see org.jppf.server.nio.NioServerFactory#createStateMap()
+   */
+  @Override
+  public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
+  {
+    Map<AcceptorState, NioState<AcceptorTransition>> map = new EnumMap<AcceptorState, NioState<AcceptorTransition>>(AcceptorState.class);
+    map.put(IDENTIFYING_PEER, new IdentifyingPeerState((AcceptorNioServer) server));
+    //map.put(IDLE, new IdleState((AcceptorNioServer) server));
+    return map;
+  }
 
-	/**
-	 * Create the map of all possible transitions.
-	 * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
-	 */
-	@Override
-	public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
-	{
-		Map<AcceptorTransition, NioTransition<AcceptorState>> map =
-			new EnumMap<AcceptorTransition, NioTransition<AcceptorState>>(AcceptorTransition.class);
-		map.put(TO_IDENTIFYING_PEER, transition(IDENTIFYING_PEER, R));
-		return map;
-	}
+  /**
+   * Create the map of all possible transitions.
+   * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
+   * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
+   */
+  @Override
+  public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
+  {
+    Map<AcceptorTransition, NioTransition<AcceptorState>> map =
+      new EnumMap<AcceptorTransition, NioTransition<AcceptorState>>(AcceptorTransition.class);
+    map.put(TO_IDENTIFYING_PEER, transition(IDENTIFYING_PEER, R));
+    return map;
+  }
 
 }

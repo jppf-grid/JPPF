@@ -26,66 +26,66 @@ import org.jppf.server.protocol.*;
  */
 public class ListDirectoryTask extends CommandLineTask
 {
-	/**
-	 * Directory in which to list the files.
-	 */
-	private String dir = null;
-	/**
-	 * Determines whether this task should run on a linux or windows host.
-	 */
-	private boolean linux = true;
+  /**
+   * Directory in which to list the files.
+   */
+  private String dir = null;
+  /**
+   * Determines whether this task should run on a linux or windows host.
+   */
+  private boolean linux = true;
 
-	/**
-	 * Initialize the script's parameters.
-	 * @param dir directory in which to list the files.
-	 */
-	public ListDirectoryTask(final String dir)
-	{
-		this.dir = dir;
-	}
+  /**
+   * Initialize the script's parameters.
+   * @param dir directory in which to list the files.
+   */
+  public ListDirectoryTask(final String dir)
+  {
+    this.dir = dir;
+  }
 
-	/**
-	 * Execute the script.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			String[] nix_oses = { "linux", "unix", "aix", "solaris" };
-			// get the name of the node's operating system
-			String os = System.getProperty("os.name").toLowerCase();
-			// the type of OS determines which command to execute
-			boolean found = false;
-			for (String s: nix_oses)
-			{
-				if (os.contains(s))
-				{
-					found = true;
-					break;
-				}
-			}
-			if (found) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
-			else if (os.contains("windows")) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
-			else
-			{
-				setResult("OS '" + os + "' not recognized");
-				return;
-			}
-			// set whether the script output is captured
-			setCaptureOutput(false);
-			// execute the script/command
-			launchProcess();
-			// copy the resulting file in memory and set it as a result
-			FileLocation fl = new FileLocation("dirlist.txt");
-			MemoryLocation ml = new MemoryLocation((int) fl.size());
-			fl.copyTo(ml);
-			setResult(new String(ml.toByteArray()));
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Execute the script.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      String[] nix_oses = { "linux", "unix", "aix", "solaris" };
+      // get the name of the node's operating system
+      String os = System.getProperty("os.name").toLowerCase();
+      // the type of OS determines which command to execute
+      boolean found = false;
+      for (String s: nix_oses)
+      {
+        if (os.contains(s))
+        {
+          found = true;
+          break;
+        }
+      }
+      if (found) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
+      else if (os.contains("windows")) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
+      else
+      {
+        setResult("OS '" + os + "' not recognized");
+        return;
+      }
+      // set whether the script output is captured
+      setCaptureOutput(false);
+      // execute the script/command
+      launchProcess();
+      // copy the resulting file in memory and set it as a result
+      FileLocation fl = new FileLocation("dirlist.txt");
+      MemoryLocation ml = new MemoryLocation((int) fl.size());
+      fl.copyTo(ml);
+      setResult(new String(ml.toByteArray()));
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }

@@ -28,39 +28,39 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class XstreamRunner
 {
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
+  /**
+   * JPPF client used to submit execution requests.
+   */
+  private static JPPFClient jppfClient = null;
 
-	/**
-	 * Entry point for this class, submits the tasks to the JPPF grid.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			jppfClient = new JPPFClient();
-			long start = System.currentTimeMillis();
-			JPPFJob job = new JPPFJob();
-			Person person = new Person("John", "Smith", new PhoneNumber(123, "456-7890"));
-			job.addTask(new XstreamTask(person));
-			// submit the tasks for execution
-			List<JPPFTask> results = jppfClient.submit(job);
-			long elapsed = System.currentTimeMillis() - start;
-			System.out.println("Task executed in " + elapsed + " ms");
-			JPPFTask result = results.get(0);
-			if (result.getException() != null) throw result.getException();
-			System.out.println("Task execution result: " + result.getResult());
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if (jppfClient != null) jppfClient.close();
-		}
-	}
+  /**
+   * Entry point for this class, submits the tasks to the JPPF grid.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      jppfClient = new JPPFClient();
+      long start = System.currentTimeMillis();
+      JPPFJob job = new JPPFJob();
+      Person person = new Person("John", "Smith", new PhoneNumber(123, "456-7890"));
+      job.addTask(new XstreamTask(person));
+      // submit the tasks for execution
+      List<JPPFTask> results = jppfClient.submit(job);
+      long elapsed = System.currentTimeMillis() - start;
+      System.out.println("Task executed in " + elapsed + " ms");
+      JPPFTask result = results.get(0);
+      if (result.getException() != null) throw result.getException();
+      System.out.println("Task execution result: " + result.getResult());
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      if (jppfClient != null) jppfClient.close();
+    }
+  }
 }

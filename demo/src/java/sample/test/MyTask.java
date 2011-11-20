@@ -26,29 +26,29 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class MyTask extends JPPFTask
 {
-	/**
-	 * serialVersionUID.
-	 */
-	private static final long serialVersionUID = 7898318895418777681L;
+  /**
+   * serialVersionUID.
+   */
+  private static final long serialVersionUID = 7898318895418777681L;
 
-	/**
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		String str = null;
+  /**
+   * 
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    String str = null;
 
-		try
-		{
-			str = ((SimpleData) getDataProvider().getValue("DATA")).getStr();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+    try
+    {
+      str = ((SimpleData) getDataProvider().getValue("DATA")).getStr();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
 
-		setResult(str);
-	}
+    setResult(str);
+  }
 }

@@ -34,72 +34,72 @@ import org.slf4j.*;
  */
 public class UILauncher
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(UILauncher.class);
-	/**
-	 * The splash screen window.
-	 */
-	private static JPPFSplash splash = null;
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(UILauncher.class);
+  /**
+   * The splash screen window.
+   */
+  private static JPPFSplash splash = null;
 
-	/**
-	 * Start this UI.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
-			String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
-					"com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
-			int n = 3;
-			boolean success = false;
-			String s = System.getProperty("swing.defaultlaf");
-			if (!success && (s != null))
-			{
-				try
-				{
-					UIManager.setLookAndFeel(s);
-					success = true;
-				}
-				catch(Throwable t)
-				{
-					log.error("could not set specified look and feel '" + s + "' : " + t.getMessage());
-					System.getProperties().remove("swing.defaultlaf");
-				}
-			}
-			if (!success)
-			{
-				try
-				{
-					UIManager.setLookAndFeel(laf[n]);
-				}
-				catch(Throwable t)
-				{
-					log.error("could not set look and feel '" + laf[n] + "' : " + t.getMessage());
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				}
-			}
-			boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
-			if (showSplash)
-			{
-				splash = new JPPFSplash("The management console is starting ...");
-				splash.start();
-			}
-			OptionElement elt = null;
-			if ("url".equalsIgnoreCase(args[1])) elt = OptionsHandler.addPageFromURL(args[0], null);
-			else elt = OptionsHandler.addPageFromXml(args[0]);
-			OptionsHandler.loadPreferences();
-			OptionsHandler.getBuilder().triggerInitialEvents(elt);
-			if (showSplash) splash.stop();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			log.error(e.getMessage(), e);
-			System.exit(1);
-		}
-	}
+  /**
+   * Start this UI.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
+      String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+          "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
+      int n = 3;
+      boolean success = false;
+      String s = System.getProperty("swing.defaultlaf");
+      if (!success && (s != null))
+      {
+        try
+        {
+          UIManager.setLookAndFeel(s);
+          success = true;
+        }
+        catch(Throwable t)
+        {
+          log.error("could not set specified look and feel '" + s + "' : " + t.getMessage());
+          System.getProperties().remove("swing.defaultlaf");
+        }
+      }
+      if (!success)
+      {
+        try
+        {
+          UIManager.setLookAndFeel(laf[n]);
+        }
+        catch(Throwable t)
+        {
+          log.error("could not set look and feel '" + laf[n] + "' : " + t.getMessage());
+          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+      }
+      boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
+      if (showSplash)
+      {
+        splash = new JPPFSplash("The management console is starting ...");
+        splash.start();
+      }
+      OptionElement elt = null;
+      if ("url".equalsIgnoreCase(args[1])) elt = OptionsHandler.addPageFromURL(args[0], null);
+      else elt = OptionsHandler.addPageFromXml(args[0]);
+      OptionsHandler.loadPreferences();
+      OptionsHandler.getBuilder().triggerInitialEvents(elt);
+      if (showSplash) splash.stop();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+      log.error(e.getMessage(), e);
+      System.exit(1);
+    }
+  }
 }

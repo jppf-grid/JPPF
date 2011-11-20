@@ -26,48 +26,48 @@ package org.jppf.server.scheduler.bundle;
  */
 public interface Bundler
 {
-	/**
-	 * Get the current size of bundle.
-	 * @return  the bundle size as an int value.
-	 */
-	int getBundleSize();
+  /**
+   * Get the current size of bundle.
+   * @return  the bundle size as an int value.
+   */
+  int getBundleSize();
 
-	/**
-	 * Feedback the bundler with the result of using the bundle with the specified size.
-	 * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.
-	 * The execution time includes the network round trip between node and server.
-	 * @param nbTasks number of tasks that were executed.
-	 * @param totalTime the total execution and transport time.
-	 */
-	void feedback(int nbTasks, double totalTime);
+  /**
+   * Feedback the bundler with the result of using the bundle with the specified size.
+   * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.
+   * The execution time includes the network round trip between node and server.
+   * @param nbTasks number of tasks that were executed.
+   * @param totalTime the total execution and transport time.
+   */
+  void feedback(int nbTasks, double totalTime);
 
-	/**
-	 * Make a copy of this bundler.
-	 * Which parts are actually copied depends on the implementation.
-	 * @return a new <code>Bundler</code> instance.
-	 */
-	Bundler copy();
+  /**
+   * Make a copy of this bundler.
+   * Which parts are actually copied depends on the implementation.
+   * @return a new <code>Bundler</code> instance.
+   */
+  Bundler copy();
 
-	/**
-	 * Get the timestamp at which this bundler was created.
-	 * This is used to enable node channels to know when the bundler settings have changed.
-	 * @return the timestamp as a long value.
-	 */
-	long getTimestamp();
+  /**
+   * Get the timestamp at which this bundler was created.
+   * This is used to enable node channels to know when the bundler settings have changed.
+   * @return the timestamp as a long value.
+   */
+  long getTimestamp();
 
-	/**
-	 * Release the resources used by this bundler.
-	 */
-	void dispose();
+  /**
+   * Release the resources used by this bundler.
+   */
+  void dispose();
 
-	/**
-	 * Perform context-independent initializations.
-	 */
-	void setup();
+  /**
+   * Perform context-independent initializations.
+   */
+  void setup();
 
-	/**
-	 * Get the parameters profile used by this load-balancer.
-	 * @return an instance of <code>LoadBalancingProfile</code>.
-	 */
-	LoadBalancingProfile getProfile();
+  /**
+   * Get the parameters profile used by this load-balancer.
+   * @return an instance of <code>LoadBalancingProfile</code>.
+   */
+  LoadBalancingProfile getProfile();
 }

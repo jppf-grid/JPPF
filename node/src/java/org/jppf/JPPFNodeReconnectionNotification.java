@@ -23,31 +23,31 @@ package org.jppf;
  */
 public class JPPFNodeReconnectionNotification extends JPPFError
 {
-	/**
-	 * Initialize this notification with a specified message.
-	 * @param message a text message indicating the reason for this notification.
-	 */
-	public JPPFNodeReconnectionNotification(final String message)
-	{
-		super(message);
-	}
+  /**
+   * Initialize this notification with a specified message.
+   * @param message a text message indicating the reason for this notification.
+   */
+  public JPPFNodeReconnectionNotification(final String message)
+  {
+    super(message);
+  }
 
-	/**
-	 * Initialize this error with a specified message and cause exception.
-	 * @param message the message for this error.
-	 * @param cause the cause exception.
-	 */
-	public JPPFNodeReconnectionNotification(final String message, final Throwable cause)
-	{
-		super(message, cause);
-	}
+  /**
+   * Initialize this error with a specified message and cause exception.
+   * @param message the message for this error.
+   * @param cause the cause exception.
+   */
+  public JPPFNodeReconnectionNotification(final String message, final Throwable cause)
+  {
+    super(message, cause);
+  }
 
-	/**
-	 * Initialize this error with a specified cause exception.
-	 * @param cause the cause exception.
-	 */
-	public JPPFNodeReconnectionNotification(final Throwable cause)
-	{
-		super(cause);
-	}
+  /**
+   * Initialize this error with a specified cause exception.
+   * @param cause the cause exception.
+   */
+  public JPPFNodeReconnectionNotification(final Throwable cause)
+  {
+    super(cause);
+  }
 }

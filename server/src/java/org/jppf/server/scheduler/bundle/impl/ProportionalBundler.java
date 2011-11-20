@@ -36,43 +36,43 @@ import org.slf4j.*;
  */
 public class ProportionalBundler extends AbstractProportionalBundler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ProportionalBundler.class);
-	/**
-	 * Determines whether debugging level is set for logging.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ProportionalBundler.class);
+  /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-	 */
-	public ProportionalBundler(final LoadBalancingProfile profile)
-	{
-		super(profile);
-	}
+  /**
+   * Creates a new instance with the initial size of bundle as the start size.
+   * @param profile the parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
+   */
+  public ProportionalBundler(final LoadBalancingProfile profile)
+  {
+    super(profile);
+  }
 
-	/**
-	 * Make a copy of this bundler
-	 * @return a <code>Bundler</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
-	 */
-	@Override
-	public Bundler copy()
-	{
-		return new ProportionalBundler(profile);
-	}
+  /**
+   * Make a copy of this bundler
+   * @return a <code>Bundler</code> instance.
+   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+   */
+  @Override
+  public Bundler copy()
+  {
+    return new ProportionalBundler(profile);
+  }
 
-	/**
-	 * Get the max bundle size that can be used for this bundler.
-	 * @return the bundle size as an int.
-	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
-	 */
-	@Override
-	protected int maxSize()
-	{
-		return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
-	}
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+   */
+  @Override
+  protected int maxSize()
+  {
+    return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
+  }
 }

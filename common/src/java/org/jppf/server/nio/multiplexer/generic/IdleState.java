@@ -29,34 +29,34 @@ import org.slf4j.*;
  */
 public class IdleState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(IdleState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IdleState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public IdleState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public IdleState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (debugEnabled)
-		{
-			log.debug("channel " + wrapper + " in idle mode");
-		}
-		return TO_IDLE;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (debugEnabled)
+    {
+      log.debug("channel " + wrapper + " in idle mode");
+    }
+    return TO_IDLE;
+  }
 }

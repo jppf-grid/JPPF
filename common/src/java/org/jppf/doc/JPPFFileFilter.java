@@ -26,52 +26,52 @@ import org.jppf.utils.FileUtils;
  */
 public class JPPFFileFilter extends AbstractFileFilter
 {
-	/**
-	 * Default excluded directory names.
-	 */
-	static final String[] DEFAULT_INCLUDES = { "html", "htm", "php" };
+  /**
+   * Default excluded directory names.
+   */
+  static final String[] DEFAULT_INCLUDES = { "html", "htm", "php" };
 
-	/**
-	 * Initialize a filter accepting all directory names except those excluded by default.
-	 */
-	public JPPFFileFilter()
-	{
-		includes = DEFAULT_INCLUDES;
-		excludes = null;
-	}
+  /**
+   * Initialize a filter accepting all directory names except those excluded by default.
+   */
+  public JPPFFileFilter()
+  {
+    includes = DEFAULT_INCLUDES;
+    excludes = null;
+  }
 
-	/**
-	 * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_INCLUDES DEFAULT_EXCLUDES}.
-	 * @param includes the included directory names; if null all are included. Null values are ignored.
-	 */
-	public JPPFFileFilter(final String[] includes)
-	{
-		this.includes = includes;
-		this.excludes = null;
-	}
+  /**
+   * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_INCLUDES DEFAULT_EXCLUDES}.
+   * @param includes the included directory names; if null all are included. Null values are ignored.
+   */
+  public JPPFFileFilter(final String[] includes)
+  {
+    this.includes = includes;
+    this.excludes = null;
+  }
 
-	/**
-	 * Initialize a filter accepting the specified directory names and excluding the specified ones.
-	 * @param includes the included directory names; if null all are included. Null values are ignored.
-	 * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
-	 */
-	public JPPFFileFilter(final String[] includes, final String[] excludes)
-	{
-		this.includes = includes;
-		this.excludes = excludes;
-	}
+  /**
+   * Initialize a filter accepting the specified directory names and excluding the specified ones.
+   * @param includes the included directory names; if null all are included. Null values are ignored.
+   * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
+   */
+  public JPPFFileFilter(final String[] includes, final String[] excludes)
+  {
+    this.includes = includes;
+    this.excludes = excludes;
+  }
 
-	/**
-	 * Determine if a file is accepted.
-	 * @param path the file path to check.
-	 * @return true if the file is accepted, false otherwise.
-	 * @see java.io.FileFilter#accept(java.io.File)
-	 */
-	@Override
-	public boolean accept(final File path)
-	{
-		if (path.isDirectory()) return false;
-		String ext = FileUtils.getFileExtension(path);
-		return included(ext, true) && !excluded(ext, true);
-	}
+  /**
+   * Determine if a file is accepted.
+   * @param path the file path to check.
+   * @return true if the file is accepted, false otherwise.
+   * @see java.io.FileFilter#accept(java.io.File)
+   */
+  @Override
+  public boolean accept(final File path)
+  {
+    if (path.isDirectory()) return false;
+    String ext = FileUtils.getFileExtension(path);
+    return included(ext, true) && !excluded(ext, true);
+  }
 }

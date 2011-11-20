@@ -27,102 +27,102 @@ import javax.resource.cci.ResourceAdapterMetaData;
  */
 public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
 {
-	/**
-	 * Get the name of this adapter.
-	 * @return the name as a string.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterName()
-	 */
-	@Override
-	public String getAdapterName()
-	{
-		return "JPPF Adapter";
-	}
+  /**
+   * Get the name of this adapter.
+   * @return the name as a string.
+   * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterName()
+   */
+  @Override
+  public String getAdapterName()
+  {
+    return "JPPF Adapter";
+  }
 
-	/**
-	 * Get a short description of this adapter.
-	 * @return the short description as a string.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterShortDescription()
-	 */
-	@Override
-	public String getAdapterShortDescription()
-	{
-		return "JPPF Adapter";
-	}
+  /**
+   * Get a short description of this adapter.
+   * @return the short description as a string.
+   * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterShortDescription()
+   */
+  @Override
+  public String getAdapterShortDescription()
+  {
+    return "JPPF Adapter";
+  }
 
-	/**
-	 * Get the vendor name of this adapter.
-	 * @return the vendor name as a string.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterVendorName()
-	 */
-	@Override
-	public String getAdapterVendorName()
-	{
-		return "JPPF.org";
-	}
+  /**
+   * Get the vendor name of this adapter.
+   * @return the vendor name as a string.
+   * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterVendorName()
+   */
+  @Override
+  public String getAdapterVendorName()
+  {
+    return "JPPF.org";
+  }
 
-	/**
-	 * Get the version of this adapter.
-	 * @return the version as a string.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterVersion()
-	 */
-	@Override
-	public String getAdapterVersion()
-	{
-		return "1.0";
-	}
+  /**
+   * Get the version of this adapter.
+   * @return the version as a string.
+   * @see javax.resource.cci.ResourceAdapterMetaData#getAdapterVersion()
+   */
+  @Override
+  public String getAdapterVersion()
+  {
+    return "1.0";
+  }
 
-	/**
-	 * Get a list of supported interactions.
-	 * @return the list as a array of strings.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#getInteractionSpecsSupported()
-	 */
-	@Override
-	public String[] getInteractionSpecsSupported()
-	{
-		return new String[] { "ExampleInteraction" };
-	}
+  /**
+   * Get a list of supported interactions.
+   * @return the list as a array of strings.
+   * @see javax.resource.cci.ResourceAdapterMetaData#getInteractionSpecsSupported()
+   */
+  @Override
+  public String[] getInteractionSpecsSupported()
+  {
+    return new String[] { "ExampleInteraction" };
+  }
 
-	/**
-	 * Get the version of the specs of this adapter.
-	 * @return the version of the specs as a string.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#getSpecVersion()
-	 */
-	@Override
-	public String getSpecVersion()
-	{
-		return "1.0";
-	}
+  /**
+   * Get the version of the specs of this adapter.
+   * @return the version of the specs as a string.
+   * @see javax.resource.cci.ResourceAdapterMetaData#getSpecVersion()
+   */
+  @Override
+  public String getSpecVersion()
+  {
+    return "1.0";
+  }
 
-	/**
-	 * Determine whether input and output record interactions are supported.
-	 * @return false
-	 * @see javax.resource.cci.ResourceAdapterMetaData#supportsExecuteWithInputAndOutputRecord()
-	 */
-	@Override
-	public boolean supportsExecuteWithInputAndOutputRecord()
-	{
-		return false;
-	}
+  /**
+   * Determine whether input and output record interactions are supported.
+   * @return false
+   * @see javax.resource.cci.ResourceAdapterMetaData#supportsExecuteWithInputAndOutputRecord()
+   */
+  @Override
+  public boolean supportsExecuteWithInputAndOutputRecord()
+  {
+    return false;
+  }
 
-	/**
-	 * Determine whether input record only interactions are supported.
-	 * @return false
-	 * @see javax.resource.cci.ResourceAdapterMetaData#supportsExecuteWithInputRecordOnly()
-	 */
-	@Override
-	public boolean supportsExecuteWithInputRecordOnly()
-	{
-		return false;
-	}
+  /**
+   * Determine whether input record only interactions are supported.
+   * @return false
+   * @see javax.resource.cci.ResourceAdapterMetaData#supportsExecuteWithInputRecordOnly()
+   */
+  @Override
+  public boolean supportsExecuteWithInputRecordOnly()
+  {
+    return false;
+  }
 
-	/**
-	 * Determine whether local transactions are supported.
-	 * @return false.
-	 * @see javax.resource.cci.ResourceAdapterMetaData#supportsLocalTransactionDemarcation()
-	 */
-	@Override
-	public boolean supportsLocalTransactionDemarcation()
-	{
-		return false;
-	}
+  /**
+   * Determine whether local transactions are supported.
+   * @return false.
+   * @see javax.resource.cci.ResourceAdapterMetaData#supportsLocalTransactionDemarcation()
+   */
+  @Override
+  public boolean supportsLocalTransactionDemarcation()
+  {
+    return false;
+  }
 }

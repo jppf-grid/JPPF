@@ -26,56 +26,56 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class ExtMatrixTask extends JPPFTask
 {
-	/**
-	 * Data provider key mapping to the second matrix operand in the multiplication.
-	 */
-	public static final String DATA_KEY = "matrix";
-	/**
-	 * The row of values to multiply by a matrix.
-	 */
-	private double[][] rowValues = null;
+  /**
+   * Data provider key mapping to the second matrix operand in the multiplication.
+   */
+  public static final String DATA_KEY = "matrix";
+  /**
+   * The row of values to multiply by a matrix.
+   */
+  private double[][] rowValues = null;
 
-	/**
-	 * Initialize this task with the specified matrix rows to multiply.
-	 * @param rowValues the values as an array of <code>double</code> values.
-	 */
-	public ExtMatrixTask(final double[][] rowValues)
-	{
-		this.rowValues = rowValues;
-	}
+  /**
+   * Initialize this task with the specified matrix rows to multiply.
+   * @param rowValues the values as an array of <code>double</code> values.
+   */
+  public ExtMatrixTask(final double[][] rowValues)
+  {
+    this.rowValues = rowValues;
+  }
 
-	/**
-	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
-			final int size = matrix.getSize();
-			final double[][] computeResult = new double[rowValues.length][size];
+  /**
+   * Perform the multiplication of a matrix row by another matrix.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+      final int size = matrix.getSize();
+      final double[][] computeResult = new double[rowValues.length][size];
 
-			// for each row of matrix a
-			for (int n=0; n<rowValues.length; n++)
-			{
-				// for each column of matrix b
-				for (int col=0; col<size; col++)
-				{
-					double sum = 0d;
-					for (int row=0; row<size; row++)
-					{
-						sum += matrix.getValueAt(row, col) * rowValues[n][row];
-					}
-					computeResult[n][col] = sum;
-				}
-			}
-			setResult(computeResult);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+      // for each row of matrix a
+      for (int n=0; n<rowValues.length; n++)
+      {
+        // for each column of matrix b
+        for (int col=0; col<size; col++)
+        {
+          double sum = 0d;
+          for (int row=0; row<size; row++)
+          {
+            sum += matrix.getValueAt(row, col) * rowValues[n][row];
+          }
+          computeResult[n][col] = sum;
+        }
+      }
+      setResult(computeResult);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }

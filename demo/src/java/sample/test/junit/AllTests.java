@@ -26,18 +26,18 @@ import junit.framework.*;
  */
 public class AllTests
 {
-	/**
-	 * Execute the tests.
-	 * @return a <code>Test</code> instance.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite("Test for sample.test.junit");
-		//$JUnit-BEGIN$
-		//suite.addTestSuite(TestRemoteTaskManagement.class);
-		//suite.addTestSuite(TestRemoteMonitoring.class);
-		suite.addTestSuite(TestRemoteImageProcessing.class);
-		//$JUnit-END$
-		return suite;
-	}
+  /**
+   * Execute the tests.
+   * @return a <code>Test</code> instance.
+   */
+  public static Test suite()
+  {
+    TestSuite suite = new TestSuite("Test for sample.test.junit");
+    //$JUnit-BEGIN$
+    //suite.addTestSuite(TestRemoteTaskManagement.class);
+    //suite.addTestSuite(TestRemoteMonitoring.class);
+    suite.addTestSuite(TestRemoteImageProcessing.class);
+    //$JUnit-END$
+    return suite;
+  }
 }

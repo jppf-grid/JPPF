@@ -27,27 +27,27 @@ import org.jppf.client.JPPFClientConnectionStatus;
  */
 public interface ClientConnectionStatusHandler
 {
-	/**
-	 * Get the status of this connection.
-	 * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 */
-	JPPFClientConnectionStatus getStatus();
+  /**
+   * Get the status of this connection.
+   * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
+   */
+  JPPFClientConnectionStatus getStatus();
 
-	/**
-	 * Set the status of this connection.
-	 * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
-	 */
-	void setStatus(JPPFClientConnectionStatus status);
+  /**
+   * Set the status of this connection.
+   * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
+   */
+  void setStatus(JPPFClientConnectionStatus status);
 
-	/**
-	 * Add a connection status listener to this connection's list of listeners.
-	 * @param listener the listener to add to the list.
-	 */
-	void addClientConnectionStatusListener(ClientConnectionStatusListener listener);
+  /**
+   * Add a connection status listener to this connection's list of listeners.
+   * @param listener the listener to add to the list.
+   */
+  void addClientConnectionStatusListener(ClientConnectionStatusListener listener);
 
-	/**
-	 * Remove a connection status listener from this connection's list of listeners.
-	 * @param listener the listener to remove from the list.
-	 */
-	void removeClientConnectionStatusListener(ClientConnectionStatusListener listener);
+  /**
+   * Remove a connection status listener from this connection's list of listeners.
+   * @param listener the listener to remove from the list.
+   */
+  void removeClientConnectionStatusListener(ClientConnectionStatusListener listener);
 }

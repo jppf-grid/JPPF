@@ -38,110 +38,110 @@ import org.slf4j.*;
  */
 public class JPPFJcaClient extends AbstractGenericClient
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFJcaClient.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Manages asynchronous work submission to the JPPF driver.
-	 */
-	private JcaSubmissionManager submissionManager = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFJcaClient.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Manages asynchronous work submission to the JPPF driver.
+   */
+  private JcaSubmissionManager submissionManager = null;
 
-	/**
-	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 * @param configuration the object holding the JPPF configuration.
-	 */
-	public JPPFJcaClient(final String uuid, final String configuration)
-	{
-		super(uuid, configuration);
-	}
+  /**
+   * Initialize this client with a specified application UUID.
+   * @param uuid the unique identifier for this local client.
+   * @param configuration the object holding the JPPF configuration.
+   */
+  public JPPFJcaClient(final String uuid, final String configuration)
+  {
+    super(uuid, configuration);
+  }
 
-	/**
-	 * Submit a JPPFJob for execution.
-	 * @param job the job to execute.
-	 * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
-	 * @throws Exception if an error occurs while sending the job for execution.
-	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
-	 */
-	@Override
-	public List<JPPFTask> submit(final JPPFJob job) throws Exception
-	{
-		return null;
-	}
+  /**
+   * Submit a JPPFJob for execution.
+   * @param job the job to execute.
+   * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
+   * @throws Exception if an error occurs while sending the job for execution.
+   * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
+   */
+  @Override
+  public List<JPPFTask> submit(final JPPFJob job) throws Exception
+  {
+    return null;
+  }
 
-	/**
-	 * Close this client and release all the resources it is using.
-	 */
-	@Override
-	public void close()
-	{
-		super.close();
-	}
+  /**
+   * Close this client and release all the resources it is using.
+   */
+  @Override
+  public void close()
+  {
+    super.close();
+  }
 
-	/**
-	 * Invoked when the status of a client connection has changed.
-	 * @param event the event to notify of.
-	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-	 */
-	@Override
-	public void statusChanged(final ClientConnectionStatusEvent event)
-	{
-		super.statusChanged(event);
-		if (submissionManager != null) submissionManager.wakeUp();
-	}
+  /**
+   * Invoked when the status of a client connection has changed.
+   * @param event the event to notify of.
+   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+   */
+  @Override
+  public void statusChanged(final ClientConnectionStatusEvent event)
+  {
+    super.statusChanged(event);
+    if (submissionManager != null) submissionManager.wakeUp();
+  }
 
-	/**
-	 * Get the submission manager for this JPPF client.
-	 * @return a <code>JPPFSubmissionManager</code> instance.
-	 */
-	public JcaSubmissionManager getSubmissionManager()
-	{
-		return submissionManager;
-	}
+  /**
+   * Get the submission manager for this JPPF client.
+   * @return a <code>JPPFSubmissionManager</code> instance.
+   */
+  public JcaSubmissionManager getSubmissionManager()
+  {
+    return submissionManager;
+  }
 
-	/**
-	 * Set the submission manager for this JPPF client.
-	 * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
-	 */
-	public void setSubmissionManager(final JcaSubmissionManager submissionManager)
-	{
-		this.submissionManager = submissionManager;
-	}
+  /**
+   * Set the submission manager for this JPPF client.
+   * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
+   */
+  public void setSubmissionManager(final JcaSubmissionManager submissionManager)
+  {
+    this.submissionManager = submissionManager;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
-	{
-		return new JPPFJcaClientConnection(this, uuid, name, info);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
+  {
+    return new JPPFJcaClientConnection(this, uuid, name, info);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void initConfig(final Object configuration)
-	{
-		if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
-		try
-		{
-			//TypedProperties props = new TypedProperties();
-			TypedProperties props = JPPFConfiguration.getProperties();
-			ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
-			props.load(bais);
-			bais.close();
-			config = props;
-		}
-		catch(Exception e)
-		{
-			log.error("Error while initializing the JPPF client configuration", e);
-		}
-		if (log.isDebugEnabled()) log.debug("config properties: " + config);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void initConfig(final Object configuration)
+  {
+    if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
+    try
+    {
+      //TypedProperties props = new TypedProperties();
+      TypedProperties props = JPPFConfiguration.getProperties();
+      ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
+      props.load(bais);
+      bais.close();
+      config = props;
+    }
+    catch(Exception e)
+    {
+      log.error("Error while initializing the JPPF client configuration", e);
+    }
+    if (log.isDebugEnabled()) log.debug("config properties: " + config);
+  }
 }

@@ -31,31 +31,31 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class TestJUnit extends TestCase implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * First test.
-	 * @throws Exception if the test fails.
-	 */
-	public void test1() throws Exception
-	{
-		JPPFClient client = new JPPFClient();
-		JPPFJob job = new JPPFJob();
-		job.addTask(new JPPFTask()
-		{
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void run()
-			{
-				System.out.println("executing task");
-			}
-		});
-		client.submit(job);
-		System.out.println("before close");
-		client.close();
-		System.out.println("after close");
-	}
+  /**
+   * First test.
+   * @throws Exception if the test fails.
+   */
+  public void test1() throws Exception
+  {
+    JPPFClient client = new JPPFClient();
+    JPPFJob job = new JPPFJob();
+    job.addTask(new JPPFTask()
+    {
+      private static final long serialVersionUID = 1L;
+      @Override
+      public void run()
+      {
+        System.out.println("executing task");
+      }
+    });
+    client.submit(job);
+    System.out.println("before close");
+    client.close();
+    System.out.println("after close");
+  }
 }

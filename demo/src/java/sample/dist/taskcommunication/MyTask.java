@@ -31,83 +31,83 @@ import com.hazelcast.core.*;
  */
 public class MyTask extends JPPFTask implements ItemListener
 {
-	/**
-	 * Determines whether the task should stop processing.
-	 */
-	private AtomicBoolean conditionReached = new AtomicBoolean(false);
+  /**
+   * Determines whether the task should stop processing.
+   */
+  private AtomicBoolean conditionReached = new AtomicBoolean(false);
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void run()
-	{
-		try
-		{
-			// add this task as an item listener on the queue
-			getQueue().addItemListener(this, false);
-			// if condition has been reached before, terminate
-			if (!getQueue().isEmpty()) return;
-			while (!conditionReached.get())
-			{
-				// ... your code here ...
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public void run()
+  {
+    try
+    {
+      // add this task as an item listener on the queue
+      getQueue().addItemListener(this, false);
+      // if condition has been reached before, terminate
+      if (!getQueue().isEmpty()) return;
+      while (!conditionReached.get())
+      {
+        // ... your code here ...
 
-				// if condition is reached by this task
-				//if (<some condition>)
-				{
-					conditionReached.set(true);
-					// put an item in the queue to notify other tasks and nodes
-					getQueue().add("Condition reached");
-				}
-			}
-		}
-		finally
-		{
-			getQueue().removeItemListener(this);
-		}
-	}
+        // if condition is reached by this task
+        //if (<some condition>)
+        {
+          conditionReached.set(true);
+          // put an item in the queue to notify other tasks and nodes
+          getQueue().add("Condition reached");
+        }
+      }
+    }
+    finally
+    {
+      getQueue().removeItemListener(this);
+    }
+  }
 
-	/**
-	 * Check that the distributed queue is empty.
-	 * This method lazily initializes the queue if required.
-	 * @return an IQueue instance (Hazel distributed queue).
-	 */
-	@SuppressWarnings("unchecked")
-	public IQueue getQueue()
-	{
-		String key = "MyDistyributedQueue";
-		IQueue<Object> queue = (IQueue<Object>) NodeRunner.getPersistentData(key);
-		// if the queue was not already present, we initialize it
-		if (queue == null)
-		{
-			queue = Hazelcast.getQueue(key);
-			// persist the queue reference in the node, so other tasks can access it.
-			NodeRunner.setPersistentData(key, queue);
-		}
-		return queue;
-	}
+  /**
+   * Check that the distributed queue is empty.
+   * This method lazily initializes the queue if required.
+   * @return an IQueue instance (Hazel distributed queue).
+   */
+  @SuppressWarnings("unchecked")
+  public IQueue getQueue()
+  {
+    String key = "MyDistyributedQueue";
+    IQueue<Object> queue = (IQueue<Object>) NodeRunner.getPersistentData(key);
+    // if the queue was not already present, we initialize it
+    if (queue == null)
+    {
+      queue = Hazelcast.getQueue(key);
+      // persist the queue reference in the node, so other tasks can access it.
+      NodeRunner.setPersistentData(key, queue);
+    }
+    return queue;
+  }
 
-	/**
-	 * Called when an item is added to the queue.
-	 * @param item the item that was added.
-	 * @see com.hazelcast.core.ItemListener#itemAdded(java.lang.Object)
-	 */
-	@Override
-	public void itemAdded(final Object item)
-	{
-		conditionReached.set(true);
-	}
+  /**
+   * Called when an item is added to the queue.
+   * @param item the item that was added.
+   * @see com.hazelcast.core.ItemListener#itemAdded(java.lang.Object)
+   */
+  @Override
+  public void itemAdded(final Object item)
+  {
+    conditionReached.set(true);
+  }
 
-	/**
-	 * This method does nothing.
-	 * @param item the item that was removed.
-	 * @see com.hazelcast.core.ItemListener#itemRemoved(java.lang.Object)
-	 */
-	@Override
-	public void itemRemoved(final Object item)
-	{
-	}
+  /**
+   * This method does nothing.
+   * @param item the item that was removed.
+   * @see com.hazelcast.core.ItemListener#itemRemoved(java.lang.Object)
+   */
+  @Override
+  public void itemRemoved(final Object item)
+  {
+  }
 
 }

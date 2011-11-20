@@ -54,64 +54,64 @@ import org.jppf.utils.Range;
  */
 public class IPv6AddressPattern extends AbstractIPAddressPattern
 {
-	/**
-	 * Initialize this object with the specified string pattern.
-	 * @param source the source pattern as a string.
-	 * @throws IllegalArgumentException if the pattern is null or invalid.
-	 */
-	public IPv6AddressPattern(final String source) throws IllegalArgumentException
-	{
-		super(source, PatternConfiguration.IPV6_CONFIGURATION);
-	}
+  /**
+   * Initialize this object with the specified string pattern.
+   * @param source the source pattern as a string.
+   * @throws IllegalArgumentException if the pattern is null or invalid.
+   */
+  public IPv6AddressPattern(final String source) throws IllegalArgumentException
+  {
+    super(source, PatternConfiguration.IPV6_CONFIGURATION);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean matches(final InetAddress ip)
-	{
-		if (!(ip instanceof Inet6Address)) return false;
-		return super.matches(ip);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean matches(final InetAddress ip)
+  {
+    if (!(ip instanceof Inet6Address)) return false;
+    return super.matches(ip);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<ranges.size(); i++)
-		{
-			if (i > 0) sb.append(config.compSeparator);
-			Range<Integer> r = ranges.get(i);
-			sb.append(Integer.toHexString(r.getLower()));
-			if (!r.getLower().equals(r.getUpper())) sb.append('-').append(Integer.toHexString(r.getUpper()));
-		}
-		return sb.toString();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<ranges.size(); i++)
+    {
+      if (i > 0) sb.append(config.compSeparator);
+      Range<Integer> r = ranges.get(i);
+      sb.append(Integer.toHexString(r.getLower()));
+      if (!r.getLower().equals(r.getUpper())) sb.append('-').append(Integer.toHexString(r.getUpper()));
+    }
+    return sb.toString();
+  }
 
-	/**
-	 * Main method.
-	 * @param args not used.
-	 */
-	public static void main(final String[] args)
-	{
-		System.out.println("***** IP v6 *****");
-		String[] ipv6patterns = { "1080:0:0:0:8:800:200C:417A", ":0::::::", "0:0:aa-bbcc:0:0:0:0:0", "1:2:3:4:5-:6:7:8", };
-		String ip = "1080:0:0:0:8:800:200C:417A";
-		for (int i=0; i<ipv6patterns.length; i++)
-		{
-			try
-			{
-				IPv6AddressPattern p = new IPv6AddressPattern(ipv6patterns[i]);
-				InetAddress addr = InetAddress.getByName(ip);
-				System.out.println("pattern " + i + " for source '" + ipv6patterns[i] + "' = '" + p + "', ip match = " + p.matches(addr));
-			}
-			catch (Exception e)
-			{
-				System.out.println("#" + i + " : " + e.getMessage());
-			}
-		}
-	}
+  /**
+   * Main method.
+   * @param args not used.
+   */
+  public static void main(final String[] args)
+  {
+    System.out.println("***** IP v6 *****");
+    String[] ipv6patterns = { "1080:0:0:0:8:800:200C:417A", ":0::::::", "0:0:aa-bbcc:0:0:0:0:0", "1:2:3:4:5-:6:7:8", };
+    String ip = "1080:0:0:0:8:800:200C:417A";
+    for (int i=0; i<ipv6patterns.length; i++)
+    {
+      try
+      {
+        IPv6AddressPattern p = new IPv6AddressPattern(ipv6patterns[i]);
+        InetAddress addr = InetAddress.getByName(ip);
+        System.out.println("pattern " + i + " for source '" + ipv6patterns[i] + "' = '" + p + "', ip match = " + p.matches(addr));
+      }
+      catch (Exception e)
+      {
+        System.out.println("#" + i + " : " + e.getMessage());
+      }
+    }
+  }
 }

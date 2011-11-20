@@ -18,14 +18,13 @@
 
 package org.jppf.client;
 
+import java.util.*;
+
 import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.data.transform.*;
 import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * Abstract implementation of the client end of the JPPF distributed class loader.
@@ -33,144 +32,147 @@ import java.util.Map;
  */
 public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AbstractClassServerDelegate.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Indicates whether this socket handler should be terminated and stop processing.
-	 */
-	protected boolean stop = false;
-	/**
-	 * Indicates whether this socket handler is closed, which means it can't handle requests anymore.
-	 */
-	protected boolean closed = false;
-	/**
-	 * Reads resource files from the classpath.
-	 */
-	protected ResourceProvider resourceProvider = new ResourceProvider();
-	/**
-	 * Unique identifier for this class server delegate, obtained from the local JPPF client.
-	 */
-	protected String clientUuid = null;
-    /**
-     * Mapping of class loader to requests uuids.
-     */
-    private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractClassServerDelegate.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Indicates whether this socket handler should be terminated and stop processing.
+   */
+  protected boolean stop = false;
+  /**
+   * Indicates whether this socket handler is closed, which means it can't handle requests anymore.
+   */
+  protected boolean closed = false;
+  /**
+   * Reads resource files from the classpath.
+   */
+  protected ResourceProvider resourceProvider = new ResourceProvider();
+  /**
+   * Unique identifier for this class server delegate, obtained from the local JPPF client.
+   */
+  protected String clientUuid = null;
+  /**
+   * Mapping of class loader to requests uuids.
+   */
+  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
 
-	/**
-	 * Default instantiation of this class is not permitted.
-	 * @param owner the client connection which owns this connection delegate.
-	 */
-	protected AbstractClassServerDelegate(final JPPFClientConnection owner)
-	{
-		super(owner);
-	}
+  /**
+   * Default instantiation of this class is not permitted.
+   * @param owner the client connection which owns this connection delegate.
+   */
+  protected AbstractClassServerDelegate(final JPPFClientConnection owner)
+  {
+    super(owner);
+  }
 
-	/**
-	 * Determine whether the socket connection is closed
-	 * @return true if the socket connection is closed, false otherwise
-	 * @see org.jppf.client.ClassServerDelegate#isClosed()
-	 */
-	@Override
-	public boolean isClosed()
-	{
-		return closed;
-	}
+  /**
+   * Determine whether the socket connection is closed
+   * @return true if the socket connection is closed, false otherwise
+   * @see org.jppf.client.ClassServerDelegate#isClosed()
+   */
+  @Override
+  public boolean isClosed()
+  {
+    return closed;
+  }
 
-	/**
-	 * Get the name of this delegate.
-	 * @return the name as a string.
-	 * @see org.jppf.client.ClassServerDelegate#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return name;
-	}
+  /**
+   * Get the name of this delegate.
+   * @return the name as a string.
+   * @see org.jppf.client.ClassServerDelegate#getName()
+   */
+  @Override
+  public String getName()
+  {
+    return name;
+  }
 
-	/**
-	 * Set the name of this delegate.
-	 * @param name the name as a string.
-	 * @see org.jppf.client.ClassServerDelegate#setName(java.lang.String)
-	 */
-	@Override
-	public void setName(final String name)
-	{
-		this.name = name;
-	}
+  /**
+   * Set the name of this delegate.
+   * @param name the name as a string.
+   * @see org.jppf.client.ClassServerDelegate#setName(java.lang.String)
+   */
+  @Override
+  public void setName(final String name)
+  {
+    this.name = name;
+  }
 
-	/**
-	 * Initialize this delegate's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.client.ClassServerDelegate#initSocketClient()
-	 */
-	@Override
-	public void initSocketClient() throws Exception
-	{
-		socketClient = new SocketClient();
-		socketClient.setHost(host);
-		socketClient.setPort(port);
-	}
+  /**
+   * Initialize this delegate's resources.
+   * @throws Exception if an error is raised during initialization.
+   * @see org.jppf.client.ClassServerDelegate#initSocketClient()
+   */
+  @Override
+  public void initSocketClient() throws Exception
+  {
+    socketClient = new SocketClient();
+    socketClient.setHost(host);
+    socketClient.setPort(port);
+  }
 
-	/**
-	 * Read a resource wrapper object from the socket connection.
-	 * @return a <code>JPPFResourceWrapper</code> instance.
-	 * @throws Exception if any error is raised.
-	 */
-	protected JPPFResourceWrapper readResource() throws Exception
-	{
-		JPPFBuffer buffer = socketClient.receiveBytes(0);
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, false, buffer.buffer, 0, buffer.length);
-		return (JPPFResourceWrapper) socketClient.getSerializer().deserialize(data);
-	}
+  /**
+   * Read a resource wrapper object from the socket connection.
+   * @return a <code>JPPFResourceWrapper</code> instance.
+   * @throws Exception if any error is raised.
+   */
+  protected JPPFResourceWrapper readResource() throws Exception
+  {
+    JPPFBuffer buffer = socketClient.receiveBytes(0);
+    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+    byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, false, buffer.buffer, 0, buffer.length);
+    return (JPPFResourceWrapper) socketClient.getSerializer().deserialize(data);
+  }
 
-	/**
-	 * Write a resource wrapper object to the socket connection.
-	 * @param resource a <code>JPPFResourceWrapper</code> instance.
-	 * @throws Exception if any error is raised.
-	 */
-	protected void writeResource(final JPPFResourceWrapper resource) throws Exception
-	{
-		JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
-		JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-		byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, true, buffer.buffer, 0, buffer.length);
-		if (debugEnabled) log.debug("sending " + data.length + " bytes to the server");
-		socketClient.sendBytes(new JPPFBuffer(data, data.length));
-		socketClient.flush();
-	}
+  /**
+   * Write a resource wrapper object to the socket connection.
+   * @param resource a <code>JPPFResourceWrapper</code> instance.
+   * @throws Exception if any error is raised.
+   */
+  protected void writeResource(final JPPFResourceWrapper resource) throws Exception
+  {
+    JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
+    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
+    byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, true, buffer.buffer, 0, buffer.length);
+    if (debugEnabled) log.debug("sending " + data.length + " bytes to the server");
+    socketClient.sendBytes(new JPPFBuffer(data, data.length));
+    socketClient.flush();
+  }
 
-    /**
-     * Add a request uuid to class loader mapping to this submission manager.
-     * @param uuid the uuid of the request.
-     * @param cl the class loader for the request.
-     */
-    public void addRequestClassLoader(final String uuid, final ClassLoader cl)
-    {
-        classLoaderMap.put(uuid, cl);
-    }
+  /**
+   * Add a request uuid to class loader mapping to this submission manager.
+   * @param uuid the uuid of the request.
+   * @param cl the class loader for the request.
+   */
+  @Override
+  public void addRequestClassLoader(final String uuid, final ClassLoader cl)
+  {
+    classLoaderMap.put(uuid, cl);
+  }
 
-    /**
-     * Add a request uuid to class loader mapping to this submission manager.
-     * @param uuid the uuid of the request.
-     */
-    public void removeRequestClassLoader(final String uuid)
-    {
-        classLoaderMap.remove(uuid);
-    }
+  /**
+   * Add a request uuid to class loader mapping to this submission manager.
+   * @param uuid the uuid of the request.
+   */
+  @Override
+  public void removeRequestClassLoader(final String uuid)
+  {
+    classLoaderMap.remove(uuid);
+  }
 
-    /**
-     * Get a class loader from its request uuid.
-     * @param uuid the uuid of the request.
-     * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
-     */
-    public ClassLoader getRequestClassLoader(final String uuid)
-    {
-        return classLoaderMap.get(uuid);
-    }
+  /**
+   * Get a class loader from its request uuid.
+   * @param uuid the uuid of the request.
+   * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+   */
+  @Override
+  public ClassLoader getRequestClassLoader(final String uuid)
+  {
+    return classLoaderMap.get(uuid);
+  }
 }

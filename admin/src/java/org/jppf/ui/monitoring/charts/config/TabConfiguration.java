@@ -27,49 +27,49 @@ import javax.swing.JPanel;
  */
 public class TabConfiguration
 {
-	/**
-	 * The name of the tab.
-	 */
-	String name = null;
-	/**
-	 * The panel that contains the configured charts.
-	 */
-	public JPanel panel = null;
-	/**
-	 * The list of chart configurations contained in this tab.
-	 */
-	public List<ChartConfiguration> configs = new ArrayList<ChartConfiguration>();
-	/**
-	 * The position of this tab in the list of tabs.
-	 */
-	public int position = -1;
+  /**
+   * The name of the tab.
+   */
+  String name = null;
+  /**
+   * The panel that contains the configured charts.
+   */
+  public JPanel panel = null;
+  /**
+   * The list of chart configurations contained in this tab.
+   */
+  public List<ChartConfiguration> configs = new ArrayList<ChartConfiguration>();
+  /**
+   * The position of this tab in the list of tabs.
+   */
+  public int position = -1;
 
-	/**
-	 * Create a tab configuration with uninitialized parameters.
-	 */
-	public TabConfiguration()
-	{
-	}
+  /**
+   * Create a tab configuration with uninitialized parameters.
+   */
+  public TabConfiguration()
+  {
+  }
 
-	/**
-	 * Create a tab configuration with a specified name and position.
-	 * @param name the name of the tab to create.
-	 * @param position the position of the tab in the list of tabs.
-	 */
-	public TabConfiguration(final String name, final int position)
-	{
-		this.name = name;
-		this.position = position;
-	}
+  /**
+   * Create a tab configuration with a specified name and position.
+   * @param name the name of the tab to create.
+   * @param position the position of the tab in the list of tabs.
+   */
+  public TabConfiguration(final String name, final int position)
+  {
+    this.name = name;
+    this.position = position;
+  }
 
-	/**
-	 * Get a string representation of this TabConfiguration
-	 * @return a string with the tab name.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return name == null ? "unnamed tab" : name;
-	}
+  /**
+   * Get a string representation of this TabConfiguration
+   * @return a string with the tab name.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return name == null ? "unnamed tab" : name;
+  }
 }

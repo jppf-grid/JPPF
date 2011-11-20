@@ -31,79 +31,79 @@ import org.jppf.management.*;
  */
 public class MBeanClient extends JMXConnectionWrapper implements NotificationListener
 {
-	/**
-	 * Count of executed tasks.
-	 */
-	private AtomicInteger taskCount = new AtomicInteger(0);
-	/**
-	 * Total cpu time on the node(s).
-	 */
-	private AtomicLong cpuTime = new AtomicLong(0L);
-	/**
-	 * Total elapsed time on the node(s).
-	 */
-	private AtomicLong elapsedTime = new AtomicLong(0L);
+  /**
+   * Count of executed tasks.
+   */
+  private AtomicInteger taskCount = new AtomicInteger(0);
+  /**
+   * Total cpu time on the node(s).
+   */
+  private AtomicLong cpuTime = new AtomicLong(0L);
+  /**
+   * Total elapsed time on the node(s).
+   */
+  private AtomicLong elapsedTime = new AtomicLong(0L);
 
-	/**
-	 * Entry point.
-	 * @param args - not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			String mbeanName = JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME;
-			ObjectName objectName = new ObjectName(mbeanName);
-			MBeanClient client = new MBeanClient("lolo-quad", 12001);
-			client.connect();
-			while (!client.isConnected()) Thread.sleep(100);
-			MBeanServerConnection mbsc = client.getMbeanConnection();
-			JPPFNodeTaskMonitorMBean proxy = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
-			proxy.getTotalTasksExecuted();
-			//client.invoke(mbeanName, "test", (Object[]) null, (String[]) null);
-			Set set = mbsc.queryNames(null, null);
-			System.out.println("all mbeans: " + set);
-			boolean b = mbsc.isInstanceOf(objectName, "javax.management.NotificationBroadcaster");
-			System.out.println('\"'+mbeanName+"\" instance of NotificationBroadcaster: "+b);
-			if (b)
-			{
-				mbsc.addNotificationListener(objectName, client, null, null);
-				Thread.sleep(1000000L);
-			}
-			client.close();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+  /**
+   * Entry point.
+   * @param args - not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      String mbeanName = JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME;
+      ObjectName objectName = new ObjectName(mbeanName);
+      MBeanClient client = new MBeanClient("lolo-quad", 12001);
+      client.connect();
+      while (!client.isConnected()) Thread.sleep(100);
+      MBeanServerConnection mbsc = client.getMbeanConnection();
+      JPPFNodeTaskMonitorMBean proxy = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, JPPFNodeTaskMonitorMBean.class, true);
+      proxy.getTotalTasksExecuted();
+      //client.invoke(mbeanName, "test", (Object[]) null, (String[]) null);
+      Set set = mbsc.queryNames(null, null);
+      System.out.println("all mbeans: " + set);
+      boolean b = mbsc.isInstanceOf(objectName, "javax.management.NotificationBroadcaster");
+      System.out.println('\"'+mbeanName+"\" instance of NotificationBroadcaster: "+b);
+      if (b)
+      {
+        mbsc.addNotificationListener(objectName, client, null, null);
+        Thread.sleep(1000000L);
+      }
+      client.close();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
 
-	/**
-	 * Initialize the connection to the remote MBean server.
-	 * @param host - the host the server is running on.
-	 * @param port - the RMI port used by the server.
-	 */
-	public MBeanClient(final String host, final int port)
-	{
-		super(host, port, JPPFAdminMBean.NODE_SUFFIX);
-	}
+  /**
+   * Initialize the connection to the remote MBean server.
+   * @param host - the host the server is running on.
+   * @param port - the RMI port used by the server.
+   */
+  public MBeanClient(final String host, final int port)
+  {
+    super(host, port, JPPFAdminMBean.NODE_SUFFIX);
+  }
 
-	/**
-	 * Handle an MBean notification.
-	 * @param notification - the notification sent by the node.
-	 * @param handback - handback object.
-	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
-	 */
-	@Override
-	public void handleNotification(final Notification notification, final Object handback)
-	{
-		TaskInformation info = ((TaskExecutionNotification) notification).getTaskInformation();
-		int n = taskCount.incrementAndGet();
-		if (n % 50 == 0)
-		{
-			long cpu = cpuTime.addAndGet(info.getCpuTime());
-			long elapsed = elapsedTime.addAndGet(info.getElapsedTime());
-			System.out.println("nb tasks = " + n + ", cpu time = " + cpu + " ms, elapsed time = " + elapsed +" ms");
-		}
-	}
+  /**
+   * Handle an MBean notification.
+   * @param notification - the notification sent by the node.
+   * @param handback - handback object.
+   * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+   */
+  @Override
+  public void handleNotification(final Notification notification, final Object handback)
+  {
+    TaskInformation info = ((TaskExecutionNotification) notification).getTaskInformation();
+    int n = taskCount.incrementAndGet();
+    if (n % 50 == 0)
+    {
+      long cpu = cpuTime.addAndGet(info.getCpuTime());
+      long elapsed = elapsedTime.addAndGet(info.getElapsedTime());
+      System.out.println("nb tasks = " + n + ", cpu time = " + cpu + " ms, elapsed time = " + elapsed +" ms");
+    }
+  }
 }

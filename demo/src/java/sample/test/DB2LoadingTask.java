@@ -26,23 +26,23 @@ package sample.test;
  */
 public class DB2LoadingTask extends JPPFTestTask
 {
-	/**
-	 * Initialize this task.
-	 */
-	public DB2LoadingTask()
-	{
-	}
+  /**
+   * Initialize this task.
+   */
+  public DB2LoadingTask()
+  {
+  }
 
-	/**
-	 * Execute the task
-	 * @throws Exception .
-	 * @see java.lang.Runnable#run()
-	 */
-	public void test() throws Exception
-	{
-		Class.forName("com.ibm.db2.jcc.DB2Driver");
-		//c.newInstance();
-		//Driver driver = new com.ibm.db2.jcc.DB2Driver();
-		//Connection conn = DriverManager.getConnection("", null);
-	}
+  /**
+   * Execute the task
+   * @throws Exception .
+   * @see java.lang.Runnable#run()
+   */
+  public void test() throws Exception
+  {
+    Class.forName("com.ibm.db2.jcc.DB2Driver");
+    //c.newInstance();
+    //Driver driver = new com.ibm.db2.jcc.DB2Driver();
+    //Connection conn = DriverManager.getConnection("", null);
+  }
 }

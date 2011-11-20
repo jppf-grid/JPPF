@@ -27,33 +27,33 @@ import java.util.*;
  */
 public class PolicyDescriptor
 {
-	/**
-	 * The type of rule, eg AND, NOT, OneOf, Equal, etc.
-	 */
-	public String type = null;
-	/**
-	 * Type of value used for some rules (currently Equal and OneOf).
-	 */
-	public String valueType = null;
-	/**
-	 * Determines whether case should be ignored in string comparisons.
-	 */
-	public String ignoreCase = null;
-	/**
-	 * The fully qualified class name of a custom policy class.
-	 */
-	public String className = null;
-	/**
-	 * The operands for this element, applies to non-logical rules (ie not AND, OR, XOR, NOT).
-	 * The first operand is always a property name.
-	 */
-	public List<String> operands = new ArrayList<String>();
-	/**
-	 * List of arguments used in a custom (user-defined policy).
-	 */
-	public List<String> arguments = new ArrayList<String>();
-	/**
-	 * The children of this element, if any.
-	 */
-	public List<PolicyDescriptor> children = new ArrayList<PolicyDescriptor>();
+  /**
+   * The type of rule, eg AND, NOT, OneOf, Equal, etc.
+   */
+  public String type = null;
+  /**
+   * Type of value used for some rules (currently Equal and OneOf).
+   */
+  public String valueType = null;
+  /**
+   * Determines whether case should be ignored in string comparisons.
+   */
+  public String ignoreCase = null;
+  /**
+   * The fully qualified class name of a custom policy class.
+   */
+  public String className = null;
+  /**
+   * The operands for this element, applies to non-logical rules (ie not AND, OR, XOR, NOT).
+   * The first operand is always a property name.
+   */
+  public List<String> operands = new ArrayList<String>();
+  /**
+   * List of arguments used in a custom (user-defined policy).
+   */
+  public List<String> arguments = new ArrayList<String>();
+  /**
+   * The children of this element, if any.
+   */
+  public List<PolicyDescriptor> children = new ArrayList<PolicyDescriptor>();
 }

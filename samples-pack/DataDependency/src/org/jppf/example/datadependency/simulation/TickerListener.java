@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface TickerListener extends EventListener
 {
-	/**
-	 * Called when a piece of market data was updated.
-	 * @param event encapsulated the market data update.
-	 */
-	void marketDataUpdated(TickerEvent event);
+  /**
+   * Called when a piece of market data was updated.
+   * @param event encapsulated the market data update.
+   */
+  void marketDataUpdated(TickerEvent event);
 }

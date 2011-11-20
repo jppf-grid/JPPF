@@ -29,39 +29,39 @@ import javax.management.*;
  */
 public class TaskNotifications extends NotificationBroadcasterSupport implements TaskNotificationsMBean
 {
-	/**
-	 * Sequence number sent with each notification.
-	 */
-	private static AtomicLong sequence = new AtomicLong(0L);
+  /**
+   * Sequence number sent with each notification.
+   */
+  private static AtomicLong sequence = new AtomicLong(0L);
 
-	/**
-	 * Initialize this MBean.
-	 */
-	public TaskNotifications()
-	{
-	}
+  /**
+   * Initialize this MBean.
+   */
+  public TaskNotifications()
+  {
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void sendTaskNotification(final String message)
-	{
-		Notification notif = new Notification("task.notification", this,
-				sequence.incrementAndGet(), System.currentTimeMillis(), message);
-		sendNotification(notif);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void sendTaskNotification(final String message)
+  {
+    Notification notif = new Notification("task.notification", this,
+        sequence.incrementAndGet(), System.currentTimeMillis(), message);
+    sendNotification(notif);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void sendTaskNotification(final String message, final Object userData)
-	{
-		Notification notif = new Notification("task.notification", this,
-				sequence.incrementAndGet(), System.currentTimeMillis(), message);
-		// add the user data
-		notif.setUserData(userData);
-		sendNotification(notif);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void sendTaskNotification(final String message, final Object userData)
+  {
+    Notification notif = new Notification("task.notification", this,
+        sequence.incrementAndGet(), System.currentTimeMillis(), message);
+    // add the user data
+    notif.setUserData(userData);
+    sendNotification(notif);
+  }
 }

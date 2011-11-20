@@ -29,10 +29,10 @@ import java.util.EventListener;
  */
 public interface JPPFTaskListener extends EventListener
 {
-	/**
-	 * Notify this listener that an event has occurred during a task's life cycle.
-	 * @param event the event this listener is notified of.
-	 * @deprecated
-	 */
-	void eventOccurred(JPPFTaskEvent event);
+  /**
+   * Notify this listener that an event has occurred during a task's life cycle.
+   * @param event the event this listener is notified of.
+   * @deprecated
+   */
+  void eventOccurred(JPPFTaskEvent event);
 }

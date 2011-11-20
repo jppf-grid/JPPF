@@ -30,39 +30,39 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class MyTaskRunner
 {
-	/**
-	 * Entry point.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		JPPFClient client = null;
-		try
-		{
-			client = new JPPFClient();
-			JPPFJob job = new JPPFJob();
-			job.addTask(new MyTask1());
-			job.addTask(new MyTask2());
-			List<JPPFTask> results = client.submit(job);
-			System.out.println("********** Results: **********");
-			for (JPPFTask task: results)
-			{
-				System.out.println("result for task [" + task.getId() + "]: " + task.getResult());
-				if (task.getException() != null)
-				{
-					StringWriter sw = new StringWriter();
-					task.getException().printStackTrace(new PrintWriter(sw));
-					System.out.println(sw.toString());
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			client.close();
-		}
-	}
+  /**
+   * Entry point.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    JPPFClient client = null;
+    try
+    {
+      client = new JPPFClient();
+      JPPFJob job = new JPPFJob();
+      job.addTask(new MyTask1());
+      job.addTask(new MyTask2());
+      List<JPPFTask> results = client.submit(job);
+      System.out.println("********** Results: **********");
+      for (JPPFTask task: results)
+      {
+        System.out.println("result for task [" + task.getId() + "]: " + task.getResult());
+        if (task.getException() != null)
+        {
+          StringWriter sw = new StringWriter();
+          task.getException().printStackTrace(new PrintWriter(sw));
+          System.out.println(sw.toString());
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      client.close();
+    }
+  }
 }

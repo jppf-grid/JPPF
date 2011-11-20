@@ -35,207 +35,207 @@ import org.jppf.utils.CollectionUtils;
  */
 public abstract class CommandLineTask extends JPPFTask implements ProcessWrapperEventListener
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The list of command-line arguments.
-	 */
-	private List<String> commandList = new LinkedList<String>();
-	/**
-	 * The environment variables to set.
-	 */
-	private Map<String, String> env = new HashMap<String, String>();
-	/**
-	 * The directory to start the command in.
-	 */
-	private String startDir = null;
-	/**
-	 * Content of the standard output for the process.
-	 */
-	private StringBuilder standardOutput = new StringBuilder();
-	/**
-	 * Content of the error output for the process.
-	 */
-	private StringBuilder errorOutput = new StringBuilder();
-	/**
-	 * Determines whether the process output should be captured.
-	 */
-	private boolean captureOutput = false;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The list of command-line arguments.
+   */
+  private List<String> commandList = new LinkedList<String>();
+  /**
+   * The environment variables to set.
+   */
+  private Map<String, String> env = new HashMap<String, String>();
+  /**
+   * The directory to start the command in.
+   */
+  private String startDir = null;
+  /**
+   * Content of the standard output for the process.
+   */
+  private StringBuilder standardOutput = new StringBuilder();
+  /**
+   * Content of the error output for the process.
+   */
+  private StringBuilder errorOutput = new StringBuilder();
+  /**
+   * Determines whether the process output should be captured.
+   */
+  private boolean captureOutput = false;
 
-	/**
-	 * Default constructor.
-	 */
-	public CommandLineTask()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public CommandLineTask()
+  {
+  }
 
-	/**
-	 * Create an instance of this class and set the parameters of the external process or script to launch.
-	 * @param commands the list of command-line arguments.
-	 */
-	public CommandLineTask(final String...commands)
-	{
-		this(null, null, commands);
-	}
+  /**
+   * Create an instance of this class and set the parameters of the external process or script to launch.
+   * @param commands the list of command-line arguments.
+   */
+  public CommandLineTask(final String...commands)
+  {
+    this(null, null, commands);
+  }
 
-	/**
-	 * Create an instance of this class and set the parameters of the external process or script to launch.
-	 * @param env the environment variables to set.
-	 * @param startDir the directory to start the command in.
-	 * @param commands the list of command-line arguments.
-	 */
-	public CommandLineTask(final Map<String, String> env, final String startDir, final String...commands)
-	{
-		if (commands != null)
-		{
-			for (String s: commands) commandList.add(s);
-		}
-		this.env = env;
-		this.startDir = startDir;
-	}
+  /**
+   * Create an instance of this class and set the parameters of the external process or script to launch.
+   * @param env the environment variables to set.
+   * @param startDir the directory to start the command in.
+   * @param commands the list of command-line arguments.
+   */
+  public CommandLineTask(final Map<String, String> env, final String startDir, final String...commands)
+  {
+    if (commands != null)
+    {
+      for (String s: commands) commandList.add(s);
+    }
+    this.env = env;
+    this.startDir = startDir;
+  }
 
-	/**
-	 * Run the external process or script.
-	 * @throws Exception if an error occurs.
-	 */
-	public void launchProcess() throws Exception
-	{
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command(commandList);
-		if (startDir != null) builder.directory(new File(startDir));
-		if (env != null)
-		{
-			Map<String, String> map = builder.environment();
-			for (Map.Entry<String, String> e: env.entrySet()) map.put(e.getKey(), e.getValue());
-		}
-		ProcessWrapper wrapper = new ProcessWrapper();
-		if (captureOutput) wrapper.addListener(this);
-		Process p = builder.start();
-		wrapper.setProcess(p);
-		p.waitFor();
-		if (captureOutput) wrapper.removeListener(this);
-	}
+  /**
+   * Run the external process or script.
+   * @throws Exception if an error occurs.
+   */
+  public void launchProcess() throws Exception
+  {
+    ProcessBuilder builder = new ProcessBuilder();
+    builder.command(commandList);
+    if (startDir != null) builder.directory(new File(startDir));
+    if (env != null)
+    {
+      Map<String, String> map = builder.environment();
+      for (Map.Entry<String, String> e: env.entrySet()) map.put(e.getKey(), e.getValue());
+    }
+    ProcessWrapper wrapper = new ProcessWrapper();
+    if (captureOutput) wrapper.addListener(this);
+    Process p = builder.start();
+    wrapper.setProcess(p);
+    p.waitFor();
+    if (captureOutput) wrapper.removeListener(this);
+  }
 
-	/**
-	 * Determines whether the process output is captured.
-	 * @return true if the output is captured, false otherwise.
-	 */
-	public boolean isCaptureOutput()
-	{
-		return captureOutput;
-	}
+  /**
+   * Determines whether the process output is captured.
+   * @return true if the output is captured, false otherwise.
+   */
+  public boolean isCaptureOutput()
+  {
+    return captureOutput;
+  }
 
-	/**
-	 * Specifies whether the process output is captured.
-	 * @param captureOutput true if the output is captured, false otherwise.
-	 */
-	public void setCaptureOutput(final boolean captureOutput)
-	{
-		this.captureOutput = captureOutput;
-	}
+  /**
+   * Specifies whether the process output is captured.
+   * @param captureOutput true if the output is captured, false otherwise.
+   */
+  public void setCaptureOutput(final boolean captureOutput)
+  {
+    this.captureOutput = captureOutput;
+  }
 
-	/**
-	 * Get the content of the standard output for the process.
-	 * @return the output as a string.
-	 */
-	public String getStandardOutput()
-	{
-		return standardOutput.toString();
-	}
+  /**
+   * Get the content of the standard output for the process.
+   * @return the output as a string.
+   */
+  public String getStandardOutput()
+  {
+    return standardOutput.toString();
+  }
 
-	/**
-	 * Get the content of the error output for the process.
-	 * @return the output as a string.
-	 */
-	public String getErrorOutput()
-	{
-		return errorOutput.toString();
-	}
+  /**
+   * Get the content of the error output for the process.
+   * @return the output as a string.
+   */
+  public String getErrorOutput()
+  {
+    return errorOutput.toString();
+  }
 
-	/**
-	 * Get the list of command-line arguments.
-	 * @return a list of arguments as strings.
-	 */
-	public List<String> getCommandList()
-	{
-		return commandList;
-	}
+  /**
+   * Get the list of command-line arguments.
+   * @return a list of arguments as strings.
+   */
+  public List<String> getCommandList()
+  {
+    return commandList;
+  }
 
-	/**
-	 * Set the list of command-line arguments.
-	 * @param commandList a list of arguments as strings.
-	 */
-	public void setCommandList(final List<String> commandList)
-	{
-		this.commandList = commandList;
-	}
+  /**
+   * Set the list of command-line arguments.
+   * @param commandList a list of arguments as strings.
+   */
+  public void setCommandList(final List<String> commandList)
+  {
+    this.commandList = commandList;
+  }
 
-	/**
-	 * Set the list of command-line arguments.
-	 * @param commands a list of arguments as strings.
-	 */
-	public void setCommandList(final String...commands)
-	{
-		commandList = CollectionUtils.list(commands);
-	}
+  /**
+   * Set the list of command-line arguments.
+   * @param commands a list of arguments as strings.
+   */
+  public void setCommandList(final String...commands)
+  {
+    commandList = CollectionUtils.list(commands);
+  }
 
-	/**
-	 * Get the environment variables to set.
-	 * @return a map of variable names to their corresponding values.
-	 */
-	public Map<String, String> getEnv()
-	{
-		return env;
-	}
+  /**
+   * Get the environment variables to set.
+   * @return a map of variable names to their corresponding values.
+   */
+  public Map<String, String> getEnv()
+  {
+    return env;
+  }
 
-	/**
-	 * Get the environment variables to set.
-	 * @param env a map of variable names to their corresponding values.
-	 */
-	public void setEnv(final Map<String, String> env)
-	{
-		this.env = env;
-	}
+  /**
+   * Get the environment variables to set.
+   * @param env a map of variable names to their corresponding values.
+   */
+  public void setEnv(final Map<String, String> env)
+  {
+    this.env = env;
+  }
 
-	/**
-	 * Get the directory to start the command in.
-	 * @return the start directory as a string.
-	 */
-	public String getStartDir()
-	{
-		return startDir;
-	}
+  /**
+   * Get the directory to start the command in.
+   * @return the start directory as a string.
+   */
+  public String getStartDir()
+  {
+    return startDir;
+  }
 
-	/**
-	 * Set the directory to start the command in.
-	 * @param startDir the start directory as a string.
-	 */
-	public void setStartDir(final String startDir)
-	{
-		this.startDir = startDir;
-	}
+  /**
+   * Set the directory to start the command in.
+   * @param startDir the start directory as a string.
+   */
+  public void setStartDir(final String startDir)
+  {
+    this.startDir = startDir;
+  }
 
-	/**
-	 * Notification that the process has written to its output stream.
-	 * @param event encapsulates the output stream's content.
-	 * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
-	 */
-	@Override
-	public void outputStreamAltered(final ProcessWrapperEvent event)
-	{
-		standardOutput.append(event.getContent());
-	}
+  /**
+   * Notification that the process has written to its output stream.
+   * @param event encapsulates the output stream's content.
+   * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   */
+  @Override
+  public void outputStreamAltered(final ProcessWrapperEvent event)
+  {
+    standardOutput.append(event.getContent());
+  }
 
-	/**
-	 * Notification that the process has written to its error stream.
-	 * @param event encapsulate the error stream's content.
-	 * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
-	 */
-	@Override
-	public void errorStreamAltered(final ProcessWrapperEvent event)
-	{
-		errorOutput.append(event.getContent());
-	}
+  /**
+   * Notification that the process has written to its error stream.
+   * @param event encapsulate the error stream's content.
+   * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   */
+  @Override
+  public void errorStreamAltered(final ProcessWrapperEvent event)
+  {
+    errorOutput.append(event.getContent());
+  }
 }

@@ -28,24 +28,24 @@ import org.jppf.comm.socket.SocketWrapper;
  */
 public interface ClientConnectionHandler extends ClientConnectionStatusHandler
 {
-	/**
-	 * Initialize the connection.
-	 * @throws Exception if an error is raised while initializing the connection.
-	 */
-	void init() throws Exception;
-	/**
-	 * Initialize the underlying socket connection of this connection handler.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	void initSocketClient() throws Exception;
-	/**
-	 * Get the socket client uses to communicate over a socket connection.
-	 * @return a <code>SocketWrapper</code> instance.
-	 * @throws Exception if the connection has failed or timed out.
-	 */
-	SocketWrapper getSocketClient() throws Exception;
-	/**
-	 * Close and cleanup this connection handler.
-	 */
-	void close();
+  /**
+   * Initialize the connection.
+   * @throws Exception if an error is raised while initializing the connection.
+   */
+  void init() throws Exception;
+  /**
+   * Initialize the underlying socket connection of this connection handler.
+   * @throws Exception if an error is raised during initialization.
+   */
+  void initSocketClient() throws Exception;
+  /**
+   * Get the socket client uses to communicate over a socket connection.
+   * @return a <code>SocketWrapper</code> instance.
+   * @throws Exception if the connection has failed or timed out.
+   */
+  SocketWrapper getSocketClient() throws Exception;
+  /**
+   * Close and cleanup this connection handler.
+   */
+  void close();
 }

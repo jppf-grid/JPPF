@@ -27,55 +27,55 @@ import org.jppf.utils.TypedProperties;
  */
 public class FixedSizeProfile implements LoadBalancingProfile
 {
-	/**
-	 * The bundle size.
-	 */
-	private int size = 1;
+  /**
+   * The bundle size.
+   */
+  private int size = 1;
 
-	/**
-	 * Default constructor.
-	 */
-	public FixedSizeProfile()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public FixedSizeProfile()
+  {
+  }
 
-	/**
-	 * Initialize this profile with values read from the specified configuration.
-	 * @param config contains a mapping of the profile parameters to their value.
-	 */
-	public FixedSizeProfile(final TypedProperties config)
-	{
-		size = config.getInt("size", 1);
-	}
+  /**
+   * Initialize this profile with values read from the specified configuration.
+   * @param config contains a mapping of the profile parameters to their value.
+   */
+  public FixedSizeProfile(final TypedProperties config)
+  {
+    size = config.getInt("size", 1);
+  }
 
-	/**
-	 * Make a copy of this profile.
-	 * @return a newly created <code>FixedSizeProfile</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
-	 */
-	@Override
-	public LoadBalancingProfile copy()
-	{
-		FixedSizeProfile other = new FixedSizeProfile();
-		other.setSize(size);
-		return other;
-	}
+  /**
+   * Make a copy of this profile.
+   * @return a newly created <code>FixedSizeProfile</code> instance.
+   * @see org.jppf.server.scheduler.bundle.LoadBalancingProfile#copy()
+   */
+  @Override
+  public LoadBalancingProfile copy()
+  {
+    FixedSizeProfile other = new FixedSizeProfile();
+    other.setSize(size);
+    return other;
+  }
 
-	/**
-	 * Get the bundle size.
-	 * @return the bundle size as an int.
-	 */
-	public int getSize()
-	{
-		return size;
-	}
+  /**
+   * Get the bundle size.
+   * @return the bundle size as an int.
+   */
+  public int getSize()
+  {
+    return size;
+  }
 
-	/**
-	 * Set the bundle size.
-	 * @param size - the bundle size as an int.
-	 */
-	public void setSize(final int size)
-	{
-		this.size = size;
-	}
+  /**
+   * Set the bundle size.
+   * @param size - the bundle size as an int.
+   */
+  public void setSize(final int size)
+  {
+    this.size = size;
+  }
 }

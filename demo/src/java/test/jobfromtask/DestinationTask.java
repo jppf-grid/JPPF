@@ -25,35 +25,35 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DestinationTask extends JPPFTask
 {
-	/**
-	 * Initialize this task.
-	 */
-	public DestinationTask()
-	{
-	}
+  /**
+   * Initialize this task.
+   */
+  public DestinationTask()
+  {
+  }
 
-	/**
-	 * Perform the execution of this task.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		System.out.println("Starting destination task '" + getId() + '\'');
-		String s = "task '" + getId() + "' completed";
-		System.out.println(s);
-		setResult(s);
-	}
+  /**
+   * Perform the execution of this task.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    System.out.println("Starting destination task '" + getId() + '\'');
+    String s = "task '" + getId() + "' completed";
+    System.out.println(s);
+    setResult(s);
+  }
 
-	/**
-	 * Called when this task is cancelled.
-	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
-	 */
-	@Override
-	public void onCancel()
-	{
-		String s = "task '" + getId() + "' has been cancelled";
-		setResult(s);
-		System.out.println(s);
-	}
+  /**
+   * Called when this task is cancelled.
+   * @see org.jppf.server.protocol.JPPFTask#onCancel()
+   */
+  @Override
+  public void onCancel()
+  {
+    String s = "task '" + getId() + "' has been cancelled";
+    setResult(s);
+    System.out.println(s);
+  }
 }

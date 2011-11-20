@@ -32,40 +32,40 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class ExampleGridRunner {
 
-	/**
-	 * 
-	 */
-	private static Logger log = Logger.getLogger(ExampleGridRunner.class.getName());
+  /**
+   * 
+   */
+  private static Logger log = Logger.getLogger(ExampleGridRunner.class.getName());
 
-	/** @param args not used*/
-	public static void main(final String... args) {
-		JPPFClient client = new JPPFClient("all your base");
+  /** @param args not used*/
+  public static void main(final String... args) {
+    JPPFClient client = new JPPFClient("all your base");
 
-		JPPFJob job = new JPPFJob();
-		try {
-			for (int i = 0; i < 20; i++) {
-				job.addTask(new ExampleTask());
-			}
-		} catch (JPPFException ex) {
-			log.log(Level.WARNING, null, ex);
-		}
-		List<JPPFTask> results = null;
-		try {
-			results = client.submit(job);
-		} catch (Exception ex) {
-			log.log(Level.WARNING, null, ex);
-		}
+    JPPFJob job = new JPPFJob();
+    try {
+      for (int i = 0; i < 20; i++) {
+        job.addTask(new ExampleTask());
+      }
+    } catch (JPPFException ex) {
+      log.log(Level.WARNING, null, ex);
+    }
+    List<JPPFTask> results = null;
+    try {
+      results = client.submit(job);
+    } catch (Exception ex) {
+      log.log(Level.WARNING, null, ex);
+    }
 
-		if (results != null) {
-			for (JPPFTask task : results) {
-				if (task.getException() != null) {
-					System.out.println("An exception was raised: " + task.getException().getMessage());
-				} else {
-					System.out.println("Execution result: " + task.getResult());
-				}
-			}
-		}
+    if (results != null) {
+      for (JPPFTask task : results) {
+        if (task.getException() != null) {
+          System.out.println("An exception was raised: " + task.getException().getMessage());
+        } else {
+          System.out.println("Execution result: " + task.getResult());
+        }
+      }
+    }
 
-		client.close();
-	}
+    client.close();
+  }
 }

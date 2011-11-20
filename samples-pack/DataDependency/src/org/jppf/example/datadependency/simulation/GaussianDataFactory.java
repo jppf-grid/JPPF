@@ -26,23 +26,23 @@ package org.jppf.example.datadependency.simulation;
  */
 public class GaussianDataFactory extends AbstractDataFactory
 {
-	/**
-	 * Generate a random number in the range [0, value[.
-	 * @param value the maximum random value (exclusive).
-	 * @return a pseudo-random number in the specified range.
-	 * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int)
-	 */
-	@Override
-	public int getRandomInt(final int value)
-	{
-		double gaussian = 2d;
-		while ((gaussian < -1d) || (gaussian >= 1d))
-		{
-			synchronized(random)
-			{
-				gaussian = random.nextGaussian();
-			}
-		}
-		return (int) (value * (1d + gaussian) / 2d);
-	}
+  /**
+   * Generate a random number in the range [0, value[.
+   * @param value the maximum random value (exclusive).
+   * @return a pseudo-random number in the specified range.
+   * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int)
+   */
+  @Override
+  public int getRandomInt(final int value)
+  {
+    double gaussian = 2d;
+    while ((gaussian < -1d) || (gaussian >= 1d))
+    {
+      synchronized(random)
+      {
+        gaussian = random.nextGaussian();
+      }
+    }
+    return (int) (value * (1d + gaussian) / 2d);
+  }
 }

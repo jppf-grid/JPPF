@@ -27,37 +27,37 @@ import org.jppf.node.Node;
  */
 public class TaskNotificationsMBeanProvider implements JPPFNodeMBeanProvider
 {
-	/**
-	 * Get the fully qualified name of the MBean interface defined by this provider.
-	 * @return the name as a string.
-	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
-	 */
-	@Override
-	public String getMBeanInterfaceName()
-	{
-		return TaskNotificationsMBean.class.getName();
-	}
+  /**
+   * Get the fully qualified name of the MBean interface defined by this provider.
+   * @return the name as a string.
+   * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
+   */
+  @Override
+  public String getMBeanInterfaceName()
+  {
+    return TaskNotificationsMBean.class.getName();
+  }
 
-	/**
-	 * Create a concrete MBean instance.
-	 * @param node not used.
-	 * @return the created MBean implementation.
-	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
-	 */
-	@Override
-	public Object createMBean(final Node node)
-	{
-		return new TaskNotifications();
-	}
+  /**
+   * Create a concrete MBean instance.
+   * @param node not used.
+   * @return the created MBean implementation.
+   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
+   */
+  @Override
+  public Object createMBean(final Node node)
+  {
+    return new TaskNotifications();
+  }
 
-	/**
-	 * Get the object name for the MBean.
-	 * @return the MBean's object name as a string.
-	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
-	 */
-	@Override
-	public String getMBeanName()
-	{
-		return TaskNotificationsMBean.MBEAN_NAME;
-	}
+  /**
+   * Get the object name for the MBean.
+   * @return the MBean's object name as a string.
+   * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
+   */
+  @Override
+  public String getMBeanName()
+  {
+    return TaskNotificationsMBean.MBEAN_NAME;
+  }
 }

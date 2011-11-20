@@ -33,150 +33,150 @@ import net.miginfocom.swing.MigLayout;
  */
 public class OptionPanel extends AbstractOptionElement implements OptionsPage
 {
-	/**
-	 * The list of children of this options page.
-	 */
-	protected List<OptionElement> children = new ArrayList<OptionElement>();
-	/**
-	 * The panel used to display this options page.
-	 */
-	protected JPanel panel = null;
-	/**
-	 * An eventual button group to which any radio button direct child is added.
-	 */
-	protected ButtonGroup buttonGroup = null;
+  /**
+   * The list of children of this options page.
+   */
+  protected List<OptionElement> children = new ArrayList<OptionElement>();
+  /**
+   * The panel used to display this options page.
+   */
+  protected JPanel panel = null;
+  /**
+   * An eventual button group to which any radio button direct child is added.
+   */
+  protected ButtonGroup buttonGroup = null;
 
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public OptionPanel()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public OptionPanel()
+  {
+  }
 
-	/**
-	 * Initialize this option page with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the panel's title.
-	 * @param scrollable determines whether this page should be enclosed within a scroll pane.
-	 * @param bordered determines whether this page has a border around it.
-	 */
-	public OptionPanel(final String name, final String label, final boolean scrollable, final boolean bordered)
-	{
-		this.name = name;
-		this.label = label;
-		this.scrollable = scrollable;
-		this.bordered = bordered;
-		createUI();
-	}
+  /**
+   * Initialize this option page with the specified parameters.
+   * @param name this component's name.
+   * @param label the panel's title.
+   * @param scrollable determines whether this page should be enclosed within a scroll pane.
+   * @param bordered determines whether this page has a border around it.
+   */
+  public OptionPanel(final String name, final String label, final boolean scrollable, final boolean bordered)
+  {
+    this.name = name;
+    this.label = label;
+    this.scrollable = scrollable;
+    this.bordered = bordered;
+    createUI();
+  }
 
-	/**
-	 * Initialize this option page with the specified parameters, setting up a page without border.
-	 * This constructor is used for building outermost pages.
-	 * @param name this component's name.
-	 * @param label the panel's title.
-	 * @param scrollable determines whether this page should be enclosed within a scroll pane.
-	 */
-	public OptionPanel(final String name, final String label, final boolean scrollable)
-	{
-		this(name, label, scrollable, false);
-	}
+  /**
+   * Initialize this option page with the specified parameters, setting up a page without border.
+   * This constructor is used for building outermost pages.
+   * @param name this component's name.
+   * @param label the panel's title.
+   * @param scrollable determines whether this page should be enclosed within a scroll pane.
+   */
+  public OptionPanel(final String name, final String label, final boolean scrollable)
+  {
+    this(name, label, scrollable, false);
+  }
 
-	/**
-	 * Initialize the panel used to display this options page.
-	 */
-	@Override
-	public void createUI()
-	{
-		panel = new JPanel();
-		if (bordered)
-		{
-			Border border = (label != null)
-			? border = BorderFactory.createTitledBorder(label)
-					: BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
-			panel.setBorder(border);
-		}
-		else panel.setBorder(BorderFactory.createEmptyBorder());
-		if (toolTipText != null) panel.setToolTipText(toolTipText);
-		MigLayout mig = new MigLayout(layoutConstraints);
-		panel.setLayout(mig);
-		if (scrollable)
-		{
-			JScrollPane sp = new JScrollPane(panel);
-			sp.setBorder(BorderFactory.createEmptyBorder());
-			UIComponent = sp;
-		}
-		else UIComponent = panel;
-		//panel.setBackground(new Color(0, 0, 255));
-	}
+  /**
+   * Initialize the panel used to display this options page.
+   */
+  @Override
+  public void createUI()
+  {
+    panel = new JPanel();
+    if (bordered)
+    {
+      Border border = (label != null)
+      ? border = BorderFactory.createTitledBorder(label)
+          : BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+      panel.setBorder(border);
+    }
+    else panel.setBorder(BorderFactory.createEmptyBorder());
+    if (toolTipText != null) panel.setToolTipText(toolTipText);
+    MigLayout mig = new MigLayout(layoutConstraints);
+    panel.setLayout(mig);
+    if (scrollable)
+    {
+      JScrollPane sp = new JScrollPane(panel);
+      sp.setBorder(BorderFactory.createEmptyBorder());
+      UIComponent = sp;
+    }
+    else UIComponent = panel;
+    //panel.setBackground(new Color(0, 0, 255));
+  }
 
-	/**
-	 * Get the options in this page.
-	 * @return a list of <code>Option</code> instances.
-	 * @see org.jppf.ui.options.OptionsPage#getChildren()
-	 */
-	@Override
-	public List<OptionElement> getChildren()
-	{
-		return children;
-	}
+  /**
+   * Get the options in this page.
+   * @return a list of <code>Option</code> instances.
+   * @see org.jppf.ui.options.OptionsPage#getChildren()
+   */
+  @Override
+  public List<OptionElement> getChildren()
+  {
+    return children;
+  }
 
-	/**
-	 * Add an element to this options page. The element can be either an option, or another page.
-	 * @param element the element to add.
-	 * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
-	 */
-	@Override
-	public void add(final OptionElement element)
-	{
-		children.add(element);
-		if (element instanceof AbstractOptionElement)
-		{
-			((AbstractOptionElement) element).setParent(this);
-			if (element instanceof RadioButtonOption)
-			{
-				if (buttonGroup == null) buttonGroup = new ButtonGroup();
-				buttonGroup.add((JRadioButton) element.getUIComponent());
-			}
-		}
-		panel.add(element.getUIComponent(), element.getComponentConstraints());
-	}
+  /**
+   * Add an element to this options page. The element can be either an option, or another page.
+   * @param element the element to add.
+   * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
+   */
+  @Override
+  public void add(final OptionElement element)
+  {
+    children.add(element);
+    if (element instanceof AbstractOptionElement)
+    {
+      ((AbstractOptionElement) element).setParent(this);
+      if (element instanceof RadioButtonOption)
+      {
+        if (buttonGroup == null) buttonGroup = new ButtonGroup();
+        buttonGroup.add((JRadioButton) element.getUIComponent());
+      }
+    }
+    panel.add(element.getUIComponent(), element.getComponentConstraints());
+  }
 
-	/**
-	 * Remove an element from this options page.
-	 * @param element the element to remove.
-	 * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
-	 */
-	@Override
-	public void remove(final OptionElement element)
-	{
-		children.remove(element);
-		if (element instanceof AbstractOption)
-		{
-			((AbstractOption) element).setParent(null);
-		}
-		panel.remove(element.getUIComponent());
-	}
+  /**
+   * Remove an element from this options page.
+   * @param element the element to remove.
+   * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
+   */
+  @Override
+  public void remove(final OptionElement element)
+  {
+    children.remove(element);
+    if (element instanceof AbstractOption)
+    {
+      ((AbstractOption) element).setParent(null);
+    }
+    panel.remove(element.getUIComponent());
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-		for (OptionElement elt: children) elt.setEnabled(enabled);
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+    for (OptionElement elt: children) elt.setEnabled(enabled);
+  }
 
-	/**
-	 * Enable or disable the events firing in this option and/or its children.
-	 * @param enabled true to enable the events, false to disable them.
-	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-	 */
-	@Override
-	public void setEventsEnabled(final boolean enabled)
-	{
-		for (OptionElement elt: children) elt.setEventsEnabled(enabled);
-	}
+  /**
+   * Enable or disable the events firing in this option and/or its children.
+   * @param enabled true to enable the events, false to disable them.
+   * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
+   */
+  @Override
+  public void setEventsEnabled(final boolean enabled)
+  {
+    for (OptionElement elt: children) elt.setEventsEnabled(enabled);
+  }
 }

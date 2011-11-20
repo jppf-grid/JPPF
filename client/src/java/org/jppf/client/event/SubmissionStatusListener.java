@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface SubmissionStatusListener extends EventListener
 {
-	/**
-	 * Called when the status of a submission has changed.
-	 * @param event the event encapsulating the change of status.
-	 */
-	void submissionStatusChanged(SubmissionStatusEvent event);
+  /**
+   * Called when the status of a submission has changed.
+   * @param event the event encapsulating the change of status.
+   */
+  void submissionStatusChanged(SubmissionStatusEvent event);
 }

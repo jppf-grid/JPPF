@@ -26,19 +26,19 @@ import java.util.EventListener;
  */
 public interface JobListener extends EventListener
 {
-	/**
-	 * Called when a job is sent to the server, or its execution starts locally.
-	 * This method may be called multiple times, in the case where the job is resubmitted,
-	 * due to a broken connection to the server for instance.
-	 * @param event encapsulates the event that caused this method to be called.
-	 */
-	void jobStarted(JobEvent event);
+  /**
+   * Called when a job is sent to the server, or its execution starts locally.
+   * This method may be called multiple times, in the case where the job is resubmitted,
+   * due to a broken connection to the server for instance.
+   * @param event encapsulates the event that caused this method to be called.
+   */
+  void jobStarted(JobEvent event);
 
-	/**
-	 * Called when the execution of a job is complete.
-	 * This method may be called multiple times, in the case where the job is resubmitted,
-	 * due to a broken connection to the server for instance.
-	 * @param event encapsulates the event that caused this method to be called.
-	 */
-	void jobEnded(JobEvent event);
+  /**
+   * Called when the execution of a job is complete.
+   * This method may be called multiple times, in the case where the job is resubmitted,
+   * due to a broken connection to the server for instance.
+   * @param event encapsulates the event that caused this method to be called.
+   */
+  void jobEnded(JobEvent event);
 }

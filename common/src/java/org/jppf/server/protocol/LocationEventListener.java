@@ -26,10 +26,10 @@ import java.util.EventListener;
  */
 public interface LocationEventListener extends EventListener
 {
-	/**
-	 * Invoked when a data transfer has occurred between the location pointed to by the event
-	 * and another location.
-	 * @param event - a representation of the event that occurred.
-	 */
-	void dataTransferred(LocationEvent event);
+  /**
+   * Invoked when a data transfer has occurred between the location pointed to by the event
+   * and another location.
+   * @param event - a representation of the event that occurred.
+   */
+  void dataTransferred(LocationEvent event);
 }

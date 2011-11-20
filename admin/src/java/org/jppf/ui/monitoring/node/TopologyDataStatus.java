@@ -24,12 +24,12 @@ package org.jppf.ui.monitoring.node;
  */
 public enum TopologyDataStatus
 {
-	/**
-	 * The node is up.
-	 */
-	UP,
-	/**
-	 * The node is down.
-	 */
-	DOWN
+  /**
+   * The node is up.
+   */
+  UP,
+  /**
+   * The node is down.
+   */
+  DOWN
 }

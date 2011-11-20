@@ -31,41 +31,41 @@ import org.slf4j.*;
  */
 public class SendingState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SendingState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SendingState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public SendingState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public SendingState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (wrapper.isReadable())
-		{
-			throw new ConnectException("multiplexer " + wrapper + " has been disconnected");
-		}
-		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (context.writeMessage(wrapper))
-		{
-			if (debugEnabled) log.debug(wrapper.toString() + " message sent");
-			context.setMessage(null);
-			return TO_SENDING_OR_RECEIVING;
-		}
-		return TO_SENDING;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (wrapper.isReadable())
+    {
+      throw new ConnectException("multiplexer " + wrapper + " has been disconnected");
+    }
+    MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+    if (context.writeMessage(wrapper))
+    {
+      if (debugEnabled) log.debug(wrapper.toString() + " message sent");
+      context.setMessage(null);
+      return TO_SENDING_OR_RECEIVING;
+    }
+    return TO_SENDING;
+  }
 }

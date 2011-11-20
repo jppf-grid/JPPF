@@ -37,203 +37,203 @@ import org.slf4j.*;
  */
 public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ClassServerDelegateImpl.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines if the handshake with the server has been performed.
-	 */
-	private boolean handshakeDone = false;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ClassServerDelegateImpl.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines if the handshake with the server has been performed.
+   */
+  private boolean handshakeDone = false;
 
-	/**
-	 * Initialize class server delegate with a specified application uuid.
-	 * @param owner the client connection which owns this delegate.
-	 * @param uuid the unique identifier for the local JPPF client.
-	 * @param host the name or IP address of the host the class server is running on.
-	 * @param port the TCP port the class server is listening to.
-	 * @throws Exception if the connection could not be opened.
-	 */
-	public ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception
-	{
-		super(owner);
-		this.clientUuid = uuid;
-		this.host = host;
-		this.port = port;
-		setName(owner.getName());
-	}
+  /**
+   * Initialize class server delegate with a specified application uuid.
+   * @param owner the client connection which owns this delegate.
+   * @param uuid the unique identifier for the local JPPF client.
+   * @param host the name or IP address of the host the class server is running on.
+   * @param port the TCP port the class server is listening to.
+   * @throws Exception if the connection could not be opened.
+   */
+  public ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception
+  {
+    super(owner);
+    this.clientUuid = uuid;
+    this.host = host;
+    this.port = port;
+    setName(owner.getName());
+  }
 
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.client.ClassServerDelegate#init()
-	 */
-	@Override
-	public final void init() throws Exception
-	{
-		try
-		{
-			handshakeDone = false;
-			socketInitializer.setName('[' + getName() + " - delegate] ");
-			setStatus(CONNECTING);
-			if (socketClient == null) initSocketClient();
-			String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ':' + port;
-			System.out.println(msg);
-			log.info(msg);
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessful() && !socketInitializer.isClosed())
-			{
-				throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
-			}
-			if (!socketInitializer.isClosed())
-			{
-				msg = "[client: " + getName() + "] Reconnected to the class server";
-				System.out.println(msg);
-				log.info(msg);
-				setStatus(ACTIVE);
-			}
-		}
-		catch(Exception e)
-		{
-			setStatus(FAILED);
-			throw e;
-		}
-	}
+  /**
+   * Initialize this node's resources.
+   * @throws Exception if an error is raised during initialization.
+   * @see org.jppf.client.ClassServerDelegate#init()
+   */
+  @Override
+  public final void init() throws Exception
+  {
+    try
+    {
+      handshakeDone = false;
+      socketInitializer.setName('[' + getName() + " - delegate] ");
+      setStatus(CONNECTING);
+      if (socketClient == null) initSocketClient();
+      String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ':' + port;
+      System.out.println(msg);
+      log.info(msg);
+      socketInitializer.initializeSocket(socketClient);
+      if (!socketInitializer.isSuccessful() && !socketInitializer.isClosed())
+      {
+        throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
+      }
+      if (!socketInitializer.isClosed())
+      {
+        msg = "[client: " + getName() + "] Reconnected to the class server";
+        System.out.println(msg);
+        log.info(msg);
+        setStatus(ACTIVE);
+      }
+    }
+    catch(Exception e)
+    {
+      setStatus(FAILED);
+      throw e;
+    }
+  }
 
-	/**
-	 * Main processing loop of this delegate.
-	 * @see org.jppf.client.ClassServerDelegate#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			while (!stop)
-			{
-				try
-				{
-					if (!handshakeDone) handshake();
-					boolean found = true;
-					JPPFResourceWrapper resource = readResource();
-					String name = resource.getName();
-					ClassLoader cl = getClassLoader(resource.getRequestUuid());
-					if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
-					if (resource.getData("multiple") != null)
-					{
-						List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
-						if (list != null) resource.setData("resource_list", list);
-					}
-					else if (resource.getData("multiple.resources.names") != null)
-					{
-						String[] names = (String[]) resource.getData("multiple.resources.names");
-						Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
-						resource.setData("resource_map", result);
-					}
-					else
-					{
-						byte[] b;
-						byte[] callable = resource.getCallable();
-						if (callable != null) b = resourceProvider.computeCallable(callable);
-						else
-						{
-							if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
-							else b = resourceProvider.getResourceAsBytes(name, cl);
-						}
-						if (b == null) found = false;
-						if (callable == null) resource.setDefinition(b);
-						else resource.setCallable(b);
-						if (debugEnabled)
-						{
-							if (found) log.debug('[' +this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-							else log.debug('[' +this.getName()+"] resource not found: " + name);
-						}
-					}
-					resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-					writeResource(resource);
-				}
-				catch(Exception e)
-				{
-					if (!closed)
-					{
-						log.warn('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
-						init();
-						if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
-					}
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			log.error('[' +getName()+"] "+e.getMessage(), e);
-			close();
-		}
-	}
+  /**
+   * Main processing loop of this delegate.
+   * @see org.jppf.client.ClassServerDelegate#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      while (!stop)
+      {
+        try
+        {
+          if (!handshakeDone) handshake();
+          boolean found = true;
+          JPPFResourceWrapper resource = readResource();
+          String name = resource.getName();
+          ClassLoader cl = getClassLoader(resource.getRequestUuid());
+          if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
+          if (resource.getData("multiple") != null)
+          {
+            List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+            if (list != null) resource.setData("resource_list", list);
+          }
+          else if (resource.getData("multiple.resources.names") != null)
+          {
+            String[] names = (String[]) resource.getData("multiple.resources.names");
+            Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+            resource.setData("resource_map", result);
+          }
+          else
+          {
+            byte[] b;
+            byte[] callable = resource.getCallable();
+            if (callable != null) b = resourceProvider.computeCallable(callable);
+            else
+            {
+              if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
+              else b = resourceProvider.getResourceAsBytes(name, cl);
+            }
+            if (b == null) found = false;
+            if (callable == null) resource.setDefinition(b);
+            else resource.setCallable(b);
+            if (debugEnabled)
+            {
+              if (found) log.debug('[' +this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+              else log.debug('[' +this.getName()+"] resource not found: " + name);
+            }
+          }
+          resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
+          writeResource(resource);
+        }
+        catch(Exception e)
+        {
+          if (!closed)
+          {
+            log.warn('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
+            init();
+            if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
+          }
+        }
+      }
+    }
+    catch (Exception e)
+    {
+      log.error('[' +getName()+"] "+e.getMessage(), e);
+      close();
+    }
+  }
 
-	/**
-	 * Perform the handshake with the server.
-	 * @throws Exception if any error occurs.
-	 */
-	private void handshake() throws Exception
-	{
-		if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
-		socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
-		if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
-		JPPFResourceWrapper resource = new JPPFResourceWrapper();
-		resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-		resource.addUuid(clientUuid);
-		writeResource(resource);
-		// read the server response
-		readResource();
-		handshakeDone = true;
-		if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
-	}
+  /**
+   * Perform the handshake with the server.
+   * @throws Exception if any error occurs.
+   */
+  private void handshake() throws Exception
+  {
+    if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
+    socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
+    if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
+    JPPFResourceWrapper resource = new JPPFResourceWrapper();
+    resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
+    resource.addUuid(clientUuid);
+    writeResource(resource);
+    // read the server response
+    readResource();
+    handshakeDone = true;
+    if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
+  }
 
-	/**
-	 * Close the socket connection.
-	 * @see org.jppf.client.ClassServerDelegate#close()
-	 */
-	@Override
-	public void close()
-	{
-		if (!closed)
-		{
-			closed = true;
-			stop = true;
+  /**
+   * Close the socket connection.
+   * @see org.jppf.client.ClassServerDelegate#close()
+   */
+  @Override
+  public void close()
+  {
+    if (!closed)
+    {
+      closed = true;
+      stop = true;
 
-			try
-			{
-				socketInitializer.close();
-				socketClient.close();
-			}
-			catch (Exception e)
-			{
-				log.error('[' + getName() + "] "+e.getMessage(), e);
-			}
-		}
-	}
+      try
+      {
+        socketInitializer.close();
+        socketClient.close();
+      }
+      catch (Exception e)
+      {
+        log.error('[' + getName() + "] "+e.getMessage(), e);
+      }
+    }
+  }
 
-	/**
-	 * Create a socket initializer for this delegate.
-	 * @return a <code>SocketInitializer</code> instance.
-	 */
-	@Override
-	protected SocketInitializer createSocketInitializer()
-	{
-		return new SocketInitializerImpl();
-	}
+  /**
+   * Create a socket initializer for this delegate.
+   * @return a <code>SocketInitializer</code> instance.
+   */
+  @Override
+  protected SocketInitializer createSocketInitializer()
+  {
+    return new SocketInitializerImpl();
+  }
 
-	/**
-	 * Retrieve the class loader to use from the client.
-	 * @param uuid the uuid of the request from which the class loader was obtained.
-	 * @return a <code>ClassLoader</code> instance, or null if none could be found.
-	 */
-	private ClassLoader getClassLoader(final String uuid)
-	{
-		return getRequestClassLoader(uuid);
-	}
+  /**
+   * Retrieve the class loader to use from the client.
+   * @param uuid the uuid of the request from which the class loader was obtained.
+   * @return a <code>ClassLoader</code> instance, or null if none could be found.
+   */
+  private ClassLoader getClassLoader(final String uuid)
+  {
+    return getRequestClassLoader(uuid);
+  }
 }

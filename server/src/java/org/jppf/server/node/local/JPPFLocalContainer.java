@@ -38,125 +38,125 @@ import org.slf4j.*;
  */
 public class JPPFLocalContainer extends JPPFContainer
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFLocalContainer.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * The I/O handler for this node.
-	 */
-	private LocalNodeChannel channel = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFLocalContainer.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * The I/O handler for this node.
+   */
+  private LocalNodeChannel channel = null;
 
-	/**
-	 * Initialize this container with a specified application uuid.
-	 * @param channel the I/O channel of the node.
-	 * @param uuidPath the unique identifier of a submitting application.
-	 * @param classLoader the class loader for this container.
-	 * @throws Exception if an error occurs while initializing.
-	 */
-	public JPPFLocalContainer(final LocalNodeChannel channel, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
-	{
-		super(uuidPath, classLoader);
-		this.channel = channel;
-	}
+  /**
+   * Initialize this container with a specified application uuid.
+   * @param channel the I/O channel of the node.
+   * @param uuidPath the unique identifier of a submitting application.
+   * @param classLoader the class loader for this container.
+   * @throws Exception if an error occurs while initializing.
+   */
+  public JPPFLocalContainer(final LocalNodeChannel channel, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
+  {
+    super(uuidPath, classLoader);
+    this.channel = channel;
+  }
 
-	/**
-	 * Deserialize a number of objects from a socket client.
-	 * @param list a list holding the resulting deserialized objects.
-	 * @param count the number of objects to deserialize.
-	 * @param executor the number of objects to deserialize.
-	 * @return the new position in the source data after deserialization.
-	 * @throws Exception if an error occurs while deserializing.
-	 */
-	@Override
-	public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Exception
-	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		try
-		{
-			Thread.currentThread().setContextClassLoader(classLoader);
-			LocalNodeMessage message = channel.getNodeResource();
-			List<DataLocation> locations = message.getLocations();
-			List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
-			for (int i=0; i<count; i++)
-			{
-				futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i+1), i)));
-			}
-			for (Future<Object> f: futureList) list.add(f.get());
-			return 0;
-		}
-		finally
-		{
-			Thread.currentThread().setContextClassLoader(cl);
-		}
-	}
+  /**
+   * Deserialize a number of objects from a socket client.
+   * @param list a list holding the resulting deserialized objects.
+   * @param count the number of objects to deserialize.
+   * @param executor the number of objects to deserialize.
+   * @return the new position in the source data after deserialization.
+   * @throws Exception if an error occurs while deserializing.
+   */
+  @Override
+  public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Exception
+  {
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    try
+    {
+      Thread.currentThread().setContextClassLoader(classLoader);
+      LocalNodeMessage message = channel.getNodeResource();
+      List<DataLocation> locations = message.getLocations();
+      List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
+      for (int i=0; i<count; i++)
+      {
+        futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i+1), i)));
+      }
+      for (Future<Object> f: futureList) list.add(f.get());
+      return 0;
+    }
+    finally
+    {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
+  }
 
-	/**
-	 * Instances of this class are used to deserialize objects from an
-	 * incoming message in parallel.
-	 */
-	protected class ObjectDeserializationTask implements Callable<Object>
-	{
-		/**
-		 * The data to send over the network connection.
-		 */
-		private DataLocation location = null;
-		/**
-		 * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
-		 */
-		private int index = 0;
+  /**
+   * Instances of this class are used to deserialize objects from an
+   * incoming message in parallel.
+   */
+  protected class ObjectDeserializationTask implements Callable<Object>
+  {
+    /**
+     * The data to send over the network connection.
+     */
+    private DataLocation location = null;
+    /**
+     * Index of the object to deserialize in the incoming IO message; used for debugging purposes.
+     */
+    private int index = 0;
 
-		/**
-		 * Initialize this task with the specified data buffer.
-		 * @param location the data read from the network connection.
-		 * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
-		 */
-		public ObjectDeserializationTask(final DataLocation location, final int index)
-		{
-			this.location = location;
-			this.index = index;
-		}
+    /**
+     * Initialize this task with the specified data buffer.
+     * @param location the data read from the network connection.
+     * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
+     */
+    public ObjectDeserializationTask(final DataLocation location, final int index)
+    {
+      this.location = location;
+      this.index = index;
+    }
 
-		/**
-		 * Execute this task.
-		 * @return a deserialized object.
-		 * @see java.util.concurrent.Callable#call()
-		 */
-		@Override
-		public Object call()
-		{
-			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			try
-			{
-				Thread.currentThread().setContextClassLoader(getClassLoader());
-				InputStream is = location.getInputStream();
-				byte[] buffer = null;
-				try
-				{
-					if (traceEnabled) log.debug("deserializing object index = " + index);
-					buffer = JPPFDataTransformFactory.transform(false, is);
-				}
-				finally
-				{
-					StreamUtils.close(is);
-				}
-				Object o = helper.getSerializer().deserialize(buffer);
-				if (traceEnabled) log.debug("deserialized object index = " + index);
-				return o;
-			}
-			catch(Throwable t)
-			{
-				log.error(t.getMessage() + " [object index: " + index + ']', t);
-				return t;
-			}
-			finally
-			{
-				Thread.currentThread().setContextClassLoader(cl);
-			}
-		}
-	}
+    /**
+     * Execute this task.
+     * @return a deserialized object.
+     * @see java.util.concurrent.Callable#call()
+     */
+    @Override
+    public Object call()
+    {
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      try
+      {
+        Thread.currentThread().setContextClassLoader(getClassLoader());
+        InputStream is = location.getInputStream();
+        byte[] buffer = null;
+        try
+        {
+          if (traceEnabled) log.debug("deserializing object index = " + index);
+          buffer = JPPFDataTransformFactory.transform(false, is);
+        }
+        finally
+        {
+          StreamUtils.close(is);
+        }
+        Object o = helper.getSerializer().deserialize(buffer);
+        if (traceEnabled) log.debug("deserialized object index = " + index);
+        return o;
+      }
+      catch(Throwable t)
+      {
+        log.error(t.getMessage() + " [object index: " + index + ']', t);
+        return t;
+      }
+      finally
+      {
+        Thread.currentThread().setContextClassLoader(cl);
+      }
+    }
+  }
 }

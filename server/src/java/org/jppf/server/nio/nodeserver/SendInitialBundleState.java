@@ -31,53 +31,53 @@ import org.slf4j.*;
  */
 class SendInitialBundleState extends NodeServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SendInitialBundleState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public SendInitialBundleState(final NodeNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SendInitialBundleState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public SendInitialBundleState(final NodeNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
-	 */
-	@Override
-	public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-		if (CHECK_CONNECTION && wrapper.isReadable())
-		{
-			if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
-		}
+  /**
+   * Execute the action associated with this channel state.
+   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if an error occurs while transitioning to another state.
+   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   */
+  @Override
+  public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
+    if (CHECK_CONNECTION && wrapper.isReadable())
+    {
+      if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
+    }
 
-		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
-		if (context.getNodeMessage() == null)
-		{
-			if (debugEnabled) log.debug("serializing initial bundle for " + wrapper);
-			context.serializeBundle(wrapper);
-		}
-		if (context.writeMessage(wrapper))
-		{
-			if (debugEnabled) log.debug("sent entire initial bundle for " + wrapper);
-			context.setNodeMessage(null, wrapper);
-			context.setBundle(null);
-			return TO_WAIT_INITIAL;
-		}
-		if (debugEnabled) log.debug("part yet to send for " + wrapper);
-		return TO_SEND_INITIAL;
-	}
+    AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
+    if (context.getNodeMessage() == null)
+    {
+      if (debugEnabled) log.debug("serializing initial bundle for " + wrapper);
+      context.serializeBundle(wrapper);
+    }
+    if (context.writeMessage(wrapper))
+    {
+      if (debugEnabled) log.debug("sent entire initial bundle for " + wrapper);
+      context.setNodeMessage(null, wrapper);
+      context.setBundle(null);
+      return TO_WAIT_INITIAL;
+    }
+    if (debugEnabled) log.debug("part yet to send for " + wrapper);
+    return TO_SEND_INITIAL;
+  }
 }

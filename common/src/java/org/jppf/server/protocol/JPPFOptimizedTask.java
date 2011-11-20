@@ -49,68 +49,68 @@ import java.io.*;
  */
 public abstract class JPPFOptimizedTask extends JPPFTask
 {
-	/**
-	 * Counts the number of times this task was serialized.
-	 */
-	private byte serializationCount = 0;
-	/**
-	 * Counts the number of times this task was deserialized.
-	 */
-	private byte deserializationCount = 0;
+  /**
+   * Counts the number of times this task was serialized.
+   */
+  private byte serializationCount = 0;
+  /**
+   * Counts the number of times this task was deserialized.
+   */
+  private byte deserializationCount = 0;
 
-	/**
-	 * Serialize this task.
-	 * The first time it is serialized, all the non-static and non-transient fields will be serialized.
-	 * Upon subsequent serializations, only <code>getResult()</code> and <code>getException()</code> will be serialized.
-	 * <p>This method is to be called only from the <code>writeObject(ObjectOutputStream)</code> method of a subclass.
-	 * @param out the object output stream to write to.
-	 * @throws IOException if any error occurs.
-	 * @see java.io.Serializable
-	 */
-	protected void serialize(final ObjectOutputStream out) throws IOException
-	{
-		int count = serializationCount;
-		out.write(++serializationCount);
-		out.write(deserializationCount);
-		// already been serialized, presumably by the client?
-		if (count > 0)
-		{
-			out.writeInt(getPosition());
-			out.writeObject(getId());
-			out.writeObject(getResult());
-			out.writeObject(getException());
-		}
-		else
-		{
-			out.defaultWriteObject();
-		}
-	}
+  /**
+   * Serialize this task.
+   * The first time it is serialized, all the non-static and non-transient fields will be serialized.
+   * Upon subsequent serializations, only <code>getResult()</code> and <code>getException()</code> will be serialized.
+   * <p>This method is to be called only from the <code>writeObject(ObjectOutputStream)</code> method of a subclass.
+   * @param out the object output stream to write to.
+   * @throws IOException if any error occurs.
+   * @see java.io.Serializable
+   */
+  protected void serialize(final ObjectOutputStream out) throws IOException
+  {
+    int count = serializationCount;
+    out.write(++serializationCount);
+    out.write(deserializationCount);
+    // already been serialized, presumably by the client?
+    if (count > 0)
+    {
+      out.writeInt(getPosition());
+      out.writeObject(getId());
+      out.writeObject(getResult());
+      out.writeObject(getException());
+    }
+    else
+    {
+      out.defaultWriteObject();
+    }
+  }
 
-	/**
-	 * Deserialize this task.
-	 * The first time it is deserialized, all the non-static and non-transient fields will be deserialized.
-	 * Upon subsequent deserializations, only <code>getResult()</code> and <code>getException()</code> will be deserialized.
-	 * <p> This method is to be called only from the <code>readObject(ObjectInputStream)</code> method of a subclass.
-	 * @param in the stream to read from.
-	 * @throws IOException if any I/O error occurs.
-	 * @throws ClassNotFoundException if a class could not be found.
-	 */
-	protected void deserialize(final ObjectInputStream in) throws IOException, ClassNotFoundException
-	{
-		serializationCount = (byte) in.read();
-		deserializationCount = (byte) in.read();
-		// already been deserialized, presumably by the node?
-		if (deserializationCount > 0)
-		{
-			setPosition(in.readInt());
-			setId((String) in.readObject());
-			setResult(in.readObject());
-			setException((Exception) in.readObject());
-		}
-		else
-		{
-			in.defaultReadObject();
-		}
-		deserializationCount++;
-	}
+  /**
+   * Deserialize this task.
+   * The first time it is deserialized, all the non-static and non-transient fields will be deserialized.
+   * Upon subsequent deserializations, only <code>getResult()</code> and <code>getException()</code> will be deserialized.
+   * <p> This method is to be called only from the <code>readObject(ObjectInputStream)</code> method of a subclass.
+   * @param in the stream to read from.
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if a class could not be found.
+   */
+  protected void deserialize(final ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    serializationCount = (byte) in.read();
+    deserializationCount = (byte) in.read();
+    // already been deserialized, presumably by the node?
+    if (deserializationCount > 0)
+    {
+      setPosition(in.readInt());
+      setId((String) in.readObject());
+      setResult(in.readObject());
+      setException((Exception) in.readObject());
+    }
+    else
+    {
+      in.defaultReadObject();
+    }
+    deserializationCount++;
+  }
 }

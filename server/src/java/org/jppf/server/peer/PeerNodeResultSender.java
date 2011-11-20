@@ -32,96 +32,96 @@ import org.slf4j.*;
  */
 class PeerNodeResultSender extends AbstractResultSender
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(PeerNodeResultSender.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Output destination wrapping all write operations on the socket client.
-	 */
-	private OutputDestination destination = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(PeerNodeResultSender.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Output destination wrapping all write operations on the socket client.
+   */
+  private OutputDestination destination = null;
 
-	/**
-	 * Initialize this result sender with a specified socket client.
-	 * @param socketClient the socket client used to send results back.
-	 */
-	public PeerNodeResultSender(final SocketWrapper socketClient)
-	{
-		super(socketClient, false);
+  /**
+   * Initialize this result sender with a specified socket client.
+   * @param socketClient the socket client used to send results back.
+   */
+  public PeerNodeResultSender(final SocketWrapper socketClient)
+  {
+    super(socketClient, false);
 
-		destination = new SocketWrapperOutputDestination(socketClient);
-	}
+    destination = new SocketWrapperOutputDestination(socketClient);
+  }
 
-	/**
-	 * This method waits until all tasks of a request have been completed.
-	 * @throws Exception if handing of the results fails.
-	 * @see org.jppf.server.AbstractResultSender#waitForExecution()
-	 */
-	@Override
-	public synchronized void waitForExecution() throws Exception
-	{
-		long start = System.nanoTime();
-		while (getPendingTasksCount() > 0)
-		{
-			try
-			{
-				wait();
-				if (debugEnabled) log.debug(Integer.toString(getResultList().size()) + " in result list");
-				if (!getResultList().isEmpty())
-				{
-					ServerJob first = getResultList().remove(0);
-					int count = first.getTasks().size();
-					int size = getResultList().size();
-					for (int i=0; i<size; i++)
-					{
-						ServerJob bundle = getResultList().remove(0);
-						for (DataLocation task: bundle.getTasks())
-						{
-							((BundleWrapper) first).addTask(task);
-							count++;
-						}
-						bundle.getTasks().clear();
-					}
-					JPPFTaskBundle firstJob = (JPPFTaskBundle) first.getJob();
-					firstJob.setTaskCount(count);
-					long elapsed = System.nanoTime() - start;
-					firstJob.setNodeExecutionTime(elapsed/1000000);
-					sendPartialResults(first);
-				}
-				getResultList().clear();
-			}
-			catch (Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
+  /**
+   * This method waits until all tasks of a request have been completed.
+   * @throws Exception if handing of the results fails.
+   * @see org.jppf.server.AbstractResultSender#waitForExecution()
+   */
+  @Override
+  public synchronized void waitForExecution() throws Exception
+  {
+    long start = System.nanoTime();
+    while (getPendingTasksCount() > 0)
+    {
+      try
+      {
+        wait();
+        if (debugEnabled) log.debug(Integer.toString(getResultList().size()) + " in result list");
+        if (!getResultList().isEmpty())
+        {
+          ServerJob first = getResultList().remove(0);
+          int count = first.getTasks().size();
+          int size = getResultList().size();
+          for (int i=0; i<size; i++)
+          {
+            ServerJob bundle = getResultList().remove(0);
+            for (DataLocation task: bundle.getTasks())
+            {
+              ((BundleWrapper) first).addTask(task);
+              count++;
+            }
+            bundle.getTasks().clear();
+          }
+          JPPFTaskBundle firstJob = (JPPFTaskBundle) first.getJob();
+          firstJob.setTaskCount(count);
+          long elapsed = System.nanoTime() - start;
+          firstJob.setNodeExecutionTime(elapsed/1000000);
+          sendPartialResults(first);
+        }
+        getResultList().clear();
+      }
+      catch (Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+  }
 
-	/**
-	 * Send the results of the tasks in a bundle back to the client who
-	 * submitted the request.
-	 * @param bundleWrapper the bundle to get the task results from.
-	 * @throws Exception if an IO exception occurred while sending the results back.
-	 */
-	@Override
-	public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
-	{
-		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-		if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
-		//long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-		//bundle.setNodeExecutionTime(elapsed);
+  /**
+   * Send the results of the tasks in a bundle back to the client who
+   * submitted the request.
+   * @param bundleWrapper the bundle to get the task results from.
+   * @throws Exception if an IO exception occurred while sending the results back.
+   */
+  @Override
+  public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
+  {
+    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+    if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
+    //long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+    //bundle.setNodeExecutionTime(elapsed);
 
-		JPPFBuffer buf = helper.getSerializer().serialize(bundle);
-		socketClient.sendBytes(buf);
-		for (DataLocation task : bundleWrapper.getTasks())
-		{
-			destination.writeInt(task.getSize());
-			task.transferTo(destination, true);
-		}
-		socketClient.flush();
-	}
+    JPPFBuffer buf = helper.getSerializer().serialize(bundle);
+    socketClient.sendBytes(buf);
+    for (DataLocation task : bundleWrapper.getTasks())
+    {
+      destination.writeInt(task.getSize());
+      task.transferTo(destination, true);
+    }
+    socketClient.flush();
+  }
 }

@@ -26,25 +26,25 @@ import java.util.List;
  */
 public interface ActionHandler
 {
-	/**
-	 * Add an action with the specified name to this action manager.
-	 * @param name the name of the action to add.
-	 * @param action the action to add.
-	 */
-	void putAction(String name, UpdatableAction action);
-	/**
-	 * Get the action with the specified name.
-	 * @param name the name of the action to find.
-	 * @return an <code>Action</code> or null if the specified name could not be found.
-	 */
-	UpdatableAction getAction(String name);
-	/**
-	 * Get the selected elements in the component handled by this action manager.
-	 * @return a list of objects.
-	 */
-	List<Object> getSelectedElements();
-	/**
-	 * Update the state of all actions registered with this <code>ActionHandler</code>.
-	 */
-	void updateActions();
+  /**
+   * Add an action with the specified name to this action manager.
+   * @param name the name of the action to add.
+   * @param action the action to add.
+   */
+  void putAction(String name, UpdatableAction action);
+  /**
+   * Get the action with the specified name.
+   * @param name the name of the action to find.
+   * @return an <code>Action</code> or null if the specified name could not be found.
+   */
+  UpdatableAction getAction(String name);
+  /**
+   * Get the selected elements in the component handled by this action manager.
+   * @return a list of objects.
+   */
+  List<Object> getSelectedElements();
+  /**
+   * Update the state of all actions registered with this <code>ActionHandler</code>.
+   */
+  void updateActions();
 }

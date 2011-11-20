@@ -24,49 +24,49 @@ package org.jppf.client.taskwrapper;
  */
 public class RunnableTaskWrapper extends AbstractTaskObjectWrapper
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The object on which to execute a method, or the class of the object if the method is static.
-	 */
-	private Runnable runnable = null;
-	/**
-	 * The name of the method to execute.
-	 */
-	private String methodName = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The object on which to execute a method, or the class of the object if the method is static.
+   */
+  private Runnable runnable = null;
+  /**
+   * The name of the method to execute.
+   */
+  private String methodName = null;
 
-	/**
-	 * Initialize this wrapper with the specified <code>Runnable</code> object.
-	 * @param taskObject the runnable object to execute.
-	 */
-	public RunnableTaskWrapper(final Runnable taskObject)
-	{
-		this.runnable = taskObject;
-	}
+  /**
+   * Initialize this wrapper with the specified <code>Runnable</code> object.
+   * @param taskObject the runnable object to execute.
+   */
+  public RunnableTaskWrapper(final Runnable taskObject)
+  {
+    this.runnable = taskObject;
+  }
 
-	/**
-	 * Execute the <code>run()</code> method of this runnable task.
-	 * @return the result of the execution.
-	 * @throws Exception if an error occurs during the execution.
-	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
-	 */
-	@Override
-	public Object execute() throws Exception
-	{
-		runnable.run();
-		return null;
-	}
+  /**
+   * Execute the <code>run()</code> method of this runnable task.
+   * @return the result of the execution.
+   * @throws Exception if an error occurs during the execution.
+   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
+   */
+  @Override
+  public Object execute() throws Exception
+  {
+    runnable.run();
+    return null;
+  }
 
-	/**
-	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static.
-	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
-	 */
-	@Override
-	public Object getTaskObject()
-	{
-		return runnable;
-	}
+  /**
+   * Return the object on which a method or constructor is called.
+   * @return an object or null if the invoked method is static.
+   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
+   */
+  @Override
+  public Object getTaskObject()
+  {
+    return runnable;
+  }
 }

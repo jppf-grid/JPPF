@@ -27,9 +27,9 @@ import java.util.EventListener;
  */
 public interface ClientConnectionListener extends EventListener
 {
-	/**
-	 * Called when the remote peer detects its connection with the server is broken.
-	 * @param event an event wrapping the connection and its status.
-	 */
-	void clientConnectionFailed(ClientConnectionEvent event);
+  /**
+   * Called when the remote peer detects its connection with the server is broken.
+   * @param event an event wrapping the connection and its status.
+   */
+  void clientConnectionFailed(ClientConnectionEvent event);
 }

@@ -25,10 +25,10 @@ package org.jppf.utils;
  */
 public interface SerializationHelper
 {
-	/**
-	 * Get a reference to the <code>ObjectSerializer</code> used by this helper.
-	 * @return an <code>ObjectSerializer</code> instance.
-	 * @throws Exception if the serializer could not be obtained.
-	 */
-	ObjectSerializer getSerializer() throws Exception;
+  /**
+   * Get a reference to the <code>ObjectSerializer</code> used by this helper.
+   * @return an <code>ObjectSerializer</code> instance.
+   * @throws Exception if the serializer could not be obtained.
+   */
+  ObjectSerializer getSerializer() throws Exception;
 }

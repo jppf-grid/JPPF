@@ -29,40 +29,40 @@ import org.jppf.node.protocol.Task;
  */
 public class TaskExecutionEvent extends EventObject
 {
-	/**
-	 * Object encapsulating information about the task.
-	 */
-	private TaskInformation taskInformation = null;
+  /**
+   * Object encapsulating information about the task.
+   */
+  private TaskInformation taskInformation = null;
 
-	/**
-	 * Initialize this event object with the specified task.
-	 * @param task the JPPF task from which the event originates.
-	 * @param jobId the id of the job this task belongs to.
-	 * @param cpuTime the cpu time taken by the task.
-	 * @param elapsedTime the wall clock time taken by the task.
-	 * @param error determines whether the task had an exception.
-	 */
-	public TaskExecutionEvent(final Task task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
-	{
-		super(task);
-		this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
-	}
+  /**
+   * Initialize this event object with the specified task.
+   * @param task the JPPF task from which the event originates.
+   * @param jobId the id of the job this task belongs to.
+   * @param cpuTime the cpu time taken by the task.
+   * @param elapsedTime the wall clock time taken by the task.
+   * @param error determines whether the task had an exception.
+   */
+  public TaskExecutionEvent(final Task task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
+  {
+    super(task);
+    this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
+  }
 
-	/**
-	 * Get the JPPF task from which the event originates.
-	 * @return a <code>JPPFTask</code> instance.
-	 */
-	public Task getTask()
-	{
-		return (Task) getSource();
-	}
+  /**
+   * Get the JPPF task from which the event originates.
+   * @return a <code>JPPFTask</code> instance.
+   */
+  public Task getTask()
+  {
+    return (Task) getSource();
+  }
 
-	/**
-	 * Get the object encapsulating information about the task.
-	 * @return a <code>TaskInformation</code> instance.
-	 */
-	public TaskInformation getTaskInformation()
-	{
-		return taskInformation;
-	}
+  /**
+   * Get the object encapsulating information about the task.
+   * @return a <code>TaskInformation</code> instance.
+   */
+  public TaskInformation getTaskInformation()
+  {
+    return taskInformation;
+  }
 }

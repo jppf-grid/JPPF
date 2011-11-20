@@ -26,46 +26,46 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class TaskVersion extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Default construction.
-	 */
-	public TaskVersion()
-	{
-	}
+  /**
+   * Default construction.
+   */
+  public TaskVersion()
+  {
+  }
 
-	/**
-	 * Initialize this task with a byte array of the specified size.
-	 * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
-	 * depending on the inNodeOnly flag.
-	 * @param datasize the size in byte of the byte array this task owns.
-	 * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
-	 */
-	public TaskVersion(final int datasize, final boolean inNodeOnly)
-	{
-	}
+  /**
+   * Initialize this task with a byte array of the specified size.
+   * The array is created at construction time and passed on to the node, or task execution time and passed back to the client,
+   * depending on the inNodeOnly flag.
+   * @param datasize the size in byte of the byte array this task owns.
+   * @param inNodeOnly if true, the array is created at execution time, otherwise at construction time.
+   */
+  public TaskVersion(final int datasize, final boolean inNodeOnly)
+  {
+  }
 
-	/**
-	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			String msg = "execution successful for task version 2";
-			setResult(msg);
-			System.out.println(msg);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Perform the multiplication of a matrix row by another matrix.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      String msg = "execution successful for task version 2";
+      setResult(msg);
+      System.out.println(msg);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }
 

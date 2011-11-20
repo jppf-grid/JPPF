@@ -24,53 +24,53 @@ import org.slf4j.*;
  */
 public abstract class SynchronizedTask implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SynchronizedTask.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * An object to synchronize against.
-	 */
-	final Object sync;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SynchronizedTask.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * An object to synchronize against.
+   */
+  final Object sync;
 
-	/**
-	 * Initialize this task with an object to synchronize against.
-	 * @param sync - an object to synchronize against.
-	 */
-	public SynchronizedTask(final Object sync)
-	{
-        if(sync == null) throw new IllegalArgumentException("sync is null");
+  /**
+   * Initialize this task with an object to synchronize against.
+   * @param sync - an object to synchronize against.
+   */
+  public SynchronizedTask(final Object sync)
+  {
+    if(sync == null) throw new IllegalArgumentException("sync is null");
 
-		this.sync = sync;
-	}
+    this.sync = sync;
+  }
 
-	/**
-	 * Wrap the task execution within a synchronized block within a try/catch block.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			synchronized(sync)
-			{
-				perform();
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Wrap the task execution within a synchronized block within a try/catch block.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      synchronized(sync)
+      {
+        perform();
+      }
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 
-	/**
-	 * Execute the task.
-	 * @throws Exception if any error occurs.
-	 */
-	public abstract void perform() throws Exception;
+  /**
+   * Execute the task.
+   * @throws Exception if any error occurs.
+   */
+  public abstract void perform() throws Exception;
 }

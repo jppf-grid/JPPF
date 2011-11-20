@@ -26,10 +26,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public interface TreeNodeSelector
 {
-	/**
-	 * Filter the specified node.
-	 * @param node the node to filter.
-	 * @return <code>true</code> if the node is accepted, <code>false</code> if it is rejected.
-	 */
-	boolean accept(DefaultMutableTreeNode node);
+  /**
+   * Filter the specified node.
+   * @param node the node to filter.
+   * @return <code>true</code> if the node is accepted, <code>false</code> if it is rejected.
+   */
+  boolean accept(DefaultMutableTreeNode node);
 }

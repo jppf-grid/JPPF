@@ -26,37 +26,37 @@ import org.slf4j.*;
  */
 public class LoggingTask extends JPPFTask
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(LoggingTask.class);
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(LoggingTask.class);
 
-	/**
-	 * Initialize this task with the specified id.
-	 * @param id the task id.
-	 */
-	public LoggingTask(final String id)
-	{
-		setId(id);
-	}
+  /**
+   * Initialize this task with the specified id.
+   * @param id the task id.
+   */
+  public LoggingTask(final String id)
+  {
+    setId(id);
+  }
 
-	/**
-	 * This method contains the code that will be executed by a node.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		log.info("task " + getId() + " has started");
-		try
-		{
-			Thread.sleep(1000L);
-			setResult("the execution was performed successfully");
-		}
-		catch(InterruptedException e)
-		{
-			setException(e);
-		}
-		log.info("task " + getId() + " has ended");
-	}
+  /**
+   * This method contains the code that will be executed by a node.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    log.info("task " + getId() + " has started");
+    try
+    {
+      Thread.sleep(1000L);
+      setResult("the execution was performed successfully");
+    }
+    catch(InterruptedException e)
+    {
+      setException(e);
+    }
+    log.info("task " + getId() + " has ended");
+  }
 }

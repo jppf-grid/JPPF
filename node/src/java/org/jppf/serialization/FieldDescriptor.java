@@ -27,70 +27,70 @@ import java.lang.reflect.Field;
  */
 class FieldDescriptor
 {
-	/**
-	 * The name of this field.
-	 */
-	String name;
-	/**
-	 * The corresponding field object.
-	 */
-	Field field;
-	/**
-	 * Descriptor for the type of this field.
-	 */
-	ClassDescriptor type;
-	/**
-	 * Handler for the field type, use at deserialization only.
-	 */
-	int typeHandle;
+  /**
+   * The name of this field.
+   */
+  String name;
+  /**
+   * The corresponding field object.
+   */
+  Field field;
+  /**
+   * Descriptor for the type of this field.
+   */
+  ClassDescriptor type;
+  /**
+   * Handler for the field type, use at deserialization only.
+   */
+  int typeHandle;
 
-	/**
-	 * Initialize an empty field descriptor.
-	 */
-	FieldDescriptor()
-	{
-	}
+  /**
+   * Initialize an empty field descriptor.
+   */
+  FieldDescriptor()
+  {
+  }
 
-	/**
-	 * Initialize a field descriptor from a field.
-	 * @param field the field to initialize from.
-	 * @throws Exception if any error occurs.
-	 */
-	FieldDescriptor(final Field field) throws Exception
-	{
-		this.field = field;
-		name = field.getName();
-	}
+  /**
+   * Initialize a field descriptor from a field.
+   * @param field the field to initialize from.
+   * @throws Exception if any error occurs.
+   */
+  FieldDescriptor(final Field field) throws Exception
+  {
+    this.field = field;
+    name = field.getName();
+  }
 
 
-	/**
-	 * Write this field descriptor to an object output stream.
-	 * @param out the stream to write to.
-	 * @throws IOException if any error occurs.
-	 */
-	void write(final ObjectOutputStream out) throws IOException
-	{
-		out.writeUTF(name);
-		out.writeInt(type.handle);
-	}
+  /**
+   * Write this field descriptor to an object output stream.
+   * @param out the stream to write to.
+   * @throws IOException if any error occurs.
+   */
+  void write(final ObjectOutputStream out) throws IOException
+  {
+    out.writeUTF(name);
+    out.writeInt(type.handle);
+  }
 
-	/**
-	 * Read this class descriptor from an input stream.
-	 * @param in the stream to read from.
-	 * @throws IOException if any error occurs.
-	 */
-	void read(final ObjectInputStream in) throws IOException
-	{
-		name = in.readUTF();
-		typeHandle = in.readInt();
-	}
+  /**
+   * Read this class descriptor from an input stream.
+   * @param in the stream to read from.
+   * @throws IOException if any error occurs.
+   */
+  void read(final ObjectInputStream in) throws IOException
+  {
+    name = in.readUTF();
+    typeHandle = in.readInt();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return "FieldDescriptor[name=" + name + ", type=" + type + ", typeHandle=" + typeHandle + ']';
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    return "FieldDescriptor[name=" + name + ", type=" + type + ", typeHandle=" + typeHandle + ']';
+  }
 }

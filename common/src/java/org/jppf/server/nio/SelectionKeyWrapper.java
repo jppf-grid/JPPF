@@ -28,99 +28,99 @@ import org.jppf.utils.StringUtils;
  */
 public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
 {
-	/**
-	 * Initialize this channel wrapper with the specified channel.
-	 * @param channel the channel to wrap.
-	 */
-	public SelectionKeyWrapper(final SelectionKey channel)
-	{
-		super(channel);
-	}
+  /**
+   * Initialize this channel wrapper with the specified channel.
+   * @param channel the channel to wrap.
+   */
+  public SelectionKeyWrapper(final SelectionKey channel)
+  {
+    super(channel);
+  }
 
-	/**
-	 * Get the {@link AbstractNioContext} attached to the channel.
-	 * @return a {@link AbstractNioContext} instance.
-	 * @see org.jppf.server.nio.AbstractChannelWrapper#getContext()
-	 */
-	@Override
-	public NioContext getContext()
-	{
-		return (NioContext) getChannel().attachment();
-	}
+  /**
+   * Get the {@link AbstractNioContext} attached to the channel.
+   * @return a {@link AbstractNioContext} instance.
+   * @see org.jppf.server.nio.AbstractChannelWrapper#getContext()
+   */
+  @Override
+  public NioContext getContext()
+  {
+    return (NioContext) getChannel().attachment();
+  }
 
-	/**
-	 * Close the channel.
-	 * @throws Exception if any error occurs while closing the channel.
-	 */
-	@Override
-	public void close() throws Exception
-	{
-		getChannel().channel().close();
-	}
+  /**
+   * Close the channel.
+   * @throws Exception if any error occurs while closing the channel.
+   */
+  @Override
+  public void close() throws Exception
+  {
+    getChannel().channel().close();
+  }
 
-	/**
-	 * Determine whether the channel is opened.
-	 * @return true if the channel is opened, false otherwise.
-	 */
-	@Override
-	public boolean isOpen()
-	{
-		return getChannel().channel().isOpen();
-	}
+  /**
+   * Determine whether the channel is opened.
+   * @return true if the channel is opened, false otherwise.
+   */
+  @Override
+  public boolean isOpen()
+  {
+    return getChannel().channel().isOpen();
+  }
 
-	/**
-	 * Generate a string that represents this channel wrapper.
-	 * @return a string that represents this channel wrapper.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (channel.isValid()) return super.toString();
-		return "[invalid channel]";
-	}
+  /**
+   * Generate a string that represents this channel wrapper.
+   * @return a string that represents this channel wrapper.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    if (channel.isValid()) return super.toString();
+    return "[invalid channel]";
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId()
-	{
-		return StringUtils.getRemoteHost(getChannel().channel());
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getId()
+  {
+    return StringUtils.getRemoteHost(getChannel().channel());
+  }
 
-	/**
-	 * Get the operations enabled for this channel.
-	 * @return the operations as an int value.
-	 * @see org.jppf.server.nio.AbstractChannelWrapper#getKeyOps()
-	 */
-	@Override
-	public int getKeyOps()
-	{
-		return getChannel().interestOps();
-	}
+  /**
+   * Get the operations enabled for this channel.
+   * @return the operations as an int value.
+   * @see org.jppf.server.nio.AbstractChannelWrapper#getKeyOps()
+   */
+  @Override
+  public int getKeyOps()
+  {
+    return getChannel().interestOps();
+  }
 
-	/**
-	 * Get the operations enabled for this channel.
-	 * @param keyOps the operations as an int value.
-	 * @see org.jppf.server.nio.AbstractChannelWrapper#setKeyOps(int)
-	 */
-	@Override
-	public void setKeyOps(final int keyOps)
-	{
-		SelectionKey key = channel;
-		key.selector().wakeup();
-		channel.interestOps(keyOps);
-	}
+  /**
+   * Get the operations enabled for this channel.
+   * @param keyOps the operations as an int value.
+   * @see org.jppf.server.nio.AbstractChannelWrapper#setKeyOps(int)
+   */
+  @Override
+  public void setKeyOps(final int keyOps)
+  {
+    SelectionKey key = channel;
+    key.selector().wakeup();
+    channel.interestOps(keyOps);
+  }
 
-	/**
-	 * Get the operations available for this channel.
-	 * @return the operations as an int value.
-	 * @see org.jppf.server.nio.AbstractChannelWrapper#getReadyOps()
-	 */
-	@Override
-	public int getReadyOps()
-	{
-		return getChannel().readyOps();
-	}
+  /**
+   * Get the operations available for this channel.
+   * @return the operations as an int value.
+   * @see org.jppf.server.nio.AbstractChannelWrapper#getReadyOps()
+   */
+  @Override
+  public int getReadyOps()
+  {
+    return getChannel().readyOps();
+  }
 }

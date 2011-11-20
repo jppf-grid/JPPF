@@ -28,67 +28,67 @@ import org.slf4j.*;
  */
 public class JcaJobSubmission extends AbstractJobSubmission
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(JcaJobSubmission.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(JcaJobSubmission.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this job submission.
-	 * @param job the submitted job.
-	 * @param connection the connection to execute the job on.
-	 * @param submissionManager the submission manager.
-	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
-	 */
-	JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
-	{
-		super(job, connection, locallyExecuting);
-		this.submissionManager = submissionManager;
-	}
+  /**
+   * Initialize this job submission.
+   * @param job the submitted job.
+   * @param connection the connection to execute the job on.
+   * @param submissionManager the submission manager.
+   * @param locallyExecuting determines whether the job will be executed locally, at least partially.
+   */
+  JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
+  {
+    super(job, connection, locallyExecuting);
+    this.submissionManager = submissionManager;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		JcaSubmissionResult result = (JcaSubmissionResult) job.getResultListener();
-		String requestUuid = job.getJobUuid();
-		ClassLoader cl = null;
-		ClassLoader oldCl = null;
-		if (!job.getTasks().isEmpty())
-		{
-			Task task = job.getTasks().get(0);
-			cl = task.getClass().getClassLoader();
-			connection.getDelegate().addRequestClassLoader(requestUuid, cl);
-			if (debugEnabled) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-		}
-		try
-		{
-			if (cl != null)
-			{
-				oldCl = Thread.currentThread().getContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-			}
-			connection.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
-			result.waitForResults(0);
-			connection.getDelegate().removeRequestClassLoader(requestUuid);
-			result.setStatus(COMPLETE);
-		}
-		catch (Exception e)
-		{
-			result.setStatus(FAILED);
-			log.error(e.getMessage(), e);
-			submissionManager.resubmitJob(job);
-		}
-		finally
-		{
-			if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    JcaSubmissionResult result = (JcaSubmissionResult) job.getResultListener();
+    String requestUuid = job.getJobUuid();
+    ClassLoader cl = null;
+    ClassLoader oldCl = null;
+    if (!job.getTasks().isEmpty())
+    {
+      Task task = job.getTasks().get(0);
+      cl = task.getClass().getClassLoader();
+      connection.getDelegate().addRequestClassLoader(requestUuid, cl);
+      if (debugEnabled) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+    }
+    try
+    {
+      if (cl != null)
+      {
+        oldCl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(cl);
+      }
+      connection.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
+      result.waitForResults(0);
+      connection.getDelegate().removeRequestClassLoader(requestUuid);
+      result.setStatus(COMPLETE);
+    }
+    catch (Exception e)
+    {
+      result.setStatus(FAILED);
+      log.error(e.getMessage(), e);
+      submissionManager.resubmitJob(job);
+    }
+    finally
+    {
+      if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
+      if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+    }
+  }
 }

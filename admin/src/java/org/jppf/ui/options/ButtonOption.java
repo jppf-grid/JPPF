@@ -30,92 +30,92 @@ import org.slf4j.*;
  */
 public class ButtonOption extends AbstractOption
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ButtonOption.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ButtonOption.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public ButtonOption()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public ButtonOption()
+  {
+  }
 
-	/**
-	 * Initialize this text option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox.
-	 * @param tooltip the tooltip associated with the checkbox.
-	 */
-	public ButtonOption(final String name, final String label, final String tooltip)
-	{
-		this.name = name;
-		this.label = label;
-		setToolTipText(tooltip);
-		createUI();
-	}
+  /**
+   * Initialize this text option with the specified parameters.
+   * @param name this component's name.
+   * @param label the label displayed with the checkbox.
+   * @param tooltip the tooltip associated with the checkbox.
+   */
+  public ButtonOption(final String name, final String label, final String tooltip)
+  {
+    this.name = name;
+    this.label = label;
+    setToolTipText(tooltip);
+    createUI();
+  }
 
-	/**
-	 * Create the UI components for this option.
-	 */
-	@Override
-	public void createUI()
-	{
-		JButton button = new JButton();
-		if (label != null) button.setText(label);
-		if (iconPath != null)
-		{
-			ImageIcon icon = GuiUtils.loadIcon(iconPath);
-			if (icon != null) button.setIcon(icon);
-		}
-		if (toolTipText != null) button.setToolTipText(toolTipText);
-		UIComponent = button;
-		setupValueChangeNotifications();
-	}
+  /**
+   * Create the UI components for this option.
+   */
+  @Override
+  public void createUI()
+  {
+    JButton button = new JButton();
+    if (label != null) button.setText(label);
+    if (iconPath != null)
+    {
+      ImageIcon icon = GuiUtils.loadIcon(iconPath);
+      if (icon != null) button.setIcon(icon);
+    }
+    if (toolTipText != null) button.setToolTipText(toolTipText);
+    UIComponent = button;
+    setupValueChangeNotifications();
+  }
 
-	/**
-	 * This method does nothing.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-		JButton button = (JButton) UIComponent;
-		button.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(final ActionEvent e)
-			{
-				fireValueChanged();
-			}
-		});
-	}
+  /**
+   * This method does nothing.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+    JButton button = (JButton) UIComponent;
+    button.addActionListener(new ActionListener()
+    {
+      @Override
+      public void actionPerformed(final ActionEvent e)
+      {
+        fireValueChanged();
+      }
+    });
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-		UIComponent.setEnabled(enabled);
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.Option#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+    UIComponent.setEnabled(enabled);
+  }
 
-	/**
-	 * This method always returns false, since buttons have no value to persist.
-	 * @return false.
-	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
-	 */
-	@Override
-	public boolean isPersistent()
-	{
-		return false;
-	}
+  /**
+   * This method always returns false, since buttons have no value to persist.
+   * @return false.
+   * @see org.jppf.ui.options.AbstractOption#isPersistent()
+   */
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
 }

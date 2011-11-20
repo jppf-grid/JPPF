@@ -27,68 +27,68 @@ import java.util.*;
  */
 public class Trade implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Trade identifier.
-	 */
-	private String id = "";
-	/**
-	 * A list of identifiers for the pieces of market data this depends on.
-	 */
-	private SortedSet<String> dataDependencies = new TreeSet<String>();
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Trade identifier.
+   */
+  private String id = "";
+  /**
+   * A list of identifiers for the pieces of market data this depends on.
+   */
+  private SortedSet<String> dataDependencies = new TreeSet<String>();
 
-	/**
-	 * Default constructor.
-	 */
-	public Trade()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public Trade()
+  {
+  }
 
-	/**
-	 * Initialize the trade with the specified identifier.
-	 * @param id the trade identifier.
-	 */
-	public Trade(final String id)
-	{
-		this.id = id;
-	}
+  /**
+   * Initialize the trade with the specified identifier.
+   * @param id the trade identifier.
+   */
+  public Trade(final String id)
+  {
+    this.id = id;
+  }
 
-	/**
-	 * Get the trade identifier.
-	 * @return the id as a string.
-	 */
-	public String getId()
-	{
-		return id;
-	}
+  /**
+   * Get the trade identifier.
+   * @return the id as a string.
+   */
+  public String getId()
+  {
+    return id;
+  }
 
-	/**
-	 * Set the trade identifier.
-	 * @param id the id as a string.
-	 */
-	public void setId(final String id)
-	{
-		this.id = id;
-	}
+  /**
+   * Set the trade identifier.
+   * @param id the id as a string.
+   */
+  public void setId(final String id)
+  {
+    this.id = id;
+  }
 
-	/**
-	 * Get the list of dependencies for this trade.
-	 * @return a list of market data identifier strings.
-	 */
-	public SortedSet<String> getDataDependencies()
-	{
-		return dataDependencies;
-	}
+  /**
+   * Get the list of dependencies for this trade.
+   * @return a list of market data identifier strings.
+   */
+  public SortedSet<String> getDataDependencies()
+  {
+    return dataDependencies;
+  }
 
-	/**
-	 * Set the list of dependencies for this trade.
-	 * @param dataDependencies a list of market data identifier strings.
-	 */
-	public void setDataDependencies(final SortedSet<String> dataDependencies)
-	{
-		this.dataDependencies = dataDependencies;
-	}
+  /**
+   * Set the list of dependencies for this trade.
+   * @param dataDependencies a list of market data identifier strings.
+   */
+  public void setDataDependencies(final SortedSet<String> dataDependencies)
+  {
+    this.dataDependencies = dataDependencies;
+  }
 }

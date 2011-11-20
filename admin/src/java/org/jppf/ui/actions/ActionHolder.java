@@ -24,9 +24,9 @@ package org.jppf.ui.actions;
  */
 public interface ActionHolder
 {
-	/**
-	 * Get the object that handles all actions in toolbars or popup menus.
-	 * @return a <code>JTreeTableActionHandler</code> instance.
-	 */
-	ActionHandler getActionHandler();
+  /**
+   * Get the object that handles all actions in toolbars or popup menus.
+   * @return a <code>JTreeTableActionHandler</code> instance.
+   */
+  ActionHandler getActionHandler();
 }

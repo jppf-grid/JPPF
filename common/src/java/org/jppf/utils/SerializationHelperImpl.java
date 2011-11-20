@@ -26,59 +26,59 @@ import org.slf4j.*;
  */
 public class SerializationHelperImpl implements SerializationHelper
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SerializationHelperImpl.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether dumping byte arrays in the log is enabled.
-	 */
-	private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SerializationHelperImpl.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether dumping byte arrays in the log is enabled.
+   */
+  private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
 
-	/**
-	 * Used to serialize and deserialize objects to and from object streams.
-	 */
-	protected ObjectSerializer serializer = null;
+  /**
+   * Used to serialize and deserialize objects to and from object streams.
+   */
+  protected ObjectSerializer serializer = null;
 
-	/**
-	 * Default constructor.
-	 */
-	public SerializationHelperImpl()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public SerializationHelperImpl()
+  {
+  }
 
-	/**
-	 * Get the object serializer for this helper.
-	 * @return an <code>ObjectSerializer</code> instance.
-	 * @throws Exception if the object serializer could not be instantiated.
-	 * @see org.jppf.utils.SerializationHelper#getSerializer()
-	 */
-	@Override
-	public ObjectSerializer getSerializer() throws Exception
-	{
-		if (serializer == null)
-		{
-			ClassLoader cl = getClass().getClassLoader();
-			if (cl instanceof AbstractJPPFClassLoader)
-			{
-				serializer = (ObjectSerializer)
-				((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
-			}
-			else if (cl instanceof NonDelegatingClassLoader)
-			{
-				serializer = (ObjectSerializer)
-				((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
-			}
-			else
-			{
-				serializer = (ObjectSerializer)
-				cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
-			}
-		}
-		return serializer;
-	}
+  /**
+   * Get the object serializer for this helper.
+   * @return an <code>ObjectSerializer</code> instance.
+   * @throws Exception if the object serializer could not be instantiated.
+   * @see org.jppf.utils.SerializationHelper#getSerializer()
+   */
+  @Override
+  public ObjectSerializer getSerializer() throws Exception
+  {
+    if (serializer == null)
+    {
+      ClassLoader cl = getClass().getClassLoader();
+      if (cl instanceof AbstractJPPFClassLoader)
+      {
+        serializer = (ObjectSerializer)
+        ((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+      }
+      else if (cl instanceof NonDelegatingClassLoader)
+      {
+        serializer = (ObjectSerializer)
+        ((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
+      }
+      else
+      {
+        serializer = (ObjectSerializer)
+        cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+      }
+    }
+    return serializer;
+  }
 }

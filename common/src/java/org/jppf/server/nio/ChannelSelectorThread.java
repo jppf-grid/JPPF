@@ -27,63 +27,63 @@ import org.slf4j.*;
  */
 public class ChannelSelectorThread extends ThreadSynchronization implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ChannelSelectorThread.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The channel selector associated with this thread.
-	 */
-	private ChannelSelector selector = null;
-	/**
-	 * The nio server that own this thread.
-	 */
-	private NioServer<?, ?> server = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ChannelSelectorThread.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The channel selector associated with this thread.
+   */
+  private ChannelSelector selector = null;
+  /**
+   * The nio server that own this thread.
+   */
+  private NioServer<?, ?> server = null;
 
-	/**
-	 * Initialize this thread with the specified name, selector and NIO server.
-	 * @param selector the channel selector associated with this thread.
-	 * @param server the nio server that own this thread.
-	 */
-	public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server)
-	{
-		this.selector = selector;
-		this.server = server;
-	}
+  /**
+   * Initialize this thread with the specified name, selector and NIO server.
+   * @param selector the channel selector associated with this thread.
+   * @param server the nio server that own this thread.
+   */
+  public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server)
+  {
+    this.selector = selector;
+    this.server = server;
+  }
 
-	/**
-	 * Perform the selection loop.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		while (!isStopped())
-		{
-			if (selector.select())
-			{
-				ChannelWrapper<?> channel = selector.getChannel();
-				synchronized(channel)
-				{
-					//if (channel instanceof AbstractChannelWrapper) ((AbstractChannelWrapper) channel).wakeUp();
-					if (debugEnabled) log.debug("selected channel " + channel);
-					server.getTransitionManager().submitTransition(channel);
-				}
-				server.postSelect();
-			}
-		}
-	}
+  /**
+   * Perform the selection loop.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    while (!isStopped())
+    {
+      if (selector.select())
+      {
+        ChannelWrapper<?> channel = selector.getChannel();
+        synchronized(channel)
+        {
+          //if (channel instanceof AbstractChannelWrapper) ((AbstractChannelWrapper) channel).wakeUp();
+          if (debugEnabled) log.debug("selected channel " + channel);
+          server.getTransitionManager().submitTransition(channel);
+        }
+        server.postSelect();
+      }
+    }
+  }
 
-	/**
-	 * Closes this channel selector. If <code>close()</code> was already called, then this method has no effect.
-	 */
-	public void close()
-	{
-		setStopped(true);
-		selector.wakeUp();
-	}
+  /**
+   * Closes this channel selector. If <code>close()</code> was already called, then this method has no effect.
+   */
+  public void close()
+  {
+    setStopped(true);
+    selector.wakeUp();
+  }
 }

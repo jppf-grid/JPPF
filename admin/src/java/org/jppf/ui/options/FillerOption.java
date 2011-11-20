@@ -25,71 +25,71 @@ import org.jppf.ui.utils.GuiUtils;
  */
 public class FillerOption extends AbstractOption
 {
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public FillerOption()
-	{
-		UIComponent = GuiUtils.createFiller(1, 1);
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public FillerOption()
+  {
+    UIComponent = GuiUtils.createFiller(1, 1);
+  }
 
-	/**
-	 * Initialize this boolean option with the specified parameters.
-	 * @param width the filler's width
-	 * @param height the filler's height.
-	 */
-	public FillerOption(final int width, final int height)
-	{
-		UIComponent = GuiUtils.createFiller(width, height);
-	}
+  /**
+   * Initialize this boolean option with the specified parameters.
+   * @param width the filler's width
+   * @param height the filler's height.
+   */
+  public FillerOption(final int width, final int height)
+  {
+    UIComponent = GuiUtils.createFiller(width, height);
+  }
 
-	/**
-	 * Create the UI components for this option.
-	 */
-	@Override
-	public void createUI()
-	{
-	}
+  /**
+   * Create the UI components for this option.
+   */
+  @Override
+  public void createUI()
+  {
+  }
 
-	/**
-	 * Get the current value for this option.
-	 * @return null.
-	 * @see org.jppf.ui.options.AbstractOption#getValue()
-	 */
-	@Override
-	public Object getValue()
-	{
-		return null;
-	}
+  /**
+   * Get the current value for this option.
+   * @return null.
+   * @see org.jppf.ui.options.AbstractOption#getValue()
+   */
+  @Override
+  public Object getValue()
+  {
+    return null;
+  }
 
-	/**
-	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-	}
+  /**
+   * Propagate the state changes of the underlying checkbox to the listeners to this option.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.Option#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+  }
 
-	/**
-	 * This method always returns false, since buttons have no value to persist.
-	 * @return false.
-	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
-	 */
-	@Override
-	public boolean isPersistent()
-	{
-		return false;
-	}
+  /**
+   * This method always returns false, since buttons have no value to persist.
+   * @return false.
+   * @see org.jppf.ui.options.AbstractOption#isPersistent()
+   */
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
 }

@@ -26,9 +26,9 @@ import java.io.Serializable;
  */
 public interface LoadBalancingProfile extends Serializable
 {
-	/**
-	 * Make a copy of this profile.
-	 * @return a newly created <code>LoadBalancingProfile</code> instance.
-	 */
-	LoadBalancingProfile copy();
+  /**
+   * Make a copy of this profile.
+   * @return a newly created <code>LoadBalancingProfile</code> instance.
+   */
+  LoadBalancingProfile copy();
 }

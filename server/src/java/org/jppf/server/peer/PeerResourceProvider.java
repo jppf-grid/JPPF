@@ -35,86 +35,86 @@ import org.slf4j.*;
  */
 class PeerResourceProvider extends AbstractSocketChannelHandler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(PeerResourceProvider.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The name of the peer in the configuration file.
-	 */
-	private final String peerName;
-	/**
-	 * Peer connection information.
-	 */
-	private final JPPFConnectionInformation connectionInfo;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(PeerResourceProvider.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The name of the peer in the configuration file.
+   */
+  private final String peerName;
+  /**
+   * Peer connection information.
+   */
+  private final JPPFConnectionInformation connectionInfo;
 
-	/**
-	 * Initialize this peer provider with the specified configuration name.
-	 * @param peerName the name of the peer in the configuration file.
-	 * @param connectionInfo peer connection information.
-	 * @param server the NioServer to which the channel is registered.
-	 */
-	public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final NioServer server)
-	{
-		super(server);
-		if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-		if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+  /**
+   * Initialize this peer provider with the specified configuration name.
+   * @param peerName the name of the peer in the configuration file.
+   * @param connectionInfo peer connection information.
+   * @param server the NioServer to which the channel is registered.
+   */
+  public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final NioServer server)
+  {
+    super(server);
+    if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+    if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
-		this.peerName = peerName;
-		this.connectionInfo = connectionInfo;
-	}
+    this.peerName = peerName;
+    this.connectionInfo = connectionInfo;
+  }
 
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	@Override
-	public synchronized void postInit() throws Exception
-	{
-		try
-		{
-			socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
-			JPPFResourceWrapper resource = new JPPFResourceWrapper();
-			resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-			socketClient.send(resource);
-			socketClient.flush();
-			if (debugEnabled) log.debug("sent node initiation");
-			// get a response containing the uuid of the contacted peer
-			resource = (JPPFResourceWrapper) socketClient.receive();
-			if (debugEnabled) log.debug("received node initiation response");
+  /**
+   * Initialize this node's resources.
+   * @throws Exception if an error is raised during initialization.
+   */
+  @Override
+  public synchronized void postInit() throws Exception
+  {
+    try
+    {
+      socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+      JPPFResourceWrapper resource = new JPPFResourceWrapper();
+      resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+      socketClient.send(resource);
+      socketClient.flush();
+      if (debugEnabled) log.debug("sent node initiation");
+      // get a response containing the uuid of the contacted peer
+      resource = (JPPFResourceWrapper) socketClient.receive();
+      if (debugEnabled) log.debug("received node initiation response");
 
-			SocketChannel channel = socketClient.getChannel();
-			socketClient.setChannel(null);
-			ClassContext context = (ClassContext) server.createNioContext();
-			//context.setState(ClassState.SENDING_PROVIDER_REQUEST);
-			context.setState(ClassState.IDLE_PROVIDER);
-			context.setPendingRequests(new Vector<ChannelWrapper<?>>());
-			context.setUuid(resource.getProviderUuid());
-			ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, 0, context, null);
-			((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), wrapper);
-			if (debugEnabled) log.debug("registered class server channel");
-		}
-		catch (IOException e)
-		{
-			log.error(e.getMessage());
-			throw new RuntimeException(e);
-		}
-	}
+      SocketChannel channel = socketClient.getChannel();
+      socketClient.setChannel(null);
+      ClassContext context = (ClassContext) server.createNioContext();
+      //context.setState(ClassState.SENDING_PROVIDER_REQUEST);
+      context.setState(ClassState.IDLE_PROVIDER);
+      context.setPendingRequests(new Vector<ChannelWrapper<?>>());
+      context.setUuid(resource.getProviderUuid());
+      ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, 0, context, null);
+      ((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), wrapper);
+      if (debugEnabled) log.debug("registered class server channel");
+    }
+    catch (IOException e)
+    {
+      log.error(e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
 
-	/**
-	 * Initialize the socket channel client.
-	 * @return a non-connected <code>SocketChannelClient</code> instance.
-	 * @throws Exception if an error is raised during initialization.
-	 */
-	@Override
-	public SocketChannelClient initSocketChannel() throws Exception
-	{
-		String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
-		int port = connectionInfo.serverPorts[0];
-		return new SocketChannelClient(host, port, false);
-	}
+  /**
+   * Initialize the socket channel client.
+   * @return a non-connected <code>SocketChannelClient</code> instance.
+   * @throws Exception if an error is raised during initialization.
+   */
+  @Override
+  public SocketChannelClient initSocketChannel() throws Exception
+  {
+    String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
+    int port = connectionInfo.serverPorts[0];
+    return new SocketChannelClient(host, port, false);
+  }
 }

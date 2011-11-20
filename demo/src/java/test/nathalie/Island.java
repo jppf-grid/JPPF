@@ -4,17 +4,17 @@ import org.jppf.server.protocol.JPPFTask;
 
 public class Island extends JPPFTask
 {
-	int c = 0;
+  int c = 0;
 
-	public Island(final int c)
-	{
-		this.c = c;
-	}
+  public Island(final int c)
+  {
+    this.c = c;
+  }
 
-	@Override
-	public void run()
-	{
-		new Intercal().intercal(c);
-		setResult("I am the island... " + c);
-	}
+  @Override
+  public void run()
+  {
+    new Intercal().intercal(c);
+    setResult("I am the island... " + c);
+  }
 }

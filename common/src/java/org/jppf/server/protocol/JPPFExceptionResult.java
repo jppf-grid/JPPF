@@ -32,60 +32,60 @@ import org.jppf.JPPFException;
  */
 public final class JPPFExceptionResult extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * This captures the result of ("" + object).
-	 */
-	private String objectDescriptor = null;
-	/**
-	 * The fully qualified class name of the object that triggered the error.
-	 */
-	private String className = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * This captures the result of ("" + object).
+   */
+  private String objectDescriptor = null;
+  /**
+   * The fully qualified class name of the object that triggered the error.
+   */
+  private String className = null;
 
-	/**
-	 * Initialize this task with the specified error context.
-	 * @param throwable the throwable that is to be captured.
-	 * @param object the object on which the throwable applies.
-	 */
-	public JPPFExceptionResult(final Throwable throwable, final Object object)
-	{
-		if (throwable instanceof Exception) setException((Exception) throwable);
-		else setException(new JPPFException(throwable));
-		objectDescriptor = String.valueOf(object);
-		if (object != null) className = object.getClass().getName();
-	}
+  /**
+   * Initialize this task with the specified error context.
+   * @param throwable the throwable that is to be captured.
+   * @param object the object on which the throwable applies.
+   */
+  public JPPFExceptionResult(final Throwable throwable, final Object object)
+  {
+    if (throwable instanceof Exception) setException((Exception) throwable);
+    else setException(new JPPFException(throwable));
+    objectDescriptor = String.valueOf(object);
+    if (object != null) className = object.getClass().getName();
+  }
 
-	/**
-	 * Display the error context captured in this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		System.out.println(toString());
-	}
+  /**
+   * Display the error context captured in this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    System.out.println(toString());
+  }
 
-	/**
-	 * Construct a string representation of this object.
-	 * @return a string representing this JPPFExceptionResult.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);
-		if (getException() != null)
-		{
-			sb.append(" :\n");
-			StringWriter sw = new StringWriter();
-			PrintWriter writer = new PrintWriter(sw);
-			getException().printStackTrace(writer);
-			sb.append(sw.toString());
-		}
-		return sb.toString();
-	}
+  /**
+   * Construct a string representation of this object.
+   * @return a string representing this JPPFExceptionResult.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);
+    if (getException() != null)
+    {
+      sb.append(" :\n");
+      StringWriter sw = new StringWriter();
+      PrintWriter writer = new PrintWriter(sw);
+      getException().printStackTrace(writer);
+      sb.append(sw.toString());
+    }
+    return sb.toString();
+  }
 }

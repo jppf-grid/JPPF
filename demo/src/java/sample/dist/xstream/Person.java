@@ -25,104 +25,104 @@ package sample.dist.xstream;
  */
 public class Person
 {
-	/**
-	 * The person's first name.
-	 */
-	private String firstname;
-	/**
-	 * The person's last name.
-	 */
-	private String lastname;
-	/**
-	 * The person's phone number.
-	 */
-	private PhoneNumber phone;
+  /**
+   * The person's first name.
+   */
+  private String firstname;
+  /**
+   * The person's last name.
+   */
+  private String lastname;
+  /**
+   * The person's phone number.
+   */
+  private PhoneNumber phone;
 
-	/**
-	 * Default constructor.
-	 */
-	public Person()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public Person()
+  {
+  }
 
-	/**
-	 * Initialize this person with the specified parameters.
-	 * @param firstname the person's first name.
-	 * @param lastname the person's last name.
-	 * @param phone the person's phone number.
-	 */
-	public Person(final String firstname, final String lastname, final PhoneNumber phone)
-	{
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.phone = phone;
-	}
+  /**
+   * Initialize this person with the specified parameters.
+   * @param firstname the person's first name.
+   * @param lastname the person's last name.
+   * @param phone the person's phone number.
+   */
+  public Person(final String firstname, final String lastname, final PhoneNumber phone)
+  {
+    this.firstname = firstname;
+    this.lastname = lastname;
+    this.phone = phone;
+  }
 
-	/**
-	 * Get the person's first name.
-	 * @return the first name as a string.
-	 */
-	public String getFirstname()
-	{
-		return firstname;
-	}
+  /**
+   * Get the person's first name.
+   * @return the first name as a string.
+   */
+  public String getFirstname()
+  {
+    return firstname;
+  }
 
-	/**
-	 * Set the person's first name.
-	 * @param firstname the first name as a string.
-	 */
-	public void setFirstname(final String firstname)
-	{
-		this.firstname = firstname;
-	}
+  /**
+   * Set the person's first name.
+   * @param firstname the first name as a string.
+   */
+  public void setFirstname(final String firstname)
+  {
+    this.firstname = firstname;
+  }
 
-	/**
-	 * Get the person's last name.
-	 * @return the last name as a string.
-	 */
-	public String getLastname()
-	{
-		return lastname;
-	}
+  /**
+   * Get the person's last name.
+   * @return the last name as a string.
+   */
+  public String getLastname()
+  {
+    return lastname;
+  }
 
-	/**
-	 * Set the person's last name.
-	 * @param lastname the last name as a string.
-	 */
-	public void setLastname(final String lastname)
-	{
-		this.lastname = lastname;
-	}
+  /**
+   * Set the person's last name.
+   * @param lastname the last name as a string.
+   */
+  public void setLastname(final String lastname)
+  {
+    this.lastname = lastname;
+  }
 
-	/**
-	 * Get the person's phone number.
-	 * @return a <code>PhoneNumber</code> instance.
-	 */
-	public PhoneNumber getPhone()
-	{
-		return phone;
-	}
+  /**
+   * Get the person's phone number.
+   * @return a <code>PhoneNumber</code> instance.
+   */
+  public PhoneNumber getPhone()
+  {
+    return phone;
+  }
 
-	/**
-	 * Set the person's phone number.
-	 * @param phone a <code>PhoneNumber</code> instance.
-	 */
-	public void setPhone(final PhoneNumber phone)
-	{
-		this.phone = phone;
-	}
+  /**
+   * Set the person's phone number.
+   * @param phone a <code>PhoneNumber</code> instance.
+   */
+  public void setPhone(final PhoneNumber phone)
+  {
+    this.phone = phone;
+  }
 
-	/**
-	 * Get a string representation of this person.
-	 * @return this person as a string.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return
-		"first name = " + firstname +
-		", last name = " + lastname +
-		", phone number = " + phone;
-	}
+  /**
+   * Get a string representation of this person.
+   * @return this person as a string.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return
+    "first name = " + firstname +
+    ", last name = " + lastname +
+    ", phone number = " + phone;
+  }
 }

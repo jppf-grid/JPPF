@@ -28,94 +28,94 @@ import org.jppf.utils.FileUtils;
  */
 class SaveFileAction implements PrivilegedAction<File>
 {
-	/**
-	 * The name of the temp folder in which to save the file.
-	 */
-	private List<String> tmpDirs = null;
-	/**
-	 * The original name of the resource to find.
-	 */
-	private String name = null;
-	/**
-	 * The resource definition to save.
-	 */
-	private final byte[] definition;
-	/**
-	 * An eventually resulting exception.
-	 */
-	private Exception exception = null;
+  /**
+   * The name of the temp folder in which to save the file.
+   */
+  private List<String> tmpDirs = null;
+  /**
+   * The original name of the resource to find.
+   */
+  private String name = null;
+  /**
+   * The resource definition to save.
+   */
+  private final byte[] definition;
+  /**
+   * An eventually resulting exception.
+   */
+  private Exception exception = null;
 
-	/**
-	 * Initialize this action with the specified resource definition.
-	 * @param tmpDirs the name of the temp folder in which to save the file.
-	 * @param name the original name of the resource to find.
-	 * @param definition the resource definition to save.
-	 */
-	public SaveFileAction(final List<String> tmpDirs, final String name, final byte[] definition)
-	{
-		this.tmpDirs = tmpDirs;
-		this.name = name;
-		this.definition = definition;
-	}
+  /**
+   * Initialize this action with the specified resource definition.
+   * @param tmpDirs the name of the temp folder in which to save the file.
+   * @param name the original name of the resource to find.
+   * @param definition the resource definition to save.
+   */
+  public SaveFileAction(final List<String> tmpDirs, final String name, final byte[] definition)
+  {
+    this.tmpDirs = tmpDirs;
+    this.name = name;
+    this.definition = definition;
+  }
 
-	/**
-	 * Initialize this action with the specified resource definition.
-	 * @param definition the resource definition to save.
-	 */
-	public SaveFileAction(final byte[] definition)
-	{
-		this.definition = definition;
-	}
+  /**
+   * Initialize this action with the specified resource definition.
+   * @param definition the resource definition to save.
+   */
+  public SaveFileAction(final byte[] definition)
+  {
+    this.definition = definition;
+  }
 
-	/**
-	 * Execute this action.
-	 * @return the abstract path for the created file.
-	 * @see java.security.PrivilegedAction#run()
-	 */
-	@Override
-	public File run()
-	{
-		File tmp = null;
-		try
-		{
-			for (String s: tmpDirs)
-			{
-				File f = new File(s, name);
-				if (!f.exists())
-				{
-					tmp = f;
-					break;
-				}
-			}
-			if (tmp == null)
-			{
-				String dir = tmpDirs.get(0) + '_' + tmpDirs.size();
-				File f = new File(dir + File.separator);
-				if (!f.exists())
-				{
-					if (!f.mkdirs()) throw new IOException("could not create folder " + f);
-					f.deleteOnExit();
-				}
-				tmp = new File(f, name);
-				tmpDirs.add(dir);
-			}
-			if (!tmp.getParentFile().mkdirs()) throw new IOException("could not create folder " + tmp.getParentFile());
-			tmp.deleteOnExit();
-			FileUtils.writeBytesToFile(definition, tmp);
-		}
-		catch(Exception e)
-		{
-			exception = e;
-		}
-		return tmp;
-	}
+  /**
+   * Execute this action.
+   * @return the abstract path for the created file.
+   * @see java.security.PrivilegedAction#run()
+   */
+  @Override
+  public File run()
+  {
+    File tmp = null;
+    try
+    {
+      for (String s: tmpDirs)
+      {
+        File f = new File(s, name);
+        if (!f.exists())
+        {
+          tmp = f;
+          break;
+        }
+      }
+      if (tmp == null)
+      {
+        String dir = tmpDirs.get(0) + '_' + tmpDirs.size();
+        File f = new File(dir + File.separator);
+        if (!f.exists())
+        {
+          if (!f.mkdirs()) throw new IOException("could not create folder " + f);
+          f.deleteOnExit();
+        }
+        tmp = new File(f, name);
+        tmpDirs.add(dir);
+      }
+      if (!tmp.getParentFile().mkdirs()) throw new IOException("could not create folder " + tmp.getParentFile());
+      tmp.deleteOnExit();
+      FileUtils.writeBytesToFile(definition, tmp);
+    }
+    catch(Exception e)
+    {
+      exception = e;
+    }
+    return tmp;
+  }
 
-	/**
-	 * Get the resulting exception.
-	 * @return an <code>Exception</code> or null if no exception was raised.
-	 */
-	public Exception getException()
-	{
-		return exception;
-	}
+  /**
+   * Get the resulting exception.
+   * @return an <code>Exception</code> or null if no exception was raised.
+   */
+  public Exception getException()
+  {
+    return exception;
+  }
 }

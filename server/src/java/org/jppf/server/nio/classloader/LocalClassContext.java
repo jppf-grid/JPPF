@@ -28,62 +28,62 @@ import org.slf4j.*;
  */
 public class LocalClassContext extends ClassContext
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(LocalClassContext.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(LocalClassContext.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
-	{
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
+  {
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JPPFResourceWrapper deserializeResource() throws Exception
-	{
-		return resource;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFResourceWrapper deserializeResource() throws Exception
+  {
+    return resource;
+  }
 
-	/**
-	 * Read data from a channel.
-	 * @param wrapper the channel to read the data from.
-	 * @return true if all the data has been read, false otherwise.
-	 * @throws Exception if an error occurs while reading the data.
-	 */
-	@Override
-	public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
-		if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
-		while (channel.getServerResource() == null) channel.goToSleep();
-		resource = channel.getServerResource();
-		channel.setServerResource(null);
-		if (traceEnabled) log.trace("message read for " + wrapper);
-		return true;
-	}
+  /**
+   * Read data from a channel.
+   * @param wrapper the channel to read the data from.
+   * @return true if all the data has been read, false otherwise.
+   * @throws Exception if an error occurs while reading the data.
+   */
+  @Override
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
+    if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
+    while (channel.getServerResource() == null) channel.goToSleep();
+    resource = channel.getServerResource();
+    channel.setServerResource(null);
+    if (traceEnabled) log.trace("message read for " + wrapper);
+    return true;
+  }
 
-	/**
-	 * Write data to a channel.
-	 * @param wrapper the channel to write the data to.
-	 * @return true if all the data has been written, false otherwise.
-	 * @throws Exception if an error occurs while writing the data.
-	 */
-	@Override
-	public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
-		LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
-		channel.setNodeResource(resource);
-		return true;
-	}
+  /**
+   * Write data to a channel.
+   * @param wrapper the channel to write the data to.
+   * @return true if all the data has been written, false otherwise.
+   * @throws Exception if an error occurs while writing the data.
+   */
+  @Override
+  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
+    LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
+    channel.setNodeResource(resource);
+    return true;
+  }
 }

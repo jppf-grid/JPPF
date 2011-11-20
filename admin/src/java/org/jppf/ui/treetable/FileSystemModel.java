@@ -71,142 +71,142 @@ import java.util.*;
  */
 public class FileSystemModel extends AbstractTreeTableModel implements TreeTableModel
 {
-	/**
-	 * Names of the columns.
-	 */
-	static String[] cNames = { "Name", "Size", "Type", "Modified" };
+  /**
+   * Names of the columns.
+   */
+  static String[] cNames = { "Name", "Size", "Type", "Modified" };
 
-	/**
-	 * Types of the columns.
-	 */
-	static Class[] cTypes = { TreeTableModel.class, Integer.class, String.class, Date.class };
+  /**
+   * Types of the columns.
+   */
+  static Class[] cTypes = { TreeTableModel.class, Integer.class, String.class, Date.class };
 
-	/**
-	 * The the returned file length for directories.
-	 */
-	public static final Integer ZERO = Integer.valueOf(0);
+  /**
+   * The the returned file length for directories.
+   */
+  public static final Integer ZERO = Integer.valueOf(0);
 
-	/**
-	 * Default constructor.
-	 */
-	public FileSystemModel()
-	{
-		super(new FileNode(new File(File.separator)));
-	}
+  /**
+   * Default constructor.
+   */
+  public FileSystemModel()
+  {
+    super(new FileNode(new File(File.separator)));
+  }
 
-	/**
-	 * Get the file a node points to.
-	 * @param node the node to get the file from.
-	 * @return a <code>File</code> instance.
-	 */
-	protected File getFile(final Object node)
-	{
-		FileNode fileNode = ((FileNode) node);
-		return fileNode.getFile();
-	}
+  /**
+   * Get the file a node points to.
+   * @param node the node to get the file from.
+   * @return a <code>File</code> instance.
+   */
+  protected File getFile(final Object node)
+  {
+    FileNode fileNode = ((FileNode) node);
+    return fileNode.getFile();
+  }
 
-	/**
-	 * Get the children of the specified node.
-	 * @param node the node to get the children of.
-	 * @return the children as an array of objects
-	 */
-	protected Object[] getChildren(final Object node)
-	{
-		FileNode fileNode = ((FileNode) node);
-		return fileNode.getChildren();
-	}
+  /**
+   * Get the children of the specified node.
+   * @param node the node to get the children of.
+   * @return the children as an array of objects
+   */
+  protected Object[] getChildren(final Object node)
+  {
+    FileNode fileNode = ((FileNode) node);
+    return fileNode.getChildren();
+  }
 
-	//
-	// The TreeModel interface
-	//
+  //
+  // The TreeModel interface
+  //
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getChildCount(final Object node)
-	{
-		Object[] children = getChildren(node);
-		return (children == null) ? 0 : children.length;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getChildCount(final Object node)
+  {
+    Object[] children = getChildren(node);
+    return (children == null) ? 0 : children.length;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object getChild(final Object node, final int i)
-	{
-		return getChildren(node)[i];
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object getChild(final Object node, final int i)
+  {
+    return getChildren(node)[i];
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isLeaf(final Object node)
-	{
-		// The superclass's implementation would work, but this is more efficient.
-		return getFile(node).isFile();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isLeaf(final Object node)
+  {
+    // The superclass's implementation would work, but this is more efficient.
+    return getFile(node).isFile();
+  }
 
-	//
-	// The TreeTableNode interface.
-	//
+  //
+  // The TreeTableNode interface.
+  //
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getColumnCount()
-	{
-		return cNames.length;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getColumnCount()
+  {
+    return cNames.length;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getColumnName(final int column)
-	{
-		return cNames[column];
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getColumnName(final int column)
+  {
+    return cNames[column];
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Class getColumnClass(final int column)
-	{
-		return cTypes[column];
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Class getColumnClass(final int column)
+  {
+    return cTypes[column];
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object getValueAt(final Object node, final int column)
-	{
-		File file = getFile(node);
-		try
-		{
-			switch (column)
-			{
-				case 0:
-					return file.getName();
-				case 1:
-					return file.isFile() ? Integer.valueOf((int) file.length()) : ZERO;
-				case 2:
-					return file.isFile() ? "File" : "Directory";
-				case 3:
-					return new Date(file.lastModified());
-			}
-		}
-		catch (SecurityException se)
-		{
-		}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Object getValueAt(final Object node, final int column)
+  {
+    File file = getFile(node);
+    try
+    {
+      switch (column)
+      {
+        case 0:
+          return file.getName();
+        case 1:
+          return file.isFile() ? Integer.valueOf((int) file.length()) : ZERO;
+        case 2:
+          return file.isFile() ? "File" : "Directory";
+        case 3:
+          return new Date(file.lastModified());
+      }
+    }
+    catch (SecurityException se)
+    {
+    }
 
-		return null;
-	}
+    return null;
+  }
 }
 
 /**
@@ -216,71 +216,71 @@ public class FileSystemModel extends AbstractTreeTableModel implements TreeTable
  */
 class FileNode
 {
-	/**
-	 * The referenced file.
-	 */
-	File file;
-	/**
-	 * This node's children.
-	 */
-	Object[] children;
+  /**
+   * The referenced file.
+   */
+  File file;
+  /**
+   * This node's children.
+   */
+  Object[] children;
 
-	/**
-	 * Initialize this node with the specified file.
-	 * @param file the referenced file.
-	 */
-	public FileNode(final File file)
-	{
-		this.file = file;
-	}
+  /**
+   * Initialize this node with the specified file.
+   * @param file the referenced file.
+   */
+  public FileNode(final File file)
+  {
+    this.file = file;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return file.getName();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    return file.getName();
+  }
 
-	/**
-	 * Get the referenced file.
-	 * @return a {@link File} instance.
-	 */
-	public File getFile()
-	{
-		return file;
-	}
+  /**
+   * Get the referenced file.
+   * @return a {@link File} instance.
+   */
+  public File getFile()
+  {
+    return file;
+  }
 
-	/**
-	 * Loads the children, caching the results in the children ivar.
-	 * @return the children as an array.
-	 */
-	protected Object[] getChildren()
-	{
-		if (children != null)
-		{
-			return children;
-		}
-		try
-		{
-			String[] files = file.list();
-			if (files != null)
-			{
-				Arrays.sort(files);
-				// fileMS.sort(files);
-				children = new FileNode[files.length];
-				String path = file.getPath();
-				for (int i = 0; i < files.length; i++)
-				{
-					File childFile = new File(path, files[i]);
-					children[i] = new FileNode(childFile);
-				}
-			}
-		}
-		catch (SecurityException se)
-		{
-		}
-		return children;
-	}
+  /**
+   * Loads the children, caching the results in the children ivar.
+   * @return the children as an array.
+   */
+  protected Object[] getChildren()
+  {
+    if (children != null)
+    {
+      return children;
+    }
+    try
+    {
+      String[] files = file.list();
+      if (files != null)
+      {
+        Arrays.sort(files);
+        // fileMS.sort(files);
+        children = new FileNode[files.length];
+        String path = file.getPath();
+        for (int i = 0; i < files.length; i++)
+        {
+          File childFile = new File(path, files[i]);
+          children[i] = new FileNode(childFile);
+        }
+      }
+    }
+    catch (SecurityException se)
+    {
+    }
+    return children;
+  }
 }

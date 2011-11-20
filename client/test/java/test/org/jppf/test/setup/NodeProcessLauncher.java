@@ -24,17 +24,17 @@ package test.org.jppf.test.setup;
  */
 public class NodeProcessLauncher extends GenericProcessLauncher
 {
-	/**
-	 * Initialize the node launcher with the specified node id.
-	 * @param n the id of the node, used to determine which configuration files to use.
-	 */
-	public NodeProcessLauncher(final int n)
-	{
-		super();
-		setMainClass("org.jppf.node.NodeRunner");
-		//addArgument("noLauncher");
-		setJppfConfig("node" + n + ".properties");
-		setLog4j("log4j-node" + n + ".properties");
-		addClasspathElement("test/classes/config");
-	}
+  /**
+   * Initialize the node launcher with the specified node id.
+   * @param n the id of the node, used to determine which configuration files to use.
+   */
+  public NodeProcessLauncher(final int n)
+  {
+    super();
+    setMainClass("org.jppf.node.NodeRunner");
+    //addArgument("noLauncher");
+    setJppfConfig("node" + n + ".properties");
+    setLog4j("log4j-node" + n + ".properties");
+    addClasspathElement("test/classes/config");
+  }
 }

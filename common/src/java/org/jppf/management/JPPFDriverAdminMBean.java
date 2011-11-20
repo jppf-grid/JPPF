@@ -29,44 +29,44 @@ import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
  */
 public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 {
-	/**
-	 * Get the latest statistics snapshot from the JPPF driver.
-	 * @return a <code>JPPFStats</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	JPPFStats statistics() throws Exception;
-	/**
-	 * Request the JMX connection information for all the nodes attached to the server.
-	 * @return a collection of <code>NodeManagementInfo</code> instances.
-	 * @throws Exception if any error occurs.
-	 */
-	Collection<JPPFManagementInfo> nodesInformation() throws Exception;
-	/**
-	 * Perform a shutdown or restart of the server.
-	 * @param shutdownDelay the delay before shutting down the server, once the command is received.
-	 * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
-	 * @return an acknowledgement message.
-	 * @throws Exception if any error occurs.
-	 */
-	String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception;
-	/**
-	 * Change the bundle size tuning settings.
-	 * @param algorithm the name opf the load-balancing algorithm to set.
-	 * @param parameters the algorithm's parameters.
-	 * @return an acknowledgement or error message.
-	 * @throws Exception if an error occurred while updating the settings.
-	 */
-	String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception;
-	/**
-	 * Obtain the current load-balancing settings.
-	 * @return an instance of <code>LoadBalancingInformation</code>.
-	 * @throws Exception if an error occurred while fetching the settings.
-	 */
-	LoadBalancingInformation loadBalancerInformation() throws Exception;
-	/**
-	 * Reset this server's statistics.
-	 * This method triggers a <code>reset()</code> event via the <code>JPPFDriverStatsManager</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	void resetStatistics() throws Exception;
+  /**
+   * Get the latest statistics snapshot from the JPPF driver.
+   * @return a <code>JPPFStats</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  JPPFStats statistics() throws Exception;
+  /**
+   * Request the JMX connection information for all the nodes attached to the server.
+   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @throws Exception if any error occurs.
+   */
+  Collection<JPPFManagementInfo> nodesInformation() throws Exception;
+  /**
+   * Perform a shutdown or restart of the server.
+   * @param shutdownDelay the delay before shutting down the server, once the command is received.
+   * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
+   * @return an acknowledgement message.
+   * @throws Exception if any error occurs.
+   */
+  String restartShutdown(Long shutdownDelay, Long restartDelay) throws Exception;
+  /**
+   * Change the bundle size tuning settings.
+   * @param algorithm the name opf the load-balancing algorithm to set.
+   * @param parameters the algorithm's parameters.
+   * @return an acknowledgement or error message.
+   * @throws Exception if an error occurred while updating the settings.
+   */
+  String changeLoadBalancerSettings(String algorithm, Map<Object, Object> parameters) throws Exception;
+  /**
+   * Obtain the current load-balancing settings.
+   * @return an instance of <code>LoadBalancingInformation</code>.
+   * @throws Exception if an error occurred while fetching the settings.
+   */
+  LoadBalancingInformation loadBalancerInformation() throws Exception;
+  /**
+   * Reset this server's statistics.
+   * This method triggers a <code>reset()</code> event via the <code>JPPFDriverStatsManager</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  void resetStatistics() throws Exception;
 }

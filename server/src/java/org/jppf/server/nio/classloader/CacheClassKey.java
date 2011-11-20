@@ -23,60 +23,60 @@ package org.jppf.server.nio.classloader;
  */
 public class CacheClassKey
 {
-	/**
-	 * The provider uuid.
-	 */
-	private String uuid;
-	/**
-	 * String describing the cached resource.
-	 */
-	private String res;
+  /**
+   * The provider uuid.
+   */
+  private String uuid;
+  /**
+   * String describing the cached resource.
+   */
+  private String res;
 
-	/**
-	 * Initialize this key with a specified provider uuid and resource string.
-	 * @param uuid the provider uuid.
-	 * @param res string describing the cached resource.
-	 */
-	public CacheClassKey(final String uuid, final String res)
-	{
-		this.uuid = uuid;
-		this.res = res;
-	}
+  /**
+   * Initialize this key with a specified provider uuid and resource string.
+   * @param uuid the provider uuid.
+   * @param res string describing the cached resource.
+   */
+  public CacheClassKey(final String uuid, final String res)
+  {
+    this.uuid = uuid;
+    this.res = res;
+  }
 
-	/**
-	 * Determine whether this key is equal to another one.
-	 * @param obj the other key to compare with.
-	 * @return true if the 2 keys a re equal, false otherwise.
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(final Object obj)
-	{
-		if (obj instanceof CacheClassKey)
-		{
-			CacheClassKey other = (CacheClassKey) obj;
-			return this.uuid.equals(other.uuid) && this.res.equals(other.res);
-		}
-		return false;
-	}
+  /**
+   * Determine whether this key is equal to another one.
+   * @param obj the other key to compare with.
+   * @return true if the 2 keys a re equal, false otherwise.
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (obj instanceof CacheClassKey)
+    {
+      CacheClassKey other = (CacheClassKey) obj;
+      return this.uuid.equals(other.uuid) && this.res.equals(other.res);
+    }
+    return false;
+  }
 
-	/**
-	 * Calculate the hash code of this key.
-	 * @return the hashcode as an int value.
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		return uuid.hashCode() + 13*res.hashCode();
-	}
+  /**
+   * Calculate the hash code of this key.
+   * @return the hashcode as an int value.
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode()
+  {
+    return uuid.hashCode() + 13*res.hashCode();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return "CacheClassKey[uuid=" + uuid + ", res=" + res + ']';
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    return "CacheClassKey[uuid=" + uuid + ", res=" + res + ']';
+  }
 }

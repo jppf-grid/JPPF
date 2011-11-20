@@ -24,18 +24,18 @@ package test.org.jppf.test.setup;
  */
 public class DriverProcessLauncher extends GenericProcessLauncher
 {
-	/**
-	 * Initialize the driver launcher.
-	 */
-	public DriverProcessLauncher()
-	{
-		super();
-		setMainClass("org.jppf.server.JPPFDriver");
-		//addArgument("noLauncher");
-		setJppfConfig("config/driver.properties");
-		setLog4j("config/log4j-driver.properties");
-		addClasspathElement("test/classes");
-		addClasspathElement("../common/classes");
-		addClasspathElement("../server/classes");
-	}
+  /**
+   * Initialize the driver launcher.
+   */
+  public DriverProcessLauncher()
+  {
+    super();
+    setMainClass("org.jppf.server.JPPFDriver");
+    //addArgument("noLauncher");
+    setJppfConfig("config/driver.properties");
+    setLog4j("config/log4j-driver.properties");
+    addClasspathElement("test/classes");
+    addClasspathElement("../common/classes");
+    addClasspathElement("../server/classes");
+  }
 }

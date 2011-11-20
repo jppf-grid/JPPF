@@ -28,29 +28,29 @@ import org.jppf.server.protocol.JPPFRunnable;
  */
 public final class TestAnnotatedStaticTask implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Instantiation not permitted.
-	 */
-	private TestAnnotatedStaticTask()
-	{
-	}
+  /**
+   * Instantiation not permitted.
+   */
+  private TestAnnotatedStaticTask()
+  {
+  }
 
-	/**
-	 * The method to run.
-	 * @param intArg an int argument.
-	 * @param stringArg a string argument.
-	 * @return the result as a string.
-	 */
-	@JPPFRunnable
-	public static String someStaticMethod(final int intArg, final String stringArg)
-	{
-		String s = "int arg = " + intArg + ", string arg = \"" + stringArg + '\"';
-		System.out.println(s);
-		return s;
-	}
+  /**
+   * The method to run.
+   * @param intArg an int argument.
+   * @param stringArg a string argument.
+   * @return the result as a string.
+   */
+  @JPPFRunnable
+  public static String someStaticMethod(final int intArg, final String stringArg)
+  {
+    String s = "int arg = " + intArg + ", string arg = \"" + stringArg + '\"';
+    System.out.println(s);
+    return s;
+  }
 }

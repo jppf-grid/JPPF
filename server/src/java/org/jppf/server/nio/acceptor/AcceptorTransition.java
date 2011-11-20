@@ -25,8 +25,8 @@ package org.jppf.server.nio.acceptor;
  */
 public enum AcceptorTransition
 {
-	/**
-	 * Transition from a state to IDENTIFYING_PEER.
-	 */
-	TO_IDENTIFYING_PEER
+  /**
+   * Transition from a state to IDENTIFYING_PEER.
+   */
+  TO_IDENTIFYING_PEER
 }

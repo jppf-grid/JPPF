@@ -27,31 +27,31 @@ import org.slf4j.*;
  */
 public class ConnectionInitializerTask implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ConnectionInitializerTask.class);
-	/**
-	 * The client connection to initialize.
-	 */
-	private JPPFClientConnection c = null;
-	/**
-	 * Instantiate this connection initializer with the specified client connection.
-	 * @param c the client connection to initialize.
-	 */
-	public ConnectionInitializerTask(final JPPFClientConnection c)
-	{
-		this.c = c;
-	}
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ConnectionInitializerTask.class);
+  /**
+   * The client connection to initialize.
+   */
+  private JPPFClientConnection c = null;
+  /**
+   * Instantiate this connection initializer with the specified client connection.
+   * @param c the client connection to initialize.
+   */
+  public ConnectionInitializerTask(final JPPFClientConnection c)
+  {
+    this.c = c;
+  }
 
-	/**
-	 * Perform the initialization of a client connection.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		//if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
-		if (c.getStatus().equals(DISCONNECTED)) c.init();
-	}
+  /**
+   * Perform the initialization of a client connection.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    //if (debugEnabled) log.debug("initializing driver connection '"+c+"'");
+    if (c.getStatus().equals(DISCONNECTED)) c.init();
+  }
 }

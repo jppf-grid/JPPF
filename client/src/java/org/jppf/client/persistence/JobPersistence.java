@@ -36,39 +36,39 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public interface JobPersistence<K>
 {
-	/**
-	 * Get the keys of all jobs in the persistence store.
-	 * @return a collection of objects representing the keys.
-	 * @throws JobPersistenceException if any error occurs while retrieving the keys.
-	 */
-	Collection<K> allKeys() throws JobPersistenceException;
+  /**
+   * Get the keys of all jobs in the persistence store.
+   * @return a collection of objects representing the keys.
+   * @throws JobPersistenceException if any error occurs while retrieving the keys.
+   */
+  Collection<K> allKeys() throws JobPersistenceException;
 
-	/**
-	 * Load a job from the persistence store given its key.
-	 * @param key the key allowing to locate the job in the persistence store.
-	 * @return a JPPFJob instance, retrieved from the store.
-	 * @throws JobPersistenceException if any error occurs while loading the job.
-	 */
-	JPPFJob loadJob(K key) throws JobPersistenceException;
+  /**
+   * Load a job from the persistence store given its key.
+   * @param key the key allowing to locate the job in the persistence store.
+   * @return a JPPFJob instance, retrieved from the store.
+   * @throws JobPersistenceException if any error occurs while loading the job.
+   */
+  JPPFJob loadJob(K key) throws JobPersistenceException;
 
-	/**
-	 * Store the specified tasks of the specified job with the specified key.
-	 * @param key the key allowing to locate the job in the persistence store.
-	 * @param job the job to store.
-	 * @param tasks the newly received completed tasks, may be used to only store the delta for better performance.
-	 * @throws JobPersistenceException if any error occurs while storing the job.
-	 */
-	void storeJob(K key, JPPFJob job, List<JPPFTask> tasks) throws JobPersistenceException;
+  /**
+   * Store the specified tasks of the specified job with the specified key.
+   * @param key the key allowing to locate the job in the persistence store.
+   * @param job the job to store.
+   * @param tasks the newly received completed tasks, may be used to only store the delta for better performance.
+   * @throws JobPersistenceException if any error occurs while storing the job.
+   */
+  void storeJob(K key, JPPFJob job, List<JPPFTask> tasks) throws JobPersistenceException;
 
-	/**
-	 * Delete the job with the specified key from the persistence store.
-	 * @param key the key allowing to locate the job in the persistence store.
-	 * @throws JobPersistenceException if any error occurs while deleting the job.
-	 */
-	void deleteJob(K key) throws JobPersistenceException;
+  /**
+   * Delete the job with the specified key from the persistence store.
+   * @param key the key allowing to locate the job in the persistence store.
+   * @throws JobPersistenceException if any error occurs while deleting the job.
+   */
+  void deleteJob(K key) throws JobPersistenceException;
 
-	/**
-	 * Close this store and release any used resources.
-	 */
-	void close();
+  /**
+   * Close this store and release any used resources.
+   */
+  void close();
 }

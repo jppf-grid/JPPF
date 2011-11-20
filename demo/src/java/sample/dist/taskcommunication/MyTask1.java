@@ -26,30 +26,30 @@ import java.util.Map;
  */
 public class MyTask1 extends AbstractMyTask
 {
-	/**
-	 * Default constructor.
-	 */
-	public MyTask1()
-	{
-		super("task1");
-	}
+  /**
+   * Default constructor.
+   */
+  public MyTask1()
+  {
+    super("task1");
+  }
 
-	/**
-	 * Add an item to a distributed map for a <code>MyTask2</code> instance, then wait for data provided by this <code>MyTask2</code>.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		Map<String, String> taskMap = getMap();
-		taskMap.put("toTask2", "This is for MyTask2");
-		String s = null;
-		while (s == null)
-		{
-			s = taskMap.get("toTask1");
-			if (s == null) doWait(50);
-		}
-		setResult(s);
-		taskMap.clear();
-	}
+  /**
+   * Add an item to a distributed map for a <code>MyTask2</code> instance, then wait for data provided by this <code>MyTask2</code>.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    Map<String, String> taskMap = getMap();
+    taskMap.put("toTask2", "This is for MyTask2");
+    String s = null;
+    while (s == null)
+    {
+      s = taskMap.get("toTask1");
+      if (s == null) doWait(50);
+    }
+    setResult(s);
+    taskMap.clear();
+  }
 }

@@ -26,16 +26,16 @@ import java.io.Serializable;
  */
 public class NodeExecutionInfo implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Total cpu time used by the tasks.
-	 */
-	public long cpuTime = 0;
-	/**
-	 * Total user time used by the tasks.
-	 */
-	public long userTime = 0;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Total cpu time used by the tasks.
+   */
+  public long cpuTime = 0;
+  /**
+   * Total user time used by the tasks.
+   */
+  public long userTime = 0;
 }

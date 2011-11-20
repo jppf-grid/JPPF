@@ -28,79 +28,79 @@ import javax.resource.spi.work.Work;
  */
 public class JPPFJcaJob implements Work
 {
-	/**
-	 * The tasks to run periodically.
-	 */
-	private List<Runnable> tasks = null;
-	/**
-	 * Length of time between to executions of the job.
-	 */
-	private long period = 0;
-	/**
-	 * Determines whether this job should be stopped or not.
-	 */
-	private boolean stop = false;
+  /**
+   * The tasks to run periodically.
+   */
+  private List<Runnable> tasks = null;
+  /**
+   * Length of time between to executions of the job.
+   */
+  private long period = 0;
+  /**
+   * Determines whether this job should be stopped or not.
+   */
+  private boolean stop = false;
 
-	/**
-	 * Create a connection initializer job with the specified tasks, delay and period.
-	 * @param tasks the tasks to run periodically.
-	 * @param period length of time between to executions of the job.
-	 */
-	public JPPFJcaJob(final List<Runnable> tasks, final long period)
-	{
-		this.tasks = tasks;
-		this.period = period;
-	}
+  /**
+   * Create a connection initializer job with the specified tasks, delay and period.
+   * @param tasks the tasks to run periodically.
+   * @param period length of time between to executions of the job.
+   */
+  public JPPFJcaJob(final List<Runnable> tasks, final long period)
+  {
+    this.tasks = tasks;
+    this.period = period;
+  }
 
-	/**
-	 * Run all the tasks in sequence.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		while (!isStopped())
-		{
-			for (Runnable r: tasks)
-			{
-				if (!isStopped()) r.run();
-			}
-			try
-			{
-				if (!isStopped()) Thread.sleep(period);
-			}
-			catch(InterruptedException ignored)
-			{
-			}
-		}
-	}
+  /**
+   * Run all the tasks in sequence.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    while (!isStopped())
+    {
+      for (Runnable r: tasks)
+      {
+        if (!isStopped()) r.run();
+      }
+      try
+      {
+        if (!isStopped()) Thread.sleep(period);
+      }
+      catch(InterruptedException ignored)
+      {
+      }
+    }
+  }
 
-	/**
-	 * Stop this job and release the resources it is using.
-	 * @see javax.resource.spi.work.Work#release()
-	 */
-	@Override
-	public void release()
-	{
-		setStopped(true);
-		tasks = null;
-	}
+  /**
+   * Stop this job and release the resources it is using.
+   * @see javax.resource.spi.work.Work#release()
+   */
+  @Override
+  public void release()
+  {
+    setStopped(true);
+    tasks = null;
+  }
 
-	/**
-	 * Get the flag that determines whether this job should be stopped or not.
-	 * @return true if the job be stopped, false otherwise.
-	 */
-	private synchronized boolean isStopped()
-	{
-		return stop;
-	}
+  /**
+   * Get the flag that determines whether this job should be stopped or not.
+   * @return true if the job be stopped, false otherwise.
+   */
+  private synchronized boolean isStopped()
+  {
+    return stop;
+  }
 
-	/**
-	 * Set the flag that determines whether this job should be stopped or not.
-	 * @param stop true if the job be stopped, false otherwise.
-	 */
-	private synchronized void setStopped(final boolean stop)
-	{
-		this.stop = stop;
-	}
+  /**
+   * Set the flag that determines whether this job should be stopped or not.
+   * @param stop true if the job be stopped, false otherwise.
+   */
+  private synchronized void setStopped(final boolean stop)
+  {
+    this.stop = stop;
+  }
 }

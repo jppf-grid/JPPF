@@ -31,55 +31,55 @@ import org.slf4j.*;
  */
 public class CascadingTestRunner
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(CascadingTestRunner.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
-	/**
-	 * Separator for each test.
-	 */
-	private static String banner = '\n' + StringUtils.padLeft("", '-', 80)+ '\n';
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(CascadingTestRunner.class);
+  /**
+   * JPPF client used to submit execution requests.
+   */
+  private static JPPFClient jppfClient = null;
+  /**
+   * Separator for each test.
+   */
+  private static String banner = '\n' + StringUtils.padLeft("", '-', 80)+ '\n';
 
-	/**
-	 * Entry point for this class, performs a matrix multiplication a number of times.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			jppfClient = new JPPFClient();
-			performCommand();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			jppfClient.close();
-		}
-		System.exit(0);
-	}
+  /**
+   * Entry point for this class, performs a matrix multiplication a number of times.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      jppfClient = new JPPFClient();
+      performCommand();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      jppfClient.close();
+    }
+    System.exit(0);
+  }
 
-	/**
-	 * .
-	 * @throws Exception .
-	 */
-	private static void performCommand() throws Exception
-	{
-		JPPFJob job = new JPPFJob();
-		job.addTask(new Task1());
-		job.getSLA().setExecutionPolicy(new Equal("id", 1));
-		List<JPPFTask> results = jppfClient.submit(job);
-		for (JPPFTask task: results)
-		{
-			if (task.getException() != null) task.getException().printStackTrace();
-			else System.out.println("result: " + task.getResult());
-		}
-	}
+  /**
+   * .
+   * @throws Exception .
+   */
+  private static void performCommand() throws Exception
+  {
+    JPPFJob job = new JPPFJob();
+    job.addTask(new Task1());
+    job.getSLA().setExecutionPolicy(new Equal("id", 1));
+    List<JPPFTask> results = jppfClient.submit(job);
+    for (JPPFTask task: results)
+    {
+      if (task.getException() != null) task.getException().printStackTrace();
+      else System.out.println("result: " + task.getResult());
+    }
+  }
 }

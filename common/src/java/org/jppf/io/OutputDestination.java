@@ -26,28 +26,28 @@ import java.nio.ByteBuffer;
  */
 public interface OutputDestination extends IO
 {
-	/**
-	 * Write data to this output destination from an array of bytes.
-	 * @param data the buffer containing the data to write.
-	 * @param offset the position in the buffer where to start reading the data.
-	 * @param len the size in bytes of the data to write.
-	 * @return the number of bytes actually written, or -1 if end of stream was reached.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int write(byte[] data, int offset, int len) throws Exception;
+  /**
+   * Write data to this output destination from an array of bytes.
+   * @param data the buffer containing the data to write.
+   * @param offset the position in the buffer where to start reading the data.
+   * @param len the size in bytes of the data to write.
+   * @return the number of bytes actually written, or -1 if end of stream was reached.
+   * @throws Exception if an IO error occurs.
+   */
+  int write(byte[] data, int offset, int len) throws Exception;
 
-	/**
-	 * Write data to this output destination from a byte buffer.
-	 * @param data the buffer containing the data to write.
-	 * @return the number of bytes actually written, or -1 if end of stream was reached.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int write(ByteBuffer data) throws Exception;
+  /**
+   * Write data to this output destination from a byte buffer.
+   * @param data the buffer containing the data to write.
+   * @return the number of bytes actually written, or -1 if end of stream was reached.
+   * @throws Exception if an IO error occurs.
+   */
+  int write(ByteBuffer data) throws Exception;
 
-	/**
-	 * Write an int value to this output destination.
-	 * @param value the value to write.
-	 * @throws Exception if an IO error occurs.
-	 */
-	void writeInt(int value) throws Exception;
+  /**
+   * Write an int value to this output destination.
+   * @param value the value to write.
+   * @throws Exception if an IO error occurs.
+   */
+  void writeInt(int value) throws Exception;
 }

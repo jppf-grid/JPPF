@@ -33,52 +33,52 @@ import org.slf4j.*;
  */
 public class SendingMultiplexingInfoState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SendingMultiplexingInfoState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SendingMultiplexingInfoState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public SendingMultiplexingInfoState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public SendingMultiplexingInfoState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (wrapper.isReadable())
-		{
-			throw new ConnectException("multiplexer channel " + wrapper + " has been disconnected");
-		}
-		if (debugEnabled) log.debug("exec() for " + wrapper);
-		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (context.getMessage() == null)
-		{
-			MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
-			NioMessage msg = new NioMessage();
-			msg.length = 4;
-			msg.buffer = ByteBuffer.wrap(new byte[4]);
-			msg.buffer.putInt(linkedContext.getBoundPort());
-			msg.buffer.flip();
-			context.setMessage(msg);
-		}
-		if (context.writeMessage(wrapper))
-		{
-			if (debugEnabled) log.debug("message sent to remote multiplexer " + wrapper);
-			context.setMessage(null);
-			return TO_SENDING_OR_RECEIVING;
-		}
-		return TO_SENDING_MULTIPLEXING_INFO;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (wrapper.isReadable())
+    {
+      throw new ConnectException("multiplexer channel " + wrapper + " has been disconnected");
+    }
+    if (debugEnabled) log.debug("exec() for " + wrapper);
+    MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+    if (context.getMessage() == null)
+    {
+      MultiplexerContext linkedContext = (MultiplexerContext) context.getLinkedKey().getContext();
+      NioMessage msg = new NioMessage();
+      msg.length = 4;
+      msg.buffer = ByteBuffer.wrap(new byte[4]);
+      msg.buffer.putInt(linkedContext.getBoundPort());
+      msg.buffer.flip();
+      context.setMessage(msg);
+    }
+    if (context.writeMessage(wrapper))
+    {
+      if (debugEnabled) log.debug("message sent to remote multiplexer " + wrapper);
+      context.setMessage(null);
+      return TO_SENDING_OR_RECEIVING;
+    }
+    return TO_SENDING_MULTIPLEXING_INFO;
+  }
 }

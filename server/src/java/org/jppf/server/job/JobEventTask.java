@@ -30,62 +30,62 @@ import org.jppf.server.protocol.*;
  */
 public class JobEventTask implements Runnable
 {
-	/**
-	 * The job manager that submits the events.
-	 */
-	private final JPPFJobManager jobManager;
-	/**
-	 * The type of event to generate.
-	 */
-	private final JobEventType eventType;
-	/**
-	 * The node, if any, for which the event happened.
-	 */
-	private final ChannelWrapper channel;
-	/**
-	 * The job data.
-	 */
-	private final JPPFTaskBundle bundle;
-	/**
-	 * Creation timestamp for this task.
-	 */
-	private final long timestamp = System.currentTimeMillis();
+  /**
+   * The job manager that submits the events.
+   */
+  private final JPPFJobManager jobManager;
+  /**
+   * The type of event to generate.
+   */
+  private final JobEventType eventType;
+  /**
+   * The node, if any, for which the event happened.
+   */
+  private final ChannelWrapper channel;
+  /**
+   * The job data.
+   */
+  private final JPPFTaskBundle bundle;
+  /**
+   * Creation timestamp for this task.
+   */
+  private final long timestamp = System.currentTimeMillis();
 
-	/**
-	 * Initialize this job manager event task with the specified parameters.
-	 * @param jobManager - the job manager that submits the events.
-	 * @param eventType - the type of event to generate.
-	 * @param bundle - the job data.
-	 * @param channel - the id of the job source of the event.
-	 */
-	public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
-	{
-		this.jobManager = jobManager;
-		this.eventType = eventType;
-		this.channel = channel;
-		this.bundle = bundle;
-	}
+  /**
+   * Initialize this job manager event task with the specified parameters.
+   * @param jobManager - the job manager that submits the events.
+   * @param eventType - the type of event to generate.
+   * @param bundle - the job data.
+   * @param channel - the id of the job source of the event.
+   */
+  public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
+  {
+    this.jobManager = jobManager;
+    this.eventType = eventType;
+    this.channel = channel;
+    this.bundle = bundle;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		JobSLA sla = bundle.getSLA();
-		Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-		JobInformation jobInfo = new JobInformation(bundle.getJobUuid(), bundle.getName(), bundle.getTaskCount(),
-				bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
-		jobInfo.setMaxNodes(sla.getMaxNodes());
-		JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
-		JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
-        if(eventType == JobEventType.JOB_UPDATED)
-        {
-            Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
-            if (n != null) jobInfo.setTaskCount(n);
-        }
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    JobSLA sla = bundle.getSLA();
+    Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+    JobInformation jobInfo = new JobInformation(bundle.getJobUuid(), bundle.getName(), bundle.getTaskCount(),
+        bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
+    jobInfo.setMaxNodes(sla.getMaxNodes());
+    JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
+    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
+    if(eventType == JobEventType.JOB_UPDATED)
+    {
+      Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
+      if (n != null) jobInfo.setTaskCount(n);
+    }
 
-        jobManager.fireJobEvent(event);
-	}
+    jobManager.fireJobEvent(event);
+  }
 }

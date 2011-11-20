@@ -27,64 +27,64 @@ import java.net.*;
  */
 public class URLLocation extends AbstractLocation<URL>
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Initialize this location with the specified file path.
-	 * @param url a URL.
-	 */
-	public URLLocation(final URL url)
-	{
-		super(url);
-	}
+  /**
+   * Initialize this location with the specified file path.
+   * @param url a URL.
+   */
+  public URLLocation(final URL url)
+  {
+    super(url);
+  }
 
-	/**
-	 * Initialize this location with the specified file path.
-	 * @param url a URL in string format.
-	 * @throws MalformedURLException if the url is malformed.
-	 */
-	public URLLocation(final String url) throws MalformedURLException
-	{
-		super(new URL(url));
-	}
+  /**
+   * Initialize this location with the specified file path.
+   * @param url a URL in string format.
+   * @throws MalformedURLException if the url is malformed.
+   */
+  public URLLocation(final String url) throws MalformedURLException
+  {
+    super(new URL(url));
+  }
 
-	/**
-	 * Obtain an input stream to read from this location.
-	 * @return an <code>InputStream</code> instance.
-	 * @throws Exception if an I/O error occurs.
-	 * @see org.jppf.server.protocol.Location#getInputStream()
-	 */
-	@Override
-	public InputStream getInputStream() throws Exception
-	{
-		return path.openStream();
-	}
+  /**
+   * Obtain an input stream to read from this location.
+   * @return an <code>InputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.server.protocol.Location#getInputStream()
+   */
+  @Override
+  public InputStream getInputStream() throws Exception
+  {
+    return path.openStream();
+  }
 
-	/**
-	 * Obtain an output stream to write to this location.
-	 * @return an <code>OutputStream</code> instance.
-	 * @throws Exception if an I/O error occurs.
-	 * @see org.jppf.server.protocol.Location#getOutputStream()
-	 */
-	@Override
-	public OutputStream getOutputStream() throws Exception
-	{
-		URLConnection conn = path.openConnection();
-		conn.setDoOutput(true);
-		return conn.getOutputStream();
-	}
+  /**
+   * Obtain an output stream to write to this location.
+   * @return an <code>OutputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.server.protocol.Location#getOutputStream()
+   */
+  @Override
+  public OutputStream getOutputStream() throws Exception
+  {
+    URLConnection conn = path.openConnection();
+    conn.setDoOutput(true);
+    return conn.getOutputStream();
+  }
 
-	/**
-	 * This method always returns -1, as there is no reliable way to know the actual size of available data.
-	 * @return -1.
-	 * @see org.jppf.server.protocol.Location#size()
-	 */
-	@Override
-	public long size()
-	{
-		return -1;
-	}
+  /**
+   * This method always returns -1, as there is no reliable way to know the actual size of available data.
+   * @return -1.
+   * @see org.jppf.server.protocol.Location#size()
+   */
+  @Override
+  public long size()
+  {
+    return -1;
+  }
 }

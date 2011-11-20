@@ -29,72 +29,72 @@ import java.io.*;
  */
 public class NotifyingOutputStream extends OutputStream
 {
-	/**
-	 * The output stream to which operations are delegated.
-	 */
-	private OutputStream delegate;
-	/**
-	 * The callback to notify of stream operations.
-	 */
-	private NotifyingStreamCallback callback;
+  /**
+   * The output stream to which operations are delegated.
+   */
+  private OutputStream delegate;
+  /**
+   * The callback to notify of stream operations.
+   */
+  private NotifyingStreamCallback callback;
 
-	/**
-	 * Initialize this stream with the specified input stream.
-	 * @param delegate the input stream to which operations are delegated.
-	 * @param callback the callback to notify of stream operations.
-	 */
-	public NotifyingOutputStream(final OutputStream delegate, final NotifyingStreamCallback callback)
-	{
-		if (delegate == null) throw new IllegalArgumentException("output stream cannot be null");
-		if (callback == null) throw new IllegalArgumentException("the callback cannot be null");
-		this.delegate = delegate;
-		this.callback = callback;
-	}
+  /**
+   * Initialize this stream with the specified input stream.
+   * @param delegate the input stream to which operations are delegated.
+   * @param callback the callback to notify of stream operations.
+   */
+  public NotifyingOutputStream(final OutputStream delegate, final NotifyingStreamCallback callback)
+  {
+    if (delegate == null) throw new IllegalArgumentException("output stream cannot be null");
+    if (callback == null) throw new IllegalArgumentException("the callback cannot be null");
+    this.delegate = delegate;
+    this.callback = callback;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void write(final int n) throws IOException
-	{
-		delegate.write(n);
-		callback.bytesNotification(1);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void write(final int n) throws IOException
+  {
+    delegate.write(n);
+    callback.bytesNotification(1);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void write(final byte[] b) throws IOException
-	{
-		write(b, 0, b.length);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void write(final byte[] b) throws IOException
+  {
+    write(b, 0, b.length);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void write(final byte[] b, final int off, final int len) throws IOException
-	{
-		delegate.write(b, off, len);
-		callback.bytesNotification(len);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void write(final byte[] b, final int off, final int len) throws IOException
+  {
+    delegate.write(b, off, len);
+    callback.bytesNotification(len);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void close() throws IOException
-	{
-		delegate.close();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close() throws IOException
+  {
+    delegate.close();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void flush() throws IOException
-	{
-		delegate.flush();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void flush() throws IOException
+  {
+    delegate.flush();
+  }
 }

@@ -26,17 +26,17 @@ import java.nio.channels.SelectionKey;
  */
 public interface ChannelState
 {
-	/**
-	 * Perform the action associated with this state.
-	 * @param key the selector key this state is associated with.
-	 * @throws IOException if an error occurred while executing the action.
-	 */
-	void exec(SelectionKey key) throws IOException;
-	/**
-	 * Perform the action associated with this state.
-	 * @param key the selector key this state is associated with.
-	 * @param context the context associated with this state.
-	 * @throws IOException if an error occurred while executing the action.
-	 */
-	//void exec(SelectionKey key, ChannelContext context) throws IOException;
+  /**
+   * Perform the action associated with this state.
+   * @param key the selector key this state is associated with.
+   * @throws IOException if an error occurred while executing the action.
+   */
+  void exec(SelectionKey key) throws IOException;
+  /**
+   * Perform the action associated with this state.
+   * @param key the selector key this state is associated with.
+   * @param context the context associated with this state.
+   * @throws IOException if an error occurred while executing the action.
+   */
+  //void exec(SelectionKey key, ChannelContext context) throws IOException;
 }

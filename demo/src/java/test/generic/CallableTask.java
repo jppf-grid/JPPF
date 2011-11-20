@@ -27,26 +27,26 @@ import java.util.concurrent.Callable;
  */
 public class CallableTask implements Callable<String>, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Default constructor.
-	 */
-	public CallableTask()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public CallableTask()
+  {
+  }
 
-	/**
-	 * Call method.
-	 * @return a string.
-	 * @see java.util.concurrent.Callable#call()
-	 */
-	@Override
-	public String call()
-	{
-		throw new NullPointerException("Throwing unchecked exception");
-	}
+  /**
+   * Call method.
+   * @return a string.
+   * @see java.util.concurrent.Callable#call()
+   */
+  @Override
+  public String call()
+  {
+    throw new NullPointerException("Throwing unchecked exception");
+  }
 }

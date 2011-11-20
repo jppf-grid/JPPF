@@ -30,66 +30,66 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class SequenceAlignmentTask extends JPPFTask
 {
-	/**
-	 * Data provider key for the target sequence.
-	 */
-	public static final String TARGET_SEQUENCE = "targetSequence";
-	/**
-	 * Data provider key for the scoring matrix to use..
-	 */
-	public static final String SCORING_MATRIX = "scoringMatrix";
-	/**
-	 * The sequence to align with the target sequence.
-	 */
-	private String sequence = null;
+  /**
+   * Data provider key for the target sequence.
+   */
+  public static final String TARGET_SEQUENCE = "targetSequence";
+  /**
+   * Data provider key for the scoring matrix to use..
+   */
+  public static final String SCORING_MATRIX = "scoringMatrix";
+  /**
+   * The sequence to align with the target sequence.
+   */
+  private String sequence = null;
 
-	/**
-	 * Initialize this task with the specified sequence to align with the target sequence.
-	 * @param sequence the sequence as a string.
-	 * @param number uniquely identifies this task.
-	 */
-	public SequenceAlignmentTask(final String sequence, final int number)
-	{
-		this.sequence = sequence;
-		setId("" + number);
-	}
+  /**
+   * Initialize this task with the specified sequence to align with the target sequence.
+   * @param sequence the sequence as a string.
+   * @param number uniquely identifies this task.
+   */
+  public SequenceAlignmentTask(final String sequence, final int number)
+  {
+    this.sequence = sequence;
+    setId("" + number);
+  }
 
-	/**
-	 * Perform the sequence alignment.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			Sequence seq = SequenceParser.parse(sequence);
-			Sequence target = (Sequence) getDataProvider().getValue(TARGET_SEQUENCE);
-			Matrix matrix = (Matrix) getDataProvider().getValue(SCORING_MATRIX);
-			Alignment a = SmithWatermanGotoh.align(seq, target, matrix, 10.0f, 0.5f);
-			setResult(a.calculateScore());
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Perform the sequence alignment.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      Sequence seq = SequenceParser.parse(sequence);
+      Sequence target = (Sequence) getDataProvider().getValue(TARGET_SEQUENCE);
+      Matrix matrix = (Matrix) getDataProvider().getValue(SCORING_MATRIX);
+      Alignment a = SmithWatermanGotoh.align(seq, target, matrix, 10.0f, 0.5f);
+      setResult(a.calculateScore());
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * Get the sequence number of this task.
-	 * @return the sequence number as an int.
-	 */
-	public int getNumber()
-	{
-		return Integer.valueOf(getId());
-	}
+  /**
+   * Get the sequence number of this task.
+   * @return the sequence number as an int.
+   */
+  public int getNumber()
+  {
+    return Integer.valueOf(getId());
+  }
 
-	/**
-	 * Get the sequence to align with the target sequence.
-	 * @return  the sequence as a string.
-	 */
-	public String getSequence()
-	{
-		return sequence;
-	}
+  /**
+   * Get the sequence to align with the target sequence.
+   * @return  the sequence as a string.
+   */
+  public String getSequence()
+  {
+    return sequence;
+  }
 }

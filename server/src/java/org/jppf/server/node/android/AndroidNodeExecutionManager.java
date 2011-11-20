@@ -21,7 +21,7 @@ package org.jppf.server.node.android;
 import java.util.List;
 
 import org.jppf.node.protocol.Task;
-import org.jppf.server.node.*;
+import org.jppf.server.node.NodeExecutionManagerImpl;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
@@ -31,44 +31,44 @@ import org.slf4j.*;
  */
 public class AndroidNodeExecutionManager extends NodeExecutionManagerImpl
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AndroidNodeExecutionManager.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The node that uses this execution manager.
-	 */
-	private AbstractJPPFAndroidNode node = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AndroidNodeExecutionManager.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The node that uses this execution manager.
+   */
+  private AbstractJPPFAndroidNode node = null;
 
-	/**
-	 * Initialize this execution manager with the specified node.
-	 * @param node the node that uses this execution manager.
-	 */
-	public AndroidNodeExecutionManager(final AbstractJPPFAndroidNode node)
-	{
-		super(null);
-		this.node = node;
-	}
+  /**
+   * Initialize this execution manager with the specified node.
+   * @param node the node that uses this execution manager.
+   */
+  public AndroidNodeExecutionManager(final AbstractJPPFAndroidNode node)
+  {
+    super(null);
+    this.node = node;
+  }
 
-	/**
-	 * Execute the specified tasks of the specified tasks bundle.
-	 * @param bundle the bundle to which the tasks are associated.
-	 * @param taskList the list of tasks to execute.
-	 * @throws Exception if the execution failed.
-	 */
-	@Override
-	public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
-	{
-		if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
-		//NodeExecutionInfo info = null;
-		//if (isCpuTimeEnabled()) info = computeExecutionInfo();
-		setup(bundle, taskList);
-		for (Task task : taskList) performTask(task);
-		waitForResults();
-		cleanup();
-	}
+  /**
+   * Execute the specified tasks of the specified tasks bundle.
+   * @param bundle the bundle to which the tasks are associated.
+   * @param taskList the list of tasks to execute.
+   * @throws Exception if the execution failed.
+   */
+  @Override
+  public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
+  {
+    if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
+    //NodeExecutionInfo info = null;
+    //if (isCpuTimeEnabled()) info = computeExecutionInfo();
+    setup(bundle, taskList);
+    for (Task task : taskList) performTask(task);
+    waitForResults();
+    cleanup();
+  }
 }

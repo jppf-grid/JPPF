@@ -25,79 +25,79 @@ package org.jppf.utils;
  */
 public abstract class ThreadSynchronization
 {
-	/**
-	 * Determines whether the thread's run() method should terminate.
-	 */
-	protected boolean stopped = false;
+  /**
+   * Determines whether the thread's run() method should terminate.
+   */
+  protected boolean stopped = false;
 
-	/**
-	 * Cause the current thread to wait until notified.
-	 */
-	public synchronized void goToSleep()
-	{
-		try
-		{
-			wait();
-		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
+  /**
+   * Cause the current thread to wait until notified.
+   */
+  public synchronized void goToSleep()
+  {
+    try
+    {
+      wait();
+    }
+    catch(InterruptedException ignored)
+    {
+    }
+  }
 
-	/**
-	 * Cause the current thread to wait until notified or the specified time has passed, whichever comes first.
-	 * @param time the maximum time to wait in milliseconds.
-	 */
-	public synchronized void goToSleep(final long time)
-	{
-		try
-		{
-			wait(time);
-		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
+  /**
+   * Cause the current thread to wait until notified or the specified time has passed, whichever comes first.
+   * @param time the maximum time to wait in milliseconds.
+   */
+  public synchronized void goToSleep(final long time)
+  {
+    try
+    {
+      wait(time);
+    }
+    catch(InterruptedException ignored)
+    {
+    }
+  }
 
-	/**
-	 * Cause the current thread to wait until notified or the specified time has passed, whichever comes first.
-	 * @param millis the maximum time to wait in milliseconds.
-	 * @param nanos the additional time to wait in nanoseconds.
-	 */
-	public synchronized void goToSleep(final long millis, final int nanos)
-	{
-		try
-		{
-			wait(millis, nanos);
-		}
-		catch(InterruptedException ignored)
-		{
-		}
-	}
+  /**
+   * Cause the current thread to wait until notified or the specified time has passed, whichever comes first.
+   * @param millis the maximum time to wait in milliseconds.
+   * @param nanos the additional time to wait in nanoseconds.
+   */
+  public synchronized void goToSleep(final long millis, final int nanos)
+  {
+    try
+    {
+      wait(millis, nanos);
+    }
+    catch(InterruptedException ignored)
+    {
+    }
+  }
 
-	/**
-	 * Notify the threads currently waiting on this object that they can resume.
-	 */
-	public synchronized void wakeUp()
-	{
-		notifyAll();
-	}
+  /**
+   * Notify the threads currently waiting on this object that they can resume.
+   */
+  public synchronized void wakeUp()
+  {
+    notifyAll();
+  }
 
-	/**
-	 * Determine whether the thread's <code>run()</code> method is terminated.
-	 * @return  true if the thread is stopped, false otherwise.
-	 */
-	public synchronized boolean isStopped()
-	{
-		return stopped;
-	}
+  /**
+   * Determine whether the thread's <code>run()</code> method is terminated.
+   * @return  true if the thread is stopped, false otherwise.
+   */
+  public synchronized boolean isStopped()
+  {
+    return stopped;
+  }
 
-	/**
-	 * Specify whether the thread's <code>run()</code> should terminate.
-	 * @param stopped true if the thread is to be stopped, false otherwise.
-	 */
-	public synchronized void setStopped(final boolean stopped)
-	{
-		this.stopped = stopped;
-	}
+  /**
+   * Specify whether the thread's <code>run()</code> should terminate.
+   * @param stopped true if the thread is to be stopped, false otherwise.
+   */
+  public synchronized void setStopped(final boolean stopped)
+  {
+    this.stopped = stopped;
+  }
 }

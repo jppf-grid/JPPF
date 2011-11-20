@@ -28,75 +28,75 @@ import java.util.*;
  */
 public class GroovyScriptRunner implements ScriptRunner
 {
-	/**
-	 * Mapping of Groovy scripts to their uuid.
-	 */
-	private static Map<String, Script> scriptMap = new HashMap<String, Script>();
+  /**
+   * Mapping of Groovy scripts to their uuid.
+   */
+  private static Map<String, Script> scriptMap = new HashMap<String, Script>();
 
-	/**
-	 * Evaluate the script specified as input and get the evaluation result.
-	 * @param script a string containing the script to evaluate.
-	 * @param variables a mapping of objects to add the scope of the script.
-	 * @return the result of the evaluation as an object.
-	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
-	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.util.Map)
-	 */
-	@Override
-	public Object evaluate(final String script, final Map<String, Object> variables) throws JPPFScriptingException
-	{
-		return evaluate(null, script, variables);
-	}
+  /**
+   * Evaluate the script specified as input and get the evaluation result.
+   * @param script a string containing the script to evaluate.
+   * @param variables a mapping of objects to add the scope of the script.
+   * @return the result of the evaluation as an object.
+   * @throws JPPFScriptingException if an error occurs while evaluating the script.
+   * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.util.Map)
+   */
+  @Override
+  public Object evaluate(final String script, final Map<String, Object> variables) throws JPPFScriptingException
+  {
+    return evaluate(null, script, variables);
+  }
 
-	/**
-	 * Evaluate the script specified as input and get the evaluation result.
-	 * @param scriptId a unique identifier for the script, to be used if the engine generates compiled code
-	 * which can be later retrieved through this id.
-	 * @param script a string containing the script to evaluate.
-	 * @param variables a mapping of objects to variable names, added within the scope of the script.
-	 * @return the result of the evaluation as an object. The actual type of the result
-	 * depends on the scripting engine that is used.
-	 * @throws JPPFScriptingException if an error occurs while evaluating the script.
-	 * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
-	 */
-	@Override
-	public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException
-	{
-		try
-		{
-			//GroovyShell shell = new GroovyShell(binding);
-			GroovyShell shell = new GroovyShell();
-			Script groovyScript = scriptMap.get(scriptId);
-			if (groovyScript == null)
-			{
-				groovyScript = shell.parse(script);
-				scriptMap.put(scriptId, groovyScript);
-			}
-			Binding binding = new Binding();
-			for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());
-			groovyScript.setBinding(binding);
-			return groovyScript.run();
-		}
-		catch(Exception e)
-		{
-			throw new JPPFScriptingException(e);
-		}
-	}
+  /**
+   * Evaluate the script specified as input and get the evaluation result.
+   * @param scriptId a unique identifier for the script, to be used if the engine generates compiled code
+   * which can be later retrieved through this id.
+   * @param script a string containing the script to evaluate.
+   * @param variables a mapping of objects to variable names, added within the scope of the script.
+   * @return the result of the evaluation as an object. The actual type of the result
+   * depends on the scripting engine that is used.
+   * @throws JPPFScriptingException if an error occurs while evaluating the script.
+   * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
+   */
+  @Override
+  public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException
+  {
+    try
+    {
+      //GroovyShell shell = new GroovyShell(binding);
+      GroovyShell shell = new GroovyShell();
+      Script groovyScript = scriptMap.get(scriptId);
+      if (groovyScript == null)
+      {
+        groovyScript = shell.parse(script);
+        scriptMap.put(scriptId, groovyScript);
+      }
+      Binding binding = new Binding();
+      for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());
+      groovyScript.setBinding(binding);
+      return groovyScript.run();
+    }
+    catch(Exception e)
+    {
+      throw new JPPFScriptingException(e);
+    }
+  }
 
-	/**
-	 * Initialize the execution environment.
-	 * @see org.jppf.scripting.ScriptRunner#init()
-	 */
-	@Override
-	public void init()
-	{
-	}
+  /**
+   * Initialize the execution environment.
+   * @see org.jppf.scripting.ScriptRunner#init()
+   */
+  @Override
+  public void init()
+  {
+  }
 
-	/**
-	 * Perform cleanup after we're done using this script runner.
-	 * @see org.jppf.scripting.ScriptRunner#cleanup()
-	 */
-	@Override
-	public void cleanup()
-	{
-	}
+  /**
+   * Perform cleanup after we're done using this script runner.
+   * @see org.jppf.scripting.ScriptRunner#cleanup()
+   */
+  @Override
+  public void cleanup()
+  {
+  }
 }

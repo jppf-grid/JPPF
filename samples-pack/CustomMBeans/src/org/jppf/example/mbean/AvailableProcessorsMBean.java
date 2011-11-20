@@ -24,9 +24,9 @@ package org.jppf.example.mbean;
  */
 public interface AvailableProcessorsMBean
 {
-	/**
-	 * Get the number of processors available to the JVM.
-	 * @return the available processors as an integer value
-	 */
-	Integer queryAvailableProcessors();
+  /**
+   * Get the number of processors available to the JVM.
+   * @return the available processors as an integer value
+   */
+  Integer queryAvailableProcessors();
 }

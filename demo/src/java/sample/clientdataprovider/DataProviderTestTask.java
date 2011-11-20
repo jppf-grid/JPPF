@@ -28,81 +28,81 @@ import org.jppf.utils.JPPFCallable;
  */
 public class DataProviderTestTask extends JPPFTask
 {
-	/**
-	 * Used as job identifier.
-	 */
-	public int i = 0;
-	/**
-	 * Used as task identifier within a job.
-	 */
-	public int j = 0;
+  /**
+   * Used as job identifier.
+   */
+  public int i = 0;
+  /**
+   * Used as task identifier within a job.
+   */
+  public int j = 0;
 
-	/**
-	 * Initialize this task with the specified parameters
-	 * @param i used as job identifier.
-	 * @param j used as task identifier within a job.
-	 */
-	public DataProviderTestTask(final int i, final int j)
-	{
-		this.i = i;
-		this.j = j;
-	}
+  /**
+   * Initialize this task with the specified parameters
+   * @param i used as job identifier.
+   * @param j used as task identifier within a job.
+   */
+  public DataProviderTestTask(final int i, final int j)
+  {
+    this.i = i;
+    this.j = j;
+  }
 
-	/**
-	 * Execute the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		//System.out.println("this should be on the node side");
-		ClientDataProvider dp = (ClientDataProvider) getDataProvider();
-		Object o = dp.computeValue("result", new MyCallable("" + i + ':' + j));
-		byte[] bytes = (byte[]) o;
-		System.out.println("Result of client-side execution is a byte[" + bytes.length + ']');
-		setResult(o);
-	}
+  /**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    //System.out.println("this should be on the node side");
+    ClientDataProvider dp = (ClientDataProvider) getDataProvider();
+    Object o = dp.computeValue("result", new MyCallable("" + i + ':' + j));
+    byte[] bytes = (byte[]) o;
+    System.out.println("Result of client-side execution is a byte[" + bytes.length + ']');
+    setResult(o);
+  }
 
-	/**
-	 * A callable that simply prints a message on the client side.
-	 */
-	public static class MyCallable implements JPPFCallable<byte[]>
-	{
-		/**
-		 * The id for this callable.
-		 */
-		private String id = null;
+  /**
+   * A callable that simply prints a message on the client side.
+   */
+  public static class MyCallable implements JPPFCallable<byte[]>
+  {
+    /**
+     * The id for this callable.
+     */
+    private String id = null;
 
-		/**
-		 * Initialize this callable wth the specified id.
-		 * @param id the id for this callable.
-		 */
-		public MyCallable(final String id)
-		{
-			this.id = id;
-		}
+    /**
+     * Initialize this callable wth the specified id.
+     * @param id the id for this callable.
+     */
+    public MyCallable(final String id)
+    {
+      this.id = id;
+    }
 
-		/**
-		 * Execute this callable.
-		 * @return a string message.
-		 * @see java.util.concurrent.Callable#call()
-		 */
-		@Override
-		public byte[] call()
-		{
-			//String s = "this should be on the client side";
-			//System.out.println(s);
-			Thread thread = Thread.currentThread();
-			System.out.println("computeValue() for callable id '" + id + "' is running in thread '" + thread.getName() + '\'');
-			try
-			{
-				Thread.sleep(1000L);
-				return new byte[10];
-			}
-			catch(Exception e)
-			{
-				return null;
-			}
-		}
-	}
+    /**
+     * Execute this callable.
+     * @return a string message.
+     * @see java.util.concurrent.Callable#call()
+     */
+    @Override
+    public byte[] call()
+    {
+      //String s = "this should be on the client side";
+      //System.out.println(s);
+      Thread thread = Thread.currentThread();
+      System.out.println("computeValue() for callable id '" + id + "' is running in thread '" + thread.getName() + '\'');
+      try
+      {
+        Thread.sleep(1000L);
+        return new byte[10];
+      }
+      catch(Exception e)
+      {
+        return null;
+      }
+    }
+  }
 }

@@ -31,19 +31,19 @@ import org.jppf.utils.Pair;
 public interface NodeIO
 {
 
-	/**
-	 * Read a task from the socket connection, along with its header information.
-	 * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
-	 * @throws Exception if an error is raised while reading the task data.
-	 */
-	Pair<JPPFTaskBundle, List<Task>> readTask() throws Exception;
+  /**
+   * Read a task from the socket connection, along with its header information.
+   * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
+   * @throws Exception if an error is raised while reading the task data.
+   */
+  Pair<JPPFTaskBundle, List<Task>> readTask() throws Exception;
 
-	/**
-	 * Write the execution results to the socket stream.
-	 * @param bundle the task wrapper to send along.
-	 * @param tasks the list of tasks with their result field updated.
-	 * @throws Exception if an error occurs while writing to the socket stream.
-	 */
-	void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
+  /**
+   * Write the execution results to the socket stream.
+   * @param bundle the task wrapper to send along.
+   * @param tasks the list of tasks with their result field updated.
+   * @throws Exception if an error occurs while writing to the socket stream.
+   */
+  void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
 
 }

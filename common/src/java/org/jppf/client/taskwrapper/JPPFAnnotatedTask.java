@@ -30,67 +30,67 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class JPPFAnnotatedTask extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Wrapper around a task that is not an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
-	 */
-	protected TaskObjectWrapper taskObjectWrapper = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Wrapper around a task that is not an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
+   */
+  protected TaskObjectWrapper taskObjectWrapper = null;
 
-	/**
-	 * Initialize this task with an object whose class is either annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable},
-	 * an instance of {@link java.lang.Runnable Runnable} or  an instance of {@link java.util.concurrent.Callable Callable}.
-	 * @param taskObject an object that encapsulates the task to execute.
-	 * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
-	 * @throws JPPFException if an error is raised while initializing this task.
-	 */
-	public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException
-	{
-		if (taskObject instanceof Runnable) taskObjectWrapper = new RunnableTaskWrapper((Runnable) taskObject);
-		else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable) taskObject);
-		else taskObjectWrapper = new AnnotatedTaskWrapper(taskObject, args);
-	}
+  /**
+   * Initialize this task with an object whose class is either annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable},
+   * an instance of {@link java.lang.Runnable Runnable} or  an instance of {@link java.util.concurrent.Callable Callable}.
+   * @param taskObject an object that encapsulates the task to execute.
+   * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
+   * @throws JPPFException if an error is raised while initializing this task.
+   */
+  public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException
+  {
+    if (taskObject instanceof Runnable) taskObjectWrapper = new RunnableTaskWrapper((Runnable) taskObject);
+    else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable) taskObject);
+    else taskObjectWrapper = new AnnotatedTaskWrapper(taskObject, args);
+  }
 
-	/**
-	 * Initialize this task from a POJO, given a method and its arguments to execute it.
-	 * @param taskObject either an instance of the POJO class if the method is non-static, or a class object if the method is static.
-	 * @param method the name of the method to execute.
-	 * @param args the arguments for the method to execute.
-	 * @throws JPPFException if an error is raised while initializing this task.
-	 */
-	public JPPFAnnotatedTask(final Object taskObject, final String method, final Object...args) throws JPPFException
-	{
-		taskObjectWrapper = new PojoTaskWrapper(method, taskObject, args);
-	}
+  /**
+   * Initialize this task from a POJO, given a method and its arguments to execute it.
+   * @param taskObject either an instance of the POJO class if the method is non-static, or a class object if the method is static.
+   * @param method the name of the method to execute.
+   * @param args the arguments for the method to execute.
+   * @throws JPPFException if an error is raised while initializing this task.
+   */
+  public JPPFAnnotatedTask(final Object taskObject, final String method, final Object...args) throws JPPFException
+  {
+    taskObjectWrapper = new PojoTaskWrapper(method, taskObject, args);
+  }
 
-	/**
-	 * Run the <code>JPPFRunnable</code>-annotated method of the task object.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			Object result = taskObjectWrapper.execute();
-			setResult(result);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Run the <code>JPPFRunnable</code>-annotated method of the task object.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      Object result = taskObjectWrapper.execute();
+      setResult(result);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
-	 * @return an object or class that is JPPF-annotated.
-	 * @see org.jppf.server.protocol.JPPFTask#getTaskObject()
-	 */
-	@Override
-	public Object getTaskObject()
-	{
-		return taskObjectWrapper.getTaskObject();
-	}
+  /**
+   * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
+   * @return an object or class that is JPPF-annotated.
+   * @see org.jppf.server.protocol.JPPFTask#getTaskObject()
+   */
+  @Override
+  public Object getTaskObject()
+  {
+    return taskObjectWrapper.getTaskObject();
+  }
 }

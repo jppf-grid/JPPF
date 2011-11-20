@@ -28,21 +28,21 @@ import java.io.*;
  */
 public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
-	{
-		return new JPPFObjectInputStream(in);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
+  {
+    return new JPPFObjectInputStream(in);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
-	{
-		return new JPPFObjectOutputStream(out);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
+  {
+    return new JPPFObjectOutputStream(out);
+  }
 }

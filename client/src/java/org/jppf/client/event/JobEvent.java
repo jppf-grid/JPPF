@@ -28,36 +28,36 @@ import org.jppf.client.JPPFJob;
  */
 public class JobEvent extends EventObject
 {
-	/**
-	 * The type of event.
-	 */
-	public enum Type
-	{
-		/**
-		 * The job started.
-		 */
-		JOB_START,
-		/**
-		 * The job ended.
-		 */
-		JOB_END
-	}
+  /**
+   * The type of event.
+   */
+  public enum Type
+  {
+    /**
+     * The job started.
+     */
+    JOB_START,
+    /**
+     * The job ended.
+     */
+    JOB_END
+  }
 
-	/**
-	 * Initialize this event with the specified job as its source.
-	 * @param source the source of this event.
-	 */
-	public JobEvent(final JPPFJob source)
-	{
-		super(source);
-	}
+  /**
+   * Initialize this event with the specified job as its source.
+   * @param source the source of this event.
+   */
+  public JobEvent(final JPPFJob source)
+  {
+    super(source);
+  }
 
-	/**
-	 * Get the source of this event.
-	 * @return the source as a {@link JPPFJob} object.
-	 */
-	public JPPFJob getJob()
-	{
-		return (JPPFJob) getSource();
-	}
+  /**
+   * Get the source of this event.
+   * @return the source as a {@link JPPFJob} object.
+   */
+  public JPPFJob getJob()
+  {
+    return (JPPFJob) getSource();
+  }
 }

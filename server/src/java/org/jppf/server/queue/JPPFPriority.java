@@ -27,69 +27,69 @@ import java.io.Serializable;
  */
 public class JPPFPriority implements Comparable<JPPFPriority>, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The actual value of the priority.
-	 */
-	private int value = 0;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The actual value of the priority.
+   */
+  private int value = 0;
 
-	/**
-	 * Initialize this priority with the specified object.
-	 * @param value the object used as priority.
-	 */
-	public JPPFPriority(final int value)
-	{
-		this.value = value;
-	}
+  /**
+   * Initialize this priority with the specified object.
+   * @param value the object used as priority.
+   */
+  public JPPFPriority(final int value)
+  {
+    this.value = value;
+  }
 
-	/**
-	 * Compare this priority with another. This method defines a descending order of priority values,
-	 * meaning a higher priority will come before a lower one.
-	 * @param o the priority to compare with.
-	 * @return a positive value if this priority is greater, a negative value if it is less, otherwise 0.
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	@Override
-	public int compareTo(final JPPFPriority o)
-	{
-		if (o == null) return 1;
-		int v2 = o.getValue();
-		return value > v2 ? -1 : (value < v2 ? 1 : 0);
-	}
+  /**
+   * Compare this priority with another. This method defines a descending order of priority values,
+   * meaning a higher priority will come before a lower one.
+   * @param o the priority to compare with.
+   * @return a positive value if this priority is greater, a negative value if it is less, otherwise 0.
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(final JPPFPriority o)
+  {
+    if (o == null) return 1;
+    int v2 = o.getValue();
+    return value > v2 ? -1 : (value < v2 ? 1 : 0);
+  }
 
-	/**
-	 * Get the actual value of the priority.
-	 * @return the priority as an integer value.
-	 */
-	public int getValue()
-	{
-		return value;
-	}
+  /**
+   * Get the actual value of the priority.
+   * @return the priority as an integer value.
+   */
+  public int getValue()
+  {
+    return value;
+  }
 
-	/**
-	 * Indicates whether some object is "equal" to this one.
-	 * @param obj the object ot compare with.
-	 * @return true if the 2 objects are equal, false otherwise.
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(final Object obj)
-	{
-		if (!(obj instanceof JPPFPriority)) return false;
-		return value == ((JPPFPriority) obj).getValue();
-	}
+  /**
+   * Indicates whether some object is "equal" to this one.
+   * @param obj the object ot compare with.
+   * @return true if the 2 objects are equal, false otherwise.
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (!(obj instanceof JPPFPriority)) return false;
+    return value == ((JPPFPriority) obj).getValue();
+  }
 
-	/**
-	 * Return a hashcode value for this object.
-	 * @return the priority value.
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		return value;
-	}
+  /**
+   * Return a hashcode value for this object.
+   * @return the priority value.
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode()
+  {
+    return value;
+  }
 }

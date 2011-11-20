@@ -25,24 +25,24 @@ package sample.test;
  */
 public class AnonymousInnerClassTask extends JPPFTestTask
 {
-	/**
-	 * Test variable.
-	 */
-	Runnable r = new Runnable()
-	{
-		@Override
-		public void run()
-		{
-		}
-	};
+  /**
+   * Test variable.
+   */
+  Runnable r = new Runnable()
+  {
+    @Override
+    public void run()
+    {
+    }
+  };
 
-	/**
-	 * Execute the task
-	 * @see java.lang.Runnable#run()
-	 */
-	public void test()
-	{
-		r.run();
-		setResult("No exception");
-	}
+  /**
+   * Execute the task
+   * @see java.lang.Runnable#run()
+   */
+  public void test()
+  {
+    r.run();
+    setResult("No exception");
+  }
 }

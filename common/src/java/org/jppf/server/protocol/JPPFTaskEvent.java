@@ -32,13 +32,13 @@ import java.util.EventObject;
  */
 public class JPPFTaskEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified source.
-	 * @param source an object describing the event, must be serializable.
-	 * @deprecated
-	 */
-	public JPPFTaskEvent(final Serializable source)
-	{
-		super(source);
-	}
+  /**
+   * Initialize this event with the specified source.
+   * @param source an object describing the event, must be serializable.
+   * @deprecated
+   */
+  public JPPFTaskEvent(final Serializable source)
+  {
+    super(source);
+  }
 }

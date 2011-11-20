@@ -30,70 +30,70 @@ import org.slf4j.*;
  */
 public class BroadcastJobCompletionListener implements TaskCompletionListener
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(BroadcastJobCompletionListener.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Handles the mappings of nodes and communication channels.
-	 */
-	private static NodeInformationHandler nodeHandler = JPPFDriver.getInstance().getNodeHandler();
-	/**
-	 * The broadcast job to dispatch ot each node.
-	 */
-	private ServerJob bundleWrapper;
-	/**
-	 * The uuids of the nodes to which the job will be dispatched.
-	 */
-	private Set<String> nodeUuids;
-	/**
-	 * Flag indicating whether the broadcast job has completed.
-	 */
-	private boolean done = false;
-	/**
-	 * This map keeps the number of not executed tasks for each node uuid.
-	 */
-	private Map<String, Integer> completionMap = new HashMap<String, Integer>();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(BroadcastJobCompletionListener.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Handles the mappings of nodes and communication channels.
+   */
+  private static NodeInformationHandler nodeHandler = JPPFDriver.getInstance().getNodeHandler();
+  /**
+   * The broadcast job to dispatch ot each node.
+   */
+  private ServerJob bundleWrapper;
+  /**
+   * The uuids of the nodes to which the job will be dispatched.
+   */
+  private Set<String> nodeUuids;
+  /**
+   * Flag indicating whether the broadcast job has completed.
+   */
+  private boolean done = false;
+  /**
+   * This map keeps the number of not executed tasks for each node uuid.
+   */
+  private Map<String, Integer> completionMap = new HashMap<String, Integer>();
 
-	/**
-	 * Initialize this completion listener with the specified broadcast job and set of node uuids.
-	 * @param bundleWrapper the broadcast job to dispatch ot each node.
-	 * @param nodeUuids the uuids of the nodes to which the job will be dispatched.
-	 */
-	public BroadcastJobCompletionListener(final ServerJob bundleWrapper, final Set<String> nodeUuids)
-	{
-		this.bundleWrapper = bundleWrapper;
-		this.nodeUuids = nodeUuids;
-		int taskCount = ((JPPFTaskBundle) bundleWrapper.getJob()).getTaskCount();
-		for (String uuid: nodeUuids) completionMap.put(uuid, taskCount);
-		if (debugEnabled) log.debug("task count=" + taskCount + ", completionMap=" + completionMap);
-	}
+  /**
+   * Initialize this completion listener with the specified broadcast job and set of node uuids.
+   * @param bundleWrapper the broadcast job to dispatch ot each node.
+   * @param nodeUuids the uuids of the nodes to which the job will be dispatched.
+   */
+  public BroadcastJobCompletionListener(final ServerJob bundleWrapper, final Set<String> nodeUuids)
+  {
+    this.bundleWrapper = bundleWrapper;
+    this.nodeUuids = nodeUuids;
+    int taskCount = ((JPPFTaskBundle) bundleWrapper.getJob()).getTaskCount();
+    for (String uuid: nodeUuids) completionMap.put(uuid, taskCount);
+    if (debugEnabled) log.debug("task count=" + taskCount + ", completionMap=" + completionMap);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public synchronized void taskCompleted(final ServerJob result)
-	{
-		JPPFTaskBundle bundle = (JPPFTaskBundle) result.getJob();
-		String uuid = (String) bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID);
-		int n = bundle.getTaskCount();
-		if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
-		int pending = completionMap.get(uuid);
-		pending -= n;
-		if (pending <= 0)
-		{
-			completionMap.remove(uuid);
-			JPPFDriver.getInstance().getJobManager().jobEnded(result);
-		}
-		else completionMap.put(uuid, pending);
-		if (completionMap.isEmpty())
-		{
-			((JPPFTaskBundle) bundleWrapper.getJob()).getCompletionListener().taskCompleted(bundleWrapper);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public synchronized void taskCompleted(final ServerJob result)
+  {
+    JPPFTaskBundle bundle = (JPPFTaskBundle) result.getJob();
+    String uuid = (String) bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID);
+    int n = bundle.getTaskCount();
+    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
+    int pending = completionMap.get(uuid);
+    pending -= n;
+    if (pending <= 0)
+    {
+      completionMap.remove(uuid);
+      JPPFDriver.getInstance().getJobManager().jobEnded(result);
+    }
+    else completionMap.put(uuid, pending);
+    if (completionMap.isEmpty())
+    {
+      ((JPPFTaskBundle) bundleWrapper.getJob()).getCompletionListener().taskCompleted(bundleWrapper);
+    }
+  }
 }

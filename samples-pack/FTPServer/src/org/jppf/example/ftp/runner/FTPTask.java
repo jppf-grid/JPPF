@@ -30,65 +30,65 @@ import org.jppf.utils.FileUtils;
  */
 public class FTPTask extends JPPFTask
 {
-	/**
-	 * The file to download from the driver.
-	 */
-	private String inFile;
-	/**
-	 * The resulting file to upload to the server.
-	 */
-	private String outFile;
+  /**
+   * The file to download from the driver.
+   */
+  private String inFile;
+  /**
+   * The resulting file to upload to the server.
+   */
+  private String outFile;
 
-	/**
-	 * Initialize this task with the specified in and out files.
-	 * @param inFile the file to download from the driver.
-	 * @param outFile the place where to store the downloaded file.
-	 */
-	public FTPTask(final String inFile, final String outFile)
-	{
-		this.inFile = inFile;
-		this.outFile = outFile;
-	}
+  /**
+   * Initialize this task with the specified in and out files.
+   * @param inFile the file to download from the driver.
+   * @param outFile the place where to store the downloaded file.
+   */
+  public FTPTask(final String inFile, final String outFile)
+  {
+    this.inFile = inFile;
+    this.outFile = outFile;
+  }
 
-	/**
-	 * Download a text file from the driver, process it, store the result in an HTML file and upload it to the driver.
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			// retrieve the FTP host from the data provider
-			DataProvider dataProvider = getDataProvider();
-			String host = (String) dataProvider.getValue("ftp.host");
-			FTPClientWrapper client = new FTPClientWrapper();
-			// this is just for demonstration purposes, the password should never be exposed like this!
-			client.open(host, 12222, "admin", "admin");
+  /**
+   * Download a text file from the driver, process it, store the result in an HTML file and upload it to the driver.
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      // retrieve the FTP host from the data provider
+      DataProvider dataProvider = getDataProvider();
+      String host = (String) dataProvider.getValue("ftp.host");
+      FTPClientWrapper client = new FTPClientWrapper();
+      // this is just for demonstration purposes, the password should never be exposed like this!
+      client.open(host, 12222, "admin", "admin");
 
-			// download the input text file
-			client.download(inFile, inFile);
-			String text = FileUtils.readTextFile(inFile);
-			// transform double line breaks into paragraphs
-			text = text.replace("\n\n", "<p>");
-			// transform remaining line breaks into html line breaks
-			text = text.replace("\n", "<br/>");
-			// set all occurrences of JPPF in bold
-			text = text.replace("JPPF", "<b>JPPF</b>");
-			// add barebone HTML header and footer
-			StringBuilder sb = new StringBuilder();
-			sb.append("<html><body>").append(text).append("</body></html>");
-			FileUtils.writeTextFile(outFile, sb.toString());
-			// upload the HTML file to the server.
-			client.upload(outFile, outFile);
+      // download the input text file
+      client.download(inFile, inFile);
+      String text = FileUtils.readTextFile(inFile);
+      // transform double line breaks into paragraphs
+      text = text.replace("\n\n", "<p>");
+      // transform remaining line breaks into html line breaks
+      text = text.replace("\n", "<br/>");
+      // set all occurrences of JPPF in bold
+      text = text.replace("JPPF", "<b>JPPF</b>");
+      // add barebone HTML header and footer
+      StringBuilder sb = new StringBuilder();
+      sb.append("<html><body>").append(text).append("</body></html>");
+      FileUtils.writeTextFile(outFile, sb.toString());
+      // upload the HTML file to the server.
+      client.upload(outFile, outFile);
 
-			client.close();
-			setResult("execution successful");
-		}
-		catch(Exception e)
-		{
-			setResult("execution failed: " + e.getClass().getName() + ": " + e.getMessage());
-			setException(e);
-		}
-	}
+      client.close();
+      setResult("execution successful");
+    }
+    catch(Exception e)
+    {
+      setResult("execution failed: " + e.getClass().getName() + ": " + e.getMessage());
+      setException(e);
+    }
+  }
 }
 

@@ -34,74 +34,74 @@ import org.slf4j.*;
  */
 class WaitInitialBundleState extends NodeServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	protected static Logger log = LoggerFactory.getLogger(WaitInitialBundleState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	protected static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  protected static Logger log = LoggerFactory.getLogger(WaitInitialBundleState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  protected static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public WaitInitialBundleState(final NodeNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public WaitInitialBundleState(final NodeNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
-	 */
-	@Override
-	public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
-		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
-		if (context.readMessage(wrapper))
-		{
-			if (debugEnabled) log.debug("read bundle for " + wrapper + " done");
-			ServerJob bundleWrapper = context.deserializeBundle();
-			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-			context.setUuid(bundle.getBundleUuid());
-			String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
-			context.setNodeUuid(uuid);
-			server.putUuid(uuid, wrapper);
-			Bundler bundler = server.getBundler().copy();
-			JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
-			context.setNodeInfo(systemInfo);
-			if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-			if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
-			bundler.setup();
-			context.setBundler(bundler);
-			boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
-			context.setPeer(isPeer);
-			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
-			{
-				String id = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM);
-				if (id != null)
-				{
-					String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
-					int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
-					JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
-					if (systemInfo != null) info.setSystemInfo(systemInfo);
-					driver.getNodeHandler().addNodeInformation(wrapper, info);
-					driver.getInitializer().getNodeConnectionEventHandler().fireNodeConnected(info);
-				}
-			}
-			// make sure the context is reset so as not to resubmit the last bundle executed by the node.
-			context.setNodeMessage(null, wrapper);
-			context.setBundle(null);
-			server.addIdleChannel(wrapper);
-			return TO_IDLE;
-		}
-		return TO_WAIT_INITIAL;
-	}
+  /**
+   * Execute the action associated with this channel state.
+   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if an error occurs while transitioning to another state.
+   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   */
+  @Override
+  public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
+    if (debugEnabled) log.debug("exec() for " + wrapper);
+    if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), wrapper);
+    if (context.readMessage(wrapper))
+    {
+      if (debugEnabled) log.debug("read bundle for " + wrapper + " done");
+      ServerJob bundleWrapper = context.deserializeBundle();
+      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+      context.setUuid(bundle.getBundleUuid());
+      String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
+      context.setNodeUuid(uuid);
+      server.putUuid(uuid, wrapper);
+      Bundler bundler = server.getBundler().copy();
+      JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
+      context.setNodeInfo(systemInfo);
+      if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+      if (debugEnabled) log.debug("processing threads for node " + wrapper + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
+      bundler.setup();
+      context.setBundler(bundler);
+      boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
+      context.setPeer(isPeer);
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
+      {
+        String id = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM);
+        if (id != null)
+        {
+          String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
+          int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
+          JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
+          if (systemInfo != null) info.setSystemInfo(systemInfo);
+          driver.getNodeHandler().addNodeInformation(wrapper, info);
+          driver.getInitializer().getNodeConnectionEventHandler().fireNodeConnected(info);
+        }
+      }
+      // make sure the context is reset so as not to resubmit the last bundle executed by the node.
+      context.setNodeMessage(null, wrapper);
+      context.setBundle(null);
+      server.addIdleChannel(wrapper);
+      return TO_IDLE;
+    }
+    return TO_WAIT_INITIAL;
+  }
 }

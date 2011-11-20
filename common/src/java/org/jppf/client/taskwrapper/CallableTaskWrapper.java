@@ -26,44 +26,44 @@ import java.util.concurrent.Callable;
  */
 public class CallableTaskWrapper extends AbstractTaskObjectWrapper
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The callable object to execute.
-	 */
-	private Callable callable = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The callable object to execute.
+   */
+  private Callable callable = null;
 
-	/**
-	 * Initialize this wrapper with the specified <code>Runnable</code> object.
-	 * @param callable the callable object to execute.
-	 */
-	public CallableTaskWrapper(final Callable callable)
-	{
-		this.callable = callable;
-	}
+  /**
+   * Initialize this wrapper with the specified <code>Runnable</code> object.
+   * @param callable the callable object to execute.
+   */
+  public CallableTaskWrapper(final Callable callable)
+  {
+    this.callable = callable;
+  }
 
-	/**
-	 * Execute the <code>call()</code> method of this callable task.
-	 * @return the result of the execution.
-	 * @throws Exception if an error occurs during the execution.
-	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
-	 */
-	@Override
-	public Object execute() throws Exception
-	{
-		return callable.call();
-	}
+  /**
+   * Execute the <code>call()</code> method of this callable task.
+   * @return the result of the execution.
+   * @throws Exception if an error occurs during the execution.
+   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#execute()
+   */
+  @Override
+  public Object execute() throws Exception
+  {
+    return callable.call();
+  }
 
-	/**
-	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static.
-	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
-	 */
-	@Override
-	public Object getTaskObject()
-	{
-		return callable;
-	}
+  /**
+   * Return the object on which a method or constructor is called.
+   * @return an object or null if the invoked method is static.
+   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getTaskObject()
+   */
+  @Override
+  public Object getTaskObject()
+  {
+    return callable;
+  }
 }

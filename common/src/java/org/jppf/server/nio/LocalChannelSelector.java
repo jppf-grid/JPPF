@@ -26,75 +26,75 @@ import org.jppf.utils.ThreadSynchronization;
  */
 public class LocalChannelSelector extends ThreadSynchronization implements ChannelSelector
 {
-	/**
-	 * The channel polled by this selector.
-	 */
-	private ChannelWrapper<?> channel = null;
+  /**
+   * The channel polled by this selector.
+   */
+  private ChannelWrapper<?> channel = null;
 
-	/**
-	 * Initialize this selector with the specified channel.
-	 * @param channel the channel polled by this selector.
-	 */
-	public LocalChannelSelector(final ChannelWrapper<?> channel)
-	{
-		this.channel = channel;
-	}
+  /**
+   * Initialize this selector with the specified channel.
+   * @param channel the channel polled by this selector.
+   */
+  public LocalChannelSelector(final ChannelWrapper<?> channel)
+  {
+    this.channel = channel;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean select()
-	{
-		return select(0);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean select()
+  {
+    return select(0);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean select(final long timeout)
-	{
-		if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
-		long start = System.currentTimeMillis();
-		long elapsed = 0;
-		boolean selected = channelSelected();
-		while (((timeout == 0L) || (elapsed < timeout)) && !selected)
-		{
-			goToSleep(timeout == 0L ? 0 : timeout - elapsed);
-			elapsed = System.currentTimeMillis() - start;
-			selected = channelSelected();
-		}
-		return selected;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean select(final long timeout)
+  {
+    if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
+    long start = System.currentTimeMillis();
+    long elapsed = 0;
+    boolean selected = channelSelected();
+    while (((timeout == 0L) || (elapsed < timeout)) && !selected)
+    {
+      goToSleep(timeout == 0L ? 0 : timeout - elapsed);
+      elapsed = System.currentTimeMillis() - start;
+      selected = channelSelected();
+    }
+    return selected;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean selectNow()
-	{
-		return (channel.getKeyOps() & channel.getReadyOps()) != 0;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean selectNow()
+  {
+    return (channel.getKeyOps() & channel.getReadyOps()) != 0;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ChannelWrapper<?> getChannel()
-	{
-		return channel;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ChannelWrapper<?> getChannel()
+  {
+    return channel;
+  }
 
-	/**
-	 * Determine whether the channel should be set as selected.
-	 * @return tre if the channel is selected, false otherwise.
-	 */
-	private boolean channelSelected()
-	{
-		synchronized(channel)
-		{
-			return (channel.getKeyOps() & channel.getReadyOps()) != 0;
-		}
-	}
+  /**
+   * Determine whether the channel should be set as selected.
+   * @return tre if the channel is selected, false otherwise.
+   */
+  private boolean channelSelected()
+  {
+    synchronized(channel)
+    {
+      return (channel.getKeyOps() & channel.getReadyOps()) != 0;
+    }
+  }
 }

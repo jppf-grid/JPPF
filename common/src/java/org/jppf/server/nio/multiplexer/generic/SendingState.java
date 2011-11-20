@@ -29,45 +29,45 @@ import org.slf4j.*;
  */
 public class SendingState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SendingState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SendingState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public SendingState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public SendingState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
-		{
-			ByteBufferWrapper message = context.nextPendingMessage();
-			context.setCurrentMessage(message.buffer);
-			if (debugEnabled) log.debug(wrapper.toString() + " about to send message #" + message.order +
-					": " + (message.buffer.limit()+1) + " bytes");
-		}
-		if (context.getCurrentMessage() == null) return TO_SENDING_OR_RECEIVING;
-		if (context.writeMultiplexerMessage(wrapper))
-		{
-			if (debugEnabled) log.debug(wrapper.toString() + " message sent");
-			context.setCurrentMessage(null);
-			return context.hasPendingMessage() ? TO_SENDING : TO_SENDING_OR_RECEIVING;
-		}
-		return TO_SENDING;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+    if (context.hasPendingMessage() && (context.getCurrentMessage() == null))
+    {
+      ByteBufferWrapper message = context.nextPendingMessage();
+      context.setCurrentMessage(message.buffer);
+      if (debugEnabled) log.debug(wrapper.toString() + " about to send message #" + message.order +
+          ": " + (message.buffer.limit()+1) + " bytes");
+    }
+    if (context.getCurrentMessage() == null) return TO_SENDING_OR_RECEIVING;
+    if (context.writeMultiplexerMessage(wrapper))
+    {
+      if (debugEnabled) log.debug(wrapper.toString() + " message sent");
+      context.setCurrentMessage(null);
+      return context.hasPendingMessage() ? TO_SENDING : TO_SENDING_OR_RECEIVING;
+    }
+    return TO_SENDING;
+  }
 }

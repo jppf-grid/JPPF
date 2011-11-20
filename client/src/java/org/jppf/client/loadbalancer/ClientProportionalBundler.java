@@ -29,57 +29,57 @@ import org.slf4j.*;
  */
 public class ClientProportionalBundler extends AbstractProportionalBundler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ClientProportionalBundler.class);
-	/**
-	 * Determines whether debugging level is set for logging.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Maximum size returned by this bundler.
-	 */
-	private int maxBundleSize = 1;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ClientProportionalBundler.class);
+  /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Maximum size returned by this bundler.
+   */
+  private int maxBundleSize = 1;
 
-	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm,
-	 * grouped as a performance analysis profile.
-	 */
-	public ClientProportionalBundler(final LoadBalancingProfile profile)
-	{
-		super(profile);
-	}
+  /**
+   * Creates a new instance with the initial size of bundle as the start size.
+   * @param profile the parameters of the auto-tuning algorithm,
+   * grouped as a performance analysis profile.
+   */
+  public ClientProportionalBundler(final LoadBalancingProfile profile)
+  {
+    super(profile);
+  }
 
-	/**
-	 * Make a copy of this bundler
-	 * @return a <code>Bundler</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
-	 */
-	@Override
-	public Bundler copy()
-	{
-		return new ClientProportionalBundler(profile);
-	}
+  /**
+   * Make a copy of this bundler
+   * @return a <code>Bundler</code> instance.
+   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+   */
+  @Override
+  public Bundler copy()
+  {
+    return new ClientProportionalBundler(profile);
+  }
 
-	/**
-	 * Get the max bundle size that can be used for this bundler.
-	 * @return the bundle size as an int.
-	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
-	 */
-	@Override
-	protected int maxSize()
-	{
-		return maxBundleSize;
-	}
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+   */
+  @Override
+  protected int maxSize()
+  {
+    return maxBundleSize;
+  }
 
-	/**
-	 * Get the maximum size returned by this bundler.
-	 * @param maxBundleSize the size as an int.
-	 */
-	public void setMaxSize(final int maxBundleSize)
-	{
-		this.maxBundleSize = maxBundleSize;
-	}
+  /**
+   * Get the maximum size returned by this bundler.
+   * @param maxBundleSize the size as an int.
+   */
+  public void setMaxSize(final int maxBundleSize)
+  {
+    this.maxBundleSize = maxBundleSize;
+  }
 }

@@ -27,34 +27,34 @@ import org.jppf.server.protocol.JPPFRunnable;
  */
 public class HelloWorldAnnotatedConstructor implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The string resulting from the task execution.
-	 */
-	private String hello = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The string resulting from the task execution.
+   */
+  private String hello = null;
 
-	/**
-	 * Execute the task.
-	 * @param message a message to print.
-	 * @param number an example primitive argument.
-	 */
-	@JPPFRunnable
-	public HelloWorldAnnotatedConstructor(final String message, final int number)
-	{
-		this.hello = "Hello, World (annotated constructor, " + message + ", " + number + ')';
-		System.out.println(this.hello);
-	}
+  /**
+   * Execute the task.
+   * @param message a message to print.
+   * @param number an example primitive argument.
+   */
+  @JPPFRunnable
+  public HelloWorldAnnotatedConstructor(final String message, final int number)
+  {
+    this.hello = "Hello, World (annotated constructor, " + message + ", " + number + ')';
+    System.out.println(this.hello);
+  }
 
-	/**
-	 * Get the string resulting from the task execution.
-	 * @return a string.
-	 */
-	@Override
-	public String toString()
-	{
-		return hello;
-	}
+  /**
+   * Get the string resulting from the task execution.
+   * @return a string.
+   */
+  @Override
+  public String toString()
+  {
+    return hello;
+  }
 }

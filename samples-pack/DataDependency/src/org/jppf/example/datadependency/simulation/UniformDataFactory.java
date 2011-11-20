@@ -26,18 +26,18 @@ package org.jppf.example.datadependency.simulation;
  */
 public class UniformDataFactory extends AbstractDataFactory
 {
-	/**
-	 * Generate a random number in the range [0, value[.
-	 * @param value the maximum random value (exclusive).
-	 * @return a pseudo-random number in the specified range.
-	 * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int)
-	 */
-	@Override
-	public int getRandomInt(final int value)
-	{
-		synchronized(random)
-		{
-			return random.nextInt(value);
-		}
-	}
+  /**
+   * Generate a random number in the range [0, value[.
+   * @param value the maximum random value (exclusive).
+   * @return a pseudo-random number in the specified range.
+   * @see org.jppf.example.datadependency.simulation.DataFactory#getRandomInt(int)
+   */
+  @Override
+  public int getRandomInt(final int value)
+  {
+    synchronized(random)
+    {
+      return random.nextInt(value);
+    }
+  }
 }

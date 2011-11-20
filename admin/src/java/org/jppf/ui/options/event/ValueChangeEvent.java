@@ -27,21 +27,21 @@ import org.jppf.ui.options.OptionElement;
  */
 public class ValueChangeEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified event source.
-	 * @param option the event source.
-	 */
-	public ValueChangeEvent(final OptionElement option)
-	{
-		super(option);
-	}
+  /**
+   * Initialize this event with the specified event source.
+   * @param option the event source.
+   */
+  public ValueChangeEvent(final OptionElement option)
+  {
+    super(option);
+  }
 
-	/**
-	 * Get the source of this event as an option.
-	 * @return an <code>OptionElement</code> instance.
-	 */
-	public OptionElement getOption()
-	{
-		return (OptionElement) getSource();
-	}
+  /**
+   * Get the source of this event as an option.
+   * @return an <code>OptionElement</code> instance.
+   */
+  public OptionElement getOption()
+  {
+    return (OptionElement) getSource();
+  }
 }

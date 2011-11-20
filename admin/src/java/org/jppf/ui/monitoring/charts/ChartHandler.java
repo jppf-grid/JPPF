@@ -27,22 +27,22 @@ import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
  */
 public interface ChartHandler
 {
-	/**
-	 * Create a chart based on a chart configuration.
-	 * @param config holds the configuration parameters for the chart created, modified by this method.
-	 * @return a <code>ChartConfiguration</code> instance.
-	 */
-	ChartConfiguration createChart(ChartConfiguration config);
-	/**
-	 * Populate a dataset based on a chart configuration.
-	 * @param config the chart configuration containing the dataset to populate.
-	 * @return a <code>ChartConfiguration</code> instance.
-	 */
-	ChartConfiguration populateDataset(ChartConfiguration config);
-	/**
-	 * Update a dataset based on a chart configuration..
-	 * @param config the chart configuration containing the dataset to update.
-	 * @return a <code>ChartConfiguration</code> instance.
-	 */
-	ChartConfiguration updateDataset(ChartConfiguration config);
+  /**
+   * Create a chart based on a chart configuration.
+   * @param config holds the configuration parameters for the chart created, modified by this method.
+   * @return a <code>ChartConfiguration</code> instance.
+   */
+  ChartConfiguration createChart(ChartConfiguration config);
+  /**
+   * Populate a dataset based on a chart configuration.
+   * @param config the chart configuration containing the dataset to populate.
+   * @return a <code>ChartConfiguration</code> instance.
+   */
+  ChartConfiguration populateDataset(ChartConfiguration config);
+  /**
+   * Update a dataset based on a chart configuration..
+   * @param config the chart configuration containing the dataset to update.
+   * @return a <code>ChartConfiguration</code> instance.
+   */
+  ChartConfiguration updateDataset(ChartConfiguration config);
 }

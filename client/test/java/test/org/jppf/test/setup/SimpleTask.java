@@ -27,46 +27,46 @@ import org.slf4j.*;
  */
 public class SimpleTask extends JPPFTask
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SimpleTask.class);
-	/**
-	 * The duration of this task;
-	 */
-	private long duration = 0L;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SimpleTask.class);
+  /**
+   * The duration of this task;
+   */
+  private long duration = 0L;
 
-	/**
-	 * Initialize this task.
-	 */
-	public SimpleTask()
-	{
-	}
+  /**
+   * Initialize this task.
+   */
+  public SimpleTask()
+  {
+  }
 
-	/**
-	 * Initialize this task.
-	 * @param duration specifies the duration of this task.
-	 */
-	public SimpleTask(final long duration)
-	{
-		this.duration = duration;
-	}
+  /**
+   * Initialize this task.
+   * @param duration specifies the duration of this task.
+   */
+  public SimpleTask(final long duration)
+  {
+    this.duration = duration;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			if (duration > 0) Thread.sleep(duration);
-			setResult(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE);
-			log.info("task id =" + getId() + ", duration=" + duration + ", result=" + getResult());
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      if (duration > 0) Thread.sleep(duration);
+      setResult(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE);
+      log.info("task id =" + getId() + ", duration=" + duration + ", result=" + getResult());
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }

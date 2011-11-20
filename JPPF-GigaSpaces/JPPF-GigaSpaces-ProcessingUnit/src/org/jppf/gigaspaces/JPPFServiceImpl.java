@@ -30,57 +30,57 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class JPPFServiceImpl implements JPPFService
 {
-	/**
-	 * Unique reference to the JPPF client.
-	 */
-	private static final AtomicReference<JPPFClient> client = new AtomicReference<JPPFClient>(newJPPFClient());
+  /**
+   * Unique reference to the JPPF client.
+   */
+  private static final AtomicReference<JPPFClient> client = new AtomicReference<JPPFClient>(newJPPFClient());
 
-	/**
-	 * Default constructor.
-	 */
-	public JPPFServiceImpl()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public JPPFServiceImpl()
+  {
+  }
 
-	/**
-	 * Submit a job sent by a local or remote GigaSpaces client.
-	 * @param job the JPPF job to execute.
-	 * @return  the job with the initial tasks replaced with the results.
-	 * @see org.jppf.gigaspaces.JPPFService#submitJob(org.jppf.client.JPPFJob)
-	 */
-	@Override
-	public JPPFJob submitJob(final JPPFJob job)
-	{
-		int n = job.getTasks().size();
-		System.out.println("received job with " + n + " task" + (n > 1 ? "s" : ""));
-		try
-		{
-			List<JPPFTask> results = getJPPFClient().submit(job);
-			job.getTasks().clear();
-			for (JPPFTask task: results) job.addTask(task);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return job;
-	}
+  /**
+   * Submit a job sent by a local or remote GigaSpaces client.
+   * @param job the JPPF job to execute.
+   * @return  the job with the initial tasks replaced with the results.
+   * @see org.jppf.gigaspaces.JPPFService#submitJob(org.jppf.client.JPPFJob)
+   */
+  @Override
+  public JPPFJob submitJob(final JPPFJob job)
+  {
+    int n = job.getTasks().size();
+    System.out.println("received job with " + n + " task" + (n > 1 ? "s" : ""));
+    try
+    {
+      List<JPPFTask> results = getJPPFClient().submit(job);
+      job.getTasks().clear();
+      for (JPPFTask task: results) job.addTask(task);
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    return job;
+  }
 
-	/**
-	 * Instantiate a new JPPF client.
-	 * @return a <code>JPPFClient</code> instance.
-	 */
-	private static synchronized JPPFClient newJPPFClient()
-	{
-		return new JPPFClient();
-	}
+  /**
+   * Instantiate a new JPPF client.
+   * @return a <code>JPPFClient</code> instance.
+   */
+  private static synchronized JPPFClient newJPPFClient()
+  {
+    return new JPPFClient();
+  }
 
-	/**
-	 * Get the JPPF client.
-	 * @return a <code>JPPFClient</code> instance.
-	 */
-	private static JPPFClient getJPPFClient()
-	{
-		return client.get();
-	}
+  /**
+   * Get the JPPF client.
+   * @return a <code>JPPFClient</code> instance.
+   */
+  private static JPPFClient getJPPFClient()
+  {
+    return client.get();
+  }
 }

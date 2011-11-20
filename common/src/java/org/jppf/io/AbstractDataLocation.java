@@ -27,33 +27,33 @@ package org.jppf.io;
  */
 public abstract class AbstractDataLocation implements DataLocation
 {
-	/**
-	 * The capacity of the underlying buffer.
-	 */
-	protected int size = UNKNOWN_SIZE;
+  /**
+   * The capacity of the underlying buffer.
+   */
+  protected int size = UNKNOWN_SIZE;
 
-	/**
-	 * Determines whether a transfer has been started.
-	 */
-	protected boolean transferring = false;
+  /**
+   * Determines whether a transfer has been started.
+   */
+  protected boolean transferring = false;
 
-	/**
-	 * Get the size of the data referenced by this data location.
-	 * @return the data size as an int.
-	 * @see org.jppf.io.DataLocation#getSize()
-	 */
-	@Override
-	public int getSize()
-	{
-		return size;
-	}
+  /**
+   * Get the size of the data referenced by this data location.
+   * @return the data size as an int.
+   * @see org.jppf.io.DataLocation#getSize()
+   */
+  @Override
+  public int getSize()
+  {
+    return size;
+  }
 
-	/**
-	 * Set the size of the data referenced by this data location.
-	 * @param size - the data size as an int.
-	 */
-	public void setSize(final int size)
-	{
-		this.size = size;
-	}
+  /**
+   * Set the size of the data referenced by this data location.
+   * @param size - the data size as an int.
+   */
+  public void setSize(final int size)
+  {
+    this.size = size;
+  }
 }

@@ -36,152 +36,152 @@ import org.slf4j.*;
  */
 public class JPPFClient extends AbstractGenericClient
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFClient.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The submission manager.
-	 */
-	private SubmissionManagerImpl submissionManager;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFClient.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The submission manager.
+   */
+  private SubmissionManagerImpl submissionManager;
 
-	/**
-	 * Initialize this client with an automatically generated application UUID.
-	 */
-	public JPPFClient()
-	{
-		super(JPPFConfiguration.getProperties());
-	}
+  /**
+   * Initialize this client with an automatically generated application UUID.
+   */
+  public JPPFClient()
+  {
+    super(JPPFConfiguration.getProperties());
+  }
 
-	/**
-	 * Initialize this client with an automatically generated application UUID.
-	 * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
-	 */
-	public JPPFClient(final ClientListener...listeners)
-	{
-		this();
-		for (ClientListener listener: listeners) addClientListener(listener);
-	}
+  /**
+   * Initialize this client with an automatically generated application UUID.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   */
+  public JPPFClient(final ClientListener...listeners)
+  {
+    this();
+    for (ClientListener listener: listeners) addClientListener(listener);
+  }
 
-	/**
-	 * Initialize this client with a specified application UUID.
-	 * @param uuid the unique identifier for this local client.
-	 */
-	public JPPFClient(final String uuid)
-	{
-		super(uuid, JPPFConfiguration.getProperties());
-	}
+  /**
+   * Initialize this client with a specified application UUID.
+   * @param uuid the unique identifier for this local client.
+   */
+  public JPPFClient(final String uuid)
+  {
+    super(uuid, JPPFConfiguration.getProperties());
+  }
 
-	/**
-	 * Initialize this client with the specified application UUID and new connection listeners.
-	 * @param uuid the unique identifier for this local client.
-	 * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
-	 */
-	public JPPFClient(final String uuid, final ClientListener...listeners)
-	{
-		this(uuid);
-		for (ClientListener listener: listeners) addClientListener(listener);
-	}
+  /**
+   * Initialize this client with the specified application UUID and new connection listeners.
+   * @param uuid the unique identifier for this local client.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   */
+  public JPPFClient(final String uuid, final ClientListener...listeners)
+  {
+    this(uuid);
+    for (ClientListener listener: listeners) addClientListener(listener);
+  }
 
-	/**
-	 * Initialize this client's configuration.
-	 * @param configuration an object holding the JPPF configuration.
-	 */
-	@Override
-	protected void initConfig(final Object configuration)
-	{
-		config = (TypedProperties) configuration;
-	}
+  /**
+   * Initialize this client's configuration.
+   * @param configuration an object holding the JPPF configuration.
+   */
+  @Override
+  protected void initConfig(final Object configuration)
+  {
+    config = (TypedProperties) configuration;
+  }
 
-	/**
-	 * Create a new driver connection based on the specified parameters.
-	 * @param uuid the uuid of the JPPF client.
-	 * @param name the name of the connection.
-	 * @param info the driver connection information.
-	 * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
-	 */
-	@Override
-	protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
-	{
-		return new JPPFClientConnectionImpl(this, uuid, name, info);
-	}
+  /**
+   * Create a new driver connection based on the specified parameters.
+   * @param uuid the uuid of the JPPF client.
+   * @param name the name of the connection.
+   * @param info the driver connection information.
+   * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
+   */
+  @Override
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
+  {
+    return new JPPFClientConnectionImpl(this, uuid, name, info);
+  }
 
-	/**
-	 * Submit a job execution request.
-	 * @param job the job to execute.
-	 * @return the list of executed tasks with their results.
-	 * @throws IllegalArgumentException if the job is null or empty.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
-	 */
-	@Override
-	public List<JPPFTask> submit(final JPPFJob job) throws Exception
-	{
-		if (job == null) throw new IllegalArgumentException("job cannot be null");
-		if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
-		if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job));
-		//else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
-		submissionManager.submitJob(job);
-		if (job.isBlocking())
-		{
-			JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-			return collector.waitForResults();
-		}
-		return null;
-	}
+  /**
+   * Submit a job execution request.
+   * @param job the job to execute.
+   * @return the list of executed tasks with their results.
+   * @throws IllegalArgumentException if the job is null or empty.
+   * @throws Exception if an error occurs while sending the request.
+   * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
+   */
+  @Override
+  public List<JPPFTask> submit(final JPPFJob job) throws Exception
+  {
+    if (job == null) throw new IllegalArgumentException("job cannot be null");
+    if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
+    if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job));
+    //else if (job.isBlocking()) job.setResultListener(new JPPFResultCollector(job.getTasks().size()));
+    submissionManager.submitJob(job);
+    if (job.isBlocking())
+    {
+      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      return collector.waitForResults();
+    }
+    return null;
+  }
 
-	/**
-	 * Send a request to get the statistics collected by the JPPF server.
-	 * @return a <code>JPPFStats</code> instance.
-	 * @throws Exception if an error occurred while trying to get the server statistics.
-	 * @deprecated this method does not allow to chose which driver to get the statistics from.
-	 * Use <code>((JPPFClientConnectionImpl) getConnection(java.lang.String)).getJmxConnection().statistics()</code> instead.
-	 */
-	public JPPFStats requestStatistics() throws Exception
-	{
-		JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(true);
-		return (conn == null) ? null : conn.getJmxConnection().statistics();
-	}
+  /**
+   * Send a request to get the statistics collected by the JPPF server.
+   * @return a <code>JPPFStats</code> instance.
+   * @throws Exception if an error occurred while trying to get the server statistics.
+   * @deprecated this method does not allow to chose which driver to get the statistics from.
+   * Use <code>((JPPFClientConnectionImpl) getConnection(java.lang.String)).getJmxConnection().statistics()</code> instead.
+   */
+  public JPPFStats requestStatistics() throws Exception
+  {
+    JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(true);
+    return (conn == null) ? null : conn.getJmxConnection().statistics();
+  }
 
-	/**
-	 * Close this client and release all the resources it is using.
-	 */
-	@Override
-	public void close()
-	{
-		super.close();
-		if (loadBalancer != null) loadBalancer.stop();
-		if (submissionManager != null)
-		{
-			submissionManager.setStopped(true);
-			submissionManager.wakeUp();
-		}
-	}
+  /**
+   * Close this client and release all the resources it is using.
+   */
+  @Override
+  public void close()
+  {
+    super.close();
+    if (loadBalancer != null) loadBalancer.stop();
+    if (submissionManager != null)
+    {
+      submissionManager.setStopped(true);
+      submissionManager.wakeUp();
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void initPools()
-	{
-		submissionManager = new SubmissionManagerImpl(this);
-		new Thread(submissionManager, "SubmissionManager").start();
-		super.initPools();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void initPools()
+  {
+    submissionManager = new SubmissionManagerImpl(this);
+    new Thread(submissionManager, "SubmissionManager").start();
+    super.initPools();
+  }
 
-	/**
-	 * Invoked when the status of a client connection has changed.
-	 * @param event the event to notify of.
-	 * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-	 */
-	@Override
-	public void statusChanged(final ClientConnectionStatusEvent event)
-	{
-		super.statusChanged(event);
-		submissionManager.wakeUp();
-	}
+  /**
+   * Invoked when the status of a client connection has changed.
+   * @param event the event to notify of.
+   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+   */
+  @Override
+  public void statusChanged(final ClientConnectionStatusEvent event)
+  {
+    super.statusChanged(event);
+    submissionManager.wakeUp();
+  }
 }

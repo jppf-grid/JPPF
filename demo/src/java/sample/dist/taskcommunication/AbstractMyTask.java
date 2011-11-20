@@ -31,62 +31,62 @@ import com.hazelcast.core.Hazelcast;
  */
 public abstract class AbstractMyTask extends JPPFTask
 {
-	/**
-	 * Initialize this task.
-	 * @param id - the task id.
-	 */
-	public AbstractMyTask(final String id)
-	{
-		setId(id);
-	}
+  /**
+   * Initialize this task.
+   * @param id - the task id.
+   */
+  public AbstractMyTask(final String id)
+  {
+    setId(id);
+  }
 
-	/**
-	 * Wait for the specified time.
-	 * @param time - the time to wait in milliseconds.
-	 */
-	protected void doWait(final long time)
-	{
-		try
-		{
-			Thread.sleep(time);
-		}
-		catch(InterruptedException e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Wait for the specified time.
+   * @param time - the time to wait in milliseconds.
+   */
+  protected void doWait(final long time)
+  {
+    try
+    {
+      Thread.sleep(time);
+    }
+    catch(InterruptedException e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * Get the distributed map, and lazily initialize it if required.
-	 * @return an <code>IMap</code> instance.
-	 */
-	@SuppressWarnings("unchecked")
-	protected Map<String, String> getMap()
-	{
-		String key = "taskMap";
-		Map<String, String> map = (Map<String, String>) NodeRunner.getPersistentData(key);
-		if (map == null)
-		{
-			map = Hazelcast.getMap(key);
-			NodeRunner.setPersistentData(key, map);
-		}
-		return map;
-	}
+  /**
+   * Get the distributed map, and lazily initialize it if required.
+   * @return an <code>IMap</code> instance.
+   */
+  @SuppressWarnings("unchecked")
+  protected Map<String, String> getMap()
+  {
+    String key = "taskMap";
+    Map<String, String> map = (Map<String, String>) NodeRunner.getPersistentData(key);
+    if (map == null)
+    {
+      map = Hazelcast.getMap(key);
+      NodeRunner.setPersistentData(key, map);
+    }
+    return map;
+  }
 
-	/**
-	 * Check that the distributed queue is empty.
-	 * This method lazily initializes the queue if required.
-	 * @return true if the distributed queue is empty, false otherwise.
-	 */
-	public boolean checkQueue()
-	{
-		String key = "MyDistyributedQueue";
-		Queue<?> queue = (Queue<?>) NodeRunner.getPersistentData(key);
-		if (queue == null)
-		{
-			queue = Hazelcast.getQueue(key);
-			NodeRunner.setPersistentData(key, queue);
-		}
-		return queue.isEmpty();
-	}
+  /**
+   * Check that the distributed queue is empty.
+   * This method lazily initializes the queue if required.
+   * @return true if the distributed queue is empty, false otherwise.
+   */
+  public boolean checkQueue()
+  {
+    String key = "MyDistyributedQueue";
+    Queue<?> queue = (Queue<?>) NodeRunner.getPersistentData(key);
+    if (queue == null)
+    {
+      queue = Hazelcast.getQueue(key);
+      NodeRunner.setPersistentData(key, queue);
+    }
+    return queue.isEmpty();
+  }
 }

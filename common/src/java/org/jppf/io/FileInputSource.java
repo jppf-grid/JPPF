@@ -26,34 +26,34 @@ import java.io.*;
  */
 public class FileInputSource extends ChannelInputSource
 {
-	/**
-	 * Initialize this file input source with the specified file path.
-	 * @param path the path to the file to read from.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public FileInputSource(final String path) throws Exception
-	{
-		this(new File(path));
-	}
+  /**
+   * Initialize this file input source with the specified file path.
+   * @param path the path to the file to read from.
+   * @throws Exception if an IO error occurs.
+   */
+  public FileInputSource(final String path) throws Exception
+  {
+    this(new File(path));
+  }
 
-	/**
-	 * Initialize this file input source with the specified file.
-	 * @param file the file to read from.
-	 * @throws Exception if an IO error occurs.
-	 */
-	public FileInputSource(final File file) throws Exception
-	{
-		super(new FileInputStream(file).getChannel());
-	}
+  /**
+   * Initialize this file input source with the specified file.
+   * @param file the file to read from.
+   * @throws Exception if an IO error occurs.
+   */
+  public FileInputSource(final File file) throws Exception
+  {
+    super(new FileInputStream(file).getChannel());
+  }
 
-	/**
-	 * Close this input source and release any system resources associated with it.
-	 * @throws IOException if an IO error occurs.
-	 * @see java.io.Closeable#close()
-	 */
-	@Override
-	public void close() throws IOException
-	{
-		channel.close();
-	}
+  /**
+   * Close this input source and release any system resources associated with it.
+   * @throws IOException if an IO error occurs.
+   * @see java.io.Closeable#close()
+   */
+  @Override
+  public void close() throws IOException
+  {
+    channel.close();
+  }
 }

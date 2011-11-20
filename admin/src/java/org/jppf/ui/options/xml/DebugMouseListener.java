@@ -33,87 +33,87 @@ import org.slf4j.*;
  */
 public class DebugMouseListener extends MouseAdapter
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(DebugMouseListener.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The option to debug.
-	 */
-	private OptionElement option = null;
-	/**
-	 * Determines whether the XML is loaded from a url or file location.
-	 */
-	private String source = null;
-	/**
-	 * Where to load the xml descriptor from.
-	 */
-	private String location = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(DebugMouseListener.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The option to debug.
+   */
+  private OptionElement option = null;
+  /**
+   * Determines whether the XML is loaded from a url or file location.
+   */
+  private String source = null;
+  /**
+   * Where to load the xml descriptor from.
+   */
+  private String location = null;
 
-	/**
-	 * 
-	 * @param option - the option to debug.
-	 * @param source - determines whether the XML is loaded from a url or file location.
-	 * @param location - where to load the xml descriptor from.
-	 */
-	public DebugMouseListener(final OptionElement option, final String source, final String location)
-	{
-		this.option = option;
-		this.source = source;
-		this.location = location;
-	}
-	/**
-	 * Processes right-click events to display popup menus.
-	 * @param event - the mouse event to process.
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mousePressed(final MouseEvent event)
-	{
-		if (event.getButton() != MouseEvent.BUTTON3) return;
-		Component comp = event.getComponent();
-		int x = event.getX();
-		int y = event.getY();
+  /**
+   * 
+   * @param option - the option to debug.
+   * @param source - determines whether the XML is loaded from a url or file location.
+   * @param location - where to load the xml descriptor from.
+   */
+  public DebugMouseListener(final OptionElement option, final String source, final String location)
+  {
+    this.option = option;
+    this.source = source;
+    this.location = location;
+  }
+  /**
+   * Processes right-click events to display popup menus.
+   * @param event - the mouse event to process.
+   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+   */
+  @Override
+  public void mousePressed(final MouseEvent event)
+  {
+    if (event.getButton() != MouseEvent.BUTTON3) return;
+    Component comp = event.getComponent();
+    int x = event.getX();
+    int y = event.getY();
 
-		JPopupMenu menu = new JPopupMenu();
-		JMenuItem item = new JMenuItem("Reload");
-		item.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ev)
-			{
-				doReloadPage();
-			}
-		});
-		menu.add(item);
-		menu.show(comp, x, y);
-	}
+    JPopupMenu menu = new JPopupMenu();
+    JMenuItem item = new JMenuItem("Reload");
+    item.addActionListener(new ActionListener()
+    {
+      @Override
+      public void actionPerformed(final ActionEvent ev)
+      {
+        doReloadPage();
+      }
+    });
+    menu.add(item);
+    menu.show(comp, x, y);
+  }
 
-	/**
-	 * Reload the page.
-	 */
-	private void doReloadPage()
-	{
-		try
-		{
-			OptionsPage parent = (OptionsPage) option.getParent();
-			parent.remove(option);
-			OptionsPageBuilder builder = new OptionsPageBuilder(true);
-			OptionElement elt;
-			if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
-			else elt = builder.buildPage(location, null);
-			builder.getFactory().addDebugComp(elt, source, location);
-			parent.add(elt);
-			builder.triggerInitialEvents(elt);
-			parent.getUIComponent().updateUI();
-		}
-		catch(Exception  e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Reload the page.
+   */
+  private void doReloadPage()
+  {
+    try
+    {
+      OptionsPage parent = (OptionsPage) option.getParent();
+      parent.remove(option);
+      OptionsPageBuilder builder = new OptionsPageBuilder(true);
+      OptionElement elt;
+      if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
+      else elt = builder.buildPage(location, null);
+      builder.getFactory().addDebugComp(elt, source, location);
+      parent.add(elt);
+      builder.triggerInitialEvents(elt);
+      parent.getUIComponent().updateUI();
+    }
+    catch(Exception  e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 }

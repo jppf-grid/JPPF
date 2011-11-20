@@ -32,70 +32,70 @@ import org.slf4j.*;
  */
 public class MultiplexerChannelHandler extends AbstractSocketChannelHandler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(MultiplexerChannelHandler.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The key associated with the initial connection.
-	 */
-	private ChannelWrapper initialKey = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(MultiplexerChannelHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The key associated with the initial connection.
+   */
+  private ChannelWrapper initialKey = null;
 
-	/**
-	 * Initialize the channel with the specified host and port.
-	 * @param server the NioServer to which the channel is registered.
-	 * @param host the remote host to connect to.
-	 * @param port the port to connect to on the remote host.
-	 * @param initialKey the key associated with the initial connection.
-	 */
-	public MultiplexerChannelHandler(final NioServer server, final String host, final int port, final ChannelWrapper initialKey)
-	{
-		super(server, host, port);
-		this.initialKey = initialKey;
-	}
+  /**
+   * Initialize the channel with the specified host and port.
+   * @param server the NioServer to which the channel is registered.
+   * @param host the remote host to connect to.
+   * @param port the port to connect to on the remote host.
+   * @param initialKey the key associated with the initial connection.
+   */
+  public MultiplexerChannelHandler(final NioServer server, final String host, final int port, final ChannelWrapper initialKey)
+  {
+    super(server, host, port);
+    this.initialKey = initialKey;
+  }
 
-	/**
-	 * Initialize the channel client.
-	 * @return a non-connected <code>SocketChannelClient</code> instance.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#initSocketChannel()
-	 */
-	@Override
-	protected SocketChannelClient initSocketChannel() throws Exception
-	{
-		return new SocketChannelClient(host, port, false);
-	}
+  /**
+   * Initialize the channel client.
+   * @return a non-connected <code>SocketChannelClient</code> instance.
+   * @throws Exception if an error is raised during initialization.
+   * @see org.jppf.server.nio.AbstractSocketChannelHandler#initSocketChannel()
+   */
+  @Override
+  protected SocketChannelClient initSocketChannel() throws Exception
+  {
+    return new SocketChannelClient(host, port, false);
+  }
 
-	/**
-	 * This method is called after the channel is successfully connected.
-	 * @throws Exception if an error is raised while performing the initialization.
-	 * @see org.jppf.server.nio.AbstractSocketChannelHandler#postInit()
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void postInit() throws Exception
-	{
-		SocketChannel channel = socketClient.getChannel();
-		socketClient.setChannel(null);
-		MultiplexerContext context = (MultiplexerContext) server.createNioContext();
-		context.setLinkedKey(initialKey);
-		context.setState(MultiplexerState.SENDING_MULTIPLEXING_INFO);
-		server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context,
-				new StateTransitionManager.ChannelRegistrationAction()
-		{
-			@Override
-			public void run()
-			{
-				MultiplexerContext initialContext = (MultiplexerContext ) initialKey.getContext();
-				initialContext.setLinkedKey(key);
-				server.getTransitionManager().transitionChannel(initialKey, MultiplexerTransition.TO_SENDING_OR_RECEIVING);
-			}
-		}
-		);
-		if (debugEnabled) log.debug("registered multiplexer channel");
-	}
+  /**
+   * This method is called after the channel is successfully connected.
+   * @throws Exception if an error is raised while performing the initialization.
+   * @see org.jppf.server.nio.AbstractSocketChannelHandler#postInit()
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void postInit() throws Exception
+  {
+    SocketChannel channel = socketClient.getChannel();
+    socketClient.setChannel(null);
+    MultiplexerContext context = (MultiplexerContext) server.createNioContext();
+    context.setLinkedKey(initialKey);
+    context.setState(MultiplexerState.SENDING_MULTIPLEXING_INFO);
+    server.getTransitionManager().registerChannel(channel, SelectionKey.OP_READ | SelectionKey.OP_WRITE, context,
+        new StateTransitionManager.ChannelRegistrationAction()
+    {
+      @Override
+      public void run()
+      {
+        MultiplexerContext initialContext = (MultiplexerContext ) initialKey.getContext();
+        initialContext.setLinkedKey(key);
+        server.getTransitionManager().transitionChannel(initialKey, MultiplexerTransition.TO_SENDING_OR_RECEIVING);
+      }
+    }
+    );
+    if (debugEnabled) log.debug("registered multiplexer channel");
+  }
 }

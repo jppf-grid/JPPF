@@ -23,28 +23,28 @@ package org.jppf.server.nio.multiplexer;
  */
 public enum MultiplexerState
 {
-	/**
-	 * IDLE state, when a channel has nothing to do.
-	 */
-	IDLE,
-	/**
-	 * State of sending or receiving data.
-	 */
-	SENDING_OR_RECEIVING,
-	/**
-	 * State of sending data.
-	 */
-	SENDING,
-	/**
-	 * State of receiving data.
-	 */
-	RECEIVING,
-	/**
-	 * State of identifying an inbound connection from a remote multiplexer.
-	 */
-	IDENTIFYING_INBOUND_CHANNEL,
-	/**
-	 * State of sending outbound port information to a remote multiplexer.
-	 */
-	SENDING_MULTIPLEXING_INFO
+  /**
+   * IDLE state, when a channel has nothing to do.
+   */
+  IDLE,
+  /**
+   * State of sending or receiving data.
+   */
+  SENDING_OR_RECEIVING,
+  /**
+   * State of sending data.
+   */
+  SENDING,
+  /**
+   * State of receiving data.
+   */
+  RECEIVING,
+  /**
+   * State of identifying an inbound connection from a remote multiplexer.
+   */
+  IDENTIFYING_INBOUND_CHANNEL,
+  /**
+   * State of sending outbound port information to a remote multiplexer.
+   */
+  SENDING_MULTIPLEXING_INFO
 }

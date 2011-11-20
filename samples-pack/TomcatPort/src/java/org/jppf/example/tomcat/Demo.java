@@ -31,68 +31,68 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class Demo
 {
-	/**
-	 * The singleton {@link JPPFClient} instance.
-	 */
-	private static JPPFClient jppfClient = null;
+  /**
+   * The singleton {@link JPPFClient} instance.
+   */
+  private static JPPFClient jppfClient = null;
 
-	/**
-	 * Get a reference to the JPPF client, lazily initializing it if needed.
-	 * @return a{@link JPPFClient} instance.
-	 */
-	public static synchronized JPPFClient getClient()
-	{
-		if (jppfClient == null)
-		{
-			jppfClient = new JPPFClient();
-			try
-			{
-				Thread.sleep(500L);
-			}
-			catch(InterruptedException e) { }
-		}
-		return jppfClient;
-	}
+  /**
+   * Get a reference to the JPPF client, lazily initializing it if needed.
+   * @return a{@link JPPFClient} instance.
+   */
+  public static synchronized JPPFClient getClient()
+  {
+    if (jppfClient == null)
+    {
+      jppfClient = new JPPFClient();
+      try
+      {
+        Thread.sleep(500L);
+      }
+      catch(InterruptedException e) { }
+    }
+    return jppfClient;
+  }
 
-	/**
-	 * Execute a job and return the result as a string.
-	 * @param jobName the name given to the JPPF job.
-	 * @param nbTasks the number of tasks in the job.
-	 * @param taskDuration the duration in milliseconds of each task in the job.
-	 * @return the job result as a string message.
-	 */
-	public String submitJob(final String jobName, final int nbTasks, final long taskDuration)
-	{
-		long start = System.currentTimeMillis();
-		JPPFJob job = null;
-		StringBuilder sb = new StringBuilder();
-		sb.append("<h2>Results for job ").append(jobName).append("</h2>");
-		try
-		{
-			job = new JPPFJob();
-			job.setName(jobName);
-			for (int i=1; i<=nbTasks; i++)
-			{
-				LongTask task = new LongTask(taskDuration);
-				task.setId("" + i);
-				job.addTask(task);
-			}
-			List<JPPFTask> results = getClient().submit(job);
-			for (JPPFTask task: results)
-			{
-				sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
-			}
-		}
-		catch(Exception e)
-		{
-			sb.append(e.getClass().getName()).append(" : ").append(e.getMessage()).append("<br/>");
-			for (StackTraceElement elt: e.getStackTrace())
-			{
-				sb.append(elt).append("<br/>");
-			}
-		}
-		long elapsed = System.currentTimeMillis() - start;
-		sb.append("<p> Total processing time: ").append(elapsed).append(" ms");
-		return sb.toString();
-	}
+  /**
+   * Execute a job and return the result as a string.
+   * @param jobName the name given to the JPPF job.
+   * @param nbTasks the number of tasks in the job.
+   * @param taskDuration the duration in milliseconds of each task in the job.
+   * @return the job result as a string message.
+   */
+  public String submitJob(final String jobName, final int nbTasks, final long taskDuration)
+  {
+    long start = System.currentTimeMillis();
+    JPPFJob job = null;
+    StringBuilder sb = new StringBuilder();
+    sb.append("<h2>Results for job ").append(jobName).append("</h2>");
+    try
+    {
+      job = new JPPFJob();
+      job.setName(jobName);
+      for (int i=1; i<=nbTasks; i++)
+      {
+        LongTask task = new LongTask(taskDuration);
+        task.setId("" + i);
+        job.addTask(task);
+      }
+      List<JPPFTask> results = getClient().submit(job);
+      for (JPPFTask task: results)
+      {
+        sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
+      }
+    }
+    catch(Exception e)
+    {
+      sb.append(e.getClass().getName()).append(" : ").append(e.getMessage()).append("<br/>");
+      for (StackTraceElement elt: e.getStackTrace())
+      {
+        sb.append(elt).append("<br/>");
+      }
+    }
+    long elapsed = System.currentTimeMillis() - start;
+    sb.append("<p> Total processing time: ").append(elapsed).append(" ms");
+    return sb.toString();
+  }
 }

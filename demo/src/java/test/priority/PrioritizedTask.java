@@ -26,27 +26,27 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class PrioritizedTask extends JPPFTask
 {
-	/**
-	 * The time to wait.
-	 */
-	private int priority = 0;
+  /**
+   * The time to wait.
+   */
+  private int priority = 0;
 
-	/**
-	 * Initialize this task with the specified priority.
-	 * @param priority the task priority.
-	 */
-	public PrioritizedTask(final int priority)
-	{
-		this.priority = priority;
-	}
+  /**
+   * Initialize this task with the specified priority.
+   * @param priority the task priority.
+   */
+  public PrioritizedTask(final int priority)
+  {
+    this.priority = priority;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		System.out.println("executing task with priority " + priority);
-	}
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    System.out.println("executing task with priority " + priority);
+  }
 }

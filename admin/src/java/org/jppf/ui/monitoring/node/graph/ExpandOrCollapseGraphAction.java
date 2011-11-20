@@ -29,53 +29,53 @@ import com.mxgraph.view.mxGraph;
  */
 public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
 {
-	/**
-	 * Determines whether this action is for collapsing or expanding graph vertices.
-	 */
-	private final boolean collapse;
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 * @param collapse determines whether this action is for collapsing or expanding graph vertices.
-	 */
-	public ExpandOrCollapseGraphAction(final GraphOption panel, final boolean collapse)
-	{
-		super(panel);
-		this.collapse = collapse;
-		//String s = collapse ? "collapse" : "expand";
-		if (collapse)
-		{
-			setupIcon("/org/jppf/ui/resources/collapse.gif");
-			setupNameAndTooltip("graph.button.collapse");
-		}
-		else
-		{
-			setupIcon("/org/jppf/ui/resources/expand.gif");
-			setupNameAndTooltip("graph.button.expand");
-		}
-	}
+  /**
+   * Determines whether this action is for collapsing or expanding graph vertices.
+   */
+  private final boolean collapse;
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   * @param collapse determines whether this action is for collapsing or expanding graph vertices.
+   */
+  public ExpandOrCollapseGraphAction(final GraphOption panel, final boolean collapse)
+  {
+    super(panel);
+    this.collapse = collapse;
+    //String s = collapse ? "collapse" : "expand";
+    if (collapse)
+    {
+      setupIcon("/org/jppf/ui/resources/collapse.gif");
+      setupNameAndTooltip("graph.button.collapse");
+    }
+    else
+    {
+      setupIcon("/org/jppf/ui/resources/expand.gif");
+      setupNameAndTooltip("graph.button.expand");
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent e)
-	{
-		synchronized(panel)
-		{
-			mxGraph graph = panel.getGraph();
-			mxGraphModel model = (mxGraphModel) graph.getModel();
-			model.beginUpdate();
-			try
-			{
-				Object[] drivers = getDriverVertices();
-				if ((drivers == null) || (drivers.length == 0)) return;
-				for (Object o: drivers) model.setCollapsed(o, collapse);
-			}
-			finally
-			{
-				model.endUpdate();
-			}
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void actionPerformed(final ActionEvent e)
+  {
+    synchronized(panel)
+    {
+      mxGraph graph = panel.getGraph();
+      mxGraphModel model = (mxGraphModel) graph.getModel();
+      model.beginUpdate();
+      try
+      {
+        Object[] drivers = getDriverVertices();
+        if ((drivers == null) || (drivers.length == 0)) return;
+        for (Object o: drivers) model.setCollapsed(o, collapse);
+      }
+      finally
+      {
+        model.endUpdate();
+      }
+    }
+  }
 }

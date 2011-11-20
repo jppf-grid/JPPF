@@ -27,25 +27,25 @@ import org.jppf.node.policy.CustomPolicy;
  */
 public class MyCustomPolicy extends CustomPolicy
 {
-	/**
-	 * Determines whether this policy accepts the specified node.
-	 * @param info system information for the node on which the tasks will run if accepted.
-	 * @return true if the node is accepted, false otherwise.
-	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
-	 */
-	@Override
-	public boolean accepts(final JPPFSystemInformation info)
-	{
-		String s = getProperty(info, "processing.thread");
-		int n = 1;
-		try
-		{
-			n = Integer.valueOf(s);
-		}
-		catch(NumberFormatException e)
-		{
-			e.printStackTrace();
-		}
-		return n > 1;
-	}
+  /**
+   * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.
+   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
+   */
+  @Override
+  public boolean accepts(final JPPFSystemInformation info)
+  {
+    String s = getProperty(info, "processing.thread");
+    int n = 1;
+    try
+    {
+      n = Integer.valueOf(s);
+    }
+    catch(NumberFormatException e)
+    {
+      e.printStackTrace();
+    }
+    return n > 1;
+  }
 }

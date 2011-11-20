@@ -28,67 +28,67 @@ import org.jppf.utils.Range;
  */
 final class PatternConfiguration
 {
-	/**
-	 * Configuration for IPv6 address patterns.
-	 */
-	static final PatternConfiguration IPV4_CONFIGURATION = new PatternConfiguration(4, 0, 255, '.', "");
-	/**
-	 * Configuration for IPv6 address patterns.
-	 */
-	static final PatternConfiguration IPV6_CONFIGURATION = new PatternConfiguration(8, 0, 0xffff, ':', "0x");
-	/**
-	 * Regex pattern that matches any sequence of one or more spaces.
-	 */
-	static final Pattern SPACES_PATTERN = Pattern.compile("\\s+");
-	/**
-	 * Regex pattern that matches any one minus sign.
-	 */
-	static final Pattern MINUS_PATTERN = Pattern.compile("-");
-	/**
-	 * The separator for the components of an address.
-	 */
-	final char compSeparator;
-	/**
-	 * Regex pattern that matches any one dot.
-	 */
-	final Pattern compSeparatorPattern;
-	/**
-	 * Constant representing the [minValue,maxValue] range.
-	 */
-	final Range<Integer> fullRange;
-	/**
-	 * Number of components in the address.
-	 */
-	final int nbComponents;
-	/**
-	 * Minimum value of a component.
-	 */
-	final int minValue;
-	/**
-	 * Maximum value of a component.
-	 */
-	final int maxValue;
-	/**
-	 * The prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0x" for hexadecimal.
-	 */
-	final String valuePrefix;
+  /**
+   * Configuration for IPv6 address patterns.
+   */
+  static final PatternConfiguration IPV4_CONFIGURATION = new PatternConfiguration(4, 0, 255, '.', "");
+  /**
+   * Configuration for IPv6 address patterns.
+   */
+  static final PatternConfiguration IPV6_CONFIGURATION = new PatternConfiguration(8, 0, 0xffff, ':', "0x");
+  /**
+   * Regex pattern that matches any sequence of one or more spaces.
+   */
+  static final Pattern SPACES_PATTERN = Pattern.compile("\\s+");
+  /**
+   * Regex pattern that matches any one minus sign.
+   */
+  static final Pattern MINUS_PATTERN = Pattern.compile("-");
+  /**
+   * The separator for the components of an address.
+   */
+  final char compSeparator;
+  /**
+   * Regex pattern that matches any one dot.
+   */
+  final Pattern compSeparatorPattern;
+  /**
+   * Constant representing the [minValue,maxValue] range.
+   */
+  final Range<Integer> fullRange;
+  /**
+   * Number of components in the address.
+   */
+  final int nbComponents;
+  /**
+   * Minimum value of a component.
+   */
+  final int minValue;
+  /**
+   * Maximum value of a component.
+   */
+  final int maxValue;
+  /**
+   * The prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0x" for hexadecimal.
+   */
+  final String valuePrefix;
 
-	/**
-	 * Initialize this pattern configuration with the specified values.
-	 * @param nbComponents the number of components in the address.
-	 * @param minValue the minimum value of a component.
-	 * @param maxValue the maximum value of a component.
-	 * @param compSeparator the separator for the components of an address.
-	 * @param valuePrefix the prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0X" for hexadecimal.
-	 */
-	private PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix)
-	{
-		this.nbComponents = nbComponents;
-		this.minValue = minValue;
-		this.maxValue = maxValue;
-		this.compSeparator = compSeparator;
-		fullRange = new Range<Integer>(minValue, maxValue);
-		compSeparatorPattern = Pattern.compile((compSeparator == '.' ? "\\" : "") + compSeparator);
-		this.valuePrefix = valuePrefix;
-	}
+  /**
+   * Initialize this pattern configuration with the specified values.
+   * @param nbComponents the number of components in the address.
+   * @param minValue the minimum value of a component.
+   * @param maxValue the maximum value of a component.
+   * @param compSeparator the separator for the components of an address.
+   * @param valuePrefix the prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0X" for hexadecimal.
+   */
+  private PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix)
+  {
+    this.nbComponents = nbComponents;
+    this.minValue = minValue;
+    this.maxValue = maxValue;
+    this.compSeparator = compSeparator;
+    fullRange = new Range<Integer>(minValue, maxValue);
+    compSeparatorPattern = Pattern.compile((compSeparator == '.' ? "\\" : "") + compSeparator);
+    this.valuePrefix = valuePrefix;
+  }
 }

@@ -26,14 +26,14 @@ import java.util.EventListener;
  */
 public interface ProcessWrapperEventListener extends EventListener
 {
-	/**
-	 * Notification that the process has written to its output stream.
-	 * @param event encapsulate the output stream's content.
-	 */
-	void outputStreamAltered(ProcessWrapperEvent event);
-	/**
-	 * Notification that the process has written to its error stream.
-	 * @param event encapsulate the error stream's content.
-	 */
-	void errorStreamAltered(ProcessWrapperEvent event);
+  /**
+   * Notification that the process has written to its output stream.
+   * @param event encapsulate the output stream's content.
+   */
+  void outputStreamAltered(ProcessWrapperEvent event);
+  /**
+   * Notification that the process has written to its error stream.
+   * @param event encapsulate the error stream's content.
+   */
+  void errorStreamAltered(ProcessWrapperEvent event);
 }

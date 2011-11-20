@@ -26,48 +26,48 @@ import java.io.Serializable;
  */
 public class SizeSnapshot implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The title given to this snapshot.
-	 */
-	private String title = "";
-	/**
-	 * The minimum recorded size.
-	 */
-	private int min = Integer.MAX_VALUE;
-	/**
-	 * The minimum recorded size.
-	 */
-	private int max = 0;
-	/**
-	 * The minimum recorded size.
-	 */
-	private int total = 0;
-	/**
-	 * The minimum recorded size.
-	 */
-	private int current = 0;
-	/**
-	 * The minimum recorded size.
-	 */
-	private int average = 0;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The title given to this snapshot.
+   */
+  private String title = "";
+  /**
+   * The minimum recorded size.
+   */
+  private int min = Integer.MAX_VALUE;
+  /**
+   * The minimum recorded size.
+   */
+  private int max = 0;
+  /**
+   * The minimum recorded size.
+   */
+  private int total = 0;
+  /**
+   * The minimum recorded size.
+   */
+  private int current = 0;
+  /**
+   * The minimum recorded size.
+   */
+  private int average = 0;
 
-	/**
-	 * Default constructor.
-	 */
-	public SizeSnapshot()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public SizeSnapshot()
+  {
+  }
 
-	/**
-	 * Default constructor.
-	 * @param title the title given to this snapshot.
-	 */
-	public SizeSnapshot(final String title)
-	{
-		this.title = title;
-	}
+  /**
+   * Default constructor.
+   * @param title the title given to this snapshot.
+   */
+  public SizeSnapshot(final String title)
+  {
+    this.title = title;
+  }
 }

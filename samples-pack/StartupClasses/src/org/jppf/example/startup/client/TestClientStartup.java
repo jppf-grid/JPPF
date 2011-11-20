@@ -27,13 +27,13 @@ import org.jppf.startup.JPPFClientStartupSPI;
  */
 public class TestClientStartup implements JPPFClientStartupSPI
 {
-	/**
-	 * This is a test of a client startup class.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		System.out.println("I'm a client startup class");
-	}
+  /**
+   * This is a test of a client startup class.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    System.out.println("I'm a client startup class");
+  }
 }

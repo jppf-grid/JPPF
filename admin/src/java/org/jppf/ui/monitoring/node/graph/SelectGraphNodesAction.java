@@ -31,45 +31,45 @@ import com.mxgraph.view.mxGraph;
  */
 public class SelectGraphNodesAction extends AbstractGraphSelectionAction
 {
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 */
-	public SelectGraphNodesAction(final GraphOption panel)
-	{
-		super(panel);
-		setupIcon("/org/jppf/ui/resources/select_drivers.gif");
-		setupNameAndTooltip("select.drivers");
-	}
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   */
+  public SelectGraphNodesAction(final GraphOption panel)
+  {
+    super(panel);
+    setupIcon("/org/jppf/ui/resources/select_drivers.gif");
+    setupNameAndTooltip("select.drivers");
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent e)
-	{
-		synchronized(panel)
-		{
-			mxGraph graph = panel.getGraph();
-			mxGraphModel model = (mxGraphModel) graph.getModel();
-			model.beginUpdate();
-			try
-			{
-				Object[] drivers = getDriverVertices();
-				if ((drivers == null) || (drivers.length == 0)) return;
-				Object[][] allNodes = new Object[drivers.length][];
-				int count = 0;
-				for (Object o: drivers)
-				{
-					mxCell driver = (mxCell) o;
-					allNodes[count++] = mxGraphModel.getChildVertices(model, driver);
-				}
-				graph.setSelectionCells(CollectionUtils.concatArrays(allNodes));
-			}
-			finally
-			{
-				model.endUpdate();
-			}
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void actionPerformed(final ActionEvent e)
+  {
+    synchronized(panel)
+    {
+      mxGraph graph = panel.getGraph();
+      mxGraphModel model = (mxGraphModel) graph.getModel();
+      model.beginUpdate();
+      try
+      {
+        Object[] drivers = getDriverVertices();
+        if ((drivers == null) || (drivers.length == 0)) return;
+        Object[][] allNodes = new Object[drivers.length][];
+        int count = 0;
+        for (Object o: drivers)
+        {
+          mxCell driver = (mxCell) o;
+          allNodes[count++] = mxGraphModel.getChildVertices(model, driver);
+        }
+        graph.setSelectionCells(CollectionUtils.concatArrays(allNodes));
+      }
+      finally
+      {
+        model.endUpdate();
+      }
+    }
+  }
 }

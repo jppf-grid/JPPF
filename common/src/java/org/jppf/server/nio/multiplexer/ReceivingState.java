@@ -31,44 +31,44 @@ import org.slf4j.*;
  */
 public class ReceivingState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ReceivingState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ReceivingState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public ReceivingState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public ReceivingState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (context.readMessage(wrapper))
-		{
-			if (debugEnabled) log.debug("read message for " + wrapper + " done");
-			ChannelWrapper linkedKey = context.getLinkedKey();
-			NioMessage msg = context.getMessage();
-			msg.buffer.flip();
-			context.setMessage(null);
-			MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.getContext();
-			linkedContext.setMessage(msg);
-			server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
-			return TO_SENDING_OR_RECEIVING;
-		}
-		return TO_RECEIVING;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+    if (debugEnabled) log.debug("exec() for " + wrapper);
+    if (context.readMessage(wrapper))
+    {
+      if (debugEnabled) log.debug("read message for " + wrapper + " done");
+      ChannelWrapper linkedKey = context.getLinkedKey();
+      NioMessage msg = context.getMessage();
+      msg.buffer.flip();
+      context.setMessage(null);
+      MultiplexerContext linkedContext = (MultiplexerContext) linkedKey.getContext();
+      linkedContext.setMessage(msg);
+      server.getTransitionManager().transitionChannel(linkedKey, MultiplexerTransition.TO_SENDING);
+      return TO_SENDING_OR_RECEIVING;
+    }
+    return TO_RECEIVING;
+  }
 }

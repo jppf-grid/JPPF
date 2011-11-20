@@ -25,105 +25,105 @@ package org.jppf.ui.monitoring.node;
  */
 public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 {
-	/**
-	 * Initialize this formatter with the specified title.
-	 * @param docTitle the title of the whole document.
-	 */
-	public HTMLPropertiesTableFormat(final String docTitle)
-	{
-		super(docTitle);
-	}
+  /**
+   * Initialize this formatter with the specified title.
+   * @param docTitle the title of the whole document.
+   */
+  public HTMLPropertiesTableFormat(final String docTitle)
+  {
+    super(docTitle);
+  }
 
-	/**
-	 * Write the prologue for the formatted text.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#start()
-	 */
-	@Override
-	public void start()
-	{
-		sb.append("<html><head></head><body style=\"font-family: Arial; font-size: 12pt\">");
-		sb.append("<h1>").append(docTitle).append("</h1>");
-	}
+  /**
+   * Write the prologue for the formatted text.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#start()
+   */
+  @Override
+  public void start()
+  {
+    sb.append("<html><head></head><body style=\"font-family: Arial; font-size: 12pt\">");
+    sb.append("<h1>").append(docTitle).append("</h1>");
+  }
 
-	/**
-	 * Write the epilogue for the formatted text.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#end()
-	 */
-	@Override
-	public void end()
-	{
-		sb.append("</body></html>");
-	}
+  /**
+   * Write the epilogue for the formatted text.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#end()
+   */
+  @Override
+  public void end()
+  {
+    sb.append("</body></html>");
+  }
 
-	/**
-	 * Write the prologue of a table.
-	 * @param title the title for the table.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableStart(java.lang.String)
-	 */
-	@Override
-	public void tableStart(final String title)
-	{
-		sb.append("<h2>").append(title).append("</h2>");
-		sb.append("<table cellspacing=\"0\" cellpadding=\"1\">");
-	}
+  /**
+   * Write the prologue of a table.
+   * @param title the title for the table.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableStart(java.lang.String)
+   */
+  @Override
+  public void tableStart(final String title)
+  {
+    sb.append("<h2>").append(title).append("</h2>");
+    sb.append("<table cellspacing=\"0\" cellpadding=\"1\">");
+  }
 
-	/**
-	 * Write the prologue of a table.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableEnd()
-	 */
-	@Override
-	public void tableEnd()
-	{
-		sb.append("</table>");
-	}
+  /**
+   * Write the prologue of a table.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableEnd()
+   */
+  @Override
+  public void tableEnd()
+  {
+    sb.append("</table>");
+  }
 
-	/**
-	 * Write the prologue of a table row.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowStart()
-	 */
-	@Override
-	public void rowStart()
-	{
-		sb.append("<tr>");
-	}
+  /**
+   * Write the prologue of a table row.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowStart()
+   */
+  @Override
+  public void rowStart()
+  {
+    sb.append("<tr>");
+  }
 
-	/**
-	 * Write the prologue of a table row.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowEnd()
-	 */
-	@Override
-	public void rowEnd()
-	{
-		sb.append("</tr>");
-	}
+  /**
+   * Write the prologue of a table row.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowEnd()
+   */
+  @Override
+  public void rowEnd()
+  {
+    sb.append("</tr>");
+  }
 
-	/**
-	 * Write the prologue of a table cell.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellStart()
-	 */
-	@Override
-	public void cellStart()
-	{
-		sb.append("<td>");
-	}
+  /**
+   * Write the prologue of a table cell.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellStart()
+   */
+  @Override
+  public void cellStart()
+  {
+    sb.append("<td>");
+  }
 
-	/**
-	 * Write the prologue of a table cell.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellEnd()
-	 */
-	@Override
-	public void cellEnd()
-	{
-		sb.append("</td>");
-	}
+  /**
+   * Write the prologue of a table cell.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellEnd()
+   */
+  @Override
+  public void cellEnd()
+  {
+    sb.append("</td>");
+  }
 
-	/**
-	 * Write the separator between 2 cells.
-	 * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellSeparator()
-	 */
-	@Override
-	public void cellSeparator()
-	{
-		sb.append("<td width\"5\"/");
-	}
+  /**
+   * Write the separator between 2 cells.
+   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellSeparator()
+   */
+  @Override
+  public void cellSeparator()
+  {
+    sb.append("<td width\"5\"/");
+  }
 }

@@ -26,12 +26,12 @@ package org.jppf.server.nio.nodeserver;
  */
 public class RemoteNodeContext extends AbstractNodeContext
 {
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public AbstractNodeMessage newMessage()
-	{
-		return new RemoteNodeMessage();
-	}
+  /**
+   * {@inheritDoc}.
+   */
+  @Override
+  public AbstractNodeMessage newMessage()
+  {
+    return new RemoteNodeMessage();
+  }
 }

@@ -28,62 +28,62 @@ import java.io.*;
  */
 public interface ObjectSerializer
 {
-	/**
-	 * Serialize an object into an array of bytes.
-	 * @param o the object to Serialize.
-	 * @return a {@link JPPFBuffer} instance holding the serialized object.
-	 * @throws Exception if the object can't be serialized.
-	 */
-	JPPFBuffer serialize(Object o) throws Exception;
+  /**
+   * Serialize an object into an array of bytes.
+   * @param o the object to Serialize.
+   * @return a {@link JPPFBuffer} instance holding the serialized object.
+   * @throws Exception if the object can't be serialized.
+   */
+  JPPFBuffer serialize(Object o) throws Exception;
 
-	/**
-	 * Serialize an object into an array of bytes.
-	 * @param o the object to Serialize.
-	 * @param noCopy avoid copying intermediate buffers.
-	 * @return a {@link JPPFBuffer} instance holding the serialized object.
-	 * @throws Exception if the object can't be serialized.
-	 */
-	JPPFBuffer serialize(Object o, boolean noCopy) throws Exception;
+  /**
+   * Serialize an object into an array of bytes.
+   * @param o the object to Serialize.
+   * @param noCopy avoid copying intermediate buffers.
+   * @return a {@link JPPFBuffer} instance holding the serialized object.
+   * @throws Exception if the object can't be serialized.
+   */
+  JPPFBuffer serialize(Object o, boolean noCopy) throws Exception;
 
-	/**
-	 * Serialize an object into an output stream.
-	 * @param o the object to Serialize.
-	 * @param os the output stream to serialize to.
-	 * @throws Exception if the object can't be serialized.
-	 */
-	void serialize(Object o, OutputStream os) throws Exception;
+  /**
+   * Serialize an object into an output stream.
+   * @param o the object to Serialize.
+   * @param os the output stream to serialize to.
+   * @throws Exception if the object can't be serialized.
+   */
+  void serialize(Object o, OutputStream os) throws Exception;
 
-	/**
-	 * Read an object from an array of bytes.
-	 * @param buf buffer holding the array of bytes to deserialize from.
-	 * @return the object that was deserialized from the array of bytes.
-	 * @throws Exception the class of the deserialized object could not be found.
-	 */
-	Object deserialize(JPPFBuffer buf) throws Exception;
+  /**
+   * Read an object from an array of bytes.
+   * @param buf buffer holding the array of bytes to deserialize from.
+   * @return the object that was deserialized from the array of bytes.
+   * @throws Exception the class of the deserialized object could not be found.
+   */
+  Object deserialize(JPPFBuffer buf) throws Exception;
 
-	/**
-	 * Read an object from an array of bytes.
-	 * @param bytes buffer holding the array of bytes to deserialize from.
-	 * @return the object that was deserialized from the array of bytes.
-	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-	 */
-	Object deserialize(byte[] bytes) throws Exception;
+  /**
+   * Read an object from an array of bytes.
+   * @param bytes buffer holding the array of bytes to deserialize from.
+   * @return the object that was deserialized from the array of bytes.
+   * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+   */
+  Object deserialize(byte[] bytes) throws Exception;
 
-	/**
-	 * Read an object from an array of bytes.
-	 * @param bytes buffer holding the array of bytes to deserialize from.
-	 * @param offset position at which to start reading the bytes from.
-	 * @param length the number of bytes to read.
-	 * @return the object that was deserialized from the array of bytes.
-	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-	 */
-	Object deserialize(byte[] bytes, int offset, int length) throws Exception;
+  /**
+   * Read an object from an array of bytes.
+   * @param bytes buffer holding the array of bytes to deserialize from.
+   * @param offset position at which to start reading the bytes from.
+   * @param length the number of bytes to read.
+   * @return the object that was deserialized from the array of bytes.
+   * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+   */
+  Object deserialize(byte[] bytes, int offset, int length) throws Exception;
 
-	/**
-	 * Read an object from an input stream.
-	 * @param is the input stream to deserialize from.
-	 * @return the object that was deserialized from the array of bytes.
-	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-	 */
-	Object deserialize(InputStream is) throws Exception;
+  /**
+   * Read an object from an input stream.
+   * @param is the input stream to deserialize from.
+   * @return the object that was deserialized from the array of bytes.
+   * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+   */
+  Object deserialize(InputStream is) throws Exception;
 }

@@ -28,34 +28,34 @@ import org.jppf.client.event.ClientConnectionStatusHandler;
  */
 public interface JPPFClientConnection extends ClientConnectionStatusHandler
 {
-	/**
-	 * Initialize this client connection.
-	 */
-	void init();
+  /**
+   * Initialize this client connection.
+   */
+  void init();
 
-	/**
-	 * Submit the request to the server.
-	 * @param job the job to execute remotely.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
-	 */
-	void submit(JPPFJob job) throws Exception;
+  /**
+   * Submit the request to the server.
+   * @param job the job to execute remotely.
+   * @throws Exception if an error occurs while sending the request.
+   * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
+   */
+  void submit(JPPFJob job) throws Exception;
 
-	/**
-	 * Get the priority assigned to this connection.
-	 * @return a priority as an int value.
-	 */
-	int getPriority();
+  /**
+   * Get the priority assigned to this connection.
+   * @return a priority as an int value.
+   */
+  int getPriority();
 
-	/**
-	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>JPPFJob</code> instances to resubmit.
-	 */
-	List<JPPFJob> close();
+  /**
+   * Shutdown this client and retrieve all pending executions for resubmission.
+   * @return a list of <code>JPPFJob</code> instances to resubmit.
+   */
+  List<JPPFJob> close();
 
-	/**
-	 * Get the name assigned to this client connection.
-	 * @return the name as a string.
-	 */
-	String getName();
+  /**
+   * Get the name assigned to this client connection.
+   * @return the name as a string.
+   */
+  String getName();
 }

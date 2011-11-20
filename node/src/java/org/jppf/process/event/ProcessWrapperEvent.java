@@ -27,21 +27,21 @@ import java.util.EventObject;
  */
 public class ProcessWrapperEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified source.
-	 * @param content the source of this event, in effect the content of the corresponding process stream.
-	 */
-	public ProcessWrapperEvent(final String content)
-	{
-		super(content);
-	}
+  /**
+   * Initialize this event with the specified source.
+   * @param content the source of this event, in effect the content of the corresponding process stream.
+   */
+  public ProcessWrapperEvent(final String content)
+  {
+    super(content);
+  }
 
-	/**
-	 * Get the content of this event.
-	 * @return the content as a string, which may include a line terminator.
-	 */
-	public String getContent()
-	{
-		return (String) getSource();
-	}
+  /**
+   * Get the content of this event.
+   * @return the content as a string, which may include a line terminator.
+   */
+  public String getContent()
+  {
+    return (String) getSource();
+  }
 }

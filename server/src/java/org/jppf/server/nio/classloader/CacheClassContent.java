@@ -23,27 +23,27 @@ package org.jppf.server.nio.classloader;
  */
 public class CacheClassContent
 {
-	/**
-	 * The actual content of this element.
-	 */
-	private byte[] content;
+  /**
+   * The actual content of this element.
+   */
+  private byte[] content;
 
-	/**
-	 * Initialize this content with the specified data.
-	 * @param content the data as an array of bytes.
-	 */
-	public CacheClassContent(final byte[] content)
-	{
-		super();
-		this.content = content;
-	}
+  /**
+   * Initialize this content with the specified data.
+   * @param content the data as an array of bytes.
+   */
+  public CacheClassContent(final byte[] content)
+  {
+    super();
+    this.content = content;
+  }
 
-	/**
-	 * Get the actual content of this element.
-	 * @return the data as an array of bytes.
-	 */
-	public byte[] getContent()
-	{
-		return content;
-	}
+  /**
+   * Get the actual content of this element.
+   * @return the data as an array of bytes.
+   */
+  public byte[] getContent()
+  {
+    return content;
+  }
 }

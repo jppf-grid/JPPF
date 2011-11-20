@@ -28,67 +28,67 @@ import org.slf4j.*;
  */
 public class JcaSocketInitializer extends AbstractSocketInitializer
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JcaSocketInitializer.class);
-	/**
-	 * Maximum number of connection attempts.
-	 */
-	private int maxAttempts = 1;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JcaSocketInitializer.class);
+  /**
+   * Maximum number of connection attempts.
+   */
+  private int maxAttempts = 1;
 
-	/**
-	 * 
-	 * @see org.jppf.comm.socket.SocketInitializer#close()
-	 */
-	@Override
-	public void close()
-	{
-		closed = true;
-	}
+  /**
+   * 
+   * @see org.jppf.comm.socket.SocketInitializer#close()
+   */
+  @Override
+  public void close()
+  {
+    closed = true;
+  }
 
-	/**
-	 * Initialize the underlying socket.
-	 * @param socketWrapper wrapper around the socket to initialize.
-	 * @see org.jppf.comm.socket.SocketInitializer#initializeSocket(org.jppf.comm.socket.SocketWrapper)
-	 */
-	@Override
-	public void initializeSocket(final SocketWrapper socketWrapper)
-	{
-		attemptCount = 0;
-		successfull = false;
-		while ((attemptCount < maxAttempts) && !successfull)
-		{
-			try
-			{
-				if (socketWrapper.isOpened()) socketWrapper.close();
-			}
-			catch(Exception ignored)
-			{
-			}
+  /**
+   * Initialize the underlying socket.
+   * @param socketWrapper wrapper around the socket to initialize.
+   * @see org.jppf.comm.socket.SocketInitializer#initializeSocket(org.jppf.comm.socket.SocketWrapper)
+   */
+  @Override
+  public void initializeSocket(final SocketWrapper socketWrapper)
+  {
+    attemptCount = 0;
+    successfull = false;
+    while ((attemptCount < maxAttempts) && !successfull)
+    {
+      try
+      {
+        if (socketWrapper.isOpened()) socketWrapper.close();
+      }
+      catch(Exception ignored)
+      {
+      }
 
-			try
-			{
-				socketWrapper.open();
-				successfull = true;
-			}
-			catch (Exception e)
-			{
-				attemptCount++;
-				if (attemptCount < maxAttempts)
-				{
-					try
-					{
-						Thread.sleep(10 + rand.nextInt(100));
-					}
-					catch(InterruptedException e2)
-					{
-						close();
-						log.error(e.getMessage());
-						break;
-					}
-				}
-			}
-		}
-	}
+      try
+      {
+        socketWrapper.open();
+        successfull = true;
+      }
+      catch (Exception e)
+      {
+        attemptCount++;
+        if (attemptCount < maxAttempts)
+        {
+          try
+          {
+            Thread.sleep(10 + rand.nextInt(100));
+          }
+          catch(InterruptedException e2)
+          {
+            close();
+            log.error(e.getMessage());
+            break;
+          }
+        }
+      }
+    }
+  }
 }

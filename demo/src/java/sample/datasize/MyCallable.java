@@ -27,26 +27,26 @@ import java.util.concurrent.Callable;
  */
 public class MyCallable implements Callable<String>, Serializable
 {
-	/**
-	 * The id of this task.
-	 */
-	private String id = null;
+  /**
+   * The id of this task.
+   */
+  private String id = null;
 
-	/**
-	 * Constructor.
-	 * @param id the id of this task.
-	 */
-	public MyCallable(final String id)
-	{
-		this.id = id;
-	}
+  /**
+   * Constructor.
+   * @param id the id of this task.
+   */
+  public MyCallable(final String id)
+  {
+    this.id = id;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String call() throws Exception
-	{
-		return null;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String call() throws Exception
+  {
+    return null;
+  }
 }

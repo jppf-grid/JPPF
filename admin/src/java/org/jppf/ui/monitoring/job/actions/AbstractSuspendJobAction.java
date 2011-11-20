@@ -28,75 +28,75 @@ import org.slf4j.*;
  */
 public abstract class AbstractSuspendJobAction extends AbstractJobAction
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AbstractSuspendJobAction.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines if the suspended sub-job should be requeued on the driver side.
-	 */
-	protected boolean requeue = true;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractSuspendJobAction.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines if the suspended sub-job should be requeued on the driver side.
+   */
+  protected boolean requeue = true;
 
-	/**
-	 * Initialize this action.
-	 */
-	public AbstractSuspendJobAction()
-	{
-	}
+  /**
+   * Initialize this action.
+   */
+  public AbstractSuspendJobAction()
+  {
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		super.updateState(selectedElements);
-		if (jobDataArray.length > 0)
-		{
-			for (JobData data: jobDataArray)
-			{
-				if (!data.getJobInformation().isSuspended())
-				{
-					setEnabled(true);
-					return;
-				}
-			}
-		}
-		setEnabled(false);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements - a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    super.updateState(selectedElements);
+    if (jobDataArray.length > 0)
+    {
+      for (JobData data: jobDataArray)
+      {
+        if (!data.getJobInformation().isSuspended())
+        {
+          setEnabled(true);
+          return;
+        }
+      }
+    }
+    setEnabled(false);
+  }
 
-	/**
-	 * Perform the action.
-	 * @param event not used.
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent event)
-	{
-		Runnable r = new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				for (JobData data: jobDataArray)
-				{
-					try
-					{
-						data.getJmxWrapper().suspendJob(data.getJobInformation().getJobUuid(), requeue);
-					}
-					catch(Exception e)
-					{
-						log.error(e.getMessage(), e);
-					}
-				}
-			}
-		};
-		new Thread(r).start();
-	}
+  /**
+   * Perform the action.
+   * @param event not used.
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    Runnable r = new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        for (JobData data: jobDataArray)
+        {
+          try
+          {
+            data.getJmxWrapper().suspendJob(data.getJobInformation().getJobUuid(), requeue);
+          }
+          catch(Exception e)
+          {
+            log.error(e.getMessage(), e);
+          }
+        }
+      }
+    };
+    new Thread(r).start();
+  }
 }

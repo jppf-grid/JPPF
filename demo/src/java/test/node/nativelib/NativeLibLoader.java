@@ -24,16 +24,16 @@ package test.node.nativelib;
  */
 public class NativeLibLoader
 {
-	static
-	{
-		/*
+  static
+  {
+    /*
 		String sep = System.getProperty("path.separator");
 		//String path = "C:\\temp" + sep + System.getProperty("java.library.path");
 		String path = System.getProperty("java.library.path");
 		System.out.println("library path = " + path);
 		//System.setProperty("java.library.path", path);
-		 */
-		System.loadLibrary("moved_AltTab");
-		System.out.println("after loading the library");
-	}
+     */
+    System.loadLibrary("moved_AltTab");
+    System.out.println("after loading the library");
+  }
 }

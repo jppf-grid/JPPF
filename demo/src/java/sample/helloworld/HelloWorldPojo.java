@@ -25,20 +25,20 @@ import java.io.Serializable;
  */
 public class HelloWorldPojo implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Execute the task.
-	 * @param message a message to print.
-	 * @param number an example primitive argument.
-	 * @return a string hello message.
-	 */
-	public String helloPojoMethod(final String message, final int number)
-	{
-		String hello = "Hello, World (pojo, " + message + ", " + number + ')';
-		System.out.println(hello);
-		return hello;
-	}
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Execute the task.
+   * @param message a message to print.
+   * @param number an example primitive argument.
+   * @return a string hello message.
+   */
+  public String helloPojoMethod(final String message, final int number)
+  {
+    String hello = "Hello, World (pojo, " + message + ", " + number + ')';
+    System.out.println(hello);
+    return hello;
+  }
 }

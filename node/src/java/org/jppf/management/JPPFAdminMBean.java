@@ -26,28 +26,28 @@ import java.io.Serializable;
  */
 public interface JPPFAdminMBean extends Serializable
 {
-	/**
-	 * RMI registry namespace suffix for drivers.
-	 */
-	String DRIVER_SUFFIX = "/jppf/driver";
-	/**
-	 * RMI registry namespace suffix for nodes.
-	 */
-	String NODE_SUFFIX = "/jppf/node";
-	/**
-	 * Name of the node's admin MBean.
-	 */
-	String NODE_MBEAN_NAME = "org.jppf:name=admin,type=node";
-	/**
-	 * Name of the driver's admin MBean.
-	 */
-	String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
+  /**
+   * RMI registry namespace suffix for drivers.
+   */
+  String DRIVER_SUFFIX = "/jppf/driver";
+  /**
+   * RMI registry namespace suffix for nodes.
+   */
+  String NODE_SUFFIX = "/jppf/node";
+  /**
+   * Name of the node's admin MBean.
+   */
+  String NODE_MBEAN_NAME = "org.jppf:name=admin,type=node";
+  /**
+   * Name of the driver's admin MBean.
+   */
+  String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
 
-	/**
-	 * Get detailed information about the node's JVM properties, environment variables
-	 * and runtime information such as memory usage and available processors.
-	 * @return a <code>JPPFSystemInformation</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	JPPFSystemInformation systemInformation() throws Exception;
+  /**
+   * Get detailed information about the node's JVM properties, environment variables
+   * and runtime information such as memory usage and available processors.
+   * @return a <code>JPPFSystemInformation</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  JPPFSystemInformation systemInformation() throws Exception;
 }

@@ -26,15 +26,15 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class HelloWorld extends JPPFTask
 {
-	/**
-	 * Execute the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		String hello = "Hello, World";
-		System.out.println(hello);
-		setResult(hello);
-	}
+  /**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    String hello = "Hello, World";
+    System.out.println(hello);
+    setResult(hello);
+  }
 }

@@ -26,41 +26,41 @@ import java.io.Serializable;
  */
 public interface TaskObjectWrapper extends Serializable
 {
-	/**
-	 * Type-safe enumeration for the type of method to execute.
-	 */
-	public enum MethodType
-	{
-		/**
-		 * Instance method type.
-		 */
-		INSTANCE,
-		/**
-		 * Constructor type.
-		 */
-		CONSTRUCTOR,
-		/**
-		 * Static method type.
-		 */
-		STATIC
-	}
+  /**
+   * Type-safe enumeration for the type of method to execute.
+   */
+  public enum MethodType
+  {
+    /**
+     * Instance method type.
+     */
+    INSTANCE,
+    /**
+     * Constructor type.
+     */
+    CONSTRUCTOR,
+    /**
+     * Static method type.
+     */
+    STATIC
+  }
 
-	/**
-	 * The type of the method to execute on the object.
-	 * @return a <code>MethodType</code> enum value.
-	 */
-	MethodType getMethodType();
+  /**
+   * The type of the method to execute on the object.
+   * @return a <code>MethodType</code> enum value.
+   */
+  MethodType getMethodType();
 
-	/**
-	 * Execute the task depending on its type.
-	 * @return the result of the execution.
-	 * @throws Exception if an error occurs during the execution.
-	 */
-	Object execute() throws Exception;
+  /**
+   * Execute the task depending on its type.
+   * @return the result of the execution.
+   * @throws Exception if an error occurs during the execution.
+   */
+  Object execute() throws Exception;
 
-	/**
-	 * Return the object on which a method or constructor is called.
-	 * @return an object or null if the invoked method is static.
-	 */
-	Object getTaskObject();
+  /**
+   * Return the object on which a method or constructor is called.
+   * @return an object or null if the invoked method is static.
+   */
+  Object getTaskObject();
 }

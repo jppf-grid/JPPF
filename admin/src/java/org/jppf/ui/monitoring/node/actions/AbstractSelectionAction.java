@@ -31,41 +31,41 @@ import org.jppf.ui.treetable.*;
  */
 public abstract class AbstractSelectionAction extends AbstractTopologyAction
 {
-	/**
-	 * Constant for an empty <code>TreePath</code>.
-	 */
-	protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
-	/**
-	 * The tree table panel to which this action applies.
-	 */
-	protected final NodeDataPanel panel;
+  /**
+   * Constant for an empty <code>TreePath</code>.
+   */
+  protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
+  /**
+   * The tree table panel to which this action applies.
+   */
+  protected final NodeDataPanel panel;
 
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 */
-	public AbstractSelectionAction(final NodeDataPanel panel)
-	{
-		this.panel = panel;
-		setEnabled(true);
-	}
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   */
+  public AbstractSelectionAction(final NodeDataPanel panel)
+  {
+    this.panel = panel;
+    setEnabled(true);
+  }
 
 
-	/**
-	 * Get the list of all tree nodes representing a driver.
-	 * @return a list of {@link DefaultMutableTreeNode} instances.
-	 */
-	protected List<DefaultMutableTreeNode> getDriverNodes()
-	{
-		List<DefaultMutableTreeNode> list = new ArrayList<DefaultMutableTreeNode>();
-		JPPFTreeTable treeTable = panel.getTreeTable();
-		TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getTreeTableModel().getRoot();
-		for (int i=0; i<root.getChildCount(); i++)
-		{
-			list.add((DefaultMutableTreeNode) root.getChildAt(i));
-		}
-		return list;
-	}
+  /**
+   * Get the list of all tree nodes representing a driver.
+   * @return a list of {@link DefaultMutableTreeNode} instances.
+   */
+  protected List<DefaultMutableTreeNode> getDriverNodes()
+  {
+    List<DefaultMutableTreeNode> list = new ArrayList<DefaultMutableTreeNode>();
+    JPPFTreeTable treeTable = panel.getTreeTable();
+    TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getTreeTableModel().getRoot();
+    for (int i=0; i<root.getChildCount(); i++)
+    {
+      list.add((DefaultMutableTreeNode) root.getChildAt(i));
+    }
+    return list;
+  }
 
 }

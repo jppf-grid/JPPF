@@ -26,16 +26,16 @@ import java.io.Serializable;
  */
 public class JPPFCredentials implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * User group.
-	 */
-	String group = null;
-	/**
-	 * User id.
-	 */
-	String userId = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * User group.
+   */
+  String group = null;
+  /**
+   * User id.
+   */
+  String userId = null;
 }

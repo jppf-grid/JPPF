@@ -25,9 +25,9 @@ import java.util.EventListener;
  */
 public interface ValueChangeListener extends EventListener
 {
-	/**
-	 * Method called when the value of an option has changed.
-	 * @param event the event encapsulating the source of the event.
-	 */
-	void valueChanged(ValueChangeEvent event);
+  /**
+   * Method called when the value of an option has changed.
+   * @param event the event encapsulating the source of the event.
+   */
+  void valueChanged(ValueChangeEvent event);
 }

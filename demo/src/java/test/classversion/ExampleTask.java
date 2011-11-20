@@ -26,17 +26,17 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class ExampleTask extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 2L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 2L;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		setResult("all your base are belong to " + System.getProperty("user.name"));
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    setResult("all your base are belong to " + System.getProperty("user.name"));
+  }
 }

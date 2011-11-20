@@ -27,15 +27,15 @@ import org.jppf.utils.SystemUtils;
  */
 public class IdleTimeDetectorFactoryImpl implements IdleTimeDetectorFactory
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public IdleTimeDetector newIdleTimeDetector()
-	{
-		if (SystemUtils.isWindows()) return new WindowsIdleTimeDetector();
-		else if (SystemUtils.isX11()) return new X11IdleTimeDetector();
-		else if (SystemUtils.isMac()) return new MacIdleTimeDetector();
-		return null;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public IdleTimeDetector newIdleTimeDetector()
+  {
+    if (SystemUtils.isWindows()) return new WindowsIdleTimeDetector();
+    else if (SystemUtils.isX11()) return new X11IdleTimeDetector();
+    else if (SystemUtils.isMac()) return new MacIdleTimeDetector();
+    return null;
+  }
 }

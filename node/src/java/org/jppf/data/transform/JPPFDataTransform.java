@@ -30,22 +30,22 @@ import java.io.*;
  */
 public interface JPPFDataTransform
 {
-	/**
-	 * Transform a block of data into another, transformed one.
-	 * This operation must be such that the result of unwrapping the data of the destination must be the same as the source data.
-	 * @param source the input stream of data to transform.
-	 * @param destination the stream into which the transformed data is written.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	void wrap(InputStream source, OutputStream destination) throws Exception;
+  /**
+   * Transform a block of data into another, transformed one.
+   * This operation must be such that the result of unwrapping the data of the destination must be the same as the source data.
+   * @param source the input stream of data to transform.
+   * @param destination the stream into which the transformed data is written.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  void wrap(InputStream source, OutputStream destination) throws Exception;
 
-	/**
-	 * Transform a block of data into another, reverse-transformed one.
-	 * This method is the reverse operation with regards to {@link #wrap(java.io.InputStream, java.io.OutputStream)}.
-	 * This operation must be such that the result of <code>this.unwrap(this.wrap(data))</code> is equal to <code>data</code>.
-	 * @param source the input stream of data to reverse-transform.
-	 * @param destination the stream into which the reverse-transformed data is written.
-	 * @throws Exception if any error occurs while transforming the data.
-	 */
-	void unwrap(InputStream source, OutputStream destination) throws Exception;
+  /**
+   * Transform a block of data into another, reverse-transformed one.
+   * This method is the reverse operation with regards to {@link #wrap(java.io.InputStream, java.io.OutputStream)}.
+   * This operation must be such that the result of <code>this.unwrap(this.wrap(data))</code> is equal to <code>data</code>.
+   * @param source the input stream of data to reverse-transform.
+   * @param destination the stream into which the reverse-transformed data is written.
+   * @throws Exception if any error occurs while transforming the data.
+   */
+  void unwrap(InputStream source, OutputStream destination) throws Exception;
 }

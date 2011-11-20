@@ -24,12 +24,12 @@ package org.jppf.example.datadependency.model;
  */
 public final class ModelConstants
 {
-	/**
-	 * The name given to the distributed map that holds the market data objects.
-	 */
-	public static final String MARKET_DATA_MAP_NAME = "MarketData";
-	/**
-	 * The prefix for the name given to each distributed map that holds the trade objects for a specific node.
-	 */
-	public static final String TRADE_MAP_PREFIX = "trades-";
+  /**
+   * The name given to the distributed map that holds the market data objects.
+   */
+  public static final String MARKET_DATA_MAP_NAME = "MarketData";
+  /**
+   * The prefix for the name given to each distributed map that holds the trade objects for a specific node.
+   */
+  public static final String TRADE_MAP_PREFIX = "trades-";
 }

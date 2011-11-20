@@ -30,50 +30,50 @@ import javax.swing.JPanel;
  */
 public class ImagePanel extends JPanel
 {
-	/**
-	 * The image to draw in this panel.
-	 */
-	private transient Image image = null;
+  /**
+   * The image to draw in this panel.
+   */
+  private transient Image image = null;
 
-	/**
-	 * Paints this panel. Overridden to allow for a color gradient in the background and
-	 * rounded corners.
-	 * @param g the graphic context to draw in
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
-	@Override
-	protected void paintComponent(final Graphics g)
-	{
-		// Now call the superclass behavior to paint the foreground.
-		super.paintComponent(g);
-		if (image != null) g.drawImage(image, 0, 0, null);
-	}
+  /**
+   * Paints this panel. Overridden to allow for a color gradient in the background and
+   * rounded corners.
+   * @param g the graphic context to draw in
+   * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+   */
+  @Override
+  protected void paintComponent(final Graphics g)
+  {
+    // Now call the superclass behavior to paint the foreground.
+    super.paintComponent(g);
+    if (image != null) g.drawImage(image, 0, 0, null);
+  }
 
-	/**
-	 * Get the image to draw in this panel.
-	 * @return an <code>Image</code> instance.
-	 */
-	public Image getImage()
-	{
-		return image;
-	}
+  /**
+   * Get the image to draw in this panel.
+   * @return an <code>Image</code> instance.
+   */
+  public Image getImage()
+  {
+    return image;
+  }
 
-	/**
-	 * Set the image to draw in this panel.
-	 * @param image an <code>Image</code> instance.
-	 */
-	public void setImage(final Image image)
-	{
-		this.image = image;
-	}
+  /**
+   * Set the image to draw in this panel.
+   * @param image an <code>Image</code> instance.
+   */
+  public void setImage(final Image image)
+  {
+    this.image = image;
+  }
 
-	/**
-	 * Set the image to draw in this panel, specified as a file to load.
-	 * @param imagePath a string specifying the path ot an image file.
-	 * @throws Exception if the image could not be loaded.
-	 */
-	public void setImage(final String imagePath) throws Exception
-	{
-		this.image = ImageIO.read(new File(imagePath));
-	}
+  /**
+   * Set the image to draw in this panel, specified as a file to load.
+   * @param imagePath a string specifying the path ot an image file.
+   * @throws Exception if the image could not be loaded.
+   */
+  public void setImage(final String imagePath) throws Exception
+  {
+    this.image = ImageIO.read(new File(imagePath));
+  }
 }

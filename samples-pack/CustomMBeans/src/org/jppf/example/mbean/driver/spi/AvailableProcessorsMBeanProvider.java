@@ -27,36 +27,36 @@ import org.jppf.management.spi.JPPFDriverMBeanProvider;
  */
 public class AvailableProcessorsMBeanProvider implements JPPFDriverMBeanProvider
 {
-	/**
-	 * Get the fully qualified name of the MBean interface defined by this provider.
-	 * @return the name as a string.
-	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
-	 */
-	@Override
-	public String getMBeanInterfaceName()
-	{
-		return "org.jppf.example.mbean.AvailableProcessorsMBean";
-	}
+  /**
+   * Get the fully qualified name of the MBean interface defined by this provider.
+   * @return the name as a string.
+   * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
+   */
+  @Override
+  public String getMBeanInterfaceName()
+  {
+    return "org.jppf.example.mbean.AvailableProcessorsMBean";
+  }
 
-	/**
-	 * Create a concrete MBean instance.
-	 * @return the created MBean implementation.
-	 * @see org.jppf.management.spi.JPPFDriverMBeanProvider#createMBean()
-	 */
-	@Override
-	public Object createMBean()
-	{
-		return new AvailableProcessors();
-	}
+  /**
+   * Create a concrete MBean instance.
+   * @return the created MBean implementation.
+   * @see org.jppf.management.spi.JPPFDriverMBeanProvider#createMBean()
+   */
+  @Override
+  public Object createMBean()
+  {
+    return new AvailableProcessors();
+  }
 
-	/**
-	 * Get the object name of the specified MBean.
-	 * @return the MBean's object name as a string.
-	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
-	 */
-	@Override
-	public String getMBeanName()
-	{
-		return "org.jppf.example.mbean:name=AvailableProcessors,type=driver";
-	}
+  /**
+   * Get the object name of the specified MBean.
+   * @return the MBean's object name as a string.
+   * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
+   */
+  @Override
+  public String getMBeanName()
+  {
+    return "org.jppf.example.mbean:name=AvailableProcessors,type=driver";
+  }
 }

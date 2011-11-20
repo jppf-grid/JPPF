@@ -25,16 +25,16 @@ package org.jppf.management.spi;
  */
 public interface JPPFMBeanProvider
 {
-	/**
-	 * Return the fully qualified name of the management interface defined by this provider.
-	 * @return the fully qualified interface name as a string.
-	 */
-	String getMBeanInterfaceName();
-	/**
-	 * Return the name of the specified MBean.<br>
-	 * This is the name under which the MBean will be registered with the MBean server.
-	 * It must be a valid object name, as specified in the documentation for {@link javax.management.ObjectName ObjectName}.
-	 * @return the MBean name for this MBean provider.
-	 */
-	String getMBeanName();
+  /**
+   * Return the fully qualified name of the management interface defined by this provider.
+   * @return the fully qualified interface name as a string.
+   */
+  String getMBeanInterfaceName();
+  /**
+   * Return the name of the specified MBean.<br>
+   * This is the name under which the MBean will be registered with the MBean server.
+   * It must be a valid object name, as specified in the documentation for {@link javax.management.ObjectName ObjectName}.
+   * @return the MBean name for this MBean provider.
+   */
+  String getMBeanName();
 }

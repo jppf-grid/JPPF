@@ -26,129 +26,129 @@ import java.util.Random;
  */
 public class LongTypeMatrix implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The range of values for random values.
-	 */
-	private static final long RANDOM_RANGE = 1000000;
-	/**
-	 * The size of this matrix. The matrix contains size*size values.
-	 */
-	private int size = 0;
-	/**
-	 * The values in this matrix.
-	 */
-	private long[][] values = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The range of values for random values.
+   */
+  private static final long RANDOM_RANGE = 1000000;
+  /**
+   * The size of this matrix. The matrix contains size*size values.
+   */
+  private int size = 0;
+  /**
+   * The values in this matrix.
+   */
+  private long[][] values = null;
 
-	/**
-	 * Initialize this matrix with a specified size.
-	 * @param newSize the size of this matrix.
-	 */
-	public LongTypeMatrix(final int newSize)
-	{
-		this.size = newSize;
-		values = new long[size][size];
-	}
+  /**
+   * Initialize this matrix with a specified size.
+   * @param newSize the size of this matrix.
+   */
+  public LongTypeMatrix(final int newSize)
+  {
+    this.size = newSize;
+    values = new long[size][size];
+  }
 
-	/**
-	 * Initialize this matrix with random values.
-	 */
-	public void assignRandomValues()
-	{
-		Random rand = new Random(System.currentTimeMillis());
-		for (int i=0; i<values.length; i++)
-		{
-			for (int j=0; j<values[i].length; j++)
-				// values in ]-RANDOM_RANGE, +RANDOM_RANGE[
-				values[i][j] = 2L * rand.nextInt((int) RANDOM_RANGE + 1) - RANDOM_RANGE;
-		}
-	}
+  /**
+   * Initialize this matrix with random values.
+   */
+  public void assignRandomValues()
+  {
+    Random rand = new Random(System.currentTimeMillis());
+    for (int i=0; i<values.length; i++)
+    {
+      for (int j=0; j<values[i].length; j++)
+        // values in ]-RANDOM_RANGE, +RANDOM_RANGE[
+        values[i][j] = 2L * rand.nextInt((int) RANDOM_RANGE + 1) - RANDOM_RANGE;
+    }
+  }
 
-	/**
-	 * Get the size of this matrix.
-	 * @return the size as an integer value.
-	 */
-	public int getSize()
-	{
-		return size;
-	}
+  /**
+   * Get the size of this matrix.
+   * @return the size as an integer value.
+   */
+  public int getSize()
+  {
+    return size;
+  }
 
-	/**
-	 * Get the row a matrix values at the specified index. Provided as a convenience.
-	 * @param row the row index.
-	 * @return the values in the row as an array of <code>double</code> values, or null if the row index is
-	 * greater than the matrix size.
-	 */
-	public long[] getRow(final int row)
-	{
-		return (row < size) ? values[row] : null;
-	}
+  /**
+   * Get the row a matrix values at the specified index. Provided as a convenience.
+   * @param row the row index.
+   * @return the values in the row as an array of <code>double</code> values, or null if the row index is
+   * greater than the matrix size.
+   */
+  public long[] getRow(final int row)
+  {
+    return (row < size) ? values[row] : null;
+  }
 
-	/**
-	 * Get a value at the specified coordinates.
-	 * @param row the row coordinate.
-	 * @param column the column coordinate.
-	 * @return the specified value as a double.
-	 */
-	public double getValueAt(final int row, final int column)
-	{
-		return values[row][column];
-	}
+  /**
+   * Get a value at the specified coordinates.
+   * @param row the row coordinate.
+   * @param column the column coordinate.
+   * @return the specified value as a double.
+   */
+  public double getValueAt(final int row, final int column)
+  {
+    return values[row][column];
+  }
 
-	/**
-	 * Set a value to the specified coordinates.
-	 * @param row the row coordinate.
-	 * @param column the column coordinate.
-	 * @param value the value to set.
-	 */
-	public void setValueAt(final int row, final int column, final long value)
-	{
-		values[row][column] = value;
-	}
+  /**
+   * Set a value to the specified coordinates.
+   * @param row the row coordinate.
+   * @param column the column coordinate.
+   * @param value the value to set.
+   */
+  public void setValueAt(final int row, final int column, final long value)
+  {
+    values[row][column] = value;
+  }
 
-	/**
-	 * Compute the result of multiplying this matrix by another: thisMatrix x otherMatrix.
-	 * @param matrix the matrix to multiply this one by.
-	 * @return a new matrix containing the result of the multiplication.
-	 */
-	public LongTypeMatrix multiply(final LongTypeMatrix matrix)
-	{
-		if (matrix.getSize() != size) return null;
-		LongTypeMatrix result = new LongTypeMatrix(size);
-		for (int i=0; i<size; i++)
-		{
-			for (int j=0; j<size; j++)
-			{
-				long value = 0;
-				for (int k=0; k< size; k++) value += matrix.getValueAt(k, j) * values[i][k];
-				result.setValueAt(j, i, value);
-			}
-		}
-		return result;
-	}
+  /**
+   * Compute the result of multiplying this matrix by another: thisMatrix x otherMatrix.
+   * @param matrix the matrix to multiply this one by.
+   * @return a new matrix containing the result of the multiplication.
+   */
+  public LongTypeMatrix multiply(final LongTypeMatrix matrix)
+  {
+    if (matrix.getSize() != size) return null;
+    LongTypeMatrix result = new LongTypeMatrix(size);
+    for (int i=0; i<size; i++)
+    {
+      for (int j=0; j<size; j++)
+      {
+        long value = 0;
+        for (int k=0; k< size; k++) value += matrix.getValueAt(k, j) * values[i][k];
+        result.setValueAt(j, i, value);
+      }
+    }
+    return result;
+  }
 
-	/**
-	 * Multiply a row of this matrix by another matrix.
-	 * The result is a row in the resulting matrix multiplication.
-	 * @param n the index of the row in this matrix.
-	 * @param matrix the matrix to multiply by.
-	 * @return a new row represented as an array of <code>double</code> values.
-	 */
-	public double[] multiplyRow(final int n, final LongTypeMatrix matrix)
-	{
-		double[] result = new double[size];
-		for (int col=0; col<size; col++)
-		{
-			double sum = 0.0d;
-			for (int row=0; row<size; row++)
-			{
-				sum += matrix.getValueAt(row, col) * getValueAt(n, row);
-			}
-			result[col] = sum;
-		}
-		return result;
-	}
+  /**
+   * Multiply a row of this matrix by another matrix.
+   * The result is a row in the resulting matrix multiplication.
+   * @param n the index of the row in this matrix.
+   * @param matrix the matrix to multiply by.
+   * @return a new row represented as an array of <code>double</code> values.
+   */
+  public double[] multiplyRow(final int n, final LongTypeMatrix matrix)
+  {
+    double[] result = new double[size];
+    for (int col=0; col<size; col++)
+    {
+      double sum = 0.0d;
+      for (int row=0; row<size; row++)
+      {
+        sum += matrix.getValueAt(row, col) * getValueAt(n, row);
+      }
+      result[col] = sum;
+    }
+    return result;
+  }
 }

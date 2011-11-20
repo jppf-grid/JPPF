@@ -29,59 +29,59 @@ import org.slf4j.*;
  */
 public class JPPFPeerInitializer extends Thread
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFPeerInitializer.class);
-	/**
-	 * Name of the peer in the configuration file.
-	 */
-	private final String peerName;
-	/**
-	 * Peer connection information.
-	 */
-	private final JPPFConnectionInformation connectionInfo;
-	/**
-	 * JPPF class server
-	 */
-	private final ClassNioServer classServer;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFPeerInitializer.class);
+  /**
+   * Name of the peer in the configuration file.
+   */
+  private final String peerName;
+  /**
+   * Peer connection information.
+   */
+  private final JPPFConnectionInformation connectionInfo;
+  /**
+   * JPPF class server
+   */
+  private final ClassNioServer classServer;
 
-	/**
-	 * Initialize this peer initializer from a specified peerName.
-	 * @param peerName the name of the peer in the configuration file.
-	 * @param connectionInfo peer connection information.
-	 * @param classServer JPPF class server
-	 */
-	public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer)
-	{
-		if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-		if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+  /**
+   * Initialize this peer initializer from a specified peerName.
+   * @param peerName the name of the peer in the configuration file.
+   * @param connectionInfo peer connection information.
+   * @param classServer JPPF class server
+   */
+  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer)
+  {
+    if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+    if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
-		this.peerName       = peerName;
-		this.connectionInfo = connectionInfo;
-		this.classServer    = classServer;
-		setName("Peer Initializer [" + peerName + ']');
-	}
+    this.peerName       = peerName;
+    this.connectionInfo = connectionInfo;
+    this.classServer    = classServer;
+    setName("Peer Initializer [" + peerName + ']');
+  }
 
-	/**
-	 * Perform the peer initialization.
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run()
-	{
-		log.info("start initialization of peer [" + peerName + ']');
-		try
-		{
-			new PeerResourceProvider(peerName, connectionInfo, classServer).init();
-			new PeerNode(peerName, connectionInfo).run();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		} finally
-		{
-			log.info("end initialization of peer [" + peerName + ']');
-		}
-	}
+  /**
+   * Perform the peer initialization.
+   * @see java.lang.Thread#run()
+   */
+  @Override
+  public void run()
+  {
+    log.info("start initialization of peer [" + peerName + ']');
+    try
+    {
+      new PeerResourceProvider(peerName, connectionInfo, classServer).init();
+      new PeerNode(peerName, connectionInfo).run();
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    } finally
+    {
+      log.info("end initialization of peer [" + peerName + ']');
+    }
+  }
 }

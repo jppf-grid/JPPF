@@ -27,74 +27,74 @@ import org.jppf.management.JPPFSystemInformation;
  */
 public class Contains extends ExecutionPolicy
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The name of the property to compare.
-	 */
-	private String propertyName = null;
-	/**
-	 * A string value to compare with.
-	 */
-	private String value = null;
-	/**
-	 * Determines if the comparison should ignore the string case.
-	 */
-	private boolean ignoreCase = false;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The name of the property to compare.
+   */
+  private String propertyName = null;
+  /**
+   * A string value to compare with.
+   */
+  private String value = null;
+  /**
+   * Determines if the comparison should ignore the string case.
+   */
+  private boolean ignoreCase = false;
 
-	/**
-	 * Define an equality comparison between the string value of a property and another string value.
-	 * @param propertyName the name of the property to compare.
-	 * @param ignoreCase determines if the comparison should ignore the string case.
-	 * @param a the value to compare with.
-	 */
-	public Contains(final String propertyName, final boolean ignoreCase, final String a)
-	{
-		this.propertyName = propertyName;
-		this.value = a;
-		this.ignoreCase = ignoreCase;
-	}
+  /**
+   * Define an equality comparison between the string value of a property and another string value.
+   * @param propertyName the name of the property to compare.
+   * @param ignoreCase determines if the comparison should ignore the string case.
+   * @param a the value to compare with.
+   */
+  public Contains(final String propertyName, final boolean ignoreCase, final String a)
+  {
+    this.propertyName = propertyName;
+    this.value = a;
+    this.ignoreCase = ignoreCase;
+  }
 
-	/**
-	 * Determines whether this policy accepts the specified node.
-	 * @param info system information for the node on which the tasks will run if accepted.
-	 * @return true if the node is accepted, false otherwise.
-	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
-	 */
-	@Override
-	public boolean accepts(final JPPFSystemInformation info)
-	{
-		if (value == null) return false;
-		String s = getProperty(info, propertyName);
-		if (s == null) return false;
-		if (ignoreCase) return s.toLowerCase().contains(value.toLowerCase());
-		return s.contains(value);
-	}
+  /**
+   * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.
+   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
+   */
+  @Override
+  public boolean accepts(final JPPFSystemInformation info)
+  {
+    if (value == null) return false;
+    String s = getProperty(info, propertyName);
+    if (s == null) return false;
+    if (ignoreCase) return s.toLowerCase().contains(value.toLowerCase());
+    return s.contains(value);
+  }
 
-	/**
-	 * Print this object to a string.
-	 * @return an XML string representation of this object
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (computedToString == null)
-		{
-			synchronized(ExecutionPolicy.class)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append(indent()).append("<Contains ignoreCase=\"").append(ignoreCase).append("\">\n");
-				toStringIndent++;
-				sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-				sb.append(indent()).append("<Value>").append(value).append("</Value>\n");
-				toStringIndent--;
-				sb.append(indent()).append("</Contains>\n");
-				computedToString = sb.toString();
-			}
-		}
-		return computedToString;
-	}
+  /**
+   * Print this object to a string.
+   * @return an XML string representation of this object
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    if (computedToString == null)
+    {
+      synchronized(ExecutionPolicy.class)
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent()).append("<Contains ignoreCase=\"").append(ignoreCase).append("\">\n");
+        toStringIndent++;
+        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
+        sb.append(indent()).append("<Value>").append(value).append("</Value>\n");
+        toStringIndent--;
+        sb.append(indent()).append("</Contains>\n");
+        computedToString = sb.toString();
+      }
+    }
+    return computedToString;
+  }
 }

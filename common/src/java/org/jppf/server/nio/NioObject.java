@@ -27,128 +27,128 @@ import org.slf4j.*;
  */
 public class NioObject
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(NioObject.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The message length.
-	 */
-	private int size = 0;
-	/**
-	 * What has currently been read from the message.
-	 */
-	private int count = 0;
-	/**
-	 * Location of the data to read or write.
-	 */
-	private DataLocation data = null;
-	/**
-	 * Determines whether the I/O performed by this object are blocking.
-	 */
-	private boolean blocking = false;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NioObject.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The message length.
+   */
+  private int size = 0;
+  /**
+   * What has currently been read from the message.
+   */
+  private int count = 0;
+  /**
+   * Location of the data to read or write.
+   */
+  private DataLocation data = null;
+  /**
+   * Determines whether the I/O performed by this object are blocking.
+   */
+  private boolean blocking = false;
 
-	/**
-	 * Initialize this NioObject with the specified size.
-	 * @param size the size of the internal buffer.
-	 * @param blocking specifies whether the I/O performed by this object are blocking.
-	 */
-	public NioObject(final int size, final boolean blocking)
-	{
-		//this(new ByteBufferLocation(size), blocking);
-		this(new MultipleBuffersLocation(size), blocking);
-	}
+  /**
+   * Initialize this NioObject with the specified size.
+   * @param size the size of the internal buffer.
+   * @param blocking specifies whether the I/O performed by this object are blocking.
+   */
+  public NioObject(final int size, final boolean blocking)
+  {
+    //this(new ByteBufferLocation(size), blocking);
+    this(new MultipleBuffersLocation(size), blocking);
+  }
 
-	/**
-	 * Initialize this NioObject with the specified buffer.
-	 * @param data the buffer containing the data.
-	 * @param offset the start position in the buffer.
-	 * @param len the size in bytes of the data to write.
-	 * @param blocking specifIes whether the I/O performed by this object are blocking.
-	 */
-	/*
+  /**
+   * Initialize this NioObject with the specified buffer.
+   * @param data the buffer containing the data.
+   * @param offset the start position in the buffer.
+   * @param len the size in bytes of the data to write.
+   * @param blocking specifIes whether the I/O performed by this object are blocking.
+   */
+  /*
 	public NioObject(byte[] data, int offset, int len, boolean blocking)
 	{
 		this(new ByteBufferLocation(data, offset, len), blocking);
 	}
-	 */
+   */
 
-	/**
-	 * Initialize this NioObject with the specified size.
-	 * @param data the location of the data to read from or write to.
-	 * @param blocking specifies whether the I/O performed by this object are blocking.
-	 */
-	public NioObject(final DataLocation data, final boolean blocking)
-	{
-		this.size = data.getSize();
-		this.data = data;
-		//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
-	}
+  /**
+   * Initialize this NioObject with the specified size.
+   * @param data the location of the data to read from or write to.
+   * @param blocking specifies whether the I/O performed by this object are blocking.
+   */
+  public NioObject(final DataLocation data, final boolean blocking)
+  {
+    this.size = data.getSize();
+    this.data = data;
+    //if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().rewind();
+  }
 
-	/**
-	 * Read the current frame.
-	 * @param source the source to read from.
-	 * @return true if the frame has been read fully, false otherwise.
-	 * @throws Exception if any error occurs.
-	 */
-	public boolean read(final InputSource source) throws Exception
-	{
-		if (count >= size) return true;
-		int n = data.transferFrom(source, blocking);
-		if (n > 0) count += n;
-		if (debugEnabled) log.debug("read " + n + " bytes from input source, count/size = " + count + '/' + size);
-		if (count >= size)
-		{
-			if (debugEnabled) log.debug("count = " + count + ", size = " + size);
-			//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
-			return true;
-		}
-		return false;
-	}
+  /**
+   * Read the current frame.
+   * @param source the source to read from.
+   * @return true if the frame has been read fully, false otherwise.
+   * @throws Exception if any error occurs.
+   */
+  public boolean read(final InputSource source) throws Exception
+  {
+    if (count >= size) return true;
+    int n = data.transferFrom(source, blocking);
+    if (n > 0) count += n;
+    if (debugEnabled) log.debug("read " + n + " bytes from input source, count/size = " + count + '/' + size);
+    if (count >= size)
+    {
+      if (debugEnabled) log.debug("count = " + count + ", size = " + size);
+      //if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
+      return true;
+    }
+    return false;
+  }
 
-	/**
-	 * Write the current data object.
-	 * @param dest the destination to write to.
-	 * @return true if the data has been written fully, false otherwise.
-	 * @throws Exception if any error occurs.
-	 */
-	public boolean write(final OutputDestination dest) throws Exception
-	{
-		if (count >= size) return true;
-		int n = data.transferTo(dest, blocking);
-		if (n > 0) count += n;
-		if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count/size = " + count + '/' + size + " (dl = " + data + ')');
-		if (count > size)
-		{
-			int breakpoint = 0;
-		}
-		if (count >= size)
-		{
-			//if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
-			return true;
-		}
-		return false;
-	}
+  /**
+   * Write the current data object.
+   * @param dest the destination to write to.
+   * @return true if the data has been written fully, false otherwise.
+   * @throws Exception if any error occurs.
+   */
+  public boolean write(final OutputDestination dest) throws Exception
+  {
+    if (count >= size) return true;
+    int n = data.transferTo(dest, blocking);
+    if (n > 0) count += n;
+    if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count/size = " + count + '/' + size + " (dl = " + data + ')');
+    if (count > size)
+    {
+      int breakpoint = 0;
+    }
+    if (count >= size)
+    {
+      //if (data instanceof ByteBufferLocation) ((ByteBufferLocation) data).buffer().flip();
+      return true;
+    }
+    return false;
+  }
 
-	/**
-	 * Location of the data to read or write.
-	 * @return a <code>DataLocation</code> instance.
-	 */
-	public DataLocation getData()
-	{
-		return data;
-	}
+  /**
+   * Location of the data to read or write.
+   * @return a <code>DataLocation</code> instance.
+   */
+  public DataLocation getData()
+  {
+    return data;
+  }
 
-	/**
-	 * Number of bytes read from or written to the message.
-	 * @return  the number of bytes as an int.
-	 */
-	public int getCount()
-	{
-		return count;
-	}
+  /**
+   * Number of bytes read from or written to the message.
+   * @return  the number of bytes as an int.
+   */
+  public int getCount()
+  {
+    return count;
+  }
 }

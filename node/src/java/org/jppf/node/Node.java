@@ -26,26 +26,26 @@ import org.jppf.node.event.LifeCycleEventHandler;
  */
 public interface Node extends Runnable
 {
-	/**
-	 * Get the underlying socket used by this node.
-	 * @return a SocketWrapper instance.
-	 */
-	SocketWrapper getSocketWrapper();
+  /**
+   * Get the underlying socket used by this node.
+   * @return a SocketWrapper instance.
+   */
+  SocketWrapper getSocketWrapper();
 
-	/**
-	 * Set the underlying socket to be used by this node.
-	 * @param socketWrapper a SocketWrapper instance.
-	 */
-	void setSocketWrapper(SocketWrapper socketWrapper);
+  /**
+   * Set the underlying socket to be used by this node.
+   * @param socketWrapper a SocketWrapper instance.
+   */
+  void setSocketWrapper(SocketWrapper socketWrapper);
 
-	/**
-	 * Stop this node and release the resources it is using.
-	 */
-	void stopNode();
+  /**
+   * Stop this node and release the resources it is using.
+   */
+  void stopNode();
 
-	/**
-	 * Get the object that manages the node life cycle events.
-	 * @return a {@link LifeCycleEventHandler} instance.
-	 */
-	LifeCycleEventHandler getLifeCycleEventHandler();
+  /**
+   * Get the object that manages the node life cycle events.
+   * @return a {@link LifeCycleEventHandler} instance.
+   */
+  LifeCycleEventHandler getLifeCycleEventHandler();
 }

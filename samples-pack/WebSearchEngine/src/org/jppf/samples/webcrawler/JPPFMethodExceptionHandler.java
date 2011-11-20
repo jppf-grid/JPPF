@@ -28,31 +28,31 @@ import org.apache.commons.httpclient.*;
  */
 public class JPPFMethodExceptionHandler implements HttpMethodRetryHandler
 {
-	/**
-	 * the max retry count to use.
-	 */
-	private int maxRetry = 1;
+  /**
+   * the max retry count to use.
+   */
+  private int maxRetry = 1;
 
-	/**
-	 * Initialize this exception handler with the specified maximum retry count.
-	 * @param maxRetry the max retry count to use.
-	 */
-	public JPPFMethodExceptionHandler(final int maxRetry)
-	{
-		this.maxRetry = maxRetry;
-	}
+  /**
+   * Initialize this exception handler with the specified maximum retry count.
+   * @param maxRetry the max retry count to use.
+   */
+  public JPPFMethodExceptionHandler(final int maxRetry)
+  {
+    this.maxRetry = maxRetry;
+  }
 
-	/**
-	 * Determine whether a request should be resent.
-	 * @param method the http method for which the exception occurred.
-	 * @param e the exception that occurred.
-	 * @param retryCount number of times the request was resent.
-	 * @return true if the request should be resent, false otherwise.
-	 * @see org.apache.commons.httpclient.HttpMethodRetryHandler#retryMethod(org.apache.commons.httpclient.HttpMethod, java.io.IOException, int)
-	 */
-	@Override
-	public boolean retryMethod(final HttpMethod method, final IOException e, final int retryCount)
-	{
-		return retryCount < maxRetry;
-	}
+  /**
+   * Determine whether a request should be resent.
+   * @param method the http method for which the exception occurred.
+   * @param e the exception that occurred.
+   * @param retryCount number of times the request was resent.
+   * @return true if the request should be resent, false otherwise.
+   * @see org.apache.commons.httpclient.HttpMethodRetryHandler#retryMethod(org.apache.commons.httpclient.HttpMethod, java.io.IOException, int)
+   */
+  @Override
+  public boolean retryMethod(final HttpMethod method, final IOException e, final int retryCount)
+  {
+    return retryCount < maxRetry;
+  }
 }

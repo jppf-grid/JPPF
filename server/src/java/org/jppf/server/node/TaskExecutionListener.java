@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface TaskExecutionListener extends EventListener
 {
-	/**
-	 * Called to notify a listener that a task was executed.
-	 * @param event - the event encapsulating the task-related data.
-	 */
-	void taskExecuted(TaskExecutionEvent event);
+  /**
+   * Called to notify a listener that a task was executed.
+   * @param event - the event encapsulating the task-related data.
+   */
+  void taskExecuted(TaskExecutionEvent event);
 }

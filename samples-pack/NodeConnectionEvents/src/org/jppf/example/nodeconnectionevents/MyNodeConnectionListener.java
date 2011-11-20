@@ -18,7 +18,7 @@
 
 package org.jppf.example.nodeconnectionevents;
 
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.event.*;
 
 /**
@@ -27,41 +27,41 @@ import org.jppf.server.event.*;
  */
 public class MyNodeConnectionListener implements NodeConnectionListener
 {
-	/**
-	 * Default no-arg constructor.
-	 */
-	public MyNodeConnectionListener()
-	{
-		System.out.println("*** MyNodeConnectionListener instance successfully loaded ***");
-	}
+  /**
+   * Default no-arg constructor.
+   */
+  public MyNodeConnectionListener()
+  {
+    System.out.println("*** MyNodeConnectionListener instance successfully loaded ***");
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void nodeConnected(final NodeConnectionEvent event)
-	{
-		System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is now connected ***");
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void nodeConnected(final NodeConnectionEvent event)
+  {
+    System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is now connected ***");
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void nodeDisconnected(final NodeConnectionEvent event)
-	{
-		System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is disconnected ***");
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void nodeDisconnected(final NodeConnectionEvent event)
+  {
+    System.out.println("*** Node " + computeIdentifier(event.getNodeInformation()) + " is disconnected ***");
+  }
 
-	/**
-	 * Build a node identifier based on its management host and port.
-	 * @param info the information from which to extract the identifier segments.
-	 * @return a string in the format 'management_host:management_port'.
-	 */
-	private String computeIdentifier(final JPPFManagementInfo info)
-	{
-		String host = info.getHost();
-		int port = info.getPort();
-		return host + ':' + port;
-	}
+  /**
+   * Build a node identifier based on its management host and port.
+   * @param info the information from which to extract the identifier segments.
+   * @return a string in the format 'management_host:management_port'.
+   */
+  private String computeIdentifier(final JPPFManagementInfo info)
+  {
+    String host = info.getHost();
+    int port = info.getPort();
+    return host + ':' + port;
+  }
 }

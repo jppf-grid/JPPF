@@ -18,8 +18,7 @@
 
 package org.jppf.jca.work;
 
-import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
-import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.*;
 
@@ -41,217 +40,217 @@ import org.slf4j.*;
  */
 public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFJcaClientConnection.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFJcaClientConnection.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this client with a specified application UUID.
-     * @param client the JPPF client that owns this connection.
-     * @param uuid the unique identifier for this local client.
-     * @param name configuration name for this local client.
-     * @param info the connection properties for this connection.
-     */
-	public JPPFJcaClientConnection(final JPPFJcaClient client, final String uuid, final String name, final JPPFConnectionInformation info)
-	{
-        this.client = client;
-        classServerPort = info.serverPorts[0];
-        configure(uuid, name, info.host, info.serverPorts[0], classServerPort, 0);
-        status.set(DISCONNECTED);
-	}
+  /**
+   * Initialize this client with a specified application UUID.
+   * @param client the JPPF client that owns this connection.
+   * @param uuid the unique identifier for this local client.
+   * @param name configuration name for this local client.
+   * @param info the connection properties for this connection.
+   */
+  public JPPFJcaClientConnection(final JPPFJcaClient client, final String uuid, final String name, final JPPFConnectionInformation info)
+  {
+    this.client = client;
+    classServerPort = info.serverPorts[0];
+    configure(uuid, name, info.host, info.serverPorts[0], classServerPort, 0);
+    status.set(DISCONNECTED);
+  }
 
-	/**
-	 * Initialize this client connection.
-	 * @see org.jppf.client.JPPFClientConnection#init()
-	 */
-	@Override
-	public void init()
-	{
-		try
-		{
-			delegate = new JcaClassServerDelegate(name, client.getUuid(), host, classServerPort, this);
-			delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
-			{
-				@Override
-				public void statusChanged(final ClientConnectionStatusEvent event)
-				{
-					delegateStatusChanged(event);
-				}
-			});
-			taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
-			{
-				@Override
-				public void statusChanged(final ClientConnectionStatusEvent event)
-				{
-					taskServerConnectionStatusChanged(event);
-				}
-			});
-      connect();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			setStatus(FAILED);
-		}
-		catch(JPPFError e)
-		{
-			setStatus(FAILED);
-			throw e;
-		}
-	}
-
-    /**
-     * Connect to the driver.
-     * @throws Exception if connection failed.
-     */
-    protected void connect() throws Exception
+  /**
+   * Initialize this client connection.
+   * @see org.jppf.client.JPPFClientConnection#init()
+   */
+  @Override
+  public void init()
+  {
+    try
     {
-        ((JcaClassServerDelegate) delegate).performConnection();
-        if (!delegate.isClosed())
+      delegate = new JcaClassServerDelegate(name, client.getUuid(), host, classServerPort, this);
+      delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+      {
+        @Override
+        public void statusChanged(final ClientConnectionStatusEvent event)
         {
-            Thread t = new Thread(delegate);
-            t.setName('[' + delegate.getName() + " : class delegate]");
-            t.start();
-            taskServerConnection.init();
+          delegateStatusChanged(event);
         }
+      });
+      taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+      {
+        @Override
+        public void statusChanged(final ClientConnectionStatusEvent event)
+        {
+          taskServerConnectionStatusChanged(event);
+        }
+      });
+      connect();
     }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+      setStatus(FAILED);
+    }
+    catch(JPPFError e)
+    {
+      setStatus(FAILED);
+      throw e;
+    }
+  }
 
-    /**
-	 * Send tasks to the server for execution.
-	 * @param cl classloader used for serialization.
-	 * @param header the task bundle to send to the driver.
-	 * @param job the job to execute remotely.
-	 * @throws Exception if an error occurs while sending the request.
-	 */
-	public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
-	{
-		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-		try
-		{
-			if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-			sendTasks(header, job);
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			throw e;
-		}
-		catch(Error e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			throw e;
-		}
-		finally
-		{
-			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
-		}
-	}
+  /**
+   * Connect to the driver.
+   * @throws Exception if connection failed.
+   */
+  protected void connect() throws Exception
+  {
+    ((JcaClassServerDelegate) delegate).performConnection();
+    if (!delegate.isClosed())
+    {
+      Thread t = new Thread(delegate);
+      t.setName('[' + delegate.getName() + " : class delegate]");
+      t.start();
+      taskServerConnection.init();
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
-	{
-		header.setRequestUuid(job.getJobUuid());
-		if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
-		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-		ClassLoader cl = (!job.getTasks().isEmpty()) ? job.getTasks().get(0).getClass().getClassLoader() : null;
-		try
-		{
-			if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-			super.sendTasks(header, job);
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			throw e;
-		}
-		catch(Error e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			throw e;
-		}
-		finally
-		{
-			if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
-		}
-	}
+  /**
+   * Send tasks to the server for execution.
+   * @param cl classloader used for serialization.
+   * @param header the task bundle to send to the driver.
+   * @param job the job to execute remotely.
+   * @throws Exception if an error occurs while sending the request.
+   */
+  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
+  {
+    ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+    try
+    {
+      if (cl != null) Thread.currentThread().setContextClassLoader(cl);
+      sendTasks(header, job);
+    }
+    catch(Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      throw e;
+    }
+    catch(Error e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      throw e;
+    }
+    finally
+    {
+      if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+    }
+  }
 
-	/**
-	 * Submit the request to the server.
-	 * @param job the job to execute remotely.
-	 * @throws Exception if an error occurs while sending the request.
-	 * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
-	 * @deprecated job submissions should be performed via {@link JPPFClient#submit(JPPFJob)} directly.
-	 */
-	@Override
-	public void submit(final JPPFJob job) throws Exception
-	{
-		throw new UnsupportedOperationException();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
+  {
+    header.setRequestUuid(job.getJobUuid());
+    if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
+    ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+    ClassLoader cl = (!job.getTasks().isEmpty()) ? job.getTasks().get(0).getClass().getClassLoader() : null;
+    try
+    {
+      if (cl != null) Thread.currentThread().setContextClassLoader(cl);
+      super.sendTasks(header, job);
+    }
+    catch(Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      throw e;
+    }
+    catch(Error e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      throw e;
+    }
+    finally
+    {
+      if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
+    }
+  }
 
-	/**
-	 * Get the name of the serialization helper implementation class name to use.
-	 * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
-	 * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
-	 */
-	@Override
-	protected String getSerializationHelperClassName()
-	{
-		return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
-	}
+  /**
+   * Submit the request to the server.
+   * @param job the job to execute remotely.
+   * @throws Exception if an error occurs while sending the request.
+   * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
+   * @deprecated job submissions should be performed via {@link JPPFClient#submit(JPPFJob)} directly.
+   */
+  @Override
+  public void submit(final JPPFJob job) throws Exception
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Get the name of the serialization helper implementation class name to use.
+   * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
+   * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
+   */
+  @Override
+  protected String getSerializationHelperClassName()
+  {
+    return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
+  }
 
 
-	/**
-	 * Shutdown this client and retrieve all pending executions for resubmission.
-	 * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
-	 * @see org.jppf.client.JPPFClientConnection#close()
-	 */
-	@Override
-	public List<JPPFJob> close()
-	{
-		if (!isShutdown)
-		{
-			isShutdown = true;
-			try
-			{
-				if (taskServerConnection != null) taskServerConnection.close();
-				if (delegate != null) delegate.close();
-			}
-			catch(Exception e)
-			{
-                if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
-				else log.error('[' + name + "] "+ e.getMessage());
-			}
-			if (job != null) return Collections.singletonList(job);
-		}
-		return Collections.emptyList();
-	}
+  /**
+   * Shutdown this client and retrieve all pending executions for resubmission.
+   * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
+   * @see org.jppf.client.JPPFClientConnection#close()
+   */
+  @Override
+  public List<JPPFJob> close()
+  {
+    if (!isShutdown)
+    {
+      isShutdown = true;
+      try
+      {
+        if (taskServerConnection != null) taskServerConnection.close();
+        if (delegate != null) delegate.close();
+      }
+      catch(Exception e)
+      {
+        if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
+        else log.error('[' + name + "] "+ e.getMessage());
+      }
+      if (job != null) return Collections.singletonList(job);
+    }
+    return Collections.emptyList();
+  }
 
-	/**
-	 * Create a socket initializer.
-	 * @return an instance of <code>SocketInitializerImpl</code>.
-	 * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
-	 */
-	@Override
-	protected SocketInitializer createSocketInitializer()
-	{
-		return new JcaSocketInitializer();
-	}
+  /**
+   * Create a socket initializer.
+   * @return an instance of <code>SocketInitializerImpl</code>.
+   * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
+   */
+  @Override
+  protected SocketInitializer createSocketInitializer()
+  {
+    return new JcaSocketInitializer();
+  }
 
-	/**
-	 * Get the JPPF client that manages connections to the JPPF drivers.
-	 * @return a <code>JPPFJcaClient</code> instance.
-	 */
-	@Override
-	public JPPFJcaClient getClient()
-	{
-		return (JPPFJcaClient) client;
-	}
+  /**
+   * Get the JPPF client that manages connections to the JPPF drivers.
+   * @return a <code>JPPFJcaClient</code> instance.
+   */
+  @Override
+  public JPPFJcaClient getClient()
+  {
+    return (JPPFJcaClient) client;
+  }
 }

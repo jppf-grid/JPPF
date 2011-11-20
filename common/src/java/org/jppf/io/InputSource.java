@@ -26,35 +26,35 @@ import java.nio.ByteBuffer;
  */
 public interface InputSource extends IO
 {
-	/**
-	 * Read data from this input source into an array of bytes.
-	 * @param data the buffer into which to write.
-	 * @param offset the position in the buffer where to start storing the data.
-	 * @param len the size in bytes of the data to read.
-	 * @return the number of bytes actually read, or -1 if end of stream was reached.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int read(byte[] data, int offset, int len) throws Exception;
+  /**
+   * Read data from this input source into an array of bytes.
+   * @param data the buffer into which to write.
+   * @param offset the position in the buffer where to start storing the data.
+   * @param len the size in bytes of the data to read.
+   * @return the number of bytes actually read, or -1 if end of stream was reached.
+   * @throws Exception if an IO error occurs.
+   */
+  int read(byte[] data, int offset, int len) throws Exception;
 
-	/**
-	 * Read data from this input source into a byte buffer.
-	 * @param data the buffer into which to write.
-	 * @return the number of bytes actually read, or -1 if end of stream was reached.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int read(ByteBuffer data) throws Exception;
+  /**
+   * Read data from this input source into a byte buffer.
+   * @param data the buffer into which to write.
+   * @return the number of bytes actually read, or -1 if end of stream was reached.
+   * @throws Exception if an IO error occurs.
+   */
+  int read(ByteBuffer data) throws Exception;
 
-	/**
-	 * Read an int value from this input source.
-	 * @return the value read, or -1 if an end of file condition was reached.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int readInt() throws Exception;
-	/**
-	 * Skip <code>n</code> bytes of data form this input source.
-	 * @param n the number of bytes to skip.
-	 * @return the number of bytes actually skipped.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int skip(int n) throws Exception;
+  /**
+   * Read an int value from this input source.
+   * @return the value read, or -1 if an end of file condition was reached.
+   * @throws Exception if an IO error occurs.
+   */
+  int readInt() throws Exception;
+  /**
+   * Skip <code>n</code> bytes of data form this input source.
+   * @param n the number of bytes to skip.
+   * @return the number of bytes actually skipped.
+   * @throws Exception if an IO error occurs.
+   */
+  int skip(int n) throws Exception;
 }

@@ -27,39 +27,39 @@ import java.util.concurrent.Callable;
  */
 class RunnableWrapper<V> implements Callable<V>, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The runnable to execute.
-	 */
-	private Runnable runnable = null;
-	/**
-	 * The result to return.
-	 */
-	private V result = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The runnable to execute.
+   */
+  private Runnable runnable = null;
+  /**
+   * The result to return.
+   */
+  private V result = null;
 
-	/**
-	 * Initialize this callable with the specified parameters.
-	 * @param runnable the runnable to execute.
-	 * @param result he result to return.
-	 */
-	public RunnableWrapper(final Runnable runnable, final V result)
-	{
-		this.runnable = runnable;
-		this.result = result;
-	}
+  /**
+   * Initialize this callable with the specified parameters.
+   * @param runnable the runnable to execute.
+   * @param result he result to return.
+   */
+  public RunnableWrapper(final Runnable runnable, final V result)
+  {
+    this.runnable = runnable;
+    this.result = result;
+  }
 
-	/**
-	 * Execute the task.
-	 * @return the result specified in the constructor.
-	 * @see java.util.concurrent.Callable#call()
-	 */
-	@Override
-	public V call()
-	{
-		runnable.run();
-		return result;
-	}
+  /**
+   * Execute the task.
+   * @return the result specified in the constructor.
+   * @see java.util.concurrent.Callable#call()
+   */
+  @Override
+  public V call()
+  {
+    runnable.run();
+    return result;
+  }
 }

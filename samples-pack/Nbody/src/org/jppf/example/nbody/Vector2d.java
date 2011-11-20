@@ -46,128 +46,128 @@ import java.io.Serializable;
  */
 public class Vector2d implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * X coordinate.
-	 */
-	public double x = 0d;
-	/**
-	 * Y coordinate.
-	 */
-	public double y = 0d;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * X coordinate.
+   */
+  public double x = 0d;
+  /**
+   * Y coordinate.
+   */
+  public double y = 0d;
 
-	/**
-	 * Default constructor.
-	 */
-	public Vector2d()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public Vector2d()
+  {
+  }
 
-	/**
-	 * Initialize this vector with the specified coordinates.
-	 * @param x x coordinate.
-	 * @param y y coordinate.
-	 */
-	public Vector2d(final double x, final double y)
-	{
-		this.x = x;
-		this.y = y;
-	}
+  /**
+   * Initialize this vector with the specified coordinates.
+   * @param x x coordinate.
+   * @param y y coordinate.
+   */
+  public Vector2d(final double x, final double y)
+  {
+    this.x = x;
+    this.y = y;
+  }
 
-	/**
-	 * Set the coordinates of another vector to this one.
-	 * @param other the other vector.
-	 * @return this vector.
-	 */
-	public Vector2d set(final Vector2d other)
-	{
-		x = other.x;
-		y = other.y;
-		return this;
-	}
+  /**
+   * Set the coordinates of another vector to this one.
+   * @param other the other vector.
+   * @return this vector.
+   */
+  public Vector2d set(final Vector2d other)
+  {
+    x = other.x;
+    y = other.y;
+    return this;
+  }
 
-	/**
-	 * Add the coordinates of another vector to this one.
-	 * @param other the other vector.
-	 * @return this vector.
-	 */
-	public Vector2d add(final Vector2d other)
-	{
-		x += other.x;
-		y += other.y;
-		return this;
-	}
+  /**
+   * Add the coordinates of another vector to this one.
+   * @param other the other vector.
+   * @return this vector.
+   */
+  public Vector2d add(final Vector2d other)
+  {
+    x += other.x;
+    y += other.y;
+    return this;
+  }
 
-	/**
-	 * Add the coordinates of another vector from this one.
-	 * @param other the other vector.
-	 * @return this vector.
-	 */
-	public Vector2d subtract(final Vector2d other)
-	{
-		x -= other.x;
-		y -= other.y;
-		return this;
-	}
+  /**
+   * Add the coordinates of another vector from this one.
+   * @param other the other vector.
+   * @return this vector.
+   */
+  public Vector2d subtract(final Vector2d other)
+  {
+    x -= other.x;
+    y -= other.y;
+    return this;
+  }
 
-	/**
-	 * Multiply the coordinates of this vector by  the specified value.
-	 * @param value the value to multiply by.
-	 * @return this vector.
-	 */
-	public Vector2d multiply(final double value)
-	{
-		x *= value;
-		y *= value;
-		return this;
-	}
+  /**
+   * Multiply the coordinates of this vector by  the specified value.
+   * @param value the value to multiply by.
+   * @return this vector.
+   */
+  public Vector2d multiply(final double value)
+  {
+    x *= value;
+    y *= value;
+    return this;
+  }
 
-	/**
-	 * Rotate this vector 90 degrees counterclockwise.
-	 * @return  This vector, rotated.
-	 */
-	public Vector2d rotate90()
-	{
-		double tmp = this.x;
-		this.x = -this.y;
-		this.y = tmp;
-		return this;
-	}
+  /**
+   * Rotate this vector 90 degrees counterclockwise.
+   * @return  This vector, rotated.
+   */
+  public Vector2d rotate90()
+  {
+    double tmp = this.x;
+    this.x = -this.y;
+    this.y = tmp;
+    return this;
+  }
 
-	/**
-	 * Rotate this vector 180 degrees.
-	 * @return  This vector, rotated.
-	 */
-	public Vector2d rotate180()
-	{
-		this.x = -this.x;
-		this.y = -this.y;
-		return this;
-	}
+  /**
+   * Rotate this vector 180 degrees.
+   * @return  This vector, rotated.
+   */
+  public Vector2d rotate180()
+  {
+    this.x = -this.x;
+    this.y = -this.y;
+    return this;
+  }
 
-	/**
-	 * Rotate this vector 270 degrees counterclockwise (90 degrees clockwise).
-	 * @return  This vector, rotated.
-	 */
-	public Vector2d rotate270()
-	{
-		double tmp = this.x;
-		this.x = this.y;
-		this.y = -tmp;
-		return this;
-	}
+  /**
+   * Rotate this vector 270 degrees counterclockwise (90 degrees clockwise).
+   * @return  This vector, rotated.
+   */
+  public Vector2d rotate270()
+  {
+    double tmp = this.x;
+    this.x = this.y;
+    this.y = -tmp;
+    return this;
+  }
 
-	/**
-	 * Reset the coordinates to zero.
-	 * @return  This vector, rotated.
-	 */
-	public Vector2d clear()
-	{
-		this.x = 0d;
-		this.y = 0d;
-		return this;
-	}
+  /**
+   * Reset the coordinates to zero.
+   * @return  This vector, rotated.
+   */
+  public Vector2d clear()
+  {
+    this.x = 0d;
+    this.y = 0d;
+    return this;
+  }
 }

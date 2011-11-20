@@ -26,103 +26,103 @@ import java.io.Serializable;
  */
 public class TaskInformation implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The task id.
-	 */
-	private String id = null;
-	/**
-	 * The id of the job this task belongs to.
-	 */
-	private String jobId = null;
-	/**
-	 * The cpu time taken by the task.
-	 */
-	private long cpuTime = 0L;
-	/**
-	 * The wall clock time taken by the task.
-	 */
-	private long elapsedTime = 0L;
-	/**
-	 * Determines whether the task had an exception.
-	 */
-	private boolean error = false;
-	/**
-	 * Timestamp for the creation of this event.
-	 */
-	private long timestamp = System.currentTimeMillis();
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The task id.
+   */
+  private String id = null;
+  /**
+   * The id of the job this task belongs to.
+   */
+  private String jobId = null;
+  /**
+   * The cpu time taken by the task.
+   */
+  private long cpuTime = 0L;
+  /**
+   * The wall clock time taken by the task.
+   */
+  private long elapsedTime = 0L;
+  /**
+   * Determines whether the task had an exception.
+   */
+  private boolean error = false;
+  /**
+   * Timestamp for the creation of this event.
+   */
+  private long timestamp = System.currentTimeMillis();
 
-	/**
-	 * Initialize this event object with the specified task.
-	 * @param id the task id.
-	 * @param jobId the id of the job this task belongs to.
-	 * @param cpuTime the cpu time taken by the task.
-	 * @param elapsedTime the wall clock time taken by the task.
-	 * @param error determines whether the task had an exception.
-	 */
-	public TaskInformation(final String id, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
-	{
-		this.id = id;
-		this.jobId = jobId;
-		this.cpuTime = cpuTime;
-		this.elapsedTime = elapsedTime;
-		this.error = error;
-	}
+  /**
+   * Initialize this event object with the specified task.
+   * @param id the task id.
+   * @param jobId the id of the job this task belongs to.
+   * @param cpuTime the cpu time taken by the task.
+   * @param elapsedTime the wall clock time taken by the task.
+   * @param error determines whether the task had an exception.
+   */
+  public TaskInformation(final String id, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
+  {
+    this.id = id;
+    this.jobId = jobId;
+    this.cpuTime = cpuTime;
+    this.elapsedTime = elapsedTime;
+    this.error = error;
+  }
 
-	/**
-	 * Get the task id.
-	 * @return the id as a string.
-	 */
-	public String getId()
-	{
-		return id;
-	}
+  /**
+   * Get the task id.
+   * @return the id as a string.
+   */
+  public String getId()
+  {
+    return id;
+  }
 
-	/**
-	 * Get the id of the job this task belongs to.
-	 * @return the job id as a string.
-	 */
-	public String getJobId()
-	{
-		return jobId;
-	}
+  /**
+   * Get the id of the job this task belongs to.
+   * @return the job id as a string.
+   */
+  public String getJobId()
+  {
+    return jobId;
+  }
 
-	/**
-	 * Get the cpu time taken by the task.
-	 * @return the cpu time in milliseconds.
-	 */
-	public long getCpuTime()
-	{
-		return cpuTime;
-	}
+  /**
+   * Get the cpu time taken by the task.
+   * @return the cpu time in milliseconds.
+   */
+  public long getCpuTime()
+  {
+    return cpuTime;
+  }
 
-	/**
-	 * Get the wall clock time taken by the task.
-	 * @return the elapsed time in milliseconds.
-	 */
-	public long getElapsedTime()
-	{
-		return elapsedTime;
-	}
+  /**
+   * Get the wall clock time taken by the task.
+   * @return the elapsed time in milliseconds.
+   */
+  public long getElapsedTime()
+  {
+    return elapsedTime;
+  }
 
-	/**
-	 * Determines whether the task had an exception.
-	 * @return true if the task had an exception, false otherwise.
-	 */
-	public boolean hasError()
-	{
-		return error;
-	}
+  /**
+   * Determines whether the task had an exception.
+   * @return true if the task had an exception, false otherwise.
+   */
+  public boolean hasError()
+  {
+    return error;
+  }
 
-	/**
-	 * Get the timestamp for the creation of this event.
-	 * @return the timestamp as a long value.
-	 */
-	public long getTimestamp()
-	{
-		return timestamp;
-	}
+  /**
+   * Get the timestamp for the creation of this event.
+   * @return the timestamp as a long value.
+   */
+  public long getTimestamp()
+  {
+    return timestamp;
+  }
 }

@@ -23,69 +23,69 @@ package org.jppf.client;
  */
 public abstract class AbstractJobSubmission implements JobSubmission
 {
-	/**
-	 * The job to execute.
-	 */
-	protected JPPFJob job;
-	/**
-	 * Flag indicating whether the job will be executed locally, at least partially.
-	 */
-	protected boolean locallyExecuting = false;
-	/**
-	 * The connection to execute the job on.
-	 */
-	protected AbstractJPPFClientConnection connection;
-	/**
-	 * The submission manager.
-	 */
-	protected SubmissionManager submissionManager;
+  /**
+   * The job to execute.
+   */
+  protected JPPFJob job;
+  /**
+   * Flag indicating whether the job will be executed locally, at least partially.
+   */
+  protected boolean locallyExecuting = false;
+  /**
+   * The connection to execute the job on.
+   */
+  protected AbstractJPPFClientConnection connection;
+  /**
+   * The submission manager.
+   */
+  protected SubmissionManager submissionManager;
 
-	/**
-	 * Initialize this job submission.
-	 * @param job the submitted job.
-	 * @param connection the connection to execute the job on.
-	 * @param locallyExecuting determines whether the job will be executed locally, at least partially.
-	 */
-	protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting)
-	{
-		this.job = job;
-		this.connection = connection;
-		this.locallyExecuting = locallyExecuting;
-	}
+  /**
+   * Initialize this job submission.
+   * @param job the submitted job.
+   * @param connection the connection to execute the job on.
+   * @param locallyExecuting determines whether the job will be executed locally, at least partially.
+   */
+  protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting)
+  {
+    this.job = job;
+    this.connection = connection;
+    this.locallyExecuting = locallyExecuting;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId()
-	{
-		return job.getJobUuid();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getId()
+  {
+    return job.getJobUuid();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public AbstractJPPFClientConnection getConnection()
-	{
-		return connection;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public AbstractJPPFClientConnection getConnection()
+  {
+    return connection;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isLocallyExecuting()
-	{
-		return locallyExecuting;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isLocallyExecuting()
+  {
+    return locallyExecuting;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JPPFJob getJob()
-	{
-		return job;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFJob getJob()
+  {
+    return job;
+  }
 }

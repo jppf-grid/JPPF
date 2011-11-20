@@ -26,112 +26,112 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractBundler implements Bundler
 {
-	/**
-	 * Count of the bundlers used to generate a readable unique id.
-	 */
-	private static AtomicInteger bundlerCount = new AtomicInteger(0);
-	/**
-	 * The bundler number for this bundler.
-	 */
-	protected int bundlerNumber = incBundlerCount();
-	/**
-	 * The creation timestamp for this bundler.
-	 */
-	protected long timestamp = System.currentTimeMillis();
-	/**
-	 * Parameters of the algorithm, grouped as a performance analysis profile.
-	 */
-	protected LoadBalancingProfile profile;
+  /**
+   * Count of the bundlers used to generate a readable unique id.
+   */
+  private static AtomicInteger bundlerCount = new AtomicInteger(0);
+  /**
+   * The bundler number for this bundler.
+   */
+  protected int bundlerNumber = incBundlerCount();
+  /**
+   * The creation timestamp for this bundler.
+   */
+  protected long timestamp = System.currentTimeMillis();
+  /**
+   * Parameters of the algorithm, grouped as a performance analysis profile.
+   */
+  protected LoadBalancingProfile profile;
 
-	/**
-	 * Default constructor.
-	 */
-	private AbstractBundler()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  private AbstractBundler()
+  {
+  }
 
-	/**
-	 * Creates a new instance with the specified parameters profile.
-	 * @param profile the parameters of the load-balancing algorithm,
-	 */
-	public AbstractBundler(final LoadBalancingProfile profile)
-	{
-		this.profile = profile;
-	}
+  /**
+   * Creates a new instance with the specified parameters profile.
+   * @param profile the parameters of the load-balancing algorithm,
+   */
+  public AbstractBundler(final LoadBalancingProfile profile)
+  {
+    this.profile = profile;
+  }
 
-	/**
-	 * Increment the bundlers count by one.
-	 * @return the new count as an int value.
-	 */
-	private static int incBundlerCount()
-	{
-		return bundlerCount.incrementAndGet();
-	}
+  /**
+   * Increment the bundlers count by one.
+   * @return the new count as an int value.
+   */
+  private static int incBundlerCount()
+  {
+    return bundlerCount.incrementAndGet();
+  }
 
-	/**
-	 * Get the max bundle size that can be used for this bundler.
-	 * @return the bundle size as an int.
-	 */
-	protected abstract int maxSize();
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   */
+  protected abstract int maxSize();
 
-	/**
-	 * This method does nothing and should be overridden in subclasses.
-	 * @param bundleSize not used.
-	 * @param totalTime not used.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
-	 */
-	@Override
-	public void feedback(final int bundleSize, final double totalTime)
-	{
-	}
+  /**
+   * This method does nothing and should be overridden in subclasses.
+   * @param bundleSize not used.
+   * @param totalTime not used.
+   * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
+   */
+  @Override
+  public void feedback(final int bundleSize, final double totalTime)
+  {
+  }
 
-	/**
-	 * Get the timestamp at which this bundler was created.
-	 * This is used to enable node channels to know when the bundler settings have changed.
-	 * @return the timestamp as a long value.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
-	 */
-	@Override
-	public long getTimestamp()
-	{
-		return timestamp;
-	}
+  /**
+   * Get the timestamp at which this bundler was created.
+   * This is used to enable node channels to know when the bundler settings have changed.
+   * @return the timestamp as a long value.
+   * @see org.jppf.server.scheduler.bundle.Bundler#getTimestamp()
+   */
+  @Override
+  public long getTimestamp()
+  {
+    return timestamp;
+  }
 
-	/**
-	 * Get the bundler number for this bundler.
-	 * @return the bundler number as an int.
-	 */
-	public int getBundlerNumber()
-	{
-		return bundlerNumber;
-	}
+  /**
+   * Get the bundler number for this bundler.
+   * @return the bundler number as an int.
+   */
+  public int getBundlerNumber()
+  {
+    return bundlerNumber;
+  }
 
-	/**
-	 * Perform context-independent initializations.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#setup()
-	 */
-	@Override
-	public void setup()
-	{
-	}
+  /**
+   * Perform context-independent initializations.
+   * @see org.jppf.server.scheduler.bundle.Bundler#setup()
+   */
+  @Override
+  public void setup()
+  {
+  }
 
-	/**
-	 * Release the resources used by this bundler.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-	}
+  /**
+   * Release the resources used by this bundler.
+   * @see org.jppf.server.scheduler.bundle.Bundler#dispose()
+   */
+  @Override
+  public void dispose()
+  {
+  }
 
-	/**
-	 * Get the parameters of the algorithm, grouped as a performance analysis profile.
-	 * @return an instance of <code>LoadBalancingProfile</code>.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#getProfile()
-	 */
-	@Override
-	public LoadBalancingProfile getProfile()
-	{
-		return profile;
-	}
+  /**
+   * Get the parameters of the algorithm, grouped as a performance analysis profile.
+   * @return an instance of <code>LoadBalancingProfile</code>.
+   * @see org.jppf.server.scheduler.bundle.Bundler#getProfile()
+   */
+  @Override
+  public LoadBalancingProfile getProfile()
+  {
+    return profile;
+  }
 }

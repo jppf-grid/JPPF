@@ -26,50 +26,50 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class OptimizedJobTask extends JPPFTask
 {
-	/**
-	 * The time this task will sleep.
-	 */
-	private long time = 0;
+  /**
+   * The time this task will sleep.
+   */
+  private long time = 0;
 
-	/**
-	 * The task id.
-	 */
-	private int id = 0;
+  /**
+   * The task id.
+   */
+  private int id = 0;
 
-	/**
-	 * Initialize this task with a byte array of the specified size.
-	 * The array is created at construction time and passed on to the node.
-	 * @param time .
-	 * @param id .
-	 */
-	public OptimizedJobTask(final long time, final int id)
-	{
-		this.time = time;
-		this.id = id;
-	}
+  /**
+   * Initialize this task with a byte array of the specified size.
+   * The array is created at construction time and passed on to the node.
+   * @param time .
+   * @param id .
+   */
+  public OptimizedJobTask(final long time, final int id)
+  {
+    this.time = time;
+    this.id = id;
+  }
 
-	/**
-	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		String s = null;
-		try
-		{
-			if (time > 0L) Thread.sleep(time);
-			s = "task #" + id + " execution successful";
-		}
-		catch(Exception e)
-		{
-			setException(e);
-			s = "task #" + id + " " + e.getMessage();
-			e.printStackTrace();
-		}
-		setResult(s);
-		System.out.println(s);
-		//System.out.print(StringUtils.padRight(result, ' ', 250));
-	}
+  /**
+   * Perform the multiplication of a matrix row by another matrix.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    String s = null;
+    try
+    {
+      if (time > 0L) Thread.sleep(time);
+      s = "task #" + id + " execution successful";
+    }
+    catch(Exception e)
+    {
+      setException(e);
+      s = "task #" + id + " " + e.getMessage();
+      e.printStackTrace();
+    }
+    setResult(s);
+    System.out.println(s);
+    //System.out.print(StringUtils.padRight(result, ' ', 250));
+  }
 }
 

@@ -29,37 +29,37 @@ import org.jppf.client.SubmissionStatus;
  */
 public class SubmissionStatusEvent extends EventObject
 {
-	/**
-	 * The status of the submission.
-	 */
-	private SubmissionStatus status = null;
+  /**
+   * The status of the submission.
+   */
+  private SubmissionStatus status = null;
 
-	/**
-	 * Initialize this event with the specified submission id and status.
-	 * @param submissionId the id of the submission whose status has changed.
-	 * @param status the new status of the submission.
-	 */
-	public SubmissionStatusEvent(final String submissionId, final SubmissionStatus status)
-	{
-		super(submissionId);
-		this.status = status;
-	}
+  /**
+   * Initialize this event with the specified submission id and status.
+   * @param submissionId the id of the submission whose status has changed.
+   * @param status the new status of the submission.
+   */
+  public SubmissionStatusEvent(final String submissionId, final SubmissionStatus status)
+  {
+    super(submissionId);
+    this.status = status;
+  }
 
-	/**
-	 * The status of the submission.
-	 * @return a <code>SubmissionStatus</code> typesafe enum value.
-	 */
-	public SubmissionStatus getStatus()
-	{
-		return status;
-	}
+  /**
+   * The status of the submission.
+   * @return a <code>SubmissionStatus</code> typesafe enum value.
+   */
+  public SubmissionStatus getStatus()
+  {
+    return status;
+  }
 
-	/**
-	 * Get the id of the submission.
-	 * @return the submission id as a string.
-	 */
-	public String getSubmissionId()
-	{
-		return (String) getSource();
-	}
+  /**
+   * Get the id of the submission.
+   * @return the submission id as a string.
+   */
+  public String getSubmissionId()
+  {
+    return (String) getSource();
+  }
 }

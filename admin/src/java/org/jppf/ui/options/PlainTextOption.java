@@ -25,74 +25,74 @@ import javax.swing.JTextField;
  */
 public class PlainTextOption extends TextOption
 {
-	/**
-	 * Number of columns (characters) displayed in the text field.
-	 */
-	private int columns = 16;
+  /**
+   * Number of columns (characters) displayed in the text field.
+   */
+  private int columns = 16;
 
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public PlainTextOption()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public PlainTextOption()
+  {
+  }
 
-	/**
-	 * Initialize this text option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox.
-	 * @param tooltip the tooltip associated with the checkbox.
-	 * @param value the initial value of this component.
-	 */
-	public PlainTextOption(final String name, final String label, final String tooltip, final String value)
-	{
-		super(name, label, tooltip, value);
-		createUI();
-	}
+  /**
+   * Initialize this text option with the specified parameters.
+   * @param name this component's name.
+   * @param label the label displayed with the checkbox.
+   * @param tooltip the tooltip associated with the checkbox.
+   * @param value the initial value of this component.
+   */
+  public PlainTextOption(final String name, final String label, final String tooltip, final String value)
+  {
+    super(name, label, tooltip, value);
+    createUI();
+  }
 
-	/**
-	 * Create the text field that holds the value of this option.
-	 * @return a JTextField instance.
-	 * @see org.jppf.ui.options.TextOption#createField()
-	 */
-	@Override
-	protected JTextField createField()
-	{
-		return new JTextField((String) value);
-	}
+  /**
+   * Create the text field that holds the value of this option.
+   * @return a JTextField instance.
+   * @see org.jppf.ui.options.TextOption#createField()
+   */
+  @Override
+  protected JTextField createField()
+  {
+    return new JTextField((String) value);
+  }
 
-	/**
-	 * Set the value of this option.
-	 * @param value the value as an <code>Object</code> instance.
-	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
-	 */
-	@Override
-	public void setValue(final Object value)
-	{
-		this.value = value;
-		if ((value != null) && (field != null)) field.setText(value.toString());
-	}
+  /**
+   * Set the value of this option.
+   * @param value the value as an <code>Object</code> instance.
+   * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+   */
+  @Override
+  public void setValue(final Object value)
+  {
+    this.value = value;
+    if ((value != null) && (field != null)) field.setText(value.toString());
+  }
 
-	/**
-	 * Get the number of columns displayed in the text field.
-	 * @return the number of columns as an int.
-	 */
-	public int getColumns()
-	{
-		return columns;
-	}
+  /**
+   * Get the number of columns displayed in the text field.
+   * @return the number of columns as an int.
+   */
+  public int getColumns()
+  {
+    return columns;
+  }
 
-	/**
-	 * Set the number of columns displayed in the text field.
-	 * @param columns the number of columns as an int.
-	 */
-	public void setColumns(final int columns)
-	{
-		this.columns = columns;
-		if (field != null)
-		{
-			field.setColumns(columns);
-		}
-	}
+  /**
+   * Set the number of columns displayed in the text field.
+   * @param columns the number of columns as an int.
+   */
+  public void setColumns(final int columns)
+  {
+    this.columns = columns;
+    if (field != null)
+    {
+      field.setColumns(columns);
+    }
+  }
 }

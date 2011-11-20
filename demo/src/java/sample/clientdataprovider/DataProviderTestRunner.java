@@ -29,51 +29,51 @@ import org.jppf.task.storage.ClientDataProvider;
  */
 public class DataProviderTestRunner
 {
-	/**
-	 * Entry point for this class, performs a matrix multiplication a number of times.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		JPPFClient jppfClient = new JPPFClient();
-		try
-		{
-			int nbJobs = 5;
-			int nbTasks = 1;
-			JPPFJob[] jobs = new JPPFJob[nbJobs];
-			for (int i=0; i<nbJobs; i++)
-			{
-				jobs[i] = new JPPFJob();
-				for (int j=1; j<=nbTasks; j++) jobs[i].addTask(new DataProviderTestTask(i+1, j));
-				jobs[i].setDataProvider(new ClientDataProvider());
-				jobs[i].setName("job " + (i+1));
-				jobs[i].setBlocking(false);
-				jobs[i].setResultListener(new JPPFResultCollector(jobs[i]));
-			}
-			for (int i=0; i<nbJobs; i++)
-			{
-				jppfClient.submit(jobs[i]);
-			}
-			for (int i=0; i<nbJobs; i++)
-			{
-				JPPFResultCollector collector = (JPPFResultCollector) jobs[i].getResultListener();
-				List<JPPFTask> results = collector.waitForResults();
-				for (JPPFTask task: results)
-				{
-					DataProviderTestTask t = (DataProviderTestTask) task;
-					if (t.getException() != null) throw t.getException();
-					else System.out.println("job #" + t.i +" task #" + t.j + " : result: " + t.getResult());
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			jppfClient.close();
-		}
-		System.exit(0);
-	}
+  /**
+   * Entry point for this class, performs a matrix multiplication a number of times.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    JPPFClient jppfClient = new JPPFClient();
+    try
+    {
+      int nbJobs = 5;
+      int nbTasks = 1;
+      JPPFJob[] jobs = new JPPFJob[nbJobs];
+      for (int i=0; i<nbJobs; i++)
+      {
+        jobs[i] = new JPPFJob();
+        for (int j=1; j<=nbTasks; j++) jobs[i].addTask(new DataProviderTestTask(i+1, j));
+        jobs[i].setDataProvider(new ClientDataProvider());
+        jobs[i].setName("job " + (i+1));
+        jobs[i].setBlocking(false);
+        jobs[i].setResultListener(new JPPFResultCollector(jobs[i]));
+      }
+      for (int i=0; i<nbJobs; i++)
+      {
+        jppfClient.submit(jobs[i]);
+      }
+      for (int i=0; i<nbJobs; i++)
+      {
+        JPPFResultCollector collector = (JPPFResultCollector) jobs[i].getResultListener();
+        List<JPPFTask> results = collector.waitForResults();
+        for (JPPFTask task: results)
+        {
+          DataProviderTestTask t = (DataProviderTestTask) task;
+          if (t.getException() != null) throw t.getException();
+          else System.out.println("job #" + t.i +" task #" + t.j + " : result: " + t.getResult());
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      jppfClient.close();
+    }
+    System.exit(0);
+  }
 }

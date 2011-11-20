@@ -28,69 +28,69 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class XstreamTask extends JPPFTask
 {
-	/**
-	 * Person object to serialize with xstream. Note that it must be declared as transient.
-	 */
-	private transient Person person = null;
-	/**
-	 * Xml representation of the Person object to deserialize with xstream.
-	 */
-	private String personXml = null;
+  /**
+   * Person object to serialize with xstream. Note that it must be declared as transient.
+   */
+  private transient Person person = null;
+  /**
+   * Xml representation of the Person object to deserialize with xstream.
+   */
+  private String personXml = null;
 
-	/**
-	 * Initialize this task with the specified person.
-	 * @param person a <code>Person</code> instance.
-	 */
-	public XstreamTask(final Person person)
-	{
-		try
-		{
-			this.person = person;
-			Object xstream = instantiateXStream();
-			Method m = xstream.getClass().getDeclaredMethod("toXML", Object.class);
-			this.personXml = (String) m.invoke(xstream, person);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Initialize this task with the specified person.
+   * @param person a <code>Person</code> instance.
+   */
+  public XstreamTask(final Person person)
+  {
+    try
+    {
+      this.person = person;
+      Object xstream = instantiateXStream();
+      Method m = xstream.getClass().getDeclaredMethod("toXML", Object.class);
+      this.personXml = (String) m.invoke(xstream, person);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * Run this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			Object xstream = instantiateXStream();
-			Method m = xstream.getClass().getDeclaredMethod("fromXML", String.class);
-			this.person = (Person) m.invoke(xstream, personXml);
-			String s = this.person.toString();
-			System.out.println("deserialized this person: " + s);
-			setResult(s);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Run this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      Object xstream = instantiateXStream();
+      Method m = xstream.getClass().getDeclaredMethod("fromXML", String.class);
+      this.person = (Person) m.invoke(xstream, personXml);
+      String s = this.person.toString();
+      System.out.println("deserialized this person: " + s);
+      setResult(s);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * Instantiates an <code>XStream</code> instance through reflection.
-	 * This avoids compile errors if the XStream jars are not in the classpath.
-	 * @return an XStream object.
-	 * @throws Exception if an instantiation error occurs or the required classes are not in the classpath.
-	 */
-	private Object instantiateXStream() throws Exception
-	{
-		Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
-		Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
-		Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
-		Class<?> domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
-		Object driver = domDriverClass.newInstance();
-		return c.newInstance(driver);
-	}
+  /**
+   * Instantiates an <code>XStream</code> instance through reflection.
+   * This avoids compile errors if the XStream jars are not in the classpath.
+   * @return an XStream object.
+   * @throws Exception if an instantiation error occurs or the required classes are not in the classpath.
+   */
+  private Object instantiateXStream() throws Exception
+  {
+    Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+    Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+    Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+    Class<?> domDriverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver");
+    Object driver = domDriverClass.newInstance();
+    return c.newInstance(driver);
+  }
 }

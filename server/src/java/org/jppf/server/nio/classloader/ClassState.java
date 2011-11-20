@@ -23,40 +23,40 @@ package org.jppf.server.nio.classloader;
  */
 public enum ClassState
 {
-	/**
-	 * State of determining the type of a channel.
-	 */
-	DEFINING_TYPE,
-	/**
-	 * State of sending the initial information to a client.
-	 */
-	SENDING_INITIAL_PROVIDER_RESPONSE,
-	/**
-	 * State of sending the initial information to a node classloader.
-	 */
-	SENDING_INITIAL_NODE_RESPONSE,
-	/**
-	 * State of waiting for a request from a node classloader.
-	 */
-	WAITING_NODE_REQUEST,
-	/**
-	 * State of waiting for a response to a node classloader.
-	 */
-	SENDING_NODE_RESPONSE,
-	/**
-	 * State of waiting for a response form a resource provider.
-	 */
-	WAITING_PROVIDER_RESPONSE,
-	/**
-	 * State of waiting for a response from a resource provider.
-	 */
-	SENDING_PROVIDER_REQUEST,
-	/**
-	 * State of doing nothing for a resource provider.
-	 */
-	IDLE_PROVIDER,
-	/**
-	 * State of doing nothing for a resource provider.
-	 */
-	IDLE_NODE
+  /**
+   * State of determining the type of a channel.
+   */
+  DEFINING_TYPE,
+  /**
+   * State of sending the initial information to a client.
+   */
+  SENDING_INITIAL_PROVIDER_RESPONSE,
+  /**
+   * State of sending the initial information to a node classloader.
+   */
+  SENDING_INITIAL_NODE_RESPONSE,
+  /**
+   * State of waiting for a request from a node classloader.
+   */
+  WAITING_NODE_REQUEST,
+  /**
+   * State of waiting for a response to a node classloader.
+   */
+  SENDING_NODE_RESPONSE,
+  /**
+   * State of waiting for a response form a resource provider.
+   */
+  WAITING_PROVIDER_RESPONSE,
+  /**
+   * State of waiting for a response from a resource provider.
+   */
+  SENDING_PROVIDER_REQUEST,
+  /**
+   * State of doing nothing for a resource provider.
+   */
+  IDLE_PROVIDER,
+  /**
+   * State of doing nothing for a resource provider.
+   */
+  IDLE_NODE
 }

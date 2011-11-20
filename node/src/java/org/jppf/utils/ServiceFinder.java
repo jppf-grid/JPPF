@@ -32,154 +32,154 @@ import org.slf4j.*;
  */
 public class ServiceFinder
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ServiceFinder.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ServiceFinder.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
-	 * @param <T> The type of provider implementations to find.
-	 * @param providerClass the provider class.
-	 * @param cl the class loader to user for the lookup.
-	 * @return a list of concrete providers of the specified type.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl)
-	{
-		if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
-		if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
-		List<T> list = new ArrayList<T>();
-		String name = providerClass.getName();
-		List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
-		for (String s: lines)
-		{
-			try
-			{
-				Class<?> clazz = null;
-				if (cl instanceof AbstractJPPFClassLoader)
-				{
-					try
-					{
-						clazz = ((AbstractJPPFClassLoader) cl).loadJPPFClass(s);
-					}
-					catch(Exception e)
-					{
-						if (debugEnabled) log.debug(e.getMessage(), e);
-					}
-				}
-				if (clazz == null) clazz = cl.loadClass(s);
-				T t = (T) clazz.newInstance();
-				list.add(t);
-			}
-			catch(Exception e)
-			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-			}
-		}
-		return list;
-	}
+  /**
+   * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @param cl the class loader to user for the lookup.
+   * @return a list of concrete providers of the specified type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl)
+  {
+    if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
+    if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
+    List<T> list = new ArrayList<T>();
+    String name = providerClass.getName();
+    List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
+    for (String s: lines)
+    {
+      try
+      {
+        Class<?> clazz = null;
+        if (cl instanceof AbstractJPPFClassLoader)
+        {
+          try
+          {
+            clazz = ((AbstractJPPFClassLoader) cl).loadJPPFClass(s);
+          }
+          catch(Exception e)
+          {
+            if (debugEnabled) log.debug(e.getMessage(), e);
+          }
+        }
+        if (clazz == null) clazz = cl.loadClass(s);
+        T t = (T) clazz.newInstance();
+        list.add(t);
+      }
+      catch(Exception e)
+      {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+      }
+    }
+    return list;
+  }
 
-	/**
-	 * Find all providers implementing or extending the specified provider interface or class, using the context class loader.
-	 * @param <T> The type of provider implementations to find.
-	 * @param providerClass the provider class.
-	 * @return a list of concrete providers of the specified type.
-	 */
-	public <T> List<T> findProviders(final Class<T> providerClass)
-	{
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		if (cl == null) cl = getClass().getClassLoader();
-		return findProviders(providerClass, cl);
-	}
+  /**
+   * Find all providers implementing or extending the specified provider interface or class, using the context class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @return a list of concrete providers of the specified type.
+   */
+  public <T> List<T> findProviders(final Class<T> providerClass)
+  {
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    if (cl == null) cl = getClass().getClassLoader();
+    return findProviders(providerClass, cl);
+  }
 
-	/**
-	 * Get a list of resources with the specified path found in the classpath.
-	 * @param path the path of the resources to find.
-	 * @param cl the class loader to user for the lookup.
-	 * @return a list of URLs.
-	 */
-	private List<URL> resourcesList(final String path, final ClassLoader cl)
-	{
-		List<URL> urls = new ArrayList<URL>();
-		try
-		{
-			Enumeration<URL> enu = cl.getResources(path);
-			while (enu.hasMoreElements()) urls.add(enu.nextElement());
-		}
-		catch(IOException e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e.getMessage());
-		}
-		return urls;
-	}
+  /**
+   * Get a list of resources with the specified path found in the classpath.
+   * @param path the path of the resources to find.
+   * @param cl the class loader to user for the lookup.
+   * @return a list of URLs.
+   */
+  private List<URL> resourcesList(final String path, final ClassLoader cl)
+  {
+    List<URL> urls = new ArrayList<URL>();
+    try
+    {
+      Enumeration<URL> enu = cl.getResources(path);
+      while (enu.hasMoreElements()) urls.add(enu.nextElement());
+    }
+    catch(IOException e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(e.getMessage());
+    }
+    return urls;
+  }
 
-	/**
-	 * Find all service definitions in the classpath, that match the specified path.
-	 * @param path the path to the definition files to find.
-	 * @param cl the class loader to use for classpath lookup.
-	 * @return the definitions found as a list of strings.
-	 */
-	public List<String> findServiceDefinitions(final String path, final ClassLoader cl)
-	{
-		List<String> lines = new ArrayList<String>();
-		try
-		{
-			List<URL> urls = resourcesList(path, cl);
-			for (URL url: urls)
-			{
-				InputStream is = url.openStream();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-				try
-				{
-					List<String> fileLines = FileUtils.textFileAsLines(reader);
-					for (String s: fileLines)
-					{
-						int idx = s.indexOf('#');
-						if (idx > 0) s = s.substring(0, idx);
-						s = s.trim();
-						if (!s.startsWith("#")) lines.add(s);
-					}
-				}
-				finally
-				{
-					reader.close();
-				}
-			}
-		}
-		catch(IOException e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e.getMessage());
-		}
-		return lines;
-	}
+  /**
+   * Find all service definitions in the classpath, that match the specified path.
+   * @param path the path to the definition files to find.
+   * @param cl the class loader to use for classpath lookup.
+   * @return the definitions found as a list of strings.
+   */
+  public List<String> findServiceDefinitions(final String path, final ClassLoader cl)
+  {
+    List<String> lines = new ArrayList<String>();
+    try
+    {
+      List<URL> urls = resourcesList(path, cl);
+      for (URL url: urls)
+      {
+        InputStream is = url.openStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        try
+        {
+          List<String> fileLines = FileUtils.textFileAsLines(reader);
+          for (String s: fileLines)
+          {
+            int idx = s.indexOf('#');
+            if (idx > 0) s = s.substring(0, idx);
+            s = s.trim();
+            if (!s.startsWith("#")) lines.add(s);
+          }
+        }
+        finally
+        {
+          reader.close();
+        }
+      }
+    }
+    catch(IOException e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(e.getMessage());
+    }
+    return lines;
+  }
 
-	/**
-	 * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
-	 * @param <T> The type of provider implementations to find.
-	 * @param providerClass the provider class.
-	 * @param cl the class loader to user for the lookup.
-	 * @return an iterator over concrete providers of the specified type.
-	 */
-	public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl)
-	{
-		return new ServiceFinder().findProviders(providerClass, cl).iterator();
-	}
+  /**
+   * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @param cl the class loader to user for the lookup.
+   * @return an iterator over concrete providers of the specified type.
+   */
+  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl)
+  {
+    return new ServiceFinder().findProviders(providerClass, cl).iterator();
+  }
 
-	/**
-	 * Find all providers implementing or extending the specified provider interface or class, using the context class loader.
-	 * @param <T> The type of provider implementations to find.
-	 * @param providerClass the provider class.
-	 * @return an iterator over concrete providers of the specified type.
-	 */
-	public static <T> Iterator<T> lookupProviders(final Class<T> providerClass)
-	{
-		return new ServiceFinder().findProviders(providerClass).iterator();
-	}
+  /**
+   * Find all providers implementing or extending the specified provider interface or class, using the context class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @return an iterator over concrete providers of the specified type.
+   */
+  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass)
+  {
+    return new ServiceFinder().findProviders(providerClass).iterator();
+  }
 }

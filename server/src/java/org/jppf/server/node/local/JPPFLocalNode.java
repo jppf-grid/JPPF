@@ -28,59 +28,59 @@ import org.jppf.server.node.JPPFNode;
  */
 public class JPPFLocalNode extends JPPFNode
 {
-	/**
-	 * The I/O handler for this node.
-	 */
-	private LocalNodeChannel channel = null;
-	/**
-	 * The I/O handler for the class loader.
-	 */
-	private LocalClassLoaderChannel classLoaderHandler = null;
+  /**
+   * The I/O handler for this node.
+   */
+  private LocalNodeChannel channel = null;
+  /**
+   * The I/O handler for the class loader.
+   */
+  private LocalClassLoaderChannel classLoaderHandler = null;
 
-	/**
-	 * Initialize this local node with the specified I/O handler.
-	 * @param channel the I/O handler for this node.
-	 * @param classLoaderHandler the I/O handler for the class loader.
-	 */
-	public JPPFLocalNode(final LocalNodeChannel channel, final LocalClassLoaderChannel classLoaderHandler)
-	{
-		this.channel = channel;
-		this.classLoaderHandler = classLoaderHandler;
-		classLoaderManager = new LocalClassLoaderManager(this);
-	}
+  /**
+   * Initialize this local node with the specified I/O handler.
+   * @param channel the I/O handler for this node.
+   * @param classLoaderHandler the I/O handler for the class loader.
+   */
+  public JPPFLocalNode(final LocalNodeChannel channel, final LocalClassLoaderChannel classLoaderHandler)
+  {
+    this.channel = channel;
+    this.classLoaderHandler = classLoaderHandler;
+    classLoaderManager = new LocalClassLoaderManager(this);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void initDataChannel() throws Exception
-	{
-		nodeIO = new LocalNodeIO(this);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void initDataChannel() throws Exception
+  {
+    nodeIO = new LocalNodeIO(this);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void closeDataChannel() throws Exception
-	{
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void closeDataChannel() throws Exception
+  {
+  }
 
-	/**
-	 * Get the I/O handler for this node.
-	 * @return a {@link LocalNodeChannel} instance.
-	 */
-	LocalNodeChannel getChannel()
-	{
-		return channel;
-	}
+  /**
+   * Get the I/O handler for this node.
+   * @return a {@link LocalNodeChannel} instance.
+   */
+  LocalNodeChannel getChannel()
+  {
+    return channel;
+  }
 
-	/**
-	 * Get the I/O handler for the class loader.
-	 * @return a {@link LocalClassLoaderChannel} instance.
-	 */
-	LocalClassLoaderChannel getClassLoaderHandler()
-	{
-		return classLoaderHandler;
-	}
+  /**
+   * Get the I/O handler for the class loader.
+   * @return a {@link LocalClassLoaderChannel} instance.
+   */
+  LocalClassLoaderChannel getClassLoaderHandler()
+  {
+    return classLoaderHandler;
+  }
 }

@@ -27,41 +27,41 @@ import java.io.File;
  */
 public class TemporaryFileHolder
 {
-	/**
-	 * The file handled by this file holder.
-	 */
-	private File file = null;
+  /**
+   * The file handled by this file holder.
+   */
+  private File file = null;
 
-	/**
-	 * Initialize this file holder with the specified file.
-	 * @param file the temporary file to handle.
-	 */
-	public TemporaryFileHolder(final File file)
-	{
-		this.file = file;
-	}
+  /**
+   * Initialize this file holder with the specified file.
+   * @param file the temporary file to handle.
+   */
+  public TemporaryFileHolder(final File file)
+  {
+    this.file = file;
+  }
 
-	/**
-	 * This method deletes the underlying file.
-	 * @throws Throwable if an error occurs.
-	 * @see java.lang.Object#finalize()
-	 */
-	@Override
-	protected void finalize() throws Throwable
-	{
-		try {
-			if ((file != null) && file.exists()) file.delete();
-		} finally {
-			super.finalize();
-		}
-	}
+  /**
+   * This method deletes the underlying file.
+   * @throws Throwable if an error occurs.
+   * @see java.lang.Object#finalize()
+   */
+  @Override
+  protected void finalize() throws Throwable
+  {
+    try {
+      if ((file != null) && file.exists()) file.delete();
+    } finally {
+      super.finalize();
+    }
+  }
 
-	/**
-	 * Get the underlying file.
-	 * @return a {@link File} instance.
-	 */
-	public File getFile()
-	{
-		return file;
-	}
+  /**
+   * Get the underlying file.
+   * @return a {@link File} instance.
+   */
+  public File getFile()
+  {
+    return file;
+  }
 }

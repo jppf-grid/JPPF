@@ -23,28 +23,28 @@ import org.jppf.server.protocol.JPPFTask;
 public class ClassLoadingTask extends JPPFTask
 {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			/*
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      /*
       AbstractJPPFClassLoader jppfClassLoader = (AbstractJPPFClassLoader) getClass().getClassLoader();
       System.out.println("jppfClassLoader = " + jppfClassLoader);
       Class c = jppfClassLoader.loadClass("com.hazelcast.core.Hazelcast");
-			 */
-			Class c = Class.forName("com.hazelcast.core.Hazelcast");
-			String s = "loaded " + c + ", classloader = " + c.getClassLoader() + ", task class loader = " + getClass().getClassLoader();
-			System.out.println(s);
-			setResult(s);
-		}
-		catch (Exception e)
-		{
-			setException(e);
-		}
-	}
+       */
+      Class c = Class.forName("com.hazelcast.core.Hazelcast");
+      String s = "loaded " + c + ", classloader = " + c.getClassLoader() + ", task class loader = " + getClass().getClassLoader();
+      System.out.println(s);
+      setResult(s);
+    }
+    catch (Exception e)
+    {
+      setException(e);
+    }
+  }
 
 }

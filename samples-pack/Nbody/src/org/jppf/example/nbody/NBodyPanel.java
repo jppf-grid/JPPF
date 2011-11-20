@@ -53,146 +53,146 @@ import org.jppf.utils.JPPFThreadFactory;
  */
 public class NBodyPanel extends JPanel
 {
-	/**
-	 * Foreground color for this panel.
-	 */
-	private static final Color FOREGROUND = Color.red;
-	/**
-	 * Background color for this panel.
-	 */
-	private static final Color BACKGROUND = Color.white;
-	/**
-	 * Thread pool used to generate paint requests.
-	 */
-	private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("PanelUpdater"));
-	/**
-	 * Used to synchronize access to the current positions array.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
-	/**
-	 * The positions currently displayed.
-	 */
-	private Vector2d[] positions = null;
-	/**
-	 * The new positions to display.
-	 */
-	private Vector2d[] newPositions = null;
-	/**
-	 * determines whether the display is being updated.
-	 */
-	private AtomicBoolean updating = new AtomicBoolean(false);
+  /**
+   * Foreground color for this panel.
+   */
+  private static final Color FOREGROUND = Color.red;
+  /**
+   * Background color for this panel.
+   */
+  private static final Color BACKGROUND = Color.white;
+  /**
+   * Thread pool used to generate paint requests.
+   */
+  private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("PanelUpdater"));
+  /**
+   * Used to synchronize access to the current positions array.
+   */
+  private ReentrantLock lock = new ReentrantLock();
+  /**
+   * The positions currently displayed.
+   */
+  private Vector2d[] positions = null;
+  /**
+   * The new positions to display.
+   */
+  private Vector2d[] newPositions = null;
+  /**
+   * determines whether the display is being updated.
+   */
+  private AtomicBoolean updating = new AtomicBoolean(false);
 
-	/**
-	 * Default constructor.
-	 */
-	public NBodyPanel()
-	{
-		setOpaque(true);
-		setBackground(BACKGROUND);
-	}
+  /**
+   * Default constructor.
+   */
+  public NBodyPanel()
+  {
+    setOpaque(true);
+    setBackground(BACKGROUND);
+  }
 
-	/**
-	 * Repaint this panel.
-	 * @param g the graphics object associated with this panel.
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
-	@Override
-	protected void paintComponent(final Graphics g)
-	{
-		//lock.lock();
-		try
-		{
-			updating.set(true);
-			super.paintComponent(g);
-			if (positions != null) drawBodies(g, positions, BACKGROUND);
-			if (newPositions != null)
-			{
-				positions = newPositions;
-				newPositions = null;
-			}
-			if (positions != null) drawBodies(g, positions, FOREGROUND);
-		}
-		catch(Throwable e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			updating.set(false);
-			//lock.unlock();
-		}
-	}
+  /**
+   * Repaint this panel.
+   * @param g the graphics object associated with this panel.
+   * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+   */
+  @Override
+  protected void paintComponent(final Graphics g)
+  {
+    //lock.lock();
+    try
+    {
+      updating.set(true);
+      super.paintComponent(g);
+      if (positions != null) drawBodies(g, positions, BACKGROUND);
+      if (newPositions != null)
+      {
+        positions = newPositions;
+        newPositions = null;
+      }
+      if (positions != null) drawBodies(g, positions, FOREGROUND);
+    }
+    catch(Throwable e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      updating.set(false);
+      //lock.unlock();
+    }
+  }
 
-	/**
-	 * Draw all the bodies in the specified color.
-	 * @param g the graphics for this panel.
-	 * @param pos the positions of the bodies to draw.
-	 * @param c the color in which to draw the bodies.
-	 */
-	protected void drawBodies(final Graphics g, final Vector2d[] pos, final Color c)
-	{
-		Color tmp = g.getColor();
-		Graphics2D g2 = (Graphics2D) g;
-		g.setColor(c);
-		for (Vector2d v: pos) g2.fillRect((int) v.x, (int) v.y, 3, 3);
-		//for (Vector2d v: pos) g2.fillOval((int) v.x, (int) v.y, 3, 3);
-		g.setColor(tmp);
-	}
+  /**
+   * Draw all the bodies in the specified color.
+   * @param g the graphics for this panel.
+   * @param pos the positions of the bodies to draw.
+   * @param c the color in which to draw the bodies.
+   */
+  protected void drawBodies(final Graphics g, final Vector2d[] pos, final Color c)
+  {
+    Color tmp = g.getColor();
+    Graphics2D g2 = (Graphics2D) g;
+    g.setColor(c);
+    for (Vector2d v: pos) g2.fillRect((int) v.x, (int) v.y, 3, 3);
+    //for (Vector2d v: pos) g2.fillOval((int) v.x, (int) v.y, 3, 3);
+    g.setColor(tmp);
+  }
 
-	/**
-	 * Add an update request.
-	 * @param pos the new positions to display.
-	 */
-	public void updatePositions(final Vector2d[] pos)
-	{
-		if (!isUpdating()) executor.submit(new UpdateRequest(pos));
-	}
+  /**
+   * Add an update request.
+   * @param pos the new positions to display.
+   */
+  public void updatePositions(final Vector2d[] pos)
+  {
+    if (!isUpdating()) executor.submit(new UpdateRequest(pos));
+  }
 
-	/**
-	 * Determine whether this panel is currently being updated.
-	 * @return true if this panel is being updated, false otherwise.
-	 */
-	public boolean isUpdating()
-	{
-		return updating.get();
-	}
+  /**
+   * Determine whether this panel is currently being updated.
+   * @return true if this panel is being updated, false otherwise.
+   */
+  public boolean isUpdating()
+  {
+    return updating.get();
+  }
 
-	/**
-	 * Update request.
-	 */
-	public class UpdateRequest implements Runnable
-	{
-		/**
-		 * The new positions to display.
-		 */
-		private Vector2d[] pos = null;
-		/**
-		 * Add an update request.
-		 * @param pos the new positions to display.
-		 */
-		public UpdateRequest(final Vector2d[] pos)
-		{
-			this.pos = pos;
-		}
+  /**
+   * Update request.
+   */
+  public class UpdateRequest implements Runnable
+  {
+    /**
+     * The new positions to display.
+     */
+    private Vector2d[] pos = null;
+    /**
+     * Add an update request.
+     * @param pos the new positions to display.
+     */
+    public UpdateRequest(final Vector2d[] pos)
+    {
+      this.pos = pos;
+    }
 
-		/**
-		 * Do the update request on the component.
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
-		public void run()
-		{
-			if (updating.get()) return;
-			//lock.lock();
-			try
-			{
-				newPositions = pos;
-				NBodyPanel.this.repaint();
-			}
-			finally
-			{
-				//lock.unlock();
-			}
-		}
-	}
+    /**
+     * Do the update request on the component.
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run()
+    {
+      if (updating.get()) return;
+      //lock.lock();
+      try
+      {
+        newPositions = pos;
+        NBodyPanel.this.repaint();
+      }
+      finally
+      {
+        //lock.unlock();
+      }
+    }
+  }
 }

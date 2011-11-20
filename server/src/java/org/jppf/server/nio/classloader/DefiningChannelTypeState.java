@@ -34,80 +34,80 @@ import org.slf4j.*;
  */
 class DefiningChannelTypeState extends ClassServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(DefiningChannelTypeState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether management features are enabled for this driver.
-	 */
-	private static boolean managementEnabled =
-		JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(DefiningChannelTypeState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether management features are enabled for this driver.
+   */
+  private static boolean managementEnabled =
+    JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
 
-	/**
-	 * Initialize this state with a specified NioServer.
-	 * @param server the JPPFNIOServer this state relates to.
-	 */
-	public DefiningChannelTypeState(final ClassNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state with a specified NioServer.
+   * @param server the JPPFNIOServer this state relates to.
+   */
+  public DefiningChannelTypeState(final ClassNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
-	 */
-	@Override
-	public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		// we don't know yet which whom we are talking, is it a node or a provider?
-		ClassContext context = (ClassContext) wrapper.getContext();
-		if (context.readMessage(wrapper))
-		{
-			JPPFResourceWrapper resource = context.deserializeResource();
-			if (debugEnabled) log.debug("channel: " + wrapper + " read resource [" + resource.getName() + "] done");
-			if (PROVIDER_INITIATION.equals(resource.getState()))
-			{
-				context.setProvider(true);
-				if (debugEnabled) log.debug("initiating provider: " + wrapper);
-				String uuid = resource.getUuidPath().getFirst();
-				// it is a provider
-				server.addProviderConnection(uuid, wrapper);
-				context.setUuid(uuid);
-				context.setPendingRequests(new Vector<ChannelWrapper<?>>());
-				context.setMessage(null);
-				if (managementEnabled)
-				{
-					resource.setManagementId(driver.getInitializer().getJmxServer().getId());
-				}
-				context.serializeResource(wrapper);
-				return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
-			}
-			else if (NODE_INITIATION.equals(resource.getState()))
-			{
-				context.setProvider(false);
-				if (debugEnabled) log.debug("initiating node: " + wrapper);
-				String uuid = (String) resource.getData("node.uuid");
-				if (uuid != null)
-				{
-					context.setUuid(uuid);
-					server.addNodeConnection(uuid, wrapper);
-				}
-				// send the uuid of this driver to the node or node peer.
-				resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-				resource.setProviderUuid(driver.getUuid());
-				context.serializeResource(wrapper);
+  /**
+   * Execute the action associated with this channel state.
+   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if an error occurs while transitioning to another state.
+   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   */
+  @Override
+  public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    // we don't know yet which whom we are talking, is it a node or a provider?
+    ClassContext context = (ClassContext) wrapper.getContext();
+    if (context.readMessage(wrapper))
+    {
+      JPPFResourceWrapper resource = context.deserializeResource();
+      if (debugEnabled) log.debug("channel: " + wrapper + " read resource [" + resource.getName() + "] done");
+      if (PROVIDER_INITIATION.equals(resource.getState()))
+      {
+        context.setProvider(true);
+        if (debugEnabled) log.debug("initiating provider: " + wrapper);
+        String uuid = resource.getUuidPath().getFirst();
+        // it is a provider
+        server.addProviderConnection(uuid, wrapper);
+        context.setUuid(uuid);
+        context.setPendingRequests(new Vector<ChannelWrapper<?>>());
+        context.setMessage(null);
+        if (managementEnabled)
+        {
+          resource.setManagementId(driver.getInitializer().getJmxServer().getId());
+        }
+        context.serializeResource(wrapper);
+        return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
+      }
+      else if (NODE_INITIATION.equals(resource.getState()))
+      {
+        context.setProvider(false);
+        if (debugEnabled) log.debug("initiating node: " + wrapper);
+        String uuid = (String) resource.getData("node.uuid");
+        if (uuid != null)
+        {
+          context.setUuid(uuid);
+          server.addNodeConnection(uuid, wrapper);
+        }
+        // send the uuid of this driver to the node or node peer.
+        resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+        resource.setProviderUuid(driver.getUuid());
+        context.serializeResource(wrapper);
 
-				return TO_SENDING_INITIAL_NODE_RESPONSE;
-			}
-		}
-		return TO_DEFINING_TYPE;
-	}
+        return TO_SENDING_INITIAL_NODE_RESPONSE;
+      }
+    }
+    return TO_DEFINING_TYPE;
+  }
 }

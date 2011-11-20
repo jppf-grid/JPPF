@@ -24,39 +24,39 @@ import java.lang.reflect.Constructor;
  */
 class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
 {
-	/**
-	 * The method to invoke.
-	 */
-	private Constructor constructor = null;
+  /**
+   * The method to invoke.
+   */
+  private Constructor constructor = null;
 
-	/**
-	 * Initialize this privileged action with the specified constructor and parameters.
-	 * @param constructor the constructor to invoke.
-	 * @param args the parameters of the constructor to invoke.
-	 */
-	public PrivilegedConstructorAction(final Constructor constructor, final Object[] args)
-	{
-		this.constructor = constructor;
-		this.args = args;
-	}
+  /**
+   * Initialize this privileged action with the specified constructor and parameters.
+   * @param constructor the constructor to invoke.
+   * @param args the parameters of the constructor to invoke.
+   */
+  public PrivilegedConstructorAction(final Constructor constructor, final Object[] args)
+  {
+    this.constructor = constructor;
+    this.args = args;
+  }
 
-	/**
-	 * Invoke the constructor.
-	 * @return the object constructed through the constructor's invocation.
-	 * @see java.security.PrivilegedAction#run()
-	 */
-	@Override
-	public Object run()
-	{
-		Object result = null;
-		try
-		{
-			result = constructor.newInstance(args);
-		}
-		catch(Exception e)
-		{
-			exception = e;
-		}
-		return result;
-	}
+  /**
+   * Invoke the constructor.
+   * @return the object constructed through the constructor's invocation.
+   * @see java.security.PrivilegedAction#run()
+   */
+  @Override
+  public Object run()
+  {
+    Object result = null;
+    try
+    {
+      result = constructor.newInstance(args);
+    }
+    catch(Exception e)
+    {
+      exception = e;
+    }
+    return result;
+  }
 }

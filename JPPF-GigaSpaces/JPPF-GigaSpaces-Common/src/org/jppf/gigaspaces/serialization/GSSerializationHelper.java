@@ -26,48 +26,48 @@ import org.jppf.utils.*;
  */
 public class GSSerializationHelper extends SerializationHelperImpl
 {
-	/**
-	 * Fully qualified name of the ObjectSerializer implementation class to use.
-	 */
-	private static final String SERIALIZER_CLASS_NAME = "org.jppf.gigaspaces.serialization.GSObjectSerializer";
+  /**
+   * Fully qualified name of the ObjectSerializer implementation class to use.
+   */
+  private static final String SERIALIZER_CLASS_NAME = "org.jppf.gigaspaces.serialization.GSObjectSerializer";
 
-	/**
-	 * Default constructor.
-	 */
-	public GSSerializationHelper()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public GSSerializationHelper()
+  {
+  }
 
-	/**
-	 * Get the object serializer for this helper.
-	 * @return an <code>ObjectSerializer</code> instance.
-	 * @throws Exception if the object serializer could not be instantiated.
-	 * @see org.jppf.utils.SerializationHelper#getSerializer()
-	 */
-	@Override
-	public ObjectSerializer getSerializer() throws Exception
-	{
-		if (serializer == null)
-		{
-			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			Class clazz = null;
-			if (cl != null)
-			{
-				try
-				{
-					clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
-				}
-				catch(ClassNotFoundException ignore)
-				{
-				}
-			}
-			if (clazz == null)
-			{
-				cl = getClass().getClassLoader();
-				clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
-			}
-			serializer = (ObjectSerializer) clazz.newInstance();
-		}
-		return serializer;
-	}
+  /**
+   * Get the object serializer for this helper.
+   * @return an <code>ObjectSerializer</code> instance.
+   * @throws Exception if the object serializer could not be instantiated.
+   * @see org.jppf.utils.SerializationHelper#getSerializer()
+   */
+  @Override
+  public ObjectSerializer getSerializer() throws Exception
+  {
+    if (serializer == null)
+    {
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      Class clazz = null;
+      if (cl != null)
+      {
+        try
+        {
+          clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
+        }
+        catch(ClassNotFoundException ignore)
+        {
+        }
+      }
+      if (clazz == null)
+      {
+        cl = getClass().getClassLoader();
+        clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
+      }
+      serializer = (ObjectSerializer) clazz.newInstance();
+    }
+    return serializer;
+  }
 }

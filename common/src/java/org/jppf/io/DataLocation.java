@@ -27,47 +27,47 @@ import java.io.*;
  */
 public interface DataLocation
 {
-	/**
-	 * Constant for unknown data location size.
-	 */
-	int UNKNOWN_SIZE = -1;
-	/**
-	 * Get the size of the data referenced by this data location.
-	 * @return the data size as an int.
-	 */
-	int getSize();
-	/**
-	 * Transfer the content of this data location from the specified input source.
-	 * @param source - the input source to transfer to.
-	 * @param blocking - if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int transferFrom(InputSource source, boolean blocking) throws Exception;
-	/**
-	 * Transfer the content of this data location to the specified output destination.
-	 * @param dest - the output destination to transfer to.
-	 * @param blocking - if true, the method will block until the entire content has been transferred.
-	 * @return the number of bytes actually transferred.
-	 * @throws Exception if an IO error occurs.
-	 */
-	int transferTo(OutputDestination dest, boolean blocking) throws Exception;
-	/**
-	 * Get an input stream for this location.
-	 * @return an <code>InputStream</code> instance.
-	 * @throws Exception if an I/O error occurs.
-	 */
-	InputStream getInputStream() throws Exception;
-	/**
-	 * Get an output stream for this location.
-	 * @return an <code>OutputStream</code> instance.
-	 * @throws Exception if an I/O error occurs.
-	 */
-	OutputStream getOutputStream() throws Exception;
-	/**
-	 * Make a shallow copy of this data location.
-	 * The data it points to is not copied.
-	 * @return a new DataLocation instance pointing to the same data.
-	 */
-	DataLocation copy();
+  /**
+   * Constant for unknown data location size.
+   */
+  int UNKNOWN_SIZE = -1;
+  /**
+   * Get the size of the data referenced by this data location.
+   * @return the data size as an int.
+   */
+  int getSize();
+  /**
+   * Transfer the content of this data location from the specified input source.
+   * @param source - the input source to transfer to.
+   * @param blocking - if true, the method will block until the entire content has been transferred.
+   * @return the number of bytes actually transferred.
+   * @throws Exception if an IO error occurs.
+   */
+  int transferFrom(InputSource source, boolean blocking) throws Exception;
+  /**
+   * Transfer the content of this data location to the specified output destination.
+   * @param dest - the output destination to transfer to.
+   * @param blocking - if true, the method will block until the entire content has been transferred.
+   * @return the number of bytes actually transferred.
+   * @throws Exception if an IO error occurs.
+   */
+  int transferTo(OutputDestination dest, boolean blocking) throws Exception;
+  /**
+   * Get an input stream for this location.
+   * @return an <code>InputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   */
+  InputStream getInputStream() throws Exception;
+  /**
+   * Get an output stream for this location.
+   * @return an <code>OutputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   */
+  OutputStream getOutputStream() throws Exception;
+  /**
+   * Make a shallow copy of this data location.
+   * The data it points to is not copied.
+   * @return a new DataLocation instance pointing to the same data.
+   */
+  DataLocation copy();
 }

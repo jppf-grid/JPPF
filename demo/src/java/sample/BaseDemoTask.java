@@ -26,26 +26,26 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public abstract class BaseDemoTask extends JPPFTask
 {
-	/**
-	 * Run the task with start and end event notifications.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-    public void run()
-	{
-		//fireNotification("start exec");
-		try
-		{
-			doWork();
-		}
-		finally
-		{
-			//fireNotification("end exec");
-		}
-	}
+  /**
+   * Run the task with start and end event notifications.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    //fireNotification("start exec");
+    try
+    {
+      doWork();
+    }
+    finally
+    {
+      //fireNotification("end exec");
+    }
+  }
 
-	/**
-	 * Perform the actual work of this task.
-	 */
-	public abstract void doWork();
+  /**
+   * Perform the actual work of this task.
+   */
+  public abstract void doWork();
 }

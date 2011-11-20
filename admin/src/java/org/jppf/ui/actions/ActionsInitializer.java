@@ -26,76 +26,76 @@ import org.jppf.ui.options.*;
  */
 public class ActionsInitializer implements Runnable
 {
-	/**
-	 * The panel to which the actions apply.
-	 */
-	private OptionElement mainPanel = null;
-	/**
-	 * The panel to which the actions apply.
-	 */
-	private ActionHolder actionHolder = null;
-	/**
-	 * The container for the buttons associated with the actions (toolbar).
-	 */
-	private String btnContainerName = null;
+  /**
+   * The panel to which the actions apply.
+   */
+  private OptionElement mainPanel = null;
+  /**
+   * The panel to which the actions apply.
+   */
+  private ActionHolder actionHolder = null;
+  /**
+   * The container for the buttons associated with the actions (toolbar).
+   */
+  private String btnContainerName = null;
 
-	/**
-	 * Initialize this actions initializer.
-	 * @param mainPanel the panel to which the actions apply.
-	 * @param btnContainerName the container for the buttons associated with the actions (toolbar).
-	 */
-	public ActionsInitializer(final OptionElement mainPanel, final String btnContainerName)
-	{
-		this(mainPanel, (ActionHolder) mainPanel, btnContainerName);
-	}
+  /**
+   * Initialize this actions initializer.
+   * @param mainPanel the panel to which the actions apply.
+   * @param btnContainerName the container for the buttons associated with the actions (toolbar).
+   */
+  public ActionsInitializer(final OptionElement mainPanel, final String btnContainerName)
+  {
+    this(mainPanel, (ActionHolder) mainPanel, btnContainerName);
+  }
 
-	/**
-	 * Initialize this actions initializer.
-	 * @param mainPanel the panel to which the actions apply.
-	 * @param actionHolder the panel to which the actions apply.
-	 * @param btnContainerName the container for the buttons associated with the actions (toolbar).
-	 */
-	public ActionsInitializer(final OptionElement mainPanel, final ActionHolder actionHolder, final String btnContainerName)
-	{
-		this.mainPanel = mainPanel;
-		this.actionHolder = actionHolder;
-		this.btnContainerName = btnContainerName;
-	}
+  /**
+   * Initialize this actions initializer.
+   * @param mainPanel the panel to which the actions apply.
+   * @param actionHolder the panel to which the actions apply.
+   * @param btnContainerName the container for the buttons associated with the actions (toolbar).
+   */
+  public ActionsInitializer(final OptionElement mainPanel, final ActionHolder actionHolder, final String btnContainerName)
+  {
+    this.mainPanel = mainPanel;
+    this.actionHolder = actionHolder;
+    this.btnContainerName = btnContainerName;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		OptionsPage page = null;
-		while (page == null)
-		{
-			final OptionElement parent = mainPanel.getParent();
-			if (parent != null) page = (OptionsPage) mainPanel.findFirstWithName(btnContainerName);
-			try
-			{
-				Thread.sleep(100L);
-			}
-			catch(final InterruptedException e)
-			{
-			}
-			if (page != null)
-			{
-				for (OptionElement elt: page.getChildren())
-				{
-					if (!(elt.getUIComponent() instanceof JButton)) continue;
-					final JButton button = (JButton) elt.getUIComponent();
-					final UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
-					if (action == null) continue;
-					button.setAction(action);
-					button.setText("");
-					button.setToolTipText((String) action.getValue(Action.NAME));
-				}
-				page.getUIComponent().invalidate();
-				page.getUIComponent().repaint();
-			}
-		}
-	}
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    OptionsPage page = null;
+    while (page == null)
+    {
+      final OptionElement parent = mainPanel.getParent();
+      if (parent != null) page = (OptionsPage) mainPanel.findFirstWithName(btnContainerName);
+      try
+      {
+        Thread.sleep(100L);
+      }
+      catch(final InterruptedException e)
+      {
+      }
+      if (page != null)
+      {
+        for (OptionElement elt: page.getChildren())
+        {
+          if (!(elt.getUIComponent() instanceof JButton)) continue;
+          final JButton button = (JButton) elt.getUIComponent();
+          final UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
+          if (action == null) continue;
+          button.setAction(action);
+          button.setText("");
+          button.setToolTipText((String) action.getValue(Action.NAME));
+        }
+        page.getUIComponent().invalidate();
+        page.getUIComponent().repaint();
+      }
+    }
+  }
 }

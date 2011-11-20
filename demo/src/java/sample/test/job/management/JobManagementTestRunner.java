@@ -33,61 +33,61 @@ import sample.dist.tasklength.LongTask;
  */
 public class JobManagementTestRunner
 {
-	/**
-	 * The JPPF client.
-	 */
-	private static JPPFClient client = null;
+  /**
+   * The JPPF client.
+   */
+  private static JPPFClient client = null;
 
-	/**
-	 * Run the first test.
-	 * @throws Exception if any error occurs.
-	 */
-	public void runTest1() throws Exception
-	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		int nbTasks = props.getInt("job.management.nbTasks", 2);
-		long duration = props.getLong("job.management.duration", 1000L);
-		String jobId = "test1";
-		JPPFJob job = new JPPFJob();
-		job.setName(jobId);
-		job.setBlocking(false);
-		for (int i=0; i<nbTasks; i++)
-		{
-			job.addTask(new LongTask(duration));
-		}
-		JPPFResultCollector collector = new JPPFResultCollector(job);
-		job.setResultListener(collector);
-		client.submit(job);
-		JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
-		driver.connect();
-		while (!driver.isConnected()) Thread.sleep(10);
-		// wait to ensure the job has been dispatched to the nodes
-		Thread.sleep(1000);
-		driver.cancelJob(jobId);
-		driver.close();
-		List<JPPFTask> results = collector.waitForResults();
-		System.out.println("Test ended");
-	}
+  /**
+   * Run the first test.
+   * @throws Exception if any error occurs.
+   */
+  public void runTest1() throws Exception
+  {
+    TypedProperties props = JPPFConfiguration.getProperties();
+    int nbTasks = props.getInt("job.management.nbTasks", 2);
+    long duration = props.getLong("job.management.duration", 1000L);
+    String jobId = "test1";
+    JPPFJob job = new JPPFJob();
+    job.setName(jobId);
+    job.setBlocking(false);
+    for (int i=0; i<nbTasks; i++)
+    {
+      job.addTask(new LongTask(duration));
+    }
+    JPPFResultCollector collector = new JPPFResultCollector(job);
+    job.setResultListener(collector);
+    client.submit(job);
+    JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
+    driver.connect();
+    while (!driver.isConnected()) Thread.sleep(10);
+    // wait to ensure the job has been dispatched to the nodes
+    Thread.sleep(1000);
+    driver.cancelJob(jobId);
+    driver.close();
+    List<JPPFTask> results = collector.waitForResults();
+    System.out.println("Test ended");
+  }
 
-	/**
-	 * Entry point.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			client = new JPPFClient();
-			JobManagementTestRunner runner = new JobManagementTestRunner();
-			runner.runTest1();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if (client != null) client.close();
-		}
-	}
+  /**
+   * Entry point.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      client = new JPPFClient();
+      JobManagementTestRunner runner = new JobManagementTestRunner();
+      runner.runTest1();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      if (client != null) client.close();
+    }
+  }
 }

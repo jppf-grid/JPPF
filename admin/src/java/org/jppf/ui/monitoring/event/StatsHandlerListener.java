@@ -25,9 +25,9 @@ import java.util.EventListener;
  */
 public interface StatsHandlerListener extends EventListener
 {
-	/**
-	 * Called to notify that the stats formatter data has changed.
-	 * @param event the object that encapsulates the data change event.
-	 */
-	void dataUpdated(StatsHandlerEvent event);
+  /**
+   * Called to notify that the stats formatter data has changed.
+   * @param event the object that encapsulates the data change event.
+   */
+  void dataUpdated(StatsHandlerEvent event);
 }

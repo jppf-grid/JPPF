@@ -33,142 +33,142 @@ import org.jppf.utils.LocalizationUtils;
  */
 public abstract class AbstractTreeTableOption extends AbstractOption implements ActionHolder
 {
-	/**
-	 * Base name for localization bundle lookups.
-	 */
-	protected String BASE = null;
-	/**
-	 * The tree table model associated with the tree table.
-	 */
-	protected transient AbstractJPPFTreeTableModel model = null;
-	/**
-	 * The root of the tree model.
-	 */
-	protected DefaultMutableTreeNode treeTableRoot = null;
-	/**
-	 * A tree table component displaying the driver and nodes information.
-	 */
-	protected JPPFTreeTable treeTable = null;
-	/**
-	 * Handles all actions in toolbars or popup menus.
-	 */
-	protected JTreeTableActionHandler actionHandler = null;
+  /**
+   * Base name for localization bundle lookups.
+   */
+  protected String BASE = null;
+  /**
+   * The tree table model associated with the tree table.
+   */
+  protected transient AbstractJPPFTreeTableModel model = null;
+  /**
+   * The root of the tree model.
+   */
+  protected DefaultMutableTreeNode treeTableRoot = null;
+  /**
+   * A tree table component displaying the driver and nodes information.
+   */
+  protected JPPFTreeTable treeTable = null;
+  /**
+   * Handles all actions in toolbars or popup menus.
+   */
+  protected JTreeTableActionHandler actionHandler = null;
 
-	/**
-	 * Get the object that handles all actions in toolbars or popup menus.
-	 * @return a <code>JTreeTableActionHandler</code> instance.
-	 */
-	@Override
-	public JTreeTableActionHandler getActionHandler()
-	{
-		return actionHandler;
-	}
+  /**
+   * Get the object that handles all actions in toolbars or popup menus.
+   * @return a <code>JTreeTableActionHandler</code> instance.
+   */
+  @Override
+  public JTreeTableActionHandler getActionHandler()
+  {
+    return actionHandler;
+  }
 
-	/**
-	 * Get the tree table component displaying the driver and nodes information.
-	 * @return a <code>JPPFTreeTable</code> instance.
-	 */
-	public JPPFTreeTable getTreeTable()
-	{
-		return treeTable;
-	}
+  /**
+   * Get the tree table component displaying the driver and nodes information.
+   * @return a <code>JPPFTreeTable</code> instance.
+   */
+  public JPPFTreeTable getTreeTable()
+  {
+    return treeTable;
+  }
 
-	/**
-	 * Not implemented.
-	 * @param enabled not used.
-	 * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-	}
+  /**
+   * Not implemented.
+   * @param enabled not used.
+   * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+  }
 
-	/**
-	 * Not implemented.
-	 * @param enabled not used.
-	 * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-	 */
-	@Override
-	public void setEventsEnabled(final boolean enabled)
-	{
-	}
+  /**
+   * Not implemented.
+   * @param enabled not used.
+   * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
+   */
+  @Override
+  public void setEventsEnabled(final boolean enabled)
+  {
+  }
 
-	/**
-	 * Not implemented.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-	}
+  /**
+   * Not implemented.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+  }
 
-	/**
-	 * Get a localized message given its unique name and the current locale.
-	 * @param message - the unique name of the localized message.
-	 * @return a message in the current locale, or the default locale
-	 * if the localization for the current locale is not found.
-	 */
-	protected String localize(final String message)
-	{
-		return LocalizationUtils.getLocalized(BASE, message);
-	}
+  /**
+   * Get a localized message given its unique name and the current locale.
+   * @param message - the unique name of the localized message.
+   * @return a message in the current locale, or the default locale
+   * if the localization for the current locale is not found.
+   */
+  protected String localize(final String message)
+  {
+    return LocalizationUtils.getLocalized(BASE, message);
+  }
 
-	/**
-	 * Set the columns width based on values stored as preferences.
-	 */
-	public void setupTableColumns()
-	{
-		Preferences pref = OptionsHandler.getPreferences();
-		String key = getName() + "_column_widths";
-		String s = pref.get(key, null);
-		if (s == null) return;
-		String[] wStr = s.split("\\s");
-		for (int i=0; i<Math.min(treeTable.getColumnCount(), wStr.length); i++)
-		{
-			int width = 60;
-			try
-			{
-				width = Integer.valueOf(wStr[i]);
-			}
-			catch(NumberFormatException e)
-			{
-			}
-			treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
-		}
-	}
+  /**
+   * Set the columns width based on values stored as preferences.
+   */
+  public void setupTableColumns()
+  {
+    Preferences pref = OptionsHandler.getPreferences();
+    String key = getName() + "_column_widths";
+    String s = pref.get(key, null);
+    if (s == null) return;
+    String[] wStr = s.split("\\s");
+    for (int i=0; i<Math.min(treeTable.getColumnCount(), wStr.length); i++)
+    {
+      int width = 60;
+      try
+      {
+        width = Integer.valueOf(wStr[i]);
+      }
+      catch(NumberFormatException e)
+      {
+      }
+      treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
+    }
+  }
 
-	/**
-	 * Set the columns width based on values stored as preferences.
-	 */
-	public void saveTableColumnsWidth()
-	{
-		Preferences pref = OptionsHandler.getPreferences();
-		String key = getName() + "_column_widths";
-		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<treeTable.getColumnCount(); i++)
-		{
-			int width = treeTable.getColumnModel().getColumn(i).getPreferredWidth();
-			if (i > 0) sb.append(' ');
-			sb.append(width);
-		}
-		pref.put(key, sb.toString());
-	}
+  /**
+   * Set the columns width based on values stored as preferences.
+   */
+  public void saveTableColumnsWidth()
+  {
+    Preferences pref = OptionsHandler.getPreferences();
+    String key = getName() + "_column_widths";
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<treeTable.getColumnCount(); i++)
+    {
+      int width = treeTable.getColumnModel().getColumn(i).getPreferredWidth();
+      if (i > 0) sb.append(' ');
+      sb.append(width);
+    }
+    pref.put(key, sb.toString());
+  }
 
-	/**
-	 * Get the root of the tree model.
-	 * @return a {@link DefaultMutableTreeNode} instance.
-	 */
-	public DefaultMutableTreeNode getTreeTableRoot()
-	{
-		return treeTableRoot;
-	}
+  /**
+   * Get the root of the tree model.
+   * @return a {@link DefaultMutableTreeNode} instance.
+   */
+  public DefaultMutableTreeNode getTreeTableRoot()
+  {
+    return treeTableRoot;
+  }
 
-	/**
-	 * get the tree table model associated with the tree table.
-	 * @return an {@link AbstractJPPFTreeTableModel} instance.
-	 */
-	public AbstractJPPFTreeTableModel getModel()
-	{
-		return model;
-	}
+  /**
+   * get the tree table model associated with the tree table.
+   * @return an {@link AbstractJPPFTreeTableModel} instance.
+   */
+  public AbstractJPPFTreeTableModel getModel()
+  {
+    return model;
+  }
 }

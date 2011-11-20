@@ -31,111 +31,111 @@ import org.jppf.utils.StringUtils;
  */
 public class DBTask extends JPPFTask
 {
-	/**
-	 * The time to wait after inserting a row in the database.
-	 */
-	private long sleepTime;
+  /**
+   * The time to wait after inserting a row in the database.
+   */
+  private long sleepTime;
 
-	/**
-	 * Initialize this task with the specified sleep time.
-	 * @param sleepTime the time to wait after inserting a row in the database (in milliseconds).
-	 */
-	public DBTask(final long sleepTime)
-	{
-		this.sleepTime = sleepTime;
-	}
+  /**
+   * Initialize this task with the specified sleep time.
+   * @param sleepTime the time to wait after inserting a row in the database (in milliseconds).
+   */
+  public DBTask(final long sleepTime)
+  {
+    this.sleepTime = sleepTime;
+  }
 
-	/**
-	 * Execute this JPPF task.
-	 * The actual database operations are executed on the single transaction thread.
-	 * This means they are sequentialized and we loose some of the parallelism.
-	 * However, any non DB-related operation can be executed safely in a different thread.
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			// submit the SQL update as a task in the transaction's worker thread
-			SQLCallable callable = new SQLCallable();
-			Integer n = NodeListener.submit(callable);
-			Throwable t = callable.throwable;
-			// if the SQL update failed, we store the exception into the JPPF task
-			if (t != null)
-			{
-				if (t instanceof Exception) setException((Exception) t);
-				else setException(new Exception("Error while executing SQL statement", t));
-				NodeListener.output(StringUtils.getStackTrace(t));
-			}
-			// otherwise we set the execution result
-			else
-			{
-				setResult("task " + getId() + " execution successful, sql return code = " + n);
-				NodeListener.output(getResult().toString());
-			}
-			// sleep to allow enough time to kill the node and test the recovery mechanism.
-			Thread.sleep(sleepTime);
-		}
-		catch (Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Execute this JPPF task.
+   * The actual database operations are executed on the single transaction thread.
+   * This means they are sequentialized and we loose some of the parallelism.
+   * However, any non DB-related operation can be executed safely in a different thread.
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      // submit the SQL update as a task in the transaction's worker thread
+      SQLCallable callable = new SQLCallable();
+      Integer n = NodeListener.submit(callable);
+      Throwable t = callable.throwable;
+      // if the SQL update failed, we store the exception into the JPPF task
+      if (t != null)
+      {
+        if (t instanceof Exception) setException((Exception) t);
+        else setException(new Exception("Error while executing SQL statement", t));
+        NodeListener.output(StringUtils.getStackTrace(t));
+      }
+      // otherwise we set the execution result
+      else
+      {
+        setResult("task " + getId() + " execution successful, sql return code = " + n);
+        NodeListener.output(getResult().toString());
+      }
+      // sleep to allow enough time to kill the node and test the recovery mechanism.
+      Thread.sleep(sleepTime);
+    }
+    catch (Exception e)
+    {
+      setException(e);
+    }
+  }
 
-	/**
-	 * This task is executed on the transaction thread and performs the database update.
-	 */
-	public class SQLCallable implements Callable<Integer>
-	{
-		/**
-		 * An eventual throwable that may occur while executing the DB update.
-		 */
-		public Throwable throwable = null;
+  /**
+   * This task is executed on the transaction thread and performs the database update.
+   */
+  public class SQLCallable implements Callable<Integer>
+  {
+    /**
+     * An eventual throwable that may occur while executing the DB update.
+     */
+    public Throwable throwable = null;
 
-		/**
-		 * Insert a row into the database.
-		 * @return the number of updated rows, or null if the operation failed.
-		 */
-		@Override
-		public Integer call()
-		{
-			Connection c = null;
-			PreparedStatement ps = null;
-			try
-			{
-				c = NodeListener.getDataSource().getConnection();
-				String sql = "INSERT INTO task_result (task_id, message) VALUES(?, ?)";
-				ps = c.prepareStatement(sql);
-				ps.setString(1, getId());
-				ps.setString(2, getId() + ": task execution successful");
-				//NodeListener.output("before executing prepared statement: " + ps);
-				int n = ps.executeUpdate();
-				return n;
-			}
-			catch (Throwable t)
-			{
-				throwable = t;
-				return null;
-			}
-			finally
-			{
-				try
-				{
-					if (ps != null) ps.close();
-				}
-				catch (Throwable t)
-				{
-					if (throwable == null) throwable = t;
-				}
-				try
-				{
-					if (c != null) c.close();
-				}
-				catch (Throwable t)
-				{
-					if (throwable == null) throwable = t;
-				}
-			}
-		}
-	}
+    /**
+     * Insert a row into the database.
+     * @return the number of updated rows, or null if the operation failed.
+     */
+    @Override
+    public Integer call()
+    {
+      Connection c = null;
+      PreparedStatement ps = null;
+      try
+      {
+        c = NodeListener.getDataSource().getConnection();
+        String sql = "INSERT INTO task_result (task_id, message) VALUES(?, ?)";
+        ps = c.prepareStatement(sql);
+        ps.setString(1, getId());
+        ps.setString(2, getId() + ": task execution successful");
+        //NodeListener.output("before executing prepared statement: " + ps);
+        int n = ps.executeUpdate();
+        return n;
+      }
+      catch (Throwable t)
+      {
+        throwable = t;
+        return null;
+      }
+      finally
+      {
+        try
+        {
+          if (ps != null) ps.close();
+        }
+        catch (Throwable t)
+        {
+          if (throwable == null) throwable = t;
+        }
+        try
+        {
+          if (c != null) c.close();
+        }
+        catch (Throwable t)
+        {
+          if (throwable == null) throwable = t;
+        }
+      }
+    }
+  }
 }

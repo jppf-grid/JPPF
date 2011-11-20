@@ -29,45 +29,45 @@ import org.jppf.ui.monitoring.job.*;
  */
 public abstract class AbstractJobAction extends AbstractUpdatableAction
 {
-	/**
-	 * Constant for an empty <code>JobData</code> array.
-	 */
-	private static final JobData[] EMPTY_JOB_DATA_ARRAY = new JobData[0];
-	/**
-	 * The object representing the JPPF jobs in the tree table.
-	 */
-	protected JobData[] jobDataArray = EMPTY_JOB_DATA_ARRAY;
-	/**
-	 * The object representing the JPPF sub-jobs in the tree table.
-	 */
-	protected JobData[] subjobDataArray = EMPTY_JOB_DATA_ARRAY;
+  /**
+   * Constant for an empty <code>JobData</code> array.
+   */
+  private static final JobData[] EMPTY_JOB_DATA_ARRAY = new JobData[0];
+  /**
+   * The object representing the JPPF jobs in the tree table.
+   */
+  protected JobData[] jobDataArray = EMPTY_JOB_DATA_ARRAY;
+  /**
+   * The object representing the JPPF sub-jobs in the tree table.
+   */
+  protected JobData[] subjobDataArray = EMPTY_JOB_DATA_ARRAY;
 
-	/**
-	 * Initialize this action.
-	 */
-	public AbstractJobAction()
-	{
-		BASE = "org.jppf.ui.i18n.JobDataPage";
-	}
+  /**
+   * Initialize this action.
+   */
+  public AbstractJobAction()
+  {
+    BASE = "org.jppf.ui.i18n.JobDataPage";
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		super.updateState(selectedElements);
-		List<JobData> jobList = new ArrayList<JobData>();
-		List<JobData> subjobList = new ArrayList<JobData>();
-		for (Object o: selectedElements)
-		{
-			JobData data = (JobData) o;
-			if (JobDataType.JOB.equals(data.getType())) jobList.add(data);
-			else if (JobDataType.SUB_JOB.equals(data.getType())) subjobList.add(data);
-		}
-		jobDataArray = jobList.toArray(new JobData[jobList.size()]);
-		subjobDataArray = subjobList.toArray(new JobData[subjobList.size()]);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements - a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    super.updateState(selectedElements);
+    List<JobData> jobList = new ArrayList<JobData>();
+    List<JobData> subjobList = new ArrayList<JobData>();
+    for (Object o: selectedElements)
+    {
+      JobData data = (JobData) o;
+      if (JobDataType.JOB.equals(data.getType())) jobList.add(data);
+      else if (JobDataType.SUB_JOB.equals(data.getType())) subjobList.add(data);
+    }
+    jobDataArray = jobList.toArray(new JobData[jobList.size()]);
+    subjobDataArray = subjobList.toArray(new JobData[subjobList.size()]);
+  }
 }

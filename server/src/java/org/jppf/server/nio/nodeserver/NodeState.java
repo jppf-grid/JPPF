@@ -25,24 +25,24 @@ package org.jppf.server.nio.nodeserver;
  */
 public enum NodeState
 {
-	/**
-	 * State of sending the initial bundle to the node.
-	 */
-	SEND_INITIAL_BUNDLE,
-	/**
-	 * State of waiting for the initial bundle from the node.
-	 */
-	WAIT_INITIAL_BUNDLE,
-	/**
-	 * State of waiting for something to do / sending a task bundle to the node.
-	 */
-	SENDING_BUNDLE,
-	/**
-	 * State of waiting for the execution result of a task bundle.
-	 */
-	WAITING_RESULTS,
-	/**
-	 * Idle state for a node channel.
-	 */
-	IDLE
+  /**
+   * State of sending the initial bundle to the node.
+   */
+  SEND_INITIAL_BUNDLE,
+  /**
+   * State of waiting for the initial bundle from the node.
+   */
+  WAIT_INITIAL_BUNDLE,
+  /**
+   * State of waiting for something to do / sending a task bundle to the node.
+   */
+  SENDING_BUNDLE,
+  /**
+   * State of waiting for the execution result of a task bundle.
+   */
+  WAITING_RESULTS,
+  /**
+   * Idle state for a node channel.
+   */
+  IDLE
 }

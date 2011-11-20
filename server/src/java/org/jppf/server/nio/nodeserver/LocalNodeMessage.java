@@ -32,53 +32,53 @@ import org.jppf.utils.streams.StreamUtils;
  */
 public class LocalNodeMessage extends AbstractNodeMessage
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean read(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		InputStream is = locations.get(0).getInputStream();
-		byte[] data = null;
-		try
-		{
-			data = FileUtils.getInputStreamAsByte(is);
-		}
-		finally
-		{
-			StreamUtils.close(is);
-		}
-		data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
-		SerializationHelper helper = new SerializationHelperImpl();
-		bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
-		return true;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean read(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    InputStream is = locations.get(0).getInputStream();
+    byte[] data = null;
+    try
+    {
+      data = FileUtils.getInputStreamAsByte(is);
+    }
+    finally
+    {
+      StreamUtils.close(is);
+    }
+    data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
+    SerializationHelper helper = new SerializationHelperImpl();
+    bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+    return true;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected synchronized boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		return true;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected synchronized boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    return true;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean write(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		//((LocalNodeWrapperHandler) wrapper).wakeUp();
-		return true;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean write(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    //((LocalNodeWrapperHandler) wrapper).wakeUp();
+    return true;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		return true;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    return true;
+  }
 }

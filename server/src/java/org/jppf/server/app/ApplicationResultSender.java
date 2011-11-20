@@ -31,55 +31,55 @@ import org.slf4j.*;
  */
 class ApplicationResultSender extends AbstractResultSender
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ApplicationResultSender.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Output destination wrapping all write operations on the socket client.
-	 */
-	private OutputDestination destination = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ApplicationResultSender.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Output destination wrapping all write operations on the socket client.
+   */
+  private OutputDestination destination = null;
 
-	/**
-	 * Initialize this result sender with a specified socket client.
-	 * @param socketClient the socket client used to send results back.
-	 */
-	public ApplicationResultSender(final SocketWrapper socketClient)
-	{
-		super(socketClient, true);
-		destination = new SocketWrapperOutputDestination(socketClient);
-	}
+  /**
+   * Initialize this result sender with a specified socket client.
+   * @param socketClient the socket client used to send results back.
+   */
+  public ApplicationResultSender(final SocketWrapper socketClient)
+  {
+    super(socketClient, true);
+    destination = new SocketWrapperOutputDestination(socketClient);
+  }
 
-	/**
-	 * Send the results of the tasks in a bundle back to the client who submitted the request.
-	 * @param bundleWrapper the bundle to get the task results from.
-	 * @throws Exception if an IO exception occurred while sending the results back.
-	 */
-	@Override
-	public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
-	{
-		JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-		if (debugEnabled)
-		{
-			Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-			log.debug("Sending bundle for job '" + bundle.getName() + "' with " + bundle.getTaskCount()+" tasks, exception parameter = " + t);
-		}
-		byte[] data = null;
-		synchronized(bundle.getParametersMap())
-		{
-			data = helper.getSerializer().serialize(bundle).getBuffer();
-		}
-		data = JPPFDataTransformFactory.transform(true, data);
-		socketClient.sendBytes(new JPPFBuffer(data, data.length));
-		for (DataLocation task : bundleWrapper.getTasks())
-		{
-			destination.writeInt(task.getSize());
-			task.transferTo(destination, true);
-		}
-		socketClient.flush();
-	}
+  /**
+   * Send the results of the tasks in a bundle back to the client who submitted the request.
+   * @param bundleWrapper the bundle to get the task results from.
+   * @throws Exception if an IO exception occurred while sending the results back.
+   */
+  @Override
+  public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
+  {
+    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+    if (debugEnabled)
+    {
+      Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+      log.debug("Sending bundle for job '" + bundle.getName() + "' with " + bundle.getTaskCount()+" tasks, exception parameter = " + t);
+    }
+    byte[] data = null;
+    synchronized(bundle.getParametersMap())
+    {
+      data = helper.getSerializer().serialize(bundle).getBuffer();
+    }
+    data = JPPFDataTransformFactory.transform(true, data);
+    socketClient.sendBytes(new JPPFBuffer(data, data.length));
+    for (DataLocation task : bundleWrapper.getTasks())
+    {
+      destination.writeInt(task.getSize());
+      task.transferTo(destination, true);
+    }
+    socketClient.flush();
+  }
 }

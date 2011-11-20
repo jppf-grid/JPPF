@@ -25,20 +25,20 @@ package sample.test;
  */
 public class ConstantTask extends JPPFTestTask
 {
-	/**
-	 * Initialize this task with a specified returned result.
-	 * @param n the task result as an integer value.
-	 */
-	public ConstantTask(final int n)
-	{
-		setResult(Integer.valueOf(n));
-	}
+  /**
+   * Initialize this task with a specified returned result.
+   * @param n the task result as an integer value.
+   */
+  public ConstantTask(final int n)
+  {
+    setResult(Integer.valueOf(n));
+  }
 
-	/**
-	 * Execute the task
-	 * @see java.lang.Runnable#run()
-	 */
-	public void test()
-	{
-	}
+  /**
+   * Execute the task
+   * @see java.lang.Runnable#run()
+   */
+  public void test()
+  {
+  }
 }

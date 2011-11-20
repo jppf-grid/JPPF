@@ -27,38 +27,38 @@ import org.slf4j.*;
  */
 public class MultiplexerChannelInitializer implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(MultiplexerChannelInitializer.class);
-	/**
-	 * Wrapper for the new connection to establish.
-	 */
-	private AbstractSocketChannelHandler channelHandler = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(MultiplexerChannelInitializer.class);
+  /**
+   * Wrapper for the new connection to establish.
+   */
+  private AbstractSocketChannelHandler channelHandler = null;
 
-	/**
-	 * Instantiate this initializer with the specified parameters.
-	 * @param channelHandler wrapper for the new connection to establish.
-	 */
-	public MultiplexerChannelInitializer(final AbstractSocketChannelHandler channelHandler)
-	{
-		this.channelHandler = channelHandler;
-	}
+  /**
+   * Instantiate this initializer with the specified parameters.
+   * @param channelHandler wrapper for the new connection to establish.
+   */
+  public MultiplexerChannelInitializer(final AbstractSocketChannelHandler channelHandler)
+  {
+    this.channelHandler = channelHandler;
+  }
 
-	/**
-	 * Perform the channel initialization.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			channelHandler.init();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Perform the channel initialization.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      channelHandler.init();
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 }

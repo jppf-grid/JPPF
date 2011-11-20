@@ -28,35 +28,35 @@ import org.slf4j.*;
  */
 public class DirectBufferPool
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(DirectBufferPool.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * 
-	 */
-	//private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolImpl();
-	private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolQueue();
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(DirectBufferPool.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * 
+   */
+  //private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolImpl();
+  private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolQueue();
 
-	/**
-	 * Get a buffer from the pool, or a new buffer if the pool is empty.
-	 * @return a {@link ByteBuffer} instance.
-	 */
-	public static ByteBuffer provideBuffer()
-	{
-		return pool.get();
-	}
+  /**
+   * Get a buffer from the pool, or a new buffer if the pool is empty.
+   * @return a {@link ByteBuffer} instance.
+   */
+  public static ByteBuffer provideBuffer()
+  {
+    return pool.get();
+  }
 
-	/**
-	 * Release a buffer into the pool and make it available.
-	 * @param buffer the buffer to release.
-	 */
-	public static void releaseBuffer(final ByteBuffer buffer)
-	{
-		pool.put(buffer);
-	}
+  /**
+   * Release a buffer into the pool and make it available.
+   * @param buffer the buffer to release.
+   */
+  public static void releaseBuffer(final ByteBuffer buffer)
+  {
+    pool.put(buffer);
+  }
 }

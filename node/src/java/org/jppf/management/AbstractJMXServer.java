@@ -32,75 +32,75 @@ import org.slf4j.*;
  */
 public abstract class AbstractJMXServer implements JMXServer
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AbstractJMXServer.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Used to synchronize lookup for available port.
-	 */
-	protected static Lock lock = new ReentrantLock();
-	/**
-	 * The mbean server.
-	 */
-	protected MBeanServer server = null;
-	/**
-	 * The JMX connector server.
-	 */
-	protected JMXConnectorServer connectorServer = null;
-	/**
-	 * Determines whether this JMX server is stopped.
-	 */
-	protected boolean stopped = true;
-	/**
-	 * This server's unique id.
-	 */
-	protected String id;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractJMXServer.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Used to synchronize lookup for available port.
+   */
+  protected static Lock lock = new ReentrantLock();
+  /**
+   * The mbean server.
+   */
+  protected MBeanServer server = null;
+  /**
+   * The JMX connector server.
+   */
+  protected JMXConnectorServer connectorServer = null;
+  /**
+   * Determines whether this JMX server is stopped.
+   */
+  protected boolean stopped = true;
+  /**
+   * This server's unique id.
+   */
+  protected String id;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public abstract void start(ClassLoader cl) throws Exception;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public abstract void start(ClassLoader cl) throws Exception;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void stop() throws Exception
-	{
-		stopped = true;
-		connectorServer.stop();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void stop() throws Exception
+  {
+    stopped = true;
+    connectorServer.stop();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MBeanServer getServer()
-	{
-		return server;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MBeanServer getServer()
+  {
+    return server;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isStopped()
-	{
-		return stopped;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isStopped()
+  {
+    return stopped;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId()
-	{
-		return id;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getId()
+  {
+    return id;
+  }
 }

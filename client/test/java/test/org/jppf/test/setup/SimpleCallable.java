@@ -26,68 +26,68 @@ import java.util.concurrent.Callable;
  */
 public class SimpleCallable implements Callable<Result>, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The position of this task.
-	 */
-	private int position = 0;
-	/**
-	 * The duration of this task.
-	 */
-	private long duration = 0;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The position of this task.
+   */
+  private int position = 0;
+  /**
+   * The duration of this task.
+   */
+  private long duration = 0;
 
-	/**
-	 * Default constructor.
-	 */
-	public SimpleCallable()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public SimpleCallable()
+  {
+  }
 
-	/**
-	 * Initialize this task with the specified position.
-	 * @param position the position of this task.
-	 */
-	public SimpleCallable(final int position)
-	{
-		this.position = position;
-	}
+  /**
+   * Initialize this task with the specified position.
+   * @param position the position of this task.
+   */
+  public SimpleCallable(final int position)
+  {
+    this.position = position;
+  }
 
-	/**
-	 * Initialize this task with the specified position.
-	 * @param position the position of this task.
-	 * @param duration the duration of this task.
-	 */
-	public SimpleCallable(final int position, final long duration)
-	{
-		this.position = position;
-		this.duration = duration;
-	}
+  /**
+   * Initialize this task with the specified position.
+   * @param position the position of this task.
+   * @param duration the duration of this task.
+   */
+  public SimpleCallable(final int position, final long duration)
+  {
+    this.position = position;
+    this.duration = duration;
+  }
 
-	/**
-	 * Execute this task.
-	 * @return a {@link Result} object.
-	 * @see java.util.concurrent.Callable#call()
-	 */
-	@Override
-	public Result call()
-	{
-		Result executionResult = new Result();
-		executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
-		executionResult.position = position;
-		if (duration > 0)
-		{
-			try
-			{
-				Thread.sleep(duration);
-			}
-			catch(InterruptedException e)
-			{
-				executionResult.message = e.getMessage();
-			}
-		}
-		return executionResult;
-	}
+  /**
+   * Execute this task.
+   * @return a {@link Result} object.
+   * @see java.util.concurrent.Callable#call()
+   */
+  @Override
+  public Result call()
+  {
+    Result executionResult = new Result();
+    executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
+    executionResult.position = position;
+    if (duration > 0)
+    {
+      try
+      {
+        Thread.sleep(duration);
+      }
+      catch(InterruptedException e)
+      {
+        executionResult.message = e.getMessage();
+      }
+    }
+    return executionResult;
+  }
 }

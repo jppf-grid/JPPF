@@ -30,36 +30,36 @@ import org.slf4j.*;
  */
 public class SendingOrReceivingState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SendingOrReceivingState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SendingOrReceivingState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public SendingOrReceivingState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public SendingOrReceivingState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
-		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		MultiplexerTransition trans = TO_SENDING_OR_RECEIVING;
-		if (context.hasPendingMessage() || (context.getCurrentMessage() != null)) trans = TO_SENDING;
-		else if (wrapper.isReadable()) trans = TO_RECEIVING;
-		if (debugEnabled) log.debug("returning "+ trans + " for " + wrapper);
-		return trans;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    //if (debugEnabled) log.debug("exec() for " + getRemoteHost(key.channel()));
+    MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+    MultiplexerTransition trans = TO_SENDING_OR_RECEIVING;
+    if (context.hasPendingMessage() || (context.getCurrentMessage() != null)) trans = TO_SENDING;
+    else if (wrapper.isReadable()) trans = TO_RECEIVING;
+    if (debugEnabled) log.debug("returning "+ trans + " for " + wrapper);
+    return trans;
+  }
 }

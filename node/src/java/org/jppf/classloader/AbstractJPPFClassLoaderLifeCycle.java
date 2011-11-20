@@ -35,229 +35,229 @@ import org.slf4j.*;
  */
 public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AbstractJPPFClassLoaderLifeCycle.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Used to synchronize access to the underlying socket from multiple threads.
-	 */
-	protected static final ReentrantLock LOCK = new ReentrantLock();
-	/**
-	 * Determines whether this class loader should handle dynamic class updating.
-	 */
-	protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
-	/**
-	 * The executor that handles asynchronous resource requests.
-	 */
-	protected static ExecutorService executor;
-	/**
-	 * Determines whether this class loader should handle dynamic class updating.
-	 */
-	protected boolean dynamic = false;
-	/**
-	 * The unique identifier for the submitting application.
-	 */
-	protected List<String> uuidPath = new ArrayList<String>();
-	/**
-	 * Uuid of the original task bundle that triggered a resource loading request.
-	 */
-	protected String requestUuid = null;
-	/**
-	 * The cache handling resources temporarily stored to file.
-	 */
-	protected ResourceCache cache = new ResourceCache();
-	/**
-	 * The object used to serialize and deserialize resources.
-	 */
-	protected ObjectSerializer serializer = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractJPPFClassLoaderLifeCycle.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Used to synchronize access to the underlying socket from multiple threads.
+   */
+  protected static final ReentrantLock LOCK = new ReentrantLock();
+  /**
+   * Determines whether this class loader should handle dynamic class updating.
+   */
+  protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
+  /**
+   * The executor that handles asynchronous resource requests.
+   */
+  protected static ExecutorService executor;
+  /**
+   * Determines whether this class loader should handle dynamic class updating.
+   */
+  protected boolean dynamic = false;
+  /**
+   * The unique identifier for the submitting application.
+   */
+  protected List<String> uuidPath = new ArrayList<String>();
+  /**
+   * Uuid of the original task bundle that triggered a resource loading request.
+   */
+  protected String requestUuid = null;
+  /**
+   * The cache handling resources temporarily stored to file.
+   */
+  protected ResourceCache cache = new ResourceCache();
+  /**
+   * The object used to serialize and deserialize resources.
+   */
+  protected ObjectSerializer serializer = null;
 
-	/**
-	 * Initialize this class loader with a parent class loader.
-	 * @param parent a ClassLoader instance.
-	 */
-	protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent)
-	{
-		super(StringUtils.ZERO_URL, parent);
-		if (parent instanceof AbstractJPPFClassLoaderLifeCycle) dynamic = true;
-	}
+  /**
+   * Initialize this class loader with a parent class loader.
+   * @param parent a ClassLoader instance.
+   */
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent)
+  {
+    super(StringUtils.ZERO_URL, parent);
+    if (parent instanceof AbstractJPPFClassLoaderLifeCycle) dynamic = true;
+  }
 
-	/**
-	 * Initialize this class loader with a parent class loader.
-	 * @param parent a ClassLoader instance.
-	 * @param uuidPath unique identifier for the submitting application.
-	 */
-	protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent, final List<String> uuidPath)
-	{
-		this(parent);
-		this.uuidPath = uuidPath;
-	}
+  /**
+   * Initialize this class loader with a parent class loader.
+   * @param parent a ClassLoader instance.
+   * @param uuidPath unique identifier for the submitting application.
+   */
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent, final List<String> uuidPath)
+  {
+    this(parent);
+    this.uuidPath = uuidPath;
+  }
 
-	/**
-	 * Initialize the underlying socket connection.
-	 */
-	protected abstract void init();
-	/**
-	 * Reset and reinitialize the connection ot the server.
-	 */
-	public abstract void reset();
+  /**
+   * Initialize the underlying socket connection.
+   */
+  protected abstract void init();
+  /**
+   * Reset and reinitialize the connection ot the server.
+   */
+  public abstract void reset();
 
-	/**
-	 * Load the specified class from a socket connection.
-	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
-	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-	 * @throws ClassNotFoundException if the class could not be loaded from the remote server.
-	 */
-	protected JPPFResourceWrapper loadResourceData(final Map<String, Object> map, final boolean asResource) throws ClassNotFoundException
-	{
-		JPPFResourceWrapper resource = null;
-		try
-		{
-			if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + ']');
-			resource = loadResourceData0(map, asResource);
-		}
-		catch(IOException e)
-		{
-			if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
-			throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
-		}
-		catch(ClassNotFoundException e)
-		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			if (debugEnabled) log.debug(e.getMessage(), e);
-		}
-		return resource;
-	}
+  /**
+   * Load the specified class from a socket connection.
+   * @param map contains the necessary resource request data.
+   * @param asResource true if the resource is loaded using getResource(), false otherwise.
+   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
+   * @throws ClassNotFoundException if the class could not be loaded from the remote server.
+   */
+  protected JPPFResourceWrapper loadResourceData(final Map<String, Object> map, final boolean asResource) throws ClassNotFoundException
+  {
+    JPPFResourceWrapper resource = null;
+    try
+    {
+      if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + ']');
+      resource = loadResourceData0(map, asResource);
+    }
+    catch(IOException e)
+    {
+      if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
+      throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
+    }
+    catch(ClassNotFoundException e)
+    {
+      throw e;
+    }
+    catch(Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return resource;
+  }
 
-	/**
-	 * Load the specified class from a socket connection.
-	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
-	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-	 * @throws Exception if the connection was lost and could not be reestablished.
-	 */
-	protected  JPPFResourceWrapper loadResourceData0(final Map<String, Object> map, final boolean asResource) throws Exception
-	{
-		if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "], requestUuid = " + requestUuid);
-		JPPFResourceWrapper resource = loadRemoteData(map, false);
-		if (debugEnabled) log.debug("remote definition for resource [" + map.get("name") + "] "+ (resource.getDefinition()==null ? "not " : "") + "found");
-		return resource;
-	}
+  /**
+   * Load the specified class from a socket connection.
+   * @param map contains the necessary resource request data.
+   * @param asResource true if the resource is loaded using getResource(), false otherwise.
+   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
+   * @throws Exception if the connection was lost and could not be reestablished.
+   */
+  protected  JPPFResourceWrapper loadResourceData0(final Map<String, Object> map, final boolean asResource) throws Exception
+  {
+    if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "], requestUuid = " + requestUuid);
+    JPPFResourceWrapper resource = loadRemoteData(map, false);
+    if (debugEnabled) log.debug("remote definition for resource [" + map.get("name") + "] "+ (resource.getDefinition()==null ? "not " : "") + "found");
+    return resource;
+  }
 
-	/**
-	 * Load the specified class from a socket connection.
-	 * @param map contains the necessary resource request data.
-	 * @param asResource true if the resource is loaded using getResource(), false otherwise.
-	 * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-	 * @throws Exception if the connection was lost and could not be reestablished.
-	 */
-	protected abstract JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception;
+  /**
+   * Load the specified class from a socket connection.
+   * @param map contains the necessary resource request data.
+   * @param asResource true if the resource is loaded using getResource(), false otherwise.
+   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
+   * @throws Exception if the connection was lost and could not be reestablished.
+   */
+  protected abstract JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception;
 
-	/**
-	 * Determine whether the socket client is being initialized.
-	 * @return true if the socket client is being initialized, false otherwise.
-	 */
-	static boolean isInitializing()
-	{
-		return INITIALIZING.get();
-	}
+  /**
+   * Determine whether the socket client is being initialized.
+   * @return true if the socket client is being initialized, false otherwise.
+   */
+  static boolean isInitializing()
+  {
+    return INITIALIZING.get();
+  }
 
-	/**
-	 * Set the socket client initialization status.
-	 * @param initFlag true if the socket client is being initialized, false otherwise.
-	 */
-	static void setInitializing(final boolean initFlag)
-	{
-		INITIALIZING.set(initFlag);
-	}
+  /**
+   * Set the socket client initialization status.
+   * @param initFlag true if the socket client is being initialized, false otherwise.
+   */
+  static void setInitializing(final boolean initFlag)
+  {
+    INITIALIZING.set(initFlag);
+  }
 
-	/**
-	 * Set the uuid for the original task bundle that triggered this resource request.
-	 * @param requestUuid the uuid as a string.
-	 */
-	public void setRequestUuid(final String requestUuid)
-	{
-		this.requestUuid = requestUuid;
-	}
+  /**
+   * Set the uuid for the original task bundle that triggered this resource request.
+   * @param requestUuid the uuid as a string.
+   */
+  public void setRequestUuid(final String requestUuid)
+  {
+    this.requestUuid = requestUuid;
+  }
 
-	/**
-	 * Terminate this classloader and clean the resources it uses.
-	 */
-	public abstract void close();
+  /**
+   * Terminate this classloader and clean the resources it uses.
+   */
+  public abstract void close();
 
-	/**
-	 * Get the object used to serialize and deserialize resources.
-	 * @return an {@link ObjectSerializer} instance.
-	 * @throws Exception if any error occurs.
-	 */
-	protected ObjectSerializer getSerializer() throws Exception
-	{
-		if (serializer == null) serializer = (ObjectSerializer) getParent().loadClass("org.jppf.comm.socket.BootstrapObjectSerializer").newInstance();
-		return serializer;
-	}
+  /**
+   * Get the object used to serialize and deserialize resources.
+   * @return an {@link ObjectSerializer} instance.
+   * @throws Exception if any error occurs.
+   */
+  protected ObjectSerializer getSerializer() throws Exception
+  {
+    if (serializer == null) serializer = (ObjectSerializer) getParent().loadClass("org.jppf.comm.socket.BootstrapObjectSerializer").newInstance();
+    return serializer;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void addURL(final URL url)
-	{
-		super.addURL(url);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addURL(final URL url)
+  {
+    super.addURL(url);
+  }
 
-	/**
-	 * Encapsulates a remote resource request submitted asynchronously
-	 * via the single-thread executor.
-	 */
-	protected abstract class AbstractResourceRequest implements Runnable
-	{
-		/**
-		 * Used to collect any throwable raised during communication with the server.
-		 */
-		protected Throwable throwable = null;
-		/**
-		 * The request to send.
-		 */
-		protected JPPFResourceWrapper request = null;
-		/**
-		 * The response received.
-		 */
-		protected JPPFResourceWrapper response = null;
+  /**
+   * Encapsulates a remote resource request submitted asynchronously
+   * via the single-thread executor.
+   */
+  protected abstract class AbstractResourceRequest implements Runnable
+  {
+    /**
+     * Used to collect any throwable raised during communication with the server.
+     */
+    protected Throwable throwable = null;
+    /**
+     * The request to send.
+     */
+    protected JPPFResourceWrapper request = null;
+    /**
+     * The response received.
+     */
+    protected JPPFResourceWrapper response = null;
 
-		/**
-		 * Initialize with the specified request.
-		 * @param request the request to send.
-		 */
-		public AbstractResourceRequest(final JPPFResourceWrapper request)
-		{
-			this.request = request;
-		}
+    /**
+     * Initialize with the specified request.
+     * @param request the request to send.
+     */
+    public AbstractResourceRequest(final JPPFResourceWrapper request)
+    {
+      this.request = request;
+    }
 
-		/**
-		 * Get the throwable eventually raised during communication with the server.
-		 * @return a {@link Throwable} instance.
-		 */
-		public Throwable getThrowable()
-		{
-			return throwable;
-		}
+    /**
+     * Get the throwable eventually raised during communication with the server.
+     * @return a {@link Throwable} instance.
+     */
+    public Throwable getThrowable()
+    {
+      return throwable;
+    }
 
-		/**
-		 * Get the response received.
-		 * @return a {@link JPPFResourceWrapper} instance.
-		 * @throws Exception if any error occurs.
-		 */
-		public JPPFResourceWrapper getResponse() throws Exception
-		{
-			return response;
-		}
-	}
+    /**
+     * Get the response received.
+     * @return a {@link JPPFResourceWrapper} instance.
+     * @throws Exception if any error occurs.
+     */
+    public JPPFResourceWrapper getResponse() throws Exception
+    {
+      return response;
+    }
+  }
 }

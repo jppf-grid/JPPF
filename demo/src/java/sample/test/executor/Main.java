@@ -32,110 +32,110 @@ import org.slf4j.*;
  */
 public class Main
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger logger = LoggerFactory.getLogger(Main.class);
+  /**
+   * Logger for this class.
+   */
+  private static Logger logger = LoggerFactory.getLogger(Main.class);
 
-	/**
-	 * Entry point.
-	 * @param args  not used.
-	 */
-	public static void main(final String[] args)
-	{
-		logger.info("Starting test");
-		JPPFClient client = new JPPFClient();
-		try
-		{
-			JPPFExecutorService executor = new JPPFExecutorService(client);
-			executor.setBatchSize(5);
-			List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
-			int nbTasks = 20;
-			logger.info("Adding tasks");
-			for (int i = 0; i < nbTasks; i++)
-			{
-				futures.add(executor.submit(new SimpleCountTask(i)));
-				//Thread.sleep(1);
-			}
-			logger.info("Waiting for pending tasks to complete");
-			executor.shutdown();
-			while (!executor.isTerminated())
-			{
-				Thread.sleep(1000);
-			}
-			logger.info("Pending tasks completed");
-			for (int i = 0; i < nbTasks; i++)
-			{
-				logger.info("Checking task {}", i);
-				if (futures.get(i).get() != i)
-				{
-					throw new Exception("Invalid future response");
-				}
-			}
-			logger.info("All completed tasks checked");
-		}
-		catch (Exception e)
-		{
-			logger.error("Error", e);
-		}
-		finally
-		{
-			try
-			{
-				client.close();
-			}
-			catch (Throwable e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
+  /**
+   * Entry point.
+   * @param args  not used.
+   */
+  public static void main(final String[] args)
+  {
+    logger.info("Starting test");
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      JPPFExecutorService executor = new JPPFExecutorService(client);
+      executor.setBatchSize(5);
+      List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
+      int nbTasks = 20;
+      logger.info("Adding tasks");
+      for (int i = 0; i < nbTasks; i++)
+      {
+        futures.add(executor.submit(new SimpleCountTask(i)));
+        //Thread.sleep(1);
+      }
+      logger.info("Waiting for pending tasks to complete");
+      executor.shutdown();
+      while (!executor.isTerminated())
+      {
+        Thread.sleep(1000);
+      }
+      logger.info("Pending tasks completed");
+      for (int i = 0; i < nbTasks; i++)
+      {
+        logger.info("Checking task {}", i);
+        if (futures.get(i).get() != i)
+        {
+          throw new Exception("Invalid future response");
+        }
+      }
+      logger.info("All completed tasks checked");
+    }
+    catch (Exception e)
+    {
+      logger.error("Error", e);
+    }
+    finally
+    {
+      try
+      {
+        client.close();
+      }
+      catch (Throwable e)
+      {
+        e.printStackTrace();
+      }
+    }
+  }
 
-	/**
-	 * Simple task.
-	 */
-	private static class SimpleCountTask implements Callable<Integer>, Serializable
-	{
-		/**
-		 * Logger for this class.
-		 */
-		private static Logger logger = LoggerFactory.getLogger(SimpleCountTask.class);
-		/**
-		 * Explicit serialVersionUID.
-		 */
-		private static final long serialVersionUID = 3044260680117586115L;
-		/**
-		 * This task's number.
-		 */
-		private int number;
+  /**
+   * Simple task.
+   */
+  private static class SimpleCountTask implements Callable<Integer>, Serializable
+  {
+    /**
+     * Logger for this class.
+     */
+    private static Logger logger = LoggerFactory.getLogger(SimpleCountTask.class);
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 3044260680117586115L;
+    /**
+     * This task's number.
+     */
+    private int number;
 
-		/**
-		 * Default constructor.
-		 */
-		public SimpleCountTask()
-		{
-		}
+    /**
+     * Default constructor.
+     */
+    public SimpleCountTask()
+    {
+    }
 
-		/**
-		 * Initialize this task with its number.
-		 * @param number the task number.
-		 */
-		public SimpleCountTask(final int number)
-		{
-			this.number = number;
-		}
+    /**
+     * Initialize this task with its number.
+     * @param number the task number.
+     */
+    public SimpleCountTask(final int number)
+    {
+      this.number = number;
+    }
 
-		/**
-		 * {@inheritDoc}
-		 */
-		// @Override
-		@Override
-		public Integer call() throws Exception
-		{
-			logger.info("From logger {}", number);
-			logger.info("From stdout " + number);
-			return number;
-		}
+    /**
+     * {@inheritDoc}
+     */
+    // @Override
+    @Override
+    public Integer call() throws Exception
+    {
+      logger.info("From logger {}", number);
+      logger.info("From stdout " + number);
+      return number;
+    }
 
-	}
+  }
 }

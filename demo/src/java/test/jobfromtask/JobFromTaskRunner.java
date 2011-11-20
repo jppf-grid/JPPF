@@ -31,58 +31,58 @@ import org.slf4j.*;
  */
 public class JobFromTaskRunner
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(JobFromTaskRunner.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(JobFromTaskRunner.class);
+  /**
+   * JPPF client used to submit execution requests.
+   */
+  private static JPPFClient jppfClient = null;
 
-	/**
-	 * Entry point for this class, submits the tasks with a set duration to the server.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			jppfClient = new JPPFClient();
-			print("Running Long Task demo with");
-			long start = System.currentTimeMillis();
-			JPPFJob job = new JPPFJob();
-			job.setName("Source job");
-			job.getSLA().setMaxNodes(1);
-			SourceTask task = new SourceTask();
-			task.setId("source");
-			job.addTask(task);
-			List<JPPFTask> results = jppfClient.submit(job);
-			for (JPPFTask t: results)
-			{
-				Exception e = t.getException();
-				if (e != null) throw e;
-			}
-			long elapsed = System.currentTimeMillis() - start;
-			print("processing  performed in "+StringUtils.toStringDuration(elapsed));
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if (jppfClient != null) jppfClient.close();
-		}
-	}
+  /**
+   * Entry point for this class, submits the tasks with a set duration to the server.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      jppfClient = new JPPFClient();
+      print("Running Long Task demo with");
+      long start = System.currentTimeMillis();
+      JPPFJob job = new JPPFJob();
+      job.setName("Source job");
+      job.getSLA().setMaxNodes(1);
+      SourceTask task = new SourceTask();
+      task.setId("source");
+      job.addTask(task);
+      List<JPPFTask> results = jppfClient.submit(job);
+      for (JPPFTask t: results)
+      {
+        Exception e = t.getException();
+        if (e != null) throw e;
+      }
+      long elapsed = System.currentTimeMillis() - start;
+      print("processing  performed in "+StringUtils.toStringDuration(elapsed));
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      if (jppfClient != null) jppfClient.close();
+    }
+  }
 
-	/**
-	 * Print a message tot he log and to the console.
-	 * @param msg the message to print.
-	 */
-	private static void print(final String msg)
-	{
-		log.info(msg);
-		System.out.println(msg);
-	}
+  /**
+   * Print a message tot he log and to the console.
+   * @param msg the message to print.
+   */
+  private static void print(final String msg)
+  {
+    log.info(msg);
+    System.out.println(msg);
+  }
 }

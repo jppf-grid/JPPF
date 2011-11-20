@@ -24,8 +24,8 @@ package sample.test;
  */
 public interface NonSerializableInterface
 {
-	/**
-	 * The only method in this interface.
-	 */
-	void run();
+  /**
+   * The only method in this interface.
+   */
+  void run();
 }

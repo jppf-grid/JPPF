@@ -25,21 +25,21 @@ import org.jppf.process.ProcessLauncher;
  */
 public class NodeLauncher
 {
-	/**
-	 * Start this application, then the JPPF driver as a subprocess.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			ProcessLauncher launcher = new ProcessLauncher("org.jppf.node.NodeRunner");
-			launcher.run();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
+  /**
+   * Start this application, then the JPPF driver as a subprocess.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      ProcessLauncher launcher = new ProcessLauncher("org.jppf.node.NodeRunner");
+      launcher.run();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+    System.exit(0);
+  }
 }

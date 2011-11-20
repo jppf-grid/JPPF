@@ -29,83 +29,83 @@ import org.slf4j.*;
  */
 public class Probe
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(Probe.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(Probe.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Main entry point.
-	 * @param args - not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			TypedProperties props = JPPFConfiguration.getProperties();
-			String host = props.getString("ipprobe.host", "localhost");
-			String[] sports = props.getString("ipprobe.ports").trim().split("\\s");
-			Integer[] ports = new Integer[sports.length];
-			for (int i=0; i<sports.length; i++) ports[i] = Integer.valueOf(sports[i]);
-			Timer timer = new Timer();
-			ProbeTask task = new ProbeTask(host, ports);
-			timer.schedule(task, 10, props.getLong("ipprobe.interval", 1000L));
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+  /**
+   * Main entry point.
+   * @param args - not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      TypedProperties props = JPPFConfiguration.getProperties();
+      String host = props.getString("ipprobe.host", "localhost");
+      String[] sports = props.getString("ipprobe.ports").trim().split("\\s");
+      Integer[] ports = new Integer[sports.length];
+      for (int i=0; i<sports.length; i++) ports[i] = Integer.valueOf(sports[i]);
+      Timer timer = new Timer();
+      ProbeTask task = new ProbeTask(host, ports);
+      timer.schedule(task, 10, props.getLong("ipprobe.interval", 1000L));
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
 
-	/**
-	 * Timer task that attempts to connect to specified TCP ports.
-	 */
-	public static class ProbeTask extends TimerTask
-	{
-		/**
-		 * The host to connect to.
-		 */
-		private String host = null;
-		/**
-		 * The ports to connect to.
-		 */
-		private Integer[] ports = null;
+  /**
+   * Timer task that attempts to connect to specified TCP ports.
+   */
+  public static class ProbeTask extends TimerTask
+  {
+    /**
+     * The host to connect to.
+     */
+    private String host = null;
+    /**
+     * The ports to connect to.
+     */
+    private Integer[] ports = null;
 
-		/**
-		 * Initialize this task with the specified host and ports.
-		 * @param host - the host to connect to.
-		 * @param ports - the ports to connect to.
-		 */
-		public ProbeTask(final String host, final Integer... ports)
-		{
-			this.host = host;
-			this.ports = ports;
-		}
+    /**
+     * Initialize this task with the specified host and ports.
+     * @param host - the host to connect to.
+     * @param ports - the ports to connect to.
+     */
+    public ProbeTask(final String host, final Integer... ports)
+    {
+      this.host = host;
+      this.ports = ports;
+    }
 
-		/**
-		 * Execute this task.
-		 * @see java.util.TimerTask#run()
-		 */
-		@Override
-		public void run()
-		{
-			for (int n: ports)
-			{
-				try
-				{
-					Socket s = new Socket(host, n);
-					s.close();
-				}
-				catch(Exception e)
-				{
-					if (debugEnabled) log.debug(e.getMessage(), e);
-					else log.error(e.getMessage());
-				}
-			}
-		}
-	}
+    /**
+     * Execute this task.
+     * @see java.util.TimerTask#run()
+     */
+    @Override
+    public void run()
+    {
+      for (int n: ports)
+      {
+        try
+        {
+          Socket s = new Socket(host, n);
+          s.close();
+        }
+        catch(Exception e)
+        {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.error(e.getMessage());
+        }
+      }
+    }
+  }
 }

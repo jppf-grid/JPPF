@@ -29,28 +29,28 @@ import org.jppf.utils.ObjectSerializerImpl;
  */
 public class GSObjectSerializer extends ObjectSerializerImpl
 {
-	/**
-	 * The default constructor must be public to allow for instantiation through Java reflection.
-	 */
-	public GSObjectSerializer()
-	{
-	}
+  /**
+   * The default constructor must be public to allow for instantiation through Java reflection.
+   */
+  public GSObjectSerializer()
+  {
+  }
 
-	/**
-	 * Read an object from an input stream.
-	 * @param is the input stream to deserialize from.
-	 * @return the object that was deserialized from the array of bytes.
-	 * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-	 * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
-	 */
-	@Override
-	public Object deserialize(final InputStream is) throws Exception
-	{
-		ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-		try {
-			return ois.readObject();
-		} finally {
-			ois.close();
-		}
-	}
+  /**
+   * Read an object from an input stream.
+   * @param is the input stream to deserialize from.
+   * @return the object that was deserialized from the array of bytes.
+   * @throws Exception if the ObjectInputStream used for deserialization raises an error.
+   * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
+   */
+  @Override
+  public Object deserialize(final InputStream is) throws Exception
+  {
+    ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
+    try {
+      return ois.readObject();
+    } finally {
+      ois.close();
+    }
+  }
 }

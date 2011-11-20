@@ -25,16 +25,16 @@ package org.jppf.server.nio.client;
  */
 public enum ClientState
 {
-	/**
-	 * State of waiting for something to do / sending a set of results to the client.
-	 */
-	SENDING_RESULTS,
-	/**
-	 * State of waiting for the client to send a job.
-	 */
-	WAITING_JOB,
-	/**
-	 * Idle state for a client channel.
-	 */
-	IDLE
+  /**
+   * State of waiting for something to do / sending a set of results to the client.
+   */
+  SENDING_RESULTS,
+  /**
+   * State of waiting for the client to send a job.
+   */
+  WAITING_JOB,
+  /**
+   * Idle state for a client channel.
+   */
+  IDLE
 }

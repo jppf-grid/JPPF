@@ -31,35 +31,35 @@ import com.mxgraph.view.mxGraph;
  */
 public abstract class AbstractGraphSelectionAction extends AbstractTopologyAction
 {
-	/**
-	 * Constant for an empty <code>TreePath</code>.
-	 */
-	protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
-	/**
-	 * The tree table panel to which this action applies.
-	 */
-	protected final GraphOption panel;
+  /**
+   * Constant for an empty <code>TreePath</code>.
+   */
+  protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
+  /**
+   * The tree table panel to which this action applies.
+   */
+  protected final GraphOption panel;
 
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 */
-	public AbstractGraphSelectionAction(final GraphOption panel)
-	{
-		this.panel = panel;
-		setEnabled(true);
-	}
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   */
+  public AbstractGraphSelectionAction(final GraphOption panel)
+  {
+    this.panel = panel;
+    setEnabled(true);
+  }
 
 
-	/**
-	 * Get the list of all tree nodes representing a driver.
-	 * @return an list of driver cells.
-	 */
-	protected Object[] getDriverVertices()
-	{
-		mxGraph graph = panel.getGraph();
-		mxGraphModel model = (mxGraphModel) graph.getModel();
-		return mxGraphModel.getChildVertices(model, graph.getDefaultParent());
-	}
+  /**
+   * Get the list of all tree nodes representing a driver.
+   * @return an list of driver cells.
+   */
+  protected Object[] getDriverVertices()
+  {
+    mxGraph graph = panel.getGraph();
+    mxGraphModel model = (mxGraphModel) graph.getModel();
+    return mxGraphModel.getChildVertices(model, graph.getDefaultParent());
+  }
 
 }

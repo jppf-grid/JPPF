@@ -27,38 +27,38 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class MyTask extends JPPFTask
 {
-	/**
-	 * How long this task waits before completing.
-	 */
-	private final long duration;
+  /**
+   * How long this task waits before completing.
+   */
+  private final long duration;
 
-	/**
-	 * Initialize this task with the specified duration and id.
-	 * @param duration the duration in milliseconds.
-	 * @param id an id assigned to this task.
-	 */
-	public MyTask(final long duration, final int id)
-	{
-		this.duration = duration;
-		setId("" + id);
-	}
+  /**
+   * Initialize this task with the specified duration and id.
+   * @param duration the duration in milliseconds.
+   * @param id an id assigned to this task.
+   */
+  public MyTask(final long duration, final int id)
+  {
+    this.duration = duration;
+    setId("" + id);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			Thread.sleep(duration);
-			System.out.println("task " + getId() + " completed successfully");
-			setResult("successful completion");
-		}
-		catch (Exception e)
-		{
-			System.out.println("task " + getId() + " completed with error [" + e.getClass().getName() + ": " + e.getMessage() + ']');
-			setException(e);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      Thread.sleep(duration);
+      System.out.println("task " + getId() + " completed successfully");
+      setResult("successful completion");
+    }
+    catch (Exception e)
+    {
+      System.out.println("task " + getId() + " completed with error [" + e.getClass().getName() + ": " + e.getMessage() + ']');
+      setException(e);
+    }
+  }
 }

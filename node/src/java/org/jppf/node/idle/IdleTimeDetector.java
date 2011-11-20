@@ -24,9 +24,9 @@ package org.jppf.node.idle;
  */
 public interface IdleTimeDetector
 {
-	/**
-	 * Get the total idle time of the system.
-	 * @return the idle time in milliseconds.
-	 */
-	long getIdleTimeMillis();
+  /**
+   * Get the total idle time of the system.
+   * @return the idle time in milliseconds.
+   */
+  long getIdleTimeMillis();
 }

@@ -27,63 +27,63 @@ import org.slf4j.*;
  */
 public class JobNotificationListener implements NotificationListener
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JobNotificationListener.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * String identifying the driver that sends the notifications.
-	 */
-	private String driverName = null;
-	/**
-	 * The panel to which the notifications are delegated.
-	 */
-	private JobDataPanel jobDataPanel = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JobNotificationListener.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * String identifying the driver that sends the notifications.
+   */
+  private String driverName = null;
+  /**
+   * The panel to which the notifications are delegated.
+   */
+  private JobDataPanel jobDataPanel = null;
 
-	/**
-	 * Initialize this listener with the specified driver name.
-	 * @param driverName - a string identifying the driver that sends the notifications.
-	 * @param jobDataPanel - the panel to which the notifications are delegated.
-	 */
-	public JobNotificationListener(final JobDataPanel jobDataPanel, final String driverName)
-	{
-		this.driverName = driverName;
-		this.jobDataPanel = jobDataPanel;
-	}
+  /**
+   * Initialize this listener with the specified driver name.
+   * @param driverName - a string identifying the driver that sends the notifications.
+   * @param jobDataPanel - the panel to which the notifications are delegated.
+   */
+  public JobNotificationListener(final JobDataPanel jobDataPanel, final String driverName)
+  {
+    this.driverName = driverName;
+    this.jobDataPanel = jobDataPanel;
+  }
 
-	/**
-	 * Handle notifications of job events.
-	 * @param notification - encapsulates the job event ot handle.
-	 * @param handback - not used.
-	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
-	 */
-	@Override
-	public void handleNotification(final Notification notification, final Object handback)
-	{
-		if (!(notification instanceof JobNotification)) return;
-		JobNotification notif = (JobNotification) notification;
-		if (traceEnabled) log.trace("received notification: " + notif);
-		switch(notif.getEventType())
-		{
-			case JOB_QUEUED:
-				jobDataPanel.jobAdded(driverName, notif.getJobInformation());
-				break;
-			case JOB_ENDED:
-				jobDataPanel.jobRemoved(driverName, notif.getJobInformation());
-				break;
-			case JOB_UPDATED:
-				jobDataPanel.jobUpdated(driverName, notif.getJobInformation());
-				break;
-			case JOB_DISPATCHED:
-				jobDataPanel.subJobAdded(driverName, notif.getJobInformation(), notif.getNodeInfo());
-				break;
-			case JOB_RETURNED:
-				jobDataPanel.subJobRemoved(driverName, notif.getJobInformation(), notif.getNodeInfo());
-				break;
-		}
-	}
+  /**
+   * Handle notifications of job events.
+   * @param notification - encapsulates the job event ot handle.
+   * @param handback - not used.
+   * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+   */
+  @Override
+  public void handleNotification(final Notification notification, final Object handback)
+  {
+    if (!(notification instanceof JobNotification)) return;
+    JobNotification notif = (JobNotification) notification;
+    if (traceEnabled) log.trace("received notification: " + notif);
+    switch(notif.getEventType())
+    {
+      case JOB_QUEUED:
+        jobDataPanel.jobAdded(driverName, notif.getJobInformation());
+        break;
+      case JOB_ENDED:
+        jobDataPanel.jobRemoved(driverName, notif.getJobInformation());
+        break;
+      case JOB_UPDATED:
+        jobDataPanel.jobUpdated(driverName, notif.getJobInformation());
+        break;
+      case JOB_DISPATCHED:
+        jobDataPanel.subJobAdded(driverName, notif.getJobInformation(), notif.getNodeInfo());
+        break;
+      case JOB_RETURNED:
+        jobDataPanel.subJobRemoved(driverName, notif.getJobInformation(), notif.getNodeInfo());
+        break;
+    }
+  }
 }

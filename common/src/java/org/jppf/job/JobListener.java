@@ -27,29 +27,29 @@ import java.util.EventListener;
  */
 public interface JobListener extends EventListener
 {
-	/**
-	 * Called when a new job is put in the job queue.
-	 * @param event - encapsulates the information about the event.
-	 */
-	void jobQueued(JobNotification event);
-	/**
-	 * Called when a job is complete and has been sent back to the client.
-	 * @param event - encapsulates the information about the event.
-	 */
-	void jobEnded(JobNotification event);
-	/**
-	 * Called when the current number of tasks in a job was updated.
-	 * @param event - encapsulates the information about the event.
-	 */
-	void jobUpdated(JobNotification event);
-	/**
-	 * Called when all or part of a job is is sent to a node for execution.
-	 * @param event - encapsulates the information about the event.
-	 */
-	void jobDispatched(JobNotification event);
-	/**
-	 * Called when all or part of a job has returned from irs execution on a node.
-	 * @param event - encapsulates the information about the event.
-	 */
-	void jobReturned(JobNotification event);
+  /**
+   * Called when a new job is put in the job queue.
+   * @param event - encapsulates the information about the event.
+   */
+  void jobQueued(JobNotification event);
+  /**
+   * Called when a job is complete and has been sent back to the client.
+   * @param event - encapsulates the information about the event.
+   */
+  void jobEnded(JobNotification event);
+  /**
+   * Called when the current number of tasks in a job was updated.
+   * @param event - encapsulates the information about the event.
+   */
+  void jobUpdated(JobNotification event);
+  /**
+   * Called when all or part of a job is is sent to a node for execution.
+   * @param event - encapsulates the information about the event.
+   */
+  void jobDispatched(JobNotification event);
+  /**
+   * Called when all or part of a job has returned from irs execution on a node.
+   * @param event - encapsulates the information about the event.
+   */
+  void jobReturned(JobNotification event);
 }

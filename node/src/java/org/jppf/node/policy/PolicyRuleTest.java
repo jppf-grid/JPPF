@@ -27,35 +27,35 @@ import org.slf4j.*;
  */
 public class PolicyRuleTest extends ExecutionPolicy
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(PolicyRuleTest.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(PolicyRuleTest.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Determines whether this policy accepts the specified node.
-	 * @param info system information for the node on which the tasks will run if accepted.
-	 * @return true if the node is accepted, false otherwise.
-	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
-	 */
-	@Override
-	public boolean accepts(final JPPFSystemInformation info)
-	{
-		boolean result = false;
-		if (info != null)
-		{
-			String s = info.getJppf().getString("node.execution.policy");
-			result = (s != null);
-		}
-		if (debugEnabled)
-		{
-			String s = info.getNetwork().getString("ipv4.addresses");
-			log.debug("node [" + s + "] accepted = " + result);
-		}
-		return result;
-	}
+  /**
+   * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.
+   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
+   */
+  @Override
+  public boolean accepts(final JPPFSystemInformation info)
+  {
+    boolean result = false;
+    if (info != null)
+    {
+      String s = info.getJppf().getString("node.execution.policy");
+      result = (s != null);
+    }
+    if (debugEnabled)
+    {
+      String s = info.getNetwork().getString("ipv4.addresses");
+      log.debug("node [" + s + "] accepted = " + result);
+    }
+    return result;
+  }
 }

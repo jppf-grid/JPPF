@@ -31,69 +31,71 @@ import org.jppf.server.node.*;
  */
 class LocalClassLoaderManager extends AbstractClassLoaderManager
 {
-	/**
-	 * The node that holds this class loader manager.
-	 */
-	private JPPFLocalNode node = null;
+  /**
+   * The node that holds this class loader manager.
+   */
+  private JPPFLocalNode node = null;
 
-	/**
-	 * Initialize this class loader manager with the specified I/O handler.
-	 * @param node the node that holds this class loader manager..
-	 */
-	LocalClassLoaderManager(final JPPFLocalNode node)
-	{
-		this.node = node;
-	}
+  /**
+   * Initialize this class loader manager with the specified I/O handler.
+   * @param node the node that holds this class loader manager..
+   */
+  LocalClassLoaderManager(final JPPFLocalNode node)
+  {
+    this.node = node;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected AbstractJPPFClassLoader createClassLoader()
-	{
-		if (classLoader == null)
-		{
-			PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
-			{
-				public AbstractJPPFClassLoader run()
-				{
-					return new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
-				}
-			};
-			classLoader = AccessController.doPrivileged(pa);
-		}
-		return classLoader;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected AbstractJPPFClassLoader createClassLoader()
+  {
+    if (classLoader == null)
+    {
+      PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+      {
+        @Override
+        public AbstractJPPFClassLoader run()
+        {
+          return new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
+        }
+      };
+      classLoader = AccessController.doPrivileged(pa);
+    }
+    return classLoader;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
-	{
-		return new JPPFLocalContainer(node.getChannel(), uuidPath, cl);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
+  {
+    return new JPPFLocalContainer(node.getChannel(), uuidPath, cl);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
-	{
-		return new Callable<AbstractJPPFClassLoader>()
-		{
-			@Override
-			public AbstractJPPFClassLoader call()
-			{
-				PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
-				{
-					public AbstractJPPFClassLoader run()
-					{
-						return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
-					}
-				};
-				return AccessController.doPrivileged(pa);
-			}
-		};
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
+  {
+    return new Callable<AbstractJPPFClassLoader>()
+    {
+      @Override
+      public AbstractJPPFClassLoader call()
+      {
+        PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+        {
+          @Override
+          public AbstractJPPFClassLoader run()
+          {
+            return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
+          }
+        };
+        return AccessController.doPrivileged(pa);
+      }
+    };
+  }
 }

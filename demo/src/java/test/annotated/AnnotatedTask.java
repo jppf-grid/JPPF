@@ -28,50 +28,50 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class AnnotatedTask extends JPPFTask
 {
-	/**
-	 * The time this task will sleep.
-	 */
-	private long time = 0;
+  /**
+   * The time this task will sleep.
+   */
+  private long time = 0;
 
-	/**
-	 * The task id.
-	 */
-	private int id = 0;
+  /**
+   * The task id.
+   */
+  private int id = 0;
 
-	/**
-	 * Initialize this task with a byte array of the specified size.
-	 * The array is created at construction time and passed on to the node.
-	 * @param time .
-	 * @param id .
-	 */
-	public AnnotatedTask(final long time, final int id)
-	{
-		this.time = time;
-		this.id = id;
-	}
+  /**
+   * Initialize this task with a byte array of the specified size.
+   * The array is created at construction time and passed on to the node.
+   * @param time .
+   * @param id .
+   */
+  public AnnotatedTask(final long time, final int id)
+  {
+    this.time = time;
+    this.id = id;
+  }
 
-	/**
-	 * Perform the multiplication of a matrix row by another matrix.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			if (time > 0L) Thread.sleep(time);
-			for (int i=0; i<3; i++)
-			{
-				Enumeration<?> en = getClass().getClassLoader().getResources("META-INF/services/xxx");
-			}
-			setResult("task #" + id + " execution successful");
-		}
-		catch(Exception e)
-		{
-			setException(e);
-			setResult("task #" + id + ' ' + e.getMessage());
-		}
-		//System.out.print(StringUtils.padRight(result, ' ', 250));
-	}
+  /**
+   * Perform the multiplication of a matrix row by another matrix.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      if (time > 0L) Thread.sleep(time);
+      for (int i=0; i<3; i++)
+      {
+        Enumeration<?> en = getClass().getClassLoader().getResources("META-INF/services/xxx");
+      }
+      setResult("task #" + id + " execution successful");
+    }
+    catch(Exception e)
+    {
+      setException(e);
+      setResult("task #" + id + ' ' + e.getMessage());
+    }
+    //System.out.print(StringUtils.padRight(result, ' ', 250));
+  }
 }
 

@@ -26,35 +26,35 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class NotifyingTask extends JPPFTask
 {
-	/**
-	 * Initialize this task with the specified id.
-	 * @param id the task id.
-	 */
-	public NotifyingTask(final String id)
-	{
-		setId(id);
-	}
+  /**
+   * Initialize this task with the specified id.
+   * @param id the task id.
+   */
+  public NotifyingTask(final String id)
+  {
+    setId(id);
+  }
 
-	/**
-	 * This method contains the code that will be executed by a node.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			for (int i=1; i<=10; i++)
-			{
-				Thread.sleep(1000L);
-				// send a status notification
-				TaskNotifier.addNotification("Task '" + getId() + "' : reached stage " + i);
-			}
-			setResult("the execution was performed successfully");
-		}
-		catch(InterruptedException e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * This method contains the code that will be executed by a node.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      for (int i=1; i<=10; i++)
+      {
+        Thread.sleep(1000L);
+        // send a status notification
+        TaskNotifier.addNotification("Task '" + getId() + "' : reached stage " + i);
+      }
+      setResult("the execution was performed successfully");
+    }
+    catch(InterruptedException e)
+    {
+      setException(e);
+    }
+  }
 }

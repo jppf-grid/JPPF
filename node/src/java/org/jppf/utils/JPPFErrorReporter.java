@@ -26,74 +26,74 @@ import java.util.*;
  */
 public class JPPFErrorReporter
 {
-	/**
-	 * A list of collected warnings.
-	 */
-	public List<String> warnings = new ArrayList<String>();
-	/**
-	 * A list of collected errors.
-	 */
-	public List<String> errors = new ArrayList<String>();
-	/**
-	 * A list of fatal (non recoverable) errors.
-	 */
-	public List<String> fatalErrors = new ArrayList<String>();
-	/**
-	 * A name used to identify this error reporter.
-	 */
-	public String name = null;
+  /**
+   * A list of collected warnings.
+   */
+  public List<String> warnings = new ArrayList<String>();
+  /**
+   * A list of collected errors.
+   */
+  public List<String> errors = new ArrayList<String>();
+  /**
+   * A list of fatal (non recoverable) errors.
+   */
+  public List<String> fatalErrors = new ArrayList<String>();
+  /**
+   * A name used to identify this error reporter.
+   */
+  public String name = null;
 
-	/**
-	 * Initialize this error reporter with the specified name.
-	 * @param name a name used to identify this error reporter.
-	 */
-	public JPPFErrorReporter(final String name)
-	{
-		this.name = name;
-	}
+  /**
+   * Initialize this error reporter with the specified name.
+   * @param name a name used to identify this error reporter.
+   */
+  public JPPFErrorReporter(final String name)
+  {
+    this.name = name;
+  }
 
-	/**
-	 * Get a string concatenating all the error messages.
-	 * @return a string.
-	 */
-	public String allErrorsAsStrings()
-	{
-		return concatenateMessages(errors);
-	}
+  /**
+   * Get a string concatenating all the error messages.
+   * @return a string.
+   */
+  public String allErrorsAsStrings()
+  {
+    return concatenateMessages(errors);
+  }
 
-	/**
-	 * Get a string concatenating all the fatal error messages.
-	 * @return a string.
-	 */
-	public String allFatalErrorsAsStrings()
-	{
-		return concatenateMessages(fatalErrors);
-	}
+  /**
+   * Get a string concatenating all the fatal error messages.
+   * @return a string.
+   */
+  public String allFatalErrorsAsStrings()
+  {
+    return concatenateMessages(fatalErrors);
+  }
 
-	/**
-	 * Get a string concatenating all the warning messages.
-	 * @return a string.
-	 */
-	public String allWarningsAsStrings()
-	{
-		return concatenateMessages(warnings);
-	}
+  /**
+   * Get a string concatenating all the warning messages.
+   * @return a string.
+   */
+  public String allWarningsAsStrings()
+  {
+    return concatenateMessages(warnings);
+  }
 
-	/**
-	 * Concatenate all string messages in a list into a single string.
-	 * @param list the list to get the messages to concatenate from.
-	 * @return a concatenation of all messages in the list, separated by new lines.
-	 */
-	protected String concatenateMessages(final List<String> list)
-	{
-		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<list.size(); i++)
-		{
-			if (i > 0) sb.append('\n');
-			sb.append(list.get(i));
-		}
-		return sb.toString();
-	}
+  /**
+   * Concatenate all string messages in a list into a single string.
+   * @param list the list to get the messages to concatenate from.
+   * @return a concatenation of all messages in the list, separated by new lines.
+   */
+  protected String concatenateMessages(final List<String> list)
+  {
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<list.size(); i++)
+    {
+      if (i > 0) sb.append('\n');
+      sb.append(list.get(i));
+    }
+    return sb.toString();
+  }
 
-	//public class
+  //public class
 }

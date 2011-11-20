@@ -27,21 +27,21 @@ import org.jppf.server.protocol.JPPFRunnable;
  */
 public class HelloWorldAnnotated implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Execute the task.
-	 * @param message a message to print.
-	 * @param number an example primitive argument.
-	 * @return a string hello message.
-	 */
-	@JPPFRunnable
-	public String helloMethod(final String message, final int number)
-	{
-		String hello = "Hello, World (annotated, " + message + ", " + number + ')';
-		System.out.println(hello);
-		return hello;
-	}
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Execute the task.
+   * @param message a message to print.
+   * @param number an example primitive argument.
+   * @return a string hello message.
+   */
+  @JPPFRunnable
+  public String helloMethod(final String message, final int number)
+  {
+    String hello = "Hello, World (annotated, " + message + ", " + number + ')';
+    System.out.println(hello);
+    return hello;
+  }
 }

@@ -32,56 +32,56 @@ import org.slf4j.*;
  */
 public class JPPFJcaResultCollector implements TaskResultListener
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFJcaResultCollector.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * A map containing the resulting tasks, ordered by ascending position in the
-	 * submitted list of tasks.
-	 */
-	private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
-	/**
-	 * The list of final results.
-	 */
-	private List<JPPFTask> results = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFJcaResultCollector.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * A map containing the resulting tasks, ordered by ascending position in the
+   * submitted list of tasks.
+   */
+  private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+  /**
+   * The list of final results.
+   */
+  private List<JPPFTask> results = null;
 
-	/**
-	 * Initialize this collector.
-	 */
-	public JPPFJcaResultCollector()
-	{
-	}
+  /**
+   * Initialize this collector.
+   */
+  public JPPFJcaResultCollector()
+  {
+  }
 
-	/**
-	 * Called to notify that the results of a number of tasks have been received from the server.
-	 * @param event a notification of completion for a set of submitted tasks.
-	 * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
-	 */
-	@Override
-	public void resultsReceived(final TaskResultEvent event)
-	{
-		List<JPPFTask> tasks = event.getTaskList();
-		if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks ");
-		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-	}
+  /**
+   * Called to notify that the results of a number of tasks have been received from the server.
+   * @param event a notification of completion for a set of submitted tasks.
+   * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
+   */
+  @Override
+  public void resultsReceived(final TaskResultEvent event)
+  {
+    List<JPPFTask> tasks = event.getTaskList();
+    if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks ");
+    for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+  }
 
-	/**
-	 * Get the list of final results.
-	 * @return a list of results as tasks, or null if not all tasks have been executed.
-	 */
-	public List<JPPFTask> getResults()
-	{
-		if (results == null)
-		{
-			results = new ArrayList<JPPFTask>();
-			for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
-			resultMap.clear();
-		}
-		return results;
-	}
+  /**
+   * Get the list of final results.
+   * @return a list of results as tasks, or null if not all tasks have been executed.
+   */
+  public List<JPPFTask> getResults()
+  {
+    if (results == null)
+    {
+      results = new ArrayList<JPPFTask>();
+      for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
+      resultMap.clear();
+    }
+    return results;
+  }
 }

@@ -30,77 +30,77 @@ import org.jppf.management.JPPFSystemInformation;
  */
 public class RegExp extends ExecutionPolicy
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The name of the property to compare.
-	 */
-	private String propertyName = null;
-	/**
-	 * A regular expression to match the property value against.
-	 */
-	private String regExp = null;
-	/**
-	 * The pattern object to compile from the regular expression.
-	 */
-	private transient Pattern pattern = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The name of the property to compare.
+   */
+  private String propertyName = null;
+  /**
+   * A regular expression to match the property value against.
+   */
+  private String regExp = null;
+  /**
+   * The pattern object to compile from the regular expression.
+   */
+  private transient Pattern pattern = null;
 
-	/**
-	 * Define an equality comparison between the string value of a property and another string value.
-	 * @param propertyName the name of the property to compare.
-	 * @param regExp a regular expression to match the property value against.
-	 * @throws PatternSyntaxException if the syntax of expression is invalid
-	 */
-	public RegExp(final String propertyName, final String regExp) throws PatternSyntaxException
-	{
-		this.propertyName = propertyName;
-		// compiled at creation time to ensure any syntax problem in the expression
-		// is known on the client side.
-		Pattern.compile(regExp);
-		this.regExp = regExp;
-	}
+  /**
+   * Define an equality comparison between the string value of a property and another string value.
+   * @param propertyName the name of the property to compare.
+   * @param regExp a regular expression to match the property value against.
+   * @throws PatternSyntaxException if the syntax of expression is invalid
+   */
+  public RegExp(final String propertyName, final String regExp) throws PatternSyntaxException
+  {
+    this.propertyName = propertyName;
+    // compiled at creation time to ensure any syntax problem in the expression
+    // is known on the client side.
+    Pattern.compile(regExp);
+    this.regExp = regExp;
+  }
 
-	/**
-	 * Determines whether this policy accepts the specified node.
-	 * @param info system information for the node on which the tasks will run if accepted.
-	 * @return true if the node is accepted, false otherwise.
-	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
-	 */
-	@Override
-	public boolean accepts(final JPPFSystemInformation info)
-	{
-		if (regExp == null) return false;
-		// the pattern is cached so it doesn't have to be compiled every time.
-		if (pattern == null) pattern = Pattern.compile(regExp);
-		String s = getProperty(info, propertyName);
-		if (s == null) return false;
-		return pattern.matcher(s).matches();
-	}
+  /**
+   * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.
+   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
+   */
+  @Override
+  public boolean accepts(final JPPFSystemInformation info)
+  {
+    if (regExp == null) return false;
+    // the pattern is cached so it doesn't have to be compiled every time.
+    if (pattern == null) pattern = Pattern.compile(regExp);
+    String s = getProperty(info, propertyName);
+    if (s == null) return false;
+    return pattern.matcher(s).matches();
+  }
 
-	/**
-	 * Print this object to a string.
-	 * @return an XML string representation of this object
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (computedToString == null)
-		{
-			synchronized(ExecutionPolicy.class)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append(indent()).append("<RegExp>\n");
-				toStringIndent++;
-				sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-				sb.append(indent()).append("<Value>").append(regExp).append("</Value>\n");
-				toStringIndent--;
-				sb.append(indent()).append("</RegExp>\n");
-				computedToString = sb.toString();
-			}
-		}
-		return computedToString;
-	}
+  /**
+   * Print this object to a string.
+   * @return an XML string representation of this object
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    if (computedToString == null)
+    {
+      synchronized(ExecutionPolicy.class)
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent()).append("<RegExp>\n");
+        toStringIndent++;
+        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
+        sb.append(indent()).append("<Value>").append(regExp).append("</Value>\n");
+        toStringIndent--;
+        sb.append(indent()).append("</RegExp>\n");
+        computedToString = sb.toString();
+      }
+    }
+    return computedToString;
+  }
 }

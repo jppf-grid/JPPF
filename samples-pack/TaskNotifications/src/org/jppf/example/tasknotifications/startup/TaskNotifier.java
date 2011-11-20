@@ -30,70 +30,70 @@ import org.jppf.startup.JPPFNodeStartupSPI;
  */
 public class TaskNotifier implements JPPFNodeStartupSPI
 {
-	/**
-	 * The proxy to the mbean that sends the actual notifications.
-	 */
-	private static TaskNotificationsMBean mbean = null;
+  /**
+   * The proxy to the mbean that sends the actual notifications.
+   */
+  private static TaskNotificationsMBean mbean = null;
 
-	/**
-	 * This is a test of a node startup class.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		System.out.println("Initializing the tasks notifier");
-		initNotifier();
-	}
+  /**
+   * This is a test of a node startup class.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    System.out.println("Initializing the tasks notifier");
+    initNotifier();
+  }
 
-	/**
-	 * Initialize the task notifications MBean proxy.
-	 */
-	private static void initNotifier()
-	{
-		// Get a reference ot the local MBean server
-		JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper();
-		jmxWrapper.connectAndWait(3000L);
-		if (!jmxWrapper.isConnected())
-		{
-			System.out.println("Error: could not connect to the local MBean server");
-			return;
-		}
-		System.out.println("  connected to the local MBean server");
-		try
-		{
-			ObjectName objectName = new ObjectName(TaskNotificationsMBean.MBEAN_NAME);
-			//obtain the MBean server connection
-			MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
-			// create the proxy instance
-			mbean = MBeanServerInvocationHandler.newProxyInstance(
-					mbsc, objectName, TaskNotificationsMBean.class, true);
-			System.out.println("  task notifier successfully initialized");
-		}
-		catch(Exception e)
-		{
-			System.out.println("Error: " + e.getMessage());
-		}
-	}
+  /**
+   * Initialize the task notifications MBean proxy.
+   */
+  private static void initNotifier()
+  {
+    // Get a reference ot the local MBean server
+    JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper();
+    jmxWrapper.connectAndWait(3000L);
+    if (!jmxWrapper.isConnected())
+    {
+      System.out.println("Error: could not connect to the local MBean server");
+      return;
+    }
+    System.out.println("  connected to the local MBean server");
+    try
+    {
+      ObjectName objectName = new ObjectName(TaskNotificationsMBean.MBEAN_NAME);
+      //obtain the MBean server connection
+      MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
+      // create the proxy instance
+      mbean = MBeanServerInvocationHandler.newProxyInstance(
+          mbsc, objectName, TaskNotificationsMBean.class, true);
+      System.out.println("  task notifier successfully initialized");
+    }
+    catch(Exception e)
+    {
+      System.out.println("Error: " + e.getMessage());
+    }
+  }
 
-	/**
-	 * Send a notification message to all registered listeners.
-	 * @param message the message to send to all registered listeners.
-	 */
-	public static void addNotification(final String message)
-	{
-		if (mbean == null) return;
-		mbean.sendTaskNotification(message);
-	}
+  /**
+   * Send a notification message to all registered listeners.
+   * @param message the message to send to all registered listeners.
+   */
+  public static void addNotification(final String message)
+  {
+    if (mbean == null) return;
+    mbean.sendTaskNotification(message);
+  }
 
-	/**
-	 * Send a notification message to all registered listeners.
-	 * @param message the message to send to all registered listeners.
-	 * @param userData additional (non trivial) data that may additionally be sent with the message.
-	 */
-	public static void addNotification(final String message, final Object userData)
-	{
-		if (mbean == null) return;
-		mbean.sendTaskNotification(message, userData);
-	}
+  /**
+   * Send a notification message to all registered listeners.
+   * @param message the message to send to all registered listeners.
+   * @param userData additional (non trivial) data that may additionally be sent with the message.
+   */
+  public static void addNotification(final String message, final Object userData)
+  {
+    if (mbean == null) return;
+    mbean.sendTaskNotification(message, userData);
+  }
 }

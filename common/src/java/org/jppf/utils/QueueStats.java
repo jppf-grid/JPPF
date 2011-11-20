@@ -26,100 +26,100 @@ import java.io.Serializable;
  */
 public class QueueStats implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Time statistics for the queued objects.
-	 */
-	private StatsSnapshot times = new StatsSnapshot("time");
-	/**
-	 * Time statistics for the queued objects.
-	 */
-	private StatsSnapshot sizes = new StatsSnapshot("size");
-	/**
-	 * Title for this queue snapshot, used in the {@link #toString()} method.
-	 */
-	public String title = "";
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Time statistics for the queued objects.
+   */
+  private StatsSnapshot times = new StatsSnapshot("time");
+  /**
+   * Time statistics for the queued objects.
+   */
+  private StatsSnapshot sizes = new StatsSnapshot("size");
+  /**
+   * Title for this queue snapshot, used in the {@link #toString()} method.
+   */
+  public String title = "";
 
-	/**
-	 * Initialize this queue snapshot with a specified title.
-	 * @param title the title for this snapshot.
-	 */
-	public QueueStats(final String title)
-	{
-		this.title = title;
-		times = new StatsSnapshot(title);
-	}
+  /**
+   * Initialize this queue snapshot with a specified title.
+   * @param title the title for this snapshot.
+   */
+  public QueueStats(final String title)
+  {
+    this.title = title;
+    times = new StatsSnapshot(title);
+  }
 
-	/**
-	 * Get the time snapshot.
-	 * @return a {@link StatsSnapshot} instance.
-	 */
-	public StatsSnapshot getTimes()
-	{
-		return times;
-	}
+  /**
+   * Get the time snapshot.
+   * @return a {@link StatsSnapshot} instance.
+   */
+  public StatsSnapshot getTimes()
+  {
+    return times;
+  }
 
-	/**
-	 * Set the time snapshot.
-	 * @param sizes a {@link StatsSnapshot} instance.
-	 */
-	public void setSizes(final StatsSnapshot sizes)
-	{
-		this.sizes = sizes;
-	}
+  /**
+   * Set the time snapshot.
+   * @param sizes a {@link StatsSnapshot} instance.
+   */
+  public void setSizes(final StatsSnapshot sizes)
+  {
+    this.sizes = sizes;
+  }
 
-	/**
-	 * Get the time snapshot.
-	 * @return a {@link StatsSnapshot} instance.
-	 */
-	public StatsSnapshot getSizes()
-	{
-		return sizes;
-	}
+  /**
+   * Get the time snapshot.
+   * @return a {@link StatsSnapshot} instance.
+   */
+  public StatsSnapshot getSizes()
+  {
+    return sizes;
+  }
 
-	/**
-	 * Set the time snapshot.
-	 * @param times a {@link StatsSnapshot} instance.
-	 */
-	public void setTimes(final StatsSnapshot times)
-	{
-		this.times = times;
-	}
+  /**
+   * Set the time snapshot.
+   * @param times a {@link StatsSnapshot} instance.
+   */
+  public void setTimes(final StatsSnapshot times)
+  {
+    this.times = times;
+  }
 
-	/**
-	 * Get the title.
-	 * @return the title string.
-	 */
-	public String getTitle()
-	{
-		return title;
-	}
+  /**
+   * Get the title.
+   * @return the title string.
+   */
+  public String getTitle()
+  {
+    return title;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(title).append(" queue");
-		sb.append(sizes.toString());
-		sb.append(times.toString());
-		return sb.toString();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(title).append(" queue");
+    sb.append(sizes.toString());
+    sb.append(times.toString());
+    return sb.toString();
+  }
 
-	/**
-	 * Male a copy of this queue stats object.
-	 * @return a {@link QueueStats} instance.
-	 */
-	public QueueStats makeCopy()
-	{
-		QueueStats qs = new QueueStats(title);
-		qs.setSizes(sizes.makeCopy());
-		qs.setTimes(times.makeCopy());
-		return qs;
-	}
+  /**
+   * Male a copy of this queue stats object.
+   * @return a {@link QueueStats} instance.
+   */
+  public QueueStats makeCopy()
+  {
+    QueueStats qs = new QueueStats(title);
+    qs.setSizes(sizes.makeCopy());
+    qs.setTimes(times.makeCopy());
+    return qs;
+  }
 }

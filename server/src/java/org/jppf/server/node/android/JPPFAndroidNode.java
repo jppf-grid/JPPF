@@ -29,101 +29,101 @@ import org.slf4j.*;
  */
 public class JPPFAndroidNode extends AbstractJPPFAndroidNode
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFAndroidNode.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Connection to the recovery server.
-	 */
-	private ClientConnection recoveryConnection = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFAndroidNode.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Connection to the recovery server.
+   */
+  private ClientConnection recoveryConnection = null;
 
-	/**
-	 * Default constructor.
-	 */
-	public JPPFAndroidNode()
-	{
-		super();
-		classLoaderManager = new AnsdroidClassLoaderManager(this);
-	}
+  /**
+   * Default constructor.
+   */
+  public JPPFAndroidNode()
+  {
+    super();
+    classLoaderManager = new AnsdroidClassLoaderManager(this);
+  }
 
-	/**
-	 * Initialize this node's resources.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.server.node.JPPFNode#initDataChannel()
-	 */
-	@Override
-	protected void initDataChannel() throws Exception
-	{
-		if (socketClient == null)
-		{
-			if (debugEnabled) log.debug("Initializing socket");
-			TypedProperties props = JPPFConfiguration.getProperties();
-			String host = props.getString("jppf.server.host", "localhost");
-			// for backward compatibility with v2.x configurations
-			int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", -1, false);
-			socketClient = new SocketClient();
-			//socketClient = new SocketConnectorWrapper();
-			socketClient.setHost(host);
-			socketClient.setPort(port);
-			socketClient.setSerializer(serializer);
-			if (debugEnabled) log.debug("end socket client initialization");
-			if (debugEnabled) log.debug("start socket initializer");
-			System.out.println("Attempting connection to the node server at " + host + ':' + port);
-			socketInitializer.initializeSocket(socketClient);
-			if (!socketInitializer.isSuccessful())
-			{
-				if (debugEnabled) log.debug("socket initializer failed");
-				throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
-			}
-			System.out.println("Reconnected to the node server");
-			if (debugEnabled) log.debug("end socket initializer");
-		}
-		nodeIO = new AndroidNodeIO(this);
-	}
+  /**
+   * Initialize this node's resources.
+   * @throws Exception if an error is raised during initialization.
+   * @see org.jppf.server.node.JPPFNode#initDataChannel()
+   */
+  @Override
+  protected void initDataChannel() throws Exception
+  {
+    if (socketClient == null)
+    {
+      if (debugEnabled) log.debug("Initializing socket");
+      TypedProperties props = JPPFConfiguration.getProperties();
+      String host = props.getString("jppf.server.host", "localhost");
+      // for backward compatibility with v2.x configurations
+      int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", -1, false);
+      socketClient = new SocketClient();
+      //socketClient = new SocketConnectorWrapper();
+      socketClient.setHost(host);
+      socketClient.setPort(port);
+      socketClient.setSerializer(serializer);
+      if (debugEnabled) log.debug("end socket client initialization");
+      if (debugEnabled) log.debug("start socket initializer");
+      System.out.println("Attempting connection to the node server at " + host + ':' + port);
+      socketInitializer.initializeSocket(socketClient);
+      if (!socketInitializer.isSuccessful())
+      {
+        if (debugEnabled) log.debug("socket initializer failed");
+        throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
+      }
+      System.out.println("Reconnected to the node server");
+      if (debugEnabled) log.debug("end socket initializer");
+    }
+    nodeIO = new AndroidNodeIO(this);
+  }
 
-	/**
-	 * Initialize this node's data channel.
-	 * @throws Exception if an error is raised during initialization.
-	 * @see org.jppf.server.node.JPPFNode#closeDataChannel()
-	 */
-	@Override
-	protected void closeDataChannel() throws Exception
-	{
-		if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
-		if (socketClient != null)
-		{
-			SocketWrapper tmp = socketClient;
-			socketClient = null;
-			tmp.close();
-		}
-		if (recoveryConnection != null)
-		{
-			//clientConnection.removeClientConnectionListener(this);
-			ClientConnection tmp = recoveryConnection;
-			recoveryConnection = null;
-			tmp.close();
-		}
-	}
+  /**
+   * Initialize this node's data channel.
+   * @throws Exception if an error is raised during initialization.
+   * @see org.jppf.server.node.JPPFNode#closeDataChannel()
+   */
+  @Override
+  protected void closeDataChannel() throws Exception
+  {
+    if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
+    if (socketClient != null)
+    {
+      SocketWrapper tmp = socketClient;
+      socketClient = null;
+      tmp.close();
+    }
+    if (recoveryConnection != null)
+    {
+      //clientConnection.removeClientConnectionListener(this);
+      ClientConnection tmp = recoveryConnection;
+      recoveryConnection = null;
+      tmp.close();
+    }
+  }
 
-	/**
-	 * Called by the recovery mechanism when it detects that the connection to the server is broken.
-	 * @param event encapsulates information about the connection.
-	 */
-	public void clientConnectionFailed(final ClientConnectionEvent event)
-	{
-		try
-		{
-			if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
-			closeDataChannel();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Called by the recovery mechanism when it detects that the connection to the server is broken.
+   * @param event encapsulates information about the connection.
+   */
+  public void clientConnectionFailed(final ClientConnectionEvent event)
+  {
+    try
+    {
+      if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
+      closeDataChannel();
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 }

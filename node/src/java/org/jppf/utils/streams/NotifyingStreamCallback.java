@@ -27,9 +27,9 @@ package org.jppf.utils.streams;
  */
 public interface NotifyingStreamCallback
 {
-	/**
-	 * Notify that some bytes were read, written or skipped.
-	 * @param length the number of bytes.
-	 */
-	void bytesNotification(long length);
+  /**
+   * Notify that some bytes were read, written or skipped.
+   * @param length the number of bytes.
+   */
+  void bytesNotification(long length);
 }

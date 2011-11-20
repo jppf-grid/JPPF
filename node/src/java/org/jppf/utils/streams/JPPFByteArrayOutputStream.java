@@ -26,41 +26,41 @@ import java.io.ByteArrayOutputStream;
  */
 public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 {
-	/**
-	 * Instantiate this stream with a default size.
-	 */
-	public JPPFByteArrayOutputStream()
-	{
-		super();
-	}
+  /**
+   * Instantiate this stream with a default size.
+   */
+  public JPPFByteArrayOutputStream()
+  {
+    super();
+  }
 
-	/**
-	 * Instantiate this stream with the specified size.
-	 * @param size the initial size of the underlying buffer.
-	 */
-	public JPPFByteArrayOutputStream(final int size)
-	{
-		super(size);
-	}
+  /**
+   * Instantiate this stream with the specified size.
+   * @param size the initial size of the underlying buffer.
+   */
+  public JPPFByteArrayOutputStream(final int size)
+  {
+    super(size);
+  }
 
-	/**
-	 * Override of <code>toByteArray()</code> that returns a reference to the internal buffer
-	 * instead of copy of it, significantly increasing the performance of this operation.
-	 * @return the content of the stream as an array of bytes.
-	 * @see java.io.ByteArrayOutputStream#toByteArray()
-	 */
-	@Override
-	public synchronized byte[] toByteArray()
-	{
-		return buf.length == count ? buf : super.toByteArray();
-	}
+  /**
+   * Override of <code>toByteArray()</code> that returns a reference to the internal buffer
+   * instead of copy of it, significantly increasing the performance of this operation.
+   * @return the content of the stream as an array of bytes.
+   * @see java.io.ByteArrayOutputStream#toByteArray()
+   */
+  @Override
+  public synchronized byte[] toByteArray()
+  {
+    return buf.length == count ? buf : super.toByteArray();
+  }
 
-	/**
-	 * Provide access to the internal buffer.
-	 * @return an array of bytes.
-	 */
-	public byte[] getBuf()
-	{
-		return buf;
-	}
+  /**
+   * Provide access to the internal buffer.
+   * @return an array of bytes.
+   */
+  public byte[] getBuf()
+  {
+    return buf;
+  }
 }

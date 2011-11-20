@@ -29,50 +29,50 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class ParserTask extends JPPFTestTask
 {
-	/**
-	 * Path to the XML file.
-	 */
-	private String filePath = null;
+  /**
+   * Path to the XML file.
+   */
+  private String filePath = null;
 
-	/**
-	 * Initialize this task with the specified xml file path.
-	 * @param filePath the client side path of the xml file to parse.
-	 */
-	public ParserTask(final String filePath)
-	{
-		this.filePath = filePath;
-	}
+  /**
+   * Initialize this task with the specified xml file path.
+   * @param filePath the client side path of the xml file to parse.
+   */
+  public ParserTask(final String filePath)
+  {
+    this.filePath = filePath;
+  }
 
-	/**
-	 * Do the parsing.
-	 * @throws Exception if parsing fails.
-	 * @see java.lang.Runnable#run()
-	 */
-	public void testParsing() throws Exception
-	{
-		System.out.println("Started Parser for "+filePath+" ...");
-		fileParser(filePath);
-		System.out.println("Finished Parser for "+filePath+" ...");
-	}
+  /**
+   * Do the parsing.
+   * @throws Exception if parsing fails.
+   * @see java.lang.Runnable#run()
+   */
+  public void testParsing() throws Exception
+  {
+    System.out.println("Started Parser for "+filePath+" ...");
+    fileParser(filePath);
+    System.out.println("Finished Parser for "+filePath+" ...");
+  }
 
-	/**
-	 * Parse the file.
-	 * @param filetoParse path of the file to parse in the client file system.
-	 * @throws Exception if parsing fails.
-	 */
-	public void fileParser(final String filetoParse) throws Exception
-	{
-		InputStream is = getClass().getClassLoader().getResourceAsStream(filetoParse);
-		//InputSource src = new InputSource(is);
-		new InputSource(is);
-		// Creating XMLReader instance
-		//XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-		XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-		/*
+  /**
+   * Parse the file.
+   * @param filetoParse path of the file to parse in the client file system.
+   * @throws Exception if parsing fails.
+   */
+  public void fileParser(final String filetoParse) throws Exception
+  {
+    InputStream is = getClass().getClassLoader().getResourceAsStream(filetoParse);
+    //InputSource src = new InputSource(is);
+    new InputSource(is);
+    // Creating XMLReader instance
+    //XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+    XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+    /*
 		reader.setContentHandler(brsaxParser);
 		reader.setErrorHandler(brsaxParser);
 		// Parsing the XML file
 		reader.parse(src);
-		 */
-	}
+     */
+  }
 }

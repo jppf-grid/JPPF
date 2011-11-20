@@ -31,164 +31,164 @@ import org.slf4j.*;
  */
 public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extends AbstractChannelWrapper<T>
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(AbstractLocalChannelWrapper.class);
-	/**
-	 * Determines whether trace-level logging is enabled.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * This channel's key ops.
-	 */
-	protected AtomicInteger keyOps = new AtomicInteger(0);
-	/**
-	 * This channel's ready ops.
-	 */
-	protected AtomicInteger readyOps = new AtomicInteger(0);
-	/**
-	 * The resource passed to the node.
-	 */
-	protected S nodeResource = null;
-	/**
-	 * The resource passed to the server.
-	 */
-	protected S serverResource = null;
-	/**
-	 * Object used to synchronize threads when reading/writing the node message.
-	 */
-	protected final SimpleObjectLock nodeLock = new SimpleObjectLock();
-	/**
-	 * Object used to synchronize threads when reading/writing the server message.
-	 */
-	protected final SimpleObjectLock serverLock = new SimpleObjectLock();
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(AbstractLocalChannelWrapper.class);
+  /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * This channel's key ops.
+   */
+  protected AtomicInteger keyOps = new AtomicInteger(0);
+  /**
+   * This channel's ready ops.
+   */
+  protected AtomicInteger readyOps = new AtomicInteger(0);
+  /**
+   * The resource passed to the node.
+   */
+  protected S nodeResource = null;
+  /**
+   * The resource passed to the server.
+   */
+  protected S serverResource = null;
+  /**
+   * Object used to synchronize threads when reading/writing the node message.
+   */
+  protected final SimpleObjectLock nodeLock = new SimpleObjectLock();
+  /**
+   * Object used to synchronize threads when reading/writing the server message.
+   */
+  protected final SimpleObjectLock serverLock = new SimpleObjectLock();
 
-	/**
-	 * Initialize this I/O handler with the specified context.
-	 * @param context the context used as communication channel.
-	 */
-	public AbstractLocalChannelWrapper(final T context)
-	{
-		super(context);
-		if (traceEnabled) log.trace("created " + this);
-	}
+  /**
+   * Initialize this I/O handler with the specified context.
+   * @param context the context used as communication channel.
+   */
+  public AbstractLocalChannelWrapper(final T context)
+  {
+    super(context);
+    if (traceEnabled) log.trace("created " + this);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public NioContext getContext()
-	{
-		return getChannel();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public NioContext getContext()
+  {
+    return getChannel();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getKeyOps()
-	{
-		return keyOps.get();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getKeyOps()
+  {
+    return keyOps.get();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setKeyOps(final int keyOps)
-	{
-		this.keyOps.set(keyOps);
-		if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
-		if (getSelector() != null) getSelector().wakeUp();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setKeyOps(final int keyOps)
+  {
+    this.keyOps.set(keyOps);
+    if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+    if (getSelector() != null) getSelector().wakeUp();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getReadyOps()
-	{
-		return readyOps.get();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getReadyOps()
+  {
+    return readyOps.get();
+  }
 
-	/**
-	 * Set the operations for which this channel is ready.
-	 * @param readyOps the bitwise operations as an int value.
-	 */
-	public void setReadyOps(final int readyOps)
-	{
-		this.readyOps.set(readyOps);
-		if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
-		if (getSelector() != null) getSelector().wakeUp();
-	}
+  /**
+   * Set the operations for which this channel is ready.
+   * @param readyOps the bitwise operations as an int value.
+   */
+  public void setReadyOps(final int readyOps)
+  {
+    this.readyOps.set(readyOps);
+    if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+    if (getSelector() != null) getSelector().wakeUp();
+  }
 
-	/**
-	 * Get the resource passed to the node.
-	 * @return an instance of the resource type used by this channel.
-	 */
-	public S getNodeResource()
-	{
-		synchronized(nodeLock)
-		{
-			return nodeResource;
-		}
-	}
+  /**
+   * Get the resource passed to the node.
+   * @return an instance of the resource type used by this channel.
+   */
+  public S getNodeResource()
+  {
+    synchronized(nodeLock)
+    {
+      return nodeResource;
+    }
+  }
 
-	/**
-	 * Set the resource passed to the node.
-	 * @param resource an instance of the resource type used by this channel.
-	 */
-	public void setNodeResource(final S resource)
-	{
-		synchronized(nodeLock)
-		{
-			this.nodeResource = resource;
-		}
-		nodeLock.wakeUp();
-	}
+  /**
+   * Set the resource passed to the node.
+   * @param resource an instance of the resource type used by this channel.
+   */
+  public void setNodeResource(final S resource)
+  {
+    synchronized(nodeLock)
+    {
+      this.nodeResource = resource;
+    }
+    nodeLock.wakeUp();
+  }
 
-	/**
-	 * Get the resource passed to the server.
-	 * @return an instance of the resource type used by this channel.
-	 */
-	public S getServerResource()
-	{
-		synchronized(serverLock)
-		{
-			return serverResource;
-		}
-	}
+  /**
+   * Get the resource passed to the server.
+   * @return an instance of the resource type used by this channel.
+   */
+  public S getServerResource()
+  {
+    synchronized(serverLock)
+    {
+      return serverResource;
+    }
+  }
 
-	/**
-	 * Set the resource passed to the server.
-	 * @param serverResource an instance of the resource type used by this channel.
-	 */
-	public void setServerResource(final S serverResource)
-	{
-		synchronized(serverLock)
-		{
-			this.serverResource = serverResource;
-		}
-		serverLock.wakeUp();
-	}
+  /**
+   * Set the resource passed to the server.
+   * @param serverResource an instance of the resource type used by this channel.
+   */
+  public void setServerResource(final S serverResource)
+  {
+    synchronized(serverLock)
+    {
+      this.serverResource = serverResource;
+    }
+    serverLock.wakeUp();
+  }
 
 
-	/**
-	 * Get the object used to synchronize threads when reading/writing the node resource.
-	 * @return a {@link SimpleObjectLock} instance.
-	 */
-	public SimpleObjectLock getNodeLock()
-	{
-		return nodeLock;
-	}
+  /**
+   * Get the object used to synchronize threads when reading/writing the node resource.
+   * @return a {@link SimpleObjectLock} instance.
+   */
+  public SimpleObjectLock getNodeLock()
+  {
+    return nodeLock;
+  }
 
-	/**
-	 * Get the object used to synchronize threads when reading/writing the server resource.
-	 * @return a {@link SimpleObjectLock} instance.
-	 */
-	public SimpleObjectLock getServerLock()
-	{
-		return serverLock;
-	}
+  /**
+   * Get the object used to synchronize threads when reading/writing the server resource.
+   * @return a {@link SimpleObjectLock} instance.
+   */
+  public SimpleObjectLock getServerLock()
+  {
+    return serverLock;
+  }
 }

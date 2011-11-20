@@ -27,20 +27,20 @@ import java.util.concurrent.Callable;
  */
 public class HelloWorldCallable implements Callable<String>, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Execute the task.
-	 * @return a string
-	 * @see java.util.concurrent.Callable#call()
-	 */
-	@Override
-	public String call()
-	{
-		String hello = "Hello, World (callable)";
-		System.out.println(hello);
-		return hello;
-	}
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Execute the task.
+   * @return a string
+   * @see java.util.concurrent.Callable#call()
+   */
+  @Override
+  public String call()
+  {
+    String hello = "Hello, World (callable)";
+    System.out.println(hello);
+    return hello;
+  }
 }

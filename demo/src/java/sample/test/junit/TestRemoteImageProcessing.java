@@ -39,95 +39,95 @@ import org.jppf.task.storage.*;
  */
 public class TestRemoteImageProcessing extends TestCase implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Execute a single JPPF task and return the results.
-	 * @throws Exception if the execution failed.
-	 */
-	public void testImageTask() throws Exception
-	{
-		JPPFTask result = null;
-		JPPFClient client = new JPPFClient();
-		try
-		{
-			BufferedImage image = ImageIO.read(new File("../samples-pack/Fractals/data/mandelbrot.jpg"));
-			int w = image.getWidth();
-			int h = image.getHeight();
-			int[] rgb = image.getRGB(0, 0, w, h, null, 0, w);
-			DataProvider dataProvider = new MemoryMapDataProvider();
-			dataProvider.setValue("image.rgb", rgb);
-			dataProvider.setValue("image.width", w);
-			dataProvider.setValue("image.height", h);
-			JPPFJob job = new JPPFJob(dataProvider);
-			job.addTask(new ImageTask());
-			List<JPPFTask> results = client.submit(job);
-			assertNotNull(results);
-			assertFalse(results.isEmpty());
-			result = results.get(0);
-			assertNull(result.getException());
-		}
-		finally
-		{
-			client.close();
-		}
-	}
+  /**
+   * Execute a single JPPF task and return the results.
+   * @throws Exception if the execution failed.
+   */
+  public void testImageTask() throws Exception
+  {
+    JPPFTask result = null;
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      BufferedImage image = ImageIO.read(new File("../samples-pack/Fractals/data/mandelbrot.jpg"));
+      int w = image.getWidth();
+      int h = image.getHeight();
+      int[] rgb = image.getRGB(0, 0, w, h, null, 0, w);
+      DataProvider dataProvider = new MemoryMapDataProvider();
+      dataProvider.setValue("image.rgb", rgb);
+      dataProvider.setValue("image.width", w);
+      dataProvider.setValue("image.height", h);
+      JPPFJob job = new JPPFJob(dataProvider);
+      job.addTask(new ImageTask());
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertFalse(results.isEmpty());
+      result = results.get(0);
+      assertNull(result.getException());
+    }
+    finally
+    {
+      client.close();
+    }
+  }
 
-	/**
-	 * Simple task implementation that waits for the time specified in its constructor.
-	 */
-	public static class ImageTask extends JPPFTask
-	{
-		/**
-		 * Initialize this task.
-		 */
-		public ImageTask()
-		{
-			setId("ImageTask");
-		}
+  /**
+   * Simple task implementation that waits for the time specified in its constructor.
+   */
+  public static class ImageTask extends JPPFTask
+  {
+    /**
+     * Initialize this task.
+     */
+    public ImageTask()
+    {
+      setId("ImageTask");
+    }
 
-		/**
-		 * Execute this task.
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
-		public void run()
-		{
-			try
-			{
-				int[] rgb = (int[]) getDataProvider().getValue("image.rgb");
-				int w = (Integer) getDataProvider().getValue("image.width");
-				int h = (Integer) getDataProvider().getValue("image.height");
-				BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-				img.setRGB(0, 0, w, h, rgb, 0, w);
-			}
-			catch(Exception e)
-			{
-				setException(e);
-			}
-		}
+    /**
+     * Execute this task.
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run()
+    {
+      try
+      {
+        int[] rgb = (int[]) getDataProvider().getValue("image.rgb");
+        int w = (Integer) getDataProvider().getValue("image.width");
+        int h = (Integer) getDataProvider().getValue("image.height");
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        img.setRGB(0, 0, w, h, rgb, 0, w);
+      }
+      catch(Exception e)
+      {
+        setException(e);
+      }
+    }
 
-		/**
-		 * Called when the task is cancelled.
-		 * @see org.jppf.server.protocol.JPPFTask#onCancel()
-		 */
-		@Override
-		public void onCancel()
-		{
-			setResult("cancelled");
-		}
+    /**
+     * Called when the task is cancelled.
+     * @see org.jppf.server.protocol.JPPFTask#onCancel()
+     */
+    @Override
+    public void onCancel()
+    {
+      setResult("cancelled");
+    }
 
-		/**
-		 * Called when the task is restarted.
-		 * @see org.jppf.server.protocol.JPPFTask#onRestart()
-		 */
-		@Override
-		public void onRestart()
-		{
-			setResult("restarted");
-		}
-	}
+    /**
+     * Called when the task is restarted.
+     * @see org.jppf.server.protocol.JPPFTask#onRestart()
+     */
+    @Override
+    public void onRestart()
+    {
+      setResult("restarted");
+    }
+  }
 }

@@ -25,33 +25,33 @@ import org.slf4j.*;
  */
 public final class CompressionUtils
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(CompressionUtils.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(CompressionUtils.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Instantiation of this class is not permitted.
-	 */
-	private CompressionUtils()
-	{
-	}
+  /**
+   * Instantiation of this class is not permitted.
+   */
+  private CompressionUtils()
+  {
+  }
 
-	/**
-	 * Compress an array of bytes using the gzip API.
-	 * @param bytes the array of bytes to compress.
-	 * @param start the start position in the array of bytes.
-	 * @param length the number of bytes to compress.
-	 * @return the compressed bytes as an array of bytes.
-	 * @throws Exception if an error occurs while compressing.
-	 */
-	public static byte[] zip(final byte[] bytes, final int start, final int length) throws Exception
-	{
-		/*
+  /**
+   * Compress an array of bytes using the gzip API.
+   * @param bytes the array of bytes to compress.
+   * @param start the start position in the array of bytes.
+   * @param length the number of bytes to compress.
+   * @return the compressed bytes as an array of bytes.
+   * @throws Exception if an error occurs while compressing.
+   */
+  public static byte[] zip(final byte[] bytes, final int start, final int length) throws Exception
+  {
+    /*
 		ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
 		//GZIPOutputStream gzos = new GZIPOutputStream(baos);
 		DataOutputStream dos = null;
@@ -64,21 +64,21 @@ public final class CompressionUtils
 		dos.close();
 		//if (debugEnabled) log.debug("compressed "+length+" bytes into "+baos.size());
 		return baos.toByteArray();
-		 */
-		return bytes;
-	}
+     */
+    return bytes;
+  }
 
-	/**
-	 * Uncompress an array of bytes using the gzip API.
-	 * @param bytes the array of bytes to uncompress.
-	 * @param start the start position in the array of bytes.
-	 * @param length the number of bytes to uncompress.
-	 * @return the uncompressed bytes as an array.
-	 * @throws Exception if an error occurs while uncompressing.
-	 */
-	public static byte[] unzip(final byte[] bytes, final int start, final int length) throws Exception
-	{
-		/*
+  /**
+   * Uncompress an array of bytes using the gzip API.
+   * @param bytes the array of bytes to uncompress.
+   * @param start the start position in the array of bytes.
+   * @param length the number of bytes to uncompress.
+   * @return the uncompressed bytes as an array.
+   * @throws Exception if an error occurs while uncompressing.
+   */
+  public static byte[] unzip(final byte[] bytes, final int start, final int length) throws Exception
+  {
+    /*
 		int count = 0;
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes, start, length);
 		//GZIPInputStream gzis = new GZIPInputStream(bais);
@@ -98,7 +98,7 @@ public final class CompressionUtils
 		dis.close();
 		//if (debugEnabled) log.debug("uncompressed " + length + " bytes into " + len);
 		return result;
-		 */
-		return bytes;
-	}
+     */
+    return bytes;
+  }
 }

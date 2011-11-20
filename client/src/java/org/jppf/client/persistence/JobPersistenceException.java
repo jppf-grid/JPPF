@@ -26,31 +26,31 @@ import org.jppf.JPPFException;
  */
 public class JobPersistenceException extends JPPFException
 {
-	/**
-	 * Initialize this exception with a specified message and cause exception.
-	 * @param message the message for this exception.
-	 * @param cause the cause exception.
-	 */
-	public JobPersistenceException(final String message, final Throwable cause)
-	{
-		super(message, cause);
-	}
+  /**
+   * Initialize this exception with a specified message and cause exception.
+   * @param message the message for this exception.
+   * @param cause the cause exception.
+   */
+  public JobPersistenceException(final String message, final Throwable cause)
+  {
+    super(message, cause);
+  }
 
-	/**
-	 * Initialize this exception with a specified message.
-	 * @param message the message for this exception.
-	 */
-	public JobPersistenceException(final String message)
-	{
-		super(message);
-	}
+  /**
+   * Initialize this exception with a specified message.
+   * @param message the message for this exception.
+   */
+  public JobPersistenceException(final String message)
+  {
+    super(message);
+  }
 
-	/**
-	 * Initialize this exception with a specified cause exception.
-	 * @param cause the cause exception.
-	 */
-	public JobPersistenceException(final Throwable cause)
-	{
-		super(cause);
-	}
+  /**
+   * Initialize this exception with a specified cause exception.
+   * @param cause the cause exception.
+   */
+  public JobPersistenceException(final Throwable cause)
+  {
+    super(cause);
+  }
 }

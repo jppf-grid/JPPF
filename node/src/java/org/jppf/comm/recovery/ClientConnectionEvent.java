@@ -26,21 +26,21 @@ import java.util.EventObject;
  */
 public class ClientConnectionEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified client-side connection.
-	 * @param connection the connection to which the event applies.
-	 */
-	public ClientConnectionEvent(final ClientConnection connection)
-	{
-		super(connection);
-	}
+  /**
+   * Initialize this event with the specified client-side connection.
+   * @param connection the connection to which the event applies.
+   */
+  public ClientConnectionEvent(final ClientConnection connection)
+  {
+    super(connection);
+  }
 
-	/**
-	 * Get the connection from which the event originated.
-	 * @return a {@link ClientConnection} instance.
-	 */
-	public ClientConnection getConnection()
-	{
-		return (ClientConnection) getSource();
-	}
+  /**
+   * Get the connection from which the event originated.
+   * @return a {@link ClientConnection} instance.
+   */
+  public ClientConnection getConnection()
+  {
+    return (ClientConnection) getSource();
+  }
 }

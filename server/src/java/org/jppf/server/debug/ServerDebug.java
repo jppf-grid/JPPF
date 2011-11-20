@@ -29,130 +29,130 @@ import org.jppf.server.nio.classloader.ClassContext;
  */
 public class ServerDebug implements ServerDebugMBean
 {
-	/**
-	 * The class loader channels.
-	 */
-	private final Set<ChannelWrapper<?>> classLoaderSet = new HashSet<ChannelWrapper<?>>();
-	/**
-	 * The node channels.
-	 */
-	private final Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
-	/**
-	 * The client channels.
-	 */
-	private final Set<ChannelWrapper<?>> clientSet = new HashSet<ChannelWrapper<?>>();
-	/**
-	 * The acceptor channels.
-	 */
-	private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
+  /**
+   * The class loader channels.
+   */
+  private final Set<ChannelWrapper<?>> classLoaderSet = new HashSet<ChannelWrapper<?>>();
+  /**
+   * The node channels.
+   */
+  private final Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
+  /**
+   * The client channels.
+   */
+  private final Set<ChannelWrapper<?>> clientSet = new HashSet<ChannelWrapper<?>>();
+  /**
+   * The acceptor channels.
+   */
+  private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String[] classLoaderChannels()
-	{
-		String[] result = null;
-		synchronized(classLoaderSet)
-		{
-			result = new String[classLoaderSet.size()];
-			int count = 0;
-			for (ChannelWrapper<?> channel: classLoaderSet)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append(channel.toString());
-				ClassContext ctx = (ClassContext) channel.getContext();
-				sb.append(", type=").append(ctx.isProvider() ? "provider" : "node");
-				sb.append(", state=").append(ctx.getState());
-				sb.append(", pending requests=").append(ctx.getNbPendingRequests());
-				sb.append(", current request=").append(ctx.getCurrentRequest());
-				sb.append(", resource=").append(ctx.getResource());
-				result[count++] = sb.toString();
-			}
-		}
-		return result;
-		//return viewChannels(classLoaderSet);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String[] classLoaderChannels()
+  {
+    String[] result = null;
+    synchronized(classLoaderSet)
+    {
+      result = new String[classLoaderSet.size()];
+      int count = 0;
+      for (ChannelWrapper<?> channel: classLoaderSet)
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.append(channel.toString());
+        ClassContext ctx = (ClassContext) channel.getContext();
+        sb.append(", type=").append(ctx.isProvider() ? "provider" : "node");
+        sb.append(", state=").append(ctx.getState());
+        sb.append(", pending requests=").append(ctx.getNbPendingRequests());
+        sb.append(", current request=").append(ctx.getCurrentRequest());
+        sb.append(", resource=").append(ctx.getResource());
+        result[count++] = sb.toString();
+      }
+    }
+    return result;
+    //return viewChannels(classLoaderSet);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String[] nodeDataChannels()
-	{
-		return viewChannels(nodeSet);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String[] nodeDataChannels()
+  {
+    return viewChannels(nodeSet);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String[] clientDataChannels()
-	{
-		return viewChannels(clientSet);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String[] clientDataChannels()
+  {
+    return viewChannels(clientSet);
+  }
 
-	/**
-	 * View the list of channels in the specified set.
-	 * @param set the set to view.
-	 * @return an array of state strings for each channel.
-	 */
-	private static String[] viewChannels(final Set<ChannelWrapper<?>> set)
-	{
-		String[] result = null;
-		synchronized(set)
-		{
-			result = new String[set.size()];
-			int count = 0;
-			for (ChannelWrapper<?> channel: set)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append(channel.toString());
-				sb.append(", state=").append(channel.getContext().getState());
-				result[count++] = sb.toString();
-			}
-		}
-		return result;
-	}
+  /**
+   * View the list of channels in the specified set.
+   * @param set the set to view.
+   * @return an array of state strings for each channel.
+   */
+  private static String[] viewChannels(final Set<ChannelWrapper<?>> set)
+  {
+    String[] result = null;
+    synchronized(set)
+    {
+      result = new String[set.size()];
+      int count = 0;
+      for (ChannelWrapper<?> channel: set)
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.append(channel.toString());
+        sb.append(", state=").append(channel.getContext().getState());
+        result[count++] = sb.toString();
+      }
+    }
+    return result;
+  }
 
-	/**
-	 * Add a channel to those observed.
-	 * @param channel the channel to add.
-	 * @param serverName the name of the server that owns the channel.
-	 */
-	public void addChannel(final ChannelWrapper<?> channel, final String serverName)
-	{
-		Set<ChannelWrapper<?>> set = findSetFromName(serverName);
-		synchronized(set)
-		{
-			set.add(channel);
-		}
-	}
+  /**
+   * Add a channel to those observed.
+   * @param channel the channel to add.
+   * @param serverName the name of the server that owns the channel.
+   */
+  public void addChannel(final ChannelWrapper<?> channel, final String serverName)
+  {
+    Set<ChannelWrapper<?>> set = findSetFromName(serverName);
+    synchronized(set)
+    {
+      set.add(channel);
+    }
+  }
 
-	/**
-	 * Remove a channel from those observed.
-	 * @param channel the channel to add.
-	 * @param serverName the name of the server that owns the channel.
-	 */
-	public void removeChannel(final ChannelWrapper<?> channel, final String serverName)
-	{
-		Set<ChannelWrapper<?>> set = findSetFromName(serverName);
-		synchronized(set)
-		{
-			set.remove(channel);
-		}
-	}
+  /**
+   * Remove a channel from those observed.
+   * @param channel the channel to add.
+   * @param serverName the name of the server that owns the channel.
+   */
+  public void removeChannel(final ChannelWrapper<?> channel, final String serverName)
+  {
+    Set<ChannelWrapper<?>> set = findSetFromName(serverName);
+    synchronized(set)
+    {
+      set.remove(channel);
+    }
+  }
 
-	/**
-	 * Get the set of channels for the specified server name.
-	 * @param name the name of the server for which to get the channels.
-	 * @return a set of <code>ChannelWrapper</code> instances.
-	 */
-	private Set<ChannelWrapper<?>> findSetFromName(final String name)
-	{
-		if (NioServer.CLASS_SERVER.equals(name)) return classLoaderSet;
-		else if (NioServer.NODE_SERVER.equals(name)) return nodeSet;
-		else if (NioServer.CLIENT_SERVER.equals(name)) return clientSet;
-		return acceptorSet;
-	}
+  /**
+   * Get the set of channels for the specified server name.
+   * @param name the name of the server for which to get the channels.
+   * @return a set of <code>ChannelWrapper</code> instances.
+   */
+  private Set<ChannelWrapper<?>> findSetFromName(final String name)
+  {
+    if (NioServer.CLASS_SERVER.equals(name)) return classLoaderSet;
+    else if (NioServer.NODE_SERVER.equals(name)) return nodeSet;
+    else if (NioServer.CLIENT_SERVER.equals(name)) return clientSet;
+    return acceptorSet;
+  }
 }

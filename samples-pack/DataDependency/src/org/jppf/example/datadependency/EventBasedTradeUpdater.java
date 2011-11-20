@@ -30,74 +30,74 @@ import com.hazelcast.core.Hazelcast;
  */
 public class EventBasedTradeUpdater extends AbstractTradeUpdater
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(EventBasedTradeUpdater.class);
-	/**
-	 * Debug enabled flag.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(EventBasedTradeUpdater.class);
+  /**
+   * Debug enabled flag.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Default constructor.
-	 */
-	public EventBasedTradeUpdater()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public EventBasedTradeUpdater()
+  {
+  }
 
-	/**
-	 * Main loop.
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			if (debugEnabled) log.debug("starting trade updater");
-			initializeData();
-			// start the ticker
-			Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
-					config.getInt("nbTickerEvents", 0), dataFactory);
-			ticker.addTickerListener(marketDataHandler);
-			ticker.addTickerListener(this);
-			print("starting ticker ...");
-			long start = System.currentTimeMillis();
-			new Thread(ticker, "ticker thread").start();
-			// let it run for the configured time
-			Thread.sleep(config.getLong("simulationDuration", 60000L));
-			// stop the ticker
-			ticker.setStopped(true);
-			print("ticker stopped: " + ticker.getEventCount() + " events generated");
-			jobExecutor.shutdown();
-			while (!jobExecutor.isTerminated()) Thread.sleep(10);
-			resultsExecutor.shutdown();
-			while (!resultsExecutor.isTerminated()) Thread.sleep(10);
-			long elapsed = System.currentTimeMillis() - start;
-			statsCollector.setTotalTime(elapsed);
-			print(statsCollector.toString());
-			marketDataHandler.close();
-			Hazelcast.shutdownAll();
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.getMessage());
-			log.error(e.getMessage(), e);
-		}
-		System.exit(0);
-	}
+  /**
+   * Main loop.
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      if (debugEnabled) log.debug("starting trade updater");
+      initializeData();
+      // start the ticker
+      Ticker ticker = new Ticker(marketDataList, config.getInt("minTickerInterval", 50), config.getInt("maxTickerInterval", 1000),
+          config.getInt("nbTickerEvents", 0), dataFactory);
+      ticker.addTickerListener(marketDataHandler);
+      ticker.addTickerListener(this);
+      print("starting ticker ...");
+      long start = System.currentTimeMillis();
+      new Thread(ticker, "ticker thread").start();
+      // let it run for the configured time
+      Thread.sleep(config.getLong("simulationDuration", 60000L));
+      // stop the ticker
+      ticker.setStopped(true);
+      print("ticker stopped: " + ticker.getEventCount() + " events generated");
+      jobExecutor.shutdown();
+      while (!jobExecutor.isTerminated()) Thread.sleep(10);
+      resultsExecutor.shutdown();
+      while (!resultsExecutor.isTerminated()) Thread.sleep(10);
+      long elapsed = System.currentTimeMillis() - start;
+      statsCollector.setTotalTime(elapsed);
+      print(statsCollector.toString());
+      marketDataHandler.close();
+      Hazelcast.shutdownAll();
+    }
+    catch(Exception e)
+    {
+      System.out.println(e.getMessage());
+      log.error(e.getMessage(), e);
+    }
+    System.exit(0);
+  }
 
-	/**
-	 * Called when a piece of market data was updated.
-	 * @param event encapsulated the market data update.
-	 * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
-	 */
-	@Override
-	public void marketDataUpdated(final TickerEvent event)
-	{
-		if (jobExecutor.isShutdown()) return;
-		if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());
-		jobExecutor.submit(new SubmissionTask(event.getMarketData()));
-		statsCollector.dataUpdated();
-	}
+  /**
+   * Called when a piece of market data was updated.
+   * @param event encapsulated the market data update.
+   * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
+   */
+  @Override
+  public void marketDataUpdated(final TickerEvent event)
+  {
+    if (jobExecutor.isShutdown()) return;
+    if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());
+    jobExecutor.submit(new SubmissionTask(event.getMarketData()));
+    statsCollector.dataUpdated();
+  }
 }

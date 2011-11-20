@@ -26,15 +26,15 @@ import java.util.EventListener;
  */
 public interface NodeConnectionListener extends EventListener
 {
-	/**
-	 * Called when a node is connected to the server.
-	 * @param event encapsulates information about the connected node.
-	 */
-	void nodeConnected(NodeConnectionEvent event);
+  /**
+   * Called when a node is connected to the server.
+   * @param event encapsulates information about the connected node.
+   */
+  void nodeConnected(NodeConnectionEvent event);
 
-	/**
-	 * Called when a node is disconnected from the server.
-	 * @param event encapsulates information about the connected node.
-	 */
-	void nodeDisconnected(NodeConnectionEvent event);
+  /**
+   * Called when a node is disconnected from the server.
+   * @param event encapsulates information about the connected node.
+   */
+  void nodeDisconnected(NodeConnectionEvent event);
 }

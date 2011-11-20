@@ -46,35 +46,35 @@ import java.io.Serializable;
  */
 public class NBody implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The total acceleration the body is subjected to.
-	 */
-	public Vector2d acceleration = new Vector2d();
-	/**
-	 * The current velocity of the body.
-	 */
-	public Vector2d velocity = new Vector2d();
-	/**
-	 * The current position of the body.
-	 */
-	public Vector2d pos = null;
-	/**
-	 * Identifier for the body.
-	 */
-	public int number = 0;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The total acceleration the body is subjected to.
+   */
+  public Vector2d acceleration = new Vector2d();
+  /**
+   * The current velocity of the body.
+   */
+  public Vector2d velocity = new Vector2d();
+  /**
+   * The current position of the body.
+   */
+  public Vector2d pos = null;
+  /**
+   * Identifier for the body.
+   */
+  public int number = 0;
 
-	/**
-	 * Initialize this body with the specified position.
-	 * @param number the body's order number.
-	 * @param position the body's position.
-	 */
-	public NBody(final int number, final Vector2d position)
-	{
-		this.number = number;
-		this.pos = position;
-	}
+  /**
+   * Initialize this body with the specified position.
+   * @param number the body's order number.
+   * @param position the body's position.
+   */
+  public NBody(final int number, final Vector2d position)
+  {
+    this.number = number;
+    this.pos = position;
+  }
 }

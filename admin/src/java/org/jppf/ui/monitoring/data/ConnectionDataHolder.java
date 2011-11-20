@@ -28,44 +28,44 @@ import org.jppf.server.JPPFStats;
  */
 public class ConnectionDataHolder
 {
-	/**
-	 * The list of all snapshots kept in memory. the size of this list is always equal to or less than
-	 * the rollover position.
-	 */
-	private List<JPPFStats> dataList = new Vector<JPPFStats>();
-	/**
-	 * Cache of the data snapshots fields maps to their corresponding string values.
-	 */
-	private List<Map<Fields, String>> stringValuesMaps = new Vector<Map<Fields, String>>();
-	/**
-	 * Cache of the data snapshots fields maps to their corresponding double values.
-	 */
-	private List<Map<Fields, Double>> doubleValuesMaps = new Vector<Map<Fields, Double>>();
+  /**
+   * The list of all snapshots kept in memory. the size of this list is always equal to or less than
+   * the rollover position.
+   */
+  private List<JPPFStats> dataList = new Vector<JPPFStats>();
+  /**
+   * Cache of the data snapshots fields maps to their corresponding string values.
+   */
+  private List<Map<Fields, String>> stringValuesMaps = new Vector<Map<Fields, String>>();
+  /**
+   * Cache of the data snapshots fields maps to their corresponding double values.
+   */
+  private List<Map<Fields, Double>> doubleValuesMaps = new Vector<Map<Fields, Double>>();
 
-	/**
-	 * Get the list of statistic snapshots for this connection data holder.
-	 * @return a list of <code>JPPFStats</code> instances.
-	 */
-	public List<JPPFStats> getDataList()
-	{
-		return dataList;
-	}
+  /**
+   * Get the list of statistic snapshots for this connection data holder.
+   * @return a list of <code>JPPFStats</code> instances.
+   */
+  public List<JPPFStats> getDataList()
+  {
+    return dataList;
+  }
 
-	/**
-	 * Get a cache of the data snapshots fields maps to their corresponding double values.
-	 * @return a list of maps of field names to double values.
-	 */
-	public List<Map<Fields, Double>> getDoubleValuesMaps()
-	{
-		return doubleValuesMaps;
-	}
+  /**
+   * Get a cache of the data snapshots fields maps to their corresponding double values.
+   * @return a list of maps of field names to double values.
+   */
+  public List<Map<Fields, Double>> getDoubleValuesMaps()
+  {
+    return doubleValuesMaps;
+  }
 
-	/**
-	 * Get a cache of the data snapshots fields maps to their corresponding string values.
-	 * @return a list of maps of field names to string values.
-	 */
-	public List<Map<Fields, String>> getStringValuesMaps()
-	{
-		return stringValuesMaps;
-	}
+  /**
+   * Get a cache of the data snapshots fields maps to their corresponding string values.
+   * @return a list of maps of field names to string values.
+   */
+  public List<Map<Fields, String>> getStringValuesMaps()
+  {
+    return stringValuesMaps;
+  }
 }

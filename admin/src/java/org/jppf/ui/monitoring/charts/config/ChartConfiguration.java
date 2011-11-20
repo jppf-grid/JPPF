@@ -28,91 +28,91 @@ import org.jppf.ui.monitoring.data.Fields;
  */
 public class ChartConfiguration
 {
-	/**
-	 * Name of this configuration. Must be unique.
-	 */
-	public String name = null;
-	/**
-	 * Determines the type of the chart, ie bar chart, plot chart, pie, etc.
-	 */
-	public ChartType type  = null;
-	/**
-	 * Unit to display on item labels or in the legend or title.
-	 */
-	public String unit = null;
-	/**
-	 * Precision of the number to display in items and tooltip labels.
-	 */
-	public int precision = 0;
-	/**
-	 * The list of fields charted in this chart.
-	 */
-	public Fields[] fields = null;
-	/**
-	 * The dataset associated with the chart.
-	 */
-	public Object dataset = null;
-	//public Dataset dataset = null;
-	/**
-	 * The JFreeChart object.
-	 */
-	public Object chart = null;
-	//public JFreeChart chart = null;
-	/**
-	 * The chartPanel enclosing the chart.
-	 */
-	public JPanel chartPanel = null;
-	//public ChartPanel chartPanel = null;
-	/**
-	 * Position of the chart in its containing panel.
-	 */
-	public int position = -1;
+  /**
+   * Name of this configuration. Must be unique.
+   */
+  public String name = null;
+  /**
+   * Determines the type of the chart, ie bar chart, plot chart, pie, etc.
+   */
+  public ChartType type  = null;
+  /**
+   * Unit to display on item labels or in the legend or title.
+   */
+  public String unit = null;
+  /**
+   * Precision of the number to display in items and tooltip labels.
+   */
+  public int precision = 0;
+  /**
+   * The list of fields charted in this chart.
+   */
+  public Fields[] fields = null;
+  /**
+   * The dataset associated with the chart.
+   */
+  public Object dataset = null;
+  //public Dataset dataset = null;
+  /**
+   * The JFreeChart object.
+   */
+  public Object chart = null;
+  //public JFreeChart chart = null;
+  /**
+   * The chartPanel enclosing the chart.
+   */
+  public JPanel chartPanel = null;
+  //public ChartPanel chartPanel = null;
+  /**
+   * Position of the chart in its containing panel.
+   */
+  public int position = -1;
 
-	/**
-	 * Default constructor.
-	 */
-	public ChartConfiguration()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public ChartConfiguration()
+  {
+  }
 
-	/**
-	 * Create a configuration with the specified parameters.
-	 * @param name the name of this configuration, must be unique.
-	 * @param type determines the type of the chart, ie bar chart, plot chart, pie, etc.
-	 * @param unit the unit to display on item labels or in the legend or title.
-	 * @param precision the precision of the number to display in items and tooltip labels.
-	 * @param fields the list of fields charted in this chart.
-	 */
-	public ChartConfiguration(final String name, final ChartType type, final String unit, final int precision, final Fields[] fields)
-	{
-		this.name = name;
-		this.type = type;
-		this.unit = unit;
-		this.precision = precision;
-		this.fields = fields;
-	}
+  /**
+   * Create a configuration with the specified parameters.
+   * @param name the name of this configuration, must be unique.
+   * @param type determines the type of the chart, ie bar chart, plot chart, pie, etc.
+   * @param unit the unit to display on item labels or in the legend or title.
+   * @param precision the precision of the number to display in items and tooltip labels.
+   * @param fields the list of fields charted in this chart.
+   */
+  public ChartConfiguration(final String name, final ChartType type, final String unit, final int precision, final Fields[] fields)
+  {
+    this.name = name;
+    this.type = type;
+    this.unit = unit;
+    this.precision = precision;
+    this.fields = fields;
+  }
 
-	/**
-	 * Create a configuration from another configuration (copy constructor).
-	 * @param cfg the configuration to copy from.
-	 */
-	public ChartConfiguration(final ChartConfiguration cfg)
-	{
-		this.name = cfg.name;
-		this.type = cfg.type;
-		this.unit = cfg.unit;
-		this.precision = cfg.precision;
-		this.fields = cfg.fields;
-	}
+  /**
+   * Create a configuration from another configuration (copy constructor).
+   * @param cfg the configuration to copy from.
+   */
+  public ChartConfiguration(final ChartConfiguration cfg)
+  {
+    this.name = cfg.name;
+    this.type = cfg.type;
+    this.unit = cfg.unit;
+    this.precision = cfg.precision;
+    this.fields = cfg.fields;
+  }
 
-	/**
-	 * Get a string representation of this chart configuration.
-	 * @return a string containing this configuration's name.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return name == null ? "no name" : name;
-	}
+  /**
+   * Get a string representation of this chart configuration.
+   * @return a string containing this configuration's name.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return name == null ? "no name" : name;
+  }
 }

@@ -27,30 +27,30 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class NonSerializableAttributeTask extends JPPFTask
 {
-	/**
-	 * Non-serializable attribute, must be null before the task execution..
-	 */
-	private NonSerializable ns = null;
+  /**
+   * Non-serializable attribute, must be null before the task execution..
+   */
+  private NonSerializable ns = null;
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		ns = new NonSerializable();
-		setResult("execution successful");
-	}
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    ns = new NonSerializable();
+    setResult("execution successful");
+  }
 
-	/**
-	 * A dummy non-serializable class.
-	 */
-	public static class NonSerializable
-	{
-		/**
-		 * A dummy attribute.
-		 */
-		public int field = 0;
-	}
+  /**
+   * A dummy non-serializable class.
+   */
+  public static class NonSerializable
+  {
+    /**
+     * A dummy attribute.
+     */
+    public int field = 0;
+  }
 }

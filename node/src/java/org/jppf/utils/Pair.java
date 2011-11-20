@@ -27,86 +27,86 @@ import java.io.Serializable;
  */
 public class Pair<U, V> implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The first object of this pair.
-	 */
-	private U first = null;
-	/**
-	 * The second object of this pair.
-	 */
-	private V second = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The first object of this pair.
+   */
+  private U first = null;
+  /**
+   * The second object of this pair.
+   */
+  private V second = null;
 
-	/**
-	 * Initialize this pair with two values.
-	 * @param first the first value of the new pair.
-	 * @param second the second value of the new pair.
-	 */
-	public Pair(final U first, final V second)
-	{
-		this.first = first;
-		this.second = second;
-	}
+  /**
+   * Initialize this pair with two values.
+   * @param first the first value of the new pair.
+   * @param second the second value of the new pair.
+   */
+  public Pair(final U first, final V second)
+  {
+    this.first = first;
+    this.second = second;
+  }
 
-	/**
-	 * Get the first value of this pair.
-	 * @return an object of type U.
-	 */
-	public U first()
-	{
-		return first;
-	}
+  /**
+   * Get the first value of this pair.
+   * @return an object of type U.
+   */
+  public U first()
+  {
+    return first;
+  }
 
-	/**
-	 * Get the second value of this pair.
-	 * @return an object of type V.
-	 */
-	public V second()
-	{
-		return second;
-	}
+  /**
+   * Get the second value of this pair.
+   * @return an object of type V.
+   */
+  public V second()
+  {
+    return second;
+  }
 
-	/**
-	 * Get the hashcode for this object.
-	 * @return the hashcode as an int value.
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((first == null) ? 0 : first.hashCode());
-		result = prime * result + ((second == null) ? 0 : second.hashCode());
-		return result;
-	}
+  /**
+   * Get the hashcode for this object.
+   * @return the hashcode as an int value.
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((first == null) ? 0 : first.hashCode());
+    result = prime * result + ((second == null) ? 0 : second.hashCode());
+    return result;
+  }
 
-	/**
-	 * Indicates whether some other object is "equal to" this one.
-	 * @param obj the reference object with which to compare.
-	 * @return <code>true</code> if this object is the same as the obj.
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(final Object obj)
-	{
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
-		Pair other = (Pair) obj;
-		if (first == null)
-		{
-			if (other.first != null) return false;
-		}
-		else if (!first.equals(other.first)) return false;
-		if (second == null)
-		{
-			if (other.second != null) return false;
-		}
-		else if (!second.equals(other.second)) return false;
-		return true;
-	}
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   * @param obj the reference object with which to compare.
+   * @return <code>true</code> if this object is the same as the obj.
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    Pair other = (Pair) obj;
+    if (first == null)
+    {
+      if (other.first != null) return false;
+    }
+    else if (!first.equals(other.first)) return false;
+    if (second == null)
+    {
+      if (other.second != null) return false;
+    }
+    else if (!second.equals(other.second)) return false;
+    return true;
+  }
 }

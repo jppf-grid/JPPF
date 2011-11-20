@@ -32,40 +32,40 @@ import org.slf4j.*;
  */
 class IdleProviderState extends ClassServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state with a specified NioServer.
-	 * @param server the NioServer this state relates to.
-	 */
-	public IdleProviderState(final ClassNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state with a specified NioServer.
+   * @param server the NioServer this state relates to.
+   */
+  public IdleProviderState(final ClassNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
-	 */
-	@Override
-	public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
-		{
-			ClassContext context = (ClassContext) wrapper.getContext();
-			server.removeProviderConnection(context.getUuid(), wrapper);
-			throw new ConnectException("provider " + wrapper + " has been disconnected");
-		}
-		return TO_IDLE_PROVIDER;
-	}
+  /**
+   * Execute the action associated with this channel state.
+   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if an error occurs while transitioning to another state.
+   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   */
+  @Override
+  public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+    {
+      ClassContext context = (ClassContext) wrapper.getContext();
+      server.removeProviderConnection(context.getUuid(), wrapper);
+      throw new ConnectException("provider " + wrapper + " has been disconnected");
+    }
+    return TO_IDLE_PROVIDER;
+  }
 }

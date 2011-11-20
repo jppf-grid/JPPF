@@ -40,91 +40,91 @@ import test.org.jppf.test.setup.*;
  */
 public class TestJPPFTask extends Setup1D1N1C
 {
-	/**
-	 * Count of the number of jobs created.
-	 */
-	private static AtomicInteger jobCount = new AtomicInteger(0);
-	/**
-	 * A "short" duration for this test.
-	 */
-	private static final long TIME_SHORT = 1000L;
-	/**
-	 * A "long" duration for this test.
-	 */
-	private static final long TIME_LONG = 3000L;
-	/**
-	 * A "rest" duration for this test.
-	 */
-	private static final long TIME_REST = 1L;
-	/**
-	 * A the date format used in the tests.
-	 */
-	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+  /**
+   * Count of the number of jobs created.
+   */
+  private static AtomicInteger jobCount = new AtomicInteger(0);
+  /**
+   * A "short" duration for this test.
+   */
+  private static final long TIME_SHORT = 1000L;
+  /**
+   * A "long" duration for this test.
+   */
+  private static final long TIME_LONG = 3000L;
+  /**
+   * A "rest" duration for this test.
+   */
+  private static final long TIME_REST = 1L;
+  /**
+   * A the date format used in the tests.
+   */
+  private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
-	/**
-	 * We test a job with 2 tasks, the 2nd task having a timeout duration set.
-	 * @throws Exception if any error occurs.
-	 */
-	@Test
-	public void testTaskTimeout() throws Exception
-	{
-		JPPFJob job = createJob("testTaskTimeoutDuration", 2, TIME_LONG);
-		List<JPPFTask> tasks = job.getTasks();
-		JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
-		tasks.get(1).setTimeoutSchedule(schedule);
-		List<JPPFTask> results = client.submit(job);
-		assertNotNull(results);
-		assertEquals(results.size(), 2);
-		LifeCycleTask task = (LifeCycleTask) results.get(0);
-		assertNotNull(task.getResult());
-		assertFalse(task.isTimedout());
-		task = (LifeCycleTask) results.get(1);
-		assertNull(task.getResult());
-		assertTrue(task.isTimedout());
-	}
+  /**
+   * We test a job with 2 tasks, the 2nd task having a timeout duration set.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testTaskTimeout() throws Exception
+  {
+    JPPFJob job = createJob("testTaskTimeoutDuration", 2, TIME_LONG);
+    List<JPPFTask> tasks = job.getTasks();
+    JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
+    tasks.get(1).setTimeoutSchedule(schedule);
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(results.size(), 2);
+    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    assertNotNull(task.getResult());
+    assertFalse(task.isTimedout());
+    task = (LifeCycleTask) results.get(1);
+    assertNull(task.getResult());
+    assertTrue(task.isTimedout());
+  }
 
-	/**
-	 * Simply test that a job does expires at a specified date.
-	 * @throws Exception if any error occurs.
-	 */
-	@Test
-	public void testTaskExpirationDate() throws Exception
-	{
-		JPPFJob job = createJob("testTaskTimeoutDate", 2, TIME_LONG);
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		Date date = new Date(System.currentTimeMillis() + TIME_LONG + TIME_SHORT + 10L);
-		JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
-		List<JPPFTask> tasks = job.getTasks();
-		tasks.get(1).setTimeoutSchedule(schedule);
-		List<JPPFTask> results = client.submit(job);
-		assertNotNull(results);
-		assertEquals(results.size(), 2);
-		LifeCycleTask task = (LifeCycleTask) results.get(0);
-		assertNotNull(task.getResult());
-		assertFalse(task.isTimedout());
-		task = (LifeCycleTask) results.get(1);
-		assertNull(task.getResult());
-		assertTrue(task.isTimedout());
-	}
+  /**
+   * Simply test that a job does expires at a specified date.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testTaskExpirationDate() throws Exception
+  {
+    JPPFJob job = createJob("testTaskTimeoutDate", 2, TIME_LONG);
+    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+    Date date = new Date(System.currentTimeMillis() + TIME_LONG + TIME_SHORT + 10L);
+    JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
+    List<JPPFTask> tasks = job.getTasks();
+    tasks.get(1).setTimeoutSchedule(schedule);
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(results.size(), 2);
+    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    assertNotNull(task.getResult());
+    assertFalse(task.isTimedout());
+    task = (LifeCycleTask) results.get(1);
+    assertNull(task.getResult());
+    assertTrue(task.isTimedout());
+  }
 
-	/**
-	 * Create a blocking job with the specified number of tasks, each with the specified duration.
-	 * @param id the job id.
-	 * @param nbTasks the number of tasks in the job.
-	 * @param duration the duration of each task.
-	 * @return a {@link JPPFJob} instance.
-	 * @throws JPPFException if an error occurs while creating the job.
-	 */
-	protected synchronized JPPFJob createJob(final String id, final int nbTasks, final long duration) throws JPPFException
-	{
-		JPPFJob job = new JPPFJob();
-		job.setName(id + '(' + jobCount.incrementAndGet() + ')');
-		for (int i=0; i<nbTasks; i++)
-		{
-			JPPFTask task = new LifeCycleTask(duration);
-			task.setId(job.getName()  + " - task " + (i+1));
-			job.addTask(task);
-		}
-		return job;
-	}
+  /**
+   * Create a blocking job with the specified number of tasks, each with the specified duration.
+   * @param id the job id.
+   * @param nbTasks the number of tasks in the job.
+   * @param duration the duration of each task.
+   * @return a {@link JPPFJob} instance.
+   * @throws JPPFException if an error occurs while creating the job.
+   */
+  protected synchronized JPPFJob createJob(final String id, final int nbTasks, final long duration) throws JPPFException
+  {
+    JPPFJob job = new JPPFJob();
+    job.setName(id + '(' + jobCount.incrementAndGet() + ')');
+    for (int i=0; i<nbTasks; i++)
+    {
+      JPPFTask task = new LifeCycleTask(duration);
+      task.setId(job.getName()  + " - task " + (i+1));
+      job.addTask(task);
+    }
+    return job;
+  }
 }

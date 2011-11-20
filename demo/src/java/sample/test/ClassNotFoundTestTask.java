@@ -26,22 +26,22 @@ package sample.test;
  */
 public class ClassNotFoundTestTask extends JPPFTestTask
 {
-	/**
-	 * Initialize this task.
-	 */
-	public ClassNotFoundTestTask()
-	{
-	}
+  /**
+   * Initialize this task.
+   */
+  public ClassNotFoundTestTask()
+  {
+  }
 
-	/**
-	 * Execute the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	public void test()
-	{
-		//new org.ujac.ui.editor.TextArea();
-		String s = "Please make sure the library 'ujac-ui.jar' is NOT present in the node, server or client classpath";
-		setResult(s);
-		System.out.println(s);
-	}
+  /**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */
+  public void test()
+  {
+    //new org.ujac.ui.editor.TextArea();
+    String s = "Please make sure the library 'ujac-ui.jar' is NOT present in the node, server or client classpath";
+    setResult(s);
+    System.out.println(s);
+  }
 }

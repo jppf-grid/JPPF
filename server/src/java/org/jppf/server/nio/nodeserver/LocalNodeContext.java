@@ -28,72 +28,72 @@ import org.slf4j.*;
  */
 public class LocalNodeContext extends AbstractNodeContext
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(LocalNodeContext.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(LocalNodeContext.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public AbstractNodeMessage newMessage()
-	{
-		return new LocalNodeMessage();
-	}
+  /**
+   * {@inheritDoc}.
+   */
+  @Override
+  public AbstractNodeMessage newMessage()
+  {
+    return new LocalNodeMessage();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
-	{
-		if (debugEnabled) log.debug("reading message from " + channel);
-		LocalNodeChannel handler = (LocalNodeChannel) channel;
-		while (handler.getServerResource() == null) handler.getServerLock().goToSleep();
-		setNodeMessage(handler.getServerResource(), channel);
-		handler.setServerResource(null);
-		return true;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
+  {
+    if (debugEnabled) log.debug("reading message from " + channel);
+    LocalNodeChannel handler = (LocalNodeChannel) channel;
+    while (handler.getServerResource() == null) handler.getServerLock().goToSleep();
+    setNodeMessage(handler.getServerResource(), channel);
+    handler.setServerResource(null);
+    return true;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
-	{
-		LocalNodeChannel handler = (LocalNodeChannel) channel;
-		boolean b = super.writeMessage(channel);
-		if (debugEnabled) log.debug("wrote " + nodeMessage + " to " + channel);
-		handler.setNodeResource((LocalNodeMessage) nodeMessage);
-		return b;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
+  {
+    LocalNodeChannel handler = (LocalNodeChannel) channel;
+    boolean b = super.writeMessage(channel);
+    if (debugEnabled) log.debug("wrote " + nodeMessage + " to " + channel);
+    handler.setNodeResource((LocalNodeMessage) nodeMessage);
+    return b;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setNodeMessage(final AbstractNodeMessage nodeMessage, final ChannelWrapper<?> channel)
-	{
-		super.setNodeMessage(nodeMessage, channel);
-		((LocalNodeChannel) channel).wakeUp();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setNodeMessage(final AbstractNodeMessage nodeMessage, final ChannelWrapper<?> channel)
+  {
+    super.setNodeMessage(nodeMessage, channel);
+    ((LocalNodeChannel) channel).wakeUp();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setState(final NodeState state)
-	{
-		if (NodeState.SENDING_BUNDLE.equals(this.state) && NodeState.IDLE.equals(state))
-		{
-			log.debug("debug stack", new Exception());
-			int breakpoint = 0;
-		}
-		super.setState(state);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setState(final NodeState state)
+  {
+    if (NodeState.SENDING_BUNDLE.equals(this.state) && NodeState.IDLE.equals(state))
+    {
+      log.debug("debug stack", new Exception());
+      int breakpoint = 0;
+    }
+    super.setState(state);
+  }
 }

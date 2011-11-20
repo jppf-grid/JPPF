@@ -26,77 +26,77 @@ import javax.swing.tree.*;
  */
 public class JPPFTreeTable extends JTreeTable
 {
-	/**
-	 * Initialize this tree table with the specified model.
-	 * @param treeTableModel - a tree table model.
-	 */
-	public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel)
-	{
-		super(treeTableModel);
-	}
+  /**
+   * Initialize this tree table with the specified model.
+   * @param treeTableModel - a tree table model.
+   */
+  public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel)
+  {
+    super(treeTableModel);
+  }
 
-	/**
-	 * Get a tree path corresponding to the node at row n in the tree.
-	 * @param n the row index for which to get the path.
-	 * @return a <code>TreePath</code> instance.
-	 */
-	public TreePath getPathForRow(final int n)
-	{
-		if (getTree().getRowCount() <= n) return null;
-		return getTree().getPathForRow(n);
-	}
+  /**
+   * Get a tree path corresponding to the node at row n in the tree.
+   * @param n the row index for which to get the path.
+   * @return a <code>TreePath</code> instance.
+   */
+  public TreePath getPathForRow(final int n)
+  {
+    if (getTree().getRowCount() <= n) return null;
+    return getTree().getPathForRow(n);
+  }
 
-	/**
-	 * Get a tree path corresponding to the node at row n in the tree.
-	 * @param node the node for which to get the path.
-	 * @return a <code>TreePath</code> instance.
-	 */
-	public TreePath getPathForNode(final DefaultMutableTreeNode node)
-	{
-		return new TreePath(node.getPath());
-	}
+  /**
+   * Get a tree path corresponding to the node at row n in the tree.
+   * @param node the node for which to get the path.
+   * @return a <code>TreePath</code> instance.
+   */
+  public TreePath getPathForNode(final DefaultMutableTreeNode node)
+  {
+    return new TreePath(node.getPath());
+  }
 
-	/**
-	 * Expand all paths in the tree.
-	 */
-	public void expandAll()
-	{
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
-		expand(root, true);
-	}
+  /**
+   * Expand all paths in the tree.
+   */
+  public void expandAll()
+  {
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
+    expand(root, true);
+  }
 
-	/**
-	 * Expands the leaves of the specified node.
-	 * @param node - the node to expand.
-	 */
-	public void expand(final DefaultMutableTreeNode node)
-	{
-		expand(node, false);
-	}
+  /**
+   * Expands the leaves of the specified node.
+   * @param node - the node to expand.
+   */
+  public void expand(final DefaultMutableTreeNode node)
+  {
+    expand(node, false);
+  }
 
-	/**
-	 * Expands the leaves of the specified node.
-	 * @param node the node to expand.
-	 * @param recursive specifies whether expansion should recurse down to the leaf nodes.
-	 */
-	public void expand(final DefaultMutableTreeNode node, final boolean recursive)
-	{
-		getTree().expandPath(getPathForNode(node));
-		if (recursive && (node.getChildCount() > 0))
-		{
-			for (int i=0; i<node.getChildCount(); i++) expand((DefaultMutableTreeNode) node.getChildAt(i), recursive);
-		}
-	}
+  /**
+   * Expands the leaves of the specified node.
+   * @param node the node to expand.
+   * @param recursive specifies whether expansion should recurse down to the leaf nodes.
+   */
+  public void expand(final DefaultMutableTreeNode node, final boolean recursive)
+  {
+    getTree().expandPath(getPathForNode(node));
+    if (recursive && (node.getChildCount() > 0))
+    {
+      for (int i=0; i<node.getChildCount(); i++) expand((DefaultMutableTreeNode) node.getChildAt(i), recursive);
+    }
+  }
 
-	/**
-	 * Collapse all paths in the tree.
-	 */
-	public void collapseAll()
-	{
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
-		for (int i=0; i<root.getChildCount(); i++)
-		{
-			getTree().collapsePath(getPathForNode((DefaultMutableTreeNode) root.getChildAt(i)));
-		}
-	}
+  /**
+   * Collapse all paths in the tree.
+   */
+  public void collapseAll()
+  {
+    DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
+    for (int i=0; i<root.getChildCount(); i++)
+    {
+      getTree().collapsePath(getPathForNode((DefaultMutableTreeNode) root.getChildAt(i)));
+    }
+  }
 }

@@ -25,27 +25,27 @@ import java.io.Serializable;
  */
 public class Result implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The result of executing this task.
-	 */
-	public String message = null;
-	/**
-	 * The position of this result.
-	 */
-	public int position = -1;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The result of executing this task.
+   */
+  public String message = null;
+  /**
+   * The position of this result.
+   */
+  public int position = -1;
 
-	/**
-	 * Get a string representation of this object.
-	 * @return a string representing this object.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return "Result[\"" + message + "\", " + position + ']';
-	}
+  /**
+   * Get a string representation of this object.
+   * @return a string representing this object.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return "Result[\"" + message + "\", " + position + ']';
+  }
 }

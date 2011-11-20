@@ -26,57 +26,57 @@ import java.util.*;
  */
 public abstract class AbstractActionHandler implements ActionHandler
 {
-	/**
-	 * Mapping of actions to their name.
-	 */
-	protected Map<String, UpdatableAction> actionMap = new HashMap<String, UpdatableAction>();
-	/**
-	 * List of elements selected in the managed component.
-	 */
-	protected List<Object> selectedElements = new LinkedList<Object>();
+  /**
+   * Mapping of actions to their name.
+   */
+  protected Map<String, UpdatableAction> actionMap = new HashMap<String, UpdatableAction>();
+  /**
+   * List of elements selected in the managed component.
+   */
+  protected List<Object> selectedElements = new LinkedList<Object>();
 
-	/**
-	 * Add an action with the specified name to this action manager.
-	 * @param name the name of the action to add.
-	 * @param action the action to add.
-	 * @see org.jppf.ui.actions.ActionHandler#putAction(java.lang.String, org.jppf.ui.actions.UpdatableAction)
-	 */
-	@Override
-	public void putAction(final String name, final UpdatableAction action)
-	{
-		actionMap.put(name, action);
-	}
+  /**
+   * Add an action with the specified name to this action manager.
+   * @param name the name of the action to add.
+   * @param action the action to add.
+   * @see org.jppf.ui.actions.ActionHandler#putAction(java.lang.String, org.jppf.ui.actions.UpdatableAction)
+   */
+  @Override
+  public void putAction(final String name, final UpdatableAction action)
+  {
+    actionMap.put(name, action);
+  }
 
-	/**
-	 * Get the action with the specified name.
-	 * @param name the name of the action to find.
-	 * @return an <code>Action</code> or null if the specified name could not be found.
-	 * @see org.jppf.ui.actions.ActionHandler#getAction(java.lang.String)
-	 */
-	@Override
-	public UpdatableAction getAction(final String name)
-	{
-		return actionMap.get(name);
-	}
+  /**
+   * Get the action with the specified name.
+   * @param name the name of the action to find.
+   * @return an <code>Action</code> or null if the specified name could not be found.
+   * @see org.jppf.ui.actions.ActionHandler#getAction(java.lang.String)
+   */
+  @Override
+  public UpdatableAction getAction(final String name)
+  {
+    return actionMap.get(name);
+  }
 
-	/**
-	 * Get the selected elements in the JTreeTable handled by this action manager.
-	 * @return a list of objects.
-	 * @see org.jppf.ui.actions.ActionHandler#getSelectedElements()
-	 */
-	@Override
-	public synchronized List<Object> getSelectedElements()
-	{
-		return selectedElements;
-	}
+  /**
+   * Get the selected elements in the JTreeTable handled by this action manager.
+   * @return a list of objects.
+   * @see org.jppf.ui.actions.ActionHandler#getSelectedElements()
+   */
+  @Override
+  public synchronized List<Object> getSelectedElements()
+  {
+    return selectedElements;
+  }
 
-	/**
-	 * Update the state of all actions registered with this <code>ActionHandler</code>.
-	 * @see org.jppf.ui.actions.ActionHandler#updateActions()
-	 */
-	@Override
-	public synchronized void updateActions()
-	{
-		for (UpdatableAction action: actionMap.values()) action.updateState(selectedElements);
-	}
+  /**
+   * Update the state of all actions registered with this <code>ActionHandler</code>.
+   * @see org.jppf.ui.actions.ActionHandler#updateActions()
+   */
+  @Override
+  public synchronized void updateActions()
+  {
+    for (UpdatableAction action: actionMap.values()) action.updateState(selectedElements);
+  }
 }

@@ -26,18 +26,18 @@ import java.io.*;
  */
 public interface JPPFObjectStreamBuilder
 {
-	/**
-	 * Obtain an input stream used for deserializing objects.
-	 * @param	in input stream to read from.
-	 * @return an <code>ObjectInputStream</code>
-	 * @throws Exception if an error is raised while creating the stream.
-	 */
-	ObjectInputStream newObjectInputStream(InputStream in) throws Exception;
-	/**
-	 * Obtain an Output stream used for serializing objects.
-	 * @param	out output stream to write to.
-	 * @return an <code>ObjectOutputStream</code>
-	 * @throws Exception if an error is raised while creating the stream.
-	 */
-	ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception;
+  /**
+   * Obtain an input stream used for deserializing objects.
+   * @param	in input stream to read from.
+   * @return an <code>ObjectInputStream</code>
+   * @throws Exception if an error is raised while creating the stream.
+   */
+  ObjectInputStream newObjectInputStream(InputStream in) throws Exception;
+  /**
+   * Obtain an Output stream used for serializing objects.
+   * @param	out output stream to write to.
+   * @return an <code>ObjectOutputStream</code>
+   * @throws Exception if an error is raised while creating the stream.
+   */
+  ObjectOutputStream newObjectOutputStream(OutputStream out) throws Exception;
 }

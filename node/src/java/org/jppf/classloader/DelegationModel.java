@@ -24,12 +24,12 @@ package org.jppf.classloader;
  */
 public enum DelegationModel
 {
-	/**
-	 * Standard delegation model to parent first.
-	 */
-	PARENT_FIRST,
-	/**
-	 * Delegation model to local URL classpath first.
-	 */
-	LOCAL_FIRST
+  /**
+   * Standard delegation model to parent first.
+   */
+  PARENT_FIRST,
+  /**
+   * Delegation model to local URL classpath first.
+   */
+  LOCAL_FIRST
 }

@@ -27,145 +27,145 @@ import org.slf4j.*;
  */
 public class JMXConnectionThread extends ThreadSynchronization implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(JMXConnectionThread.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines the suspended state of this connection thread.
-	 */
-	private boolean suspended = false;
-	/**
-	 * Determines the connecting state of this connection thread.
-	 */
-	private boolean connecting = true;
-	/**
-	 * The connection that holds this thread.
-	 */
-	private JMXConnectionWrapper connectionWrapper = null;
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(JMXConnectionThread.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines the suspended state of this connection thread.
+   */
+  private boolean suspended = false;
+  /**
+   * Determines the connecting state of this connection thread.
+   */
+  private boolean connecting = true;
+  /**
+   * The connection that holds this thread.
+   */
+  private JMXConnectionWrapper connectionWrapper = null;
 
-	/**
-	 * Initialize this thread with the specified connection.
-	 * @param connectionWrapper the connection that holds this thread.
-	 */
-	public JMXConnectionThread(final JMXConnectionWrapper connectionWrapper)
-	{
-		this.connectionWrapper = connectionWrapper;
-	}
+  /**
+   * Initialize this thread with the specified connection.
+   * @param connectionWrapper the connection that holds this thread.
+   */
+  public JMXConnectionThread(final JMXConnectionWrapper connectionWrapper)
+  {
+    this.connectionWrapper = connectionWrapper;
+  }
 
-	/**
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		while (!isStopped())
-		{
-			if (isSuspended())
-			{
-				if (debugEnabled) log.debug(connectionWrapper.getId() + " about to go to sleep");
-				goToSleep();
-				continue;
-			}
-			if (isConnecting())
-			{
-				try
-				{
-					if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
-					connectionWrapper.performConnection();
-					if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
-					suspend();
-					wakeUp();
-				}
-				catch(Exception ignored)
-				{
-					if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
-					try
-					{
-						Thread.sleep(100);
-					}
-					catch(InterruptedException e)
-					{
-						log.error(e.getMessage(), e);
-					}
-				}
-				finally
-				{
-					connectionWrapper.wakeUp();
-				}
-			}
-		}
-	}
+  /**
+   * 
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    while (!isStopped())
+    {
+      if (isSuspended())
+      {
+        if (debugEnabled) log.debug(connectionWrapper.getId() + " about to go to sleep");
+        goToSleep();
+        continue;
+      }
+      if (isConnecting())
+      {
+        try
+        {
+          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
+          connectionWrapper.performConnection();
+          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
+          suspend();
+          wakeUp();
+        }
+        catch(Exception ignored)
+        {
+          if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
+          try
+          {
+            Thread.sleep(100);
+          }
+          catch(InterruptedException e)
+          {
+            log.error(e.getMessage(), e);
+          }
+        }
+        finally
+        {
+          connectionWrapper.wakeUp();
+        }
+      }
+    }
+  }
 
-	/**
-	 * Suspend the current thread.
-	 */
-	public synchronized void suspend()
-	{
-		if (debugEnabled) log.debug(connectionWrapper.getId() + " suspending connection attempts");
-		setConnecting(false);
-		setSuspended(true);
-	}
+  /**
+   * Suspend the current thread.
+   */
+  public synchronized void suspend()
+  {
+    if (debugEnabled) log.debug(connectionWrapper.getId() + " suspending connection attempts");
+    setConnecting(false);
+    setSuspended(true);
+  }
 
-	/**
-	 * Resume the current thread's execution.
-	 */
-	public synchronized void resume()
-	{
-		if (debugEnabled) log.debug(connectionWrapper.getId() + " resuming connection attempts");
-		setConnecting(true);
-		setSuspended(false);
-		wakeUp();
-	}
+  /**
+   * Resume the current thread's execution.
+   */
+  public synchronized void resume()
+  {
+    if (debugEnabled) log.debug(connectionWrapper.getId() + " resuming connection attempts");
+    setConnecting(true);
+    setSuspended(false);
+    wakeUp();
+  }
 
-	/**
-	 * Stop this thread.
-	 */
-	public synchronized void close()
-	{
-		setConnecting(false);
-		setStopped(true);
-		wakeUp();
-	}
+  /**
+   * Stop this thread.
+   */
+  public synchronized void close()
+  {
+    setConnecting(false);
+    setStopped(true);
+    wakeUp();
+  }
 
-	/**
-	 * Get the connecting state of this connection thread.
-	 * @return true if the connection is established, false otherwise.
-	 */
-	public synchronized boolean isConnecting()
-	{
-		return connecting;
-	}
+  /**
+   * Get the connecting state of this connection thread.
+   * @return true if the connection is established, false otherwise.
+   */
+  public synchronized boolean isConnecting()
+  {
+    return connecting;
+  }
 
-	/**
-	 * Get the connecting state of this connection thread.
-	 * @param connecting true if the connection is established, false otherwise.
-	 */
-	public synchronized void setConnecting(final boolean connecting)
-	{
-		this.connecting = connecting;
-	}
+  /**
+   * Get the connecting state of this connection thread.
+   * @param connecting true if the connection is established, false otherwise.
+   */
+  public synchronized void setConnecting(final boolean connecting)
+  {
+    this.connecting = connecting;
+  }
 
-	/**
-	 * Determines the suspended state of this connection thread.
-	 * @return true if the thread is suspended, false otherwise.
-	 */
-	public synchronized boolean isSuspended()
-	{
-		return suspended;
-	}
+  /**
+   * Determines the suspended state of this connection thread.
+   * @return true if the thread is suspended, false otherwise.
+   */
+  public synchronized boolean isSuspended()
+  {
+    return suspended;
+  }
 
-	/**
-	 * Set the suspended state of this connection thread.
-	 * @param suspended true if the connection is suspended, false otherwise.
-	 */
-	public synchronized void setSuspended(final boolean suspended)
-	{
-		this.suspended = suspended;
-	}
+  /**
+   * Set the suspended state of this connection thread.
+   * @param suspended true if the connection is suspended, false otherwise.
+   */
+  public synchronized void setSuspended(final boolean suspended)
+  {
+    this.suspended = suspended;
+  }
 }

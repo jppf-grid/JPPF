@@ -34,77 +34,77 @@ import org.slf4j.*;
  */
 public class JobTreeTableMouseListener extends MouseAdapter
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JobTreeTableMouseListener.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The object that handles toolbar and menu actions.
-	 */
-	private JTreeTableActionHandler actionHandler = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JobTreeTableMouseListener.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The object that handles toolbar and menu actions.
+   */
+  private JTreeTableActionHandler actionHandler = null;
 
-	/**
-	 * Initialize this mouse listener.
-	 * @param actionHandler - the object that handles toolbar and menu actions.
-	 */
-	public JobTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
-	{
-		this.actionHandler = actionHandler;
-	}
+  /**
+   * Initialize this mouse listener.
+   * @param actionHandler - the object that handles toolbar and menu actions.
+   */
+  public JobTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
+  {
+    this.actionHandler = actionHandler;
+  }
 
-	/**
-	 * Processes right-click events to display popup menus.
-	 * @param event the mouse event to process.
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
-	@Override
-	public void mousePressed(final MouseEvent event)
-	{
-		Component comp = event.getComponent();
-		if (!(comp instanceof JPPFTreeTable)) return;
-		JPPFTreeTable treeTable = (JPPFTreeTable) comp;
-		int x = event.getX();
-		int y = event.getY();
-		int button = event.getButton();
-		if (button == MouseEvent.BUTTON3)
-		{
-			JPopupMenu menu = createPopupMenu(event);
-			menu.show(treeTable, x, y);
-		}
-	}
+  /**
+   * Processes right-click events to display popup menus.
+   * @param event the mouse event to process.
+   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+   */
+  @Override
+  public void mousePressed(final MouseEvent event)
+  {
+    Component comp = event.getComponent();
+    if (!(comp instanceof JPPFTreeTable)) return;
+    JPPFTreeTable treeTable = (JPPFTreeTable) comp;
+    int x = event.getX();
+    int y = event.getY();
+    int button = event.getButton();
+    if (button == MouseEvent.BUTTON3)
+    {
+      JPopupMenu menu = createPopupMenu(event);
+      menu.show(treeTable, x, y);
+    }
+  }
 
-	/**
-	 * Create the popup menu.
-	 * @param event the mouse event to process.
-	 * @return a <code>JPopupMenu</code> instance.
-	 */
-	private JPopupMenu createPopupMenu(final MouseEvent event)
-	{
-		Component comp = event.getComponent();
-		Point p = comp.getLocationOnScreen();
-		JPopupMenu menu = new JPopupMenu();
-		menu.add(createMenuItem(actionHandler.getAction("cancel.job"), p));
-		menu.add(createMenuItem(actionHandler.getAction("suspend.job"), p));
-		menu.add(createMenuItem(actionHandler.getAction("suspend_requeue.job"), p));
-		menu.add(createMenuItem(actionHandler.getAction("resume.job"), p));
-		menu.addSeparator();
-		menu.add(createMenuItem(actionHandler.getAction("max.nodes.job"), p));
-		return menu;
-	}
+  /**
+   * Create the popup menu.
+   * @param event the mouse event to process.
+   * @return a <code>JPopupMenu</code> instance.
+   */
+  private JPopupMenu createPopupMenu(final MouseEvent event)
+  {
+    Component comp = event.getComponent();
+    Point p = comp.getLocationOnScreen();
+    JPopupMenu menu = new JPopupMenu();
+    menu.add(createMenuItem(actionHandler.getAction("cancel.job"), p));
+    menu.add(createMenuItem(actionHandler.getAction("suspend.job"), p));
+    menu.add(createMenuItem(actionHandler.getAction("suspend_requeue.job"), p));
+    menu.add(createMenuItem(actionHandler.getAction("resume.job"), p));
+    menu.addSeparator();
+    menu.add(createMenuItem(actionHandler.getAction("max.nodes.job"), p));
+    return menu;
+  }
 
-	/**
-	 * Create a menu item.
-	 * @param action - the action associated with the neu item.
-	 * @param location - the location to use for any window create by the action.
-	 * @return a <code>JMenuItem</code> instance.
-	 */
-	private static JMenuItem createMenuItem(final Action action, final Point location)
-	{
-		if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
-		return new JMenuItem(action);
-	}
+  /**
+   * Create a menu item.
+   * @param action - the action associated with the neu item.
+   * @param location - the location to use for any window create by the action.
+   * @return a <code>JMenuItem</code> instance.
+   */
+  private static JMenuItem createMenuItem(final Action action, final Point location)
+  {
+    if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
+    return new JMenuItem(action);
+  }
 }

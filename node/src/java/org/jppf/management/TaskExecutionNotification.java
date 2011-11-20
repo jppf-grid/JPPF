@@ -26,33 +26,33 @@ import javax.management.*;
  */
 public class TaskExecutionNotification extends Notification
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Information about the task that triggered this notification.
-	 */
-	private TaskInformation taskInformation = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Information about the task that triggered this notification.
+   */
+  private TaskInformation taskInformation = null;
 
-	/**
-	 * Initialize this notification with the specified parameters.
-	 * @param source the emitter MBean's object name.
-	 * @param sequenceNumber the notification sequence number.
-	 * @param taskInformation information about the task that triggered this notification.
-	 */
-	public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation)
-	{
-		super("task.monitor", source, sequenceNumber, taskInformation.getTimestamp());
-		this.taskInformation = taskInformation;
-	}
+  /**
+   * Initialize this notification with the specified parameters.
+   * @param source the emitter MBean's object name.
+   * @param sequenceNumber the notification sequence number.
+   * @param taskInformation information about the task that triggered this notification.
+   */
+  public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation)
+  {
+    super("task.monitor", source, sequenceNumber, taskInformation.getTimestamp());
+    this.taskInformation = taskInformation;
+  }
 
-	/**
-	 * Get the object encapsulating information about the task.
-	 * @return a <code>TaskInformation</code> instance.
-	 */
-	public TaskInformation getTaskInformation()
-	{
-		return taskInformation;
-	}
+  /**
+   * Get the object encapsulating information about the task.
+   * @return a <code>TaskInformation</code> instance.
+   */
+  public TaskInformation getTaskInformation()
+  {
+    return taskInformation;
+  }
 }

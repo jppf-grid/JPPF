@@ -27,59 +27,59 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LyapunovTask extends JPPFTask
 {
-	/**
-	 * The line number, for which to compute the lambda exponent for each point in the line.
-	 */
-	private int b = -1;
+  /**
+   * The line number, for which to compute the lambda exponent for each point in the line.
+   */
+  private int b = -1;
 
-	/**
-	 * Initialize this task with the specified line number.
-	 * @param b the line number as an int value.
-	 */
-	public LyapunovTask(final int b)
-	{
-		this.b = b;
-	}
+  /**
+   * Initialize this task with the specified line number.
+   * @param b the line number as an int value.
+   */
+  public LyapunovTask(final int b)
+  {
+    this.b = b;
+  }
 
-	/**
-	 * Execute the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			// retrieve the configuration from the data provider
-			FractalConfiguration config =
-				(FractalConfiguration) getDataProvider().getValue("config");
-			double[] lambda = new double[config.asize];
-			double bval = config.bmin +
-			b * (config.bmax - config.bmin) / config.bsize;
-			double astep = (config.amax - config.amin) / config.asize;
-			double aval = config.amin;
-			for (int i=0; i<config.asize; i++)
-			{
-				double x = 0.5d;
-				int len = config.sequence.length;
-				double r = 0d;
-				double sum = 0d;
-				for (int n=0; n<config.nmax; n++)
-				{
-					r = config.sequence[n % len] ? aval : bval;
-					x = r * x * (1d - x);
-					double term = Math.log(Math.abs(r * (1d - 2d * x)));
-					sum += term;
-				}
-				lambda[i] = sum / config.nmax;
-				aval += astep;
-			}
-			// set the results
-			setResult(lambda);
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+  /**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      // retrieve the configuration from the data provider
+      FractalConfiguration config =
+        (FractalConfiguration) getDataProvider().getValue("config");
+      double[] lambda = new double[config.asize];
+      double bval = config.bmin +
+      b * (config.bmax - config.bmin) / config.bsize;
+      double astep = (config.amax - config.amin) / config.asize;
+      double aval = config.amin;
+      for (int i=0; i<config.asize; i++)
+      {
+        double x = 0.5d;
+        int len = config.sequence.length;
+        double r = 0d;
+        double sum = 0d;
+        for (int n=0; n<config.nmax; n++)
+        {
+          r = config.sequence[n % len] ? aval : bval;
+          x = r * x * (1d - x);
+          double term = Math.log(Math.abs(r * (1d - 2d * x)));
+          sum += term;
+        }
+        lambda[i] = sum / config.nmax;
+        aval += astep;
+      }
+      // set the results
+      setResult(lambda);
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }

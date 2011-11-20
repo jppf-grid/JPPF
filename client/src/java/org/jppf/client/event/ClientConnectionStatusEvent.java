@@ -28,37 +28,37 @@ import org.jppf.client.JPPFClientConnectionStatus;
  */
 public class ClientConnectionStatusEvent extends EventObject
 {
-	/**
-	 * The connection status before the change.
-	 */
-	private JPPFClientConnectionStatus oldStatus = null;
+  /**
+   * The connection status before the change.
+   */
+  private JPPFClientConnectionStatus oldStatus = null;
 
-	/**
-	 * Initialize this event with a client connection as source.
-	 * @param source the event source.
-	 * @param oldStatus the connection status before the change.
-	 */
-	public ClientConnectionStatusEvent(final ClientConnectionStatusHandler source, final JPPFClientConnectionStatus oldStatus)
-	{
-		super(source);
-		this.oldStatus = oldStatus;
-	}
+  /**
+   * Initialize this event with a client connection as source.
+   * @param source the event source.
+   * @param oldStatus the connection status before the change.
+   */
+  public ClientConnectionStatusEvent(final ClientConnectionStatusHandler source, final JPPFClientConnectionStatus oldStatus)
+  {
+    super(source);
+    this.oldStatus = oldStatus;
+  }
 
-	/**
-	 * Get the source of this event.
-	 * @return the event as a <code>JPPFClientConnection</code> instance.
-	 */
-	public ClientConnectionStatusHandler getClientConnectionStatusHandler()
-	{
-		return (ClientConnectionStatusHandler) getSource();
-	}
+  /**
+   * Get the source of this event.
+   * @return the event as a <code>JPPFClientConnection</code> instance.
+   */
+  public ClientConnectionStatusHandler getClientConnectionStatusHandler()
+  {
+    return (ClientConnectionStatusHandler) getSource();
+  }
 
-	/**
-	 * Get the connection status before the change.
-	 * @return a {@link JPPFClientConnectionStatus} enum value.
-	 */
-	public JPPFClientConnectionStatus getOldStatus()
-	{
-		return oldStatus;
-	}
+  /**
+   * Get the connection status before the change.
+   * @return a {@link JPPFClientConnectionStatus} enum value.
+   */
+  public JPPFClientConnectionStatus getOldStatus()
+  {
+    return oldStatus;
+  }
 }

@@ -30,149 +30,149 @@ import org.jppf.node.protocol.JPPFDistributedJob;
  */
 public class BundleWrapper implements ServerJob
 {
-	/**
-	 * The underlying task bundle.
-	 */
-	private JPPFTaskBundle job = null;
-	/**
-	 * The location of the data provider.
-	 */
-	private DataLocation dataProvider = null;
-	/**
-	 * The list of locations of the tasks.
-	 */
-	private List<DataLocation> tasks = new LinkedList<DataLocation>();
+  /**
+   * The underlying task bundle.
+   */
+  private JPPFTaskBundle job = null;
+  /**
+   * The location of the data provider.
+   */
+  private DataLocation dataProvider = null;
+  /**
+   * The list of locations of the tasks.
+   */
+  private List<DataLocation> tasks = new LinkedList<DataLocation>();
 
-	/**
-	 * Default constructor.
-	 */
-	public BundleWrapper()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public BundleWrapper()
+  {
+  }
 
-	/**
-	 * Initialize this bundle wrapper with the specified task bundle.
-	 * @param bundle the underlying task bundle for this wrapper.
-	 */
-	public BundleWrapper(final JPPFTaskBundle bundle)
-	{
-		this.job = bundle;
-	}
+  /**
+   * Initialize this bundle wrapper with the specified task bundle.
+   * @param bundle the underlying task bundle for this wrapper.
+   */
+  public BundleWrapper(final JPPFTaskBundle bundle)
+  {
+    this.job = bundle;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JPPFDistributedJob getJob()
-	{
-		return job;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFDistributedJob getJob()
+  {
+    return job;
+  }
 
-	/**
-	 * Set the underlying task bundle.
-	 * @param job a <code>JPPFTaskBundle</code> instance.
-	 */
-	public void setJob(final JPPFTaskBundle job)
-	{
-		this.job = job;
-	}
+  /**
+   * Set the underlying task bundle.
+   * @param job a <code>JPPFTaskBundle</code> instance.
+   */
+  public void setJob(final JPPFTaskBundle job)
+  {
+    this.job = job;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public DataLocation getDataProvider()
-	{
-		return dataProvider;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataLocation getDataProvider()
+  {
+    return dataProvider;
+  }
 
-	/**
-	 * Get the location of the data provider.
-	 * @param dataProvider a <code>JPPFTaskBundle</code> instance.
-	 */
-	public void setDataProvider(final DataLocation dataProvider)
-	{
-		this.dataProvider = dataProvider;
-	}
+  /**
+   * Get the location of the data provider.
+   * @param dataProvider a <code>JPPFTaskBundle</code> instance.
+   */
+  public void setDataProvider(final DataLocation dataProvider)
+  {
+    this.dataProvider = dataProvider;
+  }
 
-	/**
-	 * Add a task to this bundle wrapper.
-	 * @param task the task to add.
-	 */
-	public void addTask(final DataLocation task)
-	{
-		tasks.add(task);
-	}
+  /**
+   * Add a task to this bundle wrapper.
+   * @param task the task to add.
+   */
+  public void addTask(final DataLocation task)
+  {
+    tasks.add(task);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<DataLocation> getTasks()
-	{
-		return tasks;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<DataLocation> getTasks()
+  {
+    return tasks;
+  }
 
-	/**
-	 * Set the list of locations of the tasks.
-	 * @param tasks a list of <code>DataLocation</code> instances.
-	 */
-	public void setTasks(final List<DataLocation> tasks)
-	{
-		this.tasks = tasks;
-	}
+  /**
+   * Set the list of locations of the tasks.
+   * @param tasks a list of <code>DataLocation</code> instances.
+   */
+  public void setTasks(final List<DataLocation> tasks)
+  {
+    this.tasks = tasks;
+  }
 
-	/**
-	 * Make a copy of this bundle wrapper.
-	 * @return a new <code>BundleWrapper</code> instance.
-	 */
-	public BundleWrapper copy()
-	{
-		BundleWrapper wrapper = null;
-		synchronized(this)
-		{
-			wrapper = new BundleWrapper(job.copy());
-			for (DataLocation dl: tasks) wrapper.addTask(dl);
-		}
-		wrapper.setDataProvider(dataProvider.copy());
-		return wrapper;
-	}
+  /**
+   * Make a copy of this bundle wrapper.
+   * @return a new <code>BundleWrapper</code> instance.
+   */
+  public BundleWrapper copy()
+  {
+    BundleWrapper wrapper = null;
+    synchronized(this)
+    {
+      wrapper = new BundleWrapper(job.copy());
+      for (DataLocation dl: tasks) wrapper.addTask(dl);
+    }
+    wrapper.setDataProvider(dataProvider.copy());
+    return wrapper;
+  }
 
-	/**
-	 * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
-	 * @param nbTasks the number of tasks to include in the copy.
-	 * @return a new <code>BundleWrapper</code> instance.
-	 */
-	public BundleWrapper copy(final int nbTasks)
-	{
-		BundleWrapper wrapper = null;
-		synchronized(this)
-		{
-			wrapper = new BundleWrapper(job.copy(nbTasks));
-			LinkedList<DataLocation> tmp = (LinkedList<DataLocation>) tasks;
-			for (int i=0; i<nbTasks; i++) wrapper.addTask(tmp.removeFirst());
-		}
-		wrapper.setDataProvider(dataProvider.copy());
-		return wrapper;
-	}
+  /**
+   * Make a copy of this bundle wrapper containing only the first nbTasks tasks it contains.
+   * @param nbTasks the number of tasks to include in the copy.
+   * @return a new <code>BundleWrapper</code> instance.
+   */
+  public BundleWrapper copy(final int nbTasks)
+  {
+    BundleWrapper wrapper = null;
+    synchronized(this)
+    {
+      wrapper = new BundleWrapper(job.copy(nbTasks));
+      LinkedList<DataLocation> tmp = (LinkedList<DataLocation>) tasks;
+      for (int i=0; i<nbTasks; i++) wrapper.addTask(tmp.removeFirst());
+    }
+    wrapper.setDataProvider(dataProvider.copy());
+    return wrapper;
+  }
 
-	/**
-	 * Merge this bundle wrapper with another.
-	 * @param other the wrapper to merge with.
-	 * @param after determines whether the tasks from other should be added first or last.
-	 */
-	public void merge(final ServerJob other, final boolean after)
-	{
-		int n = ((JPPFTaskBundle) other.getJob()).getTaskCount();
-		job.setTaskCount(job.getTaskCount() + n);
-		job.getSLA().setSuspended(other.getJob().getSLA().isSuspended());
-		if (after)
-		{
-			for (DataLocation task: other.getTasks()) tasks.add(task);
-		}
-		else
-		{
-			for (int i=n-1; i>=0; i--) tasks.add(0, other.getTasks().get(i));
-		}
-	}
+  /**
+   * Merge this bundle wrapper with another.
+   * @param other the wrapper to merge with.
+   * @param after determines whether the tasks from other should be added first or last.
+   */
+  public void merge(final ServerJob other, final boolean after)
+  {
+    int n = ((JPPFTaskBundle) other.getJob()).getTaskCount();
+    job.setTaskCount(job.getTaskCount() + n);
+    job.getSLA().setSuspended(other.getJob().getSLA().isSuspended());
+    if (after)
+    {
+      for (DataLocation task: other.getTasks()) tasks.add(task);
+    }
+    else
+    {
+      for (int i=n-1; i>=0; i--) tasks.add(0, other.getTasks().get(i));
+    }
+  }
 }

@@ -28,21 +28,21 @@ import org.jppf.node.protocol.*;
  */
 public interface NodeExecutionManager
 {
-	/**
-	 * Get the job currently being executed.
-	 * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
-	 */
-	JPPFDistributedJob getCurrentJob();
+  /**
+   * Get the job currently being executed.
+   * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
+   */
+  JPPFDistributedJob getCurrentJob();
 
-	/**
-	 * Get the list of tasks currently being executed.
-	 * @return a list of {@link Task} instances, or null if the node is idle.
-	 */
-	List<Task> getTasks();
+  /**
+   * Get the list of tasks currently being executed.
+   * @return a list of {@link Task} instances, or null if the node is idle.
+   */
+  List<Task> getTasks();
 
-	/**
-	 * Get the id of the job currently being executed.
-	 * @return the job id as a string, or null if no job is being executed.
-	 */
-	String getCurrentJobId();
+  /**
+   * Get the id of the job currently being executed.
+   * @return the job id as a string, or null if no job is being executed.
+   */
+  String getCurrentJobId();
 }

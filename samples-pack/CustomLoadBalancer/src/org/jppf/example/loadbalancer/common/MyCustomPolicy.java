@@ -28,37 +28,37 @@ import org.jppf.node.policy.CustomPolicy;
  */
 public class MyCustomPolicy extends CustomPolicy
 {
-	/**
-	 * Minimum available size per node processing thread, in bytes.
-	 */
-	private long minimumSizePerThread = 0L;
+  /**
+   * Minimum available size per node processing thread, in bytes.
+   */
+  private long minimumSizePerThread = 0L;
 
-	/**
-	 * Initialize this policy with the specified parameter.
-	 * @param minimumSizePerThreadStr the minimum available heap size per node processing thread.
-	 */
-	public MyCustomPolicy(final String minimumSizePerThreadStr)
-	{
-		super(minimumSizePerThreadStr);
-		this.minimumSizePerThread = Long.valueOf(minimumSizePerThreadStr);
-	}
+  /**
+   * Initialize this policy with the specified parameter.
+   * @param minimumSizePerThreadStr the minimum available heap size per node processing thread.
+   */
+  public MyCustomPolicy(final String minimumSizePerThreadStr)
+  {
+    super(minimumSizePerThreadStr);
+    this.minimumSizePerThread = Long.valueOf(minimumSizePerThreadStr);
+  }
 
-	/**
-	 * Determines whether this policy accepts the specified node.
-	 * @param info system information for the node on which the tasks will run if accepted.
-	 * @return true if the node is accepted, false otherwise.
-	 * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
-	 */
-	@Override
-	public boolean accepts(final JPPFSystemInformation info)
-	{
-		// get the number of processing threads in the node
-		long nbThreads = info.getJppf().getLong("processing.threads");
-		// get the node's max heap size
-		long maxHeap = info.getRuntime().getLong("maxMemory");
-		// we assume that 20 MB is taken by JPPF code and data
-		maxHeap -= 20 * 1024 * 1024;
-		// return true only if there is at least minimumSizePerThread of memory available for each thread
-		return maxHeap / nbThreads >= minimumSizePerThread;
-	}
+  /**
+   * Determines whether this policy accepts the specified node.
+   * @param info system information for the node on which the tasks will run if accepted.
+   * @return true if the node is accepted, false otherwise.
+   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
+   */
+  @Override
+  public boolean accepts(final JPPFSystemInformation info)
+  {
+    // get the number of processing threads in the node
+    long nbThreads = info.getJppf().getLong("processing.threads");
+    // get the node's max heap size
+    long maxHeap = info.getRuntime().getLong("maxMemory");
+    // we assume that 20 MB is taken by JPPF code and data
+    maxHeap -= 20 * 1024 * 1024;
+    // return true only if there is at least minimumSizePerThread of memory available for each thread
+    return maxHeap / nbThreads >= minimumSizePerThread;
+  }
 }

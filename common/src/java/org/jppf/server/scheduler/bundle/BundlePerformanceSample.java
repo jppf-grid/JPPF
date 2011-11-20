@@ -23,31 +23,31 @@ package org.jppf.server.scheduler.bundle;
  */
 public class BundlePerformanceSample
 {
-	/**
-	 * Mean compute time for server to node round trip.
-	 */
-	public double mean;
+  /**
+   * Mean compute time for server to node round trip.
+   */
+  public double mean;
 
-	/**
-	 * Number of samples used to compute the mean value.
-	 */
-	public long samples;
+  /**
+   * Number of samples used to compute the mean value.
+   */
+  public long samples;
 
-	/**
-	 * Default constructor.
-	 */
-	public BundlePerformanceSample()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public BundlePerformanceSample()
+  {
+  }
 
-	/**
-	 * Initialize this sample with the specified mean execute time and number of samples.
-	 * @param mean Mean compute time for server to node round trip.
-	 * @param samples Number of samples used to compute the mean value.
-	 */
-	public BundlePerformanceSample(final double mean, final long samples)
-	{
-		this.mean = mean;
-		this.samples = samples;
-	}
+  /**
+   * Initialize this sample with the specified mean execute time and number of samples.
+   * @param mean Mean compute time for server to node round trip.
+   * @param samples Number of samples used to compute the mean value.
+   */
+  public BundlePerformanceSample(final double mean, final long samples)
+  {
+    this.mean = mean;
+    this.samples = samples;
+  }
 }

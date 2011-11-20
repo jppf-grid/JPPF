@@ -31,137 +31,137 @@ import org.slf4j.*;
  */
 public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFTaskFuture.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The collector that receives the results from the server.
-	 */
-	private FutureResultCollector collector = null;
-	/**
-	 * The position of the task in the job.
-	 */
-	private int position = -1;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFTaskFuture.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The collector that receives the results from the server.
+   */
+  private FutureResultCollector collector = null;
+  /**
+   * The position of the task in the job.
+   */
+  private int position = -1;
 
-	/**
-	 * Initialize this future with the specified parameters.
-	 * @param collector the collector that receives the results from the server.
-	 * @param position the position of the task in the job.
-	 */
-	public JPPFTaskFuture(final FutureResultCollector collector, final int position)
-	{
-		this.collector = collector;
-		this.position = position;
-	}
+  /**
+   * Initialize this future with the specified parameters.
+   * @param collector the collector that receives the results from the server.
+   * @param position the position of the task in the job.
+   */
+  public JPPFTaskFuture(final FutureResultCollector collector, final int position)
+  {
+    this.collector = collector;
+    this.position = position;
+  }
 
-	/**
-	 * Returns true if this task completed. Completion may be due to normal termination,
-	 * an exception, or cancellation. In all of these cases, this method will return true.
-	 * @return true if the task completed.
-	 * @see org.jppf.client.concurrent.AbstractJPPFFuture#isDone()
-	 */
-	@Override
-	public boolean isDone()
-	{
-		//done.compareAndSet(false, collector.isTaskReceived(position));
-		return done.get();
-	}
+  /**
+   * Returns true if this task completed. Completion may be due to normal termination,
+   * an exception, or cancellation. In all of these cases, this method will return true.
+   * @return true if the task completed.
+   * @see org.jppf.client.concurrent.AbstractJPPFFuture#isDone()
+   */
+  @Override
+  public boolean isDone()
+  {
+    //done.compareAndSet(false, collector.isTaskReceived(position));
+    return done.get();
+  }
 
-	/**
-	 * Waits if necessary for the computation to complete, and then retrieves its result.
-	 * @return the computed result.
-	 * @throws InterruptedException if the current thread was interrupted while waiting.
-	 * @throws ExecutionException if the computation threw an exception.
-	 * @see java.util.concurrent.Future#get()
-	 */
-	@Override
-	public V get() throws InterruptedException, ExecutionException
-	{
-		V v = null;
-		try
-		{
-			v = get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-		}
-		catch(TimeoutException e)
-		{
-			if (debugEnabled) log.debug("wait timed out, but it shouldn't have", e);
-		}
-		return v;
-	}
+  /**
+   * Waits if necessary for the computation to complete, and then retrieves its result.
+   * @return the computed result.
+   * @throws InterruptedException if the current thread was interrupted while waiting.
+   * @throws ExecutionException if the computation threw an exception.
+   * @see java.util.concurrent.Future#get()
+   */
+  @Override
+  public V get() throws InterruptedException, ExecutionException
+  {
+    V v = null;
+    try
+    {
+      v = get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+    }
+    catch(TimeoutException e)
+    {
+      if (debugEnabled) log.debug("wait timed out, but it shouldn't have", e);
+    }
+    return v;
+  }
 
-	/**
-	 * Waits if necessary for at most the given time for the computation
-	 * to complete, and then retrieves its result, if available.
-	 * @param timeout the maximum time to wait.
-	 * @param unit the time unit of the timeout argument.
-	 * @return the computed result.
-	 * @throws InterruptedException if the current thread was interrupted while waiting.
-	 * @throws ExecutionException if the computation threw an exception.
-	 * @throws TimeoutException if the wait timed out.
-	 * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
-	 */
-	@Override
-	public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
-	{
-		long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
-		getResult(millis);
-		if (timedout.get()) throw new TimeoutException("wait timed out");
-		else if (exception != null) throw new ExecutionException(exception);
-		return result;
-	}
+  /**
+   * Waits if necessary for at most the given time for the computation
+   * to complete, and then retrieves its result, if available.
+   * @param timeout the maximum time to wait.
+   * @param unit the time unit of the timeout argument.
+   * @return the computed result.
+   * @throws InterruptedException if the current thread was interrupted while waiting.
+   * @throws ExecutionException if the computation threw an exception.
+   * @throws TimeoutException if the wait timed out.
+   * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
+   */
+  @Override
+  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+  {
+    long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
+    getResult(millis);
+    if (timedout.get()) throw new TimeoutException("wait timed out");
+    else if (exception != null) throw new ExecutionException(exception);
+    return result;
+  }
 
-	/**
-	 * Wait until the execution is complete, or the specified timeout has expired, whichever happens first.
-	 * @param timeout the maximum time to wait.
-	 */
-	@SuppressWarnings("unchecked")
-	void getResult(final long timeout)
-	{
-		if (!isDone())
-		{
-			JPPFTask task = null;
-			task = (timeout > 0) ? collector.waitForTask(position, timeout) : collector.getTask(position);
-			setDone();
-			if (task == null)
-			{
-				setCancelled();
-				timedout.set(timeout > 0);
-			}
-			else
-			{
-				result = (V) task.getResult();
-				exception = task.getException();
-			}
-		}
-	}
+  /**
+   * Wait until the execution is complete, or the specified timeout has expired, whichever happens first.
+   * @param timeout the maximum time to wait.
+   */
+  @SuppressWarnings("unchecked")
+  void getResult(final long timeout)
+  {
+    if (!isDone())
+    {
+      JPPFTask task = null;
+      task = (timeout > 0) ? collector.waitForTask(position, timeout) : collector.getTask(position);
+      setDone();
+      if (task == null)
+      {
+        setCancelled();
+        timedout.set(timeout > 0);
+      }
+      else
+      {
+        result = (V) task.getResult();
+        exception = task.getException();
+      }
+    }
+  }
 
-	/**
-	 * Mark the task as done.
-	 */
-	void setDone()
-	{
-		done.set(true);
-	}
+  /**
+   * Mark the task as done.
+   */
+  void setDone()
+  {
+    done.set(true);
+  }
 
-	/**
-	 * Mark the task as cancelled.
-	 */
-	void setCancelled()
-	{
-		cancelled.set(true);
-	}
+  /**
+   * Mark the task as cancelled.
+   */
+  void setCancelled()
+  {
+    cancelled.set(true);
+  }
 
-	/**
-	 * Get the task associated with this future.
-	 * @return a {@link JPPFTask} instance.
-	 */
-	public JPPFTask getTask()
-	{
-		return collector.getTask(position);
-	}
+  /**
+   * Get the task associated with this future.
+   * @return a {@link JPPFTask} instance.
+   */
+  public JPPFTask getTask()
+  {
+    return collector.getTask(position);
+  }
 }

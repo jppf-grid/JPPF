@@ -31,100 +31,100 @@ import org.slf4j.*;
  */
 public class AutotunedDelegatingBundler extends AbstractBundler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AutotunedDelegatingBundler.class);
-	/**
-	 * Determines whether debugging level is set for logging.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The global bundler to which bundle size calculations are delegated.
-	 */
-	private static AutoTunedBundler simpleBundler = null;
-	/**
-	 * Used to synchronize multiple threads when creating the simple bundler.
-	 */
-	private static ReentrantLock lock = new ReentrantLock();
-	/**
-	 * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-	 */
-	protected AnnealingTuneProfile profile;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AutotunedDelegatingBundler.class);
+  /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The global bundler to which bundle size calculations are delegated.
+   */
+  private static AutoTunedBundler simpleBundler = null;
+  /**
+   * Used to synchronize multiple threads when creating the simple bundler.
+   */
+  private static ReentrantLock lock = new ReentrantLock();
+  /**
+   * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
+   */
+  protected AnnealingTuneProfile profile;
 
-	/**
-	 * Creates a new instance with the initial size of bundle as the start size.
-	 * @param profile the parameters of the auto-tuning algorithm grouped as a performance analysis profile.
-	 */
-	public AutotunedDelegatingBundler(final AnnealingTuneProfile profile)
-	{
-		super(profile);
-		log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-		//log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
-		lock.lock();
-		try
-		{
-			synchronized(AutotunedDelegatingBundler.class)
-			{
-				if (simpleBundler == null)
-				{
-					simpleBundler = new AutoTunedBundler(profile);
-				}
-			}
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * Creates a new instance with the initial size of bundle as the start size.
+   * @param profile the parameters of the auto-tuning algorithm grouped as a performance analysis profile.
+   */
+  public AutotunedDelegatingBundler(final AnnealingTuneProfile profile)
+  {
+    super(profile);
+    log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
+    //log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
+    lock.lock();
+    try
+    {
+      synchronized(AutotunedDelegatingBundler.class)
+      {
+        if (simpleBundler == null)
+        {
+          simpleBundler = new AutoTunedBundler(profile);
+        }
+      }
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * Make a copy of this bundler
-	 * @return a <code>Bundler</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
-	 */
-	@Override
-	public Bundler copy()
-	{
-		return new AutotunedDelegatingBundler(profile);
-	}
+  /**
+   * Make a copy of this bundler
+   * @return a <code>Bundler</code> instance.
+   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+   */
+  @Override
+  public Bundler copy()
+  {
+    return new AutotunedDelegatingBundler(profile);
+  }
 
-	/**
-	 * Get the current size of bundle.
-	 * @return  the bundle size as an int value.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
-	 */
-	@Override
-	public int getBundleSize()
-	{
-		return simpleBundler.getBundleSize();
-	}
+  /**
+   * Get the current size of bundle.
+   * @return  the bundle size as an int value.
+   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
+   */
+  @Override
+  public int getBundleSize()
+  {
+    return simpleBundler.getBundleSize();
+  }
 
-	/**
-	 * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
-	 * @param bundleSize the number of tasks executed.
-	 * @param totalTime the time in milliseconds it took to execute the tasks.
-	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
-	 */
-	@Override
-	public void feedback(final int bundleSize, final double totalTime)
-	{
-		simpleBundler.feedback(bundleSize, totalTime);
-	}
+  /**
+   * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
+   * @param bundleSize the number of tasks executed.
+   * @param totalTime the time in milliseconds it took to execute the tasks.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
+   */
+  @Override
+  public void feedback(final int bundleSize, final double totalTime)
+  {
+    simpleBundler.feedback(bundleSize, totalTime);
+  }
 
-	/**
-	 * Get the max bundle size that can be used for this bundler.
-	 * @return the bundle size as an int.
-	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
-	 */
-	@Override
-	protected int maxSize()
-	{
-		int max = 0;
-		synchronized(simpleBundler)
-		{
-			max = simpleBundler.maxSize();
-		}
-		return max;
-	}
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+   */
+  @Override
+  protected int maxSize()
+  {
+    int max = 0;
+    synchronized(simpleBundler)
+    {
+      max = simpleBundler.maxSize();
+    }
+    return max;
+  }
 }

@@ -24,18 +24,18 @@ package org.jppf.server;
  */
 public class ChannelContext
 {
-	/**
-	 * what will be executed when the channel is selected.
-	 */
-	public ChannelState state;
+  /**
+   * what will be executed when the channel is selected.
+   */
+  public ChannelState state;
 
-	/**
-	 * the "memory" of the DFA.
-	 */
-	public Object content;
+  /**
+   * the "memory" of the DFA.
+   */
+  public Object content;
 
-	/**
-	 * the uuid of the application, it does not make sense for channels to nodes.
-	 */
-	public String uuid;
+  /**
+   * the uuid of the application, it does not make sense for channels to nodes.
+   */
+  public String uuid;
 }

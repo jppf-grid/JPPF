@@ -27,91 +27,91 @@ import org.jppf.server.JPPFStats;
  */
 public class TestJMX
 {
-	/**
-	 * Entry point.
-	 * @param args - not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			TestJMX t = new TestJMX();
-			t.testConnectAndWait();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+  /**
+   * Entry point.
+   * @param args - not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      TestJMX t = new TestJMX();
+      t.testConnectAndWait();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
 
-	/**
-	 * Test the method that gets the number of nodes.
-	 * @throws Exception if any error occurs.
-	 */
-	public void testNumberOfNodes() throws Exception
-	{
-		int success = 0;
-		int failure = 0;
-		int firstFailure = -1;
-		for (int i=0; i<1000; i++)
-		{
-			try
-			{
-				int n = getNumberOfNodes();
-				//System.out.println("nb nodes: " + n);
-				success++;
-			}
-			catch(Exception ignore)
-			{
-				failure++;
-				if (firstFailure < 0) firstFailure = i;
-			}
-		}
-		System.out.println("successes: " + success + ", failures: " + failure + ", first failure: " + firstFailure);
-	}
+  /**
+   * Test the method that gets the number of nodes.
+   * @throws Exception if any error occurs.
+   */
+  public void testNumberOfNodes() throws Exception
+  {
+    int success = 0;
+    int failure = 0;
+    int firstFailure = -1;
+    for (int i=0; i<1000; i++)
+    {
+      try
+      {
+        int n = getNumberOfNodes();
+        //System.out.println("nb nodes: " + n);
+        success++;
+      }
+      catch(Exception ignore)
+      {
+        failure++;
+        if (firstFailure < 0) firstFailure = i;
+      }
+    }
+    System.out.println("successes: " + success + ", failures: " + failure + ", first failure: " + firstFailure);
+  }
 
-	/**
-	 * Test the connectAndWait() method with the JMXMP connector.
-	 * @throws Exception if any error occurs.
-	 */
-	public void testConnectAndWait() throws Exception
-	{
-		// for this test, make sure the corresponding node is NOT started.
-		JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("118.1.1.10", 12001);
-		long start = System.nanoTime();
-		System.out.println("before connectAndWait()");
-		jmx.connectAndWait(2000L);
-		long elapsed = System.nanoTime() - start;
-		System.out.println("actually waited for " + (elapsed/1000000) + " ms");
-		/*
+  /**
+   * Test the connectAndWait() method with the JMXMP connector.
+   * @throws Exception if any error occurs.
+   */
+  public void testConnectAndWait() throws Exception
+  {
+    // for this test, make sure the corresponding node is NOT started.
+    JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("118.1.1.10", 12001);
+    long start = System.nanoTime();
+    System.out.println("before connectAndWait()");
+    jmx.connectAndWait(2000L);
+    long elapsed = System.nanoTime() - start;
+    System.out.println("actually waited for " + (elapsed/1000000) + " ms");
+    /*
 		System.out.println("*** press any key to terminate ***");
 		System.in.read();
-		 */
-	}
+     */
+  }
 
-	/**
-	 * Retrieve the number of nodes from the server.
-	 * @return the number rof nodes as an int.
-	 * @throws Exception if any error occurs.
-	 */
-	public int getNumberOfNodes() throws Exception
-	{
-		// create a JMX connection to the driver
-		// replace "your_host_address" and "your_port" with the appropriate values for your configuration
-		JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
-		// start the connection process and wait until the connection is established
-		jmxConnection.connectAndWait(1000);
-		// request the statistics from the driver
-		JPPFStats stats = jmxConnection.statistics();
-		/*
+  /**
+   * Retrieve the number of nodes from the server.
+   * @return the number rof nodes as an int.
+   * @throws Exception if any error occurs.
+   */
+  public int getNumberOfNodes() throws Exception
+  {
+    // create a JMX connection to the driver
+    // replace "your_host_address" and "your_port" with the appropriate values for your configuration
+    JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
+    // start the connection process and wait until the connection is established
+    jmxConnection.connectAndWait(1000);
+    // request the statistics from the driver
+    JPPFStats stats = jmxConnection.statistics();
+    /*
 	  while (stats == null)
     {
 	    Thread.currentThread().sleep(50);
     	stats = jmxConnection.statistics();
     }
-		 */
-		jmxConnection.close();
-		// return the current number of nodes
-		return (int) stats.getNodes().getLatest();
-	}
+     */
+    jmxConnection.close();
+    // return the current number of nodes
+    return (int) stats.getNodes().getLatest();
+  }
 }

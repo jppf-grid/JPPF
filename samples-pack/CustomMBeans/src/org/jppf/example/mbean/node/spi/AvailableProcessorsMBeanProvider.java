@@ -28,37 +28,37 @@ import org.jppf.node.Node;
  */
 public class AvailableProcessorsMBeanProvider implements JPPFNodeMBeanProvider
 {
-	/**
-	 * Get the fully qualified name of the MBean interface defined by this provider.
-	 * @return the name as a string.
-	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
-	 */
-	@Override
-	public String getMBeanInterfaceName()
-	{
-		return "org.jppf.example.mbean.AvailableProcessorsMBean";
-	}
+  /**
+   * Get the fully qualified name of the MBean interface defined by this provider.
+   * @return the name as a string.
+   * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanInterfaceName()
+   */
+  @Override
+  public String getMBeanInterfaceName()
+  {
+    return "org.jppf.example.mbean.AvailableProcessorsMBean";
+  }
 
-	/**
-	 * Create a concrete MBean instance.
-	 * @param node a reference ot the JPPF node object - used by the built-in JPPF MBeans.
-	 * @return the created MBean implementation.
-	 * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
-	 */
-	@Override
-	public Object createMBean(final Node node)
-	{
-		return new AvailableProcessors();
-	}
+  /**
+   * Create a concrete MBean instance.
+   * @param node a reference ot the JPPF node object - used by the built-in JPPF MBeans.
+   * @return the created MBean implementation.
+   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
+   */
+  @Override
+  public Object createMBean(final Node node)
+  {
+    return new AvailableProcessors();
+  }
 
-	/**
-	 * Get the object name of the specified MBean.
-	 * @return the MBean's object name as a string.
-	 * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
-	 */
-	@Override
-	public String getMBeanName()
-	{
-		return "org.jppf.example.mbean:name=AvailableProcessors,type=node";
-	}
+  /**
+   * Get the object name of the specified MBean.
+   * @return the MBean's object name as a string.
+   * @see org.jppf.management.spi.JPPFMBeanProvider#getMBeanName()
+   */
+  @Override
+  public String getMBeanName()
+  {
+    return "org.jppf.example.mbean:name=AvailableProcessors,type=node";
+  }
 }

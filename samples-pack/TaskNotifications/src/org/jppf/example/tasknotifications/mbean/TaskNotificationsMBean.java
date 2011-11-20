@@ -26,21 +26,21 @@ import javax.management.NotificationEmitter;
  */
 public interface TaskNotificationsMBean extends NotificationEmitter
 {
-	/**
-	 * The name under which this MBean is registered with the MBean server.
-	 */
-	String MBEAN_NAME = "org.jppf.example.mbean:name=TaskNotifications,type=node";
+  /**
+   * The name under which this MBean is registered with the MBean server.
+   */
+  String MBEAN_NAME = "org.jppf.example.mbean:name=TaskNotifications,type=node";
 
-	/**
-	 * Send a notification message to all registered listeners.
-	 * @param message the message to send.
-	 */
-	void sendTaskNotification(String message);
+  /**
+   * Send a notification message to all registered listeners.
+   * @param message the message to send.
+   */
+  void sendTaskNotification(String message);
 
-	/**
-	 * Send a notification message to all registered listeners.
-	 * @param message the message to send.
-	 * @param userData additional (non trivial) data that may additionally be sent with the message.
-	 */
-	void sendTaskNotification(String message, Object userData);
+  /**
+   * Send a notification message to all registered listeners.
+   * @param message the message to send.
+   * @param userData additional (non trivial) data that may additionally be sent with the message.
+   */
+  void sendTaskNotification(String message, Object userData);
 }

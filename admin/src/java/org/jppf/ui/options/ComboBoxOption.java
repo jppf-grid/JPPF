@@ -28,175 +28,175 @@ import javax.swing.*;
  */
 public class ComboBoxOption extends AbstractOption
 {
-	/**
-	 * The combo box used to select one among several.
-	 */
-	private JComboBox combo = null;
-	/**
-	 * Label associated with the combo box.
-	 */
-	protected JLabel comboLabel = null;
-	/**
-	 * The items in the drop down list.
-	 */
-	protected List items = null;
+  /**
+   * The combo box used to select one among several.
+   */
+  private JComboBox combo = null;
+  /**
+   * Label associated with the combo box.
+   */
+  protected JLabel comboLabel = null;
+  /**
+   * The items in the drop down list.
+   */
+  protected List items = null;
 
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public ComboBoxOption()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public ComboBoxOption()
+  {
+  }
 
-	/**
-	 * Initialize this combo box option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox.
-	 * @param tooltip the tooltip associated with the combobox.
-	 * @param value the initially selected value of this component.
-	 * @param items the initial list of items in the combo box.
-	 */
-	public ComboBoxOption(final String name, final String label, final String tooltip, final Object value, final List<Object> items)
-	{
-		this.name = name;
-		this.label = label;
-		setToolTipText(tooltip);
-		this.value = value;
-		this.items = items;
-		createUI();
-	}
+  /**
+   * Initialize this combo box option with the specified parameters.
+   * @param name this component's name.
+   * @param label the label displayed with the checkbox.
+   * @param tooltip the tooltip associated with the combobox.
+   * @param value the initially selected value of this component.
+   * @param items the initial list of items in the combo box.
+   */
+  public ComboBoxOption(final String name, final String label, final String tooltip, final Object value, final List<Object> items)
+  {
+    this.name = name;
+    this.label = label;
+    setToolTipText(tooltip);
+    this.value = value;
+    this.items = items;
+    createUI();
+  }
 
-	/**
-	 * Create the UI components for this option.
-	 */
-	@Override
-	public void createUI()
-	{
-		combo = new JComboBox();
-		if (items != null)
-		{
-			for (Object o: items) combo.addItem(o);
-			if (value != null) combo.setSelectedItem(value);
-		}
-		comboLabel = new JLabel(label);
-		if (toolTipText != null)
-		{
-			combo.setToolTipText(toolTipText);
-			comboLabel.setToolTipText(toolTipText);
-		}
+  /**
+   * Create the UI components for this option.
+   */
+  @Override
+  public void createUI()
+  {
+    combo = new JComboBox();
+    if (items != null)
+    {
+      for (Object o: items) combo.addItem(o);
+      if (value != null) combo.setSelectedItem(value);
+    }
+    comboLabel = new JLabel(label);
+    if (toolTipText != null)
+    {
+      combo.setToolTipText(toolTipText);
+      comboLabel.setToolTipText(toolTipText);
+    }
 
-		UIComponent = layoutComponents(comboLabel, combo);
-		setupValueChangeNotifications();
-	}
+    UIComponent = layoutComponents(comboLabel, combo);
+    setupValueChangeNotifications();
+  }
 
-	/**
-	 * Get the current value for this option.
-	 * @return a <code>Boolean</code> instance.
-	 * @see org.jppf.ui.options.AbstractOption#getValue()
-	 */
-	@Override
-	public Object getValue()
-	{
-		value = combo.getSelectedItem();
-		return value;
-	}
+  /**
+   * Get the current value for this option.
+   * @return a <code>Boolean</code> instance.
+   * @see org.jppf.ui.options.AbstractOption#getValue()
+   */
+  @Override
+  public Object getValue()
+  {
+    value = combo.getSelectedItem();
+    return value;
+  }
 
-	/**
-	 * Set the current value for this option.
-	 * @param value a <code>Boolean</code> instance.
-	 * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
-	 */
-	@Override
-	public void setValue(final Object value)
-	{
-		Object val = value;
-		if (value instanceof String)
-		{
-			for (Object o: items)
-			{
-				if (value.equals(o.toString()))
-				{
-					val = o;
-					break;
-				}
-			}
-		}
-		this.value = val;
-		if (combo != null) combo.setSelectedItem(val);
-	}
+  /**
+   * Set the current value for this option.
+   * @param value a <code>Boolean</code> instance.
+   * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
+   */
+  @Override
+  public void setValue(final Object value)
+  {
+    Object val = value;
+    if (value instanceof String)
+    {
+      for (Object o: items)
+      {
+        if (value.equals(o.toString()))
+        {
+          val = o;
+          break;
+        }
+      }
+    }
+    this.value = val;
+    if (combo != null) combo.setSelectedItem(val);
+  }
 
-	/**
-	 * Propagate the selection changes in the underlying combo box to the listeners to this option.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-		combo.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(final ActionEvent event)
-			{
-				getValue();
-				fireValueChanged();
-			}
-		});
-	}
+  /**
+   * Propagate the selection changes in the underlying combo box to the listeners to this option.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+    combo.addActionListener(new ActionListener()
+    {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        getValue();
+        fireValueChanged();
+      }
+    });
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-		combo.setEnabled(enabled);
-		comboLabel.setEnabled(enabled);
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.Option#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+    combo.setEnabled(enabled);
+    comboLabel.setEnabled(enabled);
+  }
 
-	/**
-	 * Get the list of items in the combo box.
-	 * @return a list of <code>Object</code> instances.
-	 */
-	public List getItems()
-	{
-		return items;
-	}
+  /**
+   * Get the list of items in the combo box.
+   * @return a list of <code>Object</code> instances.
+   */
+  public List getItems()
+  {
+    return items;
+  }
 
-	/**
-	 * Set the list of items in the combo box.
-	 * @param items a list of <code>Object</code> instances.
-	 */
-	public void setItems(final List items)
-	{
-		this.items = items;
-		if (combo != null)
-		{
-			combo.removeAllItems();
-			Object val = "";
-			int maxLen = 0;
-			for (Object o: items)
-			{
-				String s = o.toString();
-				if (s.length() > maxLen)
-				{
-					maxLen = s.length();
-					val = s + "  ";
-				}
-			}
-			combo.setPrototypeDisplayValue(val);
-			for (Object o: items) combo.addItem(o);
-		}
-	}
+  /**
+   * Set the list of items in the combo box.
+   * @param items a list of <code>Object</code> instances.
+   */
+  public void setItems(final List items)
+  {
+    this.items = items;
+    if (combo != null)
+    {
+      combo.removeAllItems();
+      Object val = "";
+      int maxLen = 0;
+      for (Object o: items)
+      {
+        String s = o.toString();
+        if (s.length() > maxLen)
+        {
+          maxLen = s.length();
+          val = s + "  ";
+        }
+      }
+      combo.setPrototypeDisplayValue(val);
+      for (Object o: items) combo.addItem(o);
+    }
+  }
 
-	/**
-	 * Get the combo box used to select one among several items.
-	 * @return a <code>JComboBox</code> instance.
-	 */
-	public JComboBox getComboBox()
-	{
-		return combo;
-	}
+  /**
+   * Get the combo box used to select one among several items.
+   * @return a <code>JComboBox</code> instance.
+   */
+  public JComboBox getComboBox()
+  {
+    return combo;
+  }
 }

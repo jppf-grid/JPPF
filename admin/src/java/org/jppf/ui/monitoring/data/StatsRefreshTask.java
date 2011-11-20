@@ -29,28 +29,28 @@ import org.jppf.client.*;
  */
 public class StatsRefreshTask extends TimerTask
 {
-	/**
-	 * Client connection to request the data from.
-	 */
-	private JPPFClientConnectionImpl connection = null;
+  /**
+   * Client connection to request the data from.
+   */
+  private JPPFClientConnectionImpl connection = null;
 
-	/**
-	 * Initialize this task with a specified client connection.
-	 * @param connection the connection to use to request data.
-	 */
-	public StatsRefreshTask(final JPPFClientConnectionImpl connection)
-	{
-		this.connection = connection;
-	}
+  /**
+   * Initialize this task with a specified client connection.
+   * @param connection the connection to use to request data.
+   */
+  public StatsRefreshTask(final JPPFClientConnectionImpl connection)
+  {
+    this.connection = connection;
+  }
 
-	/**
-	 * Request an update from the JPPF driver.
-	 * @see java.util.TimerTask#run()
-	 */
-	@Override
-	public void run()
-	{
-		if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
-			StatsHandler.getInstance().requestUpdate(connection);
-	}
+  /**
+   * Request an update from the JPPF driver.
+   * @see java.util.TimerTask#run()
+   */
+  @Override
+  public void run()
+  {
+    if (JPPFClientConnectionStatus.ACTIVE.equals(connection.getStatus()))
+      StatsHandler.getInstance().requestUpdate(connection);
+  }
 }

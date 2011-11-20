@@ -29,42 +29,42 @@ import org.jppf.node.protocol.Task;
  */
 public abstract class AbstractNodeTaskWrapper implements Runnable
 {
-	/**
-	 * The task to execute within a try/catch block.
-	 */
-	protected final Task task;
-	/**
-	 * The key to the JPPFContainer for the task's classloader.
-	 */
-	protected final List<String> uuidPath;
-	/**
-	 * The number identifying the task.
-	 */
-	protected final long number;
-	/**
-	 * Set if the node must reconnect to the driver.
-	 */
-	protected JPPFNodeReconnectionNotification reconnectionNotification = null;
+  /**
+   * The task to execute within a try/catch block.
+   */
+  protected final Task task;
+  /**
+   * The key to the JPPFContainer for the task's classloader.
+   */
+  protected final List<String> uuidPath;
+  /**
+   * The number identifying the task.
+   */
+  protected final long number;
+  /**
+   * Set if the node must reconnect to the driver.
+   */
+  protected JPPFNodeReconnectionNotification reconnectionNotification = null;
 
-	/**
-	 * Initialize this task wrapper with a specified JPPF task.
-	 * @param task the task to execute within a try/catch block.
-	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
-	 * @param number the internal number identifying the task for the thread pool.
-	 */
-	public AbstractNodeTaskWrapper(final Task task, final List<String> uuidPath, final long number)
-	{
-		this.task = task;
-		this.uuidPath = uuidPath;
-		this.number = number;
-	}
+  /**
+   * Initialize this task wrapper with a specified JPPF task.
+   * @param task the task to execute within a try/catch block.
+   * @param uuidPath the key to the JPPFContainer for the task's classloader.
+   * @param number the internal number identifying the task for the thread pool.
+   */
+  public AbstractNodeTaskWrapper(final Task task, final List<String> uuidPath, final long number)
+  {
+    this.task = task;
+    this.uuidPath = uuidPath;
+    this.number = number;
+  }
 
-	/**
-	 * Get the task this wrapper executes within a try/catch block.
-	 * @return the task as a <code>JPPFTask</code> instance.
-	 */
-	public Task getTask()
-	{
-		return task;
-	}
+  /**
+   * Get the task this wrapper executes within a try/catch block.
+   * @return the task as a <code>JPPFTask</code> instance.
+   */
+  public Task getTask()
+  {
+    return task;
+  }
 }

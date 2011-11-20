@@ -29,21 +29,21 @@ import org.jppf.client.JPPFClientConnection;
  */
 public class ClientEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified client connection.
-	 * @param c the client connection on which the event occurs.
-	 */
-	public ClientEvent(final JPPFClientConnection c)
-	{
-		super(c);
-	}
+  /**
+   * Initialize this event with the specified client connection.
+   * @param c the client connection on which the event occurs.
+   */
+  public ClientEvent(final JPPFClientConnection c)
+  {
+    super(c);
+  }
 
-	/**
-	 * Get the client connection on which the event occurred.
-	 * @return a <code>JPPFClientConnection</code> instance.
-	 */
-	public JPPFClientConnection getConnection()
-	{
-		return (JPPFClientConnection) getSource();
-	}
+  /**
+   * Get the client connection on which the event occurred.
+   * @return a <code>JPPFClientConnection</code> instance.
+   */
+  public JPPFClientConnection getConnection()
+  {
+    return (JPPFClientConnection) getSource();
+  }
 }

@@ -24,12 +24,12 @@ package org.jppf.utils.streams;
  */
 public final class StreamConstants
 {
-	/**
-	 * Size of temporary buffers used in I/O transfers.
-	 */
-	public static final int TEMP_BUFFER_SIZE = 4 * 1024;
-	/**
-	 * A definition of an empty byte array.
-	 */
-	public static final byte[] EMPTY_BYTES = new byte[0];
+  /**
+   * Size of temporary buffers used in I/O transfers.
+   */
+  public static final int TEMP_BUFFER_SIZE = 4 * 1024;
+  /**
+   * A definition of an empty byte array.
+   */
+  public static final byte[] EMPTY_BYTES = new byte[0];
 }

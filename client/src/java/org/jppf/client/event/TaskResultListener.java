@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface TaskResultListener extends EventListener
 {
-	/**
-	 * Called to notify that the results of a number of tasks have been received from the server.
-	 * @param event the event encapsulating the tasks that were received.
-	 */
-	void resultsReceived(TaskResultEvent event);
+  /**
+   * Called to notify that the results of a number of tasks have been received from the server.
+   * @param event the event encapsulating the tasks that were received.
+   */
+  void resultsReceived(TaskResultEvent event);
 }

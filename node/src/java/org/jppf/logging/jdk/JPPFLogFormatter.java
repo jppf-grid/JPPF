@@ -28,76 +28,76 @@ import java.util.logging.*;
  */
 public class JPPFLogFormatter extends Formatter
 {
-	/**
-	 * Date format used in log entries.
-	 */
-	private final SimpleDateFormat sdf = new SimpleDateFormat("[yyyy/MM/dd hh:mm:ss.SSS]");
+  /**
+   * Date format used in log entries.
+   */
+  private final SimpleDateFormat sdf = new SimpleDateFormat("[yyyy/MM/dd hh:mm:ss.SSS]");
 
-	/**
-	 * Format a log record.
-	 * @param record the record to format.
-	 * @return a string representation of the record according to this formatter.
-	 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
-	 */
-	@Override
-	public String format(final LogRecord record)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(sdf.format(new Date(record.getMillis())));
-		sb.append('[');
-		String name = record.getLevel().getName();
-		sb.append(name);
-		// pad to 7 chars
-		for (int i=0; i<7-name.length(); i++) sb.append(' ');
-		sb.append(']');
-		sb.append('[');
-		/*
+  /**
+   * Format a log record.
+   * @param record the record to format.
+   * @return a string representation of the record according to this formatter.
+   * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
+   */
+  @Override
+  public String format(final LogRecord record)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(sdf.format(new Date(record.getMillis())));
+    sb.append('[');
+    String name = record.getLevel().getName();
+    sb.append(name);
+    // pad to 7 chars
+    for (int i=0; i<7-name.length(); i++) sb.append(' ');
+    sb.append(']');
+    sb.append('[');
+    /*
 		String s = record.getSourceClassName();
 		if (s != null) sb.append(s);
-		 */
-		String s = record.getSourceClassName();
-		String shortName = getShortName(s);
-		StackTraceElement[] elts = new Throwable().getStackTrace();
-		StackTraceElement elt = null;
-		for (StackTraceElement elt1 : elts) {
-			if (getShortName(elt1.getClassName()).equals(shortName)) {
-				elt = elt1;
-				break;
-			}
-		}
-		if (elt != null)
-		{
-			sb.append(elt.getClassName());
-			if (elt.getMethodName() != null) sb.append('.').append(elt.getMethodName());
-			sb.append('(');
-			if (elt.getLineNumber() >= 0) sb.append(elt.getLineNumber());
-			sb.append(')');
-		}
-		else
-		{
-			if (s != null) sb.append(s);
-			s = record.getSourceMethodName();
-			if (s != null) sb.append('.').append(s).append("()");
-		}
-		sb.append(']');
-		sb.append(": ");
-		s = record.getMessage();
-		if (s != null) sb.append(s);
-		Object[] params = record.getParameters();
-		if (params != null) for (Object o: params) sb.append('|').append(o);
-		sb.append('\n');
-		return sb.toString();
-	}
+     */
+    String s = record.getSourceClassName();
+    String shortName = getShortName(s);
+    StackTraceElement[] elts = new Throwable().getStackTrace();
+    StackTraceElement elt = null;
+    for (StackTraceElement elt1 : elts) {
+      if (getShortName(elt1.getClassName()).equals(shortName)) {
+        elt = elt1;
+        break;
+      }
+    }
+    if (elt != null)
+    {
+      sb.append(elt.getClassName());
+      if (elt.getMethodName() != null) sb.append('.').append(elt.getMethodName());
+      sb.append('(');
+      if (elt.getLineNumber() >= 0) sb.append(elt.getLineNumber());
+      sb.append(')');
+    }
+    else
+    {
+      if (s != null) sb.append(s);
+      s = record.getSourceMethodName();
+      if (s != null) sb.append('.').append(s).append("()");
+    }
+    sb.append(']');
+    sb.append(": ");
+    s = record.getMessage();
+    if (s != null) sb.append(s);
+    Object[] params = record.getParameters();
+    if (params != null) for (Object o: params) sb.append('|').append(o);
+    sb.append('\n');
+    return sb.toString();
+  }
 
-	/**
-	 * Get the short name of a class, without the package name.
-	 * @param fqn - the fully qualified name of the class.
-	 * @return a string representing the short name of a class.
-	 */
-	private static String getShortName(final String fqn)
-	{
-		if (fqn == null) return "";
-		int idx = fqn.lastIndexOf('.');
-		return idx >= 0 ? fqn.substring(idx+1) : fqn;
-	}
+  /**
+   * Get the short name of a class, without the package name.
+   * @param fqn - the fully qualified name of the class.
+   * @return a string representing the short name of a class.
+   */
+  private static String getShortName(final String fqn)
+  {
+    if (fqn == null) return "";
+    int idx = fqn.lastIndexOf('.');
+    return idx >= 0 ? fqn.substring(idx+1) : fqn;
+  }
 }

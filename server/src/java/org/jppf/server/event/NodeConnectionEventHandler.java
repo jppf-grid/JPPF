@@ -31,89 +31,89 @@ import org.slf4j.*;
  */
 public class NodeConnectionEventHandler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(NodeConnectionEventHandler.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The list of node connection listeners.
-	 */
-	private final List<NodeConnectionListener> listeners = new LinkedList<NodeConnectionListener>();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodeConnectionEventHandler.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The list of node connection listeners.
+   */
+  private final List<NodeConnectionListener> listeners = new LinkedList<NodeConnectionListener>();
 
-	/**
-	 * Add a listener to the list of listeners.
-	 * @param listener a {@link NodeConnectionListener} instance.
-	 */
-	public void addNodeConnectionListener(final NodeConnectionListener listener)
-	{
-		if (listener == null) return;
-		synchronized(listeners)
-		{
-			listeners.add(listener);
-		}
-	}
+  /**
+   * Add a listener to the list of listeners.
+   * @param listener a {@link NodeConnectionListener} instance.
+   */
+  public void addNodeConnectionListener(final NodeConnectionListener listener)
+  {
+    if (listener == null) return;
+    synchronized(listeners)
+    {
+      listeners.add(listener);
+    }
+  }
 
-	/**
-	 * Remove a listener from the list of listeners.
-	 * @param listener a {@link NodeConnectionListener} instance.
-	 */
-	public void removeNodeConnectionListener(final NodeConnectionListener listener)
-	{
-		if (listener == null) return;
-		synchronized(listeners)
-		{
-			listeners.remove(listener);
-		}
-	}
+  /**
+   * Remove a listener from the list of listeners.
+   * @param listener a {@link NodeConnectionListener} instance.
+   */
+  public void removeNodeConnectionListener(final NodeConnectionListener listener)
+  {
+    if (listener == null) return;
+    synchronized(listeners)
+    {
+      listeners.remove(listener);
+    }
+  }
 
-	/**
-	 * Notify all listeners that a node is connected tot he server.
-	 * @param info encapsulates the information about the node.
-	 */
-	public void fireNodeConnected(final JPPFManagementInfo info)
-	{
-		NodeConnectionEvent event = new NodeConnectionEvent(info);
-		synchronized(listeners)
-		{
-			for (NodeConnectionListener listener: listeners) listener.nodeConnected(event);
-		}
-	}
+  /**
+   * Notify all listeners that a node is connected tot he server.
+   * @param info encapsulates the information about the node.
+   */
+  public void fireNodeConnected(final JPPFManagementInfo info)
+  {
+    NodeConnectionEvent event = new NodeConnectionEvent(info);
+    synchronized(listeners)
+    {
+      for (NodeConnectionListener listener: listeners) listener.nodeConnected(event);
+    }
+  }
 
-	/**
-	 * Notify all listeners that a node is disconnected from the server.
-	 * @param info encapsulates the information about the node.
-	 */
-	public void fireNodeDisconnected(final JPPFManagementInfo info)
-	{
-		NodeConnectionEvent event = new NodeConnectionEvent(info);
-		synchronized(listeners)
-		{
-			for (NodeConnectionListener listener: listeners) listener.nodeDisconnected(event);
-		}
-	}
+  /**
+   * Notify all listeners that a node is disconnected from the server.
+   * @param info encapsulates the information about the node.
+   */
+  public void fireNodeDisconnected(final JPPFManagementInfo info)
+  {
+    NodeConnectionEvent event = new NodeConnectionEvent(info);
+    synchronized(listeners)
+    {
+      for (NodeConnectionListener listener: listeners) listener.nodeDisconnected(event);
+    }
+  }
 
-	/**
-	 * Load all listener instances found in the class path via a service definition.
-	 */
-	public void loadListeners()
-	{
-		Iterator<NodeConnectionListener> it = ServiceFinder.lookupProviders(NodeConnectionListener.class);
-		while (it.hasNext())
-		{
-			try
-			{
-				NodeConnectionListener listener = it.next();
-				addNodeConnectionListener(listener);
-				if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());
-			}
-			catch(Error e)
-			{
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
+  /**
+   * Load all listener instances found in the class path via a service definition.
+   */
+  public void loadListeners()
+  {
+    Iterator<NodeConnectionListener> it = ServiceFinder.lookupProviders(NodeConnectionListener.class);
+    while (it.hasNext())
+    {
+      try
+      {
+        NodeConnectionListener listener = it.next();
+        addNodeConnectionListener(listener);
+        if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());
+      }
+      catch(Error e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+  }
 }

@@ -25,28 +25,28 @@ package org.jppf.server.nio.multiplexer;
  */
 public enum MultiplexerTransition
 {
-	/**
-	 * Transition from a state to SENDING_OR_RECEIVING.
-	 */
-	TO_SENDING_OR_RECEIVING,
-	/**
-	 * Transition from a state to SENDING.
-	 */
-	TO_SENDING,
-	/**
-	 * Transition from a state to RECEIVING.
-	 */
-	TO_RECEIVING,
-	/**
-	 * Transition from a state to IDENTIFYING_INBOUND_CHANNEL.
-	 */
-	TO_IDENTIFYING_INBOUND_CHANNEL,
-	/**
-	 * Transition from a state to SENDING_MULTIPLEXING_INFO.
-	 */
-	TO_SENDING_MULTIPLEXING_INFO,
-	/**
-	 * Transition from a state to SENDING in idle mode.
-	 */
-	TO_IDLE
+  /**
+   * Transition from a state to SENDING_OR_RECEIVING.
+   */
+  TO_SENDING_OR_RECEIVING,
+  /**
+   * Transition from a state to SENDING.
+   */
+  TO_SENDING,
+  /**
+   * Transition from a state to RECEIVING.
+   */
+  TO_RECEIVING,
+  /**
+   * Transition from a state to IDENTIFYING_INBOUND_CHANNEL.
+   */
+  TO_IDENTIFYING_INBOUND_CHANNEL,
+  /**
+   * Transition from a state to SENDING_MULTIPLEXING_INFO.
+   */
+  TO_SENDING_MULTIPLEXING_INFO,
+  /**
+   * Transition from a state to SENDING in idle mode.
+   */
+  TO_IDLE
 }

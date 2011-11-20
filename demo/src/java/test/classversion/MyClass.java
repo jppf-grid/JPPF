@@ -26,48 +26,48 @@ import java.io.*;
  */
 public class MyClass implements Serializable
 {
-	/**
-	 * 
-	 */
-	private String name = "all your base are belong to us";
+  /**
+   * 
+   */
+  private String name = "all your base are belong to us";
 
-	/**
-	 * Get the name.
-	 * @return a string.
-	 */
-	public String getName()
-	{
-		return name;
-	}
+  /**
+   * Get the name.
+   * @return a string.
+   */
+  public String getName()
+  {
+    return name;
+  }
 
-	/**
-	 * Set the name.
-	 * @param name a string.
-	 */
-	public void setName(final String name)
-	{
-		this.name = name;
-	}
+  /**
+   * Set the name.
+   * @param name a string.
+   */
+  public void setName(final String name)
+  {
+    this.name = name;
+  }
 
-	/**
-	 * 
-	 * @param in the input stream.
-	 * @throws IOException if an I/O error occurs.
-	 * @throws ClassNotFoundException if a class cannot be found.
-	 */
-	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException
-	{
-		name = (String) in.readObject();
-		getClass().getClassLoader().loadClass(getClass().getName());
-	}
+  /**
+   * 
+   * @param in the input stream.
+   * @throws IOException if an I/O error occurs.
+   * @throws ClassNotFoundException if a class cannot be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    name = (String) in.readObject();
+    getClass().getClassLoader().loadClass(getClass().getName());
+  }
 
-	/**
-	 * 
-	 * @param out the output stream.
-	 * @throws IOException if an I/O error occurs.
-	 */
-	private void writeObject(final ObjectOutputStream out) throws IOException
-	{
-		out.writeObject(name);
-	}
+  /**
+   * 
+   * @param out the output stream.
+   * @throws IOException if an I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException
+  {
+    out.writeObject(name);
+  }
 }

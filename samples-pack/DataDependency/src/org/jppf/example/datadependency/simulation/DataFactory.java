@@ -29,40 +29,40 @@ import org.jppf.example.datadependency.model.*;
  */
 public interface DataFactory
 {
-	/**
-	 * Generate a random number in the range [0, value[.
-	 * @param value the maximum random value (exclusive).
-	 * @return a pseudo-random number in the specified range.
-	 */
-	int getRandomInt(int value);
+  /**
+   * Generate a random number in the range [0, value[.
+   * @param value the maximum random value (exclusive).
+   * @return a pseudo-random number in the specified range.
+   */
+  int getRandomInt(int value);
 
-	/**
-	 * Generate a random number in the specified range.
-	 * @param min the minimum random value.
-	 * @param max the maximum random value.
-	 * @return a pseudo-random number in the specified range.
-	 */
-	int getRandomInt(int min, int max);
+  /**
+   * Generate a random number in the specified range.
+   * @param min the minimum random value.
+   * @param max the maximum random value.
+   * @return a pseudo-random number in the specified range.
+   */
+  int getRandomInt(int min, int max);
 
-	/**
-	 * Generate the specified number of data market objects.
-	 * Each generated object has an id in the format &quot;Dn&quot; where <i>n</i> is a sequence number.
-	 * @param n the number of objects to generate.
-	 * @return a list of <code>MarketData</code> instances.
-	 */
-	List<MarketData> generateDataMarketObjects(int n);
+  /**
+   * Generate the specified number of data market objects.
+   * Each generated object has an id in the format &quot;Dn&quot; where <i>n</i> is a sequence number.
+   * @param n the number of objects to generate.
+   * @return a list of <code>MarketData</code> instances.
+   */
+  List<MarketData> generateDataMarketObjects(int n);
 
-	/**
-	 * Generate a list of trade objects with their dependencies.
-	 * Each generated object has an id in the format &quot;Tn&quot; where <i>n</i> is a sequence number.
-	 * The dependencies are randomly chosen from the specified list of data market objects.
-	 * and their number varies between the specified min and max values.
-	 * @param nbTrades the number of trade objects to generate.
-	 * @param dataList the list of market data objects to create the dependencies from.
-	 * @param minData the minimum number of dependencies per trade (inclusive).
-	 * @param maxData the maximum number of dependencies per trade (inclusive).
-	 * @return a list of <code>Trade</code> instances.
-	 */
-	List<Trade> generateTradeObjects(int nbTrades, List<MarketData> dataList, int minData, int maxData);
+  /**
+   * Generate a list of trade objects with their dependencies.
+   * Each generated object has an id in the format &quot;Tn&quot; where <i>n</i> is a sequence number.
+   * The dependencies are randomly chosen from the specified list of data market objects.
+   * and their number varies between the specified min and max values.
+   * @param nbTrades the number of trade objects to generate.
+   * @param dataList the list of market data objects to create the dependencies from.
+   * @param minData the minimum number of dependencies per trade (inclusive).
+   * @param maxData the maximum number of dependencies per trade (inclusive).
+   * @return a list of <code>Trade</code> instances.
+   */
+  List<Trade> generateTradeObjects(int nbTrades, List<MarketData> dataList, int minData, int maxData);
 
 }

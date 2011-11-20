@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface QueueListener extends EventListener
 {
-	/**
-	 * Notify a listener that a queue event occurred.
-	 * @param event - a queue event.
-	 */
-	void newBundle(QueueEvent event);
+  /**
+   * Notify a listener that a queue event occurred.
+   * @param event - a queue event.
+   */
+  void newBundle(QueueEvent event);
 }

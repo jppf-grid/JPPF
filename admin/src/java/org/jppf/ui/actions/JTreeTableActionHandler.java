@@ -29,46 +29,46 @@ import org.jppf.ui.treetable.JTreeTable;
  */
 public class JTreeTableActionHandler extends AbstractActionHandler
 {
-	/**
-	 * The JTreeTable whose actions are managed.
-	 */
-	protected JTreeTable treeTable = null;
+  /**
+   * The JTreeTable whose actions are managed.
+   */
+  protected JTreeTable treeTable = null;
 
-	/**
-	 * Initialize this action manager with the specified JTreeTable component.
-	 * @param treeTable the JTreeTable whose actions are managed.
-	 */
-	public JTreeTableActionHandler(final JTreeTable treeTable)
-	{
-		this.treeTable = treeTable;
-		treeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-		{
-			@Override
-			public void valueChanged(final ListSelectionEvent e)
-			{
-				synchronized(JTreeTableActionHandler.this)
-				{
-					computeSelectedElements();
-					updateActions();
-				}
-			}
-		});
-	}
+  /**
+   * Initialize this action manager with the specified JTreeTable component.
+   * @param treeTable the JTreeTable whose actions are managed.
+   */
+  public JTreeTableActionHandler(final JTreeTable treeTable)
+  {
+    this.treeTable = treeTable;
+    treeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+    {
+      @Override
+      public void valueChanged(final ListSelectionEvent e)
+      {
+        synchronized(JTreeTableActionHandler.this)
+        {
+          computeSelectedElements();
+          updateActions();
+        }
+      }
+    });
+  }
 
-	/**
-	 * Compute the list of elements selected in the component.
-	 */
-	protected synchronized void computeSelectedElements()
-	{
-		selectedElements.clear();
-		int[] rows = treeTable.getSelectedRows();
-		if ((rows == null) || (rows.length <= 0)) return;
-		for (int n: rows)
-		{
-			TreePath path = treeTable.getTree().getPathForRow(n);
-			if (path == null) continue;
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-			selectedElements.add(node.getUserObject());
-		}
-	}
+  /**
+   * Compute the list of elements selected in the component.
+   */
+  protected synchronized void computeSelectedElements()
+  {
+    selectedElements.clear();
+    int[] rows = treeTable.getSelectedRows();
+    if ((rows == null) || (rows.length <= 0)) return;
+    for (int n: rows)
+    {
+      TreePath path = treeTable.getTree().getPathForRow(n);
+      if (path == null) continue;
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+      selectedElements.add(node.getUserObject());
+    }
+  }
 }

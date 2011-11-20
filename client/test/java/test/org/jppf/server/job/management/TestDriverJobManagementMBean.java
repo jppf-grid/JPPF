@@ -39,77 +39,77 @@ import test.org.jppf.test.setup.*;
  */
 public class TestDriverJobManagementMBean extends Setup1D1N1C
 {
-	/**
-	 * Count of the number of jobs created.
-	 */
-	private static AtomicInteger jobCount = new AtomicInteger(0);
-	/**
-	 * A "short" duration for this test.
-	 */
-	private static final long TIME_SHORT = 1000L;
-	/**
-	 * A "long" duration for this test.
-	 */
-	private static final long TIME_LONG = 3000L;
-	/**
-	 * A "rest" duration for this test.
-	 */
-	private static final long TIME_REST = 1L;
-	/**
-	 * A the date format used in the tests.
-	 */
-	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+  /**
+   * Count of the number of jobs created.
+   */
+  private static AtomicInteger jobCount = new AtomicInteger(0);
+  /**
+   * A "short" duration for this test.
+   */
+  private static final long TIME_SHORT = 1000L;
+  /**
+   * A "long" duration for this test.
+   */
+  private static final long TIME_LONG = 3000L;
+  /**
+   * A "rest" duration for this test.
+   */
+  private static final long TIME_REST = 1L;
+  /**
+   * A the date format used in the tests.
+   */
+  private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
-	/**
-	 * We test a job with 1 task, and attempt to cancel it after it has completed.
-	 * @throws Exception if any error occurs.
-	 */
-	@Test
-	public void testCancelJobAfterCompletion() throws Exception
-	{
-		JPPFJob job = createJob("testCancelJob", 1, TIME_SHORT, true);
-		List<JPPFTask> results = client.submit(job);
-		assertEquals(results.size(), 1);
-		assertNotNull(results.get(0));
-		LifeCycleTask task = (LifeCycleTask) results.get(0);
-		assertNotNull(task.getResult());
-		DriverJobManagementMBean proxy = getProxy();
-		assertNotNull(proxy);
-		proxy.suspendJob(job.getJobUuid(), false);
-	}
+  /**
+   * We test a job with 1 task, and attempt to cancel it after it has completed.
+   * @throws Exception if any error occurs.
+   */
+  @Test
+  public void testCancelJobAfterCompletion() throws Exception
+  {
+    JPPFJob job = createJob("testCancelJob", 1, TIME_SHORT, true);
+    List<JPPFTask> results = client.submit(job);
+    assertEquals(results.size(), 1);
+    assertNotNull(results.get(0));
+    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    assertNotNull(task.getResult());
+    DriverJobManagementMBean proxy = getProxy();
+    assertNotNull(proxy);
+    proxy.suspendJob(job.getJobUuid(), false);
+  }
 
-	/**
-	 * Create a job with the specified number of tasks, each with the specified duration.
-	 * @param id the job id.
-	 * @param nbTasks the number of tasks in the job.
-	 * @param duration the duration of each task.
-	 * @param blocking specifies whether the job is blocking or not.
-	 * @return a {@link JPPFJob} instance.
-	 * @throws JPPFException if an error occurs while creating the job.
-	 */
-	protected synchronized JPPFJob createJob(final String id, final int nbTasks, final long duration, final boolean blocking) throws JPPFException
-	{
-		JPPFJob job = new JPPFJob();
-		job.setName(id + '(' + jobCount.incrementAndGet() + ')');
-		for (int i=0; i<nbTasks; i++)
-		{
-			JPPFTask task = new LifeCycleTask(duration);
-			task.setId(job.getName()  + " - task " + (i+1));
-			job.addTask(task);
-		}
-		job.setBlocking(blocking);
-		if (!blocking) job.setResultListener(new JPPFResultCollector(job));
-		return job;
-	}
+  /**
+   * Create a job with the specified number of tasks, each with the specified duration.
+   * @param id the job id.
+   * @param nbTasks the number of tasks in the job.
+   * @param duration the duration of each task.
+   * @param blocking specifies whether the job is blocking or not.
+   * @return a {@link JPPFJob} instance.
+   * @throws JPPFException if an error occurs while creating the job.
+   */
+  protected synchronized JPPFJob createJob(final String id, final int nbTasks, final long duration, final boolean blocking) throws JPPFException
+  {
+    JPPFJob job = new JPPFJob();
+    job.setName(id + '(' + jobCount.incrementAndGet() + ')');
+    for (int i=0; i<nbTasks; i++)
+    {
+      JPPFTask task = new LifeCycleTask(duration);
+      task.setId(job.getName()  + " - task " + (i+1));
+      job.addTask(task);
+    }
+    job.setBlocking(blocking);
+    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
+    return job;
+  }
 
-	/**
-	 * Get a proxy ot the job management MBean.
-	 * @return an instance of <code>DriverJobManagementMBean</code>.
-	 * @throws Exception if the proxy could not be obtained.
-	 */
-	protected DriverJobManagementMBean getProxy() throws Exception
-	{
-		JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
-		return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
-	}
+  /**
+   * Get a proxy ot the job management MBean.
+   * @return an instance of <code>DriverJobManagementMBean</code>.
+   * @throws Exception if the proxy could not be obtained.
+   */
+  protected DriverJobManagementMBean getProxy() throws Exception
+  {
+    JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+    return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+  }
 }

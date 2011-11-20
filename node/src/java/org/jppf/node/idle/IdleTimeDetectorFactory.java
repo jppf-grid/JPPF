@@ -24,9 +24,9 @@ package org.jppf.node.idle;
  */
 public interface IdleTimeDetectorFactory
 {
-	/**
-	 * Create a new detector for system idle time.
-	 * @return an {@link IdleTimeDetector} instance.
-	 */
-	IdleTimeDetector newIdleTimeDetector();
+  /**
+   * Create a new detector for system idle time.
+   * @return an {@link IdleTimeDetector} instance.
+   */
+  IdleTimeDetector newIdleTimeDetector();
 }

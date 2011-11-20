@@ -31,89 +31,89 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class HelloJPPF implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * JPPF Task used in the HelloJPPF code sample.
-	 */
-	public class InnerTask extends JPPFTestTask
-	{
-		/** task count */
-		int count = 1;
+  /**
+   * JPPF Task used in the HelloJPPF code sample.
+   */
+  public class InnerTask extends JPPFTestTask
+  {
+    /** task count */
+    int count = 1;
 
-		/**
-		 * Constructor with a sequence number argument.
-		 * @param cnt this task's sequence number.
-		 */
-		InnerTask(final int cnt)
-		{
-			count = cnt;
-		}
+    /**
+     * Constructor with a sequence number argument.
+     * @param cnt this task's sequence number.
+     */
+    InnerTask(final int cnt)
+    {
+      count = cnt;
+    }
 
-		/**
-		 * Calculate the result of the task and set the result object with setResult().
-		 */
-		public void test()
-		{
-			// ModelPackage a = ModelPackage.createPackage("x");
-			setResult("Hello World " + count + " from inner class of "+HelloJPPF.this.getClass());
-		}
-	}
+    /**
+     * Calculate the result of the task and set the result object with setResult().
+     */
+    public void test()
+    {
+      // ModelPackage a = ModelPackage.createPackage("x");
+      setResult("Hello World " + count + " from inner class of "+HelloJPPF.this.getClass());
+    }
+  }
 
-	/**
-	 * The main procedure.
-	 * @param args not used.
-	 */
-	public static void main(final String[] args)
-	{
-		try
-		{
-			HelloJPPF h = new HelloJPPF();
-			h.testInnerTask();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+  /**
+   * The main procedure.
+   * @param args not used.
+   */
+  public static void main(final String[] args)
+  {
+    try
+    {
+      HelloJPPF h = new HelloJPPF();
+      h.testInnerTask();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
 
-	/**
-	 * Test with a non-static inner class implementation of the class.
-	 * @throws Exception if any error occurs.
-	 */
-	void testInnerTask() throws Exception
-	{
-		JPPFClient client = new JPPFClient();
-		JPPFJob job = new JPPFJob();
-		for (int i = 1; i < 4; i++) job.addTask(new InnerTask(i));
-		try
-		{
-			// execute tasks
-			List<JPPFTask> results = client.submit(job);
-			// show results
-			System.out.println("Got " + results.size() + " results: ");
-			Iterator<JPPFTask> it = results.iterator();
-			while (it.hasNext())
-			{
-				JPPFTask t = it.next();
-				System.out.println("Result object: " + t);
-				System.out.println("Result: " + t.getResult() + ", Exception: " + t.getException());
-				if (null != t.getException())
-				{
-					t.getException().printStackTrace();
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			client.close();
-		}
-	}
+  /**
+   * Test with a non-static inner class implementation of the class.
+   * @throws Exception if any error occurs.
+   */
+  void testInnerTask() throws Exception
+  {
+    JPPFClient client = new JPPFClient();
+    JPPFJob job = new JPPFJob();
+    for (int i = 1; i < 4; i++) job.addTask(new InnerTask(i));
+    try
+    {
+      // execute tasks
+      List<JPPFTask> results = client.submit(job);
+      // show results
+      System.out.println("Got " + results.size() + " results: ");
+      Iterator<JPPFTask> it = results.iterator();
+      while (it.hasNext())
+      {
+        JPPFTask t = it.next();
+        System.out.println("Result object: " + t);
+        System.out.println("Result: " + t.getResult() + ", Exception: " + t.getException());
+        if (null != t.getException())
+        {
+          t.getException().printStackTrace();
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      client.close();
+    }
+  }
 }

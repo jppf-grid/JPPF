@@ -31,58 +31,58 @@ import org.slf4j.*;
  */
 public class AcceptorContext extends SimpleNioContext<AcceptorState>
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(AcceptorContext.class);
-	/**
-	 * Determines whether TRACE logging level is enabled.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * Identifier for the channel.
-	 */
-	private int id = JPPFIdentifiers.UNKNOWN;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AcceptorContext.class);
+  /**
+   * Determines whether TRACE logging level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * Identifier for the channel.
+   */
+  private int id = JPPFIdentifiers.UNKNOWN;
 
-	/**
-	 * Read data from a channel.
-	 * @param wrapper the channel to read the data from.
-	 * @return true if all the data has been read, false otherwise.
-	 * @throws Exception if an error occurs while reading the data.
-	 */
-	@Override
-	public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-		if (message == null)
-		{
-			message = new NioMessage();
-			message.length = 4;
-			message.buffer = ByteBuffer.wrap(new byte[4]);
-			readByteCount = 0;
-		}
-		readByteCount += channel.read(message.buffer);
-		if (traceEnabled) log.trace("read " + readByteCount + " bytes out of " + message.length + " for " + wrapper);
-		boolean b = readByteCount >= message.length;
-		if (b) id = SerializationUtils.readInt(message.buffer.array(), 0);
-		return b;
-	}
+  /**
+   * Read data from a channel.
+   * @param wrapper the channel to read the data from.
+   * @return true if all the data has been read, false otherwise.
+   * @throws Exception if an error occurs while reading the data.
+   */
+  @Override
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
+    if (message == null)
+    {
+      message = new NioMessage();
+      message.length = 4;
+      message.buffer = ByteBuffer.wrap(new byte[4]);
+      readByteCount = 0;
+    }
+    readByteCount += channel.read(message.buffer);
+    if (traceEnabled) log.trace("read " + readByteCount + " bytes out of " + message.length + " for " + wrapper);
+    boolean b = readByteCount >= message.length;
+    if (b) id = SerializationUtils.readInt(message.buffer.array(), 0);
+    return b;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleException(final ChannelWrapper<?> channel)
-	{
-		AcceptorNioServer.closeChannel(channel);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void handleException(final ChannelWrapper<?> channel)
+  {
+    AcceptorNioServer.closeChannel(channel);
+  }
 
-	/**
-	 * get the identifier for the channel.
-	 * @return the identifier as an int value.
-	 */
-	public int getId()
-	{
-		return id;
-	}
+  /**
+   * get the identifier for the channel.
+   * @return the identifier as an int value.
+   */
+  public int getId()
+  {
+    return id;
+  }
 }

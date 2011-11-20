@@ -29,55 +29,55 @@ import org.slf4j.*;
  */
 public class ResetTaskCounterAction extends AbstractTopologyAction
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ResetTaskCounterAction.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ResetTaskCounterAction.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this action.
-	 */
-	public ResetTaskCounterAction()
-	{
-		setupIcon("/org/jppf/ui/resources/reset.gif");
-		setupNameAndTooltip("reset.counter");
-	}
+  /**
+   * Initialize this action.
+   */
+  public ResetTaskCounterAction()
+  {
+    setupIcon("/org/jppf/ui/resources/reset.gif");
+    setupNameAndTooltip("reset.counter");
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements - a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		super.updateState(selectedElements);
-		setEnabled(dataArray.length > 0);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements - a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    super.updateState(selectedElements);
+    setEnabled(dataArray.length > 0);
+  }
 
-	/**
-	 * Perform the action.
-	 * @param event not used.
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent event)
-	{
-		for (TopologyData data: dataArray)
-		{
-			try
-			{
-				JMXNodeConnectionWrapper jmx = (JMXNodeConnectionWrapper) data.getJmxWrapper();
-				jmx.resetTaskCounter();
-			}
-			catch(Exception e)
-			{
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
+  /**
+   * Perform the action.
+   * @param event not used.
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    for (TopologyData data: dataArray)
+    {
+      try
+      {
+        JMXNodeConnectionWrapper jmx = (JMXNodeConnectionWrapper) data.getJmxWrapper();
+        jmx.resetTaskCounter();
+      }
+      catch(Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+  }
 }

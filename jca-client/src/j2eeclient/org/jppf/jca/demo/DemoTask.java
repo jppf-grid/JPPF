@@ -26,46 +26,46 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DemoTask extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1441035751363821022L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1441035751363821022L;
 
-	/**
-	 * Counts the number of times this task was run.
-	 */
-	private static int count = 0;
-	/**
-	 * A counter to be displayed.
-	 */
-	private int counter = 0;
+  /**
+   * Counts the number of times this task was run.
+   */
+  private static int count = 0;
+  /**
+   * A counter to be displayed.
+   */
+  private int counter = 0;
 
-	/**
-	 * Default constructor.
-	 */
-	public DemoTask()
-	{
-		incrementCount();
-		counter = count;
-	}
+  /**
+   * Default constructor.
+   */
+  public DemoTask()
+  {
+    incrementCount();
+    counter = count;
+  }
 
-	/**
-	 * Run this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		String s = "***** Hello JPPF !!! [" + counter + "] *****";
-		System.out.println(s);
-		setResult(s);
-	}
+  /**
+   * Run this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    String s = "***** Hello JPPF !!! [" + counter + "] *****";
+    System.out.println(s);
+    setResult(s);
+  }
 
-	/**
-	 * Increment the invocation count.
-	 */
-	private static synchronized void incrementCount()
-	{
-		count++;
-	}
+  /**
+   * Increment the invocation count.
+   */
+  private static synchronized void incrementCount()
+  {
+    count++;
+  }
 }

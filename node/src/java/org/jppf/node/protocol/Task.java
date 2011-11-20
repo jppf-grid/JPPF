@@ -30,104 +30,104 @@ import org.jppf.task.storage.DataProvider;
  */
 public interface Task<T> extends Runnable, Serializable
 {
-	/**
-	 * Get the result of the task execution.
-	 * @return the result as an array of bytes.
-	 */
-	T getResult();
+  /**
+   * Get the result of the task execution.
+   * @return the result as an array of bytes.
+   */
+  T getResult();
 
-	/**
-	 * Set the result of the task execution.
-	 * @param  result the result of this task's execution.
-	 */
-	void setResult(T  result);
+  /**
+   * Set the result of the task execution.
+   * @param  result the result of this task's execution.
+   */
+  void setResult(T  result);
 
-	/**
-	 * Get the exception that was raised by this task's execution. If the task raised a
-	 * {@link Throwable}, the exception is embedded into a {@link org.jppf.JPPFException}.
-	 * @return a <code>Exception</code> instance, or null if no exception was raised.
-	 */
-	Exception getException();
+  /**
+   * Get the exception that was raised by this task's execution. If the task raised a
+   * {@link Throwable}, the exception is embedded into a {@link org.jppf.JPPFException}.
+   * @return a <code>Exception</code> instance, or null if no exception was raised.
+   */
+  Exception getException();
 
-	/**
-	 * Sets the exception that was raised by this task's execution in the <code>run</code> method.
-	 * The exception is set by the JPPF framework.
-	 * @param exception a <code>ClientApplicationException</code> instance.
-	 */
-	void setException(Exception exception);
+  /**
+   * Sets the exception that was raised by this task's execution in the <code>run</code> method.
+   * The exception is set by the JPPF framework.
+   * @param exception a <code>ClientApplicationException</code> instance.
+   */
+  void setException(Exception exception);
 
-	/**
-	 * Get the provider of shared data for this task.
-	 * @return a <code>DataProvider</code> instance.
-	 */
-	DataProvider getDataProvider();
+  /**
+   * Get the provider of shared data for this task.
+   * @return a <code>DataProvider</code> instance.
+   */
+  DataProvider getDataProvider();
 
-	/**
-	 * Set the provider of shared data for this task.
-	 * @param dataProvider a <code>DataProvider</code> instance.
-	 */
-	void setDataProvider(DataProvider dataProvider);
+  /**
+   * Set the provider of shared data for this task.
+   * @param dataProvider a <code>DataProvider</code> instance.
+   */
+  void setDataProvider(DataProvider dataProvider);
 
-	/**
-	 * Get the user-assigned id for this task.
-	 * @return the id as a string.
-	 */
-	String getId();
+  /**
+   * Get the user-assigned id for this task.
+   * @return the id as a string.
+   */
+  String getId();
 
-	/**
-	 * Set the user-assigned id for this task.
-	 * @param id the id as a string.
-	 */
-	void setId(String id);
+  /**
+   * Set the user-assigned id for this task.
+   * @param id the id as a string.
+   */
+  void setId(String id);
 
-	/**
-	 * Callback invoked when this task is cancelled.
-	 * The default implementation does nothing and should be overriden by
-	 * subclasses that desire to implement a specific behaviour on cancellation.
-	 */
-	void onCancel();
+  /**
+   * Callback invoked when this task is cancelled.
+   * The default implementation does nothing and should be overriden by
+   * subclasses that desire to implement a specific behaviour on cancellation.
+   */
+  void onCancel();
 
-	/**
-	 * Callback invoked when this task is restarted.
-	 * The default implementation does nothing and should be overriden by
-	 * subclasses that desire to implement a specific behaviour on restart.
-	 */
-	void onRestart();
+  /**
+   * Callback invoked when this task is restarted.
+   * The default implementation does nothing and should be overriden by
+   * subclasses that desire to implement a specific behaviour on restart.
+   */
+  void onRestart();
 
-	/**
-	 * Callback invoked when this task times out.
-	 * The default implementation does nothing and should be overriden by
-	 * subclasses that desire to implement a specific behaviour on timeout.
-	 */
-	void onTimeout();
+  /**
+   * Callback invoked when this task times out.
+   * The default implementation does nothing and should be overriden by
+   * subclasses that desire to implement a specific behaviour on timeout.
+   */
+  void onTimeout();
 
-	/**
-	 * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
-	 * @return an object or class that is JPPF-annotated.
-	 */
-	Object getTaskObject();
+  /**
+   * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
+   * @return an object or class that is JPPF-annotated.
+   */
+  Object getTaskObject();
 
-	/**
-	 * Get the task timeout schedule configuration.
-	 * @return a <code>JPPFScheduleConfiguration</code> instance.
-	 */
-	JPPFSchedule getTimeoutSchedule();
+  /**
+   * Get the task timeout schedule configuration.
+   * @return a <code>JPPFScheduleConfiguration</code> instance.
+   */
+  JPPFSchedule getTimeoutSchedule();
 
-	/**
-	 * Get the task timeout schedule configuration.
-	 * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance.
-	 */
-	void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
+  /**
+   * Get the task timeout schedule configuration.
+   * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance.
+   */
+  void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
 
-	/**
-	 * Returns the position of this task in the job in which it was submitted.
-	 * @return the position of this task as an <code>int</code>.
-	 */
-	int getPosition();
+  /**
+   * Returns the position of this task in the job in which it was submitted.
+   * @return the position of this task as an <code>int</code>.
+   */
+  int getPosition();
 
-	/**
-	 * Set the position of this task in the job in which it was submitted.
-	 * @param position the position of this task as an <code>int</code>.
-	 */
-	void setPosition(int position);
+  /**
+   * Set the position of this task in the job in which it was submitted.
+   * @param position the position of this task as an <code>int</code>.
+   */
+  void setPosition(int position);
 }

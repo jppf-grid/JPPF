@@ -33,110 +33,110 @@ import org.jppf.jca.util.JPPFAccessorImpl;
  */
 public class JPPFConnectionFactory extends JPPFAccessorImpl implements ConnectionFactory
 {
-	/**
-	 * The default managed factory.
-	 */
-	private JPPFManagedConnectionFactory factory = new JPPFManagedConnectionFactory();
-	/**
-	 * The default connection manager.
-	 */
-	private ConnectionManager manager = new JPPFConnectionManager();
-	/**
-	 * 
-	 */
-	private Reference ref;
+  /**
+   * The default managed factory.
+   */
+  private JPPFManagedConnectionFactory factory = new JPPFManagedConnectionFactory();
+  /**
+   * The default connection manager.
+   */
+  private ConnectionManager manager = new JPPFConnectionManager();
+  /**
+   * 
+   */
+  private Reference ref;
 
-	/**
-	 * Default constructor.
-	 */
-	public JPPFConnectionFactory()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public JPPFConnectionFactory()
+  {
+  }
 
-	/**
-	 * Initialize this connection factory with a specified managed connection factory and connection manager..
-	 * @param factory the managed factory to use.
-	 * @param manager the connection manager to use.
-	 */
-	public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager)
-	{
-		this.factory = factory;
-		if (factory.getJppfClient() == null) setJppfClient(factory.getJppfClient());
-		this.manager = manager;
-	}
-	/**
-	 * Get a connection through the application server.
-	 * @return a <code>Connection</code> instance.
-	 * @throws ResourceException if a connection could not be obtained.
-	 * @see javax.resource.cci.ConnectionFactory#getConnection()
-	 */
-	@Override
-	public Connection getConnection() throws ResourceException
-	{
-		JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
-		if (conn == null) return null;
-		if (conn.getJppfClient() == null) conn.setJppfClient(getJppfClient());
-		if (conn.isClosed()) conn.setAvailable();
-		return conn;
-	}
+  /**
+   * Initialize this connection factory with a specified managed connection factory and connection manager..
+   * @param factory the managed factory to use.
+   * @param manager the connection manager to use.
+   */
+  public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager)
+  {
+    this.factory = factory;
+    if (factory.getJppfClient() == null) setJppfClient(factory.getJppfClient());
+    this.manager = manager;
+  }
+  /**
+   * Get a connection through the application server.
+   * @return a <code>Connection</code> instance.
+   * @throws ResourceException if a connection could not be obtained.
+   * @see javax.resource.cci.ConnectionFactory#getConnection()
+   */
+  @Override
+  public Connection getConnection() throws ResourceException
+  {
+    JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
+    if (conn == null) return null;
+    if (conn.getJppfClient() == null) conn.setJppfClient(getJppfClient());
+    if (conn.isClosed()) conn.setAvailable();
+    return conn;
+  }
 
-	/**
-	 * This method does nothing.
-	 * @param spec not used.
-	 * @return nothing.
-	 * @throws ResourceException this method always throws a NotSupportedException.
-	 * @see javax.resource.cci.ConnectionFactory#getConnection(javax.resource.cci.ConnectionSpec)
-	 */
-	@Override
-	public Connection getConnection(final ConnectionSpec spec) throws ResourceException
-	{
-		throw new NotSupportedException("getConnection(ConnectionSpec) is not supported");
-	}
+  /**
+   * This method does nothing.
+   * @param spec not used.
+   * @return nothing.
+   * @throws ResourceException this method always throws a NotSupportedException.
+   * @see javax.resource.cci.ConnectionFactory#getConnection(javax.resource.cci.ConnectionSpec)
+   */
+  @Override
+  public Connection getConnection(final ConnectionSpec spec) throws ResourceException
+  {
+    throw new NotSupportedException("getConnection(ConnectionSpec) is not supported");
+  }
 
-	/**
-	 * Get the resource adapter's metadata.
-	 * @return a <code>ResourceAdapterMetaData</code> instance.
-	 * @throws ResourceException if the metadata could not be obtained.
-	 * @see javax.resource.cci.ConnectionFactory#getMetaData()
-	 */
-	@Override
-	public ResourceAdapterMetaData getMetaData() throws ResourceException
-	{
-		return new JPPFResourceAdapterMetaData();
-	}
+  /**
+   * Get the resource adapter's metadata.
+   * @return a <code>ResourceAdapterMetaData</code> instance.
+   * @throws ResourceException if the metadata could not be obtained.
+   * @see javax.resource.cci.ConnectionFactory#getMetaData()
+   */
+  @Override
+  public ResourceAdapterMetaData getMetaData() throws ResourceException
+  {
+    return new JPPFResourceAdapterMetaData();
+  }
 
-	/**
-	 * Get a record factory.
-	 * @return a <code>RecordFactory</code> instance.
-	 * @throws ResourceException if the record factory could not be obtained.
-	 * @see javax.resource.cci.ConnectionFactory#getRecordFactory()
-	 */
-	@Override
-	public RecordFactory getRecordFactory() throws ResourceException
-	{
-		return new JPPFRecordFactory();
-	}
+  /**
+   * Get a record factory.
+   * @return a <code>RecordFactory</code> instance.
+   * @throws ResourceException if the record factory could not be obtained.
+   * @see javax.resource.cci.ConnectionFactory#getRecordFactory()
+   */
+  @Override
+  public RecordFactory getRecordFactory() throws ResourceException
+  {
+    return new JPPFRecordFactory();
+  }
 
-	/**
-	 * Set the naming reference4 for this connection factory.
-	 * @param ref a <code>Referenceable</code> instance.
-	 * @see javax.resource.Referenceable#setReference(javax.naming.Reference)
-	 */
-	@Override
-	public void setReference(final Reference ref)
-	{
-		this.ref = ref;
-	}
+  /**
+   * Set the naming reference4 for this connection factory.
+   * @param ref a <code>Referenceable</code> instance.
+   * @see javax.resource.Referenceable#setReference(javax.naming.Reference)
+   */
+  @Override
+  public void setReference(final Reference ref)
+  {
+    this.ref = ref;
+  }
 
-	/**
-	 * Get the naming reference4 for this connection factory.
-	 * @return ref a <code>Referenceable</code> instance.
-	 * @throws NamingException if the reference could not be obtained.
-	 * @see javax.naming.Referenceable#getReference()
-	 */
-	@Override
-	public Reference getReference() throws NamingException
-	{
-		return ref;
-	}
+  /**
+   * Get the naming reference4 for this connection factory.
+   * @return ref a <code>Referenceable</code> instance.
+   * @throws NamingException if the reference could not be obtained.
+   * @see javax.naming.Referenceable#getReference()
+   */
+  @Override
+  public Reference getReference() throws NamingException
+  {
+    return ref;
+  }
 }

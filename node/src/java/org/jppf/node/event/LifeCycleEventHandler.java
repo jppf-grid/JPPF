@@ -30,137 +30,137 @@ import org.slf4j.*;
  */
 public class LifeCycleEventHandler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(LifeCycleEventHandler.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(LifeCycleEventHandler.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * The list of listeners to this object's events.
-	 */
-	private final List<NodeLifeCycleListener> listeners = new ArrayList<NodeLifeCycleListener>();
+  /**
+   * The list of listeners to this object's events.
+   */
+  private final List<NodeLifeCycleListener> listeners = new ArrayList<NodeLifeCycleListener>();
 
-	/**
-	 * The object that manages the job executions for the node.
-	 */
-	private NodeExecutionManager executionManager = null;
+  /**
+   * The object that manages the job executions for the node.
+   */
+  private NodeExecutionManager executionManager = null;
 
-	/**
-	 * Initialize this event handler with the specified execution manager.
-	 * @param executionManager the object that manages the job executions for the node.
-	 */
-	public LifeCycleEventHandler(final NodeExecutionManager executionManager)
-	{
-		this.executionManager = executionManager;
-	}
+  /**
+   * Initialize this event handler with the specified execution manager.
+   * @param executionManager the object that manages the job executions for the node.
+   */
+  public LifeCycleEventHandler(final NodeExecutionManager executionManager)
+  {
+    this.executionManager = executionManager;
+  }
 
-	/**
-	 * Add a listener to the list of listeners.
-	 * @param listener the listener to add.
-	 */
-	public void addNodeLifeCycleListener(final NodeLifeCycleListener listener)
-	{
-		if (listener == null) return;
-		synchronized (listeners)
-		{
-			listeners.add(listener);
-		}
-	}
+  /**
+   * Add a listener to the list of listeners.
+   * @param listener the listener to add.
+   */
+  public void addNodeLifeCycleListener(final NodeLifeCycleListener listener)
+  {
+    if (listener == null) return;
+    synchronized (listeners)
+    {
+      listeners.add(listener);
+    }
+  }
 
-	/**
-	 * Remove a listener from the list of listeners.
-	 * @param listener the listener to remove.
-	 */
-	public void removeNodeLifeCycleListener(final NodeLifeCycleListener listener)
-	{
-		if (listener == null) return;
-		synchronized (listeners)
-		{
-			listeners.remove(listener);
-		}
-	}
+  /**
+   * Remove a listener from the list of listeners.
+   * @param listener the listener to remove.
+   */
+  public void removeNodeLifeCycleListener(final NodeLifeCycleListener listener)
+  {
+    if (listener == null) return;
+    synchronized (listeners)
+    {
+      listeners.remove(listener);
+    }
+  }
 
-	/**
-	 * Remove all listeners from the list of listeners.
-	 */
-	public void removeAllListeners()
-	{
-		synchronized (listeners)
-		{
-			listeners.clear();
-		}
-	}
+  /**
+   * Remove all listeners from the list of listeners.
+   */
+  public void removeAllListeners()
+  {
+    synchronized (listeners)
+    {
+      listeners.clear();
+    }
+  }
 
-	/**
-	 * Notify all listeners that the node is starting.
-	 */
-	public void fireNodeStarting()
-	{
-		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
-		synchronized (listeners)
-		{
-			for (NodeLifeCycleListener listener : listeners) listener.nodeStarting(event);
-		}
-	}
+  /**
+   * Notify all listeners that the node is starting.
+   */
+  public void fireNodeStarting()
+  {
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    synchronized (listeners)
+    {
+      for (NodeLifeCycleListener listener : listeners) listener.nodeStarting(event);
+    }
+  }
 
-	/**
-	 * Notify all listeners that the node is terminating.
-	 */
-	public void fireNodeEnding()
-	{
-		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
-		synchronized (listeners)
-		{
-			for (NodeLifeCycleListener listener : listeners) listener.nodeEnding(event);
-		}
-	}
+  /**
+   * Notify all listeners that the node is terminating.
+   */
+  public void fireNodeEnding()
+  {
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    synchronized (listeners)
+    {
+      for (NodeLifeCycleListener listener : listeners) listener.nodeEnding(event);
+    }
+  }
 
-	/**
-	 * Notify all listeners that the node is starting a job.
-	 */
-	public void fireJobStarting()
-	{
-		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
-		synchronized (listeners)
-		{
-			for (NodeLifeCycleListener listener : listeners) listener.jobStarting(event);
-		}
-	}
+  /**
+   * Notify all listeners that the node is starting a job.
+   */
+  public void fireJobStarting()
+  {
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    synchronized (listeners)
+    {
+      for (NodeLifeCycleListener listener : listeners) listener.jobStarting(event);
+    }
+  }
 
-	/**
-	 * Notify all listeners that the node is completing a job.
-	 */
-	public void fireJobEnding()
-	{
-		NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
-		synchronized (listeners)
-		{
-			for (NodeLifeCycleListener listener : listeners) listener.jobEnding(event);
-		}
-	}
+  /**
+   * Notify all listeners that the node is completing a job.
+   */
+  public void fireJobEnding()
+  {
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    synchronized (listeners)
+    {
+      for (NodeLifeCycleListener listener : listeners) listener.jobEnding(event);
+    }
+  }
 
-	/**
-	 * Load all listener instances found in the class path via a service definition.
-	 */
-	public void loadListeners()
-	{
-		Iterator<NodeLifeCycleListener> it = ServiceFinder.lookupProviders(NodeLifeCycleListener.class);
-		while (it.hasNext())
-		{
-			try
-			{
-				NodeLifeCycleListener listener = it.next();
-				addNodeLifeCycleListener(listener);
-				if (debugEnabled) log.debug("successfully added node life cycle listener " + listener.getClass().getName());
-			}
-			catch(Error e)
-			{
-				log.error(e.getMessage(), e);
-			}
-		}
-	}
+  /**
+   * Load all listener instances found in the class path via a service definition.
+   */
+  public void loadListeners()
+  {
+    Iterator<NodeLifeCycleListener> it = ServiceFinder.lookupProviders(NodeLifeCycleListener.class);
+    while (it.hasNext())
+    {
+      try
+      {
+        NodeLifeCycleListener listener = it.next();
+        addNodeLifeCycleListener(listener);
+        if (debugEnabled) log.debug("successfully added node life cycle listener " + listener.getClass().getName());
+      }
+      catch(Error e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+  }
 }

@@ -33,128 +33,128 @@ import org.slf4j.*;
  */
 public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JPPFBroadcaster.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The UDP sockets to broadcast to, each bound to a different network interface.
-	 */
-	private List<Pair<MulticastSocket, DatagramPacket>> socketsInfo;
-	/**
-	 * Frequency of the broadcast in milliseconds.
-	 */
-	private long broadcastInterval = 1000L;
-	/**
-	 * Holds the driver connection information to broadcast.
-	 */
-	private JPPFConnectionInformation info = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFBroadcaster.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The UDP sockets to broadcast to, each bound to a different network interface.
+   */
+  private List<Pair<MulticastSocket, DatagramPacket>> socketsInfo;
+  /**
+   * Frequency of the broadcast in milliseconds.
+   */
+  private long broadcastInterval = 1000L;
+  /**
+   * Holds the driver connection information to broadcast.
+   */
+  private JPPFConnectionInformation info = null;
 
-	/**
-	 * Initialize this broadcaster using the server configuration information.
-	 * @param info holds the driver connection information to broadcast.
-	 */
-	public JPPFBroadcaster(final JPPFConnectionInformation info)
-	{
-		this.info = info;
-	}
+  /**
+   * Initialize this broadcaster using the server configuration information.
+   * @param info holds the driver connection information to broadcast.
+   */
+  public JPPFBroadcaster(final JPPFConnectionInformation info)
+  {
+    this.info = info;
+  }
 
-	/**
-	 * Initialize the broadcast socket and data.
-	 * @throws Exception if an error occurs while initializing the datagram packet or socket.
-	 */
-	private void init() throws Exception
-	{
-		TypedProperties props = JPPFConfiguration.getProperties();
-		broadcastInterval = props.getLong("jppf.discovery.broadcast.interval", 1000L);
-		String group = props.getString("jppf.discovery.group", "230.0.0.1");
-		int port = props.getInt("jppf.discovery.port", 11111);
+  /**
+   * Initialize the broadcast socket and data.
+   * @throws Exception if an error occurs while initializing the datagram packet or socket.
+   */
+  private void init() throws Exception
+  {
+    TypedProperties props = JPPFConfiguration.getProperties();
+    broadcastInterval = props.getLong("jppf.discovery.broadcast.interval", 1000L);
+    String group = props.getString("jppf.discovery.group", "230.0.0.1");
+    int port = props.getInt("jppf.discovery.port", 11111);
 
-		List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-		if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
-		if (debugEnabled)
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("Found ").append(addresses.size()).append(" address");
-			if (addresses.size() > 1) sb.append("es");
-			sb.append(':');
-			for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
-			log.debug(sb.toString());
-		}
-		socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>(addresses.size());
-		for (InetAddress addr: addresses)
-		{
-			try
-			{
-				JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
-				ci.host = addr.getHostAddress();
-				ci.subnetMaskLength = NetworkUtils.getSubnetMaskLength(addr);
-				byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
-				ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
-				buffer.putInt(infoBytes.length);
-				buffer.put(infoBytes);
-				DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
-				MulticastSocket socket = new MulticastSocket(port);
-				socket.setInterface(addr);
-				socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));
-			}
-			catch(Exception e)
-			{
-				log.error("Unable to bind to interface " + addr.getHostAddress() + " on port " + port, e);
-			}
-		}
-	}
+    List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+    if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
+    if (debugEnabled)
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.append("Found ").append(addresses.size()).append(" address");
+      if (addresses.size() > 1) sb.append("es");
+      sb.append(':');
+      for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
+      log.debug(sb.toString());
+    }
+    socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>(addresses.size());
+    for (InetAddress addr: addresses)
+    {
+      try
+      {
+        JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
+        ci.host = addr.getHostAddress();
+        ci.subnetMaskLength = NetworkUtils.getSubnetMaskLength(addr);
+        byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
+        ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
+        buffer.putInt(infoBytes.length);
+        buffer.put(infoBytes);
+        DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
+        MulticastSocket socket = new MulticastSocket(port);
+        socket.setInterface(addr);
+        socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));
+      }
+      catch(Exception e)
+      {
+        log.error("Unable to bind to interface " + addr.getHostAddress() + " on port " + port, e);
+      }
+    }
+  }
 
-	/**
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			init();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			setStopped(true);
-		}
-		while (!isStopped())
-		{
-			Iterator<Pair<MulticastSocket, DatagramPacket>> it = socketsInfo.iterator();
-			while (it.hasNext())
-			{
-				try
-				{
-					Pair<MulticastSocket, DatagramPacket> socketInfo = it.next();
-					socketInfo.first().send(socketInfo.second());
-				}
-				catch(Exception e)
-				{
-					log.error(e.getMessage(), e);
-					it.remove();
-				}
-			}
-			if (socketsInfo.isEmpty()) setStopped(true);
-			if (!isStopped())
-			{
-				try
-				{
-					Thread.sleep(broadcastInterval);
-				}
-				catch(InterruptedException e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
-		}
-		for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
-		socketsInfo.clear();
-	}
+  /**
+   * 
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      init();
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+      setStopped(true);
+    }
+    while (!isStopped())
+    {
+      Iterator<Pair<MulticastSocket, DatagramPacket>> it = socketsInfo.iterator();
+      while (it.hasNext())
+      {
+        try
+        {
+          Pair<MulticastSocket, DatagramPacket> socketInfo = it.next();
+          socketInfo.first().send(socketInfo.second());
+        }
+        catch(Exception e)
+        {
+          log.error(e.getMessage(), e);
+          it.remove();
+        }
+      }
+      if (socketsInfo.isEmpty()) setStopped(true);
+      if (!isStopped())
+      {
+        try
+        {
+          Thread.sleep(broadcastInterval);
+        }
+        catch(InterruptedException e)
+        {
+          log.error(e.getMessage(), e);
+        }
+      }
+    }
+    for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
+    socketsInfo.clear();
+  }
 }

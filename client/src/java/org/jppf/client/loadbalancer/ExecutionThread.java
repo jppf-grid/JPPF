@@ -27,49 +27,49 @@ import org.jppf.server.protocol.JPPFTask;
  */
 abstract class ExecutionThread extends Thread
 {
-	/**
-	 * The tasks to execute.
-	 */
-	protected List<JPPFTask> tasks = null;
-	/**
-	 * Exception that may result from the execution.
-	 */
-	protected Exception exception = null;
-	/**
-	 * The execution to perform.
-	 */
-	protected JPPFJob job = null;
-	/**
-	 * The load balancer for which this thread is working.
-	 */
-	protected LoadBalancer loadBalancer = null;
+  /**
+   * The tasks to execute.
+   */
+  protected List<JPPFTask> tasks = null;
+  /**
+   * Exception that may result from the execution.
+   */
+  protected Exception exception = null;
+  /**
+   * The execution to perform.
+   */
+  protected JPPFJob job = null;
+  /**
+   * The load balancer for which this thread is working.
+   */
+  protected LoadBalancer loadBalancer = null;
 
-	/**
-	 * Initialize this execution thread for remote execution.
-	 * @param tasks the tasks to execute.
-	 * @param job the execution to perform.
-	 * @param loadBalancer the load balancer for which this thread is working.
-	 */
-	public ExecutionThread(final List<JPPFTask> tasks, final JPPFJob job, final LoadBalancer loadBalancer)
-	{
-		this.tasks = tasks;
-		this.job = job;
-		this.loadBalancer = loadBalancer;
-	}
+  /**
+   * Initialize this execution thread for remote execution.
+   * @param tasks the tasks to execute.
+   * @param job the execution to perform.
+   * @param loadBalancer the load balancer for which this thread is working.
+   */
+  public ExecutionThread(final List<JPPFTask> tasks, final JPPFJob job, final LoadBalancer loadBalancer)
+  {
+    this.tasks = tasks;
+    this.job = job;
+    this.loadBalancer = loadBalancer;
+  }
 
-	/**
-	 * Perform the execution.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public abstract void run();
+  /**
+   * Perform the execution.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public abstract void run();
 
-	/**
-	 * Get the resulting exception.
-	 * @return an <code>Exception</code> or null if no exception was raised.
-	 */
-	public Exception getException()
-	{
-		return exception;
-	}
+  /**
+   * Get the resulting exception.
+   * @return an <code>Exception</code> or null if no exception was raised.
+   */
+  public Exception getException()
+  {
+    return exception;
+  }
 }

@@ -27,49 +27,49 @@ import javax.swing.*;
  */
 public class PasswordOption extends TextOption
 {
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public PasswordOption()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public PasswordOption()
+  {
+  }
 
-	/**
-	 * Initialize this text option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox.
-	 * @param tooltip the tooltip associated with the checkbox.
-	 * @param value the initial value of this component.
-	 */
-	public PasswordOption(final String name, final String label, final String tooltip, final String value)
-	{
-		super(name, label, tooltip, value);
-		createUI();
-		field.setPreferredSize(new Dimension(100, 20));
-	}
+  /**
+   * Initialize this text option with the specified parameters.
+   * @param name this component's name.
+   * @param label the label displayed with the checkbox.
+   * @param tooltip the tooltip associated with the checkbox.
+   * @param value the initial value of this component.
+   */
+  public PasswordOption(final String name, final String label, final String tooltip, final String value)
+  {
+    super(name, label, tooltip, value);
+    createUI();
+    field.setPreferredSize(new Dimension(100, 20));
+  }
 
-	/**
-	 * Create the text field that holds the value of this password option.
-	 * @return a <code>JPasswordField</code> instance.
-	 * @see org.jppf.ui.options.TextOption#createField()
-	 */
-	@Override
-	protected JTextField createField()
-	{
-		field = new JPasswordField((String) value);
-		return field;
-	}
+  /**
+   * Create the text field that holds the value of this password option.
+   * @return a <code>JPasswordField</code> instance.
+   * @see org.jppf.ui.options.TextOption#createField()
+   */
+  @Override
+  protected JTextField createField()
+  {
+    field = new JPasswordField((String) value);
+    return field;
+  }
 
-	/**
-	 * Get the password in the password field.
-	 * @return the password as a string value.
-	 * @see org.jppf.ui.options.TextOption#getValue()
-	 */
-	@Override
-	public Object getValue()
-	{
-		value = new String(((JPasswordField) field).getPassword());
-		return value;
-	}
+  /**
+   * Get the password in the password field.
+   * @return the password as a string value.
+   * @see org.jppf.ui.options.TextOption#getValue()
+   */
+  @Override
+  public Object getValue()
+  {
+    value = new String(((JPasswordField) field).getPassword());
+    return value;
+  }
 }

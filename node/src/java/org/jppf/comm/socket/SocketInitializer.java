@@ -24,39 +24,39 @@ package org.jppf.comm.socket;
  */
 public interface SocketInitializer
 {
-	/**
-	 * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
-	 * <code>TimerTask</code> until a specified amount of time has passed.
-	 * @param socketWrapper the socket wrapper to initialize.
-	 */
-	void initializeSocket(SocketWrapper socketWrapper);
+  /**
+   * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
+   * <code>TimerTask</code> until a specified amount of time has passed.
+   * @param socketWrapper the socket wrapper to initialize.
+   */
+  void initializeSocket(SocketWrapper socketWrapper);
 
-	/**
-	 * Close this initializer.
-	 */
-	void close();
+  /**
+   * Close this initializer.
+   */
+  void close();
 
-	/**
-	 * Determine whether any connection attempt succeeded.
-	 * @return true if any attempt was successful, false otherwise.
-	 */
-	boolean isSuccessful();
+  /**
+   * Determine whether any connection attempt succeeded.
+   * @return true if any attempt was successful, false otherwise.
+   */
+  boolean isSuccessful();
 
-	/**
-	 * Determine whether this socket initializer has been intentionally closed.
-	 * @return true if this socket initializer has been intentionally closed, false otherwise.
-	 */
-	boolean isClosed();
+  /**
+   * Determine whether this socket initializer has been intentionally closed.
+   * @return true if this socket initializer has been intentionally closed, false otherwise.
+   */
+  boolean isClosed();
 
-	/**
-	 * Get the name given to this initializer.
-	 * @return the name as a string.
-	 */
-	String getName();
+  /**
+   * Get the name given to this initializer.
+   * @return the name as a string.
+   */
+  String getName();
 
-	/**
-	 * Set the name given to this initializer.
-	 * @param name the name as a string.
-	 */
-	void setName(String name);
+  /**
+   * Set the name given to this initializer.
+   * @param name the name as a string.
+   */
+  void setName(String name);
 }

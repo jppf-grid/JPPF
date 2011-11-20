@@ -25,34 +25,34 @@ import java.io.Serializable;
  */
 public class HelloWorldRunnable implements Runnable, Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The string resulting from the task execution.
-	 */
-	private String hello = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The string resulting from the task execution.
+   */
+  private String hello = null;
 
-	/**
-	 * Execute the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		this.hello = "Hello, World (runnable)";
-		System.out.println(this.hello);
-	}
+  /**
+   * Execute the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    this.hello = "Hello, World (runnable)";
+    System.out.println(this.hello);
+  }
 
-	/**
-	 * Get the string resulting from the task execution.
-	 * @return a string.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return hello;
-	}
+  /**
+   * Get the string resulting from the task execution.
+   * @return a string.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return hello;
+  }
 }

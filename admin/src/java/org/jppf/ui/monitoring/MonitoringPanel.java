@@ -38,103 +38,103 @@ import org.slf4j.*;
  */
 public class MonitoringPanel extends JPanel implements StatsHandlerListener, StatsConstants
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(MonitoringPanel.class);
-	/**
-	 * Base name for localization bundle lookups.
-	 */
-	private static final String BASE = "org.jppf.ui.i18n.StatsPage";
-	/**
-	 * The stats formatter that provides the data.
-	 */
-	private transient StatsHandler statsHandler = null;
-	/**
-	 * Holds a list of table models to update when new stats are received.
-	 */
-	private List<MonitorTableModel> tableModels = new ArrayList<MonitorTableModel>();
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(MonitoringPanel.class);
+  /**
+   * Base name for localization bundle lookups.
+   */
+  private static final String BASE = "org.jppf.ui.i18n.StatsPage";
+  /**
+   * The stats formatter that provides the data.
+   */
+  private transient StatsHandler statsHandler = null;
+  /**
+   * Holds a list of table models to update when new stats are received.
+   */
+  private List<MonitorTableModel> tableModels = new ArrayList<MonitorTableModel>();
 
-	/**
-	 * Default constructor.
-	 */
-	public MonitoringPanel()
-	{
-		this.statsHandler = StatsHandler.getInstance();
-		setLayout(new MigLayout("fill, flowy"));
-		addTablePanel(EXECUTION_PROPS, "ExecutionTable.label");
-		addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable.label");
-		addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable.label");
-		addTablePanel(JOB_PROPS, "JobTable.label");
-		addTablePanel(QUEUE_PROPS, "QueueTable.label");
-		addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
-		statsHandler.addStatsHandlerListener(this);
-	}
+  /**
+   * Default constructor.
+   */
+  public MonitoringPanel()
+  {
+    this.statsHandler = StatsHandler.getInstance();
+    setLayout(new MigLayout("fill, flowy"));
+    addTablePanel(EXECUTION_PROPS, "ExecutionTable.label");
+    addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable.label");
+    addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable.label");
+    addTablePanel(JOB_PROPS, "JobTable.label");
+    addTablePanel(QUEUE_PROPS, "QueueTable.label");
+    addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
+    statsHandler.addStatsHandlerListener(this);
+  }
 
-	/**
-	 * Add a table panel to this panel.
-	 * @param fields the fields displayed in the table.
-	 * @param label the reference to the localized title of the table.
-	 */
-	private void addTablePanel(final Fields[] fields, final String label)
-	{
-		add(makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label)), "grow");
-	}
+  /**
+   * Add a table panel to this panel.
+   * @param fields the fields displayed in the table.
+   * @param label the reference to the localized title of the table.
+   */
+  private void addTablePanel(final Fields[] fields, final String label)
+  {
+    add(makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label)), "grow");
+  }
 
-	/**
-	 * Called when new stats have been received from the server.
-	 * @param event holds the new stats values.
-	 */
-	@Override
-	public void dataUpdated(final StatsHandlerEvent event)
-	{
-		for (final MonitorTableModel model: tableModels)
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					model.fireTableDataChanged();
-				}
-			});
-		}
-	}
+  /**
+   * Called when new stats have been received from the server.
+   * @param event holds the new stats values.
+   */
+  @Override
+  public void dataUpdated(final StatsHandlerEvent event)
+  {
+    for (final MonitorTableModel model: tableModels)
+    {
+      SwingUtilities.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          model.fireTableDataChanged();
+        }
+      });
+    }
+  }
 
-	/**
-	 * Create a chartPanel displaying a group of values.
-	 * @param props the names of the values to display.
-	 * @param title the title of the chartPanel.
-	 * @return a <code>JComponent</code> instance.
-	 */
-	private JComponent makeTablePanel(final Fields[] props, final String title)
-	{
-		JPanel panel = new JPanel();
-		panel.setLayout(new MigLayout("fill"));
-		panel.setBorder(BorderFactory.createTitledBorder(title));
-		JTable table = new JTable()
-		{
-			@Override
-			public boolean isCellEditable(final int row, final int column)
-			{
-				return false;
-			}
-		};
-		MonitorTableModel model = new MonitorTableModel(props);
-		table.setModel(model);
-		table.setOpaque(true);
-		DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
-		rend1.setHorizontalAlignment(SwingConstants.RIGHT);
-		rend1.setOpaque(true);
-		table.getColumnModel().getColumn(1).setCellRenderer(rend1);
-		DefaultTableCellRenderer rend0 = new DefaultTableCellRenderer();
-		rend0.setHorizontalAlignment(SwingConstants.LEFT);
-		rend0.setOpaque(true);
-		table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-		for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
-		tableModels.add(model);
-		panel.add(table, "growx, pushx");
-		table.setShowGrid(false);
-		return panel;
-	}
+  /**
+   * Create a chartPanel displaying a group of values.
+   * @param props the names of the values to display.
+   * @param title the title of the chartPanel.
+   * @return a <code>JComponent</code> instance.
+   */
+  private JComponent makeTablePanel(final Fields[] props, final String title)
+  {
+    JPanel panel = new JPanel();
+    panel.setLayout(new MigLayout("fill"));
+    panel.setBorder(BorderFactory.createTitledBorder(title));
+    JTable table = new JTable()
+    {
+      @Override
+      public boolean isCellEditable(final int row, final int column)
+      {
+        return false;
+      }
+    };
+    MonitorTableModel model = new MonitorTableModel(props);
+    table.setModel(model);
+    table.setOpaque(true);
+    DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
+    rend1.setHorizontalAlignment(SwingConstants.RIGHT);
+    rend1.setOpaque(true);
+    table.getColumnModel().getColumn(1).setCellRenderer(rend1);
+    DefaultTableCellRenderer rend0 = new DefaultTableCellRenderer();
+    rend0.setHorizontalAlignment(SwingConstants.LEFT);
+    rend0.setOpaque(true);
+    table.getColumnModel().getColumn(0).setCellRenderer(rend0);
+    for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
+    tableModels.add(model);
+    panel.add(table, "growx, pushx");
+    table.setShowGrid(false);
+    return panel;
+  }
 }

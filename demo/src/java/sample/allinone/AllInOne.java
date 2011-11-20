@@ -27,40 +27,40 @@ import org.jppf.server.JPPFDriver;
  */
 public class AllInOne
 {
-	/**
-	 * Entry point for this program.
-	 * @param args no used.
-	 */
-	public static void main(final String... args)
-	{
-		try
-		{
-			Thread driverThread = new Thread()
-			{
-				@Override
-                public void run()
-				{
-					JPPFDriver.main("noLauncher");
-				}
-			};
-			Thread nodeThread = new Thread()
-			{
-				@Override
-                public void run()
-				{
-					NodeRunner.main("noLauncher");
-				}
-			};
-			driverThread.start();
-			System.out.println("Driver started");
-			nodeThread.start();
-			System.out.println("Node started");
-			driverThread.join();
-			nodeThread.join();
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace();
-		}
-	}
+  /**
+   * Entry point for this program.
+   * @param args no used.
+   */
+  public static void main(final String... args)
+  {
+    try
+    {
+      Thread driverThread = new Thread()
+      {
+        @Override
+        public void run()
+        {
+          JPPFDriver.main("noLauncher");
+        }
+      };
+      Thread nodeThread = new Thread()
+      {
+        @Override
+        public void run()
+        {
+          NodeRunner.main("noLauncher");
+        }
+      };
+      driverThread.start();
+      System.out.println("Driver started");
+      nodeThread.start();
+      System.out.println("Node started");
+      driverThread.join();
+      nodeThread.join();
+    }
+    catch (Throwable t)
+    {
+      t.printStackTrace();
+    }
+  }
 }

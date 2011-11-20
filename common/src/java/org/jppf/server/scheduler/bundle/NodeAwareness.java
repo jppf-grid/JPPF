@@ -26,14 +26,14 @@ import org.jppf.management.JPPFSystemInformation;
  */
 public interface NodeAwareness
 {
-	/**
-	 * Get the corresponding node's system information.
-	 * @return a {@link JPPFSystemInformation} instance.
-	 */
-	JPPFSystemInformation getNodeConfiguration();
-	/**
-	 * Set the corresponding node's system information.
-	 * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
-	 */
-	void setNodeConfiguration(JPPFSystemInformation nodeConfiguration);
+  /**
+   * Get the corresponding node's system information.
+   * @return a {@link JPPFSystemInformation} instance.
+   */
+  JPPFSystemInformation getNodeConfiguration();
+  /**
+   * Set the corresponding node's system information.
+   * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
+   */
+  void setNodeConfiguration(JPPFSystemInformation nodeConfiguration);
 }

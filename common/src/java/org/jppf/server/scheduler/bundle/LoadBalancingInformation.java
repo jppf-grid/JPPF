@@ -29,40 +29,40 @@ import org.jppf.utils.TypedProperties;
  */
 public class LoadBalancingInformation implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The name of the algorithm.
-	 */
-	public String algorithm = null;
-	/**
-	 * The algorithm's parameters.
-	 */
-	public TypedProperties parameters = null;
-	/**
-	 * The names of all available algorithms.
-	 */
-	public List<String> algorithmNames = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The name of the algorithm.
+   */
+  public String algorithm = null;
+  /**
+   * The algorithm's parameters.
+   */
+  public TypedProperties parameters = null;
+  /**
+   * The names of all available algorithms.
+   */
+  public List<String> algorithmNames = null;
 
-	/**
-	 * Default constructor.
-	 */
-	public LoadBalancingInformation()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public LoadBalancingInformation()
+  {
+  }
 
-	/**
-	 * Initialize this load balancing information with the specified algorithm and parameters.
-	 * @param algorithm - the name of the algorithm.
-	 * @param parameters - the algorithm's parameters.
-	 * @param algorithmNames - the names of all available algorithms.
-	 */
-	public LoadBalancingInformation(final String algorithm, final TypedProperties parameters, final List<String> algorithmNames)
-	{
-		this.algorithm = algorithm;
-		this.parameters = parameters;
-		this.algorithmNames = algorithmNames;
-	}
+  /**
+   * Initialize this load balancing information with the specified algorithm and parameters.
+   * @param algorithm - the name of the algorithm.
+   * @param parameters - the algorithm's parameters.
+   * @param algorithmNames - the names of all available algorithms.
+   */
+  public LoadBalancingInformation(final String algorithm, final TypedProperties parameters, final List<String> algorithmNames)
+  {
+    this.algorithm = algorithm;
+    this.parameters = parameters;
+    this.algorithmNames = algorithmNames;
+  }
 }

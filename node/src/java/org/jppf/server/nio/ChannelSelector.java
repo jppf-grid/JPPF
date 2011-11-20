@@ -25,29 +25,29 @@ package org.jppf.server.nio;
  */
 public interface ChannelSelector
 {
-	/**
-	 * This method blocks until the state of the channel has changed.
-	 * @return true if the channel state changed.
-	 */
-	boolean select();
-	/**
-	 * This method blocks until the state of the channel has changed or the timeout expires, whichever happens first.
-	 * @param timeout the maximum duration in milliseconds for this operation.
-	 * @return true if the channel state changed.
-	 */
-	boolean select(long timeout);
-	/**
-	 * Determine whether the channel state has changed and return immediately.
-	 * @return true if the channel state changed.
-	 */
-	boolean selectNow();
-	/**
-	 * Wake up this selector. If the selector was not engaged in a blocking operation, this method has no effect.
-	 */
-	void wakeUp();
-	/**
-	 * Get the channel this selector is polling.
-	 * @return a {@link ChannelWrapper} instance.
-	 */
-	ChannelWrapper<?> getChannel();
+  /**
+   * This method blocks until the state of the channel has changed.
+   * @return true if the channel state changed.
+   */
+  boolean select();
+  /**
+   * This method blocks until the state of the channel has changed or the timeout expires, whichever happens first.
+   * @param timeout the maximum duration in milliseconds for this operation.
+   * @return true if the channel state changed.
+   */
+  boolean select(long timeout);
+  /**
+   * Determine whether the channel state has changed and return immediately.
+   * @return true if the channel state changed.
+   */
+  boolean selectNow();
+  /**
+   * Wake up this selector. If the selector was not engaged in a blocking operation, this method has no effect.
+   */
+  void wakeUp();
+  /**
+   * Get the channel this selector is polling.
+   * @return a {@link ChannelWrapper} instance.
+   */
+  ChannelWrapper<?> getChannel();
 }

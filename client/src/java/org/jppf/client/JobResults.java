@@ -29,50 +29,50 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class JobResults implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * A map containing the tasks that have been successfully executed,
-	 * ordered by ascending position in the submitted list of tasks.
-	 */
-	private final SortedMap<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * A map containing the tasks that have been successfully executed,
+   * ordered by ascending position in the submitted list of tasks.
+   */
+  private final SortedMap<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
 
-	/**
-	 * Get the current number of received results.
-	 * @return the number of results as an int.
-	 */
-	public synchronized int size()
-	{
-		return resultMap.size();
-	}
+  /**
+   * Get the current number of received results.
+   * @return the number of results as an int.
+   */
+  public synchronized int size()
+  {
+    return resultMap.size();
+  }
 
-	/**
-	 * Determine whether this job received a result for the task at the specified position.
-	 * @param position the task position to check.
-	 * @return <code>true</code> if a result was received, <code>false</code> otherwise.
-	 */
-	public synchronized boolean hasResult(final int position)
-	{
-		return resultMap.containsKey(position);
-	}
+  /**
+   * Determine whether this job received a result for the task at the specified position.
+   * @param position the task position to check.
+   * @return <code>true</code> if a result was received, <code>false</code> otherwise.
+   */
+  public synchronized boolean hasResult(final int position)
+  {
+    return resultMap.containsKey(position);
+  }
 
-	/**
-	 * Add the specified results to this job.
-	 * @param tasks the list of tasks for which results were received.
-	 */
-	public synchronized void putResults(final List<JPPFTask> tasks)
-	{
-		for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-	}
+  /**
+   * Add the specified results to this job.
+   * @param tasks the list of tasks for which results were received.
+   */
+  public synchronized void putResults(final List<JPPFTask> tasks)
+  {
+    for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+  }
 
-	/**
-	 * Get all the tasks received as results for this job.
-	 * @return a collection of {@link JPPFTask} instances.
-	 */
-	public synchronized Collection<JPPFTask> getAll()
-	{
-		return Collections.unmodifiableCollection(resultMap.values());
-	}
+  /**
+   * Get all the tasks received as results for this job.
+   * @return a collection of {@link JPPFTask} instances.
+   */
+  public synchronized Collection<JPPFTask> getAll()
+  {
+    return Collections.unmodifiableCollection(resultMap.values());
+  }
 }

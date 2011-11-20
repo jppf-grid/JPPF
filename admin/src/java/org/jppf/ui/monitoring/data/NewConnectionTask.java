@@ -32,93 +32,93 @@ import org.slf4j.*;
  */
 class NewConnectionTask extends ThreadSynchronization implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(NewConnectionTask.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The new connection that was created.
-	 */
-	private JPPFClientConnection c = null;
-	/**
-	 * The {@link StatsHandler}.
-	 */
-	private final StatsHandler statsHandler;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NewConnectionTask.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The new connection that was created.
+   */
+  private JPPFClientConnection c = null;
+  /**
+   * The {@link StatsHandler}.
+   */
+  private final StatsHandler statsHandler;
 
-	/**
-	 * Initialized this task with the specified client connection.
-	 * @param statsHandler the {@link StatsHandler}.
-	 * @param c the new connection that was created.
-	 */
-	public NewConnectionTask(final StatsHandler statsHandler, final JPPFClientConnection c)
-	{
-		this.statsHandler = statsHandler;
-		this.c = c;
-	}
+  /**
+   * Initialized this task with the specified client connection.
+   * @param statsHandler the {@link StatsHandler}.
+   * @param c the new connection that was created.
+   */
+  public NewConnectionTask(final StatsHandler statsHandler, final JPPFClientConnection c)
+  {
+    this.statsHandler = statsHandler;
+    this.c = c;
+  }
 
-	/**
-	 * Perform the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		synchronized(statsHandler)
-		{
-			if (statsHandler.dataHolderMap.get(c.getName()) == null)
-			{
-				statsHandler.dataHolderMap.put(c.getName(), new ConnectionDataHolder());
-			}
-			if (statsHandler.timer != null)
-			{
-				TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
-				statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
-			}
-		}
-		JComboBox box = null;
-		while (statsHandler.getServerListOption() == null) goToSleep(50L);
-		synchronized(statsHandler)
-		{
-			if (debugEnabled) log.debug("adding client connection " + c.getName());
-			box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
-			int count = box.getItemCount();
-			boolean found = false;
-			for (int i=0; i<count; i++)
-			{
-				Object o = box.getItemAt(i);
-				if (c.equals(o))
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				box.addItem(c);
-				int maxLen = 0;
-				Object proto = null;
-				for (int i=0; i<box.getItemCount(); i++)
-				{
-					Object o = box.getItemAt(i);
-					int n = o.toString().length();
-					if (n > maxLen)
-					{
-						maxLen = n;
-						proto = o;
-					}
-				}
-				if (proto != null) box.setPrototypeDisplayValue(proto);
-			}
-			if (statsHandler.currentConnection == null)
-			{
-				//statsHandler.currentConnection = (JPPFClientConnectionImpl) c;
-				statsHandler.setCurrentConnection((JPPFClientConnectionImpl) c);
-				box.setSelectedItem(c);
-			}
-		}
-	}
+  /**
+   * Perform the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    synchronized(statsHandler)
+    {
+      if (statsHandler.dataHolderMap.get(c.getName()) == null)
+      {
+        statsHandler.dataHolderMap.put(c.getName(), new ConnectionDataHolder());
+      }
+      if (statsHandler.timer != null)
+      {
+        TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
+        statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
+      }
+    }
+    JComboBox box = null;
+    while (statsHandler.getServerListOption() == null) goToSleep(50L);
+    synchronized(statsHandler)
+    {
+      if (debugEnabled) log.debug("adding client connection " + c.getName());
+      box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
+      int count = box.getItemCount();
+      boolean found = false;
+      for (int i=0; i<count; i++)
+      {
+        Object o = box.getItemAt(i);
+        if (c.equals(o))
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        box.addItem(c);
+        int maxLen = 0;
+        Object proto = null;
+        for (int i=0; i<box.getItemCount(); i++)
+        {
+          Object o = box.getItemAt(i);
+          int n = o.toString().length();
+          if (n > maxLen)
+          {
+            maxLen = n;
+            proto = o;
+          }
+        }
+        if (proto != null) box.setPrototypeDisplayValue(proto);
+      }
+      if (statsHandler.currentConnection == null)
+      {
+        //statsHandler.currentConnection = (JPPFClientConnectionImpl) c;
+        statsHandler.setCurrentConnection((JPPFClientConnectionImpl) c);
+        box.setSelectedItem(c);
+      }
+    }
+  }
 }

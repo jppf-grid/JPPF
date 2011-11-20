@@ -29,51 +29,51 @@ import org.slf4j.*;
  */
 public class RLBundler extends AbstractRLBundler
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(RLBundler.class);
-	/**
-	 * Determines whether debugging level is set for logging.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The range of actions, expressed in terms of a percentage of increase/decrease of the bundle size.
-	 */
-	private static final int INCREASE_RANGE = 1;
-	/**
-	 * The number of possible actions.
-	 */
-	private static final int NB_ACTIONS = 2 * INCREASE_RANGE + 1;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(RLBundler.class);
+  /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The range of actions, expressed in terms of a percentage of increase/decrease of the bundle size.
+   */
+  private static final int INCREASE_RANGE = 1;
+  /**
+   * The number of possible actions.
+   */
+  private static final int NB_ACTIONS = 2 * INCREASE_RANGE + 1;
 
-	/**
-	 * Creates a new instance with the specified parameters.
-	 * @param profile the parameters of the algorithm, grouped as a performance analysis profile.
-	 */
-	public RLBundler(final LoadBalancingProfile profile)
-	{
-		super(profile);
-	}
+  /**
+   * Creates a new instance with the specified parameters.
+   * @param profile the parameters of the algorithm, grouped as a performance analysis profile.
+   */
+  public RLBundler(final LoadBalancingProfile profile)
+  {
+    super(profile);
+  }
 
-	/**
-	 * Make a copy of this bundler
-	 * @return a <code>Bundler</code> instance.
-	 * @see org.jppf.server.scheduler.bundle.Bundler#copy()
-	 */
-	@Override
-	public Bundler copy()
-	{
-		return new RLBundler(profile);
-	}
+  /**
+   * Make a copy of this bundler
+   * @return a <code>Bundler</code> instance.
+   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+   */
+  @Override
+  public Bundler copy()
+  {
+    return new RLBundler(profile);
+  }
 
-	/**
-	 * Get the max bundle size that can be used for this bundler.
-	 * @return the bundle size as an int.
-	 * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
-	 */
-	@Override
-	protected int maxSize()
-	{
-		return JPPFDriver.getQueue().getMaxBundleSize();
-	}
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+   */
+  @Override
+  protected int maxSize()
+  {
+    return JPPFDriver.getQueue().getMaxBundleSize();
+  }
 }

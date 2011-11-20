@@ -26,46 +26,46 @@ import java.io.Serializable;
  */
 public class MarketData implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Market data identifier.
-	 */
-	private String id = "";
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Market data identifier.
+   */
+  private String id = "";
 
-	/**
-	 * Default constructor.
-	 */
-	public MarketData()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public MarketData()
+  {
+  }
 
-	/**
-	 * Initialize the trade with the specified identifier.
-	 * @param id the market data identifier.
-	 */
-	public MarketData(final String id)
-	{
-		this.id = id;
-	}
+  /**
+   * Initialize the trade with the specified identifier.
+   * @param id the market data identifier.
+   */
+  public MarketData(final String id)
+  {
+    this.id = id;
+  }
 
-	/**
-	 * Get the market data identifier.
-	 * @return the id as a string.
-	 */
-	public String getId()
-	{
-		return id;
-	}
+  /**
+   * Get the market data identifier.
+   * @return the id as a string.
+   */
+  public String getId()
+  {
+    return id;
+  }
 
-	/**
-	 * Set the market data identifier.
-	 * @param id the id as a string.
-	 */
-	public void setId(final String id)
-	{
-		this.id = id;
-	}
+  /**
+   * Set the market data identifier.
+   * @param id the id as a string.
+   */
+  public void setId(final String id)
+  {
+    this.id = id;
+  }
 }

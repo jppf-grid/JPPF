@@ -25,33 +25,33 @@ package org.jppf.client;
  */
 public interface JobSubmission extends Runnable
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	void run();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  void run();
 
-	/**
-	 * Get the unique id of this submission.
-	 * @return the id as a string.
-	 */
-	String getId();
+  /**
+   * Get the unique id of this submission.
+   * @return the id as a string.
+   */
+  String getId();
 
-	/**
-	 * Get the connection to execute the job on.
-	 * @return a {@link AbstractJPPFClientConnection} instance.
-	 */
-	AbstractJPPFClientConnection getConnection();
+  /**
+   * Get the connection to execute the job on.
+   * @return a {@link AbstractJPPFClientConnection} instance.
+   */
+  AbstractJPPFClientConnection getConnection();
 
-	/**
-	 * Get the flag indicating whether the job will be executed locally, at least partially.
-	 * @return <code>true</code> if the job will execute locally, <code>false</code> otherwise.
-	 */
-	boolean isLocallyExecuting();
+  /**
+   * Get the flag indicating whether the job will be executed locally, at least partially.
+   * @return <code>true</code> if the job will execute locally, <code>false</code> otherwise.
+   */
+  boolean isLocallyExecuting();
 
-	/**
-	 * Get the job this submission is for.
-	 * @return a {@link JPPFJob} instance.
-	 */
-	JPPFJob getJob();
+  /**
+   * Get the job this submission is for.
+   * @return a {@link JPPFJob} instance.
+   */
+  JPPFJob getJob();
 }

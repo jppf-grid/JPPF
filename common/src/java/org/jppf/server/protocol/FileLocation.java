@@ -26,62 +26,62 @@ import java.io.*;
  */
 public class FileLocation extends AbstractLocation<File>
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Initialize this location with the specified file path.
-	 * @param file an abstract file path.
-	 */
-	public FileLocation(final File file)
-	{
-		super(file);
-	}
+  /**
+   * Initialize this location with the specified file path.
+   * @param file an abstract file path.
+   */
+  public FileLocation(final File file)
+  {
+    super(file);
+  }
 
-	/**
-	 * Initialize this location with the specified file path.
-	 * @param file an abstract file path.
-	 */
-	public FileLocation(final String file)
-	{
-		super(new File(file));
-	}
+  /**
+   * Initialize this location with the specified file path.
+   * @param file an abstract file path.
+   */
+  public FileLocation(final String file)
+  {
+    super(new File(file));
+  }
 
-	/**
-	 * Obtain an input stream to read from this location.
-	 * @return an <code>InputStream</code> instance.
-	 * @throws Exception if an I/O error occurs.
-	 * @see org.jppf.server.protocol.Location#getInputStream()
-	 */
-	@Override
-	public InputStream getInputStream() throws Exception
-	{
-		return new BufferedInputStream(new FileInputStream(path));
-	}
+  /**
+   * Obtain an input stream to read from this location.
+   * @return an <code>InputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.server.protocol.Location#getInputStream()
+   */
+  @Override
+  public InputStream getInputStream() throws Exception
+  {
+    return new BufferedInputStream(new FileInputStream(path));
+  }
 
-	/**
-	 * Obtain an output stream to write to this location.
-	 * @return an <code>OutputStream</code> instance.
-	 * @throws Exception if an I/O error occurs.
-	 * @see org.jppf.server.protocol.Location#getOutputStream()
-	 */
-	@Override
-	public OutputStream getOutputStream() throws Exception
-	{
-		return new BufferedOutputStream(new FileOutputStream(path));
-	}
+  /**
+   * Obtain an output stream to write to this location.
+   * @return an <code>OutputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.server.protocol.Location#getOutputStream()
+   */
+  @Override
+  public OutputStream getOutputStream() throws Exception
+  {
+    return new BufferedOutputStream(new FileOutputStream(path));
+  }
 
-	/**
-	 * Get the size of the file this location points to.
-	 * @return the size as a long value, or -1 if the file does not exist.
-	 * @see org.jppf.server.protocol.Location#size()
-	 */
-	@Override
-	public long size()
-	{
-		if ((path != null) && path.exists()) return path.length();
-		return -1;
-	}
+  /**
+   * Get the size of the file this location points to.
+   * @return the size as a long value, or -1 if the file does not exist.
+   * @see org.jppf.server.protocol.Location#size()
+   */
+  @Override
+  public long size()
+  {
+    if ((path != null) && path.exists()) return path.length();
+    return -1;
+  }
 }

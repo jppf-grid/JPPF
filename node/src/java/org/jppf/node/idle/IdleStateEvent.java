@@ -26,36 +26,36 @@ import java.util.EventObject;
  */
 public class IdleStateEvent extends EventObject
 {
-	/**
-	 * The idle state when this event was emitted.
-	 */
-	private IdleState state = null;
+  /**
+   * The idle state when this event was emitted.
+   */
+  private IdleState state = null;
 
-	/**
-	 * Initialize this event with the task as source.
-	 * @param task an {@link IdleDetectionTask} instance.
-	 */
-	public IdleStateEvent(final IdleDetectionTask task)
-	{
-		super(task);
-		this.state = task.getState();
-	}
+  /**
+   * Initialize this event with the task as source.
+   * @param task an {@link IdleDetectionTask} instance.
+   */
+  public IdleStateEvent(final IdleDetectionTask task)
+  {
+    super(task);
+    this.state = task.getState();
+  }
 
-	/**
-	 * Get the task source of this event.
-	 * @return an {@link IdleDetectionTask} instance.
-	 */
-	public IdleDetectionTask getTask()
-	{
-		return (IdleDetectionTask) getSource();
-	}
+  /**
+   * Get the task source of this event.
+   * @return an {@link IdleDetectionTask} instance.
+   */
+  public IdleDetectionTask getTask()
+  {
+    return (IdleDetectionTask) getSource();
+  }
 
-	/**
-	 * Get the idle state when this event was emitted.
-	 * @return an {@link IdleState} enum value.
-	 */
-	public IdleState getState()
-	{
-		return state;
-	}
+  /**
+   * Get the idle state when this event was emitted.
+   * @return an {@link IdleState} enum value.
+   */
+  public IdleState getState()
+  {
+    return state;
+  }
 }

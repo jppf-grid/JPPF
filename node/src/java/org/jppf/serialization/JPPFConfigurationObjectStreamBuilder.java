@@ -29,91 +29,91 @@ import java.lang.reflect.Constructor;
  */
 public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBuilder
 {
-	/**
-	 * The class of input object streams.
-	 */
-	private Class<?> oisClass = null;
-	/**
-	 * The class of output object streams.
-	 */
-	private Class<?> oosClass = null;
-	/**
-	 * Object input stream constructor.
-	 */
-	private Constructor<?> oisConstructor = null;
-	/**
-	 * Object output stream constructor.
-	 */
-	private Constructor<?> oosConstructor = null;
+  /**
+   * The class of input object streams.
+   */
+  private Class<?> oisClass = null;
+  /**
+   * The class of output object streams.
+   */
+  private Class<?> oosClass = null;
+  /**
+   * Object input stream constructor.
+   */
+  private Constructor<?> oisConstructor = null;
+  /**
+   * Object output stream constructor.
+   */
+  private Constructor<?> oosConstructor = null;
 
-	/**
-	 * Initialize this builder with the default <code>ObjectInputStream</code> and <code>ObjectOutputStream</code> classes of the JDK.
-	 * @throws Exception if an error is raised while initializing.
-	 */
-	public JPPFConfigurationObjectStreamBuilder() throws Exception
-	{
-		oisClass = ObjectInputStream.class;
-		oosClass = ObjectOutputStream.class;
-		initializeConstructors();
-	}
+  /**
+   * Initialize this builder with the default <code>ObjectInputStream</code> and <code>ObjectOutputStream</code> classes of the JDK.
+   * @throws Exception if an error is raised while initializing.
+   */
+  public JPPFConfigurationObjectStreamBuilder() throws Exception
+  {
+    oisClass = ObjectInputStream.class;
+    oosClass = ObjectOutputStream.class;
+    initializeConstructors();
+  }
 
-	/**
-	 * Initialize this builder with the specified object input and output stream classes.
-	 * @param oisClass the object input stream class to use.
-	 * @param oosClass the object output stream class to use.
-	 * @throws Exception if an error is raised while initializing.
-	 */
-	public JPPFConfigurationObjectStreamBuilder(final Class<?> oisClass, final Class<?> oosClass) throws Exception
-	{
-		this.oisClass = oisClass;
-		this.oosClass = oosClass;
-		initializeConstructors();
-	}
+  /**
+   * Initialize this builder with the specified object input and output stream classes.
+   * @param oisClass the object input stream class to use.
+   * @param oosClass the object output stream class to use.
+   * @throws Exception if an error is raised while initializing.
+   */
+  public JPPFConfigurationObjectStreamBuilder(final Class<?> oisClass, final Class<?> oosClass) throws Exception
+  {
+    this.oisClass = oisClass;
+    this.oosClass = oosClass;
+    initializeConstructors();
+  }
 
-	/**
-	 * Initialize this builder with the specified object input and output stream classes.
-	 * @param oisClassName the fully qualified name of the object input stream class to use.
-	 * @param oosClassName the fully qualified name of the object output stream class to use.
-	 * @throws Exception if an error is raised while initializing.
-	 */
-	public JPPFConfigurationObjectStreamBuilder(final String oisClassName, final String oosClassName) throws Exception
-	{
-		this(Class.forName(oisClassName), Class.forName(oosClassName));
-	}
+  /**
+   * Initialize this builder with the specified object input and output stream classes.
+   * @param oisClassName the fully qualified name of the object input stream class to use.
+   * @param oosClassName the fully qualified name of the object output stream class to use.
+   * @throws Exception if an error is raised while initializing.
+   */
+  public JPPFConfigurationObjectStreamBuilder(final String oisClassName, final String oosClassName) throws Exception
+  {
+    this(Class.forName(oisClassName), Class.forName(oosClassName));
+  }
 
-	/**
-	 * Initialize the constructors for the object stream classes.
-	 * @throws Exception if an error is raised while initializing.
-	 */
-	private void initializeConstructors() throws Exception
-	{
-		oisConstructor = oisClass.getConstructor(InputStream.class);
-		oosConstructor = oosClass.getConstructor(OutputStream.class);
-	}
+  /**
+   * Initialize the constructors for the object stream classes.
+   * @throws Exception if an error is raised while initializing.
+   */
+  private void initializeConstructors() throws Exception
+  {
+    oisConstructor = oisClass.getConstructor(InputStream.class);
+    oosConstructor = oosClass.getConstructor(OutputStream.class);
+  }
 
-	/**
-	 * Obtain an input stream used for deserializing objects.
-	 * @param	in input stream to read from.
-	 * @return an <code>ObjectInputStream</code>
-	 * @throws Exception if an error is raised while creating the stream.
-	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream(java.io.InputStream)
-	 */
-	@Override
-	public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
-	{
-		return (ObjectInputStream) oisConstructor.newInstance(in);
-	}
+  /**
+   * Obtain an input stream used for deserializing objects.
+   * @param	in input stream to read from.
+   * @return an <code>ObjectInputStream</code>
+   * @throws Exception if an error is raised while creating the stream.
+   * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream(java.io.InputStream)
+   */
+  @Override
+  public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
+  {
+    return (ObjectInputStream) oisConstructor.newInstance(in);
+  }
 
-	/**
-	 * Obtain an Output stream used for serializing objects.
-	 * @param	out output stream to write to.
-	 * @return an <code>ObjectOutputStream</code>
-	 * @throws Exception if an error is raised while creating the stream.
-	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream(java.io.OutputStream)
-	 */
-	@Override
-	public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
-	{
-		return (ObjectOutputStream) oosConstructor.newInstance(out);
-	}
+  /**
+   * Obtain an Output stream used for serializing objects.
+   * @param	out output stream to write to.
+   * @return an <code>ObjectOutputStream</code>
+   * @throws Exception if an error is raised while creating the stream.
+   * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream(java.io.OutputStream)
+   */
+  @Override
+  public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
+  {
+    return (ObjectOutputStream) oosConstructor.newInstance(out);
+  }
 }

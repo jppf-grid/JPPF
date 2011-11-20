@@ -28,21 +28,21 @@ import org.jppf.management.JPPFManagementInfo;
  */
 public class NodeConnectionEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified source.
-	 * @param nodeInfo a {@link JPPFManagementInfo} instance.
-	 */
-	public NodeConnectionEvent(final JPPFManagementInfo nodeInfo)
-	{
-		super(nodeInfo);
-	}
+  /**
+   * Initialize this event with the specified source.
+   * @param nodeInfo a {@link JPPFManagementInfo} instance.
+   */
+  public NodeConnectionEvent(final JPPFManagementInfo nodeInfo)
+  {
+    super(nodeInfo);
+  }
 
-	/**
-	 * Get the node information for this event.
-	 * @return a {@link JPPFManagementInfo} instance.
-	 */
-	public JPPFManagementInfo getNodeInformation()
-	{
-		return (JPPFManagementInfo) getSource();
-	}
+  /**
+   * Get the node information for this event.
+   * @return a {@link JPPFManagementInfo} instance.
+   */
+  public JPPFManagementInfo getNodeInformation()
+  {
+    return (JPPFManagementInfo) getSource();
+  }
 }

@@ -27,36 +27,36 @@ import java.net.Socket;
  */
 public class LauncherListener extends Thread
 {
-	/**
-	 * The port on which to listen for the launcher signals.
-	 */
-	private int port = -1;
+  /**
+   * The port on which to listen for the launcher signals.
+   */
+  private int port = -1;
 
-	/**
-	 * Initialize this LauncherListener with the specified port.
-	 * @param port - the port to listen to.
-	 */
-	public LauncherListener(final int port)
-	{
-		super("LauncherListener thread");
-		this.port = port;
-	}
+  /**
+   * Initialize this LauncherListener with the specified port.
+   * @param port - the port to listen to.
+   */
+  public LauncherListener(final int port)
+  {
+    super("LauncherListener thread");
+    this.port = port;
+  }
 
-	/**
-	 * Create a socket connection and listen to it, and exit this process when the connection is broken.
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			Socket s = new Socket("localhost", port);
-			s.getInputStream().read();
-		}
-		catch(Throwable t)
-		{
-			System.exit(0);
-		}
-	}
+  /**
+   * Create a socket connection and listen to it, and exit this process when the connection is broken.
+   * @see java.lang.Thread#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      Socket s = new Socket("localhost", port);
+      s.getInputStream().read();
+    }
+    catch(Throwable t)
+    {
+      System.exit(0);
+    }
+  }
 }

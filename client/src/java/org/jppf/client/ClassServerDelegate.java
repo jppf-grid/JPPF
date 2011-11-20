@@ -25,48 +25,48 @@ package org.jppf.client;
  */
 public interface ClassServerDelegate extends Runnable, ClientConnectionHandler
 {
-	/**
-	 * Determine whether the socket connection is closed
-	 * @return true if the socket connection is closed, false otherwise
-	 */
-	boolean isClosed();
+  /**
+   * Determine whether the socket connection is closed
+   * @return true if the socket connection is closed, false otherwise
+   */
+  boolean isClosed();
 
-	/**
-	 * Close the socket connection.
-	 */
-	@Override
-	void close();
+  /**
+   * Close the socket connection.
+   */
+  @Override
+  void close();
 
-	/**
-	 * Get the name of this delegate.
-	 * @return the name as a string.
-	 */
-	String getName();
+  /**
+   * Get the name of this delegate.
+   * @return the name as a string.
+   */
+  String getName();
 
-	/**
-	 * Set the name of this delegate.
-	 * @param name the name as a string.
-	 */
-	void setName(String name);
+  /**
+   * Set the name of this delegate.
+   * @param name the name as a string.
+   */
+  void setName(String name);
 
-    /**
-     * Add a request uuid to class loader mapping to this submission manager.
-     * @param uuid the uuid of the request.
-     * @param cl the class loader for the request.
-     */
-    void addRequestClassLoader(final String uuid, final ClassLoader cl);
+  /**
+   * Add a request uuid to class loader mapping to this submission manager.
+   * @param uuid the uuid of the request.
+   * @param cl the class loader for the request.
+   */
+  void addRequestClassLoader(final String uuid, final ClassLoader cl);
 
-    /**
-     * Add a request uuid to class loader mapping to this submission manager.
-     * @param uuid the uuid of the request.
-     */
-    void removeRequestClassLoader(final String uuid);
+  /**
+   * Add a request uuid to class loader mapping to this submission manager.
+   * @param uuid the uuid of the request.
+   */
+  void removeRequestClassLoader(final String uuid);
 
-    /**
-     * Get a class loader from its request uuid.
-     * @param uuid the uuid of the request.
-     * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
-     */
-    ClassLoader getRequestClassLoader(final String uuid);
+  /**
+   * Get a class loader from its request uuid.
+   * @param uuid the uuid of the request.
+   * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+   */
+  ClassLoader getRequestClassLoader(final String uuid);
 
 }

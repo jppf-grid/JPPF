@@ -33,103 +33,103 @@ import sample.dist.tasklength.LongTask;
  */
 public class ManyJobsRunner
 {
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(ManyJobsRunner.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(ManyJobsRunner.class);
+  /**
+   * JPPF client used to submit execution requests.
+   */
+  private static JPPFClient jppfClient = null;
 
-	/**
-	 * Entry point for this class, submits the tasks with a set duration to the server.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			TypedProperties props = JPPFConfiguration.getProperties();
-			props.setProperty("jppf.discovery.enabled", "true");
-			props.setProperty("jppf.pool.size", "50");
-			jppfClient = new JPPFClient();
-			Thread.sleep(1000);
-			int length = 300;
-			int nbTask = 100;
-			int nbJobs = 50;
-			print("Running Long Task demo with " + nbTask + " tasks of length = " + length + " ms for " + nbJobs + " iterations");
-			perform(nbTask, length, nbJobs);
-			//performLong(size, iterations);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if (jppfClient != null) jppfClient.close();
-		}
-	}
+  /**
+   * Entry point for this class, submits the tasks with a set duration to the server.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      TypedProperties props = JPPFConfiguration.getProperties();
+      props.setProperty("jppf.discovery.enabled", "true");
+      props.setProperty("jppf.pool.size", "50");
+      jppfClient = new JPPFClient();
+      Thread.sleep(1000);
+      int length = 300;
+      int nbTask = 100;
+      int nbJobs = 50;
+      print("Running Long Task demo with " + nbTask + " tasks of length = " + length + " ms for " + nbJobs + " iterations");
+      perform(nbTask, length, nbJobs);
+      //performLong(size, iterations);
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      if (jppfClient != null) jppfClient.close();
+    }
+  }
 
-	/**
-	 * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-	 * @param nbTask the number of tasks to send at each iteration.
-	 * @param length the executionlength of each task.
-	 * @param nbJobs the of jobs to submit.
-	 * @throws Exception if an error is raised during the execution.
-	 */
-	private static void perform(final int nbTask, final int length, final int nbJobs) throws Exception
-	{
-		try
-		{
-			JPPFJob[] jobs = new JPPFJob[nbJobs];
-			for (int n=0; n<nbJobs; n++)
-			{
-				long start = System.currentTimeMillis();
-				// create a task for each row in matrix a
-				jobs[n] = new JPPFJob();
-				String s = StringUtils.padLeft(""+(n+1), '0', 4);
-				jobs[n].setName("JPPF Job " + s);
-				jobs[n].setBlocking(false);
-				//job.getJobSLA().setMaxNodes(1);
-				for (int i=0; i<nbTask; i++)
-				{
-					LongTask task = new LongTask(length, false);
-					task.setId("" + (n+1) + ':' + (i+1));
-					jobs[n].addTask(task);
-				}
-				/*
+  /**
+   * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
+   * @param nbTask the number of tasks to send at each iteration.
+   * @param length the executionlength of each task.
+   * @param nbJobs the of jobs to submit.
+   * @throws Exception if an error is raised during the execution.
+   */
+  private static void perform(final int nbTask, final int length, final int nbJobs) throws Exception
+  {
+    try
+    {
+      JPPFJob[] jobs = new JPPFJob[nbJobs];
+      for (int n=0; n<nbJobs; n++)
+      {
+        long start = System.currentTimeMillis();
+        // create a task for each row in matrix a
+        jobs[n] = new JPPFJob();
+        String s = StringUtils.padLeft(""+(n+1), '0', 4);
+        jobs[n].setName("JPPF Job " + s);
+        jobs[n].setBlocking(false);
+        //job.getJobSLA().setMaxNodes(1);
+        for (int i=0; i<nbTask; i++)
+        {
+          LongTask task = new LongTask(length, false);
+          task.setId("" + (n+1) + ':' + (i+1));
+          jobs[n].addTask(task);
+        }
+        /*
 				JPPFSchedule schedule = new JPPFSchedule(5000L);
 				job.getJobSLA().setJobSchedule(schedule);
 				job.getJobSLA().setSuspended(true);
-				 */
-				// submit the tasks for execution
-				JPPFResultCollector collector = new JPPFResultCollector(jobs[n]);
-				jobs[n].setResultListener(collector);
-				jppfClient.submit(jobs[n]);
-			}
-			print("submitted " + nbJobs + " jobs");
-			for (int n=0; n<nbJobs; n++)
-			{
-				JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
-				List<JPPFTask> results = collector.waitForResults();
-			}
-			print("got all " + nbJobs + " result lists");
-		}
-		catch(Exception e)
-		{
-			throw new JPPFException(e.getMessage(), e);
-		}
-	}
+         */
+        // submit the tasks for execution
+        JPPFResultCollector collector = new JPPFResultCollector(jobs[n]);
+        jobs[n].setResultListener(collector);
+        jppfClient.submit(jobs[n]);
+      }
+      print("submitted " + nbJobs + " jobs");
+      for (int n=0; n<nbJobs; n++)
+      {
+        JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
+        List<JPPFTask> results = collector.waitForResults();
+      }
+      print("got all " + nbJobs + " result lists");
+    }
+    catch(Exception e)
+    {
+      throw new JPPFException(e.getMessage(), e);
+    }
+  }
 
-	/**
-	 * Print a message to the log and to the console.
-	 * @param msg the message to print.
-	 */
-	private static void print(final String msg)
-	{
-		log.info(msg);
-		System.out.println(msg);
-	}
+  /**
+   * Print a message to the log and to the console.
+   * @param msg the message to print.
+   */
+  private static void print(final String msg)
+  {
+    log.info(msg);
+    System.out.println(msg);
+  }
 }

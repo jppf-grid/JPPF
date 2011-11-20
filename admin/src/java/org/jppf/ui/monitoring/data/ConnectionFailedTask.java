@@ -30,76 +30,76 @@ import org.slf4j.*;
  */
 class ConnectionFailedTask extends ThreadSynchronization implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ConnectionFailedTask.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The new connection that was created.
-	 */
-	private JPPFClientConnection c = null;
-	/**
-	 * The {@link StatsHandler}.
-	 */
-	private final StatsHandler statsHandler;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ConnectionFailedTask.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The new connection that was created.
+   */
+  private JPPFClientConnection c = null;
+  /**
+   * The {@link StatsHandler}.
+   */
+  private final StatsHandler statsHandler;
 
-	/**
-	 * Initialized this task with the specified client connection.
-	 * @param statsHandler the {@link StatsHandler}.
-	 * @param c the new connection that was created.
-	 */
-	public ConnectionFailedTask(final StatsHandler statsHandler, final JPPFClientConnection c)
-	{
-		this.statsHandler = statsHandler;
-		this.c = c;
-	}
+  /**
+   * Initialized this task with the specified client connection.
+   * @param statsHandler the {@link StatsHandler}.
+   * @param c the new connection that was created.
+   */
+  public ConnectionFailedTask(final StatsHandler statsHandler, final JPPFClientConnection c)
+  {
+    this.statsHandler = statsHandler;
+    this.c = c;
+  }
 
-	/**
-	 * Perform the task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		synchronized(statsHandler)
-		{
-			if (statsHandler.dataHolderMap.get(c.getName()) != null)
-			{
-				statsHandler.dataHolderMap.remove(c.getName());
-			}
-		}
-		JComboBox box = null;
-		while (statsHandler.getServerListOption() == null) goToSleep(50L);
-		synchronized(statsHandler)
-		{
-			if (debugEnabled) log.debug("adding client connection " + c.getName());
-			box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
-			int count = box.getItemCount();
-			int idx = -1;
-			for (int i=0; i<count; i++)
-			{
-				Object o = box.getItemAt(i);
-				if (c.equals(o))
-				{
-					box.removeItemAt(i);
-					idx = i;
-					break;
-				}
-			}
-			if ((idx >= 0) && (box.getItemCount() > 0))
-			{
-				if ((statsHandler.currentConnection == null) || c.equals(statsHandler.currentConnection))
-				{
-					int n = Math.min(idx, box.getItemCount()-1);
-					JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) box.getItemAt(n);
-					statsHandler.currentConnection = conn;
-					box.setSelectedItem(conn);
-				}
-			}
-		}
-	}
+  /**
+   * Perform the task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    synchronized(statsHandler)
+    {
+      if (statsHandler.dataHolderMap.get(c.getName()) != null)
+      {
+        statsHandler.dataHolderMap.remove(c.getName());
+      }
+    }
+    JComboBox box = null;
+    while (statsHandler.getServerListOption() == null) goToSleep(50L);
+    synchronized(statsHandler)
+    {
+      if (debugEnabled) log.debug("adding client connection " + c.getName());
+      box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
+      int count = box.getItemCount();
+      int idx = -1;
+      for (int i=0; i<count; i++)
+      {
+        Object o = box.getItemAt(i);
+        if (c.equals(o))
+        {
+          box.removeItemAt(i);
+          idx = i;
+          break;
+        }
+      }
+      if ((idx >= 0) && (box.getItemCount() > 0))
+      {
+        if ((statsHandler.currentConnection == null) || c.equals(statsHandler.currentConnection))
+        {
+          int n = Math.min(idx, box.getItemCount()-1);
+          JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) box.getItemAt(n);
+          statsHandler.currentConnection = conn;
+          box.setSelectedItem(conn);
+        }
+      }
+    }
+  }
 }

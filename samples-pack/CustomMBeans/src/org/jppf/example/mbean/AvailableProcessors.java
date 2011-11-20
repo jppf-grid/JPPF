@@ -24,15 +24,15 @@ package org.jppf.example.mbean;
  */
 public class AvailableProcessors implements AvailableProcessorsMBean
 {
-	/**
-	 * Get the number of processors available to the JVM.
-	 * @return the available processors as an integer value.
-	 * @see org.jppf.example.mbean.AvailableProcessorsMBean#queryAvailableProcessors()
-	 */
-	@Override
-	public Integer queryAvailableProcessors()
-	{
-		// we use the java.lang.Runtime API
-		return Runtime.getRuntime().availableProcessors();
-	}
+  /**
+   * Get the number of processors available to the JVM.
+   * @return the available processors as an integer value.
+   * @see org.jppf.example.mbean.AvailableProcessorsMBean#queryAvailableProcessors()
+   */
+  @Override
+  public Integer queryAvailableProcessors()
+  {
+    // we use the java.lang.Runtime API
+    return Runtime.getRuntime().availableProcessors();
+  }
 }

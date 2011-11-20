@@ -26,43 +26,43 @@ import org.jppf.server.protocol.ServerJob;
  */
 public interface JPPFQueue extends Iterable<ServerJob>
 {
-	/**
-	 * Add an object to the queue, and notify all listeners about it.
-	 * @param bundleWrapper the object to add to the queue.
-	 */
-	void addBundle(ServerJob bundleWrapper);
+  /**
+   * Add an object to the queue, and notify all listeners about it.
+   * @param bundleWrapper the object to add to the queue.
+   */
+  void addBundle(ServerJob bundleWrapper);
 
-	/**
-	 * Get the next object in the queue.
-	 * @param nbTasks the maximum number of tasks to get out of the bundle.
-	 * @return the most recent object that was added to the queue.
-	 */
-	ServerJob nextBundle(int nbTasks);
+  /**
+   * Get the next object in the queue.
+   * @param nbTasks the maximum number of tasks to get out of the bundle.
+   * @return the most recent object that was added to the queue.
+   */
+  ServerJob nextBundle(int nbTasks);
 
-	/**
-	 * Get the next object in the queue.
-	 * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
-	 * @param nbTasks the maximum number of tasks to get out of the bundle.
-	 * @return the most recent object that was added to the queue.
-	 */
-	ServerJob nextBundle(ServerJob bundleWrapper, int nbTasks);
+  /**
+   * Get the next object in the queue.
+   * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
+   * @param nbTasks the maximum number of tasks to get out of the bundle.
+   * @return the most recent object that was added to the queue.
+   */
+  ServerJob nextBundle(ServerJob bundleWrapper, int nbTasks);
 
-	/**
-	 * Determine whether the queue is empty or not.
-	 * @return true if the queue is empty, false otherwise.
-	 */
-	boolean isEmpty();
+  /**
+   * Determine whether the queue is empty or not.
+   * @return true if the queue is empty, false otherwise.
+   */
+  boolean isEmpty();
 
-	/**
-	 * Get the maximum bundle size for the bundles present in the queue.
-	 * @return the bundle size as an int.
-	 */
-	int getMaxBundleSize();
+  /**
+   * Get the maximum bundle size for the bundles present in the queue.
+   * @return the bundle size as an int.
+   */
+  int getMaxBundleSize();
 
-	/**
-	 * Remove the specified bundle from the queue.
-	 * @param bundleWrapper the bundle to remove.
-	 * @return the bundle that was removed.
-	 */
-	ServerJob removeBundle(ServerJob bundleWrapper);
+  /**
+   * Remove the specified bundle from the queue.
+   * @param bundleWrapper the bundle to remove.
+   * @return the bundle that was removed.
+   */
+  ServerJob removeBundle(ServerJob bundleWrapper);
 }

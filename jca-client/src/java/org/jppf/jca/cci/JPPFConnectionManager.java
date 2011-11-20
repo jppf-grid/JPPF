@@ -27,19 +27,19 @@ import javax.resource.spi.*;
  */
 public class JPPFConnectionManager implements ConnectionManager
 {
-	/**
-	 * Get a connection from the pool.
-	 * @param mcf the managed connection factory that requested the connection.
-	 * @param cxRequestInfo the connection request information.
-	 * @return a <code>Connection</code> instance.
-	 * @throws ResourceException if the connection could not be obtained.
-	 * @see javax.resource.spi.ConnectionManager#allocateConnection(javax.resource.spi.ManagedConnectionFactory, javax.resource.spi.ConnectionRequestInfo)
-	 */
-	@Override
-	public Object allocateConnection(final ManagedConnectionFactory mcf, final ConnectionRequestInfo cxRequestInfo)
-	throws ResourceException
-	{
-		ManagedConnection conn = mcf.createManagedConnection(null, cxRequestInfo);
-		return conn.getConnection(null, cxRequestInfo);
-	}
+  /**
+   * Get a connection from the pool.
+   * @param mcf the managed connection factory that requested the connection.
+   * @param cxRequestInfo the connection request information.
+   * @return a <code>Connection</code> instance.
+   * @throws ResourceException if the connection could not be obtained.
+   * @see javax.resource.spi.ConnectionManager#allocateConnection(javax.resource.spi.ManagedConnectionFactory, javax.resource.spi.ConnectionRequestInfo)
+   */
+  @Override
+  public Object allocateConnection(final ManagedConnectionFactory mcf, final ConnectionRequestInfo cxRequestInfo)
+  throws ResourceException
+  {
+    ManagedConnection conn = mcf.createManagedConnection(null, cxRequestInfo);
+    return conn.getConnection(null, cxRequestInfo);
+  }
 }

@@ -32,43 +32,43 @@ import org.jppf.server.nio.*;
  */
 final class ClientServerFactory extends NioServerFactory<ClientState, ClientTransition>
 {
-	/**
-	 * Initialize this factory with the specified server.
-	 * @param server the server for which to initialize.
-	 */
-	public ClientServerFactory(final ClientNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this factory with the specified server.
+   * @param server the server for which to initialize.
+   */
+  public ClientServerFactory(final ClientNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Create the map of all possible states.
-	 * @return a mapping of the states enumeration to the corresponding NioState instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createStateMap()
-	 */
-	@Override
-	public Map<ClientState, NioState<ClientTransition>> createStateMap()
-	{
-		Map<ClientState, NioState<ClientTransition>> map = new EnumMap<ClientState, NioState<ClientTransition>>(ClientState.class);
-		map.put(SENDING_RESULTS, new SendingResultsState((ClientNioServer) server));
-		map.put(WAITING_JOB, new WaitingJobState((ClientNioServer) server));
-		map.put(IDLE, new IdleState((ClientNioServer) server));
-		return map;
-	}
+  /**
+   * Create the map of all possible states.
+   * @return a mapping of the states enumeration to the corresponding NioState instances.
+   * @see org.jppf.server.nio.NioServerFactory#createStateMap()
+   */
+  @Override
+  public Map<ClientState, NioState<ClientTransition>> createStateMap()
+  {
+    Map<ClientState, NioState<ClientTransition>> map = new EnumMap<ClientState, NioState<ClientTransition>>(ClientState.class);
+    map.put(SENDING_RESULTS, new SendingResultsState((ClientNioServer) server));
+    map.put(WAITING_JOB, new WaitingJobState((ClientNioServer) server));
+    map.put(IDLE, new IdleState((ClientNioServer) server));
+    return map;
+  }
 
-	/**
-	 * Create the map of all possible transitions.
-	 * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
-	 * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
-	 */
-	@Override
-	public Map<ClientTransition, NioTransition<ClientState>> createTransitionMap()
-	{
-		Map<ClientTransition, NioTransition<ClientState>> map =
-			new EnumMap<ClientTransition, NioTransition<ClientState>>(ClientTransition.class);
-		map.put(TO_SENDING_RESULTS, transition(SENDING_RESULTS, RW));
-		map.put(TO_WAITING_JOB, transition(WAITING_JOB, R));
-		map.put(TO_IDLE, transition(IDLE, R));
-		return map;
-	}
+  /**
+   * Create the map of all possible transitions.
+   * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
+   * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
+   */
+  @Override
+  public Map<ClientTransition, NioTransition<ClientState>> createTransitionMap()
+  {
+    Map<ClientTransition, NioTransition<ClientState>> map =
+      new EnumMap<ClientTransition, NioTransition<ClientState>>(ClientTransition.class);
+    map.put(TO_SENDING_RESULTS, transition(SENDING_RESULTS, RW));
+    map.put(TO_WAITING_JOB, transition(WAITING_JOB, R));
+    map.put(TO_IDLE, transition(IDLE, R));
+    return map;
+  }
 }

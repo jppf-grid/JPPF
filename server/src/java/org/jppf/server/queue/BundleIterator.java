@@ -29,94 +29,94 @@ import org.jppf.server.protocol.ServerJob;
  */
 class BundleIterator implements Iterator<ServerJob>
 {
-	/**
-	 * Iterator over the entries in the priority map.
-	 */
-	private Iterator<Map.Entry<JPPFPriority, List<ServerJob>>> entryIterator = null;
-	/**
-	 * Iterator over the task bundles in the map entry specified by <code>entryIterator</code>.
-	 */
-	private Iterator<ServerJob> listIterator = null;
-	/**
-	 * Used for synchronized access to the queue.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
+  /**
+   * Iterator over the entries in the priority map.
+   */
+  private Iterator<Map.Entry<JPPFPriority, List<ServerJob>>> entryIterator = null;
+  /**
+   * Iterator over the task bundles in the map entry specified by <code>entryIterator</code>.
+   */
+  private Iterator<ServerJob> listIterator = null;
+  /**
+   * Used for synchronized access to the queue.
+   */
+  private ReentrantLock lock = new ReentrantLock();
 
-	/**
-	 * Initialize this iterator.
-	 * @param priorityMap the map of prioritized jobs.
-	 * @param lock used to synchronize with the queue.
-	 */
-	public BundleIterator(final TreeMap<JPPFPriority, List<ServerJob>> priorityMap, final ReentrantLock lock)
-	{
-		this.lock = lock;
-		lock.lock();
-		try
-		{
-			entryIterator = priorityMap.entrySet().iterator();
-			if (entryIterator.hasNext()) listIterator = entryIterator.next().getValue().iterator();
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * Initialize this iterator.
+   * @param priorityMap the map of prioritized jobs.
+   * @param lock used to synchronize with the queue.
+   */
+  public BundleIterator(final TreeMap<JPPFPriority, List<ServerJob>> priorityMap, final ReentrantLock lock)
+  {
+    this.lock = lock;
+    lock.lock();
+    try
+    {
+      entryIterator = priorityMap.entrySet().iterator();
+      if (entryIterator.hasNext()) listIterator = entryIterator.next().getValue().iterator();
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * Determines whether an element remains to visit.
-	 * @return true if there is at least one element that hasn't been visited, false otherwise.
-	 * @see java.util.Iterator#hasNext()
-	 */
-	@Override
-	public boolean hasNext()
-	{
-		lock.lock();
-		try
-		{
-			return entryIterator.hasNext() || ((listIterator != null) && listIterator.hasNext());
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * Determines whether an element remains to visit.
+   * @return true if there is at least one element that hasn't been visited, false otherwise.
+   * @see java.util.Iterator#hasNext()
+   */
+  @Override
+  public boolean hasNext()
+  {
+    lock.lock();
+    try
+    {
+      return entryIterator.hasNext() || ((listIterator != null) && listIterator.hasNext());
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * Get the next element for this iterator.
-	 * @return the next element as a <code>JPPFTaskBundle</code> instance.
-	 * @see java.util.Iterator#next()
-	 */
-	@Override
-	public ServerJob next()
-	{
-		lock.lock();
-		try
-		{
-			if (listIterator != null)
-			{
-				if (listIterator.hasNext()) return listIterator.next();
-				if (entryIterator.hasNext())
-				{
-					listIterator = entryIterator.next().getValue().iterator();
-					if (listIterator.hasNext()) return listIterator.next();
-				}
-			}
-			throw new NoSuchElementException("no more element in this BundleIterator");
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * Get the next element for this iterator.
+   * @return the next element as a <code>JPPFTaskBundle</code> instance.
+   * @see java.util.Iterator#next()
+   */
+  @Override
+  public ServerJob next()
+  {
+    lock.lock();
+    try
+    {
+      if (listIterator != null)
+      {
+        if (listIterator.hasNext()) return listIterator.next();
+        if (entryIterator.hasNext())
+        {
+          listIterator = entryIterator.next().getValue().iterator();
+          if (listIterator.hasNext()) return listIterator.next();
+        }
+      }
+      throw new NoSuchElementException("no more element in this BundleIterator");
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * This operation is not supported and throws an <code>UnsupportedOperationException</code>.
-	 * @throws UnsupportedOperationException as this operation is not supported.
-	 * @see java.util.Iterator#remove()
-	 */
-	@Override
-	public void remove() throws UnsupportedOperationException
-	{
-		throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
-	}
+  /**
+   * This operation is not supported and throws an <code>UnsupportedOperationException</code>.
+   * @throws UnsupportedOperationException as this operation is not supported.
+   * @see java.util.Iterator#remove()
+   */
+  @Override
+  public void remove() throws UnsupportedOperationException
+  {
+    throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
+  }
 }

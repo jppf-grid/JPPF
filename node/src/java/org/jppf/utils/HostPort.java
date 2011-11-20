@@ -24,42 +24,42 @@ package org.jppf.utils;
  */
 public class HostPort extends Pair<String, Integer>
 {
-	/**
-	 * Initialize this HostPort with the specified host name and port number.
-	 * @param host the host to use.
-	 * @param port the port number.
-	 */
-	public HostPort(final String host, final Integer port)
-	{
-		super(host, port);
-	}
+  /**
+   * Initialize this HostPort with the specified host name and port number.
+   * @param host the host to use.
+   * @param port the port number.
+   */
+  public HostPort(final String host, final Integer port)
+  {
+    super(host, port);
+  }
 
-	/**
-	 * Get the host name.
-	 * @return the host as a string.
-	 */
-	public String host()
-	{
-		return first();
-	}
+  /**
+   * Get the host name.
+   * @return the host as a string.
+   */
+  public String host()
+  {
+    return first();
+  }
 
-	/**
-	 * Get the port number.
-	 * @return the port as an int.
-	 */
-	public int port()
-	{
-		return second();
-	}
+  /**
+   * Get the port number.
+   * @return the port as an int.
+   */
+  public int port()
+  {
+    return second();
+  }
 
-	/**
-	 * Get a string representation of this object.
-	 * @return a string formatted as host:port.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return host() + ':' + port();
-	}
+  /**
+   * Get a string representation of this object.
+   * @return a string formatted as host:port.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return host() + ':' + port();
+  }
 }

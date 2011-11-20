@@ -28,31 +28,31 @@ import org.jppf.server.nio.NioState;
  */
 abstract class AcceptorServerState extends NioState<AcceptorTransition>
 {
-	/**
-	 * The server that handles this state.
-	 */
-	protected AcceptorNioServer server = null;
-	/**
-	 * The driver stats manager.
-	 */
-	protected JPPFDriverStatsManager statsManager = null;
-	/**
-	 * The job manager.
-	 */
-	protected JPPFJobManager jobManager = null;
-	/**
-	 * Reference to the driver.
-	 */
-	protected JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * The server that handles this state.
+   */
+  protected AcceptorNioServer server = null;
+  /**
+   * The driver stats manager.
+   */
+  protected JPPFDriverStatsManager statsManager = null;
+  /**
+   * The job manager.
+   */
+  protected JPPFJobManager jobManager = null;
+  /**
+   * Reference to the driver.
+   */
+  protected JPPFDriver driver = JPPFDriver.getInstance();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public AcceptorServerState(final AcceptorNioServer server)
-	{
-		this.server = server;
-		statsManager = driver.getStatsManager();
-		jobManager = driver.getJobManager();
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public AcceptorServerState(final AcceptorNioServer server)
+  {
+    this.server = server;
+    statsManager = driver.getStatsManager();
+    jobManager = driver.getJobManager();
+  }
 }

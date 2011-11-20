@@ -32,30 +32,30 @@ import org.jppf.ui.treetable.*;
  */
 public class SelectDriversAction extends AbstractSelectionAction
 {
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 */
-	public SelectDriversAction(final NodeDataPanel panel)
-	{
-		super(panel);
-		setupIcon("/org/jppf/ui/resources/select_drivers.gif");
-		setupNameAndTooltip("select.drivers");
-	}
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   */
+  public SelectDriversAction(final NodeDataPanel panel)
+  {
+    super(panel);
+    setupIcon("/org/jppf/ui/resources/select_drivers.gif");
+    setupNameAndTooltip("select.drivers");
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent e)
-	{
-		synchronized(panel)
-		{
-			JPPFTreeTable treeTable = panel.getTreeTable();
-			TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-			List<TreePath> selectionPath = new ArrayList<TreePath>();
-			for (DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
-			model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void actionPerformed(final ActionEvent e)
+  {
+    synchronized(panel)
+    {
+      JPPFTreeTable treeTable = panel.getTreeTable();
+      TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+      List<TreePath> selectionPath = new ArrayList<TreePath>();
+      for (DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
+      model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
+    }
+  }
 }

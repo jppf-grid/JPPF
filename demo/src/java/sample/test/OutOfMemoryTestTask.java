@@ -26,25 +26,25 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class OutOfMemoryTestTask extends JPPFTask
 {
-	/**
-	 * Default constructor .
-	 */
-	public OutOfMemoryTestTask()
-	{
-	}
+  /**
+   * Default constructor .
+   */
+  public OutOfMemoryTestTask()
+  {
+  }
 
-	/**
-	 * This method throws a <code>OutOfMemoryError</code>.
-	 */
-	@Override
-	public void run()
-	{
-		int n = 50 * 1024 * 1024;
-		byte[][] data = new byte[n][];
-		for (int i=0; i<n; i++)
-		{
-			data[i] = new byte[10];
-		}
-		System.out.println("allocated all arrays");
-	}
+  /**
+   * This method throws a <code>OutOfMemoryError</code>.
+   */
+  @Override
+  public void run()
+  {
+    int n = 50 * 1024 * 1024;
+    byte[][] data = new byte[n][];
+    for (int i=0; i<n; i++)
+    {
+      data[i] = new byte[10];
+    }
+    System.out.println("allocated all arrays");
+  }
 }

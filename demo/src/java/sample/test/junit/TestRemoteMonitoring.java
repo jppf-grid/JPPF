@@ -31,25 +31,25 @@ import org.jppf.management.*;
  */
 public class TestRemoteMonitoring extends TestCase
 {
-	/**
-	 * Cancel task command.
-	 */
-	private static final int CANCEL = 1;
-	/**
-	 * Restart task command.
-	 */
-	private static final int RESTART = 2;
+  /**
+   * Cancel task command.
+   */
+  private static final int CANCEL = 1;
+  /**
+   * Restart task command.
+   */
+  private static final int RESTART = 2;
 
-	/**
-	 * Test the querying the state of a node.
-	 * @throws Exception if the test failed.
-	 */
-	public void testNodeState() throws Exception
-	{
-		JMXNodeConnectionWrapper jmxClient = new JMXNodeConnectionWrapper("192.168.0.5", 12001);
-		jmxClient.connect();
-		while (!jmxClient.isConnected()) Thread.sleep(100L);
-		JPPFNodeState state = jmxClient.state();
-		assertNotNull(state);
-	}
+  /**
+   * Test the querying the state of a node.
+   * @throws Exception if the test failed.
+   */
+  public void testNodeState() throws Exception
+  {
+    JMXNodeConnectionWrapper jmxClient = new JMXNodeConnectionWrapper("192.168.0.5", 12001);
+    jmxClient.connect();
+    while (!jmxClient.isConnected()) Thread.sleep(100L);
+    JPPFNodeState state = jmxClient.state();
+    assertNotNull(state);
+  }
 }

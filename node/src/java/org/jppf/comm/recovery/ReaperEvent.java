@@ -26,21 +26,21 @@ import java.util.EventObject;
  */
 public class ReaperEvent extends EventObject
 {
-	/**
-	 * Initialize this event with the specified connection to a remote peer.
-	 * @param connection the source of this event.
-	 */
-	public ReaperEvent(final ServerConnection connection)
-	{
-		super(connection);
-	}
+  /**
+   * Initialize this event with the specified connection to a remote peer.
+   * @param connection the source of this event.
+   */
+  public ReaperEvent(final ServerConnection connection)
+  {
+    super(connection);
+  }
 
-	/**
-	 * Get the connection for which this event is emitted.
-	 * @return a {@link ServerConnection} instance.
-	 */
-	public ServerConnection getConnection()
-	{
-		return (ServerConnection) getSource();
-	}
+  /**
+   * Get the connection for which this event is emitted.
+   * @return a {@link ServerConnection} instance.
+   */
+  public ServerConnection getConnection()
+  {
+    return (ServerConnection) getSource();
+  }
 }

@@ -33,68 +33,69 @@ import org.slf4j.*;
  */
 public class RemoteClassLoaderManager extends AbstractClassLoaderManager
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(RemoteClassLoaderManager.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The node that holds this class loader manager.
-	 */
-	private JPPFNode node = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(RemoteClassLoaderManager.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The node that holds this class loader manager.
+   */
+  private JPPFNode node = null;
 
-	/**
-	 * Initialize this class loader manager with the specified node.
-	 * @param node the node that holds this class loader manager.
-	 */
-	RemoteClassLoaderManager(final JPPFNode node)
-	{
-		this.node = node;
-	}
+  /**
+   * Initialize this class loader manager with the specified node.
+   * @param node the node that holds this class loader manager.
+   */
+  RemoteClassLoaderManager(final JPPFNode node)
+  {
+    this.node = node;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected AbstractJPPFClassLoader createClassLoader()
-	{
-		if (debugEnabled) log.debug("Initializing classloader");
-		if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
-		return classLoader;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected AbstractJPPFClassLoader createClassLoader()
+  {
+    if (debugEnabled) log.debug("Initializing classloader");
+    if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
+    return classLoader;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
-	{
-		return new JPPFRemoteContainer(node.getSocketWrapper(), uuidPath, cl);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
+  {
+    return new JPPFRemoteContainer(node.getSocketWrapper(), uuidPath, cl);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
-	{
-		return new Callable<AbstractJPPFClassLoader>()
-		{
-			@Override
-			public AbstractJPPFClassLoader call()
-			{
-				PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
-				{
-					public AbstractJPPFClassLoader run()
-					{
-						return new JPPFClassLoader(getClassLoader(), uuidPath);
-					}
-				};
-				return AccessController.doPrivileged(pa);
-			}
-		};
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
+  {
+    return new Callable<AbstractJPPFClassLoader>()
+    {
+      @Override
+      public AbstractJPPFClassLoader call()
+      {
+        PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+        {
+          @Override
+          public AbstractJPPFClassLoader run()
+          {
+            return new JPPFClassLoader(getClassLoader(), uuidPath);
+          }
+        };
+        return AccessController.doPrivileged(pa);
+      }
+    };
+  }
 }

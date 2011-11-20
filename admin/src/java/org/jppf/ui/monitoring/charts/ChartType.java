@@ -23,53 +23,53 @@ package org.jppf.ui.monitoring.charts;
  */
 public enum ChartType
 {
-	/**
-	 * Chart type definition for a 3D bar chart.
-	 */
-	CHART_3DBAR("3D bar chart"),
-	/**
-	 * Chart type definition for a plot XY chart.
-	 */
-	CHART_PLOTXY("Plot XY chart"),
-	/**
-	 * Chart type definition for a plot XY chart.
-	 */
-	CHART_AREA("Area chart"),
-	/**
-	 * Chart type definition for a plot XY chart.
-	 */
-	CHART_3DPIE("3D pie chart"),
-	/**
-	 * Chart type definition for a plot XY chart.
-	 */
-	CHART_RING("Ring chart"),
-	/**
-	 * Chart type definition for a plot XY chart.
-	 */
-	CHART_DIFFERENCE("Difference chart");
+  /**
+   * Chart type definition for a 3D bar chart.
+   */
+  CHART_3DBAR("3D bar chart"),
+  /**
+   * Chart type definition for a plot XY chart.
+   */
+  CHART_PLOTXY("Plot XY chart"),
+  /**
+   * Chart type definition for a plot XY chart.
+   */
+  CHART_AREA("Area chart"),
+  /**
+   * Chart type definition for a plot XY chart.
+   */
+  CHART_3DPIE("3D pie chart"),
+  /**
+   * Chart type definition for a plot XY chart.
+   */
+  CHART_RING("Ring chart"),
+  /**
+   * Chart type definition for a plot XY chart.
+   */
+  CHART_DIFFERENCE("Difference chart");
 
-	/**
-	 * An english-like name for this enum type.
-	 */
-	private String name = null;
+  /**
+   * An english-like name for this enum type.
+   */
+  private String name = null;
 
-	/**
-	 * Initialize this enum type with a nice display name.
-	 * @param name the name as a string.
-	 */
-	ChartType(final String name)
-	{
-		this.name = name;
-	}
+  /**
+   * Initialize this enum type with a nice display name.
+   * @param name the name as a string.
+   */
+  ChartType(final String name)
+  {
+    this.name = name;
+  }
 
-	/**
-	 * Get a nice display name for this enum type.
-	 * @return the name as a string.
-	 * @see java.lang.Enum#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return name;
-	}
+  /**
+   * Get a nice display name for this enum type.
+   * @return the name as a string.
+   * @see java.lang.Enum#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return name;
+  }
 }

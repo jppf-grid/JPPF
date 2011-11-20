@@ -25,53 +25,53 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.jppf.utils.streams.StreamConstants;
 
 /**
- * A ByteBuffer pool backed by a {@link ConcurrentLinkedQueue}. 
+ * A ByteBuffer pool backed by a {@link ConcurrentLinkedQueue}.
  * @author Laurent Cohen
  */
 public class DirectBufferPoolQueue implements ObjectPool<ByteBuffer>
 {
-	/**
-	 * The pool of {@link ByteBuffer}.
-	 */
-	private final Queue<ByteBuffer> queue = new ConcurrentLinkedQueue<ByteBuffer>();
+  /**
+   * The pool of {@link ByteBuffer}.
+   */
+  private final Queue<ByteBuffer> queue = new ConcurrentLinkedQueue<ByteBuffer>();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ByteBuffer get()
-	{
-		ByteBuffer bb = queue.poll();
-		if (bb == null) bb = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
-		return bb;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ByteBuffer get()
+  {
+    ByteBuffer bb = queue.poll();
+    if (bb == null) bb = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
+    return bb;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void put(final ByteBuffer buffer)
-	{
-		buffer.clear();
-		queue.offer(buffer);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void put(final ByteBuffer buffer)
+  {
+    buffer.clear();
+    queue.offer(buffer);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isEmpty()
-	{
-		return queue.isEmpty();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isEmpty()
+  {
+    return queue.isEmpty();
+  }
 
-	/**
-	 * Use this method with precaution, as its performance is in O(n).<br/>
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int size()
-	{
-		return queue.size();
-	}
+  /**
+   * Use this method with precaution, as its performance is in O(n).<br/>
+   * {@inheritDoc}
+   */
+  @Override
+  public int size()
+  {
+    return queue.size();
+  }
 }

@@ -28,55 +28,55 @@ import org.jppf.node.protocol.Task;
  */
 public class TimeoutTimerTask implements Runnable
 {
-	/**
-	 * The number identifying the task.
-	 */
-	private long number = 0L;
-	/**
-	 * The future on which to call the cancel() method.
-	 */
-	private Future<?> future = null;
-	/**
-	 * The task to cancel.
-	 */
-	private Task task = null;
-	/**
-	 * The execution manager that started this task.
-	 */
-	private NodeExecutionManagerImpl executionManager = null;
+  /**
+   * The number identifying the task.
+   */
+  private long number = 0L;
+  /**
+   * The future on which to call the cancel() method.
+   */
+  private Future<?> future = null;
+  /**
+   * The task to cancel.
+   */
+  private Task task = null;
+  /**
+   * The execution manager that started this task.
+   */
+  private NodeExecutionManagerImpl executionManager = null;
 
-	/**
-	 * Initialize this timer task with the specified future.
-	 * @param executionManager the execution manager that started this task.
-	 * @param number the number identifying the task.
-	 * @param task the task to cancel.
-	 */
-	public TimeoutTimerTask(final NodeExecutionManagerImpl executionManager, final long number, final Task task)
-	{
-		this.executionManager = executionManager;
-		this.number = number;
-		this.future = executionManager.getFutureFromNumber(number);
-		this.task = task;
-	}
+  /**
+   * Initialize this timer task with the specified future.
+   * @param executionManager the execution manager that started this task.
+   * @param number the number identifying the task.
+   * @param task the task to cancel.
+   */
+  public TimeoutTimerTask(final NodeExecutionManagerImpl executionManager, final long number, final Task task)
+  {
+    this.executionManager = executionManager;
+    this.number = number;
+    this.future = executionManager.getFutureFromNumber(number);
+    this.task = task;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.util.TimerTask#run()
-	 */
-	@Override
-	public void run()
-	{
-		if (!future.isDone())
-		{
-			try
-			{
-				future.cancel(true);
-				task.onTimeout();
-				executionManager.removeFuture(number);
-			}
-			catch(Exception ignore)
-			{
-			}
-		}
-	}
+  /**
+   * Execute this task.
+   * @see java.util.TimerTask#run()
+   */
+  @Override
+  public void run()
+  {
+    if (!future.isDone())
+    {
+      try
+      {
+        future.cancel(true);
+        task.onTimeout();
+        executionManager.removeFuture(number);
+      }
+      catch(Exception ignore)
+      {
+      }
+    }
+  }
 }

@@ -30,99 +30,99 @@ import org.apache.commons.net.ftp.*;
  */
 public class FTPClientWrapper
 {
-	/**
-	 * The underlying FTP client.
-	 */
-	private FTPClient ftpClient;
+  /**
+   * The underlying FTP client.
+   */
+  private FTPClient ftpClient;
 
-	/**
-	 * Open a secure ftp connection with the specified parameters.
-	 * @param host the host where the FTP server is running
-	 * @param port the secure FTP port.
-	 * @param user username to use.
-	 * @param password the user password.
-	 * @throws Exception if any error occurs.
-	 */
-	public void open(final String host, final int port, final String user, final String password) throws Exception
-	{
-		// create with implicit TLS
-		ftpClient = new FTPSClient(true);
-		ftpClient.connect(host, port);
-		ftpClient.login(user, password);
-	}
+  /**
+   * Open a secure ftp connection with the specified parameters.
+   * @param host the host where the FTP server is running
+   * @param port the secure FTP port.
+   * @param user username to use.
+   * @param password the user password.
+   * @throws Exception if any error occurs.
+   */
+  public void open(final String host, final int port, final String user, final String password) throws Exception
+  {
+    // create with implicit TLS
+    ftpClient = new FTPSClient(true);
+    ftpClient.connect(host, port);
+    ftpClient.login(user, password);
+  }
 
-	/**
-	 * Disconnect from the FTP server and close the connection.
-	 * @throws Exception if any error occurs.
-	 */
-	public void close() throws Exception
-	{
-		try
-		{
-			ftpClient.logout();
-		}
-		catch(IOException e)
-		{
-			System.err.println("error logging off the ftp client: " + e.getMessage());
-		}
-		try
-		{
-			ftpClient.disconnect();
-		}
-		catch(IOException e)
-		{
-			System.err.println("error disconnecting from the ftp client: " + e.getMessage());
-		}
-		ftpClient = null;
-	}
+  /**
+   * Disconnect from the FTP server and close the connection.
+   * @throws Exception if any error occurs.
+   */
+  public void close() throws Exception
+  {
+    try
+    {
+      ftpClient.logout();
+    }
+    catch(IOException e)
+    {
+      System.err.println("error logging off the ftp client: " + e.getMessage());
+    }
+    try
+    {
+      ftpClient.disconnect();
+    }
+    catch(IOException e)
+    {
+      System.err.println("error disconnecting from the ftp client: " + e.getMessage());
+    }
+    ftpClient = null;
+  }
 
-	/**
-	 * Download a file from a remote FTP server.
-	 * @param localPath the path to the resulting local file.
-	 * @param remotePath the path of the remote file.
-	 * @throws Exception if any error occurs during the file transfer.
-	 */
-	public void download(final String localPath, final String remotePath) throws Exception
-	{
-		BufferedOutputStream bos = null;
-		try
-		{
-			bos = new BufferedOutputStream(new FileOutputStream(localPath));
-			ftpClient.retrieveFile(remotePath, bos);
-		}
-		finally
-		{
-			if (bos != null) bos.close();
-		}
-	}
+  /**
+   * Download a file from a remote FTP server.
+   * @param localPath the path to the resulting local file.
+   * @param remotePath the path of the remote file.
+   * @throws Exception if any error occurs during the file transfer.
+   */
+  public void download(final String localPath, final String remotePath) throws Exception
+  {
+    BufferedOutputStream bos = null;
+    try
+    {
+      bos = new BufferedOutputStream(new FileOutputStream(localPath));
+      ftpClient.retrieveFile(remotePath, bos);
+    }
+    finally
+    {
+      if (bos != null) bos.close();
+    }
+  }
 
-	/**
-	 * Upload a local file to a remote FTP server.
-	 * @param localPath the path to the file to upload.
-	 * @param remotePath the path of the resulting remote file.
-	 * @throws Exception if any error occurs during the file transfer.
-	 */
-	public void upload(final String localPath, final String remotePath) throws Exception
-	{
-		BufferedInputStream bis = null;
-		try
-		{
-			bis = new BufferedInputStream(new FileInputStream(localPath));
-			ftpClient.storeFile(remotePath, bis);
-		}
-		finally
-		{
-			if (bis != null) bis.close();
-		}
-	}
+  /**
+   * Upload a local file to a remote FTP server.
+   * @param localPath the path to the file to upload.
+   * @param remotePath the path of the resulting remote file.
+   * @throws Exception if any error occurs during the file transfer.
+   */
+  public void upload(final String localPath, final String remotePath) throws Exception
+  {
+    BufferedInputStream bis = null;
+    try
+    {
+      bis = new BufferedInputStream(new FileInputStream(localPath));
+      ftpClient.storeFile(remotePath, bis);
+    }
+    finally
+    {
+      if (bis != null) bis.close();
+    }
+  }
 
-	/**
-	 * Get the underlying FTP client.
-	 * <br/>If this method is called before {@link #open() open()} has been invoked, the returned object will be null.
-	 * @return  an <code>FTPClient</code> instance.
-	 */
-	public FTPClient getFtpClient()
-	{
-		return ftpClient;
-	}
+  /**
+   * Get the underlying FTP client.
+   * <br/>If this method is called before {@link #open() open()} has been invoked, the returned object will be null.
+   * @return  an <code>FTPClient</code> instance.
+   */
+  public FTPClient getFtpClient()
+  {
+    return ftpClient;
+  }
 }

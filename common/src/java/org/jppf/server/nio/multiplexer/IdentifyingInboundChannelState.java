@@ -31,47 +31,47 @@ import org.slf4j.*;
  */
 public class IdentifyingInboundChannelState extends MultiplexerServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(IdentifyingInboundChannelState.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IdentifyingInboundChannelState.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public IdentifyingInboundChannelState(final MultiplexerNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public IdentifyingInboundChannelState(final MultiplexerNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
-		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (context.readMessage(wrapper))
-		{
-			int port = context.readOutBoundPort();
-			if (debugEnabled) log.debug("read port number for " + wrapper + ": " + port);
-			if (port <= 0)
-			{
-				throw new IOException("outbound port could not be read from this channel");
-			}
-			OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, wrapper);
-			MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(handler);
-			context.setMessage(null);
-			server.getTransitionManager().transitionChannel(wrapper, TO_IDLE);
-			new Thread(init).start();
-			return TO_IDLE;
-		}
-		return TO_IDENTIFYING_INBOUND_CHANNEL;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MultiplexerTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    MultiplexerContext context = (MultiplexerContext) wrapper.getContext();
+    if (debugEnabled) log.debug("exec() for " + wrapper);
+    if (context.readMessage(wrapper))
+    {
+      int port = context.readOutBoundPort();
+      if (debugEnabled) log.debug("read port number for " + wrapper + ": " + port);
+      if (port <= 0)
+      {
+        throw new IOException("outbound port could not be read from this channel");
+      }
+      OutboundChannelHandler handler = new OutboundChannelHandler(server, "localhost", port, wrapper);
+      MultiplexerChannelInitializer init = new MultiplexerChannelInitializer(handler);
+      context.setMessage(null);
+      server.getTransitionManager().transitionChannel(wrapper, TO_IDLE);
+      new Thread(init).start();
+      return TO_IDLE;
+    }
+    return TO_IDENTIFYING_INBOUND_CHANNEL;
+  }
 }

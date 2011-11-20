@@ -26,108 +26,108 @@ import org.jppf.utils.streams.StreamConstants;
  */
 public class JPPFBuffer
 {
-	/**
-	 * The actual buffer, intended to contain a serialized object graph.
-	 */
-	public byte[] buffer = StreamConstants.EMPTY_BYTES;
-	/**
-	 * The length of the buffer.
-	 */
-	public int length = 0;
-	/**
-	 * Current position in this buffer.
-	 */
-	public int pos = 0;
+  /**
+   * The actual buffer, intended to contain a serialized object graph.
+   */
+  public byte[] buffer = StreamConstants.EMPTY_BYTES;
+  /**
+   * The length of the buffer.
+   */
+  public int length = 0;
+  /**
+   * Current position in this buffer.
+   */
+  public int pos = 0;
 
-	/**
-	 * Initialize this buffer.
-	 */
-	public JPPFBuffer()
-	{
-	}
+  /**
+   * Initialize this buffer.
+   */
+  public JPPFBuffer()
+  {
+  }
 
-	/**
-	 * Initialize this buffer with the specified String, using UTF-8 encoding.
-	 * @param str the string whose contents will be put into this buffer.
-	 */
-	public JPPFBuffer(final String str)
-	{
-		this.buffer = str.getBytes(StringUtils.UTF_8);
-		this.length = buffer.length;
-	}
+  /**
+   * Initialize this buffer with the specified String, using UTF-8 encoding.
+   * @param str the string whose contents will be put into this buffer.
+   */
+  public JPPFBuffer(final String str)
+  {
+    this.buffer = str.getBytes(StringUtils.UTF_8);
+    this.length = buffer.length;
+  }
 
 
-	/**
-	 * Initialize this buffer with a specified buffer and buffer length.
-	 * @param buffer the buffer to use.
-	 * @param length the number of bytes to use in the buffer.
-	 */
-	public JPPFBuffer(final byte[] buffer, final int length)
-	{
-		this.buffer = buffer;
-		this.length = length;
-	}
+  /**
+   * Initialize this buffer with a specified buffer and buffer length.
+   * @param buffer the buffer to use.
+   * @param length the number of bytes to use in the buffer.
+   */
+  public JPPFBuffer(final byte[] buffer, final int length)
+  {
+    this.buffer = buffer;
+    this.length = length;
+  }
 
-	/**
-	 * Set the buffered data.
-	 * @param buffer an array of bytes containing the data.
-	 */
-	public void setBuffer(final byte[] buffer)
-	{
-		this.buffer = buffer;
-	}
+  /**
+   * Set the buffered data.
+   * @param buffer an array of bytes containing the data.
+   */
+  public void setBuffer(final byte[] buffer)
+  {
+    this.buffer = buffer;
+  }
 
-	/**
-	 * Get the buffered data.
-	 * @return an array of bytes containing the data.
-	 */
-	public byte[] getBuffer()
-	{
-		return buffer;
-	}
+  /**
+   * Get the buffered data.
+   * @return an array of bytes containing the data.
+   */
+  public byte[] getBuffer()
+  {
+    return buffer;
+  }
 
-	/**
-	 * Set the length of the buffered data.
-	 * @param length the length as an int.
-	 */
-	public void setLength(final int length)
-	{
-		this.length = length;
-	}
+  /**
+   * Set the length of the buffered data.
+   * @param length the length as an int.
+   */
+  public void setLength(final int length)
+  {
+    this.length = length;
+  }
 
-	/**
-	 * Get the length of the buffered data.
-	 * @return the length as an int.
-	 */
-	public int getLength()
-	{
-		return length;
-	}
+  /**
+   * Get the length of the buffered data.
+   * @return the length as an int.
+   */
+  public int getLength()
+  {
+    return length;
+  }
 
-	/**
-	 * Return the number of bytes available for writing in this buffer.
-	 * @return the available bytes as an int value.
-	 */
-	public int remaining()
-	{
-		return buffer.length - length;
-	}
+  /**
+   * Return the number of bytes available for writing in this buffer.
+   * @return the available bytes as an int value.
+   */
+  public int remaining()
+  {
+    return buffer.length - length;
+  }
 
-	/**
-	 * Return the number of bytes available for reading in this buffer.
-	 * @return the available bytes as an int value.
-	 */
-	public int remainingFromPos()
-	{
-		return length - pos;
-	}
+  /**
+   * Return the number of bytes available for reading in this buffer.
+   * @return the available bytes as an int value.
+   */
+  public int remainingFromPos()
+  {
+    return length - pos;
+  }
 
-	/**
-	 * Transform this buffer into a string using UTF-8 encoding.
-	 * @return the content of this buffer as a string.
-	 */
-	public String asString()
-	{
-		return new String(buffer, pos, length, StringUtils.UTF_8);
-	}
+  /**
+   * Transform this buffer into a string using UTF-8 encoding.
+   * @return the content of this buffer as a string.
+   */
+  public String asString()
+  {
+    return new String(buffer, pos, length, StringUtils.UTF_8);
+  }
 }

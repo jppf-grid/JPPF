@@ -29,38 +29,38 @@ import com.mxgraph.view.mxGraph;
  */
 public class SelectGraphDriversAction extends AbstractGraphSelectionAction
 {
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 */
-	public SelectGraphDriversAction(final GraphOption panel)
-	{
-		super(panel);
-		setupIcon("/org/jppf/ui/resources/select_drivers.gif");
-		setupNameAndTooltip("select.drivers");
-	}
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   */
+  public SelectGraphDriversAction(final GraphOption panel)
+  {
+    super(panel);
+    setupIcon("/org/jppf/ui/resources/select_drivers.gif");
+    setupNameAndTooltip("select.drivers");
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent e)
-	{
-		synchronized(panel)
-		{
-			mxGraph graph = panel.getGraph();
-			mxGraphModel model = (mxGraphModel) graph.getModel();
-			model.beginUpdate();
-			try
-			{
-				Object[] drivers = getDriverVertices();
-				if ((drivers == null) || (drivers.length == 0)) return;
-				graph.setSelectionCells(drivers);
-			}
-			finally
-			{
-				model.endUpdate();
-			}
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void actionPerformed(final ActionEvent e)
+  {
+    synchronized(panel)
+    {
+      mxGraph graph = panel.getGraph();
+      mxGraphModel model = (mxGraphModel) graph.getModel();
+      model.beginUpdate();
+      try
+      {
+        Object[] drivers = getDriverVertices();
+        if ((drivers == null) || (drivers.length == 0)) return;
+        graph.setSelectionCells(drivers);
+      }
+      finally
+      {
+        model.endUpdate();
+      }
+    }
+  }
 }

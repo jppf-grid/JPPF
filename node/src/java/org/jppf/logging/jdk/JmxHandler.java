@@ -28,51 +28,51 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
  */
 public class JmxHandler extends Handler
 {
-	/**
-	 * The notifier that sends formatted log messages as JMX notifications.
-	 */
-	private JmxMessageNotifier notifier = null;
-	/**
-	 * The name of the mbean that sends messages as JMX notifications.
-	 */
-	private String mbeanName = null;
+  /**
+   * The notifier that sends formatted log messages as JMX notifications.
+   */
+  private JmxMessageNotifier notifier = null;
+  /**
+   * The name of the mbean that sends messages as JMX notifications.
+   */
+  private String mbeanName = null;
 
-	/**
-	 * Initialize this appender from its configuration.
-	 */
-	private void init()
-	{
-		LogManager lm = LogManager.getLogManager();
-		mbeanName = lm.getProperty(getClass().getName() + ".mbeanName");
-		notifier = new JmxMessageNotifier(mbeanName);
-	}
+  /**
+   * Initialize this appender from its configuration.
+   */
+  private void init()
+  {
+    LogManager lm = LogManager.getLogManager();
+    mbeanName = lm.getProperty(getClass().getName() + ".mbeanName");
+    notifier = new JmxMessageNotifier(mbeanName);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void publish(final LogRecord record)
-	{
-		if (notifier == null) init();
-		Formatter f = getFormatter();
-		if (f == null) f = new JPPFLogFormatter();
-		String s = f.format(record);
-		notifier.sendMessage(s);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void publish(final LogRecord record)
+  {
+    if (notifier == null) init();
+    Formatter f = getFormatter();
+    if (f == null) f = new JPPFLogFormatter();
+    String s = f.format(record);
+    notifier.sendMessage(s);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void flush()
-	{
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void flush()
+  {
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void close() throws SecurityException
-	{
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close() throws SecurityException
+  {
+  }
 }

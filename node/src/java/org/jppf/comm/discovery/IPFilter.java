@@ -32,100 +32,100 @@ import org.slf4j.*;
  */
 public class IPFilter
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(IPFilter.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * List of accepted IP address patterns.
-	 */
-	private List<AbstractIPAddressPattern> includePatterns = new ArrayList<AbstractIPAddressPattern>();
-	/**
-	 * List of rejected IP address patterns.
-	 */
-	private List<AbstractIPAddressPattern> excludePatterns = new ArrayList<AbstractIPAddressPattern>();
-	/**
-	 * The loaded configuration.
-	 */
-	private TypedProperties config = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IPFilter.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * List of accepted IP address patterns.
+   */
+  private List<AbstractIPAddressPattern> includePatterns = new ArrayList<AbstractIPAddressPattern>();
+  /**
+   * List of rejected IP address patterns.
+   */
+  private List<AbstractIPAddressPattern> excludePatterns = new ArrayList<AbstractIPAddressPattern>();
+  /**
+   * The loaded configuration.
+   */
+  private TypedProperties config = null;
 
-	/**
-	 * Initialize this filter with the specified configuration.
-	 * @param config the configuration from which to get the include and exclude filters.
-	 */
-	public IPFilter(final TypedProperties config)
-	{
-		this.config = (config == null) ? new TypedProperties() : config;
-		configure();
-	}
+  /**
+   * Initialize this filter with the specified configuration.
+   * @param config the configuration from which to get the include and exclude filters.
+   */
+  public IPFilter(final TypedProperties config)
+  {
+    this.config = (config == null) ? new TypedProperties() : config;
+    configure();
+  }
 
-	/**
-	 * Configure this IP filter from the JPPF configuration.
-	 */
-	public void configure()
-	{
-		configureIPAddressPatterns(config.getString("jppf.discovery.include.ipv4"), includePatterns);
-		configureIPAddressPatterns(config.getString("jppf.discovery.include.ipv6"), includePatterns);
-		configureIPAddressPatterns(config.getString("jppf.discovery.exclude.ipv4"), excludePatterns);
-		configureIPAddressPatterns(config.getString("jppf.discovery.exclude.ipv6"), excludePatterns);
-	}
+  /**
+   * Configure this IP filter from the JPPF configuration.
+   */
+  public void configure()
+  {
+    configureIPAddressPatterns(config.getString("jppf.discovery.include.ipv4"), includePatterns);
+    configureIPAddressPatterns(config.getString("jppf.discovery.include.ipv6"), includePatterns);
+    configureIPAddressPatterns(config.getString("jppf.discovery.exclude.ipv4"), excludePatterns);
+    configureIPAddressPatterns(config.getString("jppf.discovery.exclude.ipv6"), excludePatterns);
+  }
 
-	/**
-	 * Parse the IP address patterns specified in the source string.
-	 * @param source contains comma or semicolumn separated patterns.
-	 * @param addToList the list to add the parsed patterns to.
-	 */
-	private void configureIPAddressPatterns(final String source, final List<AbstractIPAddressPattern> addToList)
-	{
-		if (source == null) return;
-		String src = source.trim();
-		if ("".equals(src)) return;
-		String[] p = src.split(",|;");
-		if ((p == null) || (p.length == 0)) return;
-		for (String s: p)
-		{
-			try
-			{
-				addToList.add(new IPv4AddressPattern(s));
-			}
-			catch (Exception e)
-			{
-				log.warn(e.getMessage());
-			}
-		}
-	}
+  /**
+   * Parse the IP address patterns specified in the source string.
+   * @param source contains comma or semicolumn separated patterns.
+   * @param addToList the list to add the parsed patterns to.
+   */
+  private void configureIPAddressPatterns(final String source, final List<AbstractIPAddressPattern> addToList)
+  {
+    if (source == null) return;
+    String src = source.trim();
+    if ("".equals(src)) return;
+    String[] p = src.split(",|;");
+    if ((p == null) || (p.length == 0)) return;
+    for (String s: p)
+    {
+      try
+      {
+        addToList.add(new IPv4AddressPattern(s));
+      }
+      catch (Exception e)
+      {
+        log.warn(e.getMessage());
+      }
+    }
+  }
 
-	/**
-	 * Determine whether an ip address passes the include and exclude filters.
-	 * @param ip the ip to check.
-	 * @return true if the address passes the filters, false otherwise.
-	 */
-	public boolean isAddressAccepted(final InetAddress ip)
-	{
-		int[] ipComps = StringUtils.toIntArray(ip);
-		boolean included = matches(ipComps, includePatterns, true);
-		boolean excluded = matches(ipComps, excludePatterns, false);
-		return included && !excluded;
-	}
+  /**
+   * Determine whether an ip address passes the include and exclude filters.
+   * @param ip the ip to check.
+   * @return true if the address passes the filters, false otherwise.
+   */
+  public boolean isAddressAccepted(final InetAddress ip)
+  {
+    int[] ipComps = StringUtils.toIntArray(ip);
+    boolean included = matches(ipComps, includePatterns, true);
+    boolean excluded = matches(ipComps, excludePatterns, false);
+    return included && !excluded;
+  }
 
-	/**
-	 * Determine whether the specified raw IP address matches one of the specified filters.
-	 * @param ipComps the IP address to check.
-	 * @param patterns the IP list of patterns to check the address against.
-	 * @param defIfEmpty the value to return if the list of patterns is empty.
-	 * @return <code>true</code> if the IP address matches one of the filter, <code>false</code> otherwise.
-	 */
-	private boolean matches(final int[] ipComps, final List<AbstractIPAddressPattern> patterns, final boolean defIfEmpty)
-	{
-		if ((patterns == null) || patterns.isEmpty()) return defIfEmpty;
-		for (AbstractIPAddressPattern p: patterns)
-		{
-			if (p.matches(ipComps)) return true;
-		}
-		return false;
-	}
+  /**
+   * Determine whether the specified raw IP address matches one of the specified filters.
+   * @param ipComps the IP address to check.
+   * @param patterns the IP list of patterns to check the address against.
+   * @param defIfEmpty the value to return if the list of patterns is empty.
+   * @return <code>true</code> if the IP address matches one of the filter, <code>false</code> otherwise.
+   */
+  private boolean matches(final int[] ipComps, final List<AbstractIPAddressPattern> patterns, final boolean defIfEmpty)
+  {
+    if ((patterns == null) || patterns.isEmpty()) return defIfEmpty;
+    for (AbstractIPAddressPattern p: patterns)
+    {
+      if (p.matches(ipComps)) return true;
+    }
+    return false;
+  }
 }

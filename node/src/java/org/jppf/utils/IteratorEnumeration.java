@@ -25,41 +25,41 @@ import java.util.*;
  */
 public class IteratorEnumeration<T> implements Enumeration<T>
 {
-	/**
-	 * The iterator to wrap as an enumeration.
-	 */
-	private Iterator<T> iterator = null;
+  /**
+   * The iterator to wrap as an enumeration.
+   */
+  private Iterator<T> iterator = null;
 
-	/**
-	 * Initialize this enumeration with the specified iterator.
-	 * @param iterator the iterator to wrap as an enumeration.
-	 */
-	public IteratorEnumeration(final Iterator<T> iterator)
-	{
-		this.iterator = iterator;
-	}
+  /**
+   * Initialize this enumeration with the specified iterator.
+   * @param iterator the iterator to wrap as an enumeration.
+   */
+  public IteratorEnumeration(final Iterator<T> iterator)
+  {
+    this.iterator = iterator;
+  }
 
-	/**
-	 * Tests if this enumeration contains more elements.
-	 * @return true if and only if this enumeration object contains at least one more element to provide, false otherwise.
-	 * @see java.util.Enumeration#hasMoreElements()
-	 */
-	@Override
-	public boolean hasMoreElements()
-	{
-		return iterator.hasNext();
-	}
+  /**
+   * Tests if this enumeration contains more elements.
+   * @return true if and only if this enumeration object contains at least one more element to provide, false otherwise.
+   * @see java.util.Enumeration#hasMoreElements()
+   */
+  @Override
+  public boolean hasMoreElements()
+  {
+    return iterator.hasNext();
+  }
 
-	/**
-	 * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
-	 * @return the next element of this enumeration.
-	 * @exception NoSuchElementException if no more elements exist.
-	 * @see java.util.Enumeration#nextElement()
-	 */
-	@Override
-	public T nextElement()
-	{
-		if (!iterator.hasNext()) throw new NoSuchElementException("this enumeration has no more element to provide");
-		return iterator.next();
-	}
+  /**
+   * Returns the next element of this enumeration if this enumeration object has at least one more element to provide.
+   * @return the next element of this enumeration.
+   * @exception NoSuchElementException if no more elements exist.
+   * @see java.util.Enumeration#nextElement()
+   */
+  @Override
+  public T nextElement()
+  {
+    if (!iterator.hasNext()) throw new NoSuchElementException("this enumeration has no more element to provide");
+    return iterator.next();
+  }
 }

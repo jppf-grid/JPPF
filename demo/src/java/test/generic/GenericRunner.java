@@ -32,77 +32,77 @@ import org.jppf.utils.*;
  */
 public class GenericRunner
 {
-	/**
-	 * Run the test.
-	 * @param args not used.
-	 * @throws Exception if any error occurs.
-	 */
-	public static void main(final String[] args) throws Exception
-	{
-		JPPFClient client = null;
-		try
-		{
-			JPPFJob job = new JPPFJob();
-			addConfiguredTasks(job);
-			//job.addTask(new CallableTask());
-			job.addTask(new LotsOfOutputTask(50000, 200));
-			client = new JPPFClient();
-			List<JPPFTask> results = null;
-			//results = client.submit(job);
-			JPPFResultCollector collector = new JPPFResultCollector(job)
-			{
-				@Override
-				public synchronized void resultsReceived(final TaskResultEvent event)
-				{
-					System.out.println("received " + event.getTaskList().size() + " tasks");
-					super.resultsReceived(event);
-				}
-			};
-			job.setBlocking(false);
-			job.setResultListener(collector);
-			client.submit(job);
-			results = collector.waitForResults();
-			for (JPPFTask task: results)
-			{
-				System.out.println("*****************************************");
-				System.out.println("Result: " + task.getResult());
-				if (task.getException() != null)
-				{
-					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					task.getException().printStackTrace(pw);
-					System.out.println("Exception: " + sw.toString());
-					pw.close();
-				}
-			}
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-		}
-		finally
-		{
-			if (client != null) client.close();
-		}
-		System.exit(0);
-	}
+  /**
+   * Run the test.
+   * @param args not used.
+   * @throws Exception if any error occurs.
+   */
+  public static void main(final String[] args) throws Exception
+  {
+    JPPFClient client = null;
+    try
+    {
+      JPPFJob job = new JPPFJob();
+      addConfiguredTasks(job);
+      //job.addTask(new CallableTask());
+      job.addTask(new LotsOfOutputTask(50000, 200));
+      client = new JPPFClient();
+      List<JPPFTask> results = null;
+      //results = client.submit(job);
+      JPPFResultCollector collector = new JPPFResultCollector(job)
+      {
+        @Override
+        public synchronized void resultsReceived(final TaskResultEvent event)
+        {
+          System.out.println("received " + event.getTaskList().size() + " tasks");
+          super.resultsReceived(event);
+        }
+      };
+      job.setBlocking(false);
+      job.setResultListener(collector);
+      client.submit(job);
+      results = collector.waitForResults();
+      for (JPPFTask task: results)
+      {
+        System.out.println("*****************************************");
+        System.out.println("Result: " + task.getResult());
+        if (task.getException() != null)
+        {
+          StringWriter sw = new StringWriter();
+          PrintWriter pw = new PrintWriter(sw);
+          task.getException().printStackTrace(pw);
+          System.out.println("Exception: " + sw.toString());
+          pw.close();
+        }
+      }
+    }
+    catch(Throwable t)
+    {
+      t.printStackTrace();
+    }
+    finally
+    {
+      if (client != null) client.close();
+    }
+    System.exit(0);
+  }
 
-	/**
-	 * Add tasks whose class names are read form a configuration file.
-	 * @param job the job to add the tasks to.
-	 * @throws Exception if any IO error occurs.
-	 */
-	private static void addConfiguredTasks(final JPPFJob job) throws Exception
-	{
-		String path = JPPFConfiguration.getProperties().getString("task.list.file", null);
-		if (path == null) return;
-		String text = FileUtils.readTextFile(path);
-		String[] classnames = text.split("\n");
-		for (String s: classnames)
-		{
-			Class clazz = Class.forName(s);
-			Object o = clazz.newInstance();
-			job.addTask(o);
-		}
-	}
+  /**
+   * Add tasks whose class names are read form a configuration file.
+   * @param job the job to add the tasks to.
+   * @throws Exception if any IO error occurs.
+   */
+  private static void addConfiguredTasks(final JPPFJob job) throws Exception
+  {
+    String path = JPPFConfiguration.getProperties().getString("task.list.file", null);
+    if (path == null) return;
+    String text = FileUtils.readTextFile(path);
+    String[] classnames = text.split("\n");
+    for (String s: classnames)
+    {
+      Class clazz = Class.forName(s);
+      Object o = clazz.newInstance();
+      job.addTask(o);
+    }
+  }
 }

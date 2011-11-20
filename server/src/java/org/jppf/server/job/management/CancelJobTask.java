@@ -29,63 +29,63 @@ import org.slf4j.*;
  */
 class CancelJobTask implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(CancelJobTask.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The id of the job to manage.
-	 */
-	private String jobUuid = null;
-	/**
-	 * The node on which to perform this task.
-	 */
-	private ChannelWrapper channel = null;
-	/**
-	 * True if the job should be requeued on the server side, false otherwise.
-	 */
-	private boolean requeue = true;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(CancelJobTask.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The id of the job to manage.
+   */
+  private String jobUuid = null;
+  /**
+   * The node on which to perform this task.
+   */
+  private ChannelWrapper channel = null;
+  /**
+   * True if the job should be requeued on the server side, false otherwise.
+   */
+  private boolean requeue = true;
 
-	/**
-	 * Initialize this task.
-	 * @param jobUuid the id of the job to manage.
-	 * @param channel the node on which to perform this task.
-	 * @param requeue true if the job should be requeued on the server side, false otherwise.
-	 */
-	public CancelJobTask(final String jobUuid, final ChannelWrapper channel, final boolean requeue)
-	{
-		this.jobUuid = jobUuid;
-		this.channel = channel;
-		this.requeue = requeue;
-	}
+  /**
+   * Initialize this task.
+   * @param jobUuid the id of the job to manage.
+   * @param channel the node on which to perform this task.
+   * @param requeue true if the job should be requeued on the server side, false otherwise.
+   */
+  public CancelJobTask(final String jobUuid, final ChannelWrapper channel, final boolean requeue)
+  {
+    this.jobUuid = jobUuid;
+    this.channel = channel;
+    this.requeue = requeue;
+  }
 
-	/**
-	 * Execute this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-			context.setJobCanceled(true);
-			JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
-			if (debugEnabled) log.debug("Request to cancel jobUuid = '" + jobUuid + "' on node " + channel + ", requeue = " + requeue);
-			if (nodeInfo == null) return;
-			JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());
-			node.connect();
-			while (!node.isConnected()) Thread.sleep(10);
-			node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
-			node.close();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Execute this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+      context.setJobCanceled(true);
+      JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
+      if (debugEnabled) log.debug("Request to cancel jobUuid = '" + jobUuid + "' on node " + channel + ", requeue = " + requeue);
+      if (nodeInfo == null) return;
+      JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());
+      node.connect();
+      while (!node.isConnected()) Thread.sleep(10);
+      node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
+      node.close();
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 }

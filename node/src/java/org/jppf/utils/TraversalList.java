@@ -27,141 +27,141 @@ import java.util.*;
  */
 public class TraversalList<E> implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The actual list that backs this traversal list.
-	 */
-	private List<E> list = new LinkedList<E>();
-	/**
-	 * The current position in the list.
-	 */
-	private int position = -1;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The actual list that backs this traversal list.
+   */
+  private List<E> list = new LinkedList<E>();
+  /**
+   * The current position in the list.
+   */
+  private int position = -1;
 
-	/**
-	 * Default initialization.
-	 */
-	public TraversalList()
-	{
-	}
+  /**
+   * Default initialization.
+   */
+  public TraversalList()
+  {
+  }
 
-	/**
-	 * Initialize this traversal list with a specified list with the same element type.
-	 * @param list a list with the same element type as this traversal list.
-	 */
-	public TraversalList(final List<E> list)
-	{
-		this.list = list;
-	}
+  /**
+   * Initialize this traversal list with a specified list with the same element type.
+   * @param list a list with the same element type as this traversal list.
+   */
+  public TraversalList(final List<E> list)
+  {
+    this.list = list;
+  }
 
-	/**
-	 * Add a new element to the list.
-	 * @param element the element to add.
-	 */
-	public void add(final E element)
-	{
-		list.add(element);
-	}
+  /**
+   * Add a new element to the list.
+   * @param element the element to add.
+   */
+  public void add(final E element)
+  {
+    list.add(element);
+  }
 
-	/**
-	 * Get the first element in the list.
-	 * @return the first element.
-	 */
-	public E getFirst()
-	{
-		return list.get(0);
-	}
+  /**
+   * Get the first element in the list.
+   * @return the first element.
+   */
+  public E getFirst()
+  {
+    return list.get(0);
+  }
 
-	/**
-	 * Get the last element in the list.
-	 * @return the last element.
-	 */
-	public E getLast()
-	{
-		return list.get(list.size() - 1);
-	}
+  /**
+   * Get the last element in the list.
+   * @return the last element.
+   */
+  public E getLast()
+  {
+    return list.get(list.size() - 1);
+  }
 
-	/**
-	 * Increment the current position by 1.
-	 */
-	public void incPosition()
-	{
-		if (position >= list.size() - 1)
-		{
-			throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" larger than " + list.size());
-		}
-		position++;
-	}
+  /**
+   * Increment the current position by 1.
+   */
+  public void incPosition()
+  {
+    if (position >= list.size() - 1)
+    {
+      throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" larger than " + list.size());
+    }
+    position++;
+  }
 
-	/**
-	 * Increment the current position by 1.
-	 */
-	public void decPosition()
-	{
-		if (position <= 0)
-		{
-			throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" less than 0");
-		}
-		position--;
-	}
+  /**
+   * Increment the current position by 1.
+   */
+  public void decPosition()
+  {
+    if (position <= 0)
+    {
+      throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" less than 0");
+    }
+    position--;
+  }
 
-	/**
-	 * Get the list of elements of this traversal list.
-	 * @return an unmodifiable copy of the list.
-	 */
-	public List<E> getList()
-	{
-		return Collections.unmodifiableList(list);
-	}
+  /**
+   * Get the list of elements of this traversal list.
+   * @return an unmodifiable copy of the list.
+   */
+  public List<E> getList()
+  {
+    return Collections.unmodifiableList(list);
+  }
 
-	/**
-	 * Get the current position in the list.
-	 * @return the position as an int value, -1 if the list is empty.
-	 */
-	public int getPosition()
-	{
-		return list.isEmpty() ? -1 : position;
-	}
+  /**
+   * Get the current position in the list.
+   * @return the position as an int value, -1 if the list is empty.
+   */
+  public int getPosition()
+  {
+    return list.isEmpty() ? -1 : position;
+  }
 
-	/**
-	 * Set the current position in the list.
-	 * @param pos the position as an int value, -1 if the list is empty.
-	 */
-	public void setPosition(final int pos)
-	{
-		if (list.isEmpty()) throw new IndexOutOfBoundsException("list is empty");
-		else if (pos < 0) throw new IndexOutOfBoundsException("value "+pos+" is negative");
-		else if (pos >= list.size()) throw new IndexOutOfBoundsException("value "+pos+" larger than "+(list.size()-1));
-		this.position = pos;
-	}
+  /**
+   * Set the current position in the list.
+   * @param pos the position as an int value, -1 if the list is empty.
+   */
+  public void setPosition(final int pos)
+  {
+    if (list.isEmpty()) throw new IndexOutOfBoundsException("list is empty");
+    else if (pos < 0) throw new IndexOutOfBoundsException("value "+pos+" is negative");
+    else if (pos >= list.size()) throw new IndexOutOfBoundsException("value "+pos+" larger than "+(list.size()-1));
+    this.position = pos;
+  }
 
-	/**
-	 * Return the element at the current position in the list.
-	 * @return the element at the current position.
-	 */
-	public E getCurrentElement()
-	{
-		return list.get(position);
-	}
+  /**
+   * Return the element at the current position in the list.
+   * @return the element at the current position.
+   */
+  public E getCurrentElement()
+  {
+    return list.get(position);
+  }
 
-	/**
-	 * Get the number of elements in this traversal list.
-	 * @return the size of the list as an int value.
-	 */
-	public int size()
-	{
-		return list.size();
-	}
+  /**
+   * Get the number of elements in this traversal list.
+   * @return the size of the list as an int value.
+   */
+  public int size()
+  {
+    return list.size();
+  }
 
-	/**
-	 * Determine whether this traversal list contains a specified element.
-	 * @param element the element to lookup.
-	 * @return true if this list contains the element, false otherwise.
-	 */
-	public boolean contains(final E element)
-	{
-		return list.contains(element);
-	}
+  /**
+   * Determine whether this traversal list contains a specified element.
+   * @param element the element to lookup.
+   * @return true if this list contains the element, false otherwise.
+   */
+  public boolean contains(final E element)
+  {
+    return list.contains(element);
+  }
 }

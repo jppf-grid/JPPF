@@ -30,42 +30,42 @@ import org.jppf.ui.monitoring.node.*;
  */
 public abstract class AbstractTopologyAction extends AbstractUpdatableAction
 {
-	/**
-	 * Constant for an empty <code>TopologyData</code> array.
-	 */
-	protected static final TopologyData[] EMPTY_TOPOLOGY_DATA_ARRAY = new TopologyData[0];
-	/**
-	 * The object representing the JPPF nodes in the tree table.
-	 */
-	protected TopologyData[] dataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
+  /**
+   * Constant for an empty <code>TopologyData</code> array.
+   */
+  protected static final TopologyData[] EMPTY_TOPOLOGY_DATA_ARRAY = new TopologyData[0];
+  /**
+   * The object representing the JPPF nodes in the tree table.
+   */
+  protected TopologyData[] dataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
 
-	/**
-	 * Initialize this action.
-	 */
-	protected AbstractTopologyAction()
-	{
-		BASE = "org.jppf.ui.i18n.NodeDataPage";
-	}
+  /**
+   * Initialize this action.
+   */
+  protected AbstractTopologyAction()
+  {
+    BASE = "org.jppf.ui.i18n.NodeDataPage";
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		super.updateState(selectedElements);
-		List<TopologyData> list = new ArrayList<TopologyData>();
-		for (Object o: selectedElements)
-		{
-			TopologyData data = (TopologyData) o;
-			if (TopologyDataType.NODE.equals(data.getType()))
-			{
-				JPPFManagementInfo info = data.getNodeInformation();
-				if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
-			}
-		}
-		dataArray = list.toArray(new TopologyData[list.size()]);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    super.updateState(selectedElements);
+    List<TopologyData> list = new ArrayList<TopologyData>();
+    for (Object o: selectedElements)
+    {
+      TopologyData data = (TopologyData) o;
+      if (TopologyDataType.NODE.equals(data.getType()))
+      {
+        JPPFManagementInfo info = data.getNodeInformation();
+        if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
+      }
+    }
+    dataArray = list.toArray(new TopologyData[list.size()]);
+  }
 }

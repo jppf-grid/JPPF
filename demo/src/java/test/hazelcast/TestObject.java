@@ -26,19 +26,19 @@ import java.io.Serializable;
  */
 public class TestObject implements Serializable
 {
-	private String id = "";
+  private String id = "";
 
-	public TestObject(final String id)
-	{
-		this.id = id;
-	}
+  public TestObject(final String id)
+  {
+    this.id = id;
+  }
 
-	/**
-	 * Get the id.
-	 * @return the id as a string.
-	 */
-	public String getId()
-	{
-		return id;
-	}
+  /**
+   * Get the id.
+   * @return the id as a string.
+   */
+  public String getId()
+  {
+    return id;
+  }
 }

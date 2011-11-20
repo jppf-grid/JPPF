@@ -25,10 +25,10 @@ package org.jppf.management.spi;
  */
 public interface JPPFDriverMBeanProvider extends JPPFMBeanProvider
 {
-	/**
-	 * Return a concrete MBean.<br>
-	 * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
-	 * @return an <code>Object</code> that is an implementation of the MBean interface.
-	 */
-	Object createMBean();
+  /**
+   * Return a concrete MBean.<br>
+   * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
+   * @return an <code>Object</code> that is an implementation of the MBean interface.
+   */
+  Object createMBean();
 }

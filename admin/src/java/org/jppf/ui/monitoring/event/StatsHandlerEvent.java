@@ -27,51 +27,51 @@ import org.jppf.ui.monitoring.data.StatsHandler;
  */
 public class StatsHandlerEvent extends EventObject
 {
-	/**
-	 * Enumeration of the types of events.
-	 */
-	public enum Type
-	{
-		/**
-		 * Update with a new data snapshot.
-		 */
-		UPDATE,
-		/**
-		 * The whole dataset shall be reset.
-		 */
-		RESET
-	}
-	/**
-	 * The type of this event.
-	 */
-	private Type type = Type.UPDATE;
+  /**
+   * Enumeration of the types of events.
+   */
+  public enum Type
+  {
+    /**
+     * Update with a new data snapshot.
+     */
+    UPDATE,
+    /**
+     * The whole dataset shall be reset.
+     */
+    RESET
+  }
+  /**
+   * The type of this event.
+   */
+  private Type type = Type.UPDATE;
 
-	/**
-	 * Initialize this event with a specified source <code>StatsHandler</code>.
-	 * @param source the stats formatter whose data has changed.
-	 * @param type the type of this event.
-	 */
-	public StatsHandlerEvent(final StatsHandler source, final Type type)
-	{
-		super(source);
-		this.type = type;
-	}
+  /**
+   * Initialize this event with a specified source <code>StatsHandler</code>.
+   * @param source the stats formatter whose data has changed.
+   * @param type the type of this event.
+   */
+  public StatsHandlerEvent(final StatsHandler source, final Type type)
+  {
+    super(source);
+    this.type = type;
+  }
 
-	/**
-	 * Get the <code>StatsHandler</code> source of this event.
-	 * @return a <code>StatsHandler</code> instance.
-	 */
-	public StatsHandler getStatsFormatter()
-	{
-		return (StatsHandler) getSource();
-	}
+  /**
+   * Get the <code>StatsHandler</code> source of this event.
+   * @return a <code>StatsHandler</code> instance.
+   */
+  public StatsHandler getStatsFormatter()
+  {
+    return (StatsHandler) getSource();
+  }
 
-	/**
-	 * Get the type of this event.
-	 * @return the type as a typesafe <code>Type</code> enumerated value.
-	 */
-	public Type getType()
-	{
-		return type;
-	}
+  /**
+   * Get the type of this event.
+   * @return the type as a typesafe <code>Type</code> enumerated value.
+   */
+  public Type getType()
+  {
+    return type;
+  }
 }

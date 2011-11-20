@@ -29,75 +29,75 @@ import org.jppf.utils.StringUtils;
  */
 public class SourceTask extends JPPFTask
 {
-	/**
-	 * Initialize this task.
-	 */
-	public SourceTask()
-	{
-	}
+  /**
+   * Initialize this task.
+   */
+  public SourceTask()
+  {
+  }
 
-	/**
-	 * Perform the execution of this task.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		System.out.println("Starting source task '" + getId() + '\'');
-		print("starting JPPF client");
-		JPPFClient client = new JPPFClient();
-		try
-		{
-			long start = System.currentTimeMillis();
-			print("creating destination job");
-			JPPFJob job = new JPPFJob();
-			job.setName("Destination job");
-			job.getSLA().setMaxNodes(1);
-			DestinationTask task = new DestinationTask();
-			task.setId("destination");
-			job.addTask(task);
-			print("submitting job");
-			List<JPPFTask> results = client.submit(job);
-			print("got job results");
-			for (JPPFTask t: results)
-			{
-				Exception e = t.getException();
-				if (e != null) throw e;
-				else print("destination task result: " + t.getResult());
-			}
-			long elapsed = System.currentTimeMillis() - start;
-			print("processing  performed in "+StringUtils.toStringDuration(elapsed));
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			print("closing JPPF client");
-			client.close();
-		}
-	}
+  /**
+   * Perform the execution of this task.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    System.out.println("Starting source task '" + getId() + '\'');
+    print("starting JPPF client");
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      long start = System.currentTimeMillis();
+      print("creating destination job");
+      JPPFJob job = new JPPFJob();
+      job.setName("Destination job");
+      job.getSLA().setMaxNodes(1);
+      DestinationTask task = new DestinationTask();
+      task.setId("destination");
+      job.addTask(task);
+      print("submitting job");
+      List<JPPFTask> results = client.submit(job);
+      print("got job results");
+      for (JPPFTask t: results)
+      {
+        Exception e = t.getException();
+        if (e != null) throw e;
+        else print("destination task result: " + t.getResult());
+      }
+      long elapsed = System.currentTimeMillis() - start;
+      print("processing  performed in "+StringUtils.toStringDuration(elapsed));
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      print("closing JPPF client");
+      client.close();
+    }
+  }
 
-	/**
-	 * Called when this task is cancelled.
-	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
-	 */
-	@Override
-	public void onCancel()
-	{
-		String s = "task '" + getId() + "' has been cancelled";
-		setResult(s);
-		print(s);
-	}
+  /**
+   * Called when this task is cancelled.
+   * @see org.jppf.server.protocol.JPPFTask#onCancel()
+   */
+  @Override
+  public void onCancel()
+  {
+    String s = "task '" + getId() + "' has been cancelled";
+    setResult(s);
+    print(s);
+  }
 
-	/**
-	 * Print a message to the log and to the console.
-	 * @param msg the message to print.
-	 */
-	private static void print(final String msg)
-	{
-		//log.info(msg);
-		System.out.println(msg);
-	}
+  /**
+   * Print a message to the log and to the console.
+   * @param msg the message to print.
+   */
+  private static void print(final String msg)
+  {
+    //log.info(msg);
+    System.out.println(msg);
+  }
 }

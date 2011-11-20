@@ -30,9 +30,9 @@ import org.jppf.ui.options.event.ValueChangeListener;
  */
 public interface UpdatableAction extends Action, ValueChangeListener
 {
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * @param selectedElements a list of objects.
-	 */
-	void updateState(List<Object> selectedElements);
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * @param selectedElements a list of objects.
+   */
+  void updateState(List<Object> selectedElements);
 }

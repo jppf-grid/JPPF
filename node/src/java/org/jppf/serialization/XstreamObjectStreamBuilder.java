@@ -34,100 +34,100 @@ import org.slf4j.*;
  */
 public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(XstreamObjectStreamBuilder.class);
-	/**
-	 * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Used for thread synchronization when initializing the xstream object.
-	 */
-	private static ReentrantLock lock = new ReentrantLock();
-	/**
-	 * The method to invoke to create an object input stream.
-	 */
-	private static Method createOisMethod = null;
-	/**
-	 * The method to invoke to create an object output stream.
-	 */
-	private static Method createOosMethod = null;
-	/**
-	 * The Xstream facade object.
-	 */
-	private static Object xstream = getXstream();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(XstreamObjectStreamBuilder.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Used for thread synchronization when initializing the xstream object.
+   */
+  private static ReentrantLock lock = new ReentrantLock();
+  /**
+   * The method to invoke to create an object input stream.
+   */
+  private static Method createOisMethod = null;
+  /**
+   * The method to invoke to create an object output stream.
+   */
+  private static Method createOosMethod = null;
+  /**
+   * The Xstream facade object.
+   */
+  private static Object xstream = getXstream();
 
-	/**
-	 * Obtain an input stream used for deserializing objects.
-	 * @param	in input stream to read from.
-	 * @return an <code>ObjectInputStream</code>
-	 * @throws Exception if an error is raised while creating the stream.
-	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream(java.io.InputStream)
-	 */
-	@Override
-	public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
-	{
-		return (ObjectInputStream) createOisMethod.invoke(xstream, new Object[] {in});
-	}
+  /**
+   * Obtain an input stream used for deserializing objects.
+   * @param	in input stream to read from.
+   * @return an <code>ObjectInputStream</code>
+   * @throws Exception if an error is raised while creating the stream.
+   * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectInputStream(java.io.InputStream)
+   */
+  @Override
+  public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
+  {
+    return (ObjectInputStream) createOisMethod.invoke(xstream, new Object[] {in});
+  }
 
-	/**
-	 * Obtain an Output stream used for serializing objects.
-	 * @param	out output stream to write to.
-	 * @return an <code>ObjectOutputStream</code>
-	 * @throws Exception if an error is raised while creating the stream.
-	 * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream(java.io.OutputStream)
-	 */
-	@Override
-	public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
-	{
-		return (ObjectOutputStream) createOosMethod.invoke(xstream, new Object[] {out});
-	}
+  /**
+   * Obtain an Output stream used for serializing objects.
+   * @param	out output stream to write to.
+   * @return an <code>ObjectOutputStream</code>
+   * @throws Exception if an error is raised while creating the stream.
+   * @see org.jppf.serialization.JPPFObjectStreamBuilder#newObjectOutputStream(java.io.OutputStream)
+   */
+  @Override
+  public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
+  {
+    return (ObjectOutputStream) createOosMethod.invoke(xstream, new Object[] {out});
+  }
 
-	/**
-	 * Create an Xstream object using reflection.
-	 * @return an Object instance.
-	 */
-	private static synchronized Object getXstream()
-	{
-		try
-		{
-			if (xstream == null)
-			{
-				lock.lock();
-				try
-				{
-					if (xstream == null)
-					{
-						Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
-						Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
-						Class<?> driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XppDriver"); // the fastest so far
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.Dom4JDriver"); // causes org.dom4j.DocumentException: Error on line 1 of document  : Premature end of file
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.JDomDriver"); // causes StackOverflowError
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver"); // causes com.thoughtworks.xstream.mapper.CannotResolveClassException: loadFactor : loadFactor
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver"); // causes java.lang.UnsupportedOperationException: The JsonHierarchicalStreamDriver can only write JSON
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XomDriver"); // causes org.xml.sax.SAXException: FWK005 parse may not be called while parsing
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.StaxDriver"); // causes a stack overflow at not initialization
-						//Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver"); // very very slow
-						Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
-						Object o = c.newInstance(driverClass.newInstance());
-						createOisMethod = xstreamClass.getMethod("createObjectInputStream", new Class[] {InputStream.class});
-						createOosMethod = xstreamClass.getMethod("createObjectOutputStream", new Class[] {OutputStream.class});
-						xstream = o;
-					}
-				}
-				finally
-				{
-					lock.unlock();
-				}
-			}
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-			throw new JPPFError("A fatal error occurred: " + e.getMessage(), e);
-		}
-		return xstream;
-	}
+  /**
+   * Create an Xstream object using reflection.
+   * @return an Object instance.
+   */
+  private static synchronized Object getXstream()
+  {
+    try
+    {
+      if (xstream == null)
+      {
+        lock.lock();
+        try
+        {
+          if (xstream == null)
+          {
+            Class<?> xstreamClass = Class.forName("com.thoughtworks.xstream.XStream");
+            Class<?> hierarchicalStreamDriverClass = Class.forName("com.thoughtworks.xstream.io.HierarchicalStreamDriver");
+            Class<?> driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XppDriver"); // the fastest so far
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.Dom4JDriver"); // causes org.dom4j.DocumentException: Error on line 1 of document  : Premature end of file
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.JDomDriver"); // causes StackOverflowError
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver"); // causes com.thoughtworks.xstream.mapper.CannotResolveClassException: loadFactor : loadFactor
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver"); // causes java.lang.UnsupportedOperationException: The JsonHierarchicalStreamDriver can only write JSON
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.XomDriver"); // causes org.xml.sax.SAXException: FWK005 parse may not be called while parsing
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.StaxDriver"); // causes a stack overflow at not initialization
+            //Class driverClass = Class.forName("com.thoughtworks.xstream.io.xml.DomDriver"); // very very slow
+            Constructor<?> c = xstreamClass.getConstructor(hierarchicalStreamDriverClass);
+            Object o = c.newInstance(driverClass.newInstance());
+            createOisMethod = xstreamClass.getMethod("createObjectInputStream", new Class[] {InputStream.class});
+            createOosMethod = xstreamClass.getMethod("createObjectOutputStream", new Class[] {OutputStream.class});
+            xstream = o;
+          }
+        }
+        finally
+        {
+          lock.unlock();
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+      throw new JPPFError("A fatal error occurred: " + e.getMessage(), e);
+    }
+    return xstream;
+  }
 }

@@ -31,43 +31,43 @@ import test.org.jppf.test.setup.Setup1D1N;
  */
 public class TestJPPFClient extends Setup1D1N
 {
-	/**
-	 * Launches a driver and node and start the client.
-	 * @throws IOException if a process could not be started.
-	 */
-	@Before
-	public void setupTest() throws IOException
-	{
-	}
+  /**
+   * Launches a driver and node and start the client.
+   * @throws IOException if a process could not be started.
+   */
+  @Before
+  public void setupTest() throws IOException
+  {
+  }
 
-	/**
-	 * Stops the driver and node and close the client.
-	 * @throws IOException if a process could not be stopped.
-	 */
-	@After
-	public void cleanupTest() throws IOException
-	{
-	}
+  /**
+   * Stops the driver and node and close the client.
+   * @throws IOException if a process could not be stopped.
+   */
+  @After
+  public void cleanupTest() throws IOException
+  {
+  }
 
-	/**
-	 * Invocation of the <code>JPPFClient()</code> constructor.
-	 * @throws Exception if any error occurs
-	 */
-	@Test
-	public void testDefaultConstructor() throws Exception
-	{
-		JPPFClient client = new JPPFClient();
-		client.close();
-	}
+  /**
+   * Invocation of the <code>JPPFClient()</code> constructor.
+   * @throws Exception if any error occurs
+   */
+  @Test
+  public void testDefaultConstructor() throws Exception
+  {
+    JPPFClient client = new JPPFClient();
+    client.close();
+  }
 
-	/**
-	 * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
-	 * @throws Exception if any error occurs
-	 */
-	@Test
-	public void testConstructorWithUuid() throws Exception
-	{
-		JPPFClient client = new JPPFClient("some_uuid");
-		client.close();
-	}
+  /**
+   * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
+   * @throws Exception if any error occurs
+   */
+  @Test
+  public void testConstructorWithUuid() throws Exception
+  {
+    JPPFClient client = new JPPFClient("some_uuid");
+    client.close();
+  }
 }

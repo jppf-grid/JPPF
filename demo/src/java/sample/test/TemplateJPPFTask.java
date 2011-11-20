@@ -36,52 +36,52 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class TemplateJPPFTask extends JPPFTask
 {
-	/**
-	 * Some Id.
-	 */
-	private int taskId = 0;
+  /**
+   * Some Id.
+   */
+  private int taskId = 0;
 
-	/**
-	 * Perform initializations on the client side,
-	 * before the task is executed by the node.
-	 * @param taskId Some Id.
-	 */
-	public TemplateJPPFTask(final int taskId)
-	{
-		// perform initializations here ...
-		this.taskId = taskId;
-	}
+  /**
+   * Perform initializations on the client side,
+   * before the task is executed by the node.
+   * @param taskId Some Id.
+   */
+  public TemplateJPPFTask(final int taskId)
+  {
+    // perform initializations here ...
+    this.taskId = taskId;
+  }
 
-	/**
-	 * This method contains the code that will be executed by a node.
-	 * Any uncaught {@link java.lang.Throwable Throwable} will be handled as follows:
-	 * <ul>
-	 * <li>if the {@link java.lang.Throwable Throwable} is an instance of {@link java.lang.Exception Exception},
-	 * it will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
-	 * <li>otherwise, it will first be wrapped in a {@link org.jppf.JPPFException JPPFException},
-	 * then this <code>JPPFException</code> will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
-	 * </ul>
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		try
-		{
-			// write your task code here.
-			System.out.println("Hello, this is the node executing a template JPPF task");
+  /**
+   * This method contains the code that will be executed by a node.
+   * Any uncaught {@link java.lang.Throwable Throwable} will be handled as follows:
+   * <ul>
+   * <li>if the {@link java.lang.Throwable Throwable} is an instance of {@link java.lang.Exception Exception},
+   * it will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
+   * <li>otherwise, it will first be wrapped in a {@link org.jppf.JPPFException JPPFException},
+   * then this <code>JPPFException</code> will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
+   * </ul>
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    try
+    {
+      // write your task code here.
+      System.out.println("Hello, this is the node executing a template JPPF task");
 
-			for (int i = 0; i < 10; i++)
-			{
-				System.out.println(i);
-				try {Thread.sleep(1000);} catch (Exception e) {System.out.println(e);}
-			}
-			// eventually set the execution results
-			setResult("the execution was performed successfully");
-		}
-		catch(Exception e)
-		{
-			setException(e);
-		}
-	}
+      for (int i = 0; i < 10; i++)
+      {
+        System.out.println(i);
+        try {Thread.sleep(1000);} catch (Exception e) {System.out.println(e);}
+      }
+      // eventually set the execution results
+      setResult("the execution was performed successfully");
+    }
+    catch(Exception e)
+    {
+      setException(e);
+    }
+  }
 }

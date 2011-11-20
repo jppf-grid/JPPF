@@ -28,63 +28,63 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class DurationTask extends JPPFTask
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = -6106765904127535863L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = -6106765904127535863L;
 
-	/**
-	 * Counts the number of times this task was run.
-	 */
-	private static int count = 0;
-	/**
-	 * A counter to be displayed.
-	 */
-	private int counter = 0;
-	/**
-	 * Duration of this task in seconds.
-	 */
-	private long duration = 1;
+  /**
+   * Counts the number of times this task was run.
+   */
+  private static int count = 0;
+  /**
+   * A counter to be displayed.
+   */
+  private int counter = 0;
+  /**
+   * Duration of this task in seconds.
+   */
+  private long duration = 1;
 
-	/**
-	 * Initialize this task withe specified duration.
-	 * @param duration duration of this task in milliseconds.
-	 */
-	public DurationTask(final long duration)
-	{
-		incrementCount();
-		counter = count;
-		this.duration = duration;
-	}
+  /**
+   * Initialize this task withe specified duration.
+   * @param duration duration of this task in milliseconds.
+   */
+  public DurationTask(final long duration)
+  {
+    incrementCount();
+    counter = count;
+    this.duration = duration;
+  }
 
-	/**
-	 * Run this task.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		DecimalFormat nf = new DecimalFormat("0.###");
-		String res = nf.format(duration / 1000.0f);
-		try
-		{
-			Thread.sleep(duration);
-			String s = "JPPF task [" + getId() + "] successfully completed after " + res + " seconds";
-			System.out.println(s);
-			setResult(s);
-		}
-		catch (InterruptedException e)
-		{
-			setException(e);
-			setResult("Exception for task [" + getId() + "] with specified duration of " + res + " seconds: " + e.getMessage());
-		}
-	}
+  /**
+   * Run this task.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    DecimalFormat nf = new DecimalFormat("0.###");
+    String res = nf.format(duration / 1000.0f);
+    try
+    {
+      Thread.sleep(duration);
+      String s = "JPPF task [" + getId() + "] successfully completed after " + res + " seconds";
+      System.out.println(s);
+      setResult(s);
+    }
+    catch (InterruptedException e)
+    {
+      setException(e);
+      setResult("Exception for task [" + getId() + "] with specified duration of " + res + " seconds: " + e.getMessage());
+    }
+  }
 
-	/**
-	 * Increment the invocation count.
-	 */
-	private static synchronized void incrementCount()
-	{
-		count++;
-	}
+  /**
+   * Increment the invocation count.
+   */
+  private static synchronized void incrementCount()
+  {
+    count++;
+  }
 }

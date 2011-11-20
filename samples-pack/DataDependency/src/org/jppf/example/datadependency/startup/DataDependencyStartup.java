@@ -34,55 +34,55 @@ import com.hazelcast.core.Hazelcast;
  */
 public class DataDependencyStartup implements JPPFNodeStartupSPI
 {
-	/**
-	 * Mapping of the market data.
-	 */
-	private static Map<String, MarketData> dataMap = null;
-	/**
-	 * Mapping of the trades.
-	 */
-	private static Map<String, Trade> tradeMap = null;
+  /**
+   * Mapping of the market data.
+   */
+  private static Map<String, MarketData> dataMap = null;
+  /**
+   * Mapping of the trades.
+   */
+  private static Map<String, Trade> tradeMap = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		//-Dhazelcast.wait.seconds.before.join=1
-		System.setProperty("hazelcast.wait.seconds.before.join", "1");
-		System.out.println("Initializing distributed maps");
-		dataMap = Hazelcast.getMap(ModelConstants.MARKET_DATA_MAP_NAME);
-		tradeMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + NodeRunner.getUuid());
-		System.out.println("Data initialization complete");
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    //-Dhazelcast.wait.seconds.before.join=1
+    System.setProperty("hazelcast.wait.seconds.before.join", "1");
+    System.out.println("Initializing distributed maps");
+    dataMap = Hazelcast.getMap(ModelConstants.MARKET_DATA_MAP_NAME);
+    tradeMap = Hazelcast.getMap(ModelConstants.TRADE_MAP_PREFIX + NodeRunner.getUuid());
+    System.out.println("Data initialization complete");
+  }
 
-	/**
-	 * Get the market data object with the specified id.
-	 * @param id the id of the data to lookup.
-	 * @return a {@link MarketData} instance, or null if none has the specified id.
-	 */
-	public static MarketData getMarketData(final String id)
-	{
-		return dataMap.get(id);
-	}
+  /**
+   * Get the market data object with the specified id.
+   * @param id the id of the data to lookup.
+   * @return a {@link MarketData} instance, or null if none has the specified id.
+   */
+  public static MarketData getMarketData(final String id)
+  {
+    return dataMap.get(id);
+  }
 
-	/**
-	 * Get the trade object with the specified id.
-	 * @param id the id of the trade to lookup.
-	 * @return a {@link Trade} instance, or null if none has the specified id.
-	 */
-	public static Trade getTrade(final String id)
-	{
-		return tradeMap.get(id);
-	}
+  /**
+   * Get the trade object with the specified id.
+   * @param id the id of the trade to lookup.
+   * @return a {@link Trade} instance, or null if none has the specified id.
+   */
+  public static Trade getTrade(final String id)
+  {
+    return tradeMap.get(id);
+  }
 
-	/**
-	 * Update the specified trade object.
-	 * @param trade the trade to update.
-	 */
-	public static void updateTrade(final Trade trade)
-	{
-		tradeMap.put(trade.getId(), trade);
-	}
+  /**
+   * Update the specified trade object.
+   * @param trade the trade to update.
+   */
+  public static void updateTrade(final Trade trade)
+  {
+    tradeMap.put(trade.getId(), trade);
+  }
 }

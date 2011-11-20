@@ -24,45 +24,45 @@ import java.lang.reflect.Method;
  */
 class PrivilegedMethodAction extends AbstractPrivilegedAction<Object>
 {
-	/**
-	 * The method to invoke.
-	 */
-	private Method method = null;
-	/**
-	 * The object on which to invoke the method, or null for static methods.
-	 */
-	private Object invoker = null;
+  /**
+   * The method to invoke.
+   */
+  private Method method = null;
+  /**
+   * The object on which to invoke the method, or null for static methods.
+   */
+  private Object invoker = null;
 
-	/**
-	 * Initialize this privileged action with the specified method, invoker object and parameters.
-	 * @param method the method to invoke.
-	 * @param invoker the object on which to invoke the method, or null for static methods.
-	 * @param args the parameters of the method to invoke.
-	 */
-	public PrivilegedMethodAction(final Method method, final Object invoker, final Object[] args)
-	{
-		this.method = method;
-		this.invoker = invoker;
-		this.args = args;
-	}
+  /**
+   * Initialize this privileged action with the specified method, invoker object and parameters.
+   * @param method the method to invoke.
+   * @param invoker the object on which to invoke the method, or null for static methods.
+   * @param args the parameters of the method to invoke.
+   */
+  public PrivilegedMethodAction(final Method method, final Object invoker, final Object[] args)
+  {
+    this.method = method;
+    this.invoker = invoker;
+    this.args = args;
+  }
 
-	/**
-	 * Invoke the method.
-	 * @return the method's return result, or null if the method has a <code>void</code> return type.
-	 * @see java.security.PrivilegedAction#run()
-	 */
-	@Override
-	public Object run()
-	{
-		Object result = null;
-		try
-		{
-			result = method.invoke(invoker, args);
-		}
-		catch(Exception e)
-		{
-			exception = e;
-		}
-		return result;
-	}
+  /**
+   * Invoke the method.
+   * @return the method's return result, or null if the method has a <code>void</code> return type.
+   * @see java.security.PrivilegedAction#run()
+   */
+  @Override
+  public Object run()
+  {
+    Object result = null;
+    try
+    {
+      result = method.invoke(invoker, args);
+    }
+    catch(Exception e)
+    {
+      exception = e;
+    }
+    return result;
+  }
 }

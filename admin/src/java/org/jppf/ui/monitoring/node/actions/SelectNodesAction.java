@@ -33,39 +33,39 @@ import org.jppf.ui.treetable.*;
  */
 public class SelectNodesAction extends AbstractSelectionAction
 {
-	/**
-	 * Initialize this action with the specified tree table panel.
-	 * @param panel the tree table panel to which this action applies.
-	 */
-	public SelectNodesAction(final NodeDataPanel panel)
-	{
-		super(panel);
-		setupIcon("/org/jppf/ui/resources/select_nodes.gif");
-		setupNameAndTooltip("select.nodes");
-	}
+  /**
+   * Initialize this action with the specified tree table panel.
+   * @param panel the tree table panel to which this action applies.
+   */
+  public SelectNodesAction(final NodeDataPanel panel)
+  {
+    super(panel);
+    setupIcon("/org/jppf/ui/resources/select_nodes.gif");
+    setupNameAndTooltip("select.nodes");
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent e)
-	{
-		synchronized(panel)
-		{
-			JPPFTreeTable treeTable = panel.getTreeTable();
-			TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-			List<TreePath> selectionPath = new ArrayList<TreePath>();
-			for (DefaultMutableTreeNode driverNode: getDriverNodes())
-			{
-				for (int i=0; i<driverNode.getChildCount(); i++)
-				{
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-					TopologyData data = (TopologyData) node.getUserObject();
-					if ((data == null) || !TopologyDataType.NODE.equals(data.getType()) || (data.getNodeInformation().getType() != JPPFManagementInfo.NODE)) continue;
-					selectionPath.add(treeTable.getPathForNode(node));
-				}
-			}
-			model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void actionPerformed(final ActionEvent e)
+  {
+    synchronized(panel)
+    {
+      JPPFTreeTable treeTable = panel.getTreeTable();
+      TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
+      List<TreePath> selectionPath = new ArrayList<TreePath>();
+      for (DefaultMutableTreeNode driverNode: getDriverNodes())
+      {
+        for (int i=0; i<driverNode.getChildCount(); i++)
+        {
+          DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
+          TopologyData data = (TopologyData) node.getUserObject();
+          if ((data == null) || !TopologyDataType.NODE.equals(data.getType()) || (data.getNodeInformation().getType() != JPPFManagementInfo.NODE)) continue;
+          selectionPath.add(treeTable.getPathForNode(node));
+        }
+      }
+      model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
+    }
+  }
 }

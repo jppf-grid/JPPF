@@ -31,38 +31,38 @@ import org.jppf.utils.TypedProperties;
 public class RLBundlerProvider implements JPPFBundlerProvider
 {
 
-	/**
-	 * Create a bundler instance using the specified parameters profile.
-	 * @param profile - an <code>AutoTuneProfile</code> instance.
-	 * @return an instance of the bundler implementation defined by this provider.
-	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
-	 */
-	@Override
-	public Bundler createBundler(final LoadBalancingProfile profile)
-	{
-		return new RLBundler(profile);
-	}
+  /**
+   * Create a bundler instance using the specified parameters profile.
+   * @param profile - an <code>AutoTuneProfile</code> instance.
+   * @return an instance of the bundler implementation defined by this provider.
+   * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
+   */
+  @Override
+  public Bundler createBundler(final LoadBalancingProfile profile)
+  {
+    return new RLBundler(profile);
+  }
 
-	/**
-	 * Create a bundler profile containing the parameters of the algorithm.
-	 * @param configuration - a set of properties defining the algorithm's parameters.
-	 * @return an {@link org.jppf.server.scheduler.bundle.rl.RLProfile RLProfile} instance.
-	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
-	 */
-	@Override
-	public LoadBalancingProfile createProfile(final TypedProperties configuration)
-	{
-		return new RLProfile(configuration);
-	}
+  /**
+   * Create a bundler profile containing the parameters of the algorithm.
+   * @param configuration - a set of properties defining the algorithm's parameters.
+   * @return an {@link org.jppf.server.scheduler.bundle.rl.RLProfile RLProfile} instance.
+   * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
+   */
+  @Override
+  public LoadBalancingProfile createProfile(final TypedProperties configuration)
+  {
+    return new RLProfile(configuration);
+  }
 
-	/**
-	 * Get the name of the algorithm defined by this provider.
-	 * @return the algorithm's name as a string.
-	 * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#getAlgorithmName()
-	 */
-	@Override
-	public String getAlgorithmName()
-	{
-		return "rl";
-	}
+  /**
+   * Get the name of the algorithm defined by this provider.
+   * @return the algorithm's name as a string.
+   * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#getAlgorithmName()
+   */
+  @Override
+  public String getAlgorithmName()
+  {
+    return "rl";
+  }
 }

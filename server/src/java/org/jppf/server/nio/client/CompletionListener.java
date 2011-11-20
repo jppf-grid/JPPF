@@ -30,56 +30,56 @@ import org.slf4j.*;
  */
 public class CompletionListener implements TaskCompletionListener
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(CompletionListener.class);
-	/**
-	 * Determines whether debug-level logging is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The transition manager for the server to client channels.
-	 */
-	private static StateTransitionManager transitionManager = JPPFDriver.getInstance().getClientNioServer().getTransitionManager();
-	/**
-	 * The client channel.
-	 */
-	private ChannelWrapper<?> channel;
-	/**
-	 * The client context associated with the channel.
-	 */
-	private ClientContext context;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(CompletionListener.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The transition manager for the server to client channels.
+   */
+  private static StateTransitionManager transitionManager = JPPFDriver.getInstance().getClientNioServer().getTransitionManager();
+  /**
+   * The client channel.
+   */
+  private ChannelWrapper<?> channel;
+  /**
+   * The client context associated with the channel.
+   */
+  private ClientContext context;
 
-	/**
-	 * Initialize this completion listener with the specified channel.
-	 * @param channel the client channel.
-	 */
-	public CompletionListener(final ChannelWrapper<?> channel)
-	{
-		this.channel = channel;
-		context = (ClientContext) channel.getContext();
-	}
+  /**
+   * Initialize this completion listener with the specified channel.
+   * @param channel the client channel.
+   */
+  public CompletionListener(final ChannelWrapper<?> channel)
+  {
+    this.channel = channel;
+    context = (ClientContext) channel.getContext();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void taskCompleted(final ServerJob result)
-	{
-		context.offerCompletedBundle(result);
-		if (ClientState.IDLE.equals(context.getState()))
-		{
-			try
-			{
-				transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
-			}
-			catch(Exception e)
-			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.info(e.getClass().getName() + " : " + e.getMessage());
-			}
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public void taskCompleted(final ServerJob result)
+  {
+    context.offerCompletedBundle(result);
+    if (ClientState.IDLE.equals(context.getState()))
+    {
+      try
+      {
+        transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
+      }
+      catch(Exception e)
+      {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.info(e.getClass().getName() + " : " + e.getMessage());
+      }
+    }
+  }
 }

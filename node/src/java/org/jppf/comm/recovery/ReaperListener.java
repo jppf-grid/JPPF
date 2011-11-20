@@ -26,9 +26,9 @@ import java.util.EventListener;
  */
 public interface ReaperListener extends EventListener
 {
-	/**
-	 * Called when the {@link Reaper} detects that a connection is broken.
-	 * @param event encapsulates the server-side connection to a remote peer.
-	 */
-	void connectionFailed(ReaperEvent event);
+  /**
+   * Called when the {@link Reaper} detects that a connection is broken.
+   * @param event encapsulates the server-side connection to a remote peer.
+   */
+  void connectionFailed(ReaperEvent event);
 }

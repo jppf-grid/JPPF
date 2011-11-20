@@ -31,79 +31,79 @@ import org.slf4j.*;
  */
 public final class VersionUtils
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(VersionUtils.class);
-	/**
-	 * The current JPPF build number.
-	 */
-	private static int buildNumber = -1;
-	/**
-	 * IP address of the current host.
-	 */
-	private static String ip = getLocalIpAddress();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(VersionUtils.class);
+  /**
+   * The current JPPF build number.
+   */
+  private static int buildNumber = -1;
+  /**
+   * IP address of the current host.
+   */
+  private static String ip = getLocalIpAddress();
 
-	/**
-	 * Instantiation of this class is not permitted.
-	 */
-	private VersionUtils()
-	{
-	}
+  /**
+   * Instantiation of this class is not permitted.
+   */
+  private VersionUtils()
+  {
+  }
 
-	/**
-	 * Determine the current JPPF build number.
-	 * @return the number found in the classpath, or 0 if it is not found.
-	 */
-	public static int getBuildNumber()
-	{
-		if (buildNumber < 0)
-		{
-			InputStream is = null;
-			try
-			{
-				is = VersionUtils.class.getClassLoader().getResourceAsStream("build.number");
-				TypedProperties props = new TypedProperties();
-				props.load(is);
-				buildNumber = props.getInt("build.number");
-			}
-			catch(Exception ignored)
-			{
-				buildNumber = 0;
-			}
-			finally
-			{
-				StreamUtils.close(is, log);
-			}
-		}
-		return buildNumber;
-	}
+  /**
+   * Determine the current JPPF build number.
+   * @return the number found in the classpath, or 0 if it is not found.
+   */
+  public static int getBuildNumber()
+  {
+    if (buildNumber < 0)
+    {
+      InputStream is = null;
+      try
+      {
+        is = VersionUtils.class.getClassLoader().getResourceAsStream("build.number");
+        TypedProperties props = new TypedProperties();
+        props.load(is);
+        buildNumber = props.getInt("build.number");
+      }
+      catch(Exception ignored)
+      {
+        buildNumber = 0;
+      }
+      finally
+      {
+        StreamUtils.close(is, log);
+      }
+    }
+    return buildNumber;
+  }
 
-	/**
-	 * Set the current JPPF build number.
-	 * @param buildNumber the build number to set.
-	 */
-	public static void setBuildNumber(final int buildNumber)
-	{
-		VersionUtils.buildNumber = buildNumber;
-	}
+  /**
+   * Set the current JPPF build number.
+   * @param buildNumber the build number to set.
+   */
+  public static void setBuildNumber(final int buildNumber)
+  {
+    VersionUtils.buildNumber = buildNumber;
+  }
 
-	/**
-	 * Get the IP address of the current host.<br>
-	 * @return the IP address as a string in the format &quot;a.b.c.d&quot;.
-	 */
-	public static String getLocalIpAddress()
-	{
-		if (ip != null) return ip;
-		try
-		{
-			InetAddress ip = InetAddress.getLocalHost();
-			return ip.getHostAddress();
-		}
-		catch(UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
-		return null;
-	}
+  /**
+   * Get the IP address of the current host.<br>
+   * @return the IP address as a string in the format &quot;a.b.c.d&quot;.
+   */
+  public static String getLocalIpAddress()
+  {
+    if (ip != null) return ip;
+    try
+    {
+      InetAddress ip = InetAddress.getLocalHost();
+      return ip.getHostAddress();
+    }
+    catch(UnknownHostException e)
+    {
+      e.printStackTrace();
+    }
+    return null;
+  }
 }

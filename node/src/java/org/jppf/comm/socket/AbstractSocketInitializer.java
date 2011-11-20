@@ -26,72 +26,72 @@ import java.util.Random;
  */
 public abstract class AbstractSocketInitializer implements SocketInitializer
 {
-	/**
-	 * Determines whether any connection attempt succeeded.
-	 */
-	protected boolean successfull = false;
-	/**
-	 * Current number of connection attempts.
-	 */
-	protected int attemptCount = 0;
-	/**
-	 * The socket wrapper to initialize.
-	 */
-	protected SocketWrapper socketWrapper = null;
-	/**
-	 * Used to compute a random start delay for this node.
-	 */
-	protected Random rand = new Random(System.currentTimeMillis());
-	/**
-	 * Determine whether this socket initializer has been intentionally closed.
-	 */
-	protected boolean closed = false;
-	/**
-	 * Name given to this initializer.
-	 */
-	protected String name = "";
+  /**
+   * Determines whether any connection attempt succeeded.
+   */
+  protected boolean successfull = false;
+  /**
+   * Current number of connection attempts.
+   */
+  protected int attemptCount = 0;
+  /**
+   * The socket wrapper to initialize.
+   */
+  protected SocketWrapper socketWrapper = null;
+  /**
+   * Used to compute a random start delay for this node.
+   */
+  protected Random rand = new Random(System.currentTimeMillis());
+  /**
+   * Determine whether this socket initializer has been intentionally closed.
+   */
+  protected boolean closed = false;
+  /**
+   * Name given to this initializer.
+   */
+  protected String name = "";
 
-	/**
-	 * Determine whether this socket initializer has been intentionally closed.
-	 * @return true if this socket initializer has been intentionally closed, false otherwise.
-	 * @see org.jppf.comm.socket.SocketInitializer#isClosed()
-	 */
-	@Override
-	public boolean isClosed()
-	{
-		return closed;
-	}
+  /**
+   * Determine whether this socket initializer has been intentionally closed.
+   * @return true if this socket initializer has been intentionally closed, false otherwise.
+   * @see org.jppf.comm.socket.SocketInitializer#isClosed()
+   */
+  @Override
+  public boolean isClosed()
+  {
+    return closed;
+  }
 
-	/**
-	 * Determine whether any connection attempt succeeded.
-	 * @return true if any attempt was successful, false otherwise.
-	 * @see org.jppf.comm.socket.SocketInitializer#isSuccessful()
-	 */
-	@Override
-	public boolean isSuccessful()
-	{
-		return successfull;
-	}
+  /**
+   * Determine whether any connection attempt succeeded.
+   * @return true if any attempt was successful, false otherwise.
+   * @see org.jppf.comm.socket.SocketInitializer#isSuccessful()
+   */
+  @Override
+  public boolean isSuccessful()
+  {
+    return successfull;
+  }
 
-	/**
-	 * Get the name given to this initializer.
-	 * @return the name as a string.
-	 * @see org.jppf.comm.socket.SocketInitializer#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return name;
-	}
+  /**
+   * Get the name given to this initializer.
+   * @return the name as a string.
+   * @see org.jppf.comm.socket.SocketInitializer#getName()
+   */
+  @Override
+  public String getName()
+  {
+    return name;
+  }
 
-	/**
-	 * Set the name given to this initializer.
-	 * @param name the name as a string.
-	 * @see org.jppf.comm.socket.SocketInitializer#setName(java.lang.String)
-	 */
-	@Override
-	public void setName(final String name)
-	{
-		this.name = name;
-	}
+  /**
+   * Set the name given to this initializer.
+   * @param name the name as a string.
+   * @see org.jppf.comm.socket.SocketInitializer#setName(java.lang.String)
+   */
+  @Override
+  public void setName(final String name)
+  {
+    this.name = name;
+  }
 }

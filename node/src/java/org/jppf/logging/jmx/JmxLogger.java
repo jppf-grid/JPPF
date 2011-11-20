@@ -27,13 +27,13 @@ import javax.management.NotificationEmitter;
  */
 public interface JmxLogger extends NotificationEmitter
 {
-	/**
-	 * Name of the driver's logger MBean.
-	 */
-	String DEFAULT_MBEAN_NAME = "org.jppf:name=jmxlogger,type=all";
-	/**
-	 * Log the specified message with the specified level.
-	 * @param message the message to log.
-	 */
-	void log(String message);
+  /**
+   * Name of the driver's logger MBean.
+   */
+  String DEFAULT_MBEAN_NAME = "org.jppf:name=jmxlogger,type=all";
+  /**
+   * Log the specified message with the specified level.
+   * @param message the message to log.
+   */
+  void log(String message);
 }

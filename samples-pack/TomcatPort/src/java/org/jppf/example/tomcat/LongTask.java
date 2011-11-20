@@ -25,80 +25,80 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class LongTask extends JPPFTask
 {
-	/**
-	 * Determines how long this task will run.
-	 */
-	private long taskLength = 0L;
-	/**
-	 * Timestamp marking the time when the task execution starts.
-	 */
-	private long taskStart = 0L;
-	/**
-	 * Determines this task's behavior: false if it should just sleep during its allocated time, or true if it should
-	 * do some make-do work that uses the cpu.
-	 */
-	private boolean useCPU = false;
+  /**
+   * Determines how long this task will run.
+   */
+  private long taskLength = 0L;
+  /**
+   * Timestamp marking the time when the task execution starts.
+   */
+  private long taskStart = 0L;
+  /**
+   * Determines this task's behavior: false if it should just sleep during its allocated time, or true if it should
+   * do some make-do work that uses the cpu.
+   */
+  private boolean useCPU = false;
 
-	/**
-	 * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
-	 * @param taskLength - determines how long this task will run.
-	 * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
-	 */
-	public LongTask(final long taskLength, final boolean useCPU)
-	{
-		this.taskLength = taskLength;
-		this.useCPU = useCPU;
-	}
+  /**
+   * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
+   * @param taskLength - determines how long this task will run.
+   * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
+   */
+  public LongTask(final long taskLength, final boolean useCPU)
+  {
+    this.taskLength = taskLength;
+    this.useCPU = useCPU;
+  }
 
-	/**
-	 * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
-	 * @param taskLength determines how long this task will run.
-	 */
-	public LongTask(final long taskLength)
-	{
-		this(taskLength, false);
-	}
+  /**
+   * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
+   * @param taskLength determines how long this task will run.
+   */
+  public LongTask(final long taskLength)
+  {
+    this(taskLength, false);
+  }
 
-	/**
-	 * Perform the execution of this task.
-	 * @see sample.BaseDemoTask#doWork()
-	 */
-	@Override
-	public void run()
-	{
-		taskStart = System.currentTimeMillis();
-		double elapsed = 0L;
-		if (useCPU)
-		{
-			for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
-			{
-				String s = "";
-				for (int i=0; i<10; i++) s += "A"+"10";
-			}
-		}
-		else
-		{
-			try
-			{
-				Thread.sleep(taskLength);
-				elapsed = System.currentTimeMillis() - taskStart;
-				setResult("task has run for " + elapsed + " ms");
-			}
-			catch(InterruptedException e)
-			{
-				setException(e);
-				setResult("error executing this task: " + e.getMessage());
-			}
-		}
-	}
+  /**
+   * Perform the execution of this task.
+   * @see sample.BaseDemoTask#doWork()
+   */
+  @Override
+  public void run()
+  {
+    taskStart = System.currentTimeMillis();
+    double elapsed = 0L;
+    if (useCPU)
+    {
+      for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
+      {
+        String s = "";
+        for (int i=0; i<10; i++) s += "A"+"10";
+      }
+    }
+    else
+    {
+      try
+      {
+        Thread.sleep(taskLength);
+        elapsed = System.currentTimeMillis() - taskStart;
+        setResult("task has run for " + elapsed + " ms");
+      }
+      catch(InterruptedException e)
+      {
+        setException(e);
+        setResult("error executing this task: " + e.getMessage());
+      }
+    }
+  }
 
-	/**
-	 * Called when this task is cancelled.
-	 * @see org.jppf.server.protocol.JPPFTask#onCancel()
-	 */
-	@Override
-	public void onCancel()
-	{
-		setResult("this task has been cancelled");
-	}
+  /**
+   * Called when this task is cancelled.
+   * @see org.jppf.server.protocol.JPPFTask#onCancel()
+   */
+  @Override
+  public void onCancel()
+  {
+    setResult("this task has been cancelled");
+  }
 }

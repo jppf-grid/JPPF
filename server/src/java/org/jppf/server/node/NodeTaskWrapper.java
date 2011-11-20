@@ -30,84 +30,84 @@ import org.jppf.node.protocol.Task;
  */
 class NodeTaskWrapper extends AbstractNodeTaskWrapper
 {
-	/**
-	 * The JPPF node that runs this task.
-	 */
-	private final JPPFNode node;
-    /**
-     * The execution manager.
-     */
-    private final NodeExecutionManagerImpl executionManager;
+  /**
+   * The JPPF node that runs this task.
+   */
+  private final JPPFNode node;
+  /**
+   * The execution manager.
+   */
+  private final NodeExecutionManagerImpl executionManager;
 
-	/**
-	 * Initialize this task wrapper with a specified JPPF task.
-	 * @param node the JPPF node that runs this task.
-	 * @param task the task to execute within a try/catch block.
-	 * @param uuidPath the key to the JPPFContainer for the task's classloader.
-	 * @param number the internal number identifying the task for the thread pool.
-	 */
-	public NodeTaskWrapper(final JPPFNode node, final Task task, final List<String> uuidPath, final long number)
-	{
-		super(task, uuidPath, number);
-		this.node = node;
-		this.executionManager = node.getExecutionManager();
-	}
+  /**
+   * Initialize this task wrapper with a specified JPPF task.
+   * @param node the JPPF node that runs this task.
+   * @param task the task to execute within a try/catch block.
+   * @param uuidPath the key to the JPPFContainer for the task's classloader.
+   * @param number the internal number identifying the task for the thread pool.
+   */
+  public NodeTaskWrapper(final JPPFNode node, final Task task, final List<String> uuidPath, final long number)
+  {
+    super(task, uuidPath, number);
+    this.node = node;
+    this.executionManager = node.getExecutionManager();
+  }
 
-	/**
-	 * Execute the task within a try/catch block.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run()
-	{
-		JPPFNodeAdmin nodeAdmin = null;
-		long cpuTime = 0L;
-		long elapsedTime = 0L;
-		try
-		{
-			Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
-			long id = Thread.currentThread().getId();
-			executionManager.processTaskTimeout(task, number);
-			long startTime = System.currentTimeMillis();
-			long startCpuTime = executionManager.getCpuTime(id);
-			task.run();
-			try
-			{
-				// convert cpu time from nanoseconds to milliseconds
-				cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
-				elapsedTime = System.currentTimeMillis() - startTime;
-			}
-			catch(Throwable ignore)
-			{
-			}
-		}
-		catch(JPPFNodeReconnectionNotification t)
-		{
-			reconnectionNotification = t;
-		}
-		catch(Throwable t)
-		{
-			if (t instanceof Exception) task.setException((Exception) t);
-			else task.setException(new JPPFException(t));
-		}
-		finally
-		{
-			if (reconnectionNotification == null)
-			{
-				try
-				{
-					executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
-				}
-				catch(JPPFNodeReconnectionNotification t)
-				{
-					reconnectionNotification = t;
-				}
-			}
-			if (reconnectionNotification != null)
-			{
-				executionManager.setReconnectionNotification(reconnectionNotification);
-				executionManager.wakeUp();
-			}
-		}
-	}
+  /**
+   * Execute the task within a try/catch block.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  public void run()
+  {
+    JPPFNodeAdmin nodeAdmin = null;
+    long cpuTime = 0L;
+    long elapsedTime = 0L;
+    try
+    {
+      Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
+      long id = Thread.currentThread().getId();
+      executionManager.processTaskTimeout(task, number);
+      long startTime = System.currentTimeMillis();
+      long startCpuTime = executionManager.getCpuTime(id);
+      task.run();
+      try
+      {
+        // convert cpu time from nanoseconds to milliseconds
+        cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
+        elapsedTime = System.currentTimeMillis() - startTime;
+      }
+      catch(Throwable ignore)
+      {
+      }
+    }
+    catch(JPPFNodeReconnectionNotification t)
+    {
+      reconnectionNotification = t;
+    }
+    catch(Throwable t)
+    {
+      if (t instanceof Exception) task.setException((Exception) t);
+      else task.setException(new JPPFException(t));
+    }
+    finally
+    {
+      if (reconnectionNotification == null)
+      {
+        try
+        {
+          executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+        }
+        catch(JPPFNodeReconnectionNotification t)
+        {
+          reconnectionNotification = t;
+        }
+      }
+      if (reconnectionNotification != null)
+      {
+        executionManager.setReconnectionNotification(reconnectionNotification);
+        executionManager.wakeUp();
+      }
+    }
+  }
 }

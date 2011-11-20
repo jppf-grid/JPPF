@@ -26,14 +26,14 @@ import org.jppf.node.protocol.JobMetadata;
  */
 public interface JobAwareness
 {
-	/**
-	 * Get the current job's metadata.
-	 * @return a {@link JPPFJobMetadata} instance.
-	 */
-	JobMetadata getJobMetadata();
-	/**
-	 * Set the current job's metadata.
-	 * @param metadata a {@link JPPFJobMetadata} instance.
-	 */
-	void setJobMetadata(JobMetadata metadata);
+  /**
+   * Get the current job's metadata.
+   * @return a {@link JPPFJobMetadata} instance.
+   */
+  JobMetadata getJobMetadata();
+  /**
+   * Set the current job's metadata.
+   * @param metadata a {@link JPPFJobMetadata} instance.
+   */
+  void setJobMetadata(JobMetadata metadata);
 }

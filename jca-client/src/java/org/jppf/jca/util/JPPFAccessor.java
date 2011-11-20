@@ -31,32 +31,32 @@ import org.jppf.jca.work.JPPFJcaClient;
 public interface JPPFAccessor
 {
 
-	/**
-	 * Get the JPPF client used to submit tasks.
-	 * @return a <code>JPPFJcaClient</code> instance.
-	 */
-	JPPFJcaClient getJppfClient();
+  /**
+   * Get the JPPF client used to submit tasks.
+   * @return a <code>JPPFJcaClient</code> instance.
+   */
+  JPPFJcaClient getJppfClient();
 
-	/**
-	 * Set the JPPF client used to submit tasks.
-	 * @param jppfClient a <code>JPPFJcaClient</code> instance.
-	 */
-	void setJppfClient(JPPFJcaClient jppfClient);
+  /**
+   * Set the JPPF client used to submit tasks.
+   * @param jppfClient a <code>JPPFJcaClient</code> instance.
+   */
+  void setJppfClient(JPPFJcaClient jppfClient);
 
-	/**
-	 * Get the log writer for this object.
-	 * @return a <code>PrintWriter</code> instance.
-	 * @throws ResourceException if the log writer could not be obtained.
-	 * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
-	 */
-	PrintWriter getLogWriter() throws ResourceException;
+  /**
+   * Get the log writer for this object.
+   * @return a <code>PrintWriter</code> instance.
+   * @throws ResourceException if the log writer could not be obtained.
+   * @see javax.resource.spi.ManagedConnectionFactory#getLogWriter()
+   */
+  PrintWriter getLogWriter() throws ResourceException;
 
-	/**
-	 * Set the log writer for this object.
-	 * @param writer a <code>PrintWriter</code> instance.
-	 * @throws ResourceException if the log writer could not be set.
-	 * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
-	 */
-	void setLogWriter(PrintWriter writer) throws ResourceException;
+  /**
+   * Set the log writer for this object.
+   * @param writer a <code>PrintWriter</code> instance.
+   * @throws ResourceException if the log writer could not be set.
+   * @see javax.resource.spi.ManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
+   */
+  void setLogWriter(PrintWriter writer) throws ResourceException;
 
 }

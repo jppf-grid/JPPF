@@ -24,20 +24,20 @@ import java.io.Serializable;
  */
 public class ExecutionReport implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Name of the method executed.
-	 */
-	public String methodName = "";
-	/**
-	 * Stack trace of the resulting exception, if any.
-	 */
-	public String stackTrace = "";
-	/**
-	 * Description of the test.
-	 */
-	public String description = "";
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Name of the method executed.
+   */
+  public String methodName = "";
+  /**
+   * Stack trace of the resulting exception, if any.
+   */
+  public String stackTrace = "";
+  /**
+   * Description of the test.
+   */
+  public String description = "";
 }

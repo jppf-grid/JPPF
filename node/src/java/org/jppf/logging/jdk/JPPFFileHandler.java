@@ -27,27 +27,27 @@ import java.util.logging.*;
  */
 public class JPPFFileHandler extends FileHandler
 {
-	/**
-	 * The log formatter.
-	 */
-	private JPPFLogFormatter jppfFormatter = new JPPFLogFormatter();
+  /**
+   * The log formatter.
+   */
+  private JPPFLogFormatter jppfFormatter = new JPPFLogFormatter();
 
-	/**
-	 * Initialize this Handler.
-	 * @throws IOException if any I/O error occurs.
-	 * @throws SecurityException if an operation is not allowed.
-	 */
-	public JPPFFileHandler() throws IOException, SecurityException
-	{
-		super();
-	}
+  /**
+   * Initialize this Handler.
+   * @throws IOException if any I/O error occurs.
+   * @throws SecurityException if an operation is not allowed.
+   */
+  public JPPFFileHandler() throws IOException, SecurityException
+  {
+    super();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formatter getFormatter()
-	{
-		return jppfFormatter;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Formatter getFormatter()
+  {
+    return jppfFormatter;
+  }
 }

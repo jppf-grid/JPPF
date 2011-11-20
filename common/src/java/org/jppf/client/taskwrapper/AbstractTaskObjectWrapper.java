@@ -26,23 +26,23 @@ package org.jppf.client.taskwrapper;
  */
 public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The type of the method to execute on the object.
-	 */
-	protected MethodType methodType = MethodType.INSTANCE;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The type of the method to execute on the object.
+   */
+  protected MethodType methodType = MethodType.INSTANCE;
 
-	/**
-	 * The type of the method to execute on the object.
-	 * @return a <code>MethodType</code> enum value.
-	 * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getMethodType()
-	 */
-	@Override
-	public MethodType getMethodType()
-	{
-		return null;
-	}
+  /**
+   * The type of the method to execute on the object.
+   * @return a <code>MethodType</code> enum value.
+   * @see org.jppf.client.taskwrapper.TaskObjectWrapper#getMethodType()
+   */
+  @Override
+  public MethodType getMethodType()
+  {
+    return null;
+  }
 }

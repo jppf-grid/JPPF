@@ -38,184 +38,184 @@ import org.slf4j.*;
  */
 public class NodeSystemTray implements NodeLifeCycleListener
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(NodeSystemTray.class);
-	/**
-	 * The icon displayed in the system tray.
-	 */
-	private TrayIcon trayIcon = null;
-	/**
-	 * The icons displayed.
-	 */
-	private static Image[] images = initializeImages();
-	/**
-	 * The wrapper used to access management functionalities.
-	 */
-	private JMXNodeConnectionWrapper wrapper = null;
-	/**
-	 * Proxy to the task monitor MBean.
-	 */
-	private JPPFNodeTaskMonitorMBean taskMonitor = null;
-	/**
-	 * Used to synchronize tooltip and icon updates.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodeSystemTray.class);
+  /**
+   * The icon displayed in the system tray.
+   */
+  private TrayIcon trayIcon = null;
+  /**
+   * The icons displayed.
+   */
+  private static Image[] images = initializeImages();
+  /**
+   * The wrapper used to access management functionalities.
+   */
+  private JMXNodeConnectionWrapper wrapper = null;
+  /**
+   * Proxy to the task monitor MBean.
+   */
+  private JPPFNodeTaskMonitorMBean taskMonitor = null;
+  /**
+   * Used to synchronize tooltip and icon updates.
+   */
+  private ReentrantLock lock = new ReentrantLock();
 
-	/**
-	 * Default constructor.
-	 */
-	public NodeSystemTray()
-	{
-		try
-		{
-			SystemTray tray = SystemTray.getSystemTray();
-			TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
-			if (oldTrayIcon != null) tray.remove(oldTrayIcon);
-			trayIcon = new TrayIcon(images[1]);
-			trayIcon.setImageAutoSize(true);
-			tray.add(trayIcon);
-			NodeRunner.setPersistentData("JPPFNodeTrayIcon", trayIcon);
-			initJMX();
-			trayIcon.setToolTip(generateTooltipText());
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Default constructor.
+   */
+  public NodeSystemTray()
+  {
+    try
+    {
+      SystemTray tray = SystemTray.getSystemTray();
+      TrayIcon oldTrayIcon = (TrayIcon) NodeRunner.getPersistentData("JPPFNodeTrayIcon");
+      if (oldTrayIcon != null) tray.remove(oldTrayIcon);
+      trayIcon = new TrayIcon(images[1]);
+      trayIcon.setImageAutoSize(true);
+      tray.add(trayIcon);
+      NodeRunner.setPersistentData("JPPFNodeTrayIcon", trayIcon);
+      initJMX();
+      trayIcon.setToolTip(generateTooltipText());
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 
-	/**
-	 * Initialize the JMX wrapper and register a listener to the task monitor mbean notifications.
-	 */
-	private void initJMX()
-	{
-		try
-		{
-			wrapper = new JMXNodeConnectionWrapper();
-			wrapper.connectAndWait(5000);
-			trayIcon.setImage(images[1]);
-			taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
-			taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Initialize the JMX wrapper and register a listener to the task monitor mbean notifications.
+   */
+  private void initJMX()
+  {
+    try
+    {
+      wrapper = new JMXNodeConnectionWrapper();
+      wrapper.connectAndWait(5000);
+      trayIcon.setImage(images[1]);
+      taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
+      taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 
-	/**
-	 * Generate the tooltip for the tray icon.
-	 * @return the tooltip as a string.
-	 */
-	private String generateTooltipText()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("Node localhost:").append(JPPFConfiguration.getProperties().getInt("jppf.management.port")).append("\n");
-		if (taskMonitor != null)
-		{
-			sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
-			sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
-			sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
-			sb.append("CPU time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskCpuTime())).append("\n");
-			sb.append("Clock time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
-		}
-		return sb.toString();
-	}
+  /**
+   * Generate the tooltip for the tray icon.
+   * @return the tooltip as a string.
+   */
+  private String generateTooltipText()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Node localhost:").append(JPPFConfiguration.getProperties().getInt("jppf.management.port")).append("\n");
+    if (taskMonitor != null)
+    {
+      sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
+      sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
+      sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
+      sb.append("CPU time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskCpuTime())).append("\n");
+      sb.append("Clock time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
+    }
+    return sb.toString();
+  }
 
-	/**
-	 * Listener for task-level events.
-	 */
-	public class JMXNotificationListener implements NotificationListener
-	{
-		/**
-		 * Handle task-level notifications. Here, we simply update the tray icon's tooltip text.
-		 * @param notification the notification.
-		 * @param handback not used.
-		 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
-		 */
-		@Override
-		public void handleNotification(final Notification notification, final Object handback)
-		{
-			if (lock.tryLock())
-			{
-				try
-				{
-					String s = generateTooltipText();
-					trayIcon.setToolTip(s);
-				}
-				finally
-				{
-					lock.unlock();
-				}
-			}
-		}
-	}
+  /**
+   * Listener for task-level events.
+   */
+  public class JMXNotificationListener implements NotificationListener
+  {
+    /**
+     * Handle task-level notifications. Here, we simply update the tray icon's tooltip text.
+     * @param notification the notification.
+     * @param handback not used.
+     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+     */
+    @Override
+    public void handleNotification(final Notification notification, final Object handback)
+    {
+      if (lock.tryLock())
+      {
+        try
+        {
+          String s = generateTooltipText();
+          trayIcon.setToolTip(s);
+        }
+        finally
+        {
+          lock.unlock();
+        }
+      }
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void nodeStarting(final NodeLifeCycleEvent event)
-	{
-		trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
-		lock.lock();
-		try
-		{
-			// node is disconnected, display the green icon
-			trayIcon.setImage(images[0]);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void nodeStarting(final NodeLifeCycleEvent event)
+  {
+    trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
+    lock.lock();
+    try
+    {
+      // node is disconnected, display the green icon
+      trayIcon.setImage(images[0]);
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void nodeEnding(final NodeLifeCycleEvent event)
-	{
-		trayIcon.displayMessage("JPPF Node disconnected from the server!", "attempting reconnection ...", MessageType.ERROR);
-		lock.lock();
-		try
-		{
-			// node is disconnected, display the red icon
-			trayIcon.setImage(images[1]);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void nodeEnding(final NodeLifeCycleEvent event)
+  {
+    trayIcon.displayMessage("JPPF Node disconnected from the server!", "attempting reconnection ...", MessageType.ERROR);
+    lock.lock();
+    try
+    {
+      // node is disconnected, display the red icon
+      trayIcon.setImage(images[1]);
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void jobStarting(final NodeLifeCycleEvent event)
-	{
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void jobStarting(final NodeLifeCycleEvent event)
+  {
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void jobEnding(final NodeLifeCycleEvent event)
-	{
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void jobEnding(final NodeLifeCycleEvent event)
+  {
+  }
 
-	/**
-	 * Initialize the icons used in the tray panel.
-	 * @return an array of {@link Image} objects.
-	 */
-	private static Image[] initializeImages()
-	{
-		Image[] img = new Image[2];
-		img[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_green.gif"));
-		img[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_red.gif"));
-		return img;
-	}
+  /**
+   * Initialize the icons used in the tray panel.
+   * @return an array of {@link Image} objects.
+   */
+  private static Image[] initializeImages()
+  {
+    Image[] img = new Image[2];
+    img[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_green.gif"));
+    img[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_red.gif"));
+    return img;
+  }
 }

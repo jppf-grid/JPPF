@@ -27,44 +27,44 @@ import org.slf4j.*;
  */
 class JobScheduleAction implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(JobScheduleAction.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * The bundle wrapper encapsulating the job.
-	 */
-	private ServerJob bundleWrapper = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JobScheduleAction.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The bundle wrapper encapsulating the job.
+   */
+  private ServerJob bundleWrapper = null;
 
-	/**
-	 * Initialize this action with the specified bundle wrapper.
-	 * @param bundleWrapper the bundle wrapper encapsulating the job.
-	 */
-	public JobScheduleAction(final ServerJob bundleWrapper)
-	{
-		this.bundleWrapper = bundleWrapper;
-	}
+  /**
+   * Initialize this action with the specified bundle wrapper.
+   * @param bundleWrapper the bundle wrapper encapsulating the job.
+   */
+  public JobScheduleAction(final ServerJob bundleWrapper)
+  {
+    this.bundleWrapper = bundleWrapper;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void run()
-	{
-		synchronized(bundleWrapper)
-		{
-			JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-			if (debugEnabled)
-			{
-				String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-				log.debug("job '" + jobId + "' is resuming");
-			}
-			bundle.setParameter(BundleParameter.JOB_PENDING, false);
-			JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run()
+  {
+    synchronized(bundleWrapper)
+    {
+      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+      if (debugEnabled)
+      {
+        String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+        log.debug("job '" + jobId + "' is resuming");
+      }
+      bundle.setParameter(BundleParameter.JOB_PENDING, false);
+      JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
+    }
+  }
 }

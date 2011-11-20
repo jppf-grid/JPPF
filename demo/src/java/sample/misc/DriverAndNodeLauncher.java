@@ -27,36 +27,36 @@ import org.jppf.server.JPPFDriver;
  */
 public class DriverAndNodeLauncher
 {
-	/**
-	 * Entry point for this test application.
-	 * @param args not used.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			Runnable driver = new Runnable()
-			{
-				@Override
-                public void run()
-				{
-					JPPFDriver.main("noLauncher");
-				}
-			};
-			Runnable node = new Runnable()
-			{
-				@Override
-                public void run()
-				{
-					NodeRunner.main("noLauncher");
-				}
-			};
-			new Thread(driver).start();
-			new Thread(node).start();
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-		}
-	}
+  /**
+   * Entry point for this test application.
+   * @param args not used.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      Runnable driver = new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          JPPFDriver.main("noLauncher");
+        }
+      };
+      Runnable node = new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          NodeRunner.main("noLauncher");
+        }
+      };
+      new Thread(driver).start();
+      new Thread(node).start();
+    }
+    catch(Throwable t)
+    {
+      t.printStackTrace();
+    }
+  }
 }

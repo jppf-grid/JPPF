@@ -30,81 +30,81 @@ import org.jppf.utils.streams.StreamConstants;
  */
 public class StreamOutputDestination implements OutputDestination
 {
-	/**
-	 * The output stream to write to.
-	 */
-	private OutputStream os = null;
+  /**
+   * The output stream to write to.
+   */
+  private OutputStream os = null;
 
-	/**
-	 * Initialize this input source with the specified data.
-	 * @param os the output stream to write to.
-	 */
-	public StreamOutputDestination(final OutputStream os)
-	{
-		this.os = os;
-	}
+  /**
+   * Initialize this input source with the specified data.
+   * @param os the output stream to write to.
+   */
+  public StreamOutputDestination(final OutputStream os)
+  {
+    this.os = os;
+  }
 
-	/**
-	 * Write data to this output destination from an array of bytes.
-	 * @param buffer the buffer containing the data to write.
-	 * @param offset the position in the buffer where to start reading the data.
-	 * @param len the size in bytes of the data to write.
-	 * @return the number of bytes actually written, or -1 if end of stream was reached.
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.OutputDestination#write(byte[], int, int)
-	 */
-	@Override
-	public int write(final byte[] buffer, final int offset, final int len) throws Exception
-	{
-		os.write(buffer, offset, len);
-		return len;
-	}
+  /**
+   * Write data to this output destination from an array of bytes.
+   * @param buffer the buffer containing the data to write.
+   * @param offset the position in the buffer where to start reading the data.
+   * @param len the size in bytes of the data to write.
+   * @return the number of bytes actually written, or -1 if end of stream was reached.
+   * @throws Exception if an IO error occurs.
+   * @see org.jppf.io.OutputDestination#write(byte[], int, int)
+   */
+  @Override
+  public int write(final byte[] buffer, final int offset, final int len) throws Exception
+  {
+    os.write(buffer, offset, len);
+    return len;
+  }
 
-	/**
-	 * Write data to this output destination from a byte buffer.
-	 * @param buffer the buffer containing the data to write.
-	 * @return the number of bytes actually written, or -1 if end of stream was reached.
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
-	 */
-	@Override
-	public int write(final ByteBuffer buffer) throws Exception
-	{
-		int pos = buffer.position();
-		ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
-		byte[] bytes = tmp.array();
-		while (buffer.remaining() > 0)
-		{
-			int n = buffer.position();
-			buffer.get(bytes, 0, Math.min(buffer.remaining(), bytes.length));
-			n = buffer.position() - n;
-			if (n <= 0) break;
-			os.write(bytes, 0, n);
-		}
-		return buffer.position() - pos;
-	}
+  /**
+   * Write data to this output destination from a byte buffer.
+   * @param buffer the buffer containing the data to write.
+   * @return the number of bytes actually written, or -1 if end of stream was reached.
+   * @throws Exception if an IO error occurs.
+   * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
+   */
+  @Override
+  public int write(final ByteBuffer buffer) throws Exception
+  {
+    int pos = buffer.position();
+    ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
+    byte[] bytes = tmp.array();
+    while (buffer.remaining() > 0)
+    {
+      int n = buffer.position();
+      buffer.get(bytes, 0, Math.min(buffer.remaining(), bytes.length));
+      n = buffer.position() - n;
+      if (n <= 0) break;
+      os.write(bytes, 0, n);
+    }
+    return buffer.position() - pos;
+  }
 
-	/**
-	 * Write an int value to this output destination.
-	 * @param value the value to write.
-	 * @throws Exception if an IO error occurs.
-	 * @see org.jppf.io.OutputDestination#writeInt(int)
-	 */
-	@Override
-	public void writeInt(final int value) throws Exception
-	{
-		byte[] bytes = SerializationUtils.writeInt(value);
-		os.write(bytes);
-	}
+  /**
+   * Write an int value to this output destination.
+   * @param value the value to write.
+   * @throws Exception if an IO error occurs.
+   * @see org.jppf.io.OutputDestination#writeInt(int)
+   */
+  @Override
+  public void writeInt(final int value) throws Exception
+  {
+    byte[] bytes = SerializationUtils.writeInt(value);
+    os.write(bytes);
+  }
 
-	/**
-	 * Close this output destination and release any system resources associated with it.
-	 * @throws IOException if an IO error occurs.
-	 * @see java.io.Closeable#close()
-	 */
-	@Override
-	public void close() throws IOException
-	{
-		os.close();
-	}
+  /**
+   * Close this output destination and release any system resources associated with it.
+   * @throws IOException if an IO error occurs.
+   * @see java.io.Closeable#close()
+   */
+  @Override
+  public void close() throws IOException
+  {
+    os.close();
+  }
 }

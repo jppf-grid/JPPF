@@ -27,91 +27,91 @@ import javax.swing.*;
  */
 public class ToolbarSeparatorOption extends AbstractOption
 {
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public ToolbarSeparatorOption()
-	{
-		//UIComponent = new JToolBar.Separator();
-		UIComponent = new JLabel("|");
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public ToolbarSeparatorOption()
+  {
+    //UIComponent = new JToolBar.Separator();
+    UIComponent = new JLabel("|");
+  }
 
-	/**
-	 * Initialize this separator with the specified parameters.
-	 * @param width the filler's width
-	 * @param height the filler's height.
-	 */
-	public ToolbarSeparatorOption(final int width, final int height)
-	{
-		this(" ", width, height);
-	}
+  /**
+   * Initialize this separator with the specified parameters.
+   * @param width the filler's width
+   * @param height the filler's height.
+   */
+  public ToolbarSeparatorOption(final int width, final int height)
+  {
+    this(" ", width, height);
+  }
 
-	/**
-	 * Initialize this separator with the specified parameters.
-	 * @param labelText the filler's text.
-	 * @param width the filler's width
-	 * @param height the filler's height.
-	 */
-	public ToolbarSeparatorOption(final String labelText, final int width, final int height)
-	{
-		//UIComponent = new JToolBar.Separator();
-		UIComponent = new JLabel(labelText);
-		((JLabel) UIComponent).setHorizontalAlignment(SwingConstants.CENTER);
-		((JLabel) UIComponent).setVerticalAlignment(SwingConstants.CENTER);
-		UIComponent.setForeground(UIComponent.getForeground().brighter());
-		if ((width > 0) && (height > 0))
-		{
-			UIComponent.setPreferredSize(new Dimension(width, height));
-		}
-	}
+  /**
+   * Initialize this separator with the specified parameters.
+   * @param labelText the filler's text.
+   * @param width the filler's width
+   * @param height the filler's height.
+   */
+  public ToolbarSeparatorOption(final String labelText, final int width, final int height)
+  {
+    //UIComponent = new JToolBar.Separator();
+    UIComponent = new JLabel(labelText);
+    ((JLabel) UIComponent).setHorizontalAlignment(SwingConstants.CENTER);
+    ((JLabel) UIComponent).setVerticalAlignment(SwingConstants.CENTER);
+    UIComponent.setForeground(UIComponent.getForeground().brighter());
+    if ((width > 0) && (height > 0))
+    {
+      UIComponent.setPreferredSize(new Dimension(width, height));
+    }
+  }
 
-	/**
-	 * Create the UI components for this option.
-	 */
-	@Override
-	public void createUI()
-	{
-	}
+  /**
+   * Create the UI components for this option.
+   */
+  @Override
+  public void createUI()
+  {
+  }
 
-	/**
-	 * Get the current value for this option.
-	 * @return null.
-	 * @see org.jppf.ui.options.AbstractOption#getValue()
-	 */
-	@Override
-	public Object getValue()
-	{
-		return null;
-	}
+  /**
+   * Get the current value for this option.
+   * @return null.
+   * @see org.jppf.ui.options.AbstractOption#getValue()
+   */
+  @Override
+  public Object getValue()
+  {
+    return null;
+  }
 
-	/**
-	 * Propagate the state changes of the underlying checkbox to the listeners to this option.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-	}
+  /**
+   * Propagate the state changes of the underlying checkbox to the listeners to this option.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.Option#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+  }
 
-	/**
-	 * This method always returns false, since buttons have no value to persist.
-	 * @return false.
-	 * @see org.jppf.ui.options.AbstractOption#isPersistent()
-	 */
-	@Override
-	public boolean isPersistent()
-	{
-		return false;
-	}
+  /**
+   * This method always returns false, since buttons have no value to persist.
+   * @return false.
+   * @see org.jppf.ui.options.AbstractOption#isPersistent()
+   */
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
 }

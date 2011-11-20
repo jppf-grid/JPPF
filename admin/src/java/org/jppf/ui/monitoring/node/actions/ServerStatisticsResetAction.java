@@ -29,79 +29,79 @@ import org.slf4j.*;
  */
 public class ServerStatisticsResetAction extends AbstractTopologyAction
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ServerStatisticsResetAction.class);
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ServerStatisticsResetAction.class);
 
-	/**
-	 * Initialize this action.
-	 */
-	public ServerStatisticsResetAction()
-	{
-		setupIcon("/org/jppf/ui/resources/server_reset_stats.gif");
-		setupNameAndTooltip("driver.reset.statistics");
-	}
+  /**
+   * Initialize this action.
+   */
+  public ServerStatisticsResetAction()
+  {
+    setupIcon("/org/jppf/ui/resources/server_reset_stats.gif");
+    setupNameAndTooltip("driver.reset.statistics");
+  }
 
-	/**
-	 * Update this action's enabled state based on a list of selected elements.
-	 * This method sets the enabled state to true if at list one driver is selected in the tree.
-	 * @param selectedElements a list of objects.
-	 * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
-	 */
-	@Override
-	public void updateState(final List<Object> selectedElements)
-	{
-		this.selectedElements = selectedElements;
-		for (Object o: selectedElements)
-		{
-			if (!(o instanceof TopologyData)) continue;
-			TopologyData data = (TopologyData) o;
-			if (TopologyDataType.DRIVER.equals(data.getType()))
-			{
-				setEnabled(true);
-				return;
-			}
-		}
-		setEnabled(false);
-	}
+  /**
+   * Update this action's enabled state based on a list of selected elements.
+   * This method sets the enabled state to true if at list one driver is selected in the tree.
+   * @param selectedElements a list of objects.
+   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   */
+  @Override
+  public void updateState(final List<Object> selectedElements)
+  {
+    this.selectedElements = selectedElements;
+    for (Object o: selectedElements)
+    {
+      if (!(o instanceof TopologyData)) continue;
+      TopologyData data = (TopologyData) o;
+      if (TopologyDataType.DRIVER.equals(data.getType()))
+      {
+        setEnabled(true);
+        return;
+      }
+    }
+    setEnabled(false);
+  }
 
-	/**
-	 * Perform the action.
-	 * @param event encapsulates the source of the event and additional information.
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	@Override
-	public void actionPerformed(final ActionEvent event)
-	{
-		try
-		{
-			final List<JMXDriverConnectionWrapper> driverConnections = new ArrayList<JMXDriverConnectionWrapper>();
-			for (Object o: selectedElements)
-			{
-				if (!(o instanceof TopologyData)) continue;
-				TopologyData data = (TopologyData) o;
-				if (TopologyDataType.DRIVER.equals(data.getType()))
-					driverConnections.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
-			}
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					for (JMXDriverConnectionWrapper jmx: driverConnections) {
-						try {
-							jmx.resetStatistics();
-						}
-						catch(Exception e) {
-							log.error(e.getMessage(), e);
-						}
-					}
-				}
-			};
-			new Thread(r).start();
-		}
-		catch(Exception e)
-		{
-			log.error(e.getMessage(), e);
-		}
-	}
+  /**
+   * Perform the action.
+   * @param event encapsulates the source of the event and additional information.
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    try
+    {
+      final List<JMXDriverConnectionWrapper> driverConnections = new ArrayList<JMXDriverConnectionWrapper>();
+      for (Object o: selectedElements)
+      {
+        if (!(o instanceof TopologyData)) continue;
+        TopologyData data = (TopologyData) o;
+        if (TopologyDataType.DRIVER.equals(data.getType()))
+          driverConnections.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
+      }
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          for (JMXDriverConnectionWrapper jmx: driverConnections) {
+            try {
+              jmx.resetStatistics();
+            }
+            catch(Exception e) {
+              log.error(e.getMessage(), e);
+            }
+          }
+        }
+      };
+      new Thread(r).start();
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
 }

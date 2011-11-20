@@ -30,27 +30,27 @@ import org.jppf.JPPFException;
  */
 public class JPPFApplicationServer extends JPPFServer
 {
-	/**
-	 * Initialize this socket server with a specified execution service and port number.
-	 * @param port the port this socket server is listening to.
-	 * @throws JPPFException if the underlying server socket can't be opened.
-	 */
-	public JPPFApplicationServer(final int port) throws JPPFException
-	{
-		super(port, "Application Server Thread on port " + port);
-	}
+  /**
+   * Initialize this socket server with a specified execution service and port number.
+   * @param port the port this socket server is listening to.
+   * @throws JPPFException if the underlying server socket can't be opened.
+   */
+  public JPPFApplicationServer(final int port) throws JPPFException
+  {
+    super(port, "Application Server Thread on port " + port);
+  }
 
-	/**
-	 * Instantiate a wrapper for the socket connection opened by this socket server.
-	 * Subclasses must implement this method.
-	 * @param socket the socket connection obtained through a call to
-	 * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
-	 * @return a <code>JPPFServerConnection</code> instance.
-	 * @throws JPPFException if an exception is raised while creating the socket handler.
-	 */
-	@Override
-	protected JPPFConnection createConnection(final Socket socket) throws JPPFException
-	{
-		return new ApplicationConnection(this, socket);
-	}
+  /**
+   * Instantiate a wrapper for the socket connection opened by this socket server.
+   * Subclasses must implement this method.
+   * @param socket the socket connection obtained through a call to
+   * {@link java.net.ServerSocket#accept() ServerSocket.accept()}.
+   * @return a <code>JPPFServerConnection</code> instance.
+   * @throws JPPFException if an exception is raised while creating the socket handler.
+   */
+  @Override
+  protected JPPFConnection createConnection(final Socket socket) throws JPPFException
+  {
+    return new ApplicationConnection(this, socket);
+  }
 }

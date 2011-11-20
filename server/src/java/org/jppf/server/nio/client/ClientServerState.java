@@ -29,35 +29,35 @@ import org.jppf.utils.JPPFConfiguration;
  */
 abstract class ClientServerState extends NioState<ClientTransition>
 {
-	/**
-	 * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
-	 */
-	protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
-	/**
-	 * The server that handles this state.
-	 */
-	protected ClientNioServer server = null;
-	/**
-	 * The driver stats manager.
-	 */
-	protected JPPFDriverStatsManager statsManager = null;
-	/**
-	 * The job manager.
-	 */
-	protected JPPFJobManager jobManager = null;
-	/**
-	 * Reference to the driver.
-	 */
-	protected JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
+   */
+  protected static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
+  /**
+   * The server that handles this state.
+   */
+  protected ClientNioServer server = null;
+  /**
+   * The driver stats manager.
+   */
+  protected JPPFDriverStatsManager statsManager = null;
+  /**
+   * The job manager.
+   */
+  protected JPPFJobManager jobManager = null;
+  /**
+   * Reference to the driver.
+   */
+  protected JPPFDriver driver = JPPFDriver.getInstance();
 
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public ClientServerState(final ClientNioServer server)
-	{
-		this.server = server;
-		statsManager = driver.getStatsManager();
-		jobManager = driver.getJobManager();
-	}
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public ClientServerState(final ClientNioServer server)
+  {
+    this.server = server;
+    statsManager = driver.getStatsManager();
+    jobManager = driver.getJobManager();
+  }
 }

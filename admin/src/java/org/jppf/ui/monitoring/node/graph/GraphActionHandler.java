@@ -31,41 +31,41 @@ import com.mxgraph.view.mxGraph;
  */
 public class GraphActionHandler extends AbstractActionHandler
 {
-	/**
-	 * The JTreeTable whose actions are managed.
-	 */
-	protected mxGraph graph = null;
+  /**
+   * The JTreeTable whose actions are managed.
+   */
+  protected mxGraph graph = null;
 
-	/**
-	 * Initialize this action manager with the specified JTreeTable component.
-	 * @param graph the graph whose actions are managed.
-	 */
-	public GraphActionHandler(final mxGraph graph)
-	{
-		this.graph = graph;
-		graph.getSelectionModel().addListener(null, new mxEventSource.mxIEventListener()
-		{
-			@Override
-			public void invoke(final Object source, final mxEventObject event)
-			{
-				computeSelectedElements();
-				updateActions();
-			}
-		});
-	}
+  /**
+   * Initialize this action manager with the specified JTreeTable component.
+   * @param graph the graph whose actions are managed.
+   */
+  public GraphActionHandler(final mxGraph graph)
+  {
+    this.graph = graph;
+    graph.getSelectionModel().addListener(null, new mxEventSource.mxIEventListener()
+    {
+      @Override
+      public void invoke(final Object source, final mxEventObject event)
+      {
+        computeSelectedElements();
+        updateActions();
+      }
+    });
+  }
 
-	/**
-	 * Compute the list of elements selected in the component.
-	 */
-	protected synchronized void computeSelectedElements()
-	{
-		selectedElements.clear();
-		Object[] sel = graph.getSelectionModel().getCells();
-		if ((sel == null) || (sel.length <= 0)) return;
-		for (Object o: sel)
-		{
-			mxCell cell = (mxCell) o;
-			if (cell.isVertex() && (cell.getValue() instanceof TopologyData)) selectedElements.add(cell.getValue());
-		}
-	}
+  /**
+   * Compute the list of elements selected in the component.
+   */
+  protected synchronized void computeSelectedElements()
+  {
+    selectedElements.clear();
+    Object[] sel = graph.getSelectionModel().getCells();
+    if ((sel == null) || (sel.length <= 0)) return;
+    for (Object o: sel)
+    {
+      mxCell cell = (mxCell) o;
+      if (cell.isVertex() && (cell.getValue() instanceof TopologyData)) selectedElements.add(cell.getValue());
+    }
+  }
 }

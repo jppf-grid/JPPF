@@ -24,62 +24,62 @@ import org.apache.commons.httpclient.params.*;
  */
 public class JPPFHttpDefaultParamsFactory extends DefaultHttpParamsFactory
 {
-	/**
-	 * HTTP socket connection timeout in milliseconds.
-	 */
-	private static int socketTimeout = 3000;
-	/**
-	 * Maximum number of retries when an HTTP connection fails.
-	 */
-	private static int maxConnectionRetries = 2;
+  /**
+   * HTTP socket connection timeout in milliseconds.
+   */
+  private static int socketTimeout = 3000;
+  /**
+   * Maximum number of retries when an HTTP connection fails.
+   */
+  private static int maxConnectionRetries = 2;
 
-	/**
-	 * Get the default set of parameters.
-	 * @return an <code>HttpParams</code> instance.
-	 * @see org.apache.commons.httpclient.params.DefaultHttpParamsFactory#getDefaultParams()
-	 */
-	@Override
-	public synchronized HttpParams getDefaultParams()
-	{
-		HttpParams params = super.getDefaultParams();
-		params.setParameter("http.socket.timeout", Integer.valueOf(socketTimeout));
-		params.setParameter("http.method.retry-handler", new JPPFMethodExceptionHandler(maxConnectionRetries));
-		return params;
-	}
+  /**
+   * Get the default set of parameters.
+   * @return an <code>HttpParams</code> instance.
+   * @see org.apache.commons.httpclient.params.DefaultHttpParamsFactory#getDefaultParams()
+   */
+  @Override
+  public synchronized HttpParams getDefaultParams()
+  {
+    HttpParams params = super.getDefaultParams();
+    params.setParameter("http.socket.timeout", Integer.valueOf(socketTimeout));
+    params.setParameter("http.method.retry-handler", new JPPFMethodExceptionHandler(maxConnectionRetries));
+    return params;
+  }
 
-	/**
-	 * Get the HTTP socket connection timeout in milliseconds.
-	 * @return the timeout as an int.
-	 */
-	public static int getSocketTimeout()
-	{
-		return socketTimeout;
-	}
+  /**
+   * Get the HTTP socket connection timeout in milliseconds.
+   * @return the timeout as an int.
+   */
+  public static int getSocketTimeout()
+  {
+    return socketTimeout;
+  }
 
-	/**
-	 * Set the HTTP socket connection timeout in milliseconds.
-	 * @param socketTimeout the timeout as an int.
-	 */
-	public static void setSocketTimeout(final int socketTimeout)
-	{
-		JPPFHttpDefaultParamsFactory.socketTimeout = socketTimeout;
-	}
+  /**
+   * Set the HTTP socket connection timeout in milliseconds.
+   * @param socketTimeout the timeout as an int.
+   */
+  public static void setSocketTimeout(final int socketTimeout)
+  {
+    JPPFHttpDefaultParamsFactory.socketTimeout = socketTimeout;
+  }
 
-	/**
-	 * Get the maximum number of retries when an HTTP connection fails.
-	 * @return the number of retries as an int.
-	 */
-	public static int getMaxConnectionRetries()
-	{
-		return maxConnectionRetries;
-	}
+  /**
+   * Get the maximum number of retries when an HTTP connection fails.
+   * @return the number of retries as an int.
+   */
+  public static int getMaxConnectionRetries()
+  {
+    return maxConnectionRetries;
+  }
 
-	/**
-	 * Set the maximum number of retries when an HTTP connection fails.
-	 * @param maxConnectionRetries the number of retries as an int.
-	 */
-	public static void setMaxConnectionRetries(final int maxConnectionRetries)
-	{
-		JPPFHttpDefaultParamsFactory.maxConnectionRetries = maxConnectionRetries;
-	}
+  /**
+   * Set the maximum number of retries when an HTTP connection fails.
+   * @param maxConnectionRetries the number of retries as an int.
+   */
+  public static void setMaxConnectionRetries(final int maxConnectionRetries)
+  {
+    JPPFHttpDefaultParamsFactory.maxConnectionRetries = maxConnectionRetries;
+  }
 }

@@ -33,163 +33,163 @@ import org.slf4j.*;
  */
 public class DBRunner
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(DBRunner.class);
-	/**
-	 * JPPF client used to submit execution requests.
-	 */
-	private static JPPFClient jppfClient = null;
-	/**
-	 * A JMX connection to one of the nodes.
-	 */
-	private static JMXNodeConnectionWrapper jmxNode = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(DBRunner.class);
+  /**
+   * JPPF client used to submit execution requests.
+   */
+  private static JPPFClient jppfClient = null;
+  /**
+   * A JMX connection to one of the nodes.
+   */
+  private static JMXNodeConnectionWrapper jmxNode = null;
 
-	/***
-	 * Send a job with a number of tasks that insert a row in a database table.
-	 * We use the management APIs to kill a node before the job execution is complete,
-	 * so we can demonstrate the transaction recovery mechanism (implemented in Atomikos)
-	 * on the node side. Once the job is complete, we display all the rows in the table.
-	 * @param args the first argument, if any, will be used as the JPPF client's uuid.
-	 */
-	public static void main(final String...args)
-	{
-		try
-		{
-			TypedProperties config = JPPFConfiguration.getProperties();
-			int nbTasks = config.getInt("job.nbtasks", 20);
-			long taskSleepTime = config.getLong("task.sleep.time", 2000L);
-			long timeBeforeRestartNode = config.getLong("time.before.restart.node", 6000L);
-			if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
-			else jppfClient = new JPPFClient();
-			// Initialize the JMX connection to the node
-			getNode();
-			// Create a job with the specified number of tasks
-			JPPFJob job = new JPPFJob();
-			job.setName("NodeLifeCycle demo job");
-			for (int i=1; i<=nbTasks; i++)
-			{
-				DBTask task = new DBTask(taskSleepTime);
-				task.setId("" + i);
-				job.addTask(task);
-			}
-			job.setBlocking(false);
-			// customize the result listener to display a message each time a task result is received
-			JPPFResultCollector collector = new JPPFResultCollector(job)
-			{
-				@Override
-				public synchronized void resultsReceived(final TaskResultEvent event)
-				{
-					for (JPPFTask task: event.getTaskList())
-					{
-						if (task.getException() != null) output("task " + task.getId() + " error: " + task.getException().getMessage());
-						else output("task " + task.getId() + " result: " + task.getResult());
-					}
-					super.resultsReceived(event);
-				}
-			};
-			job.setResultListener(collector);
-			jppfClient.submit(job);
-			Thread.sleep(timeBeforeRestartNode);
-			// restart the node to demonstrate the transaction recovery
-			output("restarting node");
-			restartNode();
-			// wait for the job completion
-			collector.waitForResults();
-			// display the list of rows in the DB table
-			if (config.getBoolean("display.db.content", false)) displayDBContent();
-			output("demo ended");
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if (jppfClient != null) jppfClient.close();
-		}
-	}
+  /***
+   * Send a job with a number of tasks that insert a row in a database table.
+   * We use the management APIs to kill a node before the job execution is complete,
+   * so we can demonstrate the transaction recovery mechanism (implemented in Atomikos)
+   * on the node side. Once the job is complete, we display all the rows in the table.
+   * @param args the first argument, if any, will be used as the JPPF client's uuid.
+   */
+  public static void main(final String...args)
+  {
+    try
+    {
+      TypedProperties config = JPPFConfiguration.getProperties();
+      int nbTasks = config.getInt("job.nbtasks", 20);
+      long taskSleepTime = config.getLong("task.sleep.time", 2000L);
+      long timeBeforeRestartNode = config.getLong("time.before.restart.node", 6000L);
+      if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
+      else jppfClient = new JPPFClient();
+      // Initialize the JMX connection to the node
+      getNode();
+      // Create a job with the specified number of tasks
+      JPPFJob job = new JPPFJob();
+      job.setName("NodeLifeCycle demo job");
+      for (int i=1; i<=nbTasks; i++)
+      {
+        DBTask task = new DBTask(taskSleepTime);
+        task.setId("" + i);
+        job.addTask(task);
+      }
+      job.setBlocking(false);
+      // customize the result listener to display a message each time a task result is received
+      JPPFResultCollector collector = new JPPFResultCollector(job)
+      {
+        @Override
+        public synchronized void resultsReceived(final TaskResultEvent event)
+        {
+          for (JPPFTask task: event.getTaskList())
+          {
+            if (task.getException() != null) output("task " + task.getId() + " error: " + task.getException().getMessage());
+            else output("task " + task.getId() + " result: " + task.getResult());
+          }
+          super.resultsReceived(event);
+        }
+      };
+      job.setResultListener(collector);
+      jppfClient.submit(job);
+      Thread.sleep(timeBeforeRestartNode);
+      // restart the node to demonstrate the transaction recovery
+      output("restarting node");
+      restartNode();
+      // wait for the job completion
+      collector.waitForResults();
+      // display the list of rows in the DB table
+      if (config.getBoolean("display.db.content", false)) displayDBContent();
+      output("demo ended");
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      if (jppfClient != null) jppfClient.close();
+    }
+  }
 
-	/**
-	 * Get a JMX connection to one of the nodes.
-	 * @return the node connection as a {@link JMXNodeConnectionWrapper} instance.
-	 * @throws Exception if the node connection could not be established.
-	 */
-	private static JMXNodeConnectionWrapper getNode() throws Exception
-	{
-		if (jmxNode == null)
-		{
-			JPPFClientConnectionImpl c = null;
-			do
-			{
-				Thread.sleep(100L);
-				c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-			}
-			while (c == null);
-			while ((c.getJmxConnection() == null) || !c.getJmxConnection().isConnected()) Thread.sleep(100L);
-			JMXDriverConnectionWrapper jmxDriver = c.getJmxConnection();
-			Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
-			JPPFManagementInfo info = nodesInfo.iterator().next();
-			jmxNode = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
-			jmxNode.connect();
-		}
-		return jmxNode;
-	}
+  /**
+   * Get a JMX connection to one of the nodes.
+   * @return the node connection as a {@link JMXNodeConnectionWrapper} instance.
+   * @throws Exception if the node connection could not be established.
+   */
+  private static JMXNodeConnectionWrapper getNode() throws Exception
+  {
+    if (jmxNode == null)
+    {
+      JPPFClientConnectionImpl c = null;
+      do
+      {
+        Thread.sleep(100L);
+        c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+      }
+      while (c == null);
+      while ((c.getJmxConnection() == null) || !c.getJmxConnection().isConnected()) Thread.sleep(100L);
+      JMXDriverConnectionWrapper jmxDriver = c.getJmxConnection();
+      Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
+      JPPFManagementInfo info = nodesInfo.iterator().next();
+      jmxNode = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
+      jmxNode.connect();
+    }
+    return jmxNode;
+  }
 
-	/**
-	 * Kill the node.
-	 */
-	private static void restartNode()
-	{
-		try
-		{
-			JMXNodeConnectionWrapper jmxNode = getNode();
-			jmxNode.restart();
-		}
-		catch(Exception e)
-		{
-			output("Could not restart a node:\n" + StringUtils.getStackTrace(e));
-		}
-	}
+  /**
+   * Kill the node.
+   */
+  private static void restartNode()
+  {
+    try
+    {
+      JMXNodeConnectionWrapper jmxNode = getNode();
+      jmxNode.restart();
+    }
+    catch(Exception e)
+    {
+      output("Could not restart a node:\n" + StringUtils.getStackTrace(e));
+    }
+  }
 
-	/**
-	 * List all the rows in the TASK_RESULT table.
-	 * @throws Exception if any error occurs.
-	 */
-	private static void displayDBContent() throws Exception
-	{
-		Class.forName("org.h2.Driver");
-		Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "jppf", "jppf");
-		//Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jppf_samples", "jppf", "jppf");
-		String sql = "SELECT * FROM task_result";
-		Statement stmt = c.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		int count = 1;
-		output("\n***** displaying the DB table content *****");
-		while (rs.next())
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("row ").append(count).append(": ");
-			sb.append("id=").append(rs.getObject("id"));
-			sb.append(", task_id=").append(rs.getObject("task_id"));
-			sb.append(", message=").append(rs.getObject("message"));
-			output(sb.toString());
-			count++;
-		}
-		output("***** end of DB table content *****");
-		rs.close();
-		stmt.close();
-		c.close();
-	}
+  /**
+   * List all the rows in the TASK_RESULT table.
+   * @throws Exception if any error occurs.
+   */
+  private static void displayDBContent() throws Exception
+  {
+    Class.forName("org.h2.Driver");
+    Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "jppf", "jppf");
+    //Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jppf_samples", "jppf", "jppf");
+    String sql = "SELECT * FROM task_result";
+    Statement stmt = c.createStatement();
+    ResultSet rs = stmt.executeQuery(sql);
+    int count = 1;
+    output("\n***** displaying the DB table content *****");
+    while (rs.next())
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.append("row ").append(count).append(": ");
+      sb.append("id=").append(rs.getObject("id"));
+      sb.append(", task_id=").append(rs.getObject("task_id"));
+      sb.append(", message=").append(rs.getObject("message"));
+      output(sb.toString());
+      count++;
+    }
+    output("***** end of DB table content *****");
+    rs.close();
+    stmt.close();
+    c.close();
+  }
 
-	/**
-	 * Print a message to the console and/or log file.
-	 * @param message the message to print.
-	 */
-	private static void output(final String message)
-	{
-		System.out.println(message);
-		log.info(message);
-	}
+  /**
+   * Print a message to the console and/or log file.
+   * @param message the message to print.
+   */
+  private static void output(final String message)
+  {
+    System.out.println(message);
+    log.info(message);
+  }
 }

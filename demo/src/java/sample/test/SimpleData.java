@@ -26,31 +26,31 @@ import java.io.Serializable;
  */
 public class SimpleData implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Test field.
-	 */
-	private String str = null;
+  /**
+   * Test field.
+   */
+  private String str = null;
 
-	/**
-	 * Initialize with a String.
-	 * @param str the string to init with.
-	 */
-	public SimpleData(final String str)
-	{
-		this.str = str;
-	}
+  /**
+   * Initialize with a String.
+   * @param str the string to init with.
+   */
+  public SimpleData(final String str)
+  {
+    this.str = str;
+  }
 
-	/**
-	 * Get the string.
-	 * @return a string.
-	 */
-	public String getStr()
-	{
-		return str;
-	}
+  /**
+   * Get the string.
+   * @return a string.
+   */
+  public String getStr()
+  {
+    return str;
+  }
 }

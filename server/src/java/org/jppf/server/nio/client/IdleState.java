@@ -31,38 +31,38 @@ import org.slf4j.*;
  */
 class IdleState extends ClientServerState
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(IdleState.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Initialize this state.
-	 * @param server the server that handles this state.
-	 */
-	public IdleState(final ClientNioServer server)
-	{
-		super(server);
-	}
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IdleState.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Initialize this state.
+   * @param server the server that handles this state.
+   */
+  public IdleState(final ClientNioServer server)
+  {
+    super(server);
+  }
 
-	/**
-	 * Execute the action associated with this channel state.
-	 * @param wrapper the selection key corresponding to the channel and selector for this state.
-	 * @return a state transition as an <code>NioTransition</code> instance.
-	 * @throws Exception if an error occurs while transitioning to another state.
-	 * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
-	 */
-	@Override
-	public ClientTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-	{
-		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (CHECK_CONNECTION && wrapper.isReadable())
-		{
-			throw new ConnectException("client " + wrapper + " has been disconnected");
-		}
-		return TO_IDLE;
-	}
+  /**
+   * Execute the action associated with this channel state.
+   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if an error occurs while transitioning to another state.
+   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   */
+  @Override
+  public ClientTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    if (debugEnabled) log.debug("exec() for " + wrapper);
+    if (CHECK_CONNECTION && wrapper.isReadable())
+    {
+      throw new ConnectException("client " + wrapper + " has been disconnected");
+    }
+    return TO_IDLE;
+  }
 }

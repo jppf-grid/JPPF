@@ -25,22 +25,22 @@ import org.slf4j.*;
  */
 public class SuspendJobAction extends AbstractSuspendJobAction
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SuspendJobAction.class);
-	/**
-	 * Determines whether debug log statements are enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SuspendJobAction.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
-	/**
-	 * Initialize this action.
-	 */
-	public SuspendJobAction()
-	{
-		setupIcon("/org/jppf/ui/resources/suspend.gif");
-		putValue(NAME, localize("job.suspend.label"));
-		requeue = false;
-	}
+  /**
+   * Initialize this action.
+   */
+  public SuspendJobAction()
+  {
+    setupIcon("/org/jppf/ui/resources/suspend.gif");
+    putValue(NAME, localize("job.suspend.label"));
+    requeue = false;
+  }
 }

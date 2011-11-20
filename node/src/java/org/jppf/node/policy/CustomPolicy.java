@@ -25,75 +25,75 @@ package org.jppf.node.policy;
  */
 public abstract class CustomPolicy extends ExecutionPolicy
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * The list of user-defined arguments.
-	 */
-	private String[] args = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * The list of user-defined arguments.
+   */
+  private String[] args = null;
 
-	/**
-	 * Initialize this policy with the specified arguments.
-	 * @param args the user-defined arguments for this policy.
-	 */
-	public CustomPolicy(final String...args)
-	{
-		this.args = args;
-	}
+  /**
+   * Initialize this policy with the specified arguments.
+   * @param args the user-defined arguments for this policy.
+   */
+  public CustomPolicy(final String...args)
+  {
+    this.args = args;
+  }
 
-	/**
-	 * Perform optional initializations. This default implementation does nothing.<br>
-	 * This method is called after instantiating the policy object and setting the arguments.
-	 * It allows for user-defined initializations when the custom policy is built from an XML document.
-	 */
-	public void initialize()
-	{
-	}
+  /**
+   * Perform optional initializations. This default implementation does nothing.<br>
+   * This method is called after instantiating the policy object and setting the arguments.
+   * It allows for user-defined initializations when the custom policy is built from an XML document.
+   */
+  public void initialize()
+  {
+  }
 
-	/**
-	 * Get the arguments of this policy.
-	 * @return the arguments as an array of strings.
-	 */
-	public final String[] getArgs()
-	{
-		return args;
-	}
+  /**
+   * Get the arguments of this policy.
+   * @return the arguments as an array of strings.
+   */
+  public final String[] getArgs()
+  {
+    return args;
+  }
 
-	/**
-	 * Set the arguments of this policy.
-	 * @param args the arguments as an array of strings.
-	 */
-	public final void setArgs(final String...args)
-	{
-		this.args = args;
-	}
+  /**
+   * Set the arguments of this policy.
+   * @param args the arguments as an array of strings.
+   */
+  public final void setArgs(final String...args)
+  {
+    this.args = args;
+  }
 
-	/**
-	 * Print this object to a string.
-	 * @return an XML string representation of this object
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		if (computedToString == null)
-		{
-			synchronized(ExecutionPolicy.class)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append(indent()).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
-				toStringIndent++;
-				if (args != null)
-				{
-					for (String s: args) sb.append(indent()).append("<Arg>").append(s).append("</Arg>\n");
-				}
-				toStringIndent--;
-				sb.append(indent()).append("</CustomRule>\n");
-				computedToString = sb.toString();
-			}
-		}
-		return computedToString;
-	}
+  /**
+   * Print this object to a string.
+   * @return an XML string representation of this object
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    if (computedToString == null)
+    {
+      synchronized(ExecutionPolicy.class)
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent()).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
+        toStringIndent++;
+        if (args != null)
+        {
+          for (String s: args) sb.append(indent()).append("<Arg>").append(s).append("</Arg>\n");
+        }
+        toStringIndent--;
+        sb.append(indent()).append("</CustomRule>\n");
+        computedToString = sb.toString();
+      }
+    }
+    return computedToString;
+  }
 }

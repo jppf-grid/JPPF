@@ -26,39 +26,39 @@ import java.util.Map;
  */
 public interface JobMetadata
 {
-	/**
-	 * Retrieve a parameter in the metadata.
-	 * @param key the parameter's key.
-	 * @return the parameter's value or null if no parameter with the specified key exists.
-	 */
-	Object getParameter(Object key);
+  /**
+   * Retrieve a parameter in the metadata.
+   * @param key the parameter's key.
+   * @return the parameter's value or null if no parameter with the specified key exists.
+   */
+  Object getParameter(Object key);
 
-	/**
-	 * Retrieve a parameter in the metadata.
-	 * @param key the parameter's key.
-	 * @param def a default value to return if no parameter with the specified key can be found.
-	 * @return the parameter's value or null if no parameter with the specified key exists.
-	 */
-	Object getParameter(Object key, Object def);
+  /**
+   * Retrieve a parameter in the metadata.
+   * @param key the parameter's key.
+   * @param def a default value to return if no parameter with the specified key can be found.
+   * @return the parameter's value or null if no parameter with the specified key exists.
+   */
+  Object getParameter(Object key, Object def);
 
-	/**
-	 * Set a parameter in the metadata.
-	 * If a parameter with the same key already exists, its value is replaced with the new one.
-	 * @param key the parameter's key.
-	 * @param value the parameter's value.
-	 */
-	void setParameter(Object key, Object value);
+  /**
+   * Set a parameter in the metadata.
+   * If a parameter with the same key already exists, its value is replaced with the new one.
+   * @param key the parameter's key.
+   * @param value the parameter's value.
+   */
+  void setParameter(Object key, Object value);
 
-	/**
-	 * Remove a parameter from the metadata.
-	 * @param key the parameter's key.
-	 * @return the removed parameter's value or null if no parameter with the specified key exists.
-	 */
-	Object removeParameter(Object key);
+  /**
+   * Remove a parameter from the metadata.
+   * @param key the parameter's key.
+   * @return the removed parameter's value or null if no parameter with the specified key exists.
+   */
+  Object removeParameter(Object key);
 
-	/**
-	 * Get a copy of the metadata map.
-	 * @return a map of the metadata contained in this object.
-	 */
-	Map<Object, Object> getAll();
+  /**
+   * Get a copy of the metadata map.
+   * @return a map of the metadata contained in this object.
+   */
+  Map<Object, Object> getAll();
 }

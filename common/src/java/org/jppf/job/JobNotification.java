@@ -28,71 +28,71 @@ import org.jppf.management.JPPFManagementInfo;
  */
 public class JobNotification extends Notification
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Information about a node.
-	 */
-	private JPPFManagementInfo nodeInfo = null;
-	/**
-	 * Creation timestamp for this event.
-	 */
-	private long timestamp = -1L;
-	/**
-	 * The type of this job event.
-	 */
-	private JobEventType eventType = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Information about a node.
+   */
+  private JPPFManagementInfo nodeInfo = null;
+  /**
+   * Creation timestamp for this event.
+   */
+  private long timestamp = -1L;
+  /**
+   * The type of this job event.
+   */
+  private JobEventType eventType = null;
 
-	/**
-	 * Initialize this event with the specified job and node information.
-	 * @param eventType - the type of this job event.
-	 * @param jobInfo - information about the job.
-	 * @param nodeInfo - information about the node.
-	 * @param timestamp - the creation timestamp for this event.
-	 */
-	public JobNotification(final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp)
-	{
-		super("jobEvent", jobInfo, timestamp);
-		this.eventType = eventType;
-		this.nodeInfo = nodeInfo;
-		this.timestamp = timestamp;
-	}
+  /**
+   * Initialize this event with the specified job and node information.
+   * @param eventType - the type of this job event.
+   * @param jobInfo - information about the job.
+   * @param nodeInfo - information about the node.
+   * @param timestamp - the creation timestamp for this event.
+   */
+  public JobNotification(final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp)
+  {
+    super("jobEvent", jobInfo, timestamp);
+    this.eventType = eventType;
+    this.nodeInfo = nodeInfo;
+    this.timestamp = timestamp;
+  }
 
-	/**
-	 * Get the information about the job.
-	 * @return a <code>JobInformation</code> instance.
-	 */
-	public JobInformation getJobInformation()
-	{
-		return (JobInformation) getSource();
-	}
+  /**
+   * Get the information about the job.
+   * @return a <code>JobInformation</code> instance.
+   */
+  public JobInformation getJobInformation()
+  {
+    return (JobInformation) getSource();
+  }
 
-	/**
-	 * Get the information about the node.
-	 * @return a <code>NodeManagementInfo</code> instance.
-	 */
-	public JPPFManagementInfo getNodeInfo()
-	{
-		return nodeInfo;
-	}
+  /**
+   * Get the information about the node.
+   * @return a <code>NodeManagementInfo</code> instance.
+   */
+  public JPPFManagementInfo getNodeInfo()
+  {
+    return nodeInfo;
+  }
 
-	/**
-	 * Get the creation timestamp for this event.
-	 * @return the timestamp as a long value.
-	 */
-	public long getTimestamp()
-	{
-		return timestamp;
-	}
+  /**
+   * Get the creation timestamp for this event.
+   * @return the timestamp as a long value.
+   */
+  public long getTimestamp()
+  {
+    return timestamp;
+  }
 
-	/**
-	 * Get the type of this job event.
-	 * @return a <code>JobManagerEventType</code> enum value.
-	 */
-	public JobEventType getEventType()
-	{
-		return eventType;
-	}
+  /**
+   * Get the type of this job event.
+   * @return a <code>JobManagerEventType</code> enum value.
+   */
+  public JobEventType getEventType()
+  {
+    return eventType;
+  }
 }

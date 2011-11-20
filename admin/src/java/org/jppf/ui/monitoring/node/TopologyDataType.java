@@ -24,12 +24,12 @@ package org.jppf.ui.monitoring.node;
  */
 public enum TopologyDataType
 {
-	/**
-	 * Object is a JPPF driver.
-	 */
-	DRIVER,
-	/**
-	 * Object is a JPPF node.
-	 */
-	NODE
+  /**
+   * Object is a JPPF driver.
+   */
+  DRIVER,
+  /**
+   * Object is a JPPF node.
+   */
+  NODE
 }

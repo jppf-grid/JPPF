@@ -32,179 +32,179 @@ import org.slf4j.*;
  */
 public class SocketInitializerImpl extends AbstractSocketInitializer
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(SocketInitializerImpl.class);
-	/**
-	 * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
-	 */
-	private boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * Date after which this task stop trying to connect the class loader.
-	 */
-	private Date latestAttemptDate = null;
-	/**
-	 * The locking lock used to block all class loaders while initializing the connection.
-	 */
-	private ReentrantLock lock = new ReentrantLock();
-	/**
-	 * The locking condition used to block all class loaders while initializing the connection.
-	 */
-	private Condition condition = lock.newCondition();
-	/**
-	 * The timer that periodically attempts the connection to the server.
-	 */
-	private Timer timer = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SocketInitializerImpl.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * Date after which this task stop trying to connect the class loader.
+   */
+  private Date latestAttemptDate = null;
+  /**
+   * The locking lock used to block all class loaders while initializing the connection.
+   */
+  private ReentrantLock lock = new ReentrantLock();
+  /**
+   * The locking condition used to block all class loaders while initializing the connection.
+   */
+  private Condition condition = lock.newCondition();
+  /**
+   * The timer that periodically attempts the connection to the server.
+   */
+  private Timer timer = null;
 
-	/**
-	 * Instantiate this SocketInitializer with a specified socket wrapper.
-	 */
-	public SocketInitializerImpl()
-	{
-	}
+  /**
+   * Instantiate this SocketInitializer with a specified socket wrapper.
+   */
+  public SocketInitializerImpl()
+  {
+  }
 
-	/**
-	 * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
-	 * <code>TimerTask</code> until a specified amount of time has passed.
-	 * @param socketWrapper the socket wrapper to initialize.
-	 * @see org.jppf.comm.socket.SocketInitializer#initializeSocket(org.jppf.comm.socket.SocketWrapper)
-	 */
-	@Override
-	public void initializeSocket(final SocketWrapper socketWrapper)
-	{
-		String errMsg = "SocketInitializer.initializeSocket(): Could not reconnect to the remote server";
-		String fatalErrMsg = "FATAL: could not initialize the Socket Wrapper!";
-		this.socketWrapper = socketWrapper;
-		lock.lock();
-		try
-		{
-			try
-			{
-				if (debugEnabled) log.debug(name + "about to close socket wrapper");
-				/*if(socketWrapper.isOpened())*/ socketWrapper.close();
-			}
-			catch(Exception e)
-			{
-			}
-			// random delay between 0 and 1 second , to avoid overloading the server with simultaneous connection requests.
-			TypedProperties props = JPPFConfiguration.getProperties();
-			long delay = 1000L * props.getLong("reconnect.initial.delay", 0L);
-			//if (delay == 0L) delay = rand.nextInt(1000);
-			if (delay == 0L) delay = rand.nextInt(10);
-			long maxTime = props.getLong("reconnect.max.time", 60L);
-			long maxDuration = (maxTime <= 0) ? -1L : 1000L * maxTime;
-			long period = 1000L * props.getLong("reconnect.interval", 1L);
-			latestAttemptDate = (maxDuration > 0) ? new Date(System.currentTimeMillis() + maxDuration) : null;
-			SocketInitializationTask task = new SocketInitializationTask();
-			timer = new Timer("Socket initializer timer");
-			timer.schedule(task, delay, period);
-			try
-			{
-				condition.await();
-			}
-			catch(InterruptedException e)
-			{
-				if (debugEnabled) log.debug(name + e.getMessage(), e);
-				if (!closed)
-				{
-					System.err.println(name + errMsg);
-					if (debugEnabled) log.debug(name + errMsg);
-					throw new JPPFError(name + fatalErrMsg, e);
-				}
-			}
-			timer.cancel();
-			timer.purge();
-			if (!isSuccessful() && !closed)
-			{
-				if (debugEnabled) log.debug(name + errMsg);
-				System.err.println(name + errMsg);
-				//throw new JPPFError(fatalErrMsg);
-			}
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+  /**
+   * Initialize the underlying socket client, by starting a <code>Timer</code> and a corresponding
+   * <code>TimerTask</code> until a specified amount of time has passed.
+   * @param socketWrapper the socket wrapper to initialize.
+   * @see org.jppf.comm.socket.SocketInitializer#initializeSocket(org.jppf.comm.socket.SocketWrapper)
+   */
+  @Override
+  public void initializeSocket(final SocketWrapper socketWrapper)
+  {
+    String errMsg = "SocketInitializer.initializeSocket(): Could not reconnect to the remote server";
+    String fatalErrMsg = "FATAL: could not initialize the Socket Wrapper!";
+    this.socketWrapper = socketWrapper;
+    lock.lock();
+    try
+    {
+      try
+      {
+        if (debugEnabled) log.debug(name + "about to close socket wrapper");
+        /*if(socketWrapper.isOpened())*/ socketWrapper.close();
+      }
+      catch(Exception e)
+      {
+      }
+      // random delay between 0 and 1 second , to avoid overloading the server with simultaneous connection requests.
+      TypedProperties props = JPPFConfiguration.getProperties();
+      long delay = 1000L * props.getLong("reconnect.initial.delay", 0L);
+      //if (delay == 0L) delay = rand.nextInt(1000);
+      if (delay == 0L) delay = rand.nextInt(10);
+      long maxTime = props.getLong("reconnect.max.time", 60L);
+      long maxDuration = (maxTime <= 0) ? -1L : 1000L * maxTime;
+      long period = 1000L * props.getLong("reconnect.interval", 1L);
+      latestAttemptDate = (maxDuration > 0) ? new Date(System.currentTimeMillis() + maxDuration) : null;
+      SocketInitializationTask task = new SocketInitializationTask();
+      timer = new Timer("Socket initializer timer");
+      timer.schedule(task, delay, period);
+      try
+      {
+        condition.await();
+      }
+      catch(InterruptedException e)
+      {
+        if (debugEnabled) log.debug(name + e.getMessage(), e);
+        if (!closed)
+        {
+          System.err.println(name + errMsg);
+          if (debugEnabled) log.debug(name + errMsg);
+          throw new JPPFError(name + fatalErrMsg, e);
+        }
+      }
+      timer.cancel();
+      timer.purge();
+      if (!isSuccessful() && !closed)
+      {
+        if (debugEnabled) log.debug(name + errMsg);
+        System.err.println(name + errMsg);
+        //throw new JPPFError(fatalErrMsg);
+      }
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
 
-	/**
-	 * Close this initializer.
-	 * @see org.jppf.comm.socket.SocketInitializer#close()
-	 */
-	@Override
-	public void close()
-	{
-		if (!closed)
-		{
-			if (debugEnabled) log.debug(name + "closing socket initializer");
-			closed = true;
-			if (timer != null)
-			{
-				if (debugEnabled) log.debug(name + " timer not null");
-				timer.cancel();
-				timer.purge();
-			}
-		}
-	}
+  /**
+   * Close this initializer.
+   * @see org.jppf.comm.socket.SocketInitializer#close()
+   */
+  @Override
+  public void close()
+  {
+    if (!closed)
+    {
+      if (debugEnabled) log.debug(name + "closing socket initializer");
+      closed = true;
+      if (timer != null)
+      {
+        if (debugEnabled) log.debug(name + " timer not null");
+        timer.cancel();
+        timer.purge();
+      }
+    }
+  }
 
-	/**
-	 * This timer task attempts to (re)connect a socket wrapper to its corresponding remote server.
-	 * It also checks that the maximum duration for the attempts has not been reached, and cancels itself if it has.
-	 */
-	class SocketInitializationTask extends TimerTask
-	{
-		/**
-		 * Attempt to connect to the remote server.
-		 * @see java.util.TimerTask#run()
-		 */
-		@Override
-		public void run()
-		{
-			attemptCount++;
-			try
-			{
-				if (traceEnabled) log.trace(name + " opening the socket connection");
-				socketWrapper.open();
-				successfull = true;
-				if (traceEnabled) log.trace(name + " socket connection successfully opened");
-				reset();
-			}
-			catch(Exception e)
-			{
-				if (traceEnabled) log.trace(name + " socket connection open failed: " + e.getClass().getName() + " : " + e.getMessage());
-				if (latestAttemptDate != null)
-				{
-					Date now = new Date();
-					if (now.after(latestAttemptDate))
-					{
-						successfull = false;
-						if (traceEnabled) log.trace(name + " socket initialization unsuccessful");
-						reset();
-					}
-				}
-			}
-		}
+  /**
+   * This timer task attempts to (re)connect a socket wrapper to its corresponding remote server.
+   * It also checks that the maximum duration for the attempts has not been reached, and cancels itself if it has.
+   */
+  class SocketInitializationTask extends TimerTask
+  {
+    /**
+     * Attempt to connect to the remote server.
+     * @see java.util.TimerTask#run()
+     */
+    @Override
+    public void run()
+    {
+      attemptCount++;
+      try
+      {
+        if (traceEnabled) log.trace(name + " opening the socket connection");
+        socketWrapper.open();
+        successfull = true;
+        if (traceEnabled) log.trace(name + " socket connection successfully opened");
+        reset();
+      }
+      catch(Exception e)
+      {
+        if (traceEnabled) log.trace(name + " socket connection open failed: " + e.getClass().getName() + " : " + e.getMessage());
+        if (latestAttemptDate != null)
+        {
+          Date now = new Date();
+          if (now.after(latestAttemptDate))
+          {
+            successfull = false;
+            if (traceEnabled) log.trace(name + " socket initialization unsuccessful");
+            reset();
+          }
+        }
+      }
+    }
 
-		/**
-		 * Reset the status of this task.
-		 */
-		private void reset()
-		{
-			lock.lock();
-			try
-			{
-				cancel();
-				condition.signalAll();
-			}
-			finally
-			{
-				lock.unlock();
-			}
-		}
-	}
+    /**
+     * Reset the status of this task.
+     */
+    private void reset()
+    {
+      lock.lock();
+      try
+      {
+        cancel();
+        condition.signalAll();
+      }
+      finally
+      {
+        lock.unlock();
+      }
+    }
+  }
 }

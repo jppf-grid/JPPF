@@ -32,146 +32,146 @@ import org.jppf.utils.JPPFUuid;
  */
 public final class JPPFSecurityContext implements Serializable
 {
-	/**
-	 * Explicit serialVersionUID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Uuid for the owner of these credentials.
-	 */
-	private String uuid = new JPPFUuid().toString();
-	/**
-	 * Identifier for the owner of these credentials.
-	 */
-	private String id = new JPPFUuid().toString();
-	/**
-	 * The signature associated with these credentials.
-	 */
-	private JPPFCredentials credentials = null;
-	/**
-	 * Security domain these credentials relate to.
-	 */
-	private String domain = null;
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
+   * Uuid for the owner of these credentials.
+   */
+  private String uuid = new JPPFUuid().toString();
+  /**
+   * Identifier for the owner of these credentials.
+   */
+  private String id = new JPPFUuid().toString();
+  /**
+   * The signature associated with these credentials.
+   */
+  private JPPFCredentials credentials = null;
+  /**
+   * Security domain these credentials relate to.
+   */
+  private String domain = null;
 
-	/**
-	 * No default instantiation allowed for this class.
-	 */
-	private JPPFSecurityContext()
-	{
-	}
+  /**
+   * No default instantiation allowed for this class.
+   */
+  private JPPFSecurityContext()
+  {
+  }
 
-	/**
-	 * Create a JPPF signature with he specified parameters.
-	 * @param uuid uuid for the owner of these credentials.
-	 * @param id identifier for the owner of these credentials.
-	 * @param credentials the signature associated with these credentials.
-	 */
-	public JPPFSecurityContext(final String uuid, final String id, final JPPFCredentials credentials)
-	{
-		this.uuid = uuid;
-		this.id = id;
-		this.credentials = credentials;
-	}
+  /**
+   * Create a JPPF signature with he specified parameters.
+   * @param uuid uuid for the owner of these credentials.
+   * @param id identifier for the owner of these credentials.
+   * @param credentials the signature associated with these credentials.
+   */
+  public JPPFSecurityContext(final String uuid, final String id, final JPPFCredentials credentials)
+  {
+    this.uuid = uuid;
+    this.id = id;
+    this.credentials = credentials;
+  }
 
-	/**
-	 * Get the unique universal identifier of the component that owns these credentials.
-	 * @return the uuid as a String.
-	 */
-	public String getUuid()
-	{
-		return uuid;
-	}
+  /**
+   * Get the unique universal identifier of the component that owns these credentials.
+   * @return the uuid as a String.
+   */
+  public String getUuid()
+  {
+    return uuid;
+  }
 
-	/**
-	 * Get the identifier for these credentials' owner. It doesn't have to be universally unique,
-	 * and is used to identify the entity that makes use of the framework. The entity can be an organization,
-	 * user, software component, etc...
-	 * @return the identifier as a String.
-	 */
-	public String getIdentifier()
-	{
-		return id;
-	}
+  /**
+   * Get the identifier for these credentials' owner. It doesn't have to be universally unique,
+   * and is used to identify the entity that makes use of the framework. The entity can be an organization,
+   * user, software component, etc...
+   * @return the identifier as a String.
+   */
+  public String getIdentifier()
+  {
+    return id;
+  }
 
-	/**
-	 * Get the signature for these credentials.
-	 * @return a <code>JPPFCredentials</code> instance.
-	 */
-	public JPPFCredentials getSignature()
-	{
-		return credentials;
-	}
+  /**
+   * Get the signature for these credentials.
+   * @return a <code>JPPFCredentials</code> instance.
+   */
+  public JPPFCredentials getSignature()
+  {
+    return credentials;
+  }
 
-	/**
-	 * Determine whether the owner of these credentials can execute tasks from another
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can execute the entity's tasks, false otherwise.
-	 */
-	public boolean canExecute(final JPPFSecurityContext credentials)
-	{
-		return true;
-	}
+  /**
+   * Determine whether the owner of these credentials can execute tasks from another
+   * entity on the network.
+   * @param credentials the entity's security credentials.
+   * @return true if the owner can execute the entity's tasks, false otherwise.
+   */
+  public boolean canExecute(final JPPFSecurityContext credentials)
+  {
+    return true;
+  }
 
-	/**
-	 * Determine whether the owner of these credentials can send tasks to another
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can send tasks to the other entity, false otherwise.
-	 */
-	public boolean canSend(final JPPFSecurityContext credentials)
-	{
-		return true;
-	}
+  /**
+   * Determine whether the owner of these credentials can send tasks to another
+   * entity on the network.
+   * @param credentials the entity's security credentials.
+   * @return true if the owner can send tasks to the other entity, false otherwise.
+   */
+  public boolean canSend(final JPPFSecurityContext credentials)
+  {
+    return true;
+  }
 
-	/**
-	 * Determine whether the owner of these credentials can receive tasks from another
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can receive tasks from the other entity, false otherwise.
-	 */
-	public boolean canReceive(final JPPFSecurityContext credentials)
-	{
-		return true;
-	}
+  /**
+   * Determine whether the owner of these credentials can receive tasks from another
+   * entity on the network.
+   * @param credentials the entity's security credentials.
+   * @return true if the owner can receive tasks from the other entity, false otherwise.
+   */
+  public boolean canReceive(final JPPFSecurityContext credentials)
+  {
+    return true;
+  }
 
-	/**
-	 * Determine whether the owner of these credentials can administrate an other
-	 * entity on the network.
-	 * @param credentials the entity's security credentials.
-	 * @return true if the owner can administrate the other entity, false otherwise.
-	 */
-	public boolean canAdministrate(final JPPFSecurityContext credentials)
-	{
-		return true;
-	}
+  /**
+   * Determine whether the owner of these credentials can administrate an other
+   * entity on the network.
+   * @param credentials the entity's security credentials.
+   * @return true if the owner can administrate the other entity, false otherwise.
+   */
+  public boolean canAdministrate(final JPPFSecurityContext credentials)
+  {
+    return true;
+  }
 
-	/**
-	 * Get a string representation of this instance.
-	 * @return a string displaying information about these credentials.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return "JPPF Credentials id=" + id;
-	}
+  /**
+   * Get a string representation of this instance.
+   * @return a string displaying information about these credentials.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return "JPPF Credentials id=" + id;
+  }
 
-	/**
-	 * Get the security domain these credentials relate to.
-	 * @return the domain as a string.
-	 */
-	public String getDomain()
-	{
-		return domain;
-	}
+  /**
+   * Get the security domain these credentials relate to.
+   * @return the domain as a string.
+   */
+  public String getDomain()
+  {
+    return domain;
+  }
 
-	/**
-	 * Set the security domain these credentials relate to.
-	 * @param domain the domain as a string.
-	 */
-	public void setDomain(final String domain)
-	{
-		this.domain = domain;
-	}
+  /**
+   * Set the security domain these credentials relate to.
+   * @param domain the domain as a string.
+   */
+  public void setDomain(final String domain)
+  {
+    this.domain = domain;
+  }
 }

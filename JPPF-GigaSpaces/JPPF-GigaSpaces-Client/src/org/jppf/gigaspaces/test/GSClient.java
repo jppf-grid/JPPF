@@ -30,81 +30,81 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class GSClient implements InitializingBean
 {
-	/**
-	 * Reference to the JPPF service.
-	 */
-	private JPPFService jppfService = null;
+  /**
+   * Reference to the JPPF service.
+   */
+  private JPPFService jppfService = null;
 
-	/**
-	 * Initialize the Spring context, invoke the appropriate bean method,
-	 * and return the results of the JPPF execution.
-	 * @param jobName the name given to the JPPF job.
-	 * @param nbTasks the number of tasks in the job.
-	 * @param taskDuration the duration in milliseconds of each task in the job.
-	 * @return the results as a <code>JPPFJob</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	public static JPPFJob execute(final String jobName, final int nbTasks, final long taskDuration) throws Exception
-	{
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:client.xml");
-		context.start();
-		GSClient gsc = (GSClient) context.getBean("gsclient");
-		return gsc.runJob(jobName, nbTasks, taskDuration);
-	}
+  /**
+   * Initialize the Spring context, invoke the appropriate bean method,
+   * and return the results of the JPPF execution.
+   * @param jobName the name given to the JPPF job.
+   * @param nbTasks the number of tasks in the job.
+   * @param taskDuration the duration in milliseconds of each task in the job.
+   * @return the results as a <code>JPPFJob</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFJob execute(final String jobName, final int nbTasks, final long taskDuration) throws Exception
+  {
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:client.xml");
+    context.start();
+    GSClient gsc = (GSClient) context.getBean("gsclient");
+    return gsc.runJob(jobName, nbTasks, taskDuration);
+  }
 
-	/**
-	 * Default constructor.
-	 */
-	public GSClient()
-	{
-	}
+  /**
+   * Default constructor.
+   */
+  public GSClient()
+  {
+  }
 
-	/**
-	 * Called after the Spring bean initialization.
-	 * @throws Exception if any error occurs.
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-	}
+  /**
+   * Called after the Spring bean initialization.
+   * @throws Exception if any error occurs.
+   * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+   */
+  @Override
+  public void afterPropertiesSet() throws Exception
+  {
+  }
 
-	/**
-	 * Execute a job with the specified parameters, submitting it to the JPPF space.
-	 * @param jobName the name given to the JPPF job.
-	 * @param nbTasks the number of tasks in the job.
-	 * @param taskDuration the duration in milliseconds of each task in the job.
-	 * @return the results as a <code>JPPFJob</code> instance.
-	 * @throws Exception if any error occurs.
-	 */
-	public JPPFJob runJob(final String jobName, final int nbTasks, final long taskDuration) throws Exception
-	{
-		JPPFJob job = new JPPFJob();
-		job.setName(jobName);
-		for (int i=1; i<= nbTasks; i++)
-		{
-			HelloTask task = new HelloTask(taskDuration);
-			task.setId("" + i);
-			job.addTask(task);
-		}
-		return jppfService.submitJob(job);
-	}
+  /**
+   * Execute a job with the specified parameters, submitting it to the JPPF space.
+   * @param jobName the name given to the JPPF job.
+   * @param nbTasks the number of tasks in the job.
+   * @param taskDuration the duration in milliseconds of each task in the job.
+   * @return the results as a <code>JPPFJob</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public JPPFJob runJob(final String jobName, final int nbTasks, final long taskDuration) throws Exception
+  {
+    JPPFJob job = new JPPFJob();
+    job.setName(jobName);
+    for (int i=1; i<= nbTasks; i++)
+    {
+      HelloTask task = new HelloTask(taskDuration);
+      task.setId("" + i);
+      job.addTask(task);
+    }
+    return jppfService.submitJob(job);
+  }
 
-	/**
-	 * Get a proxy to the service deployed in a GS space.
-	 * @return a <code>JPPFService</code> instance.
-	 */
-	public JPPFService getJppfService()
-	{
-		return jppfService;
-	}
+  /**
+   * Get a proxy to the service deployed in a GS space.
+   * @return a <code>JPPFService</code> instance.
+   */
+  public JPPFService getJppfService()
+  {
+    return jppfService;
+  }
 
-	/**
-	 * Set a proxy to the service deployed in a GS space.
-	 * @param service a <code>JPPFService</code> instance.
-	 */
-	public void setJppfService(final JPPFService service)
-	{
-		this.jppfService = service;
-	}
+  /**
+   * Set a proxy to the service deployed in a GS space.
+   * @param service a <code>JPPFService</code> instance.
+   */
+  public void setJppfService(final JPPFService service)
+  {
+    this.jppfService = service;
+  }
 }

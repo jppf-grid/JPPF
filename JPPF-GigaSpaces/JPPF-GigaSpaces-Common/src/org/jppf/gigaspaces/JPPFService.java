@@ -26,10 +26,10 @@ import org.jppf.client.JPPFJob;
  */
 public interface JPPFService
 {
-	/**
-	 * Submit a job to the JPPF processing unit.
-	 * @param job the job to submit.
-	 * @return the job after submission.
-	 */
-	JPPFJob submitJob(JPPFJob job);
+  /**
+   * Submit a job to the JPPF processing unit.
+   * @param job the job to submit.
+   * @return the job after submission.
+   */
+  JPPFJob submitJob(JPPFJob job);
 }

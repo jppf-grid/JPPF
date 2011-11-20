@@ -25,92 +25,92 @@ import java.util.*;
  */
 class ClientPool
 {
-	/**
-	 * The priority associated with this pool.
-	 */
-	private final int priority;
-	/**
-	 * Index of the last used connection in this pool.
-	 */
-	private int lastUsedIndex = 0;
-	/**
-	 * List of <code>JPPFClientConnection</code> instances with the same priority.
-	 */
-	private final List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
+  /**
+   * The priority associated with this pool.
+   */
+  private final int priority;
+  /**
+   * Index of the last used connection in this pool.
+   */
+  private int lastUsedIndex = 0;
+  /**
+   * List of <code>JPPFClientConnection</code> instances with the same priority.
+   */
+  private final List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
 
-	/**
-	 * Initialize this pool with the specified priority.
-	 * @param priority the priority assigned to the connections n the pool.
-	 */
-	public ClientPool(final int priority) {
-		this.priority = priority;
-	}
+  /**
+   * Initialize this pool with the specified priority.
+   * @param priority the priority assigned to the connections n the pool.
+   */
+  public ClientPool(final int priority) {
+    this.priority = priority;
+  }
 
-	/**
-	 * Get the next client connection.
-	 * @return a <code>JPPFClientConnection</code> instances.
-	 */
-	public JPPFClientConnection nextClient()
-	{
-		if (clientList.isEmpty()) return null;
-		lastUsedIndex = ++lastUsedIndex % clientList.size();
-		return clientList.get(getLastUsedIndex());
-	}
+  /**
+   * Get the next client connection.
+   * @return a <code>JPPFClientConnection</code> instances.
+   */
+  public JPPFClientConnection nextClient()
+  {
+    if (clientList.isEmpty()) return null;
+    lastUsedIndex = ++lastUsedIndex % clientList.size();
+    return clientList.get(getLastUsedIndex());
+  }
 
-	/**
-	 * Determine whether this pool is empty.
-	 * @return <code>true</code> if this pool is empty, <code>false</code> otherwise.
-	 */
-	public boolean isEmpty() {
-		return clientList.isEmpty();
-	}
+  /**
+   * Determine whether this pool is empty.
+   * @return <code>true</code> if this pool is empty, <code>false</code> otherwise.
+   */
+  public boolean isEmpty() {
+    return clientList.isEmpty();
+  }
 
-	/**
-	 * Get the current size of this pool.
-	 * @return the size as an int.
-	 */
-	public int size()
-	{
-		return clientList.size();
-	}
+  /**
+   * Get the current size of this pool.
+   * @return the size as an int.
+   */
+  public int size()
+  {
+    return clientList.size();
+  }
 
-	/**
-	 * Add a driver connection to this pool.
-	 * @param client the connection too add.
-	 * @return true if the underlying list of connections changed as a result of calling this method.
-	 */
-	public boolean add(final JPPFClientConnection client) {
-		return clientList.add(client);
-	}
+  /**
+   * Add a driver connection to this pool.
+   * @param client the connection too add.
+   * @return true if the underlying list of connections changed as a result of calling this method.
+   */
+  public boolean add(final JPPFClientConnection client) {
+    return clientList.add(client);
+  }
 
-	/**
-	 * Remove a driver connection from this pool.
-	 * @param client the connection too remove.
-	 * @return true if the underlying list of connections changed as a result of calling this method.
-	 */
-	public boolean remove(final JPPFClientConnection client) {
-		if(clientList.remove(client)) {
-			if(lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
-			return true;
-		} else
-			return false;
-	}
+  /**
+   * Remove a driver connection from this pool.
+   * @param client the connection too remove.
+   * @return true if the underlying list of connections changed as a result of calling this method.
+   */
+  public boolean remove(final JPPFClientConnection client) {
+    if(clientList.remove(client)) {
+      if(lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
+      return true;
+    } else
+      return false;
+  }
 
-	/**
-	 * Get the priority associated with this pool.
-	 * @return the priority as an int.
-	 */
-	public int getPriority()
-	{
-		return priority;
-	}
+  /**
+   * Get the priority associated with this pool.
+   * @return the priority as an int.
+   */
+  public int getPriority()
+  {
+    return priority;
+  }
 
-	/**
-	 * Get the index of the last used connection in this pool.
-	 * @return the last used index as an int.
-	 */
-	public int getLastUsedIndex()
-	{
-		return lastUsedIndex;
-	}
+  /**
+   * Get the index of the last used connection in this pool.
+   * @return the last used index as an int.
+   */
+  public int getLastUsedIndex()
+  {
+    return lastUsedIndex;
+  }
 }

@@ -26,101 +26,101 @@ import javax.swing.text.*;
  */
 public abstract class TextOption extends AbstractOption
 {
-	/**
-	 * Text field containing the option value as text.
-	 */
-	protected JTextField field = null;
-	/**
-	 * Label associated with the text field.
-	 */
-	protected JLabel fieldLabel = null;
+  /**
+   * Text field containing the option value as text.
+   */
+  protected JTextField field = null;
+  /**
+   * Label associated with the text field.
+   */
+  protected JLabel fieldLabel = null;
 
-	/**
-	 * Constructor provided as a convenience to facilitate the creation of
-	 * option elements through reflexion.
-	 */
-	public TextOption()
-	{
-	}
+  /**
+   * Constructor provided as a convenience to facilitate the creation of
+   * option elements through reflexion.
+   */
+  public TextOption()
+  {
+  }
 
-	/**
-	 * Initialize this text option with the specified parameters.
-	 * @param name this component's name.
-	 * @param label the label displayed with the checkbox.
-	 * @param tooltip the tooltip associated with the checkbox.
-	 * @param value the initial value of this component.
-	 */
-	public TextOption(final String name, final String label, final String tooltip, final String value)
-	{
-		this.name = name;
-		this.label = label;
-		setToolTipText(tooltip);
-		this.value = value;
-	}
+  /**
+   * Initialize this text option with the specified parameters.
+   * @param name this component's name.
+   * @param label the label displayed with the checkbox.
+   * @param tooltip the tooltip associated with the checkbox.
+   * @param value the initial value of this component.
+   */
+  public TextOption(final String name, final String label, final String tooltip, final String value)
+  {
+    this.name = name;
+    this.label = label;
+    setToolTipText(tooltip);
+    this.value = value;
+  }
 
-	/**
-	 * Create the UI components for this option.
-	 */
-	@Override
-	public void createUI()
-	{
-		fieldLabel = new JLabel(label);
-		field = createField();
-		field.setColumns(10);
-		if (toolTipText != null)
-		{
-			field.setToolTipText(toolTipText);
-			fieldLabel.setToolTipText(toolTipText);
-		}
-		//UIComponent = layoutComponents(fieldLabel, field);
-		//UIComponent = layoutComponents(fieldLabel, "align left, growx 0, pushx", field, "gap rel, grow");
-		UIComponent = layoutComponents(fieldLabel, "align left, grow 0", field, "gap rel, grow, push");
-		setupValueChangeNotifications();
-	}
+  /**
+   * Create the UI components for this option.
+   */
+  @Override
+  public void createUI()
+  {
+    fieldLabel = new JLabel(label);
+    field = createField();
+    field.setColumns(10);
+    if (toolTipText != null)
+    {
+      field.setToolTipText(toolTipText);
+      fieldLabel.setToolTipText(toolTipText);
+    }
+    //UIComponent = layoutComponents(fieldLabel, field);
+    //UIComponent = layoutComponents(fieldLabel, "align left, growx 0, pushx", field, "gap rel, grow");
+    UIComponent = layoutComponents(fieldLabel, "align left, grow 0", field, "gap rel, grow, push");
+    setupValueChangeNotifications();
+  }
 
-	/**
-	 * Create the text field that holds the value of this option.
-	 * @return a JTextField instance.
-	 */
-	protected abstract JTextField createField();
+  /**
+   * Create the text field that holds the value of this option.
+   * @return a JTextField instance.
+   */
+  protected abstract JTextField createField();
 
-	/**
-	 * Get the text in the text field.
-	 * @return a string value.
-	 * @see org.jppf.ui.options.AbstractOption#getValue()
-	 */
-	@Override
-	public Object getValue()
-	{
-		Document doc = field.getDocument();
-		try
-		{
-			value = doc.getText(0, doc.getLength());
-		}
-		catch(BadLocationException e)
-		{
-		}
-		return value;
-	}
+  /**
+   * Get the text in the text field.
+   * @return a string value.
+   * @see org.jppf.ui.options.AbstractOption#getValue()
+   */
+  @Override
+  public Object getValue()
+  {
+    Document doc = field.getDocument();
+    try
+    {
+      value = doc.getText(0, doc.getLength());
+    }
+    catch(BadLocationException e)
+    {
+    }
+    return value;
+  }
 
-	/**
-	 * Add a listener to the underlying text document, to receive and propagate change events.
-	 * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-	 */
-	@Override
-	protected void setupValueChangeNotifications()
-	{
-	}
+  /**
+   * Add a listener to the underlying text document, to receive and propagate change events.
+   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
+   */
+  @Override
+  protected void setupValueChangeNotifications()
+  {
+  }
 
-	/**
-	 * Enable or disable this option.
-	 * @param enabled true to enable this option, false to disable it.
-	 * @see org.jppf.ui.options.Option#setEnabled(boolean)
-	 */
-	@Override
-	public void setEnabled(final boolean enabled)
-	{
-		field.setEnabled(enabled);
-		fieldLabel.setEnabled(enabled);
-	}
+  /**
+   * Enable or disable this option.
+   * @param enabled true to enable this option, false to disable it.
+   * @see org.jppf.ui.options.Option#setEnabled(boolean)
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
+  {
+    field.setEnabled(enabled);
+    fieldLabel.setEnabled(enabled);
+  }
 }

@@ -29,67 +29,67 @@ import org.slf4j.*;
  */
 public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implements Runnable
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger log = LoggerFactory.getLogger(StateTransitionTask.class);
-	/**
-	 * Determines whether DEBUG logging level is enabled.
-	 */
-	private static boolean debugEnabled = log.isDebugEnabled();
-	/**
-	 * Determines whether TRACE logging level is enabled.
-	 */
-	private static boolean traceEnabled = log.isTraceEnabled();
-	/**
-	 * The channel whose state is changing.
-	 */
-	private ChannelWrapper<?> channel = null;
-	/**
-	 * The context attached to the key.
-	 */
-	private NioContext<S> ctx = null;
-	/**
-	 * The factory ofr the server that runs this task.
-	 */
-	private NioServerFactory<S, T> factory = null;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(StateTransitionTask.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether TRACE logging level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * The channel whose state is changing.
+   */
+  private ChannelWrapper<?> channel = null;
+  /**
+   * The context attached to the key.
+   */
+  private NioContext<S> ctx = null;
+  /**
+   * The factory ofr the server that runs this task.
+   */
+  private NioServerFactory<S, T> factory = null;
 
-	/**
-	 * Initialize this task with the specified key and factory.
-	 * @param channel the channel whose state is changing.
-	 * @param factory the factory for the server that runs this task.
-	 */
-	public StateTransitionTask(final ChannelWrapper<?> channel, final NioServerFactory<S, T> factory)
-	{
-		this.channel = channel;
-		this.factory = factory;
-	}
+  /**
+   * Initialize this task with the specified key and factory.
+   * @param channel the channel whose state is changing.
+   * @param factory the factory for the server that runs this task.
+   */
+  public StateTransitionTask(final ChannelWrapper<?> channel, final NioServerFactory<S, T> factory)
+  {
+    this.channel = channel;
+    this.factory = factory;
+  }
 
-	/**
-	 * Perform the state transition.
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void run()
-	{
-		synchronized(channel)
-		{
-			StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
-			this.ctx = (NioContext<S>) channel.getContext();
-			if (traceEnabled) log.trace("performing transition to state " + ctx.getState() + " for " + channel);
-			try
-			{
-				NioState<T> state = factory.getState(ctx.getState());
-				T transition = state.performTransition(channel);
-				if (transition != null) transitionManager.transitionChannel(channel, transition);
-			}
-			catch(Exception e)
-			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.warn(e.getMessage());
-				ctx.handleException(channel);
-			}
-		}
-	}
+  /**
+   * Perform the state transition.
+   * @see java.lang.Runnable#run()
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public void run()
+  {
+    synchronized(channel)
+    {
+      StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
+      this.ctx = (NioContext<S>) channel.getContext();
+      if (traceEnabled) log.trace("performing transition to state " + ctx.getState() + " for " + channel);
+      try
+      {
+        NioState<T> state = factory.getState(ctx.getState());
+        T transition = state.performTransition(channel);
+        if (transition != null) transitionManager.transitionChannel(channel, transition);
+      }
+      catch(Exception e)
+      {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(e.getMessage());
+        ctx.handleException(channel);
+      }
+    }
+  }
 }

@@ -26,27 +26,27 @@ import org.jppf.server.protocol.URLLocation;
  */
 public class FileDownloadTestTask extends JPPFTestTask
 {
-	/**
-	 * The URL of a file to download as a string.
-	 */
-	protected String location = null;
+  /**
+   * The URL of a file to download as a string.
+   */
+  protected String location = null;
 
-	/**
-	 * Initialize this task with the location of a file to download.
-	 * @param location the file URL as a string.
-	 */
-	public FileDownloadTestTask(final String location)
-	{
-		this.location = location;
-	}
+  /**
+   * Initialize this task with the location of a file to download.
+   * @param location the file URL as a string.
+   */
+  public FileDownloadTestTask(final String location)
+  {
+    this.location = location;
+  }
 
-	/**
-	 * Run the task.
-	 * @throws Exception if any error occurs while running ths task..
-	 * @see java.lang.Runnable#run()
-	 */
-	public void testDownloadUpload() throws Exception
-	{
-		new URLLocation(location).copyTo(new URLLocation("ftp://localhost/Options.xsd"));
-	}
+  /**
+   * Run the task.
+   * @throws Exception if any error occurs while running ths task..
+   * @see java.lang.Runnable#run()
+   */
+  public void testDownloadUpload() throws Exception
+  {
+    new URLLocation(location).copyTo(new URLLocation("ftp://localhost/Options.xsd"));
+  }
 }

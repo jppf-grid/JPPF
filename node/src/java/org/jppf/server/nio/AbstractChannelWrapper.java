@@ -31,81 +31,81 @@ import org.jppf.utils.ThreadSynchronization;
  */
 public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization implements ChannelWrapper<S>
 {
-	/**
-	 * Count of instances of this class.
-	 */
-	private static AtomicLong instanceCount = new AtomicLong(0);
-	/**
-	 * Id of this instance.
-	 */
-	protected final long id = instanceCount.incrementAndGet();
-	/**
-	 * The channel to wrap.
-	 */
-	protected S channel;
-	/**
-	 * The selector for this channel.
-	 */
-	protected ChannelSelector selector = null;
+  /**
+   * Count of instances of this class.
+   */
+  private static AtomicLong instanceCount = new AtomicLong(0);
+  /**
+   * Id of this instance.
+   */
+  protected final long id = instanceCount.incrementAndGet();
+  /**
+   * The channel to wrap.
+   */
+  protected S channel;
+  /**
+   * The selector for this channel.
+   */
+  protected ChannelSelector selector = null;
 
-	/**
-	 * Initialize this channel wrapper with the specified channel.
-	 * @param channel the channel to wrap.
-	 */
-	public AbstractChannelWrapper(final S channel)
-	{
-		this.channel = channel;
-	}
+  /**
+   * Initialize this channel wrapper with the specified channel.
+   * @param channel the channel to wrap.
+   */
+  public AbstractChannelWrapper(final S channel)
+  {
+    this.channel = channel;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public S getChannel()
-	{
-		return channel;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public S getChannel()
+  {
+    return channel;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#close()
-	 */
-	@Override
-	public void close() throws Exception
-	{
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#close()
+   */
+  @Override
+  public void close() throws Exception
+  {
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public abstract NioContext getContext();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public abstract NioContext getContext();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isOpen()
-	{
-		return true;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isOpen()
+  {
+    return true;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode()
-	{
-		return ((channel == null) ? 0 : channel.hashCode());
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode()
+  {
+    return ((channel == null) ? 0 : channel.hashCode());
+  }
 
-	/**
-	 * Determine whether an other object is equal to this one.
-	 * @param obj the object to compare with.
-	 * @return true if this object is equal to the other one, false otherwise.
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	/*
+  /**
+   * Determine whether an other object is equal to this one.
+   * @param obj the object to compare with.
+   * @return true if this object is equal to the other one, false otherwise.
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  /*
 	@Override
 	public boolean equals(final Object obj)
 	{
@@ -116,121 +116,121 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
 		if (channel == null) return (other.channel == null);
 		return channel.equals(other.channel);
 	}
-	*/
+   */
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		//return getClass().getSimpleName() + "[id=" + getId() + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
-		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getSimpleName());
-		sb.append('[');
-		sb.append(getId());
-		sb.append(',').append(" readyOps=").append(getReadyOps());
-		sb.append(',').append(" keyOps=").append(getKeyOps());
-		//sb.append(",").append(" state=").append(getContext().getState());
-		sb.append(']');
-		return sb.toString();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    //return getClass().getSimpleName() + "[id=" + getId() + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName());
+    sb.append('[');
+    sb.append(getId());
+    sb.append(',').append(" readyOps=").append(getReadyOps());
+    sb.append(',').append(" keyOps=").append(getKeyOps());
+    //sb.append(",").append(" state=").append(getContext().getState());
+    sb.append(']');
+    return sb.toString();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#getKeyOps()
-	 */
-	@Override
-	public int getKeyOps()
-	{
-		return 0;
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#getKeyOps()
+   */
+  @Override
+  public int getKeyOps()
+  {
+    return 0;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#setKeyOps(int)
-	 */
-	@Override
-	public void setKeyOps(final int keyOps)
-	{
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#setKeyOps(int)
+   */
+  @Override
+  public void setKeyOps(final int keyOps)
+  {
+  }
 
-	/**
-	 * Get the operations available for this channel.
-	 * @return the operations as an int value.
-	 */
-	@Override
-	public abstract int getReadyOps();
+  /**
+   * Get the operations available for this channel.
+   * @return the operations as an int value.
+   */
+  @Override
+  public abstract int getReadyOps();
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#isReadable()
-	 */
-	@Override
-	public boolean isReadable()
-	{
-		return (getReadyOps() & OP_READ) != 0;
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#isReadable()
+   */
+  @Override
+  public boolean isReadable()
+  {
+    return (getReadyOps() & OP_READ) != 0;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#isWritable()
-	 */
-	@Override
-	public boolean isWritable()
-	{
-		return (getReadyOps() & OP_WRITE) != 0;
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#isWritable()
+   */
+  @Override
+  public boolean isWritable()
+  {
+    return (getReadyOps() & OP_WRITE) != 0;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#isAcceptable()
-	 */
-	@Override
-	public boolean isAcceptable()
-	{
-		return (getReadyOps() & OP_ACCEPT) != 0;
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#isAcceptable()
+   */
+  @Override
+  public boolean isAcceptable()
+  {
+    return (getReadyOps() & OP_ACCEPT) != 0;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 * @see org.jppf.server.nio.ChannelWrapper#isConnectable()
-	 */
-	@Override
-	public boolean isConnectable()
-	{
-		return (getReadyOps() & OP_CONNECT) != 0;
-	}
+  /**
+   * {@inheritDoc}
+   * @see org.jppf.server.nio.ChannelWrapper#isConnectable()
+   */
+  @Override
+  public boolean isConnectable()
+  {
+    return (getReadyOps() & OP_CONNECT) != 0;
+  }
 
-	/**
-	 * Default implementation of this method returns null.
-	 * @return by default this method returns null.
-	 * @see org.jppf.server.nio.ChannelWrapper#getSelector()
-	 */
-	@Override
-	public ChannelSelector getSelector()
-	{
-		return selector;
-	}
+  /**
+   * Default implementation of this method returns null.
+   * @return by default this method returns null.
+   * @see org.jppf.server.nio.ChannelWrapper#getSelector()
+   */
+  @Override
+  public ChannelSelector getSelector()
+  {
+    return selector;
+  }
 
-	/**
-	 * By default, this method does nothing.
-	 * Subclasses should override it ot implement their own selection mechanism.
-	 * @param selector the selector associated with this mechanism.
-	 * @see org.jppf.server.nio.ChannelWrapper#setSelector(org.jppf.server.nio.ChannelSelector)
-	 */
-	@Override
-	public void setSelector(final ChannelSelector selector)
-	{
-		this.selector = selector;
-	}
+  /**
+   * By default, this method does nothing.
+   * Subclasses should override it ot implement their own selection mechanism.
+   * @param selector the selector associated with this mechanism.
+   * @see org.jppf.server.nio.ChannelWrapper#setSelector(org.jppf.server.nio.ChannelSelector)
+   */
+  @Override
+  public void setSelector(final ChannelSelector selector)
+  {
+    this.selector = selector;
+  }
 
-	/**
-	 * Get a string uniquely identifying this channel.
-	 * @return a unique id as a string.
-	 */
-	public String getId()
-	{
-		return "id=" + id;
-	}
+  /**
+   * Get a string uniquely identifying this channel.
+   * @return a unique id as a string.
+   */
+  public String getId()
+  {
+    return "id=" + id;
+  }
 }

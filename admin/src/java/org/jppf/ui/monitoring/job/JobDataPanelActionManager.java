@@ -27,12 +27,12 @@ import org.jppf.ui.treetable.JTreeTable;
  */
 public class JobDataPanelActionManager extends JTreeTableActionHandler
 {
-	/**
-	 * Initialize this action manager with the specified JTreeTable component.
-	 * @param treeTable - the JTreeTable whose actions are managed.
-	 */
-	public JobDataPanelActionManager(final JTreeTable treeTable)
-	{
-		super(treeTable);
-	}
+  /**
+   * Initialize this action manager with the specified JTreeTable component.
+   * @param treeTable - the JTreeTable whose actions are managed.
+   */
+  public JobDataPanelActionManager(final JTreeTable treeTable)
+  {
+    super(treeTable);
+  }
 }

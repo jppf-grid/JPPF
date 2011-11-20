@@ -26,8 +26,8 @@ package test.org.jppf.test.setup;
  */
 public class BaseSetup
 {
-	/**
-	 * Message used for successful task execution.
-	 */
-	public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
+  /**
+   * Message used for successful task execution.
+   */
+  public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
 }

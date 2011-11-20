@@ -26,21 +26,21 @@ import java.security.PrivilegedAction;
  */
 public abstract class AbstractPrivilegedAction<T> implements PrivilegedAction<T>
 {
-	/**
-	 * Used to capture an exception resulting from the method or constructor invocation.
-	 */
-	protected Exception exception = null;
-	/**
-	 * The parameters of the method or constructor to invoke.
-	 */
-	protected Object[] args = null;
+  /**
+   * Used to capture an exception resulting from the method or constructor invocation.
+   */
+  protected Exception exception = null;
+  /**
+   * The parameters of the method or constructor to invoke.
+   */
+  protected Object[] args = null;
 
-	/**
-	 * Get the exception resulting from the method or constructor invocation.
-	 * @return an <code>Exception</code> instance.
-	 */
-	public Exception getException()
-	{
-		return exception;
-	}
+  /**
+   * Get the exception resulting from the method or constructor invocation.
+   * @return an <code>Exception</code> instance.
+   */
+  public Exception getException()
+  {
+    return exception;
+  }
 }
