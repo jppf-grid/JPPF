@@ -91,15 +91,12 @@ class SaveFileAction implements PrivilegedAction<File>
       {
         String dir = tmpDirs.get(0) + '_' + tmpDirs.size();
         File f = new File(dir + File.separator);
-        if (!f.exists())
-        {
-          if (!f.mkdirs()) throw new IOException("could not create folder " + f);
-          f.deleteOnExit();
-        }
+        FileUtils.mkdirs(f);
+        f.deleteOnExit();
         tmp = new File(f, name);
         tmpDirs.add(dir);
       }
-      if (!tmp.getParentFile().mkdirs()) throw new IOException("could not create folder " + tmp.getParentFile());
+      FileUtils.mkdirs(tmp);
       tmp.deleteOnExit();
       FileUtils.writeBytesToFile(definition, tmp);
     }

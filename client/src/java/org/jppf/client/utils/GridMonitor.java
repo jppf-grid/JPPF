@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.utils.SystemUtils;
+import org.jppf.utils.*;
 
 /**
  * This class monitors each of the nodes and their memory usage during execution.
@@ -347,10 +347,7 @@ public class GridMonitor
     {
       File dir = new File(folder);
       // create the folders if they don't exist
-      if (!dir.exists())
-      {
-        if (!dir.mkdirs()) throw new IOException("could not create folder " + dir);
-      }
+      FileUtils.mkdirs(dir);
       int nodeCount = 1;
       for (Map.Entry<String, List<NodeData>> entry: dataMap.entrySet())
       {

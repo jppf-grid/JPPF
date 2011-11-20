@@ -183,10 +183,7 @@ class ResourceCache
       int n = findFolderIndex(base);
       String s = base + File.separator + n;
       File baseDir = new File(s + File.separator);
-      if (!baseDir.exists())
-      {
-        if (!baseDir.mkdirs())  throw new IOException("could not create folder " + baseDir);
-      }
+      FileUtils.mkdirs(baseDir);
       tempFolders.add(s);
       if (traceEnabled) log.trace("added temp folder " + s);
     }
@@ -205,10 +202,7 @@ class ResourceCache
   private int findFolderIndex(final String folder) throws Exception
   {
     File dir = new File(folder);
-    if (!dir.exists())
-    {
-      if (!dir.mkdirs()) throw new IOException("could not create folder " + dir);
-    }
+    FileUtils.mkdirs(dir);
     File[] subdirs = dir.listFiles(new FileFilter()
     {
       @Override

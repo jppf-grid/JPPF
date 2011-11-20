@@ -501,4 +501,18 @@ public final class FileUtils
     }
     return success;
   }
+ 
+  /**
+   * Create the folders of the specified path, if they do not all already esist.
+   * @param file the path for which to create the folders. If it is a file, then folders for its parent path are created.
+   * @throws IOException if the folders could not be created.
+   */
+  public static void mkdirs(final File file) throws IOException
+  {
+    File folder = file.isDirectory() ? file : file.getParentFile();
+    if (!folder.exists())
+    {
+      if (!folder.mkdirs()) throw new IOException("could not create folder " + folder);
+    }
+  }
 }

@@ -142,7 +142,7 @@
 
 	<target name="javadoc.package" description="Package the javadoc for deployment on the web site">
     <delete file="${docs}/api.tar.gz" quiet="true"/>
-		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${home}" includes="api-2.0/**/*.*"/>
+		<tar destfile="${docs}/api.tar.gz" compression="gzip" basedir="${javadoc}" includes="**/*.*"/>
 	</target>
 
 </project> 

@@ -93,7 +93,7 @@ public class HtmlDocGenerator
     String s = FileUtils.readTextFile(source);
     s = processTemplates(new HashMap<String, String>(), s, templateFolder);
     File targetFile = new File(target);
-    if (!targetFile.getParentFile().mkdirs()) throw new IOException("could not create folder " + targetFile.getParentFile());
+    FileUtils.mkdirs(targetFile);
     FileUtils.writeTextFile(target, s);
   }
 
@@ -312,10 +312,7 @@ public class HtmlDocGenerator
     HtmlDocGenerator docGen = new HtmlDocGenerator();
     for (File file: sourceDir.listFiles(new JPPFFileFilter((String[]) parameters.get(FILE_INCLUDES), (String[]) parameters.get(FILE_EXCLUDES))))
     {
-      if (!destDir.exists())
-      {
-        if (!destDir.mkdirs()) throw new IOException("could not create folder " + destDir);
-      }
+      FileUtils.mkdirs(destDir);
       String target = destDir.getPath();
       if (!target.endsWith("/") && !target.endsWith("\\")) target += '/';
       target += file.getName();

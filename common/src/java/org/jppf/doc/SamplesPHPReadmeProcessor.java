@@ -125,7 +125,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
     if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
     s += "/Readme.php";
     File outFile = new File(destDir, s);
-    if (!outFile.getParentFile().mkdirs()) throw new IOException("could not create folder " + outFile.getParentFile());
+    FileUtils.mkdirs(outFile);
     FileUtils.writeTextFile(outFile, result);
     System.out.println("writing output file " + outFile);
   }
