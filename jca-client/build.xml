@@ -103,7 +103,6 @@
 	<!-- ========================================================================= -->
 
 	<target name="build" depends="ear.all,rar.all"/>
-	<target name="build.deploy.jboss" depends="build, deploy.1.rar.jboss, deploy.1.ear.jboss"/>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -376,18 +375,9 @@
 	
 	<!--
 	-->
-	<target name="deploy.jboss7">
-		<delete quiet="true"><fileset dir="C:/Tools/jboss-as-web-7.0.0.Final/standalone/deployments" excludes="*.txt"/></delete>
-		<copy todir="C:/Tools/jboss-as-web-7.0.0.Final/standalone/deployments" file="${build.dir}/jppf_ra_${jboss7}.rar"/>
-		<copy todir="C:/Tools/jboss-as-web-7.0.0.Final/standalone/deployments" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
-	</target>
-
-	<target name="deploy.1.ear.jboss">
-		<copy todir="C:/Tools/jboss-5.1.0.GA/server/default/deploy" file="${build.zdir}/${ear.prefix}_${jboss}.ear"/>
-	</target>
-
-	<target name="deploy.1.rar.jboss">
-		<copy todir="C:/Tools/jboss-5.1.0.GA/server/default/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
+	<target name="deploy.jboss">
+		<copy todir="C:/Tools/jboss-6.0.0/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss}.rar" overwrite="true"/>
+		<copy todir="C:/Tools/jboss-6.0.0/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear" overwrite="true"/>
 	</target>
 
 	<target name="deploy.2.rar.weblogic">
