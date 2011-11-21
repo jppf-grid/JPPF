@@ -251,7 +251,7 @@ public class PolicyParser
 	 */
 	public static void validatePolicy(String policyContent) throws JPPFException, Exception
 	{
-		validatePolicy(FileUtils.getFileReader(policyContent));
+		validatePolicy(new StringReader(policyContent));
 	}
 
 	/**
