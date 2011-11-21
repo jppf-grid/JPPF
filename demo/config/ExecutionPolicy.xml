@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jppf:ExecutionPolicy xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd">
+	<Contains ignoreCase="true">
+		<Property>ipv4.addresses</Property>
+		<Value>mydomain.com</Value>
+	</Contains>
+</jppf:ExecutionPolicy>
