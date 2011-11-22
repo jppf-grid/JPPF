@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
 	<?php
-		$jppfVersion = "2.5";
+		$jppfVersion = "2.5.4";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -29,7 +29,7 @@ $template{name="about-page-header" title="Downloads"}$
 
 	<h3>Samples and tutorials</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a>
+	Make sure to get started with our <a href="/doc/v2/index.php?title=A_first_taste_of_JPPF">online tutorial</a>
 
 	<hr>
 
