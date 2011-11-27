@@ -212,23 +212,25 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
 	}
 
 	/**
-	 * Submit a task for execution.
+	 * Submit a JPPFTask that returns the specified type of result.
+	 * @param <T> the type of result returned by the task.
 	 * @param task the task to submit.
+	 * @param result this parameter is only here for type inference (I know, it's ugly).
 	 * @return a {@link Future} representing pending completion of the task.
 	 */
-	Future<Object> addTask(JPPFTask task)
+	<T> Future<T> addTask(JPPFTask task, T result)
 	{
 		lock.lock();
 		try
 		{
 			if (debugEnabled) log.debug("submitting one JPPFTask");
-			Future<Object> future = null;
+			Future<T> future = null;
 			JPPFJob job = nextJobRef.get();
 			try
 			{
 				FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
 				job.addTask(task);
-				future = new JPPFTaskFuture<Object>(collector, task.getPosition());
+				future = new JPPFTaskFuture<T>(collector, task.getPosition());
 			}
 			catch (JPPFException e)
 			{

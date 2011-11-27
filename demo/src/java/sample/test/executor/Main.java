@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.concurrent.JPPFExecutorService;
+import org.jppf.scheduling.JPPFSchedule;
 import org.slf4j.*;
 
 
@@ -43,52 +44,54 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-		logger.info("Starting test");
-		JPPFClient client = new JPPFClient();
-		try
-		{
-			JPPFExecutorService executor = new JPPFExecutorService(client);
-			executor.setBatchSize(5);
-			List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
-			int nbTasks = 20;
-			logger.info("Adding tasks");
-			for (int i = 0; i < nbTasks; i++)
-			{
-				futures.add(executor.submit(new SimpleCountTask(i)));
-				//Thread.sleep(1);
-			}
-			logger.info("Waiting for pending tasks to complete");
-			executor.shutdown();
-			while (!executor.isTerminated())
-			{
-				Thread.sleep(1000);
-			}
-			logger.info("Pending tasks completed");
-			for (int i = 0; i < nbTasks; i++)
-			{
-				logger.info("Checking task {}", i);
-				if (futures.get(i).get() != i)
-				{
-					throw new Exception("Invalid future response");
-				}
-			}
-			logger.info("All completed tasks checked");
-		}
-		catch (Exception e)
-		{
-			logger.error("Error", e);
-		}
-		finally
-		{
-			try
-			{
-				client.close();
-			}
-			catch (Throwable e)
-			{
-				e.printStackTrace();
-			}
-		}
+    logger.info("Starting test");
+    JPPFClient client = new JPPFClient();
+    JPPFExecutorService executor = new JPPFExecutorService(client);
+    try
+    {
+      executor.setBatchSize(5);
+      executor.setBatchTimeout(100L);
+      List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
+      int nbTasks = 20;
+      logger.info("Adding tasks");
+      for (int i = 0; i < nbTasks; i++)
+      {
+        futures.add(executor.submit(new SimpleCountTask(i)));
+        //Thread.sleep(1);
+      }
+      logger.info("Waiting for pending tasks to complete");
+      /*
+      executor.shutdown();
+      while (!executor.isTerminated())
+      {
+        Thread.sleep(1000);
+      }
+      */
+      logger.info("Pending tasks completed");
+      for (int i = 0; i < nbTasks; i++)
+      {
+        logger.info("Checking task {}", i);
+        if (futures.get(i).get() != i)
+        {
+          throw new Exception("Invalid future response");
+        }
+      }
+      logger.info("All completed tasks checked");
+
+      MyTask myTask = new MyTask();
+      myTask.setTimeoutSchedule(new JPPFSchedule(5000L));
+      Future<String> future = executor.submit((Callable<String>) myTask);
+      System.out.println("result: " + future.get());
+    }
+    catch (Exception e)
+    {
+      logger.error("Error", e);
+    }
+    finally
+    {
+      executor.shutdownNow();
+      client.close();
+    }
 	}
 
 	/**
