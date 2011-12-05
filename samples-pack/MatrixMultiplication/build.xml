@@ -88,7 +88,7 @@
 
 	<target name="run">
 		<echo message="starting the Matrix Multiplication application"/>
-		<java fork="yes" classname="org.jppf.samples.matrix.MatrixRunner" classpathref="project.classpath">
+		<java fork="yes" classname="org.jppf.example.matrix.MatrixRunner" classpathref="project.classpath">
 			<jvmarg value="-Xmx256m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
