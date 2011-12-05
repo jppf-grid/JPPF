@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.addons.nodetray;
+package org.jppf.example.nodetray;
 
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
