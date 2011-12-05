@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.samples.webcrawler;
+package org.jppf.example.webcrawler;
 
 import java.util.*;
 
