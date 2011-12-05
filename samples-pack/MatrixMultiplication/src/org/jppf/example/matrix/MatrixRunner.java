@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.samples.matrix;
+package org.jppf.example.matrix;
 
 import java.util.List;
 
