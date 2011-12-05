@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.samples.jaligner;
+package org.jppf.example.jaligner;
 
 import jaligner.*;
 import jaligner.matrix.Matrix;

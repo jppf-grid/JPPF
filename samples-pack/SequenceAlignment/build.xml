@@ -93,7 +93,7 @@
 			<jvmarg value="-Xmx256m"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
-			<arg value="org/jppf/samples/jaligner/xml/JPPFSequenceAlignment.xml"/>
+			<arg value="org/jppf/example/jaligner/xml/JPPFSequenceAlignment.xml"/>
 			<arg value="file"/>
 		</java>       
 	</target>
