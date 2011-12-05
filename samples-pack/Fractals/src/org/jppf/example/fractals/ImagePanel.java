@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.samples.fractals;
+package org.jppf.example.fractals;
 
 import java.awt.*;
 import java.io.File;

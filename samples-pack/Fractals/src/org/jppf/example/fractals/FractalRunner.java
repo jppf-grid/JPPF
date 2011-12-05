@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.samples.fractals;
+package org.jppf.example.fractals;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
