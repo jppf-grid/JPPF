@@ -19,4 +19,4 @@
 /**
  * A demonstration of JPPF job recovery after an application crash.
  */
-package org.jppf.examples.jobrecovery;
+package org.jppf.example.jobrecovery;

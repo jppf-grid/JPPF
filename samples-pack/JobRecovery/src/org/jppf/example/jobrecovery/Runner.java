@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.examples.jobrecovery;
+package org.jppf.example.jobrecovery;
 
 import java.util.*;
 
