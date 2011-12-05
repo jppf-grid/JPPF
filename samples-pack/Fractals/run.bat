@@ -1,5 +1,5 @@
 @echo off
-set JAVA_ARGS=-cp config;classes;../shared/lib/* -Xmx256m -Dlog4j.configuration=log4j-gui.properties -Djppf.config=jppf-gui.properties org.jppf.ui.monitoring.UILauncher org/jppf/samples/fractals/xml/JPPFFractals.xml file
+set JAVA_ARGS=-cp config;classes;../shared/lib/* -Xmx256m -Dlog4j.configuration=log4j-gui.properties -Djppf.config=jppf-gui.properties org.jppf.ui.monitoring.UILauncher org/jppf/example/fractals/xml/JPPFFractals.xml file
 
 rem *** start the JPPF admin UI with the DOS console,
 rem call java %JAVA_ARGS%
