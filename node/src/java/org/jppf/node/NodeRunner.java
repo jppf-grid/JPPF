@@ -26,6 +26,7 @@ import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.logging.jmx.JmxMessageNotifier;
+import org.jppf.node.initialization.InitializationHooksHandler;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
@@ -96,6 +97,10 @@ public class NodeRunner
    * The JPPF config is modified by the discovery mechanism, so we want to store the initial values somewhere.
    */
   private static TypedProperties initialConfig = null;
+  /**
+   * Loads and invokes node initialization hooks defined via their SPI definition.
+   */
+  private static InitializationHooksHandler hooksHandler = null;
 
   /**
    * Run a node as a standalone application.
@@ -110,6 +115,8 @@ public class NodeRunner
       new JmxMessageNotifier();
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
+      hooksHandler = new InitializationHooksHandler(initialConfig);
+      hooksHandler.loadHooks();
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0]))
@@ -180,6 +187,7 @@ public class NodeRunner
    */
   public static Node createNode() throws Exception
   {
+    hooksHandler.callHooks();
     if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";
@@ -265,15 +273,16 @@ public class NodeRunner
     if (securityManagerSet)
     {
       if (debugEnabled) log.debug("un-setting security");
-      AccessController.doPrivileged(new PrivilegedAction<Object>()
-          {
+      PrivilegedAction<Object> pa = new PrivilegedAction<Object>()
+      {
         @Override
         public Object run()
         {
           System.setSecurityManager(null);
           return null;
         }
-          });
+      };
+      AccessController.doPrivileged(pa);
       securityManagerSet = false;
     }
   }
@@ -288,14 +297,15 @@ public class NodeRunner
     {
       if (classLoader == null)
       {
-        classLoader = AccessController.doPrivileged(new PrivilegedAction<JPPFClassLoader>()
-            {
+        PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>()
+        {
           @Override
           public JPPFClassLoader run()
           {
             return new JPPFClassLoader(NodeRunner.class.getClassLoader());
           }
-            });
+        };
+        classLoader = AccessController.doPrivileged(pa);
         Thread.currentThread().setContextClassLoader(classLoader);
       }
       return classLoader;
