@@ -60,7 +60,7 @@ class SendingProviderRequestState extends ClassServerState
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		ClassContext context = (ClassContext) wrapper.getContext();
-		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			server.removeProviderConnection(context.getUuid(), wrapper);
 			ChannelWrapper<?> currentRequest = context.getCurrentRequest();

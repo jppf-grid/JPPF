@@ -23,7 +23,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.TO_IDLE_PROVIDER;
 import java.net.ConnectException;
 
 import org.jppf.classloader.LocalClassLoaderChannel;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.slf4j.*;
 
 /**
@@ -59,7 +59,7 @@ class IdleProviderState extends ClassServerState
 	 */
 	public ClassTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
-		if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+		if (wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
 		{
 			ClassContext context = (ClassContext) wrapper.getContext();
 			server.removeProviderConnection(context.getUuid(), wrapper);

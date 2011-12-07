@@ -22,7 +22,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.slf4j.*;
 
 /**
@@ -58,7 +58,7 @@ class SendInitialBundleState extends NodeServerState
 	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		//if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-		if (CHECK_CONNECTION && wrapper.isReadable())
+		if (wrapper.isReadable())
 		{
 			if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}

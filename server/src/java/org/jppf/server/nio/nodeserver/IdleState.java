@@ -58,18 +58,8 @@ class IdleState extends NodeServerState
 	public NodeTransition performTransition(ChannelWrapper<?> wrapper) throws Exception
 	{
 		if (debugEnabled) log.debug("exec() for " + wrapper);
-		if (CHECK_CONNECTION && wrapper.isReadable())
+		if (wrapper.isReadable())
 		{
-			/*
-			if (debugEnabled)
-			{
-				SelectionKey key = ((SelectionKeyWrapper) wrapper).getChannel();
-				SocketChannel channel = (SocketChannel) key.channel();
-				ByteBuffer buf = ByteBuffer.allocate(32768);
-				int n = channel.read(buf);
-				log.debug("readable channel: read " + n + " bytes");
-			}
-			*/
 			if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
 		}
 		return TO_IDLE;
