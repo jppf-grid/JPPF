@@ -28,7 +28,6 @@ import org.jppf.client.utils.GridMonitor;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
-import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.MemoryMapDataProvider;
@@ -114,9 +113,11 @@ public class MatrixRunner implements NotificationListener
 			if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
 			else jppfClient = new JPPFClient();
 			//monitor = new GridMonitor(jppfClient, 1000L);
+			/*
 			monitor = new GridMonitor("localhost", 11198);
 			monitor.testPIDs();
 			monitor.startMonitoring();
+			*/
 
 			// initialize the 2 matrices to multiply
 			Matrix a = new Matrix(size);
@@ -148,8 +149,10 @@ public class MatrixRunner implements NotificationListener
 				JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
 				output("End statistics :\n" + stats.toString());
 			}
+			/*
 			monitor.stopMonitoring();
 			monitor.storeData("./GridMonitoring");
+			*/
 		}
 		finally
 		{
@@ -192,7 +195,7 @@ public class MatrixRunner implements NotificationListener
 		job.setDataProvider(new MemoryMapDataProvider());
 		job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
 		job.getJobSLA().setExecutionPolicy(policy);
-		job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(3000L));
+		//job.getJobSLA().setJobExpirationSchedule(new JPPFSchedule(3000L));
 		//job.getJobSLA().setMaxNodes(8);
 		// submit the tasks for execution
 		List<JPPFTask> results = jppfClient.submit(job);
