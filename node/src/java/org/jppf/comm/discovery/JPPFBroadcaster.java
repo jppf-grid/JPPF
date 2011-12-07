@@ -18,6 +18,7 @@
 
 package org.jppf.comm.discovery;
 
+import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -53,6 +54,10 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	 * Holds the driver connection information to broadcast.
 	 */
 	private JPPFConnectionInformation info = null;
+	/**
+	 * 
+	 */
+	private boolean killed = false;
 
 	/**
 	 * Initialize this broadcaster using the server configuration information.
@@ -132,6 +137,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 				{
 					Pair<MulticastSocket, DatagramPacket> socketInfo = it.next();
 					socketInfo.first().send(socketInfo.second());
+					if (isKilled()) throw new IOException("test");
 				}
 				catch(Exception e)
 				{
@@ -154,5 +160,22 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 		}
 		for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
 		socketsInfo.clear();
+	}
+
+	/**
+	 * 
+	 * @return a boolean.
+	 */
+	private synchronized boolean isKilled()
+	{
+		return killed;
+	}
+
+	/**
+	 * 
+	 */
+	public synchronized void kill()
+	{
+		this.killed = true;
 	}
 }
