@@ -18,14 +18,10 @@
 
 package sample.test.executor;
 
-import java.io.Serializable;
-import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClient;
-import org.jppf.client.concurrent.JPPFExecutorService;
 import org.jppf.scheduling.JPPFSchedule;
-import org.slf4j.*;
 
 
 /**
@@ -33,10 +29,14 @@ import org.slf4j.*;
  */
 public class Main
 {
-	/**
-	 * Logger for this class.
-	 */
-	private static Logger logger = LoggerFactory.getLogger(Main.class);
+  /**
+   * 
+   */
+  private static JPPFClient client;
+  /**
+   * 
+   */
+  private static ExecutorService executor;
 
 	/**
 	 * Entry point.
@@ -44,100 +44,43 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-    logger.info("Starting test");
-    JPPFClient client = new JPPFClient();
-    JPPFExecutorService executor = new JPPFExecutorService(client);
+		System.out.println("Starting test");
     try
     {
-      executor.setBatchSize(5);
-      executor.setBatchTimeout(100L);
-      List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
-      int nbTasks = 20;
-      logger.info("Adding tasks");
-      for (int i = 0; i < nbTasks; i++)
-      {
-        futures.add(executor.submit(new SimpleCountTask(i)));
-        //Thread.sleep(1);
-      }
-      logger.info("Waiting for pending tasks to complete");
-      /*
-      executor.shutdown();
-      while (!executor.isTerminated())
-      {
-        Thread.sleep(1000);
-      }
-      */
-      logger.info("Pending tasks completed");
-      for (int i = 0; i < nbTasks; i++)
-      {
-        logger.info("Checking task {}", i);
-        if (futures.get(i).get() != i)
-        {
-          throw new Exception("Invalid future response");
-        }
-      }
-      logger.info("All completed tasks checked");
-
-      MyTask myTask = new MyTask();
-      myTask.setTimeoutSchedule(new JPPFSchedule(5000L));
-      Future<String> future = executor.submit((Callable<String>) myTask);
+      executor = createExecutor();
+      MyCallable task = new MyCallable();
+      Future<String> future = executor.submit(task);
       System.out.println("result: " + future.get());
     }
     catch (Exception e)
     {
-      logger.error("Error", e);
+      e.printStackTrace();
     }
     finally
     {
-      executor.shutdownNow();
-      client.close();
+      shutdownExecutor();
     }
 	}
 
 	/**
-	 * Simple task.
+	 * Create and configure the executor.
+	 * @return an <code>ExecutorService</code> instance.
+	 * @throws Exception if any error occurs.
 	 */
-	private static class SimpleCountTask implements Callable<Integer>, Serializable
+	public static ExecutorService createExecutor() throws Exception
 	{
-		/**
-		 * Logger for this class.
-		 */
-		private static Logger logger = LoggerFactory.getLogger(SimpleCountTask.class);
-		/**
-		 * Explicit serialVersionUID.
-		 */
-		private static final long serialVersionUID = 3044260680117586115L;
-		/**
-		 * This task's number.
-		 */
-		private int number;
+    client = new JPPFClient();
+		MyJPPFExecutorService executor = new MyJPPFExecutorService(client);
+		executor.registerClass(MyCallable.class, new ExecutionProperties(new JPPFSchedule(2000L), "taskExpired"));
+		return executor;
+	}
 
-		/**
-		 * Default constructor.
-		 */
-		public SimpleCountTask()
-		{
-		}
-
-		/**
-		 * Initialize this task with its number.
-		 * @param number the task number.
-		 */
-		public SimpleCountTask(int number)
-		{
-			this.number = number;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		// @Override
-		public Integer call() throws Exception
-		{
-			logger.info("From logger {}", number);
-			logger.info("From stdout " + number);
-			return number;
-		}
-
+	/**
+	 * Shutdown the executor.
+	 */
+	public static void shutdownExecutor()
+	{
+    executor.shutdown();
+    client.close();
 	}
 }
