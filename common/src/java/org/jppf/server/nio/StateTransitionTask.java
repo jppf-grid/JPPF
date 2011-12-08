@@ -84,8 +84,9 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
 			}
 			catch(Exception e)
 			{
-				if (debugEnabled) log.debug(e.getMessage(), e);
-				else log.warn(e.getMessage());
+			  String msg = "error on channel " + channel + " : " + e.getClass().getName() + ": ";
+				if (debugEnabled) log.debug(msg + e.getMessage(), e);
+				else log.warn(msg + e.getMessage());
 				ctx.handleException(channel);
 			}
 		}
