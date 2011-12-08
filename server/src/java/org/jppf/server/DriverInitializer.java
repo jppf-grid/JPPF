@@ -176,7 +176,7 @@ public class DriverInitializer
 		{
 			broadcaster = new JPPFBroadcaster(getConnectionInformation());
 			new Thread(broadcaster, "JPPF Broadcaster").start();
-			if (config.getBoolean("jppf.discovery.broadcast.killer", true))
+			if (config.getBoolean("jppf.discovery.broadcast.killer", false))
 			{
 				Runnable r = new Runnable()
 				{
