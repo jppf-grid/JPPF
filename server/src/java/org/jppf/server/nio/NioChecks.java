@@ -19,6 +19,7 @@
 package org.jppf.server.nio;
 
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * 
@@ -27,7 +28,23 @@ import org.jppf.utils.JPPFConfiguration;
 public class NioChecks
 {
 	/**
+	 * Logger for this class.
+	 */
+	static Logger log = LoggerFactory.getLogger(NioChecks.class);
+
+	/**
 	 * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
 	 */
-	public static final boolean CHECK_CONNECTION = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true); 
+	public static final boolean CHECK_CONNECTION = getCheckConnection();
+	
+	/**
+	 * Determine whether nio checks are enabled, and log accordingly.
+	 * @return <code>true</code> if NIO checks are enabled, <code>false</code> otherwise.
+	 */
+	private static boolean getCheckConnection()
+	{
+		boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
+		log.info("NIO checks are " + (b ? "enabled" : "disabled"));
+		return b;
+	}
 }
