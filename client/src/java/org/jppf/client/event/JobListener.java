@@ -21,7 +21,7 @@ package org.jppf.client.event;
 import java.util.EventListener;
 
 /**
- * 
+ * Listener interface for receiving job started and job ended event notifications.
  * @author Laurent Cohen
  */
 public interface JobListener extends EventListener

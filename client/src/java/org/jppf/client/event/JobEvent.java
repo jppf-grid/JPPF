@@ -23,7 +23,7 @@ import java.util.EventObject;
 import org.jppf.client.JPPFJob;
 
 /**
- * Event emitted by a job when its execution start or completes.
+ * Event emitted by a job when its execution starts or completes.
  * @author Laurent Cohen
  */
 public class JobEvent extends EventObject
