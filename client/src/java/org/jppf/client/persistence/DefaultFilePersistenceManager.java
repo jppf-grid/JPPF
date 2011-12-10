@@ -133,6 +133,17 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
   }
 
   /**
+   * Compute the key assigned ot the specified job.
+   * @param job the job for which to get a key.
+   * @return the job's UUID.
+   */
+  @Override
+  public String computeKey(final JPPFJob job)
+  {
+    return job.getUuid();
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

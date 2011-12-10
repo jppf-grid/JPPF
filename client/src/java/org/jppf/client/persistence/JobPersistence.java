@@ -31,11 +31,22 @@ import org.jppf.server.protocol.JPPFTask;
  * of tasks that completed, such as captured by the job's <code>TaskResultListener</code>.
  * The class {@link org.jppf.client.JPPFResultCollector JPPFResultCollector} does that automatically,
  * and it is recommended to use it or a subclass that calls <code>super.resultsReceived()</code> in its implementation.
+ * <p>The underlying physical store that is used is implementation-dependent.
+ * For example: file system, database, cloud storage facility, etc.
  * @param <K> the type of the keys used to identify and locate jobs in the persistence store.
  * @author Laurent Cohen
  */
 public interface JobPersistence<K>
 {
+  /**
+   * Compute the key for the specified job. The contract for this method is that
+   * it is idempotent, meaning that calling this method for the same jobb instance
+   * should always return the same key.
+   * @param job the job for which to get a key.
+   * @return A key used to identify and locate the job int he persistent store.
+   */
+  K computeKey(JPPFJob job);
+
   /**
    * Get the keys of all jobs in the persistence store.
    * @return a collection of objects representing the keys.

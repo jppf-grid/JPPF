@@ -21,7 +21,7 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.client.event.*;
-import org.jppf.client.persistence.JobPersistenceException;
+import org.jppf.client.persistence.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -53,7 +53,7 @@ public class JPPFResultCollector implements TaskResultListener
    * A map containing the resulting tasks, ordered by ascending position in the
    * submitted list of tasks.
    */
-  protected Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+  protected Map<Integer, JPPFTask> resultMap = null;
   /**
    * The list of final resulting tasks.
    */
@@ -90,6 +90,7 @@ public class JPPFResultCollector implements TaskResultListener
   {
     this.count = count;
     this.pendingCount = count;
+    resultMap = new TreeMap<Integer, JPPFTask>();
     //if (debugEnabled) log.debug("count = " + count);
   }
 
@@ -104,16 +105,17 @@ public class JPPFResultCollector implements TaskResultListener
     if (event.getThrowable() == null)
     {
       List<JPPFTask> tasks = event.getTaskList();
-      for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-      if (job != null) job.getResults().putResults(tasks);
+      if (job == null) for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+      else job.getResults().putResults(tasks);
       pendingCount -= tasks.size();
       if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
       notifyAll();
       if ((job != null) && (job.getPersistenceManager() != null))
       {
+        JobPersistence pm = job.getPersistenceManager();
         try
         {
-          job.getPersistenceManager().storeJob(job.getJobUuid(), job, tasks);
+          pm.storeJob(pm.computeKey(job), job, tasks);
         }
         catch (JobPersistenceException e)
         {
