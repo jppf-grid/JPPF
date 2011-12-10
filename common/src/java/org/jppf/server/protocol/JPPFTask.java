@@ -187,7 +187,7 @@ public abstract class JPPFTask implements Task<Object>
   /**
    * Get the timeout for this task.
    * @return the timeout as a long.
-   * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
+   * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule()} instead.
    */
   public long getTimeout()
   {
@@ -198,7 +198,7 @@ public abstract class JPPFTask implements Task<Object>
   /**
    * Set the timeout for this task.
    * @param timeout the timeout in milliseconds.
-   * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
+   * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(JPPFSchedule)} instead.
    */
   public void setTimeout(final long timeout)
   {
@@ -208,7 +208,7 @@ public abstract class JPPFTask implements Task<Object>
   /**
    * Get the timeout date for this task.
    * @return the dates in string format.
-   * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
+   * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule()} instead.
    */
   public String getTimeoutDate()
   {
@@ -219,7 +219,7 @@ public abstract class JPPFTask implements Task<Object>
   /**
    * Get the format used to express the timeout date.
    * @return a format string using the specifications for <code>SimpleDateFormat</code>.
-   * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule() getTimeoutSchedule()} instead.
+   * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule()} instead.
    */
   public String getTimeoutFormat()
   {
@@ -233,7 +233,7 @@ public abstract class JPPFTask implements Task<Object>
    * @param timeoutDate the date to set in string representation.
    * @param format the format of of the date to set, as described in the specification for {@link SimpleDateFormat}.
    * @see java.text.SimpleDateFormat
-   * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(org.jppf.scheduling.JPPFSchedule) setTimeoutSchedule(JPPFSchedule)} instead.
+   * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(JPPFSchedule)} instead.
    */
   public void setTimeoutDate(final String timeoutDate, final String format)
   {
@@ -268,6 +268,9 @@ public abstract class JPPFTask implements Task<Object>
 
   /**
    * {@inheritDoc}
+   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement. 
    */
   @Override
   public void onRestart()
