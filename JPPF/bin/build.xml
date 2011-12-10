@@ -147,6 +147,8 @@
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
 		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+	<target name="deploy.noinstaller"
+		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide,            doc"/>
 	<target name="deploy.nojavadoc"
 		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
   <target name="deploy.splash">
