@@ -38,8 +38,8 @@ $template{name="samples-page-header" title="Job Recovery example"}$
 
 					<h3>Related source files</h3>
 					<ul>
-						<li><a href="src/org/jppf/examples/jobrecovery/Runner.java.html">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
-						<li><a href="src/org/jppf/examples/jobrecovery/MyTask.java.html">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
+						<li><a href="src/org/jppf/example/jobrecovery/Runner.java.html">Runner.java</a> : this is the application that submits a job, simulates a crash, and performs the job recovery</li>
+						<li><a href="src/org/jppf/example/jobrecovery/MyTask.java.html">MyTask.java</a> : a JPPF task that simply waits for one second before completing</li>
 					</ul>
 
 					<h3>How can I build the sample?</h3>
