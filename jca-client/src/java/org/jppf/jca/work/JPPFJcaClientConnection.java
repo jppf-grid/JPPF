@@ -157,7 +157,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   @Override
   public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
-    header.setRequestUuid(job.getJobUuid());
+    header.setRequestUuid(job.getUuid());
     if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
     ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
     ClassLoader cl = (!job.getTasks().isEmpty()) ? job.getTasks().get(0).getClass().getClassLoader() : null;

@@ -317,7 +317,7 @@ public class LongTaskRunner
     DriverJobManagementMBean jobManager = getJobManagement();
     Thread.sleep(3000L);
     System.out.println("cancelling the first job");
-    jobManager.cancelJob(job.getJobUuid());
+    jobManager.cancelJob(job.getUuid());
     List<JPPFTask> results = collector.waitForResults();
     System.out.println("job cancelled");
     job.setName("Long task job 2");

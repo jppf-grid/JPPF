@@ -87,7 +87,7 @@ class WaitingJobState extends ClientServerState
       header.setCompletionListener(new CompletionListener(channel));
       context.setPendingTasksCount(header.getTaskCount());
       context.setInitialBundleWrapper(bundleWrapper);
-      context.setCurrentJobId(header.getJobUuid());
+      context.setCurrentJobId(header.getUuid());
       JPPFDriver.getQueue().addBundle(bundleWrapper);
 
       // there is nothing left to do, so this instance will wait for a task bundle

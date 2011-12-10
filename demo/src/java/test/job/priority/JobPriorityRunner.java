@@ -89,7 +89,7 @@ public class JobPriorityRunner
       runner1.start();
       runner2.start();
       Thread.sleep(2000L);
-      jobMgt.updatePriority(job2.getJobUuid(), 10);
+      jobMgt.updatePriority(job2.getUuid(), 10);
       runner1.join();
       runner2.join();
       // submit the tasks for execution

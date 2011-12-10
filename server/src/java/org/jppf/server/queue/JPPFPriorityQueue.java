@@ -91,13 +91,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   {
     JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
     JobSLA sla = bundle.getSLA();
+    String jobUuid = bundle.getUuid();
     if (sla.isBroadcastJob() && (bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID) == null))
     {
-      if (debugEnabled) log.debug("before processing broadcast job with id=" + bundle.getName() + ", uuid=" + bundle.getJobUuid() + ", task count=" + bundle.getTaskCount());
+      if (debugEnabled) log.debug("before processing broadcast job with id=" + bundle.getName() + ", uuid=" + jobUuid + ", task count=" + bundle.getTaskCount());
       processBroadcastJob(bundleWrapper);
       return;
     }
-    String jobUuid = bundle.getJobUuid();
     try
     {
       lock.lock();
@@ -254,7 +254,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getName());
       removeFromListMap(new JPPFPriority(bundle.getSLA().getPriority()), bundleWrapper, priorityMap);
-      return jobMap.remove(bundle.getJobUuid());
+      return jobMap.remove(bundle.getUuid());
     }
     finally
     {
@@ -285,7 +285,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       bundle.setParameter(BundleParameter.JOB_PENDING, true);
       String jobId = bundle.getName();
-      String uuid = bundle.getJobUuid();
+      String uuid = bundle.getUuid();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
       try
       {
@@ -314,7 +314,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     if (schedule != null)
     {
       String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
-      String uuid = bundle.getJobUuid();
+      String uuid = bundle.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
       long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
       try
@@ -371,7 +371,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       newBundle.setCompletionListener(completionListener);
       newBundle.setParameter(BundleParameter.JOB_ID, bundle.getName() + " [node: " + info.toString() + ']');
       newBundle.setParameter(BundleParameter.JOB_UUID, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
-      if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getJobUuid() + " :\n" + broadcastPolicy);
+      if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
       jobList.add(job);
     }
     for (ServerJob job: jobList) addBundle(job);

@@ -58,7 +58,7 @@ public class JcaSubmissionResult extends JPPFResultCollector
   JcaSubmissionResult(final JPPFJob job)
   {
     super(job);
-    this.id = job.getJobUuid();
+    this.id = job.getUuid();
   }
 
   /**

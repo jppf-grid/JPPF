@@ -75,7 +75,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     assertNotNull(task.getResult());
     DriverJobManagementMBean proxy = getProxy();
     assertNotNull(proxy);
-    proxy.suspendJob(job.getJobUuid(), false);
+    proxy.suspendJob(job.getUuid(), false);
   }
 
   /**

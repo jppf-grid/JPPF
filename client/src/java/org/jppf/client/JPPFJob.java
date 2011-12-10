@@ -68,7 +68,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The universal unique id for this job.
    */
-  private String jobUuid = null;
+  private String uuid = null;
   /**
    * The service level agreement between the job and the server.
    */
@@ -110,7 +110,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public JPPFJob(final String jobUuid)
   {
-    this.jobUuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString() : jobUuid;
+    this.uuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString() : jobUuid;
     name = jobUuid;
   }
 
@@ -196,11 +196,21 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 
   /**
    * {@inheritDoc}
+   * @deprecated use {@link #getUuid()} instead.
    */
   @Override
   public String getJobUuid()
   {
-    return jobUuid;
+    return getUuid();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getUuid()
+  {
+    return uuid;
   }
 
   /**
@@ -422,7 +432,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((jobUuid == null) ? 0 : jobUuid.hashCode());
+    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     return result;
   }
 
@@ -439,8 +449,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     if (obj == null) return false;
     if (!(obj instanceof JPPFJob)) return false;
     JPPFJob other = (JPPFJob) obj;
-    if (jobUuid == null) return other.jobUuid == null;
-    return jobUuid.equals(other.jobUuid);
+    if (uuid == null) return other.uuid == null;
+    return uuid.equals(other.uuid);
   }
 
   /**

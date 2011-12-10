@@ -194,9 +194,9 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getName() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
     header.setTaskCount(count);
-    header.setRequestUuid(job.getJobUuid());
+    header.setRequestUuid(job.getUuid());
     header.setParameter(BundleParameter.JOB_ID, job.getName());
-    header.setParameter(BundleParameter.JOB_UUID, job.getJobUuid());
+    header.setParameter(BundleParameter.JOB_UUID, job.getUuid());
     header.setSLA(job.getSLA());
     header.setParameter(BundleParameter.JOB_METADATA, job.getMetadata());
 

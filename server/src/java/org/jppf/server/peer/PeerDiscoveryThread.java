@@ -174,7 +174,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Defines a callback for objects wishing to be notified of discovery events.
    */
-  public static interface ConnectionHandler
+  public interface ConnectionHandler
   {
     /**
      * Called when a new connection is discovered.

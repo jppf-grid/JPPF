@@ -107,7 +107,7 @@ public class JPPFJobManager implements QueueListener
   public synchronized void jobDispatched(final ServerJob bundleWrapper, final ChannelWrapper channel)
   {
     JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    String jobUuid = bundle.getJobUuid();
+    String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
     {
@@ -127,7 +127,7 @@ public class JPPFJobManager implements QueueListener
   public synchronized void jobReturned(final ServerJob bundleWrapper, final ChannelWrapper channel)
   {
     JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    String jobUuid = bundle.getJobUuid();
+    String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
     {
@@ -146,7 +146,7 @@ public class JPPFJobManager implements QueueListener
   public synchronized void jobQueued(final ServerJob bundleWrapper)
   {
     JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    String jobUuid = bundle.getJobUuid();
+    String jobUuid = bundle.getUuid();
     bundleMap.put(jobUuid, bundleWrapper);
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
@@ -162,7 +162,7 @@ public class JPPFJobManager implements QueueListener
   {
     JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
     long time = System.nanoTime() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
-    String jobUuid = bundle.getJobUuid();
+    String jobUuid = bundle.getUuid();
     jobMap.remove(jobUuid);
     bundleMap.remove(jobUuid);
     JPPFDriver.getInstance();

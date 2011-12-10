@@ -513,9 +513,19 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 
   /**
    * {@inheritDoc}
+   * @deprecated use {@link #getUuid()} instead.
    */
   @Override
   public String getJobUuid()
+  {
+    return getUuid();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getUuid()
   {
     return (String) getParameter(BundleParameter.JOB_UUID);
   }

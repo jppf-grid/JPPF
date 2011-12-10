@@ -59,7 +59,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
   @Override
   public String getId()
   {
-    return job.getJobUuid();
+    return job.getUuid();
   }
 
   /**

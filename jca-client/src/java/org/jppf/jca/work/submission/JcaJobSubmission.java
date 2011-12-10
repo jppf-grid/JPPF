@@ -57,7 +57,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
   public void run()
   {
     JcaSubmissionResult result = (JcaSubmissionResult) job.getResultListener();
-    String requestUuid = job.getJobUuid();
+    String requestUuid = job.getUuid();
     ClassLoader cl = null;
     ClassLoader oldCl = null;
     if (!job.getTasks().isEmpty())

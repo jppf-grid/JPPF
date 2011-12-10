@@ -43,8 +43,15 @@ public interface JPPFDistributedJob
   /**
    * Get the universal unique id for this job.
    * @return the uuid as a string.
+   * @deprecated use {@link #getUuid()} instead.
    */
   String getJobUuid();
+
+  /**
+   * Get the universal unique id for this job.
+   * @return the uuid as a string.
+   */
+  String getUuid();
 
   /**
    * Get the service level agreement between the job and the server.

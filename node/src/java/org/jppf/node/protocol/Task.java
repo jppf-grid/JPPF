@@ -91,6 +91,9 @@ public interface Task<T> extends Runnable, Serializable
    * Callback invoked when this task is restarted.
    * The default implementation does nothing and should be overriden by
    * subclasses that desire to implement a specific behaviour on restart.
+   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement. 
    */
   void onRestart();
 
@@ -109,13 +112,13 @@ public interface Task<T> extends Runnable, Serializable
 
   /**
    * Get the task timeout schedule configuration.
-   * @return a <code>JPPFScheduleConfiguration</code> instance.
+   * @return a <code>JPPFSchedule</code> instance.
    */
   JPPFSchedule getTimeoutSchedule();
 
   /**
    * Get the task timeout schedule configuration.
-   * @param timeoutSchedule a <code>JPPFScheduleConfiguration</code> instance.
+   * @param timeoutSchedule a <code>JPPFSchedule</code> instance.
    */
   void setTimeoutSchedule(JPPFSchedule timeoutSchedule);
 

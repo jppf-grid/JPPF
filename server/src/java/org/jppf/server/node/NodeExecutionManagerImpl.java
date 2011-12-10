@@ -187,6 +187,10 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
   /**
    * Cancel the execution of the tasks with the specified id.
    * @param id the id of the tasks to cancel.
+   * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement.
+   * Tasks can still be cancelled, but only as part of job cancel.
    */
   public synchronized void cancelTask(final String id)
   {
@@ -219,6 +223,9 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
    * Restart the execution of the tasks with the specified id.<br>
    * The task(s) will be restarted even if their execution has already completed.
    * @param id the id of the task or tasks to restart.
+   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement. 
    */
   public synchronized void restartTask(final String id)
   {
@@ -410,7 +417,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
   @Override
   public String getCurrentJobId()
   {
-    return (bundle != null) ? bundle.getJobUuid() : null;
+    return (bundle != null) ? bundle.getUuid() : null;
   }
 
   /**

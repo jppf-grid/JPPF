@@ -133,7 +133,7 @@ public class JPPFConfiguration
    * <p>WARNING: not shown in the interface but also required:
    * implementations must have a public no-arg constructor.
    */
-  public static interface ConfigurationSource
+  public interface ConfigurationSource
   {
     /**
      * Obtain the JPPF configuration properties from an input stream.

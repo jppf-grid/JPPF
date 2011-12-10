@@ -389,7 +389,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
     client.submit(job);
     synchronized(jobMap)
     {
-      jobMap.put(job.getJobUuid(), job);
+      jobMap.put(job.getUuid(), job);
     }
   }
 

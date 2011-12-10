@@ -129,7 +129,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
    */
   public synchronized void setStatus(final SubmissionStatus status)
   {
-    if (debugEnabled) log.debug("submission [" + job.getJobUuid() + "] status changing from '" + this.status + "' to '" + status + '\'');
+    if (debugEnabled) log.debug("submission [" + job.getUuid() + "] status changing from '" + this.status + "' to '" + status + '\'');
     this.status = status;
   }
 }

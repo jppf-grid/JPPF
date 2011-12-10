@@ -338,7 +338,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
         wrapper.connect();
         try
         {
-          wrapper.cancelJob(header.getJobUuid());
+          wrapper.cancelJob(header.getUuid());
         }
         catch (Exception e)
         {

@@ -172,7 +172,7 @@ class ApplicationConnection extends JPPFConnection
 
     header.getUuidPath().add(driver.getUuid());
     header.setCompletionListener(resultSender);
-    currentJobId = header.getJobUuid();
+    currentJobId = header.getUuid();
     JPPFDriver.getQueue().addBundle(headerWrapper);
     if (count > 0)
     {
@@ -223,7 +223,7 @@ class ApplicationConnection extends JPPFConnection
       wrapper.connect();
       try
       {
-        wrapper.cancelJob(header.getJobUuid());
+        wrapper.cancelJob(header.getUuid());
       }
       catch (Exception e)
       {

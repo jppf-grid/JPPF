@@ -85,7 +85,7 @@ class RemoteExecutionThread extends ExecutionThread
       }
       while (!completed)
       {
-        requestUuid = newJob.getJobUuid();
+        requestUuid = newJob.getUuid();
         JPPFTaskBundle bundle = createBundle(newJob);
         ClassLoader cl = null;
         if (!job.getTasks().isEmpty())
@@ -147,7 +147,7 @@ class RemoteExecutionThread extends ExecutionThread
    */
   private JPPFJob createNewJob(final JPPFJob job)
   {
-    JPPFJob newJob = new JPPFJob(job.getJobUuid());
+    JPPFJob newJob = new JPPFJob(job.getUuid());
     newJob.setDataProvider(job.getDataProvider());
     newJob.setSLA(job.getSLA());
     newJob.setMetadata(job.getMetadata());
@@ -164,7 +164,7 @@ class RemoteExecutionThread extends ExecutionThread
    */
   private JPPFTaskBundle createBundle(final JPPFJob job)
   {
-    String requestUuid = job.getJobUuid();
+    String requestUuid = job.getUuid();
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setRequestUuid(requestUuid);
     return bundle;

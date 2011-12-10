@@ -237,7 +237,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private void dispatchJobToChannel(final ChannelWrapper<?> channel, final ServerJob selectedBundle)
   {
-    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getJobUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
+    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
     synchronized(channel)
     {
       AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -306,7 +306,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
         {
           log.error("An error occurred while running the execution policy to determine node participation.",ex);
         }
-        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getJobUuid() + ", nodeUuid=" + mgtInfo.getId());
+        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", nodeUuid=" + mgtInfo.getId());
         if (!b) continue;
       }
       acceptableChannels.add(i);
@@ -344,7 +344,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     if (b) return false;
     b = (Boolean) bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE);
     if (b) return false;
-    String jobId = bundle.getJobUuid();
+    String jobId = bundle.getUuid();
     int maxNodes = sla.getMaxNodes();
     List<ChannelJobPair> list = server.getJobManager().getNodesForJob(jobId);
     int n = list.size();

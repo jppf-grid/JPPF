@@ -68,7 +68,7 @@ class FutureResultCollector extends JPPFResultCollector
   FutureResultCollector(final JPPFJob job)
   {
     super(job);
-    this.jobUuid = job.getJobUuid();
+    this.jobUuid = job.getUuid();
   }
 
   /**

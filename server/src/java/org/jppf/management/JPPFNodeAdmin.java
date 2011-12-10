@@ -104,6 +104,10 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @param id the id of the tasks to cancel.
    * @throws Exception if any error occurs.
    * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
+   * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement.
+   * Tasks can still be cancelled, but only as part of job cancel.
    */
   @Override
   public void cancelTask(final String id) throws Exception
@@ -117,6 +121,9 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @param id the id of the task or tasks to restart.
    * @throws Exception if any error occurs.
    * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
+   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement. 
    */
   @Override
   public void restartTask(final String id) throws Exception
