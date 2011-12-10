@@ -23,6 +23,7 @@ import java.net.*;
 
 /**
  * Wrapper for manipulating data from a URL.
+ * This implementation of the {@link Location} interface allows writing to and reading from a URL.
  * @author Laurent Cohen
  */
 public class URLLocation extends AbstractLocation<URL>
@@ -34,7 +35,7 @@ public class URLLocation extends AbstractLocation<URL>
 
   /**
    * Initialize this location with the specified file path.
-   * @param url a URL.
+   * @param url a {@link URL}.
    */
   public URLLocation(final URL url)
   {

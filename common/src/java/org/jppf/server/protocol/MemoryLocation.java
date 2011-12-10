@@ -24,7 +24,8 @@ import java.nio.ByteBuffer;
 import org.jppf.io.ByteBufferOutputStream;
 
 /**
- * Wrapper fro manipulating a file.
+ * Wrapper fro manipulating a block of data in memory.
+ * This implementation of the {@link Location} interface allows writing to and reading from a <code>byte</code> array.
  * @author Laurent Cohen
  */
 public class MemoryLocation extends AbstractLocation<byte[]>

@@ -21,7 +21,8 @@ package org.jppf.server.protocol;
 import java.io.*;
 
 /**
- * Wrapper fro manipulating a file.
+ * Wrapper for manipulating a file.
+ * This implementation of the {@link Location} interface allows writing to and reading from a file.
  * @author Laurent Cohen
  */
 public class FileLocation extends AbstractLocation<File>
