@@ -70,17 +70,14 @@ Node successfully initialized</pre>
 					</ul>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					Pluggable startup classes for JPPF nodes and servers.<br>
-					Dynamic code deployment from the server to a node.
-					For a detailed explanation, please refer to the related documentation in the
-					<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#JPPF_startup_classes">Extending and Customizing JPPF &gt; Receiving node connection events in the server</a> section.
+					The main feature demonstrated in detail in the JPPF documentation, in the
+					<a href="http://www.jppf.org/doc/v3/index.php?title=Extending_and_Customizing_JPPF#JPPF_startup_classes">Node Initialization Hooks</a> section.
 
 					<h3>I have additional questions and comments, where can I go?</h3>
-					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.
-					<p>In addition, There are 2 privileged places you can go to:
+					<p>There are 2 privileged places you can go to:
 					<ul>
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v3">The JPPF documentation</a></li>
 					</ul>
 					
 </div>
