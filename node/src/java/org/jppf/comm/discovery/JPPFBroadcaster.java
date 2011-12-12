@@ -53,6 +53,10 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
    * Holds the driver connection information to broadcast.
    */
   private JPPFConnectionInformation info = null;
+  /**
+   * Used to keep track of sockets for which an error was detected.
+   */
+  private Set<Pair<MulticastSocket, DatagramPacket>> socketsInError = new HashSet<Pair<MulticastSocket, DatagramPacket>>();
 
   /**
    * Initialize this broadcaster using the server configuration information.
@@ -130,29 +134,23 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
       Iterator<Pair<MulticastSocket, DatagramPacket>> it = socketsInfo.iterator();
       while (it.hasNext())
       {
+        Pair<MulticastSocket, DatagramPacket> si = it.next();
         try
         {
-          Pair<MulticastSocket, DatagramPacket> socketInfo = it.next();
-          socketInfo.first().send(socketInfo.second());
+          si.first().send(si.second());
+          if (socketsInError.contains(si)) socketsInError.remove(si);
         }
         catch(Exception e)
         {
-          log.error(e.getMessage(), e);
-          it.remove();
+          if (!socketsInError.contains(si))
+          {
+            socketsInError.add(si);
+            log.error(e.getMessage(), e);
+          }
         }
       }
       if (socketsInfo.isEmpty()) setStopped(true);
-      if (!isStopped())
-      {
-        try
-        {
-          Thread.sleep(broadcastInterval);
-        }
-        catch(InterruptedException e)
-        {
-          log.error(e.getMessage(), e);
-        }
-      }
+      if (!isStopped()) goToSleep(broadcastInterval);
     }
     for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
     socketsInfo.clear();
