@@ -104,7 +104,6 @@ public class Pair<U, V> implements Serializable
 		{
 			if (other.second != null) return false;
 		}
-		else if (!second.equals(other.second)) return false;
-		return true;
+		return second.equals(other.second);
 	}
 }

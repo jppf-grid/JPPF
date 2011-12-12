@@ -51,9 +51,21 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	 */
 	private long broadcastInterval = 1000L;
 	/**
+	 * The multicast group to join.
+	 */
+	private String group = null;
+	/**
+	 * The port to broadcast to.
+	 */
+	private int port = -1;
+	/**
 	 * Holds the driver connection information to broadcast.
 	 */
 	private JPPFConnectionInformation info = null;
+	/**
+	 * Used to keep track of sockets for which an error was detected.
+	 */
+  private Set<Pair<MulticastSocket, DatagramPacket>> socketsInError = new HashSet<Pair<MulticastSocket, DatagramPacket>>();
 	/**
 	 * 
 	 */
@@ -76,8 +88,8 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 	{
 		TypedProperties props = JPPFConfiguration.getProperties();
 		broadcastInterval = props.getLong("jppf.discovery.broadcast.interval", 1000L);
-		String group = props.getString("jppf.discovery.group", "230.0.0.1");
-		int port = props.getInt("jppf.discovery.port", 11111);
+		group = props.getString("jppf.discovery.group", "230.0.0.1");
+		port = props.getInt("jppf.discovery.port", 11111);
 
 		List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
 		if (addresses.isEmpty()) addresses.add((Inet4Address) InetAddress.getByName("127.0.0.1"));
@@ -133,33 +145,35 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
 			Iterator<Pair<MulticastSocket, DatagramPacket>> it = socketsInfo.iterator();
 			while (it.hasNext())
 			{
+        Pair<MulticastSocket, DatagramPacket> si = it.next();
 				try
 				{
-					Pair<MulticastSocket, DatagramPacket> socketInfo = it.next();
-					socketInfo.first().send(socketInfo.second());
-					if (isKilled()) throw new IOException("test");
+          if (isKilled())
+          {
+            synchronized(this)
+            {
+              killed = false;
+            }
+            throw new IOException("test");
+          }
+					si.first().send(si.second());
+					if (socketsInError.contains(si)) socketsInError.remove(si);
 				}
 				catch(Exception e)
 				{
-					log.error(e.getMessage(), e);
-					it.remove();
+					if (!socketsInError.contains(si))
+					{
+            socketsInError.add(si);
+					  log.error(e.getMessage(), e);
+					}
 				}
 			}
-			if (socketsInfo.isEmpty()) setStopped(true);
-			if (!isStopped())
-			{
-				try
-				{
-					Thread.sleep(broadcastInterval);
-				}
-				catch(InterruptedException e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
+			if (socketsInfo.isEmpty() && socketsInError.isEmpty()) setStopped(true);
+			if (!isStopped()) goToSleep(broadcastInterval);
 		}
 		for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
 		socketsInfo.clear();
+		socketsInError.clear();
 	}
 
 	/**
