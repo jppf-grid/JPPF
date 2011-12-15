@@ -16,25 +16,9 @@
  * limitations under the License.
  */
 
-package test.node.nativelib;
-
 /**
- * 
- * @author Laurent Cohen
+ * Classes supporting the reproduction of a problem encountered in the forums:
+ * <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">Node and Server Connectivity</a>.
+ * This requires &quot;<code>jppf.nio.check.connection = false</code>&quot; configured on the server
  */
-public class NativeLibLoader
-{
-	static
-	{
-		/*
-		String sep = System.getProperty("path.separator");
-		//String path = "C:\\temp" + sep + System.getProperty("java.library.path");
-		String path = System.getProperty("java.library.path");
-		System.out.println("library path = " + path);
-		//System.setProperty("java.library.path", path);
-		*/
-    System.out.println("before loading the library");
-		System.loadLibrary("eclipse_1406");
-		System.out.println("after loading the library");
-	}
-}
+package test.niochecks;

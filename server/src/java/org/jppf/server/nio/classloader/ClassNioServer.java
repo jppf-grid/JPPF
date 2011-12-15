@@ -215,13 +215,15 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
 	 */
 	public void removeProviderConnection(String uuid, ChannelWrapper channel)
 	{
-		if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
+	  String s = debugEnabled ? "provider connection: uuid=" + uuid + ", channel=" + channel : null;
+		if (debugEnabled) log.debug("removing " + s);
 		if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
 		synchronized(providerConnections)
 		{
 			List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-			if (list == null) return;
-			list.remove(channel);
+			boolean b = (list != null);
+			if (b) b = list.remove(channel);
+			if (!b && debugEnabled) log.debug(s + " was not removed");
 		}
 	}
 

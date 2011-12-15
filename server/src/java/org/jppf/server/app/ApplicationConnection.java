@@ -85,7 +85,7 @@ class ApplicationConnection extends JPPFConnection
 	 */
 	private String connectionUuid = null;
 	/**
-	 * Unique ID for the connection.
+	 * Unique ID for the client.
 	 */
 	private String clientUuid = null;
 

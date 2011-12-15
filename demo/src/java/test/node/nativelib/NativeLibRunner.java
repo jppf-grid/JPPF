@@ -46,25 +46,12 @@ public class NativeLibRunner
 	{
 		try
 		{
-			// create the JPPFClient. This constructor call causes JPPF to read the configuration file
-			// and connect with one or multiple JPPF drivers.
 			jppfClient = new JPPFClient();
-
-			// create a runner instance.
 			NativeLibRunner runner = new NativeLibRunner();
-
-			for (int i=0; i<3; i++)
-			{
-				System.out.println("submitting job #" + (i+1) + " ...");
-				// Create a job
-				JPPFJob job = runner.createJob();
-				job.setId("" + (i+1));
-
-				// execute a blocking job
-				runner.executeBlockingJob(job);
-			}
-			// execute a non-blocking job 
-			//runner.executeNonBlockingJob(job);
+			JPPFJob job = runner.createJob();
+	    job.setId("Native Lib Loading");
+      System.out.println("submitting job #" + job.getId());
+			runner.executeBlockingJob(job);
 		}
 		catch(Exception e)
 		{
@@ -83,21 +70,9 @@ public class NativeLibRunner
 	 */
 	public JPPFJob createJob() throws Exception
 	{
-		// create a JPPF job
 		JPPFJob job = new JPPFJob();
-
-		// give this job a readable unique id that we can use to monitor and manage it.
-		job.setId("Template Job Id");
-
-		// add a task to the job.
 		NativeLibTask task = new NativeLibTask();
-		//task.setTimeout(1000);
 		job.addTask(task);
-
-		// add more tasks here ...
-
-		// there is no guarantee on the order of execution of the tasks,
-		// however the results are guaranteed to be returned in the same order as the tasks.
 		return job;
 	}
 
@@ -109,77 +84,18 @@ public class NativeLibRunner
 	 */
 	public void executeBlockingJob(JPPFJob job) throws Exception
 	{
-		// set the job in blocking mode.
 		job.setBlocking(true);
-
-		// Submit the job and wait until the results are returned.
-		// The results are returned as a list of JPPFTask instances,
-		// in the same order as the one in which the tasks where initially added the job.
 		List<JPPFTask> results = jppfClient.submit(job);
-
-		// process the results
 		for (JPPFTask task: results)
 		{
-			// if the task execution resulted in an exception
 			if (task.getException() != null)
 			{
-				// process the exception here ...
 				System.out.println("Caught exception:");
 				task.getException().printStackTrace();
 			}
 			else
 			{
-				// process the result here ...
 				System.out.println("Result:" + task.getResult());
-			}
-		}
-	}
-
-	/**
-	 * Execute a job in non-blocking mode. The application has the responsibility
-	 * for handling the notification of job completion and collecting the results.
-	 * @param job the JPPF job to execute.
-	 * @throws Exception if an error occurs while executing the job.
-	 */
-	public void executeNonBlockingJob(JPPFJob job) throws Exception
-	{
-		// set the job in non-blocking (or asynchronous) mode.
-		job.setBlocking(false);
-
-		// We need to be notified of when the job execution has completed.
-		// To this effect, we define an instance of the TaskResultListener interface,
-		// which we will register with the job.
-		// Here, we use an instance of JPPFResultCollector, conveniently provided by the JPPF API.
-		// JPPFResultCollector implements TaskResultListener and has a constructor that takes
-		// the number of tasks in the job as a parameter.
-		JPPFResultCollector collector = new JPPFResultCollector(job.getTasks().size());
-		job.setResultListener(collector);
-
-		
-		// Submit the job. This call returns immediately without waiting for the execution of
-		// the job to complete. As a consequence, the object returned for a non-blocking job is
-		// always null. Note that we are calling the exact same method as in the blocking case.
-		jppfClient.submit(job);
-
-		// do something else here, while the job is being executed ...
-
-		// We are now ready to get the results of the job execution.
-		// We use JPPFResultCollector.waitForResults() for this. This method returns immediately
-		// with the results if the job has completed, otherwise it waits until the job execution
-		// is complete.
-		List<JPPFTask> results = collector.waitForResults();
-
-		// process the results
-		for (JPPFTask task: results)
-		{
-			// if the task execution resulted in an exception
-			if (task.getException() != null)
-			{
-				// process the exception here ...
-			}
-			else
-			{
-				// process the result here ...
 			}
 		}
 	}

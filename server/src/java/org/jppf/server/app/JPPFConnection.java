@@ -98,7 +98,7 @@ abstract class JPPFConnection extends Thread
 		catch (Exception e)
 		{
 			if (debugEnabled) log.debug(e.getMessage(), e);
-			else log.warn(e.getMessage());
+			else log.warn(getName() + ' ' + e.getClass().getName() + " : " + e.getMessage());
 			setClosed();
 			server.removeConnection(this);
 		}

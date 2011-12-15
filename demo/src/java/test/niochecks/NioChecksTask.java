@@ -15,47 +15,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package test.node.nativelib;
+package test.niochecks;
 
 import org.jppf.JPPFException;
-import org.jppf.node.NodeRunner;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
  * This class is a template for a standard JPPF task.
  * @author Laurent Cohen
  */
-public class NativeLibTask extends JPPFTask
+public class NioChecksTask extends JPPFTask
 {
+  /**
+   * The duration of this task.
+   */
+  private final long duration;
+
 	/**
-	 * Perform initializations on the client side,
-	 * before the task is executed by the node.
+	 * Default constructor,
+	 * @param duration the duration of this task.
 	 */
-	public NativeLibTask()
+	public NioChecksTask(final long duration)
 	{
+	  this.duration = duration < 1L ? 1L : duration;
 	}
 
 	/**
-	 * This method contains the code that will be executed by a node.
+	 * {@inheritDoc}
 	 */
 	public void run()
 	{
+    System.out.println("Starting the task");
 		try
 		{
-			String path = System.getProperty("java.library.path");
-			System.out.println("java.library.path = " + path);
-			System.setProperty("java.library.path", path + System.getProperty("path.separator") + "C:/temp");
-			//getClass().getClassLoader().loadClass("test.node.nativelib.NativeLibLoader");
-			Boolean b = (Boolean) NodeRunner.getPersistentData("libLoaded");
-			if (b == null)
-			{
-  	    System.out.println("before loading the library");
-        //System.loadLibrary("eclipse_1406");
-        System.loadLibrary("eclipse_1312");
-        NodeRunner.setPersistentData("libLoaded", Boolean.TRUE);
-  	    System.out.println("after loading the library");
-			}
-			else System.out.println("library already loaded");
+		  Thread.sleep(duration);
       setResult("the execution was performed successfully");
 		}
     catch(Exception e)
