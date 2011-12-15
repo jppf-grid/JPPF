@@ -85,11 +85,13 @@ public class SubmissionManagerImpl extends ThreadSynchronization implements Subm
       if (isStopped()) break;
       synchronized(this)
       {
-        JPPFJob job = execQueue.poll();
-        if (debugEnabled) log.debug("submitting jobId=" + job.getName());
+        JPPFJob job = execQueue.peek();
         JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection(true);
+        if ((c == null) && job.getSLA().isBroadcastJob()) continue;
+        job = execQueue.poll();
+        if (debugEnabled) log.debug("submitting jobId=" + job.getName());
         if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
-        JobSubmission submission = new JobSubmissionImpl(job, c, this, execFlags.second());
+        JobSubmission submission = new JobSubmissionImpl(job, c, this, job.getSLA().isBroadcastJob() ? false : execFlags.second());
         client.getExecutor().submit(submission);
       }
     }
