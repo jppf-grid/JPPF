@@ -54,6 +54,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
     this.job = job;
     this.connection = connection;
     this.locallyExecuting = locallyExecuting;
+    this.submissionManager = submissionManager;
   }
 
   /**
