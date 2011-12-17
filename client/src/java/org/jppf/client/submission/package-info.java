@@ -15,31 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.client;
 
 /**
- * The status of a submission.
+ * Support for JPPF jobs submission.
  */
-public enum SubmissionStatus
-{
-  /**
-   * The set of tasks was just submitted.
-   */
-  SUBMITTED,
-  /**
-   * The set of tasks is currently in the submission queue.
-   */
-  PENDING,
-  /**
-   * The set of tasks is being executed.
-   */
-  EXECUTING,
-  /**
-   * The execution of the set of tasks is complete.
-   */
-  COMPLETE,
-  /**
-   * The execution of the set of tasks has failed.
-   */
-  FAILED,
-}
+package org.jppf.client.submission;

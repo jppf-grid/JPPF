@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.JobEvent.Type;
+import org.jppf.client.submission.JobSubmission;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;

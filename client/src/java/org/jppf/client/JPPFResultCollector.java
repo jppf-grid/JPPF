@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.client.event.*;
 import org.jppf.client.persistence.*;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -62,6 +63,14 @@ public class JPPFResultCollector implements TaskResultListener
    * 
    */
   protected JPPFJob job = null;
+  /**
+   * The status of this submission.
+   */
+  private SubmissionStatus status = SubmissionStatus.SUBMITTED;
+  /**
+   * List of listeners registered to receive this submission's status change notifications.
+   */
+  private final List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
 
   /**
    * Default constructor, provided as a convenience for subclasses.
@@ -91,7 +100,6 @@ public class JPPFResultCollector implements TaskResultListener
     this.count = count;
     this.pendingCount = count;
     resultMap = new TreeMap<Integer, JPPFTask>();
-    //if (debugEnabled) log.debug("count = " + count);
   }
 
   /**
@@ -190,5 +198,78 @@ public class JPPFResultCollector implements TaskResultListener
   {
     if (job == null) results = new ArrayList<JPPFTask>(resultMap.values());
     else results = new ArrayList<JPPFTask>(job.getResults().getAll());
+  }
+
+  /**
+   * Get the status of this submission.
+   * @return a {@link SubmissionStatus} enumerated value.
+   */
+  public synchronized SubmissionStatus getStatus()
+  {
+    return status;
+  }
+
+  /**
+   * Set the status of this submission.
+   * @param newStatus a {@link SubmissionStatus} enumerated value.
+   */
+  public synchronized void setStatus(final SubmissionStatus newStatus)
+  {
+    if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
+    this.status = newStatus;
+    fireStatusChangeEvent(newStatus);
+  }
+
+  /**
+   * Get the unique id of this submission.
+   * @return the id as a string.
+   */
+  public String getId()
+  {
+    return job == null ? "no-id" : job.getUuid();
+  }
+
+  /**
+   * Add a listener to the list of status listeners.
+   * @param listener the listener to add.
+   */
+  public void addSubmissionStatusListener(final SubmissionStatusListener listener)
+  {
+    synchronized(listeners)
+    {
+      if (debugEnabled) log.debug("submission [" + getId() + "] adding status listener " + listener);
+      if (listener != null) listeners.add(listener);
+    }
+  }
+
+  /**
+   * Remove a listener from the list of status listeners.
+   * @param listener the listener to remove.
+   */
+  public void removeSubmissionStatusListener(final SubmissionStatusListener listener)
+  {
+    synchronized(listeners)
+    {
+      if (debugEnabled) log.debug("submission [" + getId() + "] removing status listener " + listener);
+      if (listener != null) listeners.remove(listener);
+    }
+  }
+
+  /**
+   * Notify all listeners of a change of status for this submission.
+   * @param newStatus the status for submission event.
+   */
+  protected void fireStatusChangeEvent(final SubmissionStatus newStatus)
+  {
+    synchronized(listeners)
+    {
+      if (listeners.isEmpty()) return;
+      if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
+      SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
+      for (SubmissionStatusListener listener: listeners)
+      {
+        listener.submissionStatusChanged(event);
+      }
+    }
   }
 }

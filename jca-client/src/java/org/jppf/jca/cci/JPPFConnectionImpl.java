@@ -26,6 +26,7 @@ import javax.resource.spi.ConnectionEvent;
 
 import org.jppf.client.*;
 import org.jppf.client.event.SubmissionStatusListener;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.submission.*;
@@ -156,7 +157,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public void addSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
-    JcaSubmissionResult res = getSubmissionResult(submissionId);
+    JPPFResultCollector res = getResultCollector(submissionId);
     if (res != null) res.addSubmissionStatusListener(listener);
   }
 
@@ -168,7 +169,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public void removeSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
-    JcaSubmissionResult res = getSubmissionResult(submissionId);
+    JPPFResultCollector res = getResultCollector(submissionId);
     if (res != null) res.removeSubmissionStatusListener(listener);
   }
 
@@ -181,7 +182,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public SubmissionStatus getSubmissionStatus(final String submissionId) throws Exception
   {
-    JcaSubmissionResult res = getSubmissionResult(submissionId);
+    JPPFResultCollector res = getResultCollector(submissionId);
     if (res == null) return null;
     return res.getStatus();
   }
@@ -190,8 +191,8 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    * Get the results of an execution request.<br>
    * This method should be called only once a call to
    * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-   * either {@link org.jppf.jca.work.submission.SubmissionStatus#COMPLETE COMPLETE} or
-   * {@link org.jppf.jca.work.submission.SubmissionStatus#FAILED FAILED}
+   * either {@link org.jppf.org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
@@ -200,7 +201,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   public List<JPPFTask> getSubmissionResults(final String submissionId) throws Exception
   {
     JcaSubmissionManager mgr = getJppfClient().getSubmissionManager();
-    JcaSubmissionResult res = mgr.peekSubmission(submissionId);
+    JPPFResultCollector res = mgr.peekSubmission(submissionId);
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
     return res.getResults();
@@ -211,7 +212,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    * @param submissionId the id of the submission to find.
    * @return a <code>JPPFSubmissionResult</code> instance, or null if no submission can be found for the specified id.
    */
-  private JcaSubmissionResult getSubmissionResult(final String submissionId)
+  private JPPFResultCollector getResultCollector(final String submissionId)
   {
     return getJppfClient().getSubmissionManager().peekSubmission(submissionId);
   }
@@ -271,7 +272,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public List<JPPFTask> waitForResults(final String submissionId) throws Exception
   {
-    JcaSubmissionResult result = getSubmissionResult(submissionId);
+    JPPFResultCollector result = getResultCollector(submissionId);
     if (result == null) return null;
     result.waitForResults(0L);
     return result.getResults();

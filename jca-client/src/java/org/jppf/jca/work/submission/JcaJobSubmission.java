@@ -17,9 +17,10 @@
  */
 package org.jppf.jca.work.submission;
 
-import static org.jppf.client.SubmissionStatus.*;
+import static org.jppf.client.submission.SubmissionStatus.*;
 
 import org.jppf.client.*;
+import org.jppf.client.submission.*;
 import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
@@ -46,8 +47,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
    */
   JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
   {
-    super(job, connection, locallyExecuting);
-    this.submissionManager = submissionManager;
+    super(job, connection, locallyExecuting, submissionManager);
   }
 
   /**
@@ -56,7 +56,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
   @Override
   public void run()
   {
-    JcaSubmissionResult result = (JcaSubmissionResult) job.getResultListener();
+    JPPFResultCollector result = (JPPFResultCollector) job.getResultListener();
     String requestUuid = job.getUuid();
     ClassLoader cl = null;
     ClassLoader oldCl = null;

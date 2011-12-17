@@ -20,7 +20,7 @@ package org.jppf.client.event;
 
 import java.util.EventObject;
 
-import org.jppf.client.SubmissionStatus;
+import org.jppf.client.submission.SubmissionStatus;
 
 
 /**

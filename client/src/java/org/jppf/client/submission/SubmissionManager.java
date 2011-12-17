@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.client;
+package org.jppf.client.submission;
 
+import org.jppf.client.JPPFJob;
 import org.jppf.client.event.SubmissionStatusListener;
 
 /**

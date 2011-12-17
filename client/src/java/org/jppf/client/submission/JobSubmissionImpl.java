@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.client;
+package org.jppf.client.submission;
 
 import java.io.NotSerializableException;
 
+import org.jppf.client.*;
 import org.slf4j.*;
 
 /**
@@ -36,10 +37,6 @@ public class JobSubmissionImpl extends AbstractJobSubmission
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The status of this submission.
-   */
-  protected SubmissionStatus status = SubmissionStatus.SUBMITTED;
 
   /**
    * Initialize this job submission.
@@ -48,10 +45,9 @@ public class JobSubmissionImpl extends AbstractJobSubmission
    * @param submissionManager the submission manager.
    * @param locallyExecuting determines whether the job will be executed locally, at least partially.
    */
-  JobSubmissionImpl(final JPPFJob job, final AbstractJPPFClientConnection connection, final SubmissionManagerImpl submissionManager, final boolean locallyExecuting)
+  JobSubmissionImpl(final JPPFJob job, final AbstractJPPFClientConnection connection, final SubmissionManager submissionManager, final boolean locallyExecuting)
   {
-    super(job, connection, locallyExecuting);
-    this.submissionManager = submissionManager;
+    super(job, connection, locallyExecuting, submissionManager);
   }
 
   /**
@@ -110,26 +106,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
     finally
     {
       //if (debugEnabled) log.debug("job id '" + job.getId()  + "' ended with error = " + error);
-      if (!error && (connection != null)) connection.job = null;
+      if (!error && (connection != null)) connection.setCurrentJob(null);
     }
-  }
-
-  /**
-   * Get the status of this submission.
-   * @return a {@link SubmissionStatus} enumerated value.
-   */
-  public synchronized SubmissionStatus getStatus()
-  {
-    return status;
-  }
-
-  /**
-   * Set the status of this submission.
-   * @param status a {@link SubmissionStatus} enumerated value.
-   */
-  public synchronized void setStatus(final SubmissionStatus status)
-  {
-    if (debugEnabled) log.debug("submission [" + job.getUuid() + "] status changing from '" + this.status + "' to '" + status + '\'');
-    this.status = status;
   }
 }

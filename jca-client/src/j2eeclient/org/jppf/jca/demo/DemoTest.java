@@ -24,6 +24,7 @@ import javax.naming.InitialContext;
 import javax.resource.cci.ConnectionFactory;
 
 import org.jppf.client.*;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.cci.*;
 import org.jppf.server.protocol.JPPFTask;
 

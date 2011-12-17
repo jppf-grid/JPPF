@@ -20,6 +20,7 @@ package org.jppf.client;
 import java.util.List;
 
 import org.jppf.client.event.*;
+import org.jppf.client.submission.SubmissionManagerImpl;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;

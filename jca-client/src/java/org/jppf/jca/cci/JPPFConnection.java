@@ -24,6 +24,7 @@ import javax.resource.cci.Connection;
 
 import org.jppf.client.*;
 import org.jppf.client.event.SubmissionStatusListener;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessor;
 import org.jppf.server.protocol.JPPFTask;
@@ -89,8 +90,8 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * Get the results of an execution request.<br>
    * This method should be called only once a call to
    * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-   * either {@link org.jppf.jca.work.submission.SubmissionStatus#COMPLETE COMPLETE} or
-   * {@link org.jppf.jca.work.submission.SubmissionStatus#FAILED FAILED}
+   * either {@link org.jppf.org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.

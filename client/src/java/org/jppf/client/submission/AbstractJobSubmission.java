@@ -15,7 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.client;
+package org.jppf.client.submission;
+
+import org.jppf.client.*;
 
 
 /**
@@ -45,8 +47,9 @@ public abstract class AbstractJobSubmission implements JobSubmission
    * @param job the submitted job.
    * @param connection the connection to execute the job on.
    * @param locallyExecuting determines whether the job will be executed locally, at least partially.
+   * @param submissionManager the submission manager.
    */
-  protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting)
+  protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
   {
     this.job = job;
     this.connection = connection;

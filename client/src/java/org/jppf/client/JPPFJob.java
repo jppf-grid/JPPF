@@ -78,10 +78,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   private JobMetadata jobMetadata = new JPPFJobMetadata();
   /**
-   * The number of tasks in this job.
-   */
-  private int taskCount = 0;
-  /**
    * The object that holds the results of executed tasks.
    */
   private final JobResults results = new JobResults();
@@ -290,7 +286,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
     else jppfTask = new JPPFAnnotatedTask(taskObject, args);
     tasks.add(jppfTask);
-    jppfTask.setPosition(taskCount++);
+    jppfTask.setPosition(tasks.size()-1);
     return jppfTask;
   }
 
@@ -308,7 +304,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
     tasks.add(jppfTask);
-    jppfTask.setPosition(taskCount++);
+    jppfTask.setPosition(tasks.size()-1);
     return jppfTask;
   }
 
@@ -423,9 +419,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   }
 
   /**
-   * Compute the hashcode of this job.
-   * @return th hashcode as an int.
-   * @see java.lang.Object#hashCode()
+   * {@inheritDoc}
    */
   @Override
   public int hashCode()
@@ -437,10 +431,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   }
 
   /**
-   * Determine whether this object is equal to another.
-   * @param obj the object to compare with.
-   * @return true if the two objects are equal, false otherwise.
-   * @see java.lang.Object#equals(java.lang.Object)
+   * {@inheritDoc}
    */
   @Override
   public boolean equals(final Object obj)
@@ -449,8 +440,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     if (obj == null) return false;
     if (!(obj instanceof JPPFJob)) return false;
     JPPFJob other = (JPPFJob) obj;
-    if (uuid == null) return other.uuid == null;
-    return uuid.equals(other.uuid);
+    return (uuid == null) ? other.uuid == null : uuid.equals(other.uuid);
   }
 
   /**
@@ -507,15 +497,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     {
       for (JobListener listener: listeners)
       {
-        switch(type)
-        {
-          case JOB_START:
-            listener.jobStarted(event);
-            break;
-          case JOB_END:
-            listener.jobEnded(event);
-            break;
-        }
+        if (JobEvent.Type.JOB_START.equals(type)) listener.jobStarted(event);
+        else if (JobEvent.Type.JOB_END.equals(type)) listener.jobEnded(event);
       }
     }
   }
