@@ -18,15 +18,17 @@
 
 package org.jppf.node.protocol;
 
+import java.io.Serializable;
+
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.scheduling.JPPFSchedule;
 
 /**
- * This interface represents the Service Level Agreement Between a JPPF job and a server.
+ * This interface represents the Service Level Agreement between a JPPF job and a server.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
-public interface JobSLA
+public interface JobSLA extends Serializable
 {
 
   /**

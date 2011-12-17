@@ -18,8 +18,6 @@
 
 package org.jppf.server.protocol;
 
-import java.io.Serializable;
-
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.scheduling.JPPFSchedule;
@@ -29,7 +27,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
-public class JPPFJobSLA implements Serializable, JobSLA
+public class JPPFJobSLA implements JobSLA
 {
   /**
    * Explicit serialVersionUID.

@@ -316,8 +316,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
     if (size > 0)
     {
-      int rnd = random.nextInt(size);
-      n = acceptableChannels.remove(rnd);
+      n = size > 1 ? acceptableChannels.remove(random.nextInt(size)) : 0;
     }
     return n;
   }
@@ -335,8 +334,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     if (debugEnabled)
     {
       String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
-          "suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
-          ", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
+        "suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
+        ", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
       log.debug(s);
     }
     if (sla.isSuspended()) return false;
@@ -344,9 +343,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     if (b) return false;
     b = (Boolean) bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE);
     if (b) return false;
-    String jobId = bundle.getUuid();
     int maxNodes = sla.getMaxNodes();
-    List<ChannelJobPair> list = server.getJobManager().getNodesForJob(jobId);
+    List<ChannelJobPair> list = server.getJobManager().getNodesForJob(bundle.getUuid());
     int n = list.size();
     if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
     return n < maxNodes;

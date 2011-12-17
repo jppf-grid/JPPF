@@ -18,7 +18,6 @@
 
 package org.jppf.server.protocol;
 
-import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.node.protocol.JobMetadata;
@@ -30,7 +29,7 @@ import org.jppf.node.protocol.JobMetadata;
  * @see org.jppf.server.scheduler.bundle.JobAwareness
  * @author Laurent Cohen
  */
-public class JPPFJobMetadata implements Serializable, JobMetadata
+public class JPPFJobMetadata implements JobMetadata
 {
   /**
    * Explicit serialVersionUID.

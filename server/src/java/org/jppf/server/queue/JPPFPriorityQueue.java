@@ -313,7 +313,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     JPPFSchedule schedule = bundle.getSLA().getJobExpirationSchedule();
     if (schedule != null)
     {
-      String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+      String jobId = (String) bundle.getName();
       String uuid = bundle.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
       long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
@@ -369,8 +369,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       newBundle.setSLA(((JPPFJobSLA) sla).copy());
       newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
       newBundle.setCompletionListener(completionListener);
-      newBundle.setParameter(BundleParameter.JOB_ID, bundle.getName() + " [node: " + info.toString() + ']');
-      newBundle.setParameter(BundleParameter.JOB_UUID, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+      newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
+      newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
       if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
       jobList.add(job);
     }

@@ -18,13 +18,14 @@
 
 package org.jppf.node.protocol;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Instances of this interface hold metadata about a job, that can be used from a driver or node extension or plugin.
  * @author Laurent Cohen
  */
-public interface JobMetadata
+public interface JobMetadata extends Serializable
 {
   /**
    * Retrieve a parameter in the metadata.

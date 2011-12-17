@@ -55,11 +55,15 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * The unique identifier for this task bundle.
    */
-  private String uuid = null;
+  private String bundleUuid = null;
   /**
-   * The unique identifier for the request this task bundle is a part of.
+   * The unique identifier for the request (the job) this task bundle is a part of.
    */
-  private String requestUuid = null;
+  private String jobUuid = null;
+  /**
+   * The user-defined display name for this job.
+   */
+  private String name = null;
   /**
    * The unique identifier for the submitting application.
    */
@@ -113,6 +117,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * The service level agreement between the job and the server.
    */
   private JobSLA jobSLA = new JPPFJobSLA();
+  /**
+   * The user-defined metadata associated with this job.
+   */
+  private JobMetadata jobMetadata = new JPPFJobMetadata();
 
   /**
    * Initialize this task bundle and set its build number.
@@ -128,7 +136,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public String getBundleUuid()
   {
-    return uuid;
+    return bundleUuid;
   }
 
   /**
@@ -137,7 +145,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public void setBundleUuid(final String uuid)
   {
-    this.uuid = uuid;
+    this.bundleUuid = uuid;
   }
 
   /**
@@ -146,7 +154,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public String getRequestUuid()
   {
-    return requestUuid;
+    return jobUuid;
   }
 
   /**
@@ -155,7 +163,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public void setRequestUuid(final String requestUuid)
   {
-    this.requestUuid = requestUuid;
+    this.jobUuid = requestUuid;
   }
 
   /**
@@ -319,9 +327,9 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public JPPFTaskBundle copy()
   {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
-    bundle.setBundleUuid(uuid);
+    bundle.setBundleUuid(bundleUuid);
     bundle.setUuidPath(uuidPath);
-    bundle.setRequestUuid(requestUuid);
+    bundle.setRequestUuid(jobUuid);
     bundle.setTaskCount(taskCount);
     bundle.setDataProvider(dataProvider);
     synchronized(bundle.getParametersMap())
@@ -474,8 +482,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public String toString()
   {
     StringBuilder sb = new StringBuilder("[");
-    sb.append("jobId=").append(parameters == null ? null : getParameter(BundleParameter.JOB_ID));
-    sb.append(", jobUuid=").append(parameters == null ? null : getParameter(BundleParameter.JOB_UUID));
+    sb.append("jobId=").append(parameters == null ? null : getName());
+    sb.append(", jobUuid=").append(parameters == null ? null : getUuid());
     sb.append(", initialTaskCount=").append(initialTaskCount);
     sb.append(", taskCount=").append(taskCount);
     sb.append(", requeue=").append(parameters == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
@@ -499,7 +507,16 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   @Override
   public String getName()
   {
-    return (String) getParameter(BundleParameter.JOB_ID);
+    return name;
+  }
+
+  /**
+   * Set the user-defined display name for the job.
+   * @param name the display name as a string.
+   */
+  public void setName(final String name)
+  {
+    this.name = name;
   }
 
   /**
@@ -508,7 +525,16 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   @Override
   public JobMetadata getMetadata()
   {
-    return (JobMetadata) getParameter(BundleParameter.JOB_METADATA);
+    return jobMetadata;
+  }
+
+  /**
+   * Set this bundle's metadata.
+   * @param jobMetadata a {@link JPPFJobMetadata} instance.
+   */
+  public void setMetadata(final JobMetadata jobMetadata)
+  {
+    this.jobMetadata = jobMetadata;
   }
 
   /**
@@ -527,6 +553,15 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   @Override
   public String getUuid()
   {
-    return (String) getParameter(BundleParameter.JOB_UUID);
+    return jobUuid;
+  }
+
+  /**
+   * Set the uuid of the initial job.
+   * @param jobUuid the uuid as a string.
+   */
+  public void setUuid(final String jobUuid)
+  {
+    this.jobUuid = jobUuid;
   }
 }

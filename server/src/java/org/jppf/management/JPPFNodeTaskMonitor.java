@@ -18,6 +18,8 @@
 
 package org.jppf.management;
 
+import java.util.concurrent.*;
+
 import javax.management.*;
 
 import org.jppf.server.node.*;
@@ -75,6 +77,10 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    * The count of notification listeners registered with this MBean.
    */
   private long listenerCount = 0L;
+  /**
+   * 
+   */
+  private ExecutorService executor = Executors.newSingleThreadExecutor();
 
   /**
    * Default constructor.
@@ -114,7 +120,8 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     else taskSucessfullCount++;
     totalCpuTime += info.getCpuTime();
     totalElapsedTime += info.getElapsedTime();
-    if (listenerCount > 0) sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info));
+    //if (listenerCount > 0) sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info));
+    if (listenerCount > 0) executor.submit(new NotificationSender(info));
   }
 
   /**
@@ -213,6 +220,35 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     synchronized(this)
     {
       listenerCount--;
+    }
+  }
+
+  /**
+   * 
+   */
+  private class NotificationSender implements Runnable
+  {
+    /**
+     * 
+     */
+    private final TaskInformation info;
+
+    /**
+     * 
+     * @param info the info to send.
+     */
+    public NotificationSender(final TaskInformation info)
+    {
+      this.info = info;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void run()
+    {
+      sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info));
     }
   }
 }

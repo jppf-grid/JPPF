@@ -57,18 +57,6 @@ public enum  BundleParameter
    */
   NODE_UUID_PARAM,
   /**
-   * The SLA between job and server.
-   */
-  JOB_SLA,
-  /**
-   * The user-defined id of a job.
-   */
-  JOB_ID,
-  /**
-   * The unique universal id of a job.
-   */
-  JOB_UUID,
-  /**
    * Job requeue indicator.
    */
   JOB_REQUEUE,
@@ -80,10 +68,6 @@ public enum  BundleParameter
    * Job expired indicator, determines whether the job is should be cancelled.
    */
   JOB_EXPIRED,
-  /**
-   * Key for the job metadata Map in the JPPFTaskBundle.
-   */
-  JOB_METADATA,
   /**
    * Time at which the job is received on the server side.
    */

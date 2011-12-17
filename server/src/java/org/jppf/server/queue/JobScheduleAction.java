@@ -60,7 +60,7 @@ class JobScheduleAction implements Runnable
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       if (debugEnabled)
       {
-        String jobId = (String) bundle.getParameter(BundleParameter.JOB_ID);
+        String jobId = (String) bundle.getName();
         log.debug("job '" + jobId + "' is resuming");
       }
       bundle.setParameter(BundleParameter.JOB_PENDING, false);
