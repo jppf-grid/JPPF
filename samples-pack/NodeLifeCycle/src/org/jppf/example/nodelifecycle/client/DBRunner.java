@@ -149,7 +149,7 @@ public class DBRunner
     }
     catch(Exception e)
     {
-      output("Could not restart a node:\n" + StringUtils.getStackTrace(e));
+      output("Could not restart a node:\n" + ExceptionUtils.getStackTrace(e));
     }
   }
 

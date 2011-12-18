@@ -232,7 +232,7 @@ public class JobPriorityRunner
           StringBuilder sb = new StringBuilder();
           sb.append("results for task [").append(job.getName()).append("] ").append(task.getId()).append(" : ");
           Exception e = task.getException();
-          if (e != null) sb.append(StringUtils.getStackTrace(e));
+          if (e != null) sb.append(ExceptionUtils.getStackTrace(e));
           else sb.append(task.getResult());
           print(sb.toString());
         }

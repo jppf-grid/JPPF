@@ -24,6 +24,7 @@ import org.jppf.client.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -171,8 +172,9 @@ public class JobData
       }
       catch(Exception e)
       {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.warn(e.getMessage());
+        String s = ExceptionUtils.getMessage(e);
+        if (debugEnabled) log.debug(s, e);
+        else log.warn(s);
       }
     }
     return proxy;

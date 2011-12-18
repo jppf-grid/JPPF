@@ -361,7 +361,7 @@ public final class SystemUtils
       }
       catch (Exception e)
       {
-        String msg = "could not parse '" + sub +"' into a valid integer pid";
+        String msg = "could not parse '" + sub +"' into a valid integer pid : " + ExceptionUtils.getMessage(e);
         if (debugEnabled) log.debug(msg, e);
         else log.warn(msg);
       }

@@ -22,7 +22,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -92,7 +92,7 @@ public class FTPRunner
     List<JPPFTask> results = jppfClient.submit(job);
     for (JPPFTask t: results)
     {
-      if (t.getException() != null) System.out.println("task error: " +  StringUtils.getStackTrace(t.getException()));
+      if (t.getException() != null) System.out.println("task error: " +  ExceptionUtils.getStackTrace(t.getException()));
       else System.out.println("task result: " + t.getResult());
     }
     totalTime = System.nanoTime() - totalTime;

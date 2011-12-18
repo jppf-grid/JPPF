@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 import javax.transaction.Status;
 
 import org.jppf.node.event.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
@@ -199,7 +199,7 @@ public class NodeListener implements NodeLifeCycleListener
   public static void startTransaction(final boolean rollbackOnly)
   {
     Exception e = submit(new StartTransactionTask(rollbackOnly));
-    if (e != null) output(StringUtils.getStackTrace(e));
+    if (e != null) output(ExceptionUtils.getStackTrace(e));
   }
 
   /**
@@ -211,7 +211,7 @@ public class NodeListener implements NodeLifeCycleListener
   public synchronized static void endTransaction(final boolean rollback)
   {
     Exception e = submit(new EndTransactionTask(rollback));
-    if (e != null) output(StringUtils.getStackTrace(e));
+    if (e != null) output(ExceptionUtils.getStackTrace(e));
   }
 
   /**
@@ -230,7 +230,7 @@ public class NodeListener implements NodeLifeCycleListener
     }
     catch(Exception e)
     {
-      output(StringUtils.getStackTrace(e));
+      output(ExceptionUtils.getStackTrace(e));
     }
     return result;
   }

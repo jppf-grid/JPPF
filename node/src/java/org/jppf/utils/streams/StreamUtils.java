@@ -20,6 +20,7 @@ package org.jppf.utils.streams;
 
 import java.io.*;
 
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.Logger;
 
 /**
@@ -62,8 +63,9 @@ public final class StreamUtils
       {
         if (log != null)
         {
-          if (log.isDebugEnabled()) log.debug("unable to close input stream", e);
-          else log.warn("unable to close input stream: " + e.getClass().getName() + ": " + e.getMessage());
+          String s = "unable to close input stream: " + ExceptionUtils.getMessage(e);
+          if (log.isDebugEnabled()) log.debug(s, e);
+          else log.warn(s);
         }
       }
     }

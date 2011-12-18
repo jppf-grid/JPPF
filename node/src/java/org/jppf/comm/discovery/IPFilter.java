@@ -94,7 +94,7 @@ public class IPFilter
       }
       catch (Exception e)
       {
-        log.warn(e.getMessage());
+        log.warn(ExceptionUtils.getMessage(e));
       }
     }
   }

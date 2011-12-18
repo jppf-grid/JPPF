@@ -113,8 +113,9 @@ public class ServiceFinder
     }
     catch(IOException e)
     {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(e.getMessage());
+      String s = ExceptionUtils.getMessage(e);
+      if (debugEnabled) log.debug(s, e);
+      else log.warn(s);
     }
     return urls;
   }
@@ -154,8 +155,9 @@ public class ServiceFinder
     }
     catch(IOException e)
     {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(e.getMessage());
+      String s = ExceptionUtils.getMessage(e);
+      if (debugEnabled) log.debug(s, e);
+      else log.warn(s);
     }
     return lines;
   }

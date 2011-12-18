@@ -27,8 +27,6 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
-import sample.dist.tasklength.LongTask;
-
 /**
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
@@ -53,12 +51,12 @@ public class BroadcastJobRunner
     try
     {
       jppfClient = new JPPFClient();
+      jppfClient.setLocalExecutionEnabled(true);
       TypedProperties props = JPPFConfiguration.getProperties();
-      int length = props.getInt("longtask.length");
-      int nbTask = props.getInt("longtask.number");
-      int iterations = props.getInt("longtask.iterations");
-      print(buildString("Running Broadcast Job demo with ", nbTask, " tasks of length = ", length, " ms for ", iterations, " iterations"));
-      perform(nbTask, length, iterations);
+      int nbTask = 1;
+      int iterations = 2;
+      print(buildString("Running Broadcast Job demo with ", nbTask, " for ", iterations, " iterations"));
+      perform(nbTask, iterations);
     }
     catch(Exception e)
     {
@@ -73,11 +71,10 @@ public class BroadcastJobRunner
   /**
    * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
    * @param nbTasks the number of tasks to send at each iteration.
-   * @param length the executionlength of each task.
    * @param iterations the number of times the the tasks will be sent.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform(final int nbTasks, final int length, final int iterations) throws Exception
+  private static void perform(final int nbTasks, final int iterations) throws Exception
   {
     try
     {
@@ -92,7 +89,7 @@ public class BroadcastJobRunner
         //job.getJobSLA().setMaxNodes(1);
         for (int i=0; i<nbTasks; i++)
         {
-          LongTask task = new LongTask(length, false);
+          BroadcastTask task = new BroadcastTask();
           task.setId("" + (iter+1) + ':' + (i+1));
           job.addTask(task);
         }
@@ -125,4 +122,20 @@ public class BroadcastJobRunner
     log.info(msg);
     System.out.println(msg);
   }
+
+  /**
+   * 
+   */
+  private static class BroadcastTask extends JPPFTask
+  {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void run()
+    {
+      System.out.println("broadcast task " + getId());
+    }
+  }
+  
 }

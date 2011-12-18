@@ -23,7 +23,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -100,7 +100,7 @@ public class TestTaskRunner
       JPPFTask resultTask = results.get(0);
       if (resultTask.getException() != null)
       {
-        System.out.println("Exception was caught:" + StringUtils.getStackTrace(resultTask.getException()));
+        System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getException()));
       }
     }
     catch(Exception e)
@@ -129,7 +129,7 @@ public class TestTaskRunner
       JPPFTask resultTask = results.get(0);
       if (resultTask.getException() != null)
       {
-        System.out.println("Exception was caught:" + StringUtils.getStackTrace(resultTask.getException()));
+        System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getException()));
       }
       else
       {
@@ -241,7 +241,7 @@ public class TestTaskRunner
       JPPFTask resultTask = results.get(0);
       if (resultTask.getException() != null)
       {
-        System.out.println("Exception was caught: "+StringUtils.getStackTrace(resultTask.getException()));
+        System.out.println("Exception was caught: "+ExceptionUtils.getStackTrace(resultTask.getException()));
       }
       else
       {

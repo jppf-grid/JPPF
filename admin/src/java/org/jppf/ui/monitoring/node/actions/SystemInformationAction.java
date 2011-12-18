@@ -24,7 +24,7 @@ import javax.swing.*;
 
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.node.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.ExceptionUtils;
 
 /**
  * This action displays the driver or node environment information in a separate frame.
@@ -83,7 +83,7 @@ public class SystemInformationAction extends AbstractTopologyAction
     }
     catch(Exception e)
     {
-      s = StringUtils.getStackTrace(e).replace("\n", "<br>");
+      s = ExceptionUtils.getStackTrace(e).replace("\n", "<br>");
     }
     final JFrame frame = new JFrame("System Information");
     frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());

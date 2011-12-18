@@ -123,7 +123,7 @@ public class Runner
     List<JPPFTask> results = client.submit(job);
     for (JPPFTask task: results)
     {
-      if (task.getException() != null) System.out.println("task "+ task.getId() + " exception occurred: " + StringUtils.getStackTrace(task.getException()));
+      if (task.getException() != null) System.out.println("task "+ task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getException()));
       else System.out.println("task "+ task.getId() + " result: " + task.getResult());
     }
   }

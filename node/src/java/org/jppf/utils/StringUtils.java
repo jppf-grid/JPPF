@@ -17,7 +17,6 @@
  */
 package org.jppf.utils;
 
-import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
 import java.nio.charset.Charset;
@@ -348,20 +347,6 @@ public final class StringUtils
       return null;
     }
     return new HostPort(comps[0], port);
-  }
-
-  /**
-   * Get a throwable's stack trace.
-   * @param t the throwable to get the stack trace from.
-   * @return the stack trace as a string.
-   */
-  public static String getStackTrace(final Throwable t)
-  {
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
-    t.printStackTrace(pw);
-    pw.close();
-    return sw.toString();
   }
 
   /**

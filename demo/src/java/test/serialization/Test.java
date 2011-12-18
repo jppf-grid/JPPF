@@ -75,8 +75,8 @@ public class Test
   public static void test2() throws Exception
   {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
-    bundle.setParameter(BundleParameter.JOB_ID, "server handshake");
-    bundle.setParameter(BundleParameter.JOB_UUID, "job uuid");
+    bundle.setName("server handshake");
+    bundle.setUuid("job uuid");
     bundle.setBundleUuid("bundle_uuid");
     bundle.setRequestUuid("0");
     bundle.getUuidPath().add("driver_uuid");

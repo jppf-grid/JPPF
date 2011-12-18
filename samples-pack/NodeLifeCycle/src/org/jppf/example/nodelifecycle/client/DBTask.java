@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.example.nodelifecycle.node.NodeListener;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.ExceptionUtils;
 
 /**
  * A sample task that writes a row into the database via a datasource.
@@ -65,7 +65,7 @@ public class DBTask extends JPPFTask
       {
         if (t instanceof Exception) setException((Exception) t);
         else setException(new Exception("Error while executing SQL statement", t));
-        NodeListener.output(StringUtils.getStackTrace(t));
+        NodeListener.output(ExceptionUtils.getStackTrace(t));
       }
       // otherwise we set the execution result
       else
