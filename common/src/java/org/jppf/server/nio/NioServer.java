@@ -57,15 +57,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Name of the class server.
    */
-  public static final String CLASS_SERVER = "Class Server";
+  public static final String CLASS_SERVER = "ClassServer";
   /**
    * Name of the class server.
    */
-  public static final String NODE_SERVER = "Tasks Server";
+  public static final String NODE_SERVER = "TasksServer";
   /**
    * Name of the client task server.
    */
-  public static final String CLIENT_SERVER = "Client Server";
+  public static final String CLIENT_SERVER = "ClientServer";
   /**
    * Name of the acceptor server server.
    */

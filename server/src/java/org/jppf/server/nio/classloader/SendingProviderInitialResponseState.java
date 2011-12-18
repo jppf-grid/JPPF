@@ -52,22 +52,22 @@ class SendingProviderInitialResponseState extends ClassServerState
 
   /**
    * Execute the action associated with this channel state.
-   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    ClassContext context = (ClassContext) wrapper.getContext();
-    if (CHECK_CONNECTION && wrapper.isReadable() && !(wrapper instanceof LocalClassLoaderChannel))
+    ClassContext context = (ClassContext) channel.getContext();
+    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
     {
-      throw new ConnectException("provider " + wrapper + " has been disconnected");
+      throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if (context.writeMessage(wrapper))
+    if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent management to provider: " + wrapper);
+      if (debugEnabled) log.debug("sent management to provider: " + channel);
       //context.setMessage(null);
       return TO_IDLE_PROVIDER;
     }

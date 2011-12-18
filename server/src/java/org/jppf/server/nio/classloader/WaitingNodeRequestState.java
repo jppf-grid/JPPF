@@ -174,46 +174,12 @@ class WaitingNodeRequestState extends ClassServerState
     }
     else
     {
+      // perform lookup(s) on the client side
       uuidPath.decPosition();
-      String uuid = uuidPath.getCurrentElement();
-      ChannelWrapper<?> provider = findProviderConnection(uuid);
-      if (provider != null)
-      {
-        synchronized(provider)
-        {
-          if (debugEnabled) log.debug("request resource [" + name + "] from client: " + provider + " for node: " + channel);
-          ClassContext providerContext = (ClassContext) provider.getContext();
-          providerContext.addRequest(channel);
-          t = TO_IDLE_NODE;
-        }
-      }
+			t = TO_NODE_WAITING_PROVIDER_RESPONSE;
+			context.resetNodeState(channel, server);
     }
     return new ByteTransitionPair(b, t);
-  }
-
-  /**
-   * Find a provider connection for the specified provider uuid.
-   * @param uuid the uuid for which to find a connection.
-   * @return a <code>SelectableChannel</code> instance.
-   * @throws Exception if an error occurs while searching for a connection.
-   */
-  private ChannelWrapper findProviderConnection(final String uuid) throws Exception
-  {
-    ChannelWrapper<?> result = null;
-    List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
-    if (connections == null) return null;
-    int minRequests = Integer.MAX_VALUE;
-    for (ChannelWrapper<?> channel: connections)
-    {
-      ClassContext ctx = (ClassContext) channel.getContext();
-      int size = ctx.getNbPendingRequests();
-      if (size < minRequests)
-      {
-        minRequests = size;
-        result = channel;
-      }
-    }
-    return result;
   }
 
   /**

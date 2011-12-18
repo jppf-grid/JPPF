@@ -22,6 +22,7 @@ import java.net.Socket;
 import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -98,8 +99,9 @@ abstract class JPPFConnection extends Thread
     }
     catch (Exception e)
     {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(e.getMessage());
+      String s = ExceptionUtils.getMessage(e);
+      if (debugEnabled) log.debug(s, e);
+      else log.warn(s);
       setClosed();
       server.removeConnection(this);
     }
@@ -150,8 +152,9 @@ abstract class JPPFConnection extends Thread
     }
     catch (Exception e)
     {
-      if (debugEnabled) log.error(e.getMessage(), e);
-      else log.warn(e.getMessage());
+      String s = ExceptionUtils.getMessage(e);
+      if (debugEnabled) log.error(s, e);
+      else log.warn(s);
     }
     closed = true;
   }

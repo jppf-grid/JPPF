@@ -314,7 +314,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
    * Close the specified connection.
    * @param channel the channel representing the connection.
    */
-  static void closeConnection(final ChannelWrapper<?> channel)
+  public static void closeConnection(final ChannelWrapper<?> channel)
   {
     if (channel == null)
     {

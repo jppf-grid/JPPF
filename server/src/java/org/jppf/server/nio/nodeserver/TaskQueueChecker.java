@@ -141,8 +141,9 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
       }
       catch(Exception e)
       {
-        if (debugEnabled) log.debug("error removing channel at index " + index, e);
-        else log.warn("error removing channel at index " + index + " : " + e.getMessage());
+        String s = "error removing channel at index " + index + ExceptionUtils.getMessage(e);
+        if (debugEnabled) log.debug(s, e);
+        else log.warn(s);
       }
     }
     driver.getStatsManager().idleNodes(idleChannels.size());

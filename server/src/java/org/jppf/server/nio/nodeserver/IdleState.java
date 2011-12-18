@@ -50,16 +50,16 @@ class IdleState extends NodeServerState
 
   /**
    * Execute the action associated with this channel state.
-   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    if (debugEnabled) log.debug("exec() for " + wrapper);
-    if (CHECK_CONNECTION && wrapper.isReadable())
+    if (debugEnabled) log.debug("exec() for " + channel);
+    if (channel.isReadable() && !(channel instanceof LocalNodeChannel))
     {
       /*
 			if (debugEnabled)
@@ -71,7 +71,7 @@ class IdleState extends NodeServerState
 				log.debug("readable channel: read " + n + " bytes");
 			}
        */
-      if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
+      if (!(channel instanceof LocalNodeChannel)) throw new ConnectException("node " + channel + " has been disconnected");
     }
     return TO_IDLE;
   }

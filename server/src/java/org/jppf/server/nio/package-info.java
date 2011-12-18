@@ -16,29 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client;
-
-
 /**
- * Enumeration of the possible states for a client job channel.
- * @author Laurent Cohen
+ * Classes supporting asynchronous communication through the NIO APIs.
  */
-public enum ClientState
-{
-  /**
-   * Waiting for the handshake bundle to be received from the client.
-   */
-  WAITING_HANDSHAKE,
-  /**
-   * State of waiting for something to do / sending a set of results to the client.
-   */
-  SENDING_RESULTS,
-  /**
-   * State of waiting for the client to send a job.
-   */
-  WAITING_JOB,
-  /**
-   * Idle state for a client channel.
-   */
-  IDLE
-}
+package org.jppf.server.nio;

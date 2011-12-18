@@ -64,7 +64,7 @@ class SendingResultsState extends ClientServerState
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-    if (CHECK_CONNECTION && channel.isReadable())
+    if (channel.isReadable())
     {
       throw new ConnectException("client " + channel + " has been disconnected");
     }

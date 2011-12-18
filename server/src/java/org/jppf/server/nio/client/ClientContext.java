@@ -26,6 +26,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.classloader.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -61,10 +62,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   protected SerializationHelper helper = new SerializationHelperImpl();
   /**
-   * The uuid of the corresponding node.
-   */
-  protected String clientUuid = null;
-  /**
    * True means the job was cancelled and the task completion listener must not be called.
    */
   protected boolean jobCanceled = false;
@@ -84,6 +81,14 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * The job as initially submitted by the client.
    */
   private ServerJob initialBundleWrapper;
+  /**
+   * Unique ID for the connection.
+   */
+  private String connectionUuid = null;
+  /**
+   * Unique ID for the client.
+   */
+  private String clientUuid = null;
 
   /**
    * Get the task bundle to send or receive.
@@ -110,6 +115,23 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public void handleException(final ChannelWrapper<?> channel)
   {
     ClientNioServer.closeClient(channel);
+    if (clientUuid != null)
+    {
+      ClassNioServer classServer = JPPFDriver.getInstance().getClassServer();
+      List<ChannelWrapper<?>> list = classServer.getProviderConnections(clientUuid);
+      if ((list != null) && !list.isEmpty())
+      {
+        for (ChannelWrapper<?> classChannel: list)
+        {
+          ClassContext ctx = (ClassContext) classChannel.getContext();
+          if (ctx.getConnectionUuid().equals(connectionUuid))
+          {
+            ClassNioServer.closeConnection(channel);
+            break;
+          }
+        }
+      }
+    }
     cancelJobOnClose();
   }
 
@@ -342,8 +364,9 @@ public class ClientContext extends AbstractNioContext<ClientState>
         }
         catch (Exception e)
         {
-          if (debugEnabled) log.error(e.getMessage(), e);
-          else log.warn(e.getMessage());
+          String s = ExceptionUtils.getMessage(e);
+          if (debugEnabled) log.error(s, e);
+          else log.warn(s);
         }
       }
       jobManager.jobEnded(initialBundleWrapper);
@@ -358,5 +381,23 @@ public class ClientContext extends AbstractNioContext<ClientState>
   synchronized void setInitialBundleWrapper(final ServerJob initialBundleWrapper)
   {
     this.initialBundleWrapper = initialBundleWrapper;
+  }
+
+  /**
+   * Get the unique ID for the connection.
+   * @return the connection id.
+   */
+  public String getConnectionUuid()
+  {
+    return connectionUuid;
+  }
+
+  /**
+   * Set the unique ID for the connection.
+   * @param connectionUuid the connection id.
+   */
+  public void setConnectionUuid(final String connectionUuid)
+  {
+    this.connectionUuid = connectionUuid;
   }
 }

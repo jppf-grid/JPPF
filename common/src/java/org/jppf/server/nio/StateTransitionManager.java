@@ -74,7 +74,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    * Submit the next state transition for a specified channel.
    * @param key the selection key that references the channel.
    */
-  protected void submitTransition(final ChannelWrapper<?> key)
+  public void submitTransition(final ChannelWrapper<?> key)
   {
     if (debugEnabled) log.debug("submitting transition for " + key);
     setKeyOps(key, 0);
@@ -92,6 +92,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   private void setKeyOps(final ChannelWrapper<?> key, final int ops)
   {
     Lock lock = server.getLock();
+    server.getSelector().wakeup();
     lock.lock();
     try
     {
@@ -113,6 +114,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition)
   {
     Lock lock = server.getLock();
+    server.getSelector().wakeup();
     lock.lock();
     try
     {

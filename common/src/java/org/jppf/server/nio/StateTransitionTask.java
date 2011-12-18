@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio;
 
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -86,8 +87,9 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
       }
       catch(Exception e)
       {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.warn(e.getMessage());
+        String msg = "error on channel " + channel + " : " + ExceptionUtils.getMessage(e);
+        if (debugEnabled) log.debug(msg, e);
+        else log.warn(msg);
         ctx.handleException(channel);
       }
     }

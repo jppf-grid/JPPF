@@ -227,8 +227,8 @@ class ApplicationConnection extends JPPFConnection
       }
       catch (Exception e)
       {
-        if (debugEnabled) log.error(e.getMessage(), e);
-        else log.warn(e.getMessage());
+        if (debugEnabled) log.error(ExceptionUtils.getMessage(e), e);
+        else log.warn(ExceptionUtils.getMessage(e));
       }
       JPPFDriver.getInstance().getJobManager().jobEnded(headerWrapper);
     }

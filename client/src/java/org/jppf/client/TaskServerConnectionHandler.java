@@ -85,6 +85,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
       }
       if (debugEnabled) log.debug("sending JPPF identifier");
       socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
+      ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
       msg = "[client: "+name+"] Reconnected to the JPPF task server";
       System.out.println(msg);
       if (debugEnabled) log.debug(msg);

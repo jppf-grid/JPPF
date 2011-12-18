@@ -127,6 +127,10 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * The JPPF client that owns this connection.
    */
   protected AbstractGenericClient client = null;
+  /**
+   * Unique ID for this connection and its two channels.
+   */
+  protected final String connectionUuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString();
 
   /**
    * Configure this client connection with the specified parameters.
@@ -211,15 +215,35 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
   }
 
   /**
+   * Send a handshake job to the server.
+   * @throws Exception if an error occurs while sending the request.
+   */
+  public void sendHandshakeJob() throws Exception
+  {
+    JPPFTaskBundle header = new JPPFTaskBundle();
+    ObjectSerializer ser = makeHelper(getClass().getClassLoader()).getSerializer();
+    TraversalList<String> uuidPath = new TraversalList<String>();
+    uuidPath.add(client.getUuid());
+    header.setUuidPath(uuidPath);
+    if (debugEnabled) log.debug("[client: " + name + "] sending handshake job, uuidPath=" + uuidPath.getList());
+    header.setRequestUuid(new JPPFUuid().toString());
+    header.setName("handshake job");
+    header.setUuid("handshake job");
+    header.setParameter("connection.uuid", connectionUuid);
+    SocketWrapper socketClient = taskServerConnection.getSocketClient();
+    IOHelper.sendData(socketClient, header, ser);
+    IOHelper.sendData(socketClient, null, ser);
+    socketClient.flush();
+  }
+
+  /**
    * Receive results of tasks execution.
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public Pair<List<JPPFTask>, Integer> receiveResults() throws Exception
-  {
-    try
-    {
+  public Pair<List<JPPFTask>, Integer> receiveResults() throws Exception {
+    try {
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
       ObjectSerializer ser = makeHelper().getSerializer();
       JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
@@ -227,38 +251,28 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
       if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getName() + '\'');
       List<JPPFTask> taskList = new LinkedList<JPPFTask>();
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
-      try
-      {
+      try {
         for (int i=0; i<count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
-      }
-      finally
-      {
+      } finally {
         if (SEQUENTIAL_DESERIALIZATION) lock.unlock();
       }
 
       int startIndex = (taskList.isEmpty()) ? -1 : taskList.get(0).getPosition();
       // if an exception prevented the node from executing the tasks
       Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-      if (t != null)
-      {
+      if (t != null) {
         if (debugEnabled) log.debug("server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         for (JPPFTask task: taskList) task.setException(e);
       }
       return new Pair<List<JPPFTask>, Integer>(taskList, startIndex);
-    }
-    catch(AsynchronousCloseException e)
-    {
+    } catch(AsynchronousCloseException e) {
       log.debug(e.getMessage(), e);
       throw e;
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       throw e;
-    }
-    catch(Error e)
-    {
+    } catch(Error e) {
       log.error(e.getMessage(), e);
       throw e;
     }
@@ -271,17 +285,13 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * @param cl the context classloader to use to deserialize the results.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public Pair<List<JPPFTask>, Integer> receiveResults(final ClassLoader cl) throws Exception
-  {
+  public Pair<List<JPPFTask>, Integer> receiveResults(final ClassLoader cl) throws Exception {
     ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
     if (cl != null) Thread.currentThread().setContextClassLoader(cl);
     Pair<List<JPPFTask>, Integer> results = null;
-    try
-    {
+    try {
       results = receiveResults();
-    }
-    finally
-    {
+    } finally {
       if (cl != null) Thread.currentThread().setContextClassLoader(prevCl);
     }
     return results;
@@ -303,36 +313,28 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
    */
-  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception
-  {
+  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception {
     ClassLoader cl = classLoader;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
     final ClassLoader parent = cl;
-    PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>()
-    {
+    PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>() {
       @Override
-      public NonDelegatingClassLoader run()
-      {
+      public NonDelegatingClassLoader run() {
         return new NonDelegatingClassLoader(null, parent);
       }
     };
     NonDelegatingClassLoader ndCl = AccessController.doPrivileged(pa);
     String helperClassName = getSerializationHelperClassName();
     Class clazz = null;
-    if (cl != null)
-    {
-      try
-      {
+    if (cl != null) {
+      try {
         clazz = ndCl.loadClassDirect(helperClassName);
-      }
-      catch(ClassNotFoundException e)
-      {
+      } catch(ClassNotFoundException e) {
         log.error(e.getMessage(), e);
       }
     }
-    if (clazz == null)
-    {
+    if (clazz == null) {
       cl = this.getClass().getClassLoader();
       clazz = cl.loadClass(helperClassName);
     }
@@ -398,10 +400,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * @see org.jppf.client.JPPFClientConnection#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
    */
   @Override
-  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
-    synchronized(listeners)
-    {
+  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
+    synchronized(listeners) {
       listeners.add(listener);
     }
   }
@@ -412,10 +412,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * @see org.jppf.client.JPPFClientConnection#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
    */
   @Override
-  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
-    synchronized(listeners)
-    {
+  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
+    synchronized(listeners) {
       listeners.remove(listener);
     }
   }
@@ -424,18 +422,13 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * Notify all listeners that the status of this connection has changed.
    * @param oldStatus the connection status before the change.
    */
-  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
-  {
+  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus) {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     ClientConnectionStatusListener[] array = null;
-    synchronized(listeners)
-    {
+    synchronized(listeners) {
       array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
-    for (ClientConnectionStatusListener listener: array)
-    {
-      listener.statusChanged(event);
-    }
+    for (ClientConnectionStatusListener listener: array) listener.statusChanged(event);
   }
 
   /**
@@ -585,5 +578,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
   public String getUuid()
   {
     return uuid;
+  }
+
+  /**
+   * Get the unique ID for this connection and its two channels.
+   * @return the id as a string.
+   */
+  public String getConnectionUuid()
+  {
+    return connectionUuid;
   }
 }

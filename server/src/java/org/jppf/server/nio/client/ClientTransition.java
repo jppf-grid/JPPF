@@ -20,11 +20,15 @@ package org.jppf.server.nio.client;
 
 
 /**
- * Enumeration of the possible state transitions for a Node server channel.
+ * Enumeration of the possible state transitions for a client job channel.
  * @author Laurent Cohen
  */
 public enum ClientTransition
 {
+  /**
+   * Transition from a state to WAITING_HANDSHAKE.
+   */
+  TO_WAITING_HANDSHAKE,
   /**
    * Transition from a state to SENDING_RESULTS.
    */

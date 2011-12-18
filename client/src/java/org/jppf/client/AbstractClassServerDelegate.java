@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.data.transform.*;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -60,6 +60,10 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * Mapping of class loader to requests uuids.
    */
   private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+  /**
+   * Determines if the handshake with the server has been performed.
+   */
+  protected boolean handshakeDone = false;
 
   /**
    * Default instantiation of this class is not permitted.
@@ -174,5 +178,25 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   public ClassLoader getRequestClassLoader(final String uuid)
   {
     return classLoaderMap.get(uuid);
+  }
+
+  /**
+   * Perform the handshake with the server.
+   * @throws Exception if any error occurs.
+   */
+  protected void handshake() throws Exception
+  {
+    if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
+    socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
+    if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
+    JPPFResourceWrapper resource = new JPPFResourceWrapper();
+    resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
+    resource.addUuid(clientUuid);
+    resource.setData("connection.uuid", ((AbstractJPPFClientConnection) owner).getConnectionUuid());
+    writeResource(resource);
+    // read the server response
+    readResource();
+    handshakeDone = true;
+    if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
   }
 }

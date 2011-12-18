@@ -55,56 +55,53 @@ class SendingBundleState extends NodeServerState
 
   /**
    * Execute the action associated with this channel state.
-   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     //if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
-    if (CHECK_CONNECTION && wrapper.isReadable())
-    {
-      if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
-    }
+    if (channel.isReadable() && !(channel instanceof LocalNodeChannel)) throw new ConnectException("node " + channel + " has been disconnected");
 
-    AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
+    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getNodeMessage() == null)
     {
       ServerJob bundleWrapper = context.getBundle();
       JPPFTaskBundle bundle = (bundleWrapper == null) ? null : (JPPFTaskBundle) bundleWrapper.getJob();
       if (bundle != null)
       {
-        if (debugEnabled) log.debug("got bundle from the queue for " + wrapper);
+        if (debugEnabled) log.debug("got bundle from the queue for " + channel);
         // to avoid cycles in peer-to-peer routing of jobs.
         if (bundle.getUuidPath().contains(context.getUuid()))
         {
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath().getList());
           context.setBundle(null);
           context.resubmitBundle(bundleWrapper);
-          server.addIdleChannel(wrapper);
+          server.addIdleChannel(channel);
           return TO_IDLE;
         }
         //bundle.setExecutionStartTime(System.currentTimeMillis());
         bundle.setExecutionStartTime(System.nanoTime());
-        context.serializeBundle(wrapper);
+        context.serializeBundle(channel);
       }
       else
       {
-        if (debugEnabled) log.debug("null bundle for node " + wrapper);
-        server.addIdleChannel(wrapper);
+        if (debugEnabled) log.debug("null bundle for node " + channel);
+        server.addIdleChannel(channel);
         return TO_IDLE;
       }
     }
-    if (context.writeMessage(wrapper))
+    if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to node " + wrapper);
-      context.setNodeMessage(null, wrapper);
+      if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to node " + channel);
+      context.setNodeMessage(null, channel);
       //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
       return TO_WAITING;
     }
-    if (traceEnabled) log.trace("part yet to send to node " + wrapper);
+    if (traceEnabled) log.trace("part yet to send to node " + channel);
     return TO_SENDING;
   }
 }

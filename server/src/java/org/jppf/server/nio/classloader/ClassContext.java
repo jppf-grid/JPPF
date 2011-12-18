@@ -40,7 +40,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   private static Logger log = LoggerFactory.getLogger(ClassContext.class);
   /**
-   * Determines whether DEBUG logging level is enabled.
+   * Determines whther DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
@@ -102,6 +102,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public void handleException(final ChannelWrapper<?> channel)
   {
     ClassNioServer.closeConnection(channel);
+    if (isProvider()) handleProviderError();
   }
 
   /**
@@ -199,5 +200,74 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public void setProvider(final boolean provider)
   {
     this.provider = provider;
+  }
+
+  /**
+   * Handle the scenario where an exception occurs while sendinf a request to
+   * or receiving a response from a provider, and a node channel is wating for the response.
+   */
+  protected void handleProviderError()
+  {
+    try
+    {
+      ChannelWrapper<?> currentRequest = getCurrentRequest();
+      if ((currentRequest != null) || !getPendingRequests().isEmpty())
+      {
+        if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
+        ClassNioServer server = JPPFDriver.getInstance().getClassServer();
+        if (currentRequest != null)
+        {
+          setCurrentRequest(null);
+          resetNodeState(currentRequest, server);
+        }
+        for (int i=0; i<getPendingRequests().size(); i++) resetNodeState(getPendingRequests().remove(0), server);
+      }
+    }
+    catch (Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Reset the state of the requesting node channel, after an error
+   * occurred on the provider which attempted to provide a response.
+   * @param request the requestinhg node channel.
+   * @param server the server handling the node.
+   */
+  protected void resetNodeState(final ChannelWrapper<?> request, final ClassNioServer server)
+  {
+    try
+    {
+      if (debugEnabled) log.debug("disconnected provider: resetting channel state for node " + request);
+      server.getTransitionManager().transitionChannel(request, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
+      server.getTransitionManager().submitTransition(request);
+    }
+    catch (Exception e)
+    {
+      log.error("error while trying to send response to node " + request + ", this node may be unavailable", e);
+    }
+  }
+
+  /**
+   * Send a null response to a request node connection. This method is called for a provider
+   * that was disconnected but still has pending requests, so as not to block the requesting channels.
+   * @param request the selection key wrapping the requesting channel.
+   */
+  protected void sendNullResponse(final ChannelWrapper<?> request)
+  {
+    try
+    {
+      if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
+      ClassContext requestContext = (ClassContext) request.getContext();
+      requestContext.getResource().setDefinition(null);
+      requestContext.serializeResource(request);
+      ClassNioServer server = JPPFDriver.getInstance().getClassServer();
+      server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
+    }
+    catch (Exception e)
+    {
+      log.error("error while trying to send response to node " + request + ", this node may be unavailable", e);
+    }
   }
 }

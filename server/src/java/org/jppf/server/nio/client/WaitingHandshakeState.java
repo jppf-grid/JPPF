@@ -20,8 +20,10 @@ package org.jppf.server.nio.client;
 
 import static org.jppf.server.nio.client.ClientTransition.*;
 
-import org.jppf.server.JPPFDriver;
+import java.util.List;
+
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
@@ -29,12 +31,12 @@ import org.slf4j.*;
  * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
-class WaitingJobState extends ClientServerState
+class WaitingHandshakeState extends ClientServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(WaitingJobState.class);
+  private static Logger log = LoggerFactory.getLogger(WaitingHandshakeState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -44,7 +46,7 @@ class WaitingJobState extends ClientServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public WaitingJobState(final ClientNioServer server)
+  public WaitingHandshakeState(final ClientNioServer server)
   {
     super(server);
   }
@@ -65,26 +67,28 @@ class WaitingJobState extends ClientServerState
     {
       ServerJob bundleWrapper = context.deserializeBundle();
       JPPFTaskBundle header = (JPPFTaskBundle) bundleWrapper.getJob();
-      int count = header.getTaskCount();
-      if (debugEnabled) log.debug("read bundle" + header + " from client " + channel + " done: received " + count + " tasks");
-      if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME) == null)
-        header.setParameter(BundleParameter.JOB_RECEIVED_TIME, System.nanoTime());
-
+      if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
+      context.setConnectionUuid((String) header.getParameter("connection.uuid"));
       header.getUuidPath().incPosition();
+      String uuid = header.getUuidPath().getCurrentElement();
+      context.setUuid(uuid);
+      // wait until a class loader channel is up for the same client uuid
+      ClassNioServer classServer = driver.getClassServer();
+      List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
+      while ((list == null) || list.isEmpty())
+      {
+        Thread.sleep(1L);
+        list = classServer.getProviderConnections(uuid);
+      }
       header.getUuidPath().add(driver.getUuid());
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath().getList());
-      header.setCompletionListener(new CompletionListener(channel));
-      context.setPendingTasksCount(header.getTaskCount());
-      context.setInitialBundleWrapper(bundleWrapper);
-      context.setCurrentJobId(header.getUuid());
-      JPPFDriver.getQueue().addBundle(bundleWrapper);
 
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setClientMessage(null);
       context.setBundle(null);
-      return TO_SENDING_RESULTS;
+      return TO_WAITING_JOB;
     }
-    return TO_WAITING_JOB;
+    return TO_WAITING_HANDSHAKE;
   }
 }

@@ -85,7 +85,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   {
     try
     {
-      transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_JOB);
+      transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
     }
     catch (Exception e)
     {

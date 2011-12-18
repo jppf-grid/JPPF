@@ -50,34 +50,31 @@ class SendInitialBundleState extends NodeServerState
 
   /**
    * Execute the action associated with this channel state.
-   * @param wrapper the selection key corresponding to the channel and selector for this state.
+   * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-    if (CHECK_CONNECTION && wrapper.isReadable())
-    {
-      if (!(wrapper instanceof LocalNodeChannel)) throw new ConnectException("node " + wrapper + " has been disconnected");
-    }
+    if (channel.isReadable() && !(channel instanceof LocalNodeChannel)) throw new ConnectException("node " + channel + " has been disconnected");
 
-    AbstractNodeContext context = (AbstractNodeContext) wrapper.getContext();
+    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getNodeMessage() == null)
     {
-      if (debugEnabled) log.debug("serializing initial bundle for " + wrapper);
-      context.serializeBundle(wrapper);
+      if (debugEnabled) log.debug("serializing initial bundle for " + channel);
+      context.serializeBundle(channel);
     }
-    if (context.writeMessage(wrapper))
+    if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire initial bundle for " + wrapper);
-      context.setNodeMessage(null, wrapper);
+      if (debugEnabled) log.debug("sent entire initial bundle for " + channel);
+      context.setNodeMessage(null, channel);
       context.setBundle(null);
       return TO_WAIT_INITIAL;
     }
-    if (debugEnabled) log.debug("part yet to send for " + wrapper);
+    if (debugEnabled) log.debug("part yet to send for " + channel);
     return TO_SEND_INITIAL;
   }
 }
