@@ -27,7 +27,6 @@ import org.jppf.JPPFException;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.client.AbstractClassServerDelegate;
 import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
@@ -195,16 +194,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
     try
     {
       init();
-      if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
-      socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
-      if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
-      JPPFResourceWrapper resource = new JPPFResourceWrapper();
-      resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
-      resource.addUuid(clientUuid);
-      writeResource(resource);
-      // receive the initial response from the server.
-      readResource();
-      if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
+      handshake();
     }
     finally
     {
