@@ -330,6 +330,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setBundleUuid(bundleUuid);
     bundle.setUuidPath(uuidPath);
     bundle.setRequestUuid(jobUuid);
+    bundle.setUuid(jobUuid);
+    bundle.setName(name);
     bundle.setTaskCount(taskCount);
     bundle.setDataProvider(dataProvider);
     synchronized(bundle.getParametersMap())
@@ -482,8 +484,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public String toString()
   {
     StringBuilder sb = new StringBuilder("[");
-    sb.append("jobId=").append(parameters == null ? null : getName());
-    sb.append(", jobUuid=").append(parameters == null ? null : getUuid());
+    sb.append("jobId=").append(getName());
+    sb.append(", jobUuid=").append(getUuid());
     sb.append(", initialTaskCount=").append(initialTaskCount);
     sb.append(", taskCount=").append(taskCount);
     sb.append(", requeue=").append(parameters == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
