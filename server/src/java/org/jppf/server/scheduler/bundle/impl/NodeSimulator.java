@@ -18,12 +18,18 @@
 
 package org.jppf.server.scheduler.bundle.impl;
 
-import java.util.*;
-import java.util.concurrent.*;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
+import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler;
+import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.proportional.*;
-import org.slf4j.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Simulation of a node to test a bundler.
@@ -85,13 +91,13 @@ public class NodeSimulator
   {
     try
     {
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       long a = (long) latency;
       int b = (int) ((latency - a) * 1.0e6);
       Thread.sleep(a, b);
       Thread.sleep((long) (sizeMB * dynamicOverhead));
       for (int i=0; i<nbTasks; i++) Thread.sleep((long) (timePerTask/speed));
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = System.nanoTime() - start;
       bundler.feedback(nbTasks, elapsed);
     }
     catch(Exception e)

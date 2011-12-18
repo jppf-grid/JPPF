@@ -77,7 +77,7 @@ public abstract class AbstractBundler implements Bundler
   /**
    * This method does nothing and should be overridden in subclasses.
    * @param bundleSize not used.
-   * @param totalTime not used.
+   * @param totalTime in nanoseconds - not used.
    * @see org.jppf.server.scheduler.bundle.Bundler#feedback(int, double)
    */
   @Override

@@ -18,11 +18,13 @@
 
 package org.jppf.server.scheduler.bundle.impl;
 
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.AbstractBundler;
+import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
@@ -103,7 +105,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
   /**
    * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
    * @param bundleSize the number of tasks executed.
-   * @param totalTime the time in milliseconds it took to execute the tasks.
+   * @param totalTime the time in nanoseconds it took to execute the tasks.
    * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
    */
   @Override

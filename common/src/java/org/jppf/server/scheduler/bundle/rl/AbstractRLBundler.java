@@ -93,7 +93,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
   /**
    * This method computes the bundle size based on the new state of the server.
    * @param size the number of tasks executed.
-   * @param totalTime the time in milliseconds it took to execute the tasks.
+   * @param totalTime the time in nanoseconds it took to execute the tasks.
    * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
    */
   @Override
@@ -135,7 +135,7 @@ public abstract class AbstractRLBundler extends AbstractBundler
   /**
    * This method computes the bundle size based on the new state of the server.
    * @param size the number of tasks executed.
-   * @param totalTime the time in milliseconds it took to execute the tasks.
+   * @param totalTime the time in nanoseconds it took to execute the tasks.
    * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
    */
   public void feedback2(final int size, final double totalTime)

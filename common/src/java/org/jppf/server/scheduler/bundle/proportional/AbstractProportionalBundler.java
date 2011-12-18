@@ -18,10 +18,15 @@
 
 package org.jppf.server.scheduler.bundle.proportional;
 
-import java.util.*;
+import org.jppf.server.scheduler.bundle.AbstractBundler;
+import org.jppf.server.scheduler.bundle.BundleDataHolder;
+import org.jppf.server.scheduler.bundle.BundlePerformanceSample;
+import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.jppf.server.scheduler.bundle.*;
-import org.slf4j.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This bundler implementation computes bundle sizes proportional to the mean execution
@@ -101,7 +106,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
   /**
    * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
    * @param size the number of tasks executed.
-   * @param time the time in milliseconds it took to execute the tasks.
+   * @param time the time in nanoseconds it took to execute the tasks.
    * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
    */
   @Override

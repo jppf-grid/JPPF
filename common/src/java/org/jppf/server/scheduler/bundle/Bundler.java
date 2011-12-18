@@ -37,9 +37,9 @@ public interface Bundler
    * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.
    * The execution time includes the network round trip between node and server.
    * @param nbTasks number of tasks that were executed.
-   * @param totalTime the total execution and transport time.
+   * @param totalTime the total execution and transport time in nanoseconds.
    */
-  void feedback(int nbTasks, double totalTime);
+  void feedback(final int nbTasks, final double totalTime);
 
   /**
    * Make a copy of this bundler.
