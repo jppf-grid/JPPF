@@ -176,6 +176,7 @@ class WaitingNodeRequestState extends ClassServerState
 		else
 		{
 			uuidPath.decPosition();
+			/*
 			String uuid = uuidPath.getCurrentElement();
 			ChannelWrapper<?> provider = findProviderConnection(uuid);
 			if (provider != null)
@@ -188,6 +189,9 @@ class WaitingNodeRequestState extends ClassServerState
 					t = TO_IDLE_NODE;
 				}
 			}
+			*/
+			t = TO_NODE_WAITING_PROVIDER_RESPONSE;
+			context.resetNodeState(channel, server);
 		}
 		return new ByteTransitionPair(b, t);
 	}

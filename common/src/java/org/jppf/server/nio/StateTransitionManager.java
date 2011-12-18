@@ -20,7 +20,6 @@ package org.jppf.server.nio;
 
 import java.nio.channels.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -74,7 +73,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 * Submit the next state transition for a specified channel.
 	 * @param key the selection key that references the channel.
 	 */
-	protected void submitTransition(ChannelWrapper<?> key)
+	public void submitTransition(ChannelWrapper<?> key)
 	{
 		if (debugEnabled) log.debug("submitting transition for " + key);
 		setKeyOps(key, 0);
@@ -91,8 +90,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	 */
 	private void setKeyOps(ChannelWrapper<?> key, int ops)
 	{
-		Lock lock = server.getLock();
-		lock.lock();
+    server.getSelector().wakeup();
+		server.getLock().lock();
 		try
 		{
 			server.getSelector().wakeup();
@@ -100,7 +99,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		}
 		finally
 		{
-			lock.unlock();
+		  server.getLock().unlock();
 		}
 	}
 
@@ -112,6 +111,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 	@SuppressWarnings("unchecked")
 	public void transitionChannel(ChannelWrapper<?> channel, T transition)
 	{
+	  server.getSelector().wakeup();
 		server.getLock().lock();
 		try
 		{

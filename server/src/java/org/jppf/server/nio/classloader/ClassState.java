@@ -58,5 +58,9 @@ public enum ClassState
 	/**
 	 * State of doing nothing for a resource provider.
 	 */
-	IDLE_NODE
+	IDLE_NODE,
+	/**
+	 * Waiting for a provider (client) to provide a class or resource definition.
+	 */
+	NODE_WAITING_PROVIDER_RESPONSE
 }

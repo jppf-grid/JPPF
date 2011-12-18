@@ -57,7 +57,8 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
 		map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState((ClassNioServer) server));
 		map.put(WAITING_NODE_REQUEST, new WaitingNodeRequestState((ClassNioServer) server));
 		map.put(WAITING_PROVIDER_RESPONSE, new WaitingProviderResponseState((ClassNioServer) server));
-		map.put(IDLE_PROVIDER, new IdleProviderState((ClassNioServer) server));
+    map.put(IDLE_PROVIDER, new IdleProviderState((ClassNioServer) server));
+    map.put(NODE_WAITING_PROVIDER_RESPONSE, new NodeWaitingProviderResponseState((ClassNioServer) server));
 		return map;
 	}
 
@@ -79,6 +80,7 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
 		map.put(TO_WAITING_PROVIDER_RESPONSE, transition(WAITING_PROVIDER_RESPONSE, R));
 		map.put(TO_IDLE_NODE, transition(SENDING_NODE_RESPONSE, 0));
 		map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, NioChecks.CHECK_CONNECTION ? R : 0));
+    map.put(TO_NODE_WAITING_PROVIDER_RESPONSE, transition(NODE_WAITING_PROVIDER_RESPONSE, 0));
 		return map;
 	}
 

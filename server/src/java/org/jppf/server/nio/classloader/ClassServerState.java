@@ -53,19 +53,4 @@ abstract class ClassServerState extends NioState<ClassTransition>
 	{
 		this.server = server;
 	}
-
-	/**
-	 * Send a null response to a request node connection. This method is called for a provider
-	 * that was disconnected but still has pending requests, so as not to block the requesting channels.
-	 * @param request the selection key wrapping the requesting channel.
-	 * @throws Exception if an error occurs while setting the new requester's state.
-	 */
-	protected void sendNullResponse(ChannelWrapper request) throws Exception
-	{
-		if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
-		ClassContext requestContext = (ClassContext) request.getContext();
-		requestContext.getResource().setDefinition(null);
-		requestContext.serializeResource(request);
-		server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
-	}
 }
