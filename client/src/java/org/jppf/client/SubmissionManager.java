@@ -79,12 +79,19 @@ public class SubmissionManager extends ThreadSynchronization implements Runnable
 			if (isStopped()) break;
 			synchronized(this)
 			{
-				JPPFJob job = execQueue.poll();
-				if (debugEnabled) log.debug("submiting jobId=" + job.getId());
-				AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
-				if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
-				JobSubmission submission = new JobSubmission(job, c, this, execFlags.second());
-				client.getExecutor().submit(submission);
+        JPPFJob job = execQueue.peek();
+        boolean isBroadcast = job.getJobSLA().isBroadcastJob();
+        AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
+        if ((c == null) && isBroadcast)
+        {
+          if (execFlags.second()) client.getLoadBalancer().setLocallyExecuting(false);
+          continue;
+        }
+        job = execQueue.poll();
+        if (debugEnabled) log.debug("submitting jobId=" + job.getId());
+        if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
+        JobSubmission submission = new JobSubmission(job, c, this, isBroadcast ? false : execFlags.second());
+        client.getExecutor().submit(submission);
 			}
 		}
 	}

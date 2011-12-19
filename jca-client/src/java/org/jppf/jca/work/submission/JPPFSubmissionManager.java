@@ -96,12 +96,19 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 			if (isStopped()) break;
 			synchronized(client)
 			{
-				JPPFJob job = execQueue.poll();
-				AbstractJPPFClientConnection c = null;
-				c = (AbstractJPPFClientConnection) client.getClientConnection();
-				if (c != null) c.setStatus(JPPFClientConnectionStatus.EXECUTING);
-				JobSubmission submission = new JobSubmission(job, c, execFlags.second());
-				client.getExecutor().submit(submission);
+        JPPFJob job = execQueue.peek();
+        boolean isBroadcast = job.getJobSLA().isBroadcastJob();
+        AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
+        if ((c == null) && isBroadcast)
+        {
+          if (execFlags.second()) client.getLoadBalancer().setLocallyExecuting(false);
+          continue;
+        }
+        job = execQueue.poll();
+        if (debugEnabled) log.debug("submitting jobId=" + job.getId());
+        if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
+        JobSubmission submission = new JobSubmission(job, c, isBroadcast ? false : execFlags.second());
+        client.getExecutor().submit(submission);
 			}
 		}
 	}
