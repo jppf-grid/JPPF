@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ExecutionPolicy>
+	<Equal valueType="string">
+		<Property>jppf.management.port</Property>
+		<Value>12002</Value>
+	</Equal>
+</ExecutionPolicy>
