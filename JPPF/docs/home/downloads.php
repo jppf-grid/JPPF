@@ -264,7 +264,7 @@
 				</div>
 				<div class="jppf_content">
 	<?php
-		$jppfVersion = "2.5.4";
+		$jppfVersion = "2.5.5";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>

@@ -123,7 +123,8 @@ public class SocketClient extends AbstractSocketWrapper
 	{
 		if (serializer == null)
 		{
-			// serializer = new ObjectSerializerImpl();
+      serializer = new ObjectSerializerImpl();
+      /*
 			String name = "org.jppf.utils.ObjectSerializerImpl";
 			try
 			{
@@ -141,6 +142,7 @@ public class SocketClient extends AbstractSocketWrapper
 			{
 				log.error(e.getMessage(), e);
 			}
+      */
 		}
 		return serializer;
 	}
