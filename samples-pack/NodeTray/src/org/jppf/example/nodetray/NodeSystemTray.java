@@ -27,6 +27,8 @@ import javax.management.*;
 import org.jppf.management.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.event.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -62,6 +64,10 @@ public class NodeSystemTray implements NodeLifeCycleListener
    * Used to synchronize tooltip and icon updates.
    */
   private ReentrantLock lock = new ReentrantLock();
+  /**
+   * The JMX server used by the node for management and monitoring.
+   */
+  private JMXServer jmxServer = null;
 
   /**
    * Default constructor.
@@ -93,6 +99,9 @@ public class NodeSystemTray implements NodeLifeCycleListener
   {
     try
     {
+      // if the node is running within the server's JVM (local node)
+      if (JPPFDriver.getLocalNode() != null) jmxServer = JPPFDriver.getLocalNode().getJmxServer();
+      else jmxServer = ((JPPFNode) NodeRunner.getNode()).getJmxServer();
       wrapper = new JMXNodeConnectionWrapper();
       wrapper.connectAndWait(5000);
       trayIcon.setImage(images[1]);
@@ -112,7 +121,7 @@ public class NodeSystemTray implements NodeLifeCycleListener
   private String generateTooltipText()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("Node localhost:").append(JPPFConfiguration.getProperties().getInt("jppf.management.port")).append("\n");
+    sb.append("Node ").append(jmxServer.getManagementHost()).append(':').append(jmxServer.getManagementPort()).append('\n');
     if (taskMonitor != null)
     {
       sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");

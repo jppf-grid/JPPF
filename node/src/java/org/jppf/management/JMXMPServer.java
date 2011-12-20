@@ -73,16 +73,16 @@ public class JMXMPServer extends AbstractJMXServer
       Thread.currentThread().setContextClassLoader(cl);
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties props = JPPFConfiguration.getProperties();
-      String host = NetworkUtils.getManagementHost();
-      int port = props.getInt("jppf.management.port", 11198);
+      managementHost = NetworkUtils.getManagementHost();
+      managementPort = props.getInt("jppf.management.port", 11198);
       boolean found = false;
       JMXServiceURL url = null;
       while (!found)
       {
         try
         {
-          InetAddress addr = InetAddress.getByName(host);
-          url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + port);
+          InetAddress addr = InetAddress.getByName(managementHost);
+          url = new JMXServiceURL("service:jmx:jmxmp://" + managementHost + ':' + managementPort);
           Map<String, Object> env = new HashMap<String, Object>();
           env.put("jmx.remote.default.class.loader", cl);
           env.put("jmx.remote.protocol.provider.class.loader", cl);
@@ -95,13 +95,13 @@ public class JMXMPServer extends AbstractJMXServer
           String s = e.getMessage();
           if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
           {
-            if (port >= 65530) port = 1024;
-            port++;
+            if (managementPort >= 65530) managementPort = 1024;
+            managementPort++;
           }
           else throw e;
         }
       }
-      props.setProperty("jppf.management.port", Integer.toString(port));
+      //props.setProperty("jppf.management.port", Integer.toString(port));
       //if (debugEnabled) log.debug("starting connector server with port = " + port);
       stopped = false;
       if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);

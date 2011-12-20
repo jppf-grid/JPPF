@@ -21,7 +21,7 @@ import org.jppf.JPPFException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.*;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.node.AbstractNode;
 import org.jppf.server.*;
 import org.jppf.server.protocol.*;
@@ -59,10 +59,6 @@ class PeerNode extends AbstractNode
    * Input source for the socket client.
    */
   private InputSource is = null;
-  /**
-   * Security credentials associated with this JPPF node.
-   */
-  //private JPPFSecurityContext credentials = null;
   /**
    * Reference to the driver.
    */
@@ -156,10 +152,13 @@ class PeerNode extends AbstractNode
         {
           try
           {
+            JMXServer jmxServer = driver.getInitializer().getJmxServer();
             TypedProperties props = JPPFConfiguration.getProperties();
-            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, driver.getInitializer().getJmxServer().getId());
+            //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
+            //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
+            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, jmxServer.getId());
           }
           catch(Exception e)
           {

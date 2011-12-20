@@ -56,4 +56,16 @@ public interface JMXServer
    * @return the id as a string.
    */
   String getId();
+
+  /**
+   * Get the host interface on which the JMX server is listeneing for connections.
+   * @return the host as a string.
+   */
+  String getManagementHost();
+
+  /**
+   * Get the port on which the connector is listening for connections from remote clients.
+   * @return the port number as an int.
+   */
+  int getManagementPort();
 }

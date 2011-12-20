@@ -179,8 +179,10 @@ public abstract class JPPFNode extends AbstractNode
         try
         {
           TypedProperties props = JPPFConfiguration.getProperties();
-          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+          //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
+          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, getJmxServer().getManagementHost());
+          //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
+          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, getJmxServer().getManagementPort());
           bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
         }
         catch(Exception e)

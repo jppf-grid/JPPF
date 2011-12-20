@@ -31,6 +31,7 @@ import org.jppf.server.nio.acceptor.AcceptorNioServer;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.JPPFLocalNode;
 import org.jppf.server.queue.*;
 import org.jppf.startup.*;
@@ -62,6 +63,10 @@ public class JPPFDriver
    * Singleton instance of the JPPFDriver.
    */
   private static JPPFDriver instance = null;
+  /**
+   * Reference to the local node if it is enabled.
+   */
+  private static JPPFNode localNode = null;
   /**
    * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
    */
@@ -153,10 +158,10 @@ public class JPPFDriver
     {
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext());
-      JPPFLocalNode node = new JPPFLocalNode(localNodeChannel, localClassChannel);
+      localNode = new JPPFLocalNode(localNodeChannel, localClassChannel);
       classServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
-      new Thread(node, "Local node").start();
+      new Thread(localNode, "Local node").start();
     }
 
     initializer.initJmxServer();
@@ -413,5 +418,14 @@ public class JPPFDriver
       for (int n: ports) sb.append(' ').append(n);
     }
     System.out.println(sb.toString());
+  }
+
+  /**
+   * Get a reference to the local node if it is enabled.
+   * @return a {@link JPPFNode} instance, or <code>null</code> if local node is disabled.
+   */
+  public static JPPFNode getLocalNode()
+  {
+    return localNode;
   }
 }

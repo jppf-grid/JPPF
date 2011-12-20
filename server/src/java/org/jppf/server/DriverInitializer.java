@@ -280,11 +280,10 @@ public class DriverInitializer
     {
       if (config.getBoolean("jppf.management.enabled", true))
       {
-        //jmxServer = new JMXServerImpl(JPPFAdminMBean.DRIVER_SUFFIX, driver.getUuid());
-        //jmxServer = new JMXMPServer(driver.getUuid());
         jmxServer = JMXServerFactory.createServer(driver.getUuid(), JPPFAdminMBean.DRIVER_SUFFIX);
         jmxServer.start(getClass().getClassLoader());
-        info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
+        //info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
+        info.managementPort = jmxServer.getManagementPort();
         registerProviderMBeans();
         System.out.println("JPPF Driver management initialized");
       }

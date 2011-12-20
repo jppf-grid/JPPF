@@ -60,6 +60,14 @@ public abstract class AbstractJMXServer implements JMXServer
    * This server's unique id.
    */
   protected String id;
+  /**
+   * The host interface on which the JMX server is listeneing for connections.
+   */
+  protected String managementHost = null;
+  /**
+   * The port on which the connector is listening for connections from remote clients.
+   */
+  protected int managementPort = -1;
 
   /**
    * {@inheritDoc}
@@ -102,5 +110,23 @@ public abstract class AbstractJMXServer implements JMXServer
   public String getId()
   {
     return id;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getManagementPort()
+  {
+    return managementPort;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getManagementHost()
+  {
+    return managementHost;
   }
 }

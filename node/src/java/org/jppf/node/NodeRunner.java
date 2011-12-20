@@ -344,7 +344,7 @@ public class NodeRunner
 
   /**
    * Get the JPPF node.
-   * @return a <code>MonitoredNode</code> instance.
+   * @return a <code>Node</code> instance.
    */
   public static Node getNode()
   {
@@ -389,14 +389,14 @@ public class NodeRunner
     public void run()
     {
       AccessController.doPrivileged(new PrivilegedAction<Object>()
-          {
+      {
         @Override
         public Object run()
         {
           System.exit(restart ? 2 : 0);
           return null;
         }
-          });
+      });
     }
   }
 

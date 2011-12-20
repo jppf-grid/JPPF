@@ -88,8 +88,8 @@ public class JMXServerImpl extends AbstractJMXServer
       Thread.currentThread().setContextClassLoader(cl);
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties props = JPPFConfiguration.getProperties();
-      String host = NetworkUtils.getManagementHost();
-      int port = locateOrCreateRegistry();
+      managementHost = NetworkUtils.getManagementHost();
+      managementPort = locateOrCreateRegistry();
       int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
       boolean found = false;
       JMXServiceURL url = null;
@@ -97,8 +97,8 @@ public class JMXServerImpl extends AbstractJMXServer
       {
         try
         {
-          InetAddress addr = InetAddress.getByName(host);
-          url = new JMXServiceURL("service:jmx:rmi://" + host + ':' + rmiPort + "/jndi/rmi://localhost:" + port + namespaceSuffix);
+          InetAddress addr = InetAddress.getByName(managementHost);
+          url = new JMXServiceURL("service:jmx:rmi://" + managementHost + ':' + rmiPort + "/jndi/rmi://localhost:" + managementPort + namespaceSuffix);
           Map<String, Object> env = new HashMap<String, Object>();
           env.put("jmx.remote.default.class.loader", cl);
           env.put("jmx.remote.protocol.provider.class.loader", cl);
@@ -119,7 +119,7 @@ public class JMXServerImpl extends AbstractJMXServer
         }
       }
       props.setProperty("jppf.management.rmi.port", Integer.toString(rmiPort));
-      if (debugEnabled) log.debug("starting connector server with RMI registry port = " + port + " and RMI server port = " + rmiPort);
+      if (debugEnabled) log.debug("starting connector server with RMI registry port = " + managementPort + " and RMI server port = " + rmiPort);
       stopped = false;
       if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
     }
@@ -162,7 +162,7 @@ public class JMXServerImpl extends AbstractJMXServer
         else throw e;
       }
     }
-    props.setProperty("jppf.management.port", Integer.toString(port));
+    //props.setProperty("jppf.management.port", Integer.toString(port));
     return port;
   }
 }
