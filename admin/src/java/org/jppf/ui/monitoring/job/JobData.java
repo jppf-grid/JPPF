@@ -195,7 +195,7 @@ public class JobData
         s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getId();
         break;
       case JOB:
-        s = jobInformation.getJobId();
+        s = jobInformation.getJobName();
         break;
       case SUB_JOB:
         if (nodeInformation == null) s = "no information";

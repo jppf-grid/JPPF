@@ -52,7 +52,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
   {
     try
     {
-      String mbeanName = JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME;
+      String mbeanName = JPPFNodeTaskMonitorMBean.MBEAN_NAME;
       ObjectName objectName = new ObjectName(mbeanName);
       MBeanClient client = new MBeanClient("lolo-quad", 12001);
       client.connect();

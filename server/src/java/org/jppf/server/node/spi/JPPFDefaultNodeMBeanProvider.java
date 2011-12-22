@@ -63,6 +63,6 @@ public class JPPFDefaultNodeMBeanProvider implements JPPFNodeMBeanProvider
   @Override
   public String getMBeanName()
   {
-    return JPPFAdminMBean.NODE_MBEAN_NAME;
+    return JPPFNodeAdminMBean.MBEAN_NAME;
   }
 }

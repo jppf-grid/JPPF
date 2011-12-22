@@ -126,7 +126,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
    */
   public synchronized JPPFStats getStats()
   {
-    return stats.makeCopy();
+    return stats.copy();
   }
 
   /**

@@ -31,6 +31,10 @@ import org.jppf.classloader.DelegationModel;
 public interface JPPFNodeAdminMBean extends JPPFAdminMBean
 {
   /**
+   * Name of the node's admin MBean.
+   */
+  String MBEAN_NAME = "org.jppf:name=admin,type=node";
+  /**
    * Get the latest state information from the node.
    * @return a <code>JPPFNodeState</code> information.
    * @throws Exception if any error occurs.
@@ -40,6 +44,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
    * Get the latest task notification from the node.
    * @return the notification as a <code>Serializable</code> object.
    * @throws Exception if any error occurs.
+   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
    */
   Serializable notification() throws Exception;
   /**

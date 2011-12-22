@@ -85,27 +85,19 @@ public class JPPFStats implements Serializable
    * @return a new <code>JPPFStats</code> instance, populated with the current values
    * of the fields in this stats object.
    */
-  public JPPFStats makeCopy()
+  public JPPFStats copy()
   {
     JPPFStats s = new JPPFStats();
     s.totalTasksExecuted = totalTasksExecuted;
-    s.execution = execution.makeCopy();
-    s.nodeExecution = nodeExecution.makeCopy();
-    s.transport = transport.makeCopy();
-    s.taskQueue = taskQueue.makeCopy();
-    s.jobQueue = jobQueue.makeCopy();
-    s.jobTasks = jobTasks.makeCopy();
-    s.nodes = nodes.makeCopy();
-    s.idleNodes = idleNodes.makeCopy();
-    /*
-		s.queue = queue.makeCopy();
-		s.totalQueued = totalQueued;
-		s.queueSize = queueSize;
-		s.maxQueueSize = maxQueueSize;
-		s.nbNodes = nbNodes;
-		s.maxNodes = maxNodes;
-     */
-    s.clients = clients.makeCopy();
+    s.execution = execution.copy();
+    s.nodeExecution = nodeExecution.copy();
+    s.transport = transport.copy();
+    s.taskQueue = taskQueue.copy();
+    s.jobQueue = jobQueue.copy();
+    s.jobTasks = jobTasks.copy();
+    s.nodes = nodes.copy();
+    s.idleNodes = idleNodes.copy();
+    s.clients = clients.copy();
     s.footprint = footprint;
     return s;
   }
@@ -128,15 +120,6 @@ public class JPPFStats implements Serializable
     sb.append(jobTasks.toString());
     sb.append(nodes.toString());
     sb.append(clients.toString());
-    /*
-		sb.append("totalQueued : ").append(totalQueued).append("\n");
-		sb.append("queueSize : ").append(queueSize).append("\n");
-		sb.append("maxQueueSize : ").append(maxQueueSize).append("\n");
-		sb.append("nbNodes : ").append(nbNodes).append('\n');
-		sb.append("maxNodes : ").append(maxNodes).append('\n');
-		sb.append("nbClients : ").append(nbClients).append('\n');
-		sb.append("maxClients : ").append(maxClients).append('\n');
-     */
     return sb.toString();
   }
 

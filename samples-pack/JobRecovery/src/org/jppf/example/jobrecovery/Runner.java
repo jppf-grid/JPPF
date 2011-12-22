@@ -145,7 +145,7 @@ public class Runner
     // obtain the current load-balancing settings
     LoadBalancingInformation lbi = jmxDriver.loadBalancerInformation();
     if (lbi == null) return 1;
-    TypedProperties props = lbi.parameters;
+    TypedProperties props = lbi.getParameters();
     props.setProperty("size", "1");
     // set load-balancing algorithm to "manual" with a size of 1
     jmxDriver.changeLoadBalancerSettings("manual", props);

@@ -91,7 +91,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @return null.
    * @throws Exception if any error occurs.
    * @see org.jppf.management.JPPFNodeAdminMBean#notification()
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
+   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener} for a rationale.
    */
   @Override
   public Serializable notification() throws Exception

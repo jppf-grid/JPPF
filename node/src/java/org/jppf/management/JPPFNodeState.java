@@ -72,7 +72,7 @@ public class JPPFNodeState implements Serializable
   /**
    * This method does nothing.
    * @param taskEvent the event as an object.
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
+   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener} for a rationale.
    */
   public synchronized void setTaskEvent(final Serializable taskEvent)
   {

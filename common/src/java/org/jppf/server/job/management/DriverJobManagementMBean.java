@@ -35,55 +35,55 @@ public interface DriverJobManagementMBean extends NotificationEmitter
   String MBEAN_NAME = "org.jppf:name=jobManagement,type=driver";
   /**
    * Cancel the job with the specified id.
-   * @param jobId the id of the job to cancel.
+   * @param jobUuid the uuid of the job to cancel.
    * @throws Exception if any error occurs.
    */
-  void cancelJob(String jobId) throws Exception;
+  void cancelJob(String jobUuid) throws Exception;
   /**
    * Suspend the job with the specified id.
-   * @param jobId the id of the job to suspend.
+   * @param jobUuid the uuid of the job to suspend.
    * @param requeue true if the sub-jobs running on each node should be canceled and requeued,
    * false if they should be left to execute until completion.
    * @throws Exception if any error occurs.
    */
-  void suspendJob(String jobId, Boolean requeue) throws Exception;
+  void suspendJob(String jobUuid, Boolean requeue) throws Exception;
   /**
    * Resume the job with the specified id.
-   * @param jobId the id of the job to resume.
+   * @param jobUuid the uuid of the job to resume.
    * @throws Exception if any error occurs.
    */
-  void resumeJob(String jobId) throws Exception;
+  void resumeJob(String jobUuid) throws Exception;
   /**
    * Update the maximum number of nodes a job can run on.
-   * @param jobId the id of the job to update.
+   * @param jobUuid the uuid of the job to update.
    * @param maxNodes the new maximum number of nodes for the job.
    * @throws Exception if any error occurs.
    */
-  void updateMaxNodes(String jobId, Integer maxNodes) throws Exception;
+  void updateMaxNodes(String jobUuid, Integer maxNodes) throws Exception;
   /**
-   * Get the set of ids for all the jobs currently queued or executing.
-   * @return an array of ids as strings.
+   * Get the set of uuids for all the jobs currently queued or executing.
+   * @return an array of uuids as strings.
    * @throws Exception if any error occurs.
    */
   String[] getAllJobIds() throws Exception;
   /**
    * Get an object describing the job with the specified id.
-   * @param jobId the id of the job to get information about.
+   * @param jobUuid the uuid of the job to get information about.
    * @return an instance of <code>JobInformation</code>.
    * @throws Exception if any error occurs.
    */
-  JobInformation getJobInformation(String jobId) throws Exception;
+  JobInformation getJobInformation(String jobUuid) throws Exception;
   /**
    * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
-   * @param jobId the id of the job for which to find node information.
+   * @param jobUuid the uuid of the job for which to find node information.
    * @return an array of <code>NodeManagementInfo</code>, <code>JobInformation</code> instances.
    * @throws Exception if any error occurs.
    */
-  NodeJobInformation[] getNodeInformation(String jobId) throws Exception;
+  NodeJobInformation[] getNodeInformation(String jobUuid) throws Exception;
   /**
    * Update the priority of a job.
-   * @param jobId the uuid of the job to update.
+   * @param jobUuid the uuid of the job to update.
    * @param newPriority the job's new priority value.
    */
-  void updatePriority(String jobId, Integer newPriority);
+  void updatePriority(String jobUuid, Integer newPriority);
 }

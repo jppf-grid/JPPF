@@ -212,8 +212,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       JPPFTaskBundle bundle = (JPPFTaskBundle) nodes.get(i).second().getJob();
       Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
       JobInformation jobInfo = new JobInformation(jobUuid, bundle.getName(),
-          bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-          bundle.getSLA().isSuspended(), (pending != null) && pending);
+        bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
+        bundle.getSLA().isSuspended(), (pending != null) && pending);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i] = new NodeJobInformation(nodeInfo, jobInfo);
     }
@@ -328,7 +328,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     if (debugEnabled && (notification instanceof JobNotification))
     {
       JobNotification event = (JobNotification) notification;
-      log.debug("sending event " + event.getEventType() + " for job " + event.getJobInformation().getJobId());
+      log.debug("sending event " + event.getEventType() + " for job " + event.getJobInformation().getJobName());
     }
     super.sendNotification(notification);
   }

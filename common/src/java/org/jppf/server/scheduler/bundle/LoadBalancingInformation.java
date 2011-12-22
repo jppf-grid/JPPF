@@ -36,15 +36,15 @@ public class LoadBalancingInformation implements Serializable
   /**
    * The name of the algorithm.
    */
-  public String algorithm = null;
+  private String algorithm = null;
   /**
    * The algorithm's parameters.
    */
-  public TypedProperties parameters = null;
+  private TypedProperties parameters = null;
   /**
    * The names of all available algorithms.
    */
-  public List<String> algorithmNames = null;
+  private List<String> algorithmNames = null;
 
   /**
    * Default constructor.
@@ -55,14 +55,41 @@ public class LoadBalancingInformation implements Serializable
 
   /**
    * Initialize this load balancing information with the specified algorithm and parameters.
-   * @param algorithm - the name of the algorithm.
-   * @param parameters - the algorithm's parameters.
-   * @param algorithmNames - the names of all available algorithms.
+   * @param algorithm the name of the algorithm.
+   * @param parameters the algorithm's parameters.
+   * @param algorithmNames the names of all available algorithms.
    */
   public LoadBalancingInformation(final String algorithm, final TypedProperties parameters, final List<String> algorithmNames)
   {
     this.algorithm = algorithm;
     this.parameters = parameters;
     this.algorithmNames = algorithmNames;
+  }
+
+  /**
+   * Get the name of the algorithm.
+   * @return the algorithm name as a string. 
+   */
+  public String getAlgorithm()
+  {
+    return algorithm;
+  }
+
+  /**
+   * Get the algorithm's parameters.
+   * @return the parameters as a set of (name, value) pairs.
+   */
+  public TypedProperties getParameters()
+  {
+    return parameters;
+  }
+
+  /**
+   * The names of all available algorithms.
+   * @return a list of all available alogrithm names.
+   */
+  public List<String> getAlgorithmNames()
+  {
+    return algorithmNames;
   }
 }

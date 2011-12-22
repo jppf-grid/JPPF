@@ -36,10 +36,12 @@ public interface JPPFAdminMBean extends Serializable
   String NODE_SUFFIX = "/jppf/node";
   /**
    * Name of the node's admin MBean.
+   * @deprecated use {@link JPPFNodeAdminMBean#MBEAN_NAME} instead.
    */
-  String NODE_MBEAN_NAME = "org.jppf:name=admin,type=node";
+  String NODE_MBEAN_NAME = JPPFNodeAdminMBean.MBEAN_NAME;
   /**
    * Name of the driver's admin MBean.
+   * @deprecated use {@link JPPFDriverAdminMBean#MBEAN_NAME} instead.
    */
   String DRIVER_MBEAN_NAME = "org.jppf:name=admin,type=driver";
 

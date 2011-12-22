@@ -116,12 +116,14 @@
       	<include name="**/*.*"/>
       </fileset>
     </pack>
+    <!--
     <pack name="TCP_Multiplexer" required="no" preselected="no">
       <description>A tool that routes all JPPF traffic through a single TCP port to work in firewalled environments</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-multiplexer" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-multiplexer">
       	<include name="**/*.*"/>
       </fileset>
     </pack>
+    -->
 
   </packs>
 

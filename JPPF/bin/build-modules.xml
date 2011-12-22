@@ -27,7 +27,7 @@
 		<antcall target="runtime.node"/>
 		<antcall target="runtime.gui"/>
 		<antcall target="application.template"/>
-		<antcall target="runtime.multiplexer"/>
+		<!--<antcall target="runtime.multiplexer"/>-->
 	</target>
 
 	<macrodef name="package-module">

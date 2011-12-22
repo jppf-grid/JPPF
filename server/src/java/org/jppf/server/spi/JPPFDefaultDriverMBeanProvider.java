@@ -60,6 +60,6 @@ public class JPPFDefaultDriverMBeanProvider implements JPPFDriverMBeanProvider
   @Override
   public String getMBeanName()
   {
-    return JPPFAdminMBean.DRIVER_MBEAN_NAME;
+    return JPPFDriverAdminMBean.MBEAN_NAME;
   }
 }

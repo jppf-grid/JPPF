@@ -231,7 +231,7 @@ public abstract class JPPFNode extends AbstractNode
       try
       {
         jmxServer = getJmxServer();
-        if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFAdminMBean.NODE_MBEAN_NAME)))
+        if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME)))
         {
           registerProviderMBeans();
         }

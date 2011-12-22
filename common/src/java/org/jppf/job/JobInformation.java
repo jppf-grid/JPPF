@@ -37,9 +37,9 @@ public class JobInformation implements Serializable
    */
   private String jobUuid = null;
   /**
-   * The user-defined identifier for the job.
+   * The user-defined name for the job.
    */
-  private String jobId = null;
+  private String jobName = null;
   /**
    * The current number of tasks in the job.
    */
@@ -85,7 +85,7 @@ public class JobInformation implements Serializable
   public JobInformation(final String jobUuid, final String jobId, final int taskCount, final int initialTaskCount, final int priority, final boolean suspended, final boolean pending)
   {
     this.jobUuid = jobUuid;
-    this.jobId = jobId;
+    this.jobName = jobId;
     this.taskCount = taskCount;
     this.initialTaskCount = initialTaskCount;
     this.priority = priority;
@@ -96,19 +96,39 @@ public class JobInformation implements Serializable
   /**
    * Get the user-defined identifier for the job.
    * @return the id as a string.
+   * @deprecated use {@link #getJobName()} instead.
    */
   public String getJobId()
   {
-    return jobId;
+    return getJobName();
   }
 
   /**
    * Set the user-defined identifier for the job.
    * @param id the id as a string.
+   * @deprecated use {@link #setJobName(String)} instead.
    */
   public void setJobId(final String id)
   {
-    this.jobId = id;
+    setJobName(id);
+  }
+
+  /**
+   * Get the user-defined name for the job.
+   * @return the id as a string.
+   */
+  public String getJobName()
+  {
+    return jobName;
+  }
+
+  /**
+   * Set the user-defined name for the job.
+   * @param name the id as a string.
+   */
+  public void setJobName(final String name)
+  {
+    this.jobName = name;
   }
 
   /**

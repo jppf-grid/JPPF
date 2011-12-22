@@ -80,7 +80,7 @@ class CancelJobTask implements Runnable
       JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort());
       node.connect();
       while (!node.isConnected()) Thread.sleep(10);
-      node.invoke(JPPFAdminMBean.NODE_MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
+      node.invoke(JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
       node.close();
     }
     catch(Exception e)

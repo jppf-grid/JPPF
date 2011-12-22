@@ -30,6 +30,10 @@ import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 {
   /**
+   * Name of the driver's admin MBean.
+   */
+  String MBEAN_NAME = "org.jppf:name=admin,type=driver";
+  /**
    * Get the latest statistics snapshot from the JPPF driver.
    * @return a <code>JPPFStats</code> instance.
    * @throws Exception if any error occurs.

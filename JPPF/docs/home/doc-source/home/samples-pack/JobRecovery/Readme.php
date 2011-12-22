@@ -4,7 +4,7 @@ $template{name="samples-page-header" title="Job Recovery example"}$
 <div align="justify">
 
 					<h3>What does the sample do?</h3>
-					This sample demonstrates how the state of a JPPF job can be persisted on the cient side, then recovered after a client crash.<br/>
+					This sample demonstrates how the state of a JPPF job can be persisted on the client side, then recovered after a client crash.<br/>
 					For this purpose, the demo application submits a job then, while the job is still executing, exits brutally.
 					The next time the application is started, it reads the latest persisted state of the job and submits it again to the grid.
 					Only the part of the job that hadn't completed will be executed.

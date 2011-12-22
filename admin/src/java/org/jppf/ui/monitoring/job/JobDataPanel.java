@@ -33,7 +33,7 @@ import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.SynchronizedTask;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -53,7 +53,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   /**
    * Separate thread used to sequentialize events that impact the job data tree.
    */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobNotifications"));
   /**
    * The object that manages updates to and navigation within the tree table.
    */

@@ -35,13 +35,13 @@ public class QueueStats implements Serializable
    */
   private StatsSnapshot times = new StatsSnapshot("time");
   /**
-   * Time statistics for the queued objects.
+   * Size statistics for the queued objects.
    */
   private StatsSnapshot sizes = new StatsSnapshot("size");
   /**
    * Title for this queue snapshot, used in the {@link #toString()} method.
    */
-  public String title = "";
+  private final String title;
 
   /**
    * Initialize this queue snapshot with a specified title.
@@ -50,7 +50,6 @@ public class QueueStats implements Serializable
   public QueueStats(final String title)
   {
     this.title = title;
-    times = new StatsSnapshot(title);
   }
 
   /**
@@ -63,7 +62,7 @@ public class QueueStats implements Serializable
   }
 
   /**
-   * Set the time snapshot.
+   * Set the sizes snapshot.
    * @param sizes a {@link StatsSnapshot} instance.
    */
   public void setSizes(final StatsSnapshot sizes)
@@ -72,7 +71,7 @@ public class QueueStats implements Serializable
   }
 
   /**
-   * Get the time snapshot.
+   * Get the sizes snapshot.
    * @return a {@link StatsSnapshot} instance.
    */
   public StatsSnapshot getSizes()
@@ -112,14 +111,14 @@ public class QueueStats implements Serializable
   }
 
   /**
-   * Male a copy of this queue stats object.
+   * Make a copy of this queue stats object.
    * @return a {@link QueueStats} instance.
    */
-  public QueueStats makeCopy()
+  public QueueStats copy()
   {
     QueueStats qs = new QueueStats(title);
-    qs.setSizes(sizes.makeCopy());
-    qs.setTimes(times.makeCopy());
+    qs.setSizes(sizes.copy());
+    qs.setTimes(times.copy());
     return qs;
   }
 }

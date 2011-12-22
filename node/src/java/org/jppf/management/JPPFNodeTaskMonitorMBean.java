@@ -30,7 +30,7 @@ public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter
   /**
    * Name of the node's task monitor MBean.
    */
-  String TASK_MONITOR_MBEAN_NAME = "org.jppf:name=task.monitor,type=node";
+  String MBEAN_NAME = "org.jppf:name=task.monitor,type=node";
   /**
    * Get the total number of tasks executed by the node.
    * @return the number of tasks as an integer value.

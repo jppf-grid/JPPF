@@ -52,7 +52,7 @@
 		<unzip src="${install.prefix}-samples-pack.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-j2ee-connector.zip" dest="${install.prefix}"/>
 		<unzip src="${install.prefix}-GigaSpaces.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-multiplexer.zip" dest="${install.prefix}"/>
+		<!--<unzip src="${install.prefix}-multiplexer.zip" dest="${install.prefix}"/>-->
 
 		<!-- Generate offline installer -->
 		<!--

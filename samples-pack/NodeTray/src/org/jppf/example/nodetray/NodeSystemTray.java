@@ -105,7 +105,7 @@ public class NodeSystemTray implements NodeLifeCycleListener
       wrapper = new JMXNodeConnectionWrapper();
       wrapper.connectAndWait(5000);
       trayIcon.setImage(images[1]);
-      taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
+      taskMonitor = wrapper.getProxy(JPPFNodeTaskMonitorMBean.MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
       taskMonitor.addNotificationListener(new JMXNotificationListener(), null, null);
     }
     catch(Exception e)

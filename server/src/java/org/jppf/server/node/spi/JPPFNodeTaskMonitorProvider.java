@@ -50,7 +50,7 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
   @Override
   public Object createMBean(final Node node)
   {
-    JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME);
+    JPPFNodeTaskMonitor monitor = new JPPFNodeTaskMonitor(JPPFNodeTaskMonitorMBean.MBEAN_NAME);
     ((JPPFNode) node).getExecutionManager().addTaskExecutionListener(monitor);
     return monitor;
   }
@@ -65,6 +65,6 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
   @Override
   public String getMBeanName()
   {
-    return JPPFNodeTaskMonitorMBean.TASK_MONITOR_MBEAN_NAME;
+    return JPPFNodeTaskMonitorMBean.MBEAN_NAME;
   }
 }

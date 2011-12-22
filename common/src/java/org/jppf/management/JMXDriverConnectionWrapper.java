@@ -67,7 +67,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> nodesInformation() throws Exception
   {
-    return (Collection<JPPFManagementInfo>) invoke(DRIVER_MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
   }
 
   /**
@@ -79,7 +79,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public JPPFStats statistics() throws Exception
   {
-    return (JPPFStats) invoke(DRIVER_MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
+    return (JPPFStats) invoke(MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
   }
 
   /**
@@ -93,7 +93,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
   {
-    return (String) invoke(DRIVER_MBEAN_NAME, "restartShutdown",
+    return (String) invoke(MBEAN_NAME, "restartShutdown",
         new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
   }
 
@@ -108,7 +108,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception
   {
-    return (String) invoke(DRIVER_MBEAN_NAME, "changeLoadBalancerSettings",
+    return (String) invoke(MBEAN_NAME, "changeLoadBalancerSettings",
         new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
   }
 
@@ -121,7 +121,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public LoadBalancingInformation loadBalancerInformation() throws Exception
   {
-    return (LoadBalancingInformation) invoke(DRIVER_MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
+    return (LoadBalancingInformation) invoke(MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
   }
 
   /**
@@ -225,7 +225,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public void resetStatistics() throws Exception
   {
-    invoke(DRIVER_MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
+    invoke(MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
   }
 
   /**
@@ -234,6 +234,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
-    return (JPPFSystemInformation) invoke(DRIVER_MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);
+    return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);
   }
 }

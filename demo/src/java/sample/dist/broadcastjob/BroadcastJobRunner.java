@@ -28,7 +28,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Runner class for the &quot;Long Task&quot; demo.
+ * Runner class for the &quot;Nroadcast Job&quot; demo.
  * @author Laurent Cohen
  */
 public class BroadcastJobRunner
@@ -80,17 +80,17 @@ public class BroadcastJobRunner
     {
       // perform "iteration" times
       long totalTime = 0L;
-      for (int iter=0; iter<iterations; iter++)
+      for (int iter=1; iter<=iterations; iter++)
       {
         long start = System.currentTimeMillis();
         // create a task for each row in matrix a
         JPPFJob job = new JPPFJob();
-        job.setName("Long task iteration " + iter);
+        job.setName("broadcast " + iter);
         //job.getJobSLA().setMaxNodes(1);
-        for (int i=0; i<nbTasks; i++)
+        for (int i=1; i<=nbTasks; i++)
         {
           BroadcastTask task = new BroadcastTask();
-          task.setId("" + (iter+1) + ':' + (i+1));
+          task.setId("" + iter + " : " + i);
           job.addTask(task);
         }
         job.getSLA().setBroadcastJob(true);

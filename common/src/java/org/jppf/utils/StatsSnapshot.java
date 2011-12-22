@@ -20,7 +20,7 @@ package org.jppf.utils;
 import java.io.Serializable;
 
 /**
- * Convenience class for collecting time statistics.
+ * Convenience class for collecting time or size statistics.
  */
 public class StatsSnapshot implements Serializable
 {
@@ -31,34 +31,27 @@ public class StatsSnapshot implements Serializable
   /**
    * Title for this snapshot, used in the {@link #toString()} method.
    */
-  public String title = "";
+  private final String title;
   /**
    * The total cumulated time.
    */
   private long total = 0L;
   /**
-   * The most recent time.
+   * The most recent time / size.
    */
   private long latest = 0L;
   /**
-   * The minimum time.
+   * The minimum time / size.
    */
   private long min = Long.MAX_VALUE;
   /**
-   * The maximum task execution time.
+   * The maximum time / size.
    */
   private long max = 0L;
   /**
-   * The average time.
+   * The average time / size.
    */
   private double avg = 0d;
-
-  /**
-   * Initialize this time snapshot with a blank title.
-   */
-  public StatsSnapshot()
-  {
-  }
 
   /**
    * Initialize this time snapshot with a specified title.
@@ -105,7 +98,7 @@ public class StatsSnapshot implements Serializable
    * Make a copy of this time snapshot object.
    * @return a <code>TimeSnapshot</code> instance.
    */
-  public StatsSnapshot makeCopy()
+  public StatsSnapshot copy()
   {
     StatsSnapshot ts = new StatsSnapshot(title);
     ts.setTotal(total);
@@ -134,7 +127,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Set the total cumulated time.
+   * Set the total cumulated time / size.
    * @param total the total time as a long value.
    */
   public void setTotal(final long total)
@@ -143,7 +136,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Get the total cumulated time.
+   * Get the total cumulated time / size.
    * @return the total time as a long value.
    */
   public long getTotal()
@@ -152,7 +145,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Set the most recent time observed.
+   * Set the most recent time / size observed.
    * @param latest the most recent time as a long value.
    */
   public void setLatest(final long latest)
@@ -161,7 +154,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Get the minimum time observed.
+   * Get the minimum time / size observed.
    * @return the minimum time as a long value.
    */
   public long getLatest()
@@ -170,7 +163,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Set the smallest time observed.
+   * Set the smallest time / size observed.
    * @param min the minimum time as a long value.
    */
   public void setMin(final long min)
@@ -179,7 +172,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Get the smallest time observed.
+   * Get the smallest time / size observed.
    * @return the minimum time as a long value.
    */
   public long getMin()
@@ -188,7 +181,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Set the peak time.
+   * Set the peak time / size.
    * @param max the maximum time as a long value.
    */
   public void setMax(final long max)
@@ -197,7 +190,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Get the peak time.
+   * Get the peak time / size.
    * @return the maximum time as a long value.
    */
   public long getMax()
@@ -206,7 +199,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Set the average time.
+   * Set the average time / size.
    * @param avg the average time as a double value.
    */
   public void setAvg(final double avg)
@@ -215,7 +208,7 @@ public class StatsSnapshot implements Serializable
   }
 
   /**
-   * Get the average time.
+   * Get the average time / size.
    * @return the average time as a double value.
    */
   public double getAvg()
