@@ -144,9 +144,11 @@ public class JPPFDriver
     TypedProperties config = JPPFConfiguration.getProperties();
 
     initializer.registerDebugMBean();
+    initializer.initRecoveryServer();
+
+    initializer.initJmxServer();
     new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
     initializer.getNodeConnectionEventHandler().loadListeners();
-    initializer.initRecoveryServer();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
     classServer = startServer(recoveryServer, new ClassNioServer(null), null);
@@ -163,8 +165,6 @@ public class JPPFDriver
       nodeNioServer.initLocalChannel(localNodeChannel);
       new Thread(localNode, "Local node").start();
     }
-
-    initializer.initJmxServer();
 
     initializer.initBroadcaster();
     initializer.initPeers(classServer);

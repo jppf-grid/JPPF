@@ -23,23 +23,23 @@ package org.jppf.client.submission;
 public enum SubmissionStatus
 {
   /**
-   * The set of tasks was just submitted.
+   * The job was just submitted.
    */
   SUBMITTED,
   /**
-   * The set of tasks is currently in the submission queue.
+   * The job is currently in the submission queue (on the client side).
    */
   PENDING,
   /**
-   * The set of tasks is being executed.
+   * The job is being executed.
    */
   EXECUTING,
   /**
-   * The execution of the set of tasks is complete.
+   * The job execution is complete.
    */
   COMPLETE,
   /**
-   * The execution of the set of tasks has failed.
+   * The job execution has failed.
    */
   FAILED,
 }

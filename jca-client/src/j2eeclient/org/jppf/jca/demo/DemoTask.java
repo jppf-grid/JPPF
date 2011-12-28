@@ -18,6 +18,8 @@
 
 package org.jppf.jca.demo;
 
+import java.text.DecimalFormat;
+
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -29,7 +31,7 @@ public class DemoTask extends JPPFTask
   /**
    * Explicit serialVersionUID.
    */
-  private static final long serialVersionUID = 1441035751363821022L;
+  private static final long serialVersionUID = -6106765904127535863L;
 
   /**
    * Counts the number of times this task was run.
@@ -39,14 +41,20 @@ public class DemoTask extends JPPFTask
    * A counter to be displayed.
    */
   private int counter = 0;
+  /**
+   * Duration of this task in seconds.
+   */
+  private long duration = 1;
 
   /**
-   * Default constructor.
+   * Initialize this task withe specified duration.
+   * @param duration duration of this task in milliseconds.
    */
-  public DemoTask()
+  public DemoTask(final long duration)
   {
     incrementCount();
     counter = count;
+    this.duration = duration;
   }
 
   /**
@@ -56,9 +64,20 @@ public class DemoTask extends JPPFTask
   @Override
   public void run()
   {
-    String s = "***** Hello JPPF !!! [" + counter + "] *****";
-    System.out.println(s);
-    setResult(s);
+    DecimalFormat nf = new DecimalFormat("0.###");
+    String res = nf.format(duration / 1000.0f);
+    try
+    {
+      Thread.sleep(duration);
+      String s = "JPPF task [" + getId() + "] successfully completed after " + res + " seconds";
+      System.out.println(s);
+      setResult(s);
+    }
+    catch (InterruptedException e)
+    {
+      setException(e);
+      setResult("Exception for task [" + getId() + "] with specified duration of " + res + " seconds: " + e.getMessage());
+    }
   }
 
   /**

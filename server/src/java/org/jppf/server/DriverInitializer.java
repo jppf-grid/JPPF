@@ -285,7 +285,7 @@ public class DriverInitializer
         //info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
         info.managementPort = jmxServer.getManagementPort();
         registerProviderMBeans();
-        System.out.println("JPPF Driver management initialized");
+        System.out.println("JPPF Driver management initialized and listening on port " + jmxServer.getManagementPort());
       }
     }
     catch(Exception e)

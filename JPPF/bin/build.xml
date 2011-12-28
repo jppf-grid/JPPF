@@ -151,6 +151,8 @@
 		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide,            doc"/>
 	<target name="deploy.nojavadoc"
 		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+	<target name="deploy.nojavadoc.noinstaller"
+		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide,            doc"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>

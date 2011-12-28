@@ -20,7 +20,6 @@ package org.jppf.node.initialization;
 
 import java.util.*;
 
-import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -33,7 +32,7 @@ public class InitializationHooksHandler
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(LifeCycleEventHandler.class);
+  private static Logger log = LoggerFactory.getLogger(InitializationHooksHandler.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -45,7 +44,7 @@ public class InitializationHooksHandler
   /**
    * The initial configuration, such as read from the config file or configuration input source.
    */
-  private final TypedProperties initialConfiguration;
+  private final UnmodifiableTypedProperties initialConfiguration;
 
   /**
    * Initialize this hooks handler with the initial JPPF configuration.
@@ -53,7 +52,7 @@ public class InitializationHooksHandler
    */
   public InitializationHooksHandler(final TypedProperties initialConfiguration)
   {
-    this.initialConfiguration = new TypedProperties(initialConfiguration);
+    this.initialConfiguration = new UnmodifiableTypedProperties(initialConfiguration);
   }
 
   /**

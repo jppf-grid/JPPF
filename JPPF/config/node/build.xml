@@ -45,6 +45,7 @@
 			<jvmarg value="-Xmx16m"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-node.properties" />
 			<jvmarg value="-Djppf.config=jppf-node.properties" />
+			<jvmarg value="-Djava.util.logging.config.file=config/logging-node.properties" />
 		</java>       
 	</target>
 

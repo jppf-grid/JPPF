@@ -114,16 +114,30 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   }
 
   /**
-   * Submit an asynchronous execution request to the JPPF client.<br>
-   * This method exits immediately after adding the request to the requests queue.<br>
-   * The returned id is used to later retrieve the results and status of the execution.
-   * @param job the job to execute.
-   * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-   * @throws IllegalArgumentException if the job is null or empty.
-   * @throws Exception if an error occurs while submitting the request.
+   * {@inheritDoc}
+   * @deprecated use {@link #submit(JPPFJob, SubmissionStatusListener)} instead.
    */
   @Override
   public String submitNonBlocking(final JPPFJob job) throws Exception
+  {
+    return submit(job);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #submit(JPPFJob)} instead.
+   */
+  @Override
+  public String submitNonBlocking(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
+  {
+    return submit(job, listener);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String submit(final JPPFJob job) throws Exception
   {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
@@ -131,17 +145,10 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   }
 
   /**
-   * Submit an asynchronous execution request to the JPPF client.<br>
-   * This method exits immediately after adding the request to the requests queue.<br>
-   * The returned id is used to later retrieve the results and status of the execution.
-   * @param job the job to execute.
-   * @param listener an optional listener to receive submission status change notifications, may be null.
-   * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-   * @throws IllegalArgumentException if the job is null or empty.
-   * @throws Exception if an error occurs while submitting the request.
+   * {@inheritDoc}
    */
   @Override
-  public String submitNonBlocking(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
+  public String submit(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
   {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");

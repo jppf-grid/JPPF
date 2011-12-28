@@ -7,6 +7,7 @@
 	  int nbTasks = 10;
 	  String jobId = "Demo job";
 	  String perform = request.getParameter("perform");
+	  boolean blocking = true;
 	  if (perform != null)
 	  {
 		  String text = request.getParameter("duration");
@@ -26,11 +27,12 @@
 		  text = request.getParameter("jobId");
 		  if ((text != null) && !"".equals(text.trim())) jobId = text;
 		  session.setAttribute("jobId", text);
-		  boolean blocking = request.getParameter("blocking") != null;
-		  DemoTest test = new DemoTest(jndiName);
+		  blocking = request.getParameter("blocking") != null;
+		  session.setAttribute("blocking", "" + blocking);
+		  J2EEDemo demo = new J2EEDemo(jndiName);
 		  String msg = null;
-			if (!blocking) msg = test.testConnector(jobId, duration, nbTasks);
-			else msg = test.testConnectorBlocking(jobId, duration, nbTasks);
+			if (!blocking) msg = demo.testConnector(jobId, duration, nbTasks);
+			else msg = demo.testConnectorBlocking(jobId, duration, nbTasks);
 			response.sendRedirect(request.getContextPath()+"/index.jsp?msg="+msg);
 	  }
 		else
@@ -55,6 +57,8 @@
 			}
 			text = (String) session.getAttribute("jobId");
 			if (text != null) jobId = text;
+			text = (String) session.getAttribute("blocking");
+			if (text != null) blocking = Boolean.valueOf(text);
 %>
 		<div align="center">
 		<h1>Submit a job</h1>
@@ -76,7 +80,7 @@
 					<td><input type="text" value="<%= (float) duration / 1000.0f %>" name="duration" maxLength="10"></td>
 				</tr>
 				<tr>
-					<td colspan="2"><input type="checkbox" checked="true" name="blocking">Blocking job?</td>
+					<td colspan="2"><input type="checkbox" checked="<%= blocking %>" name="blocking">Blocking job?</td>
 				</tr>
 				<tr><td align="center" colspan="2">&nbsp;<br/><input type="hidden" value="true" name="perform"><input type="submit" value="Submit"></td></tr>
 			</table>

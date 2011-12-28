@@ -100,6 +100,7 @@
 			<packageset dir="${admin}/src/java"/>
 			<!--<packageset dir="${demo}/src/java"/>-->
 			<packageset dir="${jca-client}/src/java"/>
+			<packageset dir="${jca-client}/src/j2eeclient"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>

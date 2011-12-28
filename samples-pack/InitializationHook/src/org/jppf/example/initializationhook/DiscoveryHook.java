@@ -52,7 +52,7 @@ public class DiscoveryHook implements InitializationHook
    * @param initialConfiguration the initial configuration, such as read from the config file or configuration input source.
    */
   @Override
-  public void initializing(final TypedProperties initialConfiguration)
+  public void initializing(final UnmodifiableTypedProperties initialConfiguration)
   {
     // fetch the server to configure and put it back to the tail of the queue
     currentServer = servers.poll();

@@ -20,34 +20,27 @@ package org.jppf.jca.demo;
 
 import java.util.*;
 
-import javax.naming.InitialContext;
-import javax.resource.cci.ConnectionFactory;
-
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.client.submission.SubmissionStatus;
-import org.jppf.jca.cci.*;
+import org.jppf.jca.cci.JPPFConnection;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Instances of this class encapsulate a simple call to the JPPF resource adapter.
  * @author Laurent Cohen
  */
-public class DemoTest
+public class J2EEDemo
 {
   /**
    * JNDI name of the JPPFConnectionFactory.
    */
-  private String jndiBinding = null;
-  /**
-   * Reference ot the initial context.
-   */
-  private transient InitialContext ctx = null;
+  private final String jndiBinding;
 
   /**
    * Initialize this test object with a specified jndi location for the connection factory.
    * @param jndiBinding JNDI name of the JPPFConnectionFactory.
    */
-  public DemoTest(final String jndiBinding)
+  public J2EEDemo(final String jndiBinding)
   {
     this.jndiBinding = jndiBinding;
   }
@@ -64,10 +57,10 @@ public class DemoTest
     String id = null;
     try
     {
-      connection = getConnection();
+      connection = JPPFHelper.getConnection(jndiBinding);
       JPPFJob job = new JPPFJob();
-      job.addTask(new DurationTask(duration));
-      id = connection.submitNonBlocking(job);
+      job.addTask(new DemoTask(duration));
+      id = connection.submit(job);
 
       /*
 			// submit with an execution policy
@@ -109,7 +102,7 @@ public class DemoTest
     }
     finally
     {
-      if (connection != null) connection.close();
+      if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return id;
   }
@@ -128,20 +121,20 @@ public class DemoTest
     String id = null;
     try
     {
-      connection = getConnection();
+      connection = JPPFHelper.getConnection(jndiBinding);
       JPPFJob job = new JPPFJob();
       job.setName(jobId);
       for (int i=0; i<nbTasks; i++)
       {
-        DurationTask task = new DurationTask(duration);
+        DemoTask task = new DemoTask(duration);
         task.setId(jobId + " task #" + (i+1));
         job.addTask(task);
       }
-      id = connection.submitNonBlocking(job);
+      id = connection.submit(job);
     }
     finally
     {
-      if (connection != null) connection.close();
+      if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return id;
   }
@@ -161,35 +154,24 @@ public class DemoTest
     String id = null;
     try
     {
-      connection = getConnection();
+      connection = JPPFHelper.getConnection(jndiBinding);
       JPPFJob job = new JPPFJob();
       job.setName(jobId);
       for (int i=0; i<nbTasks; i++)
       {
-        DurationTask task = new DurationTask(duration);
+        DemoTask task = new DemoTask(duration);
         task.setId(jobId + " task #" + (i+1));
         job.addTask(task);
       }
-      id = connection.submitNonBlocking(job);
+      id = connection.submit(job);
       List<JPPFTask> results = connection.waitForResults(id);
       System.out.println("received " + results.size() + " results for job '" + job.getName() + "'");
     }
     finally
     {
-      if (connection != null) connection.close();
+      if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return id;
-  }
-
-  /**
-   * Get the initial context.
-   * @return an <code>InitialContext</code> instance.
-   * @throws Exception if the context could not be obtained.
-   */
-  public InitialContext getInitialContext() throws Exception
-  {
-    if (ctx == null) ctx = new InitialContext();
-    return ctx;
   }
 
   /**
@@ -203,7 +185,7 @@ public class DemoTest
     JPPFConnection connection = null;
     try
     {
-      connection = getConnection();
+      connection = JPPFHelper.getConnection(jndiBinding);
       Collection<String> coll = connection.getAllSubmissionIds();
       for (String id: coll)
       {
@@ -214,7 +196,7 @@ public class DemoTest
     }
     finally
     {
-      if (connection != null) connection.close();
+      if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return map;
   }
@@ -231,7 +213,7 @@ public class DemoTest
     String msg = null;
     try
     {
-      connection = getConnection();
+      connection = JPPFHelper.getConnection(jndiBinding);
       List<JPPFTask> results = connection.getSubmissionResults(id);
       if (results == null) msg = "submission is not in queue anymore";
       else
@@ -248,23 +230,8 @@ public class DemoTest
     }
     finally
     {
-      if (connection != null) connection.close();
+      if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return msg;
-  }
-
-  /**
-   * Obtain a JPPF connection from the resource adapter's connection pool.
-   * The obtained connection must be closed by the caller of this method, once it is done using it.
-   * @return a <code>JPPFConnection</code> instance.
-   * @throws Exception if the connection could not be obtained.
-   */
-  public JPPFConnection getConnection() throws Exception
-  {
-    Object objref = getInitialContext().lookup(jndiBinding);
-    JPPFConnectionFactory cf;
-    if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
-    else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
-    return (JPPFConnection) cf.getConnection();
   }
 }

@@ -42,6 +42,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @param job - the job to execute.
    * @return the id of the submission, to use for later retrieval of the results and status of the submission.
    * @throws Exception if an error occurs while submitting the request.
+   * @deprecated use {@link #submit(JPPFJob)} instead.
    */
   String submitNonBlocking(JPPFJob job) throws Exception;
 
@@ -53,8 +54,30 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @param listener an optional listener to receive submission status change notifications, may be null.
    * @return the id of the submission, to use for later retrieval of the results and status of the submission.
    * @throws Exception if an error occurs while submitting the request.
+   * @deprecated use {@link #submit(JPPFJob, SubmissionStatusListener)} instead.
    */
   String submitNonBlocking(JPPFJob job, SubmissionStatusListener listener) throws Exception;
+
+  /**
+   * Submit a job to the JPPF client.<br>
+   * This method exits immediately after adding the request to the requests queue.<br>
+   * The returned id is used to later retrieve the results and status of the execution.
+   * @param job - the job to execute.
+   * @return the id of the submission, to use for later retrieval of the results and status of the submission.
+   * @throws Exception if an error occurs while submitting the request.
+   */
+  String submit(JPPFJob job) throws Exception;
+
+  /**
+   * Submit a job to the JPPF client.<br>
+   * This method exits immediately after adding the request to the requests queue.<br>
+   * The returned id is used to later retrieve the results and status of the execution.
+   * @param job the job to execute.
+   * @param listener an optional listener to receive submission status change notifications, may be null.
+   * @return the id of the submission, to use for later retrieval of the results and status of the submission.
+   * @throws Exception if an error occurs while submitting the request.
+   */
+  String submit(JPPFJob job, SubmissionStatusListener listener) throws Exception;
 
   /**
    * Wait until all results for the specified job submission have been received.
@@ -66,8 +89,8 @@ public interface JPPFConnection extends Connection, JPPFAccessor
 
   /**
    * Add a listener to the submission with the specified id.
-   * @param submissionId - the id of the submission.
-   * @param listener - the listener to add.
+   * @param submissionId the id of the submission.
+   * @param listener the listener to add.
    */
   void addSubmissionStatusListener(String submissionId, SubmissionStatusListener listener);
 

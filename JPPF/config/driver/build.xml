@@ -45,6 +45,7 @@
 			<jvmarg value="-Xmx32m"/>
 			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging-driver.properties" />
 		</java>       
 	</target>
 

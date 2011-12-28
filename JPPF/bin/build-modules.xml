@@ -42,7 +42,7 @@
 				<zipfileset dir="${basedir}" prefix="${@{module}.prefix}">
 					<include name="${license.file}"/>
 				</zipfileset>
-				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}"/>
+				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" />
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-node.jar"/>
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
 				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
@@ -57,6 +57,24 @@
 		</sequential>
 	</macrodef>
 
+	<!-- =========== Application template packaging =========== -->
+
+	<target name="application.template">
+		<package-module module="application-template">
+			<module-elements>
+				<zipfileset dir="${build}" prefix="${application-template.prefix}/lib">
+					<include name="jppf-common.jar"/>
+					<include name="jppf-client.jar"/>
+				</zipfileset>
+				<zipfileset dir="${build}" prefix="${application-template.prefix}/lib-src">
+					<include name="jppf-common-src.jar"/>
+					<include name="jppf-client-src.jar"/>
+				</zipfileset>
+				<zipfileset dir="${application.template}/src" prefix="${application-template.prefix}/src" includes="**/*.*"/>
+				<zipfileset dir="${application.template}/classes" prefix="${application-template.prefix}/classes" includes="**/*.*"/>
+			</module-elements>
+		</package-module>
+	</target>
 
 	<!-- =========== Driver packaging =========== -->
 
@@ -97,8 +115,6 @@
 					<include name="jppf-client-src.jar"/>
 					<include name="jppf-admin-src.jar"/>
 				</zipfileset>
-				<zipfileset dir="${lib}/jmxremote" prefix="${gui.prefix}/lib" includes="*.jar"/>
-				<zipfileset dir="${lib}/jmxremote" prefix="${gui.prefix}/lib/jmxremote-license" includes="*.html"/>
 				<zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/Rhino" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="*.jar"/>
@@ -122,42 +138,6 @@
 				</zipfileset>
 			</module-elements>
 		</package-module>
-	</target>
-
-	<!-- =========== Application template packaging =========== -->
-
-	<target name="application.template" description="" depends="init">
-		<mkdir dir="${application.template}/classes"/>
-		<delete quiet="true"><fileset dir="${application.template}/classes" includes="**/*.*"/></delete>
-		<javac srcdir="" destdir="${application.template}/classes"
-			debug="on" deprecation="off" optimize="on" includes="**/*.java">
-	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked"/>
-			<src path="${application.template}/src"/>
-		</javac>
-		<property name="template.prefix" value="${app.ver}-application-template"/>
-		<property name="template.release.file" value="${build}/${template.prefix}.zip"/>
-		<delete file="${template.release.file}" quiet="true"/>
-		<zip destfile="${template.release.file}">
-			<zipfileset dir="${lib}/jmxremote" prefix="${template.prefix}/lib" includes="*.jar"/>
-			<zipfileset dir="${lib}/jmxremote" prefix="${template.prefix}/lib/jmxremote-license" includes="*.html"/>
-			<zipfileset dir="${application.template}" prefix="${template.prefix}" excludes=".*"/>
-			<zipfileset dir="${build}" prefix="${template.prefix}/lib">
-				<include name="jppf-common-node.jar"/>
-				<include name="jppf-common.jar"/>
-				<include name="jppf-client.jar"/>
-			</zipfileset>
-			<zipfileset dir="${build}" prefix="${template.prefix}/lib-src">
-				<include name="jppf-common-node-src.jar"/>
-				<include name="jppf-common-src.jar"/>
-				<include name="jppf-client-src.jar"/>
-			</zipfileset>
-			<zipfileset dir="${lib}/log4j" prefix="${template.prefix}/lib" includes="*.jar"/>
-			<zipfileset dir="${lib}/slf4j" prefix="${template.prefix}/lib">
-				<include name="slf4j-api-*.jar"/>
-				<include name="slf4j-${slf4j.bindings}-*.jar"/>
-			</zipfileset>
-		</zip>
 	</target>
 
 </project> 

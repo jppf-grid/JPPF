@@ -18,7 +18,7 @@
 
 package org.jppf.node.initialization;
 
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.UnmodifiableTypedProperties;
 
 /**
  * Interface for custom discovery of the driver to connect to.
@@ -34,5 +34,5 @@ public interface InitializationHook
    * It can be used to modify the current configuration via {@link org.jppf.utils.JPPFConfiguration#getProperties()}.
    * @param initialConfiguration the un-modified configuration properties of the node at startup time.
    */
-  void initializing(TypedProperties initialConfiguration);
+  void initializing(UnmodifiableTypedProperties initialConfiguration);
 }

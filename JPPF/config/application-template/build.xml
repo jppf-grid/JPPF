@@ -85,7 +85,7 @@
 			<jvmarg value="-Djppf.config=jppf.properties"/>
 			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
 			<jvmarg value="-Xmx64m"/>
-		</java>       
+		</java>
 	</target>
 
 </project> 

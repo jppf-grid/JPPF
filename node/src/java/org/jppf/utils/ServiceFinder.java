@@ -144,7 +144,7 @@ public class ServiceFinder
             int idx = s.indexOf('#');
             if (idx > 0) s = s.substring(0, idx);
             s = s.trim();
-            if (!s.startsWith("#")) lines.add(s);
+            if (!s.startsWith("#")&& (s.length() > 0)) lines.add(s);
           }
         }
         finally
