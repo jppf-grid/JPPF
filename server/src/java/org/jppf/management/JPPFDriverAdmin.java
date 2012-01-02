@@ -52,6 +52,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
    * Reference to the driver.
    */
   private transient JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * The latest load-balancing information set via JMX.
+   */
+  private LoadBalancingInformation currentLoadBalancingInformation;
+  /**
+   * Synchronization lock.
+   */
+  private Object loadBalancingInformationLock = new Object();
 
   /**
    * Request the JMX connection information for all the nodes attached to the server.
@@ -110,6 +118,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
       JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
       if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + '\'';
       TypedProperties props = new TypedProperties(parameters);
+      synchronized(loadBalancingInformationLock)
+      {
+        currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
+      }
       Bundler bundler = factory.createBundler(algorithm, props);
       driver.getNodeNioServer().setBundler(bundler);
       //return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
@@ -156,6 +168,19 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public LoadBalancingInformation loadBalancerInformation() throws Exception
   {
+    synchronized(loadBalancingInformationLock)
+    {
+      if (currentLoadBalancingInformation == null) currentLoadBalancingInformation = computeCurrentLoadBalancingInformation();
+      return currentLoadBalancingInformation;
+    }
+  }
+ 
+  /**
+   * Compute the current load balancing parameters form the JPPF configuration.
+   * @return a {@link LoadBalancingInformation} instance.
+   */
+  private LoadBalancingInformation computeCurrentLoadBalancingInformation()
+  {
     TypedProperties props = JPPFConfiguration.getProperties();
     String algorithm = props.getString("jppf.load.balancing.algorithm", null);
     // for compatibility with v1.x configuration files
@@ -165,7 +190,17 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
     JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
     TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
-    return new LoadBalancingInformation(algorithm, params, factory.getBundlerProviderNames());
+    List<String> algorithmsList = null;
+    try
+    {
+      algorithmsList = factory.getBundlerProviderNames();
+    }
+    catch (Exception e)
+    {
+      algorithmsList = new ArrayList<String>();
+      log.error(e.getMessage(), e);
+    }
+    return new LoadBalancingInformation(algorithm, params, algorithmsList);
   }
 
   /**
