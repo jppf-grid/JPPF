@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +27,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
- * application classes, to avoid costly redeployment system-wide.
+ * JPPF class loader implementation for nodes running within the same JVM as the JPPF server (local nodes).
  * @author Laurent Cohen
  */
 public class JPPFLocalClassLoader extends AbstractJPPFClassLoader

@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,8 @@ import java.lang.management.ManagementFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.*;
+
+import org.jppf.utils.ExceptionUtils;
 
 /**
  * Instances of this class send messages as JMX notifications.
@@ -116,12 +118,12 @@ public class JmxMessageNotifier
     {
       try
       {
-        System.out.println("Error in logging configuration: JMX logger name '" + name + "' is invalid (" + e.getMessage() + ')');
+        System.out.println("Error in logging configuration: JMX logger name '" + name + "' is invalid (" + ExceptionUtils.getMessage(e) + ')');
         objectName = new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
       }
       catch (Exception e2)
       {
-        System.out.println("Failed to initialize jmx based logging with default MBean name:" + e2.getMessage());
+        System.out.println("Failed to initialize jmx based logging with default MBean name:" + ExceptionUtils.getMessage(e2));
       }
     }
   }
@@ -137,7 +139,7 @@ public class JmxMessageNotifier
     }
     catch (Exception e)
     {
-      System.out.println("Error initializing the JMX logger MBean '" + objectName + "' : " + e.getMessage());
+      System.out.println("Error initializing the JMX logger MBean '" + objectName + "' : " + ExceptionUtils.getMessage(e));
     }
   }
 
@@ -163,7 +165,7 @@ public class JmxMessageNotifier
       }
       catch (Exception e)
       {
-        System.out.println("Error registering the JMX logger MBean '" + objectName + "' : " + e.getMessage());
+        System.out.println("Error registering the JMX logger MBean '" + objectName + "' : " + ExceptionUtils.getMessage(e));
       }
     }
     finally
@@ -185,7 +187,7 @@ public class JmxMessageNotifier
     }
     catch (Exception e)
     {
-      System.out.println("Failed to obtain the MBean server:" + e.getMessage());
+      System.out.println("Failed to obtain the MBean server: " + ExceptionUtils.getMessage(e));
       return null;
     }
   }

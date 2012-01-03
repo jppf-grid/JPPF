@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,14 +116,14 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
   void cancelJob(String jobId, Boolean requeue) throws Exception;
   /**
    * Get the current class loader delegation model for the node.
-   * @return either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#LOCAL_FIRST LOCAL_FIRST}.
+   * @return either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
    * @throws Exception if any error occurs.
    * @see org.jppf.classloader.AbstractJPPFClassLoader#getDelegationModel()
    */
   DelegationModel getDelegationModel() throws Exception;
   /**
    * Set the current class loader delegation model for the node.
-   * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#LOCAL_FIRST LOCAL_FIRST}.
+   * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
    * If any other value is specified then this method has no effect.
    * @throws Exception if any error occurs.
    * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(int)

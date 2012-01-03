@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,33 +19,33 @@
 package org.jppf.client;
 
 /**
- * Connection status of a JPPFClientConnection instance.
+ * Status of the connection between a client and a driver.
  * @author Laurent Cohen
  */
 public enum JPPFClientConnectionStatus
 {
   /**
-   * Indicates a new connection.
+   * The connection was just created.
    */
   NEW,
   /**
-   * Indicates that the connection instance is disconnected from the driver.
+   * The client was disconnected from the driver.
    */
   DISCONNECTED,
   /**
-   * Indicates that the connection instance is currently attempting to connect to the driver.
+   * The client is currently attempting to connect to the driver.
    */
   CONNECTING,
   /**
-   * Indicates that the connection instance has successfully connected to the driver.
+   * The client is successfully connected to the driver.
    */
   ACTIVE,
   /**
-   * Indicates that the connection instance has is currently executing tasks.
+   * The connection is currently executing a job.
    */
   EXECUTING,
   /**
-   * Indicates that the connection instance has failed to connect to the driver.
+   * The client failed to connect to the driver and no further attempt will be made.
    */
   FAILED
 }

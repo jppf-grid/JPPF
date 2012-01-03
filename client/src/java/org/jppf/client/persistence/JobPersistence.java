@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ public interface JobPersistence<K>
 {
   /**
    * Compute the key for the specified job. The contract for this method is that
-   * it is idempotent, meaning that calling this method for the same jobb instance
+   * it is idempotent, meaning that calling this method for the same job instance
    * should always return the same key.
    * @param job the job for which to get a key.
    * @return A key used to identify and locate the job int he persistent store.

@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -388,7 +388,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   {
     if (!isBootstrapClass(name))
     {
-      if (delegationModel == DelegationModel.LOCAL_FIRST) return loadClassLocalFirst(name, resolve);
+      if (delegationModel == DelegationModel.URL_FIRST) return loadClassLocalFirst(name, resolve);
     }
     return super.loadClass(name, resolve);
   }
@@ -473,7 +473,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   /**
    * Determine the class loading delegation model currently in use.
-   * @return an int value representing the model, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
+   * @return an int value representing the model, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #URL_FIRST LOCAL_FIRST}.
    */
   public static synchronized DelegationModel getDelegationModel()
   {
@@ -482,7 +482,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   /**
    * Specify the class loading delegation model to use.
-   * @param model an int value, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #LOCAL_FIRST LOCAL_FIRST}.
+   * @param model an int value, either {@link #PARENT_FIRST PARENT_FIRST} or {@link #URL_FIRST LOCAL_FIRST}.
    * If any other value is specified then calling this method has no effect.
    */
   public static synchronized void setDelegationModel(final DelegationModel model)
@@ -497,7 +497,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   private static synchronized DelegationModel initDelegationModel()
   {
     String s = JPPFConfiguration.getProperties().getString("jppf.classloader.delegation", "parent");
-    DelegationModel model = "local".equalsIgnoreCase(s) ? DelegationModel.LOCAL_FIRST : DelegationModel.PARENT_FIRST;
+    DelegationModel model = "url".equalsIgnoreCase(s) ? DelegationModel.URL_FIRST : DelegationModel.PARENT_FIRST;
     if (debugEnabled) log.debug("Using " + model + " class loader delegation model");
     return model;
   }

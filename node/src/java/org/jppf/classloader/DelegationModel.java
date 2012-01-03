@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,5 +31,5 @@ public enum DelegationModel
   /**
    * Delegation model to local URL classpath first.
    */
-  LOCAL_FIRST
+  URL_FIRST
 }

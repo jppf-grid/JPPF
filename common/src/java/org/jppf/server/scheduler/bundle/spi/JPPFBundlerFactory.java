@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2011 JPPF Team.
+ * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -122,17 +122,16 @@ public class JPPFBundlerFactory
   /**
    * Convert a JPPF configuration map to a profile configuration by extracting the properties related to the specified profile
    * and removing the JPPF-specific prefix from their name.
-   * @param profileName - the name of the profile to extract.
-   * @param configuration - the JPPF configuration to extract from.
+   * @param profileName the name of the profile to extract.
+   * @param configuration the JPPF configuration to extract from.
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
   public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration)
   {
     TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
     String prefix = "strategy." + profileName + '.';
-    Set<Map.Entry<Object, Object>> entries = profile.entrySet();
     TypedProperties result = new TypedProperties();
-    for (Map.Entry<Object, Object> entry: entries)
+    for (Map.Entry<Object, Object> entry: profile.entrySet())
     {
       String key = (String) entry.getKey();
       String s = key.substring(prefix.length());
