@@ -293,7 +293,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         List<String> locationsList = cache.getResourcesLocations(name);
         if (locationsList == null)
         {
-          if (debugEnabled) log.debug("resource " + name + " not found locally");
+          if (debugEnabled) log.debug("resource " + name + " not found locally in cache");
           indices.add(i);
         }
         else if (!locationsList.isEmpty())
