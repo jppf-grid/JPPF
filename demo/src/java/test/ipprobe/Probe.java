@@ -40,20 +40,20 @@ public class Probe
 
   /**
    * Main entry point.
-   * @param args - not used.
+   * @param args not used.
    */
   public static void main(final String...args)
   {
     try
     {
-      TypedProperties props = JPPFConfiguration.getProperties();
-      String host = props.getString("ipprobe.host", "localhost");
-      String[] sports = props.getString("ipprobe.ports").trim().split("\\s");
+      TypedProperties config = JPPFConfiguration.getProperties();
+      String host = config.getString("ipprobe.host", "localhost");
+      String[] sports = config.getString("ipprobe.ports").trim().split("\\s");
       Integer[] ports = new Integer[sports.length];
       for (int i=0; i<sports.length; i++) ports[i] = Integer.valueOf(sports[i]);
       Timer timer = new Timer();
       ProbeTask task = new ProbeTask(host, ports);
-      timer.schedule(task, 10, props.getLong("ipprobe.interval", 1000L));
+      timer.schedule(task, 10, config.getLong("ipprobe.interval", 1000L));
     }
     catch(Exception e)
     {
