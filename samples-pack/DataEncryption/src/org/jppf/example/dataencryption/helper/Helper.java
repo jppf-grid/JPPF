@@ -23,8 +23,8 @@ import java.security.KeyStore;
 
 import javax.crypto.*;
 
-import org.jppf.utils.FileUtils;
 import org.jppf.utils.base64.*;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * This class provides helper methods to provide a cipher and its parameters,
@@ -79,9 +79,15 @@ public final class Helper
     byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
     // store the encoded password to a file
     FileOutputStream fos = new FileOutputStream(getPasswordFilename());
-    fos.write(encodedBytes);
-    fos.flush();
-    fos.close();
+    try
+    {
+      fos.write(encodedBytes);
+      fos.flush();
+    }
+    finally
+    {
+      fos.close();
+    }
     char[] password = pwd.toCharArray();
     KeyStore ks = KeyStore.getInstance(getProvider());
     // create an empty keystore
@@ -94,8 +100,14 @@ public final class Helper
     ks.setEntry(getKeyAlias(), skEntry, new KeyStore.PasswordProtection(password));
     // save the keystore to a file
     fos = new FileOutputStream(getKeystoreFilename());
-    ks.store(fos, password);
-    fos.close();
+    try
+    {
+      ks.store(fos, password);
+    }
+    finally
+    {
+      fos.close();
+    }
   }
 
   /**
@@ -111,7 +123,7 @@ public final class Helper
         String path = getKeystoreFolder() + getPasswordFilename();
         InputStream is = Helper.class.getClassLoader().getResourceAsStream(path);
         // read the encoded password
-        byte[] encodedBytes = FileUtils.getInputStreamAsByte(is);
+        byte[] encodedBytes = StreamUtils.getInputStreamAsByte(is);
         // decode the password from Base64
         byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
         some_chars = new String(passwordBytes).toCharArray();

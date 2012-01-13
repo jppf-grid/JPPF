@@ -24,7 +24,7 @@ import static org.jppf.utils.StringUtils.*;
 import java.net.InetAddress;
 import java.util.*;
 
-import org.jppf.utils.Range;
+import org.jppf.utils.*;
 
 /**
  * Represents a pattern used for IP addresses inclusion or exclusion lists.<br/>
@@ -110,7 +110,7 @@ public abstract class AbstractIPAddressPattern
    */
   public boolean matches(final InetAddress ip)
   {
-    return matches(toIntArray(ip));
+    return matches(NetworkUtils.toIntArray(ip));
   }
 
   /**

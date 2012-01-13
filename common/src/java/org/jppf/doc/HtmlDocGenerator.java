@@ -236,16 +236,22 @@ public class HtmlDocGenerator
   {
     BufferedReader bufferedReader = new BufferedReader(reader);
     StringBuilder sb = new StringBuilder();
-    String s = "";
-    while (s != null)
+    try
     {
-      s = bufferedReader.readLine();
-      if (s == null) break;
-      String s2 = s.trim();
-      if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
-      sb.append(s).append('\n');
+      String s = "";
+      while (s != null)
+      {
+        s = bufferedReader.readLine();
+        if (s == null) break;
+        String s2 = s.trim();
+        if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
+        sb.append(s).append('\n');
+      }
     }
-    bufferedReader.close();
+    finally
+    {
+      bufferedReader.close();
+    }
     return sb.toString();
   }
 

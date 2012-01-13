@@ -134,8 +134,14 @@ public class JPPFJcaClient extends AbstractGenericClient
       //TypedProperties props = new TypedProperties();
       TypedProperties props = JPPFConfiguration.getProperties();
       ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
-      props.load(bais);
-      bais.close();
+      try
+      {
+        props.load(bais);
+      }
+      finally
+      {
+        bais.close();
+      }
       config = props;
     }
     catch(Exception e)

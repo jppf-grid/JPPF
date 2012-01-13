@@ -46,17 +46,25 @@ public final class FileUtils
   {
     BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
     StringBuilder sb = new StringBuilder();
-    String s = "";
-    while (s != null)
+    try
     {
-      s = reader.readLine();
-      if (s != null) sb.append(s).append('\n');
+      String s = "";
+      while (s != null)
+      {
+        s = reader.readLine();
+        if (s != null) sb.append(s).append('\n');
+      }
+    }
+    finally
+    {
+      reader.close();
     }
     return sb.toString();
   }
 
   /**
    * Read the content of a specified reader into a string.
+   * This method closes the reader upon terminating.
    * @param aReader the reader to read the content from.
    * @return the content of the file as a string.
    * @throws IOException if the file can't be found or read.
@@ -65,11 +73,18 @@ public final class FileUtils
   {
     List<String> lines = new ArrayList<String>();
     BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
+    try
+    {
     String s = "";
     while (s != null)
     {
       s = reader.readLine();
-      if (s != null) lines.add(s);
+      if ((s != null) && !"".equals(s.trim())) lines.add(s);
+    }
+    }
+    finally
+    {
+      reader.close();
     }
     return lines;
   }
@@ -82,10 +97,7 @@ public final class FileUtils
    */
   public static String readTextFile(final File file) throws IOException
   {
-    Reader reader = new FileReader(file);
-    String result = readTextFile(reader);
-    reader.close();
-    return result;
+    return readTextFile(new FileReader(file));
   }
 
   /**
@@ -105,9 +117,7 @@ public final class FileUtils
       if (is == null) return null;
       reader = new InputStreamReader(is);
     }
-    String result = readTextFile(reader);
-    reader.close();
-    return result;
+    return readTextFile(reader);
   }
 
   /**
@@ -142,18 +152,24 @@ public final class FileUtils
   {
     BufferedReader reader = new BufferedReader(new StringReader(content));
     Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest);
-    String s = "";
-    while (s != null)
+    try
     {
-      s = reader.readLine();
-      if (s != null)
+      String s = "";
+      while (s != null)
       {
-        writer.write(s);
-        writer.write("\n");
+        s = reader.readLine();
+        if (s != null)
+        {
+          writer.write(s);
+          writer.write("\n");
+        }
       }
+      writer.flush();
     }
-    writer.flush();
-    writer.close();
+    finally
+    {
+      writer.close();
+    }
   }
 
   /**
@@ -187,11 +203,20 @@ public final class FileUtils
   }
 
   /**
-   * Load a file from the specified path.
-   * This method looks up the schema first in the file system, then in the classpath
-   * if it is not found in the file system.
-   * @param path the path to the file to load.
-   * @return a <code>Reader</code> instance, or null if the schema file could not be found.
+   * Get an output stream given a file path.
+   * @param file the file to lookup.
+   * @return an <code>OutputStream</code> instance, or null if the file could not be created.
+   * @throws IOException if an IO error occurs while looking up the file.
+   */
+  public static OutputStream getFileOutputStream(final File file) throws IOException
+  {
+    return new BufferedOutputStream(new FileOutputStream(file));
+  }
+
+  /**
+   * Get a <code>Reader</code> for the specified file path.
+   * @param path the path to the file to lookup.
+   * @return a <code>Reader</code> instance, or null if the file could not be found.
    * @throws IOException if an IO error occurs while looking up the file.
    */
   public static Reader getFileReader(final String path) throws IOException
@@ -199,6 +224,17 @@ public final class FileUtils
     InputStream is = getFileInputStream(path);
     if (is == null) return null;
     return new InputStreamReader(is);
+  }
+
+  /**
+   * Get a <code>Writer</code> for the specified file path.
+   * @param path the path to the file to create or open.
+   * @return a <code>Writer</code> instance.
+   * @throws IOException if an IO error occurs while creating the file writer.
+   */
+  public static Writer getFileWriter(final String path) throws IOException
+  {
+    return new BufferedWriter(new FileWriter(path));
   }
 
   /**
@@ -211,14 +247,21 @@ public final class FileUtils
   {
     InputStream is = getFileInputStream(fileListPath);
     String content = readTextFile(new BufferedReader(new InputStreamReader(is)));
-    LineNumberReader reader = new LineNumberReader(new StringReader(content));
+    BufferedReader reader = new BufferedReader(new StringReader(content));
     List<String> filePaths = new ArrayList<String>();
-    boolean end = false;
-    while (!end)
+    try
     {
-      String s = reader.readLine();
-      if (s != null) filePaths.add(s);
-      else end = true;
+      boolean end = false;
+      while (!end)
+      {
+        String s = reader.readLine();
+        if (s != null) filePaths.add(s);
+        else end = true;
+      }
+    }
+    finally
+    {
+      reader.close();
     }
     return filePaths;
   }
@@ -241,7 +284,15 @@ public final class FileUtils
   public static String getFileExtension(final File file)
   {
     if ((file == null) || !file.exists() || !file.isFile()) return null;
-    String filePath = file.getPath();
+    String filePath = null;
+    try
+    {
+      filePath = file.getCanonicalPath();
+    }
+    catch(IOException e)
+    {
+      return null;
+    }
     int idx = filePath.lastIndexOf('.');
     if (idx >=0) return filePath.substring(idx+1);
     return null;
@@ -279,7 +330,7 @@ public final class FileUtils
     int idx1 = path.lastIndexOf('/');
     int idx2 = path.lastIndexOf('\\');
     if ((idx1 < 0) && (idx2 < 0)) return -1;
-    return idx1 < 0 ? idx2 : idx2 < 0 ? idx1 : Math.max(idx1, idx2);
+    return idx1 < 0 ? idx2 : (idx2 < 0 ? idx1 : Math.max(idx1, idx2));
   }
 
   /**
@@ -292,26 +343,32 @@ public final class FileUtils
   {
     BufferedReader reader = new BufferedReader(new FileReader(file));
     StringBuilder sb = new StringBuilder();
-    String s = "";
     int count = 0;
-    while (s != null)
+    try
     {
-      s = reader.readLine();
-      if (s == null) break;
-      sb.append(s).append('\n');
-      if (sb.length() >= splitSize)
+      String s = "";
+      while (s != null)
+      {
+        s = reader.readLine();
+        if (s == null) break;
+        sb.append(s).append('\n');
+        if (sb.length() >= splitSize)
+        {
+          count++;
+          writeTextFile(file + '.' + count, sb.toString());
+          sb = new StringBuilder();
+        }
+      }
+      if (sb.length() > 0)
       {
         count++;
         writeTextFile(file + '.' + count, sb.toString());
-        sb = new StringBuilder();
       }
     }
-    if (sb.length() > 0)
+    finally
     {
-      count++;
-      writeTextFile(file + '.' + count, sb.toString());
+      reader.close();
     }
-    reader.close();
   }
 
   /**
@@ -352,51 +409,8 @@ public final class FileUtils
   public static byte[] getFileAsByte(final File file) throws IOException
   {
     InputStream is = new BufferedInputStream(new FileInputStream(file));
-    byte[] data = getInputStreamAsByte(is);
-    is.close();
+    byte[] data = StreamUtils.getInputStreamAsByte(is);
     return data;
-  }
-
-  /**
-   * Get the content of an input stream as an array of bytes.
-   * @param is the input stream to read from.
-   * @return a byte array.
-   * @throws IOException if an IO error occurs.
-   */
-  public static byte[] getInputStreamAsByte(final InputStream is) throws IOException
-  {
-    byte[] buffer = new byte[StreamConstants.TEMP_BUFFER_SIZE];
-    byte[] result = null;
-    ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-    boolean end = false;
-    while (!end)
-    {
-      int n = is.read(buffer, 0, buffer.length);
-      if (n < 0) end = true;
-      else baos.write(buffer, 0, n);
-    }
-    is.close();
-    baos.flush();
-    result = baos.toByteArray();
-    baos.close();
-    return result;
-  }
-
-  /**
-   * Copy the data read from the specified input stream to the specified output stream.
-   * @param is the input stream to read from.
-   * @param os the output stream to write to.
-   * @throws IOException if an I/O error occurs.
-   */
-  public static void copyStream(final InputStream is, final OutputStream os) throws IOException
-  {
-    byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
-    while(true)
-    {
-      int n = is.read(bytes);
-      if (n <= 0) break;
-      os.write(bytes, 0, n);
-    }
   }
 
   /**
@@ -443,7 +457,7 @@ public final class FileUtils
   public static void writeBytesToStream(final byte[] data, final OutputStream os) throws IOException
   {
     ByteArrayInputStream bais = new ByteArrayInputStream(data);
-    copyStream(bais, os);
+    StreamUtils.copyStream(bais, os);
     bais.close();
   }
 
@@ -468,10 +482,7 @@ public final class FileUtils
   {
     ByteArrayInputStream bais = new ByteArrayInputStream(data);
     OutputStream os = new BufferedOutputStream(new FileOutputStream(path));
-    copyStream(bais, os);
-    bais.close();
-    os.flush();
-    os.close();
+    StreamUtils.copyStream(bais, os);
   }
 
   /**

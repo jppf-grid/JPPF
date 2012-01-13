@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 
 import org.jppf.node.NodeRunner;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -181,7 +182,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
         InputStream is = cl.getResourceAsStream(resName);
         try
         {
-          byte[] definition = FileUtils.getInputStreamAsByte(is);
+          byte[] definition = StreamUtils.getInputStreamAsByte(is);
           c = defineClass(name, definition, 0, definition.length);
         }
         catch(Exception e)

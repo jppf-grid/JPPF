@@ -106,7 +106,7 @@ public class IPFilter
    */
   public boolean isAddressAccepted(final InetAddress ip)
   {
-    int[] ipComps = StringUtils.toIntArray(ip);
+    int[] ipComps = NetworkUtils.toIntArray(ip);
     boolean included = matches(ipComps, includePatterns, true);
     boolean excluded = matches(ipComps, excludePatterns, false);
     return included && !excluded;

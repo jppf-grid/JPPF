@@ -27,6 +27,7 @@ import org.jppf.io.ByteBufferInputStream;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -72,7 +73,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public JPPFResourceWrapper deserializeResource() throws Exception
   {
     ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
-    byte[] data = FileUtils.getInputStreamAsByte(bbis);
+    byte[] data = StreamUtils.getInputStreamAsByte(bbis);
     data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
     ObjectSerializer serializer = new ObjectSerializerImpl();
     resource = (JPPFResourceWrapper) serializer.deserialize(data);

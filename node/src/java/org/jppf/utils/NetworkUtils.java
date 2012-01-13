@@ -350,4 +350,36 @@ public final class NetworkUtils
   {
     System.out.println("This host's ip addresses: " + getNonLocalHostAddress());
   }
+
+  /**
+   * Convert an IP address int array.
+   * @param addr the source address to convert.
+   * @return an array of int values, or null if the source could not be parsed.
+   */
+  public static int[] toIntArray(final InetAddress addr)
+  {
+    try
+    {
+      byte[] bytes = addr.getAddress();
+      String ip = addr.getHostAddress();
+      int[] result = null;
+      if (addr instanceof Inet6Address)
+      {
+        result = new int[8];
+        String[] comp = ip.split(":");
+        for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
+      }
+      else
+      {
+        result = new int[4];
+        String[] comp = ip.split("\\.");
+        for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
+      }
+      return result;
+    }
+    catch (Exception e)
+    {
+      return null;
+    }
+  }
 }

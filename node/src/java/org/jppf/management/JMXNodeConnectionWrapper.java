@@ -53,12 +53,12 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * Cancel the execution of the tasks with the specified id.
    * @param id the id of the tasks to cancel.
    * @throws Exception if an error occurs while invoking the Node MBean.
+   * @deprecated this method does not do anything.
    * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
    */
   @Override
   public void cancelTask(final String id) throws Exception
   {
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "cancelTask",	new Object[] { id }, new String[] { "java.lang.String" });
   }
 
   /**
@@ -66,12 +66,12 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * The task(s) will be restarted even if their execution has already completed.
    * @param id the id of the task or tasks to restart.
    * @throws Exception if an error occurs while invoking the Node MBean.
+   * @deprecated this method does not do anything.
    * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
    */
   @Override
   public void restartTask(final String id) throws Exception
   {
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "restartTask", new Object[] { id }, new String[] { "java.lang.String" });
   }
 
   /**
@@ -197,15 +197,15 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 
   /**
    * Cancel the job with the specified id.
-   * @param jobId the id of the job to cancel.
+   * @param jobUuid the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
    * @throws Exception if any error occurs.
    * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)
    */
   @Override
-  public void cancelJob(final String jobId, final Boolean requeue) throws Exception
+  public void cancelJob(final String jobUuid, final Boolean requeue) throws Exception
   {
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] { jobId, requeue }, new String[] { "java.util.String", "java.util.Boolean" });
+    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
   }
 
   /**

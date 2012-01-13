@@ -38,6 +38,14 @@ public final class GuiUtils
    * Precompiled pattern for searching line breaks in a string.
    */
   private static final Pattern TOOLTIP_PATTERN = Pattern.compile("\\n");
+  /**
+   * Keywords to look for and replace in the legend items of the charts.
+   */
+  private static final String[] KEYWORDS = { "Execution", "Maximum", "Minimum", "Average", "Cumulated" };
+  /**
+   * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
+   */
+  private static final String[] REPLACEMENTS = { "Exec", "Max", "Min", "Avg", "Cumul" };
 
   /**
    * Create a chartPanel with a box layout with the specified orientation.
@@ -124,5 +132,20 @@ public final class GuiUtils
   {
     Component tmp = SwingUtilities.getRoot(comp);
     return (tmp instanceof Frame) ? (Frame) tmp : null;
+  }
+
+  /**
+   * Replace pre-determined keywords in a string, with shorter ones.
+   * @param key the string to shorten.
+   * @return the string with its keywords replaced.
+   */
+  public static String shortenLabel(final String key)
+  {
+    String result = key;
+    for (int i=0; i<KEYWORDS.length; i++)
+    {
+      if (result.contains(KEYWORDS[i])) result = result.replace(KEYWORDS[i], REPLACEMENTS[i]);
+    }
+    return result;
   }
 }

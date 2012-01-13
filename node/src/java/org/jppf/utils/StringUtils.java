@@ -35,14 +35,6 @@ public final class StringUtils
    */
   //private static Logger log = LoggerFactory.getLogger(StringUtils.class);
   /**
-   * Keywords to look for and replace in the legend items of the charts.
-   */
-  private static final String[] KEYWORDS = { "Execution", "Maximum", "Minimum", "Average", "Cumulated" };
-  /**
-   * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
-   */
-  private static final String[] REPLACEMENTS = { "Exec", "Max", "Min", "Avg", "Cumul" };
-  /**
    * Charset instance for UTF-8 encoding.
    */
   public static final Charset UTF_8 = makeUTF8();
@@ -58,6 +50,10 @@ public final class StringUtils
    * Constant for an empty array of URLs.
    */
   public static final URL[] ZERO_URL = new URL[0];
+  /**
+   * An array of char containing the hex digits in ascending order.
+   */
+  private static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
   /**
    * Instantiation of this class is not permitted.
@@ -80,7 +76,6 @@ public final class StringUtils
     StringBuilder sb = new StringBuilder();
     String src = (source == null) ? "" : source;
     int length = src.length();
-    //if (length > maxLen) sb.append(source, length-maxLen, maxLen);
     if (length > maxLen) return source;
     else
     {
@@ -111,44 +106,38 @@ public final class StringUtils
   }
 
   /**
-   * An array of char containing the hex digits in ascending order.
+   * Convert an array of bytes into a string of hexadecimal numbers.<br>
+   * @param bytes the array that contains the sequence of byte values to convert.
+   * @return the converted bytes as a string of space-separated hexadecimal numbers.
    */
-  private static char[] hexDigits =
-  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+  public static String toHexString(final byte[] bytes)
+  {
+    return toHexString(bytes, 0, bytes.length, null);
+  }
+
   /**
-   * Convert a part of an array of bytes, into a string of space-separated hexadecimal numbers.<br>
-   * This method is proposed as a convenience for debugging purposes.
+   * Convert a part of an array of bytes, into a string of hexadecimal numbers.
+   * The hex numbers may or may not be separated, depending on the value of the <code>sep</code> parameter.<br>
    * @param bytes the array that contains the sequence of byte values to convert.
    * @param start the index to start at in the byte array.
    * @param length the number of bytes to convert in the array.
+   * @param sep the separator between hexadecimal numbers in the resulting string. If null, then no separator is used.
    * @return the converted bytes as a string of space-separated hexadecimal numbers.
    */
-  public static String dumpBytes(final byte[] bytes, final int start, final int length)
+  public static String toHexString(final byte[] bytes, final int start, final int length, final String sep)
   {
     StringBuilder sb = new StringBuilder();
     if (length >= 0)
     {
+      boolean sepNotNull = sep != null;
       for (int i=start; i<Math.min(bytes.length, start+length); i++)
       {
-        if (i > start) sb.append(' ');
-        sb.append(toHexString(bytes[i]));
+        if (sepNotNull && (i > start)) sb.append(sep);
+        byte b = bytes[i];
+        sb.append(HEX_DIGITS[(b & 0xF0) >> 4]);
+        sb.append(HEX_DIGITS[b & 0x0F]);
       }
     }
-    return sb.toString();
-  }
-
-  /**
-   * Convert a byte value into a 2-digits hexadecimal value. The first digit is 0 if the value is less than 16.<br>
-   * If a value is negative, its 2-complement value is converted, otherwise the value itself is converted.
-   * @param b the byte value to convert.
-   * @return a string containing the 2-digit hexadecimal representation of the byte value.
-   */
-  public static String toHexString(final byte b)
-  {
-    int n = (b < 0) ? b + 256 : b;
-    StringBuilder sb = new StringBuilder();
-    sb.append(hexDigits[n / 16]);
-    sb.append(hexDigits[n % 16]);
     return sb.toString();
   }
 
@@ -190,21 +179,6 @@ public final class StringUtils
   }
 
   /**
-   * Replace pre-determined keywords in a string, with shorter ones.
-   * @param key the string to shorten.
-   * @return the string with its keywords replaced.
-   */
-  public static String shortenLabel(final String key)
-  {
-    String result = key;
-    for (int i=0; i<KEYWORDS.length; i++)
-    {
-      if (result.contains(KEYWORDS[i])) result = result.replace(KEYWORDS[i], REPLACEMENTS[i]);
-    }
-    return result;
-  }
-
-  /**
    * Returns the IP address of the remote host for a socket channel.
    * @param channel the channel to get the host from.
    * @return an IP address as a string.
@@ -219,15 +193,9 @@ public final class StringUtils
         Socket s = ((SocketChannel)channel).socket();
         sb.append(getRemoteHost(s.getRemoteSocketAddress()));
       }
-      else
-      {
-        sb.append("[channel closed]");
-      }
+      else sb.append("[channel closed]");
     }
-    else
-    {
-      sb.append("[JVM-local]");
-    }
+    else sb.append("[JVM-local]");
     return sb.toString();
   }
 
@@ -239,14 +207,12 @@ public final class StringUtils
   public static String getRemoteHost(final SocketAddress address)
   {
     StringBuilder sb = new StringBuilder();
-    //sb.append("[");
     if (address instanceof InetSocketAddress)
     {
       InetSocketAddress add = (InetSocketAddress) address;
       sb.append(add.getHostName()).append(':').append(add.getPort());
     }
     else sb.append("socket address type not handled: ").append(address);
-    //sb.append("]");
     return sb.toString();
   }
 
@@ -329,27 +295,6 @@ public final class StringUtils
   }
 
   /**
-   * Parse a host:port string into a pair made of a host string and an integer port.
-   * @param s a host:port string.
-   * @return a <code>Pair&lt;String, Integer&gt;</code> instance.
-   */
-  public static HostPort parseHostPort(final String s)
-  {
-    String[] comps = s.split(":");
-    int port = -1;
-    try
-    {
-      port = Integer.valueOf(comps[1].trim());
-    }
-    catch(NumberFormatException e)
-    {
-      //log.error("invalid port number format: " + comps[1]);
-      return null;
-    }
-    return new HostPort(comps[0], port);
-  }
-
-  /**
    * Build a string made of the specified tokens.
    * @param args the tokens composing the string.
    * @return the concatenation of the string values of the tokens.
@@ -400,38 +345,6 @@ public final class StringUtils
       if (s.equals(s2)) return true;
     }
     return false;
-  }
-
-  /**
-   * Convert an IP address int array.
-   * @param addr the source address to convert.
-   * @return an array of int values, or null if the source could not be parsed.
-   */
-  public static int[] toIntArray(final InetAddress addr)
-  {
-    try
-    {
-      byte[] bytes = addr.getAddress();
-      String ip = addr.getHostAddress();
-      int[] result = null;
-      if (addr instanceof Inet6Address)
-      {
-        result = new int[8];
-        String[] comp = ip.split(":");
-        for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
-      }
-      else
-      {
-        result = new int[4];
-        String[] comp = ip.split("\\.");
-        for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
-      }
-      return result;
-    }
-    catch (Exception e)
-    {
-      return null;
-    }
   }
 
   /**

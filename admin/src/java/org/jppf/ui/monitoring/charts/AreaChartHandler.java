@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Instances of this class are used to create and update 3D bar charts with a horizontal orientation.
@@ -163,7 +163,7 @@ public class AreaChartHandler implements ChartHandler
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
     {
       Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getRowKey", args[1]);
-      return StringUtils.shortenLabel(key.toString());
+      return GuiUtils.shortenLabel(key.toString());
     }
   }
 }

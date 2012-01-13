@@ -26,6 +26,7 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -241,14 +242,7 @@ public final class PermissionsFactory
     }
     finally
     {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch(Exception ignored){}
-      }
+      StreamUtils.closeSilent(reader);
     }
   }
 

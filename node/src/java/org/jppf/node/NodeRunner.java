@@ -359,7 +359,8 @@ public class NodeRunner
   public static void shutdown(final Node node, final boolean restart)
   {
     //node.stopNode(true);
-    executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);
+    //executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);
+    new ShutdownOrRestart(restart).run();
   }
 
   /**

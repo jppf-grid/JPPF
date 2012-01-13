@@ -81,7 +81,7 @@ class Deserializer
         || (buf[1] != Serializer.HEADER[1])
         || (buf[2] != Serializer.HEADER[2])
         || (buf[3] != Serializer.HEADER[3]))
-      throw new IOException("bad header: " + StringUtils.dumpBytes(buf, 0, 4));
+      throw new IOException("bad header: " + StringUtils.toHexString(buf, 0, 4, " "));
   }
 
   /**

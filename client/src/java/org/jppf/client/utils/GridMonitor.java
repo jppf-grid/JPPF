@@ -353,14 +353,20 @@ public class GridMonitor
       {
         // create a file for each node, named node-x.csv
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, "node-" + nodeCount + ".csv")));
-        // write the node name or ip
-        writer.write("node:," + entry.getKey() + '\n');
-        // write the column names
-        writer.write(NodeData.getHeader() + '\n');
-        // write each snapshot as a CSV-formatted row
-        for (NodeData data: entry.getValue()) writer.write(data.toCSV() + '\n');
-        writer.flush();
-        writer.close();
+        try
+        {
+          // write the node name or ip
+          writer.write("node:," + entry.getKey() + '\n');
+          // write the column names
+          writer.write(NodeData.getHeader() + '\n');
+          // write each snapshot as a CSV-formatted row
+          for (NodeData data: entry.getValue()) writer.write(data.toCSV() + '\n');
+          writer.flush();
+        }
+        finally
+        {
+          writer.close();
+        }
         nodeCount++;
       }
     }

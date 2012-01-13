@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -85,7 +86,7 @@ public class ResourceProvider
       if (is != null)
       {
         if (debugEnabled) log.debug("resource [" + resName + "] found");
-        return FileUtils.getInputStreamAsByte(is);
+        return StreamUtils.getInputStreamAsByte(is);
       }
     }
     catch (Exception e)
@@ -132,7 +133,7 @@ public class ResourceProvider
       if (is != null)
       {
         if (debugEnabled) log.debug("resource [" + resName + "] found");
-        return FileUtils.getInputStreamAsByte(is);
+        return StreamUtils.getInputStreamAsByte(is);
       }
     }
     catch(Exception e)
@@ -205,7 +206,7 @@ public class ResourceProvider
         {
           URL url = urlEnum.nextElement();
           InputStream is = url.openStream();
-          byte[] b = FileUtils.getInputStreamAsByte(is);
+          byte[] b = StreamUtils.getInputStreamAsByte(is);
           result.add(b);
         }
       }

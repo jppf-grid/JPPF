@@ -91,9 +91,9 @@ public class CryptoUtils
     PrivateKey privateKey = pair.getPrivate();
     PublicKey publicKey = pair.getPublic();
     byte[] bytes = privateKey.getEncoded();
-    System.out.println("Private key: "+StringUtils.dumpBytes(bytes, 0, bytes.length));
+    System.out.println("Private key: " + StringUtils.toHexString(bytes, 0, bytes.length, " "));
     bytes = publicKey.getEncoded();
-    System.out.println("Public key: "+StringUtils.dumpBytes(bytes, 0, bytes.length));
+    System.out.println("Public key: " + StringUtils.toHexString(bytes, 0, bytes.length, " "));
     return pair;
   }
 
@@ -117,9 +117,9 @@ public class CryptoUtils
     PrivateKey privateKey = pair.getPrivate();
     PublicKey publicKey = pair.getPublic();
     byte[] bytes = privateKey.getEncoded();
-    System.out.println("Private DH key: "+StringUtils.dumpBytes(bytes, 0, bytes.length));
+    System.out.println("Private DH key: " + StringUtils.toHexString(bytes, 0, bytes.length, " "));
     bytes = publicKey.getEncoded();
-    System.out.println("Public DH key: "+StringUtils.dumpBytes(bytes, 0, bytes.length));
+    System.out.println("Public DH key: " + StringUtils.toHexString(bytes, 0, bytes.length, " "));
     return pair;
   }
 

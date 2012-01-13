@@ -69,8 +69,8 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 
   /**
    * Serialize an object into an output stream.
-   * @param o - the object to Serialize.
-   * @param os - the output stream to serialize to.
+   * @param o the object to Serialize.
+   * @param os the output stream to serialize to.
    * @throws Exception if the object can't be serialized.
    * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
    */
@@ -78,9 +78,15 @@ public class BootstrapObjectSerializer implements ObjectSerializer
   public void serialize(final Object o, final OutputStream os) throws Exception
   {
     ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
-    oos.writeObject(o);
-    oos.flush();
-    oos.close();
+    try
+    {
+      oos.writeObject(o);
+      oos.flush();
+    }
+    finally
+    {
+      oos.close();
+    }
   }
 
   /**
@@ -126,7 +132,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
 
   /**
    * Read an object from an input stream.
-   * @param is - the input stream to deserialize from.
+   * @param is the input stream to deserialize from.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
    * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
@@ -136,8 +142,14 @@ public class BootstrapObjectSerializer implements ObjectSerializer
   {
     Object o = null;
     ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-    o = ois.readObject();
-    ois.close();
+    try
+    {
+      o = ois.readObject();
+    }
+    finally
+    {
+      ois.close();
+    }
     return o;
   }
 }

@@ -289,8 +289,8 @@ public class SocketChannelClient implements SocketWrapper
   {
     if (opened)
     {
-      channel.close();
       opened = false;
+      channel.close();
     }
   }
 

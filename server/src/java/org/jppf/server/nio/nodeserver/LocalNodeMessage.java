@@ -42,7 +42,7 @@ public class LocalNodeMessage extends AbstractNodeMessage
     byte[] data = null;
     try
     {
-      data = FileUtils.getInputStreamAsByte(is);
+      data = StreamUtils.getInputStreamAsByte(is);
     }
     finally
     {

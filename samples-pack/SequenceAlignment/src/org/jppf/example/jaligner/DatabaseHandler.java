@@ -21,6 +21,8 @@ package org.jppf.example.jaligner;
 import java.io.*;
 import java.nio.charset.Charset;
 
+import org.jppf.utils.streams.StreamUtils;
+
 /**
  * This class is used to optimize the performance of reading sequences in a sequence database.
  * It generates a file that contains the length of each sequence to read, in the same order
@@ -85,8 +87,8 @@ public class DatabaseHandler
     catch(EOFException e)
     {
       eof = true;
-      dis.close();
-      reader.close();
+      StreamUtils.closeSilent(dis);
+      StreamUtils.closeSilent(reader);
       return null;
     }
     if (length > buffSize)
@@ -119,52 +121,58 @@ public class DatabaseHandler
     if (cs == null) cs = Charset.defaultCharset().name();
     Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), cs));
     DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(indexPath)));
-    boolean end = false;
-    int c = reader.read();
     int nbSequences = 0;
-    while (!end)
+    try
     {
-      int length = 0;
-      if (c == '>')
+      boolean end = false;
+      int c = reader.read();
+      while (!end)
       {
-        length++;
-        boolean lineEnd = false;
-        while (!lineEnd)
+        int length = 0;
+        if (c == '>')
         {
-          c = reader.read();
-          if (c == -1)
+          length++;
+          boolean lineEnd = false;
+          while (!lineEnd)
           {
-            lineEnd = true;
-            end = true;
-          }
-          else
-          {
-            length++;
-            if (c == '\n') lineEnd = true;
-          }
-        }
-        boolean sequenceEnd = false;
-        while (!sequenceEnd)
-        {
-          c = reader.read();
-          if ((c == '>') || (c == -1))
-          {
-            sequenceEnd = true;
-            dos.writeInt(length);
-            nbSequences++;
-            //if (nbSequences % 100 == 0) System.out.println("indexed "+nbSequences+" sequences");
+            c = reader.read();
             if (c == -1)
             {
+              lineEnd = true;
               end = true;
             }
+            else
+            {
+              length++;
+              if (c == '\n') lineEnd = true;
+            }
           }
-          else length++;
+          boolean sequenceEnd = false;
+          while (!sequenceEnd)
+          {
+            c = reader.read();
+            if ((c == '>') || (c == -1))
+            {
+              sequenceEnd = true;
+              dos.writeInt(length);
+              nbSequences++;
+              //if (nbSequences % 100 == 0) System.out.println("indexed "+nbSequences+" sequences");
+              if (c == -1)
+              {
+                end = true;
+              }
+            }
+            else length++;
+          }
         }
       }
+      dos.flush();
     }
-    dos.flush();
-    dos.close();
-    reader.close();
+    finally
+    {
+      dos.close();
+      reader.close();
+    }
     return nbSequences;
   }
 }

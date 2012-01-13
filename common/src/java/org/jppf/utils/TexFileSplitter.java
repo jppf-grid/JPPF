@@ -44,33 +44,51 @@ public class TexFileSplitter
       BufferedReader reader = new BufferedReader(new FileReader(file));
       int lines = 0;
       String s = "";
-      while (s != null)
+      try
       {
-        s = reader.readLine();
-        if (s != null) lines++;
-      }
-      reader.close();
-      System.out.println("counted " + lines  + " lines");
-      reader = new BufferedReader(new FileReader(file));
-      int nbFiles = props.getInt("nbFiles");
-      int n = lines/nbFiles;
-      for (int i=0; i<nbFiles; i++)
-      {
-        int nb = (i < nbFiles - 1) ? n : lines - (nbFiles - 1)*n;
-        s = "";
-        File out = new File(props.getString("outputDir") + '/' + props.getString("prefix") + '-' + i + props.getString("extension"));
-        FileUtils.mkdirs(out);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(out));
-        for (int j=0; j<nb && s != null; j++)
+        while (s != null)
         {
           s = reader.readLine();
-          if (s != null) writer.write(s + '\n');
+          if (s != null) lines++;
         }
-        writer.flush();
-        writer.close();
-        System.out.println("created file '" + out.getName() + '\'');
       }
-      reader.close();
+      finally
+      {
+        reader.close();
+      }
+      System.out.println("counted " + lines  + " lines");
+      reader = new BufferedReader(new FileReader(file));
+      try
+      {
+        int nbFiles = props.getInt("nbFiles");
+        int n = lines/nbFiles;
+        for (int i=0; i<nbFiles; i++)
+        {
+          int nb = (i < nbFiles - 1) ? n : lines - (nbFiles - 1)*n;
+          s = "";
+          File out = new File(props.getString("outputDir") + '/' + props.getString("prefix") + '-' + i + props.getString("extension"));
+          FileUtils.mkdirs(out);
+          BufferedWriter writer = new BufferedWriter(new FileWriter(out));
+          try
+          {
+            for (int j=0; j<nb && s != null; j++)
+            {
+              s = reader.readLine();
+              if (s != null) writer.write(s + '\n');
+            }
+            writer.flush();
+          }
+          finally
+          {
+            writer.close();
+          }
+          System.out.println("created file '" + out.getName() + '\'');
+        }
+      }
+      finally
+      {
+        reader.close();
+      }
       System.out.println("wrote all files");
     }
     catch (Exception e)

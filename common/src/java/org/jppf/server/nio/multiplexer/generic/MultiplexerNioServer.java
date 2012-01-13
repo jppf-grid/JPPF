@@ -111,7 +111,7 @@ public class MultiplexerNioServer extends NioServer<MultiplexerState, Multiplexe
       {
         remoteMultiplexers.add(name);
         s = props.getString("remote.multiplexer." + name);
-        if (s != null) remoteMultiplexerMap.put(name, StringUtils.parseHostPort(s));
+        if (s != null) remoteMultiplexerMap.put(name, new HostPort(s));
       }
       s = props.getString("bound.ports");
       if (s == null) return;

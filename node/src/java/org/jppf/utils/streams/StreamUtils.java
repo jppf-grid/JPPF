@@ -37,33 +37,42 @@ public final class StreamUtils
   }
 
   /**
-   * Attempt to close the specified input stream without logging an eventual error.
-   * @param is the input stream to close.
-   * @throws IOException if any error occurs while closing the stream.
+   * Attempt to close the specified closeable without logging an eventual error.
+   * @param closeable the closeable to close.
+   * @throws IOException if any error occurs while closing the closeable.
    */
-  public static void close(final InputStream is) throws IOException
+  public static void close(final Closeable closeable) throws IOException
   {
-    is.close();
+    closeable.close();
   }
 
   /**
-   * Attempt to close the specified input stream and log any eventual error.
-   * @param is the input stream to close.
+   * Attempt to silently close (no exception logging) the specified closeable.
+   * @param closeable the closeable to close.
+   */
+  public static void closeSilent(final Closeable closeable)
+  {
+    close(closeable, null);
+  }
+
+  /**
+   * Attempt to close the specified closeable and log any eventual error.
+   * @param closeable the closeable to close.
    * @param log the logger to use; if null no logging occurs.
    */
-  public static void close(final InputStream is, final Logger log)
+  public static void close(final Closeable closeable, final Logger log)
   {
-    if (is != null)
+    if (closeable != null)
     {
       try
       {
-        is.close();
+        closeable.close();
       }
-      catch (Exception e)
+      catch (IOException e)
       {
         if (log != null)
         {
-          String s = "unable to close input stream: " + ExceptionUtils.getMessage(e);
+          String s = "unable to close stream/reader/writer: " + ExceptionUtils.getMessage(e);
           if (log.isDebugEnabled()) log.debug(s, e);
           else log.warn(s);
         }
@@ -72,35 +81,72 @@ public final class StreamUtils
   }
 
   /**
-   * Attempt to close the specified output stream without logging an eventual error.
-   * @param os the output stream to close.
-   * @throws IOException if any error occurs while closing the stream.
+   * Get the content of an input stream as an array of bytes.
+   * This method closes the input stream before terminating.
+   * @param is the input stream to read from.
+   * @return a byte array.
+   * @throws IOException if an IO error occurs.
    */
-  public static void close(final OutputStream os) throws IOException
+  public static byte[] getInputStreamAsByte(final InputStream is) throws IOException
   {
-    os.close();
-  }
-
-  /**
-   * Attempt to close the specified output stream and log any eventual error.
-   * @param os the output stream to close.
-   * @param log the logger to use; if null no logging occurs.
-   */
-  public static void close(final OutputStream os, final Logger log)
-  {
-    if (os != null)
+    byte[] buffer = new byte[StreamConstants.TEMP_BUFFER_SIZE];
+    byte[] result = null;
+    ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
+    boolean end = false;
+    try
+    {
+      while (!end)
+      {
+        int n = is.read(buffer, 0, buffer.length);
+        if (n < 0) end = true;
+        else baos.write(buffer, 0, n);
+      }
+      baos.flush();
+      result = baos.toByteArray();
+    }
+    finally
     {
       try
       {
-        os.close();
+        is.close();
       }
-      catch (Exception e)
+      finally
       {
-        if (log != null)
-        {
-          if (log.isDebugEnabled()) log.debug("unable to close output stream", e);
-          else log.warn("unable to close output stream: " + e.getClass().getName() + ": " + e.getMessage());
-        }
+        baos.close();
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Copy the data read from the specified input stream to the specified output stream.
+   * This method closes both streams before terminating.
+   * @param is the input stream to read from.
+   * @param os the output stream to write to.
+   * @throws IOException if an I/O error occurs.
+   */
+  public static void copyStream(final InputStream is, final OutputStream os) throws IOException
+  {
+    try
+    {
+      byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
+      while(true)
+      {
+        int n = is.read(bytes);
+        if (n <= 0) break;
+        os.write(bytes, 0, n);
+      }
+      os.flush();
+    }
+    finally
+    {
+      try
+      {
+        is.close();
+      }
+      finally
+      {
+        os.close();
       }
     }
   }

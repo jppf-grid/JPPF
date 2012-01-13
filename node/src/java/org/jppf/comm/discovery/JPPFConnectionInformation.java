@@ -148,8 +148,15 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   public static JPPFConnectionInformation fromBytes(final byte[] bytes) throws Exception
   {
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
-    JPPFConnectionInformation info = (JPPFConnectionInformation) ois.readObject();
-    ois.close();
+    JPPFConnectionInformation info = null;
+    try
+    {
+      info = (JPPFConnectionInformation) ois.readObject();
+    }
+    finally
+    {
+      ois.close();
+    }
     return info;
   }
 
@@ -163,8 +170,15 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    oos.writeObject(info);
-    oos.close();
+    try
+    {
+      oos.writeObject(info);
+      oos.close();
+    }
+    finally
+    {
+      oos.close();
+    }
     return baos.toByteArray();
   }
 }

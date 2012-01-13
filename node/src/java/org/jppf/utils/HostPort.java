@@ -35,6 +35,46 @@ public class HostPort extends Pair<String, Integer>
   }
 
   /**
+   * Parse a host:port string into a pair made of a host string and an integer port.
+   * This constructor handles IPv6 adresses, in which case the host address must be
+   * enclosed within "[...]", giving the format [ipv6_address]:port.
+   * @param source a host:port string.
+   */
+  public HostPort(final String source)
+  {
+    String s = source.trim();
+    if (s.startsWith("["))
+    {
+      int idx = s.indexOf("]");
+      this.first = s.substring(1, idx);
+      int port = -1;
+      try
+      {
+        s = s.substring(idx + 2);
+        port = Integer.valueOf(s);
+      }
+      catch(NumberFormatException ignore)
+      {
+      }
+      this.second = port;
+    }
+    else
+    {
+      String[] comps = s.split(":");
+      this.first = comps[0];
+      int port = -1;
+      try
+      {
+        port = Integer.valueOf(comps[1].trim());
+      }
+      catch(NumberFormatException ignore)
+      {
+      }
+      this.second = port;
+    }
+  }
+
+  /**
    * Get the host name.
    * @return the host as a string.
    */

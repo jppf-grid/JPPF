@@ -21,7 +21,7 @@ package org.jppf.data.transform;
 import java.io.*;
 
 import org.jppf.utils.*;
-import org.jppf.utils.streams.MultipleBuffersOutputStream;
+import org.jppf.utils.streams.*;
 import org.slf4j.*;
 
 /**
@@ -144,7 +144,7 @@ public class JPPFDataTransformFactory
   public static byte[] transform(final boolean normal, final InputStream is) throws Exception
   {
     JPPFDataTransform dataTransform = createInstance();
-    if (dataTransform == null) return FileUtils.getInputStreamAsByte(is);
+    if (dataTransform == null) return StreamUtils.getInputStreamAsByte(is);
     MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
     if (normal) dataTransform.wrap(is, mbos);
     else dataTransform.unwrap(is, mbos);

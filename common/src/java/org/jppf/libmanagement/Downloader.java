@@ -23,6 +23,7 @@ import java.util.zip.*;
 
 import org.jppf.server.protocol.*;
 import org.jppf.utils.FileUtils;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * 
@@ -111,10 +112,7 @@ public class Downloader
         InputStream is = zip.getInputStream(entry);
         File f = new File("lib/" + name);
         OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-        FileUtils.copyStream(is, os);
-        is.close();
-        os.flush();
-        os.close();
+        StreamUtils.copyStream(is, os);
         System.out.println("extracted " + entry.getName() + " to " + f);
       }
       if (l != null) source.removeLocationEventListener(l);

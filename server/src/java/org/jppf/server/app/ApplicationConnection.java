@@ -121,7 +121,7 @@ class ApplicationConnection extends JPPFConnection
     byte[] data;
     try
     {
-      data = FileUtils.getInputStreamAsByte(is);
+      data = StreamUtils.getInputStreamAsByte(is);
     }
     finally
     {
