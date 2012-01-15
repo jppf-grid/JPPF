@@ -21,7 +21,8 @@ package org.jppf.example.extendedclassloading.client;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * 
+ * A simple {@link JPPFTask} implementation which demonstrates
+ * the use of classes downloaded via the library repository management facility.
  * @author Laurent Cohen
  */
 public class MyTask extends JPPFTask
@@ -36,7 +37,6 @@ public class MyTask extends JPPFTask
     {
       // we use the fully qualified name of the class to avoid having an import statement,
       // otherwise, this would cause a NoClassDefFoundError when loading this class
-      // MyServerDynamicClass was added to the classpath by the node startup
       new org.jppf.example.extendedclassloading.clientlib1.MyClientDynamicClass1().printHello();
       new org.jppf.example.extendedclassloading.clientlib2.MyClientDynamicClass2().printHello();
       setResult("Successful execution");

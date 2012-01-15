@@ -26,6 +26,7 @@
 
 	<target name="samples.pack" description="Generate the packaging for the samples pack"
 		depends="init, build" if="samples.pack.present">
+		<!-- Copy the JPPF jars to the shared/lib directory -->
 		<copy todir="${samples-pack}/shared/lib">
 			<fileset dir="${build}">
 				<include name="jppf-common-node.jar"/>
@@ -35,13 +36,17 @@
 				<include name="jppf-server.jar"/>
 			</fileset>
 		</copy>
+		<!-- Convert sources to HTML and include them in the designated samples -->
 		<antcall target="include.code"><param name="sample" value="CustomLoadBalancer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
+		<antcall target="include.code"><param name="sample" value="ExtendedClassLoading"/></antcall>
 		<antcall target="include.code"><param name="sample" value="FTPServer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="IdleSystem"/></antcall>
+		<antcall target="include.code"><param name="sample" value="InitializationHook"/></antcall>
 		<antcall target="include.code"><param name="sample" value="JobRecovery"/></antcall>
 		<antcall target="include.code"><param name="sample" value="NodeLifeCycle"/></antcall>
 		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
+		<!-- Generate the samples pack zip file -->
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
 		<delete file="samples.pack.file" quiet="true"/>
@@ -59,6 +64,7 @@
 				<include name="jppf-server-src.jar"/>
 			</zipfileset>
 		</zip>
+		<!-- Clean up and add the samples pack sources to the proper web site folder -->
     <delete dir="${home}/samples-pack" quiet="true"/>
  		<mkdir dir="${home}/samples-pack"/>
 		<copy todir="${home}/samples-pack">
@@ -67,6 +73,7 @@
 				<exclude name="**/package.html"/>
 				<exclude name="**/Readme.html"/>
 				<include name="CustomLoadBalancer/**/*.properties"/>
+				<include name="InitializationHook/**/*.properties"/>
 				<include name="NodeLifeCycle/config/jppf-client.properties"/>
 				<exclude name="**/classes/**/*.*"/>
 				<include name="shared/images/*.*"/>
@@ -75,16 +82,11 @@
 				<include name="Nbody/images/*.gif"/>
 			</fileset>
 		</copy>
-		<move file="${home}/samples-pack/samples-pack-Readme.html" tofile="${home}/samples-pack/index.html"/>
-		<delete><fileset dir="${samples-pack}/CustomLoadBalancer" includes="**/*.java.html"/></delete>
-		<delete><fileset dir="${samples-pack}/DataEncryption" includes="**/*.java.html, **/services/*.html"/></delete>
-		<delete><fileset dir="${samples-pack}/FTPServer" includes="**/*.java.html, **/services/*.html"/></delete>
-		<delete><fileset dir="${samples-pack}/IdleSystem" includes="**/*.java.html, **/services/*.html"/></delete>
-		<delete><fileset dir="${samples-pack}/JobRecovery" includes="**/*.java.html, **/services/*.html"/></delete>
-		<delete><fileset dir="${samples-pack}/NodeLifeCycle" includes="**/*.java.html, **/services/*.html"/></delete>
-		<delete><fileset dir="${samples-pack}/TaskNotifications" includes="**/*.java.html, **/services/*.html"/></delete>
+		<!-- remove HTML-converted files after the zip is created -->
+		<delete><fileset dir="${samples-pack}" includes="**/*.java.html"/></delete>
   </target>
 
+	<!-- Convert source files to HTML -->
 	<target name="include.code">
 		<java2html srcdir="${samples-pack}/${sample}" destdir="${samples-pack}/${sample}" includes="**/*.java"
 			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>

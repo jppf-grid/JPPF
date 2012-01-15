@@ -25,6 +25,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 	<li><a href="NodeConnectionEvents/Readme.php">How to receive notifications of nodes connecting and disconnecting on the server</a></li>
 	<li><a href="JobRecovery/Readme.php">Job recovery after an application crash</a></li>
 	<li><a href="InitializationHook/Readme.php">Using a node initialization hook to implement a sophisticated failover mechanism</a></li>
+	<li><a href="ExtendedClassLoading/Readme.php">Using the JPPF class loading extensions to automate the deployment and management of application libraries in the nodes at runtime</a></li>
 </ul>
 <br>
 

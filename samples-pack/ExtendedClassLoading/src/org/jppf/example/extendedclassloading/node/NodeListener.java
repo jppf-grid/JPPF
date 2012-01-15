@@ -58,8 +58,8 @@ public class NodeListener implements NodeLifeCycleListener
   /**
    * Perform library management upon connection to the server:
    * <ul>
-   * <li>- delete the libraries listed in the "toDelete" file, and updae the file accordingly</li>
-   * <li>- add the libraries listed in the index file to the class path of the current class loader (server class laoder)</li>
+   * <li> delete the libraries listed in the "toDelete" file, and updae the file accordingly</li>
+   * <li> add the libraries listed in the index file to the class path of the current class loader (server class laoder)</li>
    * </ul>
    * {@inheritDoc}
    */
@@ -108,6 +108,7 @@ public class NodeListener implements NodeLifeCycleListener
    * {@inheritDoc}
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void jobStarting(final NodeLifeCycleEvent event)
   {
     JPPFDistributedJob job = event.getJob();
@@ -152,14 +153,14 @@ public class NodeListener implements NodeLifeCycleListener
   }
 
   /**
-   * Perform the specified librariy updates.
+   * Perform the specified library updates.
    * @param updates a mapping of libraries to update or add to the classpath to their corresponding MD5 signature.
    * @param tasks the tasks from which to obtain the client class loader.
    * @return the number of libraries that were actually updated or added.
    */
   private int doUpdates(final Map<String, String> updates, final List<Task> tasks)
   {
-    // filter out libraries with matching signature: they don't to be updated
+    // filter out libraries with matching signature: they don't need to be updated
     List<String> libsToUpdate = libraryManager.computeUpdatesList(updates);
     // process new and updated libraries
     if (libsToUpdate.isEmpty()) output("  no library updates found");

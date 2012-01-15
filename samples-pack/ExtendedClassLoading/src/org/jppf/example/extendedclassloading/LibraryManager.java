@@ -269,11 +269,10 @@ public class LibraryManager
   {
     try
     {
-      String[] resourceNames = new String[updates.size()];
       // compute the path for each lib on the client side
       // we assume the folder where the libs are located is in the client's classpath
       // this means the libs should be in the client's classpath root
-      for (int i=0; i<resourceNames.length; i++) resourceNames[i] = updates.get(i);
+      String[] resourceNames = updates.toArray(new String[updates.size()]);
       // download the libraries all at once, in a single network transaction
       // they will be saved to the temporary resource cache
       URL[] urls = cl.getMultipleResources(resourceNames);

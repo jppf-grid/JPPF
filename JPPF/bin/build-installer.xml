@@ -42,17 +42,9 @@
 		<property name="installer.url" value="${url}"/>
 		<delete file="${install.file}.jar" quiet="true"/>
 		<mkdir dir="${install.prefix}"/>
-		<unzip src="${install.prefix}-full-src.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-driver.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-node.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-admin-ui.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-application-template.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-User-Guide.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-api.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-samples-pack.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-j2ee-connector.zip" dest="${install.prefix}"/>
-		<unzip src="${install.prefix}-GigaSpaces.zip" dest="${install.prefix}"/>
-		<!--<unzip src="${install.prefix}-multiplexer.zip" dest="${install.prefix}"/>-->
+		<echo message="unzipping all files"/>
+		<!-- Unzip all packages for use by the web installer generator -->
+		<unzip dest="${install.prefix}"><fileset dir="${build}" includes="${app.ver}-*.zip"/></unzip>
 
 		<!-- Generate offline installer -->
 		<!--
@@ -69,8 +61,7 @@
 		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
 		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
 
-		<!-- Sign the web installer jar -->
-		<!--	<exec executable="c:/jdk1.5.0/bin/jarsigner.exe">-->
+		<!-- Sign the web installer jars for use with JNLP -->
 		<echo message="java.home = ${java.home}"/>
 		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">
 			<contains string="${java.home}" substring="jre" casesensitive="false"/>
@@ -87,6 +78,7 @@
 			<arg value="jppf"/>
 		</exec>
 
+		<!-- Delete all unzipped file (can take a long time) -->
 		<delete dir="${install.prefix}" quiet="true"/>
 	</target>
 

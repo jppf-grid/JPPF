@@ -73,7 +73,7 @@ public class MyRunner
       // force the loading of the "index.txt" file
       libraryManager.getIndex();
       // this index represents the actual current content of the libs repository
-      currentIndex = loadCurrentIndex();
+      currentIndex = scanRepository();
 
       client = new JPPFClient();
       JPPFJob job = new JPPFJob();
@@ -111,35 +111,43 @@ public class MyRunner
   }
 
   /**
-   * Set the specified job metadata so the library management
-   * can take place properly in the nodes.
+   * Set the specified job metadata so the library management can take place properly in the nodes.
    * @param job the job on which to set the metatdata.
    */
   public static void computeJobMetadata(final JPPFJob job)
   {
     JobMetadata metadata = job.getMetadata();
-    if (currentIndex == null) currentIndex = loadCurrentIndex();
+    if (currentIndex == null) currentIndex = scanRepository();
+    // compute the list of libraries that were added, changed or deleted since the previous run
     Map<String, String> updates = computeNewAndUpdated(currentIndex);
     List<String> deletes = listDeleted(currentIndex);
     displayRepositoryChanges(updates, deletes);
-    metadata.setParameter(LibraryManager.LIBS_TO_UPDATE, updates);
+    // we send the whole repository index, not just the updates, because nodes may come online
+    // in the grid at anytime and may thus not be up to date
+    metadata.setParameter(LibraryManager.LIBS_TO_UPDATE, currentIndex);
     metadata.setParameter(LibraryManager.LIBS_TO_DELETE, deletes);
-    String s = System.getProperty("restart.node");
-    if (s == null) s = JPPFConfiguration.getProperties().getString("restart.node");
+    // determine whether we want the nodes to be restarted
+    // the flag is first looked up in the system properties, then in the JPPF configuration
+    String s = System.getProperty(LibraryManager.RESTART_NODE_FLAG);
+    if (s == null) s = JPPFConfiguration.getProperties().getString(LibraryManager.RESTART_NODE_FLAG);
     boolean restartNode = (s == null) ? false : Boolean.valueOf(s);
     metadata.setParameter(LibraryManager.RESTART_NODE_FLAG, restartNode);
     output("restart node flag set to " + restartNode);
   }
 
   /**
-   * Fetch the list of libraries currently present and compute their signature.
+   * <p>Fetch the list of libraries currently present and compute their signature.
    * This method performs a scan of the folder where the libraries are stored.
+   * <p>This method should be use with some precautions, as it computes the signature
+   * of each jar file, which can be a time-consuming operation, depending on the file
+   * size and the signature algorithm.
    * @return a map of jar file names associated with their signature.
    */
-  private static synchronized Map<String, String> loadCurrentIndex()
+  private static synchronized Map<String, String> scanRepository()
   {
     Map<String, String> map = new HashMap<String, String>();
     File dir = new File(libraryManager.getLibDir() + '/');
+    // list all the jar files in the repository
     File[] jars = dir.listFiles(new FileFilter()
     {
       @Override
@@ -161,7 +169,7 @@ public class MyRunner
   }
 
   /**
-   * Update the repository index file to the most current state.
+   * Update the repository index file to the most current state and save it to the file system.
    */
   private static void updateRepositoryIndex()
   {

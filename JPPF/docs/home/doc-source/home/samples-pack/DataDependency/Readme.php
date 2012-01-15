@@ -8,7 +8,7 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 
 					<h3>Description of the problem to solve</h3>
 					We have:
-					<ul>
+					<ul class="samplesList">
 						<li>a portfolio, made of a number of trades T<sub>1</sub>, ..., T<sub>n</sub></li>
 						<li>a number of pieces of market data such as stocks or index tickers D<sub>1</sub>, ..., D<sub>p</sub></li>
 						<li>each trade depends on one or several pieces of market data, for instance:<br>
@@ -29,35 +29,35 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 					<p>The application generates and keeps a mapping of the trades to the market data they depend on.
 					<p>The application generates and keeps a mapping of the nodes on which each trade is computed.
 					<p>When a market event occurs, the following happens:
-					<ol>
+					<ol class="samplesList">
 						<li>the nodes and the application are notified</li>
 						<li>the application determines which trades are impacted by the data update</li>
 						<li>the application determines on which nodes these trades will be updated and asynchronously submits a JPPF job for each node</li>
 					</ol>
 					The application can function in 2 distinct modes:
-					<ul style="margin-bottom: 0px">
+					<ul  class="samplesList">
 						<li>event-based mode: trade update jobs are submitted as each event occurs, simulating a "real-time" flow of trade updates.
 								In this mode, one should be careful that updates are performed fast enough, otherwise the jobs queue will keep growing until all resources are consumed.</li>
 						<li>snapshot-based mode: the application simply aggregates the update events and, at regular intervals, submits trade update jobs to the JPPF grid.
 								This mode provides the best overall throughput, but does not allow real-time updates. This is a tradeoff to consider when the market pace is too fast to work in event-based mode.</li>
 					</ul>
 					<p>The implementation relies on the <a href="http://www.hazelcast.com">Hazelcast</a> distributed cache API to store the market data and to distribute the trades among the nodes:
-					<ul style="margin-bottom: 0px">
+					<ul class="samplesList">
 						<li>the market data objects are stored in a Hazelcast distributed map that is accessed by the application and all the nodes</li>
 						<li>the trades are distributed among a number of distinct distributed maps, each of them accessed by the application and a single node only. This constitutes a partitioning of the set of trades according to the nodes</li>
 					</ul>
-					<p>A <a href="http://www.jppf.org/wiki/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> is also used to initialize the Hazelcast data structures in each node at startup time, and provides a convenient API for the tasks to access the distributed data.
+					<p>A <a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> is also used to initialize the Hazelcast data structures in each node at startup time, and provides a convenient API for the tasks to access the distributed data.
 					<p>To make it easy to simulate various scenarios, the application provides a configuration property for most of the the parameters it uses:
 					number of market data pieces, number of trades, number of market data dependencies per trade, interval between ticker events, event vs. snapshot run mode, duration of each trade computation, etc...
 					<p>As all events and resulting job submissions are fully asynchronous, the application relies on a pool of connections to the JPPF driver, rather than on a single connection.
-					See <a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Server_discovery_3">server discovery</a> and
-					<a href="http://www.jppf.org/wiki/index.php?title=Configuration_guide#Manual_network_configuration_2">manual configuration</a> in the JPPF documentation for details on how to do this.
+					See <a href="http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Server_discovery">server discovery</a> and
+					<a href="http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Manual_network_configuration">manual configuration</a> in the JPPF documentation for details on how to do this.
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and one or multiple nodes, perform the following steps:
-					<ol>
+					<ol class="samplesList">
 						<li>build the archive that will contain the libraries to deploy in the JPPF driver's class path: run either the Ant target "<b>zip</b>" which will generate the file "<b>DataDependency.zip</b>",
 						or "<b>tar.gz</b>" which will generate the file "<b>DataDependency.tar.gz</b>"</li>
 						<li>extract the generated archive in the installation folder of the JPPF driver, this will add the files "DataDependency.jar" and "hazelcast-x.y.z.jar" in the "lib" directory. This ensures the nodes will download the startup class and Hazelcast APIs from the server's classpath.</li>
@@ -65,7 +65,7 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 						<li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>
 						<li>find the line containing "<b>jppf.pool.size = value</b>" and update the value as you see fit (server connection pool size)</li>
 						<li>At the end of the file, you will find the configuration of the simulation parameters, for instance:
-<pre style="background: #D8D8D8"><font color="green">#------------------------------------------------------------------------------#</font>
+<pre Class="samples"><font color="green">#------------------------------------------------------------------------------#</font>
 <font color="green">#         Parameters specific to the data dependency application               #</font>
 <font color="green">#------------------------------------------------------------------------------#</font>
 
@@ -117,11 +117,13 @@ snapshotInterval = 3250</pre>
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					Integration with a Hazelcast data grid.<br/>
-					Use of a node startup class to facilitate the integration<br/>
-					Execution policy (to specify on which nodes the trades are computed).<br/>
-					Asynchronous job submissions.<br>
-					Extension of the JPPF configuration to application-specific parameters.<br/>
+					<ul>
+						<li>Integration with a <a href="http://www.hazelcast.com">Hazelcast</a> data grid</li>
+						<li>Use of a <a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> to facilitate the integration</li>
+						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Job_Service_Level_Agreement#Execution_policy">Execution policy</a> (to specify on which nodes the trades are computed)</li>
+						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Dealing_with_jobs#Non-blocking_jobs">Asynchronous job submissions</a></li>
+						<li>Extension of the <a href="http://www.jppf.org/doc/v3/index.php?title=The_JPPF_configuration_API">JPPF configuration</a> to application-specific parameters</li>
+					</ul>
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>DataDependency/src</b> folder.

@@ -40,14 +40,11 @@
 					<p>This sample doesn't have a graphical user interface, however you can modify some of the parameters in the JPPF configuration file:
 					<ol>
 						<li>open the file "<b>config/jppf-client.properties</b>" in a text editor</li>
-						<li>at the end of the file, you will see the following properties:<br><br>
-							<div style="background: #C0C0C0"><tt>
-								<font color="green"># the size of the matrices to multiply</font><br>
-								matrix.size = 300<br>
-								<br>
-								<font color="green"># number of times the matrix multiplication is performed</font><br>
-								matrix.iterations = 100
-							</tt></div><br>
+						<li>at the end of the file, you will see the following properties:
+<pre class="samples"><font color="green"># the size of the matrices to multiply</font>
+matrix.size = 300
+<font color="green"># number of times the matrix multiplication is performed</font>
+matrix.iterations = 100</pre>
 						</li>
 						<li>"<b>matrix.size</b>" allows you to experiment with different sizes of the matrices</li>
 						<li>"<b>matrix.iterations</b>" is the number of times the matrix multiplication will be performed.
