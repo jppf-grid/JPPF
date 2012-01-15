@@ -114,3 +114,8 @@ div.aboutMenuItem { background-color: #6D78B6;}
 	top: -150;
 	left: 0;
 }
+
+ul.samplesList, ul.samplesNestedList { margin-left: 10px; padding-left: 10px; }
+ol.samplesList { margin-left: 15px; padding-left: 10px; }
+ul.samplesNestedList { margin-top: 1px; margin-bottom: 1px; list-style-type: disc }
+pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
