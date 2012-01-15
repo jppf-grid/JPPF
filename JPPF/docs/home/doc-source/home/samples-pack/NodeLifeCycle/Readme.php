@@ -10,7 +10,7 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 					<p>To achieve this, it is natural to use database transactions so we can roll back any database update when the node crashes.
 					One requirement is to know when a transaction should be started and when it should be committed or rolled back.
 					This information will be provided by a listener that receives notifications of the node's life cycle events, as follows:
-					<ul>
+					<ul class="samplesList">
 						<li>when the node is starting: this event triggers a recovery mechanism that rolls back any transaction that was active at the time of a previous node crash. If the node didn't crash, there is no need to recover anything</li>
 						<li>when the node is terminated: here we are talking about a "clean" termination of the node, via the management APIs or the JPPF admin console. In this case, any active transaction is immediately rolled back before the node terminates</li>
 						<li>when the node starts processing a job: this is when we start a new transaction</li>
@@ -22,13 +22,13 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 					as a <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/Callable.html">Callable</a> task to this worker thread.<br/>
 					A consequence of this is that we will lose some degree of parallelism, since it will limit the node's ability to execute multiple tasks in parallel.
 					<p>For this demonstration's purpose, we chose to use the following components:
-					<ul>
+					<ul class="samplesList">
 						<li><a href="http://www.h2database.com/">H2 Database Engine</a>: a pure Java, open source, XA-compliant database with a very small footprint</li>
 						<li><a href="http://www.atomikos.com/Main/TransactionsEssentials">Atomikos TransactionsEssentials&reg;</a>: an open source transaction management system supporting JDBC/XA pools, JMS/XA pools and JTA-compliant transactions management</li>
 					</ul>
 
 					<h3>Related source files</h3>
-					<ul>
+					<ul class="samplesList">
 						<li><a href="src/org/jppf/example/nodelifecycle/node/NodeListener.java.html">NodeListener.java</a> : A listener to the node's life cycle events, provides transaction management for the JPPF tasks</li>
 						<li><a href="src/org/jppf/example/nodelifecycle/client/DBTask.java.html">DBTask.java</a> : this is the code for the tasks.
 						Each task waits for a configurable time after inserting a database row, to give the applicatione enough time to simulate a node crash and restart.</li>
@@ -38,7 +38,7 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 					</ul>
 
 					<h3>Sample directory structure</h3>
-					<ul>
+					<ul class="samplesList">
 						<li>root folder: contains the build.xml Ant script and the generated jar file to deploy to the JPPF driver</li>
 						<li><tt>/atomikos</tt>: this is where the Atomikos transaction manager keeps its work files, including the transactions log used for crash recovery</li>
 						<li><tt>/classes</tt>: contains the compiled java classes</li>
@@ -52,7 +52,7 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
 					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
-					<ol>
+					<ol class="samplesList">
 						<li>open a command prompt in JPPF-x.y-samples-pack/NodeLifeCycle</li>
 						<li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeLifeCycle.jar</b></li>
 						<li>copy NodeLifeCycle.jar in the "lib" folder of the JPPF driver installation, as well as all the *.jar files in <tt>NodeLifeCycle/lib</tt>, to add them to the driver's classpath. This is enough to deploy the add-on.</li>
@@ -67,14 +67,15 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					Subscribing to node life cycle events: please refer to the documentation at
-					<a href="http://www.jppf.org/wiki/index.php?title=Receiving_notifications_of_node_life_cycle_events">Extending and Customizing JPPF &raquo; Receiving notifications of node life cycle events</a> section.<br>
-					Integration with a JTA-compliant transaction manager and iplementation of node crash recovery
+					<ul class="samplesList">
+						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Receiving_notifications_of_node_life_cycle_events">Subscribing to node life cycle events</a></li>
+						<li>Integration with a JTA-compliant transaction manager and implementation of node crash recovery</li>
+					</ul>
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.
 					<p>In addition, There are 2 privileged places you can go to:
-					<ul>
+					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>

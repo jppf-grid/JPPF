@@ -23,7 +23,7 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol>
-						<li>open a command prompt in JPPF-2.x-samples-pack/NodeTray</li>
+						<li>open a command prompt in JPPF-x.y-samples-pack/NodeTray</li>
 						<li><b>important</b>: to build this sample you need a <b>JDK 1.6 or later</b>, as the system tray APIs are not available in prior Java versions</li>
 						<li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeTray.jar</b></li>
 						<li>copy NodeTray.jar in the "lib" folder of the JPPF node installation, to add it to the node's classpath. This is enough to deploy the add-on.</li>
@@ -33,10 +33,10 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					JPPF node life cycle notifications: please refer to the related documentation in the
-					<a href="http://www.jppf.org/wiki/index.php?title=Extending_and_Customizing_JPPF#Receiving_notifications_of_node_life_cycle_events">Extending and Customizing JPPF &gt; Receiving notifications of node life cycle events</a> section.<br>
-					Subscribing to task-level JMX notifications: please refer to the
-					<a href="http://www.jppf.org/wiki/index.php?title=Management_and_monitoring#Subscribing_to_MBean_notifications">Management and monitoring &gt; Subscribing to MBean notifications</a> section of the documentation.<br>
+					<ul>
+						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Receiving_notifications_of_node_life_cycle_events">JPPF node life cycle notifications</a></li>
+						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Node_management#Subscribing_to_MBean_notifications">Subscribing to task-level JMX notifications</a></li>
+					</ul>
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.

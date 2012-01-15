@@ -12,7 +12,7 @@ $template{name="samples-page-header" title="Web Crawler and Search Engine sample
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you must have a JPPF server and at least one node running.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
 
 					<h3>How do I use it?</h3>
@@ -20,7 +20,7 @@ $template{name="samples-page-header" title="Web Crawler and Search Engine sample
 					<p>The &quot;Compute&quot; button submits the web search for processing by JPPF.
 					<p>The &quot;Reset defaults&quot; button restores the start url, search query and link depth to their original values
 					<p>The web search relies on 3 parameters:
-					<ul>
+					<ul class="samplesList">
 						<li>start URL: this is the URL of the web page from which links will be followed recursively. To limit the scope (and length) of the search,
 						a filter is set so only links to the same server will be followed</li>
 						<li>search query: this is what to search on the visited pages; interpreted as <a href="http://lucene.apache.org/java/docs/queryparsersyntax.html">Lucene query syntax</a></li>
@@ -31,13 +31,13 @@ $template{name="samples-page-header" title="Web Crawler and Search Engine sample
 					When the search is over, the results are displayed in the search results panel, in descending order of relevance.
 
 					<h3>What integration features of JPPF are demonstrated?</h3>
-					<ul>
+					<ul class="samplesList">
 						<li><b>Integration with other Java-based open source projects</b>.<br>
 						Among other things, you will notice that the 3rd-party libraries (including Lucene and Smart and Simple Web Crawler) remain in the
 						classpath of the client application.</li>
 						<li><b>Using JPPF as part of a workflow</b>.<br>
 							In this sample the search is realized through multiple invocations of JPPF:
-							<ul>
+							<ul class="samplesNestedList">
 								<li>once for every search depth level to perform the link navigation and gather links for the next level</li>
 								<li>once for the actual indexing and searching of the pages, once all links have been gathered</li>
 							</ul>
@@ -55,7 +55,7 @@ $template{name="samples-page-header" title="Web Crawler and Search Engine sample
 					<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
 					<a href="javadoc/index.html">API documentation</a>.
 					<p>In addition, There are 2 privileged places you can go to:
-					<ul>
+					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
