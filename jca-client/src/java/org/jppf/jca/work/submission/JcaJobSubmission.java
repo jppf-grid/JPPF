@@ -21,7 +21,6 @@ import static org.jppf.client.submission.SubmissionStatus.*;
 
 import org.jppf.client.*;
 import org.jppf.client.submission.*;
-import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
 /**
@@ -57,26 +56,11 @@ public class JcaJobSubmission extends AbstractJobSubmission
   public void run()
   {
     JPPFResultCollector result = (JPPFResultCollector) job.getResultListener();
-    String requestUuid = job.getUuid();
-    ClassLoader cl = null;
-    ClassLoader oldCl = null;
-    if (!job.getTasks().isEmpty())
-    {
-      Task task = job.getTasks().get(0);
-      cl = task.getClass().getClassLoader();
-      connection.getDelegate().addRequestClassLoader(requestUuid, cl);
-      if (debugEnabled) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-    }
     try
     {
-      if (cl != null)
-      {
-        oldCl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(cl);
-      }
-      connection.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
+      result.setStatus(EXECUTING);
+      submissionManager.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
       result.waitForResults(0);
-      connection.getDelegate().removeRequestClassLoader(requestUuid);
       result.setStatus(COMPLETE);
     }
     catch (Exception e)
@@ -88,7 +72,6 @@ public class JcaJobSubmission extends AbstractJobSubmission
     finally
     {
       if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-      if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
     }
   }
 }

@@ -21,6 +21,7 @@ package org.jppf.client.submission;
 import java.io.NotSerializableException;
 
 import org.jppf.client.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -58,27 +59,28 @@ public class JobSubmissionImpl extends AbstractJobSubmission
   public void run()
   {
     boolean error = false;
+    boolean hasStatusHandler = false;
+    SubmissionStatusHandler statusHandler = null;
     try
     {
+      if (job.getResultListener() instanceof SubmissionStatusHandler)
+      {
+        hasStatusHandler = true;
+        statusHandler = (SubmissionStatusHandler) job.getResultListener();
+      }
       if (connection != null) connection.setCurrentJob(job);
       try
       {
-        ((SubmissionManagerImpl) submissionManager).client.getLoadBalancer().execute(this, connection, locallyExecuting);
-      }
-      catch(NotSerializableException e)
-      {
-        log.error(e.getClass().getName() + ": " + e.getMessage(), e);
-        throw e;
-      }
-      catch(InterruptedException e)
-      {
-        log.error(e.getClass().getName() + ": " + e.getMessage(), e);
-        throw e;
+        if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.EXECUTING);
+        submissionManager.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
+        if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.COMPLETE);
       }
       catch(Exception e)
       {
+        if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.FAILED);
+        if ((e instanceof NotSerializableException) || (e instanceof InterruptedException)) throw e;
         String src = (connection == null) ? "local execution" : connection.getName();
-        log.error('[' + src + "] " + e.getClass().getName() + ": " + e.getMessage(), e);
+        log.error('[' + src + "] " + ExceptionUtils.getMessage(e), e);
         if (connection != null)
         {
           connection.setCurrentJob(null);
@@ -101,7 +103,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
     catch(Exception e)
     {
       error = true;
-      log.error('['+connection.getName()+"] "+ e.getClass().getName() + ": " + e.getMessage(), e);
+      log.error('['+connection.getName()+"] "+ ExceptionUtils.getMessage(e), e);
     }
     finally
     {

@@ -26,7 +26,7 @@ import javax.resource.spi.ConnectionEvent;
 
 import org.jppf.client.*;
 import org.jppf.client.event.SubmissionStatusListener;
-import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.client.submission.*;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.submission.*;
@@ -189,7 +189,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public SubmissionStatus getSubmissionStatus(final String submissionId) throws Exception
   {
-    JPPFResultCollector res = getResultCollector(submissionId);
+    SubmissionStatusHandler res = getResultCollector(submissionId);
     if (res == null) return null;
     return res.getStatus();
   }
@@ -281,7 +281,8 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   {
     JPPFResultCollector result = getResultCollector(submissionId);
     if (result == null) return null;
-    result.waitForResults(0L);
-    return result.getResults();
+    result.waitForResults();
+    List<JPPFTask> tasks = result.getResults();
+    return tasks;
   }
 }

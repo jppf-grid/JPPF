@@ -103,7 +103,7 @@
 	<!-- ========================================================================= -->
 
 	<target name="build" depends="ear.all,rar.all"/>
-	<target name="build.deploy.jboss" depends="build, deploy.1.rar.jboss, deploy.1.ear.jboss"/>
+	<target name="build.deploy.jboss" depends="build, deploy.jboss"/>
 
 	<!-- ========================================================================= -->
 	<!--                         Compile the application                           -->
@@ -307,7 +307,7 @@
 	<!--   defined at the top of this file                                         -->
 	<!-- ========================================================================= -->
 
-	<target name="rar.all" depends="compile" description="generate the ear files">
+	<target name="rar.all" depends="compile, build.util.jar" description="generate the ear files">
 		<echo message="creating the RAR files..."/>
 		<!--
 		Parameters:
@@ -376,18 +376,9 @@
 	
 	<!--
 	-->
-	<target name="deploy.jboss7">
-		<delete quiet="true"><fileset dir="C:/Tools/jboss-as-web-7.0.0.Final/standalone/deployments" excludes="*.txt"/></delete>
-		<copy todir="C:/Tools/jboss-as-web-7.0.0.Final/standalone/deployments" file="${build.dir}/jppf_ra_${jboss7}.rar"/>
-		<copy todir="C:/Tools/jboss-as-web-7.0.0.Final/standalone/deployments" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
-	</target>
-
-	<target name="deploy.1.ear.jboss">
-		<copy todir="C:/Tools/jboss-5.1.0.GA/server/default/deploy" file="${build.zdir}/${ear.prefix}_${jboss}.ear"/>
-	</target>
-
-	<target name="deploy.1.rar.jboss">
-		<copy todir="C:/Tools/jboss-5.1.0.GA/server/default/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
+	<target name="deploy.jboss">
+		<copy todir="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss}.rar"/>
+		<copy todir="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
 	</target>
 
 	<target name="deploy.2.rar.weblogic">

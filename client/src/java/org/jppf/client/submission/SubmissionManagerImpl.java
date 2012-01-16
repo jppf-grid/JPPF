@@ -19,7 +19,7 @@
 package org.jppf.client.submission;
 
 import org.jppf.client.*;
-import org.jppf.client.event.SubmissionStatusListener;
+import org.jppf.client.event.*;
 import org.slf4j.*;
 
 /**
@@ -56,6 +56,8 @@ public class SubmissionManagerImpl extends AbstractSubmissionManager
   public String submitJob(final JPPFJob job)
   {
     if (debugEnabled) log.debug("adding new submission: jobId=" + job.getName());
+    TaskResultListener trl = job.getResultListener();
+    if (trl instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) trl).setStatus(SubmissionStatus.PENDING);
     execQueue.offer(job);
     wakeUp();
     return job.getName();
@@ -77,6 +79,8 @@ public class SubmissionManagerImpl extends AbstractSubmissionManager
   public String resubmitJob(final JPPFJob job)
   {
     if (debugEnabled) log.debug("resubmitting job with id=" + job.getName());
+    TaskResultListener trl = job.getResultListener();
+    if (trl instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) trl).setStatus(SubmissionStatus.PENDING);
     execQueue.offer(job);
     wakeUp();
     return job.getName();

@@ -75,14 +75,7 @@ class RemoteExecutionThread extends ExecutionThread
       long start = System.nanoTime();
       int count = 0;
       boolean completed = false;
-      JPPFJob newJob = createNewJob(job);
-      for (JPPFTask task: tasks)
-      {
-        // needed as JPPFJob.addTask() resets the position
-        int pos = task.getPosition();
-        newJob.addTask(task);
-        task.setPosition(pos);
-      }
+      JPPFJob newJob = createNewJob();
       while (!completed)
       {
         requestUuid = newJob.getUuid();
@@ -142,10 +135,10 @@ class RemoteExecutionThread extends ExecutionThread
 
   /**
    * Create a new job based on the initial one.
-   * @param job the initial job.
    * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
+   * @throws Exception if any error occurs.
    */
-  private JPPFJob createNewJob(final JPPFJob job)
+  private JPPFJob createNewJob() throws Exception
   {
     JPPFJob newJob = new JPPFJob(job.getUuid());
     newJob.setDataProvider(job.getDataProvider());
@@ -154,6 +147,13 @@ class RemoteExecutionThread extends ExecutionThread
     newJob.setBlocking(job.isBlocking());
     newJob.setResultListener(job.getResultListener());
     newJob.setName(job.getName());
+    for (JPPFTask task: tasks)
+    {
+      // needed as JPPFJob.addTask() resets the position
+      int pos = task.getPosition();
+      newJob.addTask(task);
+      task.setPosition(pos);
+    }
     return newJob;
   }
 

@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.client.event.*;
 import org.jppf.client.persistence.*;
-import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.client.submission.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -32,7 +32,7 @@ import org.slf4j.*;
  * @see org.jppf.client.JPPFClient#submitNonBlocking(List, org.jppf.task.storage.DataProvider, TaskResultListener)
  * @author Laurent Cohen
  */
-public class JPPFResultCollector implements TaskResultListener
+public class JPPFResultCollector implements TaskResultListener, SubmissionStatusHandler
 {
   /**
    * Logger for this class.
@@ -117,6 +117,7 @@ public class JPPFResultCollector implements TaskResultListener
       else job.getResults().putResults(tasks);
       pendingCount -= tasks.size();
       if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
+      if (pendingCount <= 0) buildResults();
       notifyAll();
       if ((job != null) && (job.getPersistenceManager() != null))
       {
@@ -161,7 +162,7 @@ public class JPPFResultCollector implements TaskResultListener
   public synchronized List<JPPFTask> waitForResults(final long millis)
   {
     if (millis < 0) throw new IllegalArgumentException("wait time cannot be negative");
-    if (log.isTraceEnabled()) log.trace("timeout = " + millis);
+    if (log.isTraceEnabled()) log.trace("timeout = " + millis + ", pendingCount = " + pendingCount);
     long start = System.currentTimeMillis();
     long elapsed = 0;
     while ((elapsed < millis) && (pendingCount > 0))
@@ -176,8 +177,9 @@ public class JPPFResultCollector implements TaskResultListener
         log.error(e.getMessage(), e);
       }
       elapsed = System.currentTimeMillis() - start;
+      if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed + ", millis = " + millis);
     }
-    if (pendingCount <= 0) buildResults();
+    //if (pendingCount <= 0) buildResults();
     if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed);
     return results;
   }
@@ -201,18 +203,18 @@ public class JPPFResultCollector implements TaskResultListener
   }
 
   /**
-   * Get the status of this submission.
-   * @return a {@link SubmissionStatus} enumerated value.
+   * {@inheritDoc}
    */
+  @Override
   public synchronized SubmissionStatus getStatus()
   {
     return status;
   }
 
   /**
-   * Set the status of this submission.
-   * @param newStatus a {@link SubmissionStatus} enumerated value.
+   * {@inheritDoc}
    */
+  @Override
   public synchronized void setStatus(final SubmissionStatus newStatus)
   {
     if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");

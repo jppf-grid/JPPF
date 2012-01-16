@@ -88,7 +88,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
       }
     }
   }
- 
+
   /**
    * Create a job submission for this submission manager.
    * @param job the job to submit.
@@ -97,4 +97,13 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
    * @return a new {@link JobSubmission} instance.
    */
   protected abstract JobSubmission createSubmission(final JPPFJob job, final AbstractJPPFClientConnection c, final boolean locallyExecuting);
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public AbstractGenericClient getClient()
+  {
+    return client;
+  }
 }

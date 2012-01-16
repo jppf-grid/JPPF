@@ -5,7 +5,7 @@
 <%@ include file="header.jsp"%>
 <%
   String id = request.getParameter("id");
-  DemoTest demo = new DemoTest(jndiName);
+  J2EEDemo demo = new J2EEDemo(jndiName);
   String msg = demo.getMessage(id);
 	String title = "Result for submission ID \""+id+"\"";
 %>

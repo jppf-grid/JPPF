@@ -22,7 +22,7 @@
 				<th>Status</th>
 			</tr>
 <%
-			DemoTest demo = new DemoTest(jndiName);
+			J2EEDemo demo = new J2EEDemo(jndiName);
 			Map map = demo.getStatusMap();
 			if (map.isEmpty())
 			{

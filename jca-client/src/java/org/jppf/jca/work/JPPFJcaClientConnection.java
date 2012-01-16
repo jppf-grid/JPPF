@@ -59,8 +59,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   public JPPFJcaClientConnection(final JPPFJcaClient client, final String uuid, final String name, final JPPFConnectionInformation info)
   {
     this.client = client;
-    classServerPort = info.serverPorts[0];
-    configure(uuid, name, info.host, info.serverPorts[0], classServerPort, 0);
+    configure(uuid, name, info.host, info.serverPorts[0], 0);
     status.set(DISCONNECTED);
   }
 
@@ -73,7 +72,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   {
     try
     {
-      delegate = new JcaClassServerDelegate(name, client.getUuid(), host, classServerPort, this);
+      delegate = new JcaClassServerDelegate(name, client.getUuid(), host, port, this);
       delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
       {
         @Override

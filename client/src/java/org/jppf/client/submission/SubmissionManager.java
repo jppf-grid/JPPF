@@ -18,7 +18,7 @@
 
 package org.jppf.client.submission;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.client.event.SubmissionStatusListener;
 
 /**
@@ -48,4 +48,10 @@ public interface SubmissionManager extends Runnable
    * @return the unique id of the submission.
    */
   String resubmitJob(JPPFJob job);
+
+  /**
+   * Get the JPPF client associated witht his submission manager.
+   * @return a {@link AbstractGenericClient} instance.
+   */
+  AbstractGenericClient getClient();
 }

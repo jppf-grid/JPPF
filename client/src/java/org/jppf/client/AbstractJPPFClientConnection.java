@@ -87,14 +87,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    */
   protected int port = -1;
   /**
-   * The TCP port the class server is listening to.
-   */
-  protected int classServerPort = -1;
-  /**
-   * Total count of the tasks submitted by this client.
-   */
-  protected int totalTaskCount = 0;
-  /**
    * Configuration name for this local client.
    */
   protected String name = null;
@@ -107,10 +99,6 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * Status of the connection.
    */
   protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CONNECTING);
-  /**
-   * Used to synchronize access to the status.
-   */
-  protected Object statusLock = new Object();
   /**
    * List of status listeners for this connection.
    */
@@ -138,16 +126,14 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
    * @param name configuration name for this local client.
    * @param host the name or IP address of the host the JPPF driver is running on.
    * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
-   * @param classServerPort the TCP port the class server is listening to.
    * @param priority the assigned to this client connection.
    */
-  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int classServerPort, final int priority)
+  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority)
   {
     this.uuid = uuid;
     this.host = NetworkUtils.getHostName(host);
     this.port = driverPort;
     this.priority = priority;
-    this.classServerPort = classServerPort;
     this.name = name;
     this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
   }
@@ -221,7 +207,8 @@ public abstract class AbstractJPPFClientConnection implements JPPFClientConnecti
   public void sendHandshakeJob() throws Exception
   {
     JPPFTaskBundle header = new JPPFTaskBundle();
-    ObjectSerializer ser = makeHelper(getClass().getClassLoader()).getSerializer();
+    //ObjectSerializer ser = makeHelper(getClass().getClassLoader()).getSerializer();
+    ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);

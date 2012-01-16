@@ -76,11 +76,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info)
   {
     this.client = client;
-    //classServerPort = info.classServerPorts[0];
-    classServerPort = info.serverPorts[0];
     jmxPort = info.managementPort;
     //configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
-    configure(uuid, name, info.host, info.serverPorts[0], classServerPort, 0);
+    configure(uuid, name, info.host, info.serverPorts[0], 0);
     initializeJmxConnection();
   }
 
@@ -93,7 +91,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   {
     try
     {
-      delegate = new ClassServerDelegateImpl(this, client.getUuid(), host, classServerPort);
+      delegate = new ClassServerDelegateImpl(this, client.getUuid(), host, port);
       delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
       {
         @Override
