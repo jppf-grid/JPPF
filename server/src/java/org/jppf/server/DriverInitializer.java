@@ -324,11 +324,11 @@ public class DriverInitializer
   }
 
   /**
-   * Initialize the JMX server.
+   * Initialize the recovery server.
    */
   void initRecoveryServer()
   {
-    if (config.getBoolean("jppf.recovery.enabled", true))
+    if (config.getBoolean("jppf.recovery.enabled", false))
     {
       recoveryServer = new RecoveryServer();
       new Thread(recoveryServer, "RecoveryServer thread").start();
@@ -336,7 +336,7 @@ public class DriverInitializer
   }
 
   /**
-   * Stop the JMX server.
+   * Stop the recovery server.
    */
   void stopRecoveryServer()
   {

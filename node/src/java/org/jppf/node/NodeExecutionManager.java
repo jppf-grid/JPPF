@@ -45,4 +45,9 @@ public interface NodeExecutionManager
    * @return the job id as a string, or null if no job is being executed.
    */
   String getCurrentJobId();
+  /**
+   * Get the node holding this execution manager.
+   * @return a {@link Node} instance.
+   */
+  Node getNode();
 }

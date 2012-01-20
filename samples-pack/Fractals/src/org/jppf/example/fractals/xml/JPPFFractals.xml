@@ -70,7 +70,7 @@
 		<property name="main" value="false"/>
 		<property name="tooltip" value="JPPF Fractals Generation"/>
 	
-		<import source="file" location="org/jppf/samples/fractals/xml/MandelbrotPage.xml"/>
+		<import source="file" location="org/jppf/example/fractals/xml/MandelbrotPage.xml"/>
 	
 	</child>
 

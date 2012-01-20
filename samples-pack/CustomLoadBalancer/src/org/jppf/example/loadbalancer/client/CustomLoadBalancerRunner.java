@@ -116,7 +116,7 @@ public class CustomLoadBalancerRunner
    */
   public JPPFJob createJob(final String jobName, final int nbTasks, final int size, final long duration,
       final long allowedTime, final ExecutionPolicy policy) throws Exception
-      {
+  {
     // Create a JPPF job.
     JPPFJob job = new JPPFJob();
 
@@ -150,7 +150,7 @@ public class CustomLoadBalancerRunner
     job.setResultListener(new JPPFResultCollector(job));
 
     return job;
-      }
+  }
 
   /**
    * Collect and process the execution results of a job.

@@ -116,6 +116,7 @@
 			<jvmarg value="-server"/>
 			<jvmarg value="-Djppf.config=jppf-client.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging-client.properties"/>
 		</java>       
 	</target>
 

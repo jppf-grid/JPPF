@@ -25,11 +25,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.node.*;
 import org.jppf.node.event.*;
-import org.jppf.server.JPPFDriver;
-import org.jppf.server.node.JPPFNode;
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -99,9 +97,21 @@ public class NodeSystemTray implements NodeLifeCycleListener
   {
     try
     {
-      // if the node is running within the server's JVM (local node)
-      if (JPPFDriver.getLocalNode() != null) jmxServer = JPPFDriver.getLocalNode().getJmxServer();
-      else jmxServer = ((JPPFNode) NodeRunner.getNode()).getJmxServer();
+      /*
+      try
+      {
+       // if the node is running within the server's JVM (local node)
+        if (JPPFDriver.getLocalNode() != null) jmxServer = JPPFDriver.getLocalNode().getJmxServer();
+      }
+      catch(NoClassDefFoundError e)
+      {
+        jmxServer = ((JPPFNode) NodeRunner.getNode()).getJmxServer();
+      }
+      catch(Exception e)
+      {
+        jmxServer = ((JPPFNode) NodeRunner.getNode()).getJmxServer();
+      }
+      */
       wrapper = new JMXNodeConnectionWrapper();
       wrapper.connectAndWait(5000);
       trayIcon.setImage(images[1]);
@@ -121,14 +131,16 @@ public class NodeSystemTray implements NodeLifeCycleListener
   private String generateTooltipText()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("Node ").append(jmxServer.getManagementHost()).append(':').append(jmxServer.getManagementPort()).append('\n');
+    sb.append("Node ");
+    if (jmxServer != null) sb.append(jmxServer.getManagementHost()).append(':').append(jmxServer.getManagementPort());
+    sb.append('\n');
     if (taskMonitor != null)
     {
       sb.append("Tasks executed: ").append(taskMonitor.getTotalTasksExecuted()).append("\n");
       sb.append("  successful: ").append(taskMonitor.getTotalTasksSucessfull()).append("\n");
       sb.append("  in error: ").append(taskMonitor.getTotalTasksInError()).append("\n");
       sb.append("CPU time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskCpuTime())).append("\n");
-      sb.append("Clock time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
+      sb.append("User time: ").append(StringUtils.toStringDuration(taskMonitor.getTotalTaskElapsedTime()));
     }
     return sb.toString();
   }
@@ -169,11 +181,25 @@ public class NodeSystemTray implements NodeLifeCycleListener
   public void nodeStarting(final NodeLifeCycleEvent event)
   {
     trayIcon.displayMessage("JPPF Node connected", null, MessageType.INFO);
+    if (jmxServer == null)
+    {
+      try
+      {
+        NodeExecutionManager execManager = (NodeExecutionManager) event.getSource();
+        jmxServer = execManager.getNode().getJmxServer();
+      }
+      catch (Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
     lock.lock();
     try
     {
       // node is disconnected, display the green icon
       trayIcon.setImage(images[0]);
+      String s = generateTooltipText();
+      trayIcon.setToolTip(s);
     }
     finally
     {
@@ -223,8 +249,8 @@ public class NodeSystemTray implements NodeLifeCycleListener
   private static Image[] initializeImages()
   {
     Image[] img = new Image[2];
-    img[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_green.gif"));
-    img[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/addons/nodetray/node_red.gif"));
+    img[0] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/example/nodetray/node_green.gif"));
+    img[1] = Toolkit.getDefaultToolkit().getImage(NodeSystemTray.class.getResource("/org/jppf/example/nodetray/node_red.gif"));
     return img;
   }
 }

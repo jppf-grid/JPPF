@@ -57,7 +57,7 @@
 		<property name="componentConstraints" value="grow"/>
 		<property name="layoutConstraints" value="fill"/>
 
-		<import source="file" location="org/jppf/samples/jaligner/xml/SequenceAlignment.xml"/>
+		<import source="file" location="org/jppf/example/jaligner/xml/SequenceAlignment.xml"/>
 
 	</child>
 

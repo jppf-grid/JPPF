@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.node.NodeExecutionManager;
+import org.jppf.node.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
@@ -225,7 +225,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
    * @param id the id of the task or tasks to restart.
    * @deprecated the task restart feature is inherently unsafe, as it depends on the task
    * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement. 
+   * This feature has been removed from the management APIs, with no replacement.
    */
   public synchronized void restartTask(final String id)
   {
@@ -481,5 +481,14 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
   {
     if (this.reconnectionNotification == null) return;
     this.reconnectionNotification = reconnectionNotification;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Node getNode()
+  {
+    return node;
   }
 }

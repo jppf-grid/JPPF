@@ -124,7 +124,8 @@ public class JPPFClient extends AbstractGenericClient
   {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
-    if ((job.getResultListener() == null) || job.isBlocking()) job.setResultListener(new JPPFResultCollector(job));
+    if ((job.getResultListener() == null) ||
+        (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     submissionManager.submitJob(job);
     if (job.isBlocking())
     {

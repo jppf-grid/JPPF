@@ -18,6 +18,7 @@
 package org.jppf.node;
 
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.management.JMXServer;
 import org.jppf.node.event.LifeCycleEventHandler;
 
 /**
@@ -48,4 +49,10 @@ public interface Node extends Runnable
    * @return a {@link LifeCycleEventHandler} instance.
    */
   LifeCycleEventHandler getLifeCycleEventHandler();
+  /**
+   * Get the JMX connecter server aossicated with the node.
+   * @return a JMXServer instance.
+   * @throws Exception if any error occurs.
+   */
+  JMXServer getJmxServer() throws Exception;
 }

@@ -20,7 +20,9 @@ package org.jppf.node;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.comm.socket.*;
+import org.jppf.management.JMXServer;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
 
@@ -135,5 +137,14 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   public LifeCycleEventHandler getLifeCycleEventHandler()
   {
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JMXServer getJmxServer() throws Exception
+  {
+    throw new JPPFUnsupportedOperationException("getJmxServer() is not supported on this type of node");
   }
 }

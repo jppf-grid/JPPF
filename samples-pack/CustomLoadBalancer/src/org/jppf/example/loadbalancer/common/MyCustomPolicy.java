@@ -20,6 +20,7 @@ package org.jppf.example.loadbalancer.common;
 
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.CustomPolicy;
+import org.slf4j.*;
 
 /**
  * A custom execution policy that checks a node has a specified minimum
@@ -28,6 +29,10 @@ import org.jppf.node.policy.CustomPolicy;
  */
 public class MyCustomPolicy extends CustomPolicy
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(MyCustomPolicy.class);
   /**
    * Minimum available size per node processing thread, in bytes.
    */
@@ -56,8 +61,8 @@ public class MyCustomPolicy extends CustomPolicy
     long nbThreads = info.getJppf().getLong("processing.threads");
     // get the node's max heap size
     long maxHeap = info.getRuntime().getLong("maxMemory");
-    // we assume that 20 MB is taken by JPPF code and data
-    maxHeap -= 20 * 1024 * 1024;
+    // we assume that 10 MB is taken by JPPF code and data
+    maxHeap -= 10 * 1024 * 1024;
     // return true only if there is at least minimumSizePerThread of memory available for each thread
     return maxHeap / nbThreads >= minimumSizePerThread;
   }

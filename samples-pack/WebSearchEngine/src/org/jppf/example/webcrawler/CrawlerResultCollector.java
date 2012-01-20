@@ -18,49 +18,34 @@
 
 package org.jppf.example.webcrawler;
 
-import java.util.*;
-
 import javax.swing.SwingUtilities;
 
-import org.jppf.client.JPPFResultCollector;
-import org.jppf.client.event.*;
+import org.jppf.client.*;
+import org.jppf.client.event.TaskResultEvent;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 /**
  * Result collector that updates the progress bar's value during the computation.
  */
-public class CrawlerResultCollector implements TaskResultListener
+public class CrawlerResultCollector extends JPPFResultCollector
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFResultCollector.class);
+  private static Logger log = LoggerFactory.getLogger(CrawlerResultCollector.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Count of results not yet received.
-   */
-  private int pendingCount = 0;
-  /**
-   * A map containing the resulting tasks, ordered by ascending position in the
-   * submitted list of tasks.
-   */
-  private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
-  /**
-   * The list of final results.
-   */
-  private List<JPPFTask> results = null;
 
   /**
    * Initialize this collector with a specified number of tasks.
-   * @param count the count of submitted tasks.
+   * @param job the job for which ot get the results.
    */
-  public CrawlerResultCollector(final int count)
+  public CrawlerResultCollector(final JPPFJob job)
   {
-    this.pendingCount = count;
+    super(job);
   }
 
   /**
@@ -71,56 +56,21 @@ public class CrawlerResultCollector implements TaskResultListener
   @Override
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
-    List<JPPFTask> tasks = event.getTaskList();
-    if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
-    for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-    pendingCount -= tasks.size();
-    notify();
-    int sum = 0;
-    for (JPPFTask task: tasks)
+    super.resultsReceived(event);
+    if (event.getThrowable() == null)
     {
-      sum += ((CrawlerTask) task).getToVisit().size();
+      int sum = 0;
+      for (JPPFTask task: event.getTaskList()) sum += ((CrawlerTask) task).getToVisit().size();
+      final int n = sum;
+      SwingUtilities.invokeLater(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          WebCrawlerRunner.updateProgress(n);
+        }
+      });
     }
-    final int n = sum;
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        WebCrawlerRunner.updateProgress(n);
-      }
-    });
-  }
-
-  /**
-   * Wait until all results of a request have been collected.
-   * @return the list of resulting tasks.
-   */
-  public synchronized List<JPPFTask> waitForResults()
-  {
-    while (pendingCount > 0)
-    {
-      try
-      {
-        wait();
-      }
-      catch(InterruptedException e)
-      {
-        e.printStackTrace();
-      }
-    }
-    results = new ArrayList<JPPFTask>();
-    for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
-    resultMap.clear();
-    return results;
-  }
-
-  /**
-   * Get the list of final results.
-   * @return a list of results as tasks, or null if not all tasks have been executed.
-   */
-  public List<JPPFTask> getResults()
-  {
-    return results;
+    else event.getThrowable().printStackTrace();
   }
 }

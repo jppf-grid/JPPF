@@ -238,7 +238,11 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private void dispatchJobToChannel(final ChannelWrapper<?> channel, final ServerJob selectedBundle)
   {
-    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
+    if (debugEnabled)
+    {
+      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + 
+        ", nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
+    }
     synchronized(channel)
     {
       AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -271,8 +275,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
   {
     int n = -1;
     int idleChannelsSize = idleChannels.size();
-    ExecutionPolicy rule = bundle.getSLA().getExecutionPolicy();
-    if (debugEnabled && (rule != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + rule);
+    ExecutionPolicy policy = bundle.getSLA().getExecutionPolicy();
+    if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
     List<Integer> acceptableChannels = new ArrayList<Integer>(idleChannelsSize);
     List<Integer> channelsToRemove =  new ArrayList<Integer>(idleChannelsSize);
     List<String> uuidPath = bundle.getUuidPath().getList();
@@ -294,31 +298,31 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
         }
         continue;
       }
-      if (rule != null)
+      if (policy != null)
       {
         JPPFManagementInfo mgtInfo = driver.getNodeHandler().getNodeInformation(ch);
         JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
         boolean b = false;
         try
         {
-          b = rule.accepts(info);
+          b = policy.accepts(info);
         }
         catch(Exception ex)
         {
-          log.error("An error occurred while running the execution policy to determine node participation.",ex);
+          log.error("An error occurred while running the execution policy to determine node participation.", ex);
         }
-        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", nodeUuid=" + mgtInfo.getId());
+        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + mgtInfo.getId());
         if (!b) continue;
       }
       acceptableChannels.add(i);
     }
-    for (Integer i: channelsToRemove) removeIdleChannel(i);
     int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
     if (size > 0)
     {
-      n = size > 1 ? acceptableChannels.remove(random.nextInt(size)) : 0;
+      n = acceptableChannels.remove(size > 1 ? random.nextInt(size) : 0);
     }
+    for (Integer i: channelsToRemove) removeIdleChannel(i);
     return n;
   }
 

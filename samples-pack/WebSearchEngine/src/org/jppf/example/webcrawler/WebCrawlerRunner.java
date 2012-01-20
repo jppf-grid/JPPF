@@ -84,10 +84,7 @@ public class WebCrawlerRunner
   {
     synchronized(WebCrawlerRunner.class)
     {
-      if (client == null)
-      {
-        client = new JPPFClient();
-      }
+      if (client == null) client = new JPPFClient();
     }
     init();
     WebCrawlerRunner.option = option;
@@ -111,10 +108,19 @@ public class WebCrawlerRunner
     JPPFJob job = new JPPFJob();
     for (String url: urls)
     {
+      try
+      {
       job.addTask(new CrawlerTask(url, query, ++n, doSearch));
+      }
+      catch(Throwable t)
+      {
+        log.error(t.getMessage(), t);
+        if (t instanceof Exception) throw (Exception) t;
+        else if (t instanceof Error) throw (Error) t;
+      }
     }
     if (job.getTasks() == null) return new ArrayList<JPPFTask>();
-    CrawlerResultCollector collector = new CrawlerResultCollector(job.getTasks().size());
+    CrawlerResultCollector collector = new CrawlerResultCollector(job);
     job.setResultListener(collector);
     job.setBlocking(false);
     client.submit(job);

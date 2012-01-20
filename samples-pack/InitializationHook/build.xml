@@ -92,7 +92,7 @@
 			<fileset dir="${classes.dir}"/>
 	  </jar>
 		<echo/>
-		<echo message="*** The file InitializationHook.jar is now ready to be deployed to the driver ***"/>
+		<echo message="*** The file InitializationHook.jar is now ready to be deployed to the nodes ***"/>
 		<echo/>
   </target>
 	

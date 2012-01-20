@@ -29,7 +29,7 @@
 		importPackage(Packages.org.jppf.ui.options);
 		importPackage(Packages.org.jppf.ui.options.factory);
 		importPackage(Packages.org.jppf.ui.options.event);
-		importPackage(Packages.org.jppf.samples.fractals);
+		importPackage(Packages.org.jppf.example.fractals);
 		importPackage(Packages.sun.java2d);
 		importPackage(Packages.java.awt);
 		importPackage(Packages.javax.swing);
@@ -192,8 +192,8 @@
 	<!-- ===================================================================== -->
 
 	<child name="mandelbrotImage" type="Java">
-		<property name="class" value="org.jppf.samples.fractals.ImagePanel"/>
-		<property name="mouseListenerClass" value="org.jppf.samples.fractals.MandelbrotMouseListener"/>
+		<property name="class" value="org.jppf.example.fractals.ImagePanel"/>
+		<property name="mouseListenerClass" value="org.jppf.example.fractals.MandelbrotMouseListener"/>
 		<property name="layoutConstraints" value="fill"/>
 		<property name="componentConstraints" value="grow, push"/>
 		<initializer type="script">

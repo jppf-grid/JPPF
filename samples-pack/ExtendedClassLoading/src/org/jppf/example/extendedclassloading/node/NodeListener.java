@@ -58,7 +58,7 @@ public class NodeListener implements NodeLifeCycleListener
   /**
    * Perform library management upon connection to the server:
    * <ul>
-   * <li> delete the libraries listed in the "toDelete" file, and updae the file accordingly</li>
+   * <li> delete the libraries listed in the "toDelete" file, and update the file accordingly</li>
    * <li> add the libraries listed in the index file to the class path of the current class loader (server class laoder)</li>
    * </ul>
    * {@inheritDoc}
