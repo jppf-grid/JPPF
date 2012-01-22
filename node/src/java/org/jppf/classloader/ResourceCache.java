@@ -213,15 +213,18 @@ class ResourceCache
       }
     });
     int max = -1;
-    for (File f: subdirs)
+    if(subdirs != null && subdirs.length > 0)
     {
-      try
+      for (File f: subdirs)
       {
-        int n = Integer.valueOf(f.getName());
-        if (n > max) max = n;
-      }
-      catch(Exception e)
-      {
+        try
+        {
+          int n = Integer.valueOf(f.getName());
+          if (n > max) max = n;
+        }
+        catch(Exception e)
+        {
+        }
       }
     }
     if (traceEnabled) log.trace("max index = " + max);

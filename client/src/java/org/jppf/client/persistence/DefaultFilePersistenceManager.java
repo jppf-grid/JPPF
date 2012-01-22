@@ -160,18 +160,25 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
         return name.endsWith(ext) && name.startsWith(prefix);
       }
     });
-    List<String> result = new ArrayList<String>(files.length);
-    for (File f: files)
+    if(files == null || files.length == 0)
     {
-      String s = f.getName().substring(prefix.length());
-      if (ext != null)
-      {
-        int idx = s.lastIndexOf(ext);
-        s = s.substring(0, idx);
-      }
-      result.add(s);
+      return Collections.emptyList();
     }
-    return result;
+    else
+    {
+      List<String> result = new ArrayList<String>(files.length);
+      for (File f: files)
+      {
+        String s = f.getName().substring(prefix.length());
+        if (ext != null)
+        {
+          int idx = s.lastIndexOf(ext);
+          s = s.substring(0, idx);
+        }
+        result.add(s);
+      }
+      return result;
+    }
   }
 
   /**
