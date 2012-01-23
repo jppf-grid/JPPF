@@ -15,10 +15,8 @@ $template{name="samples-page-header" title="Startup Classes sample"}$
 						<li>open a command prompt in JPPF-x.y-samples-pack/StartupClasses</li>
 						<li>build the sample: type "<b>ant jar</b>"; this will create a file named <b>StartupClasses.jar</b></li>
 						<li>copy StartupClasses.jar in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This is enough, as the node will download the startup classes code from the server.</li>
-						<li>open a command prompt in the driver's install folder and start the driver by typing "<b>ant run</b>"</li>
-						<li>in the driver console, you should see the following message: <tt>  [java] I'm a driver startup class</tt></li>
-						<li>open a command prompt in the node's install folder and start the node by typing "<b>ant run</b>"</li>
-						<li>in the node console, you should see the following message: <tt>  [java] I'm a node startup class</tt></li>
+						<li>start the driver, in the driver console, you should see the following message:<br/><tt>  [java] I'm a driver startup class</tt></li>
+						<li>start the node, in the node console, you should see the following message:<br/> <tt>  [java] I'm a node startup class</tt></li>
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>

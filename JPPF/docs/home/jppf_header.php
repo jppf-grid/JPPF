@@ -72,13 +72,13 @@ else
 if ($currentPage == "Documentation")
 {
 ?>
-<td class="headerMenuItem2">&nbsp;<a href="/wiki" class="headerMenuItem2">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem2">&nbsp;<a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="headerMenuItem2">Documentation</a>&nbsp;</td>
 <?php
 }
 else
 {
 ?>
-<td class="headerMenuItem">&nbsp;<a href="/wiki" class="headerMenuItem">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem">&nbsp;<a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="headerMenuItem">Documentation</a>&nbsp;</td>
 <?php
 }
 ?>

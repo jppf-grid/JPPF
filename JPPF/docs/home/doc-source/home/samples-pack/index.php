@@ -10,10 +10,10 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 	<li><a href="SequenceAlignment/Readme.php">Protein and DNA sequence alignment</a></li>
 	<li><a href="WebSearchEngine/Readme.php">Distributed web crawler and search engine</a></li>
 	<li><a href="TomcatPort/Readme.php">Tomcat 5.5/6.0 port</a></li>
-	<li><a href="CustomMBeans/Readme.php">Pluggable management beans sample</a></li>
-	<li><a href="DataEncryption/Readme.php">Network data encryption sample</a></li>
-	<li><a href="StartupClasses/Readme.php">Customized server and node initialization sample</a></li>
-	<li><a href="MatrixMultiplication/Readme.php">Basic dense matrix multiplication parallelization sample</a></li>
+	<li><a href="CustomMBeans/Readme.php">Pluggable management beans</a></li>
+	<li><a href="DataEncryption/Readme.php">Network data encryption</a></li>
+	<li><a href="StartupClasses/Readme.php">Customized server and node initialization</a></li>
+	<li><a href="MatrixMultiplication/Readme.php">Basic dense matrix multiplication parallelization</a></li>
 	<li><a href="DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
 	<li><a href="NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
 	<li><a href="CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>

@@ -1,7 +1,7 @@
 <?php $currentPage="Features" ?>
 $template{name="about-page-header" title="Features"}$
 
-<h1>JPPF 2.5 features</h1>
+<h1>JPPF 3.0 features</h1>
 
 <h3>Ease of use</h3>
 <ul>
@@ -9,7 +9,7 @@ $template{name="about-page-header" title="Features"}$
 	<li>automatic deployment of application code on the grid</li>
 	<li>ability to reuse existing or legacy objects without modification</li>
 	<li>"happy path" with no additional configuration</li>
-	<li>automatic server discovery</li>
+	<li>automatic server discovery, combinable with manual connection configuration</li>
 	<li>convenient reusable application template to quickly and easily start developing JPPF applications</li>
 	<li>straightforward Executor Service interface to the JPPF grid, with high throughput enhancements</li>
 </ul>
@@ -30,6 +30,13 @@ $template{name="about-page-header" title="Features"}$
 	<li>job scheduled start date</li>
 	<li>job scheduled expiration date</li>
 	<li>broadcast jobs</li>
+</ul>
+
+<h3>Job local monitoring, persistence, recovery, failover</h3>
+<ul>
+	<li>notification of job start and stop events</li>
+	<li>ability to store job snapshots on the fly</li>
+	<li>recovery of the latest job state upon application crash</li>
 </ul>
 
 <h3>Management and monitoring</h3>
@@ -55,6 +62,16 @@ $template{name="about-page-header" title="Features"}$
 	<li>Pluggable load-balancing modules allow users to write their own load balancing strategies</li>
 	<li>Ability to specify alternative serialization schemes</li>
 	<li>Subscription to nodes life cycle events</li>
+	<li>Node initialization hooks to implement dynamic failover strategies</li>
+	<li>Server-side notifications of node connection events</li>
+</ul>
+
+<h3>Dynamic class loading extensions</h3>
+<ul>
+	<li>update the classpath of the nodes at run-time</li>
+	<li>download multiple classpath resources in a single network transaction</li>
+	<li>remotely manage repositories of application libraries</li>
+	<li>new class loader delegation model enables faster class loading</li>
 </ul>
 
 <h3>Performance and resources efficiency</h3>
@@ -87,11 +104,6 @@ $template{name="about-page-header" title="Features"}$
 	<li><a href="samples-pack/NodeLifeCycle/Readme.php">Atomikos transaction manager and JDBC database</a></li>
 </ul>
 
-<h3>Add-ons</h3>
-<ul>
-	<li>TCP multiplexer, routes JPPF traffic through a single TCP port to work with firewalled environments</li>
-</ul>
-
 <h3>Deployment modes</h3>
 <ul>
 	<li>all components deployable as standalone Java applications</li>
@@ -99,6 +111,7 @@ $template{name="about-page-header" title="Features"}$
 	<li>servers and nodes deployable as Windows services</li>
 	<li>application client deployment as a Web, J2EE or GigaSpaces XAP application
 	<li>nodes can run in idle system mode (CPU scavenging)</li>
+	<li>deployment on Amazon EC2</li>
 </ul>
 
 <h3>Execution modes</h3>
@@ -116,10 +129,10 @@ $template{name="about-page-header" title="Features"}$
 	<li><a href="samples-pack/SequenceAlignment/Readme.php">Protein and DNA sequence alignment</a></li>
 	<li><a href="samples-pack/WebSearchEngine/Readme.php">Distributed web crawler and search engine</a></li>
 	<li><a href="samples-pack/TomcatPort/Readme.php">Tomcat 5.5/6.0 port</a></li>
-	<li><a href="samples-pack/CustomMBeans/Readme.php">Pluggable management beans sample</a></li>
-	<li><a href="samples-pack/DataEncryption/Readme.php">Network data encryption sample</a></li>
-	<li><a href="samples-pack/StartupClasses/Readme.php">Customized server and node initialization sample</a></li>
-	<li><a href="samples-pack/MatrixMultiplication/Readme.php">Basic dense matrix multiplication parallelization sample</a></li>
+	<li><a href="samples-pack/CustomMBeans/Readme.php">Pluggable management beans</a></li>
+	<li><a href="samples-pack/DataEncryption/Readme.php">Network data encryption</a></li>
+	<li><a href="samples-pack/StartupClasses/Readme.php">Customized server and node initialization</a></li>
+	<li><a href="samples-pack/MatrixMultiplication/Readme.php">Basic dense matrix multiplication parallelization</a></li>
 	<li><a href="samples-pack/DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
 	<li><a href="samples-pack/NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
 	<li><a href="samples-pack/CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
@@ -128,6 +141,10 @@ $template{name="about-page-header" title="Features"}$
 	<li><a href="samples-pack/NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
 	<li><a href="samples-pack/Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a  magnetic field</a></li>
 	<li><a href="samples-pack/FTPServer/Readme.php">How to embed and use an FTP server in JPPF</a></li>
+	<li><a href="samples-pack/NodeConnectionEvents/Readme.php">How to receive notifications of nodes connecting and disconnecting on the server</a></li>
+	<li><a href="samples-pack/JobRecovery/Readme.php">Job recovery after an application crash</a></li>
+	<li><a href="samples-pack/InitializationHook/Readme.php">Using a node initialization hook to implement a sophisticated failover mechanism</a></li>
+	<li><a href="samples-pack/ExtendedClassLoading/Readme.php">Using the JPPF class loading extensions to automate the deployment and management of application libraries in the nodes at runtime</a></li>
 </ul>
 
 $template{name="about-page-footer"}$

@@ -27,8 +27,7 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 						<li><b>important</b>: to build this sample you need a <b>JDK 1.6 or later</b>, as the system tray APIs are not available in prior Java versions</li>
 						<li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeTray.jar</b></li>
 						<li>copy NodeTray.jar in the "lib" folder of the JPPF node installation, to add it to the node's classpath. This is enough to deploy the add-on.</li>
-						<li>open a command prompt in the driver's install folder and start the driver by typing "<b>ant run</b>"</li>
-						<li>open a command prompt in the node's install folder and start the node by typing "<b>ant run</b>"</li>
+						<li>start the server and node</li>
 						<li>you should see the new system tray icon</li>
 					</ol>
 

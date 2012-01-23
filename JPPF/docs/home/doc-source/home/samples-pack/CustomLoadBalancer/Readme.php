@@ -68,8 +68,7 @@ $template{name="samples-page-header" title="Custom Load Balancer sample"}$
 						<li>copy <b>CustomLoadBalancer.jar in</b> the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. This will effectively install the new load-balancer.</li>
 						<li>in the server's installation config/jppf-driver.properties file, replace the property "<b>jppf.load.balancing.algorithm = xxxxx</b>" with "<b>jppf.load.balancing.algorithm = customLoadBalancer</b>",
 						to let the server know it must use the new load-balancer</li>
-						<li>start the JPPF server, by opening a console in its installation folder and typing: "<b>ant run</b>"</li>
-						<li>start each of the 2 nodes, by opening a console in its installation folder and typing: "<b>ant run</b>"</li>
+						<li>start the JPPF server and each of the 2 nodes</li>
 						<li>the demo application should already be configured with a connection pool size of 2; to confirm it you can open the file <a href="config/jppf-client.properties"><b>jppf-client.properties</a></b> in <b>CustomerLoadbalancer/config</b>, you should see a line "<b>jppf.pool.size = 2"</b></li>
 						<li>start the demo, by opening a console in <b>JPPF-x.y-samples-pack/CustomLoadBalancer</b>, and typing: "<b>ant run</b>"</li>
 						<li>in the first node's console output you should see messages of this type:<br>
