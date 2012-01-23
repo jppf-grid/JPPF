@@ -42,6 +42,10 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Reference to the JPPF configuration.
    */
   private static TypedProperties config = JPPFConfiguration.getProperties();
@@ -144,7 +148,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
     {
       log.error(e.getMessage(), e);
     }
-    if (debugEnabled) log.debug("Auto-discovery of the driver connection information: " + info);
+    if (traceEnabled) log.trace("Auto-discovery of the driver connection information: " + info);
     return info;
   }
 
