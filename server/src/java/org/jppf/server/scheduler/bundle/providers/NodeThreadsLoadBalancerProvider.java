@@ -19,11 +19,12 @@ package org.jppf.server.scheduler.bundle.providers;
 
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.impl.NodeThreadsLoadBalancer;
+import org.jppf.server.scheduler.bundle.nodethreads.NodeThreadsProfile;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider;
 import org.jppf.utils.TypedProperties;
 
 /**
- * Provider implementation for the custom load-balancing algorithm.
+ * Provider implementation for the "nodethreads" algorithm.
  * @author Laurent Cohen
  */
 public class NodeThreadsLoadBalancerProvider implements JPPFBundlerProvider
@@ -32,7 +33,7 @@ public class NodeThreadsLoadBalancerProvider implements JPPFBundlerProvider
   /**
    * Create a bundler instance using the specified parameters profile.
    * @param profile no used in this implementation.
-   * @return an instance of {@link CustomLoadBalancer}.
+   * @return an instance of {@link NodeThreadsLoadBalancer}.
    * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createBundler(org.jppf.server.scheduler.bundle.LoadBalancingProfile)
    */
   @Override
@@ -45,13 +46,13 @@ public class NodeThreadsLoadBalancerProvider implements JPPFBundlerProvider
    * Create a bundler profile containing the parameters of the algorithm.
    * This method returns null, as the algorithm does not use any parameter.
    * @param configuration a set of properties defining the algorithm parameters.
-   * @return null.
+   * @return an instance of {@link NodeThreadsProfile}.
    * @see org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
    */
   @Override
   public LoadBalancingProfile createProfile(final TypedProperties configuration)
   {
-    return null;
+    return new NodeThreadsProfile(configuration);
   }
 
   /**
@@ -62,6 +63,6 @@ public class NodeThreadsLoadBalancerProvider implements JPPFBundlerProvider
   @Override
   public String getAlgorithmName()
   {
-    return "NodeThreads";
+    return "nodethreads";
   }
 }
