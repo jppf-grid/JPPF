@@ -102,7 +102,14 @@ public abstract class AbstractRLBundler extends AbstractBundler
     if (size <= 0) return;
     BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / size, size);
     dataHolder.addSample(sample);
-
+    computeBundleSize();
+  }
+ 
+  /**
+   * Compute the new bundle size.
+   */
+  protected void computeBundleSize()
+  {
     double d = dataHolder.getPreviousMean() - dataHolder.getMean();
     double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
     prevBundleSize = bundleSize;
@@ -121,15 +128,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
     int max = maxSize();
     if (bundleSize > max) bundleSize = max;
     if (bundleSize <= 0) bundleSize = 1;
-    /*
-		if (debugEnabled)
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("bundler #").append(getBundlerNumber()).append(" : size=").append(getBundleSize());
-			sb.append(", ").append(getDataHolder());
-			log.debug(sb.toString());
-		}
-     */
   }
 
   /**

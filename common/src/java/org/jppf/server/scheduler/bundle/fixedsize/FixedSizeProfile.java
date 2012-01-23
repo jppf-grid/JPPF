@@ -72,7 +72,7 @@ public class FixedSizeProfile implements LoadBalancingProfile
 
   /**
    * Set the bundle size.
-   * @param size - the bundle size as an int.
+   * @param size the bundle size as an int.
    */
   public void setSize(final int size)
   {

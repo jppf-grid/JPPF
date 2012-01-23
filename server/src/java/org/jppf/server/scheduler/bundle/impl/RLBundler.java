@@ -37,14 +37,6 @@ public class RLBundler extends AbstractRLBundler
    * Determines whether debugging level is set for logging.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The range of actions, expressed in terms of a percentage of increase/decrease of the bundle size.
-   */
-  private static final int INCREASE_RANGE = 1;
-  /**
-   * The number of possible actions.
-   */
-  private static final int NB_ACTIONS = 2 * INCREASE_RANGE + 1;
 
   /**
    * Creates a new instance with the specified parameters.
