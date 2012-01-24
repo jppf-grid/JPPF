@@ -228,6 +228,7 @@ public class JobData
     notificationListener = listener;
     if (notificationListener != null)
     {
+      getProxy();
       if (proxy != null) proxy.addNotificationListener(notificationListener, null, null);
     }
   }

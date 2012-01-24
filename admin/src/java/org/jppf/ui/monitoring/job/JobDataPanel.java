@@ -18,8 +18,11 @@
 
 package org.jppf.ui.monitoring.job;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -33,7 +36,6 @@ import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -51,9 +53,14 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Separate thread used to sequentialize events that impact the job data tree.
+   * Map that accumulates changes between TreeTable updates.
    */
-  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobNotifications"));
+  private final Map<String, AccumulatorDriver> accumulatorMap = new HashMap<String, AccumulatorDriver>();
+  /**
+   *  Timer that publishes accumulated changes on AWT thread to TreeTable
+   */
+  private Timer timer = null;
+
   /**
    * The object that manages updates to and navigation within the tree table.
    */
@@ -64,8 +71,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   public JobDataPanel()
   {
-    if (debugEnabled) log.debug("initializing NodeDataPanel");
     BASE = "org.jppf.ui.i18n.JobDataPage";
+    if (debugEnabled) log.debug("initializing NodeDataPanel");
     createTreeTableModel();
     createUI();
     panelManager = new JobDataPanelManager(this);
@@ -89,7 +96,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   public synchronized void refresh()
   {
-    executor.submit(new RefreshTask());
+    SwingUtilities.invokeLater(new RefreshTask());
   }
 
   /**
@@ -97,6 +104,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   private synchronized void populateTreeTableModel()
   {
+    assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
+
     List<JPPFClientConnection> list = StatsHandler.getInstance().getJppfClient(null).getAllConnections();
     for (JPPFClientConnection c: list)
     {
@@ -110,7 +119,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
       JobData driverData = (JobData) driverNode.getUserObject();
       DriverJobManagementMBean proxy = driverData.getProxy();
       if (proxy == null) continue;
-      String[] jobIds = null;
+      String[] jobIds;
       try
       {
         jobIds = proxy.getAllJobIds();
@@ -133,7 +142,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
         }
         if (jobInfo == null) continue;
         panelManager.jobAdded(driverName, jobInfo);
-        DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobInfo);
         try
         {
           NodeJobInformation[] subJobInfo = proxy.getNodeInformation(id);
@@ -172,34 +180,59 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * Called to notify that a driver was added.
    * @param clientConnection a reference to the driver connection.
    */
-  public void driverAdded(final JPPFClientConnection clientConnection)
+  public synchronized void driverAdded(final JPPFClientConnection clientConnection)
   {
-    Runnable r = new SynchronizedTask(this)
-    {
-      @Override
-      public void perform()
-      {
-        panelManager.driverAdded(clientConnection);
-      }
-    };
-    executor.submit(r);
+    if(clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
+    JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
+    String driverName = wrapper.getId();
+
+    AccumulatorDriver driver = accumulatorMap.get(driverName);
+    if(driver == null) {
+      driver = new AccumulatorDriver(JobAccumulator.Type.ADD, clientConnection);
+      accumulatorMap.put(driverName, driver);
+    } else throw new IllegalStateException("driver already defined: " + driverName);
+
+    notifyChange();
   }
 
   /**
    * Called to notify that a driver was removed.
-   * @param driverName the name of the driver to remove.
+   * @param clientConnection a reference to the driver connection to remove.
    */
-  public void driverRemoved(final String driverName)
+  public synchronized void driverRemoved(final JPPFClientConnection clientConnection)
   {
-    Runnable r = new SynchronizedTask(this)
+    if(clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
+    JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
+    String driverName = wrapper.getId();
+    AccumulatorDriver driver = accumulatorMap.get(driverName);
+    if(driver == null) {
+      accumulatorMap.put(driverName, new AccumulatorDriver(JobAccumulator.Type.REMOVE, clientConnection));
+    }
+    else
     {
-      @Override
-      public void perform()
-      {
-        panelManager.driverRemoved(driverName);
-      }
-    };
-    executor.submit(r);
+      boolean remove = driver.mergeChange(JobAccumulator.Type.REMOVE);
+      if(remove) accumulatorMap.remove(driverName);
+    }
+
+    notifyChange();
+  }
+
+  public synchronized void driverUpdated(final JPPFClientConnection clientConnection)
+  {
+    if(clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
+    JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
+    String driverName = wrapper.getId();
+
+    AccumulatorDriver driver = accumulatorMap.get(driverName);
+    if(driver == null) {
+      driver = new AccumulatorDriver(JobAccumulator.Type.UPDATE, clientConnection);
+      accumulatorMap.put(driverName, driver);
+    } else {
+      boolean remove = driver.mergeChange(JobAccumulator.Type.UPDATE, clientConnection);
+      if(remove) accumulatorMap.remove(driverName);
+    }
+
+    notifyChange();
   }
 
   /**
@@ -207,17 +240,19 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param driverName the name of the driver the job was submitted to.
    * @param jobInfo information about the submitted job.
    */
-  public void jobAdded(final String driverName, final JobInformation jobInfo)
+  public synchronized void jobAdded(final String driverName, final JobInformation jobInfo)
   {
-    Runnable r = new SynchronizedTask(this)
-    {
-      @Override
-      public void perform()
-      {
-        panelManager.jobAdded(driverName, jobInfo);
-      }
-    };
-    executor.submit(r);
+    if(jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
+
+    AccumulatorDriver driver = getAccumulatedDriver(driverName);
+    Map<String, AccumulatorJob> jobMap = driver.getMap();
+    AccumulatorJob job = jobMap.get(jobInfo.getJobName());
+    if(job == null) {
+      job = new AccumulatorJob(JobAccumulator.Type.ADD, jobInfo);
+      jobMap.put(jobInfo.getJobName(), job);
+      notifyChange();
+    } else
+      throw new IllegalStateException("job already defined");
   }
 
   /**
@@ -225,17 +260,24 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param driverName the name of the driver the job was submitted to.
    * @param jobInfo information about the job.
    */
-  public void jobRemoved(final String driverName, final JobInformation jobInfo)
+  public synchronized void jobRemoved(final String driverName, final JobInformation jobInfo)
   {
-    Runnable r = new SynchronizedTask(this)
-    {
-      @Override
-      public void perform()
-      {
-        panelManager.jobRemoved(driverName, jobInfo);
-      }
-    };
-    executor.submit(r);
+    if(jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
+
+    AccumulatorDriver driver = getAccumulatedDriver(driverName);
+
+    Map<String, AccumulatorJob> jobMap = driver.getMap();
+    String jobName = jobInfo.getJobName();
+    AccumulatorJob job = jobMap.get(jobName);
+    if(job == null) {
+      job = new AccumulatorJob(JobAccumulator.Type.REMOVE, jobInfo);
+      jobMap.put(jobName, job);
+    } else {
+      boolean remove = job.mergeChange(JobAccumulator.Type.REMOVE);
+      if(remove) jobMap.remove(jobName);
+    }
+
+    notifyChange();
   }
 
   /**
@@ -243,17 +285,24 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param driverName the name of the driver the job was submitted to.
    * @param jobInfo information about the job.
    */
-  public void jobUpdated(final String driverName, final JobInformation jobInfo)
+  public synchronized void jobUpdated(final String driverName, final JobInformation jobInfo)
   {
-    Runnable r = new SynchronizedTask(this)
-    {
-      @Override
-      public void perform()
-      {
-        panelManager.jobUpdated(driverName, jobInfo);
-      }
-    };
-    executor.submit(r);
+    if(jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
+
+    AccumulatorDriver driver = getAccumulatedDriver(driverName);
+
+    Map<String, AccumulatorJob> jobMap = driver.getMap();
+    String jobName = jobInfo.getJobName();
+    AccumulatorJob job = jobMap.get(jobName);
+    if(job == null) {
+      job = new AccumulatorJob(JobAccumulator.Type.UPDATE, jobInfo);
+      jobMap.put(jobName, job);
+    } else {
+      boolean remove = job.mergeChange(JobAccumulator.Type.UPDATE, jobInfo);
+      if(remove) jobMap.remove(jobName);
+    }
+
+    notifyChange();
   }
 
   /**
@@ -262,17 +311,19 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param jobInfo information about the sub-job.
    * @param nodeInfo information about the node where the sub-job was dispatched.
    */
-  public void subJobAdded(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
+  public synchronized void subJobAdded(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
   {
-    Runnable r = new SynchronizedTask(this)
-    {
-      @Override
-      public void perform()
-      {
-        panelManager.subJobAdded(driverName, jobInfo, nodeInfo);
-      }
-    };
-    executor.submit(r);
+    AccumulatorJob job = getAccumulatorJob(driverName, jobInfo);
+
+    Map<String, AccumulatorNode> nodeMap = job.getMap();
+    String nodeName = nodeInfo.toString();
+    AccumulatorNode node = nodeMap.get(nodeName);
+    if(node == null) {
+      node = new AccumulatorNode(JobAccumulator.Type.ADD, jobInfo, nodeInfo);
+      nodeMap.put(nodeName, node);
+      notifyChange();
+    } else
+      throw new IllegalStateException("node already defined");
   }
 
   /**
@@ -281,17 +332,22 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param jobInfo information about the job.
    * @param nodeInfo information about the node where the sub-job was dispatched.
    */
-  public void subJobRemoved(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
+  public synchronized void subJobRemoved(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
   {
-    Runnable r = new SynchronizedTask(this)
-    {
-      @Override
-      public void perform()
-      {
-        panelManager.subJobRemoved(driverName, jobInfo, nodeInfo);
-      }
-    };
-    executor.submit(r);
+    AccumulatorJob job = getAccumulatorJob(driverName, jobInfo);
+
+    Map<String, AccumulatorNode> nodeMap = job.getMap();
+    String nodeName = nodeInfo.toString();
+    AccumulatorNode node = nodeMap.get(nodeName);
+    if(node == null) {
+      node = new AccumulatorNode(JobAccumulator.Type.REMOVE, jobInfo, nodeInfo);
+      nodeMap.put(nodeName, node);
+    } else {
+      boolean remove = node.mergeChange(JobAccumulator.Type.REMOVE);
+      if(remove) nodeMap.remove(nodeName);
+    }
+
+    notifyChange();
   }
 
   /**
@@ -300,7 +356,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
    */
   @Override
-  public synchronized void newConnection(final ClientEvent event)
+  public void newConnection(final ClientEvent event)
   {
     driverAdded(event.getConnection());
   }
@@ -311,8 +367,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   @Override
   public void connectionFailed(final ClientEvent event)
   {
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
-    driverRemoved(c.getJmxConnection().getId());
+    driverRemoved(event.getConnection());
   }
 
   /**
@@ -350,41 +405,179 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     new Thread(r).start();
   }
 
+  protected void publish() {
+    assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
+    Map<String, AccumulatorDriver> map = getMap();
+
+    for (Map.Entry<String, AccumulatorDriver> driverEntry : map.entrySet())
+    {
+      String driverName = driverEntry.getKey();
+      AccumulatorDriver driverAccumulator = driverEntry.getValue();
+      JobAccumulator.Type driverType = driverAccumulator.getType();
+      switch (driverType) {
+        case ADD:
+          panelManager.driverAdded(driverAccumulator.getValue());
+          break;
+        case REMOVE:
+          panelManager.driverRemoved(driverName);
+          continue;
+        case UPDATE:
+        {
+          DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
+          if (driverNode != null) getModel().changeNode(driverNode);
+        }
+        break;
+      }
+
+      DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
+      for (Map.Entry<String, AccumulatorJob> jobEntry : driverAccumulator.getMap().entrySet())
+      {
+        String jobName = jobEntry.getKey();
+        AccumulatorJob jobAccumulator = jobEntry.getValue();
+        JobAccumulator.Type jobType = jobAccumulator.getType();
+        switch (jobType) {
+          case ADD:
+            panelManager.jobAdded(driverName, jobAccumulator.getValue());
+            break;
+          case REMOVE:
+            panelManager.jobRemoved(driverName, jobName);
+            continue;
+          case UPDATE:
+          {
+            DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobName);
+            if(jobNode != null) panelManager.jobUpdated(driverName, jobAccumulator.getValue());
+          }
+          break;
+        }
+
+        for (Map.Entry<String, AccumulatorNode> nodeEntry : jobAccumulator.getMap().entrySet())
+        {
+          String nodeName = nodeEntry.getKey();
+          AccumulatorNode nodeAccumulator = nodeEntry.getValue();
+          JobAccumulator.Type nodeType = nodeAccumulator.getType();
+          switch (nodeType) {
+            case ADD:
+              panelManager.subJobAdded(driverName, nodeAccumulator.getJobInfo(), nodeAccumulator.getValue());
+              break;
+            case REMOVE:
+              panelManager.subJobRemoved(driverName, jobName, nodeName);
+              continue;
+          }
+        }
+      }
+    }
+  }
+
+  protected synchronized void notifyChange() {
+    if(timer == null) {
+      timer = new Timer(1000 / 30, new ActionListener()
+      {
+        @Override
+        public void actionPerformed(final ActionEvent e)
+        {
+          synchronized (JobDataPanel.this) {
+            timer = null;
+          }
+          publish();
+        }
+      });
+      timer.setRepeats(false);
+      timer.start();
+    }
+  }
+
+  public synchronized Map<String, AccumulatorDriver> getMap()
+  {
+    Map<String, AccumulatorDriver> copy = new HashMap<String, AccumulatorDriver>(accumulatorMap);
+    accumulatorMap.clear();
+    timer = null;
+    return copy;
+  }
+
+  protected synchronized void cleanup() {
+    accumulatorMap.clear();
+    if(timer != null) timer.stop();
+    timer = null;
+  }
+
   /**
    * This task refreshes the entire job data panel.
    */
-  public class RefreshTask extends SynchronizedTask
+  public class RefreshTask implements Runnable
   {
     /**
      * Initialize this task.
      */
     public RefreshTask()
     {
-      super(JobDataPanel.this);
     }
 
     /**
      * Perform the refresh.
      */
     @Override
-    public void perform()
+    public void run()
     {
-      int n = treeTableRoot.getChildCount();
-      for (int i=n-1; i>=0; i--)
-      {
-        DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-        try
-        {
-          ((JobData) driverNode.getUserObject()).changeNotificationListener(null);
-        }
-        catch(Exception e)
-        {
-          if (debugEnabled) log.debug("while refreshing: " + e.getMessage(), e);
-        }
-        model.removeNodeFromParent(driverNode);
-      }
+      cleanup();
+      panelManager.driverClear();
       populateTreeTableModel();
       refreshUI();
+    }
+  }
+
+  private AccumulatorDriver getAccumulatedDriver(final String driverName)
+  {
+    AccumulatorDriver driver = accumulatorMap.get(driverName);
+    if(driver == null) {
+      driver = new AccumulatorDriver(JobAccumulator.Type.KEEP, null);
+      accumulatorMap.put(driverName, driver);
+    }
+    return driver;
+  }
+
+  private AccumulatorJob getAccumulatorJob(final String driverName, final JobInformation jobInfo) {
+    AccumulatorDriver driver = getAccumulatedDriver(driverName);
+
+    Map<String, AccumulatorJob> jobMap = driver.getMap();
+    String jobName = jobInfo.getJobName();
+    AccumulatorJob job = jobMap.get(jobName);
+    if(job == null) {
+      job = new AccumulatorJob(JobAccumulator.Type.KEEP, jobInfo);
+      jobMap.put(jobName, job);
+    }
+    return job;
+  }
+
+  static class AccumulatorDriver extends JobAccumulatorBranch<JPPFClientConnection, String, AccumulatorJob>
+  {
+
+    public AccumulatorDriver(final Type type, final JPPFClientConnection value)
+    {
+      super(type, value);
+    }
+  }
+
+  static class AccumulatorJob extends JobAccumulatorBranch<JobInformation, String, AccumulatorNode>
+  {
+
+    public AccumulatorJob(final Type type, final JobInformation value)
+    {
+      super(type, value);
+    }
+  }
+
+  static class AccumulatorNode extends JobAccumulator<JPPFManagementInfo> {
+    private final JobInformation jobInfo;
+
+    AccumulatorNode(final Type type, final JobInformation jobInfo, final JPPFManagementInfo value)
+    {
+      super(type, value);
+      this.jobInfo = jobInfo;
+    }
+
+    public JobInformation getJobInfo()
+    {
+      return jobInfo;
     }
   }
 }
