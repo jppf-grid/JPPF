@@ -204,7 +204,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 
   /**
    * Get the time at which this wrapper was added to the queue.
-   * @return the time as a long value.
+   * @return the time in milliseconds as a long value.
    */
   public long getQueueEntryTime()
   {
@@ -213,7 +213,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 
   /**
    * Set the time at which this wrapper was added to the queue.
-   * @param queueEntryTime the time as a long value.
+   * @param queueEntryTime the time in milliseconds as a long value.
    */
   public void setQueueEntryTime(final long queueEntryTime)
   {

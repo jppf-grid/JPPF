@@ -69,7 +69,7 @@ public enum  BundleParameter
    */
   JOB_EXPIRED,
   /**
-   * Time at which the job is received on the server side.
+   * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
   JOB_RECEIVED_TIME,
   /**

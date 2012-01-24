@@ -60,7 +60,6 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   @Override
   public void run()
   {
-    JPPFNodeAdmin nodeAdmin = null;
     long cpuTime = 0L;
     long elapsedTime = 0L;
     try
@@ -68,14 +67,14 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
       long id = Thread.currentThread().getId();
       executionManager.processTaskTimeout(task, number);
-      long startTime = System.currentTimeMillis();
+      long startTime = System.nanoTime();
       long startCpuTime = executionManager.getCpuTime(id);
       task.run();
       try
       {
         // convert cpu time from nanoseconds to milliseconds
         cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
-        elapsedTime = System.currentTimeMillis() - startTime;
+        elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
       catch(Throwable ignore)
       {

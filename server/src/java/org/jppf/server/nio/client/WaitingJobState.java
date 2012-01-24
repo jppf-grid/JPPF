@@ -68,7 +68,7 @@ class WaitingJobState extends ClientServerState
       int count = header.getTaskCount();
       if (debugEnabled) log.debug("read bundle" + header + " from client " + channel + " done: received " + count + " tasks");
       if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME) == null)
-        header.setParameter(BundleParameter.JOB_RECEIVED_TIME, System.nanoTime());
+        header.setParameter(BundleParameter.JOB_RECEIVED_TIME, System.currentTimeMillis());
 
       header.getUuidPath().incPosition();
       header.getUuidPath().add(driver.getUuid());

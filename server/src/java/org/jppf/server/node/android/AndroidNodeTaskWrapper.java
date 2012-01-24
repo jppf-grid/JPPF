@@ -67,11 +67,11 @@ class AndroidNodeTaskWrapper extends AbstractNodeTaskWrapper
       Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
       long id = Thread.currentThread().getId();
       executionManager.processTaskTimeout(task, number);
-      long startTime = System.currentTimeMillis();
+      long startTime = System.nanoTime();
       task.run();
       try
       {
-        elapsedTime = System.currentTimeMillis() - startTime;
+        elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
       catch(Throwable ignore)
       {

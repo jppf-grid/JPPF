@@ -88,8 +88,8 @@ class PeerNodeResultSender extends AbstractResultSender
           }
           JPPFTaskBundle firstJob = (JPPFTaskBundle) first.getJob();
           firstJob.setTaskCount(count);
-          long elapsed = System.nanoTime() - start;
-          firstJob.setNodeExecutionTime(elapsed/1000000);
+          long elapsed = (System.nanoTime() - start) / 1000000L;
+          firstJob.setNodeExecutionTime(elapsed);
           sendPartialResults(first);
         }
         getResultList().clear();

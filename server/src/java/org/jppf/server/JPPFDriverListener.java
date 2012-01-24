@@ -55,15 +55,15 @@ public interface JPPFDriverListener extends EventListener
   /**
    * Called to notify that a task was removed from the queue.
    * @param count the number of tasks that have been removed from the queue.
-   * @param time the time the task remained in the queue.
+   * @param time the time in milliseconds the task remained in the queue.
    */
   void taskOutOfQueue(int count, long time);
 
   /**
    * Called when a task execution has completed.
    * @param count the number of tasks that have been executed.
-   * @param time the time it took to execute the task, including transport to and from the node.
-   * @param remoteTime the time it took to execute the in the node only.
+   * @param time the time in milliseconds it took to execute the task, including transport to and from the node.
+   * @param remoteTime the time in milliseconds it took to execute the in the node only.
    * @param size the size in bytes of the bundle that was sent to the node.
    */
   void taskExecuted(int count, long time, long remoteTime, long size);
@@ -81,7 +81,7 @@ public interface JPPFDriverListener extends EventListener
   void jobQueued(int nbTasks);
   /**
    * Called when a job is completes.
-   * @param time the total execution time of the job.
+   * @param time the total execution time in milliseconds of the job.
    */
   void jobEnded(long time);
 

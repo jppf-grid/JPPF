@@ -119,7 +119,7 @@ public class LocalNodeIO extends AbstractNodeIO
     list.add(bundle);
     try
     {
-      bundle.setNodeExecutionTime(System.currentTimeMillis());
+      bundle.setNodeExecutionTime(System.nanoTime());
       if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
       if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
       {
@@ -151,7 +151,7 @@ public class LocalNodeIO extends AbstractNodeIO
   {
     if (debugEnabled) log.debug("writing results");
     ExecutorService executor = node.getExecutionManager().getExecutor();
-    long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
+    long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime()) / 1000000L;
     bundle.setNodeExecutionTime(elapsed);
     List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));

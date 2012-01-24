@@ -94,7 +94,6 @@ public class AndroidNodeIO extends AbstractNodeIO
     list.add(bundle);
     try
     {
-      //bundle.setNodeExecutionTime(System.currentTimeMillis());
       bundle.setNodeExecutionTime(System.nanoTime());
       int count = bundle.getTaskCount();
       if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
@@ -111,11 +110,11 @@ public class AndroidNodeIO extends AbstractNodeIO
       }
       if (debugEnabled) log.debug("got all data");
     }
-    catch(Throwable e)
+    catch(Throwable t)
     {
-      log.error("Exception occurred while deserializing the tasks", e);
+      log.error("Exception occurred while deserializing the tasks", t);
       bundle.setTaskCount(0);
-      bundle.setParameter(NODE_EXCEPTION_PARAM, e);
+      bundle.setParameter(NODE_EXCEPTION_PARAM, t);
     }
     return list.toArray(new Object[list.size()]);
   }
@@ -144,10 +143,9 @@ public class AndroidNodeIO extends AbstractNodeIO
   public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
   {
     ExecutorService executor = node.getExecutionManager().getExecutor();
-    //long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-    long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime())/1000000;
+    long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime()) / 1000000L;
     bundle.setNodeExecutionTime(elapsed);
-    List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>();
+    List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
     OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
