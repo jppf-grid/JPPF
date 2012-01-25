@@ -33,6 +33,16 @@ public class JobDataPanelActionManager extends JTreeTableActionHandler
    */
   public JobDataPanelActionManager(final JTreeTable treeTable)
   {
-    super(treeTable);
+    super(treeTable, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public synchronized void updateActions()
+  {
+    computeSelectedElements();
+    super.updateActions();
   }
 }

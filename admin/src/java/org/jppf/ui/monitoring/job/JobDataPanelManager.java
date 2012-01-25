@@ -362,7 +362,7 @@ class JobDataPanelManager
   {
 
     /**
-     * Initialize this listener with the specified connection name.
+     * Initialize this listener.
      */
     public ConnectionStatusListener()
     {

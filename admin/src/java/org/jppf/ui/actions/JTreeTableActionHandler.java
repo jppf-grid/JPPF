@@ -40,16 +40,37 @@ public class JTreeTableActionHandler extends AbstractActionHandler
    */
   public JTreeTableActionHandler(final JTreeTable treeTable)
   {
+    this(treeTable, true);
+  }
+
+  /**
+   * Initialize this action manager with the specified JTreeTable component.
+   * @param treeTable the JTreeTable whose actions are managed.
+   * @param useListener if <code>true</code> then register a selection listener on the tree table to handle action states updates.
+   */
+  public JTreeTableActionHandler(final JTreeTable treeTable, final boolean useListener)
+  {
     this.treeTable = treeTable;
+    if (useListener) registerSelectionListener();
+  }
+
+  /**
+   * Register a selection listener on the tree table to handle action states updates.
+   */
+  private void registerSelectionListener()
+  {
     treeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
     {
       @Override
       public void valueChanged(final ListSelectionEvent e)
       {
-        synchronized(JTreeTableActionHandler.this)
+        if (!e.getValueIsAdjusting())
         {
-          computeSelectedElements();
-          updateActions();
+          synchronized(JTreeTableActionHandler.this)
+          {
+            computeSelectedElements();
+            updateActions();
+          }
         }
       }
     });

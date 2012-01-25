@@ -392,7 +392,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   public void setupActions()
   {
-    actionHandler = new JTreeTableActionHandler(treeTable);
+    actionHandler = new JobDataPanelActionManager(treeTable);
     actionHandler.putAction("cancel.job", new CancelJobAction());
     actionHandler.putAction("suspend.job", new SuspendJobAction());
     actionHandler.putAction("suspend_requeue.job", new SuspendRequeueJobAction());
@@ -466,6 +466,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
         }
       }
     }
+    if (actionHandler != null) actionHandler.updateActions();
   }
 
   protected synchronized void notifyChange() {
