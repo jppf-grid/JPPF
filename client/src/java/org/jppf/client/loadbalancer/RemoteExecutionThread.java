@@ -22,9 +22,8 @@ import java.util.List;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.Pair;
 import org.slf4j.*;
 
 /**
@@ -80,27 +79,19 @@ class RemoteExecutionThread extends ExecutionThread
       {
         requestUuid = newJob.getUuid();
         JPPFTaskBundle bundle = createBundle(newJob);
-        ClassLoader cl = null;
-        if (!job.getTasks().isEmpty())
-        {
-          Task task = job.getTasks().get(0);
-          cl = task.getClass().getClassLoader();
-          connection.getDelegate().addRequestClassLoader(requestUuid, cl);
-          if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-        }
         connection.sendTasks(bundle, newJob);
         while (count < tasks.size())
         {
-          Pair<List<JPPFTask>, Integer> p = connection.receiveResults(cl);
-          int n = p.first().size();
+          List<JPPFTask> results = connection.receiveResults(connection.getDelegate().getRequestClassLoader(bundle.getRequestUuid()));
+          int n = results.size();
           count += n;
-          if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + p.first().get(0).getPosition() : ""));
+          if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
           TaskResultListener listener = newJob.getResultListener();
           if (listener != null)
           {
             synchronized(listener)
             {
-              listener.resultsReceived(new TaskResultEvent(p.first()));
+              listener.resultsReceived(new TaskResultEvent(results));
             }
           }
           else log.warn("result listener is null for job " + newJob);
@@ -167,6 +158,15 @@ class RemoteExecutionThread extends ExecutionThread
     String requestUuid = job.getUuid();
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setRequestUuid(requestUuid);
+    ClassLoader cl = null;
+    if (!job.getTasks().isEmpty())
+    {
+      Object task = job.getTasks().get(0);
+      if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
+      cl = task.getClass().getClassLoader();
+      connection.getDelegate().addRequestClassLoader(requestUuid, cl);
+      if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+    }
     return bundle;
   }
 }
