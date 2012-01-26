@@ -36,6 +36,7 @@ import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -383,6 +384,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
         treeTable.invalidate();
         treeTable.doLayout();
         treeTable.updateUI();
+        notifyChange();
       }
     });
   }
@@ -471,18 +473,20 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
 
   protected synchronized void notifyChange() {
     if(timer == null) {
-      timer = new Timer(1000 / 30, new ActionListener()
+      final int period = JPPFConfiguration.getProperties().getInt("jppf.gui.publish.period", 1000/30);
+      timer = new Timer(period, new ActionListener()
       {
         @Override
         public void actionPerformed(final ActionEvent e)
         {
           synchronized (JobDataPanel.this) {
-            timer = null;
+            //timer = null;
           }
           publish();
         }
       });
-      timer.setRepeats(false);
+      //timer.setRepeats(false);
+      timer.setRepeats(true);
       timer.start();
     }
   }
