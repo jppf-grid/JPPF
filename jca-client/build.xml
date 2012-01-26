@@ -376,23 +376,21 @@
 	<!--
 	-->
 	<target name="deploy.jboss">
-		<copy todir="C:/Tools/jboss-6.0.0/server/jppf/deploy" file="${build.dir}/jppf_ra_${jboss}.rar" overwrite="true"/>
-		<copy todir="C:/Tools/jboss-6.0.0/server/jppf/deploy" file="${build.dir}/${ear.prefix}_${jboss}.ear" overwrite="true"/>
+		<!--
+		<property name="jboss.deploy" value="C:/Tools/jboss-6.0.0/server/jppf/deploy"/>
+		-->
+		<property name="jboss.deploy" value="C:/Tools/jboss-4.2.3.GA/server/default/deploy"/>
+		<copy todir="${jboss.deploy}" file="${build.dir}/jppf_ra_${jboss}.rar" overwrite="true"/>
+		<copy todir="${jboss.deploy}" file="${build.dir}/${ear.prefix}_${jboss}.ear" overwrite="true"/>
 	</target>
 
-	<target name="deploy.2.rar.weblogic">
+	<target name="deploy.weblogic">
 		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/jppf_ra_${weblogic}.rar"/>
-	</target>
-
-	<target name="deploy.2.ear.weblogic">
 		<copy todir="C:/bea/user_projects/domains/jppf_domain/autodeploy" file="${build.dir}/${ear.prefix}_${weblogic}.ear"/>
 	</target>
 
-	<target name="deploy.3.rar.sunas">
+	<target name="deploy.sunas">
 		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/jppf_ra_${sunas}.rar"/>
-	</target>
-
-	<target name="deploy.3.ear.sunsas">
 		<copy todir="C:/Tools/Sun/AppServer/domains/domain1/autodeploy" file="${build.dir}/${ear.prefix}_${sunas}.ear"/>
 	</target>
 

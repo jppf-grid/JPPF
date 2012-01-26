@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
@@ -394,6 +395,7 @@ public class LoadBalancer
 		{
 			try
 			{
+			  connection.setCurrentJob(job);
 				long start = System.currentTimeMillis();
 				int count = 0;
 				boolean completed = false;
@@ -437,10 +439,6 @@ public class LoadBalancer
 			}
 			catch(Throwable t)
 			{
-				/*
-				if (debugEnabled) log.debug(t.getMessage(), t);
-				else log.error(t.getClass().getName() + ": " + t.getMessage());
-				*/
 				log.error(t.getMessage(), t);
 				exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
 				if (job.getResultListener() != null)
@@ -450,6 +448,10 @@ public class LoadBalancer
 						job.getResultListener().resultsReceived(new TaskResultEvent(t));
 					}
 				}
+			}
+			finally
+			{
+        connection.setCurrentJob(null);
 			}
 		}
 
@@ -482,13 +484,15 @@ public class LoadBalancer
 			bundle.setRequestUuid(requestUuid);
 			ClassLoader cl = null;
 			ClassLoader oldCl = null;
-			if (!job.getTasks().isEmpty())
-			{
-				JPPFTask task = job.getTasks().get(0);
-				cl = task.getClass().getClassLoader();
-				connection.getClient().addRequestClassLoader(requestUuid, cl);
-				if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-			}
+      if (!tasks.isEmpty())
+      {
+        Object task = tasks.get(0);
+        if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
+        if (log.isDebugEnabled()) log.debug("class loader for " + task.getClass().getName() + " = " + task.getClass().getClassLoader());
+        cl = task.getClass().getClassLoader();
+        connection.getClient().addRequestClassLoader(requestUuid, cl);
+        if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+      }
 			return bundle;
 		}
 	}

@@ -96,6 +96,7 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 			pendingCount -= n;
 			if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, " + pendingCount + " pending tasks remain" +  (n > 0 ? ", first position=" + tasks.get(0).getPosition() : ""));
 			for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+			if (pendingCount <= 0) setStatus(SubmissionStatus.COMPLETE);
 			wakeUp();
 		}
 		else
@@ -158,9 +159,12 @@ public class JPPFSubmissionResult extends ThreadSynchronization implements TaskR
 	 */
 	public synchronized void setStatus(SubmissionStatus status)
 	{
-		if (debugEnabled) log.debug("submission [" + id + "] status changing from '" + this.status + "' to '" + status + "'");
-		this.status = status;
-		fireStatusChangeEvent();
+	  if (!status.equals(this.status))
+	  {
+  		if (debugEnabled) log.debug("submission [" + id + "] status changing from '" + this.status + "' to '" + status + "'");
+  		this.status = status;
+  		fireStatusChangeEvent();
+	  }
 	}
 
 	/**

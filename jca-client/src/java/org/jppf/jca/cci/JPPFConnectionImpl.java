@@ -255,7 +255,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
 	{
 		JPPFSubmissionResult result = getSubmissionResult(submissionId);
 		if (result == null) return null;
-		result.waitForResults(0L);
+		result.waitForResults(Long.MAX_VALUE);
 		return result.getResults();
 	}
 }

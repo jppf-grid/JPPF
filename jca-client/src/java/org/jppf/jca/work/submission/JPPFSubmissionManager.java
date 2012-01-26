@@ -23,11 +23,10 @@ import static org.jppf.client.SubmissionStatus.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.resource.spi.work.*;
+import javax.resource.spi.work.Work;
 
 import org.jppf.client.*;
-import org.jppf.jca.work.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.jca.work.JPPFJcaClient;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -227,37 +226,22 @@ public class JPPFSubmissionManager extends ThreadSynchronization implements Work
 		{
 			JPPFSubmissionResult result = (JPPFSubmissionResult) job.getResultListener();
 			String requestUuid = job.getJobUuid();
-			ClassLoader cl = null;
-			ClassLoader oldCl = null;
-			if (!job.getTasks().isEmpty())
-			{
-				JPPFTask task = job.getTasks().get(0);
-				cl = task.getClass().getClassLoader();
-				client.addRequestClassLoader(requestUuid, cl);
-				if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
-			}
 			try
 			{
-				if (cl != null)
-				{
-					oldCl = Thread.currentThread().getContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
-				}
+        result.setStatus(EXECUTING);
 				client.getLoadBalancer().execute(job, connection, locallyExecuting);
-				result.waitForResults(0);
-				client.removeRequestClassLoader(requestUuid);
 				result.setStatus(COMPLETE);
 			}
 			catch (Exception e)
 			{
 				result.setStatus(FAILED);
 				log.error(e.getMessage(), e);
-				addExistingSubmission(job);
+				if (!(e instanceof ClassNotFoundException)) addExistingSubmission(job);
 			}
 			finally
 			{
+        client.removeRequestClassLoader(requestUuid);
 				if (connection != null) connection.setStatus(JPPFClientConnectionStatus.ACTIVE);
-				if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
 			}
 		}
 
