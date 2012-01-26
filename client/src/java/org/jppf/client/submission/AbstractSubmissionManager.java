@@ -51,6 +51,10 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
    */
   protected ConcurrentLinkedQueue<JPPFJob> execQueue = new ConcurrentLinkedQueue<JPPFJob>();
   /**
+   * The queue of submissions pending execution.
+   */
+  protected ConcurrentLinkedQueue<JPPFJob> broadcastJobsQueue = new ConcurrentLinkedQueue<JPPFJob>();
+  /**
    * The JPPF client that manages connections to the JPPF drivers.
    */
   protected AbstractGenericClient client = null;
@@ -66,21 +70,35 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
     while (!isStopped())
     {
       Pair<Boolean, Boolean> execFlags = null;
-      while ((execQueue.isEmpty() || !(execFlags = client.handleAvailableConnection()).first()) && !isStopped())
+      while (((execQueue.isEmpty() && broadcastJobsQueue.isEmpty()) || !(execFlags = client.handleAvailableConnection()).first()) && !isStopped())
       {
         goToSleep(MAX_WAIT_MILLIS, MAX_WAIT_NANOS);
       }
       if (isStopped()) break;
       synchronized(this)
       {
-        JPPFJob job = execQueue.peek();
+        if (debugEnabled) log.debug("execFlags.first=" + execFlags.first() + ", execFlags.second=" + execFlags.second() +
+          ", execQueue.isEmpty()=" + execQueue.isEmpty() + ", broadcastJobsQueue.isEmpty()=" + broadcastJobsQueue.isEmpty());
+        JPPFJob job = null;
         AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
-        if ((c == null) && job.getSLA().isBroadcastJob())
+        if ((c != null) && !broadcastJobsQueue.isEmpty())
         {
+          job = broadcastJobsQueue.poll();
+          if (debugEnabled) log.debug("remote connection available for broadcast job " + job + ", submitting this job");
           if (execFlags.second()) client.getLoadBalancer().setLocallyExecuting(false);
-          continue;
         }
-        job = execQueue.poll();
+        else
+        {
+          job = execQueue.poll();
+          if (job == null) continue;
+          if ((c == null) && job.getSLA().isBroadcastJob())
+          {
+            if (execFlags.second()) client.getLoadBalancer().setLocallyExecuting(false);
+            if (debugEnabled) log.debug("no remote connection available for broadcast job " + job + " setting this job on hold");
+            broadcastJobsQueue.offer(job);
+            continue;
+          }
+        }
         if (debugEnabled) log.debug("submitting jobId=" + job.getName());
         if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
         JobSubmission submission = createSubmission(job, c, job.getSLA().isBroadcastJob() ? false : execFlags.second());

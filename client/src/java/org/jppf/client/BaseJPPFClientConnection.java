@@ -133,8 +133,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
-    JPPFTask t = job.getTasks().get(0);
-    ObjectSerializer ser = makeHelper(t.getClass().getClassLoader()).getSerializer();
+    ObjectSerializer ser = makeHelper(getDelegate().getRequestClassLoader(header.getRequestUuid())).getSerializer();
     int count = job.getTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
@@ -190,8 +189,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   {
     try
     {
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      if (cl == null) cl = getClass().getClassLoader();
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
-      ObjectSerializer ser = makeHelper().getSerializer();
+      ObjectSerializer ser = makeHelper(cl).getSerializer();
       JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
       if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getName() + '\'');

@@ -118,6 +118,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
       pendingCount -= tasks.size();
       if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
       if (pendingCount <= 0) buildResults();
+      setStatus(SubmissionStatus.COMPLETE);
       notifyAll();
       if ((job != null) && (job.getPersistenceManager() != null))
       {
@@ -265,12 +266,17 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     synchronized(listeners)
     {
-      if (listeners.isEmpty()) return;
-      if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
-      SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
-      for (SubmissionStatusListener listener: listeners)
+      if (!this.status.equals(newStatus))
       {
-        listener.submissionStatusChanged(event);
+        if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
+        if (!listeners.isEmpty())
+        {
+          SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
+          for (SubmissionStatusListener listener: listeners)
+          {
+            listener.submissionStatusChanged(event);
+          }
+        }
       }
     }
   }

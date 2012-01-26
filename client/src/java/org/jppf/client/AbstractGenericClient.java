@@ -68,7 +68,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * The load balancer for local versus remote execution.
    */
-  protected LoadBalancer loadBalancer = null;
+  protected LoadBalancer loadBalancer = new LoadBalancer();
   /**
    * Keeps a list of the valid connections not currently executing tasks.
    */
@@ -114,7 +114,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected void initPools()
   {
     if (debugEnabled) log.debug("initializing connections");
-    loadBalancer = new LoadBalancer();
+    //loadBalancer = new LoadBalancer();
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
     executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     if (config.getBoolean("jppf.remote.execution.enabled", true))

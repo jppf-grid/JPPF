@@ -127,7 +127,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
             if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name);
 
             String requestUuid = resource.getRequestUuid();
-            ClassLoader cl = getClassLoader(requestUuid);
+            ClassLoader cl = getRequestClassLoader(requestUuid);
             if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl + " for request uuid = " + requestUuid);
             if (resource.getData("multiple") != null)
             {
@@ -246,15 +246,5 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
   @Override
   public void release()
   {
-  }
-
-  /**
-   * Retrieve the class loader to use form the submission manager.
-   * @param uuid the uuid of the request from which the class loader was obtained.
-   * @return a <code>ClassLoader</code> instance, or null if none could be found.
-   */
-  private ClassLoader getClassLoader(final String uuid)
-  {
-    return getRequestClassLoader(uuid);
   }
 }
