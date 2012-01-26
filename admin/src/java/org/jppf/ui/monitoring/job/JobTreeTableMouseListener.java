@@ -93,6 +93,7 @@ public class JobTreeTableMouseListener extends MouseAdapter
     menu.add(createMenuItem(actionHandler.getAction("resume.job"), p));
     menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("max.nodes.job"), p));
+    menu.add(createMenuItem(actionHandler.getAction("update.priority.job"), p));
     return menu;
   }
 

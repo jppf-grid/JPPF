@@ -32,7 +32,7 @@
 		<property name="componentConstraints" value=""/>
 		<property name="tooltip" value="Settings of the node's execution thread pool"/>
 
-		<child name="job.priotity" type="SpinnerNumber">
+		<child name="job.priority" type="SpinnerNumber">
 			<property name="label" value="Job Priority"/>
 			<property name="tooltip" value="Choose or type the new job priority"/>
 			<property name="value" value="0"/>

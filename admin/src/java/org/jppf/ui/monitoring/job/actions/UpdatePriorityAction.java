@@ -92,7 +92,7 @@ public class UpdatePriorityAction extends AbstractJobAction
       priority = Integer.MAX_VALUE;
       for (JobData data: jobDataArray)
       {
-        int n = data.getJobInformation().getMaxNodes();
+        int n = data.getJobInformation().getPriority();
         if (n < priority) priority = n;
       }
       ((AbstractOption) panel.findFirstWithName("job.priority")).setValue(priority);
@@ -137,7 +137,7 @@ public class UpdatePriorityAction extends AbstractJobAction
    */
   private void doOK()
   {
-    AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
+    AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
     priority = (Integer) priorityOption.getValue();
     Runnable r = new Runnable()
     {
