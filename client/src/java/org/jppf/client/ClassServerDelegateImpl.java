@@ -210,6 +210,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
    */
   private ClassLoader getClassLoader(final String uuid)
   {
-    return getRequestClassLoader(uuid);
+    return ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(uuid);
   }
 }

@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.ClientConnectionStatusEvent;
@@ -73,6 +73,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Keeps a list of the valid connections not currently executing tasks.
    */
   protected Vector<JPPFClientConnection> availableConnections;
+  /**
+   * Mapping of class loader to requests uuids.
+   */
+  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
 
   /**
    * Initialize this client with an automatically generated application UUID.
@@ -436,5 +440,43 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public ThreadPoolExecutor getExecutor()
   {
     return executor;
+  }
+
+  /**
+   * Add a request uuid to class loader mapping to this submission manager.
+   * @param uuid the uuid of the request.
+   * @param cl the class loader for the request.
+   */
+  public void addRequestClassLoader(final String uuid, final ClassLoader cl)
+  {
+    synchronized(classLoaderMap)
+    {
+      classLoaderMap.put(uuid, cl);
+    }
+  }
+
+  /**
+   * Add a request uuid to class loader mapping to this submission manager.
+   * @param uuid the uuid of the request.
+   */
+  public void removeRequestClassLoader(final String uuid)
+  {
+    synchronized(classLoaderMap)
+    {
+      classLoaderMap.remove(uuid);
+    }
+  }
+
+  /**
+   * Get a class loader from its request uuid.
+   * @param uuid the uuid of the request.
+   * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+   */
+  public ClassLoader getRequestClassLoader(final String uuid)
+  {
+    synchronized(classLoaderMap)
+    {
+      return classLoaderMap.get(uuid);
+    }
   }
 }

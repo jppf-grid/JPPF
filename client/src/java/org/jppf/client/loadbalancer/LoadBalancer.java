@@ -49,6 +49,10 @@ public class LoadBalancer
    */
   private boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Index for local bundler.
    */
   static final int LOCAL = 0;
@@ -252,7 +256,7 @@ public class LoadBalancer
     synchronized(getAvailableConnectionLock())
     {
       this.locallyExecuting.set(locallyExecuting);
-      if (debugEnabled) log.debug("set locallyExecuting to " + locallyExecuting);
+      if (traceEnabled) log.trace("set locallyExecuting to " + locallyExecuting);
     }
   }
 

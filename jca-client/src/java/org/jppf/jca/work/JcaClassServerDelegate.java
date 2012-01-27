@@ -25,7 +25,7 @@ import javax.resource.spi.work.Work;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.client.AbstractClassServerDelegate;
+import org.jppf.client.*;
 import org.jppf.comm.socket.SocketInitializer;
 import org.slf4j.*;
 
@@ -127,7 +127,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
             if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name);
 
             String requestUuid = resource.getRequestUuid();
-            ClassLoader cl = getRequestClassLoader(requestUuid);
+            ClassLoader cl = ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(requestUuid);
             if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl + " for request uuid = " + requestUuid);
             if (resource.getData("multiple") != null)
             {

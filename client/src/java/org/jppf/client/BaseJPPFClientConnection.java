@@ -133,7 +133,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
-    ObjectSerializer ser = makeHelper(getDelegate().getRequestClassLoader(header.getRequestUuid())).getSerializer();
+    ClassLoader cl = getClient().getRequestClassLoader(job.getUuid());
+    ObjectSerializer ser = makeHelper(cl).getSerializer();
     int count = job.getTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());

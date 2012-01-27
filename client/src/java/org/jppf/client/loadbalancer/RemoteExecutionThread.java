@@ -82,7 +82,7 @@ class RemoteExecutionThread extends ExecutionThread
         connection.sendTasks(bundle, newJob);
         while (count < tasks.size())
         {
-          List<JPPFTask> results = connection.receiveResults(connection.getDelegate().getRequestClassLoader(bundle.getRequestUuid()));
+          List<JPPFTask> results = connection.receiveResults(connection.getClient().getRequestClassLoader(bundle.getRequestUuid()));
           int n = results.size();
           count += n;
           if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
@@ -120,7 +120,7 @@ class RemoteExecutionThread extends ExecutionThread
     }
     finally
     {
-      connection.getDelegate().removeRequestClassLoader(requestUuid);
+      connection.getClient().removeRequestClassLoader(requestUuid);
     }
   }
 
@@ -164,8 +164,8 @@ class RemoteExecutionThread extends ExecutionThread
       Object task = job.getTasks().get(0);
       if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
       cl = task.getClass().getClassLoader();
-      connection.getDelegate().addRequestClassLoader(requestUuid, cl);
-      if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid);
+      connection.getClient().addRequestClassLoader(requestUuid, cl);
+      if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid + ", from class " + task.getClass());
     }
     return bundle;
   }

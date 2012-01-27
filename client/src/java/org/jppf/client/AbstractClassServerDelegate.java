@@ -149,38 +149,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   }
 
   /**
-   * Add a request uuid to class loader mapping to this submission manager.
-   * @param uuid the uuid of the request.
-   * @param cl the class loader for the request.
-   */
-  @Override
-  public void addRequestClassLoader(final String uuid, final ClassLoader cl)
-  {
-    classLoaderMap.put(uuid, cl);
-  }
-
-  /**
-   * Add a request uuid to class loader mapping to this submission manager.
-   * @param uuid the uuid of the request.
-   */
-  @Override
-  public void removeRequestClassLoader(final String uuid)
-  {
-    classLoaderMap.remove(uuid);
-  }
-
-  /**
-   * Get a class loader from its request uuid.
-   * @param uuid the uuid of the request.
-   * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
-   */
-  @Override
-  public ClassLoader getRequestClassLoader(final String uuid)
-  {
-    return classLoaderMap.get(uuid);
-  }
-
-  /**
    * Perform the handshake with the server.
    * @throws Exception if any error occurs.
    */
