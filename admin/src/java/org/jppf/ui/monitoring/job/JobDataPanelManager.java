@@ -46,8 +46,11 @@ class JobDataPanelManager
    * The job data panel holding this manager.
    */
   private final JobDataPanel panel;
-
+  /**
+   * 
+   */
   private final ConnectionStatusListener listener = new ConnectionStatusListener();
+
   /**
    * Initialize this job data panel manager.
    * @param panel the job data panel holding this manager.
@@ -110,7 +113,11 @@ class JobDataPanelManager
     panel.getModel().removeNodeFromParent(driverNode);
   }
 
-  public void driverClear() {
+  /**
+   * Remove all driver nodes from the tree table.
+   */
+  public void driverClear()
+  {
     DefaultMutableTreeNode root = panel.getTreeTableRoot();
     if (debugEnabled) log.debug("removing all drivers");
     int n = root.getChildCount();
@@ -360,26 +367,17 @@ class JobDataPanelManager
    */
   public class ConnectionStatusListener implements ClientConnectionStatusListener
   {
-
     /**
-     * Initialize this listener.
-     */
-    public ConnectionStatusListener()
-    {
-    }
-
-    /**
-     * Invoked when thew connection status has changed.
-     * @param event the connection status event.
-     * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+     * {@inheritDoc}
      */
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event)
     {
-      if(event.getSource() instanceof JPPFClientConnectionImpl) {
+      if(event.getSource() instanceof JPPFClientConnectionImpl)
+      {
         panel.driverUpdated((JPPFClientConnectionImpl) event.getSource());
-      } else
-        throw new IllegalStateException("Unsupported event source - expected JPPFClientConnectionImpl");
+      }
+      else throw new IllegalStateException("Unsupported event source - expected JPPFClientConnectionImpl");
     }
   }
 }
