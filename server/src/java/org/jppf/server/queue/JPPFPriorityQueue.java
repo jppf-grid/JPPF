@@ -349,10 +349,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void processBroadcastJob(final ServerJob bundleWrapper)
   {
-    Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
-    if (uuidMap.isEmpty()) return;
-    BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());
     JPPFDistributedJob bundle = bundleWrapper.getJob();
+    Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
+    if (uuidMap.isEmpty())
+    {
+      ((JPPFTaskBundle) bundle).getCompletionListener().taskCompleted(bundleWrapper);
+      return;
+    }
+    BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());
     JobSLA sla = bundle.getSLA();
     ExecutionPolicy policy = sla.getExecutionPolicy();
     List<ServerJob> jobList = new ArrayList<ServerJob>(uuidMap.size());
