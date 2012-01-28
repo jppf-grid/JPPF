@@ -22,6 +22,7 @@ import static org.jppf.utils.StringUtils.*;
 import java.util.List;
 
 import org.jppf.JPPFException;
+import org.jppf.classloader.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -134,6 +135,15 @@ public class BroadcastJobRunner
     @Override
     public void run()
     {
+      try
+      {
+        DelegationModel model = JPPFClassLoader.getDelegationModel();
+        System.out.println("delegation model: "  + model);
+      }
+      catch (Throwable t)
+      {
+        t.printStackTrace();
+      }
       System.out.println("broadcast task " + getId());
     }
   }
