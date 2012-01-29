@@ -96,7 +96,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public JPPFJob()
   {
-    this(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+    this(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
   }
 
   /**
@@ -106,8 +106,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public JPPFJob(final String jobUuid)
   {
-    this.uuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString() : jobUuid;
-    name = jobUuid;
+    this.uuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString() : jobUuid;
+    name = (jobUuid == null) ? this.uuid : jobUuid;
   }
 
   /**

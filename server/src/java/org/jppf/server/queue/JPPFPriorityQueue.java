@@ -374,7 +374,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
       newBundle.setCompletionListener(completionListener);
       newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
-      newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+      newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
       if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
       jobList.add(job);
     }

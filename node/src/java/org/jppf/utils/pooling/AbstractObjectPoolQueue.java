@@ -18,33 +18,63 @@
 
 package org.jppf.utils.pooling;
 
-import java.nio.ByteBuffer;
-
-import org.jppf.utils.streams.StreamConstants;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A ByteBuffer pool backed by a {@link ConcurrentLinkedQueue}.
+ * @param <T>
  * @author Laurent Cohen
  */
-public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer>
+public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
 {
   /**
-   * Create a new object for the pool.
-   * @return an object that can be returned to the pool.
+   * The pool of {@link ByteBuffer}.
    */
-  @Override
-  protected ByteBuffer create()
-  {
-    return ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
-  }
+  protected final Queue<T> queue = new ConcurrentLinkedQueue<T>();
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void put(final ByteBuffer buffer)
+  public T get()
   {
-    buffer.clear();
-    queue.offer(buffer);
+    T t = queue.poll();
+    return (t == null) ? create() : t;
+  }
+
+  /**
+   * Create a new object for the pool.
+   * @return an object that can be returned to the pool.
+   */
+  protected abstract T create();
+ 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void put(final T t)
+  {
+    queue.offer(t);
+  }
+  
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isEmpty()
+  {
+    return queue.isEmpty();
+  }
+
+  /**
+   * Use this method with precaution, as its performance is in O(n).<br/>
+   * {@inheritDoc}
+   */
+  @Override
+  public int size()
+  {
+    return queue.size();
   }
 }

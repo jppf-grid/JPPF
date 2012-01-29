@@ -58,7 +58,7 @@ public class JMXServerImpl extends AbstractJMXServer
    */
   public JMXServerImpl(final String namespaceSuffix)
   {
-    this(namespaceSuffix, new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+    this(namespaceSuffix, new JPPFUuid().toString());
   }
 
   /**

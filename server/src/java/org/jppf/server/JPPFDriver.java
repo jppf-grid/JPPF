@@ -106,7 +106,7 @@ public class JPPFDriver
   /**
    * Uuid for this driver.
    */
-  private String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString().toUpperCase();
+  private String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase();
   /**
    * Performs initialization of the driver's components.
    */

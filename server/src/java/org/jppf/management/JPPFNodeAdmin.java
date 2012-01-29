@@ -57,7 +57,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * Unique id for this mbean.
    */
-  private String uuid = new JPPFUuid(JPPFUuid.ALPHA_NUM, 24).toString();
+  private String uuid = new JPPFUuid().toString();
 
   /**
    * Initialize this node management bean with the specified node.

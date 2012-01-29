@@ -48,6 +48,16 @@ public class JPPFUuid implements Serializable
     "$", "%", "^", "&", "*", "(", ")", "_", "+", "|", "{", "}", "[", "]", "-", "=", "/", ",", ".", "?", ":", ";"
   };
   /**
+   * Set of characters used to compose a uuid, including more than alphanumeric characters.
+   */
+  public static final char[] ALPHABET_SUPERSET_CHAR =
+  {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+    'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\'', '!', '@', '#',
+    '$', '%', '^', '&', '*', '(', ')', '_', '+', '|', '{', '}', '[', ']', '-', '=', '/', ',', '.', '?', ':', ';'
+  };
+  /**
    * Set of characters used to compose a uuid, including only alphanumeric characters.
    */
   public static final String[] ALPHA_NUM =
@@ -64,16 +74,23 @@ public class JPPFUuid implements Serializable
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"
   };
   /**
-   * Set of characters used to compose a uuid, including only decimal digits.
+   * Set of characters used to compose a uuid, including only hexadecimal digits in lower case.
    */
-  public static final String[] DECIMAL =
+  public static final char[] HEXADECIMAL_CHAR =
   {
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+  };
+  /**
+   * Set of characters used to compose a uuid, including only hexadecimal digits in lower case.
+   */
+  public static final char[] HEXADECIMAL_UPPER_CHAR =
+  {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
   };
   /**
    * Random number generator, static to ensure generated uuid are unique.
    */
-  private static Random rand = new Random(System.nanoTime());
+  private Random rand = new Random(System.nanoTime());
   /**
    * String holding a generated unique identifier.
    */
@@ -83,16 +100,20 @@ public class JPPFUuid implements Serializable
    */
   private String[] codes = ALPHABET_SUPERSET;
   /**
+   * The set of codes from which to choose randomly to build the uuid.
+   */
+  private char[] codes_char = ALPHABET_SUPERSET_CHAR;
+  /**
    * Number of codes to use to build the uuid.
    */
-  private int length = 16;
+  private int length = 20;
 
   /**
    * Instantiate this JPPFUuid with a generated unique identifier.
    */
   public JPPFUuid()
   {
-    this(ALPHABET_SUPERSET, 16);
+    this(ALPHABET_SUPERSET_CHAR, 20);
   }
 
   /**
@@ -108,6 +129,18 @@ public class JPPFUuid implements Serializable
   }
 
   /**
+   * Instantiate this JPPFUuid with a generated unique identifier.
+   * @param codes the set of codes from which to choose randomly to build the uuid.
+   * @param length number of codes to use to build the uuid.
+   */
+  public JPPFUuid(final char[] codes, final int length)
+  {
+    if ((codes != null) && (codes.length > 0)) this.codes_char = codes;
+    if (length > 0) this.length = length;
+    uuid = generateUuid2();
+  }
+
+  /**
    * Generate a unique uuid.
    * @return the uuid as a string.
    */
@@ -116,6 +149,18 @@ public class JPPFUuid implements Serializable
     int len = codes.length;
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<length; i++) sb.append(codes[rand.nextInt(len)]);
+    return sb.toString();
+  }
+
+  /**
+   * Generate a unique uuid.
+   * @return the uuid as a string.
+   */
+  private String generateUuid2()
+  {
+    int len = codes_char.length;
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<length; i++) sb.append(codes_char[rand.nextInt(len)]);
     return sb.toString();
   }
 

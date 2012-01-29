@@ -47,7 +47,7 @@ public class JMXMPServer extends AbstractJMXServer
    */
   public JMXMPServer()
   {
-    this(new JPPFUuid(JPPFUuid.HEXADECIMAL, 32).toString());
+    this(new JPPFUuid().toString());
   }
 
   /**
