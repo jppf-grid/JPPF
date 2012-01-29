@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.client.event.*;
-import org.jppf.security.JPPFSecurityContext;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
@@ -44,10 +43,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Security credentials associated with the application.
-   */
-  protected JPPFSecurityContext credentials = null;
   /**
    * Total count of the tasks submitted by this client.
    */
