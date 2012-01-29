@@ -19,15 +19,17 @@ package org.jppf.ui.monitoring.job;
 
 /**
  * Instances of this class represent changes made to the tree table.
- * @param <T>  the type of the values that are changed.
+ * @param <T> the type of the values that are changed.
  * @author Martin Janda
  */
-public class JobAccumulator<T> {
+public class JobAccumulator<T>
+{
 
   /**
    * The types of changes.
    */
-  public static enum Type {
+  public static enum Type
+  {
     /**
      * A value was added.
      */
@@ -53,16 +55,16 @@ public class JobAccumulator<T> {
   /**
    * The type of change performed.
    */
-  private Type    type;
+  private Type type;
 
   /**
    * Initialize this job accumulator with the specified value and type of change.
-   * @param type the type of change performed.
+   * @param type  the type of change performed.
    * @param value the initial value to change.
    */
   public JobAccumulator(final Type type, final T value)
   {
-    if(type == null) throw new IllegalArgumentException("changeType is null");
+    if (type == null) throw new IllegalArgumentException("changeType is null");
 
     this.type = type;
     this.value = value;
@@ -87,30 +89,47 @@ public class JobAccumulator<T> {
   }
 
   /**
-   * Merge a change of a different type for the same value. 
+   * Merge a change of a different type for the same value.
    * @param type the type of change to merge.
    * @return <code>true</code> if the previous change type is <code>ADD</code> and the new one is <code>REMOVE</code>, <code>false</code> otherwise.
    */
-  public boolean mergeChange(final Type type) {
+  public boolean mergeChange(final Type type)
+  {
     return mergeChange(type, value);
   }
 
   /**
-   * Merge a change of a different type for a new value. 
-   * @param type the type of change to merge.
+   * Merge a change of a different type for a new value.
+   * @param type  the type of change to merge.
    * @param value the new value to merge.
    * @return <code>true</code> if the previous change type is <code>ADD</code> and the new one is <code>REMOVE</code>, <code>false</code> otherwise.
    */
-  public boolean mergeChange(final Type type, final T value) {
-    if(this.type == type && this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
-    if(this.type.compareTo(type) > 0) throw new IllegalStateException("Can't merge type from " + this.type + " to " + type);
-
-    this.value = value;
-    if(this.type == Type.ADD && (type == Type.KEEP || type == Type.UPDATE)) return false;
-
+  public boolean mergeChange(final Type type, final T value)
+  {
     Type oldType = this.type;
-    this.type = type;
-    return oldType == Type.ADD && this.type == Type.REMOVE;
+
+    if (this.type == type && this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
+
+    if (this.type == Type.REMOVE && type == Type.ADD)
+    {
+      this.type = Type.UPDATE;
+      this.value = value;
+
+      return false;
+    }
+    else
+    {
+      if (this.type.compareTo(type) > 0)
+      {
+        throw new IllegalStateException("Can't merge type from " + this.type + " to " + type);
+      }
+
+      this.value = value;
+      if (this.type == Type.ADD && (type == Type.KEEP || type == Type.UPDATE)) return false;
+
+      this.type = type;
+      return oldType == Type.ADD && this.type == Type.REMOVE;
+    }
   }
 
   /**
