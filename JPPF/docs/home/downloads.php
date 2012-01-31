@@ -130,8 +130,8 @@ else
 				<?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
 				<?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
 				<hr/>
-				<?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
-				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
+				<?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
+				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
 				<?php if ($currentPage == "v2.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v2" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v2.x</a><br></div>
 				<?php if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br></div>
 				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
@@ -153,7 +153,7 @@ else
 				</div>
 				<div class="jppf_content">
 	<?php
-		$jppfVersion = "2.5.3";
+		$jppfVersion = "3.0";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -170,12 +170,11 @@ else
 	User Guide: <a href="/wiki">view online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
 	API documentation: <a href="/api-2.0">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
 	<h3>Connectors and add-ons</h3>
-	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
-	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-multiplexer.zip/download'; ?>">JPPF TCP multiplexer</a><p>
+	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
 	<h3>Samples and tutorials</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a>
+	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
 	<hr>
 	<h3>All JPPF releases</h3>
 	All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.

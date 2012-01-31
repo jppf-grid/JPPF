@@ -130,8 +130,8 @@ else
 				<?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
 				<?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
 				<hr/>
-				<?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
-				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
+				<?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
+				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
 				<?php if ($currentPage == "v2.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v2" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v2.x</a><br></div>
 				<?php if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br></div>
 				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
@@ -173,8 +173,8 @@ else
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<br/><p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
-		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
+		<br/><h2><i>New</i>: JPPF 3.0 is released, check it out!</h2>
+		<p style="text-align: justify; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
 		<p style="text-align: justify; font-size: 12pt">Take an easy start with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
 	</div>
 	<div class="column1">

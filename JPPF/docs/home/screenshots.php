@@ -130,8 +130,8 @@ else
 				<?php if ($currentPage == "Patches") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/patches.php" class="<?php echo $itemClass; ?>">&raquo; Patches</a><br></div>
 				<?php if ($currentPage == "Samples") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/samples-pack/index.php" class="<?php echo $itemClass; ?>">&raquo; Samples</a><br></div>
 				<hr/>
-				<?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
-				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
+				<?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
+				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v3/index.php?title=JPPF_3.x_Documentation" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
 				<?php if ($currentPage == "v2.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v2" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v2.x</a><br></div>
 				<?php if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br></div>
 				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
@@ -182,6 +182,26 @@ else
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=ConnectionsStatistics.gif">
+									<img src="screenshots/_th_ConnectionsStatistics.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=DriverSystemInformation.gif">
+									<img src="screenshots/_th_DriverSystemInformation.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=JobPriority.gif">
+									<img src="screenshots/_th_JobPriority.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=JobStatistics.gif">
+									<img src="screenshots/_th_JobStatistics.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=LoadBalancerSettings-01.gif">
 									<img src="screenshots/_th_LoadBalancerSettings-01.jpg" border="0" alt="screenshot"/>
 								</a>
@@ -191,6 +211,8 @@ else
 									<img src="screenshots/_th_MandelbrotFractals.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ManyJobs-01.gif">
 									<img src="screenshots/_th_ManyJobs-01.jpg" border="0" alt="screenshot"/>
@@ -211,8 +233,6 @@ else
 									<img src="screenshots/_th_MaxtrixSample-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=NodeSystemInformation.gif">
 									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
@@ -238,6 +258,8 @@ else
 									<img src="screenshots/_th_NodeTrayAddon-03.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif">
 									<img src="screenshots/_th_ProteinSequenceAlignment.jpg" border="0" alt="screenshot"/>

@@ -52,9 +52,9 @@ public class ManyJobsRunner
     {
       TypedProperties props = JPPFConfiguration.getProperties();
       props.setProperty("jppf.discovery.enabled", "true");
-      props.setProperty("jppf.pool.size", "50");
+      props.setProperty("jppf.pool.size", "17");
       jppfClient = new JPPFClient();
-      Thread.sleep(1000);
+      Thread.sleep(5000);
       int length = 300;
       int nbTask = 100;
       int nbJobs = 50;

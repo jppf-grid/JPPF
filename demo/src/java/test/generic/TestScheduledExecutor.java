@@ -38,7 +38,7 @@ public class TestScheduledExecutor
   /**
    * 
    */
-  static int n = 5;
+  static int n = 1;
   /**
    * 
    */
@@ -128,6 +128,7 @@ public class TestScheduledExecutor
   public static void perform3() throws Exception
   {
     int[] threadValues = { 1, 2, 4, 8, 16, 24, 32 };
+    //int[] threadValues = { 1 };
     for (int i=0; i<threadValues.length; i++)
     {
       nbThreads = threadValues[i];

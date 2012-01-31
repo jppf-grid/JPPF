@@ -5,7 +5,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 <p>The samples pack is a set of small, self-contained applications that demonstrate the use of JPPF for real-life problems.
 <p>Each application can be built and run independantly.
 <p>The current applications in the samples pack are:
-<ul>
+<ul class="samplesList">
 	<li><a href="Fractals/Readme.php">Generation of fractal images (Mandelbrot Set)</a></li>
 	<li><a href="SequenceAlignment/Readme.php">Protein and DNA sequence alignment</a></li>
 	<li><a href="WebSearchEngine/Readme.php">Distributed web crawler and search engine</a></li>

@@ -21,8 +21,8 @@ $template{name="about-page-header" title="Home"}$
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<br/><p style="text-align: justify; font-size: 12pt">JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
-		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
+		<br/><h2><i>New</i>: JPPF 3.0 is released, check it out!</h2>
+		<p style="text-align: justify; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
 		<p style="text-align: justify; font-size: 12pt">Take an easy start with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
 	</div>
 

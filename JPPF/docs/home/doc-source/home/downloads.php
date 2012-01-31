@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
 	<?php
-		$jppfVersion = "2.5.3";
+		$jppfVersion = "3.0";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -23,13 +23,12 @@ $template{name="about-page-header" title="Downloads"}$
 	API documentation: <a href="/api-2.0">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
 
 	<h3>Connectors and add-ons</h3>
-	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
-	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-multiplexer.zip/download'; ?>">JPPF TCP multiplexer</a><p>
+	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
 
 	<h3>Samples and tutorials</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a>
+	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
 
 	<hr>
 
