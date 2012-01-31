@@ -152,7 +152,7 @@ class WaitingNodeRequestState extends ClassServerState
   /**
    * Process a request to the client's resource provider.
    * @param channel encapsulates the context and channel.
-   * @param resource - the resource request description
+   * @param resource the resource request description
    * @return a pair of an array of bytes and the resulting state transition.
    * @throws Exception if any error occurs.
    */

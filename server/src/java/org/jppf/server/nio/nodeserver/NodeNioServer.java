@@ -112,9 +112,9 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
    */
   public NodeNioServer(final int[] ports) throws Exception
   {
-    super(ports, NODE_SERVER, false);
+    super(ports, NioServer.NODE_SERVER, false);
     taskQueueChecker = new TaskQueueChecker(this);
-    this.selectTimeout = 1L;
+    this.selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.bundlerRef = new AtomicReference<Bundler>(bundler);
     ((JPPFPriorityQueue) getQueue()).addQueueListener(new QueueListener()

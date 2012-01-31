@@ -94,8 +94,8 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
    */
   public ClassNioServer(final int[] ports) throws JPPFException
   {
-    super(ports, CLASS_SERVER, false);
-    selectTimeout = 1L;
+    super(ports, NioServer.CLASS_SERVER, false);
+    selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
   }
 
   /**

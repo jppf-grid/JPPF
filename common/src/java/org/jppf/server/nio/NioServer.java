@@ -53,7 +53,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * It is defined as the value of the configuration property
    * &quot;transition.thread.pool.size&quot;, with a default value of 1.
    */
-  private static final int THREAD_POOL_SIZE = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", 1);
+  private static final int THREAD_POOL_SIZE = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", Runtime.getRuntime().availableProcessors());
   /**
    * Name of the class server.
    */
@@ -70,6 +70,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Name of the acceptor server server.
    */
   public static final String ACCEPTOR = "Acceptor";
+  /**
+   * Default timeout for <code>Selector.select(long)</code> operations.
+   */
+  protected static final long DEFAULT_SELECT_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.nio.select.timeout", 1000L);
   /**
    * the selector of all socket channels open with providers or nodes.
    */
@@ -107,6 +111,14 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Shutdown requested for this server
    */
   private final AtomicBoolean requestShutdown = new AtomicBoolean(false);
+
+  /*
+  static
+  {
+    boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
+    log.info("NIO parameters: select timeout = " + DEFAULT_SELECT_TIMEOUT + ", thread pool size = " + THREAD_POOL_SIZE + ", connection checks = " + (b ? "enabled" : "disabled"));
+  }
+  */
 
   /**
    * Initialize this server with a specified port number and name.
@@ -214,6 +226,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   {
     try
     {
+      boolean hasTimeout = selectTimeout > 0L;
       while (!isStopped() && !externalStopCondition())
       {
         try
@@ -224,7 +237,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
         {
           lock.unlock();
         }
-        int n = selectTimeout > 0L ? selector.select(selectTimeout) : selector.select();
+        int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
         if (n > 0) go(selector.selectedKeys());
         postSelect();
       }

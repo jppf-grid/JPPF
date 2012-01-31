@@ -65,7 +65,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   public AcceptorNioServer(final int[] ports) throws Exception
   {
     super(ports, ACCEPTOR, false);
-    this.selectTimeout = 1L;
+    this.selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
   }
 
   /**

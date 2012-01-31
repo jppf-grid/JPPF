@@ -64,8 +64,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    */
   public ClientNioServer(final int[] ports) throws Exception
   {
-    super(ports, CLIENT_SERVER, false);
-    this.selectTimeout = 1L;
+    super(ports, NioServer.CLIENT_SERVER, false);
+    this.selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
   }
 
   /**
