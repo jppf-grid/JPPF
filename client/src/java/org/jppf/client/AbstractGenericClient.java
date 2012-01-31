@@ -173,7 +173,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
             // for backward compatibility with v2.x configurations
-            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), -1, false);
+            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), 11111, false);
             info.serverPorts = new int[] { port };
             info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             int priority = props.getInt(String.format("%s.priority", name), 0);

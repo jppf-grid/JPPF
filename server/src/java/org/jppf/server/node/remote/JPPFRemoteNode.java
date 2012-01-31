@@ -66,7 +66,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
       TypedProperties props = JPPFConfiguration.getProperties();
       String host = props.getString("jppf.server.host", "localhost");
       // for backward compatibility with v2.x configurations
-      int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", -1, false);
+      int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", 11111, false);
       socketClient = new SocketClient();
       socketClient.setHost(host);
       socketClient.setPort(port);

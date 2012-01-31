@@ -90,7 +90,7 @@ public class JPPFUuid implements Serializable
   /**
    * Random number generator, static to ensure generated uuid are unique.
    */
-  private Random rand = new Random(System.nanoTime());
+  private final Random rand = createRandom();
   /**
    * String holding a generated unique identifier.
    */
@@ -173,5 +173,19 @@ public class JPPFUuid implements Serializable
   public String toString()
   {
     return uuid;
+  }
+
+  /**
+   * Create a pseudo random number generator.
+   * @return a {@link Random} instance.
+   */
+  private Random createRandom()
+  {
+    /*
+    Random r = new SecureRandom();
+    r.setSeed(System.nanoTime());
+    return r;
+    */
+    return new Random(System.nanoTime());
   }
 }
