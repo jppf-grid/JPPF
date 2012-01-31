@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2012 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFFractals" type="page">
+	<property name="label" value="JPPF Fractals Generation"/>
+	<script language="javascript"><![CDATA[
+		importPackage(Packages.java.lang);
+		importPackage(Packages.java.util);
+		importPackage(Packages.java.awt);
+		importPackage(Packages.java.awt.event);
+		importPackage(Packages.javax.swing);
+		importPackage(Packages.org.jppf.client);
+		importPackage(Packages.org.jppf.utils);
+		importPackage(Packages.org.jppf.server.protocol);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.event);
+		importPackage(Packages.org.jppf.ui.options.factory);
+		importPackage(Packages.org.jppf.example.fractals);
+	]]></script>
+	<initializer type="script">
+		<script language="javascript"><![CDATA[
+			var frame = new JFrame(option.getLabel());
+			wa = 
+			{
+				windowClosing: function(event)
+				{
+					OptionsHandler.savePreferences();
+					FractalRunner.closeJPPFClient();
+					System.exit(0);
+				}
+			};
+			frame.addWindowListener(new WindowAdapter(wa));
+			var comp = option.findFirstWithName("/AdminPanels").getUIComponent();
+			comp.setSelectedIndex(0);
+			OptionsHandler.loadPreferences();
+			frame.getContentPane().add(option.getUIComponent());
+			frame.setSize(820, 768);
+			frame.setVisible(true);
+		]]></script>
+	</initializer>
+
+	<!-- ===================================================================== -->
+	<!--                    Server Chooser Panel                               -->
+	<!-- ===================================================================== -->
+	
+	<child name="AdminPanels" type="TabbedPane">
+		<property name="componentConstraints" value="grow"/>
+		<property name="layoutConstraints" value="fill"/>
+	
+		<property name="label" value=""/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+		<property name="tooltip" value="JPPF Fractals Generation"/>
+	
+		<import source="file" location="org/jppf/example/fractals/xml/MandelbrotPage.xml"/>
+	
+	</child>
+
+</opt:main>
