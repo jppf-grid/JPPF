@@ -28,7 +28,7 @@ import javax.tools.*;
  * @param <M> the type of file manager to delegate to.
  * @author Laurent Cohen
  */
-public class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileManager<M> {
+class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileManager<M> {
   /**
    * Map of class names to JavaFileObject instances for the bytecode.
    */

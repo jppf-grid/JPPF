@@ -27,7 +27,7 @@ import javax.tools.SimpleJavaFileObject;
  * represented as a character sequence.
  * @author Laurent Cohen
  */
-public class CharSequenceSource extends SimpleJavaFileObject {
+class CharSequenceSource extends SimpleJavaFileObject {
   /**
    * The source code of this "file".
    */

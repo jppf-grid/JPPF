@@ -18,13 +18,16 @@
 
 package test.compilation;
 
+import static test.compilation.TestCompilation.*;
+
 import java.util.*;
-import java.util.concurrent.Callable;
+
+import javax.tools.Diagnostic;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.compilation.*;
+import org.jppf.utils.compilation.SourceCompiler;
 import org.slf4j.*;
 
 /**
@@ -46,22 +49,47 @@ public class JPPFSourceCompiler
   {
     try
     {
-      String className = "test.compilation.MyTask";
+      //String className = "test.compilation.MyTask";
+      String taskClassName = null;
+      // an array of the sources - the first element is the one executed as a task
+      //CharSequence[] srcArray = { buildTaskSource() };
+      CharSequence[] srcArray = { buildSourceCode(), buildSourceCode2() };
       // build the map of sources to compile
       Map<String, CharSequence> sources = new HashMap<String, CharSequence>();
-      sources.put(className, TestCompilation.buildSourceCode());
-      sources.put(className + "2", TestCompilation.buildSourceCode2());
-      // receive the map of generated classes bytecode
-      SourceCompiler sc = new SourceCompiler(CompilationOutputKind.MEMORY);
-      Map<String, byte[]> bytecodeMap = sc.compileToMemory(sources);
-      output("bytecode map = " + bytecodeMap);
-      byte[] bytecode = bytecodeMap.get(className);
-      output("got bytecode = " + (bytecode == null ? "null" : "[length=" + bytecode.length + "]"));
-      // create a custom class loader so we can load this class
-      ClassLoader cl = new CustomClassLoader(bytecodeMap, JPPFSourceCompiler.class.getClassLoader());
-      Class<?> clazz = Class.forName(className, true, cl);
-      Callable task = (Callable) clazz.newInstance();
-      executeJob(task);
+      for (CharSequence seq: srcArray)
+      {
+        String name = classNameFromSource(seq);
+        output("adding source for " + name);
+        if (taskClassName == null) taskClassName = name;
+        sources.put(name, seq);
+      }
+      SourceCompiler compiler = null;
+      try
+      {
+        compiler = new SourceCompiler();
+        // receive the map of generated classes bytecode
+        Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
+        output("bytecode map = " + bytecodeMap);
+        byte[] bytecode = bytecodeMap.get(taskClassName);
+        output("got bytecode = " + (bytecode == null ? "null" : "[length=" + bytecode.length + "]"));
+        if (bytecode == null)
+        {
+          List<Diagnostic> diags = compiler.getDiagnostics();
+          output("diagnostics: ");
+          for (Diagnostic d: diags) output("  " + d);
+        }
+        else
+        {
+          // load the class
+          Class<?> clazz = compiler.getClassloader().loadClass(taskClassName);
+          Object task = (Object) clazz.newInstance();
+          executeJob(task);
+        }
+      }
+      finally
+      {
+        compiler.close();
+      }
     }
     catch (Exception e)
     {
@@ -74,7 +102,7 @@ public class JPPFSourceCompiler
    * @param task the task to execute.
    * @throws Exception if any error occurs.
    */
-  private static void executeJob(final Callable task) throws Exception
+  private static void executeJob(final Object task) throws Exception
   {
     JPPFClient client = new JPPFClient();
     try
@@ -94,12 +122,26 @@ public class JPPFSourceCompiler
   }
 
   /**
-   * Print a message to the console and/or log file.
-   * @param message the message to print.
+   * Generate the source code of a class.
+   * @return the source code to compile as a string.
    */
-  public static void output(final String message)
-  {
-    System.out.println(message);
-    log.info(message);
+  public static CharSequence buildTaskSource() {
+    StringBuilder sb = new StringBuilder();
+    append(sb, "package test.compilation;                      ");
+    append(sb, "                                               ");
+    append(sb, "import org.jppf.server.protocol.JPPFTask;      ");
+    append(sb, "                                               ");
+    append(sb, "public class MyJPPFTask extends JPPFTask {     ");
+    append(sb, "                                               ");
+    append(sb, "  @Override                                    ");
+    append(sb, "  public void run() {                          ");
+    append(sb, "    String msg =                               ");
+    append(sb, "      \"Hello, world of compilation! from \" + ");
+    append(sb, "      getClass().getSimpleName();              ");
+    append(sb, "    System.out.println(msg);                   ");
+    append(sb, "    setResult(msg);                            ");
+    append(sb, "  }                                            ");
+    append(sb, "}                                              ");
+    return sb;
   }
 }

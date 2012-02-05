@@ -26,7 +26,7 @@ import java.util.*;
  * A class loader that can load classes from bytecode stored in memory.
  * @author Laurent Cohen
  */
-public class CustomClassLoader extends URLClassLoader
+class CustomClassLoader extends URLClassLoader
 {
   /**
    * A cache of the definitions of the classes loaded by this class loader.<br>
@@ -36,12 +36,13 @@ public class CustomClassLoader extends URLClassLoader
 
   /**
    * Initialize this class loader with the specified urls and parent.
+   * @param urls a set of urls to add to this class loader's classpath.
    * @param bytecodes a mapping of class names to their bytecode.
    * @param parent the parent class loader.
    */
-  public CustomClassLoader(final Map<String, byte[]> bytecodes, final ClassLoader parent) {
-    super(new URL[0], parent);
-    this.bytecodes.putAll(bytecodes);
+  public CustomClassLoader(final URL[] urls, final Map<String, byte[]> bytecodes, final ClassLoader parent) {
+    super(urls == null ? new URL[0] : urls, parent);
+    if (bytecodes != null) this.bytecodes.putAll(bytecodes);
   }
 
   /**
@@ -59,9 +60,14 @@ public class CustomClassLoader extends URLClassLoader
    */
   @Override
   protected Class<?> findClass(final String name) throws ClassNotFoundException {
+    Class<?> c = null;
     byte[] bytes = bytecodes.get(name);
-    if (bytes == null) throw new ClassNotFoundException("could not find class " + name);
-    return defineClass(name, bytes, 0, bytes.length);
+    if (bytes != null) {
+      c = defineClass(name, bytes, 0, bytes.length);
+    } else {
+      c = super.findClass(name);
+    }
+    return c;
   }
 
   /**
@@ -73,16 +79,35 @@ public class CustomClassLoader extends URLClassLoader
   public InputStream getResourceAsStream(final String name) {
     if (name == null) return null;
     InputStream is = null;
-    if (getParent() != null) is = getParent().getResourceAsStream(name);
-    if (is == null) {
-      // compute the class name from its binary name
-      int idx = name.lastIndexOf(".class");
-      if (idx >= 0) {
-        String className = name.substring(0, idx).replace("/", ".");
-        byte[] bytes = bytecodes.get(className);
-        if (bytes != null) is = new ByteArrayInputStream(bytes);
-      }
+    // compute the class name from its binary name
+    int idx = name.lastIndexOf(".class");
+    if (idx >= 0) {
+      String className = name.substring(0, idx).replace("/", ".");
+      byte[] bytes = bytecodes.get(className);
+      if (bytes != null) is = new ByteArrayInputStream(bytes);
     }
+    if (is == null) is = super.getResourceAsStream(name);
     return is;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addURL(final URL url) {
+    super.addURL(url);
+  }
+
+  /**
+   * Determine whther this class loader already has the specified url in its classpath.
+   * @param url the URL to check.
+   * @return <code>true</code> if the URL already exists in this class loader's classpath, <code>false</code> otherwise.
+   */
+  public boolean hasURL(final URL url) {
+    if (url == null) return false;
+    for (URL u: getURLs()) {
+      if (u.equals(url)) return true;
+    }
+    return false;
   }
 }

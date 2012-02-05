@@ -19,11 +19,11 @@
 package test.compilation;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.regex.*;
 
-import org.jppf.utils.compilation.*;
+import org.jppf.utils.compilation.SourceCompiler;
 
 /**
  * 
@@ -31,6 +31,19 @@ import org.jppf.utils.compilation.*;
  */
 public class TestCompilation
 {
+  /**
+   * A string containing a list of whitespace characters.
+   */
+  public static final String WHITE_SPACE = " \t\n\r";
+  /**
+   * Pattern used to find the package name from the source code.
+   */
+  public static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+(.*);");
+  /**
+   * Pattern used to find the class name from the source code.
+   */
+  public static final Pattern CLASS_PATTERN = Pattern.compile("public\\s+class\\s+(\\S+)\\s+");
+
   /**
    * Entry point ofr this program.
    * @param args not used.
@@ -53,19 +66,22 @@ public class TestCompilation
     File classesDir = new File("tmpclasses/");
     if (!classesDir.exists()) {
       // create the classes dir
-      if (!classesDir.mkdirs()) throw new IOException("could not create the class directory '" + classesDir + "'");
+      if (!classesDir.mkdirs()) throw new IOException("could not create the classes directory '" + classesDir + "'");
     }
     String className = "test.compilation.MyTask";
     Map<String, CharSequence> sources = new HashMap<String, CharSequence>();
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
-    SourceCompiler sc = new SourceCompiler(CompilationOutputKind.FILE_SYSTEM);
-    sc.compileToFile(sources, classesDir);
-    sc.close();
-    URLClassLoader cl = new URLClassLoader(new URL[] { classesDir.toURI().toURL() }, TestCompilation.class.getClassLoader());
-    Class<?> clazz = Class.forName(className, true, cl);
-    Callable task = (Callable) clazz.newInstance();
-    output("result: " + task.call());
+    SourceCompiler compiler = null;
+    try {
+      compiler = new SourceCompiler();
+      compiler.compileToFile(sources, classesDir);
+      Class<?> clazz = compiler.getClassloader().loadClass(className);
+      Callable task = (Callable) clazz.newInstance();
+      output("result: " + task.call());
+    } finally {
+      compiler.close();
+    }
   }
 
   /**
@@ -79,18 +95,20 @@ public class TestCompilation
     Map<String, CharSequence> sources = new HashMap<String, CharSequence>();
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
-    SourceCompiler sc = new SourceCompiler(CompilationOutputKind.MEMORY);
-    // receive the map of generated classes bytecode
-    Map<String, byte[]> bytecodeMap = sc.compileToMemory(sources);
-    sc.close();
-    output("bytecode map = " + bytecodeMap);
-    // create a custom class loader so we can load this class
-    ClassLoader cl = new CustomClassLoader(bytecodeMap, TestCompilation.class.getClassLoader());
-    // load the class
-    Class<?> clazz = Class.forName(className, true, cl);
-    // create an instance and execute it
-    Callable task = (Callable) clazz.newInstance();
-    output("result: " + task.call());
+    SourceCompiler compiler = null;
+    try {
+      compiler = new SourceCompiler();
+      // receive the map of generated classes bytecode
+      Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
+      output("bytecode map = " + bytecodeMap);
+      // load the class
+      Class<?> clazz = compiler.getClassloader().loadClass(className);
+      // create an instance and execute it
+      Callable task = (Callable) clazz.newInstance();
+      output("result: " + task.call());
+    } finally {
+      compiler.close();
+    }
   }
 
   /**
@@ -101,10 +119,12 @@ public class TestCompilation
     StringBuilder sb = new StringBuilder();
     append(sb, "package test.compilation;                              ");
     append(sb, "                                                       ");
+    append(sb, "import java.io.Serializable;                           ");
     append(sb, "import java.util.concurrent.Callable;                  ");
     append(sb, "                                                       ");
     append(sb, "public class MyTask2                                   ");
-    append(sb, "  implements Callable<Object>, java.io.Serializable {  ");
+    append(sb, "  implements Callable<Object>, Serializable {          ");
+    append(sb, "                                                       ");
     append(sb, "  public Object call() {                               ");
     append(sb, "    String msg =                                       ");
     append(sb, "      \"Hello, world of compilation! (from MyTask2)\"; ");
@@ -123,26 +143,33 @@ public class TestCompilation
     StringBuilder sb = new StringBuilder();
     append(sb, "package test.compilation;                              ");
     append(sb, "                                                       ");
+    append(sb, "import java.io.Serializable;                           ");
     append(sb, "import java.util.concurrent.Callable;                  ");
     append(sb, "                                                       ");
     append(sb, "public class MyTask                                    ");
-    append(sb, "  implements Callable<Object>, java.io.Serializable {  ");
+    append(sb, "  implements Callable<Object>, Serializable {          ");
+    append(sb, "                                                       ");
     append(sb, "  public Object call() {                               ");
+    append(sb, "                                                       ");
     append(sb, "    // make this class execute its own code            ");
     append(sb, "    String msg = \"Hello, world of compilation!\";     ");
     append(sb, "    System.out.println(msg);                           ");
+    append(sb, "                                                       ");
     append(sb, "    // execute the code of an instance inner class     ");
     append(sb, "    new InstanceInnerClass().execute();                ");
+    append(sb, "                                                       ");
     append(sb, "    // execute the code of a static inner class        ");
     append(sb, "    new StaticInnerClass().execute();                  ");
+    append(sb, "                                                       ");
     append(sb, "    // execute the code of an anonymous inner class    ");
-    append(sb, "    new Runnable() {                                   ");
+    append(sb, "    new StaticInnerClass() {                           ");
     append(sb, "      @Override                                        ");
-    append(sb, "      public void run() {                              ");
-    append(sb, "        System.out.println(                            ");
-    append(sb, "          \"printing from **anonymous** inner class\");");
+    append(sb, "      public void execute() {                          ");
+    append(sb, "        System.out.println(\"printing from \" +        ");
+    append(sb, "          getClass().getSimpleName());                 ");
     append(sb, "      }                                                ");
-    append(sb, "    }.run();                                           ");
+    append(sb, "    }.execute();                                       ");
+    append(sb, "                                                       ");
     append(sb, "    // execute the code of another class altogether    ");
     append(sb, "    // (compiled as a separate compilation unit)       ");
     append(sb, "    new MyTask2().call();                              ");
@@ -151,18 +178,18 @@ public class TestCompilation
     append(sb, "  }                                                    ");
     append(sb, "                                                       ");
     append(sb, "  public class InstanceInnerClass                      ");
-    append(sb, "    implements java.io.Serializable {                  ");
+    append(sb, "    implements Serializable {                          ");
     append(sb, "    public void execute() {                            ");
-    append(sb, "      System.out.println(                              ");
-    append(sb, "        \"printing from **instance** inner class\");   ");
+    append(sb, "        System.out.println(\"printing from \" +        ");
+    append(sb, "          getClass().getSimpleName());                 ");
     append(sb, "    }                                                  ");
     append(sb, "  }                                                    ");
     append(sb, "                                                       ");
     append(sb, "  public static class StaticInnerClass                 ");
-    append(sb, "    implements java.io.Serializable {                  ");
+    append(sb, "    implements Serializable {                          ");
     append(sb, "    public void execute() {                            ");
-    append(sb, "      System.out.println(                              ");
-    append(sb, "        \"printing from **static** inner class\");     ");
+    append(sb, "        System.out.println(\"printing from \" +        ");
+    append(sb, "          getClass().getSimpleName());                 ");
     append(sb, "    }                                                  ");
     append(sb, "  }                                                    ");
     append(sb, "}                                                      ");
@@ -174,7 +201,7 @@ public class TestCompilation
    * @param sb a string builder to append to.
    * @param s the string to append.
    */
-  private static void append(final StringBuilder sb, final String s)
+  static void append(final StringBuilder sb, final String s)
   {
     sb.append(trimRight(s)).append('\n');
   }
@@ -184,11 +211,10 @@ public class TestCompilation
    * @param seq the char sequence to trim.
    * @return a new char sequence without spaces on the right.
    */
-  private static CharSequence trimRight(final CharSequence seq)
+  static CharSequence trimRight(final CharSequence seq)
   {
     int pos = seq.length() - 1;
-    while ((pos >=0) && (seq.charAt(pos) == ' ')) pos--;
-    //return pos > 0 ? new StringBuilder().append(seq, 0, pos+1) : "";
+    while ((pos >=0) && (WHITE_SPACE.indexOf(seq.charAt(pos)) >= 0)) pos--;
     return new StringBuilder().append(seq, 0, pos+1);
   }
 
@@ -196,7 +222,22 @@ public class TestCompilation
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  public static void output(final String message) {
+  static void output(final String message) {
     System.out.println(message);
+  }
+
+  /**
+   * 
+   * @param source the source code to parse.
+   * @return the fully qualified name of the top-level class found in the source. 
+   */
+  public static String classNameFromSource(final CharSequence source)
+  {
+    Matcher matcher = PACKAGE_PATTERN.matcher(source);
+    String pkg = matcher.find() ? matcher.group(1).trim() + '.' : "";
+    matcher = CLASS_PATTERN.matcher(source);
+    if (!matcher.find()) return null;
+    String name = matcher.group(1).trim();
+    return pkg + name;
   }
 }

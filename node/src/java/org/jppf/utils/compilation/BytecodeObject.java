@@ -29,7 +29,7 @@ import javax.tools.SimpleJavaFileObject;
  * This is in fact the equivalent of a .class file, but sotred in memory.
  * @author Laurent Cohen
  */
-public class BytecodeObject extends SimpleJavaFileObject {
+class BytecodeObject extends SimpleJavaFileObject {
   /**
    * The byte code resulting from a source compilation.
    */
