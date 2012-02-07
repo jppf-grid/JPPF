@@ -96,25 +96,14 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
   private final Map<String, ChannelWrapper<?>> uuidMap = new HashMap<String, ChannelWrapper<?>>();
 
   /**
-   * Initialize this server with a specified port number.
-   * @param port the port this socket server is listening to.
+   * Initialize this node server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeNioServer(final int port) throws Exception
+  public NodeNioServer() throws Exception
   {
-    this(new int[] { port });
-  }
-
-  /**
-   * Initialize this server with the specified port numbers.
-   * @param ports the ports this socket server is listening to.
-   * @throws Exception if the underlying server socket can't be opened.
-   */
-  public NodeNioServer(final int[] ports) throws Exception
-  {
-    super(ports, NioServer.NODE_SERVER, false);
+    super(NioConstants.NODE_SERVER, false);
     taskQueueChecker = new TaskQueueChecker(this);
-    this.selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
+    this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.bundlerRef = new AtomicReference<Bundler>(bundler);
     ((JPPFPriorityQueue) getQueue()).addQueueListener(new QueueListener()
@@ -265,7 +254,7 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
    */
   public static void closeNode(final ChannelWrapper<?> channel, final AbstractNodeContext context)
   {
-    if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, NODE_SERVER);
+    if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.NODE_SERVER);
     try
     {
       if(channel != null) channel.close();

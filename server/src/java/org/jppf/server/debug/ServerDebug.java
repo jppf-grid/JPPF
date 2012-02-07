@@ -150,9 +150,9 @@ public class ServerDebug implements ServerDebugMBean
    */
   private Set<ChannelWrapper<?>> findSetFromName(final String name)
   {
-    if (NioServer.CLASS_SERVER.equals(name)) return classLoaderSet;
-    else if (NioServer.NODE_SERVER.equals(name)) return nodeSet;
-    else if (NioServer.CLIENT_SERVER.equals(name)) return clientSet;
+    if (NioConstants.CLASS_SERVER.equals(name)) return classLoaderSet;
+    else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet;
+    else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet;
     return acceptorSet;
   }
 }

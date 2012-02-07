@@ -151,6 +151,7 @@ public class DriverInitializer
       connectionInfo.uuid = driver.getUuid();
       String s = config.getAndReplaceString("jppf.server.port", "class.server.port", "11111", false);
       connectionInfo.serverPorts = StringUtils.parseIntValues(s);
+      connectionInfo.sslServerPorts = StringUtils.parseIntValues(config.getString("jppf.ssl.server.port", "11443"));
       connectionInfo.host = NetworkUtils.getManagementHost();
       if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
       boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);

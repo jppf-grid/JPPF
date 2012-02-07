@@ -74,14 +74,14 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
     Map<ClassTransition, NioTransition<ClassState>> map =
         new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
     map.put(TO_DEFINING_TYPE, transition(DEFINING_TYPE, R));
-    map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, NioChecks.CHECK_CONNECTION ? RW : W));
-    map.put(TO_SENDING_INITIAL_NODE_RESPONSE, transition(SENDING_INITIAL_NODE_RESPONSE, NioChecks.CHECK_CONNECTION ? RW : W));
+    map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
+    map.put(TO_SENDING_INITIAL_NODE_RESPONSE, transition(SENDING_INITIAL_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));
-    map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, NioChecks.CHECK_CONNECTION ? RW : W));
-    map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, NioChecks.CHECK_CONNECTION ? RW : W));
+    map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
+    map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_PROVIDER_RESPONSE, transition(WAITING_PROVIDER_RESPONSE, R));
     map.put(TO_IDLE_NODE, transition(SENDING_NODE_RESPONSE, 0));
-    map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, NioChecks.CHECK_CONNECTION ? R : 0));
+    map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, NioConstants.CHECK_CONNECTION ? R : 0));
     map.put(TO_NODE_WAITING_PROVIDER_RESPONSE, transition(NODE_WAITING_PROVIDER_RESPONSE, 0));
     return map;
   }

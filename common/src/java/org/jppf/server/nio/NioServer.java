@@ -19,17 +19,18 @@
 package org.jppf.server.nio;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jppf.JPPFException;
+import javax.net.ssl.*;
+
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
+
 
 /**
  * Generic server for non-blocking asynchronous socket channel based communications.<br>
@@ -49,32 +50,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   private static Logger log = LoggerFactory.getLogger(NioServer.class);
   /**
-   * Size of the pool of threads for the state transition executor.
-   * It is defined as the value of the configuration property
-   * &quot;transition.thread.pool.size&quot;, with a default value of 1.
-   */
-  private static final int THREAD_POOL_SIZE = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", Runtime.getRuntime().availableProcessors());
-  /**
-   * Name of the class server.
-   */
-  public static final String CLASS_SERVER = "ClassServer";
-  /**
-   * Name of the class server.
-   */
-  public static final String NODE_SERVER = "TasksServer";
-  /**
-   * Name of the client task server.
-   */
-  public static final String CLIENT_SERVER = "ClientServer";
-  /**
-   * Name of the acceptor server server.
-   */
-  public static final String ACCEPTOR = "Acceptor";
-  /**
-   * Default timeout for <code>Selector.select(long)</code> operations.
-   */
-  protected static final long DEFAULT_SELECT_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.nio.select.timeout", 1000L);
-  /**
    * the selector of all socket channels open with providers or nodes.
    */
   protected Selector selector;
@@ -90,6 +65,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * The ports this server is listening to.
    */
   protected int[] ports = null;
+  /**
+   * The SSL ports this server is listening to.
+   */
+  protected int[] sslPorts = null;
   /**
    * Timeout for the select() operations. A value of 0 means no timeout, i.e.
    * the <code>Selector.select()</code> will be invoked without parameters.
@@ -110,68 +89,42 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Shutdown requested for this server
    */
-  private final AtomicBoolean requestShutdown = new AtomicBoolean(false);
-
-  /*
-  static
-  {
-    boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
-    log.info("NIO parameters: select timeout = " + DEFAULT_SELECT_TIMEOUT + ", thread pool size = " + THREAD_POOL_SIZE + ", connection checks = " + (b ? "enabled" : "disabled"));
-  }
-  */
-
+  protected final AtomicBoolean requestShutdown = new AtomicBoolean(false);
   /**
-   * Initialize this server with a specified port number and name.
-   * @param name the name given to this thread.
-   * @throws JPPFException if the underlying server socket can't be opened.
+   * The SSL context associated with this server.
    */
-  protected NioServer(final String name) throws JPPFException
-  {
-    this(name, false);
-  }
+  protected SSLContext sslContext = null;
 
   /**
    * Initialize this server with a specified port number and name.
    * @param name the name given to this thread.
    * @param sequential determines whether the submission of state transitions should be
    * performed sequentially or through the executor thread pool.
-   * @throws JPPFException if the underlying server socket can't be opened.
+   * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final String name, final boolean sequential) throws JPPFException
+  protected NioServer(final String name, final boolean sequential) throws Exception
   {
     super(name);
+    selector = Selector.open();
     factory = createFactory();
     transitionManager = new StateTransitionManager<S, T>(this, sequential);
   }
 
   /**
-   * Initialize this server with a specified port number and name.
-   * @param port the port this socket server is listening to.
-   * @param name the name given to this thread.
-   * @throws JPPFException if the underlying server socket can't be opened.
-   */
-  public NioServer(final int port, final String name) throws JPPFException
-  {
-    this(new int[] { port }, name, true);
-  }
-
-  /**
    * Initialize this server with a specified list of port numbers and name.
-   * @param ports the list of port this server accepts connections from.
+   * @param ports the list of ports this server accepts connections from.
+   * @param sslPorts the list of SSL ports this server accepts connections from.
    * @param name the name given to this thread.
    * @param sequential Determines whether the submission of state transitions should be
    * performed sequentially or through the executor thread pool.
-   * @throws JPPFException if the underlying server socket can't be opened.
+   * @throws Exception if the underlying server socket can't be opened.
    */
-  public NioServer(final int[] ports, final String name, final boolean sequential) throws JPPFException
+  public NioServer(final int[] ports, final int[] sslPorts, final String name, final boolean sequential) throws Exception
   {
     this(name, sequential);
-    if (ports != null)
-    {
-      this.ports = new int[ports.length];
-      System.arraycopy(ports, 0, this.ports, 0, ports.length);
-    }
-    init(this.ports);
+    if (ports != null) this.ports = Arrays.copyOf(ports, ports.length);
+    if (sslPorts != null) this.sslPorts = Arrays.copyOf(sslPorts, sslPorts.length);
+    init();
   }
 
   /**
@@ -181,39 +134,36 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   protected abstract NioServerFactory<S, T> createFactory();
 
   /**
-   * Initialize the underlying server socket with a specified port.
-   * @param ports the port the underlying server listens to.
-   * @throws JPPFException if the server socket can't be opened on the specified port.
+   * Initialize the underlying server sockets.
+   * @throws Exception if any error occurs w<hile initializing the server sockets.
    */
-  protected final void init(final int[] ports) throws JPPFException
+  protected final void init() throws Exception
   {
-    Exception e = null;
-    try
+    if ((ports != null) && (ports.length != 0))
     {
-      selector = Selector.open();
-      if (ports != null)
+      for (int port: ports)
       {
-        for (int port: ports)
-        {
-          ServerSocketChannel server = ServerSocketChannel.open();
-          server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-          server.socket().bind(new InetSocketAddress(port));
-          server.configureBlocking(false);
-          server.register(selector, SelectionKey.OP_ACCEPT);
-        }
+        ServerSocketChannel server = ServerSocketChannel.open();
+        server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+        server.socket().bind(new InetSocketAddress(port));
+        server.configureBlocking(false);
+        server.register(selector, SelectionKey.OP_ACCEPT);
       }
     }
-    catch(IllegalArgumentException iae)
+    if ((sslPorts != null) && (sslPorts.length != 0))
     {
-      e = iae;
-    }
-    catch(IOException ioe)
-    {
-      e = ioe;
-    }
-    if (e != null)
-    {
-      throw new JPPFException(e.getMessage(), e);
+      sslContext = SSLContext.getInstance("SSLv2");
+      SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
+      for (int port: sslPorts)
+      {
+        ServerSocket socket = factory.createServerSocket();
+        socket.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+        socket.bind(new InetSocketAddress(port));
+        ServerSocketChannel channel = socket.getChannel();
+        channel.configureBlocking(false);
+        channel.bind(new InetSocketAddress(port));
+        channel.register(selector, SelectionKey.OP_ACCEPT);
+      }
     }
   }
 
@@ -245,7 +195,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     catch (Throwable t)
     {
       log.error(t.getMessage(), t);
-    } finally
+    }
+    finally
     {
       end();
     }

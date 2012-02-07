@@ -48,24 +48,13 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   private static JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
-   * Initialize this server with a specified port number.
-   * @param port the port this socket server is listening to.
+   * Initialize this class loader server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientNioServer(final int port) throws Exception
+  public ClientNioServer() throws Exception
   {
-    this(new int[] { port });
-  }
-
-  /**
-   * Initialize this server with the specified port numbers.
-   * @param ports the ports this socket server is listening to.
-   * @throws Exception if the underlying server socket can't be opened.
-   */
-  public ClientNioServer(final int[] ports) throws Exception
-  {
-    super(ports, NioServer.CLIENT_SERVER, false);
-    this.selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
+    super(NioConstants.CLIENT_SERVER, false);
+    this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
   /**
@@ -124,7 +113,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    */
   public static void closeClient(final ChannelWrapper<?> channel)
   {
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, CLIENT_SERVER);
+    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.CLIENT_SERVER);
     try
     {
       channel.close();

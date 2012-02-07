@@ -48,24 +48,15 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   private static JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
-   * Initialize this server with a specified port number.
-   * @param port the port this socket server is listening to.
-   * @throws Exception if the underlying server socket can't be opened.
-   */
-  public AcceptorNioServer(final int port) throws Exception
-  {
-    this(new int[] { port });
-  }
-
-  /**
    * Initialize this server with the specified port numbers.
    * @param ports the ports this socket server is listening to.
+   * @param sslPorts the SSL ports this socket server is listening to.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public AcceptorNioServer(final int[] ports) throws Exception
+  public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception
   {
-    super(ports, ACCEPTOR, false);
-    this.selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
+    super(ports, sslPorts, NioConstants.ACCEPTOR, false);
+    this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
   /**
@@ -81,7 +72,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * {@inheritDoc}
    */
   @Override
-  public void postAccept(final ChannelWrapper channel)
+  public void postAccept(final ChannelWrapper<?> channel)
   {
     try
     {
@@ -123,7 +114,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   public static void closeChannel(final ChannelWrapper<?> channel)
   {
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, ACCEPTOR);
+    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.ACCEPTOR);
     try
     {
       channel.close();

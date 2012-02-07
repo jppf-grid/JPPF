@@ -68,9 +68,9 @@ final class ClientServerFactory extends NioServerFactory<ClientState, ClientTran
     Map<ClientTransition, NioTransition<ClientState>> map =
       new EnumMap<ClientTransition, NioTransition<ClientState>>(ClientTransition.class);
     map.put(TO_WAITING_HANDSHAKE, transition(WAITING_HANDSHAKE, R));
-    map.put(TO_SENDING_RESULTS, transition(SENDING_RESULTS, NioChecks.CHECK_CONNECTION ? RW : W));
+    map.put(TO_SENDING_RESULTS, transition(SENDING_RESULTS, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_JOB, transition(WAITING_JOB, R));
-    map.put(TO_IDLE, transition(IDLE, NioChecks.CHECK_CONNECTION ? R : 0));
+    map.put(TO_IDLE, transition(IDLE, NioConstants.CHECK_CONNECTION ? R : 0));
     return map;
   }
 }

@@ -32,7 +32,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Context associated with a channel serving tasks to a node.
+ * Context associated with a channel receiving jobs from a client, and sending the results back.
  * @author Laurent Cohen
  */
 public class ClientContext extends AbstractNioContext<ClientState>
@@ -288,18 +288,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public void setPendingTasksCount(final int pendingTasksCount)
   {
     this.pendingTasksCount.set(pendingTasksCount);
-  }
-
-  /**
-   * Get the list copy of completed bundles to send to the client.
-   * @return a linked list of <code>ServerJob</code> instances.
-   */
-  public LinkedList<ServerJob> getCompletedBundles()
-  {
-    synchronized (completedBundles)
-    {
-      return new LinkedList<ServerJob>(completedBundles);
-    }
   }
 
   /**

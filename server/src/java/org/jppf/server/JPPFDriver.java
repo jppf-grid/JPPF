@@ -151,10 +151,10 @@ public class JPPFDriver
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    classServer = startServer(recoveryServer, new ClassNioServer(null), null);
-    clientNioServer = startServer(recoveryServer, new ClientNioServer(null), null);
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(null), null);
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts), info.serverPorts);
+    classServer = startServer(recoveryServer, new ClassNioServer(), null);
+    clientNioServer = startServer(recoveryServer, new ClientNioServer(), null);
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(), null);
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, null), info.serverPorts);
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {

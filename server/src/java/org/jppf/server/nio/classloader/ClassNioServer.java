@@ -23,7 +23,6 @@ import static org.jppf.server.nio.classloader.ClassState.DEFINING_TYPE;
 import java.nio.channels.SelectionKey;
 import java.util.*;
 
-import org.jppf.JPPFException;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.recovery.*;
 import org.jppf.server.JPPFDriver;
@@ -78,24 +77,13 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
   private static JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
-   * Initialize this class server with the port it will listen to.
-   * @param port the port number as an int value.
-   * @throws JPPFException if this server could not be initialized.
+   * Initialize this class server.
+   * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClassNioServer(final int port) throws JPPFException
+  public ClassNioServer() throws Exception
   {
-    this(new int[] { port });
-  }
-
-  /**
-   * Initialize this class server with a specified list of port numbers.
-   * @param ports the list of port this server accepts connections from.
-   * @throws JPPFException if the underlying server socket can't be opened.
-   */
-  public ClassNioServer(final int[] ports) throws JPPFException
-  {
-    super(ports, NioServer.CLASS_SERVER, false);
-    selectTimeout = NioServer.DEFAULT_SELECT_TIMEOUT;
+    super(NioConstants.CLASS_SERVER, false);
+    selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
   /**
