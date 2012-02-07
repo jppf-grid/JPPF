@@ -63,6 +63,10 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
    * Determines whether the process output should be captured.
    */
   private boolean captureOutput = false;
+  /**
+   * The exit code returned by the sub-process.
+   */
+  private int exitCode = -1;
 
   /**
    * Default constructor.
@@ -98,9 +102,10 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 
   /**
    * Run the external process or script.
+   * @return the exit code returned yb the sub-process.
    * @throws Exception if an error occurs.
    */
-  public void launchProcess() throws Exception
+  public int launchProcess() throws Exception
   {
     ProcessBuilder builder = new ProcessBuilder();
     builder.command(commandList);
@@ -114,8 +119,9 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
     if (captureOutput) wrapper.addListener(this);
     Process p = builder.start();
     wrapper.setProcess(p);
-    p.waitFor();
+    exitCode = p.waitFor();
     if (captureOutput) wrapper.removeListener(this);
+    return exitCode;
   }
 
   /**
@@ -237,5 +243,16 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
   public void errorStreamAltered(final ProcessWrapperEvent event)
   {
     errorOutput.append(event.getContent());
+  }
+
+  /**
+   * Get the exit code returned by the sub-process.
+   * @return the value of the exit code returned by the sub-process.
+   * A negative value indicates the process was never launched or never returned.
+   * @see java.lang.Process#waitFor() 
+   */
+  public int getExitCode()
+  {
+    return exitCode;
   }
 }
