@@ -1,0 +1,149 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2012 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-compile-jar" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                         Compile the application                           -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" description="Compile" depends="init, i18n">
+		<antcall target="compile.module"><param name="path" value="${node}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${common}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${client}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${admin}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${server}"/></antcall>
+		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
+  </target>
+
+	<target name="compile.module">
+ 		<mkdir dir="${path}/classes"/>
+		<javac srcdir="" destdir="${path}/classes"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked -target 1.6"/>
+			<src path="${path}/src/java"/>
+	    <src path="${path}/src/resources"/>
+		</javac>
+		<copy todir="${path}/classes">
+			<fileset dir="${path}/src/resources">
+				<exclude name="**/package.html"/>
+			</fileset>
+		</copy>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--              Convert native translations to ascii                         -->
+	<!-- ========================================================================= -->
+
+	<target name="i18n" description="Convert native translations to ascii" depends="init">
+		<property name="i18n.dir" value="${admin}/src/resources/org/jppf/ui/i18n"/> 
+		<native2ascii encoding="windows-1251" src="${i18n.dir}/native/ru" dest="${i18n.dir}" includes="**/*.properties"/>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                     Build the jar files                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="jar" description="generates the application jar" depends="compile">
+		<antcall target="jar.module"><param name="module" value="common"/></antcall>
+		<antcall target="jar.module"><param name="module" value="node"/><param name="jar" value="common-node"/></antcall>
+		<antcall target="jar.module"><param name="module" value="admin"/></antcall>
+		<antcall target="jar.module"><param name="module" value="client"/></antcall>
+		<antcall target="jar.module"><param name="module" value="server"/></antcall>
+		<antcall target="jar.module"><param name="module" value="demo"/></antcall>
+	</target>
+
+	<target name="jar.module">
+		<condition property="jar" value="${module}">
+			<not>
+				<isset property="jar"/>
+			</not>
+		</condition>
+		<tstamp>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+		</tstamp>
+    <jar jarfile="${build}/jppf-${jar}.jar" index="true">
+			<fileset dir="${basedir}/../${module}/classes"/>
+			<fileset file="${bin}/build.number"/>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                     Build the source jar files                            -->
+	<!-- ========================================================================= -->
+
+	<target name="jar.src" description="generates the application jar" depends="compile">
+		<antcall target="jar.src.module"><param name="module" value="common"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="node"/><param name="jar" value="common-node"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="admin"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="client"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="server"/></antcall>
+		<antcall target="jar.src.module"><param name="module" value="demo"/></antcall>
+	</target>
+
+	<target name="jar.src.module">
+		<condition property="jar" value="${module}">
+			<not>
+				<isset property="jar"/>
+			</not>
+		</condition>
+		<tstamp>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+		</tstamp>
+    <jar jarfile="${build}/jppf-${jar}-src.jar" index="true">
+			<fileset dir="${basedir}/../${module}/src/java"/>
+			<fileset dir="${basedir}/../${module}/src/resources"/>
+			<fileset file="${bin}/build.number"/>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--               Build the logging formatter jar                             -->
+	<!-- ========================================================================= -->
+
+	<target name="jar.logging" description="generates the jar with the JPPF logging formatter" depends="compile">
+		<tstamp>
+			<format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+		</tstamp>
+    <jar jarfile="${build}/jppf-logging-formatter.jar" index="true">
+			<fileset dir="${basedir}/../node/classes">
+				<include name="**/JPPFFileHandler.class"/>
+				<include name="**/JPPFLogFormatter.class"/>
+				<include name="**/StringUtils.class"/>
+			</fileset>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+			  <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+	</target>
+
+
+</project> 
