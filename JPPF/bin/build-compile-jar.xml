@@ -33,10 +33,10 @@
 
 	<target name="compile.module">
  		<mkdir dir="${path}/classes"/>
-		<javac srcdir="" destdir="${path}/classes"
+		<javac srcdir="" destdir="${path}/classes" source="1.6" target="1.6" 
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked -target 1.6"/>
+	    <compilerarg line="-Xlint:unchecked"/>
 			<src path="${path}/src/java"/>
 	    <src path="${path}/src/resources"/>
 		</javac>
