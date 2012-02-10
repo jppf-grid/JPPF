@@ -24,19 +24,16 @@
 
 	<property name="build.properties.file" value="${basedir}/build.properties"/>
 	<property file="${build.properties.file}"/>
-	<property name="jppf.build.dir"        value="${basedir}/../JPPF/build"/>
-	<property name="jppf.lib.dir"          value="${basedir}/../JPPF/lib"/>
 	<property name="config.dir"            value="${basedir}/config"/>
 	<property name="classes.dir"           value="${basedir}/classes"/>	
 	<property name="src.dir"               value="${basedir}/src"/>
 	<property name="build.dir"             value="${basedir}/build"/>
+	<property name="lib.dir"               value="${basedir}/lib"/>
 	<property name="meta.inf.dir"          value="${basedir}/appserver"/>
 	<property name="ejb.client.jar"        value="${build.dir}/JPPFServer-Client.jar"/>
 	<property name="ear.prefix"            value="JPPF_J2EE_Demo"/>
-	<property name="jppf.build.properties.file" value="${basedir}/../JPPF/bin/build.properties"/>
-	<property file="${jppf.build.properties.file}"/>
-	<property name="build.number.file"     value="${basedir}/../JPPF/bin/build.number"/>
-	<property file="${build.number.file}"/>
+	<property file="${basedir}/build.properties"/>
+	<property file="${basedir}/build.number"/>
 
 	<!-- ========================================================================= -->
 	<!-- definition of application server-specific properties                      -->
@@ -59,10 +56,9 @@
 		<pathelement location="${classes.dir}/jca"/>
 		<pathelement location="${classes.dir}/j2eeclient"/>
 		<pathelement location="${ejb.client.jar}"/>
-		<fileset dir="${jppf.build.dir}">
+		<fileset dir="${lib.dir}">
 			<include name="jppf-common-node.jar"/>
 			<include name="jppf-common.jar"/>
-			<include name="jppf-server.jar"/>
 			<include name="jppf-client.jar"/>
 		</fileset>
 	</path>
@@ -71,7 +67,7 @@
 		<pathelement location="${classes.dir}/jca"/>
 		<pathelement location="${classes.dir}/j2eeclient"/>
 		<pathelement location="${config.dir}"/>
-		<fileset dir="${jppf.lib.dir}">
+		<fileset dir="${lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
 		<path refid="client.classpath"/>
@@ -283,7 +279,7 @@
 			</manifest>
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
 			<zipfileset dir="${build.dir}/lib" prefix="lib"/>
-			<zipfileset dir="${jppf.build.dir}" prefix="lib">
+			<zipfileset dir="${lib.dir}" prefix="lib">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
@@ -361,12 +357,12 @@
 			<zipfileset dir="${build.dir}/lib">
 				<include name="jppf-jca.jar"/>
 			</zipfileset>
-			<zipfileset dir="${jppf.build.dir}">
+			<zipfileset dir="${lib.dir}">
 				<include name="jppf-common-node.jar"/>
 				<include name="jppf-common.jar"/>
 				<include name="jppf-client.jar"/>
 			</zipfileset>
-			<zipfileset dir="${jppf.lib.dir}/slf4j">
+			<zipfileset dir="${lib.dir}">
 				<include name="slf4j-api-1.6.1.jar"/>
 				<include name="slf4j-${logging}-1.6.1.jar"/>
 			</zipfileset>
@@ -404,4 +400,3 @@
 	</target>
 
 </project> 
-

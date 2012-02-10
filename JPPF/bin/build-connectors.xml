@@ -49,6 +49,25 @@
 	<!-- ========================================================================= -->
 
 	<target name="j2ee.connector" description="" depends="rebuild">
+		<copy todir="${jca-client}/lib">
+			<fileset dir="${build}">
+				<include name="jppf-client*.jar"/>
+				<include name="jppf-common*.jar"/>
+				<include name="jppf-common-node*.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${jca-client}/lib">
+			<fileset dir="${lib}/J2EE" includes="*.jar"/>
+		</copy>
+		<copy todir="${jca-client}/lib">
+			<fileset dir="${lib}/slf4j" includes="*.jar"/>
+		</copy>
+		<copy todir="${jca-client}">
+			<fileset dir="${bin}">
+				<include name="build.properties"/>
+				<include name="build.number"/>
+			</fileset>
+		</copy>
 		<ant antfile="${basedir}/../jca-client/build.xml" inheritall="false"/>
 		<property name="j2ee.prefix" value="${app.ver}-j2ee-connector"/>
 		<property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>
