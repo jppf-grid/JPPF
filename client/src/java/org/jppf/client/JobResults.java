@@ -59,6 +59,16 @@ public class JobResults implements Serializable
   }
 
   /**
+   * Get the result for th etask at the specified position.
+   * @param position the position of the task to get.
+   * @return a <code>JPPFTask</code> instance, or null if no result was received for a task at this position.
+   */
+  public JPPFTask getResult(final int position)
+  {
+    return resultMap.get(position);
+  }
+
+  /**
    * Add the specified results to this job.
    * @param tasks the list of tasks for which results were received.
    */

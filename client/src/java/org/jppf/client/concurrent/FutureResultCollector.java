@@ -50,19 +50,6 @@ class FutureResultCollector extends JPPFResultCollector
 
   /**
    * Initialize this collector with a specified number of tasks.
-   * @param count the count of submitted tasks.
-   * @param jobUuid the uuid of the corresponding job.
-   */
-  /*
-	FutureResultCollector(int count, String jobUuid)
-	{
-		super(count);
-		this.jobUuid = jobUuid;
-	}
-   */
-
-  /**
-   * Initialize this collector with a specified number of tasks.
    * @param job the job to execute.
    */
   FutureResultCollector(final JPPFJob job)
@@ -87,7 +74,7 @@ class FutureResultCollector extends JPPFResultCollector
    */
   synchronized JPPFTask getTask(final int position)
   {
-    return resultMap.get(position);
+    return job.getResults().getResult(position);
   }
 
   /**
@@ -125,7 +112,7 @@ class FutureResultCollector extends JPPFResultCollector
       taskReceived = isTaskReceived(position);
       if ((elapsed >= millis) && !taskReceived) return null;
     }
-    return resultMap.get(position);
+    return job.getResults().getResult(position);
   }
 
   /**
@@ -135,7 +122,7 @@ class FutureResultCollector extends JPPFResultCollector
    */
   boolean isTaskReceived(final int position)
   {
-    return resultMap.get(position) != null;
+    return job.getResults().hasResult(position);
   }
 
   /**

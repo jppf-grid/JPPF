@@ -383,25 +383,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   }
 
   /**
-   * Determine whether there is a client connection available for execution.
-   * @return true if at least one connection is available, false otherwise.
-   */
-  public boolean handleAvailableConnection2()
-  {
-    synchronized(loadBalancer.getAvailableConnectionLock())
-    {
-      boolean b1 = hasAvailableConnection();
-      boolean b2 = false;
-      if (b1 && (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()))
-      {
-        loadBalancer.setLocallyExecuting(true);
-        b2 = true;
-      }
-      return b1;
-    }
-  }
-
-  /**
    * Invoked when the status of a client connection has changed.
    * @param event the event to notify of.
    * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
