@@ -16,24 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
-
-import org.jppf.server.nio.AbstractTaskBundleMessage;
-
-
-
 /**
- * Context associated with a channel serving tasks to a node.
- * @author Laurent Cohen
+ * Support for NIO-based communication with the clients, for the class loader channel.
  */
-public class RemoteNodeContext extends AbstractNodeContext
-{
-  /**
-   * {@inheritDoc}.
-   */
-  @Override
-  public AbstractTaskBundleMessage newMessage()
-  {
-    return new RemoteNodeMessage(sslEngine != null);
-  }
-}
+package org.jppf.server.nio.classloader.client;

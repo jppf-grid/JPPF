@@ -84,11 +84,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     driver.getStatsManager().newClientConnection();
   }
 
-  /**
-   * Define a context for a newly created channel.
-   * @return an <code>NioContext</code> instance.
-   * @see org.jppf.server.nio.NioServer#createNioContext()
-   */
   @Override
   public NioContext createNioContext()
   {

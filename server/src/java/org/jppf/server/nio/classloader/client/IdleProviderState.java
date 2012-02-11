@@ -16,26 +16,27 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.ClassTransition.TO_IDLE_PROVIDER;
 
 import java.net.ConnectException;
 
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * This class represents the state of sending a response to a node.
+ * This class represents the state of waiting for the next request for a provider.
  * @author Laurent Cohen
  */
-class SendingNodeResponseState extends ClassServerState
+public class IdleProviderState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingNodeResponseState.class);
+  private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -45,7 +46,7 @@ class SendingNodeResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingNodeResponseState(final ClassNioServer server)
+  public IdleProviderState(final ClassNioServer server)
   {
     super(server);
   }
@@ -62,15 +63,10 @@ class SendingNodeResponseState extends ClassServerState
   {
     if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
     {
-      throw new ConnectException("node " + channel + " has been disconnected");
+      ClassContext context = (ClassContext) channel.getContext();
+      ((ClientClassNioServer) server).removeProviderConnection(context.getUuid(), channel);
+      throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    ClassContext context = (ClassContext) channel.getContext();
-    if (context.writeMessage(channel))
-    {
-      if (debugEnabled) log.debug("node: " + channel + ", response [" + context.getResource().getName() + "] sent to the node");
-      context.setMessage(null);
-      return TO_WAITING_NODE_REQUEST;
-    }
-    return TO_SENDING_NODE_RESPONSE;
+    return TO_IDLE_PROVIDER;
   }
 }

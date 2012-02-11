@@ -18,10 +18,6 @@
 
 package org.jppf.server.nio;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
-
-import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -49,21 +45,8 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-    if (message == null) message = new NioMessage();
-    if (message.length <= 0)
-    {
-      message.length = SerializationUtils.readInt(channel);
-      message.buffer = ByteBuffer.allocate(message.length);
-      readByteCount = 0;
-    }
-    readByteCount += channel.read(message.buffer);
-    if (traceEnabled)
-    {
-      log.trace('[' + getShortClassName() + "] " + "read " + readByteCount + " bytes out of " +
-          message.length + " for " + StringUtils.getRemoteHost(channel));
-    }
-    return readByteCount >= message.length;
+    if (message == null) message = new BaseNioMessage(sslEngine != null);
+    return message.read(wrapper);
   }
 
   /**
@@ -75,19 +58,6 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    WritableByteChannel channel = (WritableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-    if (!message.lengthWritten)
-    {
-      SerializationUtils.writeInt(channel, message.length);
-      message.lengthWritten = true;
-      writeByteCount = 0;
-    }
-    writeByteCount += channel.write(message.buffer);
-    if (traceEnabled)
-    {
-      log.trace('[' + getShortClassName() + "] " + "written " + writeByteCount + " bytes out of " +
-          message.length + " for " + StringUtils.getRemoteHost(channel));
-    }
-    return writeByteCount >= message.length;
+    return message.write(wrapper);
   }
 }

@@ -18,113 +18,45 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.io.*;
-import java.nio.channels.*;
-
-import org.jppf.io.*;
-import org.jppf.server.nio.*;
-import org.jppf.utils.SerializationUtils;
-import org.jppf.utils.streams.StreamUtils;
+import org.jppf.io.IOHelper;
+import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.SerializationHelperImpl;
 
 /**
  * Representation of a message sent or received by a remote node.
  * @author Laurent Cohen
  */
-public class RemoteNodeMessage extends AbstractNodeMessage
+public class RemoteNodeMessage extends AbstractTaskBundleMessage
 {
   /**
-   * The length of the location at the current position.
+   * Initialize this nio message with the specified sll flag.
+   * @param ssl <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
    */
-  protected int currentLength = 0;
-  /**
-   * Object storing the length of the object currently being read or written.
-   */
-  protected NioObject currentLengthObject = null;
-  /**
-   * Object storing the object currently being read or written.
-   */
-  protected NioObject currentObject = null;
-
-  /**
-   * Read the next serializable object from the specified channel.
-   * @param wrapper the channel to read from.
-   * @return true if the object has been completely read from the channel, false otherwise.
-   * @throws Exception if an IO error occurs.
-   */
-  @Override
-  protected boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  public RemoteNodeMessage(final boolean ssl)
   {
-    SocketChannel channel = (SocketChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-    if (currentLengthObject == null)
-    {
-      currentLengthObject = new NioObject(4, false);
-    }
-    InputSource source = new ChannelInputSource(channel);
-    if (!currentLengthObject.read(source)) return false;
-    if (currentLength <= 0)
-    {
-      InputStream is = currentLengthObject.getData().getInputStream();
-      try
-      {
-        currentLength = SerializationUtils.readInt(is);
-      }
-      finally
-      {
-        StreamUtils.close(is);
-      }
-      count += 4;
-    }
-    if (currentObject == null)
-    {
-      DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-      currentObject = new NioObject(location, false);
-    }
-    if (!currentObject.read(source)) return false;
-    count += currentLength;
-    locations.add(currentObject.getData());
-    currentLengthObject = null;
-    currentObject = null;
-    currentLength = 0;
-    position++;
-    return true;
+    super(ssl);
   }
 
   /**
-   * Write the next object to the specified channel.
-   * @param wrapper the channel to write to.
-   * @return true if the object has been completely written the channel, false otherwise.
+   * Actions to take after the first object in the message has been fully read.
    * @throws Exception if an IO error occurs.
    */
   @Override
-  protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  protected void afterFirstRead() throws Exception
   {
-    SocketChannel channel = (SocketChannel) ((SelectionKey) wrapper.getChannel()).channel();
-    if (currentLengthObject == null)
-    {
-      currentLengthObject = new NioObject(4, false);
-      OutputStream os = currentLengthObject.getData().getOutputStream();
-      try
-      {
-        SerializationUtils.writeInt(locations.get(position).getSize(), os);
-      }
-      finally
-      {
-        StreamUtils.close(os);
-      }
-    }
-    OutputDestination dest = new ChannelOutputDestination(channel);
-    if (!currentLengthObject.write(dest)) return false;
-    if (currentObject == null)
-    {
-      DataLocation loc = locations.get(position);
-      currentObject = new NioObject(loc.copy(), false);
-    }
-    if (!currentObject.write(dest)) return false;
-    count += 4 + locations.get(position).getSize();
-    position++;
-    currentLengthObject = null;
-    currentObject = null;
-    return true;
+    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
+    nbObjects = bundle.getTaskCount() + 1;
+  }
+
+  /**
+   * Actions to take before the first object in the message is written.
+   * @throws Exception if an IO error occurs.
+   */
+  @Override
+  protected void beforeFirstWrite() throws Exception
+  {
+    nbObjects = bundle.getTaskCount() + 2;
   }
 
   /**

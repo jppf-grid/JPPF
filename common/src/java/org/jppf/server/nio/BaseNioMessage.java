@@ -18,31 +18,39 @@
 
 package org.jppf.server.nio;
 
+
 /**
  * 
  * @author Laurent Cohen
  */
-public interface NioMessage
+public class BaseNioMessage extends AbstractNioMessage
 {
   /**
-   * Read data from the channel.
-   * @param channel the channel to read from.
-   * @return true if the data has been completely read from the channel, false otherwise.
-   * @throws Exception if an IO error occurs.
+   * Initialize this nio message with the specified sll flag.
+   * @param ssl <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
    */
-  boolean read(final ChannelWrapper<?> channel) throws Exception;
+  public BaseNioMessage(final boolean ssl)
+  {
+    super(ssl);
+  }
 
   /**
-   * Read data from the channel.
-   * @param channel the channel to write to.
-   * @return true if the data has been completely written the channel, false otherwise.
+   * Actions to take after the first object in the message has been fully read.
    * @throws Exception if an IO error occurs.
    */
-  boolean write(final ChannelWrapper<?> channel) throws Exception;
+  @Override
+  protected void afterFirstRead() throws Exception
+  {
+    nbObjects = 1;
+  }
 
   /**
-   * Determines whether this message read from / writes to an SSL connection.
-   * @return <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
+   * Actions to take before the first object in the message is written.
+   * @throws Exception if an IO error occurs.
    */
-  boolean isSSL();
+  @Override
+  protected void beforeFirstWrite() throws Exception
+  {
+    nbObjects = 1;
+  }
 }

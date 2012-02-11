@@ -35,10 +35,6 @@ import org.jppf.utils.*;
 public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 {
   /**
-   * The message wrapping the data sent or received over the socket channel.
-   */
-  protected AbstractNodeMessage nodeMessage = null;
-  /**
    * The task bundle to send or receive.
    */
   protected ServerJob bundle = null;
@@ -161,7 +157,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    */
   public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception
   {
-    AbstractNodeMessage message = newMessage();
+    AbstractTaskBundleMessage message = newMessage();
     message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
     message.addLocation(bundle.getDataProvider());
     for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
@@ -176,8 +172,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    */
   public BundleWrapper deserializeBundle() throws Exception
   {
-    List<DataLocation> locations = nodeMessage.getLocations();
-    JPPFTaskBundle bundle = nodeMessage.getBundle();
+    List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
+    JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
     BundleWrapper wrapper = new BundleWrapper(bundle);
     if (locations.size() > 1)
     {
@@ -188,17 +184,17 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
 
   /**
    * Create a new message.
-   * @return an {@link AbstractNodeMessage} instance.
+   * @return an {@link AbstractTaskBundleMessage} instance.
    */
-  public abstract AbstractNodeMessage newMessage();
+  public abstract AbstractTaskBundleMessage newMessage();
 
   /**
    * Get the message wrapping the data sent or received over the socket channel.
    * @return a {@link RemoteNodeMessage NodeMessage} instance.
    */
-  public AbstractNodeMessage getNodeMessage()
+  public AbstractTaskBundleMessage getNodeMessage()
   {
-    return nodeMessage;
+    return (AbstractTaskBundleMessage) message;
   }
 
   /**
@@ -206,9 +202,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    * @param nodeMessage a {@link RemoteNodeMessage NodeMessage} instance.
    * @param channel reference to the channel.
    */
-  public void setNodeMessage(final AbstractNodeMessage nodeMessage, final ChannelWrapper<?> channel)
+  public void setNodeMessage(final AbstractTaskBundleMessage nodeMessage, final ChannelWrapper<?> channel)
   {
-    this.nodeMessage = nodeMessage;
+    this.message = nodeMessage;
   }
 
   /**
@@ -253,7 +249,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
-    if (nodeMessage == null) nodeMessage = newMessage();
+    if (message == null) message = newMessage();
     return getNodeMessage().read(channel);
   }
 

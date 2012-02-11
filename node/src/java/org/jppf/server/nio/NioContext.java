@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio;
 
+import javax.net.ssl.SSLEngine;
+
 /**
  * Context associated with an open communication channel.
  * @param <S> the type of states associated with this context.
@@ -83,4 +85,16 @@ public interface NioContext<S extends Enum<S>>
    * @param channel a {@link ChannelWrapper} instance.
    */
   void setChannel(ChannelWrapper<?> channel);
+
+  /**
+   * Get the SSL engine associated with the channel.
+   * @return an instance of {@link SSLEngine}.
+   */
+  SSLEngine getSSLEngine();
+
+  /**
+   * Get the SSL engine associated with the channel.
+   * @param sslEngine an instance of {@link SSLEngine}.
+   */
+  void setSSLEngine(SSLEngine sslEngine);
 }

@@ -18,16 +18,15 @@
 
 package org.jppf.server.nio.classloader;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.io.ByteBufferInputStream;
+import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -44,10 +43,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Determines whther DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Reference to the transition manager.
-   */
-  private static StateTransitionManager transitionManager = JPPFDriver.getInstance().getClassServer().getTransitionManager();
   /**
    * The resource read from or written to the associated channel.
    */
@@ -72,11 +67,9 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public JPPFResourceWrapper deserializeResource() throws Exception
   {
-    ByteBufferInputStream bbis = new ByteBufferInputStream(message.buffer, true);
-    byte[] data = StreamUtils.getInputStreamAsByte(bbis);
-    data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
     ObjectSerializer serializer = new ObjectSerializerImpl();
-    resource = (JPPFResourceWrapper) serializer.deserialize(data);
+    DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
+    resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, serializer);
     return resource;
   }
 
@@ -88,12 +81,9 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
   {
     ObjectSerializer serializer = new ObjectSerializerImpl();
-    byte[] data = serializer.serialize(resource).getBuffer();
-    data = JPPFDataTransformFactory.transform(true, data, 0, data.length);
-    if (message == null) message = new NioMessage();
-    message.length = data.length;
-    message.buffer = ByteBuffer.wrap(data);
-    message.lengthWritten = false;
+    DataLocation location = IOHelper.serializeData(resource, serializer);
+    message = new BaseNioMessage(sslEngine != null);
+    ((BaseNioMessage) message).addLocation(location);
   }
 
   /**
@@ -102,8 +92,12 @@ public class ClassContext extends SimpleNioContext<ClassState>
   @Override
   public void handleException(final ChannelWrapper<?> channel)
   {
-    ClassNioServer.closeConnection(channel);
-    if (isProvider()) handleProviderError();
+    if (isProvider())
+    {
+      ClientClassNioServer.closeConnection(channel);
+      handleProviderError();
+    }
+    else NodeClassNioServer.closeConnection(channel);
   }
 
   /**
@@ -134,7 +128,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
     pendingRequests.add(request);
     if (ClassState.IDLE_PROVIDER.equals(state))
     {
-      transitionManager.transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
+      JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
       if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());
     }
   }
@@ -215,7 +209,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       if ((currentRequest != null) || !getPendingRequests().isEmpty())
       {
         if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
-        ClassNioServer server = JPPFDriver.getInstance().getClassServer();
+        ClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
         if (currentRequest != null)
         {
           setCurrentRequest(null);
@@ -236,7 +230,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @param request the requestinhg node channel.
    * @param server the server handling the node.
    */
-  protected void resetNodeState(final ChannelWrapper<?> request, final ClassNioServer server)
+  public void resetNodeState(final ChannelWrapper<?> request, final ClassNioServer server)
   {
     try
     {
@@ -251,7 +245,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   /**
-   * Send a null response to a request node connection. This method is called for a provider
+   * Send a null response to a request from a node connection. This method is called for a provider
    * that was disconnected but still has pending requests, so as not to block the requesting channels.
    * @param request the selection key wrapping the requesting channel.
    */
@@ -263,7 +257,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       ClassContext requestContext = (ClassContext) request.getContext();
       requestContext.getResource().setDefinition(null);
       requestContext.serializeResource(request);
-      ClassNioServer server = JPPFDriver.getInstance().getClassServer();
+      ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
       server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
     }
     catch (Exception e)

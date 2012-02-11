@@ -26,6 +26,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
@@ -95,7 +96,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
       context.setPendingRequests(new Vector<ChannelWrapper<?>>());
       context.setUuid(resource.getProviderUuid());
       ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, 0, context, null);
-      ((ClassNioServer) server).addProviderConnection(resource.getProviderUuid(), wrapper);
+      ((ClientClassNioServer) server).addProviderConnection(resource.getProviderUuid(), wrapper);
       if (debugEnabled) log.debug("registered class server channel");
     }
     catch (IOException e)

@@ -28,9 +28,29 @@ public enum ClassTransition
    */
   TO_DEFINING_TYPE,
   /**
+   * Transition to the WAITING_INITIAL_PROVIDER_REQUEST state.
+   */
+  TO_WAITING_INITIAL_PROVIDER_REQUEST,
+  /**
    * Transition to the TO_SENDING_INITIAL_PROVIDER_RESPONSE state.
    */
   TO_SENDING_INITIAL_PROVIDER_RESPONSE,
+  /**
+   * Transition to the SENDING_PROVIDER_REQUEST state.
+   */
+  TO_SENDING_PROVIDER_REQUEST,
+  /**
+   * Transition to the WAITING_PROVIDER_RESPONSE state.
+   */
+  TO_WAITING_PROVIDER_RESPONSE,
+  /**
+   * Transition to the IDLE_PROVIDER state in idle mode.
+   */
+  TO_IDLE_PROVIDER,
+  /**
+   * Transition to the WAITING_INITIAL_NODE_REQUEST state.
+   */
+  TO_WAITING_INITIAL_NODE_REQUEST,
   /**
    * Transition to the SENDING_INITIAL_RESPONSE state.
    */
@@ -44,23 +64,11 @@ public enum ClassTransition
    */
   TO_SENDING_NODE_RESPONSE,
   /**
-   * Transition to the SENDING_PROVIDER_REQUEST state.
+   * Transition to NODE_WAITING_PROVIDER_RESPONSE state.
    */
-  TO_SENDING_PROVIDER_REQUEST,
-  /**
-   * Transition to the WAITING_PROVIDER_RESPONSE state.
-   */
-  TO_WAITING_PROVIDER_RESPONSE,
+  TO_NODE_WAITING_PROVIDER_RESPONSE,
   /**
    * Transition to the IDLE_NODE state in idle mode.
    */
-  TO_IDLE_NODE,
-  /**
-   * Transition to the IDLE_PROVIDER state in idle mode.
-   */
-  TO_IDLE_PROVIDER,
-  /**
-   * Transition to NODE_WAITING_PROVIDER_RESPONSE state.
-   */
-  TO_NODE_WAITING_PROVIDER_RESPONSE;
+  TO_IDLE_NODE;
 }

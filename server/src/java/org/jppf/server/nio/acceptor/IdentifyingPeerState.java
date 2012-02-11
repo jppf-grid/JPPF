@@ -74,10 +74,10 @@ class IdentifyingPeerState extends AcceptorServerState
       switch(id)
       {
         case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
-          newServer = driver.getClassServer();
+          newServer = driver.getClientClassServer();
           break;
         case JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL:
-          newServer = driver.getClassServer();
+          newServer = driver.getNodeClassServer();
           break;
         case JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL:
           newServer = driver.getClientNioServer();
@@ -97,13 +97,15 @@ class IdentifyingPeerState extends AcceptorServerState
       try
       {
         newServer.getSelector().wakeup();
-        ChannelWrapper<?> newChannel = newServer.accept(socketChannel);
+        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLEngine());
+        newChannel.getContext().setSSLEngine(context.getSSLEngine());
         if (debugEnabled) log.debug("channel registered: " + newChannel);
       }
       finally
       {
         newServer.getLock().unlock();
       }
+      context.setSSLEngine(null);
       return null;
     }
     return AcceptorTransition.TO_IDENTIFYING_PEER;

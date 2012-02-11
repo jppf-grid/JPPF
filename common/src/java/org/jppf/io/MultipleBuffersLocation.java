@@ -102,9 +102,6 @@ public class MultipleBuffersLocation extends AbstractDataLocation
     if (!transferring)
     {
       transferring = true;
-      //list = new ArrayList<JPPFBuffer>();
-      //currentBuffer = new JPPFBuffer(new byte[size], size);
-      //list.add(currentBuffer);
       currentBuffer = list.get(0);
       currentBufferIndex = 0;
       currentBuffer.pos = 0;
@@ -136,12 +133,12 @@ public class MultipleBuffersLocation extends AbstractDataLocation
    */
   private int blockingTransferFrom(final InputSource source) throws Exception
   {
-    //if (debugEnabled) log.debug("blocking transfer: size=" + size);
+    //if (traceEnabled) log.trace("blocking transfer: size=" + size);
     while (count < size)
     {
       int remaining = size - count;
       int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
-      //if (debugEnabled) log.debug("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
+      //if (traceEnabled) log.trace("blocking transfer: remaining=" + remaining + ", read " + n +" bytes from source=" + source +
       //	", bytes=" + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos, Math.min(100, n)));
       if (n < 0) throw new EOFException();
       if (n < remaining) currentBuffer.pos += n;
@@ -160,7 +157,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
   private int nonBlockingTransferFrom(final InputSource source) throws Exception
   {
     int remaining = size - count;
-    //if (debugEnabled) log.debug("blocking transfer: size="+size+", remaining="+remaining);
+    //if (traceEnabled) log.trace("blocking transfer: size="+size+", remaining="+remaining);
     int n = source.read(currentBuffer.buffer, currentBuffer.pos, remaining);
     if (n > 0)
     {
@@ -246,7 +243,8 @@ public class MultipleBuffersLocation extends AbstractDataLocation
     {
       log.error(e.getMessage(), e);
     }
-    if (traceEnabled) {
+    if (traceEnabled)
+    {
       log.trace("count/size=" + count + '/' + size + ", n/remaining=" + n + '/' + remaining +
           ", currentBufferIndex/listSize=" + currentBufferIndex + '/' + list.size() + ", pos=" + currentBuffer.pos + " (" + this + ')');
     }

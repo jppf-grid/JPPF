@@ -18,9 +18,6 @@
 
 package org.jppf.server.nio.acceptor;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
-
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -45,26 +42,18 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
   private int id = JPPFIdentifiers.UNKNOWN;
 
   /**
-   * Read data from a channel.
+   * Read data from a channel. This method reads a single integer which identifies the type of the channel.
    * @param wrapper the channel to read the data from.
    * @return true if all the data has been read, false otherwise.
    * @throws Exception if an error occurs while reading the data.
+   * @see org.jppf.utils.JPPFIdentifiers
    */
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    ReadableByteChannel channel = (ReadableByteChannel) ((SelectionKeyWrapper) wrapper).getChannel().channel();
-    if (message == null)
-    {
-      message = new NioMessage();
-      message.length = 4;
-      message.buffer = ByteBuffer.wrap(new byte[4]);
-      readByteCount = 0;
-    }
-    readByteCount += channel.read(message.buffer);
-    if (traceEnabled) log.trace("read " + readByteCount + " bytes out of " + message.length + " for " + wrapper);
-    boolean b = readByteCount >= message.length;
-    if (b) id = SerializationUtils.readInt(message.buffer.array(), 0);
+    NioObject nioObject = sslEngine == null ? new PlainNioObject(wrapper, 4, false) : new SSLNioObject(wrapper, 4);
+    boolean b = nioObject.read();
+    if (b) id = SerializationUtils.readInt(nioObject.getData().getInputStream());
     return b;
   }
 

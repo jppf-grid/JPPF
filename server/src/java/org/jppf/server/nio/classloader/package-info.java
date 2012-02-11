@@ -15,27 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server;
-
 
 /**
- * Class that represents a context to a channel.
- * @author Domingos Creado
+ * Support for NIO-based communication for the class loader channel.
  */
-public class ChannelContext
-{
-  /**
-   * what will be executed when the channel is selected.
-   */
-  public ChannelState state;
-
-  /**
-   * the "memory" of the DFA.
-   */
-  public Object content;
-
-  /**
-   * the uuid of the application, it does not make sense for channels to nodes.
-   */
-  public String uuid;
-}
+package org.jppf.server.nio.classloader;

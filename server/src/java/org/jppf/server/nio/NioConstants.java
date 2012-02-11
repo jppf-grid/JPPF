@@ -42,6 +42,14 @@ public class NioConstants
    */
   public static final String CLASS_SERVER = "ClassServer";
   /**
+   * Name of the client class server.
+   */
+  public static final String CLIENT_CLASS_SERVER = "ClientClassServer";
+  /**
+   * Name of the node class server.
+   */
+  public static final String NODE_CLASS_SERVER = "NodeClassServer";
+  /**
    * Name of the class server.
    */
   public static final String NODE_SERVER = "TasksServer";

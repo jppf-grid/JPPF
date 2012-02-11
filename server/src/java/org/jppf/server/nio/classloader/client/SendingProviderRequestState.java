@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
@@ -24,6 +24,7 @@ import java.net.ConnectException;
 
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
@@ -85,7 +86,7 @@ class SendingProviderRequestState extends ClassServerState
     {
       if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + context.getCurrentRequest() + 
         ", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
-      context.setMessage(new NioMessage());
+      context.setMessage(new BaseNioMessage(context.getSSLEngine() != null));
       return TO_WAITING_PROVIDER_RESPONSE;
     }
     return TO_SENDING_PROVIDER_REQUEST;

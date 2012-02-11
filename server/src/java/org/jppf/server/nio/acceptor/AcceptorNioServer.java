@@ -85,15 +85,11 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     }
   }
 
-  /**
-   * Define a context for a newly created channel.
-   * @return an <code>NioContext</code> instance.
-   * @see org.jppf.server.nio.NioServer#createNioContext()
-   */
   @Override
   public NioContext createNioContext()
   {
-    return new AcceptorContext();
+    AcceptorContext context = new AcceptorContext();
+    return context;
   }
 
   /**

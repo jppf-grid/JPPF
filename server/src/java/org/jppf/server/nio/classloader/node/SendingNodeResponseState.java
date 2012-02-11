@@ -15,24 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.nio.classloader;
+
+package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import java.net.ConnectException;
+
+import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * This class represents the state of waiting for the response from a provider.
+ * This class represents the state of sending a response to a node.
  * @author Laurent Cohen
  */
-class WaitingProviderResponseState extends ClassServerState
+class SendingNodeResponseState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(WaitingProviderResponseState.class);
+  private static Logger log = LoggerFactory.getLogger(SendingNodeResponseState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -42,7 +46,7 @@ class WaitingProviderResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public WaitingProviderResponseState(final ClassNioServer server)
+  public SendingNodeResponseState(final ClassNioServer server)
   {
     super(server);
   }
@@ -57,27 +61,17 @@ class WaitingProviderResponseState extends ClassServerState
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    ClassContext context = (ClassContext) channel.getContext();
-    if (context.readMessage(channel))
+    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
     {
-      if (debugEnabled) log.debug("read response from provider: " + channel + " complete, sending to node " + context.getCurrentRequest() + 
-        ", resource: " + context.getResource().getName());
-      JPPFResourceWrapper resource = context.deserializeResource();
-      // putting the definition in cache
-      if ((resource.getDefinition() != null) && (resource.getCallable() == null))
-        server.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
-      // fowarding it to channel that requested
-      ChannelWrapper<?> destinationChannel = context.getCurrentRequest();
-      ClassContext destinationContext = (ClassContext) destinationChannel.getContext();
-      while (!ClassState.SENDING_NODE_RESPONSE.equals(destinationChannel.getContext().getState()) ||
-        (destinationChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
-      context.setCurrentRequest(null);
-      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-      destinationContext.setResource(resource);
-      destinationContext.serializeResource(destinationChannel);
-      server.getTransitionManager().transitionChannel(destinationChannel, TO_SENDING_NODE_RESPONSE);
-      return TO_SENDING_PROVIDER_REQUEST;
+      throw new ConnectException("node " + channel + " has been disconnected");
     }
-    return TO_WAITING_PROVIDER_RESPONSE;
+    ClassContext context = (ClassContext) channel.getContext();
+    if (context.writeMessage(channel))
+    {
+      if (debugEnabled) log.debug("node: " + channel + ", response [" + context.getResource().getName() + "] sent to the node");
+      context.setMessage(null);
+      return TO_WAITING_NODE_REQUEST;
+    }
+    return TO_SENDING_NODE_RESPONSE;
   }
 }

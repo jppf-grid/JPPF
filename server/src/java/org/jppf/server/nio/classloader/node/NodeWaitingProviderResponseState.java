@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.slf4j.*;
 
 /**
@@ -93,7 +95,8 @@ class NodeWaitingProviderResponseState extends ClassServerState
   private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
   {
     ChannelWrapper<?> result = null;
-    List<ChannelWrapper<?>> connections = server.getProviderConnections(uuid);
+    ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
+    List<ChannelWrapper<?>> connections = clientClassServer.getProviderConnections(uuid);
     if (connections == null) return null;
     int minRequests = Integer.MAX_VALUE;
     for (ChannelWrapper<?> channel: connections)

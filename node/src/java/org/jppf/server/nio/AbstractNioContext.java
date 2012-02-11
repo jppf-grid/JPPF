@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio;
 
+import javax.net.ssl.SSLEngine;
+
 import org.slf4j.*;
 
 /**
@@ -63,6 +65,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Unique ID for the corresponding connection on the remote peer.
    */
   protected String connectionUuid = null;
+  /**
+   * The SSL engine associated with the channel.
+   */
+  protected SSLEngine sslEngine = null;
 
   /**
    * {@inheritDoc}
@@ -163,5 +169,23 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   public void setConnectionUuid(final String connectionUuid)
   {
     this.connectionUuid = connectionUuid;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SSLEngine getSSLEngine()
+  {
+    return sslEngine;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setSSLEngine(final SSLEngine sslEngine)
+  {
+    this.sslEngine = sslEngine;
   }
 }

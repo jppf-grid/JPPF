@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.classloader.JPPFResourceWrapper.State.*;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
-
-import java.util.Vector;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
@@ -32,12 +30,12 @@ import org.slf4j.*;
  * This class represents the state of a new class server connection, whose type is yet undetermined.
  * @author Laurent Cohen
  */
-class DefiningChannelTypeState extends ClassServerState
+class WaitingInitialNodeRequestState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(DefiningChannelTypeState.class);
+  private static Logger log = LoggerFactory.getLogger(WaitingInitialNodeRequestState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -52,7 +50,7 @@ class DefiningChannelTypeState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the JPPFNIOServer this state relates to.
    */
-  public DefiningChannelTypeState(final ClassNioServer server)
+  public WaitingInitialNodeRequestState(final ClassNioServer server)
   {
     super(server);
   }
@@ -73,41 +71,21 @@ class DefiningChannelTypeState extends ClassServerState
     {
       JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug("channel: " + wrapper + " read resource [" + resource.getName() + "] done");
-      if (PROVIDER_INITIATION.equals(resource.getState()))
+      context.setProvider(false);
+      if (debugEnabled) log.debug("initiating node: " + wrapper);
+      String uuid = (String) resource.getData("node.uuid");
+      if (uuid != null)
       {
-        context.setProvider(true);
-        if (debugEnabled) log.debug("initiating provider: " + wrapper);
-        String uuid = resource.getUuidPath().getFirst();
-        // it is a provider
-        server.addProviderConnection(uuid, wrapper);
         context.setUuid(uuid);
-        context.setPendingRequests(new Vector<ChannelWrapper<?>>());
-        context.setMessage(null);
-        if (managementEnabled)
-        {
-          resource.setManagementId(driver.getInitializer().getJmxServer().getId());
-        }
-        context.serializeResource(wrapper);
-        return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
+        ((NodeClassNioServer) server).addNodeConnection(uuid, wrapper);
       }
-      else if (NODE_INITIATION.equals(resource.getState()))
-      {
-        context.setProvider(false);
-        if (debugEnabled) log.debug("initiating node: " + wrapper);
-        String uuid = (String) resource.getData("node.uuid");
-        if (uuid != null)
-        {
-          context.setUuid(uuid);
-          server.addNodeConnection(uuid, wrapper);
-        }
-        // send the uuid of this driver to the node or node peer.
-        resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-        resource.setProviderUuid(driver.getUuid());
-        context.serializeResource(wrapper);
+      // send the uuid of this driver to the node or node peer.
+      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+      resource.setProviderUuid(driver.getUuid());
+      context.serializeResource(wrapper);
 
-        return TO_SENDING_INITIAL_NODE_RESPONSE;
-      }
+      return TO_SENDING_INITIAL_NODE_RESPONSE;
     }
-    return TO_DEFINING_TYPE;
+    return TO_WAITING_INITIAL_NODE_REQUEST;
   }
 }

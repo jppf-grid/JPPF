@@ -29,7 +29,7 @@ import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
-import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.nio.classloader.*;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -88,6 +88,10 @@ public class DriverInitializer
    * Handles listeners to node connection events.
    */
   private final NodeConnectionEventHandler nodeConnectionEventHandler = new NodeConnectionEventHandler();
+  /**
+   * Holds the soft cache of classes downlaoded form the clients r from this driver's classpath.
+   */
+  private final ClassCache classCache = new ClassCache();
 
   /**
    * Instantiate this initializer with the specified driver.
@@ -360,5 +364,14 @@ public class DriverInitializer
   public NodeConnectionEventHandler getNodeConnectionEventHandler()
   {
     return nodeConnectionEventHandler;
+  }
+
+  /**
+   * Get the soft cache of classes downloaded form the clients r from this driver's classpath.
+   * @return an instance of {@link ClassCache}.
+   */
+  public ClassCache getClassCache()
+  {
+    return classCache;
   }
 }

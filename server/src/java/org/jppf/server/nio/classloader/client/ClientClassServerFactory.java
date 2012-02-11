@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassState.*;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
@@ -24,19 +24,20 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import java.util.*;
 
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.classloader.*;
 
 /**
  * Utility class used to specify the possible states of a class server connection, as well as the possible
  * transitions between those states.
  * @author Laurent Cohen
  */
-final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransition>
+final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassTransition>
 {
   /**
    * Initialize this factory with the specified server.
    * @param server the server for which to initialize.
    */
-  public ClassServerFactory(final ClassNioServer server)
+  public ClientClassServerFactory(final ClassNioServer server)
   {
     super(server);
   }
@@ -51,15 +52,11 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
   {
     Map<ClassState, NioState<ClassTransition>> map =
         new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
-    map.put(DEFINING_TYPE, new DefiningChannelTypeState((ClassNioServer) server));
+    map.put(WAITING_INITIAL_PROVIDER_REQUEST, new WaitingProviderInitialRequestState((ClassNioServer) server));
     map.put(SENDING_INITIAL_PROVIDER_RESPONSE, new SendingProviderInitialResponseState((ClassNioServer) server));
-    map.put(SENDING_INITIAL_NODE_RESPONSE, new SendingNodeInitialResponseState((ClassNioServer) server));
-    map.put(SENDING_NODE_RESPONSE, new SendingNodeResponseState((ClassNioServer) server));
     map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState((ClassNioServer) server));
-    map.put(WAITING_NODE_REQUEST, new WaitingNodeRequestState((ClassNioServer) server));
     map.put(WAITING_PROVIDER_RESPONSE, new WaitingProviderResponseState((ClassNioServer) server));
     map.put(IDLE_PROVIDER, new IdleProviderState((ClassNioServer) server));
-    map.put(NODE_WAITING_PROVIDER_RESPONSE, new NodeWaitingProviderResponseState((ClassNioServer) server));
     return map;
   }
 
@@ -73,16 +70,11 @@ final class ClassServerFactory	extends NioServerFactory<ClassState, ClassTransit
   {
     Map<ClassTransition, NioTransition<ClassState>> map =
         new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
-    map.put(TO_DEFINING_TYPE, transition(DEFINING_TYPE, R));
+    map.put(TO_WAITING_INITIAL_PROVIDER_REQUEST, transition(WAITING_INITIAL_PROVIDER_REQUEST, R));
     map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
-    map.put(TO_SENDING_INITIAL_NODE_RESPONSE, transition(SENDING_INITIAL_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
-    map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));
-    map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_PROVIDER_RESPONSE, transition(WAITING_PROVIDER_RESPONSE, R));
-    map.put(TO_IDLE_NODE, transition(SENDING_NODE_RESPONSE, 0));
     map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, NioConstants.CHECK_CONNECTION ? R : 0));
-    map.put(TO_NODE_WAITING_PROVIDER_RESPONSE, transition(NODE_WAITING_PROVIDER_RESPONSE, 0));
     return map;
   }
 }

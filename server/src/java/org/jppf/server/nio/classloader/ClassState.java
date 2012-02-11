@@ -30,19 +30,11 @@ public enum ClassState
   /**
    * State of sending the initial information to a client.
    */
+  WAITING_INITIAL_PROVIDER_REQUEST,
+  /**
+   * State of sending the initial information to a client.
+   */
   SENDING_INITIAL_PROVIDER_RESPONSE,
-  /**
-   * State of sending the initial information to a node classloader.
-   */
-  SENDING_INITIAL_NODE_RESPONSE,
-  /**
-   * State of waiting for a request from a node classloader.
-   */
-  WAITING_NODE_REQUEST,
-  /**
-   * State of waiting for a response to a node classloader.
-   */
-  SENDING_NODE_RESPONSE,
   /**
    * State of waiting for a response form a resource provider.
    */
@@ -55,6 +47,22 @@ public enum ClassState
    * State of doing nothing for a resource provider.
    */
   IDLE_PROVIDER,
+  /**
+   * State of sending the initial information to a client.
+   */
+  WAITING_INITIAL_NODE_REQUEST,
+  /**
+   * State of sending the initial information to a node classloader.
+   */
+  SENDING_INITIAL_NODE_RESPONSE,
+  /**
+   * State of waiting for a request from a node classloader.
+   */
+  WAITING_NODE_REQUEST,
+  /**
+   * State of waiting for a response to a node classloader.
+   */
+  SENDING_NODE_RESPONSE,
   /**
    * State of doing nothing for a resource provider.
    */

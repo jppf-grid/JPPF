@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
@@ -24,18 +24,19 @@ import java.net.ConnectException;
 
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * State of sending the initial response to a newly created node channel.
+ * State of sending the initial response to a newly created provider channel.
  * @author Laurent Cohen
  */
-class SendingNodeInitialResponseState extends ClassServerState
+public class SendingProviderInitialResponseState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingNodeInitialResponseState.class);
+  private static Logger log = LoggerFactory.getLogger(SendingProviderInitialResponseState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -45,7 +46,7 @@ class SendingNodeInitialResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingNodeInitialResponseState(final ClassNioServer server)
+  public SendingProviderInitialResponseState(final ClassNioServer server)
   {
     super(server);
   }
@@ -60,17 +61,17 @@ class SendingNodeInitialResponseState extends ClassServerState
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
+    ClassContext context = (ClassContext) channel.getContext();
     if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
     {
-      throw new ConnectException("node " + channel + " has been disconnected");
+      throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    ClassContext context = (ClassContext) channel.getContext();
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent uuid to node: " + channel);
-      context.setMessage(null);
-      return TO_WAITING_NODE_REQUEST;
+      if (debugEnabled) log.debug("sent management to provider: " + channel);
+      //context.setMessage(null);
+      return TO_IDLE_PROVIDER;
     }
-    return TO_SENDING_INITIAL_NODE_RESPONSE;
+    return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
   }
 }

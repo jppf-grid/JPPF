@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.slf4j.*;
 
 
@@ -41,7 +41,7 @@ public class LocalNodeContext extends AbstractNodeContext
    * {@inheritDoc}.
    */
   @Override
-  public AbstractNodeMessage newMessage()
+  public AbstractTaskBundleMessage newMessage()
   {
     return new LocalNodeMessage();
   }
@@ -68,8 +68,8 @@ public class LocalNodeContext extends AbstractNodeContext
   {
     LocalNodeChannel handler = (LocalNodeChannel) channel;
     boolean b = super.writeMessage(channel);
-    if (debugEnabled) log.debug("wrote " + nodeMessage + " to " + channel);
-    handler.setNodeResource((LocalNodeMessage) nodeMessage);
+    if (debugEnabled) log.debug("wrote " + message + " to " + channel);
+    handler.setNodeResource((LocalNodeMessage) message);
     return b;
   }
 
@@ -77,7 +77,7 @@ public class LocalNodeContext extends AbstractNodeContext
    * {@inheritDoc}
    */
   @Override
-  public void setNodeMessage(final AbstractNodeMessage nodeMessage, final ChannelWrapper<?> channel)
+  public void setNodeMessage(final AbstractTaskBundleMessage nodeMessage, final ChannelWrapper<?> channel)
   {
     super.setNodeMessage(nodeMessage, channel);
     ((LocalNodeChannel) channel).wakeUp();

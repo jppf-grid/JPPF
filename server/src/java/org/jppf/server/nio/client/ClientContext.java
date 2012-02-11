@@ -26,7 +26,8 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.*;
-import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.ClassContext;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -49,10 +50,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Reference to the job manager.
    */
   private static JPPFJobManager jobManager = JPPFDriver.getInstance().getJobManager();
-  /**
-   * The message wrapping the data sent or received over the socket channel.
-   */
-  protected ClientMessage clientMessage = null;
   /**
    * The task bundle to send or receive.
    */
@@ -117,7 +114,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     ClientNioServer.closeClient(channel);
     if (clientUuid != null)
     {
-      ClassNioServer classServer = JPPFDriver.getInstance().getClassServer();
+      ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
       List<ChannelWrapper<?>> list = classServer.getProviderConnections(clientUuid);
       if ((list != null) && !list.isEmpty())
       {
@@ -126,7 +123,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
           ClassContext ctx = (ClassContext) classChannel.getContext();
           if (ctx.getConnectionUuid().equals(connectionUuid))
           {
-            ClassNioServer.closeConnection(channel);
+            ClientClassNioServer.closeConnection(channel);
             break;
           }
         }
@@ -155,8 +152,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ServerJob deserializeBundle() throws Exception
   {
-    List<DataLocation> locations = clientMessage.getLocations();
-    JPPFTaskBundle bundle = clientMessage.getBundle();
+    List<DataLocation> locations = ((ClientMessage) message).getLocations();
+    JPPFTaskBundle bundle = ((ClientMessage) message).getBundle();
     BundleWrapper wrapper = new BundleWrapper(bundle);
     wrapper.setDataProvider(locations.get(1));
     if (locations.size() > 2)
@@ -168,11 +165,11 @@ public class ClientContext extends AbstractNioContext<ClientState>
 
   /**
    * Create a new message.
-   * @return an {@link AbstractNodeMessage} instance.
+   * @return an {@link ClientMessage} instance.
    */
   public ClientMessage newMessage()
   {
-    return new ClientMessage();
+    return new ClientMessage(sslEngine != null);
   }
 
   /**
@@ -181,7 +178,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ClientMessage getClientMessage()
   {
-    return clientMessage;
+    return (ClientMessage) message;
   }
 
   /**
@@ -190,7 +187,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public void setClientMessage(final ClientMessage nodeMessage)
   {
-    this.clientMessage = nodeMessage;
+    this.message = nodeMessage;
   }
 
   /**
@@ -217,7 +214,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
-    if (clientMessage == null) clientMessage = newMessage();
+    if (message == null) message = newMessage();
     return getClientMessage().read(channel);
   }
 
@@ -375,6 +372,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the unique ID for the connection.
    * @return the connection id.
    */
+  @Override
   public String getConnectionUuid()
   {
     return connectionUuid;
@@ -384,6 +382,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Set the unique ID for the connection.
    * @param connectionUuid the connection id.
    */
+  @Override
   public void setConnectionUuid(final String connectionUuid)
   {
     this.connectionUuid = connectionUuid;

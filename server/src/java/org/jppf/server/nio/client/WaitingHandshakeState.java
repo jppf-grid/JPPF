@@ -23,7 +23,7 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 import java.util.List;
 
 import org.jppf.server.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
@@ -73,7 +73,7 @@ class WaitingHandshakeState extends ClientServerState
       String uuid = header.getUuidPath().getCurrentElement();
       context.setUuid(uuid);
       // wait until a class loader channel is up for the same client uuid
-      ClassNioServer classServer = driver.getClassServer();
+      ClientClassNioServer classServer = (ClientClassNioServer) driver.getClientClassServer();
       List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
       while ((list == null) || list.isEmpty())
       {

@@ -81,8 +81,6 @@ public class ChannelInputSource implements InputSource
     ByteBuffer tmpBuffer = null;
     try
     {
-      //if (tmpBuffer == null) tmpDirectBuffer = ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
-      //else tmpBuffer.clear();
       tmpBuffer = DirectBufferPool.provideBuffer();
       int remaining = data.remaining();
       int count = 0;

@@ -16,57 +16,47 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.client;
+package org.jppf.server.nio;
 
-import org.jppf.io.IOHelper;
-import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.SerializationHelperImpl;
-import org.slf4j.*;
 
 /**
- * Representation of a message sent or received by a remote node.
+ * Common abstract superclass representing a message sent or received by a node.
+ * A message is the transformation of a job into an more easily transportable format.
  * @author Laurent Cohen
  */
-public class ClientMessage extends AbstractTaskBundleMessage
+public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
 {
   /**
-   * Logger for this class.
+   * The latest bundle that was sent or received.
    */
-  private static Logger log = LoggerFactory.getLogger(ClientMessage.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  protected JPPFTaskBundle bundle = null;
 
   /**
    * Initialize this nio message with the specified sll flag.
    * @param ssl <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
    */
-  public ClientMessage(final boolean ssl)
+  public AbstractTaskBundleMessage(final boolean ssl)
   {
     super(ssl);
   }
 
   /**
-   * Actions to take after the first object in the message has been fully read.
-   * @throws Exception if an IO error occurs.
+   * Get the latest bundle that was sent or received.
+   * @return a <code>JPPFTaskBundle</code> instance.
    */
-  @Override
-  protected void afterFirstRead() throws Exception
+  public JPPFTaskBundle getBundle()
   {
-    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
-    nbObjects = bundle.getTaskCount() + 2;
+    return bundle;
   }
 
   /**
-   * Actions to take before the first object in the message is written.
-   * @throws Exception if an IO error occurs.
+   * Set the latest bundle that was sent or received.
+   * @param bundle a <code>JPPFTaskBundle</code> instance.
    */
-  @Override
-  protected void beforeFirstWrite() throws Exception
+  public void setBundle(final JPPFTaskBundle bundle)
   {
-    nbObjects = bundle.getTaskCount() + 1;
+    this.bundle = bundle;
   }
 
   /**
@@ -81,7 +71,6 @@ public class ClientMessage extends AbstractTaskBundleMessage
     sb.append(", nbObjects=").append(nbObjects);
     sb.append(", length=").append(length);
     sb.append(", count=").append(count);
-    sb.append(", currentLength=").append(currentLength);
     sb.append(']');
     return sb.toString();
   }

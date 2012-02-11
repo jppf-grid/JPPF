@@ -18,39 +18,32 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.io.InputStream;
-
-import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.io.IOHelper;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
+import org.jppf.utils.SerializationHelperImpl;
 
 /**
  * Node message implementation for an in-VM node.
  * @author Laurent Cohen
  */
-public class LocalNodeMessage extends AbstractNodeMessage
+public class LocalNodeMessage extends AbstractTaskBundleMessage
 {
+  /**
+   * Build this nio message.
+   */
+  public LocalNodeMessage()
+  {
+    super(false);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public boolean read(final ChannelWrapper<?> wrapper) throws Exception
   {
-    InputStream is = locations.get(0).getInputStream();
-    byte[] data = null;
-    try
-    {
-      data = StreamUtils.getInputStreamAsByte(is);
-    }
-    finally
-    {
-      StreamUtils.close(is);
-    }
-    data = JPPFDataTransformFactory.transform(false, data, 0, data.length);
-    SerializationHelper helper = new SerializationHelperImpl();
-    bundle = (JPPFTaskBundle) helper.getSerializer().deserialize(data);
+    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
     return true;
   }
 

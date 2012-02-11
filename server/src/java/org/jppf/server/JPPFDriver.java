@@ -29,6 +29,8 @@ import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.NioServer;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
@@ -82,7 +84,11 @@ public class JPPFDriver
   /**
    * Serves class loading requests from the JPPF nodes.
    */
-  private ClassNioServer classServer = null;
+  private ClientClassNioServer clientClassServer = null;
+  /**
+   * Serves class loading requests from the JPPF nodes.
+   */
+  private NodeClassNioServer nodeClassServer = null;
   /**
    * Handles the initial handshake and peer channel identification.
    */
@@ -151,7 +157,8 @@ public class JPPFDriver
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    classServer = startServer(recoveryServer, new ClassNioServer(), null);
+    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(), null);
+    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(), null);
     clientNioServer = startServer(recoveryServer, new ClientNioServer(), null);
     nodeNioServer = startServer(recoveryServer, new NodeNioServer(), null);
     acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, null), info.serverPorts);
@@ -161,13 +168,13 @@ public class JPPFDriver
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext());
       localNode = new JPPFLocalNode(localNodeChannel, localClassChannel);
-      classServer.initLocalChannel(localClassChannel);
+      nodeClassServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
       new Thread(localNode, "Local node").start();
     }
 
     initializer.initBroadcaster();
-    initializer.initPeers(classServer);
+    initializer.initPeers(nodeClassServer);
     System.out.println("JPPF Driver initialization complete");
   }
 
@@ -202,9 +209,18 @@ public class JPPFDriver
    * Get the JPPF class server.
    * @return a <code>ClassNioServer</code> instance.
    */
-  public ClassNioServer getClassServer()
+  public ClassNioServer getClientClassServer()
   {
-    return classServer;
+    return clientClassServer;
+  }
+
+  /**
+   * Get the JPPF class server.
+   * @return a <code>ClassNioServer</code> instance.
+   */
+  public ClassNioServer getNodeClassServer()
+  {
+    return nodeClassServer;
   }
 
   /**
@@ -259,10 +275,11 @@ public class JPPFDriver
     log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
     shuttingDown = true;
 
-    if(classServer != null) classServer.shutdown();
-    if(nodeNioServer != null) nodeNioServer.shutdown();
-    if(clientNioServer != null) clientNioServer.shutdown();
-    if(acceptorServer != null) acceptorServer.shutdown();
+    if (clientClassServer != null) clientClassServer.shutdown();
+    if (nodeClassServer != null) nodeClassServer.shutdown();
+    if (nodeNioServer != null) nodeNioServer.shutdown();
+    if (clientNioServer != null) clientNioServer.shutdown();
+    if (acceptorServer != null) acceptorServer.shutdown();
 
     Timer timer = new Timer();
     ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay);
@@ -277,9 +294,15 @@ public class JPPFDriver
     log.info("Shutting down");
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
-    if(classServer != null) {
-      classServer.end();
-      classServer = null;
+    if (clientClassServer != null)
+    {
+      clientClassServer.end();
+      clientClassServer = null;
+    }
+    if (nodeClassServer != null)
+    {
+      nodeClassServer.end();
+      nodeClassServer = null;
     }
     if (nodeNioServer != null)
     {
@@ -356,19 +379,14 @@ public class JPPFDriver
     {
       if (debugEnabled) log.debug("starting the JPPF driver");
       if ((args == null) || (args.length <= 0))
-      {
         throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
-      }
       if (!"noLauncher".equals(args[0]))
       {
         int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
-
       instance = new JPPFDriver();
       instance.run();
-      //JPPFDriver driver = getInstance();
-      //driver.run();
     }
     catch(Exception e)
     {

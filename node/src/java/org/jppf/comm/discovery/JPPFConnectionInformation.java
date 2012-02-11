@@ -40,6 +40,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   public int[] serverPorts = null;
   /**
+   * The SSL ports on which the server is listening.
+   */
+  public int[] sslServerPorts = null;
+  /**
    * Port number used for JMX management and monitoring.
    */
   public int managementPort = -1;
@@ -106,10 +110,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (this == obj) return true;
     if (getClass() != obj.getClass()) return false;
     JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
-    if (host == null) return (other.host == null) && (other.managementPort == managementPort);
-    return (host.equals(other.host)) && (other.managementPort == managementPort);
-    //if (uuid == null) return other.uuid == null;
-    //return uuid.equals(other.uuid);
+    //if (host == null) return (other.host == null) && (other.managementPort == managementPort);
+    //return (host.equals(other.host)) && (other.managementPort == managementPort);
+    if (uuid == null) return other.uuid == null;
+    return uuid.equals(other.uuid);
   }
 
   /**

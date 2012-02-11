@@ -152,16 +152,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     }
     if ((sslPorts != null) && (sslPorts.length != 0))
     {
+      // see http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext
+      // for SSLContext algorithm names
       sslContext = SSLContext.getInstance("SSLv2");
       SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
       for (int port: sslPorts)
       {
         ServerSocket socket = factory.createServerSocket();
         socket.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-        socket.bind(new InetSocketAddress(port));
         ServerSocketChannel channel = socket.getChannel();
+        socket.bind(new InetSocketAddress(port));
         channel.configureBlocking(false);
-        channel.bind(new InetSocketAddress(port));
         channel.register(selector, SelectionKey.OP_ACCEPT);
       }
     }
@@ -282,27 +283,16 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     {
       channel = serverSocketChannel.accept();
     }
-    catch (IOException ignored)
+    catch (IOException e)
     {
-      log.error(ignored.getMessage(), ignored);
+      log.error(e.getMessage(), e);
       return;
     }
     if (channel == null) return;
-    accept(channel);
-  }
-
-  /**
-   * Register an incoming connection with his server's selector.
-   * @param channel the socket channel representing the connection.
-   * @return a wrapper for the newly registered channel.
-   */
-  @SuppressWarnings("unchecked")
-  public ChannelWrapper<?> accept(final SocketChannel channel)
-  {
     try
     {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-      channel.configureBlocking(false);
+      if (channel.isBlocking()) channel.configureBlocking(false);
     }
     catch (IOException e)
     {
@@ -315,9 +305,29 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       {
         log.error(ignored.getMessage(), ignored);
       }
-      return null;
+      return;
     }
+    accept(channel, null);
+  }
+
+  /**
+   * Register an incoming connection with his server's selector.
+   * @param channel the socket channel representing the connection.
+   * @param sslEngine an sslEngine enventually passed on from a different server.
+   * @return a wrapper for the newly registered channel.
+   */
+  @SuppressWarnings("unchecked")
+  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLEngine sslEngine)
+  {
+    SSLEngine engine = null;
+    if ((sslEngine == null) && (channel.socket() instanceof SSLSocket))
+    {
+      engine = sslContext.createSSLEngine();
+      engine.setUseClientMode(false);
+    }
+    else engine = sslEngine;
     NioContext context = createNioContext();
+    context.setSSLEngine(engine);
     SelectionKeyWrapper wrapper = null;
     try
     {

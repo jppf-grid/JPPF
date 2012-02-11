@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -41,6 +42,10 @@ class WaitingNodeRequestState extends ClassServerState
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The class cache.
+   */
+  private static ClassCache classCache = driver.getInitializer().getClassCache();
 
   /**
    * Initialize this state with a specified NioServer.
@@ -129,7 +134,7 @@ class WaitingNodeRequestState extends ClassServerState
       else
       {
         if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();
-        if (uuid != null) b = server.getCacheContent(uuid, name);
+        if (uuid != null) b = classCache.getCacheContent(uuid, name);
         boolean alreadyInCache = (b != null);
         if (debugEnabled) log.debug("resource " + (alreadyInCache ? "" : "not ") + "found [" + name + "] in cache for node: " + channel);
         if (!alreadyInCache)
@@ -139,7 +144,7 @@ class WaitingNodeRequestState extends ClassServerState
         }
         if ((b != null) || !resource.isDynamic())
         {
-          if ((b != null) && !alreadyInCache) server.setCacheContent(driver.getUuid(), name, b);
+          if ((b != null) && !alreadyInCache) classCache.setCacheContent(driver.getUuid(), name, b);
           resource.setDefinition(b);
           context.serializeResource(channel);
           t = TO_SENDING_NODE_RESPONSE;
@@ -164,7 +169,7 @@ class WaitingNodeRequestState extends ClassServerState
     TraversalList<String> uuidPath = resource.getUuidPath();
     ClassContext context = (ClassContext) channel.getContext();
 
-    if (resource.getCallable() == null) b = server.getCacheContent(uuidPath.getFirst(), name);
+    if (resource.getCallable() == null) b = classCache.getCacheContent(uuidPath.getFirst(), name);
     if (b != null)
     {
       if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + channel);
