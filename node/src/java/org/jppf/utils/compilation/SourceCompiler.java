@@ -138,7 +138,7 @@ public class SourceCompiler implements Closeable
    * @return a list of {@link Diagnostic} objects.
    */
   public List<Diagnostic> getDiagnostics() {
-    return errorReporter.getDiagnostics();
+    return errorReporter.getErrors();
   }
 
   /**
