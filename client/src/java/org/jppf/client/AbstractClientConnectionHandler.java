@@ -23,9 +23,12 @@ import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.net.ssl.*;
+
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Common abstract superclass for client connections to a server.
@@ -34,6 +37,14 @@ import org.jppf.utils.JPPFConfiguration;
  */
 public abstract class AbstractClientConnectionHandler implements ClientConnectionHandler
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractClientConnectionHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The socket client uses to communicate over a socket connection.
    */
@@ -71,6 +82,17 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * List of status listeners for this connection.
    */
   private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
+
+  /**
+   * Initialize this connection with the specified owner.
+   * @param owner the client connection which owns this connection handler.
+   */
+  /*
+  protected AbstractClientConnectionHandler(final JPPFClientConnection owner)
+  {
+    this(owner, false);
+  }
+  */
 
   /**
    * Initialize this connection with the specified owner.
@@ -172,5 +194,21 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
       init();
     }
     return socketClient;
+  }
+
+  /**
+   * Create the ssl connection over an established plain connection.
+   * @throws Exception if any error occurs.
+   */
+  protected void createSSLConnection() throws Exception
+  {
+    SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+    SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), host, port, true);
+    SSLParameters params = SSLContext.getDefault().getDefaultSSLParameters();
+    if (debugEnabled) log.debug("SSL parameters : cipher suites=" + StringUtils.arrayToString(params.getCipherSuites()) +
+      ", protocols=" + StringUtils.arrayToString(params.getProtocols()) + ", neddCLientAuth=" + params.getNeedClientAuth() + ", wantClientAuth=" + params.getWantClientAuth());
+    sslSocket.setSSLParameters(params);
+    sslSocket.setUseClientMode(true);
+    socketClient = new SocketClient(sslSocket);
   }
 }

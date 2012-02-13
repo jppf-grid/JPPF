@@ -83,6 +83,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
       {
         throw new JPPFException('[' +name+"] Could not reconnect to the JPPF task server");
       }
+      if (owner.isSSL()) createSSLConnection();
       if (debugEnabled) log.debug("sending JPPF identifier");
       socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
       ((AbstractJPPFClientConnection) owner).sendHandshakeJob();

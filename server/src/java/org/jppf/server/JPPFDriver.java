@@ -157,11 +157,11 @@ public class JPPFDriver
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(), null);
-    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(), null);
-    clientNioServer = startServer(recoveryServer, new ClientNioServer(), null);
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(), null);
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, null), info.serverPorts);
+    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(), null, null);
+    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(), null, null);
+    clientNioServer = startServer(recoveryServer, new ClientNioServer(), null, null);
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(), null, null);
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts), info.serverPorts, info.sslServerPorts);
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
@@ -401,26 +401,28 @@ public class JPPFDriver
    * @param recoveryServer Recovery server for nioServers that implements ReaperListener
    * @param nioServer starting nio server
    * @param ports ports for initialization message
+   * @param sslPorts SSL ports for initialization message.
    * @param <T> the type of the server to start
    * @return started nioServer
    */
-  protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports) {
+  protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports, final int[] sslPorts) {
     if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if(recoveryServer != null && nioServer instanceof ReaperListener) {
       Reaper reaper = recoveryServer.getReaper();
       reaper.addReaperListener((ReaperListener) nioServer);
     }
     nioServer.start();
-    printInitializedMessage(ports, nioServer.getName());
+    printInitializedMessage(ports, sslPorts, nioServer.getName());
     return nioServer;
   }
 
   /**
    * Print a message to the console to signify that the initialization of a server was successful.
    * @param ports the ports on which the server is listening.
+   * @param sslPorts SSL ports for initialization message.
    * @param name the name to use for the server.
    */
-  protected static void printInitializedMessage(final int[] ports, final String name)
+  protected static void printInitializedMessage(final int[] ports, final int[] sslPorts, final String name)
   {
     StringBuilder sb = new StringBuilder();
     if (name != null)
@@ -431,9 +433,21 @@ public class JPPFDriver
     if (ports != null)
     {
       if (name != null) sb.append(" - ");
-      sb.append("accepting connections on port");
-      if (ports.length > 1) sb.append('s');
-      for (int n: ports) sb.append(' ').append(n);
+      boolean b = false;
+      if ((ports != null) && (ports.length > 0))
+      {
+        b = true;
+        sb.append("accepting plain connections on port");
+        if (ports.length > 1) sb.append('s');
+        for (int n: ports) sb.append(' ').append(n);
+      }
+      if ((sslPorts != null) && (sslPorts.length > 0))
+      {
+        if (b) sb.append('\n');
+        sb.append("accepting secure connections on SSL port");
+        if (sslPorts.length > 1) sb.append('s');
+        for (int n: sslPorts) sb.append(' ').append(n);
+      }
     }
     System.out.println(sb.toString());
   }

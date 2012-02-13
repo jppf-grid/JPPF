@@ -224,8 +224,6 @@ public abstract class AbstractNioMessage implements NioMessage
    */
   protected void afterFirstRead() throws Exception
   {
-    //bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
-    //nbObjects = bundle.getTaskCount() + 1;
   }
 
   /**
@@ -234,7 +232,6 @@ public abstract class AbstractNioMessage implements NioMessage
    */
   protected void beforeFirstWrite() throws Exception
   {
-    //nbObjects = bundle.getTaskCount() + 2;
   }
 
   /**

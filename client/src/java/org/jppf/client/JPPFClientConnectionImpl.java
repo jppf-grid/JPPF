@@ -72,13 +72,14 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    * @param uuid the unique identifier for this local client.
    * @param name configuration name for this local client.
    * @param info the connection properties for this connection.
+   * @param ssl determines whether this is an SSL connection.
    */
-  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info)
+  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
     this.client = client;
     jmxPort = info.managementPort;
     //configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
-    configure(uuid, name, info.host, info.serverPorts[0], 0);
+    configure(uuid, name, info.host, info.serverPorts[0], 0, ssl);
     initializeJmxConnection();
   }
 

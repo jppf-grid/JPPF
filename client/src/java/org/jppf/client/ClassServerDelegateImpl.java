@@ -84,6 +84,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
       {
         throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
       }
+      if (owner.isSSL()) createSSLConnection();
       if (!socketInitializer.isClosed())
       {
         msg = "[client: " + getName() + "] Reconnected to the class server";

@@ -103,12 +103,13 @@ public class JPPFClient extends AbstractGenericClient
    * @param uuid the uuid of the JPPF client.
    * @param name the name of the connection.
    * @param info the driver connection information.
+   * @param ssl determines whether this is an SSL connection.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
    */
   @Override
-  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
-    return new JPPFClientConnectionImpl(this, uuid, name, info);
+    return new JPPFClientConnectionImpl(this, uuid, name, info, ssl);
   }
 
   /**

@@ -140,10 +140,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       {
         if (debugEnabled) log.debug("initializing connections from discovery");
         boolean acceptMultipleInterfaces = props.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
+        final boolean ssl = props.getBoolean("jppf.discovery.ssl.enabled", false);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            newConnection(name, info, 0);
+            newConnection(name, info, 0, ssl);
           }
         }, new IPFilter(props), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
@@ -168,18 +169,19 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       if(initPeers)
       {
         for (String name : names) {
-          if(!VALUE_JPPF_DISCOVERY.equals(name))
+          if (!VALUE_JPPF_DISCOVERY.equals(name))
           {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
+            boolean ssl = props.getBoolean(String.format("%s.jppf.ssl.enabled", name), false);
             // for backward compatibility with v2.x configurations
-            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), 11111, false);
+            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), ssl ? 11443 : 11111, false);
             info.serverPorts = new int[] { port };
             info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             int priority = props.getInt(String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
 
-            newConnection(name, info, priority);
+            newConnection(name, info, priority, ssl);
           }
         }
       }
@@ -201,13 +203,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param name the name assigned to the connection.
    * @param info the information required for the connection to connect to the driver.
    * @param priority the priority assigned to the connection.
+   * @param ssl determines whether this is an SSL connection.
    */
-  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority) {
+  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final boolean ssl) {
     int n = config.getInt("jppf.pool.size", 1);
     if (n < 1) n = 1;
     for (int i=1; i<=n; i++)
     {
-      AbstractJPPFClientConnection c = createConnection(info.uuid, (n > 1) ? name + '-' + i : name, info);
+      AbstractJPPFClientConnection c = createConnection(info.uuid, (n > 1) ? name + '-' + i : name, info, ssl);
       c.setPriority(priority);
       newConnection(c);
     }
@@ -218,9 +221,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param uuid the uuid of the JPPF client.
    * @param name the name of the connection.
    * @param info the driver connection information.
+   * @param ssl determines whether this is an SSL connection.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
    */
-  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info);
+  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl);
 
   /**
    * Invoked when a new connection is created.

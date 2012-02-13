@@ -297,7 +297,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
     //BufferedOutputStream bos = new BufferedOutputStream(os, SOCKET_RECEIVE_BUFFER_SIZE);
     BufferedOutputStream bos = new BufferedOutputStream(os);
     dos = new DataOutputStream(bos);
-    dos.flush();
+    //dos.flush();
     BufferedInputStream bis = new BufferedInputStream(is);
     dis = new DataInputStream(bis);
   }

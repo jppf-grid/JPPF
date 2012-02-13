@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -67,6 +68,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Determines whether this connection has been shut down;
    */
   protected boolean isShutdown = false;
+  /**
+   * The name displayed for this connection.
+   */
+  protected String displayName;
+  /**
+   * Determines whether the communication via the server is done via SSL.
+   */
+  protected boolean ssl = false;
 
   /**
    * Configure this client connection with the specified parameters.
@@ -75,14 +84,25 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @param host the name or IP address of the host the JPPF driver is running on.
    * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
    * @param priority the assigned to this client connection.
+   * @param ssl determines whether the communication via the server is done via SSL.
    */
-  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority)
+  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean ssl)
   {
     this.uuid = uuid;
     this.host = NetworkUtils.getHostName(host);
     this.port = driverPort;
     this.priority = priority;
     this.name = name;
+    this.ssl = ssl;
+    try
+    {
+      String s = InetAddress.getByName(host).getCanonicalHostName();
+      displayName = name + '[' + s + ':' + port + ']';
+    }
+    catch(UnknownHostException e)
+    {
+      displayName = name;
+    }
     this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
   }
 
@@ -188,13 +208,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public String toString()
   {
-    return name + " : " + status;
+    return displayName + " : " + status;
   }
 
   /**
    * Create a socket initializer.
    * @return an instance of a class implementing <code>SocketInitializer</code>.
    */
+  @Override
   protected abstract SocketInitializer createSocketInitializer();
 
   /**
@@ -263,5 +284,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
         else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
       }
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isSSL()
+  {
+    return ssl;
   }
 }

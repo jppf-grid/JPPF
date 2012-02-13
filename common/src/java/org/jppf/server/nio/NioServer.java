@@ -29,6 +29,7 @@ import javax.net.ssl.*;
 
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 
@@ -147,25 +148,39 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
         server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
         server.socket().bind(new InetSocketAddress(port));
         server.configureBlocking(false);
-        server.register(selector, SelectionKey.OP_ACCEPT);
+        server.register(selector, SelectionKey.OP_ACCEPT, Boolean.FALSE);
       }
     }
     if ((sslPorts != null) && (sslPorts.length != 0))
     {
-      // see http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext
-      // for SSLContext algorithm names
-      sslContext = SSLContext.getInstance("SSLv2");
-      SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
+      createSSLContext();
       for (int port: sslPorts)
       {
-        ServerSocket socket = factory.createServerSocket();
-        socket.setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-        ServerSocketChannel channel = socket.getChannel();
-        socket.bind(new InetSocketAddress(port));
-        channel.configureBlocking(false);
-        channel.register(selector, SelectionKey.OP_ACCEPT);
+        ServerSocketChannel server = ServerSocketChannel.open();
+        server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+        server.socket().bind(new InetSocketAddress(port));
+        server.configureBlocking(false);
+        server.register(selector, SelectionKey.OP_ACCEPT, Boolean.TRUE);
       }
     }
+  }
+ 
+  /**
+   * Configure all SSL settings. This method is for interested subclasses classes to override.
+   * @throws Exception if any error occurs during the SSL configuration.
+   */
+  protected void createSSLContext() throws Exception
+  {
+  }
+
+  /**
+   * Configure all SSL settings for the specified SSL engine.
+   * This method is for interested subclasses classes to override.
+   * @param engine the SSL engine to configure.
+   * @throws Exception if any error occurs during the SSL configuration.
+   */
+  protected void configureSSLEngine(final SSLEngine engine) throws Exception
+  {
   }
 
   /**
@@ -278,6 +293,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   private void doAccept(final SelectionKey key)
   {
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+    boolean ssl = (Boolean) key.attachment();
     SocketChannel channel;
     try
     {
@@ -289,25 +305,24 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       return;
     }
     if (channel == null) return;
+    SSLEngine engine = null;
     try
     {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       if (channel.isBlocking()) channel.configureBlocking(false);
+      if (ssl)
+      {
+        engine = sslContext.createSSLEngine();
+        configureSSLEngine(engine);
+      }
     }
-    catch (IOException e)
+    catch (Exception e)
     {
       log.error(e.getMessage(), e);
-      try
-      {
-        channel.close();
-      }
-      catch (IOException ignored)
-      {
-        log.error(ignored.getMessage(), ignored);
-      }
+      StreamUtils.close(channel, log);
       return;
     }
-    accept(channel, null);
+    accept(channel, engine);
   }
 
   /**
@@ -319,15 +334,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   @SuppressWarnings("unchecked")
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLEngine sslEngine)
   {
-    SSLEngine engine = null;
-    if ((sslEngine == null) && (channel.socket() instanceof SSLSocket))
-    {
-      engine = sslContext.createSSLEngine();
-      engine.setUseClientMode(false);
-    }
-    else engine = sslEngine;
     NioContext context = createNioContext();
-    context.setSSLEngine(engine);
+    context.setSSLEngine(sslEngine);
     SelectionKeyWrapper wrapper = null;
     try
     {
