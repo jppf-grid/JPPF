@@ -117,9 +117,9 @@ public class JPPFJcaClient extends AbstractGenericClient
    * {@inheritDoc}
    */
   @Override
-  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info)
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
-    return new JPPFJcaClientConnection(this, uuid, name, info);
+    return new JPPFJcaClientConnection(this, uuid, name, info, ssl);
   }
 
   /**
