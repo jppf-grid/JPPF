@@ -17,12 +17,17 @@
  */
 package org.jppf.classloader;
 
-import java.io.*;
+import org.jppf.utils.IteratorEnumeration;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
-
-import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
@@ -43,6 +48,16 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * Determines the class loading delegation model to use.
    */
   private static DelegationModel delegationModel = initDelegationModel();
+
+  /**
+   * System classloader for URL_FIRST delegation model.
+   */
+  private ClassLoader systemClassLoader = null;
+
+  /**
+   * Determines whether system classloader was initialized.
+   */
+  private boolean     systemClassLoaderInitialized = false;
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -386,11 +401,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @Override
   protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException
   {
-    if (!isBootstrapClass(name))
-    {
-      if (delegationModel == DelegationModel.URL_FIRST) return loadClassLocalFirst(name, resolve);
-    }
-    return super.loadClass(name, resolve);
+    if (getDelegationModel() == DelegationModel.URL_FIRST)
+      return loadClassLocalFirst(name, resolve);
+    else
+      return super.loadClass(name, resolve);
   }
 
   /**
@@ -403,6 +417,19 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   private Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException
   {
     Class<?> c = findLoadedClass(name);
+    if(c == null)
+    {
+      ClassLoader cl = initSystemClassLoader();
+      if(cl != null) {
+        try
+        {
+          c = cl.loadClass(name);
+        } catch (ClassNotFoundException e)
+        {
+          // ignore
+        }
+      }
+    }
     if (c == null)
     {
       ClassLoader p = getParent();
@@ -433,6 +460,25 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   }
 
   /**
+   * Initializes system classloader for URL_FIRST delegation model.
+   * @return instance of system ClassLoader or null if not available.
+   */
+  protected synchronized ClassLoader initSystemClassLoader()
+  {
+    if(!systemClassLoaderInitialized) {
+      systemClassLoaderInitialized = true;
+      try
+      {
+        systemClassLoader = getSystemClassLoader();
+      } catch (Exception e)
+      {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+      }
+    }
+    return systemClassLoader;
+  }
+
+  /**
    * Find a class in this class loader's classpath.
    * @param name binary name of the resource to find.
    * @param recursive if true then look recursively into the hierarchy of parents that are instances of <code>AbstractJPPFClassLoader</code>.
@@ -457,18 +503,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       }
     }
     return c;
-  }
-
-  /**
-   * Determine whether the specified class name should be loaded by the bootstrap classloader,
-   * and hence whether the configured delegation model should be bypassed in favor of the standard one.
-   * @param name the fully qualified class name to check.
-   * @return <code>true</code> if the custom delegation model should be <code>bypassed</code>, false otherwise.
-   */
-  private static boolean isBootstrapClass(final String name)
-  {
-    if (name == null) return false;
-    return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.") || name.startsWith("com.sun.");
   }
 
   /**
