@@ -33,9 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -105,7 +103,7 @@ public class LocalExecutionManager extends ThreadSynchronization
    */
   public LocalExecutionManager()
   {
-    this.threadPool = new ForkJoinPool();
+    this.threadPool = Executors.newCachedThreadPool();
   }
 
   /**
