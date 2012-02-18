@@ -145,7 +145,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
       bundle = null;
       JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
       // broadcast jobs are not resubmitted.
-      if (tmpBundle.getSLA().isBroadcastJob()) tmpBundle.getCompletionListener().taskCompleted(tmpWrapper);
+      if (tmpBundle.getSLA().isBroadcastJob()) tmpBundle.fireTaskCompleted(tmpWrapper);
       else resubmitBundle(tmpWrapper);
     }
   }

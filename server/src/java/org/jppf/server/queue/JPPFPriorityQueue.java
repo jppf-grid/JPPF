@@ -114,8 +114,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundle.setQueueEntryTime(System.currentTimeMillis());
         putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
         putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
-        Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.JOB_REQUEUE);
-        if (requeued == null) requeued = false;
+        boolean requeued = Boolean.TRUE.equals(bundle.removeParameter(BundleParameter.JOB_REQUEUE));
         if (debugEnabled) log.debug("adding bundle with " + bundle);
         if (!requeued)
         {
@@ -353,7 +352,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
     if (uuidMap.isEmpty())
     {
-      ((JPPFTaskBundle) bundle).getCompletionListener().taskCompleted(bundleWrapper);
+      ((JPPFTaskBundle) bundle).fireTaskCompleted(bundleWrapper);
       return;
     }
     BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());

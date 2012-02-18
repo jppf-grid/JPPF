@@ -294,6 +294,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   }
 
   /**
+   * Notifies that execution of this task has completed.
+   * @param result the result of the task's execution.
+   */
+  public void fireTaskCompleted(final ServerJob result) {
+    if(this.completionListener != null) this.completionListener.taskCompleted(result);
+  }
+
+  /**
    * Compare two task bundles, based on their respective priorities.<br>
    * <b>Note:</b> <i>this class has a natural ordering that is inconsistent with equals.</i>
    * @param bundle the bundle compare this one to.

@@ -83,8 +83,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       if (queuedWrapper != null)
       {
         bundle = (JPPFTaskBundle) queuedWrapper.getJob();
-        TaskCompletionListener listener = bundle.getCompletionListener();
-        if (listener != null) listener.taskCompleted(queuedWrapper);
+        bundle.fireTaskCompleted(queuedWrapper);
       }
     }
     else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');

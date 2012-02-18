@@ -42,7 +42,7 @@ public class ThreadManager extends ThreadSynchronization
   /**
    * The thread pool that really processes the tasks
    */
-  private ThreadPoolExecutor threadPool = null;
+  private ExecutorService threadPool = null;
   /**
    * The factory used to create thread in the pool.
    */
@@ -72,6 +72,7 @@ public class ThreadManager extends ThreadSynchronization
     threadMXBean = ManagementFactory.getThreadMXBean();
     cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
     threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
+//    threadPool = new ForkJoinPool(poolSize);
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
     if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
@@ -91,19 +92,21 @@ public class ThreadManager extends ThreadSynchronization
     }
     int n = getThreadPoolSize();
     if (n == size) return;
-    ThreadPoolExecutor tpe = threadPool;
-    if (size > tpe.getCorePoolSize())
-    {
-      tpe.setMaximumPoolSize(size);
-      tpe.setCorePoolSize(size);
+    if(threadPool instanceof ThreadPoolExecutor) {
+      ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPool;
+      if (size > tpe.getCorePoolSize())
+      {
+        tpe.setMaximumPoolSize(size);
+        tpe.setCorePoolSize(size);
+      }
+      else if (size < tpe.getCorePoolSize())
+      {
+        tpe.setCorePoolSize(size);
+        tpe.setMaximumPoolSize(size);
+      }
+      log.info("Node thread pool size changed from " + n + " to " + size);
+      JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
     }
-    else if (size < tpe.getCorePoolSize())
-    {
-      tpe.setCorePoolSize(size);
-      tpe.setMaximumPoolSize(size);
-    }
-    log.info("Node thread pool size changed from " + n + " to " + size);
-    JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
   }
 
   /**
@@ -113,7 +116,12 @@ public class ThreadManager extends ThreadSynchronization
   public int getThreadPoolSize()
   {
     if (threadPool == null) return 0;
-    return threadPool.getCorePoolSize();
+    if(threadPool instanceof ThreadPoolExecutor)
+      return ((ThreadPoolExecutor)threadPool).getCorePoolSize();
+//    else if(threadPool instanceof ForkJoinPool)
+//      return ((ForkJoinPool)threadPool).getParallelism();
+    else
+      return 0;
   }
 
   /**
@@ -177,7 +185,7 @@ public class ThreadManager extends ThreadSynchronization
    * Get the thread pool that really processes the tasks
    * @return a {@link ThreadPoolExecutor} instance.
    */
-  public ThreadPoolExecutor getThreadPool()
+  public ExecutorService getThreadPool()
   {
     return threadPool;
   }

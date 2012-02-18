@@ -25,7 +25,7 @@ import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class BroadcastJobCompletionListener implements TaskCompletionListener
@@ -93,7 +93,7 @@ public class BroadcastJobCompletionListener implements TaskCompletionListener
     else completionMap.put(uuid, pending);
     if (completionMap.isEmpty())
     {
-      ((JPPFTaskBundle) bundleWrapper.getJob()).getCompletionListener().taskCompleted(bundleWrapper);
+      ((JPPFTaskBundle) bundleWrapper.getJob()).fireTaskCompleted(bundleWrapper);
     }
   }
 }

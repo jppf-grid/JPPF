@@ -69,7 +69,7 @@ class JobExpirationAction implements Runnable
       bundle.setParameter(BundleParameter.JOB_EXPIRED, true);
       if (bundle.getTaskCount() > 0)
       {
-        if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
+        bundle.fireTaskCompleted(bundleWrapper);
       }
       String jobUuid = bundleWrapper.getJob().getUuid();
       jobManagementMBean.cancelJob(jobUuid);

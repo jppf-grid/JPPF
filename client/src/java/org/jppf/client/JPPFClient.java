@@ -20,6 +20,7 @@ package org.jppf.client;
 import java.util.List;
 
 import org.jppf.client.event.*;
+import org.jppf.client.submission.SubmissionManager;
 import org.jppf.client.submission.SubmissionManagerImpl;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFStats;
@@ -48,7 +49,7 @@ public class JPPFClient extends AbstractGenericClient
   /**
    * The submission manager.
    */
-  private SubmissionManagerImpl submissionManager;
+  private SubmissionManager submissionManager;
 
   /**
    * Initialize this client with an automatically generated application UUID.
@@ -157,10 +158,11 @@ public class JPPFClient extends AbstractGenericClient
   {
     super.close();
     if (loadBalancer != null) loadBalancer.stop();
-    if (submissionManager != null)
+    if (submissionManager instanceof ThreadSynchronization)
     {
-      submissionManager.setStopped(true);
-      submissionManager.wakeUp();
+      ThreadSynchronization threadSynchronization = (ThreadSynchronization) submissionManager;
+      threadSynchronization.setStopped(true);
+      threadSynchronization.wakeUp();
     }
   }
 
@@ -171,8 +173,16 @@ public class JPPFClient extends AbstractGenericClient
   protected void initPools()
   {
     submissionManager = new SubmissionManagerImpl(this);
-    new Thread(submissionManager, "SubmissionManager").start();
-    super.initPools();
+//    try
+//    {
+//      submissionManager = new SubmissionManagerClient(this);
+//      new Thread(submissionManager, "SubmissionManager").start();
+//      super.initPools();
+//    }
+//    catch (Exception e)
+//    {
+//      e.printStackTrace();
+//    }
   }
 
   /**
@@ -184,6 +194,8 @@ public class JPPFClient extends AbstractGenericClient
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
     super.statusChanged(event);
-    submissionManager.wakeUp();
+    if (submissionManager instanceof ThreadSynchronization) {
+      ((ThreadSynchronization)submissionManager).wakeUp();
+    }
   }
 }

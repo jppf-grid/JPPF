@@ -98,9 +98,8 @@ class WaitingResultsState extends NodeServerState
       }
       else
       {
-        TaskCompletionListener listener = bundle.getCompletionListener();
         // notify the client thread about the end of a bundle
-        if (listener != null) listener.taskCompleted(context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
+        bundle.fireTaskCompleted(context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
         context.setJobCanceled(false);
       }
       Bundler bundler = context.getBundler();
