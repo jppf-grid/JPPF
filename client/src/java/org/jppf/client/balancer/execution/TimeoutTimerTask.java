@@ -49,9 +49,9 @@ public class TimeoutTimerTask implements Runnable
   /**
    * Initialize this timer task with the specified future.
    * @param executionManager the execution manager that started this task.
-   * @param number the number identifying the task.
-   * @param task the task to cancel.
-   * @param future future holding task to cancel
+   * @param number           the number identifying the task.
+   * @param task             the task to cancel.
+   * @param future           future holding task to cancel
    */
   public TimeoutTimerTask(final LocalExecutionManager executionManager, final long number, final Task task, final Future<?> future)
   {
@@ -76,7 +76,7 @@ public class TimeoutTimerTask implements Runnable
         task.onTimeout();
         executionManager.removeFuture(number);
       }
-      catch(Exception ignore)
+      catch (Exception ignore)
       {
       }
     }

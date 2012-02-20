@@ -36,11 +36,11 @@ public class TaskExecutionEvent extends EventObject
 
   /**
    * Initialize this event object with the specified task.
-   * @param task the JPPF task from which the event originates.
-   * @param jobId the id of the job this task belongs to.
-   * @param cpuTime the cpu time taken by the task.
+   * @param task        the JPPF task from which the event originates.
+   * @param jobId       the id of the job this task belongs to.
+   * @param cpuTime     the cpu time taken by the task.
    * @param elapsedTime the wall clock time taken by the task.
-   * @param error determines whether the task had an exception.
+   * @param error       determines whether the task had an exception.
    */
   public TaskExecutionEvent(final Task task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
   {

@@ -86,11 +86,12 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Bundler used to schedule tasks for the corresponding node.
    */
   private Bundler bundler;
+
   /**
    * Initialize this task queue checker with the specified node server.
-   * @param queue the reference queue to use.
+   * @param queue        the reference queue to use.
    * @param statsManager the reference to statistics manager.
-   * @param jobManager the job manager that submits the events.
+   * @param jobManager   the job manager that submits the events.
    */
   public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
   {
@@ -105,7 +106,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Create new instance of default bundler.
    * @return a new {@link Bundler} instance.
    */
-  protected Bundler createDefault() {
+  protected Bundler createDefault()
+  {
     FixedSizeProfile profile = new FixedSizeProfile();
     profile.setSize(1);
     return new FixedSizeBundler(profile);
@@ -126,11 +128,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   public void setBundler(final Bundler bundler)
   {
-    System.out.println("TaskQueueChecker.setBunlder: " + bundler);
-    if(bundler == null)
+    if (bundler == null)
+    {
       this.bundler = createDefault();
+    }
     else
+    {
       this.bundler = bundler;
+    }
   }
 
   /**
@@ -142,7 +147,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     System.out.println("TaskQueueChecker.addIdleChannel: " + channel);
     if (debugEnabled) log.trace("Adding idle channel " + channel);
     int count;
-    synchronized(idleChannels)
+    synchronized (idleChannels)
     {
       idleChannels.add(channel);
       count = idleChannels.size();
@@ -155,7 +160,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<ChannelWrapper<?>> getIdleChannels() {
+  public List<ChannelWrapper<?>> getIdleChannels()
+  {
     synchronized (idleChannels)
     {
       return new ArrayList<ChannelWrapper<?>>(idleChannels);
@@ -172,7 +178,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     System.out.println("TaskQueueChecker.removeIdleChannel: " + channel);
     if (debugEnabled) log.trace("Removing idle channel " + channel);
     int count;
-    synchronized(idleChannels)
+    synchronized (idleChannels)
     {
       idleChannels.remove(channel);
       count = idleChannels.size();
@@ -204,7 +210,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     boolean dispatched = false;
     try
     {
-      synchronized(idleChannels)
+      synchronized (idleChannels)
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
 
@@ -222,14 +228,17 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
             channel = retrieveChannel(bundleWrapper);
             if (channel != null) selectedBundle = bundleWrapper;
           }
-          if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
+          if (debugEnabled)
+          {
+            log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
+          }
           if (channel != null)
           {
             dispatchJobToChannel(channel, selectedBundle);
             dispatched = true;
           }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", ex);
         }
@@ -264,7 +273,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
 
   /**
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
-   * @param channel the node channel to dispatch the job to.
+   * @param channel        the node channel to dispatch the job to.
    * @param selectedBundle the job to dispatch.
    */
   private void dispatchJobToChannel(final ChannelWrapper<?> channel, final ClientJob selectedBundle)
@@ -275,7 +284,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
               ", nodeUuid=" + channel.getConnectionUuid());
     }
-    synchronized(channel)
+    synchronized (channel)
     {
       int size = 1;
       try
@@ -328,11 +337,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         {
           b = policy.accepts(info);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
           log.error("An error occurred while running the execution policy to determine node participation.", ex);
         }
-        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + mgtInfo.getId());
+        if (debugEnabled)
+        {
+          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + mgtInfo.getId());
+        }
         if (!b) continue;
       }
       acceptableChannels.add(ch);
@@ -377,11 +389,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
 
   /**
    * Perform the checks on the bundler before submitting a job.
-   * @param bundler the bundler to check and update.
+   * @param bundler    the bundler to check and update.
    * @param taskBundle the job.
-   * @param context the current node context.
+   * @param context    the current node context.
    */
-  private void updateBundler(final Bundler bundler, final ClientTaskBundle taskBundle, final ChannelWrapper<?>  context)
+  private void updateBundler(final Bundler bundler, final ClientTaskBundle taskBundle, final ChannelWrapper<?> context)
   {
     context.checkBundler(bundler);
     if (context.getBundler() instanceof JobAwareness)

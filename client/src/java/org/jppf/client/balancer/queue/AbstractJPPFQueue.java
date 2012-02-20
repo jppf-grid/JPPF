@@ -51,7 +51,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   protected TreeMap<Integer, List<ClientJob>> sizeMap = new TreeMap<Integer, List<ClientJob>>();
   /**
-   * 
+   *
    */
   protected int latestMaxSize = 0;
   /**
@@ -65,7 +65,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   public void addQueueListener(final QueueListener listener)
   {
-    synchronized(queueListeners)
+    synchronized (queueListeners)
     {
       queueListeners.add(listener);
     }
@@ -77,7 +77,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   public void removeQueueListener(final QueueListener listener)
   {
-    synchronized(queueListeners)
+    synchronized (queueListeners)
     {
       queueListeners.remove(listener);
     }
@@ -100,7 +100,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   protected void fireQueueEvent(final QueueEvent event)
   {
-    synchronized(queueListeners)
+    synchronized (queueListeners)
     {
       for (QueueListener listener : queueListeners) listener.newBundle(event);
     }

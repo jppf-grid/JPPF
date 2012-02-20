@@ -52,20 +52,36 @@ public class TestJPPFBalancer
 //      System.out.println("Submitting job...DONE");
 //
 //      job = new JPPFJob();
-      job.addTask(new TestTask("Task 2"));
+      job.addTask(new TestTask("Task X"));
+      job.addTask(new TestTask("Task 3"));
+      job.addTask(new TestTask("Task 4"));
+      job.addTask(new TestTask("Task 5"));
       job.getSLA().setBroadcastJob(true);
+//      job.setResultListener(new TaskResultListener()
+//      {
+//        @Override
+//        public void resultsReceived(final TaskResultEvent event)
+//        {
+//          System.out.println("resultsReceived: " + event);
+//        }
+//      });
       job.setBlocking(true);
 
       System.out.println("Submitting job...");
       client.submit(job);
       System.out.println("Submitting job...DONE");
-    } catch (Throwable t) {
+
+      System.out.println("Sleeping...");
+      Thread.sleep(10000L);
+    }
+    catch (Throwable t)
+    {
       t.printStackTrace(System.out);
     }
     finally
     {
       System.out.println("Closing...");
-      if(client != null) client.close();
+      if (client != null) client.close();
       System.out.println("Closing...DONE");
     }
     System.exit(0);

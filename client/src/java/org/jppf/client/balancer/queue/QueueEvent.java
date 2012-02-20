@@ -43,7 +43,7 @@ public class QueueEvent extends EventObject
 
   /**
    * Initialize this event with the specified queue and bundle.
-   * @param queue - the queue this event originates from.
+   * @param queue         - the queue this event originates from.
    * @param bundleWrapper - represents part or the totality of a job that was submitted.
    */
   public QueueEvent(final JPPFQueue queue, final ClientJob bundleWrapper)
@@ -53,9 +53,9 @@ public class QueueEvent extends EventObject
 
   /**
    * Initialize this event with the specified queue and bundle.
-   * @param queue - the queue this event originates from.
+   * @param queue         - the queue this event originates from.
    * @param bundleWrapper - represents part or the totality of a job that was submitted.
-   * @param requeue - determines if the event is a requeued bundle, following a node failure for instance.
+   * @param requeue       - determines if the event is a requeued bundle, following a node failure for instance.
    */
   public QueueEvent(final JPPFQueue queue, final ClientJob bundleWrapper, final boolean requeue)
   {
@@ -75,7 +75,7 @@ public class QueueEvent extends EventObject
 
   /**
    * Get the task bundle that is the cause of the event.
-   * @return  an instance of <code>BundleWrapper</code>.
+   * @return an instance of <code>BundleWrapper</code>.
    */
   public ClientJob getBundleWrapper()
   {

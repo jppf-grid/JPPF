@@ -30,7 +30,7 @@ public class ChannelJobPair extends Pair<ChannelWrapper, ClientJob>
 {
   /**
    * Initialize this object with the specified parameters.
-   * @param first - the first object of this pair.
+   * @param first  - the first object of this pair.
    * @param second - the second object of this pair.
    */
   public ChannelJobPair(final ChannelWrapper first, final ClientJob second)

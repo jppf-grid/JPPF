@@ -27,9 +27,9 @@ import org.jppf.server.scheduler.bundle.NodeAwareness;
 
 /**
  * Context associated with a channel serving state and tasks submission.
+ * @param <T> type of task bundle.
  * @author Laurent Cohen
  * @author Martin JANDA
- * @param <T> type of task bundle.
  */
 public abstract class ChannelWrapper<T>
 {
@@ -49,11 +49,13 @@ public abstract class ChannelWrapper<T>
    * Represents the management information.
    */
   private JPPFManagementInfo managementInfo = null;
+
   /**
    * Get the unique ID for the connection.
    * @return the connection id.
    */
   public abstract String getConnectionUuid();
+
   /**
    * Get the status of this connection.
    * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
@@ -127,11 +129,11 @@ public abstract class ChannelWrapper<T>
    */
   public boolean checkBundler(final Bundler serverBundler)
   {
-    if(serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
+    if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
 
     if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp())
     {
-      if(this.bundler != null) this.bundler.dispose();
+      if (this.bundler != null) this.bundler.dispose();
       this.bundler = serverBundler.copy();
       this.bundler.setup();
       if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);

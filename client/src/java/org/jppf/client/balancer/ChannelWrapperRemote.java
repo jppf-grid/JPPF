@@ -23,8 +23,13 @@ import org.jppf.client.AbstractGenericClient;
 import org.jppf.client.AbstractJPPFClientConnection;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.JPPFJob;
+import org.jppf.client.event.ClientConnectionStatusHandler;
 import org.jppf.client.event.ClientConnectionStatusListener;
+import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.TaskResultListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
@@ -37,7 +42,7 @@ import java.util.concurrent.Executors;
  * Context associated with a remote channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperRemote extends ChannelWrapper
+public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler
 {
   /**
    * The channel to the driver to use.
@@ -54,9 +59,28 @@ public class ChannelWrapperRemote extends ChannelWrapper
    */
   public ChannelWrapperRemote(final AbstractJPPFClientConnection channel)
   {
-    if(channel == null) throw new IllegalArgumentException("channel is null");
+    if (channel == null) throw new IllegalArgumentException("channel is null");
 
     this.channel = channel;
+
+    JPPFSystemInformation info = new JPPFSystemInformation(getConnectionUuid());
+
+    JPPFManagementInfo managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER);
+    managementInfo.setSystemInfo(info);
+    setSystemInfo(info);
+    setManagementInfo(managementInfo);
+  }
+
+  @Override
+  public void setSystemInfo(final JPPFSystemInformation systemInfo)
+  {
+    super.setSystemInfo(systemInfo);    //To change body of overridden methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void setManagementInfo(final JPPFManagementInfo managementInfo)
+  {
+    super.setManagementInfo(managementInfo);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   /**
@@ -65,7 +89,7 @@ public class ChannelWrapperRemote extends ChannelWrapper
   @Override
   public String getConnectionUuid()
   {
-    return channel.getConnectionUuid();
+    return channel.getUuid();
   }
 
   /**
@@ -75,6 +99,15 @@ public class ChannelWrapperRemote extends ChannelWrapper
   public JPPFClientConnectionStatus getStatus()
   {
     return channel.getStatus();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setStatus(final JPPFClientConnectionStatus status)
+  {
+    channel.getTaskServerConnection().setStatus(status);
   }
 
   /**
@@ -110,13 +143,25 @@ public class ChannelWrapperRemote extends ChannelWrapper
   @Override
   public void submit(final ClientJob bundle)
   {
+    setStatus(JPPFClientConnectionStatus.EXECUTING);
     executor.execute(new RemoteRunnable(getBundler(), bundle, channel));
+  }
+
+  @Override
+  public String toString()
+  {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("ChannelWrapperRemote");
+    sb.append("{channel=").append(channel);
+    sb.append('}');
+    return sb.toString();
   }
 
   /**
    *
    */
-  private static final class RemoteRunnable implements Runnable {
+  private class RemoteRunnable implements Runnable
+  {
     /**
      * The connection to the driver to use.
      */
@@ -129,10 +174,11 @@ public class ChannelWrapperRemote extends ChannelWrapper
      * Bundler used to schedule tasks for the corresponding node.
      */
     private final Bundler bundler;
+
     /**
      * Initialize this runnable for remote execution.
-     * @param bundler the bundler to send the resulting statistics to.
-     * @param bundle the execution to perform.
+     * @param bundler    the bundler to send the resulting statistics to.
+     * @param bundle     the execution to perform.
      * @param connection the connection to the driver to use.
      */
     private RemoteRunnable(final Bundler bundler, final ClientJob bundle, final AbstractJPPFClientConnection connection)
@@ -145,7 +191,6 @@ public class ChannelWrapperRemote extends ChannelWrapper
     @Override
     public void run()
     {
-      System.out.println("RemoteRunnable.run()");
       AbstractGenericClient client = connection.getClient();
       List<JPPFTask> tasks = this.bundle.getTasks();
       String requestUuid = null;
@@ -168,14 +213,14 @@ public class ChannelWrapperRemote extends ChannelWrapper
             int n = results.size();
             count += n;
 //            if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
-//            TaskResultListener listener = newJob.getResultListener();
-//            if (listener != null)
-//            {
-//              synchronized(listener)
-//              {
-//                listener.resultsReceived(new TaskResultEvent(results));
-//              }
-//            }
+            TaskResultListener listener = newJob.getResultListener();
+            if (listener != null)
+            {
+              synchronized (listener)
+              {
+                listener.resultsReceived(new TaskResultEvent(results));
+              }
+            }
 //            else log.warn("result listener is null for job " + newJob);
           }
           completed = true;
@@ -185,7 +230,7 @@ public class ChannelWrapperRemote extends ChannelWrapper
         bundler.feedback(tasks.size(), elapsed);
 //        connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
-      catch(Throwable t)
+      catch (Throwable t)
       {
 //        log.error(t.getMessage(), t);
         Exception exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
@@ -193,20 +238,20 @@ public class ChannelWrapperRemote extends ChannelWrapper
       }
       finally
       {
-        if(this.bundle.getCompletionListener() != null) this.bundle.getCompletionListener().taskCompleted(bundle);
+        bundle.fireTaskCompleted();
         client.removeRequestClassLoader(requestUuid);
-        System.out.println("RemoteRunnable.run...DONE");
+        setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
 
     /**
      * Create a new job based on the initial one.
-     * @param job initial job.
+     * @param job   initial job.
      * @param tasks the tasks to execute.
      * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
      * @throws Exception if any error occurs.
      */
-    private static JPPFJob createNewJob(final JPPFJob job, final List<JPPFTask> tasks) throws Exception
+    private JPPFJob createNewJob(final JPPFJob job, final List<JPPFTask> tasks) throws Exception
     {
       JPPFJob newJob = new JPPFJob(job.getUuid());
       newJob.setDataProvider(job.getDataProvider());
@@ -215,7 +260,7 @@ public class ChannelWrapperRemote extends ChannelWrapper
       newJob.setBlocking(job.isBlocking());
       newJob.setResultListener(job.getResultListener());
       newJob.setName(job.getName());
-      for (JPPFTask task: tasks)
+      for (JPPFTask task : tasks)
       {
         // needed as JPPFJob.addTask() resets the position
         int pos = task.getPosition();
@@ -228,10 +273,10 @@ public class ChannelWrapperRemote extends ChannelWrapper
     /**
      * Create a task bundle for the specified job.
      * @param client necessary for registering class loader.
-     * @param job the job to use as a base.
+     * @param job    the job to use as a base.
      * @return a JPPFTaskBundle instance.
      */
-    private static JPPFTaskBundle createBundle(final AbstractGenericClient client, final JPPFJob job)
+    private JPPFTaskBundle createBundle(final AbstractGenericClient client, final JPPFJob job)
     {
       String requestUuid = job.getUuid();
       JPPFTaskBundle bundle = new JPPFTaskBundle();
@@ -247,15 +292,5 @@ public class ChannelWrapperRemote extends ChannelWrapper
       }
       return bundle;
     }
-  }
-
-  @Override
-  public String toString()
-  {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("ChannelWrapperRemote");
-    sb.append("{channel=").append(channel);
-    sb.append('}');
-    return sb.toString();
   }
 }

@@ -36,7 +36,7 @@ public class ClientJob
   /**
    * The list of of the tasks.
    */
-  private final List<JPPFTask> tasks;
+  private List<JPPFTask> tasks;
   /**
    * The task completion listener to notify, once the execution of this task has completed.
    */
@@ -44,23 +44,24 @@ public class ClientJob
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
-   * @param job underlying task bundle.
+   * @param job   underlying task bundle.
    * @param tasks list of tasks to execute.
    */
   public ClientJob(final ClientTaskBundle job, final List<JPPFTask> tasks)
   {
-    if(job == null) throw new IllegalArgumentException("job is null");
-    if(tasks == null) throw new IllegalArgumentException("tasks is null");
-    
+    if (job == null) throw new IllegalArgumentException("job is null");
+    if (tasks == null) throw new IllegalArgumentException("tasks is null");
+
     this.job = job;
-    this.tasks = Collections.unmodifiableList(tasks);
+    this.tasks = tasks;
   }
 
   /**
    * Get the underlying task bundle.
    * @return a <code>ClientTaskBundle</code> instance.
    */
- public ClientTaskBundle getJob() {
+  public ClientTaskBundle getJob()
+  {
     return job;
   }
 
@@ -68,7 +69,8 @@ public class ClientJob
    * Get the list of of the tasks.
    * @return a list of <code>JPPFTask</code> instances.
    */
-  public List<JPPFTask> getTasks() {
+  public List<JPPFTask> getTasks()
+  {
     return Collections.unmodifiableList(tasks);
   }
 
@@ -76,7 +78,8 @@ public class ClientJob
    * Make a copy of this client job wrapper.
    * @return a new <code>ClientJob</code> instance.
    */
-  public ClientJob copy() {
+  public ClientJob copy()
+  {
     return copy(this.tasks.size());
   }
 
@@ -87,25 +90,39 @@ public class ClientJob
    */
   public ClientJob copy(final int nbTasks)
   {
-    if(nbTasks == this.tasks.size())
-      return new ClientJob(job.copy(), this.tasks);
+    if (nbTasks == this.tasks.size())
+    {
+      return new ClientJob(job.copy(), new ArrayList<JPPFTask>(this.tasks));
+    }
     else
-      return new ClientJob(job.copy(), this.tasks.subList(0, nbTasks));
+    {
+      List<JPPFTask> subList = this.tasks.subList(0, nbTasks);
+      try
+      {
+        return new ClientJob(job.copy(), new ArrayList<JPPFTask>(subList));
+      }
+      finally
+      {
+        job.setTaskCount(job.getTaskCount() - nbTasks);
+        subList.clear();
+      }
+    }
   }
 
   /**
    * Merge this client job wrapper with another.
-   * @param that the wrapper to merge with.
+   * @param that  the wrapper to merge with.
    * @param after determines whether the tasks from other should be added first or last.
    */
   public void merge(final ClientJob that, final boolean after)
   {
     List<JPPFTask> list = new ArrayList<JPPFTask>(this.tasks.size() + that.tasks.size());
-    if(!after) list.addAll(that.tasks);
+    if (!after) list.addAll(that.tasks);
     list.addAll(this.tasks);
-    if(after) list.addAll(that.tasks);
-    
-    
+    if (after) list.addAll(that.tasks);
+    this.tasks = list;
+
+
 //      int n = that.getJob().getTaskCount();
 //      job.setTaskCount(job.getTaskCount() + n);
 //      job.getSLA().setSuspended(that.getJob().getSLA().isSuspended());
@@ -123,7 +140,7 @@ public class ClientJob
    * Get the task completion listener to notify, once the execution of this task has completed.
    * @return a <code>TaskCompletionListener</code> instance.
    */
- public ClientCompletionListener getCompletionListener()
+  public ClientCompletionListener getCompletionListener()
   {
     return completionListener;
   }
@@ -140,7 +157,8 @@ public class ClientJob
   /**
    * Notifies that execution of this task has completed.
    */
- public void fireTaskCompleted() {
-    if(this.completionListener != null) this.completionListener.taskCompleted(this);
+  public void fireTaskCompleted()
+  {
+    if (this.completionListener != null) this.completionListener.taskCompleted(this);
   }
 }

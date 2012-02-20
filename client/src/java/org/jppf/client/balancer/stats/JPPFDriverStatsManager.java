@@ -33,7 +33,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public synchronized void newClientConnection()
   {
-    for (JPPFDriverListener listener: eventListeners) listener.newClientConnection();
+    for (JPPFDriverListener listener : eventListeners) listener.newClientConnection();
   }
 
   /**
@@ -42,7 +42,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public synchronized void clientConnectionClosed()
   {
-    for (JPPFDriverListener listener: eventListeners) listener.clientConnectionClosed();
+    for (JPPFDriverListener listener : eventListeners) listener.clientConnectionClosed();
   }
 
   /**
@@ -51,7 +51,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public synchronized void newNodeConnection()
   {
-    for (JPPFDriverListener listener: eventListeners) listener.newNodeConnection();
+    for (JPPFDriverListener listener : eventListeners) listener.newNodeConnection();
   }
 
   /**
@@ -60,7 +60,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public synchronized void nodeConnectionClosed()
   {
-    for (JPPFDriverListener listener: eventListeners) listener.nodeConnectionClosed();
+    for (JPPFDriverListener listener : eventListeners) listener.nodeConnectionClosed();
   }
 
   /**
@@ -70,31 +70,31 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public synchronized void taskInQueue(final int count)
   {
-    for (JPPFDriverListener listener: eventListeners) listener.taskInQueue(count);
+    for (JPPFDriverListener listener : eventListeners) listener.taskInQueue(count);
   }
 
   /**
    * Called to notify that a task was removed from the queue.
    * @param count the number of tasks that have been removed from the queue.
-   * @param time the time the task remained in the queue.
+   * @param time  the time the task remained in the queue.
    */
   @Override
   public synchronized void taskOutOfQueue(final int count, final long time)
   {
-    for (JPPFDriverListener listener: eventListeners) listener.taskOutOfQueue(count, time);
+    for (JPPFDriverListener listener : eventListeners) listener.taskOutOfQueue(count, time);
   }
 
   /**
    * Called when a task execution has completed.
-   * @param count the number of tasks that have been executed.
-   * @param time the time it took to execute the task, including transport to and from the node.
+   * @param count      the number of tasks that have been executed.
+   * @param time       the time it took to execute the task, including transport to and from the node.
    * @param remoteTime the time it took to execute the in the node only.
-   * @param size the size in bytes of the bundle that was sent to the node.
+   * @param size       the size in bytes of the bundle that was sent to the node.
    */
   @Override
   public synchronized void taskExecuted(final int count, final long time, final long remoteTime, final long size)
   {
-    for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
+    for (JPPFDriverListener listener : eventListeners) listener.taskExecuted(count, time, remoteTime, size);
   }
 
   /**
@@ -103,7 +103,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public void reset()
   {
-    for (JPPFDriverListener listener: eventListeners) listener.reset();
+    for (JPPFDriverListener listener : eventListeners) listener.reset();
   }
 
   /**
@@ -112,7 +112,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public void idleNodes(final int nbIdleNodes)
   {
-    for (JPPFDriverListener listener: eventListeners) listener.idleNodes(nbIdleNodes);
+    for (JPPFDriverListener listener : eventListeners) listener.idleNodes(nbIdleNodes);
   }
 
   /**
@@ -121,7 +121,7 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public void jobQueued(final int nbTasks)
   {
-    for (JPPFDriverListener listener: eventListeners) listener.jobQueued(nbTasks);
+    for (JPPFDriverListener listener : eventListeners) listener.jobQueued(nbTasks);
   }
 
   /**
@@ -130,6 +130,6 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
   @Override
   public void jobEnded(final long time)
   {
-    for (JPPFDriverListener listener: eventListeners) listener.jobEnded(time);
+    for (JPPFDriverListener listener : eventListeners) listener.jobEnded(time);
   }
 }

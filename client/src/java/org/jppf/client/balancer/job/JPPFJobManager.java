@@ -83,7 +83,7 @@ public class JPPFJobManager
    */
   public JPPFPriorityQueue getQueue()
   {
-    if(queue == null) throw new IllegalStateException("Queue not set");
+    if (queue == null) throw new IllegalStateException("Queue not set");
     return queue;
   }
 
@@ -130,7 +130,7 @@ public class JPPFJobManager
   /**
    * Called when all or part of a job is dispatched to a node.
    * @param bundleWrapper the dispatched job.
-   * @param channel the node to which the job is dispatched.
+   * @param channel       the node to which the job is dispatched.
    */
   public synchronized void jobDispatched(final ClientJob bundleWrapper, final ChannelWrapper channel)
   {
@@ -150,7 +150,7 @@ public class JPPFJobManager
   /**
    * Called when all or part of a job has returned from a node.
    * @param bundleWrapper the returned job.
-   * @param channel the node to which the job is dispatched.
+   * @param channel       the node to which the job is dispatched.
    */
   public synchronized void jobReturned(final ClientJob bundleWrapper, final ChannelWrapper channel)
   {
@@ -213,8 +213,8 @@ public class JPPFJobManager
   /**
    * Submit an event to the event queue.
    * @param eventType the type of event to generate.
-   * @param bundle the job data.
-   * @param channel the id of the job source of the event.
+   * @param bundle    the job data.
+   * @param channel   the id of the job source of the event.
    */
   private void submitEvent(final JobEventType eventType, final ClientTaskBundle bundle, final ChannelWrapper channel)
   {
@@ -237,7 +237,7 @@ public class JPPFJobManager
    */
   public void addJobListener(final JobListener listener)
   {
-    synchronized(eventListeners)
+    synchronized (eventListeners)
     {
       eventListeners.add(listener);
     }
@@ -249,7 +249,7 @@ public class JPPFJobManager
    */
   public void removeJobListener(final JobListener listener)
   {
-    synchronized(eventListeners)
+    synchronized (eventListeners)
     {
       eventListeners.remove(listener);
     }
@@ -261,30 +261,30 @@ public class JPPFJobManager
    */
   public void fireJobEvent(final JobNotification event)
   {
-    if(event == null) throw new IllegalArgumentException("event is null");
+    if (event == null) throw new IllegalArgumentException("event is null");
 
-    synchronized(eventListeners)
+    synchronized (eventListeners)
     {
       switch (event.getEventType())
       {
         case JOB_QUEUED:
-          for (JobListener listener: eventListeners) listener.jobQueued(event);
+          for (JobListener listener : eventListeners) listener.jobQueued(event);
           break;
 
         case JOB_ENDED:
-          for (JobListener listener: eventListeners) listener.jobEnded(event);
+          for (JobListener listener : eventListeners) listener.jobEnded(event);
           break;
 
         case JOB_UPDATED:
-          for (JobListener listener: eventListeners) listener.jobUpdated(event);
+          for (JobListener listener : eventListeners) listener.jobUpdated(event);
           break;
 
         case JOB_DISPATCHED:
-          for (JobListener listener: eventListeners) listener.jobDispatched(event);
+          for (JobListener listener : eventListeners) listener.jobDispatched(event);
           break;
 
         case JOB_RETURNED:
-          for (JobListener listener: eventListeners) listener.jobReturned(event);
+          for (JobListener listener : eventListeners) listener.jobReturned(event);
           break;
 
         default:

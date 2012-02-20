@@ -109,7 +109,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners) {
+    synchronized (listeners)
+    {
       listeners.add(listener);
     }
   }
@@ -120,7 +121,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners) {
+    synchronized (listeners)
+    {
       listeners.remove(listener);
     }
   }
@@ -130,10 +132,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
    */
-  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
-    if(oldStatus == newStatus) return;
+  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus)
+  {
+    if (oldStatus == newStatus) return;
     ClientConnectionStatusListener[] temp;
-    synchronized (listeners) {
+    synchronized (listeners)
+    {
       temp = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
@@ -172,7 +176,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     /**
      * The task bundle to execute.
      */
-  private final ClientJob bundle;
+    private final ClientJob bundle;
+
     /**
      * Initialize this runnable for local execution.
      * @param bundle the execution to perform.
@@ -194,7 +199,10 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
 //        log.error(t.getMessage(), t);
         Exception exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         t.printStackTrace();
-      } finally {
+      }
+      finally
+      {
+        bundle.fireTaskCompleted();
         setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }

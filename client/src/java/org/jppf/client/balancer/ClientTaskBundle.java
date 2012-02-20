@@ -50,6 +50,7 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
    * The job to execute.
    */
   private final JPPFJob job;
+
   /**
    * Type safe enumeration for the values of the bundle state.
    */
@@ -64,6 +65,7 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
      */
     EXECUTION_BUNDLE
   }
+
   /**
    * The unique identifier for this task bundle.
    */
@@ -148,7 +150,7 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
    * Get the job this submission is for.
    * @return a {@link JPPFJob} instance.
    */
- public JPPFJob getJob()
+  public JPPFJob getJob()
   {
     return job;
   }
@@ -320,8 +322,9 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
    * Notifies that execution of this task has completed.
    * @param result the result of the task's execution.
    */
-  public void fireTaskCompleted(final ServerJob result) {
-    if(this.completionListener != null) this.completionListener.taskCompleted(result);
+  public void fireTaskCompleted(final ServerJob result)
+  {
+    if (this.completionListener != null) this.completionListener.taskCompleted(result);
   }
 
   /**
@@ -329,7 +332,7 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
    * <b>Note:</b> <i>this class has a natural ordering that is inconsistent with equals.</i>
    * @param bundle the bundle compare this one to.
    * @return a positive int if this bundle is greater, 0 if both are equal,
-   * or a negative int if this bundle is less than the other.
+   *         or a negative int if this bundle is less than the other.
    * @see Comparable#compareTo(Object)
    */
   @Override
@@ -365,9 +368,10 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
     bundle.setName(name);
     bundle.setTaskCount(taskCount);
     bundle.setDataProvider(dataProvider);
-    synchronized(bundle.getParametersMap())
+    synchronized (bundle.getParametersMap())
     {
-      for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
+      for (Map.Entry<Object, Object> entry : parameters.entrySet())
+        bundle.setParameter(entry.getKey(), entry.getValue());
     }
     bundle.setQueueEntryTime(queueEntryTime);
     bundle.setCompletionListener(completionListener);
@@ -437,12 +441,12 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
 
   /**
    * Set a parameter of this request.
-   * @param name the name of the parameter to set.
+   * @param name  the name of the parameter to set.
    * @param value the value of the parameter to set.
    */
   public void setParameter(final Object name, final Object value)
   {
-    synchronized(parameters)
+    synchronized (parameters)
     {
       parameters.put(name, value);
     }
@@ -461,7 +465,7 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
 
   /**
    * Get the value of a parameter of this request.
-   * @param name the name of the parameter to get.
+   * @param name         the name of the parameter to get.
    * @param defaultValue the default value to return if the parameter is not set.
    * @return the value of the parameter, or <code>defaultValue</code> if the parameter is not set.
    */

@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
  * @author Laurent Cohen
  */
 public class BroadcastJobCompletionListener implements ClientCompletionListener
@@ -61,8 +60,8 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
   /**
    * Initialize this completion listener with the specified broadcast job and set of node uuids.
    * @param bundleWrapper the broadcast job to dispatch ot each node.
-   * @param connections list of all connections on which broadcast job is executed.
-   * @param jobManager the job manager that submits the events.
+   * @param connections   list of all connections on which broadcast job is executed.
+   * @param jobManager    the job manager that submits the events.
    */
   public BroadcastJobCompletionListener(final ClientJob bundleWrapper, final List<ChannelWrapper> connections, final JPPFJobManager jobManager)
   {
@@ -92,9 +91,12 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
     if (pending <= 0)
     {
       completionMap.remove(uuid);
-      jobManager.jobEnded(result);
+//      jobManager.jobEnded(result);
     }
-    else completionMap.put(uuid, pending);
+    else
+    {
+      completionMap.put(uuid, pending);
+    }
     if (completionMap.isEmpty())
     {
       bundleWrapper.fireTaskCompleted();

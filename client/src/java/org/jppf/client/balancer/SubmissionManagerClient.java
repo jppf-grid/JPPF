@@ -90,10 +90,14 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event)
     {
-      if(event.getSource() instanceof JPPFClientConnection)
+      if (event.getSource() instanceof JPPFClientConnection)
+      {
         updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
-      else if(event.getSource() instanceof ChannelWrapper)
+      }
+      else if (event.getSource() instanceof ChannelWrapper)
+      {
         updateConnectionStatus((ChannelWrapper<?>) event.getSource(), event.getOldStatus());
+      }
     }
   };
 
@@ -104,7 +108,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   public SubmissionManagerClient(final AbstractGenericClient client) throws Exception
   {
-    if(client == null) throw new IllegalArgumentException("client is null");
+    if (client == null) throw new IllegalArgumentException("client is null");
 
     this.client = client;
 
@@ -144,8 +148,8 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     });
 
-    addConnectionLocal();
-    addConnectionLocal();
+//    addConnectionLocal();
+//    addConnectionLocal();
     for (JPPFClientConnection connection : connections)
     {
       addConnection(connection);
@@ -156,9 +160,8 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Create and register new local connection.
    * @return connection wrapper for new local connection.
    */
-  protected synchronized ChannelWrapper<?> addConnectionLocal() {
-    System.out.println("SubmissionManager.addConnection: LOCAL");
-
+  protected synchronized ChannelWrapper<?> addConnectionLocal()
+  {
     ChannelWrapper wrapper = new ChannelWrapperLocal();
 //    try
 //    {
@@ -173,7 +176,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 //    {
 //      e.printStackTrace();
 //    } finally {
-      addConnection(wrapper);
+    addConnection(wrapper);
 //    }
 
     return wrapper;
@@ -183,9 +186,11 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param wrapper the connection wrapper to add.
    */
-  protected synchronized void addConnection(final ChannelWrapper<?> wrapper) {
-    if(wrapper == null) throw new IllegalArgumentException("wrapper is null");
+  protected synchronized void addConnection(final ChannelWrapper<?> wrapper)
+  {
+    if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
 
+    System.out.println("addConnection: " + wrapper);
     allConnections.add(wrapper);
     wrapper.addClientConnectionStatusListener(statusListener);
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
@@ -195,9 +200,11 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Remove the specified connection wrapper from the list of connections handled by this manager.
    * @param wrapper the connection wrapper to remove.
    */
-  protected synchronized void removeConnection(final ChannelWrapper<?> wrapper) {
-    if(wrapper == null) throw new IllegalArgumentException("wrapper is null");
+  protected synchronized void removeConnection(final ChannelWrapper<?> wrapper)
+  {
+    if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
 
+    System.out.println("removeConnection: " + wrapper);
     try
     {
       wrapper.removeClientConnectionStatusListener(statusListener);
@@ -214,27 +221,39 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param cnn the client connection to add.
    * @return wrapper for the added client connection.
    */
-  protected synchronized ChannelWrapper<?> addConnection(final JPPFClientConnection cnn) {
-    System.out.println("SubmissionManager.addConnection: " + cnn);
+  protected synchronized ChannelWrapper<?> addConnection(final JPPFClientConnection cnn)
+  {
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
 
     ChannelWrapper wrapper = wrapperMap.get(connection);
-    if(wrapper == null) {
+    if (wrapper == null)
+    {
       wrapper = new ChannelWrapperRemote(connection);
       JPPFClientConnectionImpl i = (JPPFClientConnectionImpl) connection;
       try
       {
         JMXDriverConnectionWrapper jmxConnection = i.getJmxConnection();
-        JPPFSystemInformation systemInfo = jmxConnection.systemInformation();
-        wrapper.setSystemInfo(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
-        info.setSystemInfo(systemInfo);
-        wrapper.setManagementInfo(info);
+        long timeout = 5000L;
+        long start = System.currentTimeMillis();
+        long elapsed;
+        while (!jmxConnection.isConnected() && ((elapsed = System.currentTimeMillis() - start) < timeout))
+          jmxConnection.goToSleep(timeout - elapsed);
+        System.out.println("Connection .connected: " + jmxConnection.isConnected() + "\t after: " + (System.currentTimeMillis() - start));
+        if (jmxConnection.isConnected())
+        {
+          JPPFSystemInformation systemInfo = jmxConnection.systemInformation();
+          wrapper.setSystemInfo(systemInfo);
+          JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
+          info.setSystemInfo(systemInfo);
+          wrapper.setManagementInfo(info);
+        }
       }
       catch (Exception e)
       {
         e.printStackTrace();
-      } finally {
+      }
+      finally
+      {
         wrapperMap.put(connection, wrapper);
         addConnection(wrapper);
       }
@@ -248,12 +267,13 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param cnn the client connection to remove.
    * @return wrapper for the removed client connection or null.
    */
-  protected synchronized ChannelWrapper removeConnection(final JPPFClientConnection cnn) {
-    System.out.println("SubmissionManager.removeConnection: " + cnn);
+  protected synchronized ChannelWrapper removeConnection(final JPPFClientConnection cnn)
+  {
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
 
     ChannelWrapper<?> wrapper = wrapperMap.remove(connection);
-    if(wrapper != null) {
+    if (wrapper != null)
+    {
       removeConnection(wrapper);
     }
     return wrapper;
@@ -263,13 +283,13 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Get all the client connections handled by this manager.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
-  public synchronized List<ChannelWrapper> getAllConnections() {
+  public synchronized List<ChannelWrapper> getAllConnections()
+  {
     return new ArrayList<ChannelWrapper>(allConnections);
   }
 
   /**
-   *
-   * @param cnn the client connection.
+   * @param cnn       the client connection.
    * @param oldStatus the connection status before the change.
    */
   private void updateConnectionStatus(final JPPFClientConnection cnn, final JPPFClientConnectionStatus oldStatus)
@@ -279,33 +299,32 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   /**
-   *
-   * @param wrapper the connection wrapper.
+   * @param wrapper   the connection wrapper.
    * @param oldStatus the connection status before the change.
    */
-  private void updateConnectionStatus(final ChannelWrapper<?> wrapper, final JPPFClientConnectionStatus oldStatus) {
-    if(wrapper == null) return;
+  private void updateConnectionStatus(final ChannelWrapper<?> wrapper, final JPPFClientConnectionStatus oldStatus)
+  {
+    if (wrapper == null) return;
     updateConnectionStatus(wrapper, oldStatus, wrapper.getStatus());
   }
 
   /**
-   *
-   * @param wrapper the connection wrapper.
+   * @param wrapper   the connection wrapper.
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
    */
   private void updateConnectionStatus(final ChannelWrapper<?> wrapper, final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus)
   {
     System.out.printf("SubmissionManager.updateConnectionStatus  %s: %s -> %s%n", wrapper, oldStatus, newStatus);
-    if(oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
-    if(newStatus == null) throw new IllegalArgumentException("newStatus is null");
-    if(wrapper == null || oldStatus == newStatus) return;
+    if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
+    if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
+    if (wrapper == null || oldStatus == newStatus) return;
 
     boolean oldAvailable = oldStatus == JPPFClientConnectionStatus.ACTIVE;
     boolean newAvailable = newStatus == JPPFClientConnectionStatus.ACTIVE;
 
-    if(newAvailable && !oldAvailable) taskQueueChecker.addIdleChannel(wrapper);
-    if(oldAvailable && !newAvailable) taskQueueChecker.removeIdleChannel(wrapper);
+    if (newAvailable && !oldAvailable) taskQueueChecker.addIdleChannel(wrapper);
+    if (oldAvailable && !newAvailable) taskQueueChecker.removeIdleChannel(wrapper);
   }
 
   /**
@@ -361,7 +380,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param job the job to use as a base.
    * @return a JPPFTaskBundle instance.
    */
- private static ClientTaskBundle createBundle(final JPPFJob job)
+  private static ClientTaskBundle createBundle(final JPPFJob job)
   {
     String requestUuid = job.getUuid();
     ClientTaskBundle bundle = new ClientTaskBundle(job);
@@ -376,10 +395,14 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     bundle.setRequestUuid(job.getUuid());
     bundle.setName(job.getName());
     bundle.setUuid(job.getUuid());
-    if(job.getSLA() instanceof JPPFJobSLA)
+    if (job.getSLA() instanceof JPPFJobSLA)
+    {
       bundle.setSLA(((JPPFJobSLA) job.getSLA()).copy());
+    }
     else
+    {
       bundle.setSLA(job.getSLA());
+    }
     bundle.setMetadata(job.getMetadata());
 
 //    ClassLoader cl = null;

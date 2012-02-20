@@ -95,7 +95,7 @@ class JobExpirationAction implements Runnable
       jmxWrapper.connect();
       return jmxWrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       log.error("Could not initialize a proxy to the job management MBean", e);
     }

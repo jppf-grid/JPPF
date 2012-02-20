@@ -45,7 +45,7 @@ class BundleIterator implements Iterator<ClientJob>
   /**
    * Initialize this iterator.
    * @param priorityMap the map of prioritized jobs.
-   * @param lock used to synchronize with the queue.
+   * @param lock        used to synchronize with the queue.
    */
   public BundleIterator(final TreeMap<JPPFPriority, List<ClientJob>> priorityMap, final ReentrantLock lock)
   {

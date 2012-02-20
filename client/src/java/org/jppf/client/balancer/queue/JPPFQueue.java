@@ -42,7 +42,7 @@ public interface JPPFQueue extends Iterable<ClientJob>
   /**
    * Get the next object in the queue.
    * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
-   * @param nbTasks the maximum number of tasks to get out of the bundle.
+   * @param nbTasks       the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
   ClientJob nextBundle(ClientJob bundleWrapper, int nbTasks);

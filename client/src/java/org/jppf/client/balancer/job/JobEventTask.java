@@ -57,9 +57,9 @@ public class JobEventTask implements Runnable
   /**
    * Initialize this job manager event task with the specified parameters.
    * @param jobManager - the job manager that submits the events.
-   * @param eventType - the type of event to generate.
-   * @param bundle - the job data.
-   * @param channel - the id of the job source of the event.
+   * @param eventType  - the type of event to generate.
+   * @param bundle     - the job data.
+   * @param channel    - the id of the job source of the event.
    */
   public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final ClientTaskBundle bundle, final ChannelWrapper channel)
   {
@@ -79,11 +79,11 @@ public class JobEventTask implements Runnable
     JobSLA sla = bundle.getSLA();
     Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
     JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(),
-        bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
+            bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
     jobInfo.setMaxNodes(sla.getMaxNodes());
     JPPFManagementInfo nodeInfo = null; // (channel == null) ? null : JPPFClient.getI JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
-    if(eventType == JobEventType.JOB_UPDATED)
+    if (eventType == JobEventType.JOB_UPDATED)
     {
       Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
       if (n != null) jobInfo.setTaskCount(n);

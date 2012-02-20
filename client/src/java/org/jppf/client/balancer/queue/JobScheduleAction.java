@@ -46,15 +46,16 @@ class JobScheduleAction implements Runnable
    * The job manager.
    */
   private final JPPFJobManager jobManager;
+
   /**
    * Initialize this action with the specified bundle wrapper.
    * @param bundleWrapper the bundle wrapper encapsulating the job.
-   * @param jobManager - the job manager that submits the events.
+   * @param jobManager    - the job manager that submits the events.
    */
   public JobScheduleAction(final ClientJob bundleWrapper, final JPPFJobManager jobManager)
   {
-    if(bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-    if(jobManager == null) throw new IllegalArgumentException("jobManager is null");
+    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (jobManager == null) throw new IllegalArgumentException("jobManager is null");
 
     this.bundleWrapper = bundleWrapper;
     this.jobManager = jobManager;
@@ -66,7 +67,7 @@ class JobScheduleAction implements Runnable
   @Override
   public void run()
   {
-    synchronized(bundleWrapper)
+    synchronized (bundleWrapper)
     {
       ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
       if (debugEnabled)

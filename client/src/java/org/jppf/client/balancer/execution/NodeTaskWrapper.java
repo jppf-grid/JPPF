@@ -40,9 +40,9 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param executionManager reference to the execution manager.
-   * @param task the task to execute within a try/catch block.
-   * @param uuidPath the key to the JPPFContainer for the task's classloader.
-   * @param number the internal number identifying the task for the thread pool.
+   * @param task             the task to execute within a try/catch block.
+   * @param uuidPath         the key to the JPPFContainer for the task's classloader.
+   * @param number           the internal number identifying the task for the thread pool.
    */
   public NodeTaskWrapper(final LocalExecutionManager executionManager, final Task task, final List<String> uuidPath, final long number)
   {
@@ -54,7 +54,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * Get the number identifying the task.
    * @return long value identifying the task.
    */
-  public long getNumber() {
+  public long getNumber()
+  {
     return number;
   }
 
@@ -81,18 +82,24 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
         cpuTime = 0; //(executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
         elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
-      catch(Throwable ignore)
+      catch (Throwable ignore)
       {
       }
     }
-    catch(JPPFNodeReconnectionNotification t)
+    catch (JPPFNodeReconnectionNotification t)
     {
       reconnectionNotification = t;
     }
-    catch(Throwable t)
+    catch (Throwable t)
     {
-      if (t instanceof Exception) task.setException((Exception) t);
-      else task.setException(new JPPFException(t));
+      if (t instanceof Exception)
+      {
+        task.setException((Exception) t);
+      }
+      else
+      {
+        task.setException(new JPPFException(t));
+      }
     }
     finally
     {
@@ -102,7 +109,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
         {
           executionManager.taskEnded(this, cpuTime, elapsedTime);
         }
-        catch(JPPFNodeReconnectionNotification t)
+        catch (JPPFNodeReconnectionNotification t)
         {
           reconnectionNotification = t;
         }

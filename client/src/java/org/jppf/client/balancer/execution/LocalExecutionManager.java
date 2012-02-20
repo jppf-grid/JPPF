@@ -33,7 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -98,6 +100,7 @@ public class LocalExecutionManager extends ThreadSynchronization
    * The thread pool that really processes the tasks
    */
   private ExecutorService threadPool;
+
   /**
    * Initialize this execution manager with the specified node.
    */
@@ -108,7 +111,7 @@ public class LocalExecutionManager extends ThreadSynchronization
 
   /**
    * Execute the specified tasks of the specified tasks bundle.
-   * @param bundle the bundle to which the tasks are associated.
+   * @param bundle   the bundle to which the tasks are associated.
    * @param taskList the list of tasks to execute.
    * @throws Exception if the execution failed.
    */
@@ -172,7 +175,7 @@ public class LocalExecutionManager extends ThreadSynchronization
   /**
    * Cancel all executing or pending tasks.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
-   * @param requeue true if the job should be requeued on the server side, false otherwise.
+   * @param requeue      true if the job should be requeued on the server side, false otherwise.
    */
   public synchronized void cancelAllTasks(final boolean callOnCancel, final boolean requeue)
   {
@@ -183,16 +186,16 @@ public class LocalExecutionManager extends ThreadSynchronization
       bundle.getSLA().setSuspended(true);
     }
     List<Long> list = new ArrayList<Long>(futureMap.keySet());
-    for (Long n: list) cancelTask(n, callOnCancel);
+    for (Long n : list) cancelTask(n, callOnCancel);
   }
 
   /**
    * Cancel the execution of the tasks with the specified id.
    * @param id the id of the tasks to cancel.
    * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement.
-   * Tasks can still be cancelled, but only as part of job cancel.
+   *             having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   *             This feature has been removed from the management APIs, with no replacement.
+   *             Tasks can still be cancelled, but only as part of job cancel.
    */
   public synchronized void cancelTask(final String id)
   {
@@ -200,12 +203,12 @@ public class LocalExecutionManager extends ThreadSynchronization
     List<Long> numberList = idMap.remove(id);
     if (numberList == null) return;
     if (debugEnabled) log.debug("number of tasks to cancel: " + numberList.size());
-    for (Long number: numberList) cancelTask(number, true);
+    for (Long number : numberList) cancelTask(number, true);
   }
 
   /**
    * Cancel the execution of the tasks with the specified id.
-   * @param number the index of the task to cancel.
+   * @param number       the index of the task to cancel.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
    */
   private synchronized void cancelTask(final Long number, final boolean callOnCancel)
@@ -226,8 +229,8 @@ public class LocalExecutionManager extends ThreadSynchronization
    * The task(s) will be restarted even if their execution has already completed.
    * @param id the id of the task or tasks to restart.
    * @deprecated the task restart feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement.
+   *             having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   *             This feature has been removed from the management APIs, with no replacement.
    */
   public synchronized void restartTask(final String id)
   {
@@ -235,7 +238,7 @@ public class LocalExecutionManager extends ThreadSynchronization
     List<Long> numberList = idMap.remove(id);
     if (numberList == null) return;
     if (debugEnabled) log.debug("number of tasks to restart: " + numberList.size());
-    for (Long number: numberList)
+    for (Long number : numberList)
     {
       Future<?> future = futureMap.get(number);
       if (!future.isDone())
@@ -250,7 +253,7 @@ public class LocalExecutionManager extends ThreadSynchronization
           {
             performTask(task);
           }
-          catch(Exception e)
+          catch (Exception e)
           {
             log.error(e.getMessage(), e);
           }
@@ -261,7 +264,7 @@ public class LocalExecutionManager extends ThreadSynchronization
 
   /**
    * Notify the timer that a task must be aborted if its timeout period expired.
-   * @param task the JPPF task for which to set the timeout.
+   * @param task   the JPPF task for which to set the timeout.
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
@@ -304,7 +307,7 @@ public class LocalExecutionManager extends ThreadSynchronization
 
   /**
    * Prepare this execution manager for executing the tasks of a bundle.
-   * @param bundle the bundle whose tasks are to be executed.
+   * @param bundle   the bundle whose tasks are to be executed.
    * @param taskList the list of tasks to execute.
    */
   public void setup(final ClientTaskBundle bundle, final List<? extends Task> taskList)
@@ -377,7 +380,7 @@ public class LocalExecutionManager extends ThreadSynchronization
   /**
    * Notification sent by a node task wrapper when a task is complete.
    * @param taskWrapper wrapper that holds the task.
-   * @param cpuTime the cpu time taken by the task.
+   * @param cpuTime     the cpu time taken by the task.
    * @param elapsedTime the wall clock time taken by the task
    */
   public void taskEnded(final NodeTaskWrapper taskWrapper, final long cpuTime, final long elapsedTime)
@@ -387,8 +390,10 @@ public class LocalExecutionManager extends ThreadSynchronization
     TaskResultListener resultListener = bundle.getJob().getResultListener();
     removeFuture(taskNumber);
 
-    if(resultListener != null && task instanceof JPPFTask) {
-      synchronized (resultListener) {
+    if (resultListener != null && task instanceof JPPFTask)
+    {
+      synchronized (resultListener)
+      {
         resultListener.resultsReceived(new TaskResultEvent(Collections.singletonList((JPPFTask) task)));
       }
     }
