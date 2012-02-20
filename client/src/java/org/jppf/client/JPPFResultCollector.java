@@ -31,6 +31,7 @@ import org.slf4j.*;
  * that can be used &quot;as is&quot; to collect the results of an asynchronous job submission.
  * @see org.jppf.client.JPPFClient#submitNonBlocking(List, org.jppf.task.storage.DataProvider, TaskResultListener)
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 public class JPPFResultCollector implements TaskResultListener, SubmissionStatusHandler
 {
@@ -110,15 +111,18 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   @Override
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
-    if (event.getThrowable() == null)
+    Throwable t = event.getThrowable();
+    if (t == null)
     {
       List<JPPFTask> tasks = event.getTaskList();
       if (job == null) for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
       else job.getResults().putResults(tasks);
       pendingCount -= tasks.size();
       if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
-      if (pendingCount <= 0) buildResults();
-      setStatus(SubmissionStatus.COMPLETE);
+      if (pendingCount <= 0) {
+        buildResults();
+        setStatus(SubmissionStatus.COMPLETE);
+      }
       notifyAll();
       if ((job != null) && (job.getPersistenceManager() != null))
       {
@@ -135,7 +139,6 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
     }
     else
     {
-      Throwable t = event.getThrowable();
       if (debugEnabled) log.debug("received throwable '" + t.getClass().getName() + ": " + t.getMessage() + "', resetting this result collector");
       // reset this object's state to prepare for job resubmission
       if (job != null) count = job.getTasks().size() - job.getResults().size();
