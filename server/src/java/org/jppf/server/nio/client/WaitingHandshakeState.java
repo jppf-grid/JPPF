@@ -22,6 +22,8 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 
 import java.util.List;
 
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
@@ -83,11 +85,15 @@ class WaitingHandshakeState extends ClientServerState
       header.getUuidPath().add(driver.getUuid());
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath().getList());
 
-      // there is nothing left to do, so this instance will wait for a task bundle
-      // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setClientMessage(null);
-      context.setBundle(null);
-      return TO_WAITING_JOB;
+      context.setBundle(bundleWrapper);
+      header.getParametersMap().clear();
+      // send system info back to the client
+      JPPFSystemInformation info = new JPPFSystemInformation(JPPFDriver.getInstance().getUuid());
+      info.populate();
+      header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);
+      header.setParameter(BundleParameter.DRIVER_UUID_PARAM, JPPFDriver.getInstance().getUuid());
+      return TO_SENDING_HANDSHAKE_RESULTS;
     }
     return TO_WAITING_HANDSHAKE;
   }

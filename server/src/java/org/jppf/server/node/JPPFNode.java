@@ -206,7 +206,7 @@ public abstract class JPPFNode extends AbstractNode
     {
       JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
       info.populate();
-      bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, info);
+      bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);
     }
     nodeIO.writeResults(bundle, taskList);
     if ((taskList != null) && (!taskList.isEmpty()))

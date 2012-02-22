@@ -30,6 +30,10 @@ public enum ClientState
    */
   WAITING_HANDSHAKE,
   /**
+   * Sending the handshake result back to the client.
+   */
+  SENDING_HANDSHAKE_RESULTS,
+  /**
    * State of waiting for something to do / sending a set of results to the client.
    */
   SENDING_RESULTS,

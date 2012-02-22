@@ -22,6 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
@@ -86,7 +87,8 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
       if (owner.isSSL()) createSSLConnection();
       if (debugEnabled) log.debug("sending JPPF identifier");
       socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
-      ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
+      // TODO do something with the information sent by the driver in the bundle 
+      JPPFTaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
       msg = "[client: "+name+"] Reconnected to the JPPF task server";
       System.out.println(msg);
       if (debugEnabled) log.debug(msg);

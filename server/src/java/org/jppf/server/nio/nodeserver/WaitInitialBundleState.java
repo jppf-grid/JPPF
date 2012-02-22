@@ -75,7 +75,7 @@ class WaitInitialBundleState extends NodeServerState
       context.setNodeUuid(uuid);
       server.putUuid(uuid, channel);
       Bundler bundler = server.getBundler().copy();
-      JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM);
+      JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
       context.setNodeInfo(systemInfo);
       if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       if (debugEnabled) log.debug("processing threads for node " + channel + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));

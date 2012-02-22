@@ -30,6 +30,10 @@ public enum ClientTransition
    */
   TO_WAITING_HANDSHAKE,
   /**
+   * Transition from a state to SENDING_HANDSHAKE_RESULTS.
+   */
+  TO_SENDING_HANDSHAKE_RESULTS,
+  /**
    * Transition from a state to SENDING_RESULTS.
    */
   TO_SENDING_RESULTS,

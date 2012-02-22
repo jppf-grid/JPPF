@@ -159,9 +159,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
 
   /**
    * Send a handshake job to the server.
+   * @return a JPPFTaskBundlesent by the server in response to the handshake job.
    * @throws Exception if an error occurs while sending the request.
    */
-  public void sendHandshakeJob() throws Exception
+  public JPPFTaskBundle sendHandshakeJob() throws Exception
   {
     JPPFTaskBundle header = new JPPFTaskBundle();
     //ObjectSerializer ser = makeHelper(getClass().getClassLoader()).getSerializer();
@@ -178,6 +179,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser);
     socketClient.flush();
+    return receiveBundleAndResults().first();
   }
 
   /**
@@ -186,18 +188,19 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public List<JPPFTask> receiveResults() throws Exception
+  protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults() throws Exception
   {
+    List<JPPFTask> taskList = new LinkedList<JPPFTask>();
+    JPPFTaskBundle bundle = null;
     try
     {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) cl = getClass().getClassLoader();
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
       ObjectSerializer ser = makeHelper(cl).getSerializer();
-      JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
+      bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
       if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getName() + '\'');
-      List<JPPFTask> taskList = new LinkedList<JPPFTask>();
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try
       {
@@ -216,7 +219,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         for (JPPFTask task: taskList) task.setException(e);
       }
-      return taskList;
+      return new Pair(bundle, taskList);
     }
     catch(AsynchronousCloseException e)
     {
@@ -233,6 +236,17 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       log.error(e.getMessage(), e);
       throw e;
     }
+  }
+
+  /**
+   * Receive results of tasks execution.
+   * @return a pair of objects representing the executed tasks results, and the index
+   * of the first result within the initial task execution request.
+   * @throws Exception if an error is raised while reading the results from the server.
+   */
+  public List<JPPFTask> receiveResults() throws Exception
+  {
+    return receiveBundleAndResults().second();
   }
 
   /**

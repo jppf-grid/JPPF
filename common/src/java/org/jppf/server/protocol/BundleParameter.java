@@ -51,7 +51,7 @@ public enum  BundleParameter
   /**
    * Parameter for the node's available system information.
    */
-  NODE_SYSTEM_INFO_PARAM,
+  SYSTEM_INFO_PARAM,
   /**
    * Parameter for the node's uuid.
    */
@@ -79,5 +79,9 @@ public enum  BundleParameter
   /**
    * Number of tasks in a job at the time it is submitted by the client.
    */
-  REAL_TASK_COUNT
+  REAL_TASK_COUNT,
+  /**
+   * Parameter for the driver's uuid.
+   */
+  DRIVER_UUID_PARAM
 }

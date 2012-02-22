@@ -51,8 +51,9 @@ final class ClientServerFactory extends NioServerFactory<ClientState, ClientTran
   {
     Map<ClientState, NioState<ClientTransition>> map = new EnumMap<ClientState, NioState<ClientTransition>>(ClientState.class);
     map.put(WAITING_HANDSHAKE, new WaitingHandshakeState((ClientNioServer) server));
-    map.put(SENDING_RESULTS, new SendingResultsState((ClientNioServer) server));
+    map.put(SENDING_HANDSHAKE_RESULTS, new SendingHandshakeResultsState((ClientNioServer) server));
     map.put(WAITING_JOB, new WaitingJobState((ClientNioServer) server));
+    map.put(SENDING_RESULTS, new SendingResultsState((ClientNioServer) server));
     map.put(IDLE, new IdleState((ClientNioServer) server));
     return map;
   }
@@ -68,8 +69,9 @@ final class ClientServerFactory extends NioServerFactory<ClientState, ClientTran
     Map<ClientTransition, NioTransition<ClientState>> map =
       new EnumMap<ClientTransition, NioTransition<ClientState>>(ClientTransition.class);
     map.put(TO_WAITING_HANDSHAKE, transition(WAITING_HANDSHAKE, R));
-    map.put(TO_SENDING_RESULTS, transition(SENDING_RESULTS, NioConstants.CHECK_CONNECTION ? RW : W));
+    map.put(TO_SENDING_HANDSHAKE_RESULTS, transition(SENDING_HANDSHAKE_RESULTS, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_JOB, transition(WAITING_JOB, R));
+    map.put(TO_SENDING_RESULTS, transition(SENDING_RESULTS, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_IDLE, transition(IDLE, NioConstants.CHECK_CONNECTION ? R : 0));
     return map;
   }

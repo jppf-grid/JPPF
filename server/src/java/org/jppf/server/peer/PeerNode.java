@@ -171,7 +171,7 @@ class PeerNode extends AbstractNode
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
         JPPFSystemInformation sysInfo = new JPPFSystemInformation(uuid);
         sysInfo.populate();
-        bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, sysInfo);
+        bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, sysInfo);
       }
       //boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
       boolean notEmpty = !bundleWrapper.getTasks().isEmpty();
