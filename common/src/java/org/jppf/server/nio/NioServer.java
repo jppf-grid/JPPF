@@ -305,14 +305,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       return;
     }
     if (channel == null) return;
-    SSLEngine engine = null;
+    SSLEngineManager engineManager = null;
     try
     {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       if (channel.isBlocking()) channel.configureBlocking(false);
       if (ssl)
       {
-        engine = sslContext.createSSLEngine();
+        SSLEngine engine = sslContext.createSSLEngine();
+        engineManager = new SSLEngineManager(channel, engine);
         configureSSLEngine(engine);
       }
     }
@@ -322,29 +323,29 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       StreamUtils.close(channel, log);
       return;
     }
-    accept(channel, engine);
+    accept(channel, engineManager);
   }
 
   /**
    * Register an incoming connection with his server's selector.
    * @param channel the socket channel representing the connection.
-   * @param sslEngine an sslEngine enventually passed on from a different server.
+   * @param sslEngineManager an sslEngine enventually passed on from a different server.
    * @return a wrapper for the newly registered channel.
    */
   @SuppressWarnings("unchecked")
-  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLEngine sslEngine)
+  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLEngineManager sslEngineManager)
   {
     NioContext context = createNioContext();
-    context.setSSLEngine(sslEngine);
     SelectionKeyWrapper wrapper = null;
     try
     {
+      if (sslEngineManager != null) context.setSSLEngineManager(sslEngineManager);
       SelectionKey selKey = channel.register(selector,	getInitialInterest(), context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
       postAccept(wrapper);
     }
-    catch (ClosedChannelException e)
+    catch (Exception e)
     {
       wrapper = null;
       log.error(e.getMessage(), e);

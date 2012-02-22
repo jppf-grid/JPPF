@@ -36,8 +36,7 @@ import org.slf4j.*;
 
 /**
  * The SSLEngineManager is a higher-level wrapper for javax.net.ssl.SSLEngine.
- * It takes care of all handshaking except for blocking tasks, so the only statuses the caller needs to be aware
- * of are the EngineStatus codes:
+ * It takes care of all handshaking except for blocking tasks, so the only statuses the caller needs to be aware of are the EngineStatus codes:
  *<dl>
  *<dt>OK
  *<dd>The operation completed successfully.
@@ -46,9 +45,8 @@ import org.slf4j.*;
  * It means that there is insufficient data in the appRecvBuffer to proceed.
  * The application should not retry the SSLEngineManager.unwrap() until at least one byte of data has been read into the appRecvBuffer.
  * If the ReadableByteChannel supplied is non-null and non-blocking, the SSLEngineManager will already have
- * tried a read on the channel, and only returns this status if that read returned zero (which can
- * only happen if the channel is non-blocking). In this way the SSLEngineManager makes its best attempt
- * to proceed without ever blocking the application.
+ * tried a read on the channel, and only returns this status if that read returned zero (which can only happen if the channel is non-blocking).
+ * In this way the SSLEngineManager makes its best attempt to proceed without ever blocking the application.
  *
  *<dt>BUFFER_OVERFLOW
  *<dd>This can be returned by SSLEngineManager.wrap() if there is insufficient room in the target buffer.
@@ -58,14 +56,12 @@ import org.slf4j.*;
  * if that write returned zero. In this way the SSLEngineManager makes its best attempt to proceed
  * without ever blocking the application.
  *<p>
- * BUFFER_OVERFLOW can also be returned by SSLEngineManager.unwrap() if there is unsufficient
- * room in the appRecvBuffer for the unwrapped data.
+ * BUFFER_OVERFLOW can also be returned by SSLEngineManager.unwrap() if there is unsufficient room in the appRecvBuffer for the unwrapped data.
  * The application should remove application data from the AppRecvBuffer and retry the wrap.
  * The conditions under which this happens are dependent on the implementation of SSLEngine:
  * in Sun's JDK 1.5 implementation it is returned on unwrap() if the application receive buffer
  * isn't completely empty. This is pretty drastic but can be expected to improve in later releases.
- * In any case all the application has to do is respond to the condition by emptying the buffer
- * (i.e. draining it to an application-side buffer).
+ * In any case all the application has to do is respond to the condition by emptying the buffer (i.e. draining it to an application-side buffer).
  *
  *<dt>CLOSED
  *<dd>This means that the SSLEngine is closed correctly. All the application can sensibly do
@@ -116,7 +112,7 @@ public class SSLEngineManager
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean traceEnabled = log.isTraceEnabled();
 
   /**
    * 
@@ -156,6 +152,10 @@ public class SSLEngineManager
    * 
    */
   int threadNumber = 1;
+  /**
+   * 
+   */
+  private int lastReadCount = 0;
 
   /**
    * Creates new SSLEngineManager.
@@ -209,7 +209,6 @@ public class SSLEngineManager
   }
 
   /**
-   * 
    * @return a {@link SSLEngineResult} instance.
    */
   public SSLEngineResult getEngineResult()
@@ -234,7 +233,6 @@ public class SSLEngineManager
       // NB none, some, or all of the data required may already have been
       // unwrapped/decrypted, or EOF may intervene at any of these points.
       int count = channel.read(netRecvBuffer);
-      // logger.fine("read: read "+count+" netRecv="+netRecvBuffer);
       netRecvBuffer.flip();
       engineResult = engine.unwrap(netRecvBuffer, appRecvBuffer);
       netRecvBuffer.compact();
@@ -242,21 +240,18 @@ public class SSLEngineManager
       {
         case BUFFER_UNDERFLOW:
           // Oops no data: time to read more ciphertext.
-          if (debugEnabled) log.debug("reading into netRecv={0}", netRecvBuffer);
+          if (traceEnabled) log.trace("reading into netRecv=" + netRecvBuffer);
           assert (channel.isOpen());
           cipherTextCount = channel.read(netRecvBuffer);
-          if (debugEnabled) log.debug("read count={0} netRecv={1}",
-              new Object[] { new Long(cipherTextCount), netRecvBuffer });
+          if (traceEnabled) log.trace("read count=" + cipherTextCount + ", netRecv=" + netRecvBuffer);
           if (cipherTextCount == 0) return plainTextCount;
           if (cipherTextCount == -1)
           {
-            if (debugEnabled) log.debug("read EOF, closing inbound");
+            if (traceEnabled) log.trace("read EOF, closing inbound");
             engine.closeInbound(); // may throw if incoming close_notify was not received, this is good.
           }
           break;
         case BUFFER_OVERFLOW:
-          // logger.severe("Read() unwrap source="+netRecvBuffer+" target="+appRecvBuffer+" dsts="+Arrays.asList(dsts)+":"+engineResult+":plainTextCount="+plainTextCount+":cipherTextCount="+cipherTextCount+":iteration="+iteration);
-          // logger.throwing(this.getClass().getName(),"read",new BufferUnderflowException());
           // throw new BufferOverflowException();
           // There is no room in appRecvBuffer to decrypt the data in netRecvBuffer.
           // The application must empty appRecvBuffer every time it gets > 0 from this method.
@@ -267,8 +262,7 @@ public class SSLEngineManager
           // logger.fine("SSLEngineManager.read: isInboundDone="+engine.isInboundDone()+" engineResult "+engineResult);
           // RFC 2246 #7.2.1 requires us to stop accepting input.
           channel.socket().shutdownInput();
-          // Yes but if we do that we are going to provoke outgoing RSTs
-          // on Windows platforms. EJP 18/09/2005.
+          // Yes but if we do that we are going to provoke outgoing RSTs on Windows platforms. EJP 18/09/2005.
           // RFC 2246 #7.2.1 requires us to respond with an outgoing close_notify.
           // This is deferred to processHandshake();
           break;
@@ -279,7 +273,6 @@ public class SSLEngineManager
       }
       while (processHandshakeStatus());
       plainTextCount = appRecvBuffer.position();
-      // logger.fine("read: count="+count+" netRecv="+netRecvBuffer+" appRecv="+appRecvBuffer+" remaining="+appRecvBuffer.remaining()+"; produced="+engineResult.bytesProduced());
     }
     while (plainTextCount == 0);
     if (engine.isInboundDone()) plainTextCount = -1;
@@ -289,34 +282,35 @@ public class SSLEngineManager
   /**
    * Write from the application send buffer to the channel via the SSLEngine. Called in either blocking or non-blocking
    * mode when application output is ready to send.
-   * @return the number of bytes written.
+   * @return the number of bytes consumed.
    * @throws IOException if any error occurs.
    */
   public int write() throws IOException
   {
-    if (debugEnabled) log.debug("SSLEngineManager.write: position=" + appSendBuffer.position());
+    //if (debugEnabled) log.trace("position=" + appSendBuffer.position());
     int count = appSendBuffer.position();
     int bytesConsumed = 0;
+    int totalBytesConsumed = 0;
     // If there is stuff left over to write and we still can't write it all, proceed no further.
-    if (flush() > 0 && count > 0) return 0;
+    //if (flush() > 0 && count > 0) return 0;
+    if ((count > 0) && (flush() > 0)) return 0;
     while (count > 0)
     {
-      if (debugEnabled) log.debug("SSLEngineManager.write: before flip/wrap appSend=" + appSendBuffer + " netSend=" + netSendBuffer + " count=" + count);
+      if (traceEnabled) log.trace("before flip/wrap/compact appSend=" + appSendBuffer + " netSend=" + netSendBuffer + " count=" + count);
       appSendBuffer.flip();
       engineResult = engine.wrap(appSendBuffer, netSendBuffer);
       appSendBuffer.compact();
-      if (debugEnabled) log.debug("SSLEngineManager.write: after flip/wrap/compact appSend=" + appSendBuffer + " netSend="
-          + netSendBuffer + " engineResult=" + engineResult);
+      if (traceEnabled) log.trace("after flip/wrap/compact  appSend=" + appSendBuffer + " netSend=" + netSendBuffer);
       switch (engineResult.getStatus())
       {
         case BUFFER_UNDERFLOW:
-          if (debugEnabled) log.debug(this.getClass().getName(), "write", new BufferUnderflowException());
+          if (traceEnabled) log.trace(this.getClass().getName(), "write", new BufferUnderflowException());
           throw new BufferUnderflowException(/* "source buffer: "+engineResult.getStatus() */);
         case BUFFER_OVERFLOW:
           // netSendBuffer is full: flush it and try again
+          if (traceEnabled) log.trace("BUFFER_OVERFLOW before flush() netSend=" + netSendBuffer);
           int writeCount = flush();
-          if (debugEnabled) log.debug("BUFFER_OVERFLOW netSend={0} writeCount={1}", new Object[] { netSendBuffer,
-              new Long(writeCount) });
+          if (traceEnabled) log.trace("BUFFER_OVERFLOW after flush()  netSend=" + netSendBuffer + ", writeCount=" + writeCount);
           if (writeCount == 0) return 0;
           continue;
         case CLOSED:
@@ -324,28 +318,26 @@ public class SSLEngineManager
           throw new SSLException("SSLEngine: invalid state for write - " + engineResult.getStatus());
         case OK:
           bytesConsumed = engineResult.bytesConsumed();
+          totalBytesConsumed += bytesConsumed;
           count -= bytesConsumed;
           break;
       }
-      while (processHandshakeStatus())
-        if (debugEnabled) log.debug("HS status=" + engineResult.getHandshakeStatus());
     }
     // return count of bytes written.
-    return count;
+    //return count;
+    return totalBytesConsumed;
   }
 
   /**
-   * 
    * @return the number of bytes flushed.
    * @throws IOException if any error occurs.
    */
   public int flush() throws IOException
   {
-    // logger.fine("flush: netSend="+netSendBuffer);
+    if (netSendBuffer.position() <= 0) return 0;
     netSendBuffer.flip();
     int count = channel.write(netSendBuffer);
     netSendBuffer.compact();
-    // logger.fine("flush: wrote "+count+" netSend="+netSendBuffer);
     return count;
   }
 
@@ -362,33 +354,27 @@ public class SSLEngineManager
       int count = flush();
       if (count == 0)
       {
-        // Houston we have a problem, can't flush the remaining outbound data
-        // on close, what to do in non-blocking mode?
+        // Houston we have a problem, can't flush the remaining outbound data on close, what to do in non-blocking mode?
         log.error("Can't flush remaining " + netSendBuffer.remaining() + " bytes");
         break;
       }
     }
-    if (debugEnabled) log.debug("close: closing outbound");
+    if (traceEnabled) log.trace("close: closing outbound");
     engine.closeOutbound();
-    if (debugEnabled) log.debug("close: closeOutbound handshake");
+    if (traceEnabled) log.trace("close: closeOutbound handshake");
     while (processHandshakeStatus())
       ;
     if (netSendBuffer.position() > 0 && flush() == 0)
-      // Houston we have a problem, can't flush the remaining outbound data
-      // on close, what to do in non-blocking mode?
+      // Houston we have a problem, can't flush the remaining outbound data on close, what to do in non-blocking mode?
       log.error("Can't flush remaining " + netSendBuffer.position() + " bytes");
-    if (debugEnabled) log.debug("close: closeOutbound complete");
+    if (traceEnabled) log.trace("close: closeOutbound complete");
     // RFC 2246 #7.2.1 requires us to respond to an incoming close_notify with an outgoing close_notify,
     // but it doesn't require us to wait for it if we sent it first.
     if (!engine.isInboundDone())
     {
-// logger.fine("close: closing inbound");
-// engine.closeInbound();
     }
-// logger.fine("close: closeInbound handshake");
-// logger.fine("close: closeInbound complete");
     channel.close();
-    if (debugEnabled) log.debug("close: SSLEngine & channel closed");
+    if (traceEnabled) log.trace("close: SSLEngine & channel closed");
   }
 
   /**
@@ -420,34 +406,29 @@ public class SSLEngineManager
         return true; // keep going
       case NEED_WRAP:
         // output needed
-        // logger.fine("before flip/wrap/compact appSend="+appSendBuffer+" netSend="+netSendBuffer);
         appSendBuffer.flip();
         engineResult = engine.wrap(appSendBuffer, netSendBuffer);
         appSendBuffer.compact();
         if (engineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) return (count = flush()) > 0;
-        // logger.fine("after flip/wrap/compact appSend="+appSendBuffer+" netSend="+netSendBuffer);
         return true;
       case NEED_UNWRAP:
         // Sometimes we get > 1 handshake messages at a time ...
-        // logger.fine("unwrapping netRecv="+netRecvBuffer+" appRecv="+appRecvBuffer);
         netRecvBuffer.flip();
         engineResult = engine.unwrap(netRecvBuffer, appRecvBuffer);
         netRecvBuffer.compact();
-        // logger.fine("after flip/unwrap/compact netRecv="+netRecvBuffer+" appRecv="+appRecvBuffer);
         if (engineResult.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW)
         {
-          if (debugEnabled) log.debug("unwrap underflow: reading ...");
+          if (traceEnabled) log.trace("unwrap underflow: reading ...");
           if (engine.isInboundDone()) count = -1;
           else
           {
             assert (channel.isOpen());
             count = channel.read(netRecvBuffer);
           }
-          if (debugEnabled) log.debug("unwrap underflow readCount={1}", new Object[] { engineResult, new Integer(count) });
+          if (traceEnabled) log.trace("unwrap underflow readCount=" + count);
           return count > 0;
         }
-        if (engineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) return false; // read data is ready but
-        // no room in appRecvBuffer
+        if (engineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) return false; // read data is ready but no room in appRecvBuffer
         return true;
       default: // unreachable, just for compiler
         return false;
@@ -463,7 +444,7 @@ public class SSLEngineManager
   {
     int count;
     // processs I/O
-    if (debugEnabled) log.debug("engineResult=" + engineResult);
+    if (traceEnabled) log.trace("engineResult=" + engineResult);
     switch (engineResult.getStatus())
     {
       case OK: // OK: packet was sent or received
@@ -479,27 +460,23 @@ public class SSLEngineManager
             flush();
             return netSendBuffer.position() == 0;
           case NEED_UNWRAP:
-            // If we are unwrapping we are doing input from the channel but the overflow means there is no room in the appRecvBuffer,
-            // so the application has to empty it.
+            // If we are unwrapping we are doing input from the channel but the overflow means there is no room in the appRecvBuffer, so the application has to empty it.
             // fall through
-            if (debugEnabled) log.debug("netSendBuffer=" + netSendBuffer +
-              ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
+            if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
             return false;
           default:
             return false;
         }
       case BUFFER_UNDERFLOW:
         // input needed, existing data too short to unwrap
-        if (debugEnabled) log.debug("netSendBuffer=" + netSendBuffer +
-            ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
-        // Underflow can only mean there is no data in the netRecvBuffer,
-        // so try a read. We can continue if we managed to read something,
+        if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
+        // Underflow can only mean there is no data in the netRecvBuffer, so try a read. We can continue if we managed to read something,
         // otherwise the application has to wait (select on OP_READ).
         // First flush any pending output.
         flush();
         // now read
         count = channel.read(netRecvBuffer);
-        if (debugEnabled) log.debug("underflow: read " + count + " netRecv=" + netRecvBuffer);
+        if (traceEnabled) log.trace("underflow: read " + count + " netRecv=" + netRecvBuffer);
         // If we didn't read anything we want to exit processEngineStatus()
         return count > 0;
       default: // unreachable, just for compiler
@@ -527,13 +504,29 @@ public class SSLEngineManager
         Runnable task;
         while ((task = engine.getDelegatedTask()) != null)
         {
-          if (debugEnabled) log.debug(this.getName() + ".runDelegatedTask: " + task);
+          //if (debugEnabled) log.trace(this.getName() + ".runDelegatedTask: " + task);
           task.run();
         }
       }
     };
-    //if (false) delegatedTaskThread.start();
-    //else
     delegatedTaskThread.run();
+  }
+
+  /**
+   * 
+   * @return the last count of byte sput in the app receive buffer.
+   */
+  public int getLastReadCount()
+  {
+    return lastReadCount;
+  }
+
+  /**
+   * 
+   * @param lastReadCount the last count of byte sput in the app receive buffer.
+   */
+  public void setLastReadCount(final int lastReadCount)
+  {
+    this.lastReadCount = lastReadCount;
   }
 }

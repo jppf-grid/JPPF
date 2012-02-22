@@ -97,15 +97,15 @@ class IdentifyingPeerState extends AcceptorServerState
       try
       {
         newServer.getSelector().wakeup();
-        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLEngine());
-        newChannel.getContext().setSSLEngine(context.getSSLEngine());
+        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLEngineManager());
+        newChannel.getContext().setSSLEngineManager(context.getSSLEngineManager());
         if (debugEnabled) log.debug("channel registered: " + newChannel);
       }
       finally
       {
         newServer.getLock().unlock();
       }
-      context.setSSLEngine(null);
+      context.setSSLEngineManager(null);
       return null;
     }
     return AcceptorTransition.TO_IDENTIFYING_PEER;

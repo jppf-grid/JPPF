@@ -19,6 +19,7 @@
 package org.jppf.server.nio.acceptor;
 
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.ssl.SSLNioObject;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -51,7 +52,9 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    NioObject nioObject = sslEngine == null ? new PlainNioObject(wrapper, 4, false) : new SSLNioObject(wrapper, 4);
+    NioObject nioObject = null;
+    if (sslEngineManager == null) nioObject = new PlainNioObject(wrapper, 4, false);
+    else nioObject = new SSLNioObject(wrapper, 4, sslEngineManager);
     boolean b = nioObject.read();
     if (b) id = SerializationUtils.readInt(nioObject.getData().getInputStream());
     return b;

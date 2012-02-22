@@ -24,7 +24,7 @@ import javax.net.ssl.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.server.nio.ssl.SSLHelper;
 import org.slf4j.*;
 
 /**
@@ -67,15 +67,15 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   {
     // see http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext for SSLContext algorithm names
     //sslContext = SSLContext.getInstance("SSL");
-    sslContext = SSLContext.getDefault();
+    //sslContext = SSLContext.getDefault();
+    sslContext = SSLHelper.getDefaultServerSSLContext();
   }
 
   @Override
   protected void configureSSLEngine(final SSLEngine engine) throws Exception
   {
-    SSLParameters params = sslContext.getDefaultSSLParameters();
-    if (debugEnabled) log.debug("SSL parameters : cipher suites=" + StringUtils.arrayToString(params.getCipherSuites()) +
-      ", protocols=" + StringUtils.arrayToString(params.getProtocols()) + ", neddCLientAuth=" + params.getNeedClientAuth() + ", wantClientAuth=" + params.getWantClientAuth());
+    //SSLParameters params = sslContext.getDefaultSSLParameters();
+    SSLParameters params = SSLHelper.getDefaultSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
   }

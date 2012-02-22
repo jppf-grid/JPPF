@@ -194,8 +194,8 @@ class WaitingNodeRequestState extends ClassServerState
   {
     /**
      * Initialize this pair with the specified array of bytes and class transition.
-     * @param first - an array of bytes.
-     * @param second - a class transition.
+     * @param first an array of bytes.
+     * @param second a class transition.
      */
     public ByteTransitionPair(final byte[] first, final ClassTransition second)
     {

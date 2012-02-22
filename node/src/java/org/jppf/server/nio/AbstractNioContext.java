@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio;
 
-import javax.net.ssl.SSLEngine;
-
 import org.slf4j.*;
 
 /**
@@ -68,7 +66,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   /**
    * The SSL engine associated with the channel.
    */
-  protected SSLEngine sslEngine = null;
+  protected SSLEngineManager sslEngineManager = null;
 
   /**
    * {@inheritDoc}
@@ -175,17 +173,17 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * {@inheritDoc}
    */
   @Override
-  public SSLEngine getSSLEngine()
+  public SSLEngineManager getSSLEngineManager()
   {
-    return sslEngine;
+    return sslEngineManager;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setSSLEngine(final SSLEngine sslEngine)
+  public void setSSLEngineManager(final SSLEngineManager sslEngineManager)
   {
-    this.sslEngine = sslEngine;
+    this.sslEngineManager = sslEngineManager;
   }
 }

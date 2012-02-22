@@ -82,7 +82,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation location = IOHelper.serializeData(resource, serializer);
-    message = new BaseNioMessage(sslEngine != null);
+    message = new BaseNioMessage(sslEngineManager != null);
     ((BaseNioMessage) message).addLocation(location);
   }
 
@@ -234,7 +234,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     try
     {
-      if (debugEnabled) log.debug("disconnected provider: resetting channel state for node " + request);
+      if (debugEnabled) log.debug("resetting channel state for node " + request);
       server.getTransitionManager().transitionChannel(request, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
       server.getTransitionManager().submitTransition(request);
     }

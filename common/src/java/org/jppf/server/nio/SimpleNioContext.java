@@ -45,7 +45,7 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    if (message == null) message = new BaseNioMessage(sslEngine != null);
+    if (message == null) message = new BaseNioMessage(sslEngineManager != null);
     return message.read(wrapper);
   }
 

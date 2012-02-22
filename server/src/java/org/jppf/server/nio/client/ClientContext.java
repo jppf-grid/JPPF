@@ -169,7 +169,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ClientMessage newMessage()
   {
-    return new ClientMessage(sslEngine != null);
+    return new ClientMessage(sslEngineManager != null);
   }
 
   /**
@@ -183,11 +183,11 @@ public class ClientContext extends AbstractNioContext<ClientState>
 
   /**
    * Set the message wrapping the data sent or received over the socket channel.
-   * @param nodeMessage a {@link ClientMessage NodeMessage} instance.
+   * @param message a {@link ClientMessage NodeMessage} instance.
    */
-  public void setClientMessage(final ClientMessage nodeMessage)
+  public void setClientMessage(final ClientMessage message)
   {
-    this.message = nodeMessage;
+    this.message = message;
   }
 
   /**
