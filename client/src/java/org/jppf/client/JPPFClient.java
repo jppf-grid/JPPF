@@ -172,7 +172,16 @@ public class JPPFClient extends AbstractGenericClient
   @Override
   protected void initPools()
   {
-    submissionManager = new SubmissionManagerImpl(this);
+    try
+    {
+      submissionManager = new SubmissionManagerImpl(this);
+      new Thread(submissionManager, "SubmissionManager").start();
+      super.initPools();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
 //    try
 //    {
 //      submissionManager = new SubmissionManagerClient(this);
