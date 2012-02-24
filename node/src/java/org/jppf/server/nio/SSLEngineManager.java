@@ -304,7 +304,7 @@ public class SSLEngineManager
       switch (engineResult.getStatus())
       {
         case BUFFER_UNDERFLOW:
-          if (traceEnabled) log.trace(this.getClass().getName(), "write", new BufferUnderflowException());
+          if (traceEnabled) log.trace("write", new BufferUnderflowException());
           throw new BufferUnderflowException(/* "source buffer: "+engineResult.getStatus() */);
         case BUFFER_OVERFLOW:
           // netSendBuffer is full: flush it and try again
@@ -320,11 +320,13 @@ public class SSLEngineManager
           bytesConsumed = engineResult.bytesConsumed();
           totalBytesConsumed += bytesConsumed;
           count -= bytesConsumed;
+          //if (bytesConsumed > 0) flush();
           break;
       }
     }
     // return count of bytes written.
     //return count;
+    //if (totalBytesConsumed > 0) flush();
     return totalBytesConsumed;
   }
 
@@ -334,7 +336,6 @@ public class SSLEngineManager
    */
   public int flush() throws IOException
   {
-    if (netSendBuffer.position() <= 0) return 0;
     netSendBuffer.flip();
     int count = channel.write(netSendBuffer);
     netSendBuffer.compact();
@@ -362,8 +363,7 @@ public class SSLEngineManager
     if (traceEnabled) log.trace("close: closing outbound");
     engine.closeOutbound();
     if (traceEnabled) log.trace("close: closeOutbound handshake");
-    while (processHandshakeStatus())
-      ;
+    while (processHandshakeStatus());
     if (netSendBuffer.position() > 0 && flush() == 0)
       // Houston we have a problem, can't flush the remaining outbound data on close, what to do in non-blocking mode?
       log.error("Can't flush remaining " + netSendBuffer.position() + " bytes");
@@ -513,8 +513,7 @@ public class SSLEngineManager
   }
 
   /**
-   * 
-   * @return the last count of byte sput in the app receive buffer.
+   * @return the last count of bytes put in the app receive buffer.
    */
   public int getLastReadCount()
   {
@@ -522,8 +521,7 @@ public class SSLEngineManager
   }
 
   /**
-   * 
-   * @param lastReadCount the last count of byte sput in the app receive buffer.
+   * @param lastReadCount the last count of bytes put in the app receive buffer.
    */
   public void setLastReadCount(final int lastReadCount)
   {

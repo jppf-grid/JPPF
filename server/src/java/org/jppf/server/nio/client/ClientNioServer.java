@@ -19,6 +19,7 @@
 package org.jppf.server.nio.client;
 
 import java.nio.channels.SelectionKey;
+import java.util.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -46,6 +47,10 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * Reference to the driver.
    */
   private static JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * 
+   */
+  private List<ChannelWrapper<?>> channels = new Vector<ChannelWrapper<?>>(); 
 
   /**
    * Initialize this class loader server.
@@ -70,10 +75,11 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * {@inheritDoc}
    */
   @Override
-  public void postAccept(final ChannelWrapper channel)
+  public void postAccept(final ChannelWrapper<?> channel)
   {
     try
     {
+      channels.add(channel);
       transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
     }
     catch (Exception e)
@@ -82,12 +88,22 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
       closeClient(channel);
     }
     driver.getStatsManager().newClientConnection();
+    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, NioConstants.CLIENT_SERVER);
   }
 
   @Override
   public NioContext createNioContext()
   {
     return new ClientContext();
+  }
+
+  /**
+   * Remove the specified channel.
+   * @param channel the channel to remove.
+   */
+  public void removeChannel(final ChannelWrapper<?> channel)
+  {
+    channels.remove(channel);
   }
 
   /**
@@ -111,6 +127,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.CLIENT_SERVER);
     try
     {
+      driver.getClientNioServer().removeChannel(channel);
       channel.close();
     }
     catch (Exception e)

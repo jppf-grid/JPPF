@@ -89,6 +89,7 @@ public class SSLNioObject extends AbstractNioObject
   @Override
   public boolean read() throws Exception
   {
+    if (count >= size) return true;
     ByteBuffer buf = engineManager.getAppRecvBuffer();
     if (os == null)
     {
@@ -136,38 +137,39 @@ public class SSLNioObject extends AbstractNioObject
   @Override
   public boolean write() throws Exception
   {
+    if (count >= size) return true;
     ByteBuffer buf = engineManager.getAppSendBuffer();
     if (is == null)
     {
       is = location.getInputStream();
       statefulCount = 0;
     }
-    if (count < size)
-    //while (count < size)
+    if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+    if (buf.hasRemaining() && (statefulCount < size))
     {
-      if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-      if (buf.hasRemaining() && (statefulCount < size))
+      int min = Math.min(size-statefulCount, buf.remaining());
+      if (min > 0)
       {
-        int min = Math.min(size-statefulCount, buf.remaining());
-        if (min > 0)
+        int read = is.read(buf.array(), buf.position(), min);
+        if (read > 0)
         {
-          int read = is.read(buf.array(), buf.position(), min);
-          if (read > 0)
-          {
-            statefulCount += read;
-            buf.position(buf.position() + read);
-          }
+          statefulCount += read;
+          buf.position(buf.position() + read);
         }
       }
-      if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+    }
+    if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
 
-      //int pos = buf.position();
-      int n = engineManager.write();
+    int n;
+    do
+    {
+      n = engineManager.write();
       if (n > 0) count += n;
       engineManager.flush();
       if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-      if (!buf.hasRemaining()) buf.clear();
     }
+    while (n > 0);
+
     boolean b = count >= size;
     if (b)
     {

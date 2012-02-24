@@ -76,21 +76,16 @@ public class ProfilingRunner
    */
   private static void perform(final int nbTask, final int iterations) throws Exception
   {
-    // perform "iteration" times
-    for (int iter=0; iter<iterations; iter++)
+    for (int iter=1; iter<=iterations; iter++)
     {
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
+      job.setName("profiling-" + iter);
       for (int i=0; i<nbTask; i++) job.addTask(new EmptyTask(dataSize));
-      // submit the tasks for execution
       List<JPPFTask> results = jppfClient.submit(job);
-      long elapsed = System.currentTimeMillis() - start;
-      System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+      long elapsed = System.nanoTime() - start;
+      System.out.println("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed/1000000));
     }
-    /*
-		JPPFStats stats = jppfClient.requestStatistics();
-		System.out.println("End statistics :\n"+stats.toString());
-     */
   }
 
   /**
@@ -101,13 +96,11 @@ public class ProfilingRunner
    */
   private static void performSequential(final int nbTask, final boolean silent) throws Exception
   {
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     List<JPPFTask> tasks = new ArrayList<JPPFTask>();
     for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
-    // submit the tasks for execution
     for (JPPFTask task: tasks) task.run();
-    long elapsed = System.currentTimeMillis() - start;
-    if (!silent)
-      System.out.println("Sequential iteration performed in "+StringUtils.toStringDuration(elapsed));
+    long elapsed = System.nanoTime() - start;
+    if (!silent) System.out.println("Sequential iteration performed in "+StringUtils.toStringDuration(elapsed/1000000));
   }
 }

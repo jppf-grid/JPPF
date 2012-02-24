@@ -30,7 +30,12 @@ public interface ServerDebugMBean extends Serializable
    * Get the states of the class loader channels.
    * @return the states as as an array of strings.
    */
-  String[] classLoaderChannels();
+  String[] clientClassLoaderChannels();
+  /**
+   * Get the states of the class loader channels.
+   * @return the states as as an array of strings.
+   */
+  String[] nodeClassLoaderChannels();
   /**
    * Get the states of the node data channels.
    * @return the states as as an array of strings.

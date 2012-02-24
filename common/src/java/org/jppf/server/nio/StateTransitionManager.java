@@ -92,7 +92,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   private void setKeyOps(final ChannelWrapper<?> key, final int ops)
   {
     Lock lock = server.getLock();
-    server.getSelector().wakeup();
+    //server.getSelector().wakeup();
     lock.lock();
     try
     {
@@ -114,10 +114,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition)
   {
     Lock lock = server.getLock();
-    server.getSelector().wakeup();
     lock.lock();
     try
     {
+      server.getSelector().wakeup();
       NioContext<S> context = (NioContext<S>) channel.getContext();
       S s1 = context.getState();
       NioTransition<S> t = server.getFactory().getTransition(transition);

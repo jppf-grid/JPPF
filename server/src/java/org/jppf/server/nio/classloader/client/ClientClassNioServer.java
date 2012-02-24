@@ -123,6 +123,7 @@ public class ClientClassNioServer extends ClassNioServer
       }
       list.add(channel);
     }
+    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
   }
 
   /**

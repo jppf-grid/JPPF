@@ -88,7 +88,7 @@ class WaitingHandshakeState extends ClientServerState
       context.setClientMessage(null);
       context.setBundle(bundleWrapper);
       header.getParametersMap().clear();
-      // send system info back to the client
+      // send system info (and more) back to the client
       JPPFSystemInformation info = new JPPFSystemInformation(JPPFDriver.getInstance().getUuid());
       info.populate();
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);

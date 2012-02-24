@@ -32,7 +32,11 @@ public class ServerDebug implements ServerDebugMBean
   /**
    * The class loader channels.
    */
-  private final Set<ChannelWrapper<?>> classLoaderSet = new HashSet<ChannelWrapper<?>>();
+  private final Set<ChannelWrapper<?>> clientClassLoaderSet = new HashSet<ChannelWrapper<?>>();
+  /**
+   * The class loader channels.
+   */
+  private final Set<ChannelWrapper<?>> nodeClassLoaderSet = new HashSet<ChannelWrapper<?>>();
   /**
    * The node channels.
    */
@@ -50,14 +54,33 @@ public class ServerDebug implements ServerDebugMBean
    * {@inheritDoc}
    */
   @Override
-  public String[] classLoaderChannels()
+  public String[] clientClassLoaderChannels()
+  {
+    return classLoaderChannels(clientClassLoaderSet);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String[] nodeClassLoaderChannels()
+  {
+    return classLoaderChannels(nodeClassLoaderSet);
+  }
+
+  /**
+   * Get the class loader channels for a client or node.
+   * @param set the set of channels to get a string representation of.
+   * @return the channels as as an array of strings.
+   */
+  private String[] classLoaderChannels(final Set<ChannelWrapper<?>> set)
   {
     String[] result = null;
-    synchronized(classLoaderSet)
+    synchronized(set)
     {
-      result = new String[classLoaderSet.size()];
+      result = new String[set.size()];
       int count = 0;
-      for (ChannelWrapper<?> channel: classLoaderSet)
+      for (ChannelWrapper<?> channel: set)
       {
         StringBuilder sb = new StringBuilder();
         sb.append(channel.toString());
@@ -71,7 +94,6 @@ public class ServerDebug implements ServerDebugMBean
       }
     }
     return result;
-    //return viewChannels(classLoaderSet);
   }
 
   /**
@@ -150,7 +172,8 @@ public class ServerDebug implements ServerDebugMBean
    */
   private Set<ChannelWrapper<?>> findSetFromName(final String name)
   {
-    if (NioConstants.CLASS_SERVER.equals(name)) return classLoaderSet;
+    if (NioConstants.CLIENT_CLASS_SERVER.equals(name)) return clientClassLoaderSet;
+    else if (NioConstants.NODE_CLASS_SERVER.equals(name)) return nodeClassLoaderSet;
     else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet;
     else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet;
     return acceptorSet;
