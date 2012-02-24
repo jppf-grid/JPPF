@@ -314,7 +314,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   private ChannelWrapper<?> findIdleChannelIndex(final ClientTaskBundle bundle)
   {
     int idleChannelsSize = idleChannels.size();
-    ExecutionPolicy policy = bundle.getSLA().getExecutionPolicy();
+    ExecutionPolicy policy = bundle.getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
     List<ChannelWrapper<?>> acceptableChannels = new ArrayList<ChannelWrapper<?>>(idleChannelsSize);
 

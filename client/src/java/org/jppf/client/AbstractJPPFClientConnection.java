@@ -26,6 +26,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.NetworkUtils;
 import org.slf4j.*;
 
@@ -76,6 +79,8 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Determines whether the communication via the server is done via SSL.
    */
   protected boolean ssl = false;
+
+  private JPPFSystemInformation systemInfo = null;
 
   /**
    * Configure this client connection with the specified parameters.
@@ -293,5 +298,25 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   public boolean isSSL()
   {
     return ssl;
+  }
+
+  /**
+   * Get the system information.
+   * @return a {@link JPPFSystemInformation} instance.
+   */
+  public JPPFSystemInformation getSystemInfo()
+  {
+    return systemInfo;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFTaskBundle sendHandshakeJob() throws Exception
+  {
+    JPPFTaskBundle bundle = super.sendHandshakeJob();
+    this.systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+    return bundle;
   }
 }

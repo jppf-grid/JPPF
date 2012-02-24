@@ -107,7 +107,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
     JobSLA sla = bundle.getSLA();
     String jobUuid = bundle.getUuid();
-    if (sla.isBroadcastJob() && (bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID) == null))
+    if (sla.isBroadcastJob() && (bundle.getBroadcastUUID() == null))
     {
       if (debugEnabled)
       {
@@ -133,7 +133,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundle.setQueueEntryTime(System.currentTimeMillis());
         putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
         putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
-        Boolean requeued = Boolean.TRUE.equals(bundle.removeParameter(BundleParameter.JOB_REQUEUE));
+        boolean requeued = Boolean.TRUE.equals(bundle.removeParameter(BundleParameter.JOB_REQUEUE));
         if (debugEnabled) log.debug("adding bundle with " + bundle);
         if (!requeued)
         {
@@ -414,16 +414,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       if (uuidSet.add(uuid))
       {
         JPPFManagementInfo info = connection.getManagementInfo();
-        newBundle.setParameter(BundleParameter.NODE_BROADCAST_UUID, uuid);
+        newBundle.setBroadcastUUID(uuid);
         if ((policy != null) && !policy.accepts(connection.getSystemInfo()))
         {
           System.out.println("Policy not accepted");
           continue;
         }
         ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
-        if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
         newBundle.setSLA(((JPPFJobSLA) sla).copy());
-        newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
+        newBundle.setLocalExecutionPolicy(broadcastPolicy);
         job.setCompletionListener(completionListener);
         newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
         newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());

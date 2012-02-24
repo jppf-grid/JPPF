@@ -83,8 +83,9 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
   public synchronized void taskCompleted(final ClientJob result)
   {
     ClientTaskBundle bundle = (ClientTaskBundle) result.getJob();
-    String uuid = (String) bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID);
+    String uuid = bundle.getBroadcastUUID();
     int n = bundle.getTaskCount();
+//    System.out.println("BroadcastJob.taskCompleted: " + uuid + "\t task count: " + n);
     if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     int pending = completionMap.get(uuid);
     pending -= n;
@@ -101,5 +102,6 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
     {
       bundleWrapper.fireTaskCompleted();
     }
+//    System.out.println("BroadcastJob.taskCompleted - finish: " + completionMap.size());
   }
 }

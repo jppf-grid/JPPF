@@ -19,6 +19,7 @@
 package org.jppf.client.balancer;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.node.protocol.JobSLA;
@@ -135,6 +136,12 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
    * The user-defined metadata associated with this job.
    */
   private JobMetadata jobMetadata = new JPPFJobMetadata();
+  /**
+   * The tasks execution policy.
+   */
+  private transient ExecutionPolicy localExecutionPolicy = null;
+
+  private transient String broadcastUUID = null;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -376,6 +383,8 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
     bundle.setQueueEntryTime(queueEntryTime);
     bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
+    bundle.setLocalExecutionPolicy(localExecutionPolicy);
+    bundle.setBroadcastUUID(broadcastUUID);
     //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
 
     return bundle;
@@ -600,5 +609,50 @@ public class ClientTaskBundle implements Serializable, Comparable<ClientTaskBund
   public void setUuid(final String jobUuid)
   {
     this.jobUuid = jobUuid;
+  }
+
+  /**
+   * Get the tasks execution policy.
+   * @return an <code>ExecutionPolicy</code> instance.
+   */
+  public ExecutionPolicy getExecutionPolicy() {
+    ExecutionPolicy slaPolicy;
+    if(getSLA() == null)
+      slaPolicy = null;
+    else
+      slaPolicy = getSLA().getExecutionPolicy();
+
+    if(localExecutionPolicy == null)
+      return slaPolicy;
+    else if(slaPolicy == null)
+      return localExecutionPolicy;
+    else
+      return localExecutionPolicy.and(slaPolicy);
+  }
+
+  /**
+   * Get the tasks local execution policy.
+   * @return an <code>ExecutionPolicy</code> instance.
+   */
+  public ExecutionPolicy getLocalExecutionPolicy() {
+    return localExecutionPolicy;
+  }
+
+  /**
+   * Set the tasks local execution policy.
+   * @param localExecutionPolicy an <code>ExecutionPolicy</code> instance.
+   */
+  public void setLocalExecutionPolicy(ExecutionPolicy localExecutionPolicy) {
+    this.localExecutionPolicy = localExecutionPolicy;
+  }
+
+  public String getBroadcastUUID()
+  {
+    return broadcastUUID;
+  }
+
+  public void setBroadcastUUID(final String broadcastUUID)
+  {
+    this.broadcastUUID = broadcastUUID;
   }
 }

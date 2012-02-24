@@ -233,20 +233,12 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       try
       {
         JMXDriverConnectionWrapper jmxConnection = i.getJmxConnection();
-        long timeout = 5000L;
-        long start = System.currentTimeMillis();
-        long elapsed;
-        while (!jmxConnection.isConnected() && ((elapsed = System.currentTimeMillis() - start) < timeout))
-          jmxConnection.goToSleep(timeout - elapsed);
-        System.out.println("Connection .connected: " + jmxConnection.isConnected() + "\t after: " + (System.currentTimeMillis() - start));
-        if (jmxConnection.isConnected())
-        {
-          JPPFSystemInformation systemInfo = jmxConnection.systemInformation();
-          wrapper.setSystemInfo(systemInfo);
-          JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
-          info.setSystemInfo(systemInfo);
-          wrapper.setManagementInfo(info);
-        }
+
+        JPPFSystemInformation systemInfo = i.getSystemInfo();
+        wrapper.setSystemInfo(systemInfo);
+        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
+        info.setSystemInfo(systemInfo);
+        wrapper.setManagementInfo(info);
       }
       catch (Exception e)
       {
@@ -295,7 +287,19 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   private void updateConnectionStatus(final JPPFClientConnection cnn, final JPPFClientConnectionStatus oldStatus)
   {
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
-    updateConnectionStatus(wrapperMap.get(connection), oldStatus);
+    ChannelWrapper<?> wrapper = wrapperMap.get(connection);
+    if(wrapper != null) {
+      if(oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
+        JPPFSystemInformation systemInfo = connection.getSystemInfo();
+        JMXDriverConnectionWrapper jmxConnection = ((JPPFClientConnectionImpl)connection).getJmxConnection();
+
+        wrapper.setSystemInfo(systemInfo);
+        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
+        info.setSystemInfo(systemInfo);
+        wrapper.setManagementInfo(info);
+      }
+      updateConnectionStatus(wrapper, oldStatus);
+    }
   }
 
   /**
