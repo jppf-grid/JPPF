@@ -19,6 +19,7 @@ package org.jppf.client;
 
 import java.util.List;
 
+import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.client.submission.SubmissionManagerImpl;
@@ -127,7 +128,7 @@ public class JPPFClient extends AbstractGenericClient
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
-        (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
+            (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     submissionManager.submitJob(job);
     if (job.isBlocking())
     {
@@ -172,26 +173,25 @@ public class JPPFClient extends AbstractGenericClient
   @Override
   protected void initPools()
   {
-    try
+    if(config != null && config.getBoolean("experimental.balancer", false))
+    {
+      try
+      {
+        submissionManager = new SubmissionManagerClient(this);
+        new Thread(submissionManager, "SubmissionManager").start();
+        super.initPools();
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
+    else
     {
       submissionManager = new SubmissionManagerImpl(this);
       new Thread(submissionManager, "SubmissionManager").start();
       super.initPools();
     }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-//    try
-//    {
-//      submissionManager = new SubmissionManagerClient(this);
-//      new Thread(submissionManager, "SubmissionManager").start();
-//      super.initPools();
-//    }
-//    catch (Exception e)
-//    {
-//      e.printStackTrace();
-//    }
   }
 
   /**
