@@ -7,7 +7,7 @@ mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
 $version = $_REQUEST["version"];
 if (!$version)
 {
-	$version = "3.0";
+	$version = "1.9.1";
 }
 // Performing SQL query
 $query = "SELECT * FROM news WHERE version = '" . $version . "'";

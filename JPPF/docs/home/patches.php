@@ -189,7 +189,7 @@ else
 ?>
 			<td><b>Download:</b> <a href="<?php echo $line['patch_url'] ?>"><?php echo 'http://' . $_SERVER['SERVER_NAME'] . $port . $line['patch_url'] ?></a><br/>
 			<b>Bugs:</b>
-			<ul style="margin: 0px">
+			<ul class="samplesList" style="margin-top: 0px; margin-bottom: 0px">
 <?php
 			$patch_number = $line["patch_number"];
 			$query2 = "SELECT * FROM patch_bugs where jppf_version = '" . $jppf_ver . "' AND patch_number = '" . $patch_number . "'";

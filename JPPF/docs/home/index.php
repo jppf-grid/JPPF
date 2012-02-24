@@ -173,9 +173,8 @@ else
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<br/><h2><i>New</i>: JPPF 3.0 is released, check it out!</h2>
-		<p style="text-align: justify; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
-		<p style="text-align: justify; font-size: 12pt">Take an easy start with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">JPPF Tutorial</a>.
+		<br/><h2 align="center"><i>New</i>: JPPF 3.0 is released, check it out!</h2>
+		<p style="text-align: center; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
 	</div>
 	<div class="column1">
 		<?php
@@ -208,25 +207,33 @@ else
 		<a href="quotes.php" style="text-decoration: none">... we have found the framework to be extremely powerful and easy to work with...</a>
 		<p><a href="quotes.php" style="text-decoration: none">... The ability to adapt our existing technology without having to redesign or rethink entire processes is fantastic ...</a>
 		<br>
+		<h3>Did you know ...</h3>
+		That you can turn JPPF into a full-fledged P2P Grid?
+		Read about it <a href="http://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a>
 	</div>
 	<div class="column2">
+		<h3>Getting started</h3>
+		Take an easy start with our <a href="/doc/v3/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a>
 		<h3>Easy and powerful</h3>
-		&bull;&nbsp;a JPPF grid can be up and running in minutes<br>
-		&bull;&nbsp;dynamically scalable on-demand<br>
-		&bull;&nbsp;cloud-ready, cloud is a natural medium for JPPF<br>
-		&bull;&nbsp;connectors with leading J2EE application servers<br>
-		&bull;&nbsp;connector with GigaSpaces eXtreme Application Platform<br>
-		&bull;&nbsp;easy programming model<br>
-		&bull;&nbsp;fine-grained monitoring and administration<br>
-		&bull;&nbsp;fault-tolerance and self-repair capabilities<br>
-		&bull;&nbsp;exceptional level of service and reliability<br>
-		&bull;&nbsp;fully documented samples, using JPPF on real-life problems<br>
-		&bull;&nbsp;flexible open-source licensing with <a href="/license.php"><b>Apache License v2.0</b></a>
+		<ul class="samplesList">
+			<li>a JPPF grid can be up and running in minutes</li>
+			<li>dynamically scalable on-demand</li>
+			<li>ready for the Cloud, a natural medium for JPPF</li>
+			<li>connectors with leading J2EE application servers</li>
+			<li>connector with GigaSpaces eXtreme Application Platform</li>
+			<li>easy programming model</li>
+			<li>fine-grained monitoring and administration</li>
+			<li>fault-tolerance and self-repair capabilities</li>
+			<li>exceptional level of service and reliability</li>
+			<li>fully documented samples, using JPPF on real-life problems</li>
+			<li>flexible open-source licensing with <a href="/license.php"><b>Apache License v2.0</b></a></li>
+		</ul>
 		<h3>Contribute</h3>
 		<b>Browse our <a href="./wiki" target=_top>documentation</a></b><br>
 		<b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
 		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></b><br>
-		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></b>
+		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></b><br>
+		<b>Gain insight and provide feedback in the <a href="http://www.jroller.com/jppf/" target=_top>JPPF blog</a></b>
 	</div>
 </div>
 				</td>

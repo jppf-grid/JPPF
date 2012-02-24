@@ -26,7 +26,7 @@ $template{name="about-page-header" title="Patches"}$
 	<h3>Description (included readme.txt):</h3>
 	<?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
 	<h3>Fixed bugs:</h3>
-	<ul>
+	<ul class="samplesList">
 <?php
 	mysql_free_result($result);
 	$query = "SELECT * FROM patch_bugs where jppf_version = '" . $jppf_ver . "' AND patch_number = '" . $patch_number . "'";
