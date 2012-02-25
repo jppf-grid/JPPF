@@ -144,6 +144,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     {
       for (int port: ports)
       {
+        if (port <= 0) continue;
         ServerSocketChannel server = ServerSocketChannel.open();
         server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
         server.socket().bind(new InetSocketAddress(port));
@@ -156,6 +157,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       createSSLContext();
       for (int port: sslPorts)
       {
+        if (port <= 0) continue;
         ServerSocketChannel server = ServerSocketChannel.open();
         server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
         server.socket().bind(new InetSocketAddress(port));

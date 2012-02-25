@@ -22,7 +22,6 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.io.*;
-import org.jppf.server.nio.ssl.SSLNioObject;
 import org.jppf.utils.SerializationUtils;
 import org.jppf.utils.streams.StreamUtils;
 
