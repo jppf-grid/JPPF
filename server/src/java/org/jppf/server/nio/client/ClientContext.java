@@ -79,10 +79,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   private ServerJob initialBundleWrapper;
   /**
-   * Unique ID for the connection.
-   */
-  private String connectionUuid = null;
-  /**
    * Unique ID for the client.
    */
   private String clientUuid = null;
@@ -366,25 +362,5 @@ public class ClientContext extends AbstractNioContext<ClientState>
   synchronized void setInitialBundleWrapper(final ServerJob initialBundleWrapper)
   {
     this.initialBundleWrapper = initialBundleWrapper;
-  }
-
-  /**
-   * Get the unique ID for the connection.
-   * @return the connection id.
-   */
-  @Override
-  public String getConnectionUuid()
-  {
-    return connectionUuid;
-  }
-
-  /**
-   * Set the unique ID for the connection.
-   * @param connectionUuid the connection id.
-   */
-  @Override
-  public void setConnectionUuid(final String connectionUuid)
-  {
-    this.connectionUuid = connectionUuid;
   }
 }

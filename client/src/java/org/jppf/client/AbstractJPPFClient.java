@@ -65,21 +65,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   private final List<ClientListener> listeners = new ArrayList<ClientListener>();
 
   /**
-   * Initialize this client with an automatically generated application UUID.
-   */
-  protected AbstractJPPFClient()
-  {
-    this(new JPPFUuid().toString());
-  }
-
-  /**
    * Initialize this client with a specified application UUID.
    * @param uuid the unique identifier for this local client.
    */
   protected AbstractJPPFClient(final String uuid)
   {
-    this.uuid = uuid;
-    if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + uuid);
+    this.uuid = (uuid == null) ? new JPPFUuid().toString() : uuid;
+    if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + this.uuid);
   }
 
   /**

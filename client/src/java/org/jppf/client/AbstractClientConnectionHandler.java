@@ -27,7 +27,7 @@ import javax.net.ssl.*;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
-import org.jppf.server.nio.ssl.SSLHelper;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -203,10 +203,10 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    */
   protected void createSSLConnection() throws Exception
   {
-    SSLContext context = SSLHelper.getDefaultClientSSLContext();
+    SSLContext context = SSLHelper.getSSLContext();
     SSLSocketFactory factory = (SSLSocketFactory) context.getSocketFactory();
     SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), host, port, true);
-    SSLParameters params = SSLHelper.getDefaultSSLParameters();
+    SSLParameters params = SSLHelper.getSSLParameters();
     sslSocket.setSSLParameters(params);
     sslSocket.setUseClientMode(true);
     socketClient = new SocketClient(sslSocket);

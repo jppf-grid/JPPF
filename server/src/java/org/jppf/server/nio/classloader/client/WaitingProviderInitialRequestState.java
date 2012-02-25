@@ -79,6 +79,7 @@ class WaitingProviderInitialRequestState extends ClassServerState
       // it is a provider
       ((ClientClassNioServer) server).addProviderConnection(uuid, wrapper);
       context.setUuid(uuid);
+      context.setConnectionUuid((String) resource.getData("connection.uuid"));
       context.setPendingRequests(new Vector<ChannelWrapper<?>>());
       context.setMessage(null);
       if (managementEnabled) resource.setManagementId(driver.getInitializer().getJmxServer().getId());

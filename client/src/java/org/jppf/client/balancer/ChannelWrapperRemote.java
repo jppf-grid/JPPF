@@ -160,7 +160,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   /**
    *
    */
-  private class RemoteRunnable implements Runnable
+  private final class RemoteRunnable implements Runnable
   {
     /**
      * The connection to the driver to use.

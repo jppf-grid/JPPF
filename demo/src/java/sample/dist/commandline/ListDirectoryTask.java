@@ -20,11 +20,12 @@ package sample.dist.commandline;
 
 import org.jppf.server.protocol.*;
 
+
 /**
  * This task lists the files in a specified directory of the node's host.
  * @author Laurent Cohen
  */
-public class ListDirectoryTask extends CommandLineTask
+public class ListDirectoryTask extends CommandLineTaskEx
 {
   /**
    * Directory in which to list the files.
@@ -76,7 +77,8 @@ public class ListDirectoryTask extends CommandLineTask
       // set whether the script output is captured
       setCaptureOutput(false);
       // execute the script/command
-      launchProcess();
+      int code = launchProcess();
+      System.out.println("code = " + code + ", getExitCode() = " + getExitCode());
       // copy the resulting file in memory and set it as a result
       FileLocation fl = new FileLocation("dirlist.txt");
       MemoryLocation ml = new MemoryLocation((int) fl.size());

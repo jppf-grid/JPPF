@@ -77,6 +77,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Mapping of class loader to requests uuids.
    */
   private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+  /**
+   * Determines whther SSL communication is on or off.
+   */
+  protected boolean sslEnabled = false;
 
   /**
    * Initialize this client with an automatically generated application UUID.
@@ -84,10 +88,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   public AbstractGenericClient(final Object configuration)
   {
-    super();
-    initConfig(configuration);
-    new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
-    initPools();
+    this(null, configuration);
   }
 
   /**
@@ -99,6 +100,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     super(uuid);
     initConfig(configuration);
+    sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
+    log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
     initPools();
   }
@@ -140,11 +143,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       {
         if (debugEnabled) log.debug("initializing connections from discovery");
         boolean acceptMultipleInterfaces = props.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
-        final boolean ssl = props.getBoolean("jppf.discovery.ssl.enabled", false);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            newConnection(name, info, 0, ssl);
+            newConnection(name, info, 0, sslEnabled);
           }
         }, new IPFilter(props), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
@@ -173,15 +175,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
           {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
-            boolean ssl = props.getBoolean(String.format("%s.jppf.ssl.enabled", name), false);
             // for backward compatibility with v2.x configurations
-            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), ssl ? 11443 : 11111, false);
-            info.serverPorts = new int[] { port };
+            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), sslEnabled ? 11443 : 11111, false);
+            if (!sslEnabled) info.serverPorts = new int[] { port };
+            else info.sslServerPorts = new int[] { port };
             info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             int priority = props.getInt(String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
 
-            newConnection(name, info, priority, ssl);
+            newConnection(name, info, priority, sslEnabled);
           }
         }
       }
@@ -247,33 +249,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   }
 
   /**
-   * Wait a maximum time specified in the configuration until at least one connection is initialized.
-   * After this time, control is returned to the main application, no matter how many connections are initialized.
-   * @param returnOnEmptyPool determines whether this method should return immediately when the pool of connections is empty.
-   */
-  private void waitForPools(final boolean returnOnEmptyPool)
-  {
-    if (returnOnEmptyPool && getAllConnectionsCount() == 0) return;
-    long maxWait = JPPFConfiguration.getProperties().getLong("jppf.client.max.init.time", 5000L);
-    if (maxWait <= 0) return;
-    long elapsed = 0;
-    while (elapsed < maxWait)
-    {
-      long start = System.currentTimeMillis();
-      if (getClientConnection(true) != null) break;
-      try
-      {
-        Thread.sleep(50);
-      }
-      catch(Exception ignored)
-      {
-        if (debugEnabled) log.debug(ignored.getMessage(), ignored);
-      }
-      elapsed += System.currentTimeMillis() - start;
-    }
-  }
-
-  /**
    * Close this client and release all the resources it is using.
    */
   @Override
@@ -291,45 +266,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public LoadBalancer getLoadBalancer()
   {
     return loadBalancer;
-  }
-
-  /**
-   * Get the JPPF configuration properties.
-   * @return the configuration as a {@link TypedProperties} instance.
-   */
-  public TypedProperties getConfig()
-  {
-    return config;
-  }
-
-  /**
-   * Wrapper class for the initialization of a client connection.
-   */
-  protected static class ConnectionInitializer implements Runnable
-  {
-    /**
-     * The client connection to initialize.
-     */
-    private JPPFClientConnection c = null;
-    /**
-     * Instantiate this connection initializer with the specified client connection.
-     * @param c the client connection to initialize.
-     */
-    public ConnectionInitializer(final JPPFClientConnection c)
-    {
-      this.c = c;
-    }
-
-    /**
-     * Perform the initialization of a client connection.
-     * @see java.lang.Runnable#run()
-     */
-    @Override
-    public void run()
-    {
-      if (debugEnabled) log.debug("initializing driver connection '" + c+ '\'');
-      c.init();
-    }
   }
 
   /**
@@ -386,11 +322,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     }
   }
 
-  /**
-   * Invoked when the status of a client connection has changed.
-   * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-   */
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event)
   {

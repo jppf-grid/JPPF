@@ -19,7 +19,6 @@
 package org.jppf.server.nio.acceptor;
 
 import org.jppf.server.nio.*;
-import org.jppf.server.nio.ssl.SSLNioObject;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

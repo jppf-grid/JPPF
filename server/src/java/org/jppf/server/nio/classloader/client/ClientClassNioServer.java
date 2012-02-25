@@ -103,6 +103,8 @@ public class ClientClassNioServer extends ClassNioServer
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
+    String connectionUuid = context.getConnectionUuid();
+    JPPFDriver.getInstance().getClientNioServer().closeClientConnection(connectionUuid);
   }
 
   /**

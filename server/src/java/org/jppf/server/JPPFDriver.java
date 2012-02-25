@@ -432,19 +432,15 @@ public class JPPFDriver
     }
     if (ports != null)
     {
-      if (name != null) sb.append(" - ");
-      boolean b = false;
       if ((ports != null) && (ports.length > 0))
       {
-        b = true;
-        sb.append("accepting plain connections on port");
+        sb.append("\n  - accepting plain connections on port");
         if (ports.length > 1) sb.append('s');
         for (int n: ports) sb.append(' ').append(n);
       }
       if ((sslPorts != null) && (sslPorts.length > 0))
       {
-        if (b) sb.append('\n');
-        sb.append("accepting secure connections on SSL port");
+        sb.append("\n  - accepting secure connections on SSL port");
         if (sslPorts.length > 1) sb.append('s');
         for (int n: sslPorts) sb.append(' ').append(n);
       }

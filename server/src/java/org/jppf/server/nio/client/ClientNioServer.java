@@ -50,7 +50,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   /**
    * 
    */
-  private List<ChannelWrapper<?>> channels = new Vector<ChannelWrapper<?>>(); 
+  private List<ChannelWrapper<?>> channels = new ArrayList<ChannelWrapper<?>>();
 
   /**
    * Initialize this class loader server.
@@ -79,7 +79,10 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   {
     try
     {
-      channels.add(channel);
+      synchronized(channels)
+      {
+        channels.add(channel);
+      }
       transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
     }
     catch (Exception e)
@@ -103,7 +106,10 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    */
   public void removeChannel(final ChannelWrapper<?> channel)
   {
-    channels.remove(channel);
+    synchronized(channels)
+    {
+      channels.remove(channel);
+    }
   }
 
   /**
@@ -119,11 +125,35 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   }
 
   /**
+   * Attempts to close the connection witht he specified uuid.
+   * @param connectionUuid the connection uuid to correlate.
+   */
+  public void closeClientConnection(final String connectionUuid)
+  {
+    ChannelWrapper<?> channel = null;
+    if (debugEnabled) log.debug("closing client channel with connectionUuid=" + connectionUuid);
+    synchronized(channels)
+    {
+      for (ChannelWrapper<?> ch: channels)
+      {
+        ClientContext context = (ClientContext) ch.getContext();
+        if (context.getConnectionUuid().equals(connectionUuid))
+        {
+          channel = ch;
+          break;
+        }
+      }
+      if (channel != null) closeClient(channel);
+    }
+  }
+
+  /**
    * Close a connection to a node.
    * @param channel a <code>SocketChannel</code> that encapsulates the connection.
    */
   public static void closeClient(final ChannelWrapper<?> channel)
   {
+    if (debugEnabled) log.debug("closing client channel " + channel);
     if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.CLIENT_SERVER);
     try
     {

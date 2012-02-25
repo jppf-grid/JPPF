@@ -27,7 +27,7 @@ import org.jppf.server.protocol.*;
  * This task lists the files in a specified directory of the node's host.
  * @author Laurent Cohen
  */
-public class TestTask extends CommandLineTask
+public class TestTask extends CommandLineTaskEx
 {
   /**
    * Directory in which to list the files.
