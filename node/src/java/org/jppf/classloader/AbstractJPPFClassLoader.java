@@ -126,7 +126,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws ClassNotFoundException if the class could not be loaded.
    * @see java.lang.ClassLoader#findClass(java.lang.String)
    */
-  protected Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
+  protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
     Class c = null;
     if (lookupClasspath) c = findClassInURLClasspath(name, false);
@@ -414,7 +414,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return the resulting Class object.
    * @throws ClassNotFoundException if the class could not be found.
    */
-  private Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException
+  private synchronized Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException
   {
     Class<?> c = findLoadedClass(name);
     if(c == null)
@@ -484,7 +484,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param recursive if true then look recursively into the hierarchy of parents that are instances of <code>AbstractJPPFClassLoader</code>.
    * @return a <code>Class</code> instance, or null if the class could not be found in the URL classpath.
    */
-  protected Class<?> findClassInURLClasspath(final String name, final boolean recursive)
+  protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive)
   {
     Class<?> c = findLoadedClass(name);
     if (c == null)
