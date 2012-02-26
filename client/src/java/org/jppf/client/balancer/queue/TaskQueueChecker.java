@@ -18,6 +18,7 @@
 
 package org.jppf.client.balancer.queue;
 
+import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.balancer.ChannelWrapper;
 import org.jppf.client.balancer.ClientJob;
 import org.jppf.client.balancer.ClientTaskBundle;
@@ -214,7 +215,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
 
-        System.out.println("TaskQueueChecker.dispatched: " + idleChannels.size());
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
         ChannelWrapper<?> channel = null;
         ClientJob selectedBundle = null;
@@ -278,7 +278,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private void dispatchJobToChannel(final ChannelWrapper<?> channel, final ClientJob selectedBundle)
   {
-    System.out.println("TaskQueueChecker.dispatchJobToChannel: " + channel + " <- " + selectedBundle);
     if (debugEnabled)
     {
       log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
@@ -322,7 +321,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     while (iterator.hasNext())
     {
       ChannelWrapper<?> ch = iterator.next();
-      if (!ch.isOpen())
+      if (ch.getStatus() != JPPFClientConnectionStatus.ACTIVE)
       {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
         iterator.remove();

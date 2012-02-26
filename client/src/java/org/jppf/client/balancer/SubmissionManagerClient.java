@@ -228,10 +228,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     ChannelWrapper wrapper = wrapperMap.get(connection);
     if (wrapper == null)
     {
-      wrapper = new ChannelWrapperRemote(connection);
-      JPPFClientConnectionImpl i = (JPPFClientConnectionImpl) connection;
       try
       {
+        wrapper = new ChannelWrapperRemote(connection);
+        JPPFClientConnectionImpl i = (JPPFClientConnectionImpl) connection;
         JMXDriverConnectionWrapper jmxConnection = i.getJmxConnection();
 
         JPPFSystemInformation systemInfo = i.getSystemInfo();
@@ -240,7 +240,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }
-      catch (Exception e)
+      catch (Throwable e)
       {
         e.printStackTrace();
       }
@@ -288,10 +288,12 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   {
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
     ChannelWrapper<?> wrapper = wrapperMap.get(connection);
-    if(wrapper != null) {
-      if(oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
+    if (wrapper != null)
+    {
+      if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE)
+      {
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
-        JMXDriverConnectionWrapper jmxConnection = ((JPPFClientConnectionImpl)connection).getJmxConnection();
+        JMXDriverConnectionWrapper jmxConnection = ((JPPFClientConnectionImpl) connection).getJmxConnection();
 
         wrapper.setSystemInfo(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
@@ -319,7 +321,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   private void updateConnectionStatus(final ChannelWrapper<?> wrapper, final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus)
   {
-    System.out.printf("SubmissionManager.updateConnectionStatus  %s: %s -> %s%n", wrapper, oldStatus, newStatus);
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (wrapper == null || oldStatus == newStatus) return;
@@ -346,7 +347,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
-    System.out.println("SubmissionManager.submitJob: " + job);
     ClientTaskBundle bundle = createBundle(job);
 
     queue.addBundle(new ClientJob(bundle, job.getTasks()));

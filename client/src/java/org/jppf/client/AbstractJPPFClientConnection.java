@@ -79,7 +79,9 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Determines whether the communication via the server is done via SSL.
    */
   protected boolean ssl = false;
-
+  /**
+   * Represents the system information.
+   */
   private JPPFSystemInformation systemInfo = null;
 
   /**

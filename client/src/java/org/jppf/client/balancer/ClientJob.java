@@ -159,7 +159,6 @@ public class ClientJob
    */
   public void fireTaskCompleted()
   {
-    System.out.println("fireTaskCompleted: " + this.completionListener);
     if (this.completionListener != null) this.completionListener.taskCompleted(this);
   }
 }

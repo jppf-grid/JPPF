@@ -78,6 +78,15 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * {@inheritDoc}
    */
   @Override
+  public String getUuid()
+  {
+    return connectionUuid;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public String getConnectionUuid()
   {
     return connectionUuid;

@@ -51,6 +51,12 @@ public abstract class ChannelWrapper<T>
   private JPPFManagementInfo managementInfo = null;
 
   /**
+   * Get the unique identifier of the client.
+   * @return the uuid as a string.
+   */
+  public abstract String getUuid();
+
+  /**
    * Get the unique ID for the connection.
    * @return the connection id.
    */
@@ -73,15 +79,6 @@ public abstract class ChannelWrapper<T>
    * @param listener the listener to remove from the list.
    */
   public abstract void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener);
-
-  /**
-   * Determine whether the channel is opened.
-   * @return true if the channel is opened, false otherwise.
-   */
-  public boolean isOpen()
-  {
-    return getStatus() == JPPFClientConnectionStatus.ACTIVE;
-  }
 
   /**
    * Get the task bundle to send or receive.

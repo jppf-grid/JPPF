@@ -398,7 +398,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       bundleWrapper.fireTaskCompleted();
       return;
     }
-    BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, connections, jobManager);
+    BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, connections);
     JobSLA sla = bundle.getSLA();
     ExecutionPolicy policy = sla.getExecutionPolicy();
     List<ClientJob> jobList = new ArrayList<ClientJob>(connections.size());
@@ -409,7 +409,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       ChannelWrapper xConnection = (ChannelWrapper) connection;
       ClientJob job = bundleWrapper.copy();
       ClientTaskBundle newBundle = (ClientTaskBundle) job.getJob();
-      String uuid = xConnection.getConnectionUuid();
+      String uuid = xConnection.getUuid();
       System.out.println(" sending to connection '" + uuid + "' - policy: " + policy);
       if (uuidSet.add(uuid))
       {
@@ -430,7 +430,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         jobList.add(job);
       }
     }
-    for (ClientJob job : jobList) addBundle(job);
+    if(jobList.isEmpty())
+      bundleWrapper.fireTaskCompleted();
+    else
+      for (ClientJob job : jobList) addBundle(job);
   }
 
   /**

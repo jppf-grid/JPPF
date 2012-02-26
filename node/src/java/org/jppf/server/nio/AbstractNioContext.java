@@ -152,7 +152,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   }
 
   /**
-   * Get the nique ID for the corresponding connection on the remote peer.
+   * Get the unique ID for the corresponding connection on the remote peer.
    * @return the id as a string.
    */
   public String getConnectionUuid()
@@ -161,7 +161,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   }
 
   /**
-   * Set the nique ID for the corresponding connection on the remote peer.
+   * Set the unique ID for the corresponding connection on the remote peer.
    * @param connectionUuid the id as a string.
    */
   public void setConnectionUuid(final String connectionUuid)
