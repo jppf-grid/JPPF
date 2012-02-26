@@ -21,24 +21,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
- * @param <T>
- * @param <K>
- * @param <V>
+ * Instances of this class represent changes made to the branch in tree table.
+ * @param <T> the type of the values that are changed.
+ * @param <K> the type of the key for changes accumulation.
+ * @param <V> the type of the values that are accumulated.
  * @author Martin Janda
  */
 public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
 {
-
   /**
-   * 
+   * Represents map of accumulated changes.
    */
   private final Map<K, V> map = new HashMap<K, V>();
 
   /**
-   * 
-   * @param type
-   * @param value
+   * Initialize this branch job accumulator with the specified value and type of change.
+   * @param type the type of updates.
+   * @param value the initial value to change.
    */
   public JobAccumulatorBranch(final Type type, final T value)
   {
@@ -46,8 +45,8 @@ public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
   }
 
   /**
-   * 
-   * @return
+   * Get the map of accumulated changes.
+   * @return map of accumulated changes by key.
    */
   public Map<K, V> getMap()
   {

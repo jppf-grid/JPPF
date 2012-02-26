@@ -94,6 +94,7 @@ public class JPPFThreadFactory implements ThreadFactory
     threadGroup = new ThreadGroup(this.name + " thread group");
     threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
     this.monitoringEnabled = monitoringEnabled;
+    this.priority = priority;
     if (monitoringEnabled) threadIDs = new ArrayList<Long>();
   }
 

@@ -81,7 +81,7 @@ public class JobAccumulator<T>
 
   /**
    * Get the value to change.
-   * @return an instance of the valyes type.
+   * @return an instance of the values type.
    */
   public T getValue()
   {
