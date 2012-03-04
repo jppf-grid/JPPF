@@ -30,7 +30,6 @@ import org.jppf.scheduling.*;
 import org.jppf.server.*;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
 
 /**
@@ -373,7 +372,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
       newBundle.setCompletionListener(completionListener);
       newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
-      newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
       if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
       jobList.add(job);
     }
