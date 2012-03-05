@@ -172,7 +172,6 @@ class PeerNode extends AbstractNode
             else log.warn(ExceptionUtils.getMessage(e));
           }
         }
-        bundle.setBundleUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
         bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, new JPPFSystemInformation(uuid).populate());

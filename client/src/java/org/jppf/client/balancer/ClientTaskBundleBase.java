@@ -66,13 +66,13 @@ public abstract class ClientTaskBundleBase implements Serializable, Comparable<C
   }
 
   /**
-   * The unique identifier for this task bundle.
-   */
-  private String bundleUuid = null;
-  /**
    * The unique identifier for the request (the job) this task bundle is a part of.
    */
-  private String jobUuid = null;
+  private String uuid = null;
+  /**
+   * Uuid of the original task bundle that triggered this resource request.
+   */
+  private String requestUuid = null;
   /**
    * The user-defined display name for this job.
    */
@@ -155,30 +155,15 @@ public abstract class ClientTaskBundleBase implements Serializable, Comparable<C
   }
 
   /**
-   * Get the unique identifier for this task bundle.
-   * @return the uuid as a string.
-   */
-  public String getBundleUuid()
-  {
-    return bundleUuid;
-  }
-
-  /**
-   * Set the unique identifier for this task bundle.
-   * @param uuid the uuid as a string.
-   */
-  public void setBundleUuid(final String uuid)
-  {
-    this.bundleUuid = uuid;
-  }
-
-  /**
    * Get the unique identifier for the request this task is a part of.
    * @return the request uuid as a string.
    */
   public String getRequestUuid()
   {
-    return jobUuid;
+    if(requestUuid == null)
+      return getUuid();
+    else
+      return requestUuid;
   }
 
   /**
@@ -187,7 +172,7 @@ public abstract class ClientTaskBundleBase implements Serializable, Comparable<C
    */
   public void setRequestUuid(final String requestUuid)
   {
-    this.jobUuid = requestUuid;
+    this.requestUuid = requestUuid;
   }
 
   /**
@@ -533,15 +518,15 @@ public abstract class ClientTaskBundleBase implements Serializable, Comparable<C
   @Override
   public String getUuid()
   {
-    return jobUuid;
+    return uuid;
   }
 
   /**
    * Set the uuid of the initial job.
-   * @param jobUuid the uuid as a string.
+   * @param uuid the uuid as a string.
    */
-  public void setUuid(final String jobUuid)
+  public void setUuid(final String uuid)
   {
-    this.jobUuid = jobUuid;
+    this.uuid = uuid;
   }
 }

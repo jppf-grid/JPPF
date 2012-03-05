@@ -59,7 +59,6 @@ public class ClientTaskBundle extends ClientTaskBundleBase
   public ClientTaskBundle copy()
   {
     ClientTaskBundle bundle = new ClientTaskBundle(getJob());
-    bundle.setBundleUuid(getBundleUuid());
     bundle.setUuidPath(getUuidPath());
     bundle.setRequestUuid(getRequestUuid());
     bundle.setUuid(getUuid());

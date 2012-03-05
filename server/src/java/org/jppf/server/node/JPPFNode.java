@@ -172,7 +172,7 @@ public abstract class JPPFNode extends AbstractNode
     if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
     {
       if (debugEnabled) log.debug("setting initial bundle uuid");
-      bundle.setBundleUuid(uuid);
+//      bundle.setBundleUuid(uuid);
       bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
       if (isJmxEnabled())
       {

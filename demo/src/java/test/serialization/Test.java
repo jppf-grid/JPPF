@@ -77,7 +77,6 @@ public class Test
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setName("server handshake");
     bundle.setUuid("job uuid");
-    bundle.setBundleUuid("bundle_uuid");
     bundle.setRequestUuid("0");
     bundle.getUuidPath().add("driver_uuid");
     bundle.setTaskCount(0);

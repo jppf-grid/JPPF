@@ -227,7 +227,7 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
         bb.put(buf.getBuffer());
         JPPFTaskBundle bundle = new JPPFTaskBundle();
         bundle.setName("server handshake");
-        bundle.setBundleUuid(INITIAL_BUNDLE_UUID);
+        bundle.setUuid(INITIAL_BUNDLE_UUID);
         bundle.setRequestUuid("0");
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
