@@ -50,13 +50,14 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   @Override
   public Map<ClassState, NioState<ClassTransition>> createStateMap()
   {
-    Map<ClassState, NioState<ClassTransition>> map =
-        new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
+    Map<ClassState, NioState<ClassTransition>> map = new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
     map.put(WAITING_INITIAL_PROVIDER_REQUEST, new WaitingProviderInitialRequestState((ClassNioServer) server));
     map.put(SENDING_INITIAL_PROVIDER_RESPONSE, new SendingProviderInitialResponseState((ClassNioServer) server));
     map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState((ClassNioServer) server));
     map.put(WAITING_PROVIDER_RESPONSE, new WaitingProviderResponseState((ClassNioServer) server));
     map.put(IDLE_PROVIDER, new IdleProviderState((ClassNioServer) server));
+    map.put(SENDING_PEER_INITIATION_REQUEST, new SendingPeerInitiationRequestState((ClassNioServer) server));
+    map.put(WAITING_PEER_INITIATION_RESPONSE, new WaitingPeerInitiationResponseState((ClassNioServer) server));
     return map;
   }
 
@@ -68,13 +69,15 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   @Override
   public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()
   {
-    Map<ClassTransition, NioTransition<ClassState>> map =
-        new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
+    Map<ClassTransition, NioTransition<ClassState>> map = new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
     map.put(TO_WAITING_INITIAL_PROVIDER_REQUEST, transition(WAITING_INITIAL_PROVIDER_REQUEST, R));
     map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_PROVIDER_RESPONSE, transition(WAITING_PROVIDER_RESPONSE, R));
     map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, NioConstants.CHECK_CONNECTION ? R : 0));
+    map.put(TO_IDLE_PEER_PROVIDER, transition(IDLE_PROVIDER, 0));
+    map.put(TO_SENDING_PEER_INITIATION_REQUEST, transition(SENDING_PEER_INITIATION_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
+    map.put(TO_WAITING_PEER_INITIATION_RESPONSE, transition(WAITING_PEER_INITIATION_RESPONSE, R));
     return map;
   }
 }

@@ -40,6 +40,10 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
    * Identifier for the channel.
    */
   private int id = JPPFIdentifiers.UNKNOWN;
+  /**
+   * Contains the data read from the socket channel.
+   */
+  private NioObject nioObject = null;
 
   /**
    * Read data from a channel. This method reads a single integer which identifies the type of the channel.
@@ -51,11 +55,17 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    NioObject nioObject = null;
-    if (sslEngineManager == null) nioObject = new PlainNioObject(wrapper, 4, false);
-    else nioObject = new SSLNioObject(wrapper, 4, sslEngineManager);
+    if (nioObject == null)
+    {
+      if (sslEngineManager == null) nioObject = new PlainNioObject(wrapper, 4, false);
+      else nioObject = new SSLNioObject(wrapper, 4, sslEngineManager);
+    }
     boolean b = nioObject.read();
-    if (b) id = SerializationUtils.readInt(nioObject.getData().getInputStream());
+    if (b)
+    {
+      id = SerializationUtils.readInt(nioObject.getData().getInputStream());
+      nioObject = null;
+    }
     return b;
   }
 

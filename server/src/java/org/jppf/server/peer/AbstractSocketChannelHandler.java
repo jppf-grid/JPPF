@@ -15,9 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.nio;
+package org.jppf.server.peer;
+
+import java.net.ConnectException;
 
 import org.jppf.comm.socket.*;
+import org.jppf.server.nio.classloader.ClassNioServer;
 import org.slf4j.*;
 
 /**
@@ -38,15 +41,7 @@ public abstract class AbstractSocketChannelHandler
   /**
    * The NioServer to which the channel is registered.
    */
-  protected NioServer server = null;
-  /**
-   * The remote host to connect to.
-   */
-  protected String host = null;
-  /**
-   * Port to connect to on the remote host.
-   */
-  protected int port = -1;
+  protected ClassNioServer server = null;
   /**
    * Wrapper around the underlying socket connection.
    */
@@ -60,22 +55,9 @@ public abstract class AbstractSocketChannelHandler
    * Initialize this socket channel handler.
    * @param server the NioServer to which the channel is registered.
    */
-  public AbstractSocketChannelHandler(final NioServer server)
+  public AbstractSocketChannelHandler(final ClassNioServer server)
   {
     this.server = server;
-  }
-
-  /**
-   * Initialize the channel with the specified host and port.
-   * @param server the NioServer to which the channel is registered.
-   * @param host the remote host to connect to.
-   * @param port the port to connect to on the remote host.
-   */
-  public AbstractSocketChannelHandler(final NioServer server, final String host, final int port)
-  {
-    this(server);
-    this.host = host;
-    this.port = port;
   }
 
   /**
@@ -85,9 +67,11 @@ public abstract class AbstractSocketChannelHandler
   public synchronized void init() throws Exception
   {
     if (socketClient == null) socketClient = initSocketChannel();
-    if (debugEnabled) log.debug("Attempting connection to the remote host [" + host + ':' + port + ']');
+    String msg =  "to remote peer [" + socketClient.getHost() + ':' + socketClient.getPort() + ']';
+    if (debugEnabled) log.debug("Attempting connection " + msg);
     socketInitializer.initializeSocket(socketClient);
-    if (debugEnabled) log.debug("Connected to the remote host [" + host + ':' + port + ']');
+    if (!socketInitializer.isSuccessful()) throw new ConnectException("could not connect " + msg);
+    if (debugEnabled) log.debug("Connected " + msg);
     postInit();
   }
 

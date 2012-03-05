@@ -222,16 +222,8 @@ public final class IOHelper
    */
   public static void sendData(final SocketWrapper socketWrapper, final Object o, final ObjectSerializer ser) throws Exception
   {
-    DataLocation dl = null;
     if (traceEnabled) log.trace("sending object " + o);
-    try
-    {
-      dl = serializeDataToMemory(o, ser);
-    }
-    catch(OutOfMemoryError e)
-    {
-      dl = serializeDataToFile(o, ser);
-    }
+    DataLocation dl = serializeData(o, ser);
     socketWrapper.writeInt(dl.getSize());
     OutputDestination od = new SocketWrapperOutputDestination(socketWrapper);
     dl.transferTo(od, true);

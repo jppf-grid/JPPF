@@ -79,10 +79,10 @@ class NodeWaitingProviderResponseState extends ClassServerState
         return TO_IDLE_NODE;
       }
     }
-    if (debugEnabled) log.debug("no available provider: setting null response for node " + channel);
+    if (debugEnabled) log.debug("no available provider for uuid=" + uuid + " : setting null response for node " + channel);
     resource.setDefinition(null);
     resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-    context.serializeResource(channel);
+    context.serializeResource();
     return TO_SENDING_NODE_RESPONSE;
   }
 

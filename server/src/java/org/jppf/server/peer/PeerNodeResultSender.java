@@ -19,7 +19,6 @@ package org.jppf.server.peer;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
-import org.jppf.server.AbstractResultSender;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
@@ -59,7 +58,7 @@ class PeerNodeResultSender extends AbstractResultSender
   /**
    * This method waits until all tasks of a request have been completed.
    * @throws Exception if handing of the results fails.
-   * @see org.jppf.server.AbstractResultSender#waitForExecution()
+   * @see org.jppf.server.peer.AbstractResultSender#waitForExecution()
    */
   @Override
   public synchronized void waitForExecution() throws Exception
@@ -69,7 +68,6 @@ class PeerNodeResultSender extends AbstractResultSender
     {
       try
       {
-        wait();
         if (debugEnabled) log.debug(Integer.toString(getResultList().size()) + " in result list");
         if (!getResultList().isEmpty())
         {
@@ -91,8 +89,9 @@ class PeerNodeResultSender extends AbstractResultSender
           long elapsed = (System.nanoTime() - start) / 1000000L;
           firstJob.setNodeExecutionTime(elapsed);
           sendPartialResults(first);
+          getResultList().clear();
         }
-        getResultList().clear();
+        else wait();
       }
       catch (Exception e)
       {
@@ -123,5 +122,6 @@ class PeerNodeResultSender extends AbstractResultSender
       task.transferTo(destination, true);
     }
     socketClient.flush();
+    if (debugEnabled) log.debug("bundle sent");
   }
 }

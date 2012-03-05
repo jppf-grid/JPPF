@@ -173,8 +173,9 @@ public class JPPFSystemInformation implements Serializable
 
   /**
    * Populate this node information object.
+   * @return this <code>JPPFSystemInformation</code> object.
    */
-  public void populate()
+  public JPPFSystemInformation populate()
   {
     system = SystemUtils.getSystemProperties();
     runtime = SystemUtils.getRuntimeInformation();
@@ -184,6 +185,7 @@ public class JPPFSystemInformation implements Serializable
     storage = SystemUtils.getStorageInformation();
     if (uuidProps == null) uuidProps = new TypedProperties();
     propertiesArray = new TypedProperties[] { uuidProps, jppf, system, env, network, runtime, storage };
+    return this;
   }
 
   /**

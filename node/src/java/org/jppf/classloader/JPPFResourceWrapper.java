@@ -86,10 +86,6 @@ public class JPPFResourceWrapper implements Serializable
    */
   private boolean asResource = false;
   /**
-   * The identifier for the driver's management (JMX) server.
-   */
-  private String managementId = null;
-  /**
    * Uuid of the original task bundle that triggered this resource request.
    */
   private String requestUuid = null;
@@ -236,24 +232,6 @@ public class JPPFResourceWrapper implements Serializable
   }
 
   /**
-   * Get the identifier for the driver's management (JMX) server.
-   * @return the identifier as a string.
-   */
-  public String getManagementId()
-  {
-    return managementId;
-  }
-
-  /**
-   * Set the identifier for the driver's management (JMX) server.
-   * @param managementId - the identifier as a string.
-   */
-  public void setManagementId(final String managementId)
-  {
-    this.managementId = managementId;
-  }
-
-  /**
    * Get the uuid for the original task bundle that triggered this resource request.
    * @return the uuid as a string.
    */
@@ -291,12 +269,24 @@ public class JPPFResourceWrapper implements Serializable
 
   /**
    * Get the metadata corresponding to the specified key.
-   * @param key - the string identifying the metadata.
+   * @param key the string identifying the metadata.
    * @return an object value or null if the metadata could not be found.
    */
   public Object getData(final String key)
   {
     return data.get(key);
+  }
+
+  /**
+   * Get the metadata corresponding to the specified key.
+   * @param key the string identifying the metadata.
+   * @param def a default value to return if the key is not found.
+   * @return an object value or the specified default if the metadata could not be found.
+   */
+  public Object getData(final String key, final Object def)
+  {
+    Object o = data.get(key);
+    return o == null ? def : o;
   }
 
   /**

@@ -25,6 +25,7 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.data.transform.*;
 import org.jppf.node.NodeRunner;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -50,6 +51,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * Used to synchronize access to the underlying socket from multiple threads.
    */
   private static SocketInitializer socketInitializer = new SocketInitializerImpl();
+  /**
+   * Detrmines whteher SSL is enabled.
+   */
+  private static boolean sslEnabled = false;
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -78,9 +83,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   {
     if (debugEnabled) log.debug("initializing socket connection");
     TypedProperties props = JPPFConfiguration.getProperties();
+    sslEnabled = props.getBoolean("jppf.ssl.enabled", false);
     String host = props.getString("jppf.server.host", "localhost");
     // for backward compatibility with v2.x configurations
-    int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", 11111, false);
+    int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", sslEnabled ? 11443 : 11111, false);
     socketClient = new BootstrapSocketClient();
     socketClient.setHost(host);
     socketClient.setPort(port);
@@ -112,34 +118,8 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
             socketClient = null;
             throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
           }
-
-          // we need to do this in order to dramatically simplify the state machine of ClassServer
-          try
-          {
-            if (debugEnabled) log.debug("sending channel identifier");
-            socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
-            if (debugEnabled) log.debug("sending node initiation message");
-            JPPFResourceWrapper resource = new JPPFResourceWrapper();
-            resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-            resource.setData("node.uuid", NodeRunner.getUuid());
-            ObjectSerializer serializer = socketClient.getSerializer();
-            JPPFBuffer buf = serializer.serialize(resource);
-            byte[] data = buf.getBuffer();
-            data = JPPFDataTransformFactory.transform(true, data);
-            socketClient.sendBytes(new JPPFBuffer(data, data.length));
-            socketClient.flush();
-            if (debugEnabled) log.debug("node initiation message sent, getting response");
-            socketClient.receiveBytes(0);
-            if (debugEnabled) log.debug("received node initiation response");
-          }
-          catch (IOException e)
-          {
-            throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
-          }
-          catch (Exception e)
-          {
-            throw new RuntimeException(e);
-          }
+          if (sslEnabled) createSSLConnection();
+          performHandshake();
           System.out.println("Reconnected to the class server");
         }
         finally
@@ -151,6 +131,54 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     finally
     {
       LOCK.unlock();
+    }
+  }
+
+  /**
+   * Create the ssl connection over an established plain connection.
+   */
+  protected void createSSLConnection()
+  {
+    try
+    {
+      socketClient = SSLHelper.createSSLClientConnection(socketClient);
+    }
+    catch(Exception e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Perform the handshake with the server.
+   */
+  private void performHandshake()
+  {
+    try
+    {
+      if (debugEnabled) log.debug("sending channel identifier");
+      socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+      if (debugEnabled) log.debug("sending node initiation message");
+      JPPFResourceWrapper resource = new JPPFResourceWrapper();
+      resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+      resource.setData("node.uuid", NodeRunner.getUuid());
+      ObjectSerializer serializer = socketClient.getSerializer();
+      JPPFBuffer buf = serializer.serialize(resource);
+      byte[] data = buf.getBuffer();
+      data = JPPFDataTransformFactory.transform(true, data);
+      socketClient.sendBytes(new JPPFBuffer(data, data.length));
+      socketClient.flush();
+      if (debugEnabled) log.debug("node initiation message sent, getting response");
+      socketClient.receiveBytes(0);
+      if (debugEnabled) log.debug("received node initiation response");
+    }
+    catch (IOException e)
+    {
+      throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
+    }
+    catch (Exception e)
+    {
+      throw new RuntimeException(e);
     }
   }
 

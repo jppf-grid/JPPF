@@ -191,4 +191,14 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   {
     return serverLock;
   }
+
+
+  /**
+   * @return <code>true</code>.
+   */
+  @Override
+  public boolean isLocal()
+  {
+    return true;
+  }
 }

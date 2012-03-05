@@ -79,7 +79,8 @@ public class JPPFPeerInitializer extends Thread
     catch(Exception e)
     {
       log.error(e.getMessage(), e);
-    } finally
+    }
+    finally
     {
       log.info("end initialization of peer [" + peerName + ']');
     }

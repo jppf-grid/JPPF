@@ -17,17 +17,20 @@
  */
 package org.jppf.server.peer;
 
-import java.io.IOException;
-import java.nio.channels.SocketChannel;
+import java.net.*;
+import java.nio.channels.*;
 import java.util.Vector;
+
+import javax.net.ssl.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketChannelClient;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.utils.JPPFIdentifiers;
+import org.jppf.ssl.SSLHelper;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -52,6 +55,10 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
    * Peer connection information.
    */
   private final JPPFConnectionInformation connectionInfo;
+  /**
+   * 
+   */
+  private boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
 
   /**
    * Initialize this peer provider with the specified configuration name.
@@ -59,11 +66,11 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
    * @param connectionInfo peer connection information.
    * @param server the NioServer to which the channel is registered.
    */
-  public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final NioServer server)
+  public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer server)
   {
     super(server);
-    if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-    if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+    if (peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+    if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
     this.peerName = peerName;
     this.connectionInfo = connectionInfo;
@@ -78,28 +85,26 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
   {
     try
     {
-      socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      socketClient.send(resource);
-      socketClient.flush();
-      if (debugEnabled) log.debug("sent node initiation");
-      // get a response containing the uuid of the contacted peer
-      resource = (JPPFResourceWrapper) socketClient.receive();
-      if (debugEnabled) log.debug("received node initiation response");
-
-      SocketChannel channel = socketClient.getChannel();
-      socketClient.setChannel(null);
+      String uuid = JPPFDriver.getInstance().getUuid();
+      resource.setData("node.uuid", uuid);
+      resource.setData("peer", Boolean.TRUE);
+      resource.setProviderUuid(uuid);
       ClassContext context = (ClassContext) server.createNioContext();
-      //context.setState(ClassState.SENDING_PROVIDER_REQUEST);
-      context.setState(ClassState.IDLE_PROVIDER);
+      context.setPeer(true);
+      context.setResource(resource);
+      SocketChannel socketChannel = socketClient.getChannel();
+      socketClient.setChannel(null);
       context.setPendingRequests(new Vector<ChannelWrapper<?>>());
-      context.setUuid(resource.getProviderUuid());
-      ChannelWrapper wrapper = server.getTransitionManager().registerChannel(channel, 0, context, null);
-      ((ClientClassNioServer) server).addProviderConnection(resource.getProviderUuid(), wrapper);
-      if (debugEnabled) log.debug("registered class server channel");
+      ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, 0, context);
+      if (debugEnabled) log.debug("registered class server channel " + channel);
+      if (sslEnabled) configureSSL(channel);
+      context.serializeResource();
+      server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_SENDING_PEER_INITIATION_REQUEST);
+      socketClient = null;
     }
-    catch (IOException e)
+    catch (Exception e)
     {
       log.error(e.getMessage());
       throw new RuntimeException(e);
@@ -115,7 +120,27 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
   public SocketChannelClient initSocketChannel() throws Exception
   {
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
-    int port = connectionInfo.serverPorts[0];
+    host = InetAddress.getByName(host).getHostName();
+    int port = sslEnabled ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
     return new SocketChannelClient(host, port, false);
+  }
+
+  /**
+   * Configure the SSL options for the specified channel.
+   * @param  channel the channel for which to configure SSL.
+   * @throws Exception if any error occurs.
+   */
+  private void configureSSL(final ChannelWrapper<?> channel) throws Exception
+  {
+    SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
+    ClassContext context = (ClassContext) channel.getContext();
+    SSLContext sslContext = JPPFDriver.getInstance().getAcceptorServer().getSSLContext();
+    Socket socket = socketChannel.socket();
+    SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
+    SSLParameters params = SSLHelper.getSSLParameters();
+    engine.setUseClientMode(true);
+    engine.setSSLParameters(params);
+    SSLEngineManager engineManager = new SSLEngineManager(socketChannel, engine);
+    context.setSSLEngineManager(engineManager);
   }
 }

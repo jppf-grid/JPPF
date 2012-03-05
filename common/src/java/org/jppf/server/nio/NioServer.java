@@ -314,7 +314,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       if (channel.isBlocking()) channel.configureBlocking(false);
       if (ssl)
       {
-        SSLEngine engine = sslContext.createSSLEngine();
+        SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
         engineManager = new SSLEngineManager(channel, engine);
         configureSSLEngine(engine);
       }
@@ -373,6 +373,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * constants definitions.
    */
   public abstract int getInitialInterest();
+
+  /**
+   * Get the initial state the channel should be in.
+   * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
+   * constants definitions.
+   */
+  public abstract S getInitialState();
 
   /**
    * Close the underlying server socket and stop this socket server.
@@ -471,5 +478,14 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public int[] getPorts()
   {
     return ports;
+  }
+
+  /**
+   * Get the SSL context associated with this server.
+   * @return a {@link SSLContext} instance.
+   */
+  public SSLContext getSSLContext()
+  {
+    return sslContext;
   }
 }

@@ -65,7 +65,7 @@ public abstract class ClassServerState extends NioState<ClassTransition>
     if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
     ClassContext requestContext = (ClassContext) request.getContext();
     requestContext.getResource().setDefinition(null);
-    requestContext.serializeResource(request);
+    requestContext.serializeResource();
     server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
   }
 }

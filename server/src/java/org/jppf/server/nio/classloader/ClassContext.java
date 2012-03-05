@@ -59,6 +59,14 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Determines whether this context relates to a provider or node connection.
    */
   protected boolean provider = false;
+  /**
+   * Contains the JPPF peer identifier written the socket channel.
+   */
+  private NioObject nioObject = null;
+  /**
+   * 
+   */
+  private boolean identifierSent = false;
 
   /**
    * Deserialize a resource wrapper from an array of bytes.
@@ -75,15 +83,42 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
   /**
    * Serialize a resource wrapper to an array of bytes.
-   * @param wrapper the channel through which the resource is sent.
    * @throws Exception if an error occurs while serializing.
    */
-  public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
+  public void serializeResource() throws Exception
   {
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation location = IOHelper.serializeData(resource, serializer);
     message = new BaseNioMessage(sslEngineManager != null);
     ((BaseNioMessage) message).addLocation(location);
+  }
+
+  /**
+   * Write the peer initiation message when first connecting to a remote server.
+   * The message is made of the JPPF identifier {@link JPPFIdentifiers#NODE_CLASSLOADER_CHANNEL} plus
+   * an initial resource wrapper (preceded by its serialized length).
+   * @param channel the channel to which to write the message.
+   * @return <code>true</code> if the message was fully written, <code>false</code> otherwise.
+   * @throws Exception if any error occurs.
+   */
+  public boolean writePeerInitiationMessage(final ChannelWrapper<?> channel) throws Exception
+  {
+    if (nioObject == null)
+    {
+      byte[] bytes = SerializationUtils.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+      DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
+      if (sslEngineManager == null) nioObject = new PlainNioObject(channel, dl, false);
+      else nioObject = new SSLNioObject(channel, dl, sslEngineManager);
+    }
+    if (!identifierSent)
+    {
+      boolean b = nioObject.write();
+      if (!b) return false;
+      else identifierSent = true;
+    }
+    boolean b = writeMessage(channel);
+    //if (b) nioObject = null;
+    return b;
   }
 
   /**
@@ -256,7 +291,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
       ClassContext requestContext = (ClassContext) request.getContext();
       requestContext.getResource().setDefinition(null);
-      requestContext.serializeResource(request);
+      requestContext.serializeResource();
       ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
       server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
     }

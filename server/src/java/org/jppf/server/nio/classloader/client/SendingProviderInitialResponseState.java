@@ -22,7 +22,6 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
@@ -62,7 +61,7 @@ public class SendingProviderInitialResponseState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (channel.isReadable() && !channel.isLocal())
     {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
@@ -70,7 +69,7 @@ public class SendingProviderInitialResponseState extends ClassServerState
     {
       if (debugEnabled) log.debug("sent management to provider: " + channel);
       //context.setMessage(null);
-      return TO_IDLE_PROVIDER;
+      return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
     }
     return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
   }

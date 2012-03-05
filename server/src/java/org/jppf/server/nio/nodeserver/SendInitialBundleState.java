@@ -49,7 +49,8 @@ class SendInitialBundleState extends NodeServerState
   }
 
   /**
-   * Execute the action associated with this channel state.
+   * In this state the server sends an initial bundle with no task as part of the initial handshake with the node.
+   * The node is then expected to send another bundle as the second phase of the handshake.
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
@@ -59,7 +60,7 @@ class SendInitialBundleState extends NodeServerState
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-    if (channel.isReadable() && !(channel instanceof LocalNodeChannel)) throw new ConnectException("node " + channel + " has been disconnected");
+    if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getNodeMessage() == null)

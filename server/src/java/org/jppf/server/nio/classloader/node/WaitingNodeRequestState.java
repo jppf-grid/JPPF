@@ -88,7 +88,7 @@ class WaitingNodeRequestState extends ClassServerState
       }
       if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + channel);
       resource.setDefinition(null);
-      context.serializeResource(channel);
+      context.serializeResource();
       return TO_SENDING_NODE_RESPONSE;
     }
     return TO_WAITING_NODE_REQUEST;
@@ -118,7 +118,7 @@ class WaitingNodeRequestState extends ClassServerState
         if (list != null)
         {
           resource.setData("resource_list", list);
-          context.serializeResource(channel);
+          context.serializeResource();
           t = TO_SENDING_NODE_RESPONSE;
         }
         if (debugEnabled) log.debug("multiple resources " + (list != null ? "" : "not ") + "found [" + name + "] in driver's classpath for node: " + channel);
@@ -128,7 +128,7 @@ class WaitingNodeRequestState extends ClassServerState
         String[] names = (String[]) resource.getData("multiple.resources.names");
         Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, names);
         resource.setData("resource_map", map);
-        context.serializeResource(channel);
+        context.serializeResource();
         t = TO_SENDING_NODE_RESPONSE;
       }
       else
@@ -146,7 +146,7 @@ class WaitingNodeRequestState extends ClassServerState
         {
           if ((b != null) && !alreadyInCache) classCache.setCacheContent(driver.getUuid(), name, b);
           resource.setDefinition(b);
-          context.serializeResource(channel);
+          context.serializeResource();
           t = TO_SENDING_NODE_RESPONSE;
         }
       }
@@ -174,7 +174,7 @@ class WaitingNodeRequestState extends ClassServerState
     {
       if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + channel);
       resource.setDefinition(b);
-      context.serializeResource(channel);
+      context.serializeResource();
       t = TO_SENDING_NODE_RESPONSE;
     }
     else

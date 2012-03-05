@@ -21,7 +21,11 @@ package org.jppf.server.nio;
 import org.jppf.io.DataLocation;
 
 /**
- * 
+ * Abstraction of a sequence of data read from, or written to a data channel.
+ * The size of the data is known before the read or write operation.
+ * <p>Furthermore, multiple calls to the {@link #read()} or {@link #write()} method may be required
+ * for the read or write operation to complete. This implies that an implementation of this interface
+ * should keep state information between calls. 
  * @author Laurent Cohen
  */
 public interface NioObject
@@ -34,7 +38,7 @@ public interface NioObject
   boolean read() throws Exception;
 
   /**
-   * Attempt to write an object to an outbound cannel.
+   * Attempt to write an object to an outbound channel.
    * @return <code>true</code> if an object was fully written, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */

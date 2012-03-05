@@ -479,7 +479,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
    */
   public synchronized void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification)
   {
-    if (this.reconnectionNotification == null) return;
+    if (this.reconnectionNotification != null) return;
     this.reconnectionNotification = reconnectionNotification;
   }
 

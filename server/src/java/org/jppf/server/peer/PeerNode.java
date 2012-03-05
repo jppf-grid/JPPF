@@ -17,6 +17,8 @@
  */
 package org.jppf.server.peer;
 
+import java.net.InetAddress;
+
 import org.jppf.JPPFException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketClient;
@@ -25,6 +27,7 @@ import org.jppf.management.*;
 import org.jppf.node.AbstractNode;
 import org.jppf.server.*;
 import org.jppf.server.protocol.*;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -63,6 +66,10 @@ class PeerNode extends AbstractNode
    * Reference to the driver.
    */
   private JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Determines whether communication with remote peer servers is via SSL.
+   */
+  private boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
 
   /**
    * Initialize this peer node with the specified configuration name.
@@ -76,7 +83,6 @@ class PeerNode extends AbstractNode
 
     this.peerName = peerName;
     this.connectionInfo = connectionInfo;
-    //this.uuid = new JPPFUuid().toString();
     this.uuid = driver.getUuid();
     this.helper = new SerializationHelperImpl();
   }
@@ -112,7 +118,8 @@ class PeerNode extends AbstractNode
         }
         catch(Exception e)
         {
-          log.error(e.getMessage(), e);
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(ExceptionUtils.getMessage(e));
           try
           {
             socketClient.close();
@@ -120,7 +127,8 @@ class PeerNode extends AbstractNode
           }
           catch(Exception ex)
           {
-            log.error(ex.getMessage(), ex);
+            if (debugEnabled) log.debug(e.getMessage(), ex);
+            else log.warn(ExceptionUtils.getMessage(ex));
           }
         }
         catch(Error e)
@@ -154,24 +162,20 @@ class PeerNode extends AbstractNode
           {
             JMXServer jmxServer = driver.getInitializer().getJmxServer();
             TypedProperties props = JPPFConfiguration.getProperties();
-            //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
             bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
-            //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
             bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
             bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, jmxServer.getId());
           }
           catch(Exception e)
           {
-            log.error(e.getMessage(), e);
+            if (debugEnabled) log.debug(e.getMessage(), e);
+            else log.warn(ExceptionUtils.getMessage(e));
           }
         }
-
         bundle.setBundleUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
-        JPPFSystemInformation sysInfo = new JPPFSystemInformation(uuid);
-        sysInfo.populate();
-        bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, sysInfo);
+        bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, new JPPFSystemInformation(uuid).populate());
       }
       //boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
       boolean notEmpty = !bundleWrapper.getTasks().isEmpty();
@@ -179,6 +183,7 @@ class PeerNode extends AbstractNode
       {
         int n = bundle.getTaskCount();
         bundle.getUuidPath().add(driver.getUuid());
+        if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
         bundle.setCompletionListener(resultSender);
         JPPFDriver.getQueue().addBundle(bundleWrapper);
         resultSender.run(n);
@@ -209,14 +214,14 @@ class PeerNode extends AbstractNode
       mustInit = true;
       initSocketClient();
     }
-    initCredentials();
     if (mustInit)
     {
       if (debugEnabled) log.debug(getName() + "initializing socket");
       System.out.println(getName() + "Attempting connection to the peer node server");
       socketInitializer.initializeSocket(socketClient);
       if (!socketInitializer.isSuccessful()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
-      System.out.println(getName() + "Reconnected to the peer node server");
+      System.out.println(getName() + "Reconnected to the peer node server at " + socketClient.getHost() + ':' + socketClient.getPort());
+      if (sslEnabled) socketClient = SSLHelper.createSSLClientConnection(socketClient);
       if (debugEnabled) log.debug("sending channel identifier");
       socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
       is = new SocketWrapperInputSource(socketClient);
@@ -231,18 +236,12 @@ class PeerNode extends AbstractNode
   {
     if (debugEnabled) log.debug(getName() + "initializing socket client");
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
-    int port = connectionInfo.serverPorts[0];
+    host = InetAddress.getByName(host).getHostName();
+    int port = sslEnabled ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
     socketClient = new SocketClient();
     socketClient.setHost(host);
     socketClient.setPort(port);
     socketClient.setSerializer(helper.getSerializer());
-  }
-
-  /**
-   * Initialize the security credentials associated with this JPPF node.
-   */
-  private void initCredentials()
-  {
   }
 
   /**
@@ -252,9 +251,10 @@ class PeerNode extends AbstractNode
    */
   private BundleWrapper readBundle() throws Exception
   {
-    // Read the request header - with tasks count information
-    JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(socketClient.receiveBytes(0).getBuffer());
-    if (debugEnabled) log.debug("received header from peer driver");
+    // Read the request header - with task count information
+    //JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(socketClient.receiveBytes(0).getBuffer());
+    JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, getHelper().getSerializer());
+    if (debugEnabled) log.debug("received header from peer driver: " + header);
     BundleWrapper headerWrapper = new BundleWrapper(header);
 
     int count = header.getTaskCount();

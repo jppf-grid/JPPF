@@ -15,38 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.net.ConnectException;
-
-import org.jppf.classloader.LocalClassLoaderChannel;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * This class represents the state of waiting for the next request for a provider.
+ * State of receive a response to the initial request to a peer server. This server is seen as a node by the peer,
+ * whereas the peer is seen as a client. Therefore, the information received must allow this server to
+ * register a client class loader channel.
  * @author Laurent Cohen
  */
-public class IdleProviderState extends ClassServerState
+class WaitingPeerInitiationResponseState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
+  private static Logger log = LoggerFactory.getLogger(WaitingPeerInitiationResponseState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The class cache.
+   */
+  private static ClassCache classCache = driver.getInitializer().getClassCache();
 
   /**
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public IdleProviderState(final ClassNioServer server)
+  public WaitingPeerInitiationResponseState(final ClassNioServer server)
   {
     super(server);
   }
@@ -62,11 +65,15 @@ public class IdleProviderState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (context.readMessage(channel))
     {
-      ((ClientClassNioServer) server).removeProviderConnection(context.getUuid(), channel);
-      throw new ConnectException("provider " + channel + " has been disconnected");
+      JPPFResourceWrapper resource = context.deserializeResource();
+      String uuid = resource.getProviderUuid();
+      if (debugEnabled) log.debug("read initial response from peer " + channel + ", providerUuid=" + uuid);
+      context.setUuid(uuid);
+      ((ClientClassNioServer) server).addProviderConnection(uuid, channel);
+      return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
     }
-    return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
+    return TO_WAITING_PEER_INITIATION_RESPONSE;
   }
 }

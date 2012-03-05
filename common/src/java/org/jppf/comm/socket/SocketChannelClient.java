@@ -261,7 +261,7 @@ public class SocketChannelClient implements SocketWrapper
     channel.configureBlocking(blocking);
     InetSocketAddress address = new InetSocketAddress(host, port);
     channel.connect(address);
-    if (!channel.isBlocking())
+    //if (!channel.isBlocking())
     {
       while (!channel.finishConnect())
       {

@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.data.transform.JPPFDataTransformFactory;
 import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
@@ -71,10 +70,7 @@ public class RemoteNodeIO extends AbstractNodeIO
   protected Object[] deserializeObjects() throws Exception
   {
     if (debugEnabled) log.debug("waiting for next request");
-    byte[] data = socketWrapper.receiveBytes(0).getBuffer();
-    if (traceEnabled) log.trace("bundle bytes = " + data.length);
-    data = JPPFDataTransformFactory.transform(false, data);
-    JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
+    JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketWrapper, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     return deserializeObjects(bundle);
   }

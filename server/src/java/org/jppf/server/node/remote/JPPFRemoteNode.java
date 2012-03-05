@@ -21,6 +21,7 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.recovery.*;
 import org.jppf.comm.socket.*;
 import org.jppf.server.node.JPPFNode;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -42,6 +43,10 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
    * Connection to the recovery server.
    */
   private ClientConnection recoveryConnection = null;
+  /**
+   * Determines whteher SSL is enabled.
+   */
+  private boolean sslEnabled = false;
 
   /**
    * Default constructor.
@@ -64,6 +69,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
     {
       if (debugEnabled) log.debug("Initializing socket");
       TypedProperties props = JPPFConfiguration.getProperties();
+      sslEnabled = props.getBoolean("jppf.ssl.enabled", false);
       String host = props.getString("jppf.server.host", "localhost");
       // for backward compatibility with v2.x configurations
       int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", 11111, false);
@@ -72,7 +78,6 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
       socketClient.setPort(port);
       socketClient.setSerializer(serializer);
       if (debugEnabled) log.debug("end socket client initialization");
-      if (debugEnabled) log.debug("start socket initializer");
       System.out.println("Attempting connection to the node server at " + host + ':' + port);
       socketInitializer.initializeSocket(socketClient);
       if (!socketInitializer.isSuccessful())
@@ -80,6 +85,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
       }
+      if (sslEnabled) socketClient = SSLHelper.createSSLClientConnection(socketClient);
       System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);

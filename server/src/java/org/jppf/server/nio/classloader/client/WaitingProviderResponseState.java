@@ -80,7 +80,7 @@ class WaitingProviderResponseState extends ClassServerState
       context.setCurrentRequest(null);
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
       destinationContext.setResource(resource);
-      destinationContext.serializeResource(destinationChannel);
+      destinationContext.serializeResource();
       NodeClassNioServer nodeClassServer = (NodeClassNioServer) driver.getNodeClassServer();
       nodeClassServer.getTransitionManager().transitionChannel(destinationChannel, TO_SENDING_NODE_RESPONSE);
       //context.setMessage(null);

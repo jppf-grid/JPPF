@@ -18,19 +18,21 @@
 
 package org.jppf.ssl;
 
-import java.io.*;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.net.Socket;
 import java.security.KeyStore;
+import java.util.concurrent.Callable;
 
 import javax.net.ssl.*;
 
-import org.jppf.JPPFException;
+import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
- * 
+ * Utility class handling all aspects of the SSL configuration.
  * @author Laurent Cohen
  */
 public class SSLHelper
@@ -113,7 +115,7 @@ public class SSLHelper
    */
   private static KeyStore getKeyOrTrustStore(final String filename, final char[] pwd) throws Exception
   {
-    return getKeyOrTrustStore(new BufferedInputStream(new FileInputStream(filename)), pwd);
+    return getKeyOrTrustStore(new FileStoreSource(filename).call(), pwd);
   }
 
   /**
@@ -186,7 +188,7 @@ public class SSLHelper
 
   /**
    * Get a password for the specified based property.
-   * @param baseProperty determines whether the password is for a key or trust store. 
+   * @param baseProperty determines whether the password is for a key or trust store.
    * @return the secure store password.
    * @throws Exception if the password could not be retrieved for any reason.
    */
@@ -195,18 +197,7 @@ public class SSLHelper
     String s = sslConfig.getString(baseProperty, null);
     if (s != null) return s.toCharArray();
     s = sslConfig.getString(baseProperty + ".source", null);
-    if (s == null) return null;
-    String[] tokens = s.split("\\s");
-    Class<?> clazz = Class.forName(tokens[0]);
-    String[] args = null;
-    if (tokens.length > 1)
-    {
-      args = new String[tokens.length - 1];
-      System.arraycopy(tokens, 1, args, 0, args.length);
-    }
-    Constructor c = clazz.getConstructor(String[].class);
-    PasswordSource ps = (PasswordSource) c.newInstance((Object) args);
-    return ps.call();
+    return (char[]) callSource(s);
   }
 
   /**
@@ -221,8 +212,22 @@ public class SSLHelper
     String s = sslConfig.getString(baseProperty + ".file", null);
     if (s != null) return getKeyOrTrustStore(s, pwd);
     s = sslConfig.getString(baseProperty + ".source", null);
-    if (s == null) return null;
-    String[] tokens = s.split("\\s");
+    InputStream is = (InputStream) callSource(s);
+    return getKeyOrTrustStore(is, pwd);
+  }
+
+  /**
+   * Use reflexion to compute data from the specified source.
+   * @param value defines which class is invoked, with which arguments, in the form:<br/>
+   * &nbsp;&nbsp;&nbsp;&nbsp;<code>mypackage.MyClass arg1 ... argN</code><br/>
+   * where <code>MyClass</code> is an implementation of {@link Callable}.
+   * @return the result of calling the instantiated class.
+   * @throws Exception if any error occurs.
+   */
+  private static Object callSource(final String value) throws Exception
+  {
+    if (value == null) return null;
+    String[] tokens = value.split("\\s");
     Class<?> clazz = Class.forName(tokens[0]);
     String[] args = null;
     if (tokens.length > 1)
@@ -231,9 +236,8 @@ public class SSLHelper
       System.arraycopy(tokens, 1, args, 0, args.length);
     }
     Constructor c = clazz.getConstructor(String[].class);
-    SecureStoreSource sss = (SecureStoreSource) c.newInstance((Object) args);
-    
-    return getKeyOrTrustStore(sss.call(), pwd);
+    Callable<?> callable = (Callable<?>) c.newInstance((Object) args);
+    return callable.call();
   }
 
   /**
@@ -246,32 +250,42 @@ public class SSLHelper
     {
       sslConfig = new TypedProperties();
       TypedProperties config = JPPFConfiguration.getProperties();
+      String filename = config.getString("jppf.ssl.configuration", null);
+      String configSource = config.getString("jppf.ssl.configuration.source", null);
       InputStream is = null;
       try
       {
-        String s = config.getString("jppf.ssl.configuration", null);
-        if (s != null)
-        {
-          File f = new File(s);
-          if (f.exists()) is = new BufferedInputStream(new FileInputStream(f));
-        }
-        if (is == null)
-        {
-          s = config.getString("jppf.ssl.configuration.source", null);
-          if (s != null)
-          {
-            Class<?> clazz = Class.forName(s);
-            JPPFConfiguration.ConfigurationSource cs = (JPPFConfiguration.ConfigurationSource) clazz.newInstance();
-            is = cs.getPropertyStream();
-          }
-        }
+        is = JPPFConfiguration.getConfigurationStream(filename, configSource);
         if (is != null) sslConfig.load(is);
-        else throw new JPPFException("could not load SSL configuration");
       }
       finally
       {
         if (is != null) StreamUtils.closeSilent(is);
       }
     }
+  }
+
+  /**
+   * Create an SSL connection over an established plain socket connection.
+   * @param socketClient the plain connection, already connected.
+   * @return a {@link SocketWrapper} whose socket is an {@link SSLSocket} wrapping the {@link Socket} of the plain connection.
+   * @throws Exception if an error occurs while configure the SSL parameters.
+   */
+  public static SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception
+  {
+    SSLContext context = SSLHelper.getSSLContext();
+    SSLSocketFactory factory = context.getSocketFactory();
+    SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), socketClient.getHost(), socketClient.getPort(), true);
+    SSLParameters params = SSLHelper.getSSLParameters();
+    sslSocket.setSSLParameters(params);
+    sslSocket.setUseClientMode(true);
+    ObjectSerializer serializer = socketClient.getSerializer();
+    Class<? extends SocketWrapper> clazz = socketClient.getClass();
+    Constructor<? extends SocketWrapper> c = clazz.getConstructor(Socket.class);
+    SocketWrapper target = c.newInstance(sslSocket);
+    target.setSerializer(serializer);
+    target.setHost(socketClient.getHost());
+    target.setPort(socketClient.getPort());
+    return target;
   }
 }

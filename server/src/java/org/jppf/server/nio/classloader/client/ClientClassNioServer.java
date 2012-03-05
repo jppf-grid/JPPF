@@ -18,13 +18,12 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassState.WAITING_INITIAL_PROVIDER_REQUEST;
-
 import java.util.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -74,9 +73,18 @@ public class ClientClassNioServer extends ClassNioServer
    * {@inheritDoc}
    */
   @Override
-  public void postAccept(final ChannelWrapper<?> wrapper)
+  public void postAccept(final ChannelWrapper<?> channel)
   {
-    ((ClassContext) wrapper.getContext()).setState(WAITING_INITIAL_PROVIDER_REQUEST);
+    try
+    {
+      transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
+    }
+    catch (Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+      closeConnection(channel);
+    }
   }
 
   /**
@@ -173,5 +181,11 @@ public class ClientClassNioServer extends ClassNioServer
       providerConnections.clear();
     }
     super.removeAllConnections();
+  }
+
+  @Override
+  public ClassState getInitialState()
+  {
+    return ClassState.WAITING_INITIAL_PROVIDER_REQUEST;
   }
 }

@@ -22,7 +22,6 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
@@ -31,12 +30,12 @@ import org.slf4j.*;
  * State of sending the initial response to a newly created node channel.
  * @author Laurent Cohen
  */
-class SendingNodeInitialResponseState extends ClassServerState
+class SendingInitialNodeResponseState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingNodeInitialResponseState.class);
+  private static Logger log = LoggerFactory.getLogger(SendingInitialNodeResponseState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -46,7 +45,7 @@ class SendingNodeInitialResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingNodeInitialResponseState(final ClassNioServer server)
+  public SendingInitialNodeResponseState(final ClassNioServer server)
   {
     super(server);
   }
@@ -61,14 +60,14 @@ class SendingNodeInitialResponseState extends ClassServerState
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (channel.isReadable() && !channel.isLocal())
     {
       throw new ConnectException("node " + channel + " has been disconnected");
     }
     ClassContext context = (ClassContext) channel.getContext();
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent uuid to node: " + channel);
+      if (debugEnabled) log.debug("sent uuid=" + context.getResource().getProviderUuid() + " to node " + channel);
       context.setMessage(null);
       return TO_WAITING_NODE_REQUEST;
     }

@@ -70,8 +70,9 @@ class WaitingInitialNodeRequestState extends ClassServerState
     if (context.readMessage(wrapper))
     {
       JPPFResourceWrapper resource = context.deserializeResource();
-      if (debugEnabled) log.debug("channel: " + wrapper + " read resource [" + resource.getName() + "] done");
+      if (debugEnabled) log.debug("read initial request from node " + wrapper);
       context.setProvider(false);
+      context.setPeer((Boolean) resource.getData("peer", Boolean.FALSE));
       if (debugEnabled) log.debug("initiating node: " + wrapper);
       String uuid = (String) resource.getData("node.uuid");
       if (uuid != null)
@@ -82,7 +83,7 @@ class WaitingInitialNodeRequestState extends ClassServerState
       // send the uuid of this driver to the node or node peer.
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
       resource.setProviderUuid(driver.getUuid());
-      context.serializeResource(wrapper);
+      context.serializeResource();
 
       return TO_SENDING_INITIAL_NODE_RESPONSE;
     }

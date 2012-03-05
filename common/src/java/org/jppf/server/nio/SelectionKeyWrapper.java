@@ -123,4 +123,13 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   {
     return getChannel().readyOps();
   }
+
+  /**
+   * @return <code>false</code>.
+   */
+  @Override
+  public boolean isLocal()
+  {
+    return false;
+  }
 }

@@ -22,7 +22,6 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
@@ -61,7 +60,7 @@ class SendingNodeResponseState extends ClassServerState
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (channel.isReadable() && !channel.isLocal())
     {
       throw new ConnectException("node " + channel + " has been disconnected");
     }

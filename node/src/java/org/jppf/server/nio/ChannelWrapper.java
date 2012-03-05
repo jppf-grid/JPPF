@@ -102,4 +102,10 @@ public interface ChannelWrapper<S>
    * @param selector a {@link LocalChannelSelector} instance.
    */
   void setSelector(ChannelSelector selector);
+
+  /**
+   * Determine whether this channel is local (for an in-JVM node).
+   * @return <code>false</code> if the channel is local, <code>false</code> otherwise.
+   */
+  boolean isLocal();
 }

@@ -65,6 +65,7 @@ class IdentifyingPeerState extends AcceptorServerState
   public AcceptorTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     AcceptorContext context = (AcceptorContext) channel.getContext();
+    if (log.isTraceEnabled()) log.trace("about to read from channel " + channel);
     if (context.readMessage(channel))
     {
       if (!(channel instanceof SelectionKeyWrapper)) return null;
@@ -92,13 +93,13 @@ class IdentifyingPeerState extends AcceptorServerState
       SelectionKey key = (SelectionKey) channel.getChannel();
       SocketChannel socketChannel = (SocketChannel) key.channel();
       key.cancel();
-      if (debugEnabled) log.debug("registering channel with new server");
+      if (debugEnabled) log.debug("registering channel with new server " + newServer);
       newServer.getLock().lock();
       try
       {
         newServer.getSelector().wakeup();
         ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLEngineManager());
-        newChannel.getContext().setSSLEngineManager(context.getSSLEngineManager());
+        //newChannel.getContext().setSSLEngineManager(context.getSSLEngineManager());
         if (debugEnabled) log.debug("channel registered: " + newChannel);
       }
       finally

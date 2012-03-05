@@ -18,8 +18,6 @@
 
 package org.jppf.node;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.comm.socket.*;
 import org.jppf.management.JMXServer;
@@ -27,7 +25,7 @@ import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
 
 /**
- * Abstract implementation of the <code>MonitoredNode</code> interface.
+ * Abstract implementation of the {@link Node} interface.
  * @author Laurent Cohen
  */
 public abstract class AbstractNode extends ThreadSynchronization implements Node, Runnable
@@ -49,10 +47,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   protected SocketInitializer socketInitializer = new SocketInitializerImpl();
   /**
-   * This flag is true if there is at least one listener, and false otherwise.
-   */
-  protected boolean notifying = false;
-  /**
    * Total number of tasks executed.
    */
   private int taskCount = 0;
@@ -60,10 +54,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * This node's universal identifier.
    */
   protected String uuid = null;
-  /**
-   * Holds the count of currently executing tasks. Used to determine when this node is busy or idle.
-   */
-  protected AtomicInteger executingCount = new AtomicInteger(0);
 
   /**
    * Get the underlying socket wrapper used by this node.
@@ -83,15 +73,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   public void setSocketWrapper(final SocketWrapper wrapper)
   {
     this.socketClient = wrapper;
-  }
-
-  /**
-   * Determine whether this node has at least one listener to notify of internal events.
-   * @return true if there is at least one listener, and false otherwise.
-   */
-  public boolean isNotifying()
-  {
-    return notifying;
   }
 
   /**

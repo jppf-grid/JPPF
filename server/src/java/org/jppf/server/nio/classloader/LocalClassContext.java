@@ -41,7 +41,7 @@ public class LocalClassContext extends ClassContext
    * {@inheritDoc}
    */
   @Override
-  public void serializeResource(final ChannelWrapper<?> wrapper) throws Exception
+  public void serializeResource() throws Exception
   {
   }
 

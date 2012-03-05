@@ -18,13 +18,12 @@
 
 package org.jppf.server.nio.acceptor;
 
-import java.nio.channels.SelectionKey;
-
 import javax.net.ssl.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.ssl.SSLHelper;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -98,7 +97,8 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     }
     catch (Exception e)
     {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
       closeChannel(channel);
     }
   }
@@ -119,7 +119,8 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   @Override
   public int getInitialInterest()
   {
-    return SelectionKey.OP_READ;
+    //return SelectionKey.OP_READ;
+    return 0;
   }
 
   /**
@@ -137,5 +138,11 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     {
       log.error(e.getMessage(), e);
     }
+  }
+
+  @Override
+  public AcceptorState getInitialState()
+  {
+    return AcceptorState.IDENTIFYING_PEER;
   }
 }

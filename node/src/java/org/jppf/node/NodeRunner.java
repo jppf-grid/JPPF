@@ -217,8 +217,9 @@ public class NodeRunner
     }
     if (debugEnabled) log.debug("Discovered driver: " + info);
     TypedProperties config = JPPFConfiguration.getProperties();
+    boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     config.setProperty("jppf.server.host", info.host);
-    config.setProperty("jppf.server.port", StringUtils.buildString(info.serverPorts));
+    config.setProperty("jppf.server.port", String.valueOf(ssl ? info.sslServerPorts[0] : info.serverPorts[0]));
     if (info.managementHost != null) config.setProperty("jppf.management.host", info.managementHost);
     if (info.recoveryPort >= 0)
     {

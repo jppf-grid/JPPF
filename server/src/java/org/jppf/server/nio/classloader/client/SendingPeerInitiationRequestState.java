@@ -22,21 +22,22 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * This class represents the state of waiting for the next request for a provider.
+ * State of sending an initial request to a peer server. This server is seen as a node by the peer,
+ * whereas the peer is seen as a client. Therefore, the information sent must allow the remote peer to
+ * register a node class loader channel.
  * @author Laurent Cohen
  */
-public class IdleProviderState extends ClassServerState
+public class SendingPeerInitiationRequestState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
+  private static Logger log = LoggerFactory.getLogger(SendingPeerInitiationRequestState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -46,7 +47,7 @@ public class IdleProviderState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public IdleProviderState(final ClassNioServer server)
+  public SendingPeerInitiationRequestState(final ClassNioServer server)
   {
     super(server);
   }
@@ -62,11 +63,16 @@ public class IdleProviderState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (channel.isReadable() && !channel.isLocal())
     {
-      ((ClientClassNioServer) server).removeProviderConnection(context.getUuid(), channel);
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
+    if (context.writePeerInitiationMessage(channel))
+    {
+      if (debugEnabled) log.debug("sent peer initiation to server " + channel);
+      context.setMessage(null);
+      return TO_WAITING_PEER_INITIATION_RESPONSE;
+    }
+    return TO_SENDING_PEER_INITIATION_REQUEST;
   }
 }

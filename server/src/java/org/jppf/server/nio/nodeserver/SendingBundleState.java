@@ -64,7 +64,7 @@ class SendingBundleState extends NodeServerState
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     //if (debugEnabled) log.debug("exec() for " + getRemostHost(channel));
-    if (channel.isReadable() && !(channel instanceof LocalNodeChannel)) throw new ConnectException("node " + channel + " has been disconnected");
+    if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getNodeMessage() == null)

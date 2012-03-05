@@ -18,11 +18,11 @@
 
 package org.jppf.server.nio.client;
 
-import java.nio.channels.SelectionKey;
 import java.util.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -87,7 +87,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     }
     catch (Exception e)
     {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
       closeClient(channel);
     }
     driver.getStatsManager().newClientConnection();
@@ -121,7 +122,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   @Override
   public int getInitialInterest()
   {
-    return SelectionKey.OP_READ;
+    //return SelectionKey.OP_READ;
+    return 0;
   }
 
   /**
@@ -172,5 +174,11 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     {
       log.error(e.getMessage(), e);
     }
+  }
+
+  @Override
+  public ClientState getInitialState()
+  {
+    return ClientState.WAITING_HANDSHAKE;
   }
 }

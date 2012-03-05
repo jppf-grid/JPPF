@@ -53,7 +53,7 @@ final class NodeClassServerFactory	extends NioServerFactory<ClassState, ClassTra
     Map<ClassState, NioState<ClassTransition>> map =
         new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
     map.put(WAITING_INITIAL_NODE_REQUEST, new WaitingInitialNodeRequestState((ClassNioServer) server));
-    map.put(SENDING_INITIAL_NODE_RESPONSE, new SendingNodeInitialResponseState((ClassNioServer) server));
+    map.put(SENDING_INITIAL_NODE_RESPONSE, new SendingInitialNodeResponseState((ClassNioServer) server));
     map.put(SENDING_NODE_RESPONSE, new SendingNodeResponseState((ClassNioServer) server));
     map.put(WAITING_NODE_REQUEST, new WaitingNodeRequestState((ClassNioServer) server));
     map.put(NODE_WAITING_PROVIDER_RESPONSE, new NodeWaitingProviderResponseState((ClassNioServer) server));

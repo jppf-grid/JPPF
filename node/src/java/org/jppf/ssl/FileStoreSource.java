@@ -20,6 +20,9 @@ package org.jppf.ssl;
 
 import java.io.*;
 
+import org.jppf.JPPFException;
+import org.jppf.utils.FileUtils;
+
 /**
  * A secure store source that uses a file as source.
  * @author Laurent Cohen
@@ -42,6 +45,8 @@ public class FileStoreSource extends SecureStoreSource
   @Override
   public InputStream call() throws Exception
   {
-    return new BufferedInputStream(new FileInputStream(args[0]));
+    InputStream is = FileUtils.getFileInputStream(args[0]);
+    if (is == null) throw new JPPFException("could not find secure store " + args[0]); 
+    return is;
   }
 }

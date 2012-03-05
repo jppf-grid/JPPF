@@ -72,7 +72,7 @@ class WaitingProviderInitialRequestState extends ClassServerState
     if (context.readMessage(wrapper))
     {
       JPPFResourceWrapper resource = context.deserializeResource();
-      if (debugEnabled) log.debug("channel: " + wrapper + " read resource [" + resource.getName() + "] done");
+      if (debugEnabled) log.debug("read initial request from provider " + wrapper);
       context.setProvider(true);
       if (debugEnabled) log.debug("initiating provider: " + wrapper);
       String uuid = resource.getUuidPath().getFirst();
@@ -82,8 +82,7 @@ class WaitingProviderInitialRequestState extends ClassServerState
       context.setConnectionUuid((String) resource.getData("connection.uuid"));
       context.setPendingRequests(new Vector<ChannelWrapper<?>>());
       context.setMessage(null);
-      if (managementEnabled) resource.setManagementId(driver.getInitializer().getJmxServer().getId());
-      context.serializeResource(wrapper);
+      context.serializeResource();
       return TO_SENDING_INITIAL_PROVIDER_RESPONSE;
     }
     return TO_WAITING_INITIAL_PROVIDER_REQUEST;

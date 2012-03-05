@@ -134,7 +134,7 @@ public class JPPFDriver
     nodeHandler = new NodeInformationHandler();
     statsManager.addListener(statsUpdater);
     initializer = new DriverInitializer(this);
-    if (debugEnabled) log.debug("instantiating JPPF driver with uuid=" + uuid);
+    log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
   }
 
   /**
@@ -174,7 +174,8 @@ public class JPPFDriver
     }
 
     initializer.initBroadcaster();
-    initializer.initPeers(nodeClassServer);
+    //initializer.initPeers(nodeClassServer);
+    initializer.initPeers(clientClassServer);
     System.out.println("JPPF Driver initialization complete");
   }
 

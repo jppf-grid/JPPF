@@ -26,8 +26,8 @@ import org.jppf.utils.SerializationUtils;
 import org.jppf.utils.streams.StreamUtils;
 
 /**
- * Common abstract superclass representing a message sent or received by a node.
- * A message is the transformation of a job into an more easily transportable format.
+ * Common abstract superclass representing a message sent or received by a channel.
+ * A message is the transformation of a sequence of objects into a more easily transportable format.
  * @author Laurent Cohen
  */
 public abstract class AbstractNioMessage implements NioMessage

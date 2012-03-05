@@ -22,7 +22,6 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
@@ -62,7 +61,7 @@ class SendingProviderRequestState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (channel.isReadable() && !channel.isLocal())
     {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
@@ -73,14 +72,14 @@ class SendingProviderRequestState extends ClassServerState
       context.setMessage(null);
       context.setResource(requestContext.getResource());
       if (debugEnabled) log.debug("provider " + channel + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
-      context.serializeResource(channel);
+      context.serializeResource();
       context.setCurrentRequest(request);
     }
     if (context.getCurrentRequest() == null)
     {
       if (debugEnabled) log.debug("provider: " + channel + " has no request to process, returning to idle mode");
       context.setMessage(null);
-      return TO_IDLE_PROVIDER;
+      return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
     }
     if (context.writeMessage(channel))
     {

@@ -174,6 +174,7 @@ public final class FileUtils
 
   /**
    * Get an input stream given a file path.
+   * This method first looks up in the file system for the specified path, then in the classpath.
    * @param path the path to the file to lookup.
    * @return a <code>InputStream</code> instance, or null if the file could not be found.
    * @throws IOException if an IO error occurs while looking up the file.
@@ -183,11 +184,7 @@ public final class FileUtils
     InputStream is = null;
     File file = new File(path);
     if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
-    if (is == null)
-    {
-      URL url = FileUtils.class.getClassLoader().getResource(path);
-      is = (url == null) ? null : url.openStream();
-    }
+    if (is == null) is = FileUtils.class.getClassLoader().getResourceAsStream(path);
     return is;
   }
 

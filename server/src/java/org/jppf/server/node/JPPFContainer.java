@@ -102,26 +102,6 @@ public abstract class JPPFContainer
   public abstract int deserializeObjects(List<Object> list, int count, ExecutorService executor) throws Throwable;
 
   /**
-   * Deserialize an object from a socket client.
-   * @param data the array of bytes to deserialize into an object.
-   * @return the new position in the source data after deserialization.
-   * @throws Exception if an error occurs while deserializing.
-   */
-  public Object deserializeObject(final byte[] data) throws Exception
-  {
-    ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    try
-    {
-      Thread.currentThread().setContextClassLoader(classLoader);
-      return helper.getSerializer().deserialize(data);
-    }
-    finally
-    {
-      Thread.currentThread().setContextClassLoader(cl);
-    }
-  }
-
-  /**
    * Get the main class loader for this container.
    * @return a <code>ClassLoader</code> used for loading the classes of the framework.
    */

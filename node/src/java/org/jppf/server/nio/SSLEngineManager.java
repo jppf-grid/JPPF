@@ -323,6 +323,7 @@ public class SSLEngineManager
           //if (bytesConsumed > 0) flush();
           break;
       }
+      while (processHandshakeStatus());
     }
     // return count of bytes written.
     //return count;

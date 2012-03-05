@@ -70,5 +70,13 @@ public enum ClassState
   /**
    * Waiting for a provider (client) to provide a class or resource definition.
    */
-  NODE_WAITING_PROVIDER_RESPONSE
+  NODE_WAITING_PROVIDER_RESPONSE,
+  /**
+   * Sending of the initial request by a peer server.
+   */
+  SENDING_PEER_INITIATION_REQUEST,
+  /**
+   * Waiting for the initial response from a peer server
+   */
+  WAITING_PEER_INITIATION_RESPONSE
 }

@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio;
 
+import java.io.IOException;
 import java.nio.channels.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
@@ -76,7 +77,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    */
   public void submitTransition(final ChannelWrapper<?> key)
   {
-    if (debugEnabled) log.debug("submitting transition for " + key);
+    if (debugEnabled) log.debug("submitting transition for " + key + ", state=" + key.getContext().getState());
     setKeyOps(key, 0);
     StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
     if (sequential) transition.run();
@@ -125,7 +126,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       context.setState(s2);
       channel.setKeyOps(t.getInterestOps());
       //setKeyOps(channel, t.getInterestOps());
-      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2);
+      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2 + " with ops=" + t.getInterestOps());
     }
     finally
     {
@@ -138,11 +139,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    * @param channel the channel to register.
    * @param ops the operations the channel is initially interested in.
    * @param context the context attached to the channel.
-   * @param action an action to perform upon registration of the channel.
    * @return a {@link ChannelWrapper} instance.
    */
   @SuppressWarnings("unchecked")
-  public ChannelWrapper<?> registerChannel(final SocketChannel channel, final int ops, final NioContext context,	final ChannelRegistrationAction action)
+  public ChannelWrapper<?> registerChannel(final SocketChannel channel, final int ops, final NioContext context)
   {
     ChannelWrapper<?> wrapper = null;
     SelectionKey key = null;
@@ -153,14 +153,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       try
       {
         server.getSelector().wakeup();
+        if (channel.isBlocking()) channel.configureBlocking(false);
         key = channel.register(server.getSelector(), ops, context);
         wrapper = new SelectionKeyWrapper(key);
         context.setChannel(wrapper);
-        if (action != null)
-        {
-          action.key = wrapper;
-          action.run();
-        }
       }
       finally
       {
@@ -168,6 +164,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       }
     }
     catch (ClosedChannelException e)
+    {
+      log.error(e.getMessage(), e);
+    }
+    catch (IOException e)
     {
       log.error(e.getMessage(), e);
     }
@@ -185,17 +185,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 		else executor.submit(r);
      */
     r.run();
-  }
-
-  /**
-   * Abstract super class for an action to perform upon registration of a channel.
-   */
-  public abstract static class ChannelRegistrationAction implements Runnable
-  {
-    /**
-     * The key resulting form the channel registration.
-     */
-    public ChannelWrapper<?> key = null;
   }
 
   /**

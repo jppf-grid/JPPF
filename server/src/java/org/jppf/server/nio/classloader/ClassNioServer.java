@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio.classloader;
 
-import java.nio.channels.SelectionKey;
-
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -74,7 +72,8 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
   @Override
   public int getInitialInterest()
   {
-    return SelectionKey.OP_READ;
+    //return SelectionKey.OP_READ;
+    return 0;
   }
 
   /**

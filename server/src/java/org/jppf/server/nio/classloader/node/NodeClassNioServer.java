@@ -24,7 +24,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -98,9 +98,18 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * {@inheritDoc}
    */
   @Override
-  public void postAccept(final ChannelWrapper<?> wrapper)
+  public void postAccept(final ChannelWrapper<?> channel)
   {
-    ((ClassContext) wrapper.getContext()).setState(ClassState.WAITING_INITIAL_NODE_REQUEST);
+    try
+    {
+      transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
+    }
+    catch (Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+      closeConnection(channel);
+    }
   }
 
   /**
@@ -202,5 +211,11 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
       nodeConnections.clear();
     }
     super.removeAllConnections();
+  }
+
+  @Override
+  public ClassState getInitialState()
+  {
+    return ClassState.WAITING_INITIAL_NODE_REQUEST;
   }
 }

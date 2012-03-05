@@ -24,10 +24,6 @@ package org.jppf.server.nio.classloader;
 public enum ClassTransition
 {
   /**
-   * Transition to the DEFINING_TYPE state.
-   */
-  TO_DEFINING_TYPE,
-  /**
    * Transition to the WAITING_INITIAL_PROVIDER_REQUEST state.
    */
   TO_WAITING_INITIAL_PROVIDER_REQUEST,
@@ -47,6 +43,10 @@ public enum ClassTransition
    * Transition to the IDLE_PROVIDER state in idle mode.
    */
   TO_IDLE_PROVIDER,
+  /**
+   * Transition to the IDLE_PROVIDER state in idle mode for a peer server connection.
+   */
+  TO_IDLE_PEER_PROVIDER,
   /**
    * Transition to the WAITING_INITIAL_NODE_REQUEST state.
    */
@@ -70,5 +70,13 @@ public enum ClassTransition
   /**
    * Transition to the IDLE_NODE state in idle mode.
    */
-  TO_IDLE_NODE;
+  TO_IDLE_NODE,
+  /**
+   * Sending of the initial request by a peer server.
+   */
+  TO_SENDING_PEER_INITIATION_REQUEST,
+  /**
+   * Waiting for the initial response from a peer server
+   */
+  TO_WAITING_PEER_INITIATION_RESPONSE;
 }

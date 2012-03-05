@@ -197,6 +197,7 @@ public class DriverInitializer
   {
     boolean initPeers;
     TypedProperties props = JPPFConfiguration.getProperties();
+    boolean ssl = props.getBoolean("jppf.peer.ssl.enabled", false);
     if (props.getBoolean("jppf.peer.discovery.enabled", false))
     {
       if (debugEnabled) log.debug("starting peers discovery");
@@ -225,14 +226,16 @@ public class DriverInitializer
 
       if(initPeers)
       {
-        for (String name : names) {
-          if(!VALUE_JPPF_DISCOVERY.equals(name))
+        for (String name : names)
+        {
+          if (!VALUE_JPPF_DISCOVERY.equals(name))
           {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
             // to keep backward compatibility with v2.x configurations
             String s = props.getAndReplaceString(String.format("jppf.peer.%s.server.port", name), String.format("class.peer.%s.server.port", name), "11111", false);
-            info.serverPorts = StringUtils.parseIntValues(s);
+            if (ssl) info.sslServerPorts = StringUtils.parseIntValues(s);
+            else info.serverPorts = StringUtils.parseIntValues(s);
             if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
             new JPPFPeerInitializer(name, info, classServer).start();
           }

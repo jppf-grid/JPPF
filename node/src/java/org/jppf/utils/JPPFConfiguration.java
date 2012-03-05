@@ -110,22 +110,32 @@ public class JPPFConfiguration
   private static InputStream getStream() throws Exception
   {
     String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
-    if (altSource == null)
+    String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
+    return getConfigurationStream(filename, altSource);
+  }
+
+  /**
+   * Get an inputStream for a properties file located either by the specified filename or configuration source.
+   * @param filename specifies the loaction of the properties file in the file system or classpath.
+   * @param configurationSourceName fully qualified name of a class implementating {@link JPPFConfiguration.ConfigurationSource}.
+   * @return an input stream that can be used to load the properties.
+   * @throws Exception if any error occurs while trying to obtain the stream.
+   */
+  public static InputStream getConfigurationStream(final String filename, final String configurationSourceName) throws Exception
+  {
+    InputStream is = null;
+    if (configurationSourceName != null)
     {
-      String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
-      if (log.isDebugEnabled()) log.debug("reading JPPF configuration file: " + filename);
-      InputStream is = null;
-      File file = new File(filename);
-      if (file.exists()) is = new BufferedInputStream(new FileInputStream(filename));
-      if (is == null) is = JPPFConfiguration.class.getClassLoader().getResourceAsStream(filename);
-      return is;
+      if (log.isDebugEnabled()) log.debug("reading JPPF configuration from config source: " + configurationSourceName);
+      ConfigurationSource source = (ConfigurationSource) Class.forName(configurationSourceName).newInstance();
+      is = source.getPropertyStream();
     }
     else
     {
-      if (log.isDebugEnabled()) log.debug("reading JPPF configuration from alternate source: " + altSource);
-      ConfigurationSource source = (ConfigurationSource) Class.forName(altSource).newInstance();
-      return source.getPropertyStream();
+      if (log.isDebugEnabled()) log.debug("reading JPPF configuration file: " + filename);
+      is = FileUtils.getFileInputStream(filename);
     }
+    return is;
   }
 
   /**

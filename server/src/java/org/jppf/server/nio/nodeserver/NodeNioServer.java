@@ -19,7 +19,6 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -161,7 +160,8 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
     }
     catch (Exception e)
     {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
       closeNode(channel, context);
     }
   }
@@ -202,7 +202,8 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
   @Override
   public int getInitialInterest()
   {
-    return SelectionKey.OP_READ;
+    //return SelectionKey.OP_READ;
+    return 0;
   }
 
   /**
@@ -399,5 +400,11 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
     {
       return uuidMap.remove(uuid);
     }
+  }
+
+  @Override
+  public NodeState getInitialState()
+  {
+    return NodeState.SEND_INITIAL_BUNDLE;
   }
 }
