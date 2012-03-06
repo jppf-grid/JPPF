@@ -20,7 +20,11 @@ package test.org.jppf.client.balancer;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
+import org.jppf.client.JPPFResultCollector;
+import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 import java.util.UUID;
 
@@ -39,37 +43,107 @@ public class TestJPPFBalancer
     JPPFClient client = null;
     try
     {
+      TypedProperties properties = JPPFConfiguration.getProperties();
+      properties.setProperty("experimental.balancer", "false");
+
+      properties.setProperty("jppf.load.balancing.algorithm", "manual");
+      properties.setProperty("jppf.load.balancing.strategy", "manual");
+      properties.setProperty("strategy.manual.size", "4");
+
+      properties.setProperty("jppf.local.execution.enabled", "false");
+
+      properties.setProperty("driver1.jppf.server.host", "localhost");
+      properties.setProperty("driver1.jppf.pool.size", "5");
+
+      properties.setProperty("driver1.class.server.port", "11111");
+      properties.setProperty("driver1.app.server.port", "11112");
+      properties.setProperty("driver1.priority" , "10");
+
+      properties.setProperty("driver2.jppf.server.host", "hs2.crcdata.cz");
+      properties.setProperty("driver2.jppf.pool.size", "5");
+      properties.setProperty("driver2.priority" , "10");
+      properties.setProperty("driver2.app.server.port", "11112");
+      properties.setProperty("driver2.class.server.port", "11111");
+
+      properties.setProperty("jppf.remote.execution.enabled", "true");
+
+//      if(paramJPPF.isAutoDiscovery() || (sb.length() == 0 && !paramJPPF.isLocalExecution()))
+//      properties.setProperty("jppf.discovery.enabled", "true");
+//      else {
+        properties.setProperty("jppf.discovery.enabled", "false");
+//        properties.setProperty("jppf.drivers", "driver1");
+        properties.setProperty("jppf.drivers", "driver1 driver2");
+//      }
+
+      properties.setProperty("jppf.pool.size", "2");
+
       System.out.println("Connecting...");
       client = new JPPFClient(UUID.randomUUID().toString());
+      Thread.sleep(3000L);
       System.out.println("Connecting...DONE.");
 
       JPPFJob job = new JPPFJob();
-//      job.addTask(new TestTask("Task 1"));
-//      job.setBlocking(false);
-//
+      job.addTask(new TestTask("Task BROADCAST", false));
+      job.setBlocking(true);
+      job.getSLA().setBroadcastJob(true);
+
 //      System.out.println("Submitting job...");
 //      client.submit(job);
 //      System.out.println("Submitting job...DONE");
-//
-//      job = new JPPFJob();
-      job.addTask(new TestTask("Task X"));
-      job.addTask(new TestTask("Task 3"));
-      job.addTask(new TestTask("Task 4"));
-      job.addTask(new TestTask("Task 5"));
-      job.getSLA().setBroadcastJob(true);
+
+      job = new JPPFJob();
+      job.setBlocking(true);
+      job.addJobListener(new JobListener()
+      {
+        @Override
+        public void jobStarted(final JobEvent event)
+        {
+          System.out.println("jobStarted: " + event.getJob());
+        }
+
+        @Override
+        public void jobEnded(final JobEvent event)
+        {
+          System.out.println("jobEnded: " + event.getJob());
+        }
+      });
+      for(int index = 1; index <= 24; index++) {
+        job.addTask(new TestTask(String.format("Task %d", index), index == 9));
+      }
+//      job.getSLA().setBroadcastJob(true);
+      JPPFResultCollector collector = new JPPFResultCollector(job)
+      {
+        @Override
+        public synchronized void resultsReceived(final TaskResultEvent event)
+        {
+          System.out.println("resultsReceived: " + event.getTaskList().size());
+          super.resultsReceived(event);
+        }
+      };
+      collector.addSubmissionStatusListener(new SubmissionStatusListener()
+      {
+        @Override
+        public void submissionStatusChanged(final SubmissionStatusEvent event)
+        {
+          System.out.println("submissionStatusChanged: " + event.getStatus());
+        }
+      });
+      System.out.println("Submission status: " + collector.getStatus());
+      job.setResultListener(collector);
 //      job.setResultListener(new TaskResultListener()
 //      {
 //        @Override
 //        public void resultsReceived(final TaskResultEvent event)
 //        {
-//          System.out.println("resultsReceived: " + event);
+//          System.out.println("resultsReceived: " + event.getTaskList().size());
 //        }
 //      });
-      job.setBlocking(true);
 
       System.out.println("Submitting job...");
+      long dur = System.nanoTime();
       client.submit(job);
-      System.out.println("Submitting job...DONE");
+      dur = System.nanoTime() - dur;
+      System.out.println("Submitting job...DONE in " + (dur / 1000000.0));
 
       System.out.println("Sleeping...");
       Thread.sleep(10000L);
@@ -98,27 +172,31 @@ public class TestJPPFBalancer
      */
     private final String text;
 
+    private final boolean exception;
+
     /**
      * Initializes task with describing text.
      * @param text describing this task.
      */
-    public TestTask(final String text)
+    public TestTask(final String text, final boolean exception)
     {
       this.text = text;
+      this.exception = exception;
     }
 
     @Override
     public void run()
     {
       System.out.printf("Test task: '%s'%n", text);
-      try
-      {
-        Thread.sleep(2000L);
-      }
-      catch (InterruptedException e)
-      {
-        e.printStackTrace();
-      }
+      if(exception) throw new NullPointerException("Task exception: " + text);
+//      try
+//      {
+//        Thread.sleep(2000L);
+//      }
+//      catch (InterruptedException e)
+//      {
+//        e.printStackTrace();
+//      }
     }
 
     @Override

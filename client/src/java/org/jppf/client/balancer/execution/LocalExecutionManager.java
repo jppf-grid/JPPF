@@ -469,7 +469,7 @@ public class LocalExecutionManager extends ThreadSynchronization
    */
   public synchronized void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification)
   {
-    if (this.reconnectionNotification == null) return;
+    if (this.reconnectionNotification != null) return;
     this.reconnectionNotification = reconnectionNotification;
     wakeUp();
   }

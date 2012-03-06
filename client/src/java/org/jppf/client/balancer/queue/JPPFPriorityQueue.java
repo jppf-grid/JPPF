@@ -103,7 +103,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   @Override
   public void addBundle(final ClientJob bundleWrapper)
   {
-    System.out.println("queue.addBundle: " + bundleWrapper + "\t - job: " + bundleWrapper.getJob() + "\t - sla: " + bundleWrapper.getJob().getSLA());
     ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
     JobSLA sla = bundle.getSLA();
     String jobUuid = bundle.getUuid();
@@ -113,7 +112,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       {
         log.debug("before processing broadcast job with id=" + bundle.getName() + ", uuid=" + jobUuid + ", task count=" + bundle.getTaskCount());
       }
-      System.out.println("before processing broadcast job with id=" + bundle.getName() + ", uuid=" + jobUuid + ", task count=" + bundle.getTaskCount());
       processBroadcastJob(bundleWrapper);
       return;
     }
@@ -190,7 +188,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   @Override
   public ClientJob nextBundle(final ClientJob bundleWrapper, final int nbTasks)
   {
-    System.out.println("queue.nextBundle: " + nbTasks);
     ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
     ClientJob result = null;
     try
@@ -406,18 +403,18 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     Set<String> uuidSet = new HashSet<String>();
     for (ChannelWrapper connection : connections)
     {
-      ChannelWrapper xConnection = (ChannelWrapper) connection;
-      ClientJob job = bundleWrapper.copy();
-      ClientTaskBundle newBundle = (ClientTaskBundle) job.getJob();
-      String uuid = xConnection.getUuid();
-      System.out.println(" sending to connection '" + uuid + "' - policy: " + policy);
+      String uuid = connection.getUuid();
       if (uuidSet.add(uuid))
       {
+        ClientJob job = bundleWrapper.copy();
+        ClientTaskBundle newBundle = (ClientTaskBundle) job.getJob();
+
+//        System.out.println(" sending to connection '" + uuid + "' - policy: " + policy);
         JPPFManagementInfo info = connection.getManagementInfo();
         newBundle.setBroadcastUUID(uuid);
         if ((policy != null) && !policy.accepts(connection.getSystemInfo()))
         {
-          System.out.println("Policy not accepted");
+//          System.out.println("Policy not accepted");
           continue;
         }
         ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
