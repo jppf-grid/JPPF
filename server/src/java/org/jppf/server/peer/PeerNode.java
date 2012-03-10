@@ -49,7 +49,7 @@ class PeerNode extends AbstractNode
   /**
    * Used to send the task results back to the requester.
    */
-  private AbstractResultSender resultSender = null;
+  private PeerNodeResultSender resultSender = null;
   /**
    * The name of the peer in the configuration file.
    */
@@ -172,6 +172,7 @@ class PeerNode extends AbstractNode
             else log.warn(ExceptionUtils.getMessage(e));
           }
         }
+        bundle.setUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
         bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, new JPPFSystemInformation(uuid).populate());
@@ -184,15 +185,16 @@ class PeerNode extends AbstractNode
         bundle.getUuidPath().add(driver.getUuid());
         if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
         bundle.setCompletionListener(resultSender);
+        resultSender.pendingTasksCount = n;
         JPPFDriver.getQueue().addBundle(bundleWrapper);
-        resultSender.run(n);
+        resultSender.waitForExecution();
         //resultSender.sendPartialResults(bundleWrapper);
         setTaskCount(getTaskCount() + n);
         if (debugEnabled) log.debug(getName() + "tasks executed: " + getTaskCount());
       }
       else
       {
-        resultSender.sendPartialResults(bundleWrapper);
+        resultSender.sendResults(bundleWrapper);
       }
       if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
         driver.getJobManager().jobEnded(bundleWrapper);
@@ -251,7 +253,7 @@ class PeerNode extends AbstractNode
   private BundleWrapper readBundle() throws Exception
   {
     // Read the request header - with task count information
-    //JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(socketClient.receiveBytes(0).getBuffer());
+    if (debugEnabled) log.debug("waiting for next request");
     JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, getHelper().getSerializer());
     if (debugEnabled) log.debug("received header from peer driver: " + header);
     BundleWrapper headerWrapper = new BundleWrapper(header);

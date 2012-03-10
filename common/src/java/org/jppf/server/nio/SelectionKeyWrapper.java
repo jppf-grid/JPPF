@@ -45,7 +45,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public NioContext getContext()
   {
-    return (NioContext) getChannel().attachment();
+    return (NioContext) channel.attachment();
   }
 
   /**
@@ -55,7 +55,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public void close() throws Exception
   {
-    getChannel().channel().close();
+    channel.channel().close();
   }
 
   /**
@@ -65,7 +65,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public boolean isOpen()
   {
-    return getChannel().channel().isOpen();
+    return channel.channel().isOpen();
   }
 
   /**
@@ -97,7 +97,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public int getKeyOps()
   {
-    return getChannel().interestOps();
+    return channel.interestOps();
   }
 
   /**
@@ -108,8 +108,6 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public void setKeyOps(final int keyOps)
   {
-    SelectionKey key = channel;
-    key.selector().wakeup();
     channel.interestOps(keyOps);
   }
 
@@ -121,7 +119,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public int getReadyOps()
   {
-    return getChannel().readyOps();
+    return channel.readyOps();
   }
 
   /**

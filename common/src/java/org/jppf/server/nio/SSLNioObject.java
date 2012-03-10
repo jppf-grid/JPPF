@@ -26,7 +26,9 @@ import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
- * 
+ * Implementation of {@link NioObject} for reading or writing data from or to an SSL channel.
+ * The channel and the corresponding {@link javax.net.ssl.SSLEngine SSLEngine} are both
+ * encapsulated within an instance of {@link SSLEngineManager}.
  * @author Laurent Cohen
  */
 public class SSLNioObject extends AbstractNioObject
@@ -58,69 +60,56 @@ public class SSLNioObject extends AbstractNioObject
 
   /**
    * Construct this SSLMessage.
-   * @param channel the channel wrapper for the network connection.
    * @param size the size of the internal buffer.
    * @param engineManager the SSLEngineManager to use with this nio object.
    * @throws Exception if any error occurs.
    */
-  public SSLNioObject(final ChannelWrapper<?> channel, final int size, final SSLEngineManager engineManager) throws Exception
+  public SSLNioObject(final int size, final SSLEngineManager engineManager) throws Exception
   {
-    this(channel, new MultipleBuffersLocation(size), engineManager);
+    this(new MultipleBuffersLocation(size), engineManager);
   }
 
   /**
    * Construct this SSLMessage.
-   * @param channel the channel wrapper for the network connection.
    * @param location the location of the data to read from or write to.
    * @param engineManager the SSLEngineManager to use with this nio object.
    * @throws Exception if any error occurs.
    */
-  public SSLNioObject(final ChannelWrapper<?> channel, final DataLocation location, final SSLEngineManager engineManager) throws Exception
+  public SSLNioObject(final DataLocation location, final SSLEngineManager engineManager) throws Exception
   {
     this.location = location;
     this.size = location.getSize();
     this.engineManager = engineManager;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean read() throws Exception
   {
     if (count >= size) return true;
     ByteBuffer buf = engineManager.getAppRecvBuffer();
-    if (os == null)
-    {
-      os = location.getOutputStream();
-      statefulCount = engineManager.getLastReadCount();
-    }
+    if (os == null) os = location.getOutputStream();
+
+    int n = 0;
     while (count < size)
     {
-      if (statefulCount <= 0)
+      if (buf.position() <= 0)
       {
-        statefulCount = engineManager.read();
-        if (statefulCount > 0) buf.flip();
+        n = engineManager.read();
+        if (n == 0) return false;
+        if (n < 0) throw new EOFException();
       }
-      if (traceEnabled) log.trace("lastReadCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-      if (statefulCount <= 0) break;
-      engineManager.setLastReadCount(statefulCount);
-      while (buf.hasRemaining() && (count < size))
-      {
-        int pos = buf.position();
-        int n = Math.min(buf.remaining(), size - count);
-        if (n > 0)
-        {
-          os.write(buf.array(), pos, n);
-          count += n;
-          statefulCount -= n;
-          buf.position(pos + n);
-          if (traceEnabled) log.trace("wrote " + n + " bytes to location, lastReadCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
-        }
-      }
-      if (!buf.hasRemaining()) buf.clear();
+      buf.flip();
+      if (traceEnabled) log.trace("n1=" + n + ", count=" + count + ", size=" + size + ", buf=" + buf);
+  
+      n = Math.min(buf.remaining(), size - count);
+      os.write(buf.array(), 0, n);
+      count += n;
+      buf.position(n);
+      if (traceEnabled) log.trace("n2=" + n + " count=" + count + ", size=" + size + ", buf=" + buf);
+      buf.compact();
+      if (traceEnabled) log.trace("after compact(): buf=" + buf + ", netRcvBuf=" + engineManager.getNetRecvBuffer());
     }
-    engineManager.setLastReadCount(statefulCount);
+
     boolean b = count >= size;
     if (b)
     {
@@ -130,9 +119,6 @@ public class SSLNioObject extends AbstractNioObject
     return b;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean write() throws Exception
   {
@@ -143,21 +129,18 @@ public class SSLNioObject extends AbstractNioObject
       is = location.getInputStream();
       statefulCount = 0;
     }
-    if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+    //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     if (buf.hasRemaining() && (statefulCount < size))
     {
       int min = Math.min(size-statefulCount, buf.remaining());
-      if (min > 0)
+      int read = is.read(buf.array(), buf.position(), min);
+      if (read > 0)
       {
-        int read = is.read(buf.array(), buf.position(), min);
-        if (read > 0)
-        {
-          statefulCount += read;
-          buf.position(buf.position() + read);
-        }
+        statefulCount += read;
+        buf.position(buf.position() + read);
       }
     }
-    if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+    //if (traceEnabled) log.trace("statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
 
     int n;
     do
@@ -165,7 +148,7 @@ public class SSLNioObject extends AbstractNioObject
       n = engineManager.write();
       if (n > 0) count += n;
       engineManager.flush();
-      if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
+      //if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     }
     while (n > 0);
 

@@ -52,6 +52,10 @@ public class JPPFThreadFactory implements ThreadFactory
    * Priority assigned to the threads created by this factory.
    */
   private int priority = Thread.NORM_PRIORITY;
+  /**
+   * 
+   */
+  private static ExceptionHandler defaultExceptionHandler = new ExceptionHandler();
 
   /**
    * Initialize this thread factory with the specified name.
@@ -110,6 +114,7 @@ public class JPPFThreadFactory implements ThreadFactory
     Thread thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
     if (monitoringEnabled) threadIDs.add(thread.getId());
     thread.setPriority(priority);
+    thread.setUncaughtExceptionHandler(defaultExceptionHandler);
     //thread.setDaemon(false);
     return thread;
   }
@@ -155,5 +160,17 @@ public class JPPFThreadFactory implements ThreadFactory
   public synchronized int getPriority()
   {
     return priority;
+  }
+
+  /**
+   * Default uncaught exception handler set onto the threeads created by the thread factory.
+   */
+  private static class ExceptionHandler implements Thread.UncaughtExceptionHandler
+  {
+    @Override
+    public void uncaughtException(final Thread t, final Throwable e)
+    {
+      System.out.println("exception caught from thread " + t + " :\n" + ExceptionUtils.getStackTrace(e));
+    }
   }
 }

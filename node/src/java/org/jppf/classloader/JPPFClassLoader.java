@@ -150,7 +150,13 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   }
 
   /**
-   * Perform the handshake with the server.
+   * Perform the handshake with the server. The handshake consists in:
+   * <ol>
+   * <li>sending a channel identifier {@link JPPFIdentifiers#NODE_CLASSLOADER_CHANNEL} to the server</li>
+   * <li>sending an initial message to the server</li>
+   * <li>receiving an initial response from the server</li>
+   * </ol>
+   * 
    */
   private void performHandshake()
   {
@@ -158,6 +164,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     {
       if (debugEnabled) log.debug("sending channel identifier");
       socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+      socketClient.flush();
       if (debugEnabled) log.debug("sending node initiation message");
       JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);

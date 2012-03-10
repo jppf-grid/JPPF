@@ -28,7 +28,7 @@ import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
- * This class implements the state of receiving information from the node as a
+ * This class implements the state of receiving a task bundle from the node as a
  * response to sending the initial bundle.
  * @author Laurent Cohen
  */
@@ -64,7 +64,7 @@ class WaitInitialBundleState extends NodeServerState
   {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (debugEnabled) log.debug("exec() for " + channel);
-    if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), channel);
+    if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel))
     {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
@@ -97,7 +97,7 @@ class WaitInitialBundleState extends NodeServerState
         }
       }
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
-      context.setNodeMessage(null, channel);
+      context.setMessage(null);
       context.setBundle(null);
       server.addIdleChannel(channel);
       return TO_IDLE;

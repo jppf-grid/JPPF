@@ -20,9 +20,8 @@ package org.jppf.server.nio.classloader.client;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.slf4j.*;
 
 /**
@@ -66,23 +65,25 @@ class WaitingProviderResponseState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.readMessage(channel))
     {
-      if (debugEnabled) log.debug("read response from provider: " + channel + " complete, sending to node " + context.getCurrentRequest() + 
-        ", resource: " + context.getResource().getName());
+      ChannelWrapper<?> nodeChannel = context.getCurrentRequest();
+      if (debugEnabled) log.debug("read response from provider: " + channel + ", sending to node " + nodeChannel + ", resource: " + context.getResource().getName());
       JPPFResourceWrapper resource = context.deserializeResource();
       // putting the definition in cache
       if ((resource.getDefinition() != null) && (resource.getCallable() == null))
         classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
       // fowarding it to channel that requested
-      ChannelWrapper<?> destinationChannel = context.getCurrentRequest();
-      ClassContext destinationContext = (ClassContext) destinationChannel.getContext();
-      while (!ClassState.SENDING_NODE_RESPONSE.equals(destinationChannel.getContext().getState()) ||
-        (destinationChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
-      context.setCurrentRequest(null);
-      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-      destinationContext.setResource(resource);
-      destinationContext.serializeResource();
-      NodeClassNioServer nodeClassServer = (NodeClassNioServer) driver.getNodeClassServer();
-      nodeClassServer.getTransitionManager().transitionChannel(destinationChannel, TO_SENDING_NODE_RESPONSE);
+      ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
+      synchronized(nodeChannel)
+      {
+        while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
+        if (debugEnabled) log.debug("sending response to node " + nodeChannel); 
+        context.setCurrentRequest(null);
+        resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+        nodeContext.setResource(resource);
+        nodeContext.serializeResource();
+        StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
+        tm.transitionChannel(nodeChannel, TO_SENDING_NODE_RESPONSE, tm.checkSubmitTransition(nodeChannel, TO_SENDING_NODE_RESPONSE));
+      }
       //context.setMessage(null);
       return TO_SENDING_PROVIDER_REQUEST;
     }

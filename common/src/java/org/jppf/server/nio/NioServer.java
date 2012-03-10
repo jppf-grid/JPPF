@@ -19,7 +19,7 @@
 package org.jppf.server.nio;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetSocketAddress;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -99,16 +99,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Initialize this server with a specified port number and name.
    * @param name the name given to this thread.
-   * @param sequential determines whether the submission of state transitions should be
    * performed sequentially or through the executor thread pool.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final String name, final boolean sequential) throws Exception
+  protected NioServer(final String name) throws Exception
   {
     super(name);
     selector = Selector.open();
     factory = createFactory();
-    transitionManager = new StateTransitionManager<S, T>(this, sequential);
+    transitionManager = new StateTransitionManager<S, T>(this);
   }
 
   /**
@@ -116,13 +115,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param ports the list of ports this server accepts connections from.
    * @param sslPorts the list of SSL ports this server accepts connections from.
    * @param name the name given to this thread.
-   * @param sequential Determines whether the submission of state transitions should be
    * performed sequentially or through the executor thread pool.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NioServer(final int[] ports, final int[] sslPorts, final String name, final boolean sequential) throws Exception
+  public NioServer(final int[] ports, final int[] sslPorts, final String name) throws Exception
   {
-    this(name, sequential);
+    this(name);
     if (ports != null) this.ports = Arrays.copyOf(ports, ports.length);
     if (sslPorts != null) this.sslPorts = Arrays.copyOf(sslPorts, sslPorts.length);
     init();
@@ -166,7 +164,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       }
     }
   }
- 
+
   /**
    * Configure all SSL settings. This method is for interested subclasses classes to override.
    * @throws Exception if any error occurs during the SSL configuration.
@@ -234,7 +232,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Initiates shutdown of this server.
    */
-  public void shutdown() {
+  public void shutdown()
+  {
     requestShutdown.set(true);
   }
 
@@ -311,6 +310,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     try
     {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+      channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       if (channel.isBlocking()) channel.configureBlocking(false);
       if (ssl)
       {
@@ -329,7 +329,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   }
 
   /**
-   * Register an incoming connection with his server's selector.
+   * Register an incoming connection with this server's selector.
+   * The channel is registered with an empty set of initial interest operations,
+   * which means a call to the corresponding {@link SelectionKey}'s <code>interestOps()</code> method will return 0.
    * @param channel the socket channel representing the connection.
    * @param sslEngineManager an sslEngine enventually passed on from a different server.
    * @return a wrapper for the newly registered channel.
@@ -342,7 +344,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     try
     {
       if (sslEngineManager != null) context.setSSLEngineManager(sslEngineManager);
-      SelectionKey selKey = channel.register(selector,	getInitialInterest(), context);
+      SelectionKey selKey = channel.register(selector,	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
       postAccept(wrapper);
@@ -366,20 +368,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @return an <code>NioContext</code> instance.
    */
   public abstract NioContext<?> createNioContext();
-
-  /**
-   * Get the IO operations a connection is initially interested in.
-   * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
-   * constants definitions.
-   */
-  public abstract int getInitialInterest();
-
-  /**
-   * Get the initial state the channel should be in.
-   * @return a bit-wise combination of the interests, taken from {@link java.nio.channels.SelectionKey SelectionKey}
-   * constants definitions.
-   */
-  public abstract S getInitialState();
 
   /**
    * Close the underlying server socket and stop this socket server.
@@ -488,4 +476,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   {
     return sslContext;
   }
+
+  /**
+   * Determines whther the specified channel is in an idle state.
+   * @param channel the channel to check.
+   * @return <code>true</code> if the channel is idle, <code>false</code> otherwise.
+   */
+  public abstract boolean isIdle(ChannelWrapper<?> channel);
 }

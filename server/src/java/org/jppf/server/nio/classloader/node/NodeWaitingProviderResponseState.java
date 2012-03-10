@@ -64,7 +64,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
   {
     ClassContext context = (ClassContext) channel.getContext();
     JPPFResourceWrapper resource = context.getResource();
-    if (JPPFResourceWrapper.State.NODE_RESPONSE.equals(resource.getState())) return TO_SENDING_NODE_RESPONSE;
+    if (JPPFResourceWrapper.State.NODE_RESPONSE == resource.getState()) return TO_SENDING_NODE_RESPONSE;
     String name = resource.getName();
     //uuidPath.decPosition();
     String uuid = resource.getUuidPath().getCurrentElement();

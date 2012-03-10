@@ -44,5 +44,9 @@ public enum NodeTransition
   /**
    * Transition from a state to IDLE.
    */
-  TO_IDLE
+  TO_IDLE,
+  /**
+   * Transition from a state to IDLE for a peer server.
+   */
+  TO_IDLE_PEER
 }

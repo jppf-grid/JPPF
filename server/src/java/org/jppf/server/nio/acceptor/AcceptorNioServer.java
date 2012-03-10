@@ -57,7 +57,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception
   {
-    super(ports, sslPorts, NioConstants.ACCEPTOR, false);
+    super(ports, sslPorts, NioConstants.ACCEPTOR);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
@@ -111,19 +111,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   }
 
   /**
-   * Get the IO operations a connection is initially interested in.
-   * @return a bit-wise combination of the interests, taken from
-   * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
-   * @see org.jppf.server.nio.NioServer#getInitialInterest()
-   */
-  @Override
-  public int getInitialInterest()
-  {
-    //return SelectionKey.OP_READ;
-    return 0;
-  }
-
-  /**
    * Close a connection to a node.
    * @param channel a <code>SocketChannel</code> that encapsulates the connection.
    */
@@ -140,9 +127,12 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public AcceptorState getInitialState()
+  public boolean isIdle(final ChannelWrapper<?> channel)
   {
-    return AcceptorState.IDENTIFYING_PEER;
+    return false;
   }
 }

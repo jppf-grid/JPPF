@@ -67,7 +67,7 @@ class SendingBundleState extends NodeServerState
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (context.getNodeMessage() == null)
+    if (context.getMessage() == null)
     {
       ServerJob bundleWrapper = context.getBundle();
       JPPFTaskBundle bundle = (bundleWrapper == null) ? null : (JPPFTaskBundle) bundleWrapper.getJob();
@@ -97,7 +97,7 @@ class SendingBundleState extends NodeServerState
     if (context.writeMessage(channel))
     {
       if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to node " + channel);
-      context.setNodeMessage(null, channel);
+      context.setMessage(null);
       //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
       return TO_WAITING;
     }

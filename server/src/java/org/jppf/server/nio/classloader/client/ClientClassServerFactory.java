@@ -56,6 +56,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
     map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState((ClassNioServer) server));
     map.put(WAITING_PROVIDER_RESPONSE, new WaitingProviderResponseState((ClassNioServer) server));
     map.put(IDLE_PROVIDER, new IdleProviderState((ClassNioServer) server));
+    map.put(SENDING_PEER_CHANNEL_IDENTIFIER, new SendingPeerChannelIdentifierState((ClassNioServer) server));
     map.put(SENDING_PEER_INITIATION_REQUEST, new SendingPeerInitiationRequestState((ClassNioServer) server));
     map.put(WAITING_PEER_INITIATION_RESPONSE, new WaitingPeerInitiationResponseState((ClassNioServer) server));
     return map;
@@ -76,6 +77,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
     map.put(TO_WAITING_PROVIDER_RESPONSE, transition(WAITING_PROVIDER_RESPONSE, R));
     map.put(TO_IDLE_PROVIDER, transition(IDLE_PROVIDER, NioConstants.CHECK_CONNECTION ? R : 0));
     map.put(TO_IDLE_PEER_PROVIDER, transition(IDLE_PROVIDER, 0));
+    map.put(TO_SENDING_PEER_CHANNEL_IDENTIFIER, transition(SENDING_PEER_CHANNEL_IDENTIFIER, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_SENDING_PEER_INITIATION_REQUEST, transition(SENDING_PEER_INITIATION_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_PEER_INITIATION_RESPONSE, transition(WAITING_PEER_INITIATION_RESPONSE, R));
     return map;

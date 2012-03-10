@@ -100,7 +100,7 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
    */
   public NodeNioServer() throws Exception
   {
-    super(NioConstants.NODE_SERVER, false);
+    super(NioConstants.NODE_SERVER);
     taskQueueChecker = new TaskQueueChecker(this);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
@@ -129,7 +129,7 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
       ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);
       selectorThread = new ChannelSelectorThread(channelSelector, this);
-      localChannel.setKeyOps(getInitialInterest());
+      localChannel.setKeyOps(0);
       new Thread(selectorThread, "NodeChannelSelector").start();
       postAccept(localChannel);
     }
@@ -194,25 +194,12 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
   }
 
   /**
-   * Get the IO operations a connection is initially interested in.
-   * @return a bit-wise combination of the interests, taken from
-   * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
-   * @see org.jppf.server.nio.NioServer#getInitialInterest()
-   */
-  @Override
-  public int getInitialInterest()
-  {
-    //return SelectionKey.OP_READ;
-    return 0;
-  }
-
-  /**
    * Get the task bundle sent to a newly connected node,
    * so that it can check whether it is up to date, without having
    * to wait for an actual request to be sent.
    * @return a <code>BundleWrapper</code> instance, with no task in it.
    */
-  private BundleWrapper getInitialBundle()
+  BundleWrapper getInitialBundle()
   {
     if (initialBundle == null)
     {
@@ -402,9 +389,12 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public NodeState getInitialState()
+  public boolean isIdle(final ChannelWrapper<?> channel)
   {
-    return NodeState.SEND_INITIAL_BUNDLE;
+    return NodeState.IDLE == channel.getContext().getState();
   }
 }

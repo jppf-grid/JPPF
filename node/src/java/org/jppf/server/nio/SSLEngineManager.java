@@ -240,10 +240,10 @@ public class SSLEngineManager
       {
         case BUFFER_UNDERFLOW:
           // Oops no data: time to read more ciphertext.
-          if (traceEnabled) log.trace("reading into netRecv=" + netRecvBuffer);
+          //if (traceEnabled) log.trace("reading into netRecv=" + netRecvBuffer);
           assert (channel.isOpen());
           cipherTextCount = channel.read(netRecvBuffer);
-          if (traceEnabled) log.trace("read count=" + cipherTextCount + ", netRecv=" + netRecvBuffer);
+          if (traceEnabled) log.trace("cipherTextCount=" + cipherTextCount + ", netRecv=" + netRecvBuffer);
           if (cipherTextCount == 0) return plainTextCount;
           if (cipherTextCount == -1)
           {
@@ -296,21 +296,21 @@ public class SSLEngineManager
     if ((count > 0) && (flush() > 0)) return 0;
     while (count > 0)
     {
-      if (traceEnabled) log.trace("before flip/wrap/compact appSend=" + appSendBuffer + " netSend=" + netSendBuffer + " count=" + count);
+      //if (traceEnabled) log.trace("before flip/wrap/compact appSend=" + appSendBuffer + " netSend=" + netSendBuffer + " count=" + count);
       appSendBuffer.flip();
       engineResult = engine.wrap(appSendBuffer, netSendBuffer);
       appSendBuffer.compact();
-      if (traceEnabled) log.trace("after flip/wrap/compact  appSend=" + appSendBuffer + " netSend=" + netSendBuffer);
+      //if (traceEnabled) log.trace("after flip/wrap/compact  appSend=" + appSendBuffer + " netSend=" + netSendBuffer);
       switch (engineResult.getStatus())
       {
         case BUFFER_UNDERFLOW:
-          if (traceEnabled) log.trace("write", new BufferUnderflowException());
+          //if (traceEnabled) log.trace("write", new BufferUnderflowException());
           throw new BufferUnderflowException(/* "source buffer: "+engineResult.getStatus() */);
         case BUFFER_OVERFLOW:
           // netSendBuffer is full: flush it and try again
-          if (traceEnabled) log.trace("BUFFER_OVERFLOW before flush() netSend=" + netSendBuffer);
+          //if (traceEnabled) log.trace("BUFFER_OVERFLOW before flush() netSend=" + netSendBuffer);
           int writeCount = flush();
-          if (traceEnabled) log.trace("BUFFER_OVERFLOW after flush()  netSend=" + netSendBuffer + ", writeCount=" + writeCount);
+          //if (traceEnabled) log.trace("BUFFER_OVERFLOW after flush()  netSend=" + netSendBuffer + ", writeCount=" + writeCount);
           if (writeCount == 0) return 0;
           continue;
         case CLOSED:
@@ -419,14 +419,14 @@ public class SSLEngineManager
         netRecvBuffer.compact();
         if (engineResult.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW)
         {
-          if (traceEnabled) log.trace("unwrap underflow: reading ...");
+          //if (traceEnabled) log.trace("unwrap underflow: reading ...");
           if (engine.isInboundDone()) count = -1;
           else
           {
             assert (channel.isOpen());
             count = channel.read(netRecvBuffer);
           }
-          if (traceEnabled) log.trace("unwrap underflow readCount=" + count);
+          //if (traceEnabled) log.trace("unwrap underflow readCount=" + count);
           return count > 0;
         }
         if (engineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) return false; // read data is ready but no room in appRecvBuffer
@@ -463,21 +463,21 @@ public class SSLEngineManager
           case NEED_UNWRAP:
             // If we are unwrapping we are doing input from the channel but the overflow means there is no room in the appRecvBuffer, so the application has to empty it.
             // fall through
-            if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
+            //if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
             return false;
           default:
             return false;
         }
       case BUFFER_UNDERFLOW:
         // input needed, existing data too short to unwrap
-        if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
+        //if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
         // Underflow can only mean there is no data in the netRecvBuffer, so try a read. We can continue if we managed to read something,
         // otherwise the application has to wait (select on OP_READ).
         // First flush any pending output.
         flush();
         // now read
         count = channel.read(netRecvBuffer);
-        if (traceEnabled) log.trace("underflow: read " + count + " netRecv=" + netRecvBuffer);
+        //if (traceEnabled) log.trace("underflow: read " + count + " netRecv=" + netRecvBuffer);
         // If we didn't read anything we want to exit processEngineStatus()
         return count > 0;
       default: // unreachable, just for compiler
@@ -505,7 +505,7 @@ public class SSLEngineManager
         Runnable task;
         while ((task = engine.getDelegatedTask()) != null)
         {
-          //if (debugEnabled) log.trace(this.getName() + ".runDelegatedTask: " + task);
+          //if (traceEnabled) log.trace(this.getName() + ".runDelegatedTask: " + task);
           task.run();
         }
       }
@@ -527,5 +527,23 @@ public class SSLEngineManager
   public void setLastReadCount(final int lastReadCount)
   {
     this.lastReadCount = lastReadCount;
+  }
+
+  /**
+   * Get the net send buffer.
+   * @return a {@link ByteBuffer} instance.
+   */
+  public ByteBuffer getNetSendBuffer()
+  {
+    return netSendBuffer;
+  }
+
+  /**
+   * Get the net receive buffer.
+   * @return a {@link ByteBuffer} instance.
+   */
+  public ByteBuffer getNetRecvBuffer()
+  {
+    return netRecvBuffer;
   }
 }

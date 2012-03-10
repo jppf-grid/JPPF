@@ -19,7 +19,8 @@
 package org.jppf.server.nio;
 
 /**
- * 
+ * Common interface for sending data over a communication channel.
+ * A channel is a wrapper over a socket connection or in-memory pipe.
  * @author Laurent Cohen
  */
 public interface NioMessage

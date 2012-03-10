@@ -23,7 +23,6 @@ import java.util.Vector;
 
 import javax.net.ssl.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketChannelClient;
 import org.jppf.server.JPPFDriver;
@@ -85,23 +84,15 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
   {
     try
     {
-      JPPFResourceWrapper resource = new JPPFResourceWrapper();
-      resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      String uuid = JPPFDriver.getInstance().getUuid();
-      resource.setData("node.uuid", uuid);
-      resource.setData("peer", Boolean.TRUE);
-      resource.setProviderUuid(uuid);
       ClassContext context = (ClassContext) server.createNioContext();
+      context.setPendingRequests(new Vector<ChannelWrapper<?>>());
       context.setPeer(true);
-      context.setResource(resource);
       SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      context.setPendingRequests(new Vector<ChannelWrapper<?>>());
-      ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, 0, context);
+      ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
       if (debugEnabled) log.debug("registered class server channel " + channel);
       if (sslEnabled) configureSSL(channel);
-      context.serializeResource();
-      server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_SENDING_PEER_INITIATION_REQUEST);
+      server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_SENDING_PEER_CHANNEL_IDENTIFIER);
       socketClient = null;
     }
     catch (Exception e)

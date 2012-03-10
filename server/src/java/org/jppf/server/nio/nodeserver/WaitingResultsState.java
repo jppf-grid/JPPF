@@ -21,7 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.slf4j.*;
@@ -61,7 +61,7 @@ class WaitingResultsState extends NodeServerState
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (context.getNodeMessage() == null) context.setNodeMessage(context.newMessage(), channel);
+    if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel))
     {
       ServerJob bundleWrapper = context.getBundle();
@@ -83,7 +83,7 @@ class WaitingResultsState extends NodeServerState
       else
       {
         long elapsed = System.nanoTime() - bundle.getExecutionStartTime();
-        statsManager.taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), context.getNodeMessage().getLength());
+        statsManager.taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
         context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
       }
       boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
@@ -107,7 +107,7 @@ class WaitingResultsState extends NodeServerState
       if ((systemInfo != null) && (bundler instanceof NodeAwareness)) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
-      context.setNodeMessage(null, channel);
+      context.setMessage(null);
       context.setBundle(null);
       server.addIdleChannel(channel);
       return TO_IDLE;

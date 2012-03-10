@@ -22,20 +22,24 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.server.nio.*;
+import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * This class represents the state of sending a request to a provider.
+ * State of sending an initial request to a peer server. This server is seen as a node by the peer,
+ * whereas the peer is seen as a client. Therefore, the information sent must allow the remote peer to
+ * register a node class loader channel.
  * @author Laurent Cohen
  */
-class SendingProviderRequestState extends ClassServerState
+public class SendingPeerChannelIdentifierState extends ClassServerState
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingProviderRequestState.class);
+  private static Logger log = LoggerFactory.getLogger(SendingPeerChannelIdentifierState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -45,7 +49,7 @@ class SendingProviderRequestState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingProviderRequestState(final ClassNioServer server)
+  public SendingPeerChannelIdentifierState(final ClassNioServer server)
   {
     super(server);
   }
@@ -65,30 +69,19 @@ class SendingProviderRequestState extends ClassServerState
     {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
+    if (context.writeIdentifier(channel))
     {
-      ChannelWrapper<?> request = (ChannelWrapper<?>) context.getPendingRequests().remove(0);
-      ClassContext requestContext = (ClassContext) request.getContext();
-      context.setMessage(null);
-      context.setResource(requestContext.getResource());
-      if (debugEnabled) log.debug("provider " + channel + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
+      if (debugEnabled) log.debug("sent peer initiation to server " + channel);
+      JPPFResourceWrapper resource = new JPPFResourceWrapper();
+      resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+      String uuid = JPPFDriver.getInstance().getUuid();
+      resource.setData("node.uuid", uuid);
+      resource.setData("peer", Boolean.TRUE);
+      resource.setProviderUuid(uuid);
+      context.setResource(resource);
       context.serializeResource();
-      context.setCurrentRequest(request);
+      return TO_SENDING_PEER_INITIATION_REQUEST;
     }
-    if (context.getCurrentRequest() == null)
-    {
-      if (debugEnabled) log.debug("provider: " + channel + " has no request to process, returning to idle mode");
-      context.setMessage(null);
-      //return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
-      return TO_IDLE_PROVIDER;
-    }
-    if (context.writeMessage(channel))
-    {
-      if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + context.getCurrentRequest() + 
-        ", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
-      context.setMessage(new BaseNioMessage(context.getSSLEngineManager() != null));
-      return TO_WAITING_PROVIDER_RESPONSE;
-    }
-    return TO_SENDING_PROVIDER_REQUEST;
+    return TO_SENDING_PEER_CHANNEL_IDENTIFIER;
   }
 }

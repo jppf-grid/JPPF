@@ -55,7 +55,7 @@ public class LocalNodeContext extends AbstractNodeContext
     if (debugEnabled) log.debug("reading message from " + channel);
     LocalNodeChannel handler = (LocalNodeChannel) channel;
     while (handler.getServerResource() == null) handler.getServerLock().goToSleep();
-    setNodeMessage(handler.getServerResource(), channel);
+    setMessage(handler.getServerResource());
     handler.setServerResource(null);
     return true;
   }
@@ -77,10 +77,10 @@ public class LocalNodeContext extends AbstractNodeContext
    * {@inheritDoc}
    */
   @Override
-  public void setNodeMessage(final AbstractTaskBundleMessage nodeMessage, final ChannelWrapper<?> channel)
+  public void setMessage(final NioMessage nodeMessage)
   {
-    super.setNodeMessage(nodeMessage, channel);
-    ((LocalNodeChannel) channel).wakeUp();
+    super.setMessage(nodeMessage);
+    ((LocalNodeChannel) getChannel()).wakeUp();
   }
 
   /**

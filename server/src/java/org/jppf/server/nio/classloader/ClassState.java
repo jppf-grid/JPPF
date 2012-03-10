@@ -72,6 +72,10 @@ public enum ClassState
    */
   NODE_WAITING_PROVIDER_RESPONSE,
   /**
+   * Sending of the channel type identifier by a peer server.
+   */
+  SENDING_PEER_CHANNEL_IDENTIFIER,
+  /**
    * Sending of the initial request by a peer server.
    */
   SENDING_PEER_INITIATION_REQUEST,

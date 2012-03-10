@@ -63,10 +63,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Contains the JPPF peer identifier written the socket channel.
    */
   private NioObject nioObject = null;
-  /**
-   * 
-   */
-  private boolean identifierSent = false;
 
   /**
    * Deserialize a resource wrapper from an array of bytes.
@@ -101,23 +97,18 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @return <code>true</code> if the message was fully written, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  public boolean writePeerInitiationMessage(final ChannelWrapper<?> channel) throws Exception
+  public boolean writeIdentifier(final ChannelWrapper<?> channel) throws Exception
   {
     if (nioObject == null)
     {
       byte[] bytes = SerializationUtils.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
       if (sslEngineManager == null) nioObject = new PlainNioObject(channel, dl, false);
-      else nioObject = new SSLNioObject(channel, dl, sslEngineManager);
+      else nioObject = new SSLNioObject(dl, sslEngineManager);
     }
-    if (!identifierSent)
-    {
-      boolean b = nioObject.write();
-      if (!b) return false;
-      else identifierSent = true;
-    }
-    boolean b = writeMessage(channel);
-    //if (b) nioObject = null;
+    boolean b = nioObject.write();
+    if (b  && debugEnabled) log.debug("sent channel identifier " + JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL) + " to peer server");
+    //Thread.sleep(500L);
     return b;
   }
 

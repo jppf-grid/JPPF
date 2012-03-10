@@ -50,25 +50,18 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    * The server for which this transition manager is intended.
    */
   private NioServer<S, T> server = null;
-  /**
-   * Determines whether the submission of state transitions should be
-   * performed sequentially or through the executor thread pool.
-   */
-  private boolean sequential = false;
 
   /**
    * Initialize this transition manager with the specified server and sequential flag.
    * @param server the server for which this transition manager is intended.
-   * @param sequential determines whether the submission of state transitions should be
    * performed sequentially or through the executor thread pool.
    */
-  public StateTransitionManager(final NioServer<S, T> server, final boolean sequential)
+  public StateTransitionManager(final NioServer<S, T> server)
   {
     this.server = server;
-    this.sequential = sequential;
     int size = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", -1);
     if (size <= 0) size = Runtime.getRuntime().availableProcessors();
-    if (!sequential) executor = Executors.newFixedThreadPool(size, new JPPFThreadFactory(server.getName()));
+    executor = Executors.newFixedThreadPool(size, new JPPFThreadFactory(server.getName()));
   }
 
   /**
@@ -80,8 +73,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
     if (debugEnabled) log.debug("submitting transition for " + key + ", state=" + key.getContext().getState());
     setKeyOps(key, 0);
     StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
-    if (sequential) transition.run();
-    else executor.submit(transition);
+    executor.submit(transition);
   }
 
   /**
@@ -115,6 +107,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition)
   {
     Lock lock = server.getLock();
+    //server.getSelector().wakeup();
     lock.lock();
     try
     {
@@ -135,6 +128,54 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   }
 
   /**
+   * Transition the specified channel to the specified state.
+   * @param channel the key holding the channel and associated context.
+   * @param submit specifies whther the transition should be submitted immediately,
+   * or if we should wait for the server to submit it.
+   * @param transition holds the new state of the channel and associated key ops.
+   */
+  @SuppressWarnings("unchecked")
+  public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit)
+  {
+    Lock lock = server.getLock();
+    //server.getSelector().wakeup();
+    lock.lock();
+    try
+    {
+      server.getSelector().wakeup();
+      NioContext<S> context = (NioContext<S>) channel.getContext();
+      S s1 = context.getState();
+      NioTransition<S> t = server.getFactory().getTransition(transition);
+      S s2 = t.getState();
+      context.setState(s2);
+      if (!submit) channel.setKeyOps(t.getInterestOps());
+      else
+      {
+        channel.setKeyOps(0);
+        submitTransition(channel);
+      }
+      //setKeyOps(channel, t.getInterestOps());
+      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2 + " with ops=" + t.getInterestOps());
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Register a channel not opened through this server, with intial interest operation set to 0.
+   * @param channel the channel to register.
+   * @param context the context attached to the channel.
+   * @return a {@link ChannelWrapper} instance.
+   */
+  @SuppressWarnings("unchecked")
+  public ChannelWrapper<?> registerChannel(final SocketChannel channel, final NioContext context)
+  {
+    return registerChannel(channel, 0, context);
+  }
+
+  /**
    * Register a channel not opened through this server.
    * @param channel the channel to register.
    * @param ops the operations the channel is initially interested in.
@@ -142,10 +183,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    * @return a {@link ChannelWrapper} instance.
    */
   @SuppressWarnings("unchecked")
-  public ChannelWrapper<?> registerChannel(final SocketChannel channel, final int ops, final NioContext context)
+  private ChannelWrapper<?> registerChannel(final SocketChannel channel, final int ops, final NioContext context)
   {
     ChannelWrapper<?> wrapper = null;
-    SelectionKey key = null;
     try
     {
       Lock lock = server.getLock();
@@ -154,7 +194,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       {
         server.getSelector().wakeup();
         if (channel.isBlocking()) channel.configureBlocking(false);
-        key = channel.register(server.getSelector(), ops, context);
+        SelectionKey key = channel.register(server.getSelector(), ops, context);
         wrapper = new SelectionKeyWrapper(key);
         context.setChannel(wrapper);
       }
@@ -175,24 +215,39 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   }
 
   /**
-   * Submit the specified task for execution.
-   * @param r the task to run.
+   * @param channel the channel to check.
+   * @return true or false.
    */
-  public void submit(final Runnable r)
+  public boolean checkSubmitTransition(final ChannelWrapper<?> channel)
   {
     /*
-		if (sequential) r.run();
-		else executor.submit(r);
+    return checkShouldSubmitTransition(channel, null);
      */
-    r.run();
+    if (channel.isLocal()) return false;
+    SSLEngineManager sslEngineManager = channel.getContext().getSSLEngineManager();
+    if (sslEngineManager == null) return false;
+    int keyOps = channel.getKeyOps();
+    boolean b = (keyOps != channel.getReadyOps()) && (keyOps != 0) && !server.isIdle(channel) &&
+        ((sslEngineManager.getAppRecvBuffer().position() > 0) || (sslEngineManager.getNetRecvBuffer().position() > 0));
+    return b;
   }
 
   /**
-   * Determine whether the submission of state transitions should be performed sequentially.
-   * @return true if state transitions are sequential or false if they are in parallel.
+   * @param channel the channel to check.
+   * @param transition the transition about to be performed on the channel.
+   * @return true or false.
    */
-  public boolean isSequential()
+  public boolean checkSubmitTransition(final ChannelWrapper<?> channel, final T transition)
   {
-    return sequential;
+    /*
+    return false;
+     */
+    if (channel.isLocal()) return false;
+    SSLEngineManager sslEngineManager = channel.getContext().getSSLEngineManager();
+    if (sslEngineManager == null) return false;
+    int keyOps = server.getFactory().getTransition(transition).getInterestOps();
+    boolean b = (keyOps != channel.getReadyOps()) && (keyOps != 0) && !server.isIdle(channel) &&
+        ((sslEngineManager.getAppRecvBuffer().position() > 0) || (sslEngineManager.getNetRecvBuffer().position() > 0));
+    return b;
   }
 }

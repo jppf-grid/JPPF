@@ -146,6 +146,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     if (debugEnabled) log.debug("sending " + data.length + " bytes to the server");
     socketClient.sendBytes(new JPPFBuffer(data, data.length));
     socketClient.flush();
+    if (debugEnabled) log.debug("data sent to the server");
   }
 
   /**

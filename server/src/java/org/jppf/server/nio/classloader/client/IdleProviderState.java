@@ -22,13 +22,12 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
- * This class represents the state of waiting for the next request for a provider.
+ * This class represents an idle state for a class loader provider.
  * @author Laurent Cohen
  */
 public class IdleProviderState extends ClassServerState
@@ -62,7 +61,7 @@ public class IdleProviderState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !(channel instanceof LocalClassLoaderChannel))
+    if (channel.isReadable() && !channel.isLocal())
     {
       ((ClientClassNioServer) server).removeProviderConnection(context.getUuid(), channel);
       throw new ConnectException("provider " + channel + " has been disconnected");

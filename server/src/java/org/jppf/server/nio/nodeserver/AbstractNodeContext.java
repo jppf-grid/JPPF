@@ -162,7 +162,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
     message.addLocation(bundle.getDataProvider());
     for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
     message.setBundle((JPPFTaskBundle) bundle.getJob());
-    setNodeMessage(message, wrapper);
+    setMessage(message);
   }
 
   /**
@@ -189,25 +189,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   public abstract AbstractTaskBundleMessage newMessage();
 
   /**
-   * Get the message wrapping the data sent or received over the socket channel.
-   * @return a {@link RemoteNodeMessage NodeMessage} instance.
-   */
-  public AbstractTaskBundleMessage getNodeMessage()
-  {
-    return (AbstractTaskBundleMessage) message;
-  }
-
-  /**
-   * Set the message wrapping the data sent or received over the socket channel.
-   * @param nodeMessage a {@link RemoteNodeMessage NodeMessage} instance.
-   * @param channel reference to the channel.
-   */
-  public void setNodeMessage(final AbstractTaskBundleMessage nodeMessage, final ChannelWrapper<?> channel)
-  {
-    this.message = nodeMessage;
-  }
-
-  /**
    * Get the uuid of the corresponding node.
    * @return the uuid as a string.
    */
@@ -232,7 +213,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
     if (message == null) message = newMessage();
-    return getNodeMessage().read(channel);
+    return message.read(channel);
   }
 
   /**
@@ -241,7 +222,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
   {
-    return getNodeMessage().write(channel);
+    return message.write(channel);
   }
 
   /**

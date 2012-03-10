@@ -67,7 +67,8 @@ public class SendingPeerInitiationRequestState extends ClassServerState
     {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if (context.writePeerInitiationMessage(channel))
+    //if (context.writePeerInitiationMessage(channel))
+    if (context.writeMessage(channel))
     {
       if (debugEnabled) log.debug("sent peer initiation to server " + channel);
       context.setMessage(null);

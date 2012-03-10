@@ -58,7 +58,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    */
   public ClientNioServer() throws Exception
   {
-    super(NioConstants.CLIENT_SERVER, false);
+    super(NioConstants.CLIENT_SERVER);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
@@ -114,19 +114,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   }
 
   /**
-   * Get the IO operations a connection is initially interested in.
-   * @return a bit-wise combination of the interests, taken from
-   * {@link java.nio.channels.SelectionKey SelectionKey} constants definitions.
-   * @see org.jppf.server.nio.NioServer#getInitialInterest()
-   */
-  @Override
-  public int getInitialInterest()
-  {
-    //return SelectionKey.OP_READ;
-    return 0;
-  }
-
-  /**
    * Attempts to close the connection witht he specified uuid.
    * @param connectionUuid the connection uuid to correlate.
    */
@@ -176,9 +163,12 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ClientState getInitialState()
+  public boolean isIdle(final ChannelWrapper<?> channel)
   {
-    return ClientState.WAITING_HANDSHAKE;
+    return ClientState.IDLE == channel.getContext().getState();
   }
 }

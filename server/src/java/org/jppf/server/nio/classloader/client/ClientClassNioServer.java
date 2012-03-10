@@ -77,7 +77,11 @@ public class ClientClassNioServer extends ClassNioServer
   {
     try
     {
-      transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
+      synchronized(channel)
+      {
+        transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
+        if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
+      }
     }
     catch (Exception e)
     {
@@ -183,9 +187,12 @@ public class ClientClassNioServer extends ClassNioServer
     super.removeAllConnections();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ClassState getInitialState()
+  public boolean isIdle(final ChannelWrapper<?> channel)
   {
-    return ClassState.WAITING_INITIAL_PROVIDER_REQUEST;
+    return ClassState.IDLE_PROVIDER == channel.getContext().getState();
   }
 }

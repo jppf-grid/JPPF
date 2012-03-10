@@ -22,7 +22,8 @@ import org.jppf.io.DataLocation;
 import org.slf4j.*;
 
 /**
- * Instances of this class represent a data frame read or written asynchronously.
+ * Abstract implementation of the {@link NioObject} interface, providing the means to keep stateful information
+ * across multiple calls to the <code>read()</code> or <code>write()</code> methods.
  * @author Laurent Cohen
  */
 public abstract class AbstractNioObject implements NioObject

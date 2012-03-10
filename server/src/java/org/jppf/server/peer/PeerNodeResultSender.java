@@ -20,7 +20,7 @@ package org.jppf.server.peer;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -29,7 +29,7 @@ import org.slf4j.*;
  * and send the results back to this driver.
  * @author Laurent Cohen
  */
-class PeerNodeResultSender extends AbstractResultSender
+class PeerNodeResultSender implements TaskCompletionListener
 {
   /**
    * Logger for this class.
@@ -43,6 +43,22 @@ class PeerNodeResultSender extends AbstractResultSender
    * Output destination wrapping all write operations on the socket client.
    */
   private OutputDestination destination = null;
+  /**
+   * Number of tasks that haven't yet been executed.
+   */
+  int pendingTasksCount = 0;
+  /**
+   * Used to serialize and deserialize the tasks data.
+   */
+  protected SerializationHelper helper = new SerializationHelperImpl();
+  /**
+   * The socket client used to communicate over a socket connection.
+   */
+  protected SocketWrapper socketClient = null;
+  /**
+   * 
+   */
+  protected ServerJob result = null;
 
   /**
    * Initialize this result sender with a specified socket client.
@@ -50,8 +66,7 @@ class PeerNodeResultSender extends AbstractResultSender
    */
   public PeerNodeResultSender(final SocketWrapper socketClient)
   {
-    super(socketClient, false);
-
+    this.socketClient = socketClient;
     destination = new SocketWrapperOutputDestination(socketClient);
   }
 
@@ -60,68 +75,59 @@ class PeerNodeResultSender extends AbstractResultSender
    * @throws Exception if handing of the results fails.
    * @see org.jppf.server.peer.AbstractResultSender#waitForExecution()
    */
-  @Override
   public synchronized void waitForExecution() throws Exception
   {
-    long start = System.nanoTime();
-    while (getPendingTasksCount() > 0)
-    {
-      try
-      {
-        if (debugEnabled) log.debug(Integer.toString(getResultList().size()) + " in result list");
-        if (!getResultList().isEmpty())
-        {
-          ServerJob first = getResultList().remove(0);
-          int count = first.getTasks().size();
-          int size = getResultList().size();
-          for (int i=0; i<size; i++)
-          {
-            ServerJob bundle = getResultList().remove(0);
-            for (DataLocation task: bundle.getTasks())
-            {
-              ((BundleWrapper) first).addTask(task);
-              count++;
-            }
-            bundle.getTasks().clear();
-          }
-          JPPFTaskBundle firstJob = (JPPFTaskBundle) first.getJob();
-          firstJob.setTaskCount(count);
-          long elapsed = (System.nanoTime() - start) / 1000000L;
-          firstJob.setNodeExecutionTime(elapsed);
-          sendPartialResults(first);
-          getResultList().clear();
-        }
-        else wait();
-      }
-      catch (Exception e)
-      {
-        log.error(e.getMessage(), e);
-      }
-    }
+    while (pendingTasksCount > 0) wait();
+    sendResults(result);
   }
 
   /**
-   * Send the results of the tasks in a bundle back to the client who
-   * submitted the request.
+   * Send the results of the tasks in a bundle back to the client who submitted the request.
    * @param bundleWrapper the bundle to get the task results from.
    * @throws Exception if an IO exception occurred while sending the results back.
    */
-  @Override
-  public void sendPartialResults(final ServerJob bundleWrapper) throws Exception
+  public void sendResults(final ServerJob bundleWrapper) throws Exception
   {
-    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
-    //long elapsed = System.currentTimeMillis() - bundle.getNodeExecutionTime();
-    //bundle.setNodeExecutionTime(elapsed);
-
-    JPPFBuffer buf = helper.getSerializer().serialize(bundle);
-    socketClient.sendBytes(buf);
-    for (DataLocation task : bundleWrapper.getTasks())
+    try
     {
-      destination.writeInt(task.getSize());
-      task.transferTo(destination, true);
+      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+      if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
+      IOHelper.sendData(socketClient, bundle, helper.getSerializer());
+      for (DataLocation task : bundleWrapper.getTasks())
+      {
+        destination.writeInt(task.getSize());
+        task.transferTo(destination, true);
+      }
+      socketClient.flush();
+      if (debugEnabled) log.debug("bundle sent");
     }
-    socketClient.flush();
-    if (debugEnabled) log.debug("bundle sent");
+    finally
+    {
+      result = null;
+    }
+  }
+
+
+  /**
+   * Callback method invoked when the execution of a task has completed. This
+   * method triggers a check of the request completion status. When all tasks
+   * have completed, this connection sends all results back.
+   * @param nodeResult the result of the task's execution.
+   */
+  @Override
+  public synchronized void taskCompleted(final ServerJob nodeResult)
+  {
+    JPPFTaskBundle resultJob = (JPPFTaskBundle) nodeResult.getJob();
+    pendingTasksCount -= resultJob.getTaskCount();
+    if (debugEnabled)
+    {
+      log.debug("Received results for : " + resultJob.getTaskCount() + " [size=" + nodeResult.getTasks().size() + "] tasks, " + ", pending tasks: " + pendingTasksCount);
+    }
+    if (result == null) result = nodeResult;
+    else
+    {
+      ((BundleWrapper) result).merge(nodeResult, true);
+    }
+    if (pendingTasksCount <= 0) notify();
   }
 }

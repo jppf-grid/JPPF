@@ -145,7 +145,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
             else resource.setCallable(b);
             if (debugEnabled)
             {
-              if (found) log.debug('[' +this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
+              if (found) log.debug('[' +this.getName()+"] found resource: " + name + " (" + b.length + " bytes)");
               else log.debug('[' +this.getName()+"] resource not found: " + name);
             }
           }

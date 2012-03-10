@@ -63,15 +63,16 @@ class SendInitialBundleState extends NodeServerState
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (context.getNodeMessage() == null)
+    if (context.getMessage() == null)
     {
       if (debugEnabled) log.debug("serializing initial bundle for " + channel);
+      context.setBundle(server.getInitialBundle());
       context.serializeBundle(channel);
     }
     if (context.writeMessage(channel))
     {
       if (debugEnabled) log.debug("sent entire initial bundle for " + channel);
-      context.setNodeMessage(null, channel);
+      context.setMessage(null);
       context.setBundle(null);
       return TO_WAIT_INITIAL;
     }

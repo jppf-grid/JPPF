@@ -53,7 +53,7 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    */
   public ClassNioServer(final String name) throws Exception
   {
-    super(name, false);
+    super(name);
     selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
@@ -64,16 +64,6 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
   public NioContext<?> createNioContext()
   {
     return new ClassContext();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int getInitialInterest()
-  {
-    //return SelectionKey.OP_READ;
-    return 0;
   }
 
   /**

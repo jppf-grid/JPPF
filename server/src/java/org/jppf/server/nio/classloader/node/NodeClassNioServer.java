@@ -79,7 +79,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
       ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);
       selectorThread = new ChannelSelectorThread(channelSelector, this);
-      localChannel.setKeyOps(getInitialInterest());
+      localChannel.setKeyOps(0);
       new Thread(selectorThread, "ClassChannelSelector").start();
       postAccept(localChannel);
     }
@@ -102,7 +102,11 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   {
     try
     {
-      transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
+      synchronized(channel)
+      {
+        transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
+        if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
+      }
     }
     catch (Exception e)
     {
@@ -213,9 +217,12 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
     super.removeAllConnections();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ClassState getInitialState()
+  public boolean isIdle(final ChannelWrapper<?> channel)
   {
-    return ClassState.WAITING_INITIAL_NODE_REQUEST;
+    return ClassState.IDLE_NODE == channel.getContext().getState();
   }
 }

@@ -26,7 +26,7 @@ import org.jppf.server.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**
- * This class represents the state of waiting for some action.
+ * This class represents an idle state for a client connection (job data channel).
  * @author Laurent Cohen
  */
 class IdleState extends ClientServerState
