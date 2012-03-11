@@ -38,7 +38,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class JPPFNode extends AbstractNode
+public abstract class JPPFNode extends AbstractNode implements ClassLoaderProvider
 {
   /**
    * Logger for this class.
@@ -67,7 +67,7 @@ public abstract class JPPFNode extends AbstractNode
   /**
    * The default node's management MBean.
    */
-  private JPPFNodeAdmin nodeAdmin = null;
+  private JPPFNodeAdminMBean nodeAdmin = null;
   /**
    * The jmx server that handles administration and monitoring functions for this node.
    */
@@ -320,10 +320,19 @@ public abstract class JPPFNode extends AbstractNode
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception
+  {
+    return getContainer(uuidPath).getClassLoader();
+  }
+
+  /**
    * Get the administration and monitoring MBean for this node.
    * @return a <code>JPPFNodeAdmin</code>m instance.
    */
-  public synchronized JPPFNodeAdmin getNodeAdmin()
+  public synchronized JPPFNodeAdminMBean getNodeAdmin()
   {
     return nodeAdmin;
   }
@@ -332,7 +341,7 @@ public abstract class JPPFNode extends AbstractNode
    * Set the administration and monitoring MBean for this node.
    * @param nodeAdmin a <code>JPPFNodeAdmin</code>m instance.
    */
-  public synchronized void setNodeAdmin(final JPPFNodeAdmin nodeAdmin)
+  public synchronized void setNodeAdmin(final JPPFNodeAdminMBean nodeAdmin)
   {
     this.nodeAdmin = nodeAdmin;
   }
@@ -357,7 +366,7 @@ public abstract class JPPFNode extends AbstractNode
 
   /**
    * Stop this node and release the resources it is using.
-   * @see org.jppf.node.Node#stopNode(boolean)
+   * @see org.jppf.node.Node#stopNode()
    */
   @Override
   public synchronized void stopNode()

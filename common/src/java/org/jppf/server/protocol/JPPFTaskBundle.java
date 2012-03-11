@@ -71,7 +71,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * The number of tasks in this bundle.
    */
-  private int taskCount = 0;
+  protected int taskCount = 0;
   /**
    * The initial number of tasks in this bundle.
    */

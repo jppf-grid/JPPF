@@ -26,53 +26,66 @@ import org.jppf.node.protocol.Task;
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
  * @author Domingos Creado
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 class NodeTaskWrapper extends AbstractNodeTaskWrapper
 {
   /**
-   * The JPPF node that runs this task.
-   */
-  private final JPPFNode node;
-  /**
    * The execution manager.
    */
   private final NodeExecutionManagerImpl executionManager;
-
+  /**
+   * The class loader instance.
+   */
+  private final ClassLoader classLoader;
   /**
    * Initialize this task wrapper with a specified JPPF task.
-   * @param node the JPPF node that runs this task.
+   * @param executionManager reference to the execution manager.
    * @param task the task to execute within a try/catch block.
-   * @param uuidPath the key to the JPPFContainer for the task's classloader.
+   * @param uuidPath the key to the JPPFContainer for the task's class loader.
    * @param number the internal number identifying the task for the thread pool.
+   * @param classLoader the class loader used as context class loader.
    */
-  public NodeTaskWrapper(final JPPFNode node, final Task task, final List<String> uuidPath, final long number)
+  public NodeTaskWrapper(final NodeExecutionManagerImpl executionManager, final Task task, final List<String> uuidPath,
+                         final long number, final ClassLoader classLoader)
   {
     super(task, uuidPath, number);
-    this.node = node;
-    this.executionManager = node.getExecutionManager();
+    this.executionManager = executionManager;
+    this.classLoader = classLoader;
+  }
+
+  /**
+   * Get the number identifying the task.
+   * @return long value identifying the task.
+   */
+  public long getNumber()
+  {
+    return number;
   }
 
   /**
    * Execute the task within a try/catch block.
-   * @see java.lang.Runnable#run()
+   * @see Runnable#run()
    */
   @Override
   public void run()
   {
-    long cpuTime = 0L;
+    JPPFNodeReconnectionNotification reconnectionNotification = null;
+    NodeExecutionInfo info = null;
     long elapsedTime = 0L;
     try
     {
-      Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
-      long id = Thread.currentThread().getId();
-      executionManager.processTaskTimeout(task, number);
+//      Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
+      if(classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
+//      long id = Thread.currentThread().getId();
+      info = executionManager.processTaskTimeout(this);
       long startTime = System.nanoTime();
-      long startCpuTime = executionManager.getCpuTime(id);
+//      long startCpuTime = executionManager.getCpuTime(id);
       task.run();
       try
       {
         // convert cpu time from nanoseconds to milliseconds
-        cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
+//        cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
         elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
       catch(Throwable ignore)
@@ -94,7 +107,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       {
         try
         {
-          executionManager.taskEnded(number, cpuTime, elapsedTime, task.getException() != null);
+          executionManager.taskEnded(this, info, elapsedTime);
         }
         catch(JPPFNodeReconnectionNotification t)
         {
@@ -104,7 +117,6 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       if (reconnectionNotification != null)
       {
         executionManager.setReconnectionNotification(reconnectionNotification);
-        executionManager.wakeUp();
       }
     }
   }

@@ -16,27 +16,20 @@
  * limitations under the License.
  */
 
-package org.jppf.client.balancer.execution;
+package org.jppf.server.node;
 
-import java.io.Serializable;
+import java.util.List;
 
 /**
- * Instances of this class hold statistics about the execution of a tasks bundle.
- * @author Laurent Cohen
+ * Interface for a class loader provider.
  * @author Martin JANDA
  */
-public class NodeExecutionInfo implements Serializable
-{
+public interface ClassLoaderProvider {
   /**
-   * Explicit serialVersionUID.
+   * Get a reference to the class loader associated with an application uuid.
+   * @param uuidPath the uuid path containing the key to the container.
+   * @return a <code>ClassLoader</code> used for loading the classes of the framework.
+   * @throws Exception if an error occurs while getting the class loader.
    */
-  private static final long serialVersionUID = 1L;
-  /**
-   * Total cpu time used by the tasks.
-   */
-  public long cpuTime = 0;
-  /**
-   * Total user time used by the tasks.
-   */
-  public long userTime = 0;
+  ClassLoader getClassLoader(final List<String> uuidPath) throws Exception;
 }

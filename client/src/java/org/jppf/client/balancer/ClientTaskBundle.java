@@ -21,7 +21,11 @@ package org.jppf.client.balancer;
 import org.jppf.client.JPPFJob;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.task.storage.DataProvider;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,8 +35,25 @@ import java.util.Map;
  * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
  * @author Laurent Cohen
  */
-public class ClientTaskBundle extends ClientTaskBundleBase
+public class ClientTaskBundle extends JPPFTaskBundle
 {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * The job to execute.
+   */
+  private final JPPFJob job;
+  /**
+   * The shared data provider for this task bundle.
+   */
+  private transient DataProvider dataProvider = null;
+  /**
+   * The tasks to be executed by the node.
+   */
+  private transient List<JPPFTask> tasks = null;
   /**
    * The tasks execution policy.
    */
@@ -48,14 +69,59 @@ public class ClientTaskBundle extends ClientTaskBundleBase
    */
   public ClientTaskBundle(final JPPFJob job)
   {
-    super(job);
+    this.job = job;
   }
 
+  /**
+   * Get the job this submission is for.
+   * @return a {@link JPPFJob} instance.
+   */
+  public JPPFJob getJob()
+  {
+    return job;
+  }
+
+  /**
+   * Get shared data provider for this task.
+   * @return a <code>DataProvider</code> instance.
+   */
+  public DataProvider getDataProviderL()
+  {
+    return dataProvider;
+  }
+
+  /**
+   * Set shared data provider for this task.
+   * @param dataProvider a <code>DataProvider</code> instance.
+   */
+  public void setDataProviderL(final DataProvider dataProvider)
+  {
+    this.dataProvider = dataProvider;
+  }
+
+  /**
+   * Get the tasks to be executed by the node.
+   * @return the tasks as a <code>List</code> of arrays of bytes.
+   */
+  public List<JPPFTask> getTasksL()
+  {
+    return tasks;
+  }
+
+  /**
+   * Set the tasks to be executed by the node.
+   * @param tasks the tasks as a <code>List</code> of arrays of bytes.
+   */
+  public void setTasksL(final List<JPPFTask> tasks)
+  {
+    this.tasks = tasks;
+  }
 
   /**
    * Make a copy of this bundle.
    * @return a new <code>ClientTaskBundle</code> instance.
    */
+  @Override
   public ClientTaskBundle copy()
   {
     ClientTaskBundle bundle = new ClientTaskBundle(getJob());
@@ -85,6 +151,7 @@ public class ClientTaskBundle extends ClientTaskBundleBase
    * @param nbTasks the number of tasks to include in the copy.
    * @return a new <code>ClientTaskBundle</code> instance.
    */
+  @Override
   public ClientTaskBundle copy(final int nbTasks)
   {
     ClientTaskBundle bundle = copy();

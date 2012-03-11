@@ -16,44 +16,42 @@
  * limitations under the License.
  */
 
-package org.jppf.client.balancer.execution;
+package org.jppf.server.node;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
-import org.jppf.client.balancer.ClientTaskBundle;
-import org.jppf.client.event.TaskResultEvent;
-import org.jppf.client.event.TaskResultListener;
-import org.jppf.node.protocol.JPPFDistributedJob;
-import org.jppf.node.protocol.Task;
-import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.scheduling.JPPFScheduleHandler;
-import org.jppf.server.protocol.BundleParameter;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.*;
+import org.jppf.node.protocol.*;
+import org.jppf.scheduling.*;
+import org.jppf.server.protocol.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.ThreadSynchronization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 /**
- * Instances of this class manage the execution of JPPF tasks.
+ * Instances of this class manage the execution of JPPF tasks by a node.
  * @author Laurent Cohen
- * @author Martin JANDA
  */
-public class LocalExecutionManager extends ThreadSynchronization
+public class NodeExecutionManagerImpl extends ThreadSynchronization implements NodeExecutionManager
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(LocalExecutionManager.class);
+  private static Logger log = LoggerFactory.getLogger(NodeExecutionManagerImpl.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The node that uses this execution manager.
+   */
+  private Node node = null;
   /**
    * Timer managing the tasks timeout.
    */
@@ -69,7 +67,7 @@ public class LocalExecutionManager extends ThreadSynchronization
   /**
    * The bundle whose tasks are currently being executed.
    */
-  protected ClientTaskBundle bundle = null;
+  protected JPPFTaskBundle bundle = null;
   /**
    * The list of tasks to execute.
    */
@@ -88,6 +86,14 @@ public class LocalExecutionManager extends ThreadSynchronization
    */
   protected AtomicLong taskCount = new AtomicLong(0L);
   /**
+   * List of listeners to task execution events.
+   */
+  private final List<TaskExecutionListener> taskExecutionListeners = new ArrayList<TaskExecutionListener>();
+  /**
+   * Temporary array of listeners used for faster access.
+   */
+  private TaskExecutionListener[] listenersArray = new TaskExecutionListener[0];
+  /**
    * Determines whether the number of threads or their priority has changed.
    */
   protected AtomicBoolean configChanged = new AtomicBoolean(true);
@@ -95,50 +101,59 @@ public class LocalExecutionManager extends ThreadSynchronization
    * Set if the node must reconnect to the driver.
    */
   protected JPPFNodeReconnectionNotification reconnectionNotification = null;
-
   /**
-   * The thread pool that really processes the tasks
+   * The thread manager that is used for execution.
    */
-  private ExecutorService threadPool;
+  private final ThreadManager threadManager;
 
   /**
    * Initialize this execution manager with the specified node.
+   * @param node the node that uses this execution manager.
    */
-  public LocalExecutionManager()
+  public NodeExecutionManagerImpl(final Node node)
   {
-    this.threadPool = Executors.newCachedThreadPool();
+    super();
+
+    if(node == null) throw new IllegalArgumentException("node is null");
+
+    this.node = node;
+
+    TypedProperties props = JPPFConfiguration.getProperties();
+    int poolSize = props.getInt("processing.threads", -1);
+    if (poolSize < 0)
+    {
+      poolSize = Runtime.getRuntime().availableProcessors();
+      props.setProperty("processing.threads", Integer.toString(poolSize));
+    }
+    log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
+    ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+    boolean cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
+//    threadPool = new ForkJoinPool(poolSize);
+    if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
+    if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
+
+    threadManager= new ThreadManagerThreadPool(poolSize, threadMXBean);
+//    threadManager = new ThreadManagerForkJoin(poolSize, threadMXBean);
   }
 
   /**
    * Execute the specified tasks of the specified tasks bundle.
-   * @param bundle   the bundle to which the tasks are associated.
+   * @param bundle the bundle to which the tasks are associated.
    * @param taskList the list of tasks to execute.
    * @throws Exception if the execution failed.
    */
-  public void execute(final ClientTaskBundle bundle, final List<? extends Task> taskList) throws Exception
+  public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
   {
     if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
-    NodeExecutionInfo info = computeExecutionInfo();
+    NodeExecutionInfo info = threadManager.computeExecutionInfo();
     setup(bundle, taskList);
     for (Task task : taskList) performTask(task);
     waitForResults();
     cleanup();
-    NodeExecutionInfo info2 = computeExecutionInfo();
-    if (info != null && info2 != null)
-    {
-      info2.cpuTime -= info.cpuTime;
-      info2.userTime -= info.userTime;
-      if (debugEnabled) log.debug("total cpu time used: " + info2.cpuTime + " ms, user time: " + info2.userTime);
-    }
-  }
-
-  /**
-   * Computes the total CPU time used by the execution threads.
-   * @return a <code>NodeExecutionInfo</code> instance.
-   */
-  private NodeExecutionInfo computeExecutionInfo()
-  {
-    return null;
+    NodeExecutionInfo info2 = threadManager.computeExecutionInfo();
+    info2.cpuTime -= info.cpuTime;
+    info2.userTime -= info.userTime;
+    if (debugEnabled) log.debug("total cpu time used: " + info2.cpuTime + " ms, user time: " + info2.userTime);
   }
 
   /**
@@ -152,7 +167,13 @@ public class LocalExecutionManager extends ThreadSynchronization
     String id = task.getId();
     long number = incTaskCount();
     taskMap.put(number, task);
-    Future<?> f = getExecutor().submit(new NodeTaskWrapper(this, task, uuidList, number));
+    ClassLoader classLoader;
+    if(node instanceof ClassLoaderProvider)
+      classLoader = ((ClassLoaderProvider)node).getClassLoader(uuidList);
+    else
+      classLoader = null;
+
+    Future<?> f = getExecutor().submit(new NodeTaskWrapper(this, task, uuidList, number, classLoader));
     if (!f.isDone()) futureMap.put(number, f);
     if (id != null)
     {
@@ -175,7 +196,7 @@ public class LocalExecutionManager extends ThreadSynchronization
   /**
    * Cancel all executing or pending tasks.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
-   * @param requeue      true if the job should be requeued on the server side, false otherwise.
+   * @param requeue true if the job should be requeued on the server side, false otherwise.
    */
   public synchronized void cancelAllTasks(final boolean callOnCancel, final boolean requeue)
   {
@@ -186,16 +207,16 @@ public class LocalExecutionManager extends ThreadSynchronization
       bundle.getSLA().setSuspended(true);
     }
     List<Long> list = new ArrayList<Long>(futureMap.keySet());
-    for (Long n : list) cancelTask(n, callOnCancel);
+    for (Long n: list) cancelTask(n, callOnCancel);
   }
 
   /**
    * Cancel the execution of the tasks with the specified id.
    * @param id the id of the tasks to cancel.
    * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
-   *             having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   *             This feature has been removed from the management APIs, with no replacement.
-   *             Tasks can still be cancelled, but only as part of job cancel.
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement.
+   * Tasks can still be cancelled, but only as part of job cancel.
    */
   public synchronized void cancelTask(final String id)
   {
@@ -203,12 +224,12 @@ public class LocalExecutionManager extends ThreadSynchronization
     List<Long> numberList = idMap.remove(id);
     if (numberList == null) return;
     if (debugEnabled) log.debug("number of tasks to cancel: " + numberList.size());
-    for (Long number : numberList) cancelTask(number, true);
+    for (Long number: numberList) cancelTask(number, true);
   }
 
   /**
    * Cancel the execution of the tasks with the specified id.
-   * @param number       the index of the task to cancel.
+   * @param number the index of the task to cancel.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
    */
   private synchronized void cancelTask(final Long number, final boolean callOnCancel)
@@ -229,8 +250,8 @@ public class LocalExecutionManager extends ThreadSynchronization
    * The task(s) will be restarted even if their execution has already completed.
    * @param id the id of the task or tasks to restart.
    * @deprecated the task restart feature is inherently unsafe, as it depends on the task
-   *             having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   *             This feature has been removed from the management APIs, with no replacement.
+   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
+   * This feature has been removed from the management APIs, with no replacement.
    */
   public synchronized void restartTask(final String id)
   {
@@ -238,7 +259,7 @@ public class LocalExecutionManager extends ThreadSynchronization
     List<Long> numberList = idMap.remove(id);
     if (numberList == null) return;
     if (debugEnabled) log.debug("number of tasks to restart: " + numberList.size());
-    for (Long number : numberList)
+    for (Long number: numberList)
     {
       Future<?> future = futureMap.get(number);
       if (!future.isDone())
@@ -253,7 +274,7 @@ public class LocalExecutionManager extends ThreadSynchronization
           {
             performTask(task);
           }
-          catch (Exception e)
+          catch(Exception e)
           {
             log.error(e.getMessage(), e);
           }
@@ -264,7 +285,7 @@ public class LocalExecutionManager extends ThreadSynchronization
 
   /**
    * Notify the timer that a task must be aborted if its timeout period expired.
-   * @param task   the JPPF task for which to set the timeout.
+   * @param task the JPPF task for which to set the timeout.
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
@@ -274,7 +295,7 @@ public class LocalExecutionManager extends ThreadSynchronization
     if ((schedule != null) && schedule.hasDate())
     {
       Future<?> future = getFutureFromNumber(number);
-      TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task, future);
+      TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
       timeoutHandler.scheduleAction(future, task.getTimeoutSchedule(), tt);
     }
   }
@@ -282,18 +303,21 @@ public class LocalExecutionManager extends ThreadSynchronization
   /**
    * Notify the timer that a task must be aborted if its timeout period expired.
    * @param taskWrapper the taskWrapper for which to set the timeout.
+   * @return a <code>NodeExecutionInfo</code> instance.
    * @throws Exception if any error occurs.
    */
-  public void processTaskTimeout(final NodeTaskWrapper taskWrapper) throws Exception
+  public NodeExecutionInfo processTaskTimeout(final NodeTaskWrapper taskWrapper) throws Exception
   {
-    final Task task = taskWrapper.getTask();
-    final long number = taskWrapper.getNumber();
+    Task task = taskWrapper.getTask();
+    long number = taskWrapper.getNumber();
     if (task.getTimeoutSchedule() != null)
     {
       Future<?> future = getFutureFromNumber(number);
-      TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task, future);
+      TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
       timeoutHandler.scheduleAction(future, task.getTimeoutSchedule(), tt);
     }
+
+    return threadManager.computeExecutionInfo();
   }
 
   /**
@@ -307,21 +331,16 @@ public class LocalExecutionManager extends ThreadSynchronization
 
   /**
    * Prepare this execution manager for executing the tasks of a bundle.
-   * @param bundle   the bundle whose tasks are to be executed.
+   * @param bundle the bundle whose tasks are to be executed.
    * @param taskList the list of tasks to execute.
    */
-  public void setup(final ClientTaskBundle bundle, final List<? extends Task> taskList)
+  public void setup(final JPPFTaskBundle bundle, final List<? extends Task> taskList)
   {
     this.bundle = bundle;
     this.taskList = taskList;
     this.uuidList = bundle.getUuidPath().getList();
     taskCount = new AtomicLong(0L);
-
-    for (Task task : taskList)
-    {
-      task.setDataProvider(bundle.getJob().getDataProvider());
-    }
-//    node.getLifeCycleEventHandler().fireJobStarting();
+    node.getLifeCycleEventHandler().fireJobStarting();
   }
 
   /**
@@ -329,7 +348,7 @@ public class LocalExecutionManager extends ThreadSynchronization
    */
   public void cleanup()
   {
-//    node.getLifeCycleEventHandler().fireJobEnding();
+    node.getLifeCycleEventHandler().fireJobEnding();
     this.bundle = null;
     this.taskList = null;
     this.uuidList = null;
@@ -380,23 +399,21 @@ public class LocalExecutionManager extends ThreadSynchronization
   /**
    * Notification sent by a node task wrapper when a task is complete.
    * @param taskWrapper wrapper that holds the task.
-   * @param cpuTime     the cpu time taken by the task.
+   * @param info the cpu time and wall clock time taken by the task.
    * @param elapsedTime the wall clock time taken by the task
-   */
-  public void taskEnded(final NodeTaskWrapper taskWrapper, final long cpuTime, final long elapsedTime)
+  */
+  public void taskEnded(final NodeTaskWrapper taskWrapper, final NodeExecutionInfo info, final long elapsedTime)
   {
-    final long taskNumber = taskWrapper.getNumber();
+    long taskNumber = taskWrapper.getNumber();
     Task task = taskMap.get(taskNumber);
-    TaskResultListener resultListener = bundle.getJob().getResultListener();
+    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), info.cpuTime, elapsedTime, task.getException() != null); // todo elapsed time
     removeFuture(taskNumber);
-
-    if (resultListener != null && task instanceof JPPFTask)
+    TaskExecutionListener[] tmp;
+    synchronized(taskExecutionListeners)
     {
-      synchronized (resultListener)
-      {
-        resultListener.resultsReceived(new TaskResultEvent(Collections.singletonList((JPPFTask) task)));
-      }
+      tmp = listenersArray;
     }
+    for (TaskExecutionListener listener : tmp) listener.taskExecuted(event);
   }
 
   /**
@@ -410,30 +427,56 @@ public class LocalExecutionManager extends ThreadSynchronization
   }
 
   /**
-   * Get the job currently being executed.
-   * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
+   * {@inheritDoc}
    */
+  @Override
   public JPPFDistributedJob getCurrentJob()
   {
     return bundle;
   }
 
   /**
-   * Get the list of tasks currently being executed.
-   * @return a list of {@link Task} instances, or null if the node is idle.
+   * {@inheritDoc}
    */
+  @Override
   public List<Task> getTasks()
   {
     return taskList == null ? null : Collections.unmodifiableList(taskList);
   }
 
   /**
-   * Get the id of the job currently being executed.
-   * @return the job id as a string, or null if no job is being executed.
+   * {@inheritDoc}
    */
+  @Override
   public String getCurrentJobId()
   {
     return (bundle != null) ? bundle.getUuid() : null;
+  }
+
+  /**
+   * Add a task execution listener to the list of task execution listeners.
+   * @param listener the listener to add.
+   */
+  public void addTaskExecutionListener(final TaskExecutionListener listener)
+  {
+    synchronized(taskExecutionListeners)
+    {
+      taskExecutionListeners.add(listener);
+      listenersArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
+    }
+  }
+
+  /**
+   * Remove a task execution listener from the list of task execution listeners.
+   * @param listener the listener to remove.
+   */
+  public void removeTaskExecutionListener(final TaskExecutionListener listener)
+  {
+    synchronized(taskExecutionListeners)
+    {
+      taskExecutionListeners.remove(listener);
+      listenersArray = taskExecutionListeners.toArray(new TaskExecutionListener[taskExecutionListeners.size()]);
+    }
   }
 
   /**
@@ -442,7 +485,7 @@ public class LocalExecutionManager extends ThreadSynchronization
    */
   public ExecutorService getExecutor()
   {
-    return threadPool;
+    return threadManager.getExecutorService();
   }
 
   /**
@@ -469,8 +512,76 @@ public class LocalExecutionManager extends ThreadSynchronization
    */
   public synchronized void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification)
   {
-    if (this.reconnectionNotification != null) return;
-    this.reconnectionNotification = reconnectionNotification;
-    wakeUp();
+    try {
+      if (this.reconnectionNotification != null) return;
+      this.reconnectionNotification = reconnectionNotification;
+    } finally {
+      wakeUp();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Node getNode()
+  {
+    return node;
+  }
+
+  /**
+   * Get the total cpu time used by the task processing threads.
+   * @return the cpu time on milliseconds.
+   */
+  public long getCpuTime()
+  {
+    return threadManager.computeExecutionInfo().cpuTime;
+  }
+
+  /**
+   * Set the size of the node's thread pool.
+   * @param size the size as an int.
+   */
+  public void setThreadPoolSize(final int size)
+  {
+    if (size <= 0)
+    {
+      log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
+      return;
+    }
+    int oldSize = getThreadPoolSize();
+    threadManager.setPoolSize(size);
+    int newSize = getThreadPoolSize();
+    if(oldSize != newSize)
+    {
+      log.info("Node thread pool size changed from " + oldSize + " to " + size);
+      JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
+    }
+  }
+
+  /**
+   * Get the size of the node's thread pool.
+   * @return the size as an int.
+   */
+  public int getThreadPoolSize()
+  {
+    return threadManager.getPoolSize();
+  }
+  /**
+   * Get the priority assigned to the execution threads.
+   * @return the priority as an int value.
+   */
+  public int getThreadsPriority()
+  {
+    return threadManager.getPriority();
+  }
+
+  /**
+   * Update the priority of all execution threads.
+   * @param newPriority the new priority to set.
+   */
+  public void updateThreadsPriority(final int newPriority)
+  {
+    threadManager.setPriority(newPriority);
   }
 }

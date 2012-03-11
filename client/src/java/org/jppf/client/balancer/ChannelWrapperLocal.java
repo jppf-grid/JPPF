@@ -20,12 +20,14 @@ package org.jppf.client.balancer;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.balancer.execution.LocalExecutionManager;
-import org.jppf.client.event.ClientConnectionStatusEvent;
-import org.jppf.client.event.ClientConnectionStatusHandler;
-import org.jppf.client.event.ClientConnectionStatusListener;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.client.event.*;
+import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.management.*;
+import org.jppf.node.Node;
+import org.jppf.node.event.LifeCycleEventHandler;
+import org.jppf.server.node.NodeExecutionManagerImpl;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.DataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +39,12 @@ import java.util.concurrent.Executors;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler
+public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, Node
 {
   /**
    * The task execution manager for this wrapper.
    */
-  private final LocalExecutionManager executionManager = new LocalExecutionManager();
+  private final NodeExecutionManagerImpl executionManager;
   /**
    * Status of the connection.
    */
@@ -59,12 +61,23 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * List of status listeners for this connection.
    */
   private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
+  /**
+   * The jmx server that handles administration and monitoring functions for this node.
+   */
+  private static JMXServer jmxServer = null;
+  /**
+   * Handles the firing of node life cycle events and the listeners that subscribe to these events.
+   */
+  protected LifeCycleEventHandler lifeCycleEventHandler = null;
 
   /**
    * Default initializer for local channel wrapper.
    */
   public ChannelWrapperLocal()
   {
+    executionManager = new NodeExecutionManagerImpl(this);
+    lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
+
     JPPFSystemInformation info = new JPPFSystemInformation(getConnectionUuid());
     info.populate();
 
@@ -201,7 +214,18 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     {
       try
       {
+        DataProvider dataProvider = bundle.getJob().getJob().getDataProvider();
+        for (JPPFTask task: bundle.getTasks())
+        {
+          task.setDataProvider(dataProvider);
+        }
         executionManager.execute(bundle.getJob(), bundle.getTasks());
+        TaskResultListener listener = bundle.getJob().getJob().getResultListener();
+        if(listener != null) {
+          synchronized (listener) {
+            listener.resultsReceived(new TaskResultEvent(bundle.getTasks()));
+          }
+        }
       }
       catch (Throwable t)
       {
@@ -215,5 +239,64 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
         setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SocketWrapper getSocketWrapper() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setSocketWrapper(final SocketWrapper socketWrapper) {
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void stopNode() {
+  }
+
+  /**
+   * Get the jmx server that handles administration and monitoring functions for this node.
+   * @return a <code>JMXServerImpl</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  @Override
+  public JMXServer getJmxServer() throws Exception
+  {
+    synchronized(this)
+    {
+      if ((jmxServer == null) || jmxServer.isStopped())
+      {
+        jmxServer = JMXServerFactory.createServer(getUuid(), JPPFAdminMBean.NODE_SUFFIX);
+        jmxServer.start(getClass().getClassLoader());
+        System.out.println("JPPF Node management initialized");
+      }
+    }
+    return jmxServer;
+  }
+
+  /**
+   * Get the object that handles the firing of node life cycle events and the listeners that subscribe to these events.
+   * @return an instance of <code>LifeCycleEventHandler</code>.
+   */
+  @Override
+  public LifeCycleEventHandler getLifeCycleEventHandler()
+  {
+    return lifeCycleEventHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void run() {
   }
 }

@@ -19,7 +19,6 @@
 package org.jppf.server.node;
 
 import java.lang.management.*;
-import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.utils.*;
@@ -28,8 +27,9 @@ import org.slf4j.*;
 /**
  * This class manages the thread for the node's execution manager.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
-public class ThreadManager extends ThreadSynchronization
+public abstract class ThreadManager
 {
   /**
    * Logger for this class.
@@ -40,26 +40,14 @@ public class ThreadManager extends ThreadSynchronization
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The thread pool that really processes the tasks
-   */
-  private ExecutorService threadPool = null;
-  /**
-   * The factory used to create thread in the pool.
-   */
-  private JPPFThreadFactory threadFactory = null;
-  /**
    * The platform MBean used to gather statistics about the JVM threads.
    */
   private ThreadMXBean threadMXBean = null;
-  /**
-   * Determines whether the thread cpu time measurement is supported and enabled.
-   */
-  private boolean cpuTimeEnabled = false;
 
   /**
    * Initialize this execution manager with the specified node.
    */
-  public ThreadManager()
+  protected ThreadManager()
   {
     TypedProperties props = JPPFConfiguration.getProperties();
     int poolSize = props.getInt("processing.threads", -1);
@@ -70,88 +58,32 @@ public class ThreadManager extends ThreadSynchronization
     }
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadMXBean = ManagementFactory.getThreadMXBean();
-    cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
-    threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
+    boolean cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
 //    threadPool = new ForkJoinPool(poolSize);
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-    threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
     if (debugEnabled) log.debug("thread cpu time supported = " + cpuTimeEnabled);
     if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
+
+//    threadService = new ThreadServiceThreadPool(poolSize, threadMXBean);
+//    threadService = new ThreadServiceForkJoin(poolSize, threadMXBean);
   }
 
   /**
    * Set the size of the node's thread pool.
    * @param size the size as an int.
    */
-  public void setThreadPoolSize(final int size)
-  {
-    if (size <= 0)
-    {
-      log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
-      return;
-    }
-    int n = getThreadPoolSize();
-    if (n == size) return;
-    if(threadPool instanceof ThreadPoolExecutor) {
-      ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPool;
-      if (size > tpe.getCorePoolSize())
-      {
-        tpe.setMaximumPoolSize(size);
-        tpe.setCorePoolSize(size);
-      }
-      else if (size < tpe.getCorePoolSize())
-      {
-        tpe.setCorePoolSize(size);
-        tpe.setMaximumPoolSize(size);
-      }
-      log.info("Node thread pool size changed from " + n + " to " + size);
-      JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
-    }
-  }
+  public abstract void setPoolSize(final int size);
 
   /**
    * Get the size of the node's thread pool.
    * @return the size as an int.
    */
-  public int getThreadPoolSize()
-  {
-    if (threadPool == null) return 0;
-    if(threadPool instanceof ThreadPoolExecutor)
-      return ((ThreadPoolExecutor)threadPool).getCorePoolSize();
-//    else if(threadPool instanceof ForkJoinPool)
-//      return ((ForkJoinPool)threadPool).getParallelism();
-    else
-      return 0;
-  }
-
-  /**
-   * Get the total cpu time used by the task processing threads.
-   * @return the cpu time on milliseconds.
-   */
-  public long getCpuTime()
-  {
-    if (!cpuTimeEnabled) return 0L;
-    return computeExecutionInfo().cpuTime;
-  }
+  public abstract int getPoolSize();
 
   /**
    * Computes the total CPU time used by the execution threads.
    * @return a <code>NodeExecutionInfo</code> instance.
    */
-  protected NodeExecutionInfo computeExecutionInfo()
-  {
-    if (!cpuTimeEnabled) return null;
-    NodeExecutionInfo info = new NodeExecutionInfo();
-    List<Long> ids = threadFactory.getThreadIDs();
-    for (Long id: ids)
-    {
-      info.cpuTime += threadMXBean.getThreadCpuTime(id);
-      info.userTime += threadMXBean.getThreadUserTime(id);
-    }
-    info.cpuTime /= 1.0e6;
-    info.userTime /= 1.0e6;
-    return info;
-  }
+  public abstract NodeExecutionInfo computeExecutionInfo();
 
   /**
    * Get the current cpu time for the thread identified by the specified id.
@@ -167,28 +99,19 @@ public class ThreadManager extends ThreadSynchronization
    * Get the priority assigned to the execution threads.
    * @return the priority as an int value.
    */
-  public int getThreadsPriority()
-  {
-    return threadFactory.getPriority();
-  }
+  public abstract int getPriority();
 
   /**
    * Update the priority of all execution threads.
    * @param newPriority the new priority to set.
    */
-  public void updateThreadsPriority(final int newPriority)
-  {
-    threadFactory.updatePriority(newPriority);
-  }
+  public abstract void setPriority(final int newPriority);
 
   /**
    * Get the thread pool that really processes the tasks
    * @return a {@link ThreadPoolExecutor} instance.
    */
-  public ExecutorService getThreadPool()
-  {
-    return threadPool;
-  }
+  public abstract ExecutorService getExecutorService();
 
   /**
    * Determines whether the thread cpu time measurement is supported and enabled.
@@ -196,16 +119,7 @@ public class ThreadManager extends ThreadSynchronization
    */
   public boolean isCpuTimeEnabled()
   {
-    return cpuTimeEnabled;
-  }
-
-  /**
-   * Get the factory used to create thread in the pool.
-   * @return a {@link JPPFThreadFactory} instance.
-   */
-  public JPPFThreadFactory getThreadFactory()
-  {
-    return threadFactory;
+    return threadMXBean.isThreadCpuTimeSupported() && threadMXBean.isThreadCpuTimeEnabled();
   }
 
   /**
