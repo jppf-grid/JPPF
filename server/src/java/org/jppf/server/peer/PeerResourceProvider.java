@@ -24,7 +24,7 @@ import java.util.Vector;
 import javax.net.ssl.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.socket.SocketChannelClient;
+import org.jppf.comm.socket.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
@@ -36,7 +36,7 @@ import org.slf4j.*;
  * This class represents a connection to the class server of a remote JPPF driver (peer driver).
  * @author Laurent Cohen
  */
-class PeerResourceProvider extends AbstractSocketChannelHandler
+class PeerResourceProvider
 {
   /**
    * Logger for this class.
@@ -47,17 +47,29 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
    */
   private boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whther ssl is enabled for peer-to-peer cpmmunication between servers.
+   */
+  private static boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
+  /**
    * The name of the peer in the configuration file.
    */
-  private final String peerName;
+  private String peerName;
   /**
    * Peer connection information.
    */
   private final JPPFConnectionInformation connectionInfo;
   /**
-   * 
+   * The NioServer to which the channel is registered.
    */
-  private boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
+  private ClassNioServer server = null;
+  /**
+   * Wrapper around the underlying socket connection.
+   */
+  private SocketChannelClient socketClient = null;
+  /**
+   * Used to synchronize access to the underlying socket from multiple threads.
+   */
+  private SocketInitializer socketInitializer = new SocketInitializerImpl();
 
   /**
    * Initialize this peer provider with the specified configuration name.
@@ -67,7 +79,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
    */
   public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer server)
   {
-    super(server);
+    this.server = server;
     if (peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
@@ -79,8 +91,22 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  @Override
-  public synchronized void postInit() throws Exception
+  public synchronized void init() throws Exception
+  {
+    if (socketClient == null) socketClient = initSocketChannel();
+    String msg =  "to remote peer [" + socketClient.getHost() + ':' + socketClient.getPort() + ']';
+    if (debugEnabled) log.debug("Attempting connection " + msg);
+    socketInitializer.initializeSocket(socketClient);
+    if (!socketInitializer.isSuccessful()) throw new ConnectException("could not connect " + msg);
+    if (debugEnabled) log.debug("Connected " + msg);
+    postInit();
+  }
+
+  /**
+   * Initialize this node's resources.
+   * @throws Exception if an error is raised during initialization.
+   */
+  private void postInit() throws Exception
   {
     try
     {
@@ -107,12 +133,12 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
    * @return a non-connected <code>SocketChannelClient</code> instance.
    * @throws Exception if an error is raised during initialization.
    */
-  @Override
-  public SocketChannelClient initSocketChannel() throws Exception
+  private SocketChannelClient initSocketChannel() throws Exception
   {
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
     int port = sslEnabled ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
+    peerName = peerName + '@' + host + ':' + port;
     return new SocketChannelClient(host, port, false);
   }
 
@@ -131,7 +157,7 @@ class PeerResourceProvider extends AbstractSocketChannelHandler
     SSLParameters params = SSLHelper.getSSLParameters();
     engine.setUseClientMode(true);
     engine.setSSLParameters(params);
-    SSLEngineManager engineManager = new SSLEngineManager(socketChannel, engine);
-    context.setSSLEngineManager(engineManager);
+    SSLHandler sslHandler = new SSLHandler(channel, engine);
+    context.setSSLHandler(sslHandler);
   }
 }

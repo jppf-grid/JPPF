@@ -101,7 +101,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<ChannelWrapper<?>> getIdleChannels() {
+  public List<ChannelWrapper<?>> getIdleChannels()
+  {
     synchronized (idleChannels)
     {
       return new ArrayList<ChannelWrapper<?>>(idleChannels);
@@ -241,7 +242,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     if (debugEnabled)
     {
       log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + 
-        ", nodeUuid=" + ((AbstractNodeContext) channel.getContext()).nodeUuid);
+        ", nodeUuid=" + ((AbstractNodeContext) channel.getContext()).getUuid());
     }
     synchronized(channel)
     {
@@ -290,12 +291,10 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
         continue;
       }
       AbstractNodeContext context = (AbstractNodeContext) ch.getContext();
-      if (uuidPath.contains(context.getNodeUuid()))
+      if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + context.getUuid());
+      if (uuidPath.contains(context.getUuid()))
       {
-        if (log.isTraceEnabled())
-        {
-          log.trace("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + context.getNodeUuid());
-        }
+        if (debugEnabled) log.debug("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + context.getUuid());
         continue;
       }
       if (policy != null)

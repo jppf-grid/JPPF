@@ -72,7 +72,6 @@ class WaitInitialBundleState extends NodeServerState
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
       context.setUuid(uuid);
-      context.setNodeUuid(uuid);
       server.putUuid(uuid, channel);
       Bundler bundler = server.getBundler().copy();
       JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);

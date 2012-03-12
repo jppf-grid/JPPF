@@ -98,15 +98,14 @@ class IdentifyingPeerState extends AcceptorServerState
       try
       {
         newServer.getSelector().wakeup();
-        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLEngineManager());
-        //newChannel.getContext().setSSLEngineManager(context.getSSLEngineManager());
+        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLHandler(), false);
         if (debugEnabled) log.debug("channel registered: " + newChannel);
       }
       finally
       {
         newServer.getLock().unlock();
       }
-      context.setSSLEngineManager(null);
+      context.setSSLHandler(null);
       return null;
     }
     return AcceptorTransition.TO_IDENTIFYING_PEER;

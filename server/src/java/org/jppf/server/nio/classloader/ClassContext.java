@@ -85,7 +85,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation location = IOHelper.serializeData(resource, serializer);
-    message = new BaseNioMessage(sslEngineManager != null);
+    message = new BaseNioMessage(sslHandler != null);
     ((BaseNioMessage) message).addLocation(location);
   }
 
@@ -103,8 +103,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
     {
       byte[] bytes = SerializationUtils.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
-      if (sslEngineManager == null) nioObject = new PlainNioObject(channel, dl, false);
-      else nioObject = new SSLNioObject(dl, sslEngineManager);
+      if (sslHandler == null) nioObject = new PlainNioObject(channel, dl, false);
+      else nioObject = new SSLNioObject(dl, sslHandler);
     }
     boolean b = nioObject.write();
     if (b  && debugEnabled) log.debug("sent channel identifier " + JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL) + " to peer server");

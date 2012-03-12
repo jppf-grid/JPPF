@@ -122,6 +122,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 
   /**
    * {@inheritDoc}
+   * <p>This implemenatation throws a <code>JPPFUnsupportedOperationException</code>.
+   * It is up to subclasses to implement it.
    */
   @Override
   public JMXServer getJmxServer() throws Exception

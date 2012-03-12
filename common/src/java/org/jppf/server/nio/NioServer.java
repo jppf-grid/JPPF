@@ -306,18 +306,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       return;
     }
     if (channel == null) return;
-    SSLEngineManager engineManager = null;
     try
     {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       if (channel.isBlocking()) channel.configureBlocking(false);
-      if (ssl)
-      {
-        SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
-        engineManager = new SSLEngineManager(channel, engine);
-        configureSSLEngine(engine);
-      }
     }
     catch (Exception e)
     {
@@ -325,7 +318,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       StreamUtils.close(channel, log);
       return;
     }
-    accept(channel, engineManager);
+    accept(channel, null, ssl);
   }
 
   /**
@@ -333,20 +326,28 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * The channel is registered with an empty set of initial interest operations,
    * which means a call to the corresponding {@link SelectionKey}'s <code>interestOps()</code> method will return 0.
    * @param channel the socket channel representing the connection.
-   * @param sslEngineManager an sslEngine enventually passed on from a different server.
+   * @param sslHandler an sslEngine enventually passed on from a different server.
+   * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
    * @return a wrapper for the newly registered channel.
    */
   @SuppressWarnings("unchecked")
-  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLEngineManager sslEngineManager)
+  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl)
   {
     NioContext context = createNioContext();
     SelectionKeyWrapper wrapper = null;
     try
     {
-      if (sslEngineManager != null) context.setSSLEngineManager(sslEngineManager);
+      if (sslHandler != null) context.setSSLHandler(sslHandler);
       SelectionKey selKey = channel.register(selector,	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
+      if (ssl && (sslHandler == null))
+      {
+        SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
+        configureSSLEngine(engine);
+        SSLHandler newSSLHandler = new SSLHandler(wrapper, engine);
+        context.setSSLHandler(newSSLHandler);
+      }
       postAccept(wrapper);
     }
     catch (Exception e)

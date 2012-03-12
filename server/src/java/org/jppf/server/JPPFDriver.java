@@ -435,13 +435,13 @@ public class JPPFDriver
     {
       if ((ports != null) && (ports.length > 0))
       {
-        sb.append("\n  - accepting plain connections on port");
+        sb.append("\n-  accepting plain connections on port");
         if (ports.length > 1) sb.append('s');
         for (int n: ports) sb.append(' ').append(n);
       }
       if ((sslPorts != null) && (sslPorts.length > 0))
       {
-        sb.append("\n  - accepting secure connections on SSL port");
+        sb.append("\n- accepting secure connections on port");
         if (sslPorts.length > 1) sb.append('s');
         for (int n: sslPorts) sb.append(' ').append(n);
       }

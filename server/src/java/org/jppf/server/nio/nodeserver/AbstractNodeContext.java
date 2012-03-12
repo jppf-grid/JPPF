@@ -51,10 +51,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    */
   private boolean peer = false;
   /**
-   * The uuid of the corresponding node.
-   */
-  protected String nodeUuid = null;
-  /**
    * True means the job was cancelled and the task completion listener must not be called.
    */
   protected boolean jobCanceled = false;
@@ -187,24 +183,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    * @return an {@link AbstractTaskBundleMessage} instance.
    */
   public abstract AbstractTaskBundleMessage newMessage();
-
-  /**
-   * Get the uuid of the corresponding node.
-   * @return the uuid as a string.
-   */
-  public String getNodeUuid()
-  {
-    return nodeUuid;
-  }
-
-  /**
-   * Set the uuid of the corresponding node.
-   * @param nodeUuid the uuid as a string.
-   */
-  public void setNodeUuid(final String nodeUuid)
-  {
-    this.nodeUuid = nodeUuid;
-  }
 
   /**
    * {@inheritDoc}

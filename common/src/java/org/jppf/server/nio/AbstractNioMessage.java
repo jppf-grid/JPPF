@@ -71,7 +71,7 @@ public abstract class AbstractNioMessage implements NioMessage
   /**
    * 
    */
-  protected SSLEngineManager engineManager = null;
+  protected SSLHandler sslHandler = null;
 
   /**
    * Initialize this nio message with the specified sll flag.
@@ -99,7 +99,7 @@ public abstract class AbstractNioMessage implements NioMessage
   {
     if (nbObjects <= 0)
     {
-      if (ssl) this.engineManager = channel.getContext().getSSLEngineManager();
+      if (ssl) this.sslHandler = channel.getContext().getSSLHandler();
       if (position != 0) position = 0;
       if (!readNextObject(channel)) return false;
       afterFirstRead();
@@ -119,7 +119,7 @@ public abstract class AbstractNioMessage implements NioMessage
   {
     if (nbObjects <= 0)
     {
-      if (ssl) this.engineManager = channel.getContext().getSSLEngineManager();
+      if (ssl) this.sslHandler = channel.getContext().getSSLHandler();
       position = 0;
       beforeFirstWrite();
     }
@@ -140,7 +140,7 @@ public abstract class AbstractNioMessage implements NioMessage
   {
     if (currentLengthObject == null)
     {
-      currentLengthObject = ssl ? new SSLNioObject(4, engineManager) : new PlainNioObject(channel, 4, false);
+      currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4, false);
     }
     if (!currentLengthObject.read()) return false;
     if (currentLength <= 0)
@@ -159,7 +159,7 @@ public abstract class AbstractNioMessage implements NioMessage
     if (currentObject == null)
     {
       DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-      currentObject = ssl ? new SSLNioObject(location, engineManager) : new PlainNioObject(channel, location, false);
+      currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location, false);
     }
     if (!currentObject.read()) return false;
     count += currentLength;
@@ -181,7 +181,7 @@ public abstract class AbstractNioMessage implements NioMessage
   {
     if (currentLengthObject == null)
     {
-      currentLengthObject = ssl ? new SSLNioObject(4, engineManager) : new PlainNioObject(channel, 4, false);
+      currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4, false);
       OutputStream os = currentLengthObject.getData().getOutputStream();
       try
       {
@@ -196,7 +196,7 @@ public abstract class AbstractNioMessage implements NioMessage
     if (currentObject == null)
     {
       DataLocation loc = locations.get(position);
-      currentObject = ssl ? new SSLNioObject(loc.copy(), engineManager) : new PlainNioObject(channel, loc.copy(), false);
+      currentObject = ssl ? new SSLNioObject(loc.copy(), sslHandler) : new PlainNioObject(channel, loc.copy(), false);
     }
     if (!currentObject.write()) return false;
     count += 4 + locations.get(position).getSize();

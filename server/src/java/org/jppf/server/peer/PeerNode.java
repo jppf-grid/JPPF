@@ -24,8 +24,8 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.*;
 import org.jppf.management.*;
-import org.jppf.node.AbstractNode;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -36,7 +36,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-class PeerNode extends AbstractNode
+class PeerNode extends AbstractCommonNode
 {
   /**
    * Logger for this class.
@@ -53,7 +53,7 @@ class PeerNode extends AbstractNode
   /**
    * The name of the peer in the configuration file.
    */
-  private final String peerName;
+  private String peerName;
   /**
    * Peer connection information.
    */
@@ -156,22 +156,7 @@ class PeerNode extends AbstractNode
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
       {
-        if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
-        {
-          try
-          {
-            JMXServer jmxServer = driver.getInitializer().getJmxServer();
-            TypedProperties props = JPPFConfiguration.getProperties();
-            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
-            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
-            bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, jmxServer.getId());
-          }
-          catch(Exception e)
-          {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-            else log.warn(ExceptionUtils.getMessage(e));
-          }
-        }
+        if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
         bundle.setUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
@@ -188,7 +173,6 @@ class PeerNode extends AbstractNode
         resultSender.pendingTasksCount = n;
         JPPFDriver.getQueue().addBundle(bundleWrapper);
         resultSender.waitForExecution();
-        //resultSender.sendPartialResults(bundleWrapper);
         setTaskCount(getTaskCount() + n);
         if (debugEnabled) log.debug(getName() + "tasks executed: " + getTaskCount());
       }
@@ -218,10 +202,10 @@ class PeerNode extends AbstractNode
     if (mustInit)
     {
       if (debugEnabled) log.debug(getName() + "initializing socket");
-      System.out.println(getName() + "Attempting connection to the peer node server");
+      System.out.println("Connecting to  " + peerName);
       socketInitializer.initializeSocket(socketClient);
-      if (!socketInitializer.isSuccessful()) throw new JPPFException(getName() + " : Unable to reconnect to peer server");
-      System.out.println(getName() + "Reconnected to the peer node server at " + socketClient.getHost() + ':' + socketClient.getPort());
+      if (!socketInitializer.isSuccessful()) throw new JPPFException("Unable to reconnect to " + peerName);
+      System.out.println("Reconnected to " + peerName);
       if (sslEnabled) socketClient = SSLHelper.createSSLClientConnection(socketClient);
       if (debugEnabled) log.debug("sending channel identifier");
       socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
@@ -243,6 +227,7 @@ class PeerNode extends AbstractNode
     socketClient.setHost(host);
     socketClient.setPort(port);
     socketClient.setSerializer(helper.getSerializer());
+    peerName = peerName + '@' + host + ':' + port;
   }
 
   /**
@@ -306,5 +291,14 @@ class PeerNode extends AbstractNode
   private String getName()
   {
     return "[peer: " + peerName +"] ";
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JMXServer getJmxServer() throws Exception
+  {
+    return driver.getInitializer().getJmxServer();
   }
 }

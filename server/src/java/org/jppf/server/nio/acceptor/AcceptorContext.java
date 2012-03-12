@@ -57,8 +57,8 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
   {
     if (nioObject == null)
     {
-      if (sslEngineManager == null) nioObject = new PlainNioObject(wrapper, 4, false);
-      else nioObject = new SSLNioObject(4, sslEngineManager);
+      if (sslHandler == null) nioObject = new PlainNioObject(wrapper, 4, false);
+      else nioObject = new SSLNioObject(4, sslHandler);
     }
     boolean b = nioObject.read();
     if (b)

@@ -28,7 +28,7 @@ import org.slf4j.*;
 /**
  * Implementation of {@link NioObject} for reading or writing data from or to an SSL channel.
  * The channel and the corresponding {@link javax.net.ssl.SSLEngine SSLEngine} are both
- * encapsulated within an instance of {@link SSLEngineManager}.
+ * encapsulated within an instance of {@link SSLHandler}.
  * @author Laurent Cohen
  */
 public class SSLNioObject extends AbstractNioObject
@@ -52,7 +52,7 @@ public class SSLNioObject extends AbstractNioObject
   /**
    * 
    */
-  private SSLEngineManager engineManager;
+  private SSLHandler sslHandler;
   /**
    * 
    */
@@ -61,32 +61,32 @@ public class SSLNioObject extends AbstractNioObject
   /**
    * Construct this SSLMessage.
    * @param size the size of the internal buffer.
-   * @param engineManager the SSLEngineManager to use with this nio object.
+   * @param sslHandler the <code>SSLHandler</code> to use with this nio object.
    * @throws Exception if any error occurs.
    */
-  public SSLNioObject(final int size, final SSLEngineManager engineManager) throws Exception
+  public SSLNioObject(final int size, final SSLHandler sslHandler) throws Exception
   {
-    this(new MultipleBuffersLocation(size), engineManager);
+    this(new MultipleBuffersLocation(size), sslHandler);
   }
 
   /**
    * Construct this SSLMessage.
    * @param location the location of the data to read from or write to.
-   * @param engineManager the SSLEngineManager to use with this nio object.
+   * @param sslHandler the <code>SSLHandler</code> to use with this nio object.
    * @throws Exception if any error occurs.
    */
-  public SSLNioObject(final DataLocation location, final SSLEngineManager engineManager) throws Exception
+  public SSLNioObject(final DataLocation location, final SSLHandler sslHandler) throws Exception
   {
     this.location = location;
     this.size = location.getSize();
-    this.engineManager = engineManager;
+    this.sslHandler = sslHandler;
   }
 
   @Override
   public boolean read() throws Exception
   {
     if (count >= size) return true;
-    ByteBuffer buf = engineManager.getAppRecvBuffer();
+    ByteBuffer buf = sslHandler.getApplicationReceiveBuffer();
     if (os == null) os = location.getOutputStream();
 
     int n = 0;
@@ -94,7 +94,7 @@ public class SSLNioObject extends AbstractNioObject
     {
       if (buf.position() <= 0)
       {
-        n = engineManager.read();
+        n = sslHandler.read();
         if (n == 0) return false;
         if (n < 0) throw new EOFException();
       }
@@ -107,7 +107,7 @@ public class SSLNioObject extends AbstractNioObject
       buf.position(n);
       if (traceEnabled) log.trace("n2=" + n + " count=" + count + ", size=" + size + ", buf=" + buf);
       buf.compact();
-      if (traceEnabled) log.trace("after compact(): buf=" + buf + ", netRcvBuf=" + engineManager.getNetRecvBuffer());
+      if (traceEnabled) log.trace("after compact(): buf=" + buf + ", netRcvBuf=" + sslHandler.getChannelReceiveBuffer());
     }
 
     boolean b = count >= size;
@@ -123,7 +123,7 @@ public class SSLNioObject extends AbstractNioObject
   public boolean write() throws Exception
   {
     if (count >= size) return true;
-    ByteBuffer buf = engineManager.getAppSendBuffer();
+    ByteBuffer buf = sslHandler.getApplicationSendBuffer();
     if (is == null)
     {
       is = location.getInputStream();
@@ -145,9 +145,9 @@ public class SSLNioObject extends AbstractNioObject
     int n;
     do
     {
-      n = engineManager.write();
+      n = sslHandler.write();
       if (n > 0) count += n;
-      engineManager.flush();
+      sslHandler.flush();
       //if (traceEnabled) log.trace("n=" + n + ", statefulCount=" + statefulCount + ", count=" + count + ", size=" + size + ", buf=" + buf);
     }
     while (n > 0);
@@ -155,7 +155,7 @@ public class SSLNioObject extends AbstractNioObject
     boolean b = count >= size;
     if (b)
     {
-      engineManager.flush();
+      sslHandler.flush();
       buf.clear();
       StreamUtils.close(is, log);
       is = null;

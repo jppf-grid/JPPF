@@ -224,11 +224,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
     return checkShouldSubmitTransition(channel, null);
      */
     if (channel.isLocal()) return false;
-    SSLEngineManager sslEngineManager = channel.getContext().getSSLEngineManager();
-    if (sslEngineManager == null) return false;
+    SSLHandler sslHandler = channel.getContext().getSSLHandler();
+    if (sslHandler == null) return false;
     int keyOps = channel.getKeyOps();
     boolean b = (keyOps != channel.getReadyOps()) && (keyOps != 0) && !server.isIdle(channel) &&
-        ((sslEngineManager.getAppRecvBuffer().position() > 0) || (sslEngineManager.getNetRecvBuffer().position() > 0));
+        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
     return b;
   }
 
@@ -243,11 +243,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
     return false;
      */
     if (channel.isLocal()) return false;
-    SSLEngineManager sslEngineManager = channel.getContext().getSSLEngineManager();
-    if (sslEngineManager == null) return false;
+    SSLHandler sslHandler = channel.getContext().getSSLHandler();
+    if (sslHandler == null) return false;
     int keyOps = server.getFactory().getTransition(transition).getInterestOps();
     boolean b = (keyOps != channel.getReadyOps()) && (keyOps != 0) && !server.isIdle(channel) &&
-        ((sslEngineManager.getAppRecvBuffer().position() > 0) || (sslEngineManager.getNetRecvBuffer().position() > 0));
+        ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
     return b;
   }
 }

@@ -38,7 +38,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class JPPFNode extends AbstractNode implements ClassLoaderProvider
+public abstract class JPPFNode extends AbstractCommonNode
 {
   /**
    * Logger for this class.
@@ -165,31 +165,16 @@ public abstract class JPPFNode extends AbstractNode implements ClassLoaderProvid
   /**
    * Checks whether the received bundle is the initial one sent by the driver,
    * and prepare a specific response if it is.
-   * @param bundle - the bundle to check.
+   * @param bundle the bundle to check.
+   * @throws Exception if any error occurs.
    */
-  private void checkInitialBundle(final JPPFTaskBundle bundle)
+  private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception
   {
     if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
     {
       if (debugEnabled) log.debug("setting initial bundle uuid");
-//      bundle.setBundleUuid(uuid);
       bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
-      if (isJmxEnabled())
-      {
-        try
-        {
-          TypedProperties props = JPPFConfiguration.getProperties();
-          //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
-          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, getJmxServer().getManagementHost());
-          //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
-          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, getJmxServer().getManagementPort());
-          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, getJmxServer().getId());
-        }
-        catch(Exception e)
-        {
-          log.error(e.getMessage(), e);
-        }
-      }
+      if (isJmxEnabled()) setupManagementParameters(bundle);
     }
   }
 
@@ -320,17 +305,8 @@ public abstract class JPPFNode extends AbstractNode implements ClassLoaderProvid
   }
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception
-  {
-    return getContainer(uuidPath).getClassLoader();
-  }
-
-  /**
    * Get the administration and monitoring MBean for this node.
-   * @return a <code>JPPFNodeAdmin</code>m instance.
+   * @return a <code>JPPFNodeAdminMBean</code> instance.
    */
   public synchronized JPPFNodeAdminMBean getNodeAdmin()
   {
@@ -339,7 +315,7 @@ public abstract class JPPFNode extends AbstractNode implements ClassLoaderProvid
 
   /**
    * Set the administration and monitoring MBean for this node.
-   * @param nodeAdmin a <code>JPPFNodeAdmin</code>m instance.
+   * @param nodeAdmin a <code>JPPFNodeAdminMBean</code>m instance.
    */
   public synchronized void setNodeAdmin(final JPPFNodeAdminMBean nodeAdmin)
   {
@@ -366,7 +342,7 @@ public abstract class JPPFNode extends AbstractNode implements ClassLoaderProvid
 
   /**
    * Stop this node and release the resources it is using.
-   * @see org.jppf.node.Node#stopNode()
+   * @see org.jppf.node.Node#stopNode(boolean)
    */
   @Override
   public synchronized void stopNode()

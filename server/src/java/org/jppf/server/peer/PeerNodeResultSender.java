@@ -73,7 +73,6 @@ class PeerNodeResultSender implements TaskCompletionListener
   /**
    * This method waits until all tasks of a request have been completed.
    * @throws Exception if handing of the results fails.
-   * @see org.jppf.server.peer.AbstractResultSender#waitForExecution()
    */
   public synchronized void waitForExecution() throws Exception
   {

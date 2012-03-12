@@ -257,7 +257,7 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
       server.removeIdleChannel(channel);
       if (context != null)
       {
-        String uuid = context.getNodeUuid();
+        String uuid = context.getUuid();
         if (uuid != null)
         {
           server.removeUuid(uuid);

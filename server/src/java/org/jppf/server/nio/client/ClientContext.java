@@ -165,7 +165,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ClientMessage newMessage()
   {
-    return new ClientMessage(sslEngineManager != null);
+    return new ClientMessage(sslHandler != null);
   }
 
   /**

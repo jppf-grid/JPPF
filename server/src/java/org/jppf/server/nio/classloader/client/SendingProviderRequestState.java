@@ -86,7 +86,7 @@ class SendingProviderRequestState extends ClassServerState
     {
       if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + context.getCurrentRequest() + 
         ", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
-      context.setMessage(new BaseNioMessage(context.getSSLEngineManager() != null));
+      context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
       return TO_WAITING_PROVIDER_RESPONSE;
     }
     return TO_SENDING_PROVIDER_REQUEST;

@@ -66,7 +66,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   /**
    * The SSL engine associated with the channel.
    */
-  protected SSLEngineManager sslEngineManager = null;
+  protected SSLHandler sslHandler = null;
   /**
    * Determines whether the associated channel is connected to a peer server.
    */
@@ -177,18 +177,18 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * {@inheritDoc}
    */
   @Override
-  public SSLEngineManager getSSLEngineManager()
+  public SSLHandler getSSLHandler()
   {
-    return sslEngineManager;
+    return sslHandler;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setSSLEngineManager(final SSLEngineManager sslEngineManager)
+  public void setSSLHandler(final SSLHandler sslHandler)
   {
-    this.sslEngineManager = sslEngineManager;
+    this.sslHandler = sslHandler;
   }
 
   /**
