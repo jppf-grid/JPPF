@@ -180,8 +180,8 @@ public abstract class JPPFNode extends AbstractCommonNode
 
   /**
    * Send the results back to the server and perform final checks for the current execution.
-   * @param bundle - the bundle that contains the tasks and header information.
-   * @param taskList - the tasks results.
+   * @param bundle the bundle that contains the tasks and header information.
+   * @param taskList the tasks results.
    * @throws Exception if any error occurs.
    */
   private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception
@@ -449,7 +449,8 @@ public abstract class JPPFNode extends AbstractCommonNode
     {
       if ((jmxServer == null) || jmxServer.isStopped())
       {
-        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), JPPFAdminMBean.NODE_SUFFIX);
+        boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
+        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized");
       }

@@ -77,9 +77,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
     this.client = client;
-    jmxPort = info.managementPort;
+    this.ssl = ssl;
     //configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
     configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
+    jmxPort = ssl ? info.sslManagementPort : info.managementPort;
     initializeJmxConnection();
   }
 
@@ -160,7 +161,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       port = jmxPort;
     }
     mHost = NetworkUtils.getHostName(mHost);
-    jmxConnection = new JMXDriverConnectionWrapper(mHost, port);
+    jmxConnection = new JMXDriverConnectionWrapper(mHost, port, ssl);
     jmxConnection.connect();
   }
 

@@ -18,7 +18,6 @@
 
 package org.jppf.management;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.jppf.classloader.DelegationModel;
@@ -40,33 +39,6 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
    * @throws Exception if any error occurs.
    */
   JPPFNodeState state() throws Exception;
-  /**
-   * Get the latest task notification from the node.
-   * @return the notification as a <code>Serializable</code> object.
-   * @throws Exception if any error occurs.
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
-   */
-  Serializable notification() throws Exception;
-  /**
-   * Cancel the execution of the tasks with the specified id.
-   * @param id the id of the tasks to cancel.
-   * @throws Exception if any error occurs.
-   * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement.
-   * Tasks can still be cancelled, but only as part of job cancel.
-   */
-  void cancelTask(String id) throws Exception;
-  /**
-   * Restart the execution of the tasks with the specified id.<br>
-   * The task(s) will be restarted even if their execution has already completed.
-   * @param id the id of the task or tasks to restart.
-   * @throws Exception if any error occurs.
-   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement. 
-   */
-  void restartTask(String id) throws Exception;
   /**
    * Set the size of the node's thread pool.
    * @param size the size as an int.

@@ -48,6 +48,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   public int managementPort = -1;
   /**
+   * Port number used for JMX management and monitoring over a SSL/TLS connection.
+   */
+  public int sslManagementPort = -1;
+  /**
    * Port number for recovery from hardware failures.
    */
   public int recoveryPort = -1;

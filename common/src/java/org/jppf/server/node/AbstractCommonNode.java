@@ -25,7 +25,7 @@ import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
- * This class is used a container for common methods that cannot be implemented in {@link AbstractNode}.
+ * This class is used as a container for common methods that cannot be implemented in {@link AbstractNode}.
  * @author Laurent Cohen
  */
 public abstract class AbstractCommonNode extends AbstractNode

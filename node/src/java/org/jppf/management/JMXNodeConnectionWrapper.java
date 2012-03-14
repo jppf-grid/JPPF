@@ -18,7 +18,6 @@
 
 package org.jppf.management;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.jppf.classloader.DelegationModel;
@@ -45,33 +44,21 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    */
   public JMXNodeConnectionWrapper(final String host, final int port)
   {
-    super(host, port, JPPFAdminMBean.NODE_SUFFIX);
+    //super(host, port, JPPFAdminMBean.NODE_SUFFIX);
+    this(host, port, false);
+  }
+
+  /**
+   * Initialize the connection to the remote MBean server.
+   * @param host the host the server is running on.
+   * @param port the port used by the server.
+   * @param secure specifies whether the connection should be established over SSL/TLS.
+   */
+  public JMXNodeConnectionWrapper(final String host, final int port, final boolean secure)
+  {
+    //super(host, port, JPPFAdminMBean.NODE_SUFFIX);
+    super(host, port, secure);
     local = false;
-  }
-
-  /**
-   * Cancel the execution of the tasks with the specified id.
-   * @param id the id of the tasks to cancel.
-   * @throws Exception if an error occurs while invoking the Node MBean.
-   * @deprecated this method does not do anything.
-   * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
-   */
-  @Override
-  public void cancelTask(final String id) throws Exception
-  {
-  }
-
-  /**
-   * Restart the execution of the tasks with the specified id.<br>
-   * The task(s) will be restarted even if their execution has already completed.
-   * @param id the id of the task or tasks to restart.
-   * @throws Exception if an error occurs while invoking the Node MBean.
-   * @deprecated this method does not do anything.
-   * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
-   */
-  @Override
-  public void restartTask(final String id) throws Exception
-  {
   }
 
   /**
@@ -84,19 +71,6 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   public JPPFNodeState state() throws Exception
   {
     return (JPPFNodeState) invoke(JPPFNodeAdminMBean.MBEAN_NAME,	"state", (Object[]) null, (String[]) null);
-  }
-
-  /**
-   * This method always returns null.
-   * @return <code>null</code>.
-   * @throws Exception if an error occurs while invoking the Node MBean.
-   * @see org.jppf.management.JPPFNodeAdminMBean#notification()
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener} for a rationale.
-   */
-  @Override
-  public Serializable notification() throws Exception
-  {
-    return null;
   }
 
   /**
@@ -192,7 +166,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   public void updateConfiguration(final Map config, final Boolean reconnect) throws Exception
   {
     invoke(JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration",
-      new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" });
+        new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" });
   }
 
   /**

@@ -153,6 +153,7 @@ public class JPPFDriver
     initializer.initRecoveryServer();
 
     initializer.initJmxServer();
+    if (isManagementEnabled()) initializer.registerProviderMBeans();
     new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
     initializer.getNodeConnectionEventHandler().loadListeners();
 
@@ -456,5 +457,15 @@ public class JPPFDriver
   public static JPPFNode getLocalNode()
   {
     return localNode;
+  }
+
+  /**
+   * Determine whther management is enabled and if there is an active remote connector server.
+   * @return <code>true</code> if management is enabled, <code>false</code> otherwise.
+   */
+  public boolean isManagementEnabled()
+  {
+    TypedProperties props = JPPFConfiguration.getProperties();
+    return props.getBoolean("jppf.management.enabled", true) || props.getBoolean("jppf.management.ssl.enabled", false);
   }
 }

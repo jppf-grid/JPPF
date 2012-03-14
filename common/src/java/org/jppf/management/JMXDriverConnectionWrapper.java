@@ -49,11 +49,22 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    * Initialize the connection to the remote MBean server.
    * @param host the host the server is running on.
-   * @param port the RMI port used by the server.
+   * @param port the port used by the server.
    */
   public JMXDriverConnectionWrapper(final String host, final int port)
   {
-    super(host, port, JPPFAdminMBean.DRIVER_SUFFIX);
+    this(host, port, false);
+  }
+
+  /**
+   * Initialize the connection to the remote MBean server.
+   * @param host the host the server is running on.
+   * @param port the port used by the server.
+   * @param secure specifies whether the connection should be established over SSL/TLS.
+   */
+  public JMXDriverConnectionWrapper(final String host, final int port, final boolean secure)
+  {
+    super(host, port, secure);
     local = false;
   }
 
@@ -94,7 +105,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
   {
     return (String) invoke(MBEAN_NAME, "restartShutdown",
-        new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
+      new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
   }
 
   /**

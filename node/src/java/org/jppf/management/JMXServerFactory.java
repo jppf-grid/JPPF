@@ -22,7 +22,7 @@ import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
- * 
+ * This class provides factory methods to create rmeorte JMX connector servers.
  * @author Laurent Cohen
  */
 public class JMXServerFactory
@@ -44,12 +44,27 @@ public class JMXServerFactory
    * Create a JMXServer instance based on the specified parameters.
    * @param uuid the server's unique identifier.
    * @param suffix the suffix to use int he JMX service URL, only used with the RMI connector
+   * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @return an instance of {@link JMXServer}.
    * @throws Exception if the server could not be created.
    */
-  public static JMXServer createServer(final String uuid, final String suffix) throws Exception
+  private static JMXServer createServer(final String uuid, final String suffix, final boolean ssl) throws Exception
   {
-    JMXServer server = !usingRMIConnector && isJMXMPPresent() ? new JMXMPServer(uuid) : new JMXServerImpl(suffix, uuid);
+    JMXServer server = !usingRMIConnector && isJMXMPPresent() ? new JMXMPServer(uuid, ssl) : new JMXServerImpl(suffix, uuid);
+    if (debugEnabled) log.debug("created JMX server: " + server);
+    return server;
+  }
+
+  /**
+   * Create a JMXServer instance based on the specified parameters.
+   * @param uuid the server's unique identifier.
+   * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
+   * @return an instance of {@link JMXServer}.
+   * @throws Exception if the server could not be created.
+   */
+  public static JMXServer createServer(final String uuid, final boolean ssl) throws Exception
+  {
+    JMXServer server = new JMXMPServer(uuid, ssl);
     if (debugEnabled) log.debug("created JMX server: " + server);
     return server;
   }

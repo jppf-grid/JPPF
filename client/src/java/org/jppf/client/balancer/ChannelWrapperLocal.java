@@ -28,6 +28,7 @@ import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.server.node.NodeExecutionManagerImpl;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.JPPFConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -275,7 +276,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     {
       if ((jmxServer == null) || jmxServer.isStopped())
       {
-        jmxServer = JMXServerFactory.createServer(getUuid(), JPPFAdminMBean.NODE_SUFFIX);
+        boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
+        jmxServer = JMXServerFactory.createServer(getUuid(), ssl);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized");
       }

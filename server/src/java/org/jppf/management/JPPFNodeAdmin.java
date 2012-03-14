@@ -18,7 +18,6 @@
 
 package org.jppf.management;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.jppf.JPPFNodeReconnectionNotification;
@@ -84,51 +83,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   public JPPFNodeState state() throws Exception
   {
     return nodeState.copy();
-  }
-
-  /**
-   * This method always returns null.
-   * @return null.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#notification()
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener} for a rationale.
-   */
-  @Override
-  public Serializable notification() throws Exception
-  {
-    return null;
-  }
-
-  /**
-   * Cancel the execution of the tasks with the specified id.
-   * @param id the id of the tasks to cancel.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#cancelTask(java.lang.String)
-   * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement.
-   * Tasks can still be cancelled, but only as part of job cancel.
-   */
-  @Override
-  public void cancelTask(final String id) throws Exception
-  {
-    node.getExecutionManager().cancelTask(id);
-  }
-
-  /**
-   * Restart the execution of the tasks with the specified id.<br>
-   * The task(s) will be restarted even if their execution has already completed.
-   * @param id the id of the task or tasks to restart.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#restartTask(java.lang.String)
-   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement. 
-   */
-  @Override
-  public void restartTask(final String id) throws Exception
-  {
-    node.getExecutionManager().restartTask(id);
   }
 
   /**

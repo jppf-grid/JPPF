@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.security.KeyStore;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.net.ssl.*;
@@ -51,96 +52,6 @@ public class SSLHelper
   private static TypedProperties sslConfig = null;
 
   /**
-   * Get default SSL parameters for testing purposes.
-   * @return a {@link SSLParameters} instance.
-   * @throws Exception if any error occurs.
-   */
-  public static SSLParameters getDefaultSSLParameters() throws Exception
-  {
-    //SSLParameters params = SSLContext.getDefault().getDefaultSSLParameters();
-    SSLParameters params = new SSLParameters();
-    //params.setCipherSuites(new String[] { "SSL_RSA_WITH_RC4_128_MD5", "SSL_RSA_WITH_RC4_128_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_DES_CBC_SHA" });
-    params.setCipherSuites(new String[] { "SSL_RSA_WITH_DES_CBC_SHA" });
-    params.setProtocols(new String[] { "SSLv2Hello", "SSLv3" });
-    params.setNeedClientAuth(false);
-    params.setWantClientAuth(false);
-
-    if (debugEnabled) log.debug("SSL parameters : cipher suites=" + StringUtils.arrayToString(params.getCipherSuites()) +
-        ", protocols=" + StringUtils.arrayToString(params.getProtocols()) + ", needCLientAuth=" + params.getNeedClientAuth() + ", wantClientAuth=" + params.getWantClientAuth());
-    return params;
-  }
-
-  /**
-   * Get a default SSL context for the client side, for testing purposes.
-   * @return a {@link SSLContext} instance.
-   * @throws Exception if any error occurs.
-   */
-  public static SSLContext getDefaultServerSSLContext() throws Exception
-  {
-    char[] pwd = "password".toCharArray();
-    SSLContext sslContext = SSLContext.getInstance("SSL");
-    KeyStore trustStore = getKeyOrTrustStore("config/ssl/truststore.ks", pwd);
-    //TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
-    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    tmf.init(trustStore);
-    KeyStore keyStore = getKeyOrTrustStore("config/ssl/keystore.ks", pwd);
-    //KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-    kmf.init(keyStore, pwd);
-    sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-    return sslContext;
-  }
-
-  /**
-   * Get a default SSL context for the client side, for testing purposes.
-   * @return a {@link SSLContext} instance.
-   * @throws Exception if any error occurs.
-   */
-  public static SSLContext getDefaultClientSSLContext() throws Exception
-  {
-    SSLContext sslContext = SSLContext.getInstance("SSL");
-    KeyStore trustStore = getKeyOrTrustStore("config/ssl/truststore.ks", "password".toCharArray());
-    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    tmf.init(trustStore);
-    sslContext.init(null, tmf.getTrustManagers(), null);
-    return sslContext;
-  }
-
-  /**
-   * Create and load a keystore from the specified file.
-   * @param filename the name of the keystore file.
-   * @param pwd the key store password.
-   * @return a {@link KeyStore} instance.
-   * @throws Exception if any error occurs.
-   */
-  private static KeyStore getKeyOrTrustStore(final String filename, final char[] pwd) throws Exception
-  {
-    return getKeyOrTrustStore(new FileStoreSource(filename).call(), pwd);
-  }
-
-  /**
-   * Create and load a keystore from the specified input stream.
-   * @param is the input stream from which to load the store.
-   * @param pwd the store password.
-   * @return a {@link KeyStore} instance.
-   * @throws Exception if any error occurs.
-   */
-  private static KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd) throws Exception
-  {
-    KeyStore ks = null;
-    try
-    {
-      ks = KeyStore.getInstance(KeyStore.getDefaultType());
-      ks.load(is, pwd);
-    }
-    finally
-    {
-      StreamUtils.close(is, log);
-    }
-    return ks;
-  }
-
-  /**
    * Get a SSL context from the SSL configuration.
    * @return a {@link SSLContext} instance.
    * @throws Exception if any error occurs.
@@ -148,7 +59,6 @@ public class SSLHelper
   public static SSLContext getSSLContext() throws Exception
   {
     if (sslConfig == null) loadSSLProperties();
-
     char[] keyPwd = getPassword("jppf.ssl.keystore.password");
     KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
     KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
@@ -184,6 +94,82 @@ public class SSLHelper
     if (debugEnabled) log.debug("SSL parameters : cipher suites=" + StringUtils.arrayToString(params.getCipherSuites()) +
       ", protocols=" + StringUtils.arrayToString(params.getProtocols()) + ", needCLientAuth=" + params.getNeedClientAuth() + ", wantClientAuth=" + params.getWantClientAuth());
     return params;
+  }
+
+  /**
+   * Create an SSL connection over an established plain socket connection.
+   * @param socketClient the plain connection, already connected.
+   * @return a {@link SocketWrapper} whose socket is an {@link SSLSocket} wrapping the {@link Socket} of the plain connection.
+   * @throws Exception if an error occurs while configure the SSL parameters.
+   */
+  public static SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception
+  {
+    SSLContext context = SSLHelper.getSSLContext();
+    SSLSocketFactory factory = context.getSocketFactory();
+    SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), socketClient.getHost(), socketClient.getPort(), true);
+    SSLParameters params = SSLHelper.getSSLParameters();
+    sslSocket.setSSLParameters(params);
+    sslSocket.setUseClientMode(true);
+    ObjectSerializer serializer = socketClient.getSerializer();
+    Class<? extends SocketWrapper> clazz = socketClient.getClass();
+    Constructor<? extends SocketWrapper> c = clazz.getConstructor(Socket.class);
+    SocketWrapper target = c.newInstance(sslSocket);
+    target.setSerializer(serializer);
+    target.setHost(socketClient.getHost());
+    target.setPort(socketClient.getPort());
+    return target;
+  }
+
+  /**
+   * Configure the SSL environment parameters for a JMX connector server or client.
+   * @param env the environment in which to add the SSL/TLS properties.
+   * @throws Exception if any error occurs.
+   */
+  public static void configureJMXProperties(final Map<String, Object> env) throws Exception
+  {
+    SSLContext sslContext = SSLHelper.getSSLContext();
+    SSLSocketFactory factory = sslContext.getSocketFactory();
+    env.put("jmx.remote.profiles", "TLS");
+    env.put("jmx.remote.tls.socket.factory", factory);
+    SSLParameters params = SSLHelper.getSSLParameters();
+    env.put("jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(params.getProtocols(), " ", null, null));
+    env.put("jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(params.getCipherSuites(), " ", null, null));
+    env.put("jmx.remote.tls.need.client.authentication", "" + params.getNeedClientAuth());
+    env.put("jmx.remote.tls.want.client.authentication", "" + params.getWantClientAuth());
+  }
+
+  /**
+   * Create and load a keystore from the specified file.
+   * @param filename the name of the keystore file.
+   * @param pwd the key store password.
+   * @return a {@link KeyStore} instance.
+   * @throws Exception if any error occurs.
+   */
+  private static KeyStore getKeyOrTrustStore(final String filename, final char[] pwd) throws Exception
+  {
+    return getKeyOrTrustStore(new FileStoreSource(filename).call(), pwd);
+  }
+
+  /**
+   * Create and load a keystore from the specified input stream.
+   * @param is the input stream from which to load the store.
+   * @param pwd the store password.
+   * @return a {@link KeyStore} instance.
+   * @throws Exception if any error occurs.
+   */
+  private static KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd) throws Exception
+  {
+    KeyStore ks = null;
+    try
+    {
+      ks = KeyStore.getInstance(KeyStore.getDefaultType());
+      ks.load(is, pwd);
+    }
+    finally
+    {
+      StreamUtils.close(is, log);
+    }
+    return ks;
   }
 
   /**
@@ -263,29 +249,5 @@ public class SSLHelper
         if (is != null) StreamUtils.closeSilent(is);
       }
     }
-  }
-
-  /**
-   * Create an SSL connection over an established plain socket connection.
-   * @param socketClient the plain connection, already connected.
-   * @return a {@link SocketWrapper} whose socket is an {@link SSLSocket} wrapping the {@link Socket} of the plain connection.
-   * @throws Exception if an error occurs while configure the SSL parameters.
-   */
-  public static SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception
-  {
-    SSLContext context = SSLHelper.getSSLContext();
-    SSLSocketFactory factory = context.getSocketFactory();
-    SSLSocket sslSocket = (SSLSocket) factory.createSocket(socketClient.getSocket(), socketClient.getHost(), socketClient.getPort(), true);
-    SSLParameters params = SSLHelper.getSSLParameters();
-    sslSocket.setSSLParameters(params);
-    sslSocket.setUseClientMode(true);
-    ObjectSerializer serializer = socketClient.getSerializer();
-    Class<? extends SocketWrapper> clazz = socketClient.getClass();
-    Constructor<? extends SocketWrapper> c = clazz.getConstructor(Socket.class);
-    SocketWrapper target = c.newInstance(sslSocket);
-    target.setSerializer(serializer);
-    target.setHost(socketClient.getHost());
-    target.setPort(socketClient.getPort());
-    return target;
   }
 }

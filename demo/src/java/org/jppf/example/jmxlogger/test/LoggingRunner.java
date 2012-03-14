@@ -183,7 +183,7 @@ public class LoggingRunner implements NotificationListener
       try
       {
         // get a jmx connection to the node MBean server
-        JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort());
+        JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort(), node.isSecure());
         JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
 
         // used as handback object so we know where the log messages comes from.

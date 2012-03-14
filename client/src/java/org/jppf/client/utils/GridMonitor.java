@@ -155,7 +155,8 @@ public class GridMonitor
     // else if we provided the driver host and jmx port
     else
     {
-      driver.jmx = new JMXDriverConnectionWrapper(driverHost, managementPort);
+      boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
+      driver.jmx = new JMXDriverConnectionWrapper(driverHost, managementPort, ssl);
       driver.jmx.connect();
     }
     // wait until the jmx connection is established with the driver
@@ -167,7 +168,7 @@ public class GridMonitor
     for (JPPFManagementInfo info: infoCollection)
     {
       // get the connection to the node's JMX connection
-      JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
+      JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
       node.connect();
       // wait until the jmx connection is established with the node
       while (!node.isConnected()) Thread.sleep(1L);

@@ -27,6 +27,7 @@ import javax.management.*;
 import javax.management.remote.*;
 
 import org.jppf.JPPFException;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -48,10 +49,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Determines whether trace log statements are enabled.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Determine whether we should use the RMI or JMXMP connector.
-   */
-  private static boolean useRMIConnector = "rmi".equalsIgnoreCase(JPPFConfiguration.getProperties().getString("jppf.management.connector", "jmxmp"));
   /**
    * URL of the MBean server, in a JMX-compliant format.
    */
@@ -88,6 +85,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Determines whether the connection to the JMX server has been established.
    */
   protected boolean local = false;
+  /**
+   * JMX property used for establishing the connection.
+   */
+  protected Map<String, Object> env = new HashMap<String, Object>();
+  /**
+   * Determines whether the JMX connection should be secure or not.
+   */
+  protected boolean ssl = false;
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -103,7 +108,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param port the RMI port used by the server.
    * @param rmiSuffix	RMI registry namespace suffix.
    */
-  public JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
+  private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
   {
     this.host = host;
     this.port = port;
@@ -111,9 +116,35 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     try
     {
       idString = host + ':' + port;
-      String s = !JMXServerFactory.isUsingRMIConnector() && JMXServerFactory.isJMXMPPresent()
-      ? "service:jmx:jmxmp://" + idString : "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
+      String s = null;
+      if (!JMXServerFactory.isUsingRMIConnector() && JMXServerFactory.isJMXMPPresent()) s = "service:jmx:jmxmp://" + idString;
+      else s = "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
       url = new JMXServiceURL(s);
+    }
+    catch(Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+    local = false;
+  }
+
+  /**
+   * Initialize the connection to the remote MBean server.
+   * @param host the host the server is running on.
+   * @param port the port used by the server.
+   * @param ssl specifies whether the jmx connection should be secure or not.
+   */
+  public JMXConnectionWrapper(final String host, final int port, final boolean ssl)
+  {
+    this.host = host;
+    this.port = port;
+    this.ssl = ssl;
+
+    try
+    {
+      idString = host + ':' + port;
+      url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
+      if (ssl) SSLHelper.configureJMXProperties(env);
     }
     catch(Exception e)
     {
@@ -163,7 +194,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   void performConnection() throws Exception
   {
     setConnectedStatus(false);
-    Map<String, Object> env = new HashMap<String, Object>();
     synchronized(this)
     {
       jmxc = JMXConnectorFactory.connect(url, env);

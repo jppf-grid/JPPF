@@ -299,6 +299,6 @@ class PeerNode extends AbstractCommonNode
   @Override
   public JMXServer getJmxServer() throws Exception
   {
-    return driver.getInitializer().getJmxServer();
+    return driver.getInitializer().getJmxServer(sslEnabled);
   }
 }

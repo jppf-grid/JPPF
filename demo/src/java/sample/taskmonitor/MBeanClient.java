@@ -85,7 +85,7 @@ public class MBeanClient extends JMXConnectionWrapper implements NotificationLis
    */
   public MBeanClient(final String host, final int port)
   {
-    super(host, port, JPPFAdminMBean.NODE_SUFFIX);
+    super(host, port, false);
   }
 
   /**

@@ -37,11 +37,11 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * DRIVER information type.
    */
-  public static final int DRIVER = 0;
+  public static final byte DRIVER = 0;
   /**
    * Node information type.
    */
-  public static final int NODE = 1;
+  public static final byte NODE = 1;
   /**
    * The host on which the node is running.
    */
@@ -55,9 +55,13 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   private String id = null;
   /**
-   * The type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
+   * The type of component this info is for, must be one of {@link #NODE} or {@link #DRIVER}.
    */
-  private int type = NODE;
+  private byte type = NODE;
+  /**
+   * Determines whether communication with the node or driver should be secure, i.e. via SSL/TLS.
+   */
+  private boolean secure = false;
   /**
    * The system information associated with the node at the time of the initial connection.
    */
@@ -71,7 +75,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public JPPFManagementInfo(final String host, final int port, final String id)
   {
-    this(host, port, id, NODE);
+    this(host, port, id, NODE, false);
   }
 
   /**
@@ -83,10 +87,24 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public JPPFManagementInfo(final String host, final int port, final String id, final int type)
   {
+    this(host, port, id, type, false);
+  }
+
+  /**
+   * Initialize this information with the specified parameters.
+   * @param host the host on which the node is running.
+   * @param port the port on which the node's JMX server is listening.
+   * @param id unique id for the node's mbean server.
+   * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
+   * @param secure sepecifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
+   */
+  public JPPFManagementInfo(final String host, final int port, final String id, final int type, final boolean secure)
+  {
     this.host = NetworkUtils.getHostName(host);
     this.port = port;
     this.id = id;
-    this.type = type;
+    this.type = (byte) type;
+    this.secure = secure;
   }
 
   /**
@@ -223,5 +241,14 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   public boolean isDriver()
   {
     return type == DRIVER;
+  }
+
+  /**
+   * Determine whether communication with the node or driver is be secure, i.e. via SSL/TLS.
+   * @return <code>true</code> if the connection is secure, <code>false</code> otherwise.
+   */
+  public boolean isSecure()
+  {
+    return secure;
   }
 }

@@ -89,7 +89,10 @@ class WaitInitialBundleState extends NodeServerState
         {
           String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
           int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
-          JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE);
+          boolean ssl = false;
+          if (channel.isLocal()) ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
+          else ssl = context.getSSLHandler() != null;
+          JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE, ssl);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           driver.getNodeHandler().addNodeInformation(channel, info);
           driver.getInitializer().getNodeConnectionEventHandler().fireNodeConnected(info);

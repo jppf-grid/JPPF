@@ -68,6 +68,10 @@ public abstract class AbstractJMXServer implements JMXServer
    * The port on which the connector is listening for connections from remote clients.
    */
   protected int managementPort = -1;
+  /**
+   * Determines whether JMX should be used over an SSL/TLS connection.
+   */
+  protected boolean ssl = false;
 
   /**
    * {@inheritDoc}

@@ -77,6 +77,10 @@ public class DriverInitializer
    */
   private JMXServer jmxServer = null;
   /**
+   * The jmx server used to manage and monitor this driver over a secure connection.
+   */
+  private JMXServer sslJmxServer = null;
+  /**
    * The object that collects debug information.
    */
   private ServerDebug serverDebug = null;
@@ -131,7 +135,7 @@ public class DriverInitializer
   @SuppressWarnings("unchecked")
   void registerProviderMBeans() throws Exception
   {
-    MBeanServer server = getJmxServer().getServer();
+    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
     List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
     for (JPPFDriverMBeanProvider provider: list)
@@ -158,7 +162,11 @@ public class DriverInitializer
       s = config.getString("jppf.ssl.server.port", null);
       connectionInfo.sslServerPorts = s != null ? StringUtils.parseIntValues(s) : null;
       connectionInfo.host = NetworkUtils.getManagementHost();
-      if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
+      if (config.getBoolean("jppf.management.enabled", true))
+      {
+        connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
+        connectionInfo.sslManagementPort = config.getInt("jppf.management.port", 11198);
+      }
       boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
       if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
     }
@@ -272,11 +280,12 @@ public class DriverInitializer
 
   /**
    * Get the jmx server used to manage and monitor this driver.
+   * @param ssl specifies whether to get the ssl-based connector server. 
    * @return a <code>JMXServerImpl</code> instance.
    */
-  public synchronized JMXServer getJmxServer()
+  public synchronized JMXServer getJmxServer(final boolean ssl)
   {
-    return jmxServer;
+    return ssl ? sslJmxServer : jmxServer;
   }
 
   /**
@@ -284,28 +293,43 @@ public class DriverInitializer
    */
   void initJmxServer()
   {
+    jmxServer = createJMXServer(false);
+    sslJmxServer = createJMXServer(true);
+  }
+
+  /**
+   * Create a JMX connector server.
+   * @param ssl specifies whether JMX communication should be done via SSL/TLS.
+   * @return a new {@link JMXServer} instance, or null if the server could not be created.
+   */
+  private JMXServer createJMXServer(final boolean ssl)
+  {
+    JMXServer server = null;
     JPPFConnectionInformation info = getConnectionInformation();
+    String prop = ssl ? "jppf.management.ssl.enabled" : "jppf.management.enabled";
+    String tmp = ssl ? "secure " : "";
     try
     {
-      if (config.getBoolean("jppf.management.enabled", true))
+      // default is false for ssl, true for plain connection
+      if (config.getBoolean(prop, !ssl))
       {
-        jmxServer = JMXServerFactory.createServer(driver.getUuid(), JPPFAdminMBean.DRIVER_SUFFIX);
-        jmxServer.start(getClass().getClassLoader());
-        //info.managementPort = JPPFConfiguration.getProperties().getInt("jppf.management.port", 11198);
-        info.managementPort = jmxServer.getManagementPort();
-        registerProviderMBeans();
-        System.out.println("JPPF Driver management initialized and listening on port " + jmxServer.getManagementPort());
+        server = JMXServerFactory.createServer(driver.getUuid(), ssl);
+        server.start(getClass().getClassLoader());
+        if (!ssl) info.managementPort = server.getManagementPort();
+        else info.sslManagementPort = server.getManagementPort();
+        System.out.println(tmp + "management initialized and listening on port " + server.getManagementPort());
       }
     }
     catch(Exception e)
     {
       log.error(e.getMessage(), e);
-      config.setProperty("jppf.management.enabled", "false");
+      config.setProperty(prop, "false");
       String s = e.getMessage();
       s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
-      System.out.println("JPPF Driver management failed to initialize, with error message: '" + s + '\'');
-      System.out.println("Management features are disabled. Please consult the driver's log file for more information");
+      System.out.println(tmp + "management failed to initialize, with error message: '" + s + '\'');
+      System.out.println(tmp + "management features are disabled. Please consult the driver's log file for more information");
     }
+    return server;
   }
 
   /**

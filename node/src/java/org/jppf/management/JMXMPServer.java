@@ -24,11 +24,12 @@ import java.util.*;
 
 import javax.management.remote.*;
 
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Wrapper around the JMXMP reomte connector server implementation.
  * @author Laurent Cohen
  */
 public class JMXMPServer extends AbstractJMXServer
@@ -47,16 +48,18 @@ public class JMXMPServer extends AbstractJMXServer
    */
   public JMXMPServer()
   {
-    this(new JPPFUuid().toString());
+    this(new JPPFUuid().toString(), false);
   }
 
   /**
    * Initialize this JMX server with the specified uuid.
    * @param id the unique id of the driver or node holding this jmx server.
+   * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    */
-  public JMXMPServer(final String id)
+  public JMXMPServer(final String id, final boolean ssl)
   {
     this.id = id;
+    this.ssl = ssl;
   }
 
   /**
@@ -74,7 +77,12 @@ public class JMXMPServer extends AbstractJMXServer
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties props = JPPFConfiguration.getProperties();
       managementHost = NetworkUtils.getManagementHost();
-      managementPort = props.getInt("jppf.management.port", 11198);
+      if (!ssl) managementPort = props.getInt("jppf.management.port", 11198);
+      else managementPort = props.getInt("jppf.management.ssl.port", 11193);
+      Map<String, Object> env = new HashMap<String, Object>();
+      env.put("jmx.remote.default.class.loader", cl);
+      env.put("jmx.remote.protocol.provider.class.loader", cl);
+      if (ssl) SSLHelper.configureJMXProperties(env);
       boolean found = false;
       JMXServiceURL url = null;
       while (!found)
@@ -83,9 +91,6 @@ public class JMXMPServer extends AbstractJMXServer
         {
           InetAddress addr = InetAddress.getByName(managementHost);
           url = new JMXServiceURL("service:jmx:jmxmp://" + managementHost + ':' + managementPort);
-          Map<String, Object> env = new HashMap<String, Object>();
-          env.put("jmx.remote.default.class.loader", cl);
-          env.put("jmx.remote.protocol.provider.class.loader", cl);
           connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
           connectorServer.start();
           found = true;
