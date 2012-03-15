@@ -22,7 +22,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.slf4j.*;
 
 /**
@@ -56,29 +55,21 @@ public class ServiceFinder
     List<T> list = new ArrayList<T>();
     String name = providerClass.getName();
     List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
+    Set<String> alreadyLoaded = new HashSet<String>();
     for (String s: lines)
     {
+      if (alreadyLoaded.contains(s)) continue;
       try
       {
-        Class<?> clazz = null;
-        if (cl instanceof AbstractJPPFClassLoader)
-        {
-          try
-          {
-            clazz = ((AbstractJPPFClassLoader) cl).loadJPPFClass(s);
-          }
-          catch(Exception e)
-          {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-          }
-        }
-        if (clazz == null) clazz = cl.loadClass(s);
+        Class<?> clazz = cl.loadClass(s);
         T t = (T) clazz.newInstance();
         list.add(t);
+        alreadyLoaded.add(s);
       }
       catch(Exception e)
       {
         if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(ExceptionUtils.getMessage(e));
       }
     }
     return list;
