@@ -24,6 +24,7 @@ import java.util.LinkedList;
 /**
  * Each instance of this class acts as a container for the performance data related to a node.
  * @author Laurent Cohen
+ * @exclude
  */
 public class BundleDataHolder
 {

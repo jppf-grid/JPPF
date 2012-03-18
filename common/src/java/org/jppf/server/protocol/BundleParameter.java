@@ -21,6 +21,7 @@ package org.jppf.server.protocol;
 /**
  * Constants used when a client sends an admin command to a server.
  * @author Laurent Cohen
+ * @exclude
  */
 public enum  BundleParameter
 {

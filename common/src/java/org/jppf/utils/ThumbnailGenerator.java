@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 /**
  * Instances of this class generate thumbnails from a set of images stored in a file system folder.
  * @author Laurent Cohen
+ * @exclude
  */
 public class ThumbnailGenerator
 {

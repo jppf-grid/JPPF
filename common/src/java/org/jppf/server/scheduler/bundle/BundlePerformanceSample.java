@@ -20,6 +20,7 @@ package org.jppf.server.scheduler.bundle;
 /**
  * This is a utility class to be used to store the pair of mean and the
  * number of samples this mean is based on.
+ * @exclude
  */
 public class BundlePerformanceSample
 {

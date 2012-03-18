@@ -28,6 +28,7 @@ import org.jppf.utils.streams.JPPFByteArrayOutputStream;
  * A specific use of this class is that it can be loaded by a new classloader, making the execution transparent
  * to any change in the client code.
  * @author Laurent Cohen
+ * @exclude
  */
 public class ObjectSerializerImpl implements ObjectSerializer
 {

@@ -28,6 +28,7 @@ import org.slf4j.*;
  * Utility to replace multiline content in text files.
  * This is the same kind of utility as the Ant "replace" task, except that it works.
  * @author Laurent Cohen
+ * @exclude
  */
 public class FileReplacer
 {

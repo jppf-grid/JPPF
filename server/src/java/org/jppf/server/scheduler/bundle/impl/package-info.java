@@ -16,35 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
-
-import java.util.List;
-
-import org.jppf.io.DataLocation;
-import org.jppf.node.protocol.JPPFDistributedJob;
-
 /**
- * 
- * @author Laurent Cohen
+ * Classes supporting the automatic tuning of the task bundle size, using the propertional bundling algorithm.
  * @exclude
  */
-public interface ServerJob
-{
-  /**
-   * Get the underlying task bundle.
-   * @return a <code>JPPFTaskBundle</code> instance.
-   */
-  JPPFDistributedJob getJob();
-
-  /**
-   * Get the location of the data provider.
-   * @return a <code>JPPFTaskBundle</code> instance.
-   */
-  DataLocation getDataProvider();
-
-  /**
-   * Get the list of locations of the tasks.
-   * @return a list of <code>DataLocation</code> instances.
-   */
-  List<DataLocation> getTasks();
-}
+package org.jppf.server.scheduler.bundle.impl;

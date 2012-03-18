@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the fixes size bundle ("manual") load-balancing algorithm.
+ * @exclude
  */
 package org.jppf.server.scheduler.bundle.fixedsize;

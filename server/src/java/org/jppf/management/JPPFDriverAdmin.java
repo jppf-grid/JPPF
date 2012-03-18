@@ -29,6 +29,7 @@ import org.slf4j.*;
 /**
  * Instances of this class encapsulate the administration functionalities for a JPPF driver.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFDriverAdmin implements JPPFDriverAdminMBean
 {

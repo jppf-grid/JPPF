@@ -23,6 +23,7 @@ import org.slf4j.*;
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SerializationHelperImpl implements SerializationHelper
 {

@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the automatic adaptive tuning of the task bundle size, using the "proportional" load-balancing algorithm.
+ * @exclude
  */
 package org.jppf.server.scheduler.bundle.proportional;

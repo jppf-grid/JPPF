@@ -29,6 +29,7 @@ import java.util.EventObject;
  * as only the latest notification is kept and processed. In a multithreaded/parallel context,
  * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">TaskNotification sample</a>
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFTaskEvent extends EventObject
 {

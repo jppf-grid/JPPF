@@ -24,6 +24,7 @@ import org.jppf.utils.LocalizationUtils;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class NodeStatusNotifier implements NodeLifeCycleListener
 {

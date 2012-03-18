@@ -46,6 +46,7 @@ import java.io.*;
  * }
  * </pre>
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class JPPFOptimizedTask extends JPPFTask
 {

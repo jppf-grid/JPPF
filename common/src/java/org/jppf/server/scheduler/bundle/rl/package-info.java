@@ -18,6 +18,6 @@
 
 /**
  * Classes supporting the automatic adaptive tuning of the task bundle size, using the "rl" (reinforcement learning) load-balancing algorithm.
- * Here idle means no keyboard or mouse activity was detected for a specified time.
+ * @exclude
  */
 package org.jppf.server.scheduler.bundle.rl;

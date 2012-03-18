@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the automatic adaptive tuning of the task bundle size, using the "autotuned" load-balancing algorithm.
+ * @exclude
  */
 package org.jppf.server.scheduler.bundle.autotuned;

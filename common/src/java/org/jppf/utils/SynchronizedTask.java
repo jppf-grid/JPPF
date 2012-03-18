@@ -21,6 +21,7 @@ import org.slf4j.*;
 
 /**
  * Task that is submitted for each received notification.
+ * @exclude
  */
 public abstract class SynchronizedTask implements Runnable
 {
