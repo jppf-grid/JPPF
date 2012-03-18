@@ -86,13 +86,15 @@
 	<!--                        Generate the Javadoc                               -->
 	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all java doc">
+	<target name="javadoc" depends="compile.doclet" description="Generate all java doc">
 		<echo message="gs.home = ${gs.home}"/>
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
 		<javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF"
-			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
-			stylesheetfile="${bin}/javadoc.css" additionalparam="-quiet">
+			packagenames="**/*.*" classpathref="javadoc.classpath" stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
+			doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes"
+	  >
+			<arg value="-J-Xmx512m"/>
 			<packageset dir="${node}/src/java"/>
 			<packageset dir="${common}/src/java"/>
 			<packageset dir="${client}/src/java"/>
@@ -146,6 +148,20 @@
 		<tar destfile="${docs}/api.tar.gz" compression="gzip">
 			<tarfileset prefix="api-3" dir="${javadoc}" includes="**/*.*"/>
 		</tar>
+	</target>
+
+	<path id="doclet.classpath">
+		<pathelement location="${java.home}/lib/tools.jar"/>
+	</path>
+
+	<target name="compile.doclet" description="compile the @exclude doclet">
+		<delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
+		<javac srcdir="" destdir="${basedir}/classes" source="1.6" target="1.6"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="doclet.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${basedir}/src/java"/>
+		</javac>
 	</target>
 
 </project> 
