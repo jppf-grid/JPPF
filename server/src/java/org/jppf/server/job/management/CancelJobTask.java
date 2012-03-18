@@ -26,6 +26,7 @@ import org.slf4j.*;
 /**
  * Instances of this class are intended to perform job management functions for a specific node.
  * @author Laurent Cohen
+ * @exclude
  */
 class CancelJobTask implements Runnable
 {

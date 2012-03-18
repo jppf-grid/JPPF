@@ -29,6 +29,7 @@ import org.jppf.process.ProcessLauncher;
  * <li>If the subprocess exit code is equal to 2, the subprocess is restarted</li>
  * </ul>
  * @author Laurent Cohen
+ * @exclude
  */
 public class DriverLauncher
 {

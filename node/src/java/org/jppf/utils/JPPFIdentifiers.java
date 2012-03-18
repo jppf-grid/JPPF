@@ -21,8 +21,9 @@ package org.jppf.utils;
 import java.util.*;
 
 /**
- * 
+ * Channel identifiers sent over the network as part of the handshaking with a JPPF server.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class JPPFIdentifiers
 {

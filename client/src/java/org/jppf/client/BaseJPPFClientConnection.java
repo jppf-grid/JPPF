@@ -39,6 +39,7 @@ import org.slf4j.*;
  * classes from the submitting application should be dynamically reloaded or not
  * depending on whether the uuid has changed or not.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class BaseJPPFClientConnection implements JPPFClientConnection
 {

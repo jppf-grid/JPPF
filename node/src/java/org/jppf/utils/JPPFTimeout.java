@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Convenience class used to express a timeout in various units of time.
  * @see java.util.concurrent.TimeUnit
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFTimeout extends Pair<TimeUnit, Long>
 {

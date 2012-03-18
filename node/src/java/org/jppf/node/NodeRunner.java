@@ -163,6 +163,7 @@ public class NodeRunner
   /**
    * Run a node as a standalone application.
    * @param args not used.
+   * @exclude
    */
   public static void start(final String...args)
   {
@@ -173,6 +174,7 @@ public class NodeRunner
   /**
    * Run a node as a standalone application.
    * @param args not used.
+   * @exclude
    */
   public static void stop(final String...args)
   {
@@ -184,6 +186,7 @@ public class NodeRunner
    * Start the node.
    * @return the node that was started, as a <code>MonitoredNode</code> instance.
    * @throws Exception if the node failed to run or couldn't connect to the server.
+   * @exclude
    */
   public static Node createNode() throws Exception
   {
@@ -204,7 +207,7 @@ public class NodeRunner
    * account the discovered information. If no information could be received, the node relies on
    * the static information in the configuration file.
    */
-  public static void discoverDriver()
+  private static void discoverDriver()
   {
     JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(ipFilter);
     JPPFConnectionInformation info = receiver.receive();
@@ -247,7 +250,7 @@ public class NodeRunner
    * Set the security manager with the permission granted in the policy file.
    * @throws Exception if the security could not be set.
    */
-  public static void setSecurity() throws Exception
+  private static void setSecurity() throws Exception
   {
     if (!securityManagerSet)
     {
@@ -269,7 +272,7 @@ public class NodeRunner
   /**
    * Set the security manager with the permission granted in the policy file.
    */
-  public static void unsetSecurity()
+  private static void unsetSecurity()
   {
     if (securityManagerSet)
     {
@@ -291,6 +294,7 @@ public class NodeRunner
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @return a <code>AbstractJPPFClassLoader</code> used for loading the classes of the framework.
+   * @exclude
    */
   public static AbstractJPPFClassLoader getJPPFClassLoader()
   {
@@ -346,6 +350,7 @@ public class NodeRunner
   /**
    * Get the JPPF node.
    * @return a <code>Node</code> instance.
+   * @exclude
    */
   public static Node getNode()
   {
@@ -356,6 +361,7 @@ public class NodeRunner
    * Shutdown and eventually restart the node.
    * @param node the node to shutdown or restart.
    * @param restart determines whether this node should be restarted by the node launcher.
+   * @exclude
    */
   public static void shutdown(final Node node, final boolean restart)
   {
@@ -366,6 +372,7 @@ public class NodeRunner
 
   /**
    * Task used to terminate the JVM.
+   * @exclude
    */
   public static class ShutdownOrRestart implements Runnable
   {

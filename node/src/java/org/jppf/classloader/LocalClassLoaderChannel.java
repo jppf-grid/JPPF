@@ -23,6 +23,7 @@ import org.jppf.server.nio.*;
 /**
  * Channel wrapper and I/O implementation for the class loader of an in-VM node.
  * @author Laurent Cohen
+ * @exclude
  */
 public class LocalClassLoaderChannel extends AbstractLocalChannelWrapper<JPPFResourceWrapper, AbstractNioContext>
 {

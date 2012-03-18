@@ -30,6 +30,7 @@ import org.slf4j.*;
 
 /**
  * Wrapper for an {@link SSLEngine} and an associated channel.
+ * @exclude
  */
 public class SSLHandler
 {
@@ -134,7 +135,7 @@ public class SSLHandler
           count = applicationReceiveBuffer.position();
           break;
       }
-      while (processHandshakeStatus());
+      while (processHandshake());
       count = applicationReceiveBuffer.position();
     }
     while (count == 0);
@@ -155,11 +156,11 @@ public class SSLHandler
     if ((remaining > 0) && (flush() > 0)) return 0;
     while (remaining > 0)
     {
-      if (traceEnabled) log.trace("before flip/wrap/compact applicationSendBuffer=" + applicationSendBuffer + " channelSendBuffer=" + channelSendBuffer + " count=" + remaining);
+      if (traceEnabled) log.trace("before flip/wrap/compact " + printSendBuffers() + " count=" + remaining);
       applicationSendBuffer.flip();
       sslEngineResult = sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
       applicationSendBuffer.compact();
-      if (traceEnabled) log.trace("after flip/wrap/compact  applicationSendBuffer=" + applicationSendBuffer + " channelSendBuffer=" + channelSendBuffer);
+      if (traceEnabled) log.trace("after  flip/wrap/compact " + printSendBuffers());
       switch (sslEngineResult.getStatus())
       {
         case BUFFER_UNDERFLOW:
@@ -169,7 +170,7 @@ public class SSLHandler
         case BUFFER_OVERFLOW:
           if (traceEnabled) log.trace("buffer overflow, before flush() channelSendBuffer=" + channelSendBuffer);
           int flushCount = flush();
-          if (traceEnabled) log.trace("buffer overflow, after flush()  channelSendBuffer=" + channelSendBuffer + ", flushCount=" + flushCount);
+          if (traceEnabled) log.trace("buffer overflow, after  flush() channelSendBuffer=" + channelSendBuffer + ", flushCount=" + flushCount);
           if (flushCount == 0) return 0;
           continue;
 
@@ -182,7 +183,7 @@ public class SSLHandler
           remaining -= n;
           break;
       }
-      while (processHandshakeStatus());
+      while (processHandshake());
     }
     return writeCount;
   }
@@ -218,7 +219,7 @@ public class SSLHandler
     }
     sslEngine.closeOutbound();
     if (traceEnabled) log.trace("close outbound handshake");
-    while (processHandshakeStatus());
+    while (processHandshake());
     if (channelSendBuffer.position() > 0 && flush() == 0) log.error("unable to flush remaining " + channelSendBuffer.position() + " bytes");
     if (traceEnabled) log.trace("close outbound done");
     channel.close();
@@ -231,15 +232,15 @@ public class SSLHandler
    */
   private void processEngineResult() throws Exception
   {
-    while (processStatus() && processHandshakeStatus()) continue;
+    while (processEngineResultStatus() && processHandshake()) continue;
   }
 
   /**
-   * Process the current handshaking sttaus.
+   * Process the current handshaking status.
    * @return <code>true</code> if handshaking is still ongoing, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  private boolean processHandshakeStatus() throws Exception
+  private boolean processHandshake() throws Exception
   {
     int count;
     switch (sslEngine.getHandshakeStatus())
@@ -287,10 +288,10 @@ public class SSLHandler
    * @return true if a full SSL packet was read or written, false otherwise.
    * @throws Exception if any error occurs.
    */
-  boolean processStatus() throws Exception
+  boolean processEngineResultStatus() throws Exception
   {
     int count;
-    if (traceEnabled) log.trace("engineResult=" + sslEngineResult);
+    if (traceEnabled) log.trace("sslEngineResult=" + sslEngineResult);
     switch (sslEngineResult.getStatus())
     {
       case OK:
@@ -307,7 +308,7 @@ public class SSLHandler
             return channelSendBuffer.position() == 0;
 
           case NEED_UNWRAP:
-            //if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
+            if (traceEnabled) log.trace(printBuffers());
             return false;
 
           default:
@@ -315,10 +316,10 @@ public class SSLHandler
         }
 
       case BUFFER_UNDERFLOW:
-        //if (traceEnabled) log.trace("netSendBuffer=" + netSendBuffer + ", netRecvBuffer=" + netRecvBuffer + ", appSendBuffer=" + appSendBuffer + ", appRecvBuffer=" + appRecvBuffer);
+        if (traceEnabled) log.trace(printBuffers());
         flush();
         count = channel.read(channelReceiveBuffer);
-        //if (traceEnabled) log.trace("underflow: read " + count + " netRecv=" + netRecvBuffer);
+        if (traceEnabled) log.trace("underflow: count=" + count + ", channelReceiveBuffer=" + channelReceiveBuffer);
         return count > 0;
 
       default:
@@ -381,5 +382,33 @@ public class SSLHandler
   public ByteBuffer getChannelSendBuffer()
   {
     return channelSendBuffer;
+  }
+  
+  /**
+   * Print the state of all buffers to a string.
+   * This method is intended for logging and debugging purposes.
+   * @return a string representation of the buffers states.
+   */
+  private String printBuffers()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("applicationSendBuffer=").append(applicationSendBuffer);
+    sb.append(", channelSendBuffer=").append(channelSendBuffer);
+    sb.append(", applicationReceiveBuffer=").append(applicationReceiveBuffer);
+    sb.append(", channelReceiveBuffer=").append(channelReceiveBuffer);
+    return sb.toString();
+  }
+  
+  /**
+   * Print the state of all send buffers to a string.
+   * This method is intended for logging and debugging purposes.
+   * @return a string representation of the send buffers states.
+   */
+  private String printSendBuffers()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("applicationSendBuffer=").append(applicationSendBuffer);
+    sb.append(", channelSendBuffer=").append(channelSendBuffer);
+    return sb.toString();
   }
 }

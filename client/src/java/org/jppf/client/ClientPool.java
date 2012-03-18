@@ -22,6 +22,7 @@ import java.util.*;
 
 /**
  * Instances of this class manage a list of client connections with the same priority.
+ * @exclude
  */
 class ClientPool
 {

@@ -26,6 +26,7 @@ import org.jppf.utils.TraversalList;
  * Instances of this class encapsulate the necessary information used by the network classloader,
  * for sending class definition requests as well as receiving the class definitions.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFResourceWrapper implements Serializable
 {

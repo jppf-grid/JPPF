@@ -24,6 +24,7 @@ import java.util.*;
  * A list that maintains and manages a current position and corresponding current element.
  * @param <E> The element type for this list.
  * @author Laurent Cohen
+ * @exclude
  */
 public class TraversalList<E> implements Serializable
 {

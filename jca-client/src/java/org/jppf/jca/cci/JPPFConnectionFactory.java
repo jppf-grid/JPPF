@@ -30,6 +30,7 @@ import org.jppf.jca.util.JPPFAccessorImpl;
  * Implementation of the {@link javax.resource.cci.ConnectionFactory ConnectionFactory} interface for
  * the JPPF resource adapter.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFConnectionFactory extends JPPFAccessorImpl implements ConnectionFactory
 {

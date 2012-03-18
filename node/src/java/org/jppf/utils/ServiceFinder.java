@@ -28,6 +28,7 @@ import org.slf4j.*;
  * Instances of this class look for and find services implemented via the Service Provider Interface (SPI).
  * This class is an alternative for the static methods found in {@link javax.imageio.spi.ServiceRegistry}.
  * @author Laurent Cohen
+ * @exclude
  */
 public class ServiceFinder
 {

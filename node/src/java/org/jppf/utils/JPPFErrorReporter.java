@@ -23,6 +23,7 @@ import java.util.*;
  * Utility class used to collect error and warning messages for various operations,
  * including XML parsing and validation.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFErrorReporter
 {

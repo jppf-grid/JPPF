@@ -18,5 +18,6 @@
 
 /**
  * Unit tests setup classes.
+ * @exclude
  */
 package test.org.jppf.test.setup;

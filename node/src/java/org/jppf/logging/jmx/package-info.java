@@ -18,5 +18,6 @@
 
 /**
  * Support for the JMX-based logging.
+ * @exclude
  */
 package org.jppf.logging.jmx;

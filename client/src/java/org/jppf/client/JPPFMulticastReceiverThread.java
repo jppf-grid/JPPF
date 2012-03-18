@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * This class listens to information broadcast by JPPF servers on the network and uses it
  * to establish a connection with one or more servers.
+ * @exclude
  */
 class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable
 {

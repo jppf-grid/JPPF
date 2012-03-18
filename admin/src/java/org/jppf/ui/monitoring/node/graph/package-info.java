@@ -18,5 +18,6 @@
 
 /**
  * Support for the graph view of the grid topology.
+ * @exclude
  */
 package org.jppf.ui.monitoring.node.graph;

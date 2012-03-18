@@ -18,5 +18,6 @@
 
 /**
  * Utility and helper classes used throughout the JPPF code.
+ * @exclude
  */
 package org.jppf.utils.pooling;

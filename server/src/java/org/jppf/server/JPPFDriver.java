@@ -124,6 +124,7 @@ public class JPPFDriver
 
   /**
    * Initialize this JPPFDriver.
+   * @exclude
    */
   protected JPPFDriver()
   {
@@ -140,6 +141,7 @@ public class JPPFDriver
   /**
    * Initialize and start this driver.
    * @throws Exception if the initialization fails.
+   * @exclude
    */
   public void run() throws Exception
   {
@@ -192,6 +194,7 @@ public class JPPFDriver
   /**
    * Get the queue that handles the tasks to execute.
    * @return a JPPFQueue instance.
+   * @exclude
    */
   public static JPPFQueue getQueue()
   {
@@ -201,6 +204,7 @@ public class JPPFDriver
   /**
    * Get the JPPF client server.
    * @return a <code>ClientNioServer</code> instance.
+   * @exclude
    */
   public ClientNioServer getClientNioServer()
   {
@@ -210,6 +214,7 @@ public class JPPFDriver
   /**
    * Get the JPPF class server.
    * @return a <code>ClassNioServer</code> instance.
+   * @exclude
    */
   public ClassNioServer getClientClassServer()
   {
@@ -219,6 +224,7 @@ public class JPPFDriver
   /**
    * Get the JPPF class server.
    * @return a <code>ClassNioServer</code> instance.
+   * @exclude
    */
   public ClassNioServer getNodeClassServer()
   {
@@ -228,6 +234,7 @@ public class JPPFDriver
   /**
    * Get the JPPF nodes server.
    * @return a <code>NodeNioServer</code> instance.
+   * @exclude
    */
   public NodeNioServer getNodeNioServer()
   {
@@ -237,6 +244,7 @@ public class JPPFDriver
   /**
    * Get the server which handles the initial handshake and peer channel identification.
    * @return a {@link AcceptorNioServer} instance.
+   * @exclude
    */
   public AcceptorNioServer getAcceptorServer()
   {
@@ -271,6 +279,7 @@ public class JPPFDriver
    * If set to false, then the JVM will exit.
    * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
    * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
+   * @exclude
    */
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay)
   {
@@ -290,6 +299,7 @@ public class JPPFDriver
 
   /**
    * Shutdown this server and all its components.
+   * @exclude
    */
   public void shutdown()
   {
@@ -329,6 +339,7 @@ public class JPPFDriver
   /**
    * Get the listener that gathers the statistics published through the management interface.
    * @return a <code>JPPFStatsUpdater</code> instance.
+   * @exclude
    */
   public JPPFDriverStatsUpdater getStatsUpdater()
   {
@@ -338,6 +349,7 @@ public class JPPFDriver
   /**
    * Get a reference to the object that generates the statistics events of which all related listeners are notified.
    * @return a <code>JPPFDriverStatsManager</code> instance.
+   * @exclude
    */
   public JPPFDriverStatsManager getStatsManager()
   {
@@ -347,6 +359,7 @@ public class JPPFDriver
   /**
    * Get the object that manages and monitors the jobs throughout their processing within this driver.
    * @return an instance of <code>JPPFJobManager</code>.
+   * @exclude
    */
   public JPPFJobManager getJobManager()
   {
@@ -356,6 +369,7 @@ public class JPPFDriver
   /**
    * Get this driver's initializer.
    * @return a <code>DriverInitializer</code> instance.
+   * @exclude
    */
   public DriverInitializer getInitializer()
   {
@@ -365,6 +379,7 @@ public class JPPFDriver
   /**
    * Get the object that manages information about the nodes.
    * @return a {@link NodeInformationHandler} instance.
+   * @exclude
    */
   public NodeInformationHandler getNodeHandler()
   {
@@ -407,7 +422,7 @@ public class JPPFDriver
    * @param <T> the type of the server to start
    * @return started nioServer
    */
-  protected static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports, final int[] sslPorts) {
+  private static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports, final int[] sslPorts) {
     if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if(recoveryServer != null && nioServer instanceof ReaperListener) {
       Reaper reaper = recoveryServer.getReaper();
@@ -424,7 +439,7 @@ public class JPPFDriver
    * @param sslPorts SSL ports for initialization message.
    * @param name the name to use for the server.
    */
-  protected static void printInitializedMessage(final int[] ports, final int[] sslPorts, final String name)
+  private static void printInitializedMessage(final int[] ports, final int[] sslPorts, final String name)
   {
     StringBuilder sb = new StringBuilder();
     if (name != null)
@@ -451,19 +466,10 @@ public class JPPFDriver
   }
 
   /**
-   * Get a reference to the local node if it is enabled.
-   * @return a {@link JPPFNode} instance, or <code>null</code> if local node is disabled.
-   */
-  public static JPPFNode getLocalNode()
-  {
-    return localNode;
-  }
-
-  /**
    * Determine whther management is enabled and if there is an active remote connector server.
    * @return <code>true</code> if management is enabled, <code>false</code> otherwise.
    */
-  public boolean isManagementEnabled()
+  private boolean isManagementEnabled()
   {
     TypedProperties props = JPPFConfiguration.getProperties();
     return props.getBoolean("jppf.management.enabled", true) || props.getBoolean("jppf.management.ssl.enabled", false);

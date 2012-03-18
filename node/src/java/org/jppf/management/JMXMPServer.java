@@ -31,6 +31,7 @@ import org.slf4j.*;
 /**
  * Wrapper around the JMXMP reomte connector server implementation.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JMXMPServer extends AbstractJMXServer
 {

@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the lookup and registration of custom MBeans.
+ * @exclude
  */
 package org.jppf.management.spi;

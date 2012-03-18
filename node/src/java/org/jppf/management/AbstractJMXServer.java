@@ -29,6 +29,7 @@ import org.slf4j.*;
  * This class is a wrapper around a JMX management server.
  * It is used essentially to hide the details of the remote management protocol used.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractJMXServer implements JMXServer
 {

@@ -26,6 +26,7 @@ import org.slf4j.*;
 /**
  * Instances of this class load and invoke node initialization hooks defined via their SPI definition.
  * @author Laurent Cohen
+ * @exclude
  */
 public class InitializationHooksHandler
 {

@@ -18,5 +18,6 @@
 
 /**
  * Support for network communications.
+ * @exclude
  */
 package org.jppf.comm.socket;

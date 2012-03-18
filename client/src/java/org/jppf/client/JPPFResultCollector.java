@@ -264,6 +264,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   /**
    * Notify all listeners of a change of status for this submission.
    * @param newStatus the status for submission event.
+   * @exclude
    */
   protected void fireStatusChangeEvent(final SubmissionStatus newStatus)
   {

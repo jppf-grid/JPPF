@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * This class handles the firing of node life cycle events and the listeners that subscribe to these events.
  * @author Laurent Cohen
+ * @exclude
  */
 public class LifeCycleEventHandler
 {

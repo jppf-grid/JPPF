@@ -24,7 +24,8 @@ import java.util.logging.*;
 /**
  * A handler that prints log messages using a {@link JPPFLogFormatter} instance.
  * @author Laurent Cohen
- */
+ * @exclude
+*/
 public class JPPFFileHandler extends FileHandler
 {
   /**

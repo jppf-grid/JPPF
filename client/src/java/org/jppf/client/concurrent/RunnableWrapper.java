@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 /**
  * Callable wrapper around a Runnable.
  * @param <V> the type of result.
+ * @exclude
  */
 class RunnableWrapper<V> implements Callable<V>, Serializable
 {

@@ -193,6 +193,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * {@inheritDoc}
    * @deprecated use {@link #getUuid()} instead.
+   * @exclude
    */
   @Override
   public String getJobUuid()
@@ -212,6 +213,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * {@inheritDoc}
    * @deprecated use {@link #getName() getName()} instead.
+   * @exclude
    */
   @Override
   public String getId()
@@ -223,6 +225,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * Set the user-defined display name for this job.
    * @param id the display name as a string.
    * @deprecated use {@link #setName(java.lang.String) setName(String)} instead.
+   * @exclude
    */
   public void setId(final String id)
   {
@@ -366,6 +369,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * Get the service level agreement between the job and the server.
    * @return an instance of {@link JobSLA}.
    * @deprecated use {@link #getSLA() getSLA()} instead
+   * @exclude
    */
   public JPPFJobSLA getJobSLA()
   {
@@ -394,6 +398,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * Get the user-defined metadata associated with this job.
    * @return a {@link JobMetadata} instance.
    * @deprecated use {@link #getMetadata() getMetadata()} instead
+   * @exclude
    */
   public JPPFJobMetadata getJobMetadata()
   {

@@ -18,5 +18,6 @@
 
 /**
  * Classes used for compiling source code on the fly.
+ * @exclude
  */
 package org.jppf.utils.compilation;

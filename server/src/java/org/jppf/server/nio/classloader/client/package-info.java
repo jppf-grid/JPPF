@@ -18,5 +18,6 @@
 
 /**
  * Support for NIO-based communication with the clients, for the class loader channel.
+ * @exclude
  */
 package org.jppf.server.nio.classloader.client;

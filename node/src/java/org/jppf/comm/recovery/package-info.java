@@ -18,6 +18,7 @@
 
 /**
  * Support for detection and recovery from hardware failures occurring on remote peers.
- */
+ * @exclude
+*/
 package org.jppf.comm.recovery;
 

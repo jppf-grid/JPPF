@@ -18,11 +18,10 @@
 
 package org.jppf.client.taskwrapper;
 
-
-
 /**
  * Common abstract superclass for non-JPPF tasks wrappers.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractTaskObjectWrapper implements TaskObjectWrapper
 {

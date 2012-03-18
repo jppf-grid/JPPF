@@ -22,6 +22,7 @@ package org.jppf.client;
 /**
  * Interface for all class server clients.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface ClassServerDelegate extends Runnable, ClientConnectionHandler
 {

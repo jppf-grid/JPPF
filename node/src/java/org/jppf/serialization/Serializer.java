@@ -28,6 +28,7 @@ import org.slf4j.*;
 /**
  * Instances of this class are intended to serialize object graphs to an underlying output stream.
  * @author Laurent Cohen
+ * @exclude
  */
 class Serializer
 {

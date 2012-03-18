@@ -18,5 +18,6 @@
 
 /**
  * Unit tests for <code>org.jppf.server.protocol</code> package.
+ * @exclude
  */
 package test.org.jppf.server.protocol;

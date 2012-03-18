@@ -53,7 +53,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * System classloader for URL_FIRST delegation model.
    */
   private ClassLoader systemClassLoader = null;
-
   /**
    * Determines whether system classloader was initialized.
    */
@@ -83,6 +82,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param name the binary name of the class
    * @return the resulting <tt>Class</tt> object
    * @throws ClassNotFoundException if the class could not be found
+   * @exclude
    */
   public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
   {
@@ -397,6 +397,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   /**
    * {@inheritDoc}
+   * @exclude
    */
   @Override
   protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException
@@ -462,6 +463,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   /**
    * Initializes system classloader for URL_FIRST delegation model.
    * @return instance of system ClassLoader or null if not available.
+   * @exclude
    */
   protected synchronized ClassLoader initSystemClassLoader()
   {
@@ -483,6 +485,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param name binary name of the resource to find.
    * @param recursive if true then look recursively into the hierarchy of parents that are instances of <code>AbstractJPPFClassLoader</code>.
    * @return a <code>Class</code> instance, or null if the class could not be found in the URL classpath.
+   * @exclude
    */
   protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive)
   {

@@ -382,6 +382,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
    * Submit the specified job for execution on the grid.
    * @param job the job to submit.
    * @throws Exception if any error occurs.
+   * @exclude
    */
   void submitJob(final JPPFJob job) throws Exception
   {
@@ -422,6 +423,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
    * Called when all results from a job have been received.
    * @param event the event object.
    * @see org.jppf.client.concurrent.FutureResultCollectorListener#resultsComplete(org.jppf.client.concurrent.FutureResultCollectorEvent)
+   * @exclude
    */
   @Override
   public void resultsComplete(final FutureResultCollectorEvent event)

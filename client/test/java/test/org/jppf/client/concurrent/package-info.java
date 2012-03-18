@@ -18,5 +18,6 @@
 
 /**
  * Unit tests for package <code>org.jppf.client.concurrent</code>.
+ * @exclude
  */
 package test.org.jppf.client.concurrent;

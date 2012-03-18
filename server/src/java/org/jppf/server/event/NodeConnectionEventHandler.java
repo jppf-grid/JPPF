@@ -28,6 +28,7 @@ import org.slf4j.*;
  * This class handles operations for node connection events, including
  * listener registration, event notifications and initial loading of listeners via SPI.
  * @author Laurent Cohen
+ * @exclude
  */
 public class NodeConnectionEventHandler
 {

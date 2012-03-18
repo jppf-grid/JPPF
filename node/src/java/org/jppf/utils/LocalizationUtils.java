@@ -26,6 +26,7 @@ import org.slf4j.*;
 /**
  * Utility methods to localize messages in the JPPF components.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class LocalizationUtils
 {

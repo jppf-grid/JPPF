@@ -23,6 +23,7 @@ import org.jppf.management.spi.JPPFDriverMBeanProvider;
 /**
  * Provider for the default JPPF driver management and monitoring features.
  * @author Laurent Cohen
+ * @exclude
  */
 public class DriverJobManagementMBeanProvider implements JPPFDriverMBeanProvider
 {

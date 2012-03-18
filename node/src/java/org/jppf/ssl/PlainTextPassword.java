@@ -18,22 +18,29 @@
 
 package org.jppf.ssl;
 
+import java.util.concurrent.Callable;
+
 /**
  * A password source which uses a plain text string
  * @author Laurent Cohen
  */
-public class PlainTextPassword extends PasswordSource
+public class PlainTextPassword implements Callable<char[]>
 {
   /**
-   * Initialize this password source with a plain text password.
-   * @param args the firt argument represents a plain text password.
+   * Optional arguments that may be specified in the configuration.
    */
-  public PlainTextPassword(final String... args)
-  {
-    super(args);
-    if ((args == null) || (args.length == 0)) throw new IllegalArgumentException("missing parameter: plain text password");
-  }
+  private final String[] args;
 
+  /**
+   * Initialize this password source with a plain text password.
+   * @param args the first argument represents a plain text password.
+   * @throws Exception if any error occurs.
+   */
+  public PlainTextPassword(final String... args) throws Exception
+  {
+    this.args = args;
+    if ((args == null) || (args.length == 0)) throw new SSLConfigurationException("missing plain text password");
+  }
 
   /**
    * {@inheritDoc}

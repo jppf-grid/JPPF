@@ -25,6 +25,7 @@ import javax.resource.cci.InteractionSpec;
 /**
  * Implementation of the InteractionSpec interface.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFInteractionSpec implements InteractionSpec
 {

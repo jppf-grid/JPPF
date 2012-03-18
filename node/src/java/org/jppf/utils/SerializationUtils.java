@@ -25,6 +25,7 @@ import java.nio.channels.*;
 /**
  * Utility methods for serializing and deserializing data
  * @author Laurent Cohen
+ * @exclude
  */
 public final class SerializationUtils
 {

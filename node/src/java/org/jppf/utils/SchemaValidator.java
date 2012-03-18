@@ -30,6 +30,7 @@ import org.xml.sax.*;
 /**
  * Utility class to validate an XML document against an XML schema.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SchemaValidator
 {

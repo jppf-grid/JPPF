@@ -25,6 +25,7 @@ import org.jppf.utils.FileUtils;
 
 /**
  * Privileged action wrapper for saving a resource definition to a temporary file.
+ * @exclude
  */
 class SaveFileAction implements PrivilegedAction<File>
 {

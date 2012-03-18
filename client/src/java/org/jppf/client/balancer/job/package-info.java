@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting load-balancing.
+ * @exclude
  */
 package org.jppf.client.balancer.job;

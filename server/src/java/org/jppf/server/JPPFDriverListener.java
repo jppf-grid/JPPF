@@ -23,6 +23,7 @@ import java.util.EventListener;
 /**
  * Instances of this class are used to collect statistics on the JPPF server.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface JPPFDriverListener extends EventListener
 {

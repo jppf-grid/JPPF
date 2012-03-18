@@ -24,6 +24,7 @@ import org.slf4j.*;
 /**
  * This class is intended to be used as a thread that attempts to (re-)connect to
  * the management server.
+ * @exclude
  */
 public class JMXConnectionThread extends ThreadSynchronization implements Runnable
 {

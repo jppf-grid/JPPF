@@ -22,6 +22,7 @@ import org.jppf.process.ProcessLauncher;
 /**
  * Bootstrap class for launching a JPPF node. The node class is dynamically loaded from a remote server.
  * @author Laurent Cohen
+ * @exclude
  */
 public class NodeLauncher
 {

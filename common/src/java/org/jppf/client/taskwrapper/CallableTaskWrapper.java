@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 /**
  * Task wrapper for classes implementing {@link java.util.concurrent.Callable Callable}.
  * @author Laurent Cohen
+ * @exclude
  */
 public class CallableTaskWrapper extends AbstractTaskObjectWrapper
 {

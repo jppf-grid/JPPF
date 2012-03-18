@@ -29,6 +29,7 @@ import org.slf4j.*;
 /**
  * Instances of this class are used as cache for resources downloaded from a driver or client, using the JPPF class loader APIs.
  * @author Laurent Cohen
+ * @exclude
  */
 class ResourceCache
 {

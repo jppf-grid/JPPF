@@ -28,6 +28,7 @@ import org.slf4j.*;
  * Implementation of a future handled by a {@link JPPFExecutorService}.
  * @param <V> the type of the result for the future.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 {

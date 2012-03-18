@@ -30,7 +30,8 @@ import org.slf4j.*;
  * "jppf.data.transform.class = <i>fully qualified class name</i>". If the class cannot be found, or none is specified,
  * then no transformation takes place.
  * @author Laurent Cohen
- */
+ * @exclude
+*/
 public class JPPFDataTransformFactory
 {
   /**

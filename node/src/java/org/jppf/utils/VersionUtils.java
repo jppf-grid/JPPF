@@ -28,6 +28,7 @@ import org.slf4j.*;
  * It is used for the nodes to determine when their code is outdated, in which case they will automatically reload
  * their own code.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class VersionUtils
 {

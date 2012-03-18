@@ -23,6 +23,7 @@ import org.jppf.utils.streams.StreamConstants;
  * buffer for the data read from or written to a socket connection.
  * @author Laurent Cohen
  * @author Domingos Creado
+ * @exclude
  */
 public class JPPFBuffer
 {

@@ -18,25 +18,31 @@
 
 package org.jppf.ssl;
 
-import java.io.*;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
-import org.jppf.JPPFException;
 import org.jppf.utils.FileUtils;
 
 /**
  * A secure store source that uses a file as source.
  * @author Laurent Cohen
  */
-public class FileStoreSource extends SecureStoreSource
+public class FileStoreSource implements Callable<InputStream>
 {
+  /**
+   * Optional arguments that may be specified in the configuration.
+   */
+  private final String[] args;
+
   /**
    * Initialize this store source with a file name.
    * @param args the firt argument reprsents the path to the key or trust store
+   * @throws SSLConfigurationException if there is less than 1 argument.
    */
-  public FileStoreSource(final String... args)
+  public FileStoreSource(final String... args) throws SSLConfigurationException
   {
-    super(args);
-    if ((args == null) || (args.length == 0)) throw new IllegalArgumentException("missing parameter: keystore or trustore path");
+    this.args = args;
+    if ((args == null) || (args.length == 0)) throw new SSLConfigurationException("missing parameter: keystore or trustore path");
   }
 
   /**
@@ -46,7 +52,7 @@ public class FileStoreSource extends SecureStoreSource
   public InputStream call() throws Exception
   {
     InputStream is = FileUtils.getFileInputStream(args[0]);
-    if (is == null) throw new JPPFException("could not find secure store " + args[0]); 
+    if (is == null) throw new SSLConfigurationException("could not find secure store " + args[0]); 
     return is;
   }
 }

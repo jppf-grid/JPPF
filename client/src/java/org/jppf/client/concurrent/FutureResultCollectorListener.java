@@ -23,6 +23,7 @@ import java.util.EventListener;
 /**
  * Listener interface for {@link FutureResultCollector} events.
  * @author Laurent Cohen
+ * @exclude
  */
 interface FutureResultCollectorListener extends EventListener
 {

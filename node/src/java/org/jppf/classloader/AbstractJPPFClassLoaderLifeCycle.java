@@ -32,6 +32,7 @@ import org.slf4j.*;
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 {

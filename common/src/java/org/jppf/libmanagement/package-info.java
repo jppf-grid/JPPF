@@ -19,5 +19,6 @@
 /**
  * Classes used to download libraries from various URLs.
  * Here idle means no keyboard or mouse activity was detected for a specified time.
+ * @exclude
  */
 package org.jppf.libmanagement;

@@ -18,5 +18,6 @@
 
 /**
  * Support for embedded scripting within JPPF.
+ * @exclude
  */
 package org.jppf.scripting;

@@ -43,6 +43,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @return the id of the submission, to use for later retrieval of the results and status of the submission.
    * @throws Exception if an error occurs while submitting the request.
    * @deprecated use {@link #submit(JPPFJob)} instead.
+   * @exclude
    */
   String submitNonBlocking(JPPFJob job) throws Exception;
 
@@ -55,6 +56,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @return the id of the submission, to use for later retrieval of the results and status of the submission.
    * @throws Exception if an error occurs while submitting the request.
    * @deprecated use {@link #submit(JPPFJob, SubmissionStatusListener)} instead.
+   * @exclude
    */
   String submitNonBlocking(JPPFJob job, SubmissionStatusListener listener) throws Exception;
 
@@ -130,23 +132,27 @@ public interface JPPFConnection extends Connection, JPPFAccessor
   /**
    * Determine whether this connection has been closed.
    * @return true if the connection was closed, false otherwise.
+   * @exclude
    */
   boolean isClosed();
 
   /**
    * Set the closed  state of this connection.
+   * @exclude
    */
   void setAvailable();
 
   /**
    * Get the associated managed connection.
    * @return a <code>JPPFManagedConnection</code> instance.
+   * @exclude
    */
   JPPFManagedConnection getManagedConnection();
 
   /**
    * Set the associated managed connection.
    * @param conn a <code>JPPFManagedConnection</code> instance.
+   * @exclude
    */
   void setManagedConnection(JPPFManagedConnection conn);
 

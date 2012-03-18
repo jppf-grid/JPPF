@@ -24,6 +24,7 @@ import org.jppf.utils.EventEmitter;
  * It then notifies all listeners that registered with it.
  * @see org.jppf.server.JPPFDriver#getStatsManager()
  * @author Laurent Cohen
+ * @exclude
  */
 public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListener> implements JPPFDriverListener
 {

@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 /**
  * Instances of this class describe a non-transient field of a Java class with in order ot enable serialization and deserialization of this field.
  * @author Laurent Cohen
+ * @exclude
  */
 class FieldDescriptor
 {

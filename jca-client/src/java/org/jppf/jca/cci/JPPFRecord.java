@@ -24,6 +24,7 @@ import javax.resource.cci.Record;
  * Implementation of the {@link javax.resource.cci.Record Record} interface for
  * the JPPF resource adapter.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFRecord implements Record
 {

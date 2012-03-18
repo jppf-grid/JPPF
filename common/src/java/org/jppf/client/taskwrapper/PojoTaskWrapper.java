@@ -28,6 +28,7 @@ import org.jppf.utils.ReflectionUtils;
 /**
  * Task wrapper for POJO classes.
  * @author Laurent Cohen
+ * @exclude
  */
 public class PojoTaskWrapper extends AbstractTaskObjectWrapper
 {

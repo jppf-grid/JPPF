@@ -35,6 +35,7 @@ import org.jppf.server.protocol.JPPFTask;
 /**
  * Implementation of a JCA connection. This class provides an API to send tasks to a JPPF driver.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnection
 {

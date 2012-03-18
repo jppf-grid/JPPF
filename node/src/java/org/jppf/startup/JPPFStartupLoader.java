@@ -26,6 +26,7 @@ import org.slf4j.*;
 /**
  * Loader for the JPPF startup SPI implementations.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFStartupLoader
 {

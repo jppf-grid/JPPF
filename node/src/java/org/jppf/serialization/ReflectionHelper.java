@@ -27,8 +27,10 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This helper class provides utility methods to facilitate the JPPF-sepcific
+ * serialization and deserilaization.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class ReflectionHelper
 {

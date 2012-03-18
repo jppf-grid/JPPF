@@ -29,6 +29,7 @@ import org.jppf.utils.ReflectionUtils;
 /**
  * Wrapper class for a task not extending {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
  * @author Laurent Cohen
+ * @exclude
  */
 class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
 {

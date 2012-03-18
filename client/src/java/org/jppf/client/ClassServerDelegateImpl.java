@@ -33,6 +33,7 @@ import org.slf4j.*;
  * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
  * @author Domingos Creado
+ * @exclude
  */
 public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 {

@@ -18,5 +18,6 @@
 
 /**
  * Classes providing server debug information via JMX.
+ * @exclude
  */
 package org.jppf.server.debug;

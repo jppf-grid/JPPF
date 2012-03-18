@@ -24,6 +24,7 @@ import javax.resource.spi.*;
 /**
  * Instances of this class represent a default connection manager for non-managed environments.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFConnectionManager implements ConnectionManager
 {

@@ -29,6 +29,7 @@ import org.slf4j.*;
  * Factory class for JPPF load-balancing algorithms defined through the {@link org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider JPPFBundlerProvider}
  * service provider interface.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFBundlerFactory
 {

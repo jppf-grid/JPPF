@@ -94,6 +94,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 
   /**
    * Initialize the underlying socket connection.
+   * @exclude
    */
   @Override
   protected void init()
@@ -137,7 +138,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   /**
    * Create the ssl connection over an established plain connection.
    */
-  protected void createSSLConnection()
+  private void createSSLConnection()
   {
     try
     {
@@ -191,6 +192,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
 
   /**
    * {@inheritDoc}
+   * @exclude
    */
   @Override
   public void reset()
@@ -257,6 +259,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * @param asResource true if the resource is loaded using getResource(), false otherwise.
    * @return a <code>JPPFResourceWrapper</code> containing the resource content.
    * @throws Exception if the connection was lost and could not be reestablished.
+   * @exclude
    */
   @Override
   protected JPPFResourceWrapper loadRemoteData(final Map<String, Object> map, final boolean asResource) throws Exception

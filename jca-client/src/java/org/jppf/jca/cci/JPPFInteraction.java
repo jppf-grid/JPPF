@@ -24,6 +24,7 @@ import javax.resource.cci.*;
 /**
  * Implementation of the Interaction interface.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFInteraction implements Interaction
 {

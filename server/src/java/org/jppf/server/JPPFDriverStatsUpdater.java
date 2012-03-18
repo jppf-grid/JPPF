@@ -23,6 +23,7 @@ import org.jppf.utils.*;
 /**
  * Instances of this class are used to collect statistics on the JPPF server.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class JPPFDriverStatsUpdater implements JPPFDriverListener
 {

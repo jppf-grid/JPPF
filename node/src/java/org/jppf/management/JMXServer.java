@@ -23,6 +23,7 @@ import javax.management.MBeanServer;
 /**
  * Interface for JMX remote servers associated to drivers and nodes.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface JMXServer
 {

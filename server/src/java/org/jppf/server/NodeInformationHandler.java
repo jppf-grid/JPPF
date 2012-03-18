@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * Instances of this class manage information on the nodes obtained via JMX.
  * @author Laurent Cohen
+ * @exclude
  */
 public class NodeInformationHandler
 {

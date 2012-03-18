@@ -35,6 +35,7 @@ import org.slf4j.*;
 /**
  * Utility class handling all aspects of the SSL configuration.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SSLHelper
 {
@@ -100,7 +101,7 @@ public class SSLHelper
    * Create an SSL connection over an established plain socket connection.
    * @param socketClient the plain connection, already connected.
    * @return a {@link SocketWrapper} whose socket is an {@link SSLSocket} wrapping the {@link Socket} of the plain connection.
-   * @throws Exception if an error occurs while configure the SSL parameters.
+   * @throws Exception if an error occurs while configuring the SSL parameters.
    */
   public static SocketWrapper createSSLClientConnection(final SocketWrapper socketClient) throws Exception
   {
@@ -183,6 +184,7 @@ public class SSLHelper
     String s = sslConfig.getString(baseProperty, null);
     if (s != null) return s.toCharArray();
     s = sslConfig.getString(baseProperty + ".source", null);
+    //return (char[]) callSource(s);
     return (char[]) callSource(s);
   }
 
@@ -198,7 +200,8 @@ public class SSLHelper
     String s = sslConfig.getString(baseProperty + ".file", null);
     if (s != null) return getKeyOrTrustStore(s, pwd);
     s = sslConfig.getString(baseProperty + ".source", null);
-    InputStream is = (InputStream) callSource(s);
+    //InputStream is = (InputStream) callSource(s);
+    InputStream is = callSource(s);
     return getKeyOrTrustStore(is, pwd);
   }
 
@@ -208,21 +211,30 @@ public class SSLHelper
    * &nbsp;&nbsp;&nbsp;&nbsp;<code>mypackage.MyClass arg1 ... argN</code><br/>
    * where <code>MyClass</code> is an implementation of {@link Callable}.
    * @return the result of calling the instantiated class.
+   * @param <E> the of the object returned by invoking the instantiated class..
    * @throws Exception if any error occurs.
    */
-  private static Object callSource(final String value) throws Exception
+  @SuppressWarnings("unchecked")
+  private static <E> E callSource(final String value) throws Exception
   {
     if (value == null) return null;
     String[] tokens = value.split("\\s");
-    Class<?> clazz = Class.forName(tokens[0]);
+    Class<? extends Callable<E>> clazz = (Class<? extends Callable<E>>) Class.forName(tokens[0]);
     String[] args = null;
     if (tokens.length > 1)
     {
       args = new String[tokens.length - 1];
       System.arraycopy(tokens, 1, args, 0, args.length);
     }
-    Constructor c = clazz.getConstructor(String[].class);
-    Callable<?> callable = (Callable<?>) c.newInstance((Object) args);
+    Constructor<? extends Callable<E>> c = null;
+    try
+    {
+      c = clazz.getConstructor(String[].class);
+    }
+    catch (NoSuchMethodException ignore)
+    {
+    }
+    Callable<E> callable = (Callable<E>) (c == null ? clazz.newInstance() : c.newInstance((Object) args));
     return callable.call();
   }
 
@@ -235,18 +247,23 @@ public class SSLHelper
     if (sslConfig == null)
     {
       sslConfig = new TypedProperties();
-      TypedProperties config = JPPFConfiguration.getProperties();
-      String filename = config.getString("jppf.ssl.configuration", null);
-      String configSource = config.getString("jppf.ssl.configuration.source", null);
       InputStream is = null;
+      TypedProperties config = JPPFConfiguration.getProperties();
+      String configSource = config.getString("jppf.ssl.configuration.source", null);
+      if (configSource != null) is = callSource(configSource);
+      else
+      {
+        String filename = config.getString("jppf.ssl.configuration.file", null);
+        is = FileUtils.getFileInputStream(filename);
+      }
+      if (is == null) throw new SSLConfigurationException("could not load the SSL configuration");
       try
       {
-        is = JPPFConfiguration.getConfigurationStream(filename, configSource);
-        if (is != null) sslConfig.load(is);
+        sslConfig.load(is);
       }
       finally
       {
-        if (is != null) StreamUtils.closeSilent(is);
+        StreamUtils.closeSilent(is);
       }
     }
   }

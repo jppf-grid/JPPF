@@ -28,6 +28,7 @@ import org.slf4j.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 class FutureResultCollector extends JPPFResultCollector
 {

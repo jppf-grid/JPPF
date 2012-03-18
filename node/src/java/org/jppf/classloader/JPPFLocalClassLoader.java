@@ -70,6 +70,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 
   /**
    * Initialize the underlying socket connection.
+   * @exclude
    */
   @Override
   protected void init()
@@ -124,6 +125,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
 
   /**
    * {@inheritDoc}
+   * @exclude
    */
   @Override
   public void reset()
@@ -134,6 +136,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   /**
    * Terminate this classloader and clean the resources it uses.
    * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
+   * @exclude
    */
   @Override
   public void close()
@@ -155,6 +158,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
    * @param name the binary name of the class
    * @return the resulting <tt>Class</tt> object
    * @throws ClassNotFoundException if the class could not be found
+   * @exclude
    */
   @Override
   public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
@@ -205,6 +209,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
    * @param asResource true if the resource is loaded using getResource(), false otherwise.
    * @return a <code>JPPFResourceWrapper</code> containing the resource content.
    * @throws Exception if the connection was lost and could not be reestablished.
+   * @exclude
    */
   @Override
   protected JPPFResourceWrapper loadRemoteData(final Map<String, Object> map, final boolean asResource) throws Exception

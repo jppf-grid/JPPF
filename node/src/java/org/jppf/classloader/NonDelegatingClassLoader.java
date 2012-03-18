@@ -28,6 +28,7 @@ import org.jppf.utils.streams.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class NonDelegatingClassLoader extends URLClassLoader
 {

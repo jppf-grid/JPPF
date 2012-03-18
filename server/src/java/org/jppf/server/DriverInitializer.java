@@ -37,6 +37,7 @@ import org.slf4j.*;
 /**
  * Handles various initializations for the driver.
  * @author Laurent Cohen
+ * @exclude
  */
 public class DriverInitializer
 {

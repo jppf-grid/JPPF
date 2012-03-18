@@ -34,6 +34,7 @@ import org.slf4j.*;
  * It handles both normal mode and batching mode, where the tasks throughput is streamlined
  * by specifying how many tasks should be sent to the grid, and a which intervals.
  * @author Laurent Cohen
+ * @exclude
  */
 public class BatchHandler extends ThreadSynchronization implements Runnable
 {

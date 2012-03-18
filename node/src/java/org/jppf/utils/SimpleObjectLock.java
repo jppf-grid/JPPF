@@ -21,6 +21,7 @@ package org.jppf.utils;
 /**
  * Instances of this class be used simply as synchronization focus of multiple threads.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SimpleObjectLock extends ThreadSynchronization
 {

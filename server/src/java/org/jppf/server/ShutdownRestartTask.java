@@ -25,6 +25,7 @@ import org.slf4j.*;
 /**
  * Task used by a timer to shutdown, and eventually restart, this server.<br>
  * Both shutdown and restart operations can be performed with a specified delay.
+ * @exclude
  */
 class ShutdownRestartTask extends TimerTask
 {

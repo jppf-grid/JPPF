@@ -30,6 +30,7 @@ import org.slf4j.*;
  * arrays of bytes.
  * @author Laurent Cohen
  * @author Domingos Creado
+ * @exclude
  */
 public class ResourceProvider
 {

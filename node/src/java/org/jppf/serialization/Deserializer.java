@@ -28,6 +28,7 @@ import org.slf4j.*;
 /**
  * Instances of this class are intended to deserialize object graphs from an underlying input stream.
  * @author Laurent Cohen
+ * @exclude
  */
 class Deserializer
 {
