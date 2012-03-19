@@ -83,7 +83,9 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public JPPFNodeState state() throws Exception
   {
-    return nodeState.copy();
+    JPPFNodeState ns = nodeState.copy();
+    if (log.isTraceEnabled()) log.trace("nn threads = " + ns.getThreadPoolSize());
+    return ns;
   }
 
   /**
