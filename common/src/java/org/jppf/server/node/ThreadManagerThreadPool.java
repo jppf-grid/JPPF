@@ -139,7 +139,7 @@ public class ThreadManagerThreadPool extends ThreadManager
   @Override
   public int getPoolSize()
   {
-      return threadPool.getPoolSize();
+    return threadPool.getMaximumPoolSize();
   }
 
   /**

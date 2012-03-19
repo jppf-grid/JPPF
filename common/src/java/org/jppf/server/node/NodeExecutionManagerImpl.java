@@ -119,7 +119,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     this.node = node;
 
     TypedProperties props = JPPFConfiguration.getProperties();
-    int poolSize = props.getInt("processing.threads", -1);
+    int poolSize = props.getInt("processing.threads", Runtime.getRuntime().availableProcessors());
     if (poolSize < 0)
     {
       poolSize = Runtime.getRuntime().availableProcessors();
@@ -217,14 +217,10 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
    * This feature has been removed from the management APIs, with no replacement.
    * Tasks can still be cancelled, but only as part of job cancel.
+   * As a consequence, this method does not do anything anymore.
    */
   public synchronized void cancelTask(final String id)
   {
-    if (debugEnabled) log.debug("cancelling tasks with id = " + id);
-    List<Long> numberList = idMap.remove(id);
-    if (numberList == null) return;
-    if (debugEnabled) log.debug("number of tasks to cancel: " + numberList.size());
-    for (Long number: numberList) cancelTask(number, true);
   }
 
   /**
@@ -252,35 +248,10 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * @deprecated the task restart feature is inherently unsafe, as it depends on the task
    * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
    * This feature has been removed from the management APIs, with no replacement.
+   * As a consequence, this method does not do anything anymore.
    */
   public synchronized void restartTask(final String id)
   {
-    if (debugEnabled) log.debug("restarting tasks with id = " + id);
-    List<Long> numberList = idMap.remove(id);
-    if (numberList == null) return;
-    if (debugEnabled) log.debug("number of tasks to restart: " + numberList.size());
-    for (Long number: numberList)
-    {
-      Future<?> future = futureMap.get(number);
-      if (!future.isDone())
-      {
-        future.cancel(true);
-        Task task = taskMap.remove(number);
-        removeFuture(number);
-        if (task != null)
-        {
-          task.onRestart();
-          try
-          {
-            performTask(task);
-          }
-          catch(Exception e)
-          {
-            log.error(e.getMessage(), e);
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -316,7 +287,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
       TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
       timeoutHandler.scheduleAction(future, task.getTimeoutSchedule(), tt);
     }
-
     return threadManager.computeExecutionInfo();
   }
 
@@ -426,27 +396,18 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     return futureMap.get(number);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFDistributedJob getCurrentJob()
   {
     return bundle;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public List<Task> getTasks()
   {
     return taskList == null ? null : Collections.unmodifiableList(taskList);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getCurrentJobId()
   {
@@ -512,17 +473,17 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    */
   public synchronized void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification)
   {
-    try {
+    try
+    {
       if (this.reconnectionNotification != null) return;
       this.reconnectionNotification = reconnectionNotification;
-    } finally {
+    }
+    finally
+    {
       wakeUp();
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Node getNode()
   {
@@ -556,6 +517,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     {
       log.info("Node thread pool size changed from " + oldSize + " to " + size);
       JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
+      configChanged.set(true);
     }
   }
 
@@ -567,6 +529,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   {
     return threadManager.getPoolSize();
   }
+
   /**
    * Get the priority assigned to the execution threads.
    * @return the priority as an int value.
