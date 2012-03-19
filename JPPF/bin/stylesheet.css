@@ -323,6 +323,7 @@ ul.inheritance li ul.inheritance {
     margin-left:15px;
     padding-left:15px;
     padding-top:1px;
+    list-style-image: url('resources/inherit.gif');
 }
 ul.blockList, ul.blockListLast {
     margin:0;
@@ -475,6 +476,16 @@ table.packageSummary td.colFirst, table.overviewSummary th.colFirst {
     /*width:25%;*/
     vertical-align:middle;
 }
+
+table.packageSummary {
+  margin-top: 10px;
+}
+
+table.packageSummary tbody tr th {
+  background-color: #6D78B6;
+  color: white;
+}
+
 /*
 Content styles
 */
