@@ -22,6 +22,8 @@ import org.jppf.client.*;
 
 /**
  * Wrapper for submitting a job.
+ * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractJobSubmission implements JobSubmission
 {

@@ -68,7 +68,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The universal unique id for this job.
    */
-  private String uuid = null;
+  private final String uuid;
   /**
    * The service level agreement between the job and the server.
    */
@@ -84,7 +84,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The list of listeners registered with this job.
    */
-  private transient List<JobListener> listeners = new LinkedList<JobListener>();
+  private final transient List<JobListener> listeners = new LinkedList<JobListener>();
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
@@ -458,22 +458,12 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   }
 
   /**
-   * Get the list of job listeners.
-   * @return a list of <code>JobListener</code> instances.
-   */
-  private synchronized List<JobListener> getListeners()
-  {
-    if (listeners == null) listeners = new LinkedList<JobListener>();
-    return listeners;
-  }
-
-  /**
    * Add a listener to the list of job listeners.
    * @param listener a {@link JobListener} instance.
    */
   public void addJobListener(final JobListener listener)
   {
-    synchronized(getListeners())
+    synchronized(listeners)
     {
       listeners.add(listener);
     }
@@ -485,7 +475,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public void removeJobListener(final JobListener listener)
   {
-    synchronized(getListeners())
+    synchronized(listeners)
     {
       listeners.remove(listener);
     }
@@ -494,11 +484,12 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * Notify all listeners of the specified event type.
    * @param type the type of the event.
+   * @exclude
    */
   public void fireJobEvent(final JobEvent.Type type)
   {
     JobEvent event = new JobEvent(this);
-    synchronized(getListeners())
+    synchronized(listeners)
     {
       for (JobListener listener: listeners)
       {

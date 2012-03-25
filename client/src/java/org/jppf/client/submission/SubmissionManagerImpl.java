@@ -27,6 +27,7 @@ import org.slf4j.*;
  * It relies on a queue where job are first added, then submitted when a driver connection becomes available.
  * It also provides methods to check the status of a submission and retrieve the results.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SubmissionManagerImpl extends AbstractSubmissionManager
 {

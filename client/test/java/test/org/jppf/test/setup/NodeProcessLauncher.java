@@ -30,7 +30,7 @@ public class NodeProcessLauncher extends GenericProcessLauncher
    */
   public NodeProcessLauncher(final int n)
   {
-    super();
+    super("[node " + n + "] ");
     setMainClass("org.jppf.node.NodeRunner");
     //addArgument("noLauncher");
     setJppfConfig("node" + n + ".properties");

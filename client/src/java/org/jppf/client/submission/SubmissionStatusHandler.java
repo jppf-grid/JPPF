@@ -20,7 +20,7 @@ package org.jppf.client.submission;
 
 
 /**
- * Interface implemented by {@link org.jppf.client.TaskResultListener} implementations
+ * Interface implemented by {@link org.jppf.client.event.TaskResultListener TaskResultListener} implementations
  * that wish to handle submission statuses.
  * @author Laurent Cohen
  */

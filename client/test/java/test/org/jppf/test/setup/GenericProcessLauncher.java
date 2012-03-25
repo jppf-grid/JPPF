@@ -23,6 +23,7 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
+import org.jppf.process.event.*;
 import org.slf4j.*;
 
 /**
@@ -64,10 +65,6 @@ public class GenericProcessLauncher
    */
   private List<String> arguments = new ArrayList<String>();
   /**
-   * Path to the commons-logging configuration file.
-   */
-  private String comonsLogging = "config/commons-logging.properties";
-  /**
    * Path to the log4j configuration file.
    */
   private String log4j = null;
@@ -95,18 +92,24 @@ public class GenericProcessLauncher
    * The port number the server socket listens to.
    */
   private int processPort = 0;
+  /**
+   * 
+   */
+  private String name = "";
 
   /**
    * Default constructor.
+   * @param name the name for this process.
    */
-  public GenericProcessLauncher()
+  public GenericProcessLauncher(final String name)
   {
+    this.name = name;
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
-    //addClasspathElement(libDir + "slf4j/jcl-over-slf4j-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
+    addClasspathElement(libDir + "jmxremote/jmxremote_optional.jar");
   }
 
   /**
@@ -125,24 +128,6 @@ public class GenericProcessLauncher
   public void setJppfConfig(final String jppfConfig)
   {
     this.jppfConfig = jppfConfig;
-  }
-
-  /**
-   * Get the path to the commons-logging configuration file.
-   * @return the path as a string.
-   */
-  public String getComonsLogging()
-  {
-    return comonsLogging;
-  }
-
-  /**
-   * Set the path to the commons-logging configuration file.
-   * @param comonsLogging the path as a string.
-   */
-  public void setComonsLogging(final String comonsLogging)
-  {
-    this.comonsLogging = comonsLogging;
   }
 
   /**
@@ -254,6 +239,20 @@ public class GenericProcessLauncher
     builder.command(command);
     if (dir != null) builder.directory(new File(dir));
     wrapper = new ProcessWrapper();
+    wrapper.addListener(new ProcessWrapperEventListener()
+    {
+      @Override
+      public void outputStreamAltered(final ProcessWrapperEvent event)
+      {
+        System.out.print(name + event.getContent());
+      }
+
+      @Override
+      public void errorStreamAltered(final ProcessWrapperEvent event)
+      {
+        System.err.print(name + event.getContent());
+      }
+    });
     wrapper.setProcess(builder.start());
     Process process = wrapper.getProcess();
     log.info("starting process " + process);

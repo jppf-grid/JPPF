@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * Abstract super class for J2SE and JCA submission managers.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractSubmissionManager extends ThreadSynchronization implements SubmissionManager
 {

@@ -29,7 +29,7 @@ public class DriverProcessLauncher extends GenericProcessLauncher
    */
   public DriverProcessLauncher()
   {
-    super();
+    super("[driver] ");
     setMainClass("org.jppf.server.JPPFDriver");
     //addArgument("noLauncher");
     setJppfConfig("config/driver.properties");

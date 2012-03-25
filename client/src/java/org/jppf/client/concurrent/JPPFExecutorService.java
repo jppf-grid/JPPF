@@ -471,4 +471,22 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
   {
     batchHandler.setBatchTimeout(batchTimeout);
   }
+
+  /**
+   * Get the configuration for this executor service.
+   * @return an {@link ExecutorServiceConfiguration} instance.
+   */
+  public ExecutorServiceConfiguration getConfiguration()
+  {
+    return batchHandler.getConfig();
+  }
+
+  /**
+   * Reset the configuration for this executor service to a blank state.
+   * @return an {@link ExecutorServiceConfiguration} instance.
+   */
+  public ExecutorServiceConfiguration resetConfiguration()
+  {
+    return batchHandler.resetConfig();
+  }
 }

@@ -29,7 +29,7 @@ import org.slf4j.*;
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
  * that can be used &quot;as is&quot; to collect the results of an asynchronous job submission.
- * @see org.jppf.client.JPPFClient#submitNonBlocking(List, org.jppf.task.storage.DataProvider, TaskResultListener)
+ * @see org.jppf.client.JPPFClient#submit(org.jppf.client.JPPFJob)
  * @author Laurent Cohen
  * @author Martin JANDA
  */
@@ -45,23 +45,27 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The initial task count in the job.
+   * @exclude
    */
   protected int count;
   /**
    * Count of results not yet received.
+   * @exclude
    */
   protected int pendingCount = 0;
   /**
    * A map containing the resulting tasks, ordered by ascending position in the
    * submitted list of tasks.
+   * @exclude
    */
   protected Map<Integer, JPPFTask> resultMap = null;
   /**
    * The list of final resulting tasks.
+   * @exclude
    */
   protected List<JPPFTask> results = null;
   /**
-   * 
+   * The job whose results this object is collecting.
    */
   protected JPPFJob job = null;
   /**
@@ -75,6 +79,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
 
   /**
    * Default constructor, provided as a convenience for subclasses.
+   * @exclude
    */
   protected JPPFResultCollector()
   {
@@ -95,6 +100,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    * Initialize this collector with a specified number of tasks.
    * @param count the count of submitted tasks.
    * @deprecated use {@link #JPPFResultCollector(JPPFJob) JPPFResultCollector(JPPFJob)} instead.
+   * @exclude
    */
   public JPPFResultCollector(final int count)
   {

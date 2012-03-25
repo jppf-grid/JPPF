@@ -38,6 +38,14 @@ public class JPPFAnnotatedTask extends JPPFTask
    * Wrapper around a task that is not an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
    */
   protected TaskObjectWrapper taskObjectWrapper = null;
+  /**
+   * A delegate for the <code>onCancel()</code> method.
+   */
+  protected JPPFTaskCallback cancelCallback = null;
+  /**
+   * A delegate for the <code>onTimeout()</code> method.
+   */
+  protected JPPFTaskCallback timeoutCallback = null;
 
   /**
    * Initialize this task with an object whose class is either annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable},
@@ -92,5 +100,49 @@ public class JPPFAnnotatedTask extends JPPFTask
   public Object getTaskObject()
   {
     return taskObjectWrapper.getTaskObject();
+  }
+
+  /**
+   * Set the delegate for the <code>onCancel()</code> method.
+   * @param cancelCallback a {@link JPPFTaskCallback} instance.
+   */
+  public void setCancelCallback(final JPPFTaskCallback cancelCallback)
+  {
+    this.cancelCallback = cancelCallback;
+  }
+
+  /**
+   * Set the delegate for the <code>onTimeout()</code> method.
+   * @param timeoutCallback a {@link JPPFTaskCallback} instance.
+   */
+  public void setTimeoutCallback(final JPPFTaskCallback timeoutCallback)
+  {
+    this.timeoutCallback = timeoutCallback;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void onCancel()
+  {
+    if (cancelCallback != null)
+    {
+      cancelCallback.setTask(this);
+      cancelCallback.run();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void onTimeout()
+  {
+    if (timeoutCallback != null)
+    {
+      timeoutCallback.setTask(this);
+      timeoutCallback.run();
+    }
   }
 }

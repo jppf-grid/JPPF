@@ -25,7 +25,8 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -50,6 +51,10 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
    * Count of jobs created by this executor service.
    */
   private static AtomicLong jobCount = new AtomicLong(0);
+  /**
+   * The default configuration all batch handlers.
+   */
+  private static final ExecutorServiceConfiguration DEFAULT_CONFIG = new ExecutorServiceConfigurationImpl();
   /**
    * The minimum number of tasks that must be submitted before they are sent to the server.
    */
@@ -87,6 +92,10 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
    * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
    */
   private Condition jobReady = lock.newCondition();
+  /**
+   * The configuration for this batch handler.
+   */
+  private ExecutorServiceConfiguration config = new ExecutorServiceConfigurationImpl();
 
   /**
    * Default constructor.
@@ -163,6 +172,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
           if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getTasks().size() + " tasks");
           FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
           collector.setTaskCount(job.getTasks().size() - job.getResults().size());
+          configureJob(job);
           executor.submitJob(job);
           currentJobRef.set(null);
           elapsed = System.currentTimeMillis() - start;
@@ -266,6 +276,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       {
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
         JPPFTask jppfTask = job.addTask(task);
+        configureTask((JPPFAnnotatedTask) jppfTask);
         future = new JPPFTaskFuture<T>(collector, jppfTask.getPosition());
       }
       catch (JPPFException e)
@@ -303,7 +314,11 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       {
         List<JPPFTask> jobTasks = job.getTasks();
         start = jobTasks.size();
-        for (Callable<?> task: tasks) job.addTask(task);
+        for (Callable<?> task: tasks)
+        {
+          JPPFTask t = job.addTask(task);
+          configureTask((JPPFAnnotatedTask) t);
+        }
       }
       catch (JPPFException e)
       {
@@ -332,7 +347,38 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
     job.setResultListener(collector);
     job.setBlocking(false);
     collector.addListener(executor);
+    //configureJob(job);
     return job;
+  }
+
+  /**
+   * Configure the specfied job using the current configuration.
+   * @param job the job to configure.
+   */
+  private synchronized void configureJob(final JPPFJob job)
+  {
+    if (config != null)
+    {
+      JobConfiguration jc = config.getJobConfiguration();
+      job.setSLA(jc.getSLA());
+      job.setMetadata(jc.getMetadata());
+      job.setPersistenceManager(jc.getPersistenceManager());
+    }
+  }
+
+  /**
+   * Configure the specfied job using the current configuration.
+   * @param task the task to configure.
+   */
+  private synchronized void configureTask(final JPPFAnnotatedTask task)
+  {
+    if (config != null)
+    {
+      TaskConfiguration tc = config.getTaskConfiguration();
+      task.setCancelCallback(tc.getOnCancelCallback());
+      task.setTimeoutCallback(tc.getOnTimeoutCallback());
+      task.setTimeoutSchedule(tc.getTimeoutSchedule());
+    }
   }
 
   /**
@@ -350,5 +396,35 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
     {
       lock.unlock();
     }
+  }
+
+  /**
+   * Get the configuration for this batch handler.
+   * @return an {@link ExecutorServiceConfiguration} instance.
+   */
+  synchronized ExecutorServiceConfiguration getConfig()
+  {
+    return config;
+  }
+
+  /**
+   * Set the configuration for this batch handler.
+   * @param config an {@link ExecutorServiceConfiguration} instance.
+   * @throws IllegalArgumentException if the new configuration is null.
+   */
+  synchronized void setConfig(final ExecutorServiceConfiguration config) throws IllegalArgumentException
+  {
+    if (config == null) throw new IllegalArgumentException("configuration cannot be null");
+    this.config = config;
+  }
+
+  /**
+   * Get the configuration for this batch handler.
+   * @return an {@link ExecutorServiceConfiguration} instance.
+   */
+  synchronized ExecutorServiceConfiguration resetConfig()
+  {
+    config = new ExecutorServiceConfigurationImpl();
+    return config;
   }
 }

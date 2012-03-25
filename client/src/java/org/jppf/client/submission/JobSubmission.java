@@ -24,6 +24,7 @@ import org.jppf.client.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public interface JobSubmission extends Runnable
 {

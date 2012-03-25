@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * This class encapsulates the results of a job submission.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JobSubmissionImpl extends AbstractJobSubmission
 {
