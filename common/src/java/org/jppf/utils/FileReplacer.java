@@ -184,6 +184,7 @@ public class FileReplacer
 
   /**
    * File filter based on a set of extensions.
+   * @exclude
    */
   public static class ReplacerFilter implements FileFilter
   {

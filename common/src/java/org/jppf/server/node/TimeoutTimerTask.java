@@ -25,6 +25,7 @@ import org.jppf.node.protocol.Task;
  * Instances of this class are scheduled by a timer to execute one time, check
  * whether the corresponding JPPF task timeout has been reached, and abort the
  * task if necessary.
+ * @exclude
  */
 public class TimeoutTimerTask implements Runnable
 {
@@ -71,7 +72,11 @@ public class TimeoutTimerTask implements Runnable
       try
       {
         future.cancel(true);
-        task.onTimeout();
+        synchronized(task)
+        {
+          if (task.getException() instanceof InterruptedException) task.setException(null);
+          task.onTimeout();
+        }
         executionManager.removeFuture(number);
       }
       catch(Exception ignore)

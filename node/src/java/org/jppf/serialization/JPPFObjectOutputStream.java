@@ -31,7 +31,7 @@ import org.jppf.utils.SerializationUtils;
  * <ul>
  * <li>transient fields are not serialized</li>
  * <li><code>private void writeObject(ObjectOutputStream)</code> is used whenever implemented</li>
- * <li>the {@link Externalized} interface is respected</li>
+ * <li>the {@link Externalizable} interface is respected</li>
  * </ul>
  * @author Laurent Cohen
  */

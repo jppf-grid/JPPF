@@ -28,12 +28,12 @@ public interface JobAwareness
 {
   /**
    * Get the current job's metadata.
-   * @return a {@link JPPFJobMetadata} instance.
+   * @return a {@link JobMetadata} instance.
    */
   JobMetadata getJobMetadata();
   /**
    * Set the current job's metadata.
-   * @param metadata a {@link JPPFJobMetadata} instance.
+   * @param metadata a {@link JobMetadata} instance.
    */
   void setJobMetadata(JobMetadata metadata);
 }

@@ -26,16 +26,16 @@ import org.jppf.utils.Range;
  * Instances of this class represent the configuration parameters for a specific IP address pattern implementation.
  * @author Laurent Cohen
  */
-final class PatternConfiguration
+public final class PatternConfiguration
 {
   /**
    * Configuration for IPv6 address patterns.
    */
-  static final PatternConfiguration IPV4_CONFIGURATION = new PatternConfiguration(4, 0, 255, '.', "");
+  public static final PatternConfiguration IPV4_CONFIGURATION = new PatternConfiguration(4, 0, 255, '.', "");
   /**
    * Configuration for IPv6 address patterns.
    */
-  static final PatternConfiguration IPV6_CONFIGURATION = new PatternConfiguration(8, 0, 0xffff, ':', "0x");
+  public static final PatternConfiguration IPV6_CONFIGURATION = new PatternConfiguration(8, 0, 0xffff, ':', "0x");
   /**
    * Regex pattern that matches any sequence of one or more spaces.
    */

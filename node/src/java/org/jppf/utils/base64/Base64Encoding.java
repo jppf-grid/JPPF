@@ -107,7 +107,7 @@ public final class Base64Encoding
 
   /**
    * Performs Base64 encoding on the <code>raw</code> ByteBuffer, writing it to the <code>encoded</code> ByteBuffer.
-   * This is an experimental feature. Currently it does not pass along any options (such as {@link #DO_BREAK_LINES} or {@link #GZIP}.
+   * This is an experimental feature. Currently it does not pass along any options (such as {@link Base64#DO_BREAK_LINES DO_BREAK_LINES} or {@link Base64#GZIP GZIP}.
    * @param raw input buffer
    * @param encoded output buffer
    * @since 2.3
@@ -125,7 +125,7 @@ public final class Base64Encoding
 
   /**
    * Performs Base64 encoding on the <code>raw</code> ByteBuffer, writing it to the <code>encoded</code> CharBuffer.
-   * This is an experimental feature. Currently it does not pass along any options (such as {@link #DO_BREAK_LINES} or {@link #GZIP}.
+   * This is an experimental feature. Currently it does not pass along any options (such as {@link Base64#DO_BREAK_LINES DO_BREAK_LINES} or {@link Base64#GZIP GZIP}.
    * @param raw input buffer
    * @param encoded output buffer
    * @since 2.3

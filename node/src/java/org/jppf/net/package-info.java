@@ -18,6 +18,5 @@
 
 /**
  * Support for networking in JPPF.
- * @exclude
  */
 package org.jppf.net;

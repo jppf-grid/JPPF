@@ -29,6 +29,7 @@ import org.slf4j.*;
 /**
  * Instances of this class manage the node's class loader and associated operations.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractClassLoaderManager
 {

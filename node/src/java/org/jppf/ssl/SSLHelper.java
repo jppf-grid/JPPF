@@ -37,7 +37,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class SSLHelper
+public final class SSLHelper
 {
   /**
    * Logger for this class.
@@ -51,6 +51,13 @@ public class SSLHelper
    * The SSL configuration properties.
    */
   private static TypedProperties sslConfig = null;
+
+  /**
+   * Instantiating this class is not permitted.
+   */
+  private SSLHelper()
+  {
+  }
 
   /**
    * Get a SSL context from the SSL configuration.

@@ -23,6 +23,7 @@ import java.util.List;
 /**
  * Interface for a class loader provider.
  * @author Martin JANDA
+ * @exclude
  */
 public interface ClassLoaderProvider {
   /**

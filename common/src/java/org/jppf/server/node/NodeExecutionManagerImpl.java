@@ -236,7 +236,14 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     {
       future.cancel(true);
       Task task = taskMap.remove(number);
-      if (task != null && callOnCancel) task.onCancel();
+      if (task != null)
+      {
+        synchronized(task)
+        {
+          if (task.getException() instanceof InterruptedException) task.setException(null);
+          if (callOnCancel) task.onCancel();
+        }
+      }
       removeFuture(number);
     }
   }

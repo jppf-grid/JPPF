@@ -347,9 +347,6 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
     System.out.print(event.getContent());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void idleStateChanged(final IdleStateEvent event)
   {

@@ -34,6 +34,7 @@ import org.slf4j.*;
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractNodeIO implements NodeIO
 {
@@ -164,6 +165,7 @@ public abstract class AbstractNodeIO implements NodeIO
 
   /**
    * A pairing of a list of buffers and the total length of their usable data.
+   * @exclude
    */
   protected static class BufferList extends Pair<List<JPPFBuffer>, Integer>
   {

@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
  * Extension of {@link java.io.ByteArrayOutputStream ByteArrayOutputStream}, providing
  * a faster toByteArray() method that does not involve copying its internal buffer.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFByteArrayOutputStream extends ByteArrayOutputStream
 {

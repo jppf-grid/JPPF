@@ -29,7 +29,7 @@ import java.util.Map;
  * <ul>
  * <li>transient fields are not deserialized</li>
  * <li><code>private void readObject(ObjectInputStream)</code> is used whenever implemented</li>
- * <li>the {@link Externalized} interface is respected</li>
+ * <li>the {@link java.io.Externalizable Externalizable} interface is respected</li>
  * </ul>
  * @author Laurent Cohen
  */

@@ -15,10 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.jppf.node.protocol;
-
-
 
 /**
  * Common interface for client-side jobs (see {@link org.jppf.client.JPPFJob JPPFJob} and server-side jobs
@@ -31,6 +28,7 @@ public interface JPPFDistributedJob
    * Get the user-defined display name for this job. This is the name displayed in the administration console.
    * @return the id as a string.
    * @deprecated use {@link #getName() getName()} instead.
+   * @exclude
    */
   String getId();
 
@@ -44,6 +42,7 @@ public interface JPPFDistributedJob
    * Get the universal unique id for this job.
    * @return the uuid as a string.
    * @deprecated use {@link #getUuid()} instead.
+   * @exclude
    */
   String getJobUuid();
 

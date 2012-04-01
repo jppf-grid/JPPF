@@ -27,10 +27,10 @@ import org.jppf.utils.Pair;
 /**
  * This interface defines how a node receives a job and sends its execution results.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface NodeIO
 {
-
   /**
    * Read a task from the socket connection, along with its header information.
    * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.

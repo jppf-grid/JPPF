@@ -41,7 +41,8 @@ public abstract class ExecutionPolicy implements Serializable
    * Stores the XML representation of this object.
    * Used to avoid doing it more than once.
    */
-  protected String computedToString = null;
+  String computedToString = null;
+
   /**
    * Determines whether this policy accepts the specified node.
    * @param info system information for the node on which the tasks will run if accepted.
@@ -122,6 +123,7 @@ public abstract class ExecutionPolicy implements Serializable
   /**
    * Get an indented string.
    * @return an indented string depending on the value of <code>toStringIndent</code>.
+   * @exclude
    */
   protected static String indent()
   {
@@ -137,6 +139,7 @@ public abstract class ExecutionPolicy implements Serializable
   {
     /**
      * First operand.
+     * @exclude
      */
     protected ExecutionPolicy[] rules = null;
 

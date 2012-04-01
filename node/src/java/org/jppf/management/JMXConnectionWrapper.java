@@ -158,6 +158,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void connect()
   {
+    if (isConnected()) return;
     if (local)
     {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());

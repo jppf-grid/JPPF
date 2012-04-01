@@ -157,6 +157,7 @@ public abstract class JPPFTask implements Task<Object>
    * @deprecated this method does nothing. Sending task notifications via this means has very little, if any, usefulness,
    * as only the latest notification is kept and processed. In a multithreaded/parallel context,
    * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
+   * @exclude
    */
   public synchronized void addJPPFTaskListener(final JPPFTaskListener listener)
   {
@@ -168,6 +169,7 @@ public abstract class JPPFTask implements Task<Object>
    * @deprecated this method does nothing. Sending task notifications via this means has very little, if any, usefulness,
    * as only the latest notification is kept and processed. In a multithreaded/parallel context,
    * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
+   * @exclude
    */
   public synchronized void removeJPPFTaskListener(final JPPFTaskListener listener)
   {
@@ -179,6 +181,7 @@ public abstract class JPPFTask implements Task<Object>
    * @deprecated this method does nothing. Sending task notifications via this means has very little, if any, usefulness,
    * as only the latest notification is kept and processed. In a multithreaded/parallel context,
    * this doesn't make any sense. It is much better to use the approach described in the <a href="http://www.jppf.org/samples-pack/TaskNotifications/Readme.php">Tasks Notifications sample</a>
+   * @exclude
    */
   public synchronized void fireNotification(final Serializable source)
   {
@@ -188,6 +191,7 @@ public abstract class JPPFTask implements Task<Object>
    * Get the timeout for this task.
    * @return the timeout as a long.
    * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule()} instead.
+   * @exclude
    */
   public long getTimeout()
   {
@@ -199,6 +203,7 @@ public abstract class JPPFTask implements Task<Object>
    * Set the timeout for this task.
    * @param timeout the timeout in milliseconds.
    * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(JPPFSchedule)} instead.
+   * @exclude
    */
   public void setTimeout(final long timeout)
   {
@@ -209,6 +214,7 @@ public abstract class JPPFTask implements Task<Object>
    * Get the timeout date for this task.
    * @return the dates in string format.
    * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule()} instead.
+   * @exclude
    */
   public String getTimeoutDate()
   {
@@ -220,6 +226,7 @@ public abstract class JPPFTask implements Task<Object>
    * Get the format used to express the timeout date.
    * @return a format string using the specifications for <code>SimpleDateFormat</code>.
    * @deprecated use the {@link JPPFSchedule} object from {@link #getTimeoutSchedule()} instead.
+   * @exclude
    */
   public String getTimeoutFormat()
   {
@@ -234,6 +241,7 @@ public abstract class JPPFTask implements Task<Object>
    * @param format the format of of the date to set, as described in the specification for {@link SimpleDateFormat}.
    * @see java.text.SimpleDateFormat
    * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(JPPFSchedule)} instead.
+   * @exclude
    */
   public void setTimeoutDate(final String timeoutDate, final String format)
   {
@@ -270,7 +278,8 @@ public abstract class JPPFTask implements Task<Object>
    * {@inheritDoc}
    * @deprecated the task restart feature is inherently unsafe, as it depends on the task
    * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement. 
+   * This feature has been removed from the management APIs, with no replacement.
+   * @exclude
    */
   @Override
   public void onRestart()

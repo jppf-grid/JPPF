@@ -32,6 +32,7 @@ import org.slf4j.*;
  * The application is identified through a unique uuid. This class effectively acts as a container for the classes of
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class JPPFContainer
 {

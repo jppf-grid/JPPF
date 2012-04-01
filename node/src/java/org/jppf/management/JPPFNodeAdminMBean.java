@@ -98,7 +98,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
    * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
    * If any other value is specified then this method has no effect.
    * @throws Exception if any error occurs.
-   * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(int)
+   * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(org.jppf.classloader.DelegationModel)
    */
   void setDelegationModel(DelegationModel model) throws Exception;
 }

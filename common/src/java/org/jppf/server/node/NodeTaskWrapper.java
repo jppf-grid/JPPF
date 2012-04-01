@@ -27,6 +27,7 @@ import org.jppf.node.protocol.Task;
  * @author Domingos Creado
  * @author Laurent Cohen
  * @author Martin JANDA
+ * @exclude
  */
 class NodeTaskWrapper extends AbstractNodeTaskWrapper
 {
@@ -38,6 +39,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * The class loader instance.
    */
   private final ClassLoader classLoader;
+
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param executionManager reference to the execution manager.
@@ -81,7 +83,10 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       info = executionManager.processTaskTimeout(this);
       long startTime = System.nanoTime();
 //      long startCpuTime = executionManager.getCpuTime(id);
-      task.run();
+      synchronized(task)
+      {
+        task.run();
+      }
       try
       {
         // convert cpu time from nanoseconds to milliseconds

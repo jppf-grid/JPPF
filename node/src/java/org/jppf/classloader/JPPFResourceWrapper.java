@@ -37,6 +37,7 @@ public class JPPFResourceWrapper implements Serializable
 
   /**
    * Enumeration of the possible states for this resource wrapper.
+   * @exclude
    */
   public enum State
   {

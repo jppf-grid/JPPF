@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Abstract implementation of the bundler interface.
  * @author Laurent Cohen
- * @exclude
  */
 public abstract class AbstractBundler implements Bundler
 {
