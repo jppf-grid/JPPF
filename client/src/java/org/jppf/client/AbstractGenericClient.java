@@ -146,7 +146,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            newConnection(name, info, 0, sslEnabled);
+            newConnection(name, info, 0, props.getInt("jppf.pool.size", 1), sslEnabled);
           }
         }, new IPFilter(props), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
@@ -183,7 +183,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
             int priority = props.getInt(String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
 
-            newConnection(name, info, priority, sslEnabled);
+            newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
           }
         }
       }
@@ -205,14 +205,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param name the name assigned to the connection.
    * @param info the information required for the connection to connect to the driver.
    * @param priority the priority assigned to the connection.
+   * @param poolSize the size of the associated connection pool.
    * @param ssl determines whether this is an SSL connection.
    */
-  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final boolean ssl) {
-    int n = config.getInt("jppf.pool.size", 1);
-    if (n < 1) n = 1;
-    for (int i=1; i<=n; i++)
+  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl)
+  {
+    for (int i=1; i<=poolSize; i++)
     {
-      AbstractJPPFClientConnection c = createConnection(info.uuid, (n > 1) ? name + '-' + i : name, info, ssl);
+      AbstractJPPFClientConnection c = createConnection(info.uuid, (poolSize > 1) ? name + '-' + i : name, info, ssl);
       c.setPriority(priority);
       newConnection(c);
     }
