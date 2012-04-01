@@ -22,7 +22,7 @@ import java.util.*;
 
 import javax.resource.cci.Connection;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.spi.JPPFManagedConnection;
@@ -114,9 +114,9 @@ public interface JPPFConnection extends Connection, JPPFAccessor
   /**
    * Get the results of an execution request.<br>
    * This method should be called only once a call to
-   * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-   * either {@link org.jppf.org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
-   * {@link org.jppf.org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
+   * {@link #getSubmissionStatus(java.lang.String) getSubmissionStatus(submissionId)} has returned
+   * either {@link org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
@@ -156,4 +156,10 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    */
   void setManagedConnection(JPPFManagedConnection conn);
 
+  /**
+   * Close this connection.
+   * @see javax.resource.cci.Connection#close()
+   */
+  @Override
+  void close();
 }

@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
+	<classpathentry kind="lib" path="/JPPF/lib/J2EE/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
 	<classpathentry kind="output" path="classes/jca"/>
 </classpath>

@@ -30,7 +30,6 @@ import org.jppf.jca.util.JPPFAccessorImpl;
  * Implementation of the {@link javax.resource.cci.ConnectionFactory ConnectionFactory} interface for
  * the JPPF resource adapter.
  * @author Laurent Cohen
- * @exclude
  */
 public class JPPFConnectionFactory extends JPPFAccessorImpl implements ConnectionFactory
 {
@@ -49,6 +48,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
 
   /**
    * Default constructor.
+   * @exclude
    */
   public JPPFConnectionFactory()
   {
@@ -58,6 +58,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
    * Initialize this connection factory with a specified managed connection factory and connection manager..
    * @param factory the managed factory to use.
    * @param manager the connection manager to use.
+   * @exclude
    */
   public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager)
   {
@@ -65,6 +66,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
     if (factory.getJppfClient() == null) setJppfClient(factory.getJppfClient());
     this.manager = manager;
   }
+
   /**
    * Get a connection through the application server.
    * @return a <code>Connection</code> instance.
@@ -87,6 +89,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
    * @return nothing.
    * @throws ResourceException this method always throws a NotSupportedException.
    * @see javax.resource.cci.ConnectionFactory#getConnection(javax.resource.cci.ConnectionSpec)
+   * @exclude
    */
   @Override
   public Connection getConnection(final ConnectionSpec spec) throws ResourceException
@@ -99,6 +102,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
    * @return a <code>ResourceAdapterMetaData</code> instance.
    * @throws ResourceException if the metadata could not be obtained.
    * @see javax.resource.cci.ConnectionFactory#getMetaData()
+   * @exclude
    */
   @Override
   public ResourceAdapterMetaData getMetaData() throws ResourceException
@@ -111,6 +115,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
    * @return a <code>RecordFactory</code> instance.
    * @throws ResourceException if the record factory could not be obtained.
    * @see javax.resource.cci.ConnectionFactory#getRecordFactory()
+   * @exclude
    */
   @Override
   public RecordFactory getRecordFactory() throws ResourceException
@@ -122,6 +127,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
    * Set the naming reference4 for this connection factory.
    * @param ref a <code>Referenceable</code> instance.
    * @see javax.resource.Referenceable#setReference(javax.naming.Reference)
+   * @exclude
    */
   @Override
   public void setReference(final Reference ref)
@@ -134,6 +140,7 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
    * @return ref a <code>Referenceable</code> instance.
    * @throws NamingException if the reference could not be obtained.
    * @see javax.naming.Referenceable#getReference()
+   * @exclude
    */
   @Override
   public Reference getReference() throws NamingException
