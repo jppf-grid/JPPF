@@ -17,9 +17,7 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page">
-	<!-- test comment for save -->
-	<property name="label" value="Topology"/>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
 
 	<!-- ===================================================================== -->

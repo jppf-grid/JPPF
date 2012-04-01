@@ -156,6 +156,7 @@ public class OptionElementFactory
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setIconPath(desc.getProperty("icon"));
+    option.setToggle(desc.getBoolean("toggle", false));
     option.createUI();
     option.setEventsEnabled(true);
     return option;

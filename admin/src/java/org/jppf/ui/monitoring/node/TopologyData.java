@@ -60,6 +60,10 @@ public class TopologyData
    * Object describing the current state of a node.
    */
   private JPPFNodeState nodeState = null;
+  /**
+   * Determines whether the corresponding driver is collapsed in the visualization panel.
+   */
+  private boolean collapsed = false;
 
   /**
    * Initialize topology job data with the specified type.
@@ -117,6 +121,15 @@ public class TopologyData
   }
 
   /**
+   * Set the wrapper holding the connection to the JMX server on a driver or node.
+   * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
+   */
+  public void setJmxWrapper(final JMXConnectionWrapper jmxWrapper)
+  {
+    this.jmxWrapper = jmxWrapper;
+  }
+
+  /**
    * Get the information on a JPPF node.
    * @return a <code>NodeManagementInfo</code> instance.
    */
@@ -164,6 +177,15 @@ public class TopologyData
   }
 
   /**
+   * Set the driver connection.
+   * @param clientConnection a <code>JPPFClientConnection</code> instance.
+   */
+  public void setClientConnection(final JPPFClientConnection clientConnection)
+  {
+    this.clientConnection = clientConnection;
+  }
+
+  /**
    * Refresh the state of the node represented by this topology data.
    */
   public void refreshNodeState()
@@ -208,5 +230,62 @@ public class TopologyData
   public String getId()
   {
     return (jmxWrapper == null) ? null : jmxWrapper.getId();
+  }
+
+  /**
+   * Determine whether this object represents an node.
+   * @return <code>true</code> if this object represets a node, <code>false</code> otherwise.
+   */
+  public boolean isNode()
+  {
+    return (type == TopologyDataType.NODE) && (nodeInformation != null) && nodeInformation.isNode();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+    return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    TopologyData other = (TopologyData) obj;
+    if (getId() == null)
+    {
+      if (other.getId() != null) return false;
+    }
+    else if (!getId().equals(other.getId())) return false;
+    return true;
+  }
+
+  /**
+   * Determine whether the corresponding driver is collapsed in the visualization panel.
+   * @return <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
+   */
+  public boolean isCollapsed()
+  {
+    return collapsed;
+  }
+
+  /**
+   * Specify whether the corresponding driver is collapsed in the visualization panel.
+   * @param collapsed <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
+   */
+  public void setCollapsed(final boolean collapsed)
+  {
+    this.collapsed = collapsed;
   }
 }

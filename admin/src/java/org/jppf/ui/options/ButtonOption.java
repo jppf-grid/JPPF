@@ -38,6 +38,10 @@ public class ButtonOption extends AbstractOption
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
+   */
+  private boolean toggle = false;
 
   /**
    * Constructor provided as a convenience to facilitate the creation of
@@ -55,8 +59,21 @@ public class ButtonOption extends AbstractOption
    */
   public ButtonOption(final String name, final String label, final String tooltip)
   {
+    this(name, label, tooltip, false);
+  }
+
+  /**
+   * Initialize this text option with the specified parameters.
+   * @param name this component's name.
+   * @param label the label displayed with the checkbox.
+   * @param tooltip the tooltip associated with the checkbox.
+   * @param toggle specifies
+   */
+  public ButtonOption(final String name, final String label, final String tooltip, final boolean toggle)
+  {
     this.name = name;
     this.label = label;
+    this.toggle = toggle;
     setToolTipText(tooltip);
     createUI();
   }
@@ -67,7 +84,7 @@ public class ButtonOption extends AbstractOption
   @Override
   public void createUI()
   {
-    JButton button = new JButton();
+    AbstractButton button = toggle ? new JToggleButton() : new JButton();
     if (label != null) button.setText(label);
     if (iconPath != null)
     {
@@ -86,7 +103,7 @@ public class ButtonOption extends AbstractOption
   @Override
   protected void setupValueChangeNotifications()
   {
-    JButton button = (JButton) UIComponent;
+    AbstractButton button = (AbstractButton) UIComponent;
     button.addActionListener(new ActionListener()
     {
       @Override
@@ -117,5 +134,23 @@ public class ButtonOption extends AbstractOption
   public boolean isPersistent()
   {
     return false;
+  }
+
+  /**
+   * Determine whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
+   * @return <code>true</code> if this object is a toggle button, <code>false</code> otherwise.
+   */
+  public boolean isToggle()
+  {
+    return toggle;
+  }
+
+  /**
+   * Specify whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
+   * @param toggle <code>true</code> if this object is a toggle button, <code>false</code> otherwise.
+   */
+  public void setToggle(final boolean toggle)
+  {
+    this.toggle = toggle;
   }
 }

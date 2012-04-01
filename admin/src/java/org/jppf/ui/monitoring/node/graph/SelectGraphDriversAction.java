@@ -20,8 +20,9 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
 
-import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.view.mxGraph;
+import org.jppf.ui.monitoring.node.*;
+
+import edu.uci.ics.jung.visualization.VisualizationViewer;
 
 /**
  * Action performed to select all drivers in the topology view.
@@ -48,19 +49,8 @@ public class SelectGraphDriversAction extends AbstractGraphSelectionAction
   {
     synchronized(panel)
     {
-      mxGraph graph = panel.getGraph();
-      mxGraphModel model = (mxGraphModel) graph.getModel();
-      model.beginUpdate();
-      try
-      {
-        Object[] drivers = getDriverVertices();
-        if ((drivers == null) || (drivers.length == 0)) return;
-        graph.setSelectionCells(drivers);
-      }
-      finally
-      {
-        model.endUpdate();
-      }
+      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
+      for (TopologyData data: getVertices()) viewer.getPickedVertexState().pick(data, !data.isNode());
     }
   }
 }

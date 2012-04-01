@@ -20,10 +20,9 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
 
-import org.jppf.utils.CollectionUtils;
+import org.jppf.ui.monitoring.node.*;
 
-import com.mxgraph.model.*;
-import com.mxgraph.view.mxGraph;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
 
 /**
  * Action performed to select all drivers in the topology view.
@@ -38,8 +37,8 @@ public class SelectGraphNodesAction extends AbstractGraphSelectionAction
   public SelectGraphNodesAction(final GraphOption panel)
   {
     super(panel);
-    setupIcon("/org/jppf/ui/resources/select_drivers.gif");
-    setupNameAndTooltip("select.drivers");
+    setupIcon("/org/jppf/ui/resources/select_nodes.gif");
+    setupNameAndTooltip("select.nodes");
   }
 
   /**
@@ -50,26 +49,8 @@ public class SelectGraphNodesAction extends AbstractGraphSelectionAction
   {
     synchronized(panel)
     {
-      mxGraph graph = panel.getGraph();
-      mxGraphModel model = (mxGraphModel) graph.getModel();
-      model.beginUpdate();
-      try
-      {
-        Object[] drivers = getDriverVertices();
-        if ((drivers == null) || (drivers.length == 0)) return;
-        Object[][] allNodes = new Object[drivers.length][];
-        int count = 0;
-        for (Object o: drivers)
-        {
-          mxCell driver = (mxCell) o;
-          allNodes[count++] = mxGraphModel.getChildVertices(model, driver);
-        }
-        graph.setSelectionCells(CollectionUtils.concatArrays(allNodes));
-      }
-      finally
-      {
-        model.endUpdate();
-      }
+      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
+      for (TopologyData data: getVertices()) viewer.getPickedVertexState().pick(data, data.isNode());
     }
   }
 }

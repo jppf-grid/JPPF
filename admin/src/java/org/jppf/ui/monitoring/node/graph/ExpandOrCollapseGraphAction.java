@@ -19,9 +19,11 @@
 package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
+import java.util.Set;
 
-import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.view.mxGraph;
+import org.jppf.ui.monitoring.node.TopologyData;
+
+import edu.uci.ics.jung.visualization.VisualizationViewer;
 
 /**
  * Action performed to select all drivers in the topology view.
@@ -33,6 +35,7 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
    * Determines whether this action is for collapsing or expanding graph vertices.
    */
   private final boolean collapse;
+
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
@@ -63,19 +66,32 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
   {
     synchronized(panel)
     {
-      mxGraph graph = panel.getGraph();
-      mxGraphModel model = (mxGraphModel) graph.getModel();
-      model.beginUpdate();
-      try
+      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
+      Set<TopologyData> sel = viewer.getPickedVertexState().getPicked();
+      int count = 0;
+      if (collapse)
       {
-        Object[] drivers = getDriverVertices();
-        if ((drivers == null) || (drivers.length == 0)) return;
-        for (Object o: drivers) model.setCollapsed(o, collapse);
+        for (TopologyData data: sel)
+        {
+          if (!data.isNode() && !data.isCollapsed())
+          {
+            panel.getGraphHandler().collapse(data);
+            count++;
+          }
+        }
       }
-      finally
+      else
       {
-        model.endUpdate();
+        for (TopologyData data: sel)
+        {
+          if (!data.isNode() && data.isCollapsed())
+          {
+            panel.getGraphHandler().expand(data);
+            count++;
+          }
+        }
       }
+      if (count > 0) panel.repaintGraph();
     }
   }
 }

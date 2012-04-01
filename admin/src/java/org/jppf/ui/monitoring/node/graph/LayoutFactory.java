@@ -18,10 +18,13 @@
 
 package org.jppf.ui.monitoring.node.graph;
 
-import com.mxgraph.layout.*;
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.orthogonal.mxOrthogonalLayout;
-import com.mxgraph.view.mxGraph;
+import java.util.Collection;
+
+import org.jppf.ui.monitoring.node.TopologyData;
+
+import edu.uci.ics.jung.algorithms.layout.*;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
 
 /**
  * Factory class to create layouts for <code>mxGraph</code> instances.
@@ -32,15 +35,19 @@ class LayoutFactory
   /**
    * The graph for which to create a layout.
    */
-  private mxGraph graph;
+  private Graph<TopologyData, Number> initialGraph = null;
+  /**
+   * The graph visualization component.
+   */
+  private VisualizationViewer<TopologyData, Number> viewer = null;
 
   /**
    * Create a factory instance for the specified graph.
-   * @param graph the graph for which to create layouts.
+   * @param graph the viewer of the graph for which to create layouts.
    */
-  LayoutFactory(final mxGraph graph)
+  LayoutFactory(final Graph<TopologyData, Number> graph)
   {
-    this.graph = graph;
+    this.initialGraph = graph;
   }
 
   /**
@@ -48,120 +55,138 @@ class LayoutFactory
    * @param name the name of the layout to create.
    * @return a <code>mxIGraphLayout</code> instance.
    */
-  mxIGraphLayout createLayout(final String name)
+  Layout<TopologyData, Number> createLayout(final String name)
   {
-    mxIGraphLayout layout;
-    if ("Circle".equals(name)) layout = newCircleLayout();
-    else if ("EdgeLabel".equals(name)) layout = newEdgeLabelLayout();
-    else if ("FastOrganic".equals(name)) layout = newFastOrganicLayout();
-    else if ("Hierarchical".equals(name)) layout = newHierarchicalLayout();
-    else if ("Organic".equals(name)) layout = newOrganicLayout();
-    else if ("Orthogonal".equals(name)) layout = newOrthogonalLayout();
-    else if ("ParallelEdge".equals(name)) layout = newParallelEdgeLayout();
-    else if ("Partition".equals(name)) layout = newPartitionLayout();
-    else if ("Stack".equals(name)) layout = newStackLayout();
-    else layout = newCompactTreeLayout();
+    Layout<TopologyData, Number> layout = null;
+    if ("Circle".equals(name)) return createCircleLayout();
+    else if ("Fruchterman-Reingold".equals(name)) return createFRLayout();
+    else if ("Fruchterman-Reingold-2".equals(name)) return createFRLayout2();
+    else if ("Self Organizing Map".equals(name)) return createISOMLayout();
+    else if ("Kamada-Kawai".equals(name)) return createKKLayout();
+    else if ("Spring".equals(name)) return createSpringLayout();
+    else if ("Spring2".equals(name)) return createSpringLayout2();
+    else if ("Static".equals(name)) return createStaticLayout();
+    else if ("Radial".equals(name)) return createRadialLayout();
+    return createISOMLayout();
+  }
+
+  /**
+   * Create a new circle layout.
+   * @return a <code>CircleLayout</code> instance.
+   */
+  private CircleLayout<TopologyData, Number> createCircleLayout()
+  {
+    CircleLayout<TopologyData, Number> layout = new CircleLayout<TopologyData, Number>(initialGraph);
+    layout.setRadius(150);
     return layout;
   }
 
   /**
-   * Create a compact tree layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
+   * Create a new Fruchterman-Reingold layout.
+   * @return a <code>FRLayout</code> instance.
    */
-  private mxIGraphLayout newCompactTreeLayout()
+  private FRLayout<TopologyData, Number> createFRLayout()
   {
-    mxCompactTreeLayout layout = new mxCompactTreeLayout(graph);
-    layout.setNodeDistance(60);
-    layout.setResetEdges(true);
-    layout.setResizeParent(false);
+    FRLayout<TopologyData, Number> layout = new FRLayout<TopologyData, Number>(initialGraph);
+    layout.setAttractionMultiplier(0.75d);
+    layout.setRepulsionMultiplier(0.75d);
+    layout.setMaxIterations(700);
     return layout;
   }
 
   /**
-   * Create a circle layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
+   * Create a new Fruchterman-Reingold (2) layout.
+   * @return a <code>FRLayout2</code> instance.
    */
-  private mxIGraphLayout newCircleLayout()
+  private FRLayout2<TopologyData, Number> createFRLayout2()
   {
-    return new mxCircleLayout(graph);
-  }
-
-  /**
-   * Create an edge label layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
-   */
-  private mxIGraphLayout newEdgeLabelLayout()
-  {
-    return new mxEdgeLabelLayout(graph);
-  }
-
-  /**
-   * Create a fast organic layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
-   */
-  private mxIGraphLayout newFastOrganicLayout()
-  {
-    return new mxFastOrganicLayout(graph);
-  }
-
-  /**
-   * Create a hierarchical layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
-   */
-  private mxIGraphLayout newHierarchicalLayout()
-  {
-    return new mxHierarchicalLayout(graph);
-  }
-
-  /**
-   * Create an organic layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
-   */
-  private mxIGraphLayout newOrganicLayout()
-  {
-    mxOrganicLayout layout = new mxOrganicLayout(graph);
-    layout.setRadiusScaleFactor(1.0);
-    layout.setApproxNodeDimensions(false);
-    layout.setEdgeCrossingCostFactor(8000.0);
-    layout.setNodeDistributionCostFactor(layout.getNodeDistributionCostFactor() * 5.0);
-    layout.setEdgeDistanceCostFactor(layout.getEdgeDistanceCostFactor() * 5.0);
-    layout.setEdgeLengthCostFactor(layout.getEdgeLengthCostFactor() / 1000.0);
+    FRLayout2<TopologyData, Number> layout = new FRLayout2<TopologyData, Number>(initialGraph);
+    layout.setAttractionMultiplier(0.75d);
+    layout.setRepulsionMultiplier(0.75d);
+    layout.setMaxIterations(700);
     return layout;
   }
 
   /**
-   * Create an orthogonal layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
+   * Create a new Self Organizing Map layout.
+   * @return a <code>ISOMLayout</code> instance.
    */
-  private mxIGraphLayout newOrthogonalLayout()
+  private ISOMLayout<TopologyData, Number> createISOMLayout()
   {
-    return new mxOrthogonalLayout(graph);
+    ISOMLayout<TopologyData, Number> layout = new ISOMLayout<TopologyData, Number>(initialGraph);
+    return layout;
   }
 
   /**
-   * Create a parallel edge layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
+   * Create a new Kamada-Kawai layout.
+   * @return a <code>KKLayout</code> instance.
    */
-  private mxIGraphLayout newParallelEdgeLayout()
+  private KKLayout<TopologyData, Number> createKKLayout()
   {
-    return new mxParallelEdgeLayout(graph);
+    KKLayout<TopologyData, Number> layout = new KKLayout<TopologyData, Number>(initialGraph);
+    layout.setAdjustForGravity(true);
+    layout.setDisconnectedDistanceMultiplier(0.5d);
+    layout.setExchangeVertices(true);
+    layout.setLengthFactor(0.9d);
+    layout.setMaxIterations(2000);
+    return layout;
   }
 
   /**
-   * Create a partition layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
+   * Create a new Spring layout.
+   * @return a <code>SpringLayout</code> instance.
    */
-  private mxIGraphLayout newPartitionLayout()
+  private SpringLayout<TopologyData, Number> createSpringLayout()
   {
-    return new mxPartitionLayout(graph, false, 10);
+    SpringLayout<TopologyData, Number> layout = new SpringLayout<TopologyData, Number>(initialGraph);
+    layout.setForceMultiplier(1d/3d);
+    layout.setRepulsionRange(100*100);
+    layout.setStretch(0.7d);
+    return layout;
   }
 
   /**
-   * Create a stack layout for the graph.
-   * @return the layout as a <code>mxIGraphLayout</code> instance.
+   * Create a new Spring (2) layout.
+   * @return a <code>SpringLayout2</code> instance.
    */
-  private mxIGraphLayout newStackLayout()
+  private SpringLayout2<TopologyData, Number> createSpringLayout2()
   {
-    return new mxStackLayout(graph);
+    SpringLayout2<TopologyData, Number> layout = new SpringLayout2<TopologyData, Number>(initialGraph);
+    layout.setForceMultiplier(1d/3d);
+    layout.setRepulsionRange(100*100);
+    layout.setStretch(0.7d);
+    return layout;
+  }
+
+  /**
+   * Create a new Static layout.
+   * @return a <code>StaticLayout</code> instance.
+   */
+  private RadialLayout createRadialLayout()
+  {
+    RadialLayout layout = new RadialLayout(initialGraph);
+    if (viewer != null) layout.setSize(viewer.getSize());
+    return layout;
+  }
+
+  /**
+   * Create a new Static layout.
+   * @return a <code>StaticLayout</code> instance.
+   */
+  private StaticLayout<TopologyData, Number> createStaticLayout()
+  {
+    Collection<TopologyData> vertices = initialGraph.getVertices();
+    StaticLayout<TopologyData, Number> layout = new StaticLayout<TopologyData, Number>(initialGraph);
+    return layout;
+  }
+
+  /**
+   * Set the graph visualization component.
+   * @param viewer a <code>VisualizationViewer</code> instance.
+   */
+  void setViewer(final VisualizationViewer<TopologyData, Number> viewer)
+  {
+    this.viewer = viewer;
+    initialGraph = viewer.getGraphLayout().getGraph();
   }
 }

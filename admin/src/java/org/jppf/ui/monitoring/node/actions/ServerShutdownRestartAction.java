@@ -82,7 +82,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
     {
       if (!(o instanceof TopologyData)) continue;
       TopologyData data = (TopologyData) o;
-      if (TopologyDataType.DRIVER.equals(data.getType()))
+      if (!data.isNode())
       {
         setEnabled(true);
         return;

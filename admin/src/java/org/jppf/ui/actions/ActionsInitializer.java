@@ -85,8 +85,8 @@ public class ActionsInitializer implements Runnable
       {
         for (OptionElement elt: page.getChildren())
         {
-          if (!(elt.getUIComponent() instanceof JButton)) continue;
-          final JButton button = (JButton) elt.getUIComponent();
+          if (!(elt.getUIComponent() instanceof AbstractButton)) continue;
+          final AbstractButton button = (AbstractButton) elt.getUIComponent();
           final UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
           if (action == null) continue;
           button.setAction(action);

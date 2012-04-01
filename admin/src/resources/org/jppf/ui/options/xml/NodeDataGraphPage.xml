@@ -17,9 +17,9 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="graph.NodeDataPage" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="graph.NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<!-- test comment for save -->
-	<property name="label" value="Graph View"/>
+	<!--<property name="label" value="Graph View"/>-->
 	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
 
 	<!-- ===================================================================== -->
@@ -52,21 +52,20 @@
 		<child name="Layout" type="ComboBox">
 			<property name="label" value="Layout"/>
 			<property name="tooltip" value="choose a graph layout form the list"/>
-			<property name="value" value="Circle"/>
+			<property name="value" value="CircleLayout"/>
 			<property name="persistent" value="true"/>
 			<listener type="script">
 				<script language="groovy">option.findFirstWithName("/NodeGraph").setLayout(option.getValue())</script>
 			</listener>
 			<item name="Circle" selected="true"/>
-			<item name="CompactTree" selected="false"/>
-			<item name="EdgeLabel" selected="false"/>
-			<item name="FastOrganic" selected="false"/>
-			<item name="Hierarchical" selected="false"/>
-			<item name="Organic" selected="false"/>
-			<item name="Orthogonal" selected="false"/>
-			<item name="ParallelEdge" selected="false"/>
-			<item name="Partition" selected="false"/>
-			<item name="Stack" selected="false"/>
+			<item name="Fruchterman-Reingold" selected="false"/>
+			<item name="Fruchterman-Reingold-2" selected="false"/>
+			<item name="Self Organizing Map" selected="false"/>
+			<item name="Kamada-Kawai" selected="false"/>
+			<item name="Spring" selected="false"/>
+			<item name="Spring-2" selected="false"/>
+			<item name="Radial" selected="false"/>
+			<item name="Static" selected="false"/>
 		</child>
 		
 		<child name="sep3" type="ToolbarSeparator"/>
@@ -76,6 +75,11 @@
 		<child name="sep4" type="ToolbarSeparator"/>
 		<child name="graph.select.drivers" type="Button"/>
 		<child name="graph.select.nodes" type="Button"/>
+
+		<child name="sep5" type="ToolbarSeparator"/>
+		<child name="graph.toggle.mode" type="Button">
+			<property name="toggle" value="true"/>
+		</child>
 	</child>
 	
 
@@ -94,11 +98,9 @@
 			<initializer type="script">
 				<script language="groovy">
 					option.setupActions();
+					option.setLayout("CircleLayout");
 				</script>
 			</initializer>
-			<finalizer type="script">
-				<script language="groovy">//option.saveTableColumnsWidth();</script>
-			</finalizer>
 		</child>
 
 	</child>

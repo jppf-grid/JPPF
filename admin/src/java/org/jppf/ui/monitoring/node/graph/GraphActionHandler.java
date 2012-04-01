@@ -18,12 +18,13 @@
 
 package org.jppf.ui.monitoring.node.graph;
 
+import java.awt.event.*;
+
 import org.jppf.ui.actions.AbstractActionHandler;
 import org.jppf.ui.monitoring.node.TopologyData;
 
-import com.mxgraph.model.mxCell;
-import com.mxgraph.util.*;
-import com.mxgraph.view.mxGraph;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.picking.MultiPickedState;
 
 /**
  * Abstract implementation of the <code>ActionManager</code> interface for <code>mxGraph</code> components.
@@ -34,19 +35,20 @@ public class GraphActionHandler extends AbstractActionHandler
   /**
    * The JTreeTable whose actions are managed.
    */
-  protected mxGraph graph = null;
+  protected VisualizationViewer<TopologyData, Number> graph = null;
 
   /**
    * Initialize this action manager with the specified JTreeTable component.
    * @param graph the graph whose actions are managed.
    */
-  public GraphActionHandler(final mxGraph graph)
+  public GraphActionHandler(final VisualizationViewer<TopologyData, Number> graph)
   {
     this.graph = graph;
-    graph.getSelectionModel().addListener(null, new mxEventSource.mxIEventListener()
+    MultiPickedState mps = (MultiPickedState) graph.getPickedVertexState();
+    mps.addItemListener(new ItemListener()
     {
       @Override
-      public void invoke(final Object source, final mxEventObject event)
+      public void itemStateChanged(final ItemEvent e)
       {
         computeSelectedElements();
         updateActions();
@@ -60,12 +62,8 @@ public class GraphActionHandler extends AbstractActionHandler
   protected synchronized void computeSelectedElements()
   {
     selectedElements.clear();
-    Object[] sel = graph.getSelectionModel().getCells();
+    Object[] sel = ((MultiPickedState<TopologyData>) graph.getPickedVertexState()).getSelectedObjects();
     if ((sel == null) || (sel.length <= 0)) return;
-    for (Object o: sel)
-    {
-      mxCell cell = (mxCell) o;
-      if (cell.isVertex() && (cell.getValue() instanceof TopologyData)) selectedElements.add(cell.getValue());
-    }
+    for (Object data: sel) selectedElements.add(data);
   }
 }

@@ -17,11 +17,10 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataTabsPage" type="TabbedPane">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataTabsPage" type="TabbedPane" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<property name="componentConstraints" value="push, grow"/>
 	<property name="layoutConstraints" value="fill"/>
 	<property name="bordered" value="false"/>
-	<property name="label" value="Topology"/>
 	<import source="file" location="org/jppf/ui/options/xml/NodeDataPage2.xml"/>
 	<import source="file" location="org/jppf/ui/options/xml/NodeDataGraphPage.xml"/>
 </opt:main>

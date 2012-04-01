@@ -18,13 +18,12 @@
 
 package org.jppf.ui.monitoring.node.graph;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.JComponent;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.*;
 
-import org.jppf.management.JPPFManagementInfo;
+import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.monitoring.node.actions.*;
@@ -32,10 +31,12 @@ import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.treetable.AbstractTreeTableOption;
 import org.slf4j.*;
 
-import com.mxgraph.layout.*;
-import com.mxgraph.model.*;
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.view.mxGraph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.visualization.*;
+import edu.uci.ics.jung.visualization.control.*;
+import edu.uci.ics.jung.visualization.decorators.*;
+import edu.uci.ics.jung.visualization.picking.*;
+import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 
 /**
  * 
@@ -56,21 +57,25 @@ public class GraphOption extends AbstractOption implements ActionHolder
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The graph to display.
-   */
-  protected transient mxGraph graph = null;
-  /**
-   * The graph component.
-   */
-  protected mxGraphComponent graphComponent = null;
-  /**
    * The tree view.
    */
   protected AbstractTreeTableOption treeTableOption = null;
   /**
+   * The graph visualization component.
+   */
+  protected VisualizationViewer<TopologyData, Number> viewer = null;
+  /**
+   * The graph component.
+   */
+  protected GraphZoomScrollPane graphComponent = null;
+  /**
    * The graph layout.
    */
-  protected transient mxIGraphLayout layout = null;
+  protected transient String layout = null;
+  /**
+   * Creates the layout objects based on their name.
+   */
+  protected transient LayoutFactory layoutFactory = null;
   /**
    * Manages the actions for this graph.
    */
@@ -78,37 +83,64 @@ public class GraphOption extends AbstractOption implements ActionHolder
   /**
    * 
    */
-  protected Map<String, mxCell> groupsMap = new HashMap<String, mxCell>();
+  AtomicBoolean repaintFlag = new AtomicBoolean(true);
+  /**
+   * Handles operations modifying the graph.
+   */
+  private GraphTopologyHandler graphHandler = null;
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setEnabled(final boolean enabled)
+  public synchronized void createUI()
   {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void setupValueChangeNotifications()
-  {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void createUI()
-  {
-    graph = new JPPFGraph();
-    graphComponent =  new mxGraphComponent(graph);
-    graphComponent.getViewport().setOpaque(true);
-    graphComponent.getViewport().setBackground(Color.WHITE);
-    graphComponent.setDragEnabled(false);
-    layout = new mxCompactTreeLayout(graph);
-    //graphComponent.set
+    if (graphHandler == null)
+    {
+      if (debugEnabled) log.debug("creating UI");
+      graphHandler = new GraphTopologyHandler(this);
+      SparseMultigraph<TopologyData, Number> graph = graphHandler.getDisplayGraph();
+      layoutFactory = new LayoutFactory(graph);
+      layout = "Circle";
+      viewer = new VisualizationViewer<TopologyData, Number>(layoutFactory.createLayout(layout));
+      layoutFactory.setViewer(viewer);
+      viewer.setBackground(Color.white);
+      viewer.setPickedVertexState(new MultiPickedState());
+      viewer.setPickSupport(new ShapePickSupport(viewer));
+      VertexLabelAsShapeRenderer<TopologyData, Number> vlasr = new VertexLabelAsShapeRenderer<TopologyData, Number>(viewer.getRenderContext());
+      viewer.getRenderer().setVertexLabelRenderer(vlasr);
+      viewer.getRenderContext().setVertexShapeTransformer(vlasr);
+      JPPFVertexLabelRenderer renderer = new JPPFVertexLabelRenderer();
+      int height = 50;
+      Dimension d = renderer.getPreferredSize();
+      d.width = 100;
+      if (d.height < height)
+      {
+        d.height = height;
+        renderer.setPreferredSize(d);
+      }
+      viewer.getRenderContext().setVertexLabelRenderer(renderer);
+      viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<TopologyData>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
+      viewer.getRenderContext().setVertexDrawPaintTransformer(new ConstantTransformer(null));
+      viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(0.5f)));
+      viewer.setVertexToolTipTransformer(new ToStringLabeller<TopologyData>()
+      {
+        @Override
+        public String transform(final TopologyData v)
+        {
+          if (!v.isNode()) return super.transform(v);
+          return computeNodeTooltip(v);
+        }
+      });
+      graphComponent = new GraphZoomScrollPane(viewer);
+      actionHandler = new GraphActionHandler(viewer);
+      EditingModalGraphMouse<TopologyData, Number> graphMouse = new EditingModalGraphMouse<TopologyData, Number>(viewer.getRenderContext(), null, null);
+      graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
+      PopupMenuMousePlugin<TopologyData, Number> myPlugin = new PopupMenuMousePlugin<TopologyData, Number>(actionHandler);
+      graphMouse.remove(graphMouse.getPopupEditingPlugin());
+      graphMouse.add(myPlugin);
+      viewer.setGraphMouse(graphMouse);
+    }
   }
 
   /**
@@ -118,62 +150,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
   public JComponent getUIComponent()
   {
     return graphComponent;
-  }
-
-  /**
-   * Redraw the graph.
-   */
-  public void populate()
-  {
-    Object parent = graph.getDefaultParent();
-    graph.getModel().beginUpdate();
-    try
-    {
-      graph.selectAll();
-      graph.removeCells();
-    }
-    finally
-    {
-      graph.getModel().endUpdate();
-    }
-    graph.getModel().beginUpdate();
-    DefaultMutableTreeNode root = treeTableOption.getTreeTableRoot();
-    try
-    {
-      Map<String, DefaultMutableTreeNode> drivers = new HashMap<String, DefaultMutableTreeNode>();
-      Map<String, mxCell> vertices = new HashMap<String, mxCell>();
-      for (int i=0; i<root.getChildCount(); i++)
-      {
-        DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
-        TopologyData data = (TopologyData) child.getUserObject();
-        String id = data.getJmxWrapper().getId();
-        drivers.put(id, child);
-        mxCell vertex = insertDriverVertex(data);
-        vertices.put(id, vertex);
-        if (debugEnabled) log.debug("added vertex for " + id);
-      }
-      for (int i=0; i<root.getChildCount(); i++)
-      {
-        DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
-        TopologyData driverData = (TopologyData) driver.getUserObject();
-        String id = driverData.getJmxWrapper().getId();
-        mxCell v1 = vertices.get(id);
-        for (int j=0; j<driver.getChildCount(); j++)
-        {
-          DefaultMutableTreeNode child = (DefaultMutableTreeNode) driver.getChildAt(j);
-          TopologyData childData = (TopologyData) child.getUserObject();
-          String childId = childData.getJmxWrapper().getId();
-          JPPFManagementInfo info = childData.getNodeInformation();
-          if (info == null) continue;
-          mxCell v2 = insertNodeVertex(v1, childData);
-        }
-      }
-      layout.execute(parent);
-    }
-    finally
-    {
-      graph.getModel().endUpdate();
-    }
   }
 
   /**
@@ -189,7 +165,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Get the current layout.
    * @return the layout.
    */
-  public mxIGraphLayout getLayout()
+  public String getLayout()
   {
     return layout;
   }
@@ -200,9 +176,8 @@ public class GraphOption extends AbstractOption implements ActionHolder
    */
   public void setLayout(final String name)
   {
-    layout = new LayoutFactory(graph).createLayout(name);
-    layout.execute(graph.getDefaultParent());
-    //if (treeTableOption != null) populate();
+    layout = name;
+    viewer.setGraphLayout(layoutFactory.createLayout(name));
   }
 
   /**
@@ -219,206 +194,101 @@ public class GraphOption extends AbstractOption implements ActionHolder
    */
   public void setupActions()
   {
-    actionHandler = new GraphActionHandler(graph);
-    actionHandler.putAction("graph.shutdown.restart.driver", new ServerShutdownRestartAction());
-    actionHandler.putAction("graph.driver.reset.statistics", new ServerStatisticsResetAction());
-    actionHandler.putAction("graph.update.configuration", new NodeConfigurationAction());
-    actionHandler.putAction("graph.show.information", new SystemInformationAction());
-    actionHandler.putAction("graph.update.threads", new NodeThreadsAction());
-    actionHandler.putAction("graph.reset.counter", new ResetTaskCounterAction());
-    actionHandler.putAction("graph.restart.node", new RestartNodeAction());
-    actionHandler.putAction("graph.shutdown.node", new ShutdownNodeAction());
-    actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
-    actionHandler.putAction("graph.select.nodes", new SelectGraphNodesAction(this));
-    actionHandler.putAction("graph.button.collapse", new ExpandOrCollapseGraphAction(this, true));
-    actionHandler.putAction("graph.button.expand", new ExpandOrCollapseGraphAction(this, false));
-    actionHandler.updateActions();
+    synchronized(actionHandler)
+    {
+      actionHandler.putAction("graph.shutdown.restart.driver", new ServerShutdownRestartAction());
+      actionHandler.putAction("graph.driver.reset.statistics", new ServerStatisticsResetAction());
+      actionHandler.putAction("graph.update.configuration", new NodeConfigurationAction());
+      actionHandler.putAction("graph.show.information", new SystemInformationAction());
+      actionHandler.putAction("graph.update.threads", new NodeThreadsAction());
+      actionHandler.putAction("graph.reset.counter", new ResetTaskCounterAction());
+      actionHandler.putAction("graph.restart.node", new RestartNodeAction());
+      actionHandler.putAction("graph.shutdown.node", new ShutdownNodeAction());
+      actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
+      actionHandler.putAction("graph.select.nodes", new SelectGraphNodesAction(this));
+      actionHandler.putAction("graph.button.collapse", new ExpandOrCollapseGraphAction(this, true));
+      actionHandler.putAction("graph.button.expand", new ExpandOrCollapseGraphAction(this, false));
+      actionHandler.putAction("graph.toggle.mode", new ToggleModeAction(this));
+      actionHandler.updateActions();
+    }
     //treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
     Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
     new Thread(r).start();
   }
 
   /**
-   * Called when a driver was added in the topology.
-   * @param driver the data representing the driver.
+   * Get the graph visualization component.
+   * @return a <code>VisualizationViewer</code> instance.
    */
-  public void driverAdded(final TopologyData driver)
+  public VisualizationViewer<TopologyData, Number> getViewer()
   {
-    String id = driver.getId();
-    graph.getModel().beginUpdate();
-    try
-    {
-      Object vertex = insertDriverVertex(driver);
-      if (debugEnabled) log.debug("added driver " + id + " to graph");
-    }
-    catch(Throwable t)
-    {
-      log.info(t.getMessage(), t);
-    }
-    finally
-    {
-      graph.getModel().endUpdate();
-    }
+    return viewer;
   }
 
   /**
-   * Called when a driver was removed from the topology.
-   * @param driver the data representing the driver.
+   * Repaint the graph after changes have occurred.
    */
-  public void driverRemoved(final TopologyData driver)
+  void repaintGraph()
   {
-    String id = driver.getId();
-    mxGraphModel model = (mxGraphModel) graph.getModel();
-    model.beginUpdate();
-    try
+    if (!repaintFlag.get()) return;
+    if (getUIComponent() != null)
     {
-      mxCell vertex = (mxCell) model.getCell(id);
-      if (vertex != null)
+      SwingUtilities.invokeLater(new Runnable()
       {
-        for (int i=0; i<vertex.getEdgeCount(); i++) model.remove(vertex.getEdgeAt(i));
-        model.remove(vertex);
-        graph.getView().invalidate();
-        if (debugEnabled) log.debug("removed driver " + id + " from graph");
-      }
-    }
-    catch(Throwable t)
-    {
-      log.info(t.getMessage(), t);
-    }
-    finally
-    {
-      model.endUpdate();
-    }
-  }
-
-  /**
-   * Called when a node was added in the topology.
-   * @param driver the driver to which the node is added.
-   * @param node the data representing the node.
-   */
-  public void nodeAdded(final TopologyData driver, final TopologyData node)
-  {
-    String id = driver.getId();
-    mxGraphModel model = (mxGraphModel) graph.getModel();
-    model.beginUpdate();
-    try
-    {
-      mxCell v1 = (mxCell) model.getCell(id);
-      if (v1 != null)
-      {
-        insertNodeVertex(v1, node);
-        if (debugEnabled)
+        @Override
+        public void run()
         {
-          String s = node.getNodeInformation().isDriver() ? "peer driver" : "node";
-          log.debug("added " + s + ' ' + node.getId() + " to driver " + id);
+          getUIComponent().invalidate();
+          getUIComponent().repaint();
         }
-      }
-    }
-    catch(Throwable t)
-    {
-      log.info(t.getMessage(), t);
-    }
-    finally
-    {
-      model.endUpdate();
+      });
     }
   }
 
   /**
-   * Called when a node was removed from the topology.
-   * @param driver the driver to which the node is added.
-   * @param node the data representing the node.
+   * Compute ther tooltipe for a node vertex.
+   * @param node contains the information to put in the tooltip.
+   * @return the text to set as tooltip.
    */
-  public void nodeRemoved(final TopologyData driver, final TopologyData node)
+  private String computeNodeTooltip(final TopologyData node)
   {
-    mxGraphModel model = (mxGraphModel) graph.getModel();
-    model.beginUpdate();
-    try
-    {
-      mxCell vertex = (mxCell) model.getCell(node.getId());
-      if (vertex != null)
-      {
-        for (int i=0; i<vertex.getEdgeCount(); i++) model.remove(vertex.getEdgeAt(i));
-        model.remove(vertex);
-      }
-      Object driverVertex = model.getCell(driver.getId());
-      graph.getView().invalidate(driverVertex);
-      if (debugEnabled) log.debug("removed node " + node.getId() + " from driver " + driver.getId());
-    }
-    catch(Throwable t)
-    {
-      log.info(t.getMessage(), t);
-    }
-    finally
-    {
-      model.endUpdate();
-    }
+    StringBuilder sb = new StringBuilder();
+    sb.append("<html>").append(node.getId()).append("<br>");
+    sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
+    sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
+    return sb.toString();
   }
 
   /**
-   * Called when the state information of a node has changed.
-   * @param driver the driver to which the node is attached.
-   * @param node the node to update.
+   * Redraw the graph.
    */
-  public void nodeDataUpdated(final TopologyData driver, final TopologyData node)
+  public void populate()
+  {
+    graphHandler.populate(treeTableOption.getTreeTableRoot());
+  }
+
+  /**
+   * Get the object that handles operations modifying the graph.
+   * @return a {@link GraphTopologyHandler} instance.
+   */
+  public GraphTopologyHandler getGraphHandler()
+  {
+    return graphHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setEnabled(final boolean enabled)
   {
   }
 
   /**
-   * Insert a new vertex for a newly added driver.
-   * @param driver data for the driver to add.
-   * @return the new vertex object.
+   * {@inheritDoc}
    */
-  private mxCell insertDriverVertex(final TopologyData driver)
+  @Override
+  protected void setupValueChangeNotifications()
   {
-    StringBuilder style = new StringBuilder();
-    style.append("shape=image;image=/org/jppf/ui/resources/mainframe.gif");
-    style.append(";verticalLabelPosition=bottom");
-    mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), driver.getId(), driver, 0.0, 0.0, 30.0, 20.0, style.toString());
-    vertex.setCollapsed(false);
-    if (layout != null)
-    {
-      layout.execute(vertex);
-    }
-    return vertex;
-  }
-
-  /**
-   * Insert a new vertex for a newly added node.
-   * @param driverVertex vertex representing the driver to which the node is attached.
-   * @param node data for the newly added node.
-   * @return the new vertex object.
-   */
-  private mxCell insertNodeVertex(final mxCell driverVertex, final TopologyData node)
-  {
-    mxCell nodeVertex;
-    if (node.getNodeInformation().isDriver())
-    {
-      nodeVertex = (mxCell) ((mxGraphModel) graph.getModel()).getCell(node.getId());
-      graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
-    }
-    else
-    {
-      StringBuilder style = new StringBuilder();
-      style.append("shape=image;image=/org/jppf/ui/resources/buggi_server.gif");
-      style.append(";verticalLabelPosition=bottom");
-      nodeVertex = (mxCell) graph.insertVertex(driverVertex, node.getId(), node, 0.0, 0.0, 20.0, 20.0, style.toString());
-      mxCell edge = (mxCell) graph.insertEdge(driverVertex, null, null, driverVertex, nodeVertex);
-      nodeVertex.setParent(edge);
-    }
-    if (layout != null)
-    {
-      layout.execute(driverVertex);
-    }
-    return nodeVertex;
-  }
-
-  /**
-   * Get the displayed graph.
-   * @return a <code>mxGraph</code> instance.
-   */
-  public mxGraph getGraph()
-  {
-    return graph;
   }
 }

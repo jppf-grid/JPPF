@@ -430,13 +430,16 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   public void setupActions()
   {
     actionHandler = new JobDataPanelActionManager(treeTable);
-    actionHandler.putAction("cancel.job", new CancelJobAction());
-    actionHandler.putAction("suspend.job", new SuspendJobAction());
-    actionHandler.putAction("suspend_requeue.job", new SuspendRequeueJobAction());
-    actionHandler.putAction("resume.job", new ResumeJobAction());
-    actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
-    actionHandler.putAction("update.priority.job", new UpdatePriorityAction());
-    actionHandler.updateActions();
+    synchronized(actionHandler)
+    {
+      actionHandler.putAction("cancel.job", new CancelJobAction());
+      actionHandler.putAction("suspend.job", new SuspendJobAction());
+      actionHandler.putAction("suspend_requeue.job", new SuspendRequeueJobAction());
+      actionHandler.putAction("resume.job", new ResumeJobAction());
+      actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
+      actionHandler.putAction("update.priority.job", new UpdatePriorityAction());
+      actionHandler.updateActions();
+    }
     treeTable.addMouseListener(new JobTreeTableMouseListener(actionHandler));
     Runnable r = new ActionsInitializer(this, "/job.toolbar");
     new Thread(r).start();

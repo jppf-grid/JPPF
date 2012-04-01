@@ -66,7 +66,11 @@ public class NodeDataPanelManager
     final DefaultMutableTreeNode driverNode = findDriver(driverName);
     if (driverNode == null) return;
     final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
-    if (node != null) panel.getModel().changeNode(node);
+    if (node != null)
+    {
+      panel.getModel().changeNode(node);
+      if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().driverAdded((TopologyData) node.getUserObject());
+    }
   }
 
   /**
@@ -83,7 +87,7 @@ public class NodeDataPanelManager
     DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
     if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
     panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
-    if (panel.getGraphOption() != null) panel.getGraphOption().driverAdded(driverData);
+    if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().driverAdded(driverData);
     if (panel.getListenerMap().get(wrapper.getId()) == null)
     {
       ConnectionStatusListener listener = new ConnectionStatusListener(panel, wrapper.getId());
@@ -121,6 +125,7 @@ public class NodeDataPanelManager
     final DefaultMutableTreeNode driverNode = findDriver(driverName);
     if (debugEnabled) log.debug("removing driver: " + driverName);
     if (driverNode == null) return;
+    TopologyData driverData = (TopologyData) driverNode.getUserObject();
     try
     {
       int n = driverNode.getChildCount();
@@ -128,18 +133,19 @@ public class NodeDataPanelManager
       for (int i=n-1; i>=0; i--)
       {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode ) driverNode.getChildAt(i);
-        TopologyData data = (TopologyData) node.getUserObject();
-        if (TopologyDataType.NODE.equals(data.getType()))
+        TopologyData nodeData = (TopologyData) node.getUserObject();
+        if (nodeData.isNode())
         {
           try
           {
-            if (data.getJmxWrapper() != null) data.getJmxWrapper().close();
+            if (nodeData.getJmxWrapper() != null) nodeData.getJmxWrapper().close();
           }
           catch (Exception e)
           {
             log.error(e.getMessage(), e);
           }
           panel.getModel().removeNodeFromParent(node);
+          if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().nodeRemoved(driverData, nodeData);
           count++;
         }
       }
@@ -147,7 +153,7 @@ public class NodeDataPanelManager
       if (!removeNodesOnly)
       {
         panel.getModel().removeNodeFromParent(driverNode);
-        if (panel.getGraphOption() != null) panel.getGraphOption().driverAdded((TopologyData) driverNode.getUserObject());
+        if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().driverRemoved(driverData);
         panel.updateStatusBar("/StatusNbServers", -1);
       }
     }
@@ -186,7 +192,7 @@ public class NodeDataPanelManager
     //if (debugEnabled) log.debug("created TopologyData instance");
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
     panel.getModel().insertNodeInto(nodeNode, driverNode, index);
-    if (panel.getGraphOption() != null) panel.getGraphOption().nodeAdded((TopologyData) driverNode.getUserObject(), data);
+    if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().nodeAdded((TopologyData) driverNode.getUserObject(), data);
     if (nodeInfo.getType() == JPPFManagementInfo.NODE) panel.updateStatusBar("/StatusNbNodes", 1);
 
     for (int i=0; i<panel.getTreeTableRoot().getChildCount(); i++)
@@ -218,7 +224,7 @@ public class NodeDataPanelManager
     if (debugEnabled) log.debug("removing node: " + nodeName);
     panel.getModel().removeNodeFromParent(node);
     TopologyData data = (TopologyData) node.getUserObject();
-    if (panel.getGraphOption() != null) panel.getGraphOption().nodeRemoved((TopologyData) driverNode.getUserObject(), data);
+    if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().nodeRemoved((TopologyData) driverNode.getUserObject(), data);
     if ((data != null) && (data.getNodeInformation().getType() == JPPFManagementInfo.NODE)) panel.updateStatusBar("/StatusNbNodes", -1);
     repaintTreeTable();
   }

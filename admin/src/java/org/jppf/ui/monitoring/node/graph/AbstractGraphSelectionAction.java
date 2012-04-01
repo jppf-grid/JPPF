@@ -18,12 +18,15 @@
 
 package org.jppf.ui.monitoring.node.graph;
 
+import java.util.*;
+
 import javax.swing.tree.TreePath;
 
+import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 
-import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.view.mxGraph;
+import edu.uci.ics.jung.graph.SparseMultigraph;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
 
 /**
  * Abstract superclass for actions that select nodes in the tree table.
@@ -50,16 +53,14 @@ public abstract class AbstractGraphSelectionAction extends AbstractTopologyActio
     setEnabled(true);
   }
 
-
   /**
    * Get the list of all tree nodes representing a driver.
    * @return an list of driver cells.
    */
-  protected Object[] getDriverVertices()
+  protected Collection<TopologyData> getVertices()
   {
-    mxGraph graph = panel.getGraph();
-    mxGraphModel model = (mxGraphModel) graph.getModel();
-    return mxGraphModel.getChildVertices(model, graph.getDefaultParent());
+    VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
+    SparseMultigraph<TopologyData, Number> graph = (SparseMultigraph<TopologyData, Number>) viewer.getGraphLayout().getGraph();
+    return graph.getVertices();
   }
-
 }
