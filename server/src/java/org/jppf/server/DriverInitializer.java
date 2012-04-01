@@ -19,7 +19,7 @@
 package org.jppf.server;
 
 import java.lang.management.ManagementFactory;
-import java.util.List;
+import java.util.*;
 
 import javax.management.*;
 
@@ -150,7 +150,7 @@ public class DriverInitializer
       connectionInfo = new JPPFConnectionInformation();
       connectionInfo.uuid = driver.getUuid();
       String s = config.getAndReplaceString("jppf.server.port", "class.server.port", "11111", false);
-      connectionInfo.serverPorts = StringUtils.parseIntValues(s);
+      connectionInfo.serverPorts = parsePorts(s, 11111);
       connectionInfo.host = NetworkUtils.getManagementHost();
       if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
       boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
@@ -359,5 +359,33 @@ public class DriverInitializer
   public NodeConnectionEventHandler getNodeConnectionEventHandler()
   {
     return nodeConnectionEventHandler;
+  }
+
+  /**
+   * Parse an array of port numbers from a string containing a list of space-separated port numbers.
+   * @param s list of space-separated port numbers
+   * @param def the default port number to use if none is specified or valid.
+   * @return an array of int port numbers.
+   */
+  private int[] parsePorts(final String s, final int def)
+  {
+    String[] strPorts = s.split("\\s");
+    List<Integer> portsList = new ArrayList<Integer>(strPorts.length);
+    for (int i=0; i<strPorts.length; i++)
+    {
+      try
+      {
+        int n = Integer.valueOf(strPorts[i].trim());
+        portsList.add(n);
+      }
+      catch(NumberFormatException e)
+      {
+        if (debugEnabled) log.debug("invalid port number value '" + strPorts[i] + "'");
+      }
+    }
+    if (portsList.isEmpty() && (def > 0)) portsList.add(def);
+    int[] ports = new int[portsList.size()];
+    for (int i=0; i<ports.length; i++) ports[i] = portsList.get(i);
+    return ports;
   }
 }
