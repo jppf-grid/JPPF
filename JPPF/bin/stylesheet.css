@@ -110,7 +110,8 @@ Navigation bar styles
     background-repeat:repeat-x;
     */
     background: transparent;
-    color:#FFFFFF;
+    /*color:#FFFFFF;*/
+    color:#6D78B6;
     padding:.1em .1em .1em .1em;
     height:auto;/*height:1.8em;*/
     font-size:1em;
@@ -463,14 +464,18 @@ td.colOne, th.colOne {
     border-right:1px solid #9eadc0;
     border-left:1px solid #9eadc0;
 }
+th.colFirst, th.colLast {
+  background-color: #6D78B6;
+  color: white;
+}
 table.overviewSummary  {
     padding:0px;
     margin-left:0px;
 }
 table.overviewSummary td.colFirst, table.overviewSummary th.colFirst,
 table.overviewSummary td.colOne, table.overviewSummary th.colOne {
-    /*width:25%;*/
-    vertical-align:middle;
+  /*width:25%;*/
+  vertical-align:middle;
 }
 table.packageSummary td.colFirst, table.overviewSummary th.colFirst {
     /*width:25%;*/
