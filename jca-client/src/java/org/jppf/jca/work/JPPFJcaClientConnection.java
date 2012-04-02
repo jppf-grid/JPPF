@@ -59,6 +59,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   public JPPFJcaClientConnection(final JPPFJcaClient client, final String uuid, final String name, final JPPFConnectionInformation info)
   {
     this.client = client;
+    if (debugEnabled) log.debug("connection information: " + info);
     configure(uuid, name, info.host, info.serverPorts[0], 0);
     status.set(DISCONNECTED);
   }

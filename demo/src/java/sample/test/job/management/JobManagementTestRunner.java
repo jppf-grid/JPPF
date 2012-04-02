@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
@@ -59,8 +60,15 @@ public class JobManagementTestRunner
     job.setResultListener(collector);
     client.submit(job);
     JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
+    long start = System.currentTimeMillis();
+    driver.connectAndWait(0L);
+    long elapsed = System.currentTimeMillis() - start;
+    System.out.println("Waited " + elapsed + " ms");
+    DriverJobManagementMBean proxy = driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+    /*
     driver.connect();
     while (!driver.isConnected()) Thread.sleep(10);
+    */
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
     driver.cancelJob(jobId);

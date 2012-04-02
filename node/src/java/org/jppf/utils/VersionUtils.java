@@ -63,6 +63,7 @@ public final class VersionUtils
       try
       {
         is = VersionUtils.class.getClassLoader().getResourceAsStream("build.number");
+        if (is == null) return 0;
         TypedProperties props = new TypedProperties();
         props.load(is);
         buildNumber = props.getInt("build.number");
