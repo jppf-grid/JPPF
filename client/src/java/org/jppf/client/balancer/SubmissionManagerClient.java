@@ -33,13 +33,11 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.ThreadSynchronization;
 import org.jppf.utils.TraversalList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This task provides asynchronous management of tasks submitted through the resource adapter.
@@ -50,10 +48,6 @@ import java.util.Map;
  */
 public class SubmissionManagerClient extends ThreadSynchronization implements SubmissionManager
 {
-  /**
-   * The JPPF client that manages connections to the JPPF drivers.
-   */
-  private final AbstractGenericClient client;
   /**
    * The job manager.
    */
@@ -100,17 +94,18 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     }
   };
+  /**
+   * Determines whether local execution is enabled on this client.
+   */
+  private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", false);
 
   /**
    * Instantiates client submission manager.
-   * @param client JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
-  public SubmissionManagerClient(final AbstractGenericClient client) throws Exception
+  public SubmissionManagerClient(final JPPFClient client) throws Exception
   {
     if (client == null) throw new IllegalArgumentException("client is null");
-
-    this.client = client;
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 
@@ -366,15 +361,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * {@inheritDoc}
    */
   @Override
-  public AbstractGenericClient getClient()
-  {
-    return client;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public void run()
   {
   }
@@ -419,5 +405,41 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 //      if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid + ", from class " + task.getClass());
 //    }
     return bundle;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean hasAvailableConnection()
+  {
+    return false;  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isLocalExecutionEnabled()
+  {
+    return localEnabled;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setLocalExecutionEnabled(final boolean localExecutionEnabled)
+  {
+    this.localEnabled = localExecutionEnabled;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Vector<JPPFClientConnection> getAvailableConnections()
+  {
+    return new Vector<JPPFClientConnection>();
   }
 }

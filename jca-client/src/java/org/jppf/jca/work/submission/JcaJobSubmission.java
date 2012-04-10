@@ -26,7 +26,7 @@ import org.slf4j.*;
 /**
  * Wrapper for submitting a job.
  */
-public class JcaJobSubmission extends AbstractJobSubmission
+public class JcaJobSubmission extends AbstractJobSubmission<JcaSubmissionManager>
 {
   /**
    * Logger for this class.
@@ -44,7 +44,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
    * @param submissionManager the submission manager.
    * @param locallyExecuting determines whether the job will be executed locally, at least partially.
    */
-  JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
+  JcaJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final JcaSubmissionManager submissionManager)
   {
     super(job, connection, locallyExecuting, submissionManager);
   }
@@ -59,7 +59,7 @@ public class JcaJobSubmission extends AbstractJobSubmission
     try
     {
       result.setStatus(EXECUTING);
-      submissionManager.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
+      submissionManager.execute(this, connection, locallyExecuting);
       result.setStatus(COMPLETE);
     }
     catch (Exception e)

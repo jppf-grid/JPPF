@@ -99,6 +99,7 @@ public class JPPFJcaClient extends AbstractGenericClient
    * Get the submission manager for this JPPF client.
    * @return a <code>JPPFSubmissionManager</code> instance.
    */
+  @Override
   public JcaSubmissionManager getSubmissionManager()
   {
     return submissionManager;

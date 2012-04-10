@@ -25,7 +25,6 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.NonDelegatingClassLoader;
-import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
 import org.jppf.server.protocol.*;
@@ -351,15 +350,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   public ClassServerDelegate getDelegate()
   {
     return delegate;
-  }
-
-  /**
-   * Get the load balancer that distributes the load between local and remote execution.
-   * @return a {@link LoadBalancer} instance.
-   */
-  public LoadBalancer getLoadBalancer()
-  {
-    return client.getLoadBalancer();
   }
 
   /**

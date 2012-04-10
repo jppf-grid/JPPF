@@ -158,7 +158,6 @@ public class JPPFClient extends AbstractGenericClient
   public void close()
   {
     super.close();
-    if (loadBalancer != null) loadBalancer.stop();
     if (submissionManager instanceof ThreadSynchronization)
     {
       ThreadSynchronization threadSynchronization = (ThreadSynchronization) submissionManager;
@@ -206,5 +205,14 @@ public class JPPFClient extends AbstractGenericClient
     if (submissionManager instanceof ThreadSynchronization) {
       ((ThreadSynchronization)submissionManager).wakeUp();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected SubmissionManager getSubmissionManager()
+  {
+    return submissionManager;
   }
 }

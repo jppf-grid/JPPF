@@ -25,7 +25,7 @@ import org.jppf.client.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractJobSubmission implements JobSubmission
+public abstract class AbstractJobSubmission<S extends SubmissionManager> implements JobSubmission
 {
   /**
    * The job to execute.
@@ -42,7 +42,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
   /**
    * The submission manager.
    */
-  protected SubmissionManager submissionManager;
+  protected S submissionManager;
 
   /**
    * Initialize this job submission.
@@ -51,7 +51,7 @@ public abstract class AbstractJobSubmission implements JobSubmission
    * @param locallyExecuting determines whether the job will be executed locally, at least partially.
    * @param submissionManager the submission manager.
    */
-  protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final SubmissionManager submissionManager)
+  protected AbstractJobSubmission(final JPPFJob job, final AbstractJPPFClientConnection connection, final boolean locallyExecuting, final S submissionManager)
   {
     this.job = job;
     this.connection = connection;

@@ -21,7 +21,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.ClientConnectionStatusEvent;
-import org.jppf.client.loadbalancer.LoadBalancer;
+import org.jppf.client.event.ClientConnectionStatusListener;
+import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
@@ -65,14 +66,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Performs server discovery.
    */
   protected JPPFMulticastReceiverThread receiverThread = null;
-  /**
-   * The load balancer for local versus remote execution.
-   */
-  protected LoadBalancer loadBalancer = new LoadBalancer();
-  /**
-   * Keeps a list of the valid connections not currently executing tasks.
-   */
-  protected Vector<JPPFClientConnection> availableConnections;
   /**
    * Mapping of class loader to requests uuids.
    */
@@ -260,21 +253,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   }
 
   /**
-   * Get the load balancer for local versus remote execution.
-   * @return a <code>LoadBalancer</code> instance.
-   */
-  public LoadBalancer getLoadBalancer()
-  {
-    return loadBalancer;
-  }
-
-  /**
    * Determine whether local execution is enabled on this client.
    * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
    */
   public boolean isLocalExecutionEnabled()
   {
-    return loadBalancer != null && loadBalancer.isLocalEnabled();
+    SubmissionManager submissionManager = getSubmissionManager();
+    return submissionManager != null && submissionManager.isLocalExecutionEnabled();
   }
 
   /**
@@ -283,7 +268,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   public void setLocalExecutionEnabled(final boolean localExecutionEnabled)
   {
-    if (loadBalancer != null) loadBalancer.setLocalEnabled(localExecutionEnabled);
+    SubmissionManager submissionManager = getSubmissionManager();
+    if(submissionManager != null) submissionManager.setLocalExecutionEnabled(localExecutionEnabled);
   }
 
   /**
@@ -292,34 +278,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   public boolean hasAvailableConnection()
   {
-    if (traceEnabled)
-    {
-      StringBuilder sb = new StringBuilder();
-      sb.append("available connections: ").append(getAvailableConnections().size()).append(", ");
-      sb.append("local execution enabled: ").append(loadBalancer.isLocalEnabled()).append(", ");
-      sb.append("locally executing: ").append(loadBalancer.isLocallyExecuting());
-      log.trace(sb.toString());
-    }
-    return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
-  }
-
-  /**
-   * Determine whether there is a client connection available for execution.
-   * @return true if at least one connection is available, false otherwise.
-   */
-  public Pair<Boolean, Boolean> handleAvailableConnection()
-  {
-    synchronized(loadBalancer.getAvailableConnectionLock())
-    {
-      boolean b1 = hasAvailableConnection();
-      boolean b2 = false;
-      if (b1 && (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()))
-      {
-        loadBalancer.setLocallyExecuting(true);
-        b2 = true;
-      }
-      return new Pair<Boolean, Boolean>(b1, b2);
-    }
+    SubmissionManager submissionManager = getSubmissionManager();
+    return submissionManager.hasAvailableConnection();
   }
 
   @Override
@@ -327,15 +287,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     super.statusChanged(event);
     JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-    if (debugEnabled) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
-    switch(c.getStatus())
+    SubmissionManager submissionManager = getSubmissionManager();
+    if(submissionManager instanceof ClientConnectionStatusListener)
     {
-      case ACTIVE:
-        getAvailableConnections().add(c);
-        break;
-      default:
-        getAvailableConnections().remove(c);
-        break;
+      ((ClientConnectionStatusListener)submissionManager).statusChanged(event);
     }
   }
 
@@ -345,8 +300,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   public Vector<JPPFClientConnection> getAvailableConnections()
   {
-    if (availableConnections == null) availableConnections = new Vector<JPPFClientConnection>();
-    return availableConnections;
+    SubmissionManager submissionManager = getSubmissionManager();
+    if(submissionManager == null)
+      return new Vector<JPPFClientConnection>();
+    else
+    return submissionManager.getAvailableConnections();
   }
 
   /**
@@ -395,4 +353,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       return classLoaderMap.get(uuid);
     }
   }
+
+  /**
+   * Get the submission manager for this JPPF client.
+   * @return a <code>JPPFSubmissionManager</code> instance.
+   */
+  protected abstract SubmissionManager getSubmissionManager();
 }

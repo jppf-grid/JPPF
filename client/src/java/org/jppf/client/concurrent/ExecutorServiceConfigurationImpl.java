@@ -23,7 +23,7 @@ import org.jppf.server.protocol.*;
 /**
  * COncrete implementation of the {@link ExecutorServiceConfiguration} interface.
  * @author Laurent Cohen
- * @€xclude
+ * @exclude
  */
 class ExecutorServiceConfigurationImpl implements ExecutorServiceConfiguration
 {

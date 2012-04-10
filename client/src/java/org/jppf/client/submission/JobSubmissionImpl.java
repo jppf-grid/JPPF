@@ -29,7 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JobSubmissionImpl extends AbstractJobSubmission
+public class JobSubmissionImpl extends AbstractJobSubmission<SubmissionManagerImpl>
 {
   /**
    * Logger for this class.
@@ -47,7 +47,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
    * @param submissionManager the submission manager.
    * @param locallyExecuting determines whether the job will be executed locally, at least partially.
    */
-  JobSubmissionImpl(final JPPFJob job, final AbstractJPPFClientConnection connection, final SubmissionManager submissionManager, final boolean locallyExecuting)
+  JobSubmissionImpl(final JPPFJob job, final AbstractJPPFClientConnection connection, final SubmissionManagerImpl submissionManager, final boolean locallyExecuting)
   {
     super(job, connection, locallyExecuting, submissionManager);
   }
@@ -73,7 +73,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
       try
       {
         if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.EXECUTING);
-        submissionManager.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
+        submissionManager.execute(this, connection, locallyExecuting);
         if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.COMPLETE);
       }
       catch (Exception e)

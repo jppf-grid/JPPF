@@ -55,7 +55,7 @@ public class JcaSubmissionManager extends AbstractSubmissionManager
    */
   public JcaSubmissionManager(final JPPFJcaClient client)
   {
-    this.client = client;
+    super(client);
   }
 
   /**

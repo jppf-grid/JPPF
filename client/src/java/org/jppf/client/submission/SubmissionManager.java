@@ -21,6 +21,8 @@ package org.jppf.client.submission;
 import org.jppf.client.*;
 import org.jppf.client.event.SubmissionStatusListener;
 
+import java.util.Vector;
+
 /**
  * Interface for an asynchronous job submission manager.
  * @author Laurent Cohen
@@ -51,8 +53,25 @@ public interface SubmissionManager extends Runnable
   String resubmitJob(JPPFJob job);
 
   /**
-   * Get the JPPF client associated witht his submission manager.
-   * @return a {@link AbstractGenericClient} instance.
+   * Determine whether there is a client connection available for execution.
+   * @return true if at least one connection is available, false otherwise.
    */
-  AbstractGenericClient getClient();
+  boolean hasAvailableConnection();
+
+  /**
+   * Determine whether local execution is enabled on this client.
+   * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
+   */
+  boolean isLocalExecutionEnabled();
+
+  /**
+   * Specify whether local execution is enabled on this client.
+   * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
+   */
+  void setLocalExecutionEnabled(final boolean localExecutionEnabled);
+  /**
+   * Get the list of available connections.
+   * @return a vector of connections instances.
+   */
+  Vector<JPPFClientConnection> getAvailableConnections();
 }

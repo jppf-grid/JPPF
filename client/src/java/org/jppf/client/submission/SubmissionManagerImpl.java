@@ -47,7 +47,7 @@ public class SubmissionManagerImpl extends AbstractSubmissionManager
    */
   public SubmissionManagerImpl(final JPPFClient client)
   {
-    this.client = client;
+    super(client);
   }
 
   /**
