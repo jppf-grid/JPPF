@@ -38,7 +38,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this job submission.
@@ -76,7 +76,7 @@ public class JobSubmissionImpl extends AbstractJobSubmission
         submissionManager.getClient().getLoadBalancer().execute(this, connection, locallyExecuting);
         if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.COMPLETE);
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         if (hasStatusHandler) statusHandler.setStatus(SubmissionStatus.FAILED);
         if ((e instanceof NotSerializableException) || (e instanceof InterruptedException)) throw e;
@@ -94,17 +94,17 @@ public class JobSubmissionImpl extends AbstractJobSubmission
           {
             connection.getTaskServerConnection().init();
           }
-          catch(Exception e2)
+          catch (Exception e2)
           {
             log.error(e2.getMessage(), e2);
           }
         }
       }
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       error = true;
-      log.error('['+connection.getName()+"] "+ ExceptionUtils.getMessage(e), e);
+      log.error('[' + connection.getName() + "] " + ExceptionUtils.getMessage(e), e);
     }
     finally
     {

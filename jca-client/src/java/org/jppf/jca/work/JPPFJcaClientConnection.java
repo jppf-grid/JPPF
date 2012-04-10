@@ -92,12 +92,12 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
       });
       connect();
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       log.error(e.getMessage(), e);
       setStatus(FAILED);
     }
-    catch(JPPFError e)
+    catch (JPPFError e)
     {
       setStatus(FAILED);
       throw e;
@@ -121,57 +121,24 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   }
 
   /**
-   * Send tasks to the server for execution.
-   * @param cl classloader used for serialization.
-   * @param header the task bundle to send to the driver.
-   * @param job the job to execute remotely.
-   * @throws Exception if an error occurs while sending the request.
-   */
-  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
-  {
-    ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-    try
-    {
-      if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-      sendTasks(header, job);
-    }
-    catch(Exception e)
-    {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      throw e;
-    }
-    catch(Error e)
-    {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      throw e;
-    }
-    finally
-    {
-      if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
-    }
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
-  public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
+  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
-    header.setRequestUuid(job.getUuid());
     if (debugEnabled) log.debug("sending tasks bundle with requestUuid=" + header.getRequestUuid());
     ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-    ClassLoader cl = (!job.getTasks().isEmpty()) ? job.getTasks().get(0).getClass().getClassLoader() : null;
     try
     {
       if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-      super.sendTasks(header, job);
+      super.sendTasks(cl, header, job);
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
     }
-    catch(Error e)
+    catch (Error e)
     {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
@@ -223,10 +190,16 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
         if (taskServerConnection != null) taskServerConnection.close();
         if (delegate != null) delegate.close();
       }
-      catch(Exception e)
+      catch (Exception e)
       {
-        if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
-        else log.error('[' + name + "] "+ e.getMessage());
+        if (debugEnabled)
+        {
+          log.debug('[' + name + "] " + e.getMessage(), e);
+        }
+        else
+        {
+          log.error('[' + name + "] " + e.getMessage());
+        }
       }
       if (job != null) return Collections.singletonList(job);
     }

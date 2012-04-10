@@ -79,7 +79,7 @@ class RemoteExecutionThread extends ExecutionThread
       {
         requestUuid = newJob.getUuid();
         JPPFTaskBundle bundle = createBundle(newJob);
-        connection.sendTasks(bundle, newJob);
+        connection.sendTasks(connection.getClient().getRequestClassLoader(bundle.getRequestUuid()), bundle, newJob);
         while (count < tasks.size())
         {
           List<JPPFTask> results = connection.receiveResults(connection.getClient().getRequestClassLoader(bundle.getRequestUuid()));

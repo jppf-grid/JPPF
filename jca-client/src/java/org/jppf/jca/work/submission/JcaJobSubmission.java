@@ -31,9 +31,9 @@ public class JcaJobSubmission extends AbstractJobSubmission
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(JcaJobSubmission.class);
+  private static Logger log = LoggerFactory.getLogger(JcaJobSubmission.class);
   /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
 

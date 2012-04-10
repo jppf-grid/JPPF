@@ -213,7 +213,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         {
           requestUuid = newJob.getUuid();
           JPPFTaskBundle bundle = createBundle(client, newJob);
-          connection.sendTasks(bundle, newJob);
+          connection.sendTasks(client.getRequestClassLoader(bundle.getRequestUuid()), bundle, newJob);
           while (count < tasks.size())
           {
             List<JPPFTask> results = connection.receiveResults(client.getRequestClassLoader(bundle.getRequestUuid()));

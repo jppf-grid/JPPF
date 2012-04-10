@@ -105,36 +105,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
 
   /**
    * Send tasks to the server for execution.
-   * @param job the job to execute remotely.
-   * @throws Exception if an error occurs while sending the request.
-   */
-  public void sendTasks(final JPPFJob job) throws Exception
-  {
-    try
-    {
-      sendTasks(new JPPFTaskBundle(), job);
-    }
-    catch(Exception e)
-    {
-      log.error(e.getMessage(), e);
-      throw e;
-    }
-    catch(Error e)
-    {
-      log.error(e.getMessage(), e);
-      throw e;
-    }
-  }
-
-  /**
-   * Send tasks to the server for execution.
+   * @param cl classloader used for serialization.
    * @param header the task bundle to send to the driver.
    * @param job the job to execute remotely.
    * @throws Exception if an error occurs while sending the request.
    */
-  public void sendTasks(final JPPFTaskBundle header, final JPPFJob job) throws Exception
+  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
-    ClassLoader cl = getClient().getRequestClassLoader(job.getUuid());
     ObjectSerializer ser = makeHelper(cl).getSerializer();
     int count = job.getTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<String>();
@@ -142,7 +119,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getName() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
     header.setTaskCount(count);
-    header.setRequestUuid(job.getUuid());
     header.setName(job.getName());
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
@@ -205,7 +181,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try
       {
-        for (int i=0; i<count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
+        for (int i = 0; i < count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
       }
       finally
       {
@@ -218,21 +194,21 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       {
         if (debugEnabled) log.debug("server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        for (JPPFTask task: taskList) task.setException(e);
+        for (JPPFTask task : taskList) task.setException(e);
       }
       return new Pair(bundle, taskList);
     }
-    catch(AsynchronousCloseException e)
+    catch (AsynchronousCloseException e)
     {
       log.debug(e.getMessage(), e);
       throw e;
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       log.error(e.getMessage(), e);
       throw e;
     }
-    catch(Error e)
+    catch (Error e)
     {
       log.error(e.getMessage(), e);
       throw e;
@@ -252,9 +228,9 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
 
   /**
    * Receive results of tasks execution.
+   * @param cl the context classloader to use to deserialize the results.
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
-   * @param cl the context classloader to use to deserialize the results.
    * @throws Exception if an error is raised while reading the results from the server.
    */
   public List<JPPFTask> receiveResults(final ClassLoader cl) throws Exception
@@ -312,7 +288,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       {
         clazz = ndCl.loadClassDirect(helperClassName);
       }
-      catch(ClassNotFoundException e)
+      catch (ClassNotFoundException e)
       {
         log.error(e.getMessage(), e);
       }
