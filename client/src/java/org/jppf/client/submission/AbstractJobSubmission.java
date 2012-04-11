@@ -24,6 +24,7 @@ import org.jppf.client.*;
  * Wrapper for submitting a job.
  * @author Laurent Cohen
  * @exclude
+ * @param <S> class type for submission manager implementation
  */
 public abstract class AbstractJobSubmission<S extends SubmissionManager> implements JobSubmission
 {

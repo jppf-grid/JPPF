@@ -101,6 +101,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 
   /**
    * Instantiates client submission manager.
+   * @param client JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
   public SubmissionManagerClient(final JPPFClient client) throws Exception
