@@ -17,16 +17,13 @@
  */
 package org.jppf.server.node.local;
 
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.io.DataLocation;
+import org.jppf.io.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFContainer;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -50,6 +47,10 @@ public class JPPFLocalContainer extends JPPFContainer
    * The I/O handler for this node.
    */
   private LocalNodeChannel channel = null;
+  /**
+   * The message to deserialize.
+   */
+  private LocalNodeMessage currentMessage = null;
 
   /**
    * Initialize this container with a specified application uuid.
@@ -79,8 +80,7 @@ public class JPPFLocalContainer extends JPPFContainer
     try
     {
       Thread.currentThread().setContextClassLoader(classLoader);
-      LocalNodeMessage message = channel.getNodeResource();
-      List<DataLocation> locations = message.getLocations();
+      List<DataLocation> locations = currentMessage.getLocations();
       List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
       for (int i=0; i<count; i++)
       {
@@ -91,6 +91,7 @@ public class JPPFLocalContainer extends JPPFContainer
     }
     finally
     {
+      currentMessage = null;
       Thread.currentThread().setContextClassLoader(cl);
     }
   }
@@ -133,18 +134,7 @@ public class JPPFLocalContainer extends JPPFContainer
       try
       {
         Thread.currentThread().setContextClassLoader(getClassLoader());
-        InputStream is = location.getInputStream();
-        byte[] buffer = null;
-        try
-        {
-          if (traceEnabled) log.debug("deserializing object index = " + index);
-          buffer = JPPFDataTransformFactory.transform(false, is);
-        }
-        finally
-        {
-          StreamUtils.close(is);
-        }
-        Object o = helper.getSerializer().deserialize(buffer);
+        Object o = IOHelper.unwrappedData(location, helper.getSerializer());
         if (traceEnabled) log.debug("deserialized object index = " + index);
         return o;
       }
@@ -158,5 +148,14 @@ public class JPPFLocalContainer extends JPPFContainer
         Thread.currentThread().setContextClassLoader(cl);
       }
     }
+  }
+
+  /**
+   * Set the message to deserialize.
+   * @param currentMessage a <code>LocalNodeMessage</code> instance.
+   */
+  void setCurrentMessage(final LocalNodeMessage currentMessage)
+  {
+    this.currentMessage = currentMessage;
   }
 }

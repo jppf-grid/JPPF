@@ -28,7 +28,6 @@ import org.slf4j.*;
  * It is used for the nodes to determine when their code is outdated, in which case they will automatically reload
  * their own code.
  * @author Laurent Cohen
- * @exclude
  */
 public final class VersionUtils
 {
@@ -64,9 +63,13 @@ public final class VersionUtils
       try
       {
         is = VersionUtils.class.getClassLoader().getResourceAsStream("build.number");
-        TypedProperties props = new TypedProperties();
-        props.load(is);
-        buildNumber = props.getInt("build.number");
+        if (is == null) buildNumber = 0;
+        else
+        {
+          TypedProperties props = new TypedProperties();
+          props.load(is);
+          buildNumber = props.getInt("build.number");
+        }
       }
       catch(Exception ignored)
       {

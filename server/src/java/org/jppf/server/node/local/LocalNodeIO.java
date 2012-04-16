@@ -21,17 +21,14 @@ package org.jppf.server.node.local;
 import static java.nio.channels.SelectionKey.*;
 import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.data.transform.JPPFDataTransformFactory;
-import org.jppf.io.DataLocation;
+import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -52,6 +49,10 @@ public class LocalNodeIO extends AbstractNodeIO
    * The I/O channel for this node.
    */
   private LocalNodeChannel channel = null;
+  /**
+   * The message to deserialize.
+   */
+  private LocalNodeMessage currentMessage = null;
 
   /**
    * Initialize this TaskIO with the specified node.
@@ -81,29 +82,21 @@ public class LocalNodeIO extends AbstractNodeIO
   @Override
   protected Object[] deserializeObjects() throws Exception
   {
-    channel.setReadyOps(OP_WRITE);
-    if (debugEnabled) log.debug("waiting for next request");
-    // wait until a message has been sent by the server
-    while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
-    if (debugEnabled) log.debug("got request");
-    LocalNodeMessage message = null;
-    channel.setReadyOps(0);
-    message = channel.getNodeResource();
-    DataLocation location = message.getLocations().get(0);
-    if (debugEnabled) log.debug("got bundle");
-    byte[] data = null;
-    InputStream is = location.getInputStream();
-    try
+    Object[] result = null;
+    synchronized(channel.getNodeLock())
     {
-      data = JPPFDataTransformFactory.transform(false, is);
+      channel.setReadyOps(OP_WRITE);
+      if (debugEnabled) log.debug("waiting for next request");
+      // wait until a message has been sent by the server
+      while ((currentMessage = channel.getNodeResource()) == null) channel.getNodeLock().goToSleep();
+      if (debugEnabled) log.debug("got request");
+      channel.setReadyOps(0);
+      channel.setNodeResource(null);
     }
-    finally
-    {
-      StreamUtils.close(is);
-    }
-    JPPFTaskBundle bundle = (JPPFTaskBundle) node.getHelper().getSerializer().deserialize(data);
-    Object[] result = deserializeObjects(bundle);
-    channel.setNodeResource(null);
+    DataLocation location = currentMessage.getLocations().get(0);
+    JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
+    if (debugEnabled) log.debug("got bundle " + bundle);
+    result = deserializeObjects(bundle);
     if (debugEnabled) log.debug("got all data");
     return result;
   }
@@ -123,14 +116,14 @@ public class LocalNodeIO extends AbstractNodeIO
       if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
       if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
       {
-        JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+        JPPFLocalContainer cont = (JPPFLocalContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
+        cont.setCurrentMessage(currentMessage);
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
       }
       else
       {
         // skip null data provider
-        //ioHandler.read();
       }
       if (debugEnabled) log.debug("got all data");
     }
@@ -139,6 +132,10 @@ public class LocalNodeIO extends AbstractNodeIO
       log.error("Exception occurred while deserializing the tasks", t);
       bundle.setTaskCount(0);
       bundle.setParameter(NODE_EXCEPTION_PARAM, t);
+    }
+    finally
+    {
+      currentMessage = null;
     }
     return list.toArray(new Object[list.size()]);
   }
@@ -149,7 +146,7 @@ public class LocalNodeIO extends AbstractNodeIO
   @Override
   public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
   {
-    if (debugEnabled) log.debug("writing results");
+    if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime()) / 1000000L;
     bundle.setNodeExecutionTime(elapsed);
@@ -164,11 +161,14 @@ public class LocalNodeIO extends AbstractNodeIO
       message.addLocation(location);
     }
     message.setBundle(bundle);
-    channel.setServerResource(message);
-    channel.setReadyOps(OP_READ);
-    if (debugEnabled) log.debug("wrote full results");
-    // wait until the message has been read by the server
-    while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
-    channel.setReadyOps(0);
+    synchronized(channel.getServerLock())
+    {
+      channel.setReadyOps(OP_READ);
+      channel.setServerResource(message);
+      if (debugEnabled) log.debug("wrote full results");
+      // wait until the message has been read by the server
+      while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
+      channel.setReadyOps(0);
+    }
   }
 }

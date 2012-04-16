@@ -65,9 +65,13 @@ public class LocalClassContext extends ClassContext
   {
     LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
     if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
-    while (channel.getServerResource() == null) channel.goToSleep();
-    resource = channel.getServerResource();
-    channel.setServerResource(null);
+    JPPFResourceWrapper res;
+    synchronized(channel.getServerLock())
+    {
+      while ((res = channel.getServerResource()) == null) channel.getServerLock().goToSleep();
+      channel.setServerResource(null);
+    }
+    resource = res;
     if (traceEnabled) log.trace("message read for " + wrapper);
     return true;
   }

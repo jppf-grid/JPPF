@@ -154,7 +154,7 @@ class PeerNode extends AbstractCommonNode
     {
       BundleWrapper bundleWrapper = readBundle();
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+      if (bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
       {
         if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
         bundle.setUuid(uuid);
@@ -180,8 +180,7 @@ class PeerNode extends AbstractCommonNode
       {
         resultSender.sendResults(bundleWrapper);
       }
-      if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-        driver.getJobManager().jobEnded(bundleWrapper);
+      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) driver.getJobManager().jobEnded(bundleWrapper);
     }
     if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
   }

@@ -38,6 +38,13 @@ public class LocalNodeContext extends AbstractNodeContext
   private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
+   * Default constructor.
+   */
+  public LocalNodeContext()
+  {
+  }
+
+  /**
    * {@inheritDoc}.
    */
   @Override
@@ -54,9 +61,14 @@ public class LocalNodeContext extends AbstractNodeContext
   {
     if (debugEnabled) log.debug("reading message from " + channel);
     LocalNodeChannel handler = (LocalNodeChannel) channel;
-    while (handler.getServerResource() == null) handler.getServerLock().goToSleep();
-    setMessage(handler.getServerResource());
-    handler.setServerResource(null);
+    handler.getServerLock().wakeUp();
+    LocalNodeMessage lnm; 
+    synchronized(handler.getServerLock())
+    {
+      while ((lnm = handler.getServerResource()) == null) handler.getServerLock().goToSleep();
+      setMessage(lnm);
+      handler.setServerResource(null);
+    }
     return true;
   }
 
@@ -67,10 +79,9 @@ public class LocalNodeContext extends AbstractNodeContext
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
   {
     LocalNodeChannel handler = (LocalNodeChannel) channel;
-    boolean b = super.writeMessage(channel);
     if (debugEnabled) log.debug("wrote " + message + " to " + channel);
     handler.setNodeResource((LocalNodeMessage) message);
-    return b;
+    return true;
   }
 
   /**
@@ -81,19 +92,5 @@ public class LocalNodeContext extends AbstractNodeContext
   {
     super.setMessage(nodeMessage);
     ((LocalNodeChannel) getChannel()).wakeUp();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setState(final NodeState state)
-  {
-    if (NodeState.SENDING_BUNDLE.equals(this.state) && NodeState.IDLE.equals(state))
-    {
-      log.debug("debug stack", new Exception());
-      int breakpoint = 0;
-    }
-    super.setState(state);
   }
 }

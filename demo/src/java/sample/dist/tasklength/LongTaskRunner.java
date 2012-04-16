@@ -24,7 +24,6 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -91,7 +90,7 @@ public class LongTaskRunner
     {
       // perform "iteration" times
       long totalTime = 0L;
-      for (int iter=0; iter<iterations; iter++)
+      for (int iter=1; iter<=iterations; iter++)
       {
         long start = System.currentTimeMillis();
         JPPFJob job = new JPPFJob();
@@ -99,7 +98,7 @@ public class LongTaskRunner
         for (int i=0; i<nbTasks; i++)
         {
           LongTask task = new LongTask(length, false);
-          task.setId("" + (iter+1) + ':' + (i+1));
+          task.setId("" + iter + ':' + (i+1));
           job.addTask(task);
         }
         // submit the tasks for execution
@@ -110,12 +109,12 @@ public class LongTaskRunner
           if (e != null) throw e;
         }
         long elapsed = System.currentTimeMillis() - start;
-        //print("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
+        print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
         totalTime += elapsed;
       }
-      print("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
-      JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
-      print("End statistics :\n"+stats.toString());
+      print("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
+      //JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+      //print("End statistics :\n"+stats.toString());
     }
     catch(Exception e)
     {

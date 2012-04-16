@@ -116,12 +116,12 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getName() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
     header.setTaskCount(count);
     header.setName(job.getName());
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
+    if (debugEnabled) log.debug("[client: " + name + "] sending job " + header);
 
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
@@ -146,7 +146,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug("[client: " + name + "] sending handshake job, uuidPath=" + uuidPath.getList());
+    if (debugEnabled) log.debug("[client: " + name + "] sending handshake job, uuidPath=" + uuidPath);
     header.setRequestUuid(new JPPFUuid().toString());
     header.setName("handshake job");
     header.setUuid("handshake job");
@@ -176,7 +176,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       ObjectSerializer ser = makeHelper(cl).getSerializer();
       bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
-      if (debugEnabled) log.debug("received bundle with " + count + " tasks for job '" + bundle.getName() + '\'');
+      if (debugEnabled) log.debug("received bundle " + bundle);
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try
       {

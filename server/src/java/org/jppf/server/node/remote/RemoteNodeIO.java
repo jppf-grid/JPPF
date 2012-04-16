@@ -133,6 +133,7 @@ public class RemoteNodeIO extends AbstractNodeIO
   @Override
   public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
   {
+    if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime()) / 1000000L;
     bundle.setNodeExecutionTime(elapsed);
@@ -148,6 +149,6 @@ public class RemoteNodeIO extends AbstractNodeIO
       dl.transferTo(dest, true);
     }
     socketWrapper.flush();
-    //ioHandler.flush();
+    if (debugEnabled) log.debug("wrote full results");
   }
 }

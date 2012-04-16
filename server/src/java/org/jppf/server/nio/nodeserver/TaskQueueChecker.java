@@ -265,6 +265,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
       server.getTransitionManager().transitionChannel(channel, NodeTransition.TO_SENDING);
       driver.getJobManager().jobDispatched(context.getBundle(), channel);
     }
+    if (channel.getSelector() != null) channel.getSelector().wakeUp();
   }
 
   /**
@@ -313,15 +314,21 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
         if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + mgtInfo.getId());
         if (!b) continue;
       }
+      // add a bias toward local node
+      if (ch instanceof LocalNodeChannel)
+      {
+        n = i;
+        break;
+      }
       acceptableChannels.add(i);
     }
-    int size = acceptableChannels.size();
-    if (debugEnabled) log.debug("found " + size + " acceptable channels");
-    if (size > 0)
+    if (n < 0)
     {
-      n = acceptableChannels.remove(size > 1 ? random.nextInt(size) : 0);
+      int size = acceptableChannels.size();
+      if (debugEnabled) log.debug("found " + size + " acceptable channels");
+      if (size > 0) n = acceptableChannels.remove(size > 1 ? random.nextInt(size) : 0);
+      for (Integer i: channelsToRemove) removeIdleChannel(i);
     }
-    for (Integer i: channelsToRemove) removeIdleChannel(i);
     return n;
   }
 

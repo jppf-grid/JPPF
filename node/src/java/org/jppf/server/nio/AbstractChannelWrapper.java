@@ -131,7 +131,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
     sb.append(getId());
     sb.append(',').append(" readyOps=").append(getReadyOps());
     sb.append(',').append(" keyOps=").append(getKeyOps());
-    //sb.append(",").append(" state=").append(getContext().getState());
+    sb.append(",").append(" state=").append(getContext().getState());
     sb.append(']');
     return sb.toString();
   }

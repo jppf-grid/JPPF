@@ -19,9 +19,10 @@ package org.jppf.server.protocol;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.TraversalList;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -102,10 +103,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   private long executionStartTime = 0L;
   /**
-   * The build number of the current version of JPPF.
-   */
-  private int buildNumber = 0;
-  /**
    * The state of this bundle, to indicate whether it is used for handshake with
    * the server or for transporting tasks to execute.
    */
@@ -122,13 +119,16 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * The user-defined metadata associated with this job.
    */
   private JobMetadata jobMetadata = new JPPFJobMetadata();
+  /**
+   * Count of bundles copied.
+   */
+  private static AtomicLong copyCount = new AtomicLong(0);
 
   /**
    * Initialize this task bundle and set its build number.
    */
   public JPPFTaskBundle()
   {
-    buildNumber = VersionUtils.getBuildNumber();
   }
 
   /**
@@ -306,15 +306,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   }
 
   /**
-   * Get the build number under which this task bundle was created.
-   * @return the build number as an int value.
-   */
-  public int getBuildNumber()
-  {
-    return buildNumber;
-  }
-
-  /**
    * Make a copy of this bundle.
    * @return a new <code>JPPFTaskBundle</code> instance.
    */
@@ -334,6 +325,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setQueueEntryTime(queueEntryTime);
     bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
+    bundle.setMetadata(jobMetadata);
+    bundle.setParameter("bundle.uuid", uuidPath.getLast() + "-" + copyCount.incrementAndGet());
     //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
 
     return bundle;
@@ -347,8 +340,11 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public JPPFTaskBundle copy(final int nbTasks)
   {
     JPPFTaskBundle bundle = copy();
-    bundle.setTaskCount(nbTasks);
-    taskCount -= nbTasks;
+    synchronized(this)
+    {
+      bundle.setTaskCount(nbTasks);
+      taskCount -= nbTasks;
+    }
     return bundle;
   }
 
@@ -477,12 +473,13 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public String toString()
   {
     StringBuilder sb = new StringBuilder("[");
-    sb.append("jobId=").append(getName());
-    sb.append(", jobUuid=").append(getUuid());
-    sb.append(", requestUuid=").append(getRequestUuid());
-    sb.append(", initialTaskCount=").append(initialTaskCount);
-    sb.append(", taskCount=").append(taskCount);
-    sb.append(", requeue=").append(parameters == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
+    sb.append("name=").append(getName());
+    sb.append(", uuid=").append(getUuid());
+    sb.append(", initCount=").append(initialTaskCount);
+    sb.append(", count=").append(taskCount);
+    sb.append(", bundle.uuid=").append(getParameter("bundle.uuid"));
+    sb.append(", uuidPath=").append(uuidPath);
+    sb.append(", requeue=").append(parameters.get(BundleParameter.JOB_REQUEUE));
     sb.append(']');
     return sb.toString();
   }

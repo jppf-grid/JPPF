@@ -29,7 +29,7 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
   /**
    * The channel polled by this selector.
    */
-  private ChannelWrapper<?> channel = null;
+  private AbstractLocalChannelWrapper channel = null;
 
   /**
    * Initialize this selector with the specified channel.
@@ -37,7 +37,7 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
    */
   public LocalChannelSelector(final ChannelWrapper<?> channel)
   {
-    this.channel = channel;
+    this.channel = (AbstractLocalChannelWrapper) channel;
   }
 
   /**
@@ -58,12 +58,11 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
     if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
     long start = System.currentTimeMillis();
     long elapsed = 0;
-    boolean selected = channelSelected();
-    while (((timeout == 0L) || (elapsed < timeout)) && !selected)
+    boolean selected = false;
+    while (((timeout == 0L) || (elapsed < timeout)) && !(selected = channelSelected()))
     {
       goToSleep(timeout == 0L ? 0 : timeout - elapsed);
       elapsed = System.currentTimeMillis() - start;
-      selected = channelSelected();
     }
     return selected;
   }
@@ -92,7 +91,7 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
    */
   private boolean channelSelected()
   {
-    synchronized(channel)
+    synchronized(channel.getOpsLock())
     {
       return (channel.getKeyOps() & channel.getReadyOps()) != 0;
     }

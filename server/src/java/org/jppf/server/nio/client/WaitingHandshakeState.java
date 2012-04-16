@@ -83,7 +83,7 @@ class WaitingHandshakeState extends ClientServerState
         list = classServer.getProviderConnections(uuid);
       }
       header.getUuidPath().add(driver.getUuid());
-      if (debugEnabled) log.debug("uuid path=" + header.getUuidPath().getList());
+      if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
 
       context.setClientMessage(null);
       context.setBundle(bundleWrapper);

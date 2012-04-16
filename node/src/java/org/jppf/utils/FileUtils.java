@@ -339,28 +339,33 @@ public final class FileUtils
   public static void splitTextFile(final String file, final int splitSize) throws IOException
   {
     BufferedReader reader = new BufferedReader(new FileReader(file));
-    StringBuilder sb = new StringBuilder();
+    BufferedWriter writer = null;
     int count = 0;
+    int size = 0;
     try
     {
       String s = "";
       while (s != null)
       {
+        if (writer == null)
+        {
+          String name = file + '.' + count;
+          System.out.println("creating file " + name);
+          writer = new BufferedWriter(new FileWriter(name));
+        }
         s = reader.readLine();
         if (s == null) break;
-        sb.append(s).append('\n');
-        if (sb.length() >= splitSize)
+        writer.write(s + "\n");
+        size += s.length();
+        if (size >= splitSize)
         {
+          writer.close();
+          writer = null;
           count++;
-          writeTextFile(file + '.' + count, sb.toString());
-          sb = new StringBuilder();
+          size = 0;
         }
       }
-      if (sb.length() > 0)
-      {
-        count++;
-        writeTextFile(file + '.' + count, sb.toString());
-      }
+      if (writer != null) writer.close();
     }
     finally
     {

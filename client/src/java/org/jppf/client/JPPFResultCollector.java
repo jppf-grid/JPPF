@@ -125,7 +125,8 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
       else job.getResults().putResults(tasks);
       pendingCount -= tasks.size();
       if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
-      if (pendingCount <= 0) {
+      if (pendingCount <= 0)
+      {
         buildResults();
         setStatus(SubmissionStatus.COMPLETE);
       }
