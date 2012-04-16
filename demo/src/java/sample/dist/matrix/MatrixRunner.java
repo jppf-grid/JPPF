@@ -111,7 +111,7 @@ public class MatrixRunner implements NotificationListener
     try
     {
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
-      else jppfClient = new JPPFClient();
+      else jppfClient = new JPPFClient("client");
       /*
 			//monitor = new GridMonitor(jppfClient, 1000L);
 			monitor = new GridMonitor("localhost", 11198);
@@ -136,11 +136,11 @@ public class MatrixRunner implements NotificationListener
         policy = PolicyParser.parsePolicy(s);
       }
       // perform "iteration" times
-      for (int iter=0; iter<iterations; iter++)
+      for (int iter=1; iter<=iterations; iter++)
       {
-        long elapsed = performParallelMultiplication(a, b, nbRows, policy);
+        long elapsed = performParallelMultiplication(a, b, nbRows, policy, iter);
         totalIterationTime += elapsed;
-        output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
+        output("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
@@ -166,16 +166,18 @@ public class MatrixRunner implements NotificationListener
    * @param b the right-hand matrix.
    * @param nbRows number of rows of matrix a per task.
    * @param policy the execution policy to apply to the submitted job, may be null.
+   * @param iter the iteration number.
    * @return the elapsed time for the computation.
    * @throws Exception if an error is raised during the execution.
    */
-  private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy) throws Exception
+  private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy, final int iter) throws Exception
   {
     //long start = System.currentTimeMillis();
     long start = System.nanoTime();
     int size = a.getSize();
     // create a task for each row in matrix a
-    JPPFJob job = new JPPFJob();
+    //JPPFJob job = new JPPFJob();
+    JPPFJob job = new JPPFJob("m" + iter);
     job.setName("matrix sample " + (iterationsCount++));
     int remaining = size;
     for (int i=0; i<size; i+= nbRows)
@@ -242,7 +244,7 @@ public class MatrixRunner implements NotificationListener
         {
           if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
           else jppfClient = new JPPFClient();
-          long elapsed = performParallelMultiplication(a, b, nbRows, null);
+          long elapsed = performParallelMultiplication(a, b, nbRows, null, iter);
           totalIterationTime += elapsed;
           output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
         }

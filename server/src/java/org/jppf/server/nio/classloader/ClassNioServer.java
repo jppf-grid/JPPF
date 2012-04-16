@@ -149,6 +149,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
   @Override
   public void postAccept(final ChannelWrapper<?> wrapper)
   {
+    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(wrapper, CLASS_SERVER);
     ((ClassContext) wrapper.getContext()).setState(DEFINING_TYPE);
   }
 
@@ -208,7 +209,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
   public void removeProviderConnection(final String uuid, final ChannelWrapper channel)
   {
     if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
+    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, CLASS_SERVER);
     synchronized(providerConnections)
     {
       List<ChannelWrapper<?>> list = providerConnections.get(uuid);
@@ -290,7 +291,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
     synchronized(nodeConnections)
     {
       nodeConnections.put(uuid, channel);
-      if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().addChannel(channel, getName());
+      if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().addChannel(channel, CLASS_SERVER);
     }
   }
 
@@ -305,7 +306,7 @@ public class ClassNioServer extends NioServer<ClassState, ClassTransition> imple
     synchronized(nodeConnections)
     {
       ChannelWrapper<?> channel = nodeConnections.remove(uuid);
-      if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
+      if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, CLASS_SERVER);
       return channel;
     }
   }

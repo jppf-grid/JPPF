@@ -34,17 +34,23 @@ public class TraversalList<E> implements Serializable
   /**
    * The actual list that backs this traversal list.
    */
-  private List<E> list = new LinkedList<E>();
+  private final List<E> list;
   /**
    * The current position in the list.
    */
   private int position = -1;
+  /**
+   * String representation of this list.
+   */
+  private String toStr = null;
 
   /**
    * Default initialization.
    */
   public TraversalList()
   {
+    list = new LinkedList<E>();
+    toStr = list.toString();
   }
 
   /**
@@ -54,6 +60,7 @@ public class TraversalList<E> implements Serializable
   public TraversalList(final List<E> list)
   {
     this.list = list;
+    toStr = list.toString();
   }
 
   /**
@@ -63,6 +70,7 @@ public class TraversalList<E> implements Serializable
   public void add(final E element)
   {
     list.add(element);
+    toStr = list.toString();
   }
 
   /**
@@ -113,7 +121,8 @@ public class TraversalList<E> implements Serializable
    */
   public List<E> getList()
   {
-    return Collections.unmodifiableList(list);
+    return list;
+    //return Collections.unmodifiableList(list);
   }
 
   /**
@@ -163,5 +172,20 @@ public class TraversalList<E> implements Serializable
   public boolean contains(final E element)
   {
     return list.contains(element);
+  }
+
+  @Override
+  public String toString()
+  {
+    return toStr;
+  }
+
+  /**
+   * Get a string rpresentation of this list.
+   * @return a string equivalent to <code>toString()</code>.
+   */
+  public String asString()
+  {
+    return toStr;
   }
 }

@@ -20,11 +20,9 @@ package sample.dist.tasklength;
 import java.util.*;
 import java.util.concurrent.Future;
 
-import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -57,12 +55,12 @@ public class LongTaskRunner
   {
     try
     {
-      jppfClient = new JPPFClient();
+      jppfClient = new JPPFClient("client");
       TypedProperties props = JPPFConfiguration.getProperties();
       int length = props.getInt("longtask.length");
       int nbTask = props.getInt("longtask.number");
       int iterations = props.getInt("longtask.iterations");
-      print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
+      print("Running Long Task demo with " + nbTask + " tasks of length = " + length + " ms for " + iterations + " iterations");
       perform(nbTask, length, iterations);
       //perform3(nbTask, length, iterations);
       //perform4();
@@ -87,40 +85,34 @@ public class LongTaskRunner
    */
   private static void perform(final int nbTasks, final int length, final int iterations) throws Exception
   {
-    try
+    long totalTime = 0L;
+    for (int iter=1; iter<=iterations; iter++)
     {
-      // perform "iteration" times
-      long totalTime = 0L;
-      for (int iter=0; iter<iterations; iter++)
+      long start = System.nanoTime();
+      JPPFJob job = new JPPFJob("job_" + iter);
+      //job.setName("Long task iteration " + iter);
+      job.setName("iter " + iter);
+      for (int i=0; i<nbTasks; i++)
       {
-        long start = System.currentTimeMillis();
-        JPPFJob job = new JPPFJob();
-        job.setName("Long task iteration " + iter);
-        for (int i=0; i<nbTasks; i++)
-        {
-          LongTask task = new LongTask(length, false);
-          task.setId("" + (iter+1) + ':' + (i+1));
-          job.addTask(task);
-        }
-        // submit the tasks for execution
-        List<JPPFTask> results = jppfClient.submit(job);
-        for (JPPFTask task: results)
-        {
-          Exception e = task.getException();
-          if (e != null) throw e;
-        }
-        long elapsed = System.currentTimeMillis() - start;
-        //print("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
-        totalTime += elapsed;
+        LongTask task = new LongTask(length, false);
+        task.setId("" + (iter+1) + ':' + (i+1));
+        job.addTask(task);
       }
-      print("Average iteration time: "+StringUtils.toStringDuration(totalTime/iterations));
-      JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
-      print("End statistics :\n"+stats.toString());
+      List<JPPFTask> results = jppfClient.submit(job);
+      for (JPPFTask task: results)
+      {
+        Exception e = task.getException();
+        if (e != null) throw e;
+      }
+      long elapsed = System.nanoTime() - start;
+      print("Iteration #" + iter+" performed in " + StringUtils.toStringDuration(elapsed/1000000L));
+      totalTime += elapsed;
     }
-    catch(Exception e)
-    {
-      throw new JPPFException(e.getMessage(), e);
-    }
+    print("Average iteration time: " + StringUtils.toStringDuration(totalTime/(iterations*1000000L)));
+    /*
+    JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+    print("End statistics :\n"+stats.toString());
+    */
   }
 
   /**

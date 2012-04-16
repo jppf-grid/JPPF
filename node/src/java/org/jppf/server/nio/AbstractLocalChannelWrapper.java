@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.jppf.utils.SimpleObjectLock;
 import org.slf4j.*;
 
@@ -42,11 +40,11 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   /**
    * This channel's key ops.
    */
-  protected AtomicInteger keyOps = new AtomicInteger(0);
+  protected int keyOps = 0;
   /**
    * This channel's ready ops.
    */
-  protected AtomicInteger readyOps = new AtomicInteger(0);
+  protected int readyOps = 0;
   /**
    * The resource passed to the node.
    */
@@ -63,6 +61,10 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
    * Object used to synchronize threads when reading/writing the server message.
    */
   protected final SimpleObjectLock serverLock = new SimpleObjectLock();
+  /**
+   * Object used to synchronize threads when reading/writing the keyOps or readyOps.
+   */
+  protected final SimpleObjectLock opsLock = new SimpleObjectLock();
 
   /**
    * Initialize this I/O handler with the specified context.
@@ -89,7 +91,10 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   @Override
   public int getKeyOps()
   {
-    return keyOps.get();
+    synchronized(opsLock)
+    {
+      return keyOps;
+    }
   }
 
   /**
@@ -98,8 +103,11 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   @Override
   public void setKeyOps(final int keyOps)
   {
-    this.keyOps.set(keyOps);
-    if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+    synchronized(opsLock)
+    {
+      this.keyOps = keyOps;
+      if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+    }
     if (getSelector() != null) getSelector().wakeUp();
   }
 
@@ -109,7 +117,10 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   @Override
   public int getReadyOps()
   {
-    return readyOps.get();
+    synchronized(opsLock)
+    {
+      return readyOps;
+    }
   }
 
   /**
@@ -118,8 +129,11 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
    */
   public void setReadyOps(final int readyOps)
   {
-    this.readyOps.set(readyOps);
-    if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+    synchronized(opsLock)
+    {
+      this.readyOps = readyOps;
+      if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+    }
     if (getSelector() != null) getSelector().wakeUp();
   }
 
@@ -190,5 +204,14 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   public SimpleObjectLock getServerLock()
   {
     return serverLock;
+  }
+
+  /**
+   * Get the object used to synchronize threads when reading/writing the keyOps or readyOps.
+   * @return a {@link SimpleObjectLock} instance.
+   */
+  public SimpleObjectLock getOpsLock()
+  {
+    return opsLock;
   }
 }

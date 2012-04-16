@@ -19,6 +19,7 @@
 package org.jppf.server;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.nio.ChannelWrapper;
@@ -46,6 +47,10 @@ public class NodeInformationHandler
    * A list of objects containing the information required to connect to the nodes JMX servers.
    */
   private final Map<String, JPPFManagementInfo> uuidMap = new HashMap<String, JPPFManagementInfo>();
+  /**
+   * 
+   */
+  private AtomicInteger pseudoThreadNumber = new AtomicInteger(0);
 
   /**
    * Add a node information object to the map of node information.

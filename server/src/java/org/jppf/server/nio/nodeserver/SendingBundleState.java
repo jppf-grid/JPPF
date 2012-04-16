@@ -77,7 +77,7 @@ class SendingBundleState extends NodeServerState
         // to avoid cycles in peer-to-peer routing of jobs.
         if (bundle.getUuidPath().contains(context.getUuid()))
         {
-          if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath().getList());
+          if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());
           context.setBundle(null);
           context.resubmitBundle(bundleWrapper);
           server.addIdleChannel(channel);

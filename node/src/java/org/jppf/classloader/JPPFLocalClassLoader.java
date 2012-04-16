@@ -89,10 +89,10 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
           JPPFResourceWrapper resource = new JPPFResourceWrapper();
           resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
           resource.setData("node.uuid", NodeRunner.getUuid());
+          channel.setServerResource(resource);
+          channel.setNodeResource(null);
           synchronized(channel)
           {
-            channel.setServerResource(resource);
-            channel.setNodeResource(null);
             channel.setReadyOps(SelectionKey.OP_READ);
           }
           while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
@@ -254,17 +254,21 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     {
       try
       {
-        synchronized(channel)
+        if (debugEnabled) log.debug("channel " + channel + " sending request " + request);
+        synchronized(channel.getServerLock())
         {
           channel.setServerResource(request);
           channel.setReadyOps(SelectionKey.OP_READ);
+          while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
         }
-        while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
-
-        channel.setReadyOps(SelectionKey.OP_WRITE);
-        while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
-        response = channel.getNodeResource();
-        channel.setNodeResource(null);
+        synchronized(channel.getNodeLock())
+        {
+          channel.setReadyOps(SelectionKey.OP_WRITE);
+          while ((response = channel.getNodeResource()) == null) channel.getNodeLock().goToSleep();
+          //response = channel.getNodeResource();
+          channel.setNodeResource(null);
+        }
+        if (debugEnabled) log.debug("channel " + channel + " got response " + response);
       }
       catch (Throwable t)
       {

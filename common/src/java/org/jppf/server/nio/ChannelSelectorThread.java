@@ -38,11 +38,15 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
   /**
    * The channel selector associated with this thread.
    */
-  private ChannelSelector selector = null;
+  private final ChannelSelector selector;
   /**
    * The nio server that own this thread.
    */
-  private NioServer<?, ?> server = null;
+  private final NioServer<?, ?> server;
+  /**
+   * The maximum time a select() operation can block.
+   */
+  private final long timeout;
 
   /**
    * Initialize this thread with the specified name, selector and NIO server.
@@ -51,8 +55,21 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
    */
   public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server)
   {
+    this(selector, server, 0L);
+  }
+
+  /**
+   * Initialize this thread with the specified name, selector and NIO server.
+   * @param selector the channel selector associated with this thread.
+   * @param server the nio server that own this thread.
+   * @param timeout the maximum time a select() operation can block.
+   */
+  public ChannelSelectorThread(final ChannelSelector selector, final NioServer<?, ?> server, final long timeout)
+  {
+    if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
     this.selector = selector;
     this.server = server;
+    this.timeout = timeout;
   }
 
   /**
@@ -64,7 +81,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
   {
     while (!isStopped())
     {
-      if (selector.select())
+      if (selector.select(timeout))
       {
         ChannelWrapper<?> channel = selector.getChannel();
         synchronized(channel)

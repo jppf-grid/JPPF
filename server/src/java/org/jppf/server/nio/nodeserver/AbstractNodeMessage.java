@@ -172,6 +172,7 @@ public abstract class AbstractNodeMessage
     sb.append(", nbObjects=").append(nbObjects);
     sb.append(", length=").append(length);
     sb.append(", count=").append(count);
+    sb.append(", bundle=").append(bundle);
     sb.append(']');
     return sb.toString();
   }

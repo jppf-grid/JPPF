@@ -211,8 +211,9 @@ public abstract class JPPFNode extends AbstractNode
     nodeIO.writeResults(bundle, taskList);
     if ((taskList != null) && (!taskList.isEmpty()))
     {
-      if (isJmxEnabled()) getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
-      else setTaskCount(getTaskCount() + taskList.size());
+      //getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
+      // if jmx is enabled, done by the status notifier
+      if (!isJmxEnabled()) setTaskCount(getTaskCount() + taskList.size());
       if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
     }
   }

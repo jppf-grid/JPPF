@@ -45,11 +45,11 @@ public class CompletionListener implements TaskCompletionListener
   /**
    * The client channel.
    */
-  private ChannelWrapper<?> channel;
+  private final ChannelWrapper<?> channel;
   /**
    * The client context associated with the channel.
    */
-  private ClientContext context;
+  private final ClientContext context;
 
   /**
    * Initialize this completion listener with the specified channel.
@@ -68,17 +68,20 @@ public class CompletionListener implements TaskCompletionListener
   @SuppressWarnings("unchecked")
   public void taskCompleted(final ServerJob result)
   {
-    context.offerCompletedBundle(result);
-    if (ClientState.IDLE.equals(context.getState()))
+    synchronized(channel)
     {
-      try
+      context.offerCompletedBundle(result);
+      if (ClientState.IDLE.equals(context.getState()))
       {
-        transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
-      }
-      catch(Exception e)
-      {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.info(e.getClass().getName() + " : " + e.getMessage());
+        try
+        {
+          transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
+        }
+        catch(Exception e)
+        {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.info(e.getClass().getName() + " : " + e.getMessage());
+        }
       }
     }
   }

@@ -85,6 +85,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   {
     try
     {
+      if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, CLIENT_SERVER);
       transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
     }
     catch (Exception e)

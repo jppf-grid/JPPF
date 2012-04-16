@@ -106,7 +106,7 @@ public class JPPFDriver
   /**
    * Uuid for this driver.
    */
-  private String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase();
+  private String uuid = JPPFConfiguration.getProperties().getString("jppf.driver.uuid", new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase());
   /**
    * Performs initialization of the driver's components.
    */
@@ -159,7 +159,9 @@ public class JPPFDriver
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
+      localClassChannel.getContext().setChannel(localClassChannel);
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext());
+      localNodeChannel.getContext().setChannel(localNodeChannel);
       localNode = new JPPFLocalNode(localNodeChannel, localClassChannel);
       classServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);

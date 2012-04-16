@@ -46,7 +46,8 @@ class PeerNode extends AbstractNode
   /**
    * Used to send the task results back to the requester.
    */
-  private AbstractResultSender resultSender = null;
+  private PeerNodeResultSender resultSender = null;
+  //private AbstractResultSender resultSender = null;
   /**
    * The name of the peer in the configuration file.
    */
@@ -146,7 +147,7 @@ class PeerNode extends AbstractNode
     {
       BundleWrapper bundleWrapper = readBundle();
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+      if (bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
       {
         if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
         {
@@ -154,9 +155,7 @@ class PeerNode extends AbstractNode
           {
             JMXServer jmxServer = driver.getInitializer().getJmxServer();
             TypedProperties props = JPPFConfiguration.getProperties();
-            //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, NetworkUtils.getManagementHost());
             bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
-            //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, props.getInt("jppf.management.port", 11198));
             bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
             bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, jmxServer.getId());
           }
@@ -173,22 +172,23 @@ class PeerNode extends AbstractNode
         sysInfo.populate();
         bundle.setParameter(BundleParameter.NODE_SYSTEM_INFO_PARAM, sysInfo);
       }
-      //boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
       boolean notEmpty = !bundleWrapper.getTasks().isEmpty();
       if (notEmpty)
       {
         int n = bundle.getTaskCount();
         bundle.getUuidPath().add(driver.getUuid());
+        if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath());
         bundle.setCompletionListener(resultSender);
+        resultSender.pendingTasksCount = n;
         JPPFDriver.getQueue().addBundle(bundleWrapper);
-        resultSender.run(n);
-        //resultSender.sendPartialResults(bundleWrapper);
+        resultSender.waitForExecution();
         setTaskCount(getTaskCount() + n);
         if (debugEnabled) log.debug(getName() + "tasks executed: " + getTaskCount());
       }
       else
       {
-        resultSender.sendPartialResults(bundleWrapper);
+        //resultSender.sendPartialResults(bundleWrapper);
+        resultSender.sendResults(bundleWrapper);
       }
       if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
         driver.getJobManager().jobEnded(bundleWrapper);
@@ -254,11 +254,11 @@ class PeerNode extends AbstractNode
   {
     // Read the request header - with tasks count information
     JPPFTaskBundle header = (JPPFTaskBundle) helper.getSerializer().deserialize(socketClient.receiveBytes(0).getBuffer());
-    if (debugEnabled) log.debug("received header from peer driver");
+    if (debugEnabled) log.debug("received header from peer driver " + header);
     BundleWrapper headerWrapper = new BundleWrapper(header);
 
     int count = header.getTaskCount();
-    if (debugEnabled) log.debug("Received " + count + " tasks");
+    //if (debugEnabled) log.debug("Received " + count + " tasks");
 
     for (int i=0; i<count+1; i++)
     {
@@ -266,14 +266,15 @@ class PeerNode extends AbstractNode
       if (i == 0)
       {
         headerWrapper.setDataProvider(dl);
-        if (debugEnabled) log.debug("received data provider from peer driver, data length = " + dl.getSize());
+        //if (debugEnabled) log.debug("received data provider from peer driver, data length = " + dl.getSize());
       }
       else
       {
         headerWrapper.addTask(dl);
-        if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
+        //if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
       }
     }
+    if (debugEnabled) log.debug("done reading job");
     return headerWrapper;
   }
 
