@@ -31,7 +31,8 @@ import org.jppf.utils.compilation.SourceCompiler;
 import org.slf4j.*;
 
 /**
- * 
+ * Build a JPPTask class from its source stored in a string,
+ * then execute it in a JPPF grid.
  * @author Laurent Cohen
  */
 public class JPPFSourceCompiler
@@ -42,7 +43,7 @@ public class JPPFSourceCompiler
   private static Logger log = LoggerFactory.getLogger(JPPFSourceCompiler.class);
 
   /**
-   * 
+   * Entry point for this demo.
    * @param args not used.
    */
   public static void main(final String[] args)
@@ -119,29 +120,5 @@ public class JPPFSourceCompiler
     {
       client.close();
     }
-  }
-
-  /**
-   * Generate the source code of a class.
-   * @return the source code to compile as a string.
-   */
-  public static CharSequence buildTaskSource() {
-    StringBuilder sb = new StringBuilder();
-    append(sb, "package test.compilation;                      ");
-    append(sb, "                                               ");
-    append(sb, "import org.jppf.server.protocol.JPPFTask;      ");
-    append(sb, "                                               ");
-    append(sb, "public class MyJPPFTask extends JPPFTask {     ");
-    append(sb, "                                               ");
-    append(sb, "  @Override                                    ");
-    append(sb, "  public void run() {                          ");
-    append(sb, "    String msg =                               ");
-    append(sb, "      \"Hello, world of compilation! from \" + ");
-    append(sb, "      getClass().getSimpleName();              ");
-    append(sb, "    System.out.println(msg);                   ");
-    append(sb, "    setResult(msg);                            ");
-    append(sb, "  }                                            ");
-    append(sb, "}                                              ");
-    return sb;
   }
 }

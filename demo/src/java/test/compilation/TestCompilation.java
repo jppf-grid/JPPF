@@ -48,11 +48,15 @@ public class TestCompilation
    * Entry point ofr this program.
    * @param args not used.
    */
-  public static void main(final String[] args) {
-    try {
+  public static void main(final String[] args)
+  {
+    try
+    {
       testToFile();
       testToMemory();
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       e.printStackTrace();
     }
   }
@@ -61,7 +65,8 @@ public class TestCompilation
    * Test compilation to file system from a string java source.
    * @throws Exception if any error occurs.
    */
-  public static void testToFile() throws Exception {
+  public static void testToFile() throws Exception
+  {
     output("****************************************");
     File classesDir = new File("tmpclasses/");
     if (!classesDir.exists()) {
@@ -73,13 +78,16 @@ public class TestCompilation
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
     SourceCompiler compiler = null;
-    try {
+    try
+    {
       compiler = new SourceCompiler();
       compiler.compileToFile(sources, classesDir);
       Class<?> clazz = compiler.getClassloader().loadClass(className);
       Callable task = (Callable) clazz.newInstance();
       output("result: " + task.call());
-    } finally {
+    }
+    finally
+    {
       compiler.close();
     }
   }
@@ -88,7 +96,8 @@ public class TestCompilation
    * Test compilation to memory from a string java source.
    * @throws Exception if any error occurs.
    */
-  public static void testToMemory() throws Exception {
+  public static void testToMemory() throws Exception
+  {
     output("****************************************");
     String className = "test.compilation.MyTask";
     // build the map of sources to compile
@@ -96,7 +105,8 @@ public class TestCompilation
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
     SourceCompiler compiler = null;
-    try {
+    try
+    {
       compiler = new SourceCompiler();
       // receive the map of generated classes bytecode
       Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
@@ -106,7 +116,9 @@ public class TestCompilation
       // create an instance and execute it
       Callable task = (Callable) clazz.newInstance();
       output("result: " + task.call());
-    } finally {
+    }
+    finally
+    {
       compiler.close();
     }
   }
@@ -115,7 +127,8 @@ public class TestCompilation
    * Generate the source code of a class.
    * @return the source code to compile as a string.
    */
-  public static CharSequence buildSourceCode2() {
+  public static CharSequence buildSourceCode2()
+  {
     StringBuilder sb = new StringBuilder();
     append(sb, "package test.compilation;                              ");
     append(sb, "                                                       ");
@@ -139,7 +152,8 @@ public class TestCompilation
    * Generate the source code of a more complex class.
    * @return the source code to compile as a string.
    */
-  public static CharSequence buildSourceCode() {
+  public static CharSequence buildSourceCode()
+  {
     StringBuilder sb = new StringBuilder();
     append(sb, "package test.compilation;                              ");
     append(sb, "                                                       ");
@@ -222,12 +236,13 @@ public class TestCompilation
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  static void output(final String message) {
+  static void output(final String message)
+  {
     System.out.println(message);
   }
 
   /**
-   * 
+   * Attempt to determine the qualified name of a class from its source. 
    * @param source the source code to parse.
    * @return the fully qualified name of the top-level class found in the source. 
    */
