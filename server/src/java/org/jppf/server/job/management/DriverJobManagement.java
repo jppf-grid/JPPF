@@ -212,8 +212,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       JPPFTaskBundle bundle = (JPPFTaskBundle) nodes.get(i).second().getJob();
       Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
       JobInformation jobInfo = new JobInformation(jobUuid, bundle.getName(),
-        bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-        bundle.getSLA().isSuspended(), (pending != null) && pending);
+          bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
+          bundle.getSLA().isSuspended(), (pending != null) && pending);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i] = new NodeJobInformation(nodeInfo, jobInfo);
     }
@@ -276,7 +276,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
     /**
      * Called when a job is complete and has been sent back to the client.
-     * @param event - encapsulates the information about the event.
+     * @param event encapsulates the information about the event.
      * @see org.jppf.job.JobListener#jobEnded(org.jppf.job.JobNotification)
      */
     @Override
@@ -287,7 +287,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
     /**
      * Called when the current number of tasks in a job was updated.
-     * @param event - encapsulates the information about the event.
+     * @param event encapsulates the information about the event.
      * @see org.jppf.job.JobListener#jobUpdated(org.jppf.job.JobNotification)
      */
     @Override
@@ -298,7 +298,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
     /**
      * Called when all or part of a job is is sent to a node for execution.
-     * @param event - encapsulates the information about the event.
+     * @param event encapsulates the information about the event.
      * @see org.jppf.job.JobListener#jobDispatched(org.jppf.job.JobNotification)
      */
     @Override
@@ -309,7 +309,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
     /**
      * Called when all or part of a job has returned from irs execution on a node.
-     * @param event - encapsulates the information about the event.
+     * @param event encapsulates the information about the event.
      * @see org.jppf.job.JobListener#jobReturned(org.jppf.job.JobNotification)
      */
     @Override
