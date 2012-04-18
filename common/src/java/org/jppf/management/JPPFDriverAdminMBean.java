@@ -20,6 +20,7 @@ package org.jppf.management;
 
 import java.util.*;
 
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 
@@ -73,4 +74,11 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @throws Exception if any error occurs.
    */
   void resetStatistics() throws Exception;
+  /**
+   * Compute the number of nodes that would match the specified execution policy.
+   * @param policy the execution to check against the nodes.
+   * @return the number of nodes that match the execution policy, or 0 if no node matches it.
+   * @throws Exception if any error occurs.
+   */
+  Integer matchingNodes(ExecutionPolicy policy) throws Exception;;
 }

@@ -93,6 +93,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * {@inheritDoc}
    */
   @Override
+  @SuppressWarnings("unchecked")
   public synchronized void createUI()
   {
     if (graphHandler == null)

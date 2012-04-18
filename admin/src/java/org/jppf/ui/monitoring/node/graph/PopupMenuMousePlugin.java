@@ -60,6 +60,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin
    * @param e the mouse event.
    */
   @Override
+  @SuppressWarnings("unchecked")
   protected void handlePopup(final MouseEvent e)
   {
     final VisualizationViewer<V, E> viewer = (VisualizationViewer<V, E>) e.getSource();

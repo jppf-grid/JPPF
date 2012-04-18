@@ -111,6 +111,7 @@ public class ListOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOptionElement#createUI()
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void createUI()
   {
     list = new JList();
@@ -141,6 +142,7 @@ public class ListOption extends AbstractOption
    * Populate the list using the current list of items along with the current
    * list of selected items.
    */
+  @SuppressWarnings("unchecked")
   private void populateList()
   {
     if (list == null) return;

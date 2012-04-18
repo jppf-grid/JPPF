@@ -169,6 +169,7 @@ public class ComboBoxOption extends AbstractOption
    * Set the list of items in the combo box.
    * @param items a list of <code>Object</code> instances.
    */
+  @SuppressWarnings("unchecked")
   public void setItems(final List items)
   {
     this.items = items;

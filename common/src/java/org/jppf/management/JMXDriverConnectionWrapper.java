@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.job.JobInformation;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.job.management.*;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
@@ -105,7 +106,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
   {
     return (String) invoke(MBEAN_NAME, "restartShutdown",
-      new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
+        new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
   }
 
   /**
@@ -246,5 +247,14 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   public JPPFSystemInformation systemInformation() throws Exception
   {
     return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Integer matchingNodes(final ExecutionPolicy policy) throws Exception
+  {
+    return (Integer) invoke(MBEAN_NAME, "matchingNodes", new Object[] { policy }, new String[] { ExecutionPolicy.class.getName() });
   }
 }

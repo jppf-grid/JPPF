@@ -65,6 +65,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
    * @see java.lang.Runnable#run()
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void run()
   {
     synchronized(statsHandler)

@@ -89,6 +89,7 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * {@inheritDoc}
    */
   @Override
+  @SuppressWarnings("unchecked")
   public <T> JobPersistence<T> getPersistenceManager()
   {
     return (JobPersistence<T>) persistenceManager;

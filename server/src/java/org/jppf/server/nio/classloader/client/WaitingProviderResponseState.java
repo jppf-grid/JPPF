@@ -60,6 +60,7 @@ class WaitingProviderResponseState extends ClassServerState
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
+  @SuppressWarnings("unchecked")
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();

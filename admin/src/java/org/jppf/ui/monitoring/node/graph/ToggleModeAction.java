@@ -67,6 +67,7 @@ public class ToggleModeAction extends AbstractGraphSelectionAction
    * {@inheritDoc}
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void actionPerformed(final ActionEvent e)
   {
     synchronized(panel)
