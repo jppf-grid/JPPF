@@ -105,7 +105,7 @@ public class Downloader
       source.copyTo(dest);
       System.out.println("downloaded to " + dest);
       ZipFile zip = new ZipFile(tmp);
-      FileUtils.mkdirs(dir);
+      if (!dir.mkdirs()) throw new IOException("Could not create the directories for " + dir);
       for (String name: names)
       {
         ZipEntry entry = zip.getEntry("jfreechart-1.0.12/lib/" + name);
