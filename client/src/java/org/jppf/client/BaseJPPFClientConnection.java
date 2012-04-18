@@ -164,6 +164,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
+  @SuppressWarnings("unchecked")
   protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults() throws Exception
   {
     List<JPPFTask> taskList = new LinkedList<JPPFTask>();

@@ -504,6 +504,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @return a {@link JobPersistence} instance.
    * @param <T> the type of the keys used by the persistence manager.
    */
+  @SuppressWarnings("unchecked")
   public <T> JobPersistence<T> getPersistenceManager()
   {
     return (JobPersistence<T>) persistenceManager;

@@ -115,6 +115,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
    */
   @Override
+  @SuppressWarnings("unchecked")
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
     Throwable t = event.getThrowable();
