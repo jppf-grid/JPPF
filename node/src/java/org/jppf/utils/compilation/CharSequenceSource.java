@@ -38,13 +38,15 @@ class CharSequenceSource extends SimpleJavaFileObject {
    * @param name the name of the compilation unit represented by this file object
    * @param code the source code for the compilation unit represented by this file object
    */
-  public CharSequenceSource(final String name, final CharSequence code) {
+  public CharSequenceSource(final String name, final CharSequence code)
+  {
     super(URI.create("string:///" + name.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
     this.code = code;
   }
 
   @Override
-  public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
+  public CharSequence getCharContent(final boolean ignoreEncodingErrors)
+  {
     return code;
   }
 }

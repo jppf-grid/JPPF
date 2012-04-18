@@ -39,7 +39,8 @@ class BytecodeObject extends SimpleJavaFileObject {
    * Constructs a new BytecodeObject.
    * @param name the name of the compilation unit represented by this file object
    */
-  public BytecodeObject(final String name) {
+  public BytecodeObject(final String name)
+  {
     super(URI.create("bytecode:///" + name.replace('.', '/') + Kind.CLASS.extension), Kind.CLASS);
   }
 
@@ -49,7 +50,8 @@ class BytecodeObject extends SimpleJavaFileObject {
    * @throws IOException if any I/O error occurs.
    */
   @Override
-  public InputStream openInputStream() throws IOException {
+  public InputStream openInputStream() throws IOException
+  {
     return new ByteArrayInputStream(bytecode);
   }
 
@@ -59,13 +61,16 @@ class BytecodeObject extends SimpleJavaFileObject {
    * @throws IOException if any I/O error occurs.
    */
   @Override
-  public OutputStream openOutputStream() throws IOException {
-    return new ByteArrayOutputStream() {
+  public OutputStream openOutputStream() throws IOException
+  {
+    return new ByteArrayOutputStream()
+    {
       /**
        * Upon closing this output stream, update the bytecode.
        */
       @Override
-      public void close() throws IOException {
+      public void close() throws IOException
+      {
         bytecode = this.toByteArray();
         super.close();
       }
@@ -76,7 +81,8 @@ class BytecodeObject extends SimpleJavaFileObject {
    * Get the bytecode of this object.
    * @return an array of bytes.
    */
-  public byte[] getBytecode() {
+  public byte[] getBytecode()
+  {
     return bytecode;
   }
 }
