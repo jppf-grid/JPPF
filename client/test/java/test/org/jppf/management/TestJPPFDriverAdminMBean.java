@@ -16,73 +16,43 @@
  * limitations under the License.
  */
 
-package sample.test.job.management;
+package test.org.jppf.management;
 
-import java.util.*;
+import static org.junit.Assert.*;
+
+import java.util.Collection;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
+import org.junit.Test;
 
-import sample.dist.tasklength.LongTask;
-import test.org.jppf.management.TestJPPFDriverAdminMBean.MyBroadcastTask;
+import test.org.jppf.test.setup.Setup1D2N1C;
 
 /**
- * 
+ * Unit tests for {@link JPPFDriverAdminMBean}.
+ * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-public class JobManagementTestRunner
+public class TestJPPFDriverAdminMBean extends Setup1D2N1C
 {
   /**
-   * The JPPF client.
-   */
-  private static JPPFClient client = null;
-
-  /**
-   * Run the first test.
+   * We test a job with 1 task, and attempt to cancel it after it has completed.
    * @throws Exception if any error occurs.
    */
-  public void runTest1() throws Exception
-  {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    int nbTasks = props.getInt("job.management.nbTasks", 2);
-    long duration = props.getLong("job.management.duration", 1000L);
-    String jobId = "test1";
-    JPPFJob job = new JPPFJob();
-    job.setName(jobId);
-    job.setBlocking(false);
-    for (int i=0; i<nbTasks; i++)
-    {
-      job.addTask(new LongTask(duration));
-    }
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
-    client.submit(job);
-    JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
-    driver.connect();
-    while (!driver.isConnected()) Thread.sleep(10);
-    // wait to ensure the job has been dispatched to the nodes
-    Thread.sleep(1000);
-    driver.cancelJob(jobId);
-    driver.close();
-    List<JPPFTask> results = collector.waitForResults();
-    System.out.println("Test ended");
-  }
-
-  /**
-   * Run the first test.
-   * @throws Exception if any error occurs.
-   */
-  public void runTest2() throws Exception
+  @Test
+  public void testNodesMatchingExecutionPolicy() throws Exception
   {
     JMXNodeConnectionWrapper[] nodes = null;
     JMXDriverConnectionWrapper driver = null;
     try
     {
       driver = getDriverProxy();
+      assertNotNull(driver);
       Collection<JPPFManagementInfo> coll = driver.nodesInformation();
+      assertNotNull(coll);
+      assertTrue(coll.size() == 2);
       nodes = new JMXNodeConnectionWrapper[2];
       int count = 0;
       for (JPPFManagementInfo info: coll)
@@ -97,13 +67,13 @@ public class JobManagementTestRunner
       Thread.sleep(500L);
       ExecutionPolicy policy = new AtLeast("processing.threads", 4);
       int n = driver.matchingNodes(policy);
-      System.out.println("found " + n + " nodes, expected = 2");
+      assertTrue("n is " + n + " but should be 2", n == 2);
       nodes[1].updateThreadPoolSize(2);
       Thread.sleep(500L);
       client.submit(createJob("broadcast2"));
       Thread.sleep(500L);
       n = driver.matchingNodes(policy);
-      System.out.println("found " + n + " nodes, expected = 1");
+      assertTrue("n is " + n + " but should be 1", n == 1);
     }
     finally
     {
@@ -142,24 +112,14 @@ public class JobManagementTestRunner
   }
 
   /**
-   * Entry point.
-   * @param args not used.
+   * A simple task.
    */
-  public static void main(final String...args)
+  public static class MyBroadcastTask extends JPPFTask
   {
-    try
+    @Override
+    public void run()
     {
-      client = new JPPFClient();
-      JobManagementTestRunner runner = new JobManagementTestRunner();
-      runner.runTest2();
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-    finally
-    {
-      if (client != null) client.close();
+      System.out.println("broadcast of " + getClass().getName());
     }
   }
 }

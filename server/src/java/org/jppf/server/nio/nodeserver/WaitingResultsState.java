@@ -75,7 +75,7 @@ class WaitingResultsState extends NodeServerState
         if (debugEnabled)
         {
           Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-          log.debug("node " + channel + " returned exception parameter in the header for job '" + newBundle.getName() + "' : " + t);
+          log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
         }
         newBundleWrapper.setTasks(bundleWrapper.getTasks());
         newBundle.setTaskCount(bundle.getTaskCount());
@@ -102,9 +102,13 @@ class WaitingResultsState extends NodeServerState
         bundle.fireTaskCompleted(context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
         context.setJobCanceled(false);
       }
-      Bundler bundler = context.getBundler();
-      JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-      if ((systemInfo != null) && (bundler instanceof NodeAwareness)) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+      JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+      if (systemInfo != null)
+      {
+        driver.getNodeHandler().updateNodeInformation(channel, systemInfo);
+        Bundler bundler = context.getBundler();
+        if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+      }
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setMessage(null);

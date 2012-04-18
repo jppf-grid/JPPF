@@ -20,7 +20,7 @@ package org.jppf.server;
 
 import java.util.*;
 
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.slf4j.*;
 
@@ -81,6 +81,22 @@ public class NodeInformationHandler
     synchronized (uuidMap)
     {
       if (info != null) uuidMap.remove(info.getId());
+    }
+  }
+
+  /**
+   * Add a node information object to the map of node information.
+   * @param channel a <code>SocketChannel</code> instance.
+   * @param info a <code>JPPFNodeManagementInformation</code> instance.
+   */
+  public void updateNodeInformation(final ChannelWrapper<?> channel, final JPPFSystemInformation info)
+  {
+    if (debugEnabled) log.debug("updating node information for " + info + ", channel=" + channel);
+    JPPFManagementInfo mgtInfo = null;
+    synchronized (nodeInfo)
+    {
+      mgtInfo = nodeInfo.get(channel);
+      if (mgtInfo != null) mgtInfo.setSystemInfo(info);
     }
   }
 

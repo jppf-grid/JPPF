@@ -20,7 +20,9 @@ package org.jppf.management;
 
 import java.util.*;
 
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.*;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
@@ -233,5 +235,43 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     JPPFSystemInformation info = new JPPFSystemInformation(driver.getUuid());
     info.populate();
     return info;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Integer matchingNodes(final ExecutionPolicy policy) throws Exception
+  {
+    NodeInformationHandler handler = JPPFDriver.getInstance().getNodeHandler();
+    Map<ChannelWrapper<?>, JPPFManagementInfo> map = handler.getNodeInformationMap();
+    if (debugEnabled) log.debug("Testing policy against " + map.size() + " nodes:\n" + policy );
+    if (policy == null) return map.size();
+    
+    int count = 0;
+    for (Map.Entry<ChannelWrapper<?>, JPPFManagementInfo> entry: map.entrySet())
+    {
+      JPPFManagementInfo mgtInfo = entry.getValue();
+      boolean match = false;
+      if (mgtInfo == null) match = true;
+      else
+      {
+        JPPFSystemInformation info = mgtInfo.getSystemInfo();
+        try
+        {
+          match = policy.accepts(info);
+        }
+        catch(Exception e)
+        {
+          String msg = "An error occurred while checking node " + mgtInfo + " against execution policy " + policy;
+          if (debugEnabled) log.debug(msg, e);
+          else log.warn(msg);
+        }
+        if (match) count++;
+        if (debugEnabled) log.debug("testing against " + mgtInfo + " returns " + match);
+      }
+    }
+    if (debugEnabled) log.debug("matching nodes = " + count);
+    return count;
   }
 }

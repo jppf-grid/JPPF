@@ -189,6 +189,7 @@ public abstract class JPPFNode extends AbstractCommonNode
     if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
     if (executionManager.checkConfigChanged())
     {
+      if (debugEnabled) log.debug("detected configuration change, sending new system information to the server");
       JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
       info.populate();
       bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);
