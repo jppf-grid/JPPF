@@ -18,7 +18,6 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ChartsCheckPanel" type="page">
-	<property name="label" value="Update number of threads and priority"/>
 	<property name="layoutConstraints" value="flowy"/>
 	<property name="componentConstraints" value=""/>
 
@@ -27,10 +26,19 @@
 	<!-- ===================================================================== -->
 	
 	<child name="msgText" type="TextArea">
-		<property name="label" value="Server Messages"/>
-		<property name="tooltip" value="Feedback messages received from the server"/>
+		<property name="label" value="Download missing charting libraries?"/>
 		<property name="value" value=""/>
 		<property name="componentConstraints" value="grow, push"/>
+	</child>
+
+	<child name="askAgainPage" type="page">
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value=""/>
+
+		<child name="dontAskAgain" type="Boolean">
+			<property name="label" value="Do not ask again"/>
+			<property name="value" value="true"/>
+		</child>
 	</child>
 
 	<child name="threadButtons" type="page">
@@ -38,7 +46,7 @@
 		<property name="componentConstraints" value=""/>
 
 		<child name="YesBtn" type="Button">
-			<property name="label" value="OK"/>
+			<property name="label" value="Yes"/>
 		</child>
 
 		<child name="NoBtn" type="Button">
