@@ -155,7 +155,7 @@ public class AccumulatorHelper
    * @param driverName the name of the driver.
    * @return an {@link AccumulatorDriver} instance.
    */
-  AccumulatorDriver getAccumulatedDriver(final String driverName)
+  synchronized AccumulatorDriver getAccumulatedDriver(final String driverName)
   {
     AccumulatorDriver driver = accumulatorMap.get(driverName);
     if(driver == null) {
@@ -171,7 +171,7 @@ public class AccumulatorHelper
    * @param jobInfo the job description
    * @return an {@link AccumulatorJob} instance.
    */
-  AccumulatorJob getAccumulatorJob(final String driverName, final JobInformation jobInfo)
+  synchronized AccumulatorJob getAccumulatorJob(final String driverName, final JobInformation jobInfo)
   {
     AccumulatorDriver driver = getAccumulatedDriver(driverName);
 
