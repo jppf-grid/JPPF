@@ -27,7 +27,6 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
 import sample.dist.tasklength.LongTask;
-import test.org.jppf.management.TestJPPFDriverAdminMBean.MyBroadcastTask;
 
 /**
  * 
@@ -160,6 +159,18 @@ public class JobManagementTestRunner
     finally
     {
       if (client != null) client.close();
+    }
+  }
+
+  /**
+   * A simple task.
+   */
+  public static class MyBroadcastTask extends JPPFTask
+  {
+    @Override
+    public void run()
+    {
+      System.out.println("broadcast of " + getClass().getName());
     }
   }
 }
