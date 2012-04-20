@@ -18,6 +18,13 @@
 
 package org.jppf.client.balancer;
 
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.client.submission.SubmissionStatusHandler;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.protocol.JPPFTask;
 
 import java.util.ArrayList;
@@ -32,7 +39,7 @@ public class ClientJob
   /**
    * The underlying task bundle.
    */
-  private final ClientTaskBundle job;
+  private final JPPFJob job;
   /**
    * The list of of the tasks.
    */
@@ -41,26 +48,150 @@ public class ClientJob
    * The task completion listener to notify, once the execution of this task has completed.
    */
   private ClientCompletionListener completionListener = null;
+  /**
+   * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
+   */
+  private long jobReceivedTime = 0L;
+  /**
+   * Job expired indicator, determines whether the job is should be cancelled.
+   */
+  private boolean jobExpired = false;
+  /**
+   * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
+   */
+  private boolean pending = false;
+  /**
+   * Job suspended indicator.
+   */
+  private boolean jobSuspended = false;
+  /**
+   * Job requeue indicator.
+   */
+  private boolean requeued = false;
+  /**
+   * The time at which this wrapper was added to the queue.
+   */
+  private transient long queueEntryTime = 0L;
+  /**
+   * The broadcast UUID.
+   */
+  private transient String broadcastUUID = null;
+  /**
+   * The universal unique id for this job.
+   */
+  private String uuid = null;
+  /**
+   * The user-defined display name for this job.
+   */
+  private String name = null;
+  /**
+   * The service level agreement between the job and the server.
+   */
+  private JobSLA sla = null;
+  /**
+   * List of all bundles in this job.
+   */
+  private final List<ClientTaskBundle> bundleList = new ArrayList<ClientTaskBundle>();
+  /**
+   * The status of this submission.
+   */
+  private SubmissionStatus submissionStatus;
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
    * @param job   underlying task bundle.
    * @param tasks list of tasks to execute.
    */
-  public ClientJob(final ClientTaskBundle job, final List<JPPFTask> tasks)
+  public ClientJob(final JPPFJob job, final List<JPPFTask> tasks)
   {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
 
     this.job = job;
-    this.tasks = tasks;
+    if (getJob().getResultListener() instanceof SubmissionStatusHandler)
+    {
+      this.submissionStatus = ((SubmissionStatusHandler) getJob().getResultListener()).getStatus();
+    }
+    else
+    {
+      this.submissionStatus = SubmissionStatus.SUBMITTED;
+    }
+
+    this.tasks = new ArrayList<JPPFTask>(tasks);
+    this.uuid = getJob().getUuid();
+    this.name = getJob().getName();
+    this.sla = getJob().getSLA();
+  }
+
+  /**
+   * Get the universal unique id for this job.
+   * @return the uuid as a string.
+   * @exclude
+   */
+  public String getUuid()
+  {
+    return uuid;
+  }
+
+  /**
+   * Set the universal unique id for this job.
+   * @param uuid the universal unique id.
+   */
+  public void setUuid(final String uuid)
+  {
+    this.uuid = uuid;
+  }
+
+  /**
+   * Get the user-defined display name for this job. This is the name displayed in the administration console.
+   * @return the name as a string.
+   */
+  public String getName()
+  {
+    return name;
+  }
+
+  /**
+   * Set the user-defined display name for this job.
+   * @param name the display name as a string.
+   */
+  public void setName(final String name)
+  {
+    this.name = name;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @return an instance of {@link JobSLA}.
+   */
+  public JobSLA getSLA()
+  {
+    return sla;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param sla an instance of <code>JobSLA</code>.
+   */
+  public void setSLA(final JobSLA sla)
+  {
+    this.sla = sla;
+  }
+
+  /**
+   * Get the current number of tasks in the job.
+   * @return the number of tasks as an int.
+   */
+  public int getTaskCount()
+  {
+    return tasks.size();
   }
 
   /**
    * Get the underlying task bundle.
    * @return a <code>ClientTaskBundle</code> instance.
    */
-  public ClientTaskBundle getJob()
+  public JPPFJob getJob()
   {
     return job;
   }
@@ -80,7 +211,8 @@ public class ClientJob
    */
   public ClientJob copy()
   {
-    return copy(this.tasks.size());
+    return new ClientJob(job, this.tasks);
+//    return copy(this.tasks.size());
   }
 
   /**
@@ -88,22 +220,22 @@ public class ClientJob
    * @param nbTasks the number of tasks to include in the copy.
    * @return a new <code>ClientJob</code> instance.
    */
-  public ClientJob copy(final int nbTasks)
+  public ClientTaskBundle copy(final int nbTasks)
   {
     if (nbTasks == this.tasks.size())
     {
-      return new ClientJob(job.copy(), new ArrayList<JPPFTask>(this.tasks));
+      return new ClientTaskBundle(this, this.tasks);
     }
     else
     {
       List<JPPFTask> subList = this.tasks.subList(0, nbTasks);
       try
       {
-        return new ClientJob(job.copy(), new ArrayList<JPPFTask>(subList));
+        return new ClientTaskBundle(this, subList);
       }
       finally
       {
-        job.setTaskCount(job.getTaskCount() - nbTasks);
+//        job.setTaskCount(job.getTaskCount() - nbTasks);
         subList.clear();
       }
     }
@@ -160,5 +292,237 @@ public class ClientJob
   public void fireTaskCompleted()
   {
     if (this.completionListener != null) this.completionListener.taskCompleted(this);
+  }
+
+  /**
+   * Get the job received time.
+   * @return the time in milliseconds as a long value.
+   */
+  public long getJobReceivedTime()
+  {
+    return jobReceivedTime;
+  }
+
+  /**
+   * Set the job received time.
+   * @param jobReceivedTime the time in milliseconds as a long value.
+   */
+  public void setJobReceivedTime(final long jobReceivedTime)
+  {
+    this.jobReceivedTime = jobReceivedTime;
+  }
+
+  /**
+   * Get the job expired indicator.
+   * @return <code>true</code> if job has expired, <code>false</code> otherwise.
+   */
+  public boolean isJobExpired()
+  {
+    return jobExpired;
+  }
+
+  /**
+   * Set the job expired indicator.
+   * @param jobExpired <code>true</code> to indicate that job has expired, <code>false</code> otherwise
+   */
+  public void setJobExpired(final boolean jobExpired)
+  {
+    this.jobExpired = jobExpired;
+  }
+
+  /**
+   * Get the job pending indicator.
+   * @return <code>true</code> if job is pending, <code>false</code> otherwise.
+   */
+  public boolean isPending()
+  {
+    return pending;
+  }
+
+  /**
+   * Set the job pending indicator.
+   * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
+   */
+  public void setPending(final boolean pending)
+  {
+    this.pending = pending;
+  }
+
+  /**
+   * Get the job suspended indicator.
+   * @return <code>true</code> if job is suspended, <code>false</code> otherwise.
+   */
+  public boolean isJobSuspended()
+  {
+    return jobSuspended;
+  }
+
+  /**
+   * Set the job suspended indicator.
+   * @param jobSuspended <code>true</code> to indicate that job was suspended, <code>false</code> otherwise
+   */
+  public void setJobSuspended(final boolean jobSuspended)
+  {
+    this.jobSuspended = jobSuspended;
+  }
+
+  /**
+   * Notifies that job was cancelled.
+   */
+  public void jobCancelled()
+  {
+
+  }
+
+  /**
+   * Notifies that job has expired.
+   */
+  public void jobExpired()
+  {
+    fireTaskCompleted();
+    jobCancelled();
+  }
+
+  /**
+   * Get the broadcast UUID.
+   * @return an <code>String</code> instance.
+   */
+  public String getBroadcastUUID()
+  {
+    return broadcastUUID;
+  }
+
+  /**
+   * Set the broadcast UUID.
+   * @param broadcastUUID the broadcast UUID.
+   */
+  public void setBroadcastUUID(final String broadcastUUID)
+  {
+    this.broadcastUUID = broadcastUUID;
+  }
+
+  /**
+   * Get the requeued indicator.
+   * @return <code>true</code> if job is requeued, <code>false</code> otherwise.
+   */
+  public boolean isRequeued()
+  {
+    return requeued;
+  }
+
+  /**
+   * Set the requeued indicator.
+   * @param requeued <code>true</code> to indicate that job was requeued, <code>false</code> otherwise
+   */
+  public void setRequeued(final boolean requeued)
+  {
+    this.requeued = requeued;
+  }
+
+  /**
+   * Get the time at which this wrapper was added to the queue.
+   * @return the time in milliseconds as a long value.
+   */
+  public long getQueueEntryTime()
+  {
+    return queueEntryTime;
+  }
+
+  /**
+   * Set the time at which this wrapper was added to the queue.
+   * @param queueEntryTime the time in milliseconds as a long value.
+   */
+  public void setQueueEntryTime(final long queueEntryTime)
+  {
+    this.queueEntryTime = queueEntryTime;
+  }
+
+  /**
+   * Called to notify that the results of a number of tasks have been received from the server.
+   * @param bundle  the executing job.
+   * @param results the list of tasks whose results have been received from the server.
+   */
+  public void resultsReceived(final ClientTaskBundle bundle, final List<JPPFTask> results)
+  {
+    TaskResultListener listener = getJob().getResultListener();
+    if (listener != null)
+    {
+      synchronized (listener)
+      {
+        listener.resultsReceived(new TaskResultEvent(results));
+      }
+    }
+  }
+
+  /**
+   * Called to notify that throwable eventually raised while receiving the results.
+   * @param bundle    the finished job.
+   * @param throwable the throwable that was raised while receiving the results.
+   */
+  public void resultsReceived(final ClientTaskBundle bundle, final Throwable throwable)
+  {
+    TaskResultListener listener = getJob().getResultListener();
+    if (listener != null)
+    {
+      synchronized (listener)
+      {
+        listener.resultsReceived(new TaskResultEvent(throwable));
+      }
+    }
+  }
+
+  /**
+   * Called to notify that the execution of a task has completed.
+   * @param bundle the completed task.
+   * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
+   */
+  public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
+  {
+    bundleList.remove(bundle);
+    if (bundleList.isEmpty())
+    {
+      getJob().fireJobEvent(JobEvent.Type.JOB_END);
+      if(exception == null)
+        setSubmissionStatus(SubmissionStatus.COMPLETE);
+      else
+        setSubmissionStatus(SubmissionStatus.FAILED);
+    }
+  }
+
+  /**
+   * Called when all or part of a job is dispatched to a node.
+   * @param bundle  the dispatched job.
+   * @param channel the node to which the job is dispatched.
+   */
+  public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel)
+  {
+    bundleList.add(bundle);
+    if (bundleList.size() == 1)
+    {
+      setSubmissionStatus(SubmissionStatus.EXECUTING);
+      getJob().fireJobEvent(JobEvent.Type.JOB_START);
+    }
+  }
+
+  /**
+   * Get the status of this submission.
+   * @return a {@link SubmissionStatus} enumerated value.
+   */
+  public SubmissionStatus getSubmissionStatus()
+  {
+    return submissionStatus;
+  }
+
+  /**
+   * Set the status of this submission.
+   * @param submissionStatus a {@link SubmissionStatus} enumerated value.
+   */
+  public void setSubmissionStatus(final SubmissionStatus submissionStatus)
+  {
+    this.submissionStatus = submissionStatus;
+    if (getJob().getResultListener() instanceof SubmissionStatusHandler)
+    {
+      ((SubmissionStatusHandler) getJob().getResultListener()).setStatus(this.submissionStatus);
+    }
   }
 }

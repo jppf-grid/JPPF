@@ -23,7 +23,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 
 /**
- * Abstract implemzntation of the <code>JobConfiguration</code> interface.
+ * Abstract implementation of the <code>JobConfiguration</code> interface.
  * @author Laurent Cohen
  * @exclude
  */

@@ -36,7 +36,7 @@ public abstract class ChannelWrapper<T>
   /**
    * The task bundle to send or receive.
    */
-  private ClientJob bundle = null;
+  private ClientTaskBundle bundle = null;
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -84,7 +84,7 @@ public abstract class ChannelWrapper<T>
    * Get the task bundle to send or receive.
    * @return a <code>ClientJob</code> instance.
    */
-  public ClientJob getBundle()
+  public ClientTaskBundle getBundle()
   {
     return bundle;
   }
@@ -93,7 +93,7 @@ public abstract class ChannelWrapper<T>
    * Set the task bundle to send or receive.
    * @param bundle a {@link ClientJob} instance.
    */
-  public void setBundle(final ClientJob bundle)
+  public void setBundle(final ClientTaskBundle bundle)
   {
     this.bundle = bundle;
   }
@@ -177,7 +177,7 @@ public abstract class ChannelWrapper<T>
 
   /**
    * Submit bundle for execution on corresponding node.
-   * @param bundle a {@link ClientJob} instance.
+   * @param bundle a {@link ClientTaskBundle} instance.
    */
-  public abstract void submit(final ClientJob bundle);
+  public abstract void submit(final ClientTaskBundle bundle);
 }

@@ -21,7 +21,6 @@ package org.jppf.client.balancer.queue;
 import org.jppf.client.balancer.ChannelWrapper;
 import org.jppf.client.balancer.ClientCompletionListener;
 import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,7 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
   public BroadcastJobCompletionListener(final ClientJob bundleWrapper, final List<ChannelWrapper> connections)
   {
     this.bundleWrapper = bundleWrapper;
-    int taskCount = ((ClientTaskBundle) bundleWrapper.getJob()).getTaskCount();
+    int taskCount = bundleWrapper.getTaskCount();
     for (ChannelWrapper connection : connections)
     {
       ChannelWrapper xConnection = (ChannelWrapper) connection;
@@ -74,9 +73,8 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
   @Override
   public synchronized void taskCompleted(final ClientJob result)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) result.getJob();
-    String uuid = bundle.getBroadcastUUID();
-    int n = bundle.getTaskCount();
+    String uuid = result.getBroadcastUUID();
+    int n = result.getTaskCount();
 //    System.out.println("BroadcastJob.taskCompleted: " + uuid + "\t task count: " + n);
     if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     int pending = completionMap.get(uuid);

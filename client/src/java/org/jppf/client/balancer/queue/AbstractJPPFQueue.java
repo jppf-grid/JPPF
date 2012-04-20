@@ -19,7 +19,6 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +90,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   protected int getSize(final ClientJob bundleWrapper)
   {
     //return bundle.getTaskCount();
-    return ((ClientTaskBundle) bundleWrapper.getJob()).getInitialTaskCount();
+    return bundleWrapper.getJob().getTasks().size();
   }
 
   /**

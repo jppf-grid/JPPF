@@ -23,6 +23,7 @@ import org.jppf.client.balancer.ClientJob;
 import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.balancer.job.JPPFJobManager;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -30,7 +31,6 @@ import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.scheduling.JPPFScheduleHandler;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.Logger;
@@ -103,14 +103,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   @Override
   public void addBundle(final ClientJob bundleWrapper)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    JobSLA sla = bundle.getSLA();
-    String jobUuid = bundle.getUuid();
-    if (sla.isBroadcastJob() && (bundle.getBroadcastUUID() == null))
+    JobSLA sla = bundleWrapper.getSLA();
+    String jobUuid = bundleWrapper.getUuid();
+    if (sla.isBroadcastJob() && (bundleWrapper.getBroadcastUUID() == null))
     {
       if (debugEnabled)
       {
-        log.debug("before processing broadcast job with id=" + bundle.getName() + ", uuid=" + jobUuid + ", task count=" + bundle.getTaskCount());
+        log.debug("before processing broadcast job with id=" + bundleWrapper.getName() + ", uuid=" + jobUuid + ", task count=" + bundleWrapper.getTaskCount());
       }
       processBroadcastJob(bundleWrapper);
       return;
@@ -122,17 +121,18 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       if (other != null)
       {
         other.merge(bundleWrapper, false);
-        if (debugEnabled) log.debug("re-submitting bundle with " + bundle);
-        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundle.getTaskCount());
+        if (debugEnabled) log.debug("re-submitting bundle with " + bundleWrapper);
+//        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundleWrapper.getTaskCount());
         fireQueueEvent(new QueueEvent(this, other, true));
       }
       else
       {
-        bundle.setQueueEntryTime(System.currentTimeMillis());
+        bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
+        bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
         putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
         putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
-        boolean requeued = Boolean.TRUE.equals(bundle.removeParameter(BundleParameter.JOB_REQUEUE));
-        if (debugEnabled) log.debug("adding bundle with " + bundle);
+        boolean requeued = bundleWrapper.isRequeued(); // Boolean.TRUE.equals(bundle.removeParameter(BundleParameter.JOB_REQUEUE));
+        if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
         if (!requeued)
         {
           handleStartJobSchedule(bundleWrapper);
@@ -173,7 +173,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * @return the most recent object that was added to the queue.
    */
   @Override
-  public ClientJob nextBundle(final int nbTasks)
+  public ClientTaskBundle nextBundle(final int nbTasks)
   {
     Iterator<ClientJob> it = iterator();
     return it.hasNext() ? nextBundle(it.next(), nbTasks) : null;
@@ -186,30 +186,29 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * @return the most recent object that was added to the queue.
    */
   @Override
-  public ClientJob nextBundle(final ClientJob bundleWrapper, final int nbTasks)
+  public ClientTaskBundle nextBundle(final ClientJob bundleWrapper, final int nbTasks)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    ClientJob result = null;
+    ClientTaskBundle result = null;
     try
     {
       lock.lock();
       if (debugEnabled)
       {
-        log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundle.getTaskCount() + " tasks");
+        log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
       }
       int size = getSize(bundleWrapper);
       removeFromListMap(size, bundleWrapper, sizeMap);
-      if (nbTasks >= bundle.getTaskCount())
+      if (nbTasks >= bundleWrapper.getTaskCount())
       {
-        result = bundleWrapper;
+        result = bundleWrapper.copy(bundleWrapper.getTaskCount());
         removeBundle(bundleWrapper);
-        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, 0);
+//        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, 0);
       }
       else
       {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
         result = bundleWrapper.copy(nbTasks);
-        int newSize = bundle.getTaskCount();
+        int newSize = bundleWrapper.getTaskCount();
         List<ClientJob> list = sizeMap.get(newSize);
         if (list == null)
         {
@@ -218,8 +217,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           sizeMap.put(size, list);
         }
         list.add(bundleWrapper);
-        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundle.getTaskCount());
-        List<ClientJob> bundleList = priorityMap.get(new JPPFPriority(bundle.getSLA().getPriority()));
+//        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundleWrapper.getTaskCount());
+        List<ClientJob> bundleList = priorityMap.get(new JPPFPriority(bundleWrapper.getSLA().getPriority()));
         bundleList.remove(bundleWrapper);
         bundleList.add(bundleWrapper);
       }
@@ -235,7 +234,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " +
               formatSizeMapInfo("sizeMap", sizeMap));
     }
-    ClientTaskBundle resultJob = (ClientTaskBundle) result.getJob();
+//    ClientTaskBundle resultJob = (ClientTaskBundle) result.getJob();
 //    statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
     return result;
   }
@@ -286,10 +285,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
-      ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-      if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundle.getName());
-      removeFromListMap(new JPPFPriority(bundle.getSLA().getPriority()), bundleWrapper, priorityMap);
-      return jobMap.remove(bundle.getUuid());
+      if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundleWrapper.getName());
+      removeFromListMap(new JPPFPriority(bundleWrapper.getSLA().getPriority()), bundleWrapper, priorityMap);
+      return jobMap.remove(bundleWrapper.getUuid());
     }
     finally
     {
@@ -314,29 +312,28 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void handleStartJobSchedule(final ClientJob bundleWrapper)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    JPPFSchedule schedule = bundle.getSLA().getJobSchedule();
+    JPPFSchedule schedule = bundleWrapper.getSLA().getJobSchedule();
     if (schedule != null)
     {
-      bundle.setParameter(BundleParameter.JOB_PENDING, true);
-      String jobId = bundle.getName();
-      String uuid = bundle.getUuid();
+      bundleWrapper.setPending(true);
+      String jobId = bundleWrapper.getName();
+      String uuid = bundleWrapper.getUuid();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
       try
       {
-        long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
+        long dt = bundleWrapper.getJobReceivedTime();
         jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper, jobManager), dt);
       }
       catch (ParseException e)
       {
-        bundle.setParameter(BundleParameter.JOB_PENDING, false);
+        bundleWrapper.setPending(false);
         log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() +
                 ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
     else
     {
-      bundle.setParameter(BundleParameter.JOB_PENDING, false);
+      bundleWrapper.setPending(false);
     }
   }
 
@@ -346,23 +343,22 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void handleExpirationJobSchedule(final ClientJob bundleWrapper)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
-    JPPFSchedule schedule = bundle.getSLA().getJobExpirationSchedule();
+    bundleWrapper.setJobExpired(false);
+    JPPFSchedule schedule = bundleWrapper.getSLA().getJobExpirationSchedule();
     if (schedule != null)
     {
-      String jobId = (String) bundle.getName();
-      String uuid = bundle.getUuid();
+      String jobId = bundleWrapper.getName();
+      String uuid = bundleWrapper.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
-      long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
+      long dt = bundleWrapper.getJobReceivedTime();
       try
       {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
       }
       catch (ParseException e)
       {
-        bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
-        log.error("Unparseable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
+        bundleWrapper.setJobExpired(false);
+        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
                 ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
@@ -407,7 +403,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       if (uuidSet.add(uuid))
       {
         ClientJob job = bundleWrapper.copy();
-        ClientTaskBundle newBundle = (ClientTaskBundle) job.getJob();
+        ClientJob newBundle = job;
 
 //        System.out.println(" sending to connection '" + uuid + "' - policy: " + policy);
         JPPFManagementInfo info = connection.getManagementInfo();
@@ -419,7 +415,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         }
         ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
         newBundle.setSLA(((JPPFJobSLA) sla).copy());
-        newBundle.setLocalExecutionPolicy(broadcastPolicy);
+//        newBundle.setLocalExecutionPolicy(broadcastPolicy);
         job.setCompletionListener(completionListener);
         newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
         newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
@@ -427,10 +423,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         jobList.add(job);
       }
     }
-    if(jobList.isEmpty())
+    if (jobList.isEmpty())
+    {
       bundleWrapper.fireTaskCompleted();
+    }
     else
+    {
       for (ClientJob job : jobList) addBundle(job);
+    }
   }
 
   /**

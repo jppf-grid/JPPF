@@ -69,7 +69,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
    */
-  protected LifeCycleEventHandler lifeCycleEventHandler = null;
+  protected final LifeCycleEventHandler lifeCycleEventHandler;
 
   /**
    * Default initializer for local channel wrapper.
@@ -174,7 +174,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * {@inheritDoc}
    */
   @Override
-  public void submit(final ClientJob bundle)
+  public void submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     executor.execute(new LocalRunnable(bundle));
@@ -199,13 +199,13 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     /**
      * The task bundle to execute.
      */
-    private final ClientJob bundle;
+    private final ClientTaskBundle bundle;
 
     /**
      * Initialize this runnable for local execution.
      * @param bundle the execution to perform.
      */
-    public LocalRunnable(final ClientJob bundle)
+    public LocalRunnable(final ClientTaskBundle bundle)
     {
       this.bundle = bundle;
     }
@@ -213,31 +213,29 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     @Override
     public void run()
     {
+      Exception exception = null;
       try
       {
-        DataProvider dataProvider = bundle.getJob().getJob().getDataProvider();
-        for (JPPFTask task: bundle.getTasks())
+        DataProvider dataProvider = bundle.getJob().getDataProvider();
+        List<JPPFTask> tasks = bundle.getTasksL();
+        for (JPPFTask task : tasks)
         {
           task.setDataProvider(dataProvider);
         }
-        executionManager.execute(bundle.getJob(), bundle.getTasks());
-        TaskResultListener listener = bundle.getJob().getJob().getResultListener();
-        if(listener != null) {
-          synchronized (listener) {
-            listener.resultsReceived(new TaskResultEvent(bundle.getTasks()));
-          }
-        }
+        executionManager.execute(bundle, tasks);
+        setStatus(JPPFClientConnectionStatus.ACTIVE);
+        bundle.resultsReceived(tasks);
       }
       catch (Throwable t)
       {
 //        log.error(t.getMessage(), t);
-        Exception exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        t.printStackTrace();
+        exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+        setStatus(JPPFClientConnectionStatus.ACTIVE);
+        bundle.resultsReceived(t);
       }
       finally
       {
-        bundle.fireTaskCompleted();
-        setStatus(JPPFClientConnectionStatus.ACTIVE);
+        bundle.taskCompleted(exception);
       }
     }
   }
@@ -246,7 +244,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * {@inheritDoc}
    */
   @Override
-  public SocketWrapper getSocketWrapper() {
+  public SocketWrapper getSocketWrapper()
+  {
     return null;
   }
 
@@ -254,14 +253,18 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * {@inheritDoc}
    */
   @Override
-  public void setSocketWrapper(final SocketWrapper socketWrapper) {
+  public void setSocketWrapper(final SocketWrapper socketWrapper)
+  {
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void stopNode() {
+  public void stopNode()
+  {
+    setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+    executionManager.shutdown();
   }
 
   /**
@@ -272,7 +275,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public JMXServer getJmxServer() throws Exception
   {
-    synchronized(this)
+    synchronized (this)
     {
       if ((jmxServer == null) || jmxServer.isStopped())
       {
@@ -299,6 +302,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * {@inheritDoc}
    */
   @Override
-  public void run() {
+  public void run()
+  {
   }
 }

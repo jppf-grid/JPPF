@@ -17,16 +17,23 @@
  */
 package org.jppf.client;
 
-import java.util.*;
-import java.util.concurrent.*;
-
 import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.client.submission.SubmissionManager;
-import org.jppf.comm.discovery.*;
-import org.jppf.startup.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.comm.discovery.IPFilter;
+import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.startup.JPPFClientStartupSPI;
+import org.jppf.startup.JPPFStartupLoader;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -70,6 +77,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Mapping of class loader to requests uuids.
    */
   private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+  /**
+   * Mapping of registered class loaders.
+   */
+  private final Map<String, Set<RegisteredClassLoader>> classLoaderRegistrations = new HashMap<String, Set<RegisteredClassLoader>>();
   /**
    * Determines whther SSL communication is on or off.
    */
@@ -359,4 +370,96 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @return a <code>JPPFSubmissionManager</code> instance.
    */
   protected abstract SubmissionManager getSubmissionManager();
+
+  /**
+   * Register class loader with this submission manager.
+   * @param uuid unique id assigned to classLoader
+   * @param cl a <code>ClassLoader</code> instance.
+   * @return a <code>RegisteredClassLoader</code> instance.
+   */
+  public RegisteredClassLoader registerClassLoader(final String uuid, final ClassLoader cl) {
+    if(uuid == null) throw new IllegalArgumentException("uuid is null");
+    if(cl == null) throw new IllegalArgumentException("cl is null");
+
+    RegisteredClassLoader registeredClassLoader = new RegisteredClassLoader(uuid, cl);
+    synchronized (classLoaderRegistrations) {
+      Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);
+      if(list == null) {
+        list = new HashSet<RegisteredClassLoader>();
+        classLoaderRegistrations.put(uuid, list);
+
+        addRequestClassLoader(uuid, cl);
+      }
+      list.add(registeredClassLoader);
+    }
+    return registeredClassLoader;
+  }
+
+  /**
+   * Unregisters class loader from this submission manager.
+   * @param registeredClassLoader a <code>RegisteredClassLoader</code> instance.
+   */
+  protected void unregister(final RegisteredClassLoader registeredClassLoader) {
+    if(registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
+
+    synchronized (classLoaderRegistrations) {
+      Set<RegisteredClassLoader> list = classLoaderRegistrations.get(registeredClassLoader.getUuid());
+      if(list == null) throw new IllegalStateException("classLoader already unregistered");
+
+      if(list.remove(registeredClassLoader)) {
+        if(list.isEmpty()) {
+          classLoaderRegistrations.remove(registeredClassLoader.getUuid());
+          removeRequestClassLoader(registeredClassLoader.getUuid());
+        }
+      } else
+        throw new IllegalStateException("ClassLoader already unregistered");
+    }
+  }
+
+  /**
+   * Helper class for managing registered class loaders.
+   */
+  public class RegisteredClassLoader {
+    /**
+     * Unique id assigned to class loader.
+     */
+    private final String      uuid;
+    /**
+     * A <code>ClassLoader</code> instance.
+     */
+    private final ClassLoader classLoader;
+
+    /**
+     *
+     * @param uuid unique id assigned to classLoader
+     * @param classLoader a <code>ClassLoader</code> instance.
+     */
+    protected RegisteredClassLoader(final String uuid, final ClassLoader classLoader) {
+      this.uuid = uuid;
+      this.classLoader = classLoader;
+    }
+
+    /**
+     * Get unique id assigned to class loader.
+     * @return an id assigned to <code>ClassLoader</code>
+     */
+    public String getUuid() {
+      return uuid;
+    }
+
+    /**
+     * Get a class loader instance.
+     * @return a <code>ClassLoader</code> instance.
+     */
+    public ClassLoader getClassLoader() {
+      return classLoader;
+    }
+
+    /**
+     *
+     */
+    public void dispose() {
+      unregister(this);
+    }
+  }
 }

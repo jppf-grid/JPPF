@@ -25,7 +25,6 @@ import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.job.JobEventType;
 import org.jppf.job.JobListener;
 import org.jppf.job.JobNotification;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,12 +128,11 @@ public class JPPFJobManager
 
   /**
    * Called when all or part of a job is dispatched to a node.
-   * @param bundleWrapper the dispatched job.
-   * @param channel       the node to which the job is dispatched.
+   * @param bundle  the dispatched job.
+   * @param channel the node to which the job is dispatched.
    */
-  public synchronized void jobDispatched(final ClientJob bundleWrapper, final ChannelWrapper channel)
+  public synchronized void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper channel)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
     String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
@@ -142,19 +140,18 @@ public class JPPFJobManager
       list = new ArrayList<ChannelJobPair>();
       jobMap.put(jobUuid, list);
     }
-    list.add(new ChannelJobPair(channel, bundleWrapper));
+    list.add(new ChannelJobPair(channel, bundle));
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
     submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
   }
 
   /**
    * Called when all or part of a job has returned from a node.
-   * @param bundleWrapper the returned job.
-   * @param channel       the node to which the job is dispatched.
+   * @param bundle  the returned job.
+   * @param channel the node to which the job is dispatched.
    */
-  public synchronized void jobReturned(final ClientJob bundleWrapper, final ChannelWrapper channel)
+  public synchronized void jobReturned(final ClientTaskBundle bundle, final ChannelWrapper channel)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
     String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
@@ -162,7 +159,7 @@ public class JPPFJobManager
       log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
       return;
     }
-    list.remove(new ChannelJobPair(channel, bundleWrapper));
+    list.remove(new ChannelJobPair(channel, bundle));
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
   }
@@ -173,12 +170,11 @@ public class JPPFJobManager
    */
   public synchronized void jobQueued(final ClientJob bundleWrapper)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    String jobUuid = bundle.getUuid();
+    String jobUuid = bundleWrapper.getUuid();
     bundleMap.put(jobUuid, bundleWrapper);
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
-    submitEvent(JobEventType.JOB_QUEUED, bundle, null);
+    if (debugEnabled) log.debug("jobId '" + bundleWrapper.getName() + "' queued");
+    submitEvent(JobEventType.JOB_QUEUED, bundleWrapper, null);
 //    JPPFDriver.getInstance().getStatsUpdater().jobQueued(bundle.getTaskCount());
   }
 
@@ -188,14 +184,13 @@ public class JPPFJobManager
    */
   public synchronized void jobEnded(final ClientJob bundleWrapper)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    long time = System.currentTimeMillis() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
-    String jobUuid = bundle.getUuid();
+    long time = System.currentTimeMillis() - bundleWrapper.getJobReceivedTime();
+    String jobUuid = bundleWrapper.getUuid();
     jobMap.remove(jobUuid);
     bundleMap.remove(jobUuid);
     getQueue().clearSchedules(jobUuid);
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
-    submitEvent(JobEventType.JOB_ENDED, bundle, null);
+    if (debugEnabled) log.debug("jobId '" + bundleWrapper.getName() + "' ended");
+    submitEvent(JobEventType.JOB_ENDED, bundleWrapper, null);
 //    JPPFDriver.getInstance().getStatsUpdater().jobEnded(time);
   }
 
@@ -205,9 +200,19 @@ public class JPPFJobManager
    */
   public synchronized void jobUpdated(final ClientJob bundleWrapper)
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' updated");
-    submitEvent(JobEventType.JOB_UPDATED, bundle, null);
+    if (debugEnabled) log.debug("jobId '" + bundleWrapper.getName() + "' updated");
+    submitEvent(JobEventType.JOB_UPDATED, bundleWrapper, null);
+  }
+
+  /**
+   * Submit an event to the event queue.
+   * @param eventType the type of event to generate.
+   * @param bundle    the job data.
+   * @param channel   the id of the job source of the event.
+   */
+  private void submitEvent(final JobEventType eventType, final ClientJob bundle, final ChannelWrapper channel)
+  {
+    // todo implement
   }
 
   /**

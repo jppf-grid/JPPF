@@ -25,8 +25,8 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.task.storage.DataProvider;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -45,7 +45,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
   /**
    * The job to execute.
    */
-  private final JPPFJob job;
+  private final ClientJob job;
   /**
    * The shared data provider for this task bundle.
    */
@@ -65,11 +65,15 @@ public class ClientTaskBundle extends JPPFTaskBundle
 
   /**
    * Initialize this task bundle and set its build number.
-   * @param job the job to execute.
+   * @param job   the job to execute.
+   * @param tasks the tasks to execute.
    */
-  public ClientTaskBundle(final JPPFJob job)
+  public ClientTaskBundle(final ClientJob job, final List<JPPFTask> tasks)
   {
+    if (job == null) throw new IllegalArgumentException("job us null");
+
     this.job = job;
+    this.tasks = new ArrayList<JPPFTask>(tasks);
   }
 
   /**
@@ -78,7 +82,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   public JPPFJob getJob()
   {
-    return job;
+    return job.getJob();
   }
 
   /**
@@ -124,26 +128,27 @@ public class ClientTaskBundle extends JPPFTaskBundle
   @Override
   public ClientTaskBundle copy()
   {
-    ClientTaskBundle bundle = new ClientTaskBundle(getJob());
-    bundle.setUuidPath(getUuidPath());
-    bundle.setRequestUuid(getRequestUuid());
-    bundle.setUuid(getUuid());
-    bundle.setName(getName());
-    bundle.setTaskCount(getTaskCount());
-    bundle.setDataProvider(getDataProvider());
-    synchronized (bundle.getParametersMap())
-    {
-      for (Map.Entry<Object, Object> entry : getParametersMap().entrySet())
-        bundle.setParameter(entry.getKey(), entry.getValue());
-    }
-    bundle.setQueueEntryTime(getQueueEntryTime());
-    bundle.setCompletionListener(getCompletionListener());
-    bundle.setSLA(getSLA());
-    bundle.setLocalExecutionPolicy(localExecutionPolicy);
-    bundle.setBroadcastUUID(broadcastUUID);
-    //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
-
-    return bundle;
+    throw new UnsupportedOperationException();
+//    ClientTaskBundle bundle = new ClientTaskBundle(getJob(), tasks);
+//    bundle.setUuidPath(getUuidPath());
+//    bundle.setRequestUuid(getRequestUuid());
+//    bundle.setUuid(getUuid());
+//    bundle.setName(getName());
+//    bundle.setTaskCount(getTaskCount());
+//    bundle.setDataProvider(getDataProvider());
+//    synchronized (bundle.getParametersMap())
+//    {
+//      for (Map.Entry<Object, Object> entry : getParametersMap().entrySet())
+//        bundle.setParameter(entry.getKey(), entry.getValue());
+//    }
+//    bundle.setQueueEntryTime(getQueueEntryTime());
+//    bundle.setCompletionListener(getCompletionListener());
+//    bundle.setSLA(getSLA());
+//    bundle.setLocalExecutionPolicy(localExecutionPolicy);
+//    bundle.setBroadcastUUID(broadcastUUID);
+//    //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
+//
+//    return bundle;
   }
 
   /**
@@ -154,10 +159,11 @@ public class ClientTaskBundle extends JPPFTaskBundle
   @Override
   public ClientTaskBundle copy(final int nbTasks)
   {
-    ClientTaskBundle bundle = copy();
-    bundle.setTaskCount(nbTasks);
-    taskCount -= nbTasks;
-    return bundle;
+    throw new UnsupportedOperationException();
+//    ClientTaskBundle bundle = copy();
+//    bundle.setTaskCount(nbTasks);
+//    taskCount -= nbTasks;
+//    return bundle;
   }
 
 
@@ -242,5 +248,41 @@ public class ClientTaskBundle extends JPPFTaskBundle
   public void setBroadcastUUID(final String broadcastUUID)
   {
     this.broadcastUUID = broadcastUUID;
+  }
+
+  /**
+   * Called to notify that the results of a number of tasks have been received from the server.
+   * @param results the list of tasks whose results have been received from the server.
+   */
+  public void resultsReceived(final List<JPPFTask> results)
+  {
+    job.resultsReceived(this, results);
+  }
+
+  /**
+   * Called to notify that throwable eventually raised while receiving the results.
+   * @param throwable the throwable that was raised while receiving the results.
+   */
+  public void resultsReceived(final Throwable throwable)
+  {
+    job.resultsReceived(this, throwable);
+  }
+
+  /**
+   * Called to notify that the execution of a task has completed.
+   * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
+   */
+  public void taskCompleted(final Exception exception)
+  {
+    job.taskCompleted(this, exception);
+  }
+
+  /**
+   * Called when all or part of a job is dispatched to a node.
+   * @param channel the node to which the job is dispatched.
+   */
+  public void jobDispatched(final ChannelWrapper<?> channel)
+  {
+    job.jobDispatched(this, channel);
   }
 }

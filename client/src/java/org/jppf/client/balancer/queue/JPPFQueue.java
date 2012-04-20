@@ -19,6 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.balancer.ClientJob;
+import org.jppf.client.balancer.ClientTaskBundle;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -37,7 +38,7 @@ public interface JPPFQueue extends Iterable<ClientJob>
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
-  ClientJob nextBundle(int nbTasks);
+  ClientTaskBundle nextBundle(int nbTasks);
 
   /**
    * Get the next object in the queue.
@@ -45,7 +46,7 @@ public interface JPPFQueue extends Iterable<ClientJob>
    * @param nbTasks       the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
-  ClientJob nextBundle(ClientJob bundleWrapper, int nbTasks);
+  ClientTaskBundle nextBundle(ClientJob bundleWrapper, int nbTasks);
 
   /**
    * Determine whether the queue is empty or not.

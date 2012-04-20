@@ -22,6 +22,7 @@ import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.JPPFResultCollector;
 import org.jppf.client.event.*;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.TypedProperties;
@@ -77,8 +78,15 @@ public class TestJPPFBalancer
 //      job.getSLA().setBroadcastJob(true);
       JPPFResultCollector collector = new JPPFResultCollector(job) {
         @Override
+        public synchronized void setStatus(final SubmissionStatus newStatus) {
+          System.out.println("setStatus: " + newStatus);
+          super.setStatus(newStatus);
+        }
+
+        @Override
         public synchronized void resultsReceived(final TaskResultEvent event) {
           System.out.println("resultsReceived: " + event.getTaskList().size());
+          if(event.getThrowable() != null) event.getThrowable().printStackTrace(System.out);
           super.resultsReceived(event);
         }
       };
@@ -103,8 +111,6 @@ public class TestJPPFBalancer
       dur = System.nanoTime() - dur;
       System.out.println("Submitting job...DONE in " + (dur / 1000000.0));
 
-      System.out.println("Sleeping...");
-      Thread.sleep(10000L);
     } catch (Throwable t) {
       t.printStackTrace(System.out);
     } finally {
@@ -121,11 +127,11 @@ public class TestJPPFBalancer
   private static void configure()
   {
     TypedProperties properties = JPPFConfiguration.getProperties();
-    properties.setProperty("experimental.balancer", "false");
+    properties.setProperty("experimental.balancer", "true");
     properties.setProperty("jppf.load.balancing.algorithm", "manual");
     properties.setProperty("jppf.load.balancing.strategy", "manual");
     properties.setProperty("strategy.manual.size", "4");
-    properties.setProperty("jppf.local.execution.enabled", "false");
+    properties.setProperty("jppf.local.execution.enabled", "true");
     properties.setProperty("driver1.jppf.server.host", "localhost");
     properties.setProperty("driver1.jppf.pool.size", "5");
     properties.setProperty("driver1.class.server.port", "11111");
@@ -136,14 +142,14 @@ public class TestJPPFBalancer
     properties.setProperty("driver2.priority" , "10");
     properties.setProperty("driver2.app.server.port", "11112");
     properties.setProperty("driver2.class.server.port", "11111");
-    properties.setProperty("jppf.remote.execution.enabled", "true");
+    properties.setProperty("jppf.remote.execution.enabled", "false");
 
 //    if(paramJPPF.isAutoDiscovery() || (sb.length() == 0 && !paramJPPF.isLocalExecution()))
 //    properties.setProperty("jppf.discovery.enabled", "true");
 //    else {
-      properties.setProperty("jppf.discovery.enabled", "false");
+    properties.setProperty("jppf.discovery.enabled", "false");
 //      properties.setProperty("jppf.drivers", "driver1");
-      properties.setProperty("jppf.drivers", "driver1 driver2");
+    properties.setProperty("jppf.drivers", "driver1 driver2");
 //    }
 
     properties.setProperty("jppf.pool.size", "2");
@@ -155,6 +161,10 @@ public class TestJPPFBalancer
    */
   public static class TestTask extends JPPFTask
   {
+    /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
     /**
      * The text describing this task.
      */

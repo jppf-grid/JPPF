@@ -19,9 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.client.balancer.job.JPPFJobManager;
-import org.jppf.server.protocol.BundleParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,13 +67,12 @@ class JobScheduleAction implements Runnable
   {
     synchronized (bundleWrapper)
     {
-      ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
       if (debugEnabled)
       {
-        String jobId = bundle.getName();
+        String jobId = bundleWrapper.getName();
         log.debug("job '" + jobId + "' is resuming");
       }
-      bundle.setParameter(BundleParameter.JOB_PENDING, false);
+      bundleWrapper.setPending(false);
       jobManager.jobUpdated(bundleWrapper);
     }
   }

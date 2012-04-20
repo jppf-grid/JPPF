@@ -30,12 +30,10 @@ import org.jppf.client.submission.SubmissionManager;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.ThreadSynchronization;
-import org.jppf.utils.TraversalList;
 
 import java.util.*;
 
@@ -98,13 +96,17 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Determines whether local execution is enabled on this client.
    */
   private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", false);
+  /**
+   * Wrapper for local execution node.
+   */
+  private ChannelWrapperLocal wrapperLocal = null;
 
   /**
    * Instantiates client submission manager.
    * @param client JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
-  public SubmissionManagerClient(final JPPFClient client) throws Exception
+  public SubmissionManagerClient(final AbstractGenericClient client) throws Exception
   {
     if (client == null) throw new IllegalArgumentException("client is null");
 
@@ -144,8 +146,8 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     });
 
-//    addConnectionLocal();
-//    addConnectionLocal();
+    updateLocalExecution(this.localEnabled);
+
     for (JPPFClientConnection connection : connections)
     {
       addConnection(connection);
@@ -343,9 +345,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
-    ClientTaskBundle bundle = createBundle(job);
+//    ClientTaskBundle bundle = createBundle(job);
 
-    queue.addBundle(new ClientJob(bundle, job.getTasks()));
+    queue.addBundle(new ClientJob(job, job.getTasks()));
     return job.getName();
   }
 
@@ -367,61 +369,19 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   /**
-   * Create a task bundle for the specified job.
-   * @param job the job to use as a base.
-   * @return a JPPFTaskBundle instance.
+   * {@inheritDoc}
    */
-  private static ClientTaskBundle createBundle(final JPPFJob job)
+  @Override
+  public synchronized boolean hasAvailableConnection()
   {
-    String requestUuid = job.getUuid();
-    ClientTaskBundle bundle = new ClientTaskBundle(job);
-    bundle.setRequestUuid(requestUuid);
-
-    int count = job.getTasks().size() - job.getResults().size();
-    TraversalList<String> uuidPath = new TraversalList<String>();
-//    uuidPath.add(client.getUuid());
-    bundle.setUuidPath(uuidPath);
-//    if (debugEnabled) log.debug("[client: " + name + "] sending job '" + job.getName() + "' with " + count + " tasks, uuidPath=" + uuidPath.getList());
-    bundle.setTaskCount(count);
-    bundle.setRequestUuid(job.getUuid());
-    bundle.setName(job.getName());
-    bundle.setUuid(job.getUuid());
-    if (job.getSLA() instanceof JPPFJobSLA)
-    {
-      bundle.setSLA(((JPPFJobSLA) job.getSLA()).copy());
-    }
-    else
-    {
-      bundle.setSLA(job.getSLA());
-    }
-    bundle.setMetadata(job.getMetadata());
-
-//    ClassLoader cl = null;
-//    if (!job.getTasks().isEmpty())
-//    {
-//      Object task = job.getTasks().get(0);
-//      if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
-//      cl = task.getClass().getClassLoader();
-//      connection.getClient().addRequestClassLoader(requestUuid, cl);
-//      if (log.isDebugEnabled()) log.debug("adding request class loader=" + cl + " for uuid=" + requestUuid + ", from class " + task.getClass());
-//    }
-    return bundle;
+    return taskQueueChecker.hasIdleChannel() || wrapperLocal != null && wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean hasAvailableConnection()
-  {
-    return false;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isLocalExecutionEnabled()
+  public synchronized boolean isLocalExecutionEnabled()
   {
     return localEnabled;
   }
@@ -430,9 +390,39 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * {@inheritDoc}
    */
   @Override
-  public void setLocalExecutionEnabled(final boolean localExecutionEnabled)
+  public synchronized void setLocalExecutionEnabled(final boolean localExecutionEnabled)
   {
+    if (this.localEnabled == localExecutionEnabled) return;
     this.localEnabled = localExecutionEnabled;
+    updateLocalExecution(this.localEnabled);
+  }
+
+  /**
+   * Starts or stops local execution node according to specified parameter.
+   * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
+   */
+  protected synchronized void updateLocalExecution(final boolean localExecutionEnabled)
+  {
+    if (localExecutionEnabled)
+    {
+      wrapperLocal = new ChannelWrapperLocal();
+      addConnection(wrapperLocal);
+    }
+    else
+    {
+      if (wrapperLocal != null)
+      {
+        try
+        {
+          wrapperLocal.stopNode();
+        }
+        finally
+        {
+          removeConnection(wrapperLocal);
+          wrapperLocal = null;
+        }
+      }
+    }
   }
 
   /**
@@ -441,6 +431,16 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public Vector<JPPFClientConnection> getAvailableConnections()
   {
-    return new Vector<JPPFClientConnection>();
+    List<ChannelWrapper<?>> idleChannels = taskQueueChecker.getIdleChannels();
+    Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>(idleChannels.size());
+    for (ChannelWrapper<?> idleChannel : idleChannels)
+    {
+      if (idleChannel instanceof ChannelWrapperRemote)
+      {
+        ChannelWrapperRemote wrapperRemote = (ChannelWrapperRemote) idleChannel;
+        availableConnections.add(wrapperRemote.getChannel());
+      }
+    }
+    return availableConnections;
   }
 }

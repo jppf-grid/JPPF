@@ -19,10 +19,6 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
-import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.BundleParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +36,6 @@ class JobExpirationAction implements Runnable
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Proxy to the job management MBean.
-   */
-  private static DriverJobManagementMBean jobManagementMBean = createJobManagementProxy();
-  /**
    * The bundle wrapper encapsulating the job.
    */
   private ClientJob bundleWrapper = null;
@@ -54,6 +46,8 @@ class JobExpirationAction implements Runnable
    */
   public JobExpirationAction(final ClientJob bundleWrapper)
   {
+    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+
     this.bundleWrapper = bundleWrapper;
   }
 
@@ -64,41 +58,15 @@ class JobExpirationAction implements Runnable
   @Override
   public void run()
   {
-    ClientTaskBundle bundle = (ClientTaskBundle) bundleWrapper.getJob();
-    String jobId = bundle.getName();
+    String jobId = bundleWrapper.getName();
     try
     {
       if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
-      bundle.setParameter(BundleParameter.JOB_EXPIRED, true);
-      if (bundle.getTaskCount() > 0)
-      {
-        bundleWrapper.fireTaskCompleted();
-      }
-      String jobUuid = bundleWrapper.getJob().getUuid();
-      jobManagementMBean.cancelJob(jobUuid);
+      bundleWrapper.jobExpired();
     }
     catch (Exception e)
     {
       log.error("Error while cancelling job id = " + jobId, e);
     }
-  }
-
-  /**
-   * Create a proxy to the local job management mbean.
-   * @return a {@link org.jppf.server.job.management.DriverJobManagementMBean} instance.
-   */
-  private static DriverJobManagementMBean createJobManagementProxy()
-  {
-    try
-    {
-      JMXDriverConnectionWrapper jmxWrapper = new JMXDriverConnectionWrapper();
-      jmxWrapper.connect();
-      return jmxWrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
-    }
-    catch (Exception e)
-    {
-      log.error("Could not initialize a proxy to the job management MBean", e);
-    }
-    return null;
   }
 }

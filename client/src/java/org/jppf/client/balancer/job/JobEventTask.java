@@ -19,13 +19,13 @@
 package org.jppf.client.balancer.job;
 
 import org.jppf.client.balancer.ChannelWrapper;
-import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.job.JobEventType;
 import org.jppf.job.JobInformation;
 import org.jppf.job.JobNotification;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * Instances of this class are submitted into an event queue and generate actual
@@ -48,7 +48,7 @@ public class JobEventTask implements Runnable
   /**
    * The job data.
    */
-  private final ClientTaskBundle bundle;
+  private final JPPFTaskBundle bundle;
   /**
    * Creation timestamp for this task.
    */
@@ -61,7 +61,7 @@ public class JobEventTask implements Runnable
    * @param bundle     - the job data.
    * @param channel    - the id of the job source of the event.
    */
-  public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final ClientTaskBundle bundle, final ChannelWrapper channel)
+  public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
   {
     this.jobManager = jobManager;
     this.eventType = eventType;
@@ -81,7 +81,7 @@ public class JobEventTask implements Runnable
     JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(),
             bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
     jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = null; // (channel == null) ? null : JPPFClient.getI JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
+    JPPFManagementInfo nodeInfo = channel == null ? null : channel.getManagementInfo();
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
     if (eventType == JobEventType.JOB_UPDATED)
     {
