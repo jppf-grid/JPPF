@@ -188,7 +188,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   @Override
   public ClientTaskBundle nextBundle(final ClientJob bundleWrapper, final int nbTasks)
   {
-    ClientTaskBundle result = null;
+    final ClientTaskBundle result;
     try
     {
       lock.lock();
@@ -236,6 +236,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
 //    ClientTaskBundle resultJob = (ClientTaskBundle) result.getJob();
 //    statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
+    result.setOnRequeue(new Runnable() {
+      @Override
+      public void run()
+      {
+        ClientJob clientJob = new ClientJob(result.getJob(), result.getTasksL());
+        clientJob.setRequeued(true);
+        addBundle(clientJob);
+      }
+    });
     return result;
   }
 

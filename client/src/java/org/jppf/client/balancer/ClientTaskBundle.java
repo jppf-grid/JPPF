@@ -62,6 +62,10 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * The broadcast UUID.
    */
   private transient String broadcastUUID = null;
+  /**
+   * The requeue handler.
+   */
+  private Runnable onRequeue = null;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -284,5 +288,31 @@ public class ClientTaskBundle extends JPPFTaskBundle
   public void jobDispatched(final ChannelWrapper<?> channel)
   {
     job.jobDispatched(this, channel);
+  }
+
+  /**
+   * Called when this task bundle should be resubmitted
+   */
+  public void resubmit()
+  {
+    if(onRequeue != null) onRequeue.run();
+  }
+
+  /**
+   * Get the requeue handler.
+   * @return an <code>Runnable</code> instance.
+   */
+  public Runnable getOnRequeue()
+  {
+    return onRequeue;
+  }
+
+  /**
+   * Set the reuque handler.
+   * @param onRequeue {@Link Runnable} executed on requeue.
+   */
+  public void setOnRequeue(final Runnable onRequeue)
+  {
+    this.onRequeue = onRequeue;
   }
 }

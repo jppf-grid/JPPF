@@ -26,6 +26,7 @@ import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.startup.JPPFStartupLoader;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.JPPFUuid;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   private final Map<String, Set<RegisteredClassLoader>> classLoaderRegistrations = new HashMap<String, Set<RegisteredClassLoader>>();
   /**
-   * Determines whther SSL communication is on or off.
+   * Mapping class loader to uuid.
+   */
+  private final Map<ClassLoader, String>  classLoaderUUIDs = new WeakHashMap<ClassLoader, String>();
+  /**
+   * Determines whether SSL communication is on or off.
    */
   protected boolean sslEnabled = false;
 
@@ -315,7 +320,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     if(submissionManager == null)
       return new Vector<JPPFClientConnection>();
     else
-    return submissionManager.getAvailableConnections();
+      return submissionManager.getAvailableConnections();
   }
 
   /**
@@ -373,16 +378,23 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
   /**
    * Register class loader with this submission manager.
-   * @param uuid unique id assigned to classLoader
    * @param cl a <code>ClassLoader</code> instance.
    * @return a <code>RegisteredClassLoader</code> instance.
    */
-  public RegisteredClassLoader registerClassLoader(final String uuid, final ClassLoader cl) {
+  public RegisteredClassLoader registerClassLoader(final ClassLoader cl) {
     if(uuid == null) throw new IllegalArgumentException("uuid is null");
     if(cl == null) throw new IllegalArgumentException("cl is null");
 
-    RegisteredClassLoader registeredClassLoader = new RegisteredClassLoader(uuid, cl);
+    RegisteredClassLoader registeredClassLoader;
     synchronized (classLoaderRegistrations) {
+      String uuid = classLoaderUUIDs.get(cl);
+      if (uuid == null)
+      {
+        uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+        classLoaderUUIDs.put(cl, uuid);
+      }
+
+      registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);
       if(list == null) {
         list = new HashSet<RegisteredClassLoader>();
@@ -456,7 +468,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     }
 
     /**
-     *
+     * Disposes this registration for classLoader.
      */
     public void dispose() {
       unregister(this);

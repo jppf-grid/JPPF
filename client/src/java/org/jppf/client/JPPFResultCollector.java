@@ -151,7 +151,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
       // reset this object's state to prepare for job resubmission
       if (job != null) count = job.getTasks().size() - job.getResults().size();
       pendingCount = count;
-      resultMap = new TreeMap<Integer, JPPFTask>();
+      if (resultMap != null) resultMap.clear();
       results = null;
     }
   }

@@ -31,7 +31,10 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.NotSerializableException;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -42,6 +45,14 @@ import java.util.concurrent.Executors;
  */
 public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ChannelWrapperRemote.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The channel to the driver to use.
    */
@@ -155,6 +166,21 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     executor.execute(new RemoteRunnable(getBundler(), bundle, channel));
   }
 
+  /**
+   * Called when reconnection of this channel is required.
+   */
+  public void reconnect() {
+    setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+    try
+    {
+      channel.getTaskServerConnection().init();
+    }
+    catch (Exception e2)
+    {
+      log.error(e2.getMessage(), e2);
+    }
+  }
+
   @Override
   public String toString()
   {
@@ -202,7 +228,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       Exception exception = null;
       AbstractGenericClient client = connection.getClient();
       List<JPPFTask> tasks = this.bundle.getTasksL();
-      String requestUuid = null;
       AbstractGenericClient.RegisteredClassLoader registeredClassLoader = null;
       try
       {
@@ -211,11 +236,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         boolean completed = false;
         JPPFJob newJob = createNewJob(bundle.getJob(), tasks);
         ClassLoader classLoader = getClassLoader(newJob);
-        requestUuid = newJob.getUuid();
-        registeredClassLoader = client.registerClassLoader(requestUuid, classLoader);
+        registeredClassLoader = client.registerClassLoader(classLoader);
         while (!completed)
         {
           JPPFTaskBundle bundle = createBundle(client, newJob);
+          bundle.setRequestUuid(registeredClassLoader.getUuid());
           connection.sendTasks(classLoader, bundle, newJob);
           while (count < tasks.size())
           {
@@ -236,10 +261,17 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       }
       catch (Throwable t)
       {
-//        log.error(t.getMessage(), t);
+        log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(t);
+
+        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) {
+          return;
+        }
+
+        bundle.resubmit();
+        reconnect();
       }
       finally
       {
