@@ -17,17 +17,12 @@
  */
 package org.jppf.classloader;
 
-import org.jppf.utils.IteratorEnumeration;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
+
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class is a custom class loader serving the purpose of dynamically loading the JPPF classes and the client
@@ -186,21 +181,27 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   {
     URL url = null;
     url = cache.getResourceURL(name);
-    if (url != null)
+    if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found in local cache");
+    if (url == null)
     {
-      if (debugEnabled) log.debug("resource [" + name + "] found in local cache");
-      return url;
+      url = super.findResource(name);
+      if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found in URL classpath");
+      if (url == null)
+      {
+        if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
+        try
+        {
+          List<URL> urlList = findRemoteResources(name);
+          if ((urlList != null) && !urlList.isEmpty()) url = urlList.get(0);
+        }
+        catch(Exception e)
+        {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(ExceptionUtils.getMessage(e));
+        }
+        if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
+      }
     }
-    if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
-    try
-    {
-      Enumeration<URL> urlEnum = findResources(name);
-      if ((urlEnum != null) && urlEnum.hasMoreElements()) url = urlEnum.nextElement();
-    }
-    catch(IOException e)
-    {
-    }
-    if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
     return url;
   }
 
@@ -246,44 +247,68 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @SuppressWarnings("unchecked")
   public Enumeration<URL> findResources(final String name) throws IOException
   {
-    List<URL> urlList = null;
+    List<URL> urlList = new ArrayList<URL>();
     if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
     try
     {
       List<String> locationsList = cache.getResourcesLocations(name);
-      if (locationsList == null)
-      {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("name", name);
-        map.put("multiple", "true");
-        JPPFResourceWrapper resource = loadResourceData(map, true);
-        List<byte[]> dataList = (List<byte[]>)resource.getData("resource_list");
-        boolean found = (dataList != null) && !dataList.isEmpty();
-        if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
-        if (found)
-        {
-          cache.registerResources(name, dataList);
-          urlList = new ArrayList<URL>();
-          locationsList = cache.getResourcesLocations(name);
-        }
-      }
       if (locationsList != null)
       {
-        for (String path: locationsList)
-        {
-          File file = new File(path);
-          if (urlList == null) urlList = new ArrayList<URL>();
-          urlList.add(file.toURI().toURL());
-        }
-        if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
+        urlList = new ArrayList<URL>();
+        for (String path: locationsList) urlList.add(new File(path).toURI().toURL());
+      }
+      else
+      {
+        List<URL> tempList = findRemoteResources(name);
+        if (tempList != null) urlList.addAll(tempList);
+      }
+      Enumeration<URL> tempEnum = super.findResources(name);
+      if (tempEnum != null)
+      {
+        while (tempEnum.hasMoreElements()) urlList.add(tempEnum.nextElement());
       }
     }
     catch(Exception e)
     {
-      if (debugEnabled) log.debug("resource [" + name + "] not found remotely");
-      if (e instanceof IOException) throw (IOException) e;
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+      throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
-    return urlList == null ? null : new IteratorEnumeration<URL>(urlList.iterator());
+    return new IteratorEnumeration<URL>(urlList.iterator());
+  }
+
+  /**
+   * Find all resources with the specified name.
+   * @param name name of the resources to find in the class loader's classpath.
+   * @return A list of URLs pointing to the resources found.
+   * @throws Exception if an error occurs.
+   * @see java.lang.ClassLoader#findResources(java.lang.String)
+   */
+  @SuppressWarnings("unchecked")
+  private List<URL> findRemoteResources(final String name) throws Exception
+  {
+    List<URL> urlList = null;
+    List<String> locationsList = null;
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("name", name);
+    map.put("multiple", "true");
+    JPPFResourceWrapper resource = loadResourceData(map, true);
+    List<byte[]> dataList = (List<byte[]>)resource.getData("resource_list");
+    boolean found = (dataList != null) && !dataList.isEmpty();
+    if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
+    if (found)
+    {
+      cache.registerResources(name, dataList);
+      urlList = new ArrayList<URL>();
+      locationsList = cache.getResourcesLocations(name);
+    }
+    if (locationsList != null)
+    {
+      if (urlList == null) urlList = new ArrayList<URL>();
+      for (String path: locationsList) urlList.add(new File(path).toURI().toURL());
+      if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
+    }
+    return urlList;
   }
 
   /**
@@ -299,27 +324,27 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
     URL[] results = new URL[names.length];
     for (int i=0; i<results.length; i++) results[i] = null;
-    try
-    {
+    try {
       List<Integer> indices = new ArrayList<Integer>();
-      for (int i=0; i<names.length; i++)
-      {
+      for (int i=0; i<names.length; i++) {
         String name = names[i];
         List<String> locationsList = cache.getResourcesLocations(name);
-        if (locationsList == null)
-        {
-          if (debugEnabled) log.debug("resource " + name + " not found locally in cache");
-          indices.add(i);
-        }
-        else if (!locationsList.isEmpty())
-        {
+        if ((locationsList != null) && !locationsList.isEmpty()) {
           results[i] = cache.getURLFromPath(locationsList.get(0));
-          if (debugEnabled) log.debug("resource " + name + " found locally as " + results[i]);
+          if (debugEnabled) log.debug("resource " + name + " found in local cache as " + results[i]);
+        } else {
+          URL url = super.findResource(names[i]);
+          if (url != null) {
+            results[i] = url;
+            if (debugEnabled) log.debug("resource " + name + " found in URL classpath as " + results[i]);
+          } else {
+            if (debugEnabled) log.debug("resource " + name + " not found locally");
+            indices.add(i);
+          }
         }
       }
-      if (indices.isEmpty())
-      {
-        if (debugEnabled) log.debug("all resources were found in the local cache");
+      if (indices.isEmpty()) {
+        if (debugEnabled) log.debug("all resources were found locally");
         return results;
       }
       Map<String, Object> map = new HashMap<String, Object>();
@@ -341,10 +366,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
           if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
     }
     return results;
   }
