@@ -71,6 +71,7 @@ public class ThreadManager extends ThreadSynchronization
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadMXBean = ManagementFactory.getThreadMXBean();
     cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
+    log.info("Thread CPU time measurement is " + (cpuTimeEnabled ? "" : "not ") + "supported");
     threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
@@ -122,7 +123,7 @@ public class ThreadManager extends ThreadSynchronization
    */
   public long getCpuTime()
   {
-    if (!cpuTimeEnabled) return 0L;
+    if (!cpuTimeEnabled) return -1L;
     return computeExecutionInfo().cpuTime;
   }
 
@@ -152,7 +153,7 @@ public class ThreadManager extends ThreadSynchronization
    */
   public long getCpuTime(final long threadId)
   {
-    return threadMXBean.getThreadCpuTime(threadId);
+    return cpuTimeEnabled ? threadMXBean.getThreadCpuTime(threadId) : 0L;
   }
 
   /**

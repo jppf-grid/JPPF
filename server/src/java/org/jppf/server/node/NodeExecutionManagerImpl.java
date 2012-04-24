@@ -116,13 +116,7 @@ public class NodeExecutionManagerImpl extends ThreadManager implements NodeExecu
   public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
   {
     if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
-    NodeExecutionInfo info;
-    if (isCpuTimeEnabled())
-    {
-      info = computeExecutionInfo();
-    } else {
-      info = null;
-    }
+    NodeExecutionInfo info = isCpuTimeEnabled() ? computeExecutionInfo() : null;
     setup(bundle, taskList);
     for (Task task : taskList) performTask(task);
     waitForResults();
