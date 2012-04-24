@@ -20,6 +20,7 @@ package org.jppf.server.node;
 import java.util.List;
 
 import org.jppf.*;
+import org.jppf.node.*;
 import org.jppf.node.protocol.Task;
 
 /**
@@ -34,7 +35,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   /**
    * The execution manager.
    */
-  private final NodeExecutionManagerImpl executionManager;
+  private final NodeExecutionManager executionManager;
   /**
    * The class loader instance.
    */
@@ -48,7 +49,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * @param number the internal number identifying the task for the thread pool.
    * @param classLoader the class loader used as context class loader.
    */
-  public NodeTaskWrapper(final NodeExecutionManagerImpl executionManager, final Task task, final List<String> uuidPath,
+  public NodeTaskWrapper(final NodeExecutionManager executionManager, final Task task, final List<String> uuidPath,
                          final long number, final ClassLoader classLoader)
   {
     super(task, uuidPath, number);
@@ -73,16 +74,16 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   public void run()
   {
     JPPFNodeReconnectionNotification reconnectionNotification = null;
+    ThreadManager threadManager = executionManager.getThreadManager();
     NodeExecutionInfo info = null;
+    NodeExecutionInfo info2 = null;
     long elapsedTime = 0L;
     try
     {
-//      Thread.currentThread().setContextClassLoader(node.getContainer(uuidPath).getClassLoader());
-      if(classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
-//      long id = Thread.currentThread().getId();
-      info = executionManager.processTaskTimeout(this);
+      if (classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
+      long id = Thread.currentThread().getId();
       long startTime = System.nanoTime();
-//      long startCpuTime = executionManager.getCpuTime(id);
+      info = threadManager.computeExecutionInfo(id);
       synchronized(task)
       {
         task.run();
@@ -90,7 +91,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       try
       {
         // convert cpu time from nanoseconds to milliseconds
-//        cpuTime = (executionManager.getCpuTime(id) - startCpuTime) / 1000000L;
+        if (info != null) info2 = threadManager.computeExecutionInfo(id).subtract(info);
         elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
       catch(Throwable ignore)
@@ -112,7 +113,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       {
         try
         {
-          executionManager.taskEnded(this, info, elapsedTime);
+          executionManager.taskEnded(task, number, info2, elapsedTime);
         }
         catch(JPPFNodeReconnectionNotification t)
         {

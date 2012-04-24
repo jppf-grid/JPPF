@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.node.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -113,7 +113,8 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   {
     JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
     info.populate();
-    info.getRuntime().setProperty("cpuTime", Long.toString(node.getExecutionManager().getCpuTime()));
+    NodeExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
+    info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime/1000000));
     return info;
   }
 

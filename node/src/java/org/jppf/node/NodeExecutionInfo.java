@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.node;
 
 import java.io.Serializable;
 
@@ -38,4 +38,46 @@ public class NodeExecutionInfo implements Serializable
    * Total user time used by the tasks.
    */
   public long userTime = 0;
+
+  /**
+   * Default no-arg constructor.
+   */
+  public NodeExecutionInfo()
+  {
+  }
+
+  /**
+   * Default no-args constructor.
+   * @param cpuTime total cpu time used by the tasks.
+   * @param userTime total user time used by the tasks.
+   */
+  public NodeExecutionInfo(final long cpuTime, final long userTime)
+  {
+    this.cpuTime = cpuTime;
+    this.userTime = userTime;
+  }
+
+  /**
+   * Add the times of another instance to this one.
+   * @param other the other execution info object from which to add the values.
+   * @return this exection info.
+   */
+  public NodeExecutionInfo add(final NodeExecutionInfo other)
+  {
+    cpuTime += other.cpuTime;
+    userTime += other.userTime;
+    return this;
+  }
+
+  /**
+   * Subtract the times of another instance from this one.
+   * @param other the other execution info object from which to subtract the values.
+   * @return this exection info.
+   */
+  public NodeExecutionInfo subtract(final NodeExecutionInfo other)
+  {
+    cpuTime -= other.cpuTime;
+    userTime -= other.userTime;
+    return this;
+  }
 }

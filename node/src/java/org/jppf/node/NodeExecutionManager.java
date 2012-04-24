@@ -20,6 +20,7 @@ package org.jppf.node;
 
 import java.util.List;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.protocol.*;
 
 /**
@@ -45,9 +46,37 @@ public interface NodeExecutionManager
    * @return the job id as a string, or null if no job is being executed.
    */
   String getCurrentJobId();
+
   /**
    * Get the node holding this execution manager.
    * @return a {@link Node} instance.
    */
   Node getNode();
+
+  /**
+   * Get the thread manager for this node.
+   * @return a {@link ThreadManager} instance.
+   */
+  ThreadManager getThreadManager();
+
+  /**
+   * Notification sent by a node task wrapper when a task is complete.
+   * @param task the task that just ended.
+   * @param taskNumber identifier for the task future.
+   * @param info the cpu time and wall clock time taken by the task.
+   * @param elapsedTime the wall clock time taken by the task
+   */
+  void taskEnded(Task task, long taskNumber, NodeExecutionInfo info, long elapsedTime);
+
+  /**
+   * Get the notification that the node must reconnect to the driver.
+   * @return a {@link JPPFNodeReconnectionNotification} instance.
+   */
+  JPPFNodeReconnectionNotification getReconnectionNotification();
+
+  /**
+   * Set the notification that the node must reconnect to the driver.
+   * @param reconnectionNotification a {@link JPPFNodeReconnectionNotification} instance.
+   */
+  void setReconnectionNotification(JPPFNodeReconnectionNotification reconnectionNotification);
 }

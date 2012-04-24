@@ -18,23 +18,19 @@
 
 package org.jppf.server.node;
 
-import org.jppf.utils.JPPFThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.management.ThreadMXBean;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
+import org.jppf.node.NodeExecutionInfo;
+import org.jppf.utils.JPPFThreadFactory;
+import org.slf4j.*;
 
 /**
  * This class manages the thread pool pool for the node's execution manager.
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class ThreadManagerThreadPool extends ThreadManager
+public class ThreadManagerThreadPool extends AbstractThreadManager
 {
   /**
    * Logger for this class.
@@ -52,19 +48,14 @@ public class ThreadManagerThreadPool extends ThreadManager
    * The factory used to create thread in the pool.
    */
   private JPPFThreadFactory threadFactory = null;
-  /**
-   * The platform MBean used to gather statistics about the JVM threads.
-   */
-  private ThreadMXBean threadMXBean;
 
   /**
    * Initialized thread manager.
    * @param poolSize the initial size of the thread pool.
-   * @param threadMXBean the MBean used to gather statistics about the JVM threads.
    */
-  public ThreadManagerThreadPool(final int poolSize, final ThreadMXBean threadMXBean)
+  public ThreadManagerThreadPool(final int poolSize)
   {
-    this.threadMXBean = threadMXBean;
+    super();
     threadFactory = new JPPFThreadFactory("node processing", threadMXBean.isThreadCpuTimeSupported() && threadMXBean.isThreadCpuTimeEnabled());
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
@@ -76,29 +67,10 @@ public class ThreadManagerThreadPool extends ThreadManager
   @Override
   public NodeExecutionInfo computeExecutionInfo()
   {
+    if (!cpuTimeEnabled) return null;
     List<Long> ids = threadFactory.getThreadIDs();
-    long cpuTime = 0L;
-    long userTime = 0L;
-    for (Long id: ids)
-    {
-      cpuTime += threadMXBean.getThreadCpuTime(id);
-      userTime += threadMXBean.getThreadUserTime(id);
-    }
     NodeExecutionInfo info = new NodeExecutionInfo();
-    info.cpuTime = cpuTime;
-    info.userTime = userTime;
-    return info;
-  }
-
-  /**
-   * Computes the CPU time used by thread identified by threadID.
-   * @param threadID the thread ID.
-   * @return a <code>NodeExecutionInfo</code> instance.
-   */
-  protected NodeExecutionInfo computeExecutionInfo(final long threadID) {
-    NodeExecutionInfo info = new NodeExecutionInfo();
-    info.cpuTime = threadMXBean.getThreadCpuTime(threadID);
-    info.userTime = threadMXBean.getThreadUserTime(threadID);
+    for (Long id: ids) info.add(computeExecutionInfo(id));
     return info;
   }
 
