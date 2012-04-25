@@ -33,6 +33,7 @@ import org.slf4j.*;
 /**
  * Instances of this class manage the execution of JPPF tasks by a node.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 /**
  * 
@@ -123,7 +124,39 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
       props.setProperty("processing.threads", Integer.toString(poolSize));
     }
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
-    threadManager= new ThreadManagerThreadPool(poolSize);
+    threadManager = createThreadManager(poolSize);
+  }
+
+  /**
+   * Create the thread manager instance. Default is {@link ThreadManagerThreadPool}.
+   * @return an instance of {@link ThreadManager}.
+   */
+  private static ThreadManager createThreadManager(final int poolSize)
+  {
+    ThreadManager result = null;
+    String s = JPPFConfiguration.getProperties().getString("jppf.thread.manager.class", "default");
+
+    if(!"default".equalsIgnoreCase(s) && !"org.jppf.server.node.ThreadManagerThreadPool".equals(s) && s != null)
+    {
+      try
+      {
+        Class clazz = Class.forName(s);
+        Object instance = ReflectionHelper.invokeConstructor(clazz, new Class[]{Integer.TYPE}, poolSize);
+        if(instance instanceof ThreadManager) {
+          result = (ThreadManager) instance;
+          log.info("Using custom thread manager: " + s);
+        }
+      }
+      catch(Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+    if(result == null) {
+      log.info("Using default thread manager");
+      return new ThreadManagerThreadPool(poolSize);
+    }
+    return result;
   }
 
   /**
