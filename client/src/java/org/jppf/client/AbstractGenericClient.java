@@ -379,20 +379,21 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Register class loader with this submission manager.
    * @param cl a <code>ClassLoader</code> instance.
+   * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
    * @return a <code>RegisteredClassLoader</code> instance.
    */
-  public RegisteredClassLoader registerClassLoader(final ClassLoader cl) {
-    if(uuid == null) throw new IllegalArgumentException("uuid is null");
+  public RegisteredClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
     if(cl == null) throw new IllegalArgumentException("cl is null");
+    if(uuid == null) throw new IllegalArgumentException("uuid is null");
 
     RegisteredClassLoader registeredClassLoader;
     synchronized (classLoaderRegistrations) {
-      String uuid = classLoaderUUIDs.get(cl);
-      if (uuid == null)
-      {
-        uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
-        classLoaderUUIDs.put(cl, uuid);
-      }
+//      String uuid = classLoaderUUIDs.get(cl);
+//      if (uuid == null)
+//      {
+//        uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+//        classLoaderUUIDs.put(cl, uuid);
+//      }
 
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);

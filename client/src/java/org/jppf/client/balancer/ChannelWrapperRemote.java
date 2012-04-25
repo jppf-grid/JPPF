@@ -236,7 +236,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         boolean completed = false;
         JPPFJob newJob = createNewJob(bundle.getJob(), tasks);
         ClassLoader classLoader = getClassLoader(newJob);
-        registeredClassLoader = client.registerClassLoader(classLoader);
+        registeredClassLoader = client.registerClassLoader(classLoader, newJob.getUuid());
         while (!completed)
         {
           JPPFTaskBundle bundle = createBundle(client, newJob);
