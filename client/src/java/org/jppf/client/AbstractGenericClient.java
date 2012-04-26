@@ -17,24 +17,15 @@
  */
 package org.jppf.client;
 
-import org.jppf.client.event.ClientConnectionStatusEvent;
-import org.jppf.client.event.ClientConnectionStatusListener;
-import org.jppf.client.submission.SubmissionManager;
-import org.jppf.comm.discovery.IPFilter;
-import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.startup.JPPFClientStartupSPI;
-import org.jppf.startup.JPPFStartupLoader;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.JPPFThreadFactory;
-import org.jppf.utils.JPPFUuid;
-import org.jppf.utils.TypedProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
+import org.jppf.client.event.*;
+import org.jppf.client.submission.SubmissionManager;
+import org.jppf.comm.discovery.*;
+import org.jppf.startup.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
