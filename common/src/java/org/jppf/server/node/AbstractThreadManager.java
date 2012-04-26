@@ -130,13 +130,4 @@ public abstract class AbstractThreadManager implements ThreadManager
   {
     return cpuTimeEnabled;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ThreadMXBean getThreadMXBean()
-  {
-    return threadMXBean;
-  }
 }

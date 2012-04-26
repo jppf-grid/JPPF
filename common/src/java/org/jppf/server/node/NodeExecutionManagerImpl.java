@@ -35,10 +35,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-/**
- * 
- * @author Laurent Cohen
- */
 public class NodeExecutionManagerImpl extends ThreadSynchronization implements NodeExecutionManager
 {
   /**
@@ -129,6 +125,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 
   /**
    * Create the thread manager instance. Default is {@link ThreadManagerThreadPool}.
+   * @param poolSize the initial pool size.
    * @return an instance of {@link ThreadManager}.
    */
   private static ThreadManager createThreadManager(final int poolSize)
@@ -159,6 +156,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     return result;
   }
 
+
   /**
    * Execute the specified tasks of the specified tasks bundle.
    * @param bundle the bundle to which the tasks are associated.
@@ -175,9 +173,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     cleanup();
     if (info != null)
     {
-      NodeExecutionInfo info2 = threadManager.computeExecutionInfo();
-      info2.cpuTime -= info.cpuTime;
-      info2.userTime -= info.userTime;
+      NodeExecutionInfo info2 = threadManager.computeExecutionInfo().subtract(info);
       if (debugEnabled) log.debug("total cpu time used: " + info2.cpuTime + " ms, user time: " + info2.userTime);
     }
   }
@@ -396,13 +392,8 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   @Override
   public void taskEnded(final Task task, final long taskNumber, final NodeExecutionInfo info, final long elapsedTime)
   {
-    boolean error = task.getException() != null;
-    long cpuTime;
-    if(info == null || error)
-      cpuTime = 0L;
-    else
-      cpuTime = info.cpuTime;
-    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime, error);
+    long cpuTime = (info == null) ? 0L : info.cpuTime;
+    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime, task.getException() != null);
     removeFuture(taskNumber);
     TaskExecutionListener[] tmp;
     synchronized(taskExecutionListeners)

@@ -18,7 +18,6 @@
 
 package org.jppf.node;
 
-import java.lang.management.ThreadMXBean;
 import java.util.concurrent.*;
 
 /**
@@ -83,11 +82,4 @@ public interface ThreadManager
    * @return true is cpu time measurement is enabled, false otherwise.
    */
   boolean isCpuTimeEnabled();
-
-  /**
-   * Get the platform MBean used to gather statistics about the JVM threads.
-   * @return a {@link ThreadMXBean} instance.
-   */
-  ThreadMXBean getThreadMXBean();
-
 }

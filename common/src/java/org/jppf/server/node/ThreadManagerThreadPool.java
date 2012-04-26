@@ -89,6 +89,11 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
   @Override
   public void setPoolSize(final int size)
   {
+    if (size <= 0)
+    {
+      log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
+      return;
+    }
     int n = getPoolSize();
     if (n == size) return;
 
