@@ -50,15 +50,15 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
   /**
    * The proportionality factor.
    */
-  private int proportionalityFactor = 2;
+  private int proportionalityFactor = 1;
   /**
    * The initial bundle size to use when the performance cache is empty, to bootstrap the algorithm.
    */
   private int initialSize = 1;
   /**
-   * The initial value of the mean execution time, used to bootstrap the algorithm.
+   * The initial value of the mean execution time, used to bootstrap the algorithm. Expressed in nanoseconds.
    */
-  private double initialMeanTime = 1000d;
+  private double initialMeanTime = 1e9d;
   /**
    * The name of this profile.
    */
@@ -85,7 +85,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000, 1, Integer.MAX_VALUE);
     proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 1, 1, Integer.MAX_VALUE);
     initialSize = props.getInt(prefix + "initialSize", 1, 1, Integer.MAX_VALUE);
-    initialMeanTime = props.getDouble(prefix + "initialMeanTime", 1000d, Double.MIN_VALUE, Double.MAX_VALUE);
+    initialMeanTime = props.getDouble(prefix + "initialMeanTime", 1e9d, Double.MIN_VALUE, Double.MAX_VALUE);
   }
 
   /**
@@ -98,7 +98,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
     performanceCacheSize = config.getInt("performanceCacheSize", 2000);
     proportionalityFactor = config.getInt("proportionalityFactor", 1);
     initialSize = config.getInt("initialSize", 1);
-    initialMeanTime = config.getDouble("initialMeanTime", 1000d, Double.MIN_VALUE, Double.MAX_VALUE);
+    initialMeanTime = config.getDouble("initialMeanTime", 1e9d, Double.MIN_VALUE, Double.MAX_VALUE);
   }
 
   /**
