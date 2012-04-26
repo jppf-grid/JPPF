@@ -233,6 +233,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
    * @see java.util.concurrent.ExecutorService#submit(java.util.concurrent.Callable)
    */
   @Override
+  @SuppressWarnings("unchecked")
   public <T> Future<T> submit(final Callable<T> task)
   {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");

@@ -135,6 +135,7 @@ public class JPPFDriver
    * Initialize and start this driver.
    * @throws Exception if the initialization fails.
    */
+  @SuppressWarnings("unchecked")
   public void run() throws Exception
   {
     jobManager = new JPPFJobManager();

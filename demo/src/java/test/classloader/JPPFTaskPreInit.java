@@ -85,6 +85,7 @@ public class JPPFTaskPreInit extends JPPFTask {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static <V> V safeComputeValue(final ClientDataProvider dataProvider, final Object key, final JPPFCallable<V> callable) {
     if (key == null) return null;
     Object result = dataProvider.computeValue(key, callable);

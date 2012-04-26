@@ -64,9 +64,9 @@ public class Downloader
 
   /**
    * Extract the specified files from the specified archive.
-   * @param sourceUrl - the URL pointing to the archive to download.
-   * @param destPath - the folder in which to extract the files.
-   * @param names - the names of the zip entries to extract.
+   * @param sourceUrl the URL pointing to the archive to download.
+   * @param destPath the folder in which to extract the files.
+   * @param names the names of the zip entries to extract.
    * @throws Exception if any IO error occurs.
    */
   public void extractFiles(final String sourceUrl, final String destPath, final String...names) throws Exception
@@ -94,10 +94,7 @@ public class Downloader
           int oneMB = 1024*1024;
           int n = event.bytesTransferred();
           int p = count % oneMB;
-          if (n + p >= oneMB)
-          {
-            System.out.println(String.valueOf(((n + count) / oneMB)) +" MB downloaded");
-          }
+          if (n + p >= oneMB) System.out.println(String.valueOf(((n + count) / oneMB)) +" MB downloaded");
           count += n;
         }
       };
@@ -105,7 +102,7 @@ public class Downloader
       source.copyTo(dest);
       System.out.println("downloaded to " + dest);
       ZipFile zip = new ZipFile(tmp);
-      FileUtils.mkdirs(dir);
+      if (!dir.mkdirs()) throw new IOException("Could not create the directories for " + dir);
       for (String name: names)
       {
         ZipEntry entry = zip.getEntry("jfreechart-1.0.12/lib/" + name);
@@ -125,8 +122,8 @@ public class Downloader
 
   /**
    * Check that the specified files are present in the specified path.
-   * @param folder - the folder in which to check for the files.
-   * @param names - the names of the files to lookup.
+   * @param folder the folder in which to check for the files.
+   * @param names the names of the files to lookup.
    * @return true if the folder and the files exist.
    */
   public boolean checkFilesPresent(final File folder, final String...names)
