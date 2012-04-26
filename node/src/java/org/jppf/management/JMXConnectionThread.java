@@ -80,7 +80,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
           connectionWrapper.performConnection();
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
           suspend();
-          wakeUp();
+          connectionWrapper.wakeUp();
         }
         catch(Exception ignored)
         {
@@ -110,6 +110,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
     if (debugEnabled) log.debug(connectionWrapper.getId() + " suspending connection attempts");
     setConnecting(false);
     setSuspended(true);
+    wakeUp();
   }
 
   /**

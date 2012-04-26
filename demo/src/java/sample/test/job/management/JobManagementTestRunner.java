@@ -38,42 +38,44 @@ public class JobManagementTestRunner
    * The JPPF client.
    */
   private static JPPFClient client = null;
+  /**
+   * 
+   */
+  private static JMXDriverConnectionWrapper driver = null;
 
   /**
    * Run the first test.
+   * @param jobName name given to the job.
    * @throws Exception if any error occurs.
    */
-  public void runTest1() throws Exception
+  public void runTest1(final String jobName) throws Exception
   {
     TypedProperties props = JPPFConfiguration.getProperties();
     int nbTasks = props.getInt("job.management.nbTasks", 2);
     long duration = props.getLong("job.management.duration", 1000L);
-    String jobId = "test1";
-    JPPFJob job = new JPPFJob();
-    job.setName(jobId);
+    JPPFJob job = new JPPFJob(jobName);
+    job.setName(jobName);
     job.setBlocking(false);
     for (int i=0; i<nbTasks; i++)
     {
-      job.addTask(new LongTask(duration));
+      JPPFTask task = new LongTask(duration);
+      task.setId(jobName + " - task " + i);
+      job.addTask(task);
     }
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
     client.submit(job);
-    JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("localhost", 11198);
-    long start = System.currentTimeMillis();
-    driver.connectAndWait(0L);
-    long elapsed = System.currentTimeMillis() - start;
-    System.out.println("Waited " + elapsed + " ms");
     DriverJobManagementMBean proxy = driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
-    /*
-    driver.connect();
-    while (!driver.isConnected()) Thread.sleep(10);
-    */
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
-    driver.cancelJob(jobId);
-    driver.close();
+    driver.cancelJob(job.getUuid());
     List<JPPFTask> results = collector.waitForResults();
+    for (JPPFTask task: results)
+    {
+      Exception e = task.getException();
+      if (e != null) System.out.println("" + task.getId() + " has an exception: " + ExceptionUtils.getStackTrace(e));
+      else System.out.println("Result for " + task.getId() + ": " + task.getResult());
+    }
     System.out.println("Test ended");
   }
 
@@ -85,9 +87,18 @@ public class JobManagementTestRunner
   {
     try
     {
-      client = new JPPFClient();
+      System.out.println("Initializing client ...");
+      client = new JPPFClient("client");
+      System.out.println("Awaiting server connection ...");
+      while (!client.hasAvailableConnection()) Thread.sleep(100L);
+      System.out.println("Awaiting JMX connection ...");
+      driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+      while (!driver.isConnected()) driver.connectAndWait(100L);
       JobManagementTestRunner runner = new JobManagementTestRunner();
-      runner.runTest1();
+      System.out.println("Running test 1 ...");
+      runner.runTest1("job1");
+      System.out.println("Running test 2 ...");
+      runner.runTest1("job2");
     }
     catch(Exception e)
     {
@@ -95,6 +106,17 @@ public class JobManagementTestRunner
     }
     finally
     {
+      if (driver != null)
+      {
+        try
+        {
+          driver.close();
+        }
+        catch (Exception e)
+        {
+          e.printStackTrace();
+        }
+      }
       if (client != null) client.close();
     }
   }

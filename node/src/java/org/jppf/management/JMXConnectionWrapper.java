@@ -127,6 +127,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void connect()
   {
+    if (isConnected()) return;
     if (local)
     {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
@@ -134,10 +135,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     }
     else
     {
-      connectionThread.set(new JMXConnectionThread(this));
-      Thread t = new Thread(connectionThread.get(), "JMX connection " + getId());
-      t.setDaemon(true);
-      t.start();
+      JMXConnectionThread jct = connectionThread.get();
+      if (jct == null)
+      {
+        jct = new JMXConnectionThread(this);
+        connectionThread.set(jct);
+        Thread t = new Thread(jct, "JMX connection " + getId());
+        t.setDaemon(true);
+        t.start();
+      }
+      else if (!jct.isConnecting()) jct.resume();
     }
   }
 
@@ -305,9 +312,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected void setConnectedStatus(final boolean status)
   {
-    boolean changed = status == connected.get();
     connected.set(status);
-    if (changed) wakeUp();
+    wakeUp();
   }
 
   /**

@@ -105,7 +105,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       ServerJob other = null;
       String jobUuid = bundle.getUuid();
       Map<String, ServerJob> map = jobMap.get(jobUuid);
-      if (map != null) other = map.get(bundle.getUuidPath().toString());
+      if (map != null) other = map.get(bundle.getUuidPath().asString());
       //other = jobMap.get(jobUuid);
       if (other != null)
       {
