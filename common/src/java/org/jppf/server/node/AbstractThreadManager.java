@@ -64,6 +64,7 @@ public abstract class AbstractThreadManager implements ThreadManager
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadMXBean = ManagementFactory.getThreadMXBean();
     cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
+    props.setProperty("cpuTimeSupported", Boolean.toString(cpuTimeEnabled));
     if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
     log.info("Thread CPU time measurement is " + (cpuTimeEnabled ? "" : "not ") + "supported");
   }
@@ -84,7 +85,13 @@ public abstract class AbstractThreadManager implements ThreadManager
    * {@inheritDoc}
    */
   @Override
-  public abstract NodeExecutionInfo computeExecutionInfo();
+  public NodeExecutionInfo computeExecutionInfo()
+  {
+    NodeExecutionInfo info = new NodeExecutionInfo();
+    long[] ids = getThreadIds();
+    for (long id: ids) info.add(computeExecutionInfo(id));
+    return info;
+  }
 
   /**
    * {@inheritDoc}
@@ -92,8 +99,14 @@ public abstract class AbstractThreadManager implements ThreadManager
   @Override
   public NodeExecutionInfo computeExecutionInfo(final long threadID)
   {
-    return (!cpuTimeEnabled) ? null : new NodeExecutionInfo(threadMXBean.getThreadCpuTime(threadID), threadMXBean.getThreadUserTime(threadID));
+    return (!cpuTimeEnabled) ? new NodeExecutionInfo() : new NodeExecutionInfo(threadMXBean.getThreadCpuTime(threadID), threadMXBean.getThreadUserTime(threadID));
   }
+
+  /**
+   * Get the ids of all managed threads. 
+   * @return the ids as an array of long values, may be an empty but never null array.
+   */
+  protected abstract long[] getThreadIds();
 
   /**
    * {@inheritDoc}

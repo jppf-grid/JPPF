@@ -60,7 +60,7 @@ public class NodeExecutionInfo implements Serializable
   /**
    * Add the times of another instance to this one.
    * @param other the other execution info object from which to add the values.
-   * @return this exection info.
+   * @return this execution info.
    */
   public NodeExecutionInfo add(final NodeExecutionInfo other)
   {
@@ -72,7 +72,7 @@ public class NodeExecutionInfo implements Serializable
   /**
    * Subtract the times of another instance from this one.
    * @param other the other execution info object from which to subtract the values.
-   * @return this exection info.
+   * @return this execution info.
    */
   public NodeExecutionInfo subtract(final NodeExecutionInfo other)
   {

@@ -55,7 +55,6 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
   /**
    * Initialized thread manager.
    * @param poolSize the initial size of the thread pool.
-   *
    */
   public ThreadManagerForkJoin(final int poolSize)
   {
@@ -73,20 +72,9 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
    * {@inheritDoc}
    */
   @Override
-  public NodeExecutionInfo computeExecutionInfo()
+  protected long[] getThreadIds()
   {
-    long cpuTime = 0L;
-    long userTime = 0L;
-    long[] ids = threadFactory.getThreadIDs();
-    for (long id: ids)
-    {
-      cpuTime += threadMXBean.getThreadCpuTime(id);
-      userTime += threadMXBean.getThreadUserTime(id);
-    }
-    NodeExecutionInfo info = new NodeExecutionInfo();
-    info.cpuTime = cpuTime;
-    info.userTime = userTime;
-    return info;
+    return threadFactory.getThreadIDs();
   }
 
   /**
@@ -237,9 +225,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
       if(threadIDs != null) {
         long threadID = thread.getId();
         threadIDs.remove(threadID);
-        NodeExecutionInfo info = computeExecutionInfo(threadID);
-        terminatedInfo.cpuTime += info.cpuTime;
-        terminatedInfo.userTime += info.userTime;
+        terminatedInfo.add(computeExecutionInfo(threadID));
       }
       if(exception != null) {
         System.out.printf("Thread [%d:%s] terminated with exception: %s%n", thread.getId(), thread.getName(), exception);
@@ -256,14 +242,12 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     {
       if(threadIDs == null || threadIDs.isEmpty())
         return new long[0];
-      else {
-        long[] ids = new long[threadIDs.size()];
-        int dstIndex = 0;
-        for (Long id : threadIDs) {
-          ids[dstIndex++] = id;
-        }
-        return ids;
+      long[] ids = new long[threadIDs.size()];
+      int dstIndex = 0;
+      for (Long id : threadIDs) {
+        ids[dstIndex++] = id;
       }
+      return ids;
     }
 
     /**

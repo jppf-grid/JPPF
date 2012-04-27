@@ -18,10 +18,8 @@
 
 package org.jppf.server.node;
 
-import java.util.List;
 import java.util.concurrent.*;
 
-import org.jppf.node.NodeExecutionInfo;
 import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 
@@ -65,13 +63,9 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
    * {@inheritDoc}
    */
   @Override
-  public NodeExecutionInfo computeExecutionInfo()
+  protected long[] getThreadIds()
   {
-    if (!cpuTimeEnabled) return null;
-    List<Long> ids = threadFactory.getThreadIDs();
-    NodeExecutionInfo info = new NodeExecutionInfo();
-    for (Long id: ids) info.add(computeExecutionInfo(id));
-    return info;
+    return threadFactory.getThreadIDs();
   }
 
   /**

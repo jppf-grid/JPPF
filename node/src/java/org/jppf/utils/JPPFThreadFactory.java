@@ -124,10 +124,13 @@ public class JPPFThreadFactory implements ThreadFactory
    * Get the ids of the monitored threads.
    * @return a list of long values.
    */
-  public List<Long> getThreadIDs()
+  public synchronized long[] getThreadIDs()
   {
-    if (!monitoringEnabled) return null;
-    return Collections.unmodifiableList(threadIDs);
+    if (!monitoringEnabled || (threadIDs == null) || threadIDs.isEmpty()) return new long[0];
+    long[] ids = new long[threadIDs.size()];
+    int i = 0;
+    for (long id: threadIDs) ids[i++] = id;
+    return ids;
   }
 
   /**
