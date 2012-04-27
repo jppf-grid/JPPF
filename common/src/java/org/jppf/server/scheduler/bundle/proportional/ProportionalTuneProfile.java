@@ -58,7 +58,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
   /**
    * The initial value of the mean execution time, used to bootstrap the algorithm.
    */
-  private double initialMeanTime = 1000d;
+  private double initialMeanTime = 1e9d;
   /**
    * The name of this profile.
    */
