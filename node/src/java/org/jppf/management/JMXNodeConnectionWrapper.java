@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.util.Map;
 
 import org.jppf.classloader.DelegationModel;
+import org.slf4j.*;
 
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
@@ -29,6 +30,15 @@ import org.jppf.classloader.DelegationModel;
  */
 public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JPPFNodeAdminMBean
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JMXNodeConnectionWrapper.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+
   /**
    * Initialize a local connection to the MBean server.
    */
@@ -106,6 +116,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void shutdown() throws Exception
   {
+    if (debugEnabled) log.debug("node " + this + " shutdown requested");
     invoke(JPPFNodeAdminMBean.MBEAN_NAME, "shutdown", (Object[]) null, (String[]) null);
   }
 
@@ -117,6 +128,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void restart() throws Exception
   {
+    if (debugEnabled) log.debug("node " + this + " restart requested");
     invoke(JPPFNodeAdminMBean.MBEAN_NAME, "restart", (Object[]) null, (String[]) null);
   }
 

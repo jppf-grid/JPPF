@@ -26,6 +26,7 @@ import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.logging.jmx.JmxMessageNotifier;
+import org.jppf.management.JMXServer;
 import org.jppf.node.initialization.InitializationHooksHandler;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
@@ -278,16 +279,16 @@ public class NodeRunner
     {
       if (debugEnabled) log.debug("un-setting security");
       PrivilegedAction<Object> pa = new PrivilegedAction<Object>()
-      {
+          {
         @Override
         public Object run()
         {
           System.setSecurityManager(null);
           return null;
         }
-      };
-      AccessController.doPrivileged(pa);
-      securityManagerSet = false;
+          };
+          AccessController.doPrivileged(pa);
+          securityManagerSet = false;
     }
   }
 
@@ -303,15 +304,15 @@ public class NodeRunner
       if (classLoader == null)
       {
         PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>()
-        {
+            {
           @Override
           public JPPFClassLoader run()
           {
             return new JPPFClassLoader(NodeRunner.class.getClassLoader());
           }
-        };
-        classLoader = AccessController.doPrivileged(pa);
-        Thread.currentThread().setContextClassLoader(classLoader);
+            };
+            classLoader = AccessController.doPrivileged(pa);
+            Thread.currentThread().setContextClassLoader(classLoader);
       }
       return classLoader;
     }
@@ -365,9 +366,45 @@ public class NodeRunner
    */
   public static void shutdown(final Node node, final boolean restart)
   {
-    //node.stopNode(true);
-    //executor.submit(restart ? RESTART_TASK : SHUTDOWN_TASK);
-    new ShutdownOrRestart(restart).run();
+    // close the JMX server connection to avoid
+    // request beuing sent azgain by the client.
+    try
+    {
+      final JMXServer jmxServer = node.getJmxServer();
+      if (jmxServer != null)
+      {
+        jmxServer.stop();
+        Runnable r = new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            try
+            {
+              jmxServer.stop();
+            }
+            catch (Exception ignore)
+            {
+            }
+          }
+        };
+        Future<?> f = executor.submit(r);
+        // we don't want to wait forever for the connection to close
+        try
+        {
+          f.get(1000L, TimeUnit.MILLISECONDS);
+        }
+        catch (Exception ignore)
+        {
+        }
+        if (!f.isDone()) f.cancel(true);
+      }
+    }
+    catch (Exception ignore)
+    {
+    }
+    executor.submit(new ShutdownOrRestart(restart));
+    //new ShutdownOrRestart(restart).run();
   }
 
   /**

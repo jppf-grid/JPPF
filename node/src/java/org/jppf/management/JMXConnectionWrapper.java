@@ -243,6 +243,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     }
     catch(IOException e)
     {
+      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
       setConnectedStatus(false);
       try
       {
@@ -253,7 +254,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         if (debugEnabled) log.debug(e2.getMessage(), e2);
       }
       if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
     }
     return result;
   }
@@ -287,6 +287,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       }
       if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
       if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+      throw e;
     }
     return result;
   }

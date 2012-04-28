@@ -76,7 +76,9 @@ public class RestartNodeAction extends AbstractTopologyAction
         {
           try
           {
-            ((JMXNodeConnectionWrapper) data.getJmxWrapper()).restart();
+            JMXNodeConnectionWrapper node = (JMXNodeConnectionWrapper) data.getJmxWrapper();
+            if (debugEnabled) log.debug("requesting restart of node " + node);
+            node.restart();
           }
           catch(Exception e)
           {

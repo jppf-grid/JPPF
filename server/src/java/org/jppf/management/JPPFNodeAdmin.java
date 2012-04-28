@@ -97,6 +97,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public void updateThreadPoolSize(final Integer size) throws Exception
   {
+    if (debugEnabled) log.debug("node request to change thread pool size to " + size);
     node.getExecutionManager().setThreadPoolSize(size);
     nodeState.setThreadPoolSize(size);
   }
@@ -126,6 +127,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public void restart() throws Exception
   {
+    if (debugEnabled) log.debug("node restart requested");
     node.shutdown(true);
   }
 
@@ -137,6 +139,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public void shutdown() throws Exception
   {
+    if (debugEnabled) log.debug("node shutdown requested");
     node.shutdown(false);
   }
 
@@ -148,6 +151,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public void resetTaskCounter() throws Exception
   {
+    if (debugEnabled) log.debug("node task counter reset requested");
     setTaskCounter(0);
   }
 
@@ -160,6 +164,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public synchronized void setTaskCounter(final Integer n) throws Exception
   {
+    if (debugEnabled) log.debug("node taks counter reset to " + n + " requested");
     node.setTaskCount(n);
     nodeState.setNbTasksExecuted(n);
   }
@@ -173,6 +178,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public void updateThreadsPriority(final Integer newPriority) throws Exception
   {
+    if (debugEnabled) log.debug("node threads priority reset to " + newPriority + " requested");
     node.getExecutionManager().updateThreadsPriority(newPriority);
     nodeState.setThreadPriority(newPriority);
   }
@@ -180,7 +186,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * Update the configuration properties of the node.
    * @param config the set of properties to update.
-   * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
    * @throws Exception if any error occurs.
    * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
    */
@@ -188,6 +194,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception
   {
     if (config == null) return;
+    if (debugEnabled) log.debug("node request to change configuration");
     JPPFConfiguration.getProperties().putAll(config);
     if (reconnect) triggerReconnect();
   }
