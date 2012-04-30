@@ -103,7 +103,7 @@ public abstract class AbstractThreadManager implements ThreadManager
   }
 
   /**
-   * Get the ids of all managed threads. 
+   * Get the ids of all managed threads.
    * @return the ids as an array of long values, may be an empty but never null array.
    */
   protected abstract long[] getThreadIds();

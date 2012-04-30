@@ -58,6 +58,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
    * @return the name as a string.
    */
   String getName();
+
   /**
    * Determines if this connection is over SSL.
    * @return <code>true</code> if this is an SSL connection, <code>false</code> otherwise.

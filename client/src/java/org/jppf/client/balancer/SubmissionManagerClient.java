@@ -361,6 +361,15 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   /**
+   * Cancels job by jobUUID
+   * @param jobId id of job to cancel.
+   */
+  public void cancelJob(final String jobId)
+  {
+    queue.cancelJob(jobId);
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

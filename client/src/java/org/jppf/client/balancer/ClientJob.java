@@ -30,6 +30,7 @@ import org.jppf.server.protocol.JPPFTask;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * @author Martin JANDA
@@ -93,9 +94,24 @@ public class ClientJob
    */
   private final List<ClientTaskBundle> bundleList = new ArrayList<ClientTaskBundle>();
   /**
+   * List of all futures in this job.
+   */
+  private final List<Future> futureList = new ArrayList<Future>();
+  /**
+   * List of all runnables called on job completion.
+   */
+  private final List<Runnable> onDoneList = new ArrayList<Runnable>();
+  /**
    * The status of this submission.
    */
   private SubmissionStatus submissionStatus;
+
+  protected static final int NEW = 0;
+  protected static final int EXECUTING = 1;
+  protected static final int DONE = 2;
+  protected static final int CANCELLED = 3;
+
+  private volatile int status = NEW;
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
@@ -371,7 +387,7 @@ public class ClientJob
    */
   public void jobCancelled()
   {
-
+    cancel();
   }
 
   /**
@@ -379,7 +395,7 @@ public class ClientJob
    */
   public void jobExpired()
   {
-    fireTaskCompleted();
+//    fireTaskCompleted();
     jobCancelled();
   }
 
@@ -473,19 +489,23 @@ public class ClientJob
 
   /**
    * Called to notify that the execution of a task has completed.
-   * @param bundle the completed task.
+   * @param bundle    the completed task.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
   {
+    System.out.println("taskCompleted: " + bundle + "\t - " + exception);
     bundleList.remove(bundle);
     if (bundleList.isEmpty())
     {
+      System.out.println("Tasks: " + this.tasks.size());
       getJob().fireJobEvent(JobEvent.Type.JOB_END);
-      if(exception == null)
-        setSubmissionStatus(SubmissionStatus.COMPLETE);
-      else
+      if (exception != null)
+//        setSubmissionStatus(SubmissionStatus.COMPLETE);
+//      else
+      {
         setSubmissionStatus(SubmissionStatus.FAILED);
+      }
     }
   }
 
@@ -494,11 +514,13 @@ public class ClientJob
    * @param bundle  the dispatched job.
    * @param channel the node to which the job is dispatched.
    */
-  public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel)
+  public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel, final Future<?> future)
   {
     bundleList.add(bundle);
-    if (bundleList.size() == 1)
+    futureList.add(future);
+    if (status == NEW)
     {
+      status = EXECUTING;
       setSubmissionStatus(SubmissionStatus.EXECUTING);
       getJob().fireJobEvent(JobEvent.Type.JOB_START);
     }
@@ -524,5 +546,80 @@ public class ClientJob
     {
       ((SubmissionStatusHandler) getJob().getResultListener()).setStatus(this.submissionStatus);
     }
+  }
+
+  /**
+   * Cancels this job.
+   * @return whether cancellation was successful.
+   */
+  public boolean cancel()
+  {
+    if (status > EXECUTING) return false;
+    status = CANCELLED;
+    try
+    {
+      for (Future future : futureList)
+      {
+        try
+        {
+          future.cancel(false);
+        }
+        catch (Exception e)
+        {
+          e.printStackTrace();
+        }
+      }
+    }
+    finally
+    {
+      done();
+    }
+    return true;
+  }
+
+  /**
+   * @return <code>true</code> when job is cancelled or finished normally.
+   */
+  public boolean isDone()
+  {
+    return status >= EXECUTING;
+  }
+
+  /**
+   * @return <code>true</code> when job was cancelled.
+   */
+  public boolean isCancelled()
+  {
+    return status >= CANCELLED;
+  }
+
+  /**
+   * Called when task was cancelled or finished.
+   */
+  protected void done()
+  {
+    for (Runnable runnable : onDoneList)
+    {
+      runnable.run();
+    }
+    fireTaskCompleted();
+  }
+
+  /**
+   * Registers instance to be called on job finish.
+   * @param runnable {@link Runnable} to be called on job finish.
+   */
+  public void addOnDone(final Runnable runnable)
+  {
+    onDoneList.add(runnable);
+  }
+
+  /**
+   * Deregisters instance to be called on job finish.
+   * @param runnable {@link Runnable} to be called on job finish.
+   */
+  public void removeOnDone(final Runnable runnable)
+  {
+    onDoneList.remove(runnable);
   }
 }

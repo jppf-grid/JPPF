@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -226,7 +227,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       synchronized (idleChannels)
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
-
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
         ChannelWrapper<?> channel = null;
         ClientJob selectedBundle = null;
@@ -310,9 +310,9 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         setBundler(new FixedSizeBundler(profile));
       }
       ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
-      bundleWrapper.jobDispatched(channel);
-      channel.submit(bundleWrapper);
-      channel.setBundle(bundleWrapper);
+//      bundleWrapper.jobDispatched(channel);
+      Future<?> future = channel.submit(bundleWrapper);
+      selectedBundle.jobDispatched(bundleWrapper, channel, future);
       jobManager.jobDispatched(bundleWrapper, channel);
     }
   }
@@ -328,7 +328,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
     List<ChannelWrapper<?>> acceptableChannels = new ArrayList<ChannelWrapper<?>>(idleChannelsSize);
-
     Iterator<ChannelWrapper<?>> iterator = idleChannels.iterator();
     while (iterator.hasNext())
     {

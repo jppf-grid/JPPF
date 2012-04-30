@@ -74,7 +74,7 @@ public class JobResults implements Serializable
    */
   public synchronized void putResults(final List<JPPFTask> tasks)
   {
-    for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+    for (JPPFTask task : tasks) resultMap.put(task.getPosition(), task);
   }
 
   /**

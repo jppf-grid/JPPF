@@ -19,13 +19,13 @@
 package org.jppf.client.balancer;
 
 import org.jppf.JPPFException;
-import org.jppf.client.AbstractGenericClient;
-import org.jppf.client.AbstractJPPFClientConnection;
-import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
+import org.jppf.client.balancer.utils.JPPFFuture;
+import org.jppf.client.balancer.utils.JPPFFutureTask;
 import org.jppf.client.event.ClientConnectionStatusHandler;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.protocol.JPPFTask;
@@ -36,8 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.NotSerializableException;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Context associated with a remote channel serving state and tasks submission.
@@ -160,16 +159,52 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * {@inheritDoc}
    */
   @Override
-  public void submit(final ClientTaskBundle bundle)
+  public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    executor.execute(new RemoteRunnable(getBundler(), bundle, channel));
+    JPPFFutureTask<?> task = new JPPFFutureTask(new RemoteRunnable(getBundler(), bundle, channel), null)
+    {
+      @Override
+      public boolean cancel(final boolean mayInterruptIfRunning)
+      {
+        System.out.println("Cancel");
+        if (super.cancel(false))
+        {
+          try
+          {
+            ChannelWrapperRemote.this.cancel(bundle.getJob().getUuid());
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+          return true;
+        }
+        return false;
+      }
+    };
+    executor.execute(task);
+    return task;
+  }
+
+  protected void cancel(final String jobId) throws Exception
+  {
+    if (channel instanceof JPPFClientConnectionImpl)
+    {
+      JPPFClientConnectionImpl cnn = (JPPFClientConnectionImpl) channel;
+      JMXDriverConnectionWrapper jmxConnection = cnn.getJmxConnection();
+      if (jmxConnection.isConnected())
+      {
+        jmxConnection.cancelJob(jobId);
+      }
+    }
   }
 
   /**
    * Called when reconnection of this channel is required.
    */
-  public void reconnect() {
+  public void reconnect()
+  {
     setStatus(JPPFClientConnectionStatus.DISCONNECTED);
     try
     {
@@ -194,7 +229,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   /**
    *
    */
-  private final class RemoteRunnable implements Runnable
+  private class RemoteRunnable implements Runnable
   {
     /**
      * The connection to the driver to use.
@@ -239,7 +274,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         registeredClassLoader = client.registerClassLoader(classLoader, newJob.getUuid());
         while (!completed)
         {
-          JPPFTaskBundle bundle = createBundle(client, newJob);
+          JPPFTaskBundle bundle = createBundle(newJob);
           bundle.setRequestUuid(registeredClassLoader.getUuid());
           connection.sendTasks(classLoader, bundle, newJob);
           while (count < tasks.size())
@@ -266,7 +301,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(t);
 
-        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) {
+        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException))
+        {
           return;
         }
 
@@ -289,8 +325,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      */
     private JPPFJob createNewJob(final JPPFJob job, final List<JPPFTask> tasks) throws Exception
     {
-      JPPFJob newJob = new JPPFJob();
-//      JPPFJob newJob = new JPPFJob(job.getUuid());
+//      JPPFJob newJob = new JPPFJob();
+      JPPFJob newJob = new JPPFJob(job.getUuid());
       newJob.setDataProvider(job.getDataProvider());
       newJob.setSLA(job.getSLA());
       newJob.setMetadata(job.getMetadata());
@@ -309,11 +345,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
     /**
      * Create a task bundle for the specified job.
-     * @param client necessary for registering class loader.
-     * @param job    the job to use as a base.
+     * @param job the job to use as a base.
      * @return a JPPFTaskBundle instance.
      */
-    private JPPFTaskBundle createBundle(final AbstractGenericClient client, final JPPFJob job)
+    private JPPFTaskBundle createBundle(final JPPFJob job)
     {
       String requestUuid = job.getUuid();
       JPPFTaskBundle bundle = new JPPFTaskBundle();

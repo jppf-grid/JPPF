@@ -104,7 +104,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   public void addBundle(final ClientJob bundleWrapper)
   {
     JobSLA sla = bundleWrapper.getSLA();
-    String jobUuid = bundleWrapper.getUuid();
+    final String jobUuid = bundleWrapper.getUuid();
     if (sla.isBroadcastJob() && (bundleWrapper.getBroadcastUUID() == null))
     {
       if (debugEnabled)
@@ -127,8 +127,25 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       }
       else
       {
+        bundleWrapper.addOnDone(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            lock.lock();
+            try
+            {
+              jobMap.remove(jobUuid);
+            }
+            finally
+            {
+              lock.unlock();
+            }
+          }
+        });
         bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
         bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
+        bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
         putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
         putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
         boolean requeued = bundleWrapper.isRequeued(); // Boolean.TRUE.equals(bundle.removeParameter(BundleParameter.JOB_REQUEUE));
@@ -236,7 +253,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
 //    ClientTaskBundle resultJob = (ClientTaskBundle) result.getJob();
 //    statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
-    result.setOnRequeue(new Runnable() {
+    result.setOnRequeue(new Runnable()
+    {
       @Override
       public void run()
       {
@@ -296,7 +314,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundleWrapper.getName());
       removeFromListMap(new JPPFPriority(bundleWrapper.getSLA().getPriority()), bundleWrapper, priorityMap);
-      return jobMap.remove(bundleWrapper.getUuid());
+//      jobMap.remove(bundleWrapper.getUuid());
+      return null;
     }
     finally
     {
@@ -326,12 +345,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       bundleWrapper.setPending(true);
       String jobId = bundleWrapper.getName();
-      String uuid = bundleWrapper.getUuid();
+      final String uuid = bundleWrapper.getUuid();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
       try
       {
         long dt = bundleWrapper.getJobReceivedTime();
         jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper, jobManager), dt);
+        bundleWrapper.addOnDone(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            jobScheduleHandler.cancelAction(uuid);
+          }
+        });
       }
       catch (ParseException e)
       {
@@ -357,12 +384,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     if (schedule != null)
     {
       String jobId = bundleWrapper.getName();
-      String uuid = bundleWrapper.getUuid();
+      final String uuid = bundleWrapper.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
       long dt = bundleWrapper.getJobReceivedTime();
       try
       {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
+        bundleWrapper.addOnDone(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            jobExpirationHandler.cancelAction(uuid);
+          }
+        });
       }
       catch (ParseException e)
       {
@@ -462,6 +497,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         putInListMap(new JPPFPriority(newPriority), job, priorityMap);
         jobManager.jobUpdated(job);
       }
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  public void cancelJob(final String jobId)
+  {
+    lock.lock();
+    try
+    {
+      ClientJob job = jobMap.get(jobId);
+      if (job != null) job.cancel();
     }
     finally
     {

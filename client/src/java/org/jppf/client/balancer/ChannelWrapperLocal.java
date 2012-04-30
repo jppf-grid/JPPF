@@ -20,6 +20,8 @@ package org.jppf.client.balancer;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.balancer.utils.JPPFFuture;
+import org.jppf.client.balancer.utils.JPPFFutureTask;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.management.*;
@@ -33,8 +35,7 @@ import org.jppf.utils.JPPFConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Context associated with a local channel serving state and tasks submission.
@@ -174,10 +175,39 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * {@inheritDoc}
    */
   @Override
-  public void submit(final ClientTaskBundle bundle)
+  public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    executor.execute(new LocalRunnable(bundle));
+    JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(bundle), null);
+    task.addListener(new JPPFFuture.Listener()
+    {
+      @Override
+      public void onDone(final JPPFFuture<?> future)
+      {
+        if (future.isCancelled())
+        {
+          try
+          {
+            ChannelWrapperLocal.this.cancel(bundle.getUuid());
+          }
+          catch (Exception e)
+          {
+            e.printStackTrace();
+          }
+        }
+      }
+    });
+    executor.execute(task);
+    return task;
+  }
+
+  /**
+   * @param jobId
+   * @throws Exception
+   */
+  protected void cancel(final String jobId) throws Exception
+  {
+    executionManager.cancelAllTasks(true, false);
   }
 
   @Override

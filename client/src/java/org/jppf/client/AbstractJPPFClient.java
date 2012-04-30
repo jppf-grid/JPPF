@@ -96,7 +96,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Get count of all client connections handled by this JPPFClient.
    * @return count of <code>JPPFClientConnection</code> instances.
    */
-  protected int getAllConnectionsCount() {
+  protected int getAllConnectionsCount()
+  {
     synchronized (pools)
     {
       return allConnections.size();
@@ -113,7 +114,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     synchronized (pools)
     {
       names = new LinkedList<String>();
-      for (JPPFClientConnection c: allConnections) names.add(c.getName());
+      for (JPPFClientConnection c : allConnections) names.add(c.getName());
     }
     return names;
   }
@@ -127,7 +128,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   {
     synchronized (pools)
     {
-      for (JPPFClientConnection c: allConnections)
+      for (JPPFClientConnection c : allConnections)
       {
         if (c.getName().equals(name)) return c;
       }
@@ -181,14 +182,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
           {
             JPPFClientConnection c = pool.nextClient();
             if (c == null) break;
-            switch(c.getStatus())
+            switch (c.getStatus())
             {
               case ACTIVE:
                 connection = c;
                 break;
               case FAILED:
                 pool.remove(c);
-                if(pool.isEmpty()) poolIterator.remove();
+                if (pool.isEmpty()) poolIterator.remove();
                 break;
               default:
                 if (anyState) connection = c;
@@ -248,13 +249,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Add a new connection to the set of connections handled by this client.
    * @param connection the connection to add.
    */
-  protected void addClientConnection(final JPPFClientConnection connection) {
-    if(connection == null) throw new IllegalArgumentException("connection is null");
+  protected void addClientConnection(final JPPFClientConnection connection)
+  {
+    if (connection == null) throw new IllegalArgumentException("connection is null");
 
     connection.addClientConnectionStatusListener(this);
     connection.setStatus(JPPFClientConnectionStatus.NEW);
     int priority = connection.getPriority();
-    synchronized(pools)
+    synchronized (pools)
     {
       ClientPool pool = pools.get(priority);
       if (pool == null)
@@ -271,12 +273,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Remove a connection from the set of connections handled by this client.
    * @param connection the connection to remove.
    */
-  protected void removeClientConnection(final JPPFClientConnection connection) {
-    if(connection == null) throw new IllegalArgumentException("connection is null");
+  protected void removeClientConnection(final JPPFClientConnection connection)
+  {
+    if (connection == null) throw new IllegalArgumentException("connection is null");
 
     connection.removeClientConnectionStatusListener(this);
     int priority = connection.getPriority();
-    synchronized (pools) {
+    synchronized (pools)
+    {
       ClientPool pool = pools.get(priority);
       boolean emptyPools = false;
       if (pool != null)
@@ -300,13 +304,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public void close()
   {
     List<JPPFClientConnection> list = getAllConnections();
-    for (JPPFClientConnection c: list)
+    for (JPPFClientConnection c : list)
     {
       try
       {
         c.close();
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         log.error(e.getMessage(), e);
       }
@@ -319,7 +323,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public void addClientListener(final ClientListener listener)
   {
-    synchronized(listeners)
+    synchronized (listeners)
     {
       listeners.add(listener);
     }
@@ -331,7 +335,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public void removeClientListener(final ClientListener listener)
   {
-    synchronized(listeners)
+    synchronized (listeners)
     {
       listeners.remove(listener);
     }
@@ -344,8 +348,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   protected void fireConnectionFailed(final JPPFClientConnection c)
   {
     ClientEvent event = new ClientEvent(c);
-    synchronized (listeners) {
-      for (ClientListener listener : listeners) {
+    synchronized (listeners)
+    {
+      for (ClientListener listener : listeners)
+      {
         listener.connectionFailed(event);
       }
     }
@@ -358,9 +364,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   protected void fireNewConnection(final JPPFClientConnection c)
   {
     ClientEvent event = new ClientEvent(c);
-    synchronized(listeners)
+    synchronized (listeners)
     {
-      for (ClientListener listener: listeners)
+      for (ClientListener listener : listeners)
       {
         listener.newConnection(event);
       }
@@ -405,8 +411,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     @Override
     public int compare(final Integer o1, final Integer o2)
     {
-      if(o1 < o2) return 1;
-      if(o1 > o2) return -1;
+      if (o1 < o2) return 1;
+      if (o1 > o2) return -1;
       return 0;
     }
   }

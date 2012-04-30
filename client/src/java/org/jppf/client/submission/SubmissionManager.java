@@ -69,6 +69,7 @@ public interface SubmissionManager extends Runnable
    * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
    */
   void setLocalExecutionEnabled(final boolean localExecutionEnabled);
+
   /**
    * Get the list of available connections.
    * @return a vector of connections instances.

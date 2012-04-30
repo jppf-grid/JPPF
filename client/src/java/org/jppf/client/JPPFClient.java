@@ -64,10 +64,10 @@ public class JPPFClient extends AbstractGenericClient
    * Initialize this client with an automatically generated application UUID.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final ClientListener...listeners)
+  public JPPFClient(final ClientListener... listeners)
   {
     this();
-    for (ClientListener listener: listeners) addClientListener(listener);
+    for (ClientListener listener : listeners) addClientListener(listener);
   }
 
   /**
@@ -84,10 +84,10 @@ public class JPPFClient extends AbstractGenericClient
    * @param uuid the unique identifier for this local client.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final String uuid, final ClientListener...listeners)
+  public JPPFClient(final String uuid, final ClientListener... listeners)
   {
     this(uuid);
-    for (ClientListener listener: listeners) addClientListener(listener);
+    for (ClientListener listener : listeners) addClientListener(listener);
   }
 
   /**
@@ -172,7 +172,7 @@ public class JPPFClient extends AbstractGenericClient
   @Override
   protected void initPools()
   {
-    if(config != null && config.getBoolean("experimental.balancer", false))
+    if (config != null && config.getBoolean("experimental.balancer", false))
     {
       try
       {
@@ -202,8 +202,9 @@ public class JPPFClient extends AbstractGenericClient
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
     super.statusChanged(event);
-    if (submissionManager instanceof ThreadSynchronization) {
-      ((ThreadSynchronization)submissionManager).wakeUp();
+    if (submissionManager instanceof ThreadSynchronization)
+    {
+      ((ThreadSynchronization) submissionManager).wakeUp();
     }
   }
 

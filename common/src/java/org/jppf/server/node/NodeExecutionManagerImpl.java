@@ -156,7 +156,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     return result;
   }
 
-
   /**
    * Execute the specified tasks of the specified tasks bundle.
    * @param bundle the bundle to which the tasks are associated.

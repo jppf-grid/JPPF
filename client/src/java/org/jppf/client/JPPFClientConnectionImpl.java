@@ -58,7 +58,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    */
   private JMXDriverConnectionWrapper jmxConnection = null;
   /**
-   * 
+   *
    */
   private int jmxPort = -1;
   /**
@@ -112,12 +112,12 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       });
       connect();
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       log.error(e.getMessage(), e);
       setStatus(FAILED);
     }
-    catch(JPPFError e)
+    catch (JPPFError e)
     {
       setStatus(FAILED);
       throw e;
@@ -195,7 +195,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
         if (delegate != null) delegate.close();
         if (jmxConnection != null) jmxConnection.close();
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
         else log.error('[' + name + "] "+ e.getMessage());
@@ -217,7 +217,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
 
   /**
    * Get the lock used to synchronize request submissions performed by multiple threads.
-   * @return  a <code>ReentrantLock</code> instance.
+   * @return a <code>ReentrantLock</code> instance.
    */
   public ReentrantLock getLock()
   {

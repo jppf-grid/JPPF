@@ -19,6 +19,7 @@
 package org.jppf.client.balancer;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.balancer.utils.JPPFFuture;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
@@ -33,10 +34,6 @@ import org.jppf.server.scheduler.bundle.NodeAwareness;
  */
 public abstract class ChannelWrapper<T>
 {
-  /**
-   * The task bundle to send or receive.
-   */
-  private ClientTaskBundle bundle = null;
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -79,24 +76,6 @@ public abstract class ChannelWrapper<T>
    * @param listener the listener to remove from the list.
    */
   public abstract void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener);
-
-  /**
-   * Get the task bundle to send or receive.
-   * @return a <code>ClientJob</code> instance.
-   */
-  public ClientTaskBundle getBundle()
-  {
-    return bundle;
-  }
-
-  /**
-   * Set the task bundle to send or receive.
-   * @param bundle a {@link ClientJob} instance.
-   */
-  public void setBundle(final ClientTaskBundle bundle)
-  {
-    this.bundle = bundle;
-  }
 
   /**
    * Get the bundler used to schedule tasks for the corresponding node.
@@ -179,5 +158,5 @@ public abstract class ChannelWrapper<T>
    * Submit bundle for execution on corresponding node.
    * @param bundle a {@link ClientTaskBundle} instance.
    */
-  public abstract void submit(final ClientTaskBundle bundle);
+  public abstract JPPFFuture<?> submit(final ClientTaskBundle bundle);
 }

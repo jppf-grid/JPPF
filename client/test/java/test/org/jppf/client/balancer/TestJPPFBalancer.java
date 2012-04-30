@@ -27,6 +27,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.TypedProperties;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -86,7 +87,13 @@ public class TestJPPFBalancer
         @Override
         public synchronized void resultsReceived(final TaskResultEvent event) {
           System.out.println("resultsReceived: " + event.getTaskList().size());
-          if(event.getThrowable() != null) event.getThrowable().printStackTrace(System.out);
+          if(event.getThrowable() != null)
+            event.getThrowable().printStackTrace(System.out);
+          else {
+            for (JPPFTask task : event.getTaskList()) {
+              System.out.println("Ex: " + task.getException() + "\t result: " + task.getResult());
+            }
+          }
           super.resultsReceived(event);
         }
       };
@@ -126,19 +133,21 @@ public class TestJPPFBalancer
    */
   private static void configure()
   {
+    String poolSize = "1";
+
     TypedProperties properties = JPPFConfiguration.getProperties();
     properties.setProperty("experimental.balancer", "true");
     properties.setProperty("jppf.load.balancing.algorithm", "manual");
     properties.setProperty("jppf.load.balancing.strategy", "manual");
-    properties.setProperty("strategy.manual.size", "4");
+    properties.setProperty("strategy.manual.size", "1");
     properties.setProperty("jppf.local.execution.enabled", "true");
     properties.setProperty("driver1.jppf.server.host", "localhost");
-    properties.setProperty("driver1.jppf.pool.size", "5");
+    properties.setProperty("driver1.jppf.pool.size", poolSize);
     properties.setProperty("driver1.class.server.port", "11111");
     properties.setProperty("driver1.app.server.port", "11112");
     properties.setProperty("driver1.priority" , "10");
     properties.setProperty("driver2.jppf.server.host", "hs2.crcdata.cz");
-    properties.setProperty("driver2.jppf.pool.size", "5");
+    properties.setProperty("driver2.jppf.pool.size", poolSize);
     properties.setProperty("driver2.priority" , "10");
     properties.setProperty("driver2.app.server.port", "11112");
     properties.setProperty("driver2.class.server.port", "11111");
@@ -152,7 +161,7 @@ public class TestJPPFBalancer
     properties.setProperty("jppf.drivers", "driver1 driver2");
 //    }
 
-    properties.setProperty("jppf.pool.size", "2");
+    properties.setProperty("jppf.pool.size", poolSize);
   }
 
   /**
@@ -190,15 +199,19 @@ public class TestJPPFBalancer
     public void run()
     {
       System.out.printf("Test task: '%s'%n", text);
-      if(exception) throw new NullPointerException("Task exception: " + text);
-//      try
-//      {
-//        Thread.sleep(2000L);
-//      }
-//      catch (InterruptedException e)
-//      {
-//        e.printStackTrace();
-//      }
+      if(exception)
+      {
+        throw new NullPointerException("Task exception: " + text);
+      }
+      try
+      {
+        Thread.sleep(20000L);
+      }
+      catch (InterruptedException e)
+      {
+        System.out.println("Interrupted: " + new Date());
+        e.printStackTrace(System.out);
+      }
     }
 
     @Override

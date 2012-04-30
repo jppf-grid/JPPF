@@ -43,7 +43,8 @@ class ClientPool
    * Initialize this pool with the specified priority.
    * @param priority the priority assigned to the connections n the pool.
    */
-  public ClientPool(final int priority) {
+  public ClientPool(final int priority)
+  {
     this.priority = priority;
   }
 
@@ -62,7 +63,8 @@ class ClientPool
    * Determine whether this pool is empty.
    * @return <code>true</code> if this pool is empty, <code>false</code> otherwise.
    */
-  public boolean isEmpty() {
+  public boolean isEmpty()
+  {
     return clientList.isEmpty();
   }
 
@@ -80,7 +82,8 @@ class ClientPool
    * @param client the connection too add.
    * @return true if the underlying list of connections changed as a result of calling this method.
    */
-  public boolean add(final JPPFClientConnection client) {
+  public boolean add(final JPPFClientConnection client)
+  {
     return clientList.add(client);
   }
 
@@ -89,12 +92,17 @@ class ClientPool
    * @param client the connection too remove.
    * @return true if the underlying list of connections changed as a result of calling this method.
    */
-  public boolean remove(final JPPFClientConnection client) {
-    if(clientList.remove(client)) {
-      if(lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
+  public boolean remove(final JPPFClientConnection client)
+  {
+    if (clientList.remove(client))
+    {
+      if (lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
       return true;
-    } else
+    }
+    else
+    {
       return false;
+    }
   }
 
   /**

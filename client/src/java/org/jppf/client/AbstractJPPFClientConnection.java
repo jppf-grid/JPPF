@@ -106,7 +106,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
       String s = InetAddress.getByName(host).getCanonicalHostName();
       displayName = name + '[' + s + ':' + port + ']';
     }
-    catch(UnknownHostException e)
+    catch (UnknownHostException e)
     {
       displayName = name;
     }
@@ -172,7 +172,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized(listeners)
+    synchronized (listeners)
     {
       listeners.add(listener);
     }
@@ -186,7 +186,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized(listeners)
+    synchronized (listeners)
     {
       listeners.remove(listener);
     }
@@ -200,11 +200,11 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     ClientConnectionStatusListener[] array = null;
-    synchronized(listeners)
+    synchronized (listeners)
     {
       array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
-    for (ClientConnectionStatusListener listener: array) listener.statusChanged(event);
+    for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
   }
 
   /**

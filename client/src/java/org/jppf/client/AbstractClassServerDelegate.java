@@ -156,9 +156,9 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected void handshake() throws Exception
   {
-    if  (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
+    if (debugEnabled) log.debug('[' + getName() + "] : sending channel identifier");
     socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
-    if  (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
+    if (debugEnabled) log.debug('[' + getName() + "] : sending initial resource");
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
     resource.addUuid(clientUuid);
@@ -167,6 +167,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     // read the server response
     readResource();
     handshakeDone = true;
-    if  (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
+    if (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
   }
 }

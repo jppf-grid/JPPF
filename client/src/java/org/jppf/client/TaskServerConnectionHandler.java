@@ -77,25 +77,25 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     {
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
-      String msg = "[client: "+name+"] Attempting connection to the JPPF task server at " + host + ':' + port;
+      String msg = "[client: " + name + "] Attempting connection to the JPPF task server at " + host + ':' + port;
       System.out.println(msg);
       if (debugEnabled) log.debug(msg);
       socketInitializer.initializeSocket(socketClient);
       if (!socketInitializer.isSuccessful())
       {
-        throw new JPPFException('[' +name+"] Could not reconnect to the JPPF task server");
+        throw new JPPFException('[' + name + "] Could not reconnect to the JPPF task server");
       }
       if (owner.isSSL()) createSSLConnection();
       if (debugEnabled) log.debug("sending JPPF identifier");
       socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
       // TODO do something with the information sent by the driver in the bundle 
       JPPFTaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
-      msg = "[client: "+name+"] Reconnected to the JPPF task server";
+      msg = "[client: " + name + "] Reconnected to the JPPF task server";
       System.out.println(msg);
       if (debugEnabled) log.debug(msg);
       setStatus(ACTIVE);
     }
-    catch(Exception e)
+    catch (Exception e)
     {
       setStatus(FAILED);
       throw e;
@@ -127,9 +127,9 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
       if (socketInitializer != null) socketInitializer.close();
       if (socketClient != null) socketClient.close();
     }
-    catch(Exception e)
+    catch (Exception e)
     {
-      log.error('[' + name + "] "+ e.getMessage(), e);
+      log.error('[' + name + "] " + e.getMessage(), e);
     }
   }
 }

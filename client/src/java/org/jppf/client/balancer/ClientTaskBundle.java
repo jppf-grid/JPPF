@@ -78,6 +78,8 @@ public class ClientTaskBundle extends JPPFTaskBundle
 
     this.job = job;
     this.tasks = new ArrayList<JPPFTask>(tasks);
+
+    setTaskCount(this.tasks.size());
   }
 
   /**
@@ -282,20 +284,11 @@ public class ClientTaskBundle extends JPPFTaskBundle
   }
 
   /**
-   * Called when all or part of a job is dispatched to a node.
-   * @param channel the node to which the job is dispatched.
-   */
-  public void jobDispatched(final ChannelWrapper<?> channel)
-  {
-    job.jobDispatched(this, channel);
-  }
-
-  /**
    * Called when this task bundle should be resubmitted
    */
   public void resubmit()
   {
-    if(onRequeue != null) onRequeue.run();
+    if (onRequeue != null) onRequeue.run();
   }
 
   /**

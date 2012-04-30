@@ -136,7 +136,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized(listeners)
+    synchronized (listeners)
     {
       listeners.add(listener);
     }
@@ -150,7 +150,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized(listeners)
+    synchronized (listeners)
     {
       listeners.remove(listener);
     }
@@ -170,11 +170,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     ClientConnectionStatusListener[] array;
-    synchronized(listeners)
+    synchronized (listeners)
     {
       array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
-    for (ClientConnectionStatusListener listener: array) listener.statusChanged(event);
+    for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
   }
 
   /**
@@ -187,7 +187,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   {
     // If the socket has been idle too long, recycle the connection.
     if ((maxSocketIdleMillis > 10000L)
-        && (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
+            && (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
     {
       close();
       init();
