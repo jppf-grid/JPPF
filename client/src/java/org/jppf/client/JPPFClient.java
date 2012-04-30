@@ -17,17 +17,22 @@
  */
 package org.jppf.client;
 
-import java.util.List;
-
 import org.jppf.client.balancer.SubmissionManagerClient;
-import org.jppf.client.event.*;
+import org.jppf.client.event.ClientConnectionStatusEvent;
+import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.client.submission.SubmissionManagerImpl;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -215,5 +220,38 @@ public class JPPFClient extends AbstractGenericClient
   protected SubmissionManager getSubmissionManager()
   {
     return submissionManager;
+  }
+
+  /**
+   * Cancel the job with the specified id.
+   * @param jobUUID the id of the job to cancel.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   */
+  public boolean cancelJob(final String jobUUID) throws Exception
+  {
+    if (jobUUID == null || jobUUID.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
+
+    if (submissionManager instanceof SubmissionManagerClient)
+    {
+      ((SubmissionManagerClient) submissionManager).cancelJob(jobUUID);
+    }
+    else
+    {
+      for (JPPFClientConnection connection : getAllConnections())
+      {
+        if (connection instanceof JPPFClientConnectionImpl)
+        {
+          JPPFClientConnectionImpl cnn = (JPPFClientConnectionImpl) connection;
+          JMXDriverConnectionWrapper jmxConnection = cnn.getJmxConnection();
+          if (jmxConnection != null && jmxConnection.isConnected())
+          {
+            jmxConnection.cancelJob(jobUUID);
+          }
+        }
+      }
+    }
+    return true;
   }
 }
