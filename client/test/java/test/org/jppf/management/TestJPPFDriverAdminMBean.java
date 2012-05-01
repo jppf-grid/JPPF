@@ -50,9 +50,15 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     {
       driver = getDriverProxy();
       assertNotNull(driver);
-      Collection<JPPFManagementInfo> coll = driver.nodesInformation();
+      Collection<JPPFManagementInfo> coll = null;
+      while (true)
+      {
+        coll = driver.nodesInformation();
+        if ((coll == null) || (coll.size() < 2)) Thread.sleep(100L);
+        else break;
+      }
       assertNotNull(coll);
-      assertTrue(coll.size() == 2);
+      assertTrue("coll.size() should be 2, but is " + coll.size(), coll.size() == 2);
       nodes = new JMXNodeConnectionWrapper[2];
       int count = 0;
       for (JPPFManagementInfo info: coll)

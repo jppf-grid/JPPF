@@ -37,5 +37,6 @@ public class DriverProcessLauncher extends GenericProcessLauncher
     addClasspathElement("test/classes");
     addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");
+    addJvmOption("-Djava.util.logging.config.file=test/classes/config/logging-driver.properties");
   }
 }

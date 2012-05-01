@@ -53,10 +53,6 @@ public class LifeCycleTask extends JPPFTask
    */
   private boolean cancelled = false;
   /**
-   * Determines whether this task was restarted.
-   */
-  private boolean restarted = false;
-  /**
    * Determines whether this task timed out.
    */
   private boolean timedout = false;
@@ -112,17 +108,6 @@ public class LifeCycleTask extends JPPFTask
    * {@inheritDoc}
    */
   @Override
-  public void onRestart()
-  {
-    elapsed = System.currentTimeMillis() - start;
-    restarted = true;
-    displayElapsed("restarted");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public void onTimeout()
   {
     elapsed = System.currentTimeMillis() - start;
@@ -146,15 +131,6 @@ public class LifeCycleTask extends JPPFTask
   public boolean isCancelled()
   {
     return cancelled;
-  }
-
-  /**
-   * Determines whether this task was restarted.
-   * @return true if the task was restarted, false otherwise.
-   */
-  public boolean isRestarted()
-  {
-    return restarted;
   }
 
   /**

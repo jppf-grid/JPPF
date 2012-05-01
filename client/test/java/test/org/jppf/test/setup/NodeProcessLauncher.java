@@ -36,5 +36,6 @@ public class NodeProcessLauncher extends GenericProcessLauncher
     setJppfConfig("node" + n + ".properties");
     setLog4j("log4j-node" + n + ".properties");
     addClasspathElement("test/classes/config");
+    addJvmOption("-Djava.util.logging.config.file=test/classes/config/logging-node" + n + ".properties");
   }
 }

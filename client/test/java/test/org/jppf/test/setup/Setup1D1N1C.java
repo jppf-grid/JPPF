@@ -32,54 +32,6 @@ public class Setup1D1N1C
    * The jppf client to use.
    */
   protected static JPPFClient client = null;
-  /**
-   * The node to lunch for the test.
-   */
-  protected static NodeProcessLauncher node = null;
-  /**
-   * The node to lunch for the test.
-   */
-  protected static DriverProcessLauncher driver = null;
-  /**
-   * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
-   */
-  protected static Thread shutdownHook = null;
-  /**
-   * Specifies whether to launch the driver and node processes, or rely on externally launched ones.
-   */
-  protected static boolean launchProcesses = true;
-
-  /**
-   * Stop driver and node processes.
-   */
-  protected static void stopProcesses()
-  {
-    try
-    {
-      if (node != null) node.stopProcess();
-      if (driver != null) driver.stopProcess();
-    }
-    catch(Throwable t)
-    {
-      t.printStackTrace();
-    }
-  }
-
-  /**
-   * Create the shutdown hook.
-   */
-  protected static void createShutdownHook()
-  {
-    shutdownHook = new Thread()
-    {
-      @Override
-      public void run()
-      {
-        stopProcesses();
-      }
-    };
-    Runtime.getRuntime().addShutdownHook(shutdownHook);
-  }
 
   /**
    * Launches a driver and node and start the client.
@@ -88,17 +40,7 @@ public class Setup1D1N1C
   @BeforeClass
   public static void setup() throws Exception
   {
-    System.out.println("performing setup");
-    if (launchProcesses)
-    {
-      createShutdownHook();
-      (driver = new DriverProcessLauncher()).startProcess();
-      // to avoid driver and node producing the same UUID
-      Thread.sleep(51L);
-      (node = new NodeProcessLauncher(1)).startProcess();
-    }
-    client = new JPPFClient();
-    Thread.sleep(1000L);
+    client = BaseSetup.setup(1);
   }
 
   /**
@@ -108,12 +50,6 @@ public class Setup1D1N1C
   @AfterClass
   public static void cleanup() throws Exception
   {
-    client.close();
-    Thread.sleep(1000L);
-    if (launchProcesses)
-    {
-      stopProcesses();
-      Runtime.getRuntime().removeShutdownHook(shutdownHook);
-    }
+    BaseSetup.cleanup();
   }
 }
