@@ -60,7 +60,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   public JPPFJcaClientConnection(final JPPFJcaClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
     this.client = client;
-    configure(uuid, name, info.host, info.serverPorts[0], 0, ssl);
+    configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
     status.set(DISCONNECTED);
   }
 
