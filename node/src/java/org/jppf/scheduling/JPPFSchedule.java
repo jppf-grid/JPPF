@@ -49,7 +49,7 @@ public class JPPFSchedule implements Serializable
   /**
    * Format describing the schedule date.
    */
-  private final transient SimpleDateFormat dateFormat;
+  private transient SimpleDateFormat dateFormat = null;
 
   /**
    * Initialize this schedule configuration with the specified duration.
@@ -60,7 +60,6 @@ public class JPPFSchedule implements Serializable
     this.duration = duration;
     this.date = null;
     this.format = null;
-    this.dateFormat = null;
   }
 
   /**
@@ -74,7 +73,6 @@ public class JPPFSchedule implements Serializable
     this.duration = 0L;
     this.date = date;
     this.format = format;
-    this.dateFormat = new SimpleDateFormat(format);
   }
 
   /**
@@ -116,7 +114,11 @@ public class JPPFSchedule implements Serializable
   {
     Date dt = null;
     if ((date == null) || (format == null)) dt = new Date(startDate + duration);
-    else dt = dateFormat.parse(date);
+    else
+    {
+      if (dateFormat == null) dateFormat = new SimpleDateFormat(format);
+      dt = dateFormat.parse(date);
+    }
     return dt;
   }
 
@@ -132,6 +134,7 @@ public class JPPFSchedule implements Serializable
     if ((date == null) || (format == null)) result = startDate + duration;
     else
     {
+      if (dateFormat == null) dateFormat = new SimpleDateFormat(format);
       Date dt = dateFormat.parse(date);
       result = dt.getTime();
     }
@@ -145,7 +148,7 @@ public class JPPFSchedule implements Serializable
   public String toString()
   {
     StringBuilder sb = new StringBuilder("schedule[");
-    if (date != null) sb.append("date=").append(date).append(", format=").append(dateFormat == null ? "null" : dateFormat.toPattern());
+    if (date != null) sb.append("date=").append(date).append(", format=").append(format == null ? "null" : format);
     else sb.append("delay=").append(duration);
     sb.append(']');
     return sb.toString();
