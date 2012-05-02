@@ -244,6 +244,17 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   /**
+   * Cancel the job with the specified id.
+   * @param jobId the id of the job to cancel.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   */
+  public boolean cancelJob(final String jobId) throws Exception {
+    return false;
+  }
+
+  /**
    * Invoked to notify of a status change event on a client connection.
    * @param event the event to notify of.
    * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)

@@ -62,6 +62,44 @@ public class JPPFJcaClient extends AbstractGenericClient
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void initConfig(final Object configuration)
+  {
+    if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
+    try
+    {
+      //TypedProperties props = new TypedProperties();
+      TypedProperties props = JPPFConfiguration.getProperties();
+      ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
+      try
+      {
+        props.load(bais);
+      }
+      finally
+      {
+        bais.close();
+      }
+      config = props;
+    }
+    catch(Exception e)
+    {
+      log.error("Error while initializing the JPPF client configuration", e);
+    }
+    if (log.isDebugEnabled()) log.debug("config properties: " + config);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
+  {
+    return new JPPFJcaClientConnection(this, uuid, name, info, ssl);
+  }
+
+  /**
    * Submit a JPPFJob for execution.
    * @param job the job to execute.
    * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
@@ -92,12 +130,14 @@ public class JPPFJcaClient extends AbstractGenericClient
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
     super.statusChanged(event);
-    if (submissionManager != null) submissionManager.wakeUp();
+    if (submissionManager instanceof ThreadSynchronization)
+    {
+      ((ThreadSynchronization) submissionManager).wakeUp();
+    }
   }
 
   /**
-   * Get the submission manager for this JPPF client.
-   * @return a <code>JPPFSubmissionManager</code> instance.
+   * {@inheritDoc}
    */
   @Override
   public JcaSubmissionManager getSubmissionManager()
@@ -112,43 +152,5 @@ public class JPPFJcaClient extends AbstractGenericClient
   public void setSubmissionManager(final JcaSubmissionManager submissionManager)
   {
     this.submissionManager = submissionManager;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
-  {
-    return new JPPFJcaClientConnection(this, uuid, name, info, ssl);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void initConfig(final Object configuration)
-  {
-    if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
-    try
-    {
-      //TypedProperties props = new TypedProperties();
-      TypedProperties props = JPPFConfiguration.getProperties();
-      ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
-      try
-      {
-        props.load(bais);
-      }
-      finally
-      {
-        bais.close();
-      }
-      config = props;
-    }
-    catch(Exception e)
-    {
-      log.error("Error while initializing the JPPF client configuration", e);
-    }
-    if (log.isDebugEnabled()) log.debug("config properties: " + config);
   }
 }

@@ -368,6 +368,28 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected abstract SubmissionManager getSubmissionManager();
 
   /**
+   * Cancel the job with the specified id.
+   * @param jobId the id of the job to cancel.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   */
+  public boolean cancelJob(final String jobId) throws Exception
+  {
+    if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
+
+    boolean cancelled = false;
+    for (JPPFClientConnection connection : getAllConnections())
+    {
+      if (connection instanceof AbstractJPPFClientConnection)
+      {
+        cancelled |= ((AbstractJPPFClientConnection) connection).cancelJob(jobId);
+      }
+    }
+    return cancelled;
+  }
+
+  /**
    * Register class loader with this submission manager.
    * @param cl a <code>ClassLoader</code> instance.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.

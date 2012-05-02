@@ -361,12 +361,16 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   /**
-   * Cancels job by jobUUID
-   * @param jobId id of job to cancel.
+   * Cancel the job with the specified id.
+   * @param jobId the id of the job to cancel.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
-  public void cancelJob(final String jobId)
+  public boolean cancelJob(final String jobId) throws Exception
   {
     queue.cancelJob(jobId);
+    return true;
   }
 
   /**

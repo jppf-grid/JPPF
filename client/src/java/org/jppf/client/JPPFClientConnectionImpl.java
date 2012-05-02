@@ -78,7 +78,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   {
     this.client = client;
     this.ssl = ssl;
-    //configure(uuid, name, info.host, info.applicationServerPorts[0], classServerPort, 0);
     configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
     jmxPort = ssl ? info.sslManagementPort : info.managementPort;
     initializeJmxConnection();
@@ -137,7 +136,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       t.setName('[' + delegate.getName() + " : class delegate]");
       t.start();
       taskServerConnection.init();
-      //setStatus(delegate.getStatus());
     }
   }
 
@@ -179,8 +177,23 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean cancelJob(final String jobId) throws Exception
+  {
+    JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
+    if ( jmxConnection != null && jmxConnection.isConnected())
+    {
+      jmxConnection.cancelJob(jobId);
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Shutdown this client and retrieve all pending executions for resubmission.
-   * @return a list of <code>JPPFJob</code> instances to resubmit.
+   * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
    * @see org.jppf.client.JPPFClientConnection#close()
    */
   @Override
@@ -197,9 +210,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       }
       catch (Exception e)
       {
-        if (debugEnabled) log.debug('[' + name + "] "+ e.getMessage(), e);
-        else log.error('[' + name + "] "+ e.getMessage());
+        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
+        else log.error('[' + name + "] " + e.getMessage());
       }
+      if (job != null) return Collections.singletonList(job);
     }
     return Collections.emptyList();
   }

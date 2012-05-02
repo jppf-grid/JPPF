@@ -199,8 +199,8 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    * Get the results of an execution request.<br>
    * This method should be called only once a call to
    * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-   * either {@link org.jppf.org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
-   * {@link org.jppf.org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
+   * either {@link org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
@@ -233,6 +233,15 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   public Collection<String> getAllSubmissionIds()
   {
     return getJppfClient().getSubmissionManager().getAllSubmissionIds();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean cancelJob(final String submissionId) throws Exception
+  {
+    return getJppfClient().cancelJob(submissionId);
   }
 
   /**

@@ -90,6 +90,15 @@ public interface JPPFConnection extends Connection, JPPFAccessor
   List<JPPFTask> waitForResults(String submissionId) throws Exception;
 
   /**
+   * Cancel the job with the specified id.
+   * @param submissionId the id of the job to cancel.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   */
+  boolean cancelJob(String submissionId) throws Exception;
+
+  /**
    * Add a listener to the submission with the specified id.
    * @param submissionId the id of the submission.
    * @param listener the listener to add.
