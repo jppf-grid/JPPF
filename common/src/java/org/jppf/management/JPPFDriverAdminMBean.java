@@ -80,5 +80,5 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @return the number of nodes that match the execution policy, or 0 if no node matches it.
    * @throws Exception if any error occurs.
    */
-  Integer matchingNodes(ExecutionPolicy policy) throws Exception;;
+  Integer matchingNodes(ExecutionPolicy policy) throws Exception;
 }
