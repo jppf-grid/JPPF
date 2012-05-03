@@ -20,11 +20,11 @@ package org.jppf.server.node.fj;
 
 import org.jppf.node.NodeExecutionInfo;
 import org.jppf.server.node.AbstractThreadManager;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
@@ -62,8 +62,11 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     threadPool = new ForkJoinPool(poolSize, threadFactory, new Thread.UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(final Thread t, final Throwable e) {
-        System.out.printf("UncaughtException [%d:%s] - %s%n ", t.getId(), t.getName(), e);
-        e.printStackTrace(System.out);
+        StringBuilder sb = new StringBuilder();
+        new Formatter(sb).format("UncaughtException in thread[%d:%s] - %s", t.getId(), t.getName(), ExceptionUtils.getMessage(e));
+        //System.out.println(sb);
+        //e.printStackTrace(System.out);
+        log.error(sb.toString(), e);
       }
     }, false);
   }
