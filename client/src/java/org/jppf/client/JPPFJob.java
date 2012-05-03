@@ -124,7 +124,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @param dataProvider the container for data shared between tasks.
    * @param jobSLA service level agreement between job and server.
    */
-  public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA)
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA)
   {
     this(dataProvider, jobSLA, true, null);
   }
@@ -154,7 +154,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @param jobSLA service level agreement between job and server.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final TaskResultListener resultsListener)
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final TaskResultListener resultsListener)
   {
     this(dataProvider, jobSLA, false, resultsListener);
   }
@@ -166,7 +166,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @param blocking determines whether this job is blocking.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final boolean blocking, final TaskResultListener resultsListener)
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final boolean blocking, final TaskResultListener resultsListener)
   {
     this(dataProvider, jobSLA, null, blocking, resultsListener);
   }
@@ -179,7 +179,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @param blocking determines whether this job is blocking.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final JPPFJobSLA jobSLA, final JPPFJobMetadata jobMetadata,
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final JPPFJobMetadata jobMetadata,
       final boolean blocking, final TaskResultListener resultsListener)
   {
     this();
