@@ -21,15 +21,13 @@ package test.org.jppf.test.setup;
 import org.junit.*;
 
 /**
- * Unit tests for {@link JPPFExecutorService}.
- * This class starts and stops a driver and a node before and after
- * running the tests in a unit test class.
+ * Basic setup for 1 driver, 1 node and no client.
  * @author Laurent Cohen
  */
 public class Setup1D1N
 {
   /**
-   * Launches a driver and node and start the client.
+   * Launches a driver and node.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
@@ -39,7 +37,7 @@ public class Setup1D1N
   }
 
   /**
-   * Stops the driver and node and close the client.
+   * Stops the driver and node.
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass

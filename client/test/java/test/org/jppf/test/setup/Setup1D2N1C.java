@@ -23,7 +23,7 @@ import org.junit.*;
 
 
 /**
- * Unit tests for {@link JPPFExecutorService}.
+ * Basic setup for 1 driver, 2 nodes and 1 client.
  * @author Laurent Cohen
  */
 public class Setup1D2N1C
@@ -34,7 +34,7 @@ public class Setup1D2N1C
   protected static JPPFClient client = null;
 
   /**
-   * Launches a driver and node and start the client.
+   * Launches a driver and 2 nodes and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
@@ -44,7 +44,7 @@ public class Setup1D2N1C
   }
 
   /**
-   * Stops the driver and node and close the client.
+   * Stops the driver and nodes and close the client.
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass

@@ -23,7 +23,6 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
@@ -59,7 +58,8 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   public void testCancelJob() throws Exception
   {
     int nbTasks = 10;
-    JPPFJob job = createJob("testCancelJob", nbTasks, TIME_LONG, false);
+    //JPPFJob job = createJob("testCancelJob", nbTasks, TIME_LONG, false);
+    JPPFJob job = BaseSetup.createJob("testCancelJob", false, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submit(job);
     Thread.sleep(TIME_SHORT);
@@ -85,7 +85,8 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   @Test
   public void testCancelJobAfterCompletion() throws Exception
   {
-    JPPFJob job = createJob("testCancelJobAfterCompletion", 1, TIME_SHORT, true);
+    //JPPFJob job = createJob("testCancelJobAfterCompletion", 1, TIME_SHORT, true);
+    JPPFJob job = BaseSetup.createJob("testCancelJobAfterCompletion", true, false, 1, LifeCycleTask.class, TIME_SHORT);
     List<JPPFTask> results = client.submit(job);
     assertEquals(results.size(), 1);
     assertNotNull(results.get(0));
@@ -94,29 +95,5 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
-  }
-
-  /**
-   * Create a job with the specified number of tasks, each with the specified duration.
-   * @param jobName the job id.
-   * @param nbTasks the number of tasks in the job.
-   * @param duration the duration of each task.
-   * @param blocking specifies whether the job is blocking or not.
-   * @return a {@link JPPFJob} instance.
-   * @throws JPPFException if an error occurs while creating the job.
-   */
-  protected synchronized JPPFJob createJob(final String jobName, final int nbTasks, final long duration, final boolean blocking) throws JPPFException
-  {
-    JPPFJob job = new JPPFJob();
-    job.setName(jobName + " (" + JOB_COUNT.incrementAndGet() + ')');
-    for (int i=1; i<=nbTasks; i++)
-    {
-      JPPFTask task = new LifeCycleTask(duration);
-      task.setId(job.getName()  + " - task " + i);
-      job.addTask(task);
-    }
-    job.setBlocking(blocking);
-    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
-    return job;
   }
 }

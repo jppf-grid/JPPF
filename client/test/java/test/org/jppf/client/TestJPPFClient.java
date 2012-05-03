@@ -18,15 +18,19 @@
 
 package test.org.jppf.client;
 
-import java.io.IOException;
+import static org.junit.Assert.*;
 
-import org.jppf.client.JPPFClient;
+import java.io.IOException;
+import java.util.List;
+
+import org.jppf.client.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.junit.*;
 
-import test.org.jppf.test.setup.Setup1D1N;
+import test.org.jppf.test.setup.*;
 
 /**
- * Unit tests for {@link JPPFExecutorService}.
+ * Unit tests for <code>JPPFClient</code>.
  * @author Laurent Cohen
  */
 public class TestJPPFClient extends Setup1D1N
@@ -56,7 +60,7 @@ public class TestJPPFClient extends Setup1D1N
   @Test
   public void testDefaultConstructor() throws Exception
   {
-    JPPFClient client = new JPPFClient();
+    JPPFClient client = BaseSetup.createClient(null);
     client.close();
   }
 
@@ -67,7 +71,95 @@ public class TestJPPFClient extends Setup1D1N
   @Test
   public void testConstructorWithUuid() throws Exception
   {
-    JPPFClient client = new JPPFClient("some_uuid");
+    JPPFClient client = BaseSetup.createClient("some_uuid");
     client.close();
+  }
+
+  /**
+   * Test the submission of a job.
+   * @throws Exception if any error occurs
+   */
+  @Test
+  public void testSubmit() throws Exception
+  {
+    JPPFClient client = BaseSetup.createClient(null);
+    int nbTasks = 10;
+    JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, MyTask.class, 0L);
+    int i = 0;
+    for (JPPFTask task: job.getTasks()) task.setId("" + i++);
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
+    for (i=0; i<nbTasks; i++)
+    {
+      JPPFTask t = results.get(i);
+      Exception e = t.getException();
+      assertNull("task " + i +" has an exception " + e, e);
+      String s = "success: " + i;
+      assertEquals("result of task " + i + " should be " + s + " but is " + t.getResult(), s, t.getResult());
+    }
+    client.close();
+  }
+
+  /**
+   * Test the cancellation of a job.
+   * @throws Exception if any error occurs
+   */
+  @Test
+  public void testCancelJob() throws Exception
+  {
+    JPPFClient client = BaseSetup.createClient(null);
+    int nbTasks = 10;
+    JPPFJob job = BaseSetup.createJob("TestJPPFClientCancelJob", false, false, nbTasks, MyTask.class, 5000L);
+    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+    int i = 0;
+    for (JPPFTask task: job.getTasks()) task.setId("" + i++);
+    client.submit(job);
+    Thread.sleep(1500L);
+    client.cancelJob(job.getUuid());
+    List<JPPFTask> results = collector.waitForResults();
+    assertNotNull(results);
+    assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
+    int count = 0;
+    for (JPPFTask t: results)
+    {
+      if (t.getResult() == null) count++;
+    }
+    assertTrue(count > 0);
+    client.close();
+  }
+
+  /**
+   * A simple JPPF task for unit-testing.
+   */
+  public static class MyTask extends JPPFTask
+  {
+    /**
+     * The duration of this task;
+     */
+    private long duration = 0L;
+
+    /**
+     * Initialize this task.
+     * @param duration specifies the duration of this task.
+     */
+    public MyTask(final long duration)
+    {
+      this.duration = duration;
+    }
+
+    @Override
+    public void run()
+    {
+      try
+      {
+        if (duration > 0) Thread.sleep(duration);
+        setResult("success: " + getId());
+      }
+      catch(Exception e)
+      {
+        setException(e);
+      }
+    }
   }
 }

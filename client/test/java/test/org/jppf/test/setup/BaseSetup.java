@@ -18,9 +18,13 @@
 
 package test.org.jppf.test.setup;
 
+import java.lang.reflect.Constructor;
+import java.util.Collection;
+
 import org.jppf.client.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
@@ -58,8 +62,21 @@ public class BaseSetup
   public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception
   {
     JMXDriverConnectionWrapper driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(100L);
+    while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+  }
+
+  /**
+   * Get a proxy to the driver admin MBean.
+   * @param client the JPPF client from which to get the proxy.
+   * @return an instance of <code>DriverJobManagementMBean</code>.
+   * @throws Exception if the proxy could not be obtained.
+   */
+  public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception
+  {
+    JMXDriverConnectionWrapper driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+    while (!driver.isConnected()) driver.connectAndWait(10L);
+    return driver;
   }
 
   /**
@@ -89,18 +106,27 @@ public class BaseSetup
     for (int i=0; i<nodes.length; i++)
     {
       // to avoid driver and node producing the same UUID
-      Thread.sleep(51L);
+      if (i > 0) Thread.sleep(511L);
       nodes[i] = new NodeProcessLauncher(i+1);
       nodes[i].startProcess();
-      Thread.sleep(500L);
     }
-    if (initClient)
-    {
-      client = new JPPFClient();
-      System.out.println("waiting for available client connection");
-      while (!client.hasAvailableConnection()) Thread.sleep(100L);
-    }
+    if (initClient) client = createClient(null);
+    checkDriverAndNodesInitialized(nbNodes);
     return client;
+  }
+
+  /**
+   * Create a client with the specified uuid.
+   * @param uuid if null, let the client generate its uuid.
+   * @return a <code>JPPFClient</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFClient createClient(final String uuid) throws Exception
+  {
+    JPPFClient jppfClient = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
+    System.out.println("waiting for available client connection");
+    while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
+    return jppfClient;
   }
 
   /**
@@ -110,9 +136,34 @@ public class BaseSetup
   public static void cleanup() throws Exception
   {
     if (client != null) client.close();
-    Thread.sleep(1000L);
+    Thread.sleep(500L);
     stopProcesses();
     Runtime.getRuntime().removeShutdownHook(shutdownHook);
+  }
+
+  /**
+   * Check that the drivr and all nodes have been started and are accessible.
+   * @param nbNodes the number of nodes that were started.
+   * @throws Exception if any error occurs.
+   */
+  protected static void checkDriverAndNodesInitialized(final int nbNodes) throws Exception
+  {
+    JMXDriverConnectionWrapper wrapper = null;
+    try
+    {
+      wrapper = new JMXDriverConnectionWrapper("localhost", 11198);
+      while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
+      while (true)
+      {
+        Collection<JPPFManagementInfo> coll = wrapper.nodesInformation();
+        if ((coll == null) || (coll.size() < nbNodes)) Thread.sleep(10L);
+        else break;
+      }
+    }
+    finally
+    {
+      if (wrapper != null) wrapper.close();
+    }
   }
 
   /**
@@ -147,4 +198,44 @@ public class BaseSetup
     Runtime.getRuntime().addShutdownHook(shutdownHook);
   }
 
+  /**
+   * Create a job with the specified parameters.
+   * The type of the tasks is specified via their class, and the constructor to
+   * use is specified based on the number of parameters.
+   * @param name the job's name.
+   * @param blocking specifies whether the job is blocking.
+   * @param broadcast specifies whether the job is a broadcast job.
+   * @param nbTasks the number of tasks to add to the job.
+   * @param taskClass the class of the tasks to add to the job.
+   * @param params the parameters for the tasks constructor.
+   * @return a <code>JPPFJob</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFJob createJob(final String name, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception
+  {
+    JPPFJob job = new JPPFJob();
+    job.setName(name);
+    Constructor[] constructors = taskClass.getConstructors();
+    Constructor constructor = null;
+    int nbArgs = (params == null) ? 0 : params.length;
+    for (Constructor c: constructors)
+    {
+      if (c.getParameterTypes().length == nbArgs)
+      {
+        constructor = c;
+        break;
+      }
+    }
+    if (constructor == null) throw new IllegalArgumentException("couldn't find a constructor for class " + taskClass.getName() + " with " + nbArgs + " arguments");
+    for (int i=1; i<=nbTasks; i++)
+    {
+      Object o = constructor.newInstance(params);
+      if (o instanceof JPPFTask) ((JPPFTask) o).setId(job.getName() + " - task " + i);
+      job.addTask(o);
+    }
+    job.setBlocking(blocking);
+    job.getSLA().setBroadcastJob(broadcast);
+    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
+    return job;
+  }
 }

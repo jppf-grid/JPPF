@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
@@ -68,7 +67,7 @@ public class TestJPPFTask extends Setup1D1N1C
   @Test
   public void testTaskTimeout() throws Exception
   {
-    JPPFJob job = createJob("testTaskTimeoutDuration", 2, TIME_LONG);
+    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDuration", true, false, 2, LifeCycleTask.class, TIME_LONG);
     List<JPPFTask> tasks = job.getTasks();
     JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
     tasks.get(1).setTimeoutSchedule(schedule);
@@ -90,7 +89,7 @@ public class TestJPPFTask extends Setup1D1N1C
   @Test
   public void testTaskExpirationDate() throws Exception
   {
-    JPPFJob job = createJob("testTaskTimeoutDate", 2, TIME_LONG);
+    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDate", true, false, 2, LifeCycleTask.class, TIME_LONG);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     Date date = new Date(System.currentTimeMillis() + TIME_LONG + TIME_SHORT + 10L);
     JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
@@ -105,26 +104,5 @@ public class TestJPPFTask extends Setup1D1N1C
     task = (LifeCycleTask) results.get(1);
     assertNull(task.getResult());
     assertTrue(task.isTimedout());
-  }
-
-  /**
-   * Create a blocking job with the specified number of tasks, each with the specified duration.
-   * @param id the job id.
-   * @param nbTasks the number of tasks in the job.
-   * @param duration the duration of each task.
-   * @return a {@link JPPFJob} instance.
-   * @throws JPPFException if an error occurs while creating the job.
-   */
-  protected synchronized JPPFJob createJob(final String id, final int nbTasks, final long duration) throws JPPFException
-  {
-    JPPFJob job = new JPPFJob();
-    job.setName(id + '(' + jobCount.incrementAndGet() + ')');
-    for (int i=0; i<nbTasks; i++)
-    {
-      JPPFTask task = new LifeCycleTask(duration);
-      task.setId(job.getName()  + " - task " + (i+1));
-      job.addTask(task);
-    }
-    return job;
   }
 }

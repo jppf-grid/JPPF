@@ -23,7 +23,7 @@ import org.junit.*;
 
 
 /**
- * Unit tests for {@link JPPFExecutorService}.
+ * Basic setup for 1 driver, 1 node and 1 client.
  * @author Laurent Cohen
  */
 public class Setup1D1N1C
