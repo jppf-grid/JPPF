@@ -25,7 +25,6 @@ import org.jppf.client.balancer.utils.JPPFFutureTask;
 import org.jppf.client.event.ClientConnectionStatusHandler;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.protocol.JPPFTask;
@@ -95,6 +94,9 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     super.setSystemInfo(systemInfo);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getUuid()
   {
@@ -167,12 +169,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning)
       {
-        System.out.println("Cancel");
         if (super.cancel(false))
         {
           try
           {
-            ChannelWrapperRemote.this.cancel(bundle.getJob().getUuid());
+            channel.cancelJob(bundle.getJob().getUuid());
           }
           catch (Exception e)
           {
@@ -185,19 +186,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     };
     executor.execute(task);
     return task;
-  }
-
-  protected void cancel(final String jobId) throws Exception
-  {
-    if (channel instanceof JPPFClientConnectionImpl)
-    {
-      JPPFClientConnectionImpl cnn = (JPPFClientConnectionImpl) channel;
-      JMXDriverConnectionWrapper jmxConnection = cnn.getJmxConnection();
-      if (jmxConnection.isConnected())
-      {
-        jmxConnection.cancelJob(jobId);
-      }
-    }
   }
 
   /**
@@ -232,17 +220,17 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   private class RemoteRunnable implements Runnable
   {
     /**
-     * The connection to the driver to use.
-     */
-    private final AbstractJPPFClientConnection connection;
-    /**
-     * The task bundle to send or receive.
+     * The task bundle to execute.
      */
     private final ClientTaskBundle bundle;
     /**
      * Bundler used to schedule tasks for the corresponding node.
      */
     private final Bundler bundler;
+    /**
+     * The connection to the driver to use.
+     */
+    private final AbstractJPPFClientConnection connection;
 
     /**
      * Initialize this runnable for remote execution.
@@ -250,19 +238,19 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @param bundle     the execution to perform.
      * @param connection the connection to the driver to use.
      */
-    private RemoteRunnable(final Bundler bundler, final ClientTaskBundle bundle, final AbstractJPPFClientConnection connection)
+    public RemoteRunnable(final Bundler bundler, final ClientTaskBundle bundle, final AbstractJPPFClientConnection connection)
     {
-      this.connection = connection;
       this.bundler = bundler;
       this.bundle = bundle;
+      this.connection = connection;
     }
 
     @Override
     public void run()
     {
       Exception exception = null;
-      AbstractGenericClient client = connection.getClient();
       List<JPPFTask> tasks = this.bundle.getTasksL();
+      AbstractGenericClient client = connection.getClient();
       AbstractGenericClient.RegisteredClassLoader registeredClassLoader = null;
       try
       {

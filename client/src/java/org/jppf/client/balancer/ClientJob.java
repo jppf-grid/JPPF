@@ -113,6 +113,9 @@ public class ClientJob
 
   private volatile int status = NEW;
 
+  private int dispatchedCount = 0;
+  private int completedCount = 0;
+
   /**
    * Initialized client job with task bundle and list of tasks to execute.
    * @param job   underlying task bundle.
@@ -460,6 +463,8 @@ public class ClientJob
    */
   public void resultsReceived(final ClientTaskBundle bundle, final List<JPPFTask> results)
   {
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+
     TaskResultListener listener = getJob().getResultListener();
     if (listener != null)
     {
@@ -477,6 +482,8 @@ public class ClientJob
    */
   public void resultsReceived(final ClientTaskBundle bundle, final Throwable throwable)
   {
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+
     TaskResultListener listener = getJob().getResultListener();
     if (listener != null)
     {
@@ -494,19 +501,30 @@ public class ClientJob
    */
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
   {
-    System.out.println("taskCompleted: " + bundle + "\t - " + exception);
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+
+    completedCount += bundle.getTasksL().size();
+    System.out.println("taskCompleted: " + bundle + "\t - " + exception + "\t completed: " + completedCount + " / " + job.getTasks().size());
     bundleList.remove(bundle);
-    if (bundleList.isEmpty())
-    {
-      System.out.println("Tasks: " + this.tasks.size());
-      getJob().fireJobEvent(JobEvent.Type.JOB_END);
-      if (exception != null)
-//        setSubmissionStatus(SubmissionStatus.COMPLETE);
-//      else
-      {
-        setSubmissionStatus(SubmissionStatus.FAILED);
-      }
+
+    if(completedCount > dispatchedCount) throw new IllegalStateException("completedCount > dispatchedCount");
+
+    if(exception != null) {
+      if(submissionStatus == SubmissionStatus.EXECUTING) job.fireJobEvent(JobEvent.Type.JOB_END);
+      setSubmissionStatus(SubmissionStatus.FAILED);
     }
+
+    if(completedCount == job.getTasks().size())
+    {
+      if(submissionStatus == SubmissionStatus.EXECUTING)
+      {
+        job.fireJobEvent(JobEvent.Type.JOB_END);
+        setSubmissionStatus(SubmissionStatus.COMPLETE);
+      }
+    } else if(completedCount < job.getTasks().size())
+    {
+    } else
+      throw new IllegalStateException("completedCount > job.tasks.size");
   }
 
   /**
@@ -516,13 +534,18 @@ public class ClientJob
    */
   public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel, final Future<?> future)
   {
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    if (future == null) throw new IllegalArgumentException("future is null");
+
+    dispatchedCount += bundle.getTasksL().size();
     bundleList.add(bundle);
     futureList.add(future);
     if (status == NEW)
     {
       status = EXECUTING;
       setSubmissionStatus(SubmissionStatus.EXECUTING);
-      getJob().fireJobEvent(JobEvent.Type.JOB_START);
+      job.fireJobEvent(JobEvent.Type.JOB_START);
     }
   }
 

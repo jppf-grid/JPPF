@@ -29,8 +29,11 @@ import org.jppf.node.Node;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.server.node.NodeExecutionManagerImpl;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +47,14 @@ import java.util.concurrent.*;
 public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, Node
 {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ChannelWrapperLocal.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+   /**
    * The task execution manager for this wrapper.
    */
   private final NodeExecutionManagerImpl executionManager;
@@ -178,36 +189,27 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(bundle), null);
-    task.addListener(new JPPFFuture.Listener()
-    {
+    JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(getBundler(), bundle), null) {
       @Override
-      public void onDone(final JPPFFuture<?> future)
+      public boolean cancel(final boolean mayInterruptIfRunning)
       {
-        if (future.isCancelled())
+        if (super.cancel(mayInterruptIfRunning))
         {
           try
           {
-            ChannelWrapperLocal.this.cancel(bundle.getUuid());
+            executionManager.cancelAllTasks(true, false);
           }
           catch (Exception e)
           {
             e.printStackTrace();
           }
+          return true;
         }
+        return false;
       }
-    });
+    };
     executor.execute(task);
     return task;
-  }
-
-  /**
-   * @param jobId
-   * @throws Exception
-   */
-  protected void cancel(final String jobId) throws Exception
-  {
-    executionManager.cancelAllTasks(true, false);
   }
 
   @Override
@@ -230,13 +232,19 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
      * The task bundle to execute.
      */
     private final ClientTaskBundle bundle;
+    /**
+     * Bundler used to schedule tasks for the corresponding node.
+     */
+    private final Bundler bundler;
 
     /**
      * Initialize this runnable for local execution.
+     * @param bundler    the bundler to send the resulting statistics to.
      * @param bundle the execution to perform.
      */
-    public LocalRunnable(final ClientTaskBundle bundle)
+    public LocalRunnable(final Bundler bundler, final ClientTaskBundle bundle)
     {
+      this.bundler = bundler;
       this.bundle = bundle;
     }
 
@@ -244,10 +252,11 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     public void run()
     {
       Exception exception = null;
+      List<JPPFTask> tasks = this.bundle.getTasksL();
       try
       {
+        long start = System.nanoTime();
         DataProvider dataProvider = bundle.getJob().getDataProvider();
-        List<JPPFTask> tasks = bundle.getTasksL();
         for (JPPFTask task : tasks)
         {
           task.setDataProvider(dataProvider);
@@ -255,10 +264,13 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
         executionManager.execute(bundle, tasks);
         setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(tasks);
+
+        double elapsed = System.nanoTime() - start;
+        bundler.feedback(tasks.size(), elapsed);
       }
       catch (Throwable t)
       {
-//        log.error(t.getMessage(), t);
+        log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(t);
