@@ -102,7 +102,7 @@ public abstract class CommandLineTask extends JPPFTask implements ProcessWrapper
 
   /**
    * Run the external process or script.
-   * @return the exit code returned yb the sub-process.
+   * @return the exit code returned by the sub-process.
    * @throws Exception if an error occurs.
    */
   public int launchProcess() throws Exception
