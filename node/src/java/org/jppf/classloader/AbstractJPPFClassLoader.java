@@ -513,6 +513,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive)
   {
+    if (debugEnabled) log.debug("looking up up resource [" + name + "] in the URL classpath for " + this);
     Class<?> c = findLoadedClass(name);
     if (c == null)
     {
@@ -529,6 +530,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         catch(ClassNotFoundException ignore){}
       }
     }
+    if (debugEnabled) log.debug("resource [" + name + "] " + (c == null ? "not " : "") + "found in the URL classpath for " + this);
     return c;
   }
 

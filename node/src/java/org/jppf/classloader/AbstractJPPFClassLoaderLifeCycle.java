@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFNodeReconnectionNotification;
@@ -53,6 +53,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
   /**
+   * Determines whether this class loader should handle dynamic class updating.
+   */
+  private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
+  /**
    * The executor that handles asynchronous resource requests.
    */
   protected static ExecutorService executor;
@@ -76,6 +80,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The object used to serialize and deserialize resources.
    */
   protected ObjectSerializer serializer = null;
+  /**
+   * Uniquely identifies this class loader instance.
+   */
+  protected final int instanceNumber = INSTANCE_COUNT.incrementAndGet();
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -260,5 +268,27 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     {
       return response;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append("[id=").append(instanceNumber).append(", type=").append(dynamic ? "client" : "server");
+    URL[] urls = getURLs();
+    if ((urls != null) && (urls.length > 0))
+    {
+      sb.append(", classpath=");
+      for (int i=0; i<urls.length; i++)
+      {
+        if (i > 0) sb.append(';');
+        sb.append(urls[i]);
+      }
+    }
+    sb.append(']');
+    return sb.toString();
   }
 }
