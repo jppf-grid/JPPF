@@ -85,7 +85,7 @@ public class TimeoutTimerTask implements Runnable
           }
           finally
           {
-            Thread.currentThread().setContextClassLoader(null);
+            Thread.currentThread().setContextClassLoader(oldCl);
           }
         }
         executionManager.removeFuture(number);

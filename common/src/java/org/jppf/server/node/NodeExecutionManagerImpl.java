@@ -257,7 +257,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
             }
             finally
             {
-              Thread.currentThread().setContextClassLoader(null);
+              Thread.currentThread().setContextClassLoader(oldCl);
             }
           }
         }
@@ -301,9 +301,8 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   private void processTaskTimeout(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
-    Task task = taskWrapper.getTask();
     TimeoutTimerTask tt = new TimeoutTimerTask(this, number, taskWrapper);
-    timeoutHandler.scheduleAction(future, task.getTimeoutSchedule(), tt);
+    timeoutHandler.scheduleAction(future, taskWrapper.getTask().getTimeoutSchedule(), tt);
   }
 
   /**
