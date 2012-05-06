@@ -17,7 +17,6 @@
  */
 package org.jppf.server.node;
 
-import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.protocol.Task;
 
 /**
@@ -36,10 +35,6 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
    * The number identifying the task.
    */
   protected final long number;
-  /**
-   * Set if the node must reconnect to the driver.
-   */
-  protected JPPFNodeReconnectionNotification reconnectionNotification = null;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
