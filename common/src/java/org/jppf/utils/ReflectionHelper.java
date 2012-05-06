@@ -65,7 +65,8 @@ public final class ReflectionHelper
 
   /**
    * Invoke a method using reflection, without having to specify the parameters types.
-   * In this case, we assume the first method found with the specified name is the one we use.
+   * In this case, we assume the first method found with the specified name, and whose 
+   * number of parameter is the same as the number of values, is the one we use.
    * @param clazz the class on which to invoke the method.
    * @param instance the object on which to invoke the method, may be null if the method is static.
    * @param methodName the name of the method to invoke.
@@ -73,14 +74,15 @@ public final class ReflectionHelper
    * @return the result of the method's invocation, or null if the method's return type is void,
    * or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object invokeMethod(final Class clazz, final Object instance, final String methodName, final Object...values)
+  public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Object...values)
   {
     try
     {
+      int nbArgs = (values == null) ? 0 : values.length;
       Method[] methods = clazz.getMethods();
       for (Method m: methods)
       {
-        if (m.getName().equals(methodName)) return m.invoke(instance, values);
+        if (m.getName().equals(methodName) && (m.getParameterTypes().length == nbArgs)) return m.invoke(instance, values);
       }
       throw new NoSuchMethodException("class : " + clazz + ", method: " + methodName);
     }
