@@ -17,8 +17,6 @@
  */
 package org.jppf.server.node;
 
-import java.util.List;
-
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.node.protocol.Task;
 
@@ -35,10 +33,6 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
    */
   protected final Task task;
   /**
-   * The key to the JPPFContainer for the task's classloader.
-   */
-  protected final List<String> uuidPath;
-  /**
    * The number identifying the task.
    */
   protected final long number;
@@ -50,13 +44,11 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param task the task to execute within a try/catch block.
-   * @param uuidPath the key to the JPPFContainer for the task's classloader.
    * @param number the internal number identifying the task for the thread pool.
    */
-  public AbstractNodeTaskWrapper(final Task task, final List<String> uuidPath, final long number)
+  public AbstractNodeTaskWrapper(final Task task, final long number)
   {
     this.task = task;
-    this.uuidPath = uuidPath;
     this.number = number;
   }
 

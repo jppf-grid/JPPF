@@ -40,7 +40,7 @@ public class TimeoutTimerTask implements Runnable
   /**
    * The task to cancel.
    */
-  private Task task = null;
+  private NodeTaskWrapper taskWrapper = null;
   /**
    * The execution manager that started this task.
    */
@@ -50,14 +50,14 @@ public class TimeoutTimerTask implements Runnable
    * Initialize this timer task with the specified future.
    * @param executionManager the execution manager that started this task.
    * @param number the number identifying the task.
-   * @param task the task to cancel.
+   * @param taskWrapper the task to cancel.
    */
-  public TimeoutTimerTask(final NodeExecutionManagerImpl executionManager, final long number, final Task task)
+  public TimeoutTimerTask(final NodeExecutionManagerImpl executionManager, final long number, final NodeTaskWrapper taskWrapper)
   {
     this.executionManager = executionManager;
     this.number = number;
     this.future = executionManager.getFutureFromNumber(number);
-    this.task = task;
+    this.taskWrapper = taskWrapper;
   }
 
   /**
@@ -72,10 +72,21 @@ public class TimeoutTimerTask implements Runnable
       try
       {
         future.cancel(true);
+        Task task = taskWrapper.getTask();
         synchronized(task)
         {
           if (task.getException() instanceof InterruptedException) task.setException(null);
-          task.onTimeout();
+          ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+          try
+          {
+            // task.onTimeout() should have the same context classloader as the task.run()
+            Thread.currentThread().setContextClassLoader(taskWrapper.getClassLoader());
+            task.onTimeout();
+          }
+          finally
+          {
+            Thread.currentThread().setContextClassLoader(null);
+          }
         }
         executionManager.removeFuture(number);
       }

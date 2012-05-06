@@ -17,8 +17,6 @@
  */
 package org.jppf.server.node;
 
-import java.util.List;
-
 import org.jppf.*;
 import org.jppf.node.*;
 import org.jppf.node.protocol.Task;
@@ -45,14 +43,12 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * Initialize this task wrapper with a specified JPPF task.
    * @param executionManager reference to the execution manager.
    * @param task the task to execute within a try/catch block.
-   * @param uuidPath the key to the JPPFContainer for the task's class loader.
    * @param number the internal number identifying the task for the thread pool.
    * @param classLoader the class loader used as context class loader.
    */
-  public NodeTaskWrapper(final NodeExecutionManager executionManager, final Task task, final List<String> uuidPath,
-                         final long number, final ClassLoader classLoader)
+  public NodeTaskWrapper(final NodeExecutionManager executionManager, final Task task, final long number, final ClassLoader classLoader)
   {
-    super(task, uuidPath, number);
+    super(task, number);
     this.executionManager = executionManager;
     this.classLoader = classLoader;
   }
@@ -125,5 +121,14 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
         executionManager.setReconnectionNotification(reconnectionNotification);
       }
     }
+  }
+
+  /**
+   * Get the context class loader for this task.
+   * @return a {@link ClassLoader} instance.
+   */
+  public ClassLoader getClassLoader()
+  {
+    return classLoader;
   }
 }

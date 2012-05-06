@@ -54,13 +54,9 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    */
   protected JPPFScheduleHandler timeoutHandler = new JPPFScheduleHandler("Task Timeout Timer");
   /**
-   * Mapping of tasks numbers to their id.
-   */
-  protected Map<String, List<Long>> idMap = new Hashtable<String, List<Long>>();
-  /**
    * Mapping of internal number to the corresponding tasks.
    */
-  protected Map<Long, Task> taskMap = new Hashtable<Long, Task>();
+  protected Map<Long, NodeTaskWrapper> taskMap = new Hashtable<Long, NodeTaskWrapper>();
   /**
    * The bundle whose tasks are currently being executed.
    */
@@ -185,32 +181,18 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    */
   public synchronized long performTask(final Task task) throws Exception
   {
-    String id = task.getId();
     long number = incTaskCount();
-    taskMap.put(number, task);
-    ClassLoader classLoader;
-    if (node instanceof ClassLoaderProvider)
-      classLoader = ((ClassLoaderProvider)node).getClassLoader(uuidList);
-    else
-      classLoader = null;
+    ClassLoader classLoader = (node instanceof ClassLoaderProvider) ? ((ClassLoaderProvider)node).getClassLoader(uuidList) : null;
+    NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, number, classLoader);
+    taskMap.put(number, taskWrapper);
 
-    Future<?> f = getExecutor().submit(new NodeTaskWrapper(this, task, uuidList, number, classLoader));
+    Future<?> f = getExecutor().submit(taskWrapper);
     if (!f.isDone()) futureMap.put(number, f);
-    if (id != null)
-    {
-      List<Long> pairList = idMap.get(id);
-      if (pairList == null)
-      {
-        pairList = new ArrayList<Long>();
-        idMap.put(id, pairList);
-      }
-      pairList.add(number);
-    }
     JPPFSchedule schedule = task.getTimeoutSchedule();
     if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null)))
     {
-      if (schedule.getDuration() > 0L) processTaskTimeout(task, number);
-      else if (schedule.getDate() != null) processTaskExpirationDate(task, number);
+      if (schedule.getDuration() > 0L) processTaskTimeout(taskWrapper, number);
+      else if (schedule.getDate() != null) processTaskExpirationDate(taskWrapper, number);
     }
     return number;
   }
@@ -257,13 +239,27 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     if (!future.isDone())
     {
       future.cancel(true);
-      Task task = taskMap.remove(number);
-      if (task != null)
+      NodeTaskWrapper taskWrapper = taskMap.remove(number);
+      if (taskWrapper != null)
       {
+        Task task = taskWrapper.getTask();
         synchronized(task)
         {
           if (task.getException() instanceof InterruptedException) task.setException(null);
-          if (callOnCancel) task.onCancel();
+          if (callOnCancel)
+          {
+            ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            try
+            {
+              // task.onCancel() should have the same context classloader as the task.run()
+              Thread.currentThread().setContextClassLoader(taskWrapper.getClassLoader());
+              task.onCancel();
+            }
+            finally
+            {
+              Thread.currentThread().setContextClassLoader(null);
+            }
+          }
         }
       }
       removeFuture(number);
@@ -285,27 +281,28 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 
   /**
    * Notify the timer that a task must be aborted if its timeout period expired.
-   * @param task the JPPF task for which to set the timeout.
+   * @param taskWrapper the JPPF task for which to set the timeout.
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
-  private void processTaskExpirationDate(final Task task, final long number) throws Exception
+  private void processTaskExpirationDate(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
-    TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
-    timeoutHandler.scheduleAction(future, task.getTimeoutSchedule(), tt);
+    TimeoutTimerTask tt = new TimeoutTimerTask(this, number, taskWrapper);
+    timeoutHandler.scheduleAction(future, taskWrapper.getTask().getTimeoutSchedule(), tt);
   }
 
   /**
    * Notify the timer that a task must be aborted if its timeout period expired.
-   * @param task the JPPF task for which to set the timeout.
+   * @param taskWrapper the JPPF task for which to set the timeout.
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
-  private void processTaskTimeout(final Task task, final long number) throws Exception
+  private void processTaskTimeout(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
-    TimeoutTimerTask tt = new TimeoutTimerTask(this, number, task);
+    Task task = taskWrapper.getTask();
+    TimeoutTimerTask tt = new TimeoutTimerTask(this, number, taskWrapper);
     timeoutHandler.scheduleAction(future, task.getTimeoutSchedule(), tt);
   }
 
@@ -344,7 +341,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     futureMap.clear();
     taskMap.clear();
     timeoutHandler.clear();
-    idMap.clear();
   }
 
   /**

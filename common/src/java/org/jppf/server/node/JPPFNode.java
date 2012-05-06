@@ -25,7 +25,7 @@ import org.jppf.JPPFError;
 import org.jppf.classloader.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
-import org.jppf.node.*;
+import org.jppf.node.NodeRunner;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
@@ -38,7 +38,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class JPPFNode extends AbstractCommonNode
+public abstract class JPPFNode extends AbstractCommonNode implements ClassLoaderProvider
 {
   /**
    * Logger for this class.
@@ -445,6 +445,7 @@ public abstract class JPPFNode extends AbstractCommonNode
    * @return a <code>JMXServerImpl</code> instance.
    * @throws Exception if any error occurs.
    */
+  @Override
   public JMXServer getJmxServer() throws Exception
   {
     synchronized(this)
@@ -468,5 +469,14 @@ public abstract class JPPFNode extends AbstractCommonNode
   public LifeCycleEventHandler getLifeCycleEventHandler()
   {
     return lifeCycleEventHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception
+  {
+    return classLoaderManager.getContainer(uuidPath).getClassLoader();
   }
 }

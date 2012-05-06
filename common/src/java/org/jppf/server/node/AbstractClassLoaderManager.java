@@ -104,7 +104,7 @@ public abstract class AbstractClassLoaderManager
       {
         if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
         AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
-            {
+        {
           @Override
           public AbstractJPPFClassLoader run()
           {
@@ -118,7 +118,7 @@ public abstract class AbstractClassLoaderManager
             }
             return null;
           }
-            });
+        });
         container = newJPPFContainer(uuidPath, cl);
         if (containerList.size() >= maxContainers)
         {
