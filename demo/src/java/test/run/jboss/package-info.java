@@ -16,28 +16,7 @@
  * limitations under the License.
  */
 
-package sample.test.junit;
-
-import junit.framework.*;
-
 /**
- * Test suite for this package.
- * @author Laurent Cohen
+ * Classes used ot test the submission of jobs with prioritization.
  */
-public class AllTests
-{
-  /**
-   * Execute the tests.
-   * @return a <code>Test</code> instance.
-   */
-  public static Test suite()
-  {
-    TestSuite suite = new TestSuite("Test for sample.test.junit");
-    //$JUnit-BEGIN$
-    //suite.addTestSuite(TestRemoteTaskManagement.class);
-    //suite.addTestSuite(TestRemoteMonitoring.class);
-    suite.addTestSuite(TestRemoteImageProcessing.class);
-    //$JUnit-END$
-    return suite;
-  }
-}
+package test.run.jboss;
