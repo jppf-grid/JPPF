@@ -75,7 +75,7 @@ public class LoadBalancer
   /**
    * The bundlers used to split the tasks between local and remote execution.
    */
-  private final Bundler[] bundlers = new ClientProportionalBundler[2];
+  private final Bundler[] bundlers = new Bundler[2];
   /**
    * Determines whether this load balancer is currently executing tasks locally.
    */
@@ -123,6 +123,20 @@ public class LoadBalancer
   public synchronized void stop()
   {
     if (threadPool != null) threadPool.shutdownNow();
+    if(localInitialized)
+    {
+      synchronized (bundlers) {
+        for (int index = 0; index < bundlers.length; index++)
+        {
+          Bundler bundler = bundlers[index];
+          if (bundler != null)
+          {
+            bundler.dispose();
+            bundlers[index] = null;
+          }
+        }
+      }
+    }
     localInitialized = false;
   }
 
