@@ -388,12 +388,12 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   {
     long cpuTime = (info == null) ? 0L : info.cpuTime;
     TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime, task.getException() != null);
-    removeFuture(taskNumber);
     TaskExecutionListener[] tmp;
     synchronized(taskExecutionListeners)
     {
       tmp = listenersArray;
     }
+    removeFuture(taskNumber);
     for (TaskExecutionListener listener : tmp) listener.taskExecuted(event);
   }
 
