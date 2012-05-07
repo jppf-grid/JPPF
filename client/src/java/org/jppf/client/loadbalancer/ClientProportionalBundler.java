@@ -22,6 +22,9 @@ import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler;
 import org.slf4j.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Implementation of the &quot;proportional&quot; load-balancing algorithm, dedicated to
  * balancing the load between local and remote execution, when local execution is enabled in the client.
@@ -49,7 +52,17 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
    */
   public ClientProportionalBundler(final LoadBalancingProfile profile)
   {
-    super(profile);
+    this(profile, new HashSet<AbstractProportionalBundler>());
+  }
+
+  /**
+   * Creates a new instance with the initial size of bundle as the start size.
+   * @param profile the parameters of the load-balancing algorithm,
+   * @param bundlers mapping of individual bundler to corresponding performance data.
+   */
+  protected ClientProportionalBundler(final LoadBalancingProfile profile, final Set<AbstractProportionalBundler> bundlers)
+  {
+    super(profile, bundlers);
   }
 
   /**
@@ -60,7 +73,7 @@ public class ClientProportionalBundler extends AbstractProportionalBundler
   @Override
   public Bundler copy()
   {
-    return new ClientProportionalBundler(profile);
+    return new ClientProportionalBundler(profile, getBundlers());
   }
 
   /**

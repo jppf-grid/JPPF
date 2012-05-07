@@ -54,7 +54,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-   /**
+  /**
    * The task execution manager for this wrapper.
    */
   private final NodeExecutionManagerImpl executionManager;
@@ -201,7 +201,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
           }
           catch (Exception e)
           {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
           }
           return true;
         }
@@ -210,6 +210,15 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     };
     executor.execute(task);
     return task;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isLocal()
+  {
+    return true;
   }
 
   @Override
@@ -262,7 +271,6 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
           task.setDataProvider(dataProvider);
         }
         executionManager.execute(bundle, tasks);
-        setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(tasks);
 
         double elapsed = System.nanoTime() - start;
@@ -272,12 +280,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
       {
         log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(t);
       }
       finally
       {
         bundle.taskCompleted(exception);
+        setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
   }

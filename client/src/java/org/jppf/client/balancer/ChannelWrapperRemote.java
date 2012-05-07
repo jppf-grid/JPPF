@@ -177,7 +177,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           }
           catch (Exception e)
           {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
           }
           return true;
         }
@@ -186,6 +186,15 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     };
     executor.execute(task);
     return task;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isLocal()
+  {
+    return false;
   }
 
   /**
@@ -270,8 +279,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
             List<JPPFTask> results = connection.receiveResults(classLoader);
             int n = results.size();
             count += n;
-            if (count == tasks.size()) setStatus(JPPFClientConnectionStatus.ACTIVE);
-//            if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
+            if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
             this.bundle.resultsReceived(results);
 //            else log.warn("result listener is null for job " + newJob);
           }
@@ -280,19 +288,14 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
         double elapsed = System.nanoTime() - start;
         bundler.feedback(tasks.size(), elapsed);
-//        connection.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
       catch (Throwable t)
       {
         log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.resultsReceived(t);
 
-        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException))
-        {
-          return;
-        }
+        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) return;
 
         bundle.resubmit();
         reconnect();
@@ -301,6 +304,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       {
         if (registeredClassLoader != null) registeredClassLoader.dispose();
         bundle.taskCompleted(exception);
+        if(exception == null) setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
 
@@ -313,7 +317,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      */
     private JPPFJob createNewJob(final JPPFJob job, final List<JPPFTask> tasks) throws Exception
     {
-//      JPPFJob newJob = new JPPFJob();
       JPPFJob newJob = new JPPFJob(job.getUuid());
       newJob.setDataProvider(job.getDataProvider());
       newJob.setSLA(job.getSLA());

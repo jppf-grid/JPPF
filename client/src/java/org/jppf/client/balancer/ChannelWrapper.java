@@ -159,4 +159,10 @@ public abstract class ChannelWrapper<T>
    * @param bundle a {@link ClientTaskBundle} instance.
    */
   public abstract JPPFFuture<?> submit(final ClientTaskBundle bundle);
+
+  /**
+   * Determine whether this channel is local (for an in-JVM node).
+   * @return <code>false</code> if the channel is local, <code>false</code> otherwise.
+   */
+  public abstract boolean isLocal();
 }

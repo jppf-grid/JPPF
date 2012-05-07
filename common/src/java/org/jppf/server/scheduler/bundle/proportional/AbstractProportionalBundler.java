@@ -55,9 +55,13 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Mapping of individual bundler to corresponding performance data.
+   * Mapping of individual bundler to corresponding performance data - global.
    */
   private static final Set<AbstractProportionalBundler> BUNDLERS = new HashSet<AbstractProportionalBundler>();
+  /**
+   * Mapping of individual bundler to corresponding performance data - local.
+   */
+  private final Set<AbstractProportionalBundler> bundlers;
   /**
    * Bounded memory of the past performance updates.
    */
@@ -73,13 +77,38 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
    */
   public AbstractProportionalBundler(final LoadBalancingProfile profile)
   {
+    this(profile, null);
+  }
+
+  /**
+   * Creates a new instance with the initial size of bundle as the start size.
+   * @param profile the parameters of the load-balancing algorithm,
+   * @param bundlers mapping of individual bundler to corresponding performance data.
+   */
+  protected AbstractProportionalBundler(final LoadBalancingProfile profile, final Set<AbstractProportionalBundler> bundlers)
+  {
     super(profile);
+
+    if (bundlers == null)
+      this.bundlers = BUNDLERS;
+    else
+      this.bundlers = bundlers;
+
     if (this.profile == null) this.profile = new ProportionalTuneProfile();
     ProportionalTuneProfile prof = (ProportionalTuneProfile) this.profile;
     dataHolder = new BundleDataHolder(prof.getPerformanceCacheSize(), prof.getInitialMeanTime());
     bundleSize = prof.getInitialSize();
     if (bundleSize < 1) bundleSize = 1;
     if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using proportional bundle size - the initial size is " + bundleSize + ", profile: " + profile);
+  }
+
+  /**
+   * Get local mapping of individual bundler to corresponding performance data.
+   * @return <code>Set<AbstractProportionalBundler></code>
+   */
+  protected final Set<AbstractProportionalBundler> getBundlers()
+  {
+    return bundlers;
   }
 
   /**
@@ -115,7 +144,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
     if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
     if (size <= 0) return;
     BundlePerformanceSample sample = new BundlePerformanceSample(time / size, size);
-    synchronized(BUNDLERS)
+    synchronized(bundlers)
     {
       dataHolder.addSample(sample);
       computeBundleSizes();
@@ -129,9 +158,9 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
   @Override
   public void setup()
   {
-    synchronized(BUNDLERS)
+    synchronized(bundlers)
     {
-      BUNDLERS.add(this);
+      bundlers.add(this);
     }
   }
 
@@ -142,9 +171,9 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
   @Override
   public void dispose()
   {
-    synchronized(BUNDLERS)
+    synchronized(bundlers)
     {
-      BUNDLERS.remove(this);
+      bundlers.remove(this);
     }
   }
 
@@ -162,13 +191,13 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
    */
   private void computeBundleSizes()
   {
-    synchronized(BUNDLERS)
+    synchronized(bundlers)
     {
       double maxMean = Double.NEGATIVE_INFINITY;
       double minMean = Double.POSITIVE_INFINITY;
       AbstractProportionalBundler minBundler = null;
       double meanSum = 0.0d;
-      for (AbstractProportionalBundler b: BUNDLERS)
+      for (AbstractProportionalBundler b: bundlers)
       {
         BundleDataHolder h = b.getDataHolder();
         double m = h.getMean();
@@ -179,14 +208,14 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
           minBundler = b;
         }
       }
-      for (AbstractProportionalBundler b: BUNDLERS)
+      for (AbstractProportionalBundler b: bundlers)
       {
         BundleDataHolder h = b.getDataHolder();
         meanSum += normalize(h.getMean());
       }
       int max = maxSize();
       int sum = 0;
-      for (AbstractProportionalBundler b: BUNDLERS)
+      for (AbstractProportionalBundler b: bundlers)
       {
         BundleDataHolder h = b.getDataHolder();
         double p = normalize(h.getMean()) / meanSum;
@@ -205,7 +234,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
         StringBuilder sb = new StringBuilder();
         sb.append("bundler info:\n");
         sb.append("  minMean=").append(minMean).append(", maxMean=").append(maxMean).append(", maxSize=").append(max).append('\n');
-        for (AbstractProportionalBundler b: BUNDLERS)
+        for (AbstractProportionalBundler b: bundlers)
         {
           sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
           sb.append(b.getDataHolder()).append('\n');
