@@ -157,6 +157,7 @@ public abstract class ChannelWrapper<T>
   /**
    * Submit bundle for execution on corresponding node.
    * @param bundle a {@link ClientTaskBundle} instance.
+   * @return a {@link JPPFFuture}.
    */
   public abstract JPPFFuture<?> submit(final ClientTaskBundle bundle);
 

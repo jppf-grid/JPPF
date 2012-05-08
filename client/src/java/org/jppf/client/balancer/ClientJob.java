@@ -105,15 +105,33 @@ public class ClientJob
    * The status of this submission.
    */
   private SubmissionStatus submissionStatus;
-
+  /**
+   * Job status is new (just submitted).
+   */
   protected static final int NEW = 0;
+  /**
+   * Job status is excuting.
+   */
   protected static final int EXECUTING = 1;
+  /**
+   * Job status is done/complete.
+   */
   protected static final int DONE = 2;
+  /**
+   * Job status is cancelled.
+   */
   protected static final int CANCELLED = 3;
-
+  /**
+   * The job status.
+   */
   private volatile int status = NEW;
-
+  /**
+   * Number of tasks that have been dispatched to the executor.
+   */
   private int dispatchedCount = 0;
+  /**
+   * Number of tasks that hav completed.
+   */
   private int completedCount = 0;
 
   /**
@@ -531,6 +549,7 @@ public class ClientJob
    * Called when all or part of a job is dispatched to a node.
    * @param bundle  the dispatched job.
    * @param channel the node to which the job is dispatched.
+   * @param future  TODO: add javadoc.
    */
   public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel, final Future<?> future)
   {

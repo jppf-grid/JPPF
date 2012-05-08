@@ -504,6 +504,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
+  /**
+   * Cancel the job with the specified UUID
+   * @param jobId the uuid of the job to cancel.
+   */
   public void cancelJob(final String jobId)
   {
     lock.lock();
