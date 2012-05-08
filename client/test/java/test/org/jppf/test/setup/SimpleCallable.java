@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 /**
  * A simple callable task implementation.
  */
-public class SimpleCallable implements Callable<Result>, Serializable
+public class SimpleCallable implements Callable<TaskResult>, Serializable
 {
   /**
    * Explicit serialVersionUID.
@@ -68,13 +68,13 @@ public class SimpleCallable implements Callable<Result>, Serializable
 
   /**
    * Execute this task.
-   * @return a {@link Result} object.
+   * @return a {@link TaskResult} object.
    * @see java.util.concurrent.Callable#call()
    */
   @Override
-  public Result call()
+  public TaskResult call()
   {
-    Result executionResult = new Result();
+    TaskResult executionResult = new TaskResult();
     executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
     executionResult.position = position;
     if (duration > 0)

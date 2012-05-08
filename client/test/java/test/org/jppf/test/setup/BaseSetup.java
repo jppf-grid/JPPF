@@ -215,18 +215,8 @@ public class BaseSetup
   {
     JPPFJob job = new JPPFJob();
     job.setName(name);
-    Constructor[] constructors = taskClass.getConstructors();
-    Constructor constructor = null;
     int nbArgs = (params == null) ? 0 : params.length;
-    for (Constructor c: constructors)
-    {
-      if (c.getParameterTypes().length == nbArgs)
-      {
-        constructor = c;
-        break;
-      }
-    }
-    if (constructor == null) throw new IllegalArgumentException("couldn't find a constructor for class " + taskClass.getName() + " with " + nbArgs + " arguments");
+    Constructor constructor = findConstructor(taskClass, nbArgs);
     for (int i=1; i<=nbTasks; i++)
     {
       Object o = constructor.newInstance(params);
@@ -237,5 +227,47 @@ public class BaseSetup
     job.getSLA().setBroadcastJob(broadcast);
     if (!blocking) job.setResultListener(new JPPFResultCollector(job));
     return job;
+  }
+
+  /**
+   * Create a task with the specified parameters.
+   * The type of the task is specified via its class, and the constructor to
+   * use is specified based on the number of parameters.
+   * @param id the task id.
+   * @param taskClass the class of the tasks to add to the job.
+   * @param params the parameters for the tasks constructor.
+   * @return an <code>Object</code> representing a task.
+   * @throws Exception if any error occurs.
+   */
+  public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception
+  {
+    int nbArgs = (params == null) ? 0 : params.length;
+    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Object o = constructor.newInstance(params);
+    if (o instanceof JPPFTask) ((JPPFTask) o).setId(id);
+    return o;
+  }
+
+  /**
+   * Find a constructor with the specfied number of parameters for the specified class.
+   * @param taskClass the class of the tasks to add to the job.
+   * @param nbParams the number of parameters for the tasks constructor.
+   * @return a <code>constructor</code> instance.
+   * @throws Exception if any error occurs if a construcotr could not be found.
+   */
+  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
+  {
+    Constructor[] constructors = taskClass.getConstructors();
+    Constructor constructor = null;
+    for (Constructor c: constructors)
+    {
+      if (c.getParameterTypes().length == nbParams)
+      {
+        constructor = c;
+        break;
+      }
+    }
+    if (constructor == null) throw new IllegalArgumentException("couldn't find a constructor for class " + taskClass.getName() + " with " + nbParams + " arguments");
+    return constructor;
   }
 }

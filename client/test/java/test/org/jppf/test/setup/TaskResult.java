@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * Instances of this class represent the result of a task execution.
  */
-public class Result implements Serializable
+public class TaskResult implements Serializable
 {
   /**
    * Explicit serialVersionUID.

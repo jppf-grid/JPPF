@@ -56,10 +56,6 @@ public class TestJPPFBalancer
       job.setBlocking(true);
       job.getSLA().setBroadcastJob(true);
 
-//      System.out.println("Submitting job...");
-//      client.submit(job);
-//      System.out.println("Submitting job...DONE");
-
       job = new JPPFJob();
       job.setBlocking(true);
       job.addJobListener(new JobListener() {
@@ -105,12 +101,6 @@ public class TestJPPFBalancer
       });
       System.out.println("Submission status: " + collector.getStatus());
       job.setResultListener(collector);
-//      job.setResultListener(new TaskResultListener() {
-//        @Override
-//        public void resultsReceived(final TaskResultEvent event) {
-//          System.out.println("resultsReceived: " + event.getTaskList().size());
-//        }
-//      });
 
       System.out.println("Submitting job...");
       long dur = System.nanoTime();

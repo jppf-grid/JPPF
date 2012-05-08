@@ -32,7 +32,7 @@ public class SimpleRunnable implements Runnable, Serializable
   /**
    * The result of executing this task.
    */
-  private Result executionResult = null;
+  private TaskResult executionResult = null;
 
   /**
    * Default constructor.
@@ -45,7 +45,7 @@ public class SimpleRunnable implements Runnable, Serializable
    * Initialize this task with the specified result object.
    * @param result the result to use.
    */
-  public SimpleRunnable(final Result result)
+  public SimpleRunnable(final TaskResult result)
   {
     this.executionResult = result;
   }

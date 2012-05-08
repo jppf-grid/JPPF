@@ -71,7 +71,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   @Test
   public void testSubmitRunnable() throws Exception
   {
-    Result result = new Result();
+    TaskResult result = new TaskResult();
     SimpleRunnable sr = new SimpleRunnable(result);
     Future<?> future = executor.submit(sr);
     future.get();
@@ -86,11 +86,11 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   @Test
   public void testSubmitRunnableWithResult() throws Exception
   {
-    Result result = new Result();
+    TaskResult result = new TaskResult();
     SimpleRunnable sr = new SimpleRunnable(result);
-    Future<Result> future = executor.submit(sr, result);
+    Future<TaskResult> future = executor.submit(sr, result);
     assertNotNull(future);
-    Result finalResult = future.get();
+    TaskResult finalResult = future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(finalResult);
@@ -105,9 +105,9 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   public void testSubmitCallable() throws Exception
   {
     SimpleCallable sc = new SimpleCallable();
-    Future<Result> future = executor.submit(sc);
+    Future<TaskResult> future = executor.submit(sc);
     assertNotNull(future);
-    Result finalResult = future.get();
+    TaskResult finalResult = future.get();
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(finalResult);
@@ -124,14 +124,14 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     int n = 10;
     List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
-    List<Future<Result>> futures = executor.invokeAll(tasks);
+    List<Future<TaskResult>> futures = executor.invokeAll(tasks);
     assertNotNull(futures);
     assertEquals(n, futures.size());
     for (int i=0; i<n; i++)
     {
-      Future<Result> future = futures.get(i);
+      Future<TaskResult> future = futures.get(i);
       assertNotNull(future);
-      Result finalResult = future.get();
+      TaskResult finalResult = future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
       assertNotNull(finalResult);
@@ -152,10 +152,10 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     long timeout = TASK_DURATION / 2L;
     List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
-    List<Future<Result>> futures = executor.invokeAll(tasks, timeout, TimeUnit.MILLISECONDS);
+    List<Future<TaskResult>> futures = executor.invokeAll(tasks, timeout, TimeUnit.MILLISECONDS);
     assertNotNull(futures);
     assertEquals(n, futures.size());
-    for (Future<Result> f: futures)
+    for (Future<TaskResult> f: futures)
     {
       assertNull(f.get());
       assertTrue(f.isDone());
@@ -174,7 +174,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     int n = 10;
     List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
-    Result result = executor.invokeAny(tasks);
+    TaskResult result = executor.invokeAny(tasks);
     assertNotNull(result);
     assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
     assertTrue(result.position >= 0);
@@ -192,7 +192,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     long timeout = TASK_DURATION / 2L;
     List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
-    Result result = executor.invokeAny(tasks, timeout, TimeUnit.MILLISECONDS);
+    TaskResult result = executor.invokeAny(tasks, timeout, TimeUnit.MILLISECONDS);
     assertNull(result);
     Thread.sleep(100L + (n * TASK_DURATION) - timeout);
   }
