@@ -21,7 +21,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.utils.streams.*;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * This class provides a set of utility methods for reading, writing and manipulating files.
@@ -75,12 +75,12 @@ public final class FileUtils
     BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
     try
     {
-    String s = "";
-    while (s != null)
-    {
-      s = reader.readLine();
-      if ((s != null) && !"".equals(s.trim())) lines.add(s);
-    }
+      String s = "";
+      while (s != null)
+      {
+        s = reader.readLine();
+        if ((s != null) && !"".equals(s.trim())) lines.add(s);
+      }
     }
     finally
     {
@@ -514,7 +514,7 @@ public final class FileUtils
     }
     return success;
   }
- 
+
   /**
    * Create the folders of the specified path, if they do not all already esist.
    * @param file the path for which to create the folders. If it is a file, then folders for its parent path are created.
