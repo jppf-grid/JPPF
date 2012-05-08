@@ -55,4 +55,13 @@ public abstract class AbstractNodeTaskWrapper implements Runnable
   {
     return task;
   }
+
+  /**
+   * Get the number identifying the task.
+   * @return long value identifying the task.
+   */
+  public long getNumber()
+  {
+    return number;
+  }
 }

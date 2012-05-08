@@ -54,25 +54,15 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   }
 
   /**
-   * Get the number identifying the task.
-   * @return long value identifying the task.
-   */
-  public long getNumber()
-  {
-    return number;
-  }
-
-  /**
    * Execute the task within a try/catch block.
    * @see Runnable#run()
    */
   @Override
   public void run()
   {
-    JPPFNodeReconnectionNotification reconnectionNotification = null;
+    JPPFNodeReconnectionNotification rn = null;
     ThreadManager threadManager = executionManager.getThreadManager();
     NodeExecutionInfo info = null;
-    NodeExecutionInfo info2 = null;
     long elapsedTime = 0L;
     try
     {
@@ -87,7 +77,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       try
       {
         // convert cpu time from nanoseconds to milliseconds
-        if (info != null) info2 = threadManager.computeExecutionInfo(id).subtract(info);
+        if (info != null) info = threadManager.computeExecutionInfo(id).subtract(info);
         elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
       catch(Throwable ignore)
@@ -96,7 +86,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     }
     catch(JPPFNodeReconnectionNotification t)
     {
-      reconnectionNotification = t;
+      rn = t;
     }
     catch(Throwable t)
     {
@@ -105,21 +95,18 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     }
     finally
     {
-      if (reconnectionNotification == null)
+      if (rn == null)
       {
         try
         {
-          executionManager.taskEnded(task, number, info2, elapsedTime);
+          executionManager.taskEnded(task, number, info, elapsedTime);
         }
         catch(JPPFNodeReconnectionNotification t)
         {
-          reconnectionNotification = t;
+          rn = t;
         }
       }
-      if (reconnectionNotification != null)
-      {
-        executionManager.setReconnectionNotification(reconnectionNotification);
-      }
+      if (rn != null) executionManager.setReconnectionNotification(rn);
     }
   }
 
