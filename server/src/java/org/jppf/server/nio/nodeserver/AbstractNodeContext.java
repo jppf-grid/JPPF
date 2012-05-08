@@ -101,14 +101,17 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    * If it is not, then it is replaced with a copy of the specified bundler, with a
    * timestamp taken at creation time.
    * @param serverBundler the bundler to compare with.
+   * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
-  public boolean checkBundler(final Bundler serverBundler)
+  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext)
   {
     if (this.bundler.getTimestamp() < serverBundler.getTimestamp())
     {
       this.bundler.dispose();
+      if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
       this.bundler = serverBundler.copy();
+      if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
       if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(nodeInfo);
       return true;
@@ -132,7 +135,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   @Override
   public void handleException(final ChannelWrapper<?> channel)
   {
-    if (getBundler() != null) getBundler().dispose();
+    if (getBundler() != null) {
+      getBundler().dispose();
+      if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
+    }
     NodeNioServer.closeNode(channel, this);
     if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(((JPPFTaskBundle) bundle.getJob()).getState()))
     {

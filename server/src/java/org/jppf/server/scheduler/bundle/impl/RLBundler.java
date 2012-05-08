@@ -27,7 +27,7 @@ import org.slf4j.*;
  * Bundler based on a reinforcement learning algorithm.
  * @author Laurent Cohen
  */
-public class RLBundler extends AbstractRLBundler
+public class RLBundler extends AbstractRLBundler implements ContextAwareness
 {
   /**
    * Logger for this class.
@@ -37,6 +37,10 @@ public class RLBundler extends AbstractRLBundler
    * Determines whether debugging level is set for logging.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Holds information about the execution context.
+   */
+  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the specified parameters.
@@ -66,6 +70,25 @@ public class RLBundler extends AbstractRLBundler
   @Override
   protected int maxSize()
   {
-    return JPPFDriver.getQueue().getMaxBundleSize();
+    if(jppfContext == null) throw new IllegalStateException("jppfContext not set");
+    return jppfContext.getMaxBundleSize();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFContext getJPPFContext()
+  {
+    return jppfContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setJPPFContext(final JPPFContext context)
+  {
+    this.jppfContext = context;
   }
 }

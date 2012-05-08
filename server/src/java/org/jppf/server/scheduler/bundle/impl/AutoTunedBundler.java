@@ -17,6 +17,7 @@
  */
 package org.jppf.server.scheduler.bundle.impl;
 
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
@@ -33,7 +34,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public class AutoTunedBundler extends AbstractAutoTunedBundler
+public class AutoTunedBundler extends AbstractAutoTunedBundler implements ContextAwareness
 {
   /**
    * Logger for this class.
@@ -47,6 +48,10 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
    * Determines whether trace level is set for logging.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * Holds information about the execution context.
+   */
+  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -199,6 +204,25 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
   @Override
   protected int maxSize()
   {
-    return JPPFDriver.getQueue().getMaxBundleSize()/2;
+    if(jppfContext == null) throw new IllegalStateException("jppfContext not set");
+    return jppfContext.getMaxBundleSize() / 2;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFContext getJPPFContext()
+  {
+    return jppfContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setJPPFContext(final JPPFContext context)
+  {
+    this.jppfContext = context;
   }
 }

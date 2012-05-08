@@ -24,6 +24,8 @@ import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.ContextAwareness;
+import org.jppf.server.scheduler.bundle.JPPFContext;
 import org.jppf.server.scheduler.bundle.NodeAwareness;
 
 /**
@@ -101,16 +103,22 @@ public abstract class ChannelWrapper<T>
    * If it is not, then it is replaced with a copy of the specified bundler, with a
    * timestamp taken at creation time.
    * @param serverBundler the bundler to compare with.
+   * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
-  public boolean checkBundler(final Bundler serverBundler)
+  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext)
   {
     if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
 
     if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp())
     {
-      if (this.bundler != null) this.bundler.dispose();
+      if (this.bundler != null)
+      {
+        this.bundler.dispose();
+        if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
+      }
       this.bundler = serverBundler.copy();
+      if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
       if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);
       return true;

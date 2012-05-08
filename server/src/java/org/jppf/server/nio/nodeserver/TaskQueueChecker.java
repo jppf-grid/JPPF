@@ -23,6 +23,7 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
+import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.ChannelJobPair;
 import org.jppf.server.nio.ChannelWrapper;
@@ -369,7 +370,7 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private void updateBundler(final Bundler bundler, final JPPFTaskBundle taskBundle, final AbstractNodeContext context)
   {
-    context.checkBundler(server.getBundler());
+    context.checkBundler(server.getBundler(), JPPFContextDriver.getInstance());
     if (context.getBundler() instanceof JobAwareness)
     {
       JobMetadata metadata = taskBundle.getMetadata();

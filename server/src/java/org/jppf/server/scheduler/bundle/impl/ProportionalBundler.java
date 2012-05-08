@@ -34,7 +34,7 @@ import org.slf4j.*;
  * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
  */
-public class ProportionalBundler extends AbstractProportionalBundler
+public class ProportionalBundler extends AbstractProportionalBundler implements ContextAwareness
 {
   /**
    * Logger for this class.
@@ -44,6 +44,10 @@ public class ProportionalBundler extends AbstractProportionalBundler
    * Determines whether debugging level is set for logging.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Holds information about the execution context.
+   */
+  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -73,6 +77,24 @@ public class ProportionalBundler extends AbstractProportionalBundler
   @Override
   protected int maxSize()
   {
-    return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
+    return (jppfContext == null ||  jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFContext getJPPFContext()
+  {
+    return jppfContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setJPPFContext(final JPPFContext context)
+  {
+    this.jppfContext = context;
   }
 }

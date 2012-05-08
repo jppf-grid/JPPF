@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import org.jppf.management.*;
+import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
@@ -78,6 +79,7 @@ class WaitInitialBundleState extends NodeServerState
       context.setNodeInfo(systemInfo);
       if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       if (debugEnabled) log.debug("processing threads for node " + channel + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
+      if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(JPPFContextDriver.getInstance());
       bundler.setup();
       context.setBundler(bundler);
       boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);

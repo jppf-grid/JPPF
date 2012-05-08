@@ -19,6 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.JPPFContextClient;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.balancer.ChannelWrapper;
 import org.jppf.client.balancer.ClientJob;
@@ -32,6 +33,7 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.JPPFContext;
 import org.jppf.server.scheduler.bundle.JobAwareness;
 import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeBundler;
 import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile;
@@ -88,6 +90,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Bundler used to schedule tasks for the corresponding node.
    */
   private Bundler bundler;
+  /**
+   * Holds information about the execution context.
+   */
+  private final JPPFContext jppfContext;
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -98,6 +104,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
   {
     this.queue = queue;
+    this.jppfContext = new JPPFContextClient(queue);
     this.statsManager = statsManager;
     this.jobManager = jobManager;
     this.queueLock = queue.getLock();
@@ -405,7 +412,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final ChannelWrapper<?> context)
   {
-    context.checkBundler(bundler);
+    context.checkBundler(bundler, jppfContext);
     if (context.getBundler() instanceof JobAwareness)
     {
       JobMetadata metadata = taskBundle.getMetadata();

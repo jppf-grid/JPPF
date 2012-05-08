@@ -28,6 +28,8 @@ import org.jppf.client.event.JobEvent.Type;
 import org.jppf.client.submission.JobSubmission;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.ContextAwareness;
+import org.jppf.server.scheduler.bundle.JPPFContext;
 import org.jppf.server.scheduler.bundle.proportional.ProportionalTuneProfile;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -85,9 +87,17 @@ public class LoadBalancer
    */
   private final Object availableConnectionLock = new Object();
 
+  private final JPPFContext jppfContext = new JPPFContext()
+  {
+    @Override
+    public int getMaxBundleSize()
+    {
+      return -1;
+    }
+  };
   /**
-   * Default constructor.
-   */
+  * Default constructor.
+  */
   @SuppressWarnings("unchecked")
   public LoadBalancer()
   {
@@ -112,7 +122,10 @@ public class LoadBalancer
     {
       bundlers[LOCAL] = new ClientProportionalBundler(profile);
       bundlers[REMOTE] = new ClientProportionalBundler(profile);
-      for (Bundler b: bundlers) b.setup();
+      for (Bundler bundler : bundlers) {
+        if (bundler instanceof ContextAwareness) ((ContextAwareness)bundler).setJPPFContext(jppfContext);
+        bundler.setup();
+      }
     }
     localInitialized = true;
   }
@@ -132,6 +145,7 @@ public class LoadBalancer
           if (bundler != null)
           {
             bundler.dispose();
+            if (bundler instanceof ContextAwareness) ((ContextAwareness)bundler).setJPPFContext(null);
             bundlers[index] = null;
           }
         }

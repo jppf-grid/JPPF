@@ -29,12 +29,16 @@ import org.slf4j.*;
  * user-defined parameter which defaults to one.
  * @author Laurent Cohen
  */
-public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer
+public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer implements ContextAwareness
 {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(NodeThreadsLoadBalancer.class);
+  /**
+   * Holds information about the execution context.
+   */
+  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the specified parameters profile.
@@ -66,6 +70,24 @@ public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer
   @Override
   protected int maxSize()
   {
-    return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
+    return (jppfContext == null ||  jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JPPFContext getJPPFContext()
+  {
+    return jppfContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setJPPFContext(final JPPFContext context)
+  {
+    this.jppfContext = context;
   }
 }
