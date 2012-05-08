@@ -105,8 +105,11 @@
 	<!--                         Compile the application                           -->
 	<!-- ========================================================================= -->
 
+  <taskdef resource="checkstyletask.properties" classpath="${lib.dir}/checkstyle-5.5-all.jar"/>
+
 	<target name="compile" depends="init">
 		<echo message="compiling the project..."/>
+    <checkstyle config="${basedir}/CheckStyle_JPPF_config.xml"><fileset dir="${src.dir}" includes="**/*.java"/></checkstyle>
 		<javac srcdir="" destdir="${classes.dir}/jca"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>

@@ -31,7 +31,10 @@
 		<antcall target="compile.module"><param name="path" value="${demo}"/></antcall>
   </target>
 
-	<target name="compile.module">
+  <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
+
+  <target name="compile.module">
+    <checkstyle  config="${basedir}/CheckStyle_JPPF_config.xml"><fileset dir="${path}/src/java" includes="**/*.java"/></checkstyle>
  		<mkdir dir="${path}/classes"/>
 		<javac srcdir="" destdir="${path}/classes" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
