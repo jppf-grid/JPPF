@@ -17,7 +17,7 @@
  */
 
 /**
- * TODO add doc here.
+ * Utility classes for load balancing in JPPF client.
  * @exclude
  */
 package org.jppf.client.balancer.utils;

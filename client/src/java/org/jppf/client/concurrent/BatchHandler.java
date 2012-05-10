@@ -352,7 +352,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Configure the specfied job using the current configuration.
+   * Configure the specified job using the current configuration.
    * @param job the job to configure.
    */
   private synchronized void configureJob(final JPPFJob job)
@@ -367,7 +367,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Configure the specfied job using the current configuration.
+   * Configure the specified job using the current configuration.
    * @param task the task to configure.
    */
   private synchronized void configureTask(final JPPFAnnotatedTask task)

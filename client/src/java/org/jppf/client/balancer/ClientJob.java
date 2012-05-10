@@ -19,6 +19,7 @@
 package org.jppf.client.balancer;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.client.balancer.utils.AbstractClientJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.client.event.TaskResultListener;
@@ -26,6 +27,8 @@ import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.client.submission.SubmissionStatusHandler;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +38,12 @@ import java.util.concurrent.Future;
 /**
  * @author Martin JANDA
  */
-public class ClientJob
+public class ClientJob extends AbstractClientJob
 {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
   /**
    * The underlying task bundle.
    */
@@ -62,10 +69,6 @@ public class ClientJob
    */
   private boolean pending = false;
   /**
-   * Job suspended indicator.
-   */
-  private boolean jobSuspended = false;
-  /**
    * Job requeue indicator.
    */
   private boolean requeued = false;
@@ -90,41 +93,13 @@ public class ClientJob
    */
   private JobSLA sla = null;
   /**
-   * List of all bundles in this job.
-   */
-  private final List<ClientTaskBundle> bundleList = new ArrayList<ClientTaskBundle>();
-  /**
    * List of all futures in this job.
    */
   private final List<Future> futureList = new ArrayList<Future>();
   /**
-   * List of all runnables called on job completion.
-   */
-  private final List<Runnable> onDoneList = new ArrayList<Runnable>();
-  /**
    * The status of this submission.
    */
   private SubmissionStatus submissionStatus;
-  /**
-   * Job status is new (just submitted).
-   */
-  protected static final int NEW = 0;
-  /**
-   * Job status is excuting.
-   */
-  protected static final int EXECUTING = 1;
-  /**
-   * Job status is done/complete.
-   */
-  protected static final int DONE = 2;
-  /**
-   * Job status is cancelled.
-   */
-  protected static final int CANCELLED = 3;
-  /**
-   * The job status.
-   */
-  private volatile int status = NEW;
   /**
    * Number of tasks that have been dispatched to the executor.
    */
@@ -145,14 +120,10 @@ public class ClientJob
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
 
     this.job = job;
-    if (getJob().getResultListener() instanceof SubmissionStatusHandler)
-    {
-      this.submissionStatus = ((SubmissionStatusHandler) getJob().getResultListener()).getStatus();
-    }
+    if (this.job.getResultListener() instanceof SubmissionStatusHandler)
+      this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
     else
-    {
       this.submissionStatus = SubmissionStatus.SUBMITTED;
-    }
 
     this.tasks = new ArrayList<JPPFTask>(tasks);
     this.uuid = getJob().getUuid();
@@ -249,7 +220,6 @@ public class ClientJob
   public ClientJob copy()
   {
     return new ClientJob(job, this.tasks);
-//    return copy(this.tasks.size());
   }
 
   /**
@@ -272,7 +242,6 @@ public class ClientJob
       }
       finally
       {
-//        job.setTaskCount(job.getTaskCount() - nbTasks);
         subList.clear();
       }
     }
@@ -290,19 +259,6 @@ public class ClientJob
     list.addAll(this.tasks);
     if (after) list.addAll(that.tasks);
     this.tasks = list;
-
-
-//      int n = that.getJob().getTaskCount();
-//      job.setTaskCount(job.getTaskCount() + n);
-//      job.getSLA().setSuspended(that.getJob().getSLA().isSuspended());
-//      if (after)
-//      {
-//        for (DataLocation task: that.getTasks()) tasks.add(task);
-//      }
-//      else
-//      {
-//        for (int i=n-1; i>=0; i--) tasks.add(0, that.getTasks().get(i));
-//      }
   }
 
   /**
@@ -386,24 +342,6 @@ public class ClientJob
   }
 
   /**
-   * Get the job suspended indicator.
-   * @return <code>true</code> if job is suspended, <code>false</code> otherwise.
-   */
-  public boolean isJobSuspended()
-  {
-    return jobSuspended;
-  }
-
-  /**
-   * Set the job suspended indicator.
-   * @param jobSuspended <code>true</code> to indicate that job was suspended, <code>false</code> otherwise
-   */
-  public void setJobSuspended(final boolean jobSuspended)
-  {
-    this.jobSuspended = jobSuspended;
-  }
-
-  /**
    * Notifies that job was cancelled.
    */
   public void jobCancelled()
@@ -416,7 +354,6 @@ public class ClientJob
    */
   public void jobExpired()
   {
-//    fireTaskCompleted();
     jobCancelled();
   }
 
@@ -522,8 +459,6 @@ public class ClientJob
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
 
     completedCount += bundle.getTasksL().size();
-    System.out.println("taskCompleted: " + bundle + "\t - " + exception + "\t completed: " + completedCount + " / " + job.getTasks().size());
-    bundleList.remove(bundle);
 
     if(completedCount > dispatchedCount) throw new IllegalStateException("completedCount > dispatchedCount");
 
@@ -532,16 +467,11 @@ public class ClientJob
       setSubmissionStatus(SubmissionStatus.FAILED);
     }
 
-    if(completedCount == job.getTasks().size())
+    if(completedCount == job.getTasks().size() && submissionStatus == SubmissionStatus.EXECUTING)
     {
-      if(submissionStatus == SubmissionStatus.EXECUTING)
-      {
-        job.fireJobEvent(JobEvent.Type.JOB_END);
-        setSubmissionStatus(SubmissionStatus.COMPLETE);
-      }
-    } else if(completedCount < job.getTasks().size())
-    {
-    } else
+      job.fireJobEvent(JobEvent.Type.JOB_END);
+      setSubmissionStatus(SubmissionStatus.COMPLETE);
+    } else if(completedCount >= job.getTasks().size())
       throw new IllegalStateException("completedCount > job.tasks.size");
   }
 
@@ -549,7 +479,7 @@ public class ClientJob
    * Called when all or part of a job is dispatched to a node.
    * @param bundle  the dispatched job.
    * @param channel the node to which the job is dispatched.
-   * @param future  TODO: add javadoc.
+   * @param future  future assigned to bundle execution.
    */
   public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel, final Future<?> future)
   {
@@ -558,11 +488,9 @@ public class ClientJob
     if (future == null) throw new IllegalArgumentException("future is null");
 
     dispatchedCount += bundle.getTasksL().size();
-    bundleList.add(bundle);
     futureList.add(future);
-    if (status == NEW)
+    if (updateStatus(NEW, EXECUTING))
     {
-      status = EXECUTING;
       setSubmissionStatus(SubmissionStatus.EXECUTING);
       job.fireJobEvent(JobEvent.Type.JOB_START);
     }
@@ -591,77 +519,43 @@ public class ClientJob
   }
 
   /**
-   * Cancels this job.
-   * @return whether cancellation was successful.
+   * {@inheritDoc}
    */
+  @Override
   public boolean cancel()
   {
-    if (status > EXECUTING) return false;
-    status = CANCELLED;
-    try
-    {
-      for (Future future : futureList)
+    if(super.cancel()) {
+      try
       {
-        try
+        for (Future future : futureList)
         {
-          future.cancel(false);
-        }
-        catch (Exception e)
-        {
-          e.printStackTrace();
+          try
+          {
+            future.cancel(false);
+          }
+          catch (Exception e)
+          {
+            log.error("Error cancelling job " + this, e);
+          }
         }
       }
+      finally
+      {
+        done();
+      }
+      return true;
     }
-    finally
-    {
-      done();
-    }
-    return true;
+    else
+      return false;
   }
 
   /**
-   * @return <code>true</code> when job is cancelled or finished normally.
+   * {@inheritDoc}
    */
-  public boolean isDone()
-  {
-    return status >= EXECUTING;
-  }
-
-  /**
-   * @return <code>true</code> when job was cancelled.
-   */
-  public boolean isCancelled()
-  {
-    return status >= CANCELLED;
-  }
-
-  /**
-   * Called when task was cancelled or finished.
-   */
+  @Override
   protected void done()
   {
-    for (Runnable runnable : onDoneList)
-    {
-      runnable.run();
-    }
+    super.done();
     fireTaskCompleted();
-  }
-
-  /**
-   * Registers instance to be called on job finish.
-   * @param runnable {@link Runnable} to be called on job finish.
-   */
-  public void addOnDone(final Runnable runnable)
-  {
-    onDoneList.add(runnable);
-  }
-
-  /**
-   * Deregisters instance to be called on job finish.
-   * @param runnable {@link Runnable} to be called on job finish.
-   */
-  public void removeOnDone(final Runnable runnable)
-  {
-    onDoneList.remove(runnable);
   }
 }

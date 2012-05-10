@@ -168,16 +168,15 @@ public class TestJPPFBalancer
      * The text describing this task.
      */
     private final String text;
-
     /**
-     * TODO javadoc here
+     * Indicates whether exception should be fired during task execution.
      */
     private final boolean exception;
 
     /**
      * Initializes task with describing text.
      * @param text describing this task.
-     * @param exception exception TODO javadoc here
+     * @param exception indicates whether exception should be fired.
      */
     public TestTask(final String text, final boolean exception)
     {

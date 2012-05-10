@@ -17,7 +17,6 @@
  */
 package org.jppf.server.scheduler.bundle.impl;
 
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.nodethreads.AbstractNodeThreadsLoadBalancer;
 import org.slf4j.*;

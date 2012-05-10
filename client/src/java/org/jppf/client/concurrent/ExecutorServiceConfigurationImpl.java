@@ -21,7 +21,7 @@ package org.jppf.client.concurrent;
 import org.jppf.server.protocol.*;
 
 /**
- * COncrete implementation of the {@link ExecutorServiceConfiguration} interface.
+ * Concrete implementation of the {@link ExecutorServiceConfiguration} interface.
  * @author Laurent Cohen
  * @exclude
  */

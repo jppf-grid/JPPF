@@ -21,21 +21,35 @@ package org.jppf.client.balancer.utils;
 import java.util.concurrent.Future;
 
 /**
- * Created with IntelliJ IDEA.
- * User: martin
- * Date: 4/29/12
- * Time: 10:34 PM
- * To change this template use File | Settings | File Templates.
+ * Interface for notifying Future.
+ * @param <V> The result type returned by <code>get</code> method.
+ * @author Martin JANDA
  */
 public interface JPPFFuture<V> extends Future<V>
 {
+  /**
+   * Add a future done listener to this future's list of listeners.
+   * @param listener the listener to add to the list.
+   * @throws IllegalArgumentException when listener is null.
+   */
+  void addListener(final Listener listener);
 
-  public void addListener(final Listener listener);
+  /**
+   * Add a future done listener to this future's list of listeners.
+   * @param listener the listener to remove from the list.
+   * @throws IllegalArgumentException when listener is null.
+   */
+  void removeListener(final Listener listener);
 
-  public void removeListener(final Listener listener);
-
-  public static interface Listener
+  /**
+   * Instances of this interface listen transition of Future to done state.
+   */
+  public interface Listener
   {
-    public void onDone(final JPPFFuture<?> future);
+    /**
+     * Invoked to notify that future is done (normally or cancelled).
+     * @param future the future that has been done.
+     */
+    void onDone(final JPPFFuture<?> future);
   }
 }

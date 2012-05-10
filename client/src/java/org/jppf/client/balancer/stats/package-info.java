@@ -17,6 +17,7 @@
  */
 
 /**
- * TODO add doc here.
+ * Classes supporting client statistics notification.
+ * @exclude
  */
 package org.jppf.client.balancer.stats;

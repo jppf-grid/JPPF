@@ -21,9 +21,9 @@ package org.jppf.client.concurrent;
 /**
  * Interface for the configuration properties of a {@link JPPFExecutorService}.
  * Instances of this interface hold the properties to associate to each job submitted by
- * the executor service, along with te properties to associate whith each individual task.
+ * the executor service, along with te properties to associate with each individual task.
  * This configuration interface represents a way to provide JPPF-specific properties without
- * explicitely breaking the semantics of the {@link java.util.concurrent.ExecutorService ExecutorService} interface.
+ * explicitly breaking the semantics of the {@link java.util.concurrent.ExecutorService ExecutorService} interface.
  * @author Laurent Cohen
  */
 public interface ExecutorServiceConfiguration
@@ -34,7 +34,7 @@ public interface ExecutorServiceConfiguration
    */
   JobConfiguration getJobConfiguration();
   /**
-   * Get the configuration to use for the tasksz submitted by the executor service.
+   * Get the configuration to use for the tasks submitted by the executor service.
    * @return a {@link TaskConfiguration} instance.
    */
   TaskConfiguration getTaskConfiguration();

@@ -26,7 +26,7 @@ import org.jppf.client.balancer.ClientJob;
 import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.client.balancer.job.ChannelJobPair;
 import org.jppf.client.balancer.job.JPPFJobManager;
-import org.jppf.client.balancer.stats.JPPFDriverStatsManager;
+import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -73,7 +73,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   /**
    * Reference to the statistics manager.
    */
-  private final JPPFDriverStatsManager statsManager;
+  private final JPPFClientStatsManager statsManager;
   /**
    * Reference to the job manager.
    */
@@ -101,7 +101,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param statsManager the reference to statistics manager.
    * @param jobManager   the job manager that submits the events.
    */
-  public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
+  public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFClientStatsManager statsManager, final JPPFJobManager jobManager)
   {
     this.queue = queue;
     this.jppfContext = new JPPFContextClient(queue);

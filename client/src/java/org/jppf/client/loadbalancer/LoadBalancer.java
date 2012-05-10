@@ -86,7 +86,9 @@ public class LoadBalancer
    * Lock used when determining if a job can be executed immediately.
    */
   private final Object availableConnectionLock = new Object();
-
+  /**
+   * Holds information about the execution context.
+   */
   private final JPPFContext jppfContext = new JPPFContext()
   {
     @Override

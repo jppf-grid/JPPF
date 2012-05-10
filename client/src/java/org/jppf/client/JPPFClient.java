@@ -182,19 +182,18 @@ public class JPPFClient extends AbstractGenericClient
       {
         submissionManager = new SubmissionManagerClient(this);
         new Thread(submissionManager, "SubmissionManager").start();
-        super.initPools();
       }
       catch (Exception e)
       {
-        e.printStackTrace();
+        log.error("Can't initialize SubmissionManagerClient", e);
       }
     }
     else
     {
       submissionManager = new SubmissionManagerImpl(this);
       new Thread(submissionManager, "SubmissionManager").start();
-      super.initPools();
     }
+    super.initPools();
   }
 
   /**

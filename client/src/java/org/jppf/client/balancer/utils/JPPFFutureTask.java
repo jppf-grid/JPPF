@@ -24,36 +24,59 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.FutureTask;
 
 /**
- * Created with IntelliJ IDEA.
- * User: martin
- * Date: 4/29/12
- * Time: 10:37 PM
- * To change this template use File | Settings | File Templates.
+ * Future task that notifies transition to done state.
+ * @param <V> The result type returned by <code>get</code> method.
+ * @author Martin JANDA
  */
 public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
 {
+  /**
+   * List of listeners for this task.
+   */
+  private final List<Listener> listenerList = new CopyOnWriteArrayList<Listener>();
 
-  private final List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
-
+  /**
+   * Creates a <tt>FutureTask</tt> that will, upon running, execute the
+   * given <tt>Callable</tt>.
+   *
+   * @param callable the callable task.
+   * @throws NullPointerException if callable is null.
+   */
   public JPPFFutureTask(final Callable<V> callable)
   {
     super(callable);
   }
 
+  /**
+   *
+   * @param runnable the runnable task.
+   * @param result the result returned on successful completion.
+   * @throws NullPointerException if runnable is null.
+   */
   public JPPFFutureTask(final Runnable runnable, final V result)
   {
     super(runnable, result);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected void done()
   {
+    Listener[] listeners;
+    synchronized (listenerList) {
+      listeners = listenerList.toArray(new Listener[listenerList.size()]);
+    }
     for (Listener listener : listeners)
     {
       listener.onDone(this);
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addListener(final Listener listener)
   {
@@ -65,15 +88,24 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
     }
     else
     {
-      listeners.add(listener);
+      synchronized (listenerList)
+      {
+        listenerList.add(listener);
+      }
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void removeListener(final Listener listener)
   {
     if (listener == null) throw new IllegalArgumentException("listener is null");
 
-    listeners.remove(listener);
+    synchronized (listenerList)
+    {
+      listenerList.remove(listener);
+    }
   }
 }

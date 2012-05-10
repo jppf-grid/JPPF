@@ -22,28 +22,29 @@ import java.util.EventListener;
 
 
 /**
- * Instances of this class are used to collect statistics on the JPPF server.
+ * Instances of this class are used to collect statistics on the JPPF client.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
-public interface JPPFDriverListener extends EventListener
+public interface JPPFClientListener extends EventListener
 {
   /**
-   * Called to notify that a new client is connected to he JPPF server.
+   * Called to notify that a new client is connected to he JPPF client.
    */
   void newClientConnection();
 
   /**
-   * Called to notify that a new client has disconnected from he JPPF server.
+   * Called to notify that a new client has disconnected from he JPPF client.
    */
   void clientConnectionClosed();
 
   /**
-   * Called to notify that a new node is connected to he JPPF server.
+   * Called to notify that a new node is connected to he JPPF client.
    */
   void newNodeConnection();
 
   /**
-   * Called to notify that a new node is connected to he JPPF server.
+   * Called to notify that a new node is connected to he JPPF client.
    */
   void nodeConnectionClosed();
 
@@ -88,7 +89,7 @@ public interface JPPFDriverListener extends EventListener
   void jobEnded(long time);
 
   /**
-   * Notification that a reset of this server's statistics has been requested.
+   * Notification that a reset of this client's statistics has been requested.
    */
   void reset();
 }

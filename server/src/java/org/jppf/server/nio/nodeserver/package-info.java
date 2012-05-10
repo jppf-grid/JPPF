@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the server node-side of the JPPF asynchronous comunication model.
+ * Classes supporting the server node-side of the JPPF asynchronous communication model.
  * @exclude
  */
 package org.jppf.server.nio.nodeserver;

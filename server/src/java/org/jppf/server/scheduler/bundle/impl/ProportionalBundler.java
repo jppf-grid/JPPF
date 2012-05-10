@@ -18,7 +18,6 @@
 
 package org.jppf.server.scheduler.bundle.impl;
 
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.proportional.AbstractProportionalBundler;
 import org.slf4j.*;

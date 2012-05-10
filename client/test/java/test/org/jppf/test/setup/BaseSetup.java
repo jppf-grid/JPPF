@@ -249,11 +249,11 @@ public class BaseSetup
   }
 
   /**
-   * Find a constructor with the specfied number of parameters for the specified class.
+   * Find a constructor with the specified number of parameters for the specified class.
    * @param taskClass the class of the tasks to add to the job.
    * @param nbParams the number of parameters for the tasks constructor.
    * @return a <code>constructor</code> instance.
-   * @throws Exception if any error occurs if a construcotr could not be found.
+   * @throws Exception if any error occurs if a constructor could not be found.
    */
   public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
   {

@@ -59,7 +59,7 @@ public class JobResults implements Serializable
   }
 
   /**
-   * Get the result for th etask at the specified position.
+   * Get the result for the task at the specified position.
    * @param position the position of the task to get.
    * @return a <code>JPPFTask</code> instance, or null if no result was received for a task at this position.
    */

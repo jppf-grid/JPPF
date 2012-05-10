@@ -66,7 +66,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 //  /**
 //   * The driver stats manager.
 //   */
-//  protected JPPFDriverStatsManager statsManager = null;
+//  protected JPPFClientStatsManager statsManager = null;
   /**
    * The job manager.
    */

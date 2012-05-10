@@ -24,7 +24,7 @@ import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.balancer.queue.QueueEvent;
 import org.jppf.client.balancer.queue.QueueListener;
 import org.jppf.client.balancer.queue.TaskQueueChecker;
-import org.jppf.client.balancer.stats.JPPFDriverStatsManager;
+import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -34,6 +34,8 @@ import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -47,6 +49,10 @@ import java.util.*;
 public class SubmissionManagerClient extends ThreadSynchronization implements SubmissionManager
 {
   /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(SubmissionManagerClient.class);
+  /**
    * The job manager.
    */
   private final JPPFJobManager jobManager;
@@ -57,7 +63,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * The statistics manager.
    */
-  private JPPFDriverStatsManager statsManager = new JPPFDriverStatsManager();
+  private JPPFClientStatsManager statsManager = new JPPFClientStatsManager();
   /**
    * The bundler factory.
    */
@@ -161,22 +167,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   protected synchronized ChannelWrapper<?> addConnectionLocal()
   {
     ChannelWrapper wrapper = new ChannelWrapperLocal();
-//    try
-//    {
-//      JMXDriverConnectionWrapper jmxConnection = i.getJmxConnection();
-//      JPPFSystemInformation systemInfo = jmxConnection.systemInformation();
-//      wrapper.setNodeInfo(systemInfo);
-//      JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
-//      info.setSystemInfo(systemInfo);
-//      wrapper.setManagementInfo(info);
-//    }
-//    catch (Exception e)
-//    {
-//      e.printStackTrace();
-//    } finally {
     addConnection(wrapper);
-//    }
-
     return wrapper;
   }
 
@@ -202,7 +193,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
 
-    System.out.println("removeConnection: " + wrapper);
     try
     {
       wrapper.removeClientConnectionStatusListener(statusListener);
@@ -240,7 +230,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
       catch (Throwable e)
       {
-        e.printStackTrace();
+        log.error("Error while adding connection " + cnn, e);
       }
       finally
       {
@@ -345,8 +335,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
-//    ClientTaskBundle bundle = createBundle(job);
-
     queue.addBundle(new ClientJob(job, job.getTasks()));
     return job.getName();
   }
