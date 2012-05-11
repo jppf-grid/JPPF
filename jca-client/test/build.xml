@@ -36,6 +36,8 @@
   <path id="project.classpath">
     <pathelement location="${classes.dir}" />
     <pathelement location="${config.dir}" />
+    <pathelement location="${basedir}/../classes/jca" />
+    <pathelement location="${basedir}/../../client/test/classes" />
     <fileset dir="${lib.dir}" includes="**/*.jar" />
   </path>
 
@@ -74,25 +76,26 @@
   <target name="generate.tests.list">
     <echo message="basedir=${basedir}, src.dir=${src.dir}"/>
     <echo message="Generating the list of test classes"/>
-    <java fork="yes" classname="org.jppf.utils.TestUtils" classpathref="project.classpath">
+    <java fork="yes" classname="test.org.jppf.test.setup.TestListBuilder" classpathref="project.classpath">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx64m"/>
       <!--
       <arg value="${basedir}/../../client/test/java"/>
       <arg value="${basedir}/../../client/test/resources/TestClasses.txt"/>
       -->
-      <arg value="${src.dir}/java"/>
-      <arg value="${src.dir}/resources/TestClasses.txt"/>
-    </java>       
+      <arg value="${classes.dir}"/>
+      <arg value="${classes.dir}/TestClasses.txt"/>
+    </java>
+    <copy todir="${src.dir}/resources" file="${classes.dir}/TestClasses.txt" overwrite="true"/>
   </target>
 
   <!-- ========================================================================= -->
   <!--                         Compile the application                           -->
   <!-- ========================================================================= -->
 
-  <target name="compile" depends="init, generate.tests.list">
+  <target name="compile" depends="init">
     <echo message="compiling the project..." />
-    <javac srcdir="" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac srcdir="" destdir="${classes.dir}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:unchecked" />
       <src path="${src.dir}/java" />
@@ -100,6 +103,7 @@
     <copy todir="${classes.dir}">
       <fileset dir="${src.dir}/resources"/>
     </copy>
+    <antcall target="generate.tests.list"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -116,8 +120,9 @@
       </manifest>
       <zipfileset dir="${basedir}/webapp/WEB-INF" excludes="web.xml" prefix="WEB-INF" />
       <zipfileset dir="${classes.dir}" prefix="WEB-INF/classes"/>
+      <zipfileset dir="${basedir}/../classes/j2eeclient" prefix="WEB-INF/classes"/>
       <zipfileset dir="${basedir}/webapp" includes="*.*" />
-      <zipfileset dir="${basedir}/../lib" includes="junit-4.8.2.jar" prefix="WEB-INF/lib" />
+      <zipfileset dir="${basedir}/../lib" includes="junit-4.10.jar" prefix="WEB-INF/lib" />
     </war>
   </target>
 

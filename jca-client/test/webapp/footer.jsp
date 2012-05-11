@@ -1,3 +1,0 @@
-    <!-- end content -->
-  </body>
-</html>

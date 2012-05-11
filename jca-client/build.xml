@@ -110,7 +110,7 @@
 	<target name="compile" depends="init">
 		<echo message="compiling the project..."/>
     <checkstyle config="${basedir}/CheckStyle_JPPF_config.xml"><fileset dir="${src.dir}" includes="**/*.java"/></checkstyle>
-		<javac srcdir="" destdir="${classes.dir}/jca"
+		<javac srcdir="" destdir="${classes.dir}/jca" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>
 			<compilerarg line="-Xlint:unchecked"/>
@@ -125,7 +125,7 @@
 				<exclude name="**/*.java"/>
 			</fileset>
 		</copy>
-		<javac srcdir="" destdir="${classes.dir}/j2eeclient"
+		<javac srcdir="" destdir="${classes.dir}/j2eeclient" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>
 			<compilerarg line="-Xlint:unchecked"/>
@@ -377,9 +377,9 @@
 	-->
 	<target name="deploy.jboss">
 		<!--
-		<property name="jboss.deploy" value="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy"/>
+    <property name="jboss.deploy" value="C:/Tools/jboss-4.2.3.GA/server/default/deploy"/>
 		-->
-		<property name="jboss.deploy" value="C:/Tools/jboss-4.2.3.GA/server/default/deploy"/>
+    <property name="jboss.deploy" value="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy"/>
 		<copy todir="${jboss.deploy}" file="${build.dir}/jppf_ra_${jboss}.rar"/>
 		<!--
 		<copy todir="${jboss.deploy}" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>

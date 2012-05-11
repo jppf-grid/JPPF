@@ -42,7 +42,7 @@ public final class CollectionUtils
    */
   public static <T> Set<T> set(final T...array)
   {
-    Set<T> newSet = new HashSet<T>();
+    Set<T> newSet = new HashSet<T>(array.length);
     for (T element: array) newSet.add(element);
     return newSet;
   }

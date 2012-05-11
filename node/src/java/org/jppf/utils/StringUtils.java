@@ -17,11 +17,14 @@
  */
 package org.jppf.utils;
 
+import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import org.jppf.utils.streams.StreamUtils;
 
 
 /**
@@ -385,5 +388,39 @@ public final class StringUtils
       return null;
     }
     return utf8;
+  }
+
+  /**
+   * Indent the specified source string by added the specified
+   * indentation at the start of each of its lines.
+   * @param source the osurce string to indent.
+   * @param indentation the indentation to use.
+   * @return the indented string.
+   */
+  public static String indent(final String source, final String indentation)
+  {
+    if (source == null) throw new IllegalArgumentException("source can't be null");
+    if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
+    boolean endsWithNewline = source.endsWith("\n") || source.endsWith("\r");
+    StringBuilder sb = new StringBuilder();
+    BufferedReader reader = null;
+    try
+    {
+      reader = new BufferedReader(new StringReader(source));
+      String s;
+      while ((s = reader.readLine()) != null)
+      {
+        sb.append(indentation).append(s).append('\n');
+      }
+      if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
+    }
+    catch(Exception e)
+    {
+    }
+    finally
+    {
+      if (reader != null) StreamUtils.closeSilent(reader);
+    }
+    return sb.toString();
   }
 }

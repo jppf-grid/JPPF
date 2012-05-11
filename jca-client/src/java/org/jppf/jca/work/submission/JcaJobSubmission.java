@@ -60,7 +60,7 @@ public class JcaJobSubmission extends AbstractJobSubmission<JcaSubmissionManager
     {
       result.setStatus(EXECUTING);
       submissionManager.execute(this, connection, locallyExecuting);
-      result.setStatus(COMPLETE);
+      //result.setStatus(COMPLETE);
     }
     catch (Exception e)
     {

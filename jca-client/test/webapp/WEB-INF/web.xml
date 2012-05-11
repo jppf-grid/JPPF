@@ -8,8 +8,22 @@
 <!-- ============================================================= -->
 
 <web-app>
-  <display-name>jppftest</display-name>
-  <description>jppftest</description>
+  <display-name>JPPF_J2EE_Tests</display-name>
+  <description>JPPF_J2EE_Tests</description>
+
+  <servlet>
+    <servlet-name>JPPFTestServlet</servlet-name>
+    <servlet-class>test.org.jppf.test.setup.JPPFTestServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>JPPFTestServlet</servlet-name>
+    <url-pattern>/performTests</url-pattern>
+  </servlet-mapping>
+
+  <session-config>
+    <session-timeout>30</session-timeout> 
+  </session-config>
 
   <!-- Establish the default list of welcome files -->
   <welcome-file-list>
