@@ -16,34 +16,8 @@
  * limitations under the License.
  */
 
-package test.org.jppf.test.setup;
-
-import org.junit.*;
-
-
 /**
- * Basic setup for 1 driver, 1 node and no client.
- * @author Laurent Cohen
+ * Unit tests setup classes.
+ * @exclude
  */
-public class Setup1D1N
-{
-  /**
-   * Launches a driver and node.
-   * @throws Exception if a process could not be started.
-   */
-  @BeforeClass
-  public static void setup() throws Exception
-  {
-    BaseSetup.setup(1, false);
-  }
-
-  /**
-   * Stops the driver and node.
-   * @throws Exception if a process could not be stopped.
-   */
-  @AfterClass
-  public static void cleanup() throws Exception
-  {
-    BaseSetup.cleanup();
-  }
-}
+package test.org.jppf.test.setup.common;

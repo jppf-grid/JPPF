@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.org.jppf.test.setup;
+package test.org.jppf.test.setup.common;
 
 import java.io.Serializable;
 

@@ -30,6 +30,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFTask}.

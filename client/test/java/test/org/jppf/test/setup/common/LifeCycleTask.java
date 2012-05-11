@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.org.jppf.test.setup;
+package test.org.jppf.test.setup.common;
 
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
@@ -83,7 +83,7 @@ public class LifeCycleTask extends JPPFTask
     try
     {
       if (duration > 0) Thread.sleep(duration);
-      setResult(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE);
+      setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       elapsed = System.currentTimeMillis() - start;
       displayElapsed("successful");
     }

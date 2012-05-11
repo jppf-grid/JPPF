@@ -30,6 +30,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link org.jppf.node.protocol.JobSLA JobSLA}.
@@ -94,7 +95,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
     assertEquals(results.size(), 1);
     JPPFTask task = results.get(0);
     assertNotNull(task.getResult());
-    assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
   }
 
   /**
@@ -127,7 +128,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
     assertEquals(results.size(), 1);
     JPPFTask task = results.get(0);
     assertNotNull(task.getResult());
-    assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
   }
 
   /**

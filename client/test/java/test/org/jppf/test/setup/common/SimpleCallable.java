@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.org.jppf.test.setup;
+package test.org.jppf.test.setup.common;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
@@ -75,7 +75,7 @@ public class SimpleCallable implements Callable<TaskResult>, Serializable
   public TaskResult call()
   {
     TaskResult executionResult = new TaskResult();
-    executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
+    executionResult.message = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
     executionResult.position = position;
     if (duration > 0)
     {

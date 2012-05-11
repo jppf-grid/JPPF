@@ -26,16 +26,14 @@ import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 
+import test.org.jppf.test.setup.common.BaseTestHelper;
+
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
  */
 public class BaseSetup
 {
-  /**
-   * Message used for successful task execution.
-   */
-  public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
   /**
    * The jppf client to use.
    */
@@ -216,7 +214,7 @@ public class BaseSetup
     JPPFJob job = new JPPFJob();
     job.setName(name);
     int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Constructor constructor = BaseTestHelper.findConstructor(taskClass, nbArgs);
     for (int i=1; i<=nbTasks; i++)
     {
       Object o = constructor.newInstance(params);

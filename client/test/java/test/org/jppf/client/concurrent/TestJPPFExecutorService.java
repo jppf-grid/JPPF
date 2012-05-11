@@ -28,6 +28,7 @@ import org.jppf.client.concurrent.JPPFExecutorService;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFExecutorService}.
@@ -94,7 +95,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(finalResult);
-    assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
   }
 
   /**
@@ -111,7 +112,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
     assertNotNull(finalResult);
-    assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
   }
 
   /**
@@ -135,7 +136,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
       assertNotNull(finalResult);
-      assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
+      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, finalResult.message);
       assertEquals(i, finalResult.position);
     }
   }
@@ -176,7 +177,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
     TaskResult result = executor.invokeAny(tasks);
     assertNotNull(result);
-    assertEquals(BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, result.message);
     assertTrue(result.position >= 0);
   }
 

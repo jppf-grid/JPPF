@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package test.org.jppf.test.setup;
+package test.org.jppf.test.setup.common;
 
 import java.io.Serializable;
 
@@ -57,6 +57,6 @@ public class SimpleRunnable implements Runnable, Serializable
   @Override
   public void run()
   {
-    executionResult.message = BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
+    executionResult.message = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
   }
 }

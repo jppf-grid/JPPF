@@ -30,6 +30,7 @@ import org.jppf.scheduling.JPPFSchedule;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFExecutorService}.
@@ -191,7 +192,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     {
       Thread.sleep(duration);
       System.out.println("task executed");
-      return BaseSetup.EXECUTION_SUCCESSFUL_MESSAGE;
+      return BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
     }
   }
 }
