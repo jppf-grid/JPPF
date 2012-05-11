@@ -278,16 +278,13 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     synchronized(listeners)
     {
-      if (!this.status.equals(newStatus))
+      if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
+      if (!listeners.isEmpty())
       {
-        if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
-        if (!listeners.isEmpty())
+        SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
+        for (SubmissionStatusListener listener: listeners)
         {
-          SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
-          for (SubmissionStatusListener listener: listeners)
-          {
-            listener.submissionStatusChanged(event);
-          }
+          listener.submissionStatusChanged(event);
         }
       }
     }
