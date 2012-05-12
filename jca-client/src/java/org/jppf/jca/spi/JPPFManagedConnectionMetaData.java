@@ -62,7 +62,7 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
   @Override
   public String getEISProductVersion() throws ResourceException
   {
-    return "JPPF 1.0 beta";
+    return "JPPF 3.1";
   }
 
   /**

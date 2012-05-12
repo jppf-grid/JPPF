@@ -60,7 +60,7 @@ public class JPPFConnectionMetaData implements ConnectionMetaData
   @Override
   public String getEISProductVersion()
   {
-    return "1.0 beta";
+    return "3.1";
   }
 
   /**

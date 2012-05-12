@@ -68,7 +68,7 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
   @Override
   public String getAdapterVersion()
   {
-    return "1.0";
+    return "3.1";
   }
 
   /**
@@ -90,7 +90,7 @@ public class JPPFResourceAdapterMetaData implements ResourceAdapterMetaData
   @Override
   public String getSpecVersion()
   {
-    return "1.0";
+    return "3.1";
   }
 
   /**
