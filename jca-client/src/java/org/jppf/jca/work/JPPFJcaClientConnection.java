@@ -27,10 +27,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.NetworkUtils;
-import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -51,18 +48,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Provides access to the management functions of the driver.
-   */
-  private JMXDriverConnectionWrapper jmxConnection = null;
-  /**
-   *
-   */
-  private int jmxPort = -1;
-  /**
-   * Contains the configuration properties for this client connection.
-   */
-  private TypedProperties props = null;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -139,30 +124,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   }
 
   /**
-   * Initialize the jmx connection using the specified jmx server id.
-   */
-  public void initializeJmxConnection()
-  {
-    String mHost = null;
-    int port = -1;
-    if (props != null)
-    {
-      String prefix = name + '.';
-      mHost = props.getString(prefix + "jppf.management.host", "localhost");
-      port = props.getInt(prefix + "jppf.management.port", 11198);
-    }
-    else
-    {
-      if (jmxPort < 0) return;
-      mHost = host;
-      port = jmxPort;
-    }
-    mHost = NetworkUtils.getHostName(mHost);
-    jmxConnection = new JMXDriverConnectionWrapper(mHost, port, ssl);
-    jmxConnection.connect();
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -215,22 +176,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
     return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean cancelJob(final String jobId) throws Exception
-  {
-    JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
-    if ( jmxConnection != null && jmxConnection.isConnected())
-    {
-      jmxConnection.cancelJob(jobId);
-      return true;
-    }
-    return false;
-  }
-
   /**
    * Shutdown this client and retrieve all pending executions for resubmission.
    * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
@@ -277,14 +222,5 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   public JPPFJcaClient getClient()
   {
     return (JPPFJcaClient) client;
-  }
-
-  /**
-   * Get the object that provides access to the management functions of the driver.
-   * @return a <code>JMXConnectionWrapper</code> instance.
-   */
-  public JMXDriverConnectionWrapper getJmxConnection()
-  {
-    return jmxConnection;
   }
 }
