@@ -108,7 +108,7 @@
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
 			<link href="http://download.oracle.com/javase/6/docs/api/"/>
 			<link href="http://docs.oracle.com/javaee/6/api/"/>
-			<link href="http://junit.sourceforge.net/javadoc"/>
+			<link href="http://kentbeck.github.com/junit/javadoc/latest"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
 			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
 			<header>
