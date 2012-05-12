@@ -27,8 +27,6 @@ import org.jppf.JPPFError;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -53,18 +51,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    * Used to synchronize request submissions performed by multiple threads.
    */
   private ReentrantLock lock = new ReentrantLock();
-  /**
-   * Provides access to the management functions of the driver.
-   */
-  private JMXDriverConnectionWrapper jmxConnection = null;
-  /**
-   *
-   */
-  private int jmxPort = -1;
-  /**
-   * Contains the configuration properties for this client connection.
-   */
-  private TypedProperties props = null;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -140,30 +126,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   }
 
   /**
-   * Initialize the jmx connection using the specified jmx server id.
-   */
-  public void initializeJmxConnection()
-  {
-    String mHost = null;
-    int port = -1;
-    if (props != null)
-    {
-      String prefix = name + '.';
-      mHost = props.getString(prefix + "jppf.management.host", "localhost");
-      port = props.getInt(prefix + "jppf.management.port", 11198);
-    }
-    else
-    {
-      if (jmxPort < 0) return;
-      mHost = host;
-      port = jmxPort;
-    }
-    mHost = NetworkUtils.getHostName(mHost);
-    jmxConnection = new JMXDriverConnectionWrapper(mHost, port, ssl);
-    jmxConnection.connect();
-  }
-
-  /**
    * Submit the request to the server.
    * @param job the job to execute remotely.
    * @throws Exception if an error occurs while sending the request.
@@ -174,21 +136,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   public void submit(final JPPFJob job) throws Exception
   {
     throw new UnsupportedOperationException();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean cancelJob(final String jobId) throws Exception
-  {
-    JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
-    if ( jmxConnection != null && jmxConnection.isConnected())
-    {
-      jmxConnection.cancelJob(jobId);
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -236,14 +183,5 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   public ReentrantLock getLock()
   {
     return lock;
-  }
-
-  /**
-   * Get the object that provides access to the management functions of the driver.
-   * @return a <code>JMXConnectionWrapper</code> instance.
-   */
-  public JMXDriverConnectionWrapper getJmxConnection()
-  {
-    return jmxConnection;
   }
 }

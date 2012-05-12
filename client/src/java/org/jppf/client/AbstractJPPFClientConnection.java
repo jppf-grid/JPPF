@@ -26,10 +26,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.NetworkUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -83,6 +83,18 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Represents the system information.
    */
   private JPPFSystemInformation systemInfo = null;
+  /**
+   * Provides access to the management functions of the driver.
+   */
+  protected JMXDriverConnectionWrapper jmxConnection = null;
+  /**
+  *
+  */
+ protected int jmxPort = -1;
+ /**
+  * Contains the configuration properties for this client connection.
+  */
+ protected TypedProperties props = null;
 
   /**
    * Configure this client connection with the specified parameters.
@@ -250,7 +262,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
-  public boolean cancelJob(final String jobId) throws Exception {
+  public boolean cancelJob(final String jobId) throws Exception
+  {
+    JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
+    if ( jmxConnection != null && jmxConnection.isConnected())
+    {
+      jmxConnection.cancelJob(jobId);
+      return true;
+    }
     return false;
   }
 
@@ -331,5 +350,40 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     JPPFTaskBundle bundle = super.sendHandshakeJob();
     this.systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
     return bundle;
+  }
+
+  /**
+   * Initialize the jmx connection using the specified jmx server id.
+   */
+  public void initializeJmxConnection()
+  {
+    /*
+    String mHost = null;
+    int port = -1;
+    if (props != null)
+    {
+      String prefix = name + '.';
+      mHost = props.getString(prefix + "jppf.management.host", "localhost");
+      port = props.getInt(prefix + "jppf.management.port", 11198);
+    }
+    else
+    {
+      if (jmxPort < 0) return;
+      mHost = host;
+      port = jmxPort;
+    }
+    mHost = NetworkUtils.getHostName(mHost);
+    */
+    jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, ssl);
+    jmxConnection.connect();
+  }
+
+  /**
+   * Get the object that provides access to the management functions of the driver.
+   * @return a <code>JMXConnectionWrapper</code> instance.
+   */
+  public JMXDriverConnectionWrapper getJmxConnection()
+  {
+    return jmxConnection;
   }
 }
