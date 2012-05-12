@@ -293,6 +293,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (result == null) return null;
     result.waitForResults();
     List<JPPFTask> tasks = result.getResults();
+    getJppfClient().getSubmissionManager().pollSubmission(submissionId);
     return tasks;
   }
 }
