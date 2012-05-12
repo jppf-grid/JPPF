@@ -153,7 +153,6 @@ public class TextResultRenderer extends AbstractTestResultRenderer
   {
     if (source == null) throw new IllegalArgumentException("source can't be null");
     if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
-    boolean endsWithNewline = source.endsWith("\n") || source.endsWith("\r");
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = null;
     try
@@ -165,7 +164,14 @@ public class TextResultRenderer extends AbstractTestResultRenderer
         if (s.indexOf("at org.junit.Assert") >= 0) continue;
         sb.append(indentation).append(s).append('\n');
       }
-      if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
+      //boolean endsWithNewline = false;
+      //if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
+      while (true)
+      {
+        char c = sb.charAt(sb.length()-1);
+        if ((c == '\n') || (c == '\r')) sb.deleteCharAt(sb.length()-1);
+        else break;
+      }
     }
     catch(Exception e)
     {

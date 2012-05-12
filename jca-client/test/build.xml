@@ -135,4 +135,17 @@
     <copy todir="${jboss.deploy}" file="${build.dir}/${war.prefix}.war"/>
   </target>
 
+  <!-- ========================================================================= -->
+  <!--                          Run the tests                                    -->
+  <!-- ========================================================================= -->
+
+  <target name="run.tests">
+    <echo message="Running the tests"/>
+    <java fork="yes" classname="test.org.jppf.test.setup.JPPFTestRunner" classpathref="project.classpath">
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx64m"/>
+      <arg value="http://localhost:8080/JPPF_J2EE_Tests/performTests?remoteClient=true"/>
+    </java>
+  </target>
+
 </project>

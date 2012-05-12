@@ -18,16 +18,17 @@
 
 package test.org.jppf.jca.cci;
 
-import static org.junit.Assert.*;
 import static org.jppf.client.submission.SubmissionStatus.*;
+import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.cci.JPPFConnection;
 import org.jppf.server.protocol.JPPFTask;
-import org.junit.*;
+import org.jppf.utils.ExceptionUtils;
+import org.junit.Test;
 
 import test.org.jppf.test.setup.JPPFHelper;
 import test.org.jppf.test.setup.jca.*;
@@ -44,28 +45,10 @@ public class TestJPPFConnection
   private JPPFConnection connection = null;
 
   /**
-   * Launches a driver and node and start the client.
-   * @throws Exception if any error occurs.
-   */
-  @Before
-  public void setupTest() throws Exception
-  {
-  }
-
-  /**
-   * Stops the driver and node and close the client.
-   * @throws Exception if any error occurs.
-   */
-  @After
-  public void cleanupTest() throws Exception
-  {
-  }
-
-  /**
    * Test submitting a simple job and getting the results.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000L)
   public void testSubmit() throws Exception
   {
     JPPFConnection connection = null;
@@ -93,10 +76,56 @@ public class TestJPPFConnection
   }
 
   /**
+   * Test submitting a job and retrieving the results after closing the JCA connection and getting a new one.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testSubmitAndRetrieve() throws Exception
+  {
+    JPPFConnection connection = null;
+    int nbTasks = 10;
+    String id = null;
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      assertNotNull(connection);
+      JPPFJob job = JCATestHelper.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 500L);
+      id = connection.submit(job);
+      assertNotNull(id);
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+    Thread.sleep(1000L);
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      List<JPPFTask> results = connection.waitForResults(id);
+      assertNotNull(results);
+      int n = results.size();
+      assertEquals("results size should be " + nbTasks + " but is " + n, nbTasks, n);
+      int count = 0;
+      for (JPPFTask task: results)
+      {
+        assertNotNull("task" + count + " is null", task);
+        Exception e = task.getException();
+        assertNull(task.getId() + " exception should be null but is '" + (e == null ? "" : ExceptionUtils.getMessage(e)) + "'", e);
+        assertNotNull(task.getId() + " result is null", task.getResult());
+        assertEquals(task.getResult(), JCATestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
+      }
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+  }
+
+  /**
    * Test submitting a simple job with a status listener.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000L)
   public void testStatusListenerFromSubmit() throws Exception
   {
     JPPFConnection connection = null;
@@ -123,7 +152,7 @@ public class TestJPPFConnection
   }
 
   /**
-   * Test test cancelling at job after it is submiited and before its completion.
+   * Test cancelling at job after it is submiited and before its completion.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000L)
@@ -146,7 +175,136 @@ public class TestJPPFConnection
       JPPFTask task = results.get(0);
       assertNotNull(task);
       assertNull(task.getException());
-      assertNull(task.getResult());
+      assertNull("task result should be null but is '" + task.getResult() + "'" , task.getResult());
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+  }
+
+  /**
+   * Test cancelling at job after it is submiited and after its completion.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testCancelJobAfterCompletion() throws Exception
+  {
+    JPPFConnection connection = null;
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      assertNotNull(connection);
+      JPPFJob job = JCATestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class, 100L);
+      String id = connection.submit(job);
+      assertNotNull(id);
+      Thread.sleep(3000L);
+      connection.cancelJob(id);
+      List<JPPFTask> results = connection.waitForResults(id);
+      assertNotNull(results);
+      int n = results.size();
+      assertTrue("results size should be 1 but is " + n, n == 1);
+      JPPFTask task = results.get(0);
+      assertNotNull(task);
+      assertNull(task.getException());
+      assertNotNull(task.getResult());
+      assertEquals(JCATestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+  }
+
+  /**
+   * Test submitting a simple job and getting the results.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testSubmissionResults() throws Exception
+  {
+    JPPFConnection connection = null;
+    int nbTasks = 1;
+    String id = null;
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      assertNotNull(connection);
+      JPPFJob job = JCATestHelper.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 100L);
+      id = connection.submit(job);
+      assertNotNull(id);
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+    Thread.sleep(2000L);
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      List<JPPFTask> results = connection.getSubmissionResults(id);
+      assertNotNull(results);
+      int n = results.size();
+      assertEquals("results size should be " + nbTasks + " but is " + n, nbTasks, n);
+      int count = 0;
+      for (JPPFTask task: results)
+      {
+        assertNotNull("task" + count + " is null", task);
+        Exception e = task.getException();
+        assertNull(task.getId() + " exception should be null but is '" + (e == null ? "" : ExceptionUtils.getMessage(e)) + "'", e);
+        assertNotNull(task.getId() + " result is null", task.getResult());
+        assertEquals(task.getResult(), JCATestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
+      }
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+  }
+
+  /**
+   * Test submitting multiple jobs ad retrieving their submission ids from a separate JCA connection.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testGetAllSubmissionIds() throws Exception
+  {
+    JPPFConnection connection = null;
+    String prefix = "JCA Test Job ";
+    int nbJobs = 2;
+    JPPFJob[] jobs = new JPPFJob[nbJobs];
+    String[] ids= new String[nbJobs];
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      assertNotNull(connection);
+      for (int i=0; i<nbJobs; i++)
+      {
+        JPPFJob job = new JPPFJob(prefix + i);
+        job.addTask(new LifeCycleTask(1000L));
+        jobs[i] = job;
+        ids[i] = connection.submit(job);
+        assertNotNull(ids[i]);
+        assertEquals(prefix + i, ids[i]);
+      }
+    }
+    finally
+    {
+      if (connection != null) connection.close();
+    }
+    Thread.sleep(500L);
+    try
+    {
+      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      Collection<String> coll = connection.getAllSubmissionIds();
+      assertNotNull(coll);
+      assertEquals(nbJobs, coll.size());
+      for (int i=0; i<nbJobs; i++) assertTrue(coll.contains(ids[i]));
+      for (int i=0; i<nbJobs; i++)
+      {
+        List<JPPFTask> results = connection.waitForResults(ids[i]);
+        assertNotNull(results);
+      }
     }
     finally
     {
