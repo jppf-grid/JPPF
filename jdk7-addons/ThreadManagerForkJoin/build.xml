@@ -22,13 +22,15 @@
   <!--                          Property definitions                             -->
   <!-- ========================================================================= -->
 
-  <property name="jppf.dir"     value="${basedir}/../../JPPF" />
+  <property name="jppf.dir" value="${basedir}/../../JPPF" />
   <property name="jppf.lib.dir" value="${jppf.dir}/lib" />
-  <property name="config.dir"   value="${basedir}/config" />
-  <property name="classes.dir"  value="${basedir}/classes" />
-  <property name="src.dir"      value="${basedir}/src" />
-  <property name="javadoc"      value="${basedir}/javadoc" />
-  <property name="jar.file"     value="ThreadManagerForkJoin.jar" />
+  <property name="config.dir" value="${basedir}/config" />
+  <property name="classes.dir" value="${basedir}/classes" />
+  <property name="src.dir" value="${basedir}/src" />
+  <property name="javadoc" value="${basedir}/javadoc" />
+  <property name="jar.file" value="ThreadManagerForkJoin.jar" />
+  <property file="${jppf.dir}/bin/build.properties" />
+  <property name="build.number.file" value="${jppf.dir}/bin/build.number" />
 
   <!-- ========================================================================= -->
   <!--                           Classpath definitions                           -->
@@ -53,7 +55,7 @@
   <!-- ========================================================================= -->
 
   <target name="clean">
-    <delete dir="${classes.dir}" quiet="true" includes="**/*.*"/>
+    <delete dir="${classes.dir}" quiet="true" includes="**/*.*" />
   </target>
 
   <!-- ========================================================================= -->
@@ -61,14 +63,28 @@
   <!-- ========================================================================= -->
 
   <target name="init" description="Initialize ressources">
+    <propertyfile file="${build.number.file}">
+      <entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
+    </propertyfile>
+    <!-- Read the build number -->
+    <property file="${build.number.file}" />
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z" />
+    </tstamp>
   </target>
 
   <!-- ========================================================================= -->
   <!--                                  Compile                                  -->
   <!-- ========================================================================= -->
 
+  <taskdef resource="checkstyletask.properties" classpath="${jppf.lib.dir}/Checkstyle/checkstyle-5.5-all.jar"/>
+
   <target name="compile" depends="clean, init">
-    <javac srcdir="" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <checkstyle  config="${jppf.dir}/CheckStyle_JPPF_config.xml">
+      <fileset dir="${src.dir}" includes="**/*.java"/>
+    </checkstyle>
+
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:unchecked" />
       <src path="${src.dir}" />
@@ -89,24 +105,15 @@
   <target name="jar" depends="compile">
     <jar jarfile="${jar.file}" index="true">
       <fileset dir="${classes.dir}" />
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}" />
+        <attribute name="JPPF-Build" value="${build.number}" />
+        <attribute name="JPPF-BuildDate" value="${readable.now}" />
+      </manifest>
     </jar>
     <echo />
     <echo message="*** The file ${jar.file} is now ready to be deployed ***" />
     <echo />
-  </target>
-
-  <!-- ========================================================================= -->
-  <!--                     Run the sample application                            -->
-  <!-- ========================================================================= -->
-
-  <target name="run">
-    <echo message="Testing the Custom Load Balancer" />
-    <java fork="yes" classname="org.jppf.example.loadbalancer.client.CustomLoadBalancerRunner" classpathref="project.classpath">
-      <jvmarg value="-server" />
-      <jvmarg value="-Xmx256m" />
-      <jvmarg value="-Djppf.config=jppf-client.properties" />
-      <jvmarg value="-Dlog4j.configuration=log4j-client.properties" />
-    </java>
   </target>
 
   <!-- ========================================================================= -->
@@ -119,34 +126,32 @@
     <javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath"
       verbose="false" use="true" stylesheetfile="${jppf.dir}/bin/stylesheet.css" additionalparam="-quiet">
       <packageset dir="${src.dir}" />
-      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
-      <link href="http://www.jppf.org/api-3"/>
+      <link href="http://docs.oracle.com/javase/7/docs/api/" />
+      <link href="http://www.jppf.org/api-3" />
       <doctitle>
         <![CDATA[JPPF - Thread Manager Fork Join Implementation]]>
       </doctitle>
       <header>
         <![CDATA[
-					<table>
-        <tr>
-          <td valign="center">
+					<table><tr><td valign="center">
             <a href="http://www.jppf.org" target="_top">
               <img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
             </a>
-          </td>
-        </tr>
-      </table>
+          </td></tr></table>
 				]]>
 			</header>
-			<bottom>
-      	<![CDATA[<font face="Arial" size=2 color="#6D78B6"><i>Copyright &copy; 2005-2012 JPPF Team.</i></font>]]>
-			</bottom>
-		</javadoc>
-		<copy todir="${javadoc}/resources" overwrite="true">
-			<fileset dir="${jppf.dir}/bin">
-				<include name="jppf_group_large.gif" />
-				<include name="inherit.gif" />
-			</fileset>
-		</copy>
-	</target>
+      <bottom>
+        <![CDATA[<font face="Arial" size=2 color="#6D78B6">
+          <i>Copyright &copy; 2005-2012 JPPF Team.</i>
+        </font>]]>
+	    </bottom>
+    </javadoc>
+    <copy todir="${javadoc}/resources" overwrite="true">
+      <fileset dir="${jppf.dir}/bin">
+        <include name="jppf_group_large.gif" />
+        <include name="inherit.gif" />
+      </fileset>
+    </copy>
+  </target>
 
 </project>

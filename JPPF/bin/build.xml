@@ -29,10 +29,10 @@
 	<property name="server"                value="${basedir}/../server"/>
 	<property name="demo"                  value="${basedir}/../demo"/>
 	<property name="jca-client"            value="${basedir}/../jca-client"/>
-	<property name="jppfQuickStart"        value="${basedir}/../JPPFQuickStart"/>
 	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
-	<property name="samples-pack"          value="${basedir}/../samples-pack"/>
+  <property name="samples-pack"          value="${basedir}/../samples-pack"/>
+  <property name="jdk7-addons"           value="${basedir}/../jdk7-addons"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -125,7 +125,6 @@
  		<mkdir dir="${build}"/>
 		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
 		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
-		<available type="dir" file="${basedir}/../JPPFQuickStart" property="jppfQuickStart.present"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
@@ -146,13 +145,13 @@
 	<target name="rebuild" depends="clean.all, build"/>
 	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
 	<target name="deploy"
-		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc"/>
 	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide,            doc"/>
+		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide,            doc"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide, installer, doc"/>
+		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc"/>
 	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, user.guide,            doc"/>
+		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide,            doc"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -160,7 +159,8 @@
 
 	<import file="build-compile-jar.xml"/>
 	<import file="build-modules.xml"/>
-	<import file="build-samples.xml"/>
+  <import file="build-samples.xml"/>
+  <import file="build-jdk7-addons.xml"/>
 	<import file="build-connectors.xml"/>
 	<import file="build-installer.xml"/>
 	<import file="build-findbugs.xml"/>
