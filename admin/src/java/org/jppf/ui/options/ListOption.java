@@ -93,6 +93,7 @@ public class ListOption extends AbstractOption
   {
     selectionListener = new ListSelectionListener()
     {
+      @SuppressWarnings("deprecation")
       @Override
       public void valueChanged(final ListSelectionEvent e)
       {
