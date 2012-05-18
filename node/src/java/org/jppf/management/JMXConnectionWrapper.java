@@ -28,7 +28,7 @@ import javax.management.remote.*;
 
 import org.jppf.JPPFException;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.*;
+import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
 /**
@@ -234,7 +234,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public synchronized Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
   {
-    if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
+    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
     Object result = null;
     try
     {
@@ -299,6 +299,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public String getHost()
   {
     return host;
+  }
+
+  /**
+   * Get the host the server is running on.
+   * @param host the host as a string.
+   */
+  public void setHost(final String host)
+  {
+    this.host = host;
+    this.idString = this.host + ':' + this.port;
   }
 
   /**
@@ -380,11 +390,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public <T> T getProxy(final ObjectName objectName, final Class<T> inf) throws Exception
   {
     // if the connection is not yet established, then connect
-    if (!isConnected()) connectAndWait(5000L);
-    // obtain a connection to the remote MBean server
-    MBeanServerConnection mbsc = getMbeanConnection();
-    // finally obtain and return a proxy to the specified remote MBean
-    return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
+    //if (!isConnected()) connectAndWait(5000L);
+    if (!isConnected()) connect();
+    if (isConnected())
+    {
+      // obtain a connection to the remote MBean server
+      MBeanServerConnection mbsc = getMbeanConnection();
+      // finally obtain and return a proxy to the specified remote MBean
+      return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
+    }
+    return null;
   }
 
   /**
