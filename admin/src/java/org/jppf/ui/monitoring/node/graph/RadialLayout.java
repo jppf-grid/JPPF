@@ -91,18 +91,21 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
       double radius = radiusFactor * (height < width ? height : width);
 
       int i = 0;
+      int dSize = drivers.size();
       for (TopologyData driver : drivers)
       {
         Point2D coord = transform(driver);
-        double angle = (2d * Math.PI * i) / drivers.size();
-        coord.setLocation(Math.cos(angle) * radius + width / 2d, Math.sin(angle) * radius + height / 2d);
+        double angle = dSize > 1 ? (2d * Math.PI * i) / dSize : 0d;
+        if (dSize == 1) coord.setLocation(width / 2d, height / 2d);
+        else coord.setLocation(Math.cos(angle) * radius + width / 2d, Math.sin(angle) * radius + height / 2d);
         Collection<TopologyData> nodes = getNodes(driver);
-        double firstAngle = angle - Math.PI/2d;
+        double firstAngle = dSize > 1 ? angle - Math.PI/2d : 0d;
         int j = 0;
+        double factor = dSize > 1 ? 1d : 2d;
         for (TopologyData node : nodes)
         {
           Point2D nodeCoord = transform(node);
-          double nodeAngle = firstAngle + Math.PI * j / nodes.size();
+          double nodeAngle = firstAngle + factor * Math.PI * j / nodes.size();
           nodeCoord.setLocation(Math.cos(nodeAngle) * radius + coord.getX(), Math.sin(nodeAngle) * radius + coord.getY());
           j++;
         }

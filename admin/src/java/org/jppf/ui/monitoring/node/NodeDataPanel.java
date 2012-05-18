@@ -188,6 +188,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       }
     };
     executor.submit(r);
+    if (debugEnabled) log.debug("submitted driverRemoved task for " + driverName);
   }
 
   /**
@@ -197,23 +198,13 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    */
   public void nodeAdded(final String driverName, final JPPFManagementInfo nodeInfo)
   {
-    final DefaultMutableTreeNode driverNode = manager.findDriver(driverName);
-    if (driverNode == null) return;
-    nodeAdded(driverNode, nodeInfo);
-  }
-
-  /**
-   * Called to notify that a node was added to a driver.
-   * @param driverNode the driver to which the node is added.
-   * @param nodeInfo the object that encapsulates the node addition.
-   */
-  public void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo)
-  {
     Runnable r = new Runnable()
     {
       @Override
       public void run()
       {
+        final DefaultMutableTreeNode driverNode = manager.findDriver(driverName);
+        if (driverNode == null) return;
         manager.nodeAdded(driverNode, nodeInfo);
       }
     };

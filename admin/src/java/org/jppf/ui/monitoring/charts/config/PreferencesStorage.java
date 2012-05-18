@@ -137,8 +137,7 @@ public class PreferencesStorage
       result[cnt] = config;
       cnt++;
     }
-    Arrays.sort(result, new Comparator<ChartConfiguration>()
-        {
+    Arrays.sort(result, new Comparator<ChartConfiguration>() {
       @Override
       public int compare(final ChartConfiguration o1, final ChartConfiguration o2)
       {
@@ -147,7 +146,7 @@ public class PreferencesStorage
         if (o2 == null) return 1;
         return Integer.valueOf(o1.position).compareTo(o2.position);
       }
-        });
+    });
     return result;
   }
 

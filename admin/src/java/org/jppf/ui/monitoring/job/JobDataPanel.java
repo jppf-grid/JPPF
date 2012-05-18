@@ -179,7 +179,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * Called to notify that a driver was added.
    * @param clientConnection a reference to the driver connection.
    */
-  public synchronized void driverAdded(final JPPFClientConnection clientConnection)
+  public /*synchronized*/ void driverAdded(final JPPFClientConnection clientConnection)
   {
     if (clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
     JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
@@ -204,7 +204,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * Called to notify that a driver was removed.
    * @param clientConnection a reference to the driver connection to remove.
    */
-  public synchronized void driverRemoved(final JPPFClientConnection clientConnection)
+  public /*synchronized*/ void driverRemoved(final JPPFClientConnection clientConnection)
   {
     if (clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
     JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
@@ -228,7 +228,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * Called to notify that a driver was updated.
    * @param clientConnection a reference to the driver connection that changed.
    */
-  public synchronized void driverUpdated(final JPPFClientConnection clientConnection)
+  public /*synchronized*/ void driverUpdated(final JPPFClientConnection clientConnection)
   {
     if (clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
     JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
@@ -254,7 +254,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param driverName the name of the driver the job was submitted to.
    * @param jobInfo    information about the submitted job.
    */
-  public synchronized void jobAdded(final String driverName, final JobInformation jobInfo)
+  public /*synchronized*/ void jobAdded(final String driverName, final JobInformation jobInfo)
   {
     if (jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
     String jobName = jobInfo.getJobName();
@@ -281,7 +281,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param driverName the name of the driver the job was submitted to.
    * @param jobInfo    information about the job.
    */
-  public synchronized void jobRemoved(final String driverName, final JobInformation jobInfo)
+  public /*synchronized*/ void jobRemoved(final String driverName, final JobInformation jobInfo)
   {
     if (jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
 
@@ -309,7 +309,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param driverName the name of the driver the job was submitted to.
    * @param jobInfo    information about the job.
    */
-  public synchronized void jobUpdated(final String driverName, final JobInformation jobInfo)
+  public /*synchronized*/ void jobUpdated(final String driverName, final JobInformation jobInfo)
   {
     if (jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
 
@@ -338,7 +338,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param jobInfo    information about the sub-job.
    * @param nodeInfo   information about the node where the sub-job was dispatched.
    */
-  public synchronized void subJobAdded(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
+  public /*synchronized*/ void subJobAdded(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
   {
     AccumulatorJob job = accumulatorHelper.getAccumulatorJob(driverName, jobInfo);
 
@@ -365,7 +365,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    * @param jobInfo    information about the job.
    * @param nodeInfo   information about the node where the sub-job was dispatched.
    */
-  public synchronized void subJobRemoved(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
+  public /*synchronized*/ void subJobRemoved(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo)
   {
     AccumulatorJob job = accumulatorHelper.getAccumulatorJob(driverName, jobInfo);
 

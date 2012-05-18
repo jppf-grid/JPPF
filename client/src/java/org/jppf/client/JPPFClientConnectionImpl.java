@@ -80,8 +80,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
     {
       try
       {
-        String s = InetAddress.getByName(host).getCanonicalHostName();
-        displayName = name + '[' + s + ':' + port + ']';
+        //String s = InetAddress.getByName(host).getCanonicalHostName();
+        host = InetAddress.getByName(host).getCanonicalHostName();
+        displayName = name + '[' + host + ':' + port + ']';
+        getJmxConnection().setHost(host);
       }
       catch (UnknownHostException e)
       {

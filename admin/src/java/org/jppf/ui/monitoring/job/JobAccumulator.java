@@ -107,26 +107,18 @@ public class JobAccumulator<T>
   public boolean mergeChange(final Type type, final T value)
   {
     Type oldType = this.type;
-
     if (this.type == type && this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
-
     if (this.type == Type.REMOVE && type == Type.ADD)
     {
       this.type = Type.UPDATE;
       this.value = value;
-
       return false;
     }
     else
     {
-      if (this.type.compareTo(type) > 0)
-      {
-        throw new IllegalStateException("Can't merge type from " + this.type + " to " + type);
-      }
-
+      if (this.type.compareTo(type) > 0) throw new IllegalStateException("Can't merge type from " + this.type + " to " + type);
       this.value = value;
       if (this.type == Type.ADD && (type == Type.KEEP || type == Type.UPDATE)) return false;
-
       this.type = type;
       return oldType == Type.ADD && this.type == Type.REMOVE;
     }

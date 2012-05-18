@@ -122,8 +122,8 @@ public class NodeDataPanelManager
    */
   void driverRemoved(final String driverName, final boolean removeNodesOnly)
   {
-    final DefaultMutableTreeNode driverNode = findDriver(driverName);
     if (debugEnabled) log.debug("removing driver: " + driverName);
+    final DefaultMutableTreeNode driverNode = findDriver(driverName);
     if (driverNode == null) return;
     TopologyData driverData = (TopologyData) driverNode.getUserObject();
     try

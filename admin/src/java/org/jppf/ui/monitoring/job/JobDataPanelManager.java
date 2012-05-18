@@ -390,7 +390,10 @@ class JobDataPanelManager
     {
       if (event.getSource() instanceof JPPFClientConnectionImpl)
       {
-        panel.driverUpdated((JPPFClientConnectionImpl) event.getSource());
+        JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
+        if (status == JPPFClientConnectionStatus.FAILED)
+          panel.driverRemoved((JPPFClientConnectionImpl) event.getSource());
+        else panel.driverUpdated((JPPFClientConnectionImpl) event.getSource());
       }
       else
       {
