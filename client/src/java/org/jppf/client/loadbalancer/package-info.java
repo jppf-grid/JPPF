@@ -18,5 +18,6 @@
 
 /**
  * Support for the load-balancing of local versus remote execution on the client side.
+ * @exclude
  */
 package org.jppf.client.loadbalancer;
