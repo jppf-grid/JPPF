@@ -211,6 +211,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   protected synchronized ChannelWrapper<?> addConnection(final JPPFClientConnection cnn)
   {
+    if (log.isDebugEnabled()) log.debug("adding connection " + cnn);
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
 
     ChannelWrapper wrapper = wrapperMap.get(connection);
@@ -238,7 +239,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         addConnection(wrapper);
       }
     }
-
+    if (log.isDebugEnabled()) log.debug("end of adding connection " + cnn);
     return wrapper;
   }
 

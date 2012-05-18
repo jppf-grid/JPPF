@@ -156,6 +156,7 @@ public class MatrixRunner implements NotificationListener
     finally
     {
       if (monitor != null) monitor.close();
+      output("closing the client");
       if (jppfClient != null) jppfClient.close();
     }
   }

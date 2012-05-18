@@ -60,6 +60,10 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
    * The timer that periodically attempts the connection to the server.
    */
   private Timer timer = null;
+  /**
+   * The task run by the timer.
+   */
+  private SocketInitializationTask task = null;
 
   /**
    * Instantiate this SocketInitializer with a specified socket wrapper.
@@ -100,8 +104,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
       long maxDuration = (maxTime <= 0) ? -1L : 1000L * maxTime;
       long period = 1000L * props.getLong("reconnect.interval", 1L);
       latestAttemptDate = (maxDuration > 0) ? new Date(System.currentTimeMillis() + maxDuration) : null;
-      SocketInitializationTask task = new SocketInitializationTask();
-      timer = new Timer("Socket initializer timer");
+      task = new SocketInitializationTask();
+      timer = new Timer("Socket initializer (" + instanceNumber + ") timer for " + socketWrapper, true);
       timer.schedule(task, delay, period);
       try
       {
@@ -143,12 +147,31 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     {
       if (debugEnabled) log.debug(name + "closing socket initializer");
       closed = true;
+      if (task != null) task.cancel();
       if (timer != null)
       {
         if (debugEnabled) log.debug(name + " timer not null");
         timer.cancel();
         timer.purge();
+        timer = null;
       }
+      signalAll();
+    }
+  }
+
+  /**
+   * Signal all threads waiting on the condition.
+   */
+  private void signalAll()
+  {
+    lock.lock();
+    try
+    {
+      condition.signalAll();
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -195,16 +218,8 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
      */
     private void reset()
     {
-      lock.lock();
-      try
-      {
-        cancel();
-        condition.signalAll();
-      }
-      finally
-      {
-        lock.unlock();
-      }
+      cancel();
+      signalAll();
     }
   }
 }

@@ -20,7 +20,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
 
-import java.util.*;
+import java.net.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFError;
@@ -78,6 +78,15 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   {
     try
     {
+      try
+      {
+        String s = InetAddress.getByName(host).getCanonicalHostName();
+        displayName = name + '[' + s + ':' + port + ']';
+      }
+      catch (UnknownHostException e)
+      {
+        displayName = name;
+      }
       delegate = new ClassServerDelegateImpl(this, client.getUuid(), host, port);
       delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
       {
@@ -136,33 +145,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   public void submit(final JPPFJob job) throws Exception
   {
     throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Shutdown this client and retrieve all pending executions for resubmission.
-   * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
-   * @see org.jppf.client.JPPFClientConnection#close()
-   */
-  @Override
-  public List<JPPFJob> close()
-  {
-    if (!isShutdown)
-    {
-      isShutdown = true;
-      try
-      {
-        if (taskServerConnection != null) taskServerConnection.close();
-        if (delegate != null) delegate.close();
-        if (jmxConnection != null) jmxConnection.close();
-      }
-      catch (Exception e)
-      {
-        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
-        else log.error('[' + name + "] " + e.getMessage());
-      }
-      if (job != null) return Collections.singletonList(job);
-    }
-    return Collections.emptyList();
   }
 
   /**

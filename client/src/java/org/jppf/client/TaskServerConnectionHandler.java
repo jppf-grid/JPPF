@@ -114,22 +114,4 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     socketClient.setHost(host);
     socketClient.setPort(port);
   }
-
-  /**
-   * Close and cleanup this connection handler.
-   * @see org.jppf.client.ClientConnectionHandler#close()
-   */
-  @Override
-  public void close()
-  {
-    try
-    {
-      if (socketInitializer != null) socketInitializer.close();
-      if (socketClient != null) socketClient.close();
-    }
-    catch (Exception e)
-    {
-      log.error('[' + name + "] " + e.getMessage(), e);
-    }
-  }
 }

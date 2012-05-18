@@ -303,6 +303,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public void close()
   {
+    if (debugEnabled) log.debug("closing all connections");
     List<JPPFClientConnection> list = getAllConnections();
     for (JPPFClientConnection c : list)
     {

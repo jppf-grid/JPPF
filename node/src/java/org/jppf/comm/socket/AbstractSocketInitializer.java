@@ -19,6 +19,7 @@
 package org.jppf.comm.socket;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Common abstract superclass for objects that establish a connection with a remote socket.
@@ -26,6 +27,14 @@ import java.util.Random;
  */
 public abstract class AbstractSocketInitializer implements SocketInitializer
 {
+  /**
+   * Instances count.
+   */
+  protected static final AtomicLong instanceCount = new AtomicLong(0L);
+  /**
+   * Instance number.
+   */
+  protected final long instanceNumber = instanceCount.incrementAndGet();
   /**
    * Determines whether any connection attempt succeeded.
    */

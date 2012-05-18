@@ -172,30 +172,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
   }
 
   /**
-   * Close the socket connection.
-   * @see org.jppf.client.ClassServerDelegate#close()
-   */
-  @Override
-  public void close()
-  {
-    if (!closed)
-    {
-      closed = true;
-      stop = true;
-
-      try
-      {
-        socketInitializer.close();
-        socketClient.close();
-      }
-      catch (Exception e)
-      {
-        log.error('[' + getName() + "] "+e.getMessage(), e);
-      }
-    }
-  }
-
-  /**
    * Create a socket initializer for this delegate.
    * @return a <code>SocketInitializer</code> instance.
    */

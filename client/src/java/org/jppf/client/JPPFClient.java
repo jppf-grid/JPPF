@@ -162,6 +162,7 @@ public class JPPFClient extends AbstractGenericClient
   public void close()
   {
     super.close();
+    if (debugEnabled) log.debug("closing submission manager");
     if (submissionManager instanceof ThreadSynchronization)
     {
       ThreadSynchronization threadSynchronization = (ThreadSynchronization) submissionManager;

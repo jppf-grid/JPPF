@@ -20,16 +20,14 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.management.*;
-import org.jppf.server.protocol.BundleParameter;
-import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.*;
+import org.jppf.server.protocol.*;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -88,13 +86,13 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected JMXDriverConnectionWrapper jmxConnection = null;
   /**
-  *
-  */
- protected int jmxPort = -1;
- /**
-  * Contains the configuration properties for this client connection.
-  */
- protected TypedProperties props = null;
+   *
+   */
+  protected int jmxPort = -1;
+  /**
+   * Contains the configuration properties for this client connection.
+   */
+  protected TypedProperties props = null;
 
   /**
    * Configure this client connection with the specified parameters.
@@ -108,11 +106,13 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean ssl)
   {
     this.uuid = uuid;
-    this.host = NetworkUtils.getHostName(host);
+    //this.host = NetworkUtils.getHostName(host);
+    this.host = host;
     this.port = driverPort;
     this.priority = priority;
     this.name = name;
     this.ssl = ssl;
+    /*
     try
     {
       String s = InetAddress.getByName(host).getCanonicalHostName();
@@ -122,6 +122,8 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     {
       displayName = name;
     }
+     */
+    displayName = name;
     this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
   }
 
@@ -357,23 +359,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   public void initializeJmxConnection()
   {
-    /*
-    String mHost = null;
-    int port = -1;
-    if (props != null)
-    {
-      String prefix = name + '.';
-      mHost = props.getString(prefix + "jppf.management.host", "localhost");
-      port = props.getInt(prefix + "jppf.management.port", 11198);
-    }
-    else
-    {
-      if (jmxPort < 0) return;
-      mHost = host;
-      port = jmxPort;
-    }
-    mHost = NetworkUtils.getHostName(mHost);
-    */
     jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, ssl);
     jmxConnection.connect();
   }
@@ -386,4 +371,40 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   {
     return jmxConnection;
   }
+
+  /**
+   * Shutdown this client and retrieve all pending executions for resubmission.
+   * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
+   * @see org.jppf.client.JPPFClientConnection#close()
+   */
+  @Override
+  public List<JPPFJob> close()
+  {
+    if (debugEnabled) log.debug("closing connection " + this);
+    List<JPPFJob> list = null;
+    synchronized(listeners)
+    {
+      listeners.clear();
+    }
+    if (!isShutdown)
+    {
+      isShutdown = true;
+      try
+      {
+        if (taskServerConnection != null) taskServerConnection.close();
+        if (delegate != null) delegate.close();
+        if (jmxConnection != null) jmxConnection.close();
+      }
+      catch (Exception e)
+      {
+        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
+        else log.error('[' + name + "] " + e.getMessage());
+      }
+      if (job != null) list = Collections.singletonList(job);
+    }
+    if (list == null) list = Collections.emptyList();
+    if (debugEnabled) log.debug("connection " + this + " closed");
+    return list;
+  }
+
 }

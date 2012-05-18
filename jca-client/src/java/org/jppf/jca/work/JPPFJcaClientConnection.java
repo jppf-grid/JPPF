@@ -20,8 +20,6 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import java.util.*;
-
 import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
@@ -174,33 +172,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   protected String getSerializationHelperClassName()
   {
     return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
-  }
-
-  /**
-   * Shutdown this client and retrieve all pending executions for resubmission.
-   * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
-   * @see org.jppf.client.JPPFClientConnection#close()
-   */
-  @Override
-  public List<JPPFJob> close()
-  {
-    if (!isShutdown)
-    {
-      isShutdown = true;
-      try
-      {
-        if (taskServerConnection != null) taskServerConnection.close();
-        if (delegate != null) delegate.close();
-        if (jmxConnection != null) jmxConnection.close();
-      }
-      catch (Exception e)
-      {
-        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
-        else log.error('[' + name + "] " + e.getMessage());
-      }
-      if (job != null) return Collections.singletonList(job);
-    }
-    return Collections.emptyList();
   }
 
   /**

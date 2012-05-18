@@ -169,4 +169,21 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     handshakeDone = true;
     if (debugEnabled) log.debug('[' + getName() + "] : server handshake done");
   }
+
+  /**
+   * Close the socket connection.
+   * @see org.jppf.client.ClassServerDelegate#close()
+   */
+  @Override
+  public void close()
+  {
+    if (!closed)
+    {
+      if (debugEnabled) log.debug("closing " + getName());
+      closed = true;
+      stop = true;
+      super.close();
+      if (debugEnabled) log.debug(getName() + " closed");
+    }
+  }
 }

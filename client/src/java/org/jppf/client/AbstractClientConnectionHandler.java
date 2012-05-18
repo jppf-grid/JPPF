@@ -80,18 +80,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * List of status listeners for this connection.
    */
-  private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
-
-  /**
-   * Initialize this connection with the specified owner.
-   * @param owner the client connection which owns this connection handler.
-   */
-  /*
-  protected AbstractClientConnectionHandler(final JPPFClientConnection owner)
-  {
-    this(owner, false);
-  }
-  */
+  protected final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
 
   /**
    * Initialize this connection with the specified owner.
@@ -187,7 +176,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   {
     // If the socket has been idle too long, recycle the connection.
     if ((maxSocketIdleMillis > 10000L)
-            && (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
+        && (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
     {
       close();
       init();
@@ -202,5 +191,26 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   protected void createSSLConnection() throws Exception
   {
     socketClient = SSLHelper.createSSLClientConnection(socketClient);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close()
+  {
+    synchronized (listeners)
+    {
+      listeners.clear();
+    }
+    try
+    {
+      if (socketInitializer != null) socketInitializer.close();
+      if (socketClient != null) socketClient.close();
+    }
+    catch (Exception e)
+    {
+      log.error('[' + name + "] " + e.getMessage(), e);
+    }
   }
 }

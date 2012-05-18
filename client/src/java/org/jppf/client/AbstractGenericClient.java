@@ -236,7 +236,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   @Override
   public void newConnection(final JPPFClientConnection c)
   {
-    log.info("Connection [" + c.getName() + "] created");
+    log.info("connection [" + c.getName() + "] created");
     addClientConnection(c);
     int n = getAllConnectionsCount() + 1;
     if (executor.getCorePoolSize() < n)
@@ -246,6 +246,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     }
     executor.submit(new ConnectionInitializer(c));
     fireNewConnection(c);
+    if (debugEnabled) log.debug("end of connection [" + c.getName() + "] created");
   }
 
   /**
@@ -255,7 +256,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public void close()
   {
     super.close();
+    if (debugEnabled) log.debug("closing broadcast receiver");
     if (receiverThread != null) receiverThread.setStopped(true);
+    if (debugEnabled) log.debug("closing executor");
     if (executor != null) executor.shutdownNow();
   }
 
