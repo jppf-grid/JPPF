@@ -153,7 +153,7 @@ else
 				</div>
 				<div class="jppf_content">
 	<?php
-		$jppfVersion = "3.0";
+		$jppfVersion = "3.1";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -171,6 +171,7 @@ else
 	API documentation: <a href="/api-2.0">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
 	<h3>Connectors and add-ons</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-jdk7-addons.zip/download'; ?>">JDK 7+ add-ons</a><br>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
 	<h3>Samples and tutorials</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>

@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
 	<?php
-		$jppfVersion = "3.0";
+		$jppfVersion = "3.1";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -24,6 +24,7 @@ $template{name="about-page-header" title="Downloads"}$
 
 	<h3>Connectors and add-ons</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-jdk7-addons.zip/download'; ?>">JDK 7+ add-ons</a><br>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
 
 	<h3>Samples and tutorials</h3>

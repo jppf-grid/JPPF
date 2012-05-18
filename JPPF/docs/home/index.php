@@ -173,7 +173,7 @@ else
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<br/><h2 align="center"><i>New</i>: JPPF 3.0 is released, check it out!</h2>
+		<br/><h2 align="center"><i>New</i>: JPPF 3.0.1 is released, check it out!</h2>
 		<p style="text-align: center; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
 	</div>
 	<div class="column1">
