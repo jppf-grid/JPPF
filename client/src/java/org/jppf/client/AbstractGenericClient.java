@@ -433,7 +433,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
     synchronized (classLoaderRegistrations) {
       Set<RegisteredClassLoader> list = classLoaderRegistrations.get(registeredClassLoader.getUuid());
-      if(list == null) throw new IllegalStateException("classLoader already unregistered");
+      if(list == null) throw new IllegalStateException("ClassLoader already unregistered");
 
       if(list.remove(registeredClassLoader)) {
         if(list.isEmpty()) {

@@ -130,6 +130,15 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UsedClassLoader useClassLoader(final ClassLoader classLoader)
+  {
+    return threadFactory.useClassLoader(classLoader);
+  }
+
+  /**
    *
    */
   protected class FJThreadFactory implements ForkJoinPool.ForkJoinWorkerThreadFactory {
@@ -157,6 +166,15 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * List of monitored threads.
      */
     private final List<Thread> threadList = new ArrayList<Thread>();
+    /**
+     * A context class loader used during execution.
+     */
+    private ClassLoader classLoader = null;
+    /**
+     * A set of used class loaders used during execution.
+     */
+    private final Set<UsedClassLoader> usedClassLoaders = new HashSet<UsedClassLoader>();
+
     /**
      * Initialize this thread factory with the specified name.
      * @param name the name used as prefix for the constructed threads name.
@@ -265,8 +283,9 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     public synchronized void setPriority(final int priority)
     {
       if ((priority < Thread.MIN_PRIORITY) || (priority > Thread.MAX_PRIORITY) || (this.priority == priority)) return;
-      for (Thread thread : threadList) {
-         thread.setPriority(priority);
+      for (Thread thread : threadList)
+      {
+        thread.setPriority(priority);
       }
       this.priority = priority;
     }
@@ -286,6 +305,83 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      */
     public synchronized NodeExecutionInfo getTerminatedInfo() {
       return terminatedInfo;
+    }
+
+    /**
+     * Use class loader in this thread manager.
+     * @param classLoader a <code>ClassLoader</code> instance.
+     * @return a <code>UsedClassLoader</code> instance. Never return <code>null</code>.
+     */
+    public synchronized FJUsedClassLoader useClassLoader(final ClassLoader classLoader)
+    {
+      if (usedClassLoaders.isEmpty())
+      {
+        this.classLoader = classLoader;
+        for (Thread thread : threadList)
+        {
+          thread.setContextClassLoader(classLoader);
+        }
+      }
+      else if (this.classLoader != classLoader)
+      {
+        throw new IllegalStateException("Already used different classLoader");
+      }
+
+      FJUsedClassLoader usedClassLoader = new FJUsedClassLoader(classLoader, this);
+      usedClassLoaders.add(usedClassLoader);
+      return usedClassLoader;
+    }
+
+    /**
+     * Disposes used class loaderer from this thread factory.
+     * @param usedClassLoader a <code>FJUsedClassLoader</code> instance.
+     */
+    protected synchronized void dispose(final FJUsedClassLoader usedClassLoader)
+    {
+      if (usedClassLoader == null) throw new IllegalArgumentException("usedClassLoader is null");
+
+      if (usedClassLoaders.remove(usedClassLoader))
+      {
+        if (usedClassLoaders.isEmpty()) this.classLoader = null;
+      }
+      else
+      {
+        throw new IllegalStateException("UsedClassLoader already disposed");
+      }
+    }
+  }
+
+  /**
+   * Helper class that implements used class loader for fork join thread manager.
+   */
+  private static final class FJUsedClassLoader extends UsedClassLoader
+  {
+    /**
+     * The thread factory that has registered this UsedClassLoader.
+     */
+    private final FJThreadFactory threadFactory;
+
+    /**
+     * Initialize this used class loader with specified parameters.
+     * @param classLoader a <code>ClassLoader</code> instance.
+     * @param threadFactory a <code>FJThreadFactory</code> instance.
+     */
+    private FJUsedClassLoader(final ClassLoader classLoader, final FJThreadFactory threadFactory)
+    {
+      super(classLoader);
+
+      if (threadFactory == null) throw new IllegalArgumentException("threadFactory is null");
+
+      this.threadFactory = threadFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose()
+    {
+      threadFactory.dispose(this);
     }
   }
 }

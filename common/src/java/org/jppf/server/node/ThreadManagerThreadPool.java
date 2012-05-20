@@ -130,4 +130,47 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
   {
     threadFactory.updatePriority(priority);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UsedClassLoader useClassLoader(final ClassLoader classLoader)
+  {
+    ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+    if (classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
+    return new UsedClassLoaderThread(classLoader, oldClassLoader);
+  }
+
+  /**
+   * Helper class that implements used class loader for thread pool thread manager.
+   */
+  private static final class UsedClassLoaderThread extends UsedClassLoader
+  {
+    /**
+     * An original <code>ClassLoader</code> instance.
+     */
+    private final ClassLoader oldClassLoader;
+
+    /**
+     * Initialize this used class loader with specified parameters.
+     * @param classLoader a <code>ClassLoader</code> instance.
+     * @param oldClassLoader an original <code>ClassLoader</code> instance that will be restored when dispose is called.
+     */
+    private UsedClassLoaderThread(final ClassLoader classLoader, final ClassLoader oldClassLoader)
+    {
+      super(classLoader);
+
+      this.oldClassLoader = oldClassLoader;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose()
+    {
+      if (getClassLoader() != null) Thread.currentThread().setContextClassLoader(oldClassLoader);
+    }
+  }
 }

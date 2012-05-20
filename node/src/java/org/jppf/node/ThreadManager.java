@@ -82,4 +82,44 @@ public interface ThreadManager
    * @return true is cpu time measurement is enabled, false otherwise.
    */
   boolean isCpuTimeEnabled();
+
+  /**
+   * Use class loader in this thread manager.
+   * @param classLoader  a <code>ClassLoader</code> instance.
+   * @return a <code>UsedClassLoader</code> instance. Never return <code>null</code>.
+   */
+  UsedClassLoader useClassLoader(final ClassLoader classLoader);
+
+  /**
+   * Helper class for managing used class loaders.
+   */
+  public static abstract class UsedClassLoader
+  {
+    /**
+     * A <code>ClassLoader</code> instance.
+     */
+    private final ClassLoader classLoader;
+
+    /**
+     *
+     * @param classLoader a <code>ClassLoader</code> instance.
+     */
+    protected UsedClassLoader(final ClassLoader classLoader)
+    {
+      this.classLoader = classLoader;
+    }
+
+    /**
+     * Get a class loader instance.
+     * @return a <code>ClassLoader</code> instance.
+     */
+    public ClassLoader getClassLoader() {
+      return classLoader;
+    }
+
+    /**
+     * Disposes usage for classLoader.
+     */
+    public abstract void dispose();
+  }
 }

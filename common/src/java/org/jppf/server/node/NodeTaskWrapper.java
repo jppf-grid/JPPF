@@ -61,12 +61,13 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   public void run()
   {
     JPPFNodeReconnectionNotification rn = null;
+    ThreadManager.UsedClassLoader usedClassLoader = null;
     ThreadManager threadManager = executionManager.getThreadManager();
     NodeExecutionInfo info = null;
     long elapsedTime = 0L;
     try
     {
-      if (classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
+      usedClassLoader = threadManager.useClassLoader(classLoader);
       long id = Thread.currentThread().getId();
       long startTime = System.nanoTime();
       info = threadManager.computeExecutionInfo(id);
@@ -95,6 +96,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     }
     finally
     {
+      if (usedClassLoader != null) usedClassLoader.dispose();
       if (rn == null)
       {
         try
