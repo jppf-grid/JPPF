@@ -232,30 +232,33 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public synchronized Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
+  public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
   {
     if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
-    Object result = null;
-    try
+    synchronized(this)
     {
-      ObjectName mbeanName = new ObjectName(name);
-      result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+	    Object result = null;
+	    try
+	    {
+	      ObjectName mbeanName = new ObjectName(name);
+	      result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+	    }
+	    catch(IOException e)
+	    {
+	      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+	      setConnectedStatus(false);
+	      try
+	      {
+	        if (jmxc != null) jmxc.close();
+	      }
+	      catch(Exception e2)
+	      {
+	        if (debugEnabled) log.debug(e2.getMessage(), e2);
+	      }
+	      if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+	    }
+	    return result;
     }
-    catch(IOException e)
-    {
-      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-      setConnectedStatus(false);
-      try
-      {
-        if (jmxc != null) jmxc.close();
-      }
-      catch(Exception e2)
-      {
-        if (debugEnabled) log.debug(e2.getMessage(), e2);
-      }
-      if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-    }
-    return result;
   }
 
   /**
@@ -265,31 +268,34 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public synchronized Object getAttribute(final String name, final String attribute) throws Exception
+  public Object getAttribute(final String name, final String attribute) throws Exception
   {
-    if ((connectionThread.get() != null) && connectionThread.get().isConnecting()) return null;
-    Object result = null;
-    try
+    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
+    synchronized(this)
     {
-      ObjectName mbeanName = new ObjectName(name);
-      result = getMbeanConnection().getAttribute(mbeanName, attribute);
+	    Object result = null;
+	    try
+	    {
+	      ObjectName mbeanName = new ObjectName(name);
+	      result = getMbeanConnection().getAttribute(mbeanName, attribute);
+	    }
+	    catch(IOException e)
+	    {
+	      setConnectedStatus(false);
+	      try
+	      {
+	        if (jmxc != null) jmxc.close();
+	      }
+	      catch(Exception e2)
+	      {
+	        if (debugEnabled) log.debug(e2.getMessage(), e2);
+	      }
+	      if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+	      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+	      throw e;
+	    }
+	    return result;
     }
-    catch(IOException e)
-    {
-      setConnectedStatus(false);
-      try
-      {
-        if (jmxc != null) jmxc.close();
-      }
-      catch(Exception e2)
-      {
-        if (debugEnabled) log.debug(e2.getMessage(), e2);
-      }
-      if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-      throw e;
-    }
-    return result;
   }
 
   /**
