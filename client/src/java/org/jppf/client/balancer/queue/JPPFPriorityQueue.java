@@ -444,27 +444,24 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     for (ChannelWrapper connection : connections)
     {
       String uuid = connection.getUuid();
-      if (uuidSet.add(uuid))
+      if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
       {
-        ClientJob job = bundleWrapper.copy();
-        ClientJob newBundle = job;
+        ClientJob newBundle = bundleWrapper.copy();
 
-//        System.out.println(" sending to connection '" + uuid + "' - policy: " + policy);
         JPPFManagementInfo info = connection.getManagementInfo();
         newBundle.setBroadcastUUID(uuid);
         if ((policy != null) && !policy.accepts(connection.getSystemInfo()))
         {
-//          System.out.println("Policy not accepted");
           continue;
         }
         ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
         newBundle.setSLA(((JPPFJobSLA) sla).copy());
 //        newBundle.setLocalExecutionPolicy(broadcastPolicy);
-        job.setCompletionListener(completionListener);
+        newBundle.setCompletionListener(completionListener);
         newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
         newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
         if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
-        jobList.add(job);
+        jobList.add(newBundle);
       }
     }
     if (jobList.isEmpty())
