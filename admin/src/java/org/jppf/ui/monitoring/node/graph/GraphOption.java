@@ -178,7 +178,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
   public void setLayout(final String name)
   {
     layout = name;
-    viewer.setGraphLayout(layoutFactory.createLayout(name));
+    if (viewer != null) viewer.setGraphLayout(layoutFactory.createLayout(name));
   }
 
   /**
