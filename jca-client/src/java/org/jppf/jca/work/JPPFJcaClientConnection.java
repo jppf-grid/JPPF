@@ -20,6 +20,8 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
+import java.net.*;
+
 import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
@@ -74,6 +76,17 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   {
     try
     {
+      try
+      {
+        //String s = InetAddress.getByName(host).getCanonicalHostName();
+        host = InetAddress.getByName(host).getCanonicalHostName();
+        displayName = name + '[' + host + ':' + port + ']';
+        getJmxConnection().setHost(host);
+      }
+      catch (UnknownHostException e)
+      {
+        displayName = name;
+      }
       delegate = new JcaClassServerDelegate(this, name, client.getUuid(), host, port);
       delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
       {
