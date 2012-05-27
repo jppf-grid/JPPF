@@ -223,7 +223,13 @@ public class JobData
   {
     if (notificationListener != null)
     {
-      if (proxy != null) proxy.removeNotificationListener(notificationListener);
+      try
+      {
+        if (proxy != null) proxy.removeNotificationListener(notificationListener);
+      }
+      catch (Exception ignore)
+      {
+      }
     }
     notificationListener = listener;
     if (notificationListener != null)

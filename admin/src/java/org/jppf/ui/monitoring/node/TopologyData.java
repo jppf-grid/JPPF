@@ -194,9 +194,12 @@ public class TopologyData
     try
     {
       if (!jmxWrapper.isConnected()) return;
-      nodeState = ((JMXNodeConnectionWrapper) jmxWrapper).state();
-      if (nodeState == null) setStatus(TopologyDataStatus.DOWN);
-      else setStatus(TopologyDataStatus.UP);
+      if (jmxWrapper instanceof JMXNodeConnectionWrapper)
+      {
+        nodeState = ((JMXNodeConnectionWrapper) jmxWrapper).state();
+        if (nodeState == null) setStatus(TopologyDataStatus.DOWN);
+        else setStatus(TopologyDataStatus.UP);
+      }
     }
     catch(Exception e)
     {

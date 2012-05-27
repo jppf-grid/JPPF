@@ -88,12 +88,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     if (debugEnabled) log.debug("initializing NodeDataPanel");
     manager = new NodeDataPanelManager(this);
     createTreeTableModel();
-    /*
-		populateTreeTableModel();
-		refreshNodeStates();
-		refreshHandler = new NodeRefreshHandler(this);
-     */
-    createUI();
   }
 
   /**

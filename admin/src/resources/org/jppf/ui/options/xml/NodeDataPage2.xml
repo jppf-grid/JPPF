@@ -93,7 +93,8 @@
 		<property name="layoutConstraints" value="fill, nogrid"/>
 		<property name="componentConstraints" value="grow, span, push, width 0"/>
 	
-		<child name="NodeTreeTable" type="NodeDataPanel">
+    <child name="NodeTreeTable" type="Custom">
+      <property name="impl.class" value="org.jppf.ui.monitoring.node.NodeDataPanel"/>
 			<property name="componentConstraints" value="grow, width 0"/>
 			<property name="value" value=""/>
 			<initializer type="script">

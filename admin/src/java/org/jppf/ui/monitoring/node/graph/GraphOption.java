@@ -39,7 +39,7 @@ import edu.uci.ics.jung.visualization.picking.*;
 import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 
 /**
- * 
+ * Displays and updates the graph view of the grid topology.
  * @author Laurent Cohen
  */
 public class GraphOption extends AbstractOption implements ActionHolder
@@ -88,6 +88,18 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Handles operations modifying the graph.
    */
   private GraphTopologyHandler graphHandler = null;
+  /**
+   * Determines whether to automatically layout the graph upon topology changes.
+   */
+  private AtomicBoolean autoLayout = new AtomicBoolean(true);
+
+  /**
+   * Default constructor.
+   */
+  public GraphOption()
+  {
+    //createUI();
+  }
 
   /**
    * {@inheritDoc}
@@ -102,7 +114,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
       graphHandler = new GraphTopologyHandler(this);
       SparseMultigraph<TopologyData, Number> graph = graphHandler.getDisplayGraph();
       layoutFactory = new LayoutFactory(graph);
-      layout = "Circle";
+      layout = "Radial";
       viewer = new VisualizationViewer<TopologyData, Number>(layoutFactory.createLayout(layout));
       layoutFactory.setViewer(viewer);
       viewer.setBackground(Color.white);
@@ -129,8 +141,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
         @Override
         public String transform(final TopologyData v)
         {
-          if (!v.isNode()) return super.transform(v);
-          return computeNodeTooltip(v);
+          return v.isNode() ? computeNodeTooltip(v) : super.transform(v);
         }
       });
       graphComponent = new GraphZoomScrollPane(viewer);
@@ -182,6 +193,14 @@ public class GraphOption extends AbstractOption implements ActionHolder
   }
 
   /**
+   * Set the current layout.
+   */
+  public void setLayout()
+  {
+    setLayout("Radial");
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -210,9 +229,9 @@ public class GraphOption extends AbstractOption implements ActionHolder
       actionHandler.putAction("graph.button.collapse", new ExpandOrCollapseGraphAction(this, true));
       actionHandler.putAction("graph.button.expand", new ExpandOrCollapseGraphAction(this, false));
       actionHandler.putAction("graph.toggle.mode", new ToggleModeAction(this));
+      actionHandler.putAction("graph.toggle.layout", new ToggleLayoutAction(this));
       actionHandler.updateActions();
     }
-    //treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
     Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
     new Thread(r).start();
   }
@@ -228,8 +247,9 @@ public class GraphOption extends AbstractOption implements ActionHolder
 
   /**
    * Repaint the graph after changes have occurred.
+   * @param updateLayout true if the layout should be updated, false otherwise.
    */
-  void repaintGraph()
+  void repaintGraph(final boolean updateLayout)
   {
     if (!repaintFlag.get()) return;
     if (getUIComponent() != null)
@@ -239,8 +259,12 @@ public class GraphOption extends AbstractOption implements ActionHolder
         @Override
         public void run()
         {
-          getUIComponent().invalidate();
-          getUIComponent().repaint();
+          if (updateLayout) setLayout();
+          else
+          {
+            getUIComponent().invalidate();
+            getUIComponent().repaint();
+          }
         }
       });
     }
@@ -257,6 +281,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
     sb.append("<html>").append(node.getId()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
+    sb.append("</html>");
     return sb.toString();
   }
 
@@ -291,5 +316,23 @@ public class GraphOption extends AbstractOption implements ActionHolder
   @Override
   protected void setupValueChangeNotifications()
   {
+  }
+
+  /**
+   * Determine whether to automatically layout the graph.
+   * @return <code>true</code> if auto-layout is on, <code>false</code> otherwise.
+   */
+  public boolean isAutoLayout()
+  {
+    return autoLayout.get();
+  }
+
+  /**
+   * Specify whether to automatically layout the graph.
+   * @param autoLayout <code>true</code> to set auto-layout on, <code>false</code> otherwise.
+   */
+  public void setAutoLayout(final boolean autoLayout)
+  {
+    this.autoLayout.set(autoLayout);
   }
 }

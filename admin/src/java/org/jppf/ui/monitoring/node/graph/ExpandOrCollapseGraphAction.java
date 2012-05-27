@@ -91,7 +91,7 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
           }
         }
       }
-      if (count > 0) panel.repaintGraph();
+      if (count > 0) panel.repaintGraph(panel.isAutoLayout());
     }
   }
 }

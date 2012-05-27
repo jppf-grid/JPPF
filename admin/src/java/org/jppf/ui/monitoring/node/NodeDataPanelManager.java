@@ -69,7 +69,8 @@ public class NodeDataPanelManager
     if (node != null)
     {
       panel.getModel().changeNode(node);
-      if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().driverAdded((TopologyData) node.getUserObject());
+      if (panel.getGraphOption() != null)
+        panel.getGraphOption().getGraphHandler().nodeDataUpdated((TopologyData) driverNode.getUserObject(), (TopologyData) node.getUserObject());
     }
   }
 

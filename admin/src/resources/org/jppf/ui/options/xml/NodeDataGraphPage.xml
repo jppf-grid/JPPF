@@ -45,10 +45,15 @@
 		<child name="graph.button.refresh" type="Button">
 			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
 			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/NodeGraph").populate()</script>
+				<script language="groovy">
+				  def graph = option.findFirstWithName("/NodeGraph");
+				  graph.populate();
+				  graph.setLayout();
+				</script>
 			</listener>
 		</child>
 
+		<!--
 		<child name="Layout" type="ComboBox">
 			<property name="label" value="Layout"/>
 			<property name="tooltip" value="choose a graph layout form the list"/>
@@ -63,10 +68,14 @@
 			<item name="Fruchterman-Reingold-2" selected="false"/>
 			<item name="Self Organizing Map" selected="false"/>
 			<item name="Kamada-Kawai" selected="false"/>
-			<!--<item name="Spring" selected="false"/>-->
+			<item name="Spring" selected="false"/>
 			<item name="Spring-2" selected="false"/>
-			<!--<item name="Static" selected="false"/>-->
+			<item name="Static" selected="false"/>
 		</child>
+		-->
+    <child name="graph.toggle.layout" type="Button">
+      <property name="toggle" value="true"/>
+    </child>
 		
 		<child name="sep3" type="ToolbarSeparator"/>
 		<child name="graph.button.expand" type="Button"/>
@@ -98,7 +107,7 @@
 			<initializer type="script">
 				<script language="groovy">
 					option.setupActions();
-					option.setLayout("CircleLayout");
+					option.setLayout();
 				</script>
 			</initializer>
 		</child>

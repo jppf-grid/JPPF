@@ -29,7 +29,12 @@ import org.slf4j.*;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 
 /**
- * 
+ * This class handles operations on the graph.
+ * <p>It actually holds 2 graphs:
+ * <ul>
+ * <li>one, the full graph, which contains the entire set of vertices (representing drviers and nodes)</li>  
+ * <li>another one, the displayed graph, where the collapsed nodes are filtered out</li>
+ * </ul>  
  * @author Laurent Cohen
  */
 public class GraphTopologyHandler
@@ -123,7 +128,7 @@ public class GraphTopologyHandler
     {
       graphOption.repaintFlag.set(true);
     }
-    graphOption.repaintGraph();
+    graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("end populate");
   }
 
@@ -148,7 +153,7 @@ public class GraphTopologyHandler
       }
     }
     insertDriverVertex(driver);
-    graphOption.repaintGraph();
+    graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("added driver " + driver.getId() + " to graph");
   }
 
@@ -164,7 +169,7 @@ public class GraphTopologyHandler
       driversAsNodes.remove(driver.getId());
     }
     removeVertex(driver);
-    graphOption.repaintGraph();
+    graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("removed driver " + driver.getId() + " to graph");
   }
 
@@ -198,7 +203,7 @@ public class GraphTopologyHandler
       }
     }
     insertNodeVertex(driver, node);
-    graphOption.repaintGraph();
+    graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node.getId() + " to driver " + driver.getId());
   }
 
@@ -210,7 +215,7 @@ public class GraphTopologyHandler
   public void nodeRemoved(final TopologyData driver, final TopologyData node)
   {
     removeVertex(node);
-    graphOption.repaintGraph();
+    graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("removed node " + node.getId() + " from driver " + driver.getId());
   }
 
@@ -221,7 +226,9 @@ public class GraphTopologyHandler
    */
   public void nodeDataUpdated(final TopologyData driver, final TopologyData node)
   {
-    graphOption.repaintGraph();
+    if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
+    graphOption.repaintGraph(false);
+    //graphOption.repaintGraph(graphOption.isAutoLayout());
   }
 
   /**
@@ -270,7 +277,7 @@ public class GraphTopologyHandler
   }
 
   /**
-   * Collapse the specified driver.
+   * Collapse the specified driver by removing attached nodes from the display graph.
    * @param driver the driver to collapse.
    */
   public void collapse(final TopologyData driver)
@@ -287,7 +294,7 @@ public class GraphTopologyHandler
   }
 
   /**
-   * Expand the specified driver.
+   * Expand the specified driver by adding attached nodes to the display graph.
    * @param driver the driver to expand.
    */
   public void expand(final TopologyData driver)

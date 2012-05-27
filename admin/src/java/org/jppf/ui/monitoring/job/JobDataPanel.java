@@ -72,12 +72,10 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     BASE = "org.jppf.ui.i18n.JobDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
     createTreeTableModel();
-    createUI();
     panelManager = new JobDataPanelManager(this);
     accumulatorHelper = new AccumulatorHelper(this);
     populateTreeTableModel();
     StatsHandler.getInstance().getJppfClient(null).addClientListener(this);
-    treeTable.expandAll();
   }
 
   /**
@@ -172,7 +170,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer());
     JScrollPane sp = new JScrollPane(treeTable);
     setUIComponent(sp);
-    //setupActions();
+    treeTable.expandAll();
   }
 
   /**

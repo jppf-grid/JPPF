@@ -30,16 +30,14 @@ import org.jppf.ui.utils.GuiUtils;
 
 import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 
-//import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
-
 /**
- * 
+ * Instances of this class handle the rendering of the vertices in the graph view.
  * @author Laurent Cohen
  */
 public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
 {
   /**
-   * 
+   * Default constructor, initializes this renderer with a white background.
    */
   public JPPFVertexLabelRenderer()
   {

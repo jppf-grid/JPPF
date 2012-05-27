@@ -66,6 +66,6 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
         if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
       }
     }
-    dataArray = list.toArray(new TopologyData[list.size()]);
+    dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new TopologyData[list.size()]);
   }
 }

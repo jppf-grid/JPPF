@@ -18,11 +18,9 @@
 
 package org.jppf.ui.monitoring.node.graph;
 
-import java.util.*;
+import java.util.Collection;
 
-import javax.swing.tree.TreePath;
-
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -35,10 +33,6 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 public abstract class AbstractGraphSelectionAction extends AbstractTopologyAction
 {
   /**
-   * Constant for an empty <code>TreePath</code>.
-   */
-  protected static final TreePath[] EMPTY_TREE_PATH = new TreePath[0];
-  /**
    * The tree table panel to which this action applies.
    */
   protected final GraphOption panel;
@@ -49,6 +43,7 @@ public abstract class AbstractGraphSelectionAction extends AbstractTopologyActio
    */
   public AbstractGraphSelectionAction(final GraphOption panel)
   {
+    super();
     this.panel = panel;
     setEnabled(true);
   }

@@ -90,7 +90,8 @@
 		<property name="layoutConstraints" value="fill, nogrid"/>
 		<property name="componentConstraints" value="grow, span, push, cell 0 1, width 0"/>
 	
-		<child name="JobTreetable" type="JobDataPanel">
+    <child name="JobTreetable" type="Custom">
+      <property name="impl.class" value="org.jppf.ui.monitoring.job.JobDataPanel"/>
 			<property name="componentConstraints" value="grow, width 0"/>
 			<property name="value" value=""/>
 			<initializer type="script">

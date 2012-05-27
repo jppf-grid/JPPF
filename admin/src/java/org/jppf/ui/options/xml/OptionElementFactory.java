@@ -470,36 +470,6 @@ public class OptionElementFactory
   }
 
   /**
-   * Build a NodeDataPanel from the specified descriptor.
-   * @param desc the descriptor to get the properties from.
-   * @return an <code>Option</code> instance, or null if the option could not be build.
-   * @throws Exception if an error was raised while building the option.
-   */
-  public Option buildNodeDataPanel(final OptionDescriptor desc) throws Exception
-  {
-    //NodeDataPanel option = new NodeDataPanel();
-    Class clazz = Class.forName("org.jppf.ui.monitoring.node.NodeDataPanel");
-    AbstractOption option = (AbstractOption) clazz.newInstance();
-    builder.initCommonOptionAttributes(option, desc);
-    return option;
-  }
-
-  /**
-   * Build a JobDataPanel from the specified descriptor.
-   * @param desc the descriptor to get the properties from.
-   * @return an <code>Option</code> instance, or null if the option could not be build.
-   * @throws Exception if an error was raised while building the option.
-   */
-  public Option buildJobDataPanel(final OptionDescriptor desc) throws Exception
-  {
-    //JobDataPanel option = new JobDataPanel();
-    Class clazz = Class.forName("org.jppf.ui.monitoring.job.JobDataPanel");
-    AbstractOption option = (AbstractOption) clazz.newInstance();
-    builder.initCommonOptionAttributes(option, desc);
-    return option;
-  }
-
-  /**
    * Build a custom option implemented as a Java class.
    * @param desc the descriptor to get the properties from.
    * @return an <code>Option</code> instance, or null if the option could not be build.
