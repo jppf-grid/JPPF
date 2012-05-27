@@ -19,6 +19,7 @@
 package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
@@ -98,7 +99,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
    */
   public GraphOption()
   {
-    //createUI();
   }
 
   /**
@@ -136,11 +136,9 @@ public class GraphOption extends AbstractOption implements ActionHolder
       viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<TopologyData>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
       viewer.getRenderContext().setVertexDrawPaintTransformer(new ConstantTransformer(null));
       viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(0.5f)));
-      viewer.setVertexToolTipTransformer(new ToStringLabeller<TopologyData>()
-      {
+      viewer.setVertexToolTipTransformer(new ToStringLabeller<TopologyData>() {
         @Override
-        public String transform(final TopologyData v)
-        {
+        public String transform(final TopologyData v) {
           return v.isNode() ? computeNodeTooltip(v) : super.transform(v);
         }
       });
@@ -152,6 +150,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
       graphMouse.remove(graphMouse.getPopupEditingPlugin());
       graphMouse.add(myPlugin);
       viewer.setGraphMouse(graphMouse);
+      graphComponent.addComponentListener(new ViewerComponentListener());
     }
   }
 
@@ -334,5 +333,32 @@ public class GraphOption extends AbstractOption implements ActionHolder
   public void setAutoLayout(final boolean autoLayout)
   {
     this.autoLayout.set(autoLayout);
+  }
+
+  /**
+   * Listens to resize events to perform a graph layout.
+   */
+  public class ViewerComponentListener implements ComponentListener
+  {
+    @Override
+    public void componentResized(final ComponentEvent e)
+    {
+      if (e.getComponent() != null) repaintGraph(isAutoLayout());
+    }
+
+    @Override
+    public void componentMoved(final ComponentEvent e)
+    {
+    }
+
+    @Override
+    public void componentShown(final ComponentEvent e)
+    {
+    }
+
+    @Override
+    public void componentHidden(final ComponentEvent e)
+    {
+    }
   }
 }
