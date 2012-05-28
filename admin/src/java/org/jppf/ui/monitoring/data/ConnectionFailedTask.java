@@ -76,7 +76,7 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
     while (statsHandler.getServerListOption() == null) goToSleep(50L);
     synchronized(statsHandler)
     {
-      if (debugEnabled) log.debug("adding client connection " + c.getName());
+      if (debugEnabled) log.debug("removing client connection " + c.getName() + " from driver combo box");
       box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
       int count = box.getItemCount();
       int idx = -1;

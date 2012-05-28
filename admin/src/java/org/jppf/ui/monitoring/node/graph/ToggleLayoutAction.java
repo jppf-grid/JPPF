@@ -45,7 +45,7 @@ public class ToggleLayoutAction extends AbstractGraphSelectionAction
   {
     super(panel);
     setupIcon("/org/jppf/ui/resources/layout.gif");
-    //setupNameAndTooltip("graph.toggle.layout");
+    setupNameAndTooltip("graph.toggle.layout");
     //setupNameAndTooltip("graph.toggle.layout.on");
     //setupTooltip("graph.toggle.layout.on");
     button = (AbstractButton) panel.findFirstWithName("/graph.toggle.layout").getUIComponent();
@@ -75,7 +75,7 @@ public class ToggleLayoutAction extends AbstractGraphSelectionAction
       boolean selected = button.isSelected();
       //setupNameAndTooltip(selected ? "graph.toggle.layout.on" : "graph.toggle.layout.off");
       //setupTooltip(selected ? "graph.toggle.layout.on" : "graph.toggle.layout.off");
-      button.setToolTipText(localize(selected ? "graph.toggle.layout.on.tooltip" : "graph.toggle.layout.off.tooltip"));
+      //button.setToolTipText(localize(selected ? "graph.toggle.layout.on.tooltip" : "graph.toggle.layout.off.tooltip"));
       panel.setAutoLayout(selected);
     }
   }

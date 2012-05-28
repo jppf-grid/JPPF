@@ -154,6 +154,16 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
 
   /**
    * Remove a disconnected connection.
+   * @param uuid uuid of the driver for the connections to remove.
+   * @return whether connection was successfully removed
+   */
+  public synchronized boolean removeConnectionInformation(final String uuid)
+  {
+    return infoMap.remove(uuid) != null;
+  }
+
+  /**
+   * Remove a disconnected connection.
    * @param info connection info of the peer to remove
    * @return whether connection was successfully removed
    */
@@ -163,7 +173,8 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
     {
       Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
       return set != null && set.remove(info);
-    } else
+    }
+    else
     {
       return infoMap.remove(info.uuid) != null;
     }

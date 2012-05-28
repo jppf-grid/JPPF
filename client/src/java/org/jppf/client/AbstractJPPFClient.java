@@ -238,12 +238,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
    * @param c the connection that failed.
    */
-  protected void connectionFailed(final JPPFClientConnection c)
-  {
-    log.info("Connection [" + c.getName() + "] failed");
-    removeClientConnection(c);
-    fireConnectionFailed(c);
-  }
+  protected abstract void connectionFailed(final JPPFClientConnection c);
 
   /**
    * Add a new connection to the set of connections handled by this client.

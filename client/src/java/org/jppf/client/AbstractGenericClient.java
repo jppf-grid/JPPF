@@ -250,6 +250,19 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   }
 
   /**
+   * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
+   * @param c the connection that failed.
+   */
+  @Override
+  protected void connectionFailed(final JPPFClientConnection c)
+  {
+    log.info("Connection [" + c.getName() + "] failed");
+    if (receiverThread != null) receiverThread.removeConnectionInformation(((AbstractJPPFClientConnection) c).getUuid());
+    removeClientConnection(c);
+    fireConnectionFailed(c);
+  }
+
+  /**
    * Close this client and release all the resources it is using.
    */
   @Override
