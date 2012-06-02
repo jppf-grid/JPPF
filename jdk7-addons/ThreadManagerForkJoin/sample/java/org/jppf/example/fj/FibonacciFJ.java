@@ -41,7 +41,7 @@ public class FibonacciFJ
 
   /**
    * Main method for demonstration of fork join support
-   * @param args
+   * @param args not used.
    */
   public static void main(final String[] args)
   {
@@ -124,7 +124,7 @@ public class FibonacciFJ
 
     /**
      * Compute Fibonacci number.
-     * @param n
+     * @param n order of Fibonacci number to compute.
      * @return the Fibonacci number.
      */
     private static long fib(final int n)

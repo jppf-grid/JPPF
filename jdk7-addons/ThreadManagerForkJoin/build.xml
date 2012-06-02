@@ -27,6 +27,7 @@
   <property name="config.dir" value="${basedir}/config" />
   <property name="classes.dir" value="${basedir}/classes" />
   <property name="src.dir" value="${basedir}/src" />
+  <property name="sample.dir" value="${basedir}/sample" />
   <property name="javadoc" value="${basedir}/javadoc" />
   <property name="jar.file" value="ThreadManagerForkJoin.jar" />
   <property file="${jppf.dir}/bin/build.properties" />
@@ -42,6 +43,7 @@
     <pathelement location="${basedir}/../../node/classes" />
     <pathelement location="${basedir}/../../common/classes" />
     <pathelement location="${basedir}/../../server/classes" />
+    <pathelement location="${basedir}/../../client/classes" />
     <pathelement location="${jppf.lib.dir}/slf4j/slf4j-api-1.6.1.jar" />
   </path>
 
@@ -56,6 +58,7 @@
 
   <target name="clean">
     <delete dir="${classes.dir}" quiet="true" includes="**/*.*" />
+    <delete dir="${sample.dir}/classes" quiet="true" includes="**/*.*" />
   </target>
 
   <!-- ========================================================================= -->
@@ -82,6 +85,7 @@
   <target name="compile" depends="clean, init">
     <checkstyle  config="${jppf.dir}/CheckStyle_JPPF_config.xml">
       <fileset dir="${src.dir}" includes="**/*.java"/>
+      <fileset dir="${sample.dir}/java" includes="**/*.java"/>
     </checkstyle>
 
     <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
@@ -96,7 +100,14 @@
         <exclude name="**/package.html" />
       </fileset>
     </copy>
-  </target>
+
+    <javac srcdir="" destdir="${sample.dir}/classes" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="project.classpath" />
+      <compilerarg line="-Xlint:unchecked" />
+      <src path="${sample.dir}/java" />
+    </javac>
+
+</target>
 
   <!-- ========================================================================= -->
   <!--                                  Jar                                      -->
