@@ -7,6 +7,6 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.utils.TexFileSplitter"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-i C:/temp/ZSAssociates/20101223/jppf-node.log -o C:/temp/ZSAssociates/20101223/split -n 15 -p split-log -e .log"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-i C:/ftp/util/Dictionaries/enwiki-latest-pages-articles.xml -o C:/ftp/util/Dictionaries/split -n 360 -p wikipedia -e .xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="common"/>
 </launchConfiguration>

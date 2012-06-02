@@ -62,7 +62,8 @@ public class LongTaskRunner
       int nbTask = props.getInt("longtask.number");
       int iterations = props.getInt("longtask.iterations");
       print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-      perform(nbTask, length, iterations);
+      //perform(nbTask, length, iterations);
+      performAsync(nbTask, length, iterations);
       //perform3(nbTask, length, iterations);
       //perform4();
       //perform5();
@@ -108,6 +109,51 @@ public class LongTaskRunner
           Exception e = task.getException();
           if (e != null) throw e;
         }
+        long elapsed = System.currentTimeMillis() - start;
+        print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
+        totalTime += elapsed;
+      }
+      print("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
+      //JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+      //print("End statistics :\n"+stats.toString());
+    }
+    catch(Exception e)
+    {
+      throw new JPPFException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+   * @param nbTasks the number of tasks to send at each iteration.
+   * @param length the executionlength of each task.
+   * @param iterations the number of times the the tasks will be sent.
+   * @throws Exception if an error is raised during the execution.
+   */
+  private static void performAsync(final int nbTasks, final int length, final int iterations) throws Exception
+  {
+    try
+    {
+      // perform "iteration" times
+      long totalTime = 0L;
+      for (int iter=1; iter<=iterations; iter++)
+      {
+        long start = System.currentTimeMillis();
+        JPPFJob job = new JPPFJob();
+        job.setName("Long task iteration " + iter);
+        for (int i=0; i<nbTasks; i++)
+        {
+          //JPPFTask task = new LongTask(length, false);
+          JPPFTask task = new PrintTask();
+          task.setId("" + iter + ':' + (i+1));
+          job.addTask(task);
+        }
+        job.setBlocking(false);
+        //job.getSLA().setCancelUponClientDisconnect(false);
+        // submit the tasks for execution
+        jppfClient.submit(job);
+        print("submitted non blocking job '" + job.getName() + "'");
+        Thread.sleep(2000L);
         long elapsed = System.currentTimeMillis() - start;
         print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
         totalTime += elapsed;
@@ -385,5 +431,32 @@ public class LongTaskRunner
     };
     //new Thread(r).start();
     r.run();
+  }
+
+  /**
+   * A task that prints a lot of messages to the console.
+   */
+  private static class PrintTask extends JPPFTask
+  {
+    @Override
+    public void run()
+    {
+      long start = System.currentTimeMillis();
+      int sum = 0;
+      for (int i=0; i<1*1000*1000; i++)
+      {
+        System.out.println("printing " + i);
+        if (Thread.currentThread().isInterrupted()) break;
+        //sum += 1;
+      }
+      long elapsed = System.currentTimeMillis() - start;
+      System.out.println("total time: " + elapsed + " ms");
+    }
+
+    @Override
+    public void onCancel()
+    {
+      System.err.println("*** task cancelled ***");
+    }
   }
 }
