@@ -169,7 +169,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     if (info != null)
     {
       NodeExecutionInfo info2 = threadManager.computeExecutionInfo().subtract(info);
-      if (debugEnabled) log.debug("total cpu time used: " + info2.cpuTime + " ms, user time: " + info2.userTime);
+      if (debugEnabled) log.debug("total cpu time used: " + (info2.cpuTime/1000000) + " ms, user time: " + (info2.userTime/1000000));
     }
   }
 
@@ -238,6 +238,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     Future<?> future = futureMap.get(number);
     if (!future.isDone())
     {
+      if (debugEnabled) log.debug("calling future.cancel(true) for task number = " + number);
       future.cancel(true);
       NodeTaskWrapper taskWrapper = taskMap.remove(number);
       if (taskWrapper != null)
