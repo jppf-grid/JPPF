@@ -60,6 +60,10 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * Holds a set of filters to include or exclude sets of IP addresses in the discovery process.
    */
   private final IPFilter ipFilter;
+  /**
+   * The thread that executes the <code>run()</code> method.
+   */
+  private Thread runningThread = null;
 
   /**
    * Initialize this discovery thread with the specified JPPF client.
@@ -83,6 +87,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   @Override
   public void run()
   {
+    runningThread = Thread.currentThread();
     JPPFMulticastReceiver receiver = null;
     try
     {
@@ -177,6 +182,19 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
     else
     {
       return infoMap.remove(info.uuid) != null;
+    }
+  }
+
+  /**
+   * Close this multicast receiver and interrupt the thread that rns it.
+   */
+  public void close()
+  {
+    setStopped(true);
+    if (runningThread != null)
+    {
+      runningThread.interrupt();
+      runningThread = null;
     }
   }
 

@@ -268,11 +268,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   @Override
   public void close()
   {
-    super.close();
     if (debugEnabled) log.debug("closing broadcast receiver");
-    if (receiverThread != null) receiverThread.setStopped(true);
+    if (receiverThread != null) receiverThread.close();
     if (debugEnabled) log.debug("closing executor");
     if (executor != null) executor.shutdownNow();
+    super.close();
   }
 
   /**
