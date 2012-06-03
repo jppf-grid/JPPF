@@ -179,7 +179,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
 
-    System.out.println("addConnection: " + wrapper);
     allConnections.add(wrapper);
     wrapper.addClientConnectionStatusListener(statusListener);
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
