@@ -276,6 +276,11 @@ else
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=Topology-GraphView-02.gif">
+									<img src="screenshots/_th_Topology-GraphView-02.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=Topology-GraphView.gif">
 									<img src="screenshots/_th_Topology-GraphView.jpg" border="0" alt="screenshot"/>
 								</a>
