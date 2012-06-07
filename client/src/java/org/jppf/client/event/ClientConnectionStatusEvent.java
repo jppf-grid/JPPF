@@ -46,7 +46,7 @@ public class ClientConnectionStatusEvent extends EventObject
 
   /**
    * Get the source of this event.
-   * @return the event as a <code>JPPFClientConnection</code> instance.
+   * @return the event source as a <code>ClientConnectionStatusHandler</code> instance.
    */
   public ClientConnectionStatusHandler getClientConnectionStatusHandler()
   {

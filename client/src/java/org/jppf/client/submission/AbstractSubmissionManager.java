@@ -74,7 +74,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   /**
    * Keeps a list of the valid connections not currently executing tasks.
    */
-  protected Vector<JPPFClientConnection> availableConnections;
+  protected final Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>();
 
   /**
    * Initialize this submission worker with the specified JPPF client.
@@ -110,6 +110,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
             ", execQueue.isEmpty()=" + execQueue.isEmpty() + ", broadcastJobsQueue.isEmpty()=" + broadcastJobsQueue.isEmpty());
           */
           JPPFJob job = null;
+          //AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
           AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
           if ((c != null) && !broadcastJobsQueue.isEmpty())
           {
@@ -129,7 +130,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
               continue;
             }
           }
-          if (debugEnabled) log.debug("submitting jobId=" + job.getName());
+          if (debugEnabled) log.debug("submitting job " + job.getName());
           if (c != null) c.getTaskServerConnection().setStatus(JPPFClientConnectionStatus.EXECUTING);
           JobSubmission submission = createSubmission(job, c, job.getSLA().isBroadcastJob() ? false : execFlags.second());
           client.getExecutor().submit(submission);
@@ -195,7 +196,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
       sb.append("locally executing: ").append(loadBalancer.isLocallyExecuting());
       log.trace(sb.toString());
     }
-    return (!getAvailableConnections().isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
+    return (!availableConnections.isEmpty() || (loadBalancer.isLocalEnabled() && !loadBalancer.isLocallyExecuting()));
   }
 
   /**
@@ -233,16 +234,17 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
     JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-    if (debugEnabled) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
-    switch(c.getStatus())
+    JPPFClientConnectionStatus status = c.getStatus();
+    switch(status)
     {
       case ACTIVE:
-        getAvailableConnections().add(c);
+        availableConnections.add(c);
         break;
       default:
-        getAvailableConnections().remove(c);
+        availableConnections.remove(c);
         break;
     }
+    if (debugEnabled) log.debug("connection=" + c + ", availableConnections=" + availableConnections);
   }
 
   /**
@@ -252,7 +254,6 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   @Override
   public Vector<JPPFClientConnection> getAvailableConnections()
   {
-    if (availableConnections == null) availableConnections = new Vector<JPPFClientConnection>();
     return availableConnections;
   }
 }

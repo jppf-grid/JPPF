@@ -60,7 +60,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
     this.clientUuid = uuid;
     this.host = host;
     this.port = port;
-    setName(owner.getName());
+    //setName(host + ':' + port);
   }
 
   /**

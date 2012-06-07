@@ -105,6 +105,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
         }
       });
       connect();
+      if (getStatus() == ACTIVE) client.addClientConnection(this);
     }
     catch (Exception e)
     {

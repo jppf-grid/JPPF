@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.FAILED;
+import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.net.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -81,7 +81,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       try
       {
         //String s = InetAddress.getByName(host).getCanonicalHostName();
-        host = InetAddress.getByName(host).getCanonicalHostName();
+        host = InetAddress.getByName(host).getHostName();
         displayName = name + '[' + host + ':' + port + ']';
         getJmxConnection().setHost(host);
       }
@@ -107,6 +107,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
         }
       });
       connect();
+      if (debugEnabled) log.debug("connection [" + name + "] status=" + getStatus());
+      if (getStatus() == ACTIVE) client.addClientConnection(this);
+      if (debugEnabled) log.debug("connection [" + name + "] added to the client pool");
     }
     catch (Exception e)
     {

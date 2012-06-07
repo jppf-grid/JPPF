@@ -174,8 +174,12 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   public void setStatus(final JPPFClientConnectionStatus status)
   {
     JPPFClientConnectionStatus oldStatus = getStatus();
-    this.status.set(status);
-    if (!status.equals(oldStatus)) fireStatusChanged(oldStatus);
+    if (status != oldStatus)
+    {
+      if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
+      this.status.set(status);
+      fireStatusChanged(oldStatus);
+    }
   }
 
   /**
@@ -307,20 +311,20 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus)
   {
-    if (FAILED.equals(delegateStatus)) setStatus(FAILED);
-    else if (ACTIVE.equals(delegateStatus))
+    if (delegateStatus == FAILED) setStatus(FAILED);
+    else if (delegateStatus == ACTIVE)
     {
-      if (ACTIVE.equals(taskConnectionStatus) && !ACTIVE.equals(this.getStatus())) setStatus(ACTIVE);
-      else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+      if ((taskConnectionStatus == ACTIVE) && (this.getStatus() != ACTIVE)) setStatus(ACTIVE);
+      else if (taskConnectionStatus != this.getStatus()) setStatus(taskConnectionStatus);
     }
     else
     {
-      if (ACTIVE.equals(taskConnectionStatus)) setStatus(delegateStatus);
+      if (taskConnectionStatus == ACTIVE) setStatus(delegateStatus);
       else
       {
         int n = delegateStatus.compareTo(taskConnectionStatus);
-        if ((n < 0) && !delegateStatus.equals(this.getStatus())) setStatus(delegateStatus);
-        else if (!taskConnectionStatus.equals(this.getStatus())) setStatus(taskConnectionStatus);
+        if ((n < 0) && (delegateStatus != this.getStatus())) setStatus(delegateStatus);
+        else if (taskConnectionStatus != this.getStatus()) setStatus(taskConnectionStatus);
       }
     }
   }
@@ -351,6 +355,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   {
     JPPFTaskBundle bundle = super.sendHandshakeJob();
     this.systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+    this.uuid = (String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
     return bundle;
   }
 

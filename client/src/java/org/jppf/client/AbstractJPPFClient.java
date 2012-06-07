@@ -244,12 +244,11 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Add a new connection to the set of connections handled by this client.
    * @param connection the connection to add.
    */
-  protected void addClientConnection(final JPPFClientConnection connection)
+  public void addClientConnection(final JPPFClientConnection connection)
   {
     if (connection == null) throw new IllegalArgumentException("connection is null");
-
-    connection.addClientConnectionStatusListener(this);
-    connection.setStatus(JPPFClientConnectionStatus.NEW);
+    //connection.addClientConnectionStatusListener(this);
+    //connection.setStatus(JPPFClientConnectionStatus.NEW);
     int priority = connection.getPriority();
     synchronized (pools)
     {

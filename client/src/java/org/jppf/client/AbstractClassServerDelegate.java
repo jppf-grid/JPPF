@@ -72,7 +72,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected AbstractClassServerDelegate(final JPPFClientConnection owner)
   {
-    super(owner);
+    super(owner, owner.getName() + " - ClassServer");
   }
 
   /**

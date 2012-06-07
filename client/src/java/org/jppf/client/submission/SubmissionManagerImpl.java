@@ -23,7 +23,7 @@ import org.jppf.client.event.*;
 import org.slf4j.*;
 
 /**
- * This task provides asynchronous management of tasks submitted through the resource adapter.
+ * This class queues and manages the jobs submitted via a JPPF clint.
  * It relies on a queue where job are first added, then submitted when a driver connection becomes available.
  * It also provides methods to check the status of a submission and retrieve the results.
  * @author Laurent Cohen

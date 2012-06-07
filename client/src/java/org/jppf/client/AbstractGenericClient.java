@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.*;
-import org.jppf.client.submission.SubmissionManager;
+import org.jppf.client.submission.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
@@ -182,7 +182,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
             info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             int priority = props.getInt(String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
-
             newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
           }
         }
@@ -237,8 +236,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public void newConnection(final JPPFClientConnection c)
   {
     log.info("connection [" + c.getName() + "] created");
-    addClientConnection(c);
-    int n = getAllConnectionsCount() + 1;
+    //addClientConnection(c);
+    c.addClientConnectionStatusListener((AbstractSubmissionManager) getSubmissionManager());
+    c.setStatus(JPPFClientConnectionStatus.NEW);
+    int n = getAllConnectionsCount() + 2;
     if (executor.getCorePoolSize() < n)
     {
       executor.setMaximumPoolSize(n);
@@ -315,19 +316,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     {
       ((ClientConnectionStatusListener)submissionManager).statusChanged(event);
     }
-  }
-
-  /**
-   * Get the list of available connections.
-   * @return a vector of connections instances.
-   */
-  public Vector<JPPFClientConnection> getAvailableConnections()
-  {
-    SubmissionManager submissionManager = getSubmissionManager();
-    if(submissionManager == null)
-      return new Vector<JPPFClientConnection>();
-    else
-      return submissionManager.getAvailableConnections();
   }
 
   /**

@@ -85,11 +85,13 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * Initialize this connection with the specified owner.
    * @param owner the client connection which owns this connection handler.
+   * @param name the name given to this connection.
    */
-  protected AbstractClientConnectionHandler(final JPPFClientConnection owner)
+  protected AbstractClientConnectionHandler(final JPPFClientConnection owner, final String name)
   {
     this.owner = owner;
-    if (owner != null) this.name = owner.getName();
+    //if (owner != null) this.name = owner.getName();
+    this.name = name;
     long configSocketIdle = JPPFConfiguration.getProperties().getLong("jppf.socket.max-idle", -1L);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
   }
@@ -114,7 +116,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   public void setStatus(final JPPFClientConnectionStatus newStatus)
   {
     JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
-    if (!newStatus.equals(oldStatus)) fireStatusChanged(oldStatus);
+    if (newStatus != oldStatus)
+    {
+      if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + newStatus);
+      fireStatusChanged(oldStatus);
+    }
   }
 
   /**

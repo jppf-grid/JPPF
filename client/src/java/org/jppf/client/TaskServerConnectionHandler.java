@@ -50,7 +50,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
    */
   public TaskServerConnectionHandler(final JPPFClientConnection owner, final String host, final int port)
   {
-    super(owner);
+    super(owner, owner.getName() + " - TasksServer");
     this.host = host;
     this.port = port;
   }
