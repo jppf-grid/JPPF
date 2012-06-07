@@ -146,7 +146,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
     }
     catch(Exception e)
     {
-      log.error(e.getMessage(), e);
+      if (!(e instanceof InterruptedException)) log.error(e.getMessage(), e);
     }
     if (traceEnabled) log.trace("Auto-discovery of the driver connection information: " + info);
     return info;

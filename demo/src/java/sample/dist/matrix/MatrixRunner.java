@@ -69,7 +69,7 @@ public class MatrixRunner implements NotificationListener
    * Entry point for this class, performs a matrix multiplication a number of times.,<br>
    * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
-   * @param args - not used.
+   * @param args not used.
    */
   public static void main(final String...args)
   {
@@ -77,8 +77,8 @@ public class MatrixRunner implements NotificationListener
     try
     {
       /*
-			System.out.println("press any key when ready to start");
-			int c = System.in.read();
+      System.out.println("press any key when ready to start");
+      int c = System.in.read();
        */
       String clientUuid = ((args != null) && (args.length > 0)) ? args[0] : null;
       TypedProperties props = JPPFConfiguration.getProperties();
