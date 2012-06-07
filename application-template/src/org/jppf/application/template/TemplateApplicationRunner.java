@@ -28,8 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
  * to write an application using JPPF.
  * @author Laurent Cohen
  */
-public class TemplateApplicationRunner
-{
+public class TemplateApplicationRunner {
   /**
    * The JPPF client, handles all communications with the server.
    * It is recommended to only use one JPPF client per JVM, so it
@@ -42,10 +41,8 @@ public class TemplateApplicationRunner
    * @param args by default, we do not use the command line arguments,
    * however nothing prevents us from using them if need be.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       // create the JPPFClient. This constructor call causes JPPF to read the configuration file
       // and connect with one or multiple JPPF drivers.
       jppfClient = new JPPFClient();
@@ -58,15 +55,12 @@ public class TemplateApplicationRunner
 
       // execute a blocking job
       runner.executeBlockingJob(job);
+
       // execute a non-blocking job
       //runner.executeNonBlockingJob(job);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -76,8 +70,7 @@ public class TemplateApplicationRunner
    * @return an instance of the {@link org.jppf.client.JPPFJob JPPFJob} class.
    * @throws Exception if an error occurs while creating the job or adding tasks.
    */
-  public JPPFJob createJob() throws Exception
-  {
+  public JPPFJob createJob() throws Exception {
     // create a JPPF job
     JPPFJob job = new JPPFJob();
 
@@ -100,8 +93,7 @@ public class TemplateApplicationRunner
    * @param job the JPPF job to execute.
    * @throws Exception if an error occurs while executing the job.
    */
-  public void executeBlockingJob(final JPPFJob job) throws Exception
-  {
+  public void executeBlockingJob(final JPPFJob job) throws Exception {
     // set the job in blocking mode.
     job.setBlocking(true);
 
@@ -111,18 +103,7 @@ public class TemplateApplicationRunner
     List<JPPFTask> results = jppfClient.submit(job);
 
     // process the results
-    for (JPPFTask task: results)
-    {
-      // if the task execution resulted in an exception
-      if (task.getException() != null)
-      {
-        // process the exception here ...
-      }
-      else
-      {
-        // process the result here ...
-      }
-    }
+    processExecutionResults(results);
   }
 
   /**
@@ -131,8 +112,35 @@ public class TemplateApplicationRunner
    * @param job the JPPF job to execute.
    * @throws Exception if an error occurs while executing the job.
    */
-  public void executeNonBlockingJob(final JPPFJob job) throws Exception
-  {
+  public void executeNonBlockingJob(final JPPFJob job) throws Exception {
+    // set the job in non-blocking (or asynchronous) mode.
+    job.setBlocking(false);
+
+    // this call returns immediately. We will use the collector at a later time
+    // to obtain the execution results asynchronously
+    JPPFResultCollector collector = submitNonBlockingJob(job);
+
+    // the non-blocking job execution is asynchronous, we can do anything else in the meantime
+    System.out.println("Doing something while the job is executing ...");
+    // ...
+
+    // We are now ready to get the results of the job execution.
+    // We use JPPFResultCollector.waitForResults() for this. This method returns immediately with
+    // the results if the job has completed, otherwise it waits until the job execution is complete.
+    List<JPPFTask> results = collector.waitForResults();
+
+    // process the results
+    processExecutionResults(results);
+  }
+
+  /**
+   * Execute a job in non-blocking mode. The application has the responsibility
+   * for handling the notification of job completion and collecting the results.
+   * @param job the JPPF job to execute.
+   * @return a JPPFResultCollector used to obtain the execution results at a later time.
+   * @throws Exception if an error occurs while executing the job.
+   */
+  public JPPFResultCollector submitNonBlockingJob(final JPPFJob job) throws Exception {
     // set the job in non-blocking (or asynchronous) mode.
     job.setBlocking(false);
 
@@ -145,30 +153,29 @@ public class TemplateApplicationRunner
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
 
-
     // Submit the job. This call returns immediately without waiting for the execution of
     // the job to complete. As a consequence, the object returned for a non-blocking job is
     // always null. Note that we are calling the exact same method as in the blocking case.
     jppfClient.submit(job);
 
-    // do something else here, while the job is being executed ...
+    // finally return the result collector, so it can be used to collect the exeuction results
+    // at a time of our chosing. The collector can also be obtained at any time by calling 
+    // (JPPFResultCollector) job.getResultListener()
+    return collector;
+  }
 
-    // We are now ready to get the results of the job execution.
-    // We use JPPFResultCollector.waitForResults() for this. This method returns immediately
-    // with the results if the job has completed, otherwise it waits until the job execution
-    // is complete.
-    List<JPPFTask> results = collector.waitForResults();
-
+  /**
+   * Process the execution results of each submitted task. 
+   * @param results the tasks results after execution on the grid.
+   */
+  public void processExecutionResults(final List<JPPFTask> results) {
     // process the results
-    for (JPPFTask task: results)
-    {
+    for (JPPFTask task: results) {
       // if the task execution resulted in an exception
-      if (task.getException() != null)
-      {
+      if (task.getException() != null) {
         // process the exception here ...
       }
-      else
-      {
+      else {
         // process the result here ...
       }
     }
