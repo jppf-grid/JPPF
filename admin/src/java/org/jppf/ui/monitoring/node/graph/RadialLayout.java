@@ -28,7 +28,7 @@ import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.Graph;
 
 /**
- * Radial layout for JPPF toplogy graph.
+ * Radial layout for JPPF topology graph.
  * <p> This layout places all the driver vertices on a circle centered on the current view.
  * The node vertices for each driver are then placed in a half-circle centered on the driver vertex,
  * in the angle range [driverAngle - PI/2, driverAngle + PI/2], where <i>driverAngle</i> is the angle
@@ -86,12 +86,13 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
     if (d != null)
     {
       Collection<TopologyData> drivers = getDrivers();
+      int dSize = drivers.size();
       double height = d.getHeight();
       double width = d.getWidth();
       double radius = radiusFactor * (height < width ? height : width);
+      radius *= (dSize > 1) ? 1d : 2d;
 
       int i = 0;
-      int dSize = drivers.size();
       for (TopologyData driver : drivers)
       {
         Point2D coord = transform(driver);
