@@ -18,26 +18,19 @@
 
 package org.jppf.client.balancer;
 
+import java.util.*;
+
 import org.jppf.client.*;
 import org.jppf.client.balancer.job.JPPFJobManager;
-import org.jppf.client.balancer.queue.JPPFPriorityQueue;
-import org.jppf.client.balancer.queue.QueueEvent;
-import org.jppf.client.balancer.queue.QueueListener;
-import org.jppf.client.balancer.queue.TaskQueueChecker;
+import org.jppf.client.balancer.queue.*;
 import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
-import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.ThreadSynchronization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This task provides asynchronous management of tasks submitted through the resource adapter.
@@ -98,6 +91,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     }
   };
+
   /**
    * Determines whether local execution is enabled on this client.
    */
@@ -443,5 +437,14 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     }
     return availableConnections;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ClientConnectionStatusListener getClientConnectionStatusListener()
+  {
+    return this.statusListener;
   }
 }

@@ -19,7 +19,7 @@
 package org.jppf.client.submission;
 
 import org.jppf.client.*;
-import org.jppf.client.event.SubmissionStatusListener;
+import org.jppf.client.event.*;
 
 import java.util.Vector;
 
@@ -75,4 +75,9 @@ public interface SubmissionManager extends Runnable
    * @return a vector of connections instances.
    */
   Vector<JPPFClientConnection> getAvailableConnections();
+  /**
+   * Get a listener to the status of the managed connections.
+   * @return a {@link ClientConnectionStatusListener} instance.
+   */
+  ClientConnectionStatusListener getClientConnectionStatusListener();
 }

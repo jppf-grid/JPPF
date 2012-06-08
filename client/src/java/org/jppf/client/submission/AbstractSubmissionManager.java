@@ -22,8 +22,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.jppf.client.*;
-import org.jppf.client.event.ClientConnectionStatusEvent;
-import org.jppf.client.event.ClientConnectionStatusListener;
+import org.jppf.client.event.*;
 import org.jppf.client.loadbalancer.LoadBalancer;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -108,7 +107,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
           /*
           if (debugEnabled) log.debug("execFlags.first=" + execFlags.first() + ", execFlags.second=" + execFlags.second() +
             ", execQueue.isEmpty()=" + execQueue.isEmpty() + ", broadcastJobsQueue.isEmpty()=" + broadcastJobsQueue.isEmpty());
-          */
+           */
           JPPFJob job = null;
           //AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
           AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
@@ -255,5 +254,11 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   public Vector<JPPFClientConnection> getAvailableConnections()
   {
     return availableConnections;
+  }
+
+  @Override
+  public ClientConnectionStatusListener getClientConnectionStatusListener()
+  {
+    return this;
   }
 }

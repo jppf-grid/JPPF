@@ -21,7 +21,7 @@ package org.jppf.server;
 import org.jppf.server.scheduler.bundle.JPPFContext;
 
 /**
- * Context associated with a client.
+ * Context associated with a driver.
  * @author Martin JANDA
  */
 public class JPPFContextDriver extends JPPFContext

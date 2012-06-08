@@ -314,7 +314,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundleWrapper.getName());
       removeFromListMap(new JPPFPriority(bundleWrapper.getSLA().getPriority()), bundleWrapper, priorityMap);
-//      jobMap.remove(bundleWrapper.getUuid());
+      jobMap.remove(bundleWrapper.getUuid());
       return null;
     }
     finally
