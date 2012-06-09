@@ -18,9 +18,9 @@
 
 package org.jppf.client.balancer.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -33,7 +33,7 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
   /**
    * List of listeners for this task.
    */
-  private final List<Listener> listenerList = new CopyOnWriteArrayList<Listener>();
+  private final List<Listener> listenerList = new ArrayList<Listener>();
 
   /**
    * Creates a <tt>FutureTask</tt> that will, upon running, execute the
