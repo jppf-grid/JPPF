@@ -90,6 +90,9 @@
 		<echo message="gs.home = ${gs.home}"/>
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
+    <exec executable="java">
+      <arg value="-version"/>
+    </exec>
 		<javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF"
 			packagenames="**/*.*" classpathref="javadoc.classpath" stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
 			doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes"
