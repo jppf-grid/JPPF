@@ -27,6 +27,10 @@ public enum JPPFClientConnectionStatus
   /**
    * The connection was just created.
    */
+  CREATED,
+  /**
+   * The connection was just created.
+   */
   NEW,
   /**
    * The client was disconnected from the driver.

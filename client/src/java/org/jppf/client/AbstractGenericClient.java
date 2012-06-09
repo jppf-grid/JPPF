@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.*;
-import org.jppf.client.submission.*;
+import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
@@ -83,27 +83,28 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected boolean sslEnabled = false;
 
   /**
-   * Initialize this client with an automatically generated application UUID.
-   * @param configuration the object holding the JPPF configuration.
-   */
-  public AbstractGenericClient(final Object configuration)
-  {
-    this(null, configuration);
-  }
-
-  /**
    * Initialize this client with a specified application UUID.
    * @param uuid the unique identifier for this local client.
    * @param configuration the object holding the JPPF configuration.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public AbstractGenericClient(final String uuid, final Object configuration)
+  public AbstractGenericClient(final String uuid, final Object configuration, final ClientListener... listeners)
   {
     super(uuid);
+    for (ClientListener listener : listeners) addClientListener(listener);
     initConfig(configuration);
     sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
-    initPools();
+    Runnable r = new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        initPools();
+      }
+    };
+    new Thread(r, "InitPools").start();
   }
 
   /**

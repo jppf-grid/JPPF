@@ -18,24 +18,20 @@
 
 package org.jppf.client.balancer;
 
-import org.jppf.JPPFException;
-import org.jppf.client.*;
-import org.jppf.client.balancer.utils.JPPFFuture;
-import org.jppf.client.balancer.utils.JPPFFutureTask;
-import org.jppf.client.event.ClientConnectionStatusHandler;
-import org.jppf.client.event.ClientConnectionStatusListener;
-import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.NotSerializableException;
 import java.util.List;
 import java.util.concurrent.*;
+
+import org.jppf.JPPFException;
+import org.jppf.client.*;
+import org.jppf.client.balancer.utils.*;
+import org.jppf.client.event.*;
+import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.management.*;
+import org.jppf.server.protocol.*;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.utils.JPPFThreadFactory;
+import org.slf4j.*;
 
 /**
  * Context associated with a remote channel serving state and tasks submission.
@@ -55,10 +51,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * The channel to the driver to use.
    */
   private final AbstractJPPFClientConnection channel;
-  /**
-   * Executor for submitting bundles for processing.
-   */
-  private final Executor executor = Executors.newSingleThreadExecutor();
   /**
    * Unique identifier of the client.
    */
@@ -81,6 +73,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     managementInfo.setSystemInfo(info);
     super.setSystemInfo(info);
     setManagementInfo(managementInfo);
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("channel-" + channel.getName() + "-"));
   }
 
   @Override

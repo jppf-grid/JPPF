@@ -56,7 +56,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Status of the connection.
    */
-  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CONNECTING);
+  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CREATED);
   /**
    * List of status listeners for this connection.
    */

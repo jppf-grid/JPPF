@@ -18,28 +18,20 @@
 
 package org.jppf.client.balancer.queue;
 
-import org.jppf.client.balancer.ChannelWrapper;
-import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
-import org.jppf.client.balancer.SubmissionManagerClient;
-import org.jppf.client.balancer.job.JPPFJobManager;
-import org.jppf.client.submission.SubmissionStatus;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.policy.Equal;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JPPFDistributedJob;
-import org.jppf.node.protocol.JobSLA;
-import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.scheduling.JPPFScheduleHandler;
-import org.jppf.server.protocol.JPPFJobSLA;
-import org.jppf.utils.JPPFUuid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.jppf.utils.CollectionUtils.*;
 
 import java.text.ParseException;
 import java.util.*;
 
-import static org.jppf.utils.CollectionUtils.*;
+import org.jppf.client.balancer.*;
+import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.policy.*;
+import org.jppf.node.protocol.*;
+import org.jppf.scheduling.*;
+import org.jppf.server.protocol.JPPFJobSLA;
+import org.jppf.utils.JPPFUuid;
+import org.slf4j.*;
 
 /**
  * A JPPF queue whose elements are ordered by decreasing priority.
@@ -63,14 +55,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * Contains the ids of all queued jobs.
    */
   private Map<String, ClientJob> jobMap = new HashMap<String, ClientJob>();
-//  /**
-//   * The driver stats manager.
-//   */
-//  protected JPPFClientStatsManager statsManager = null;
-  /**
-   * The job manager.
-   */
-  protected JPPFJobManager jobManager = null;
   /**
    * The job submission manager
    */
@@ -86,13 +70,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 
   /**
    * Initialize this queue.
-   * @param jobManager        reference to job manager.
    * @param submissionManager reference to submission manager.
    */
-  public JPPFPriorityQueue(final JPPFJobManager jobManager, final SubmissionManagerClient submissionManager)
+  public JPPFPriorityQueue(final SubmissionManagerClient submissionManager)
   {
-//    this.statsManager = JPPFDriver.getInstance().getStatsManager();
-    this.jobManager = jobManager;
     this.submissionManager = submissionManager;
   }
 
@@ -167,21 +148,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     }
-//    statsManager.taskInQueue(bundle.getTaskCount());
-  }
-
-  @Override
-  protected void fireQueueEvent(final QueueEvent event)
-  {
-    super.fireQueueEvent(event);
-    if (!event.isRequeued())
-    {
-      jobManager.jobQueued(event.getBundleWrapper());
-    }
-    else
-    {
-      jobManager.jobUpdated(event.getBundleWrapper());
-    }
   }
 
   /**
@@ -239,8 +205,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundleList.remove(bundleWrapper);
         bundleList.add(bundleWrapper);
       }
-      jobManager.jobUpdated(bundleWrapper);
-      //result.getBundle().setExecutionStartTime(System.currentTimeMillis());
     }
     finally
     {
@@ -248,11 +212,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
     if (debugEnabled)
     {
-      log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " +
-              formatSizeMapInfo("sizeMap", sizeMap));
+      log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     }
 //    ClientTaskBundle resultJob = (ClientTaskBundle) result.getJob();
-//    statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
     result.setOnRequeue(new Runnable()
     {
       @Override
@@ -350,7 +312,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       try
       {
         long dt = bundleWrapper.getJobReceivedTime();
-        jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper, jobManager), dt);
+        jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
         bundleWrapper.addOnDone(new Runnable()
         {
           @Override
@@ -492,7 +454,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         job.getJob().getSLA().setPriority(newPriority);
         removeFromListMap(new JPPFPriority(oldPriority), job, priorityMap);
         putInListMap(new JPPFPriority(newPriority), job, priorityMap);
-        jobManager.jobUpdated(job);
       }
     }
     finally
@@ -512,6 +473,23 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       ClientJob job = jobMap.get(jobId);
       if (job != null) job.cancel();
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Close this queue and all resources it uses.
+   */
+  public void close()
+  {
+    lock.lock();
+    try
+    {
+      jobScheduleHandler.clear();
+      jobExpirationHandler.clear();
     }
     finally
     {

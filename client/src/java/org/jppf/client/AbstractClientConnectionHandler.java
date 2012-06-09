@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.DISCONNECTED;
+import static org.jppf.client.JPPFClientConnectionStatus.NEW;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -76,7 +76,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * Status of the connection.
    */
-  protected final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(DISCONNECTED);
+  protected final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(NEW);
   /**
    * List of status listeners for this connection.
    */
@@ -116,9 +116,9 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   public void setStatus(final JPPFClientConnectionStatus newStatus)
   {
     JPPFClientConnectionStatus oldStatus = status.getAndSet(newStatus);
+    if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + newStatus);
     if (newStatus != oldStatus)
     {
-      if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + newStatus);
       fireStatusChanged(oldStatus);
     }
   }

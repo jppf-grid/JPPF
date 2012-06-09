@@ -18,15 +18,13 @@
 
 package org.jppf.client.balancer;
 
+import java.util.concurrent.*;
+
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.balancer.utils.JPPFFuture;
 import org.jppf.client.event.ClientConnectionStatusListener;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.ContextAwareness;
-import org.jppf.server.scheduler.bundle.JPPFContext;
-import org.jppf.server.scheduler.bundle.NodeAwareness;
+import org.jppf.management.*;
+import org.jppf.server.scheduler.bundle.*;
 
 /**
  * Context associated with a channel serving state and tasks submission.
@@ -48,6 +46,10 @@ public abstract class ChannelWrapper<T>
    * Represents the management information.
    */
   private JPPFManagementInfo managementInfo = null;
+  /**
+   * Executor for submitting bundles for processing.
+   */
+  protected ExecutorService executor;
 
   /**
    * Get the unique identifier of the client.
@@ -174,4 +176,12 @@ public abstract class ChannelWrapper<T>
    * @return <code>false</code> if the channel is local, <code>false</code> otherwise.
    */
   public abstract boolean isLocal();
+
+  /**
+   * Close this channel and release the resources it uses.
+   */
+  public void close()
+  {
+    if (executor != null) executor.shutdownNow();
+  }
 }

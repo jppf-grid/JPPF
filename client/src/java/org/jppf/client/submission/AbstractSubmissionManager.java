@@ -261,4 +261,14 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   {
     return this;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close()
+  {
+    setStopped(true);
+    wakeUp();
+  }
 }

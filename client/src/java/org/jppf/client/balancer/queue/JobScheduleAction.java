@@ -19,9 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.job.JPPFJobManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Action triggered when a job reaches its scheduled execution date.
@@ -40,23 +38,16 @@ class JobScheduleAction implements Runnable
    * The bundle wrapper encapsulating the job.
    */
   private final ClientJob bundleWrapper;
-  /**
-   * The job manager.
-   */
-  private final JPPFJobManager jobManager;
 
   /**
    * Initialize this action with the specified bundle wrapper.
    * @param bundleWrapper the bundle wrapper encapsulating the job.
-   * @param jobManager    - the job manager that submits the events.
    */
-  public JobScheduleAction(final ClientJob bundleWrapper, final JPPFJobManager jobManager)
+  public JobScheduleAction(final ClientJob bundleWrapper)
   {
     if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-    if (jobManager == null) throw new IllegalArgumentException("jobManager is null");
 
     this.bundleWrapper = bundleWrapper;
-    this.jobManager = jobManager;
   }
 
   /**
@@ -73,7 +64,6 @@ class JobScheduleAction implements Runnable
         log.debug("job '" + jobId + "' is resuming");
       }
       bundleWrapper.setPending(false);
-      jobManager.jobUpdated(bundleWrapper);
     }
   }
 }

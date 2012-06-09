@@ -61,7 +61,7 @@ public class JPPFClient extends AbstractGenericClient
    */
   public JPPFClient()
   {
-    super(JPPFConfiguration.getProperties());
+    super(null, JPPFConfiguration.getProperties());
   }
 
   /**
@@ -70,8 +70,7 @@ public class JPPFClient extends AbstractGenericClient
    */
   public JPPFClient(final ClientListener... listeners)
   {
-    this();
-    for (ClientListener listener : listeners) addClientListener(listener);
+    super(null, JPPFConfiguration.getProperties(), listeners);
   }
 
   /**
@@ -90,8 +89,7 @@ public class JPPFClient extends AbstractGenericClient
    */
   public JPPFClient(final String uuid, final ClientListener... listeners)
   {
-    this(uuid);
-    for (ClientListener listener : listeners) addClientListener(listener);
+    super(uuid, JPPFConfiguration.getProperties(), listeners);
   }
 
   /**
@@ -163,12 +161,7 @@ public class JPPFClient extends AbstractGenericClient
   {
     super.close();
     if (debugEnabled) log.debug("closing submission manager");
-    if (submissionManager instanceof ThreadSynchronization)
-    {
-      ThreadSynchronization threadSynchronization = (ThreadSynchronization) submissionManager;
-      threadSynchronization.setStopped(true);
-      threadSynchronization.wakeUp();
-    }
+    submissionManager.close();
   }
 
   /**

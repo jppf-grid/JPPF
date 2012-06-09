@@ -31,7 +31,7 @@ import org.jppf.server.node.NodeExecutionManagerImpl;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +63,6 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   private JPPFClientConnectionStatus status = JPPFClientConnectionStatus.ACTIVE;
   /**
-   * Executor for submitting bundles for processing.
-   */
-  private final Executor executor = Executors.newSingleThreadExecutor();
-  /**
    * Unique ID for the connection.
    */
   private final String connectionUuid = UUID.randomUUID().toString();
@@ -88,6 +84,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   public ChannelWrapperLocal()
   {
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper-"));
     executionManager = new NodeExecutionManagerImpl(this);
     lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
 

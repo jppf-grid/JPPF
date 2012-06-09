@@ -18,36 +18,20 @@
 
 package org.jppf.client.balancer.queue;
 
-import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.JPPFContextClient;
-import org.jppf.client.JPPFJob;
-import org.jppf.client.balancer.ChannelWrapper;
-import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
-import org.jppf.client.balancer.job.ChannelJobPair;
-import org.jppf.client.balancer.job.JPPFJobManager;
-import org.jppf.client.balancer.stats.JPPFClientStatsManager;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JobMetadata;
-import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.JPPFContext;
-import org.jppf.server.scheduler.bundle.JobAwareness;
-import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeBundler;
-import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile;
-import org.jppf.utils.StringUtils;
-import org.jppf.utils.ThreadSynchronization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
+
+import org.jppf.client.*;
+import org.jppf.client.balancer.*;
+import org.jppf.client.balancer.stats.JPPFClientStatsManager;
+import org.jppf.management.*;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.*;
+import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.fixedsize.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -75,10 +59,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private final JPPFClientStatsManager statsManager;
   /**
-   * Reference to the job manager.
-   */
-  private final JPPFJobManager jobManager;
-  /**
    * Lock on the job queue.
    */
   private final Lock queueLock;
@@ -99,14 +79,12 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Initialize this task queue checker with the specified node server.
    * @param queue        the reference queue to use.
    * @param statsManager the reference to statistics manager.
-   * @param jobManager   the job manager that submits the events.
    */
-  public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFClientStatsManager statsManager, final JPPFJobManager jobManager)
+  public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFClientStatsManager statsManager)
   {
     this.queue = queue;
     this.jppfContext = new JPPFContextClient(queue);
     this.statsManager = statsManager;
-    this.jobManager = jobManager;
     this.queueLock = queue.getLock();
     this.bundler = createDefault();
   }
@@ -217,7 +195,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   {
     while (!isStopped())
     {
-      if (!dispatch()) goToSleep(1000L, 10000);
+      if (!dispatch()) goToSleep(10L, 10000);
     }
   }
 
@@ -320,7 +298,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
 //      bundleWrapper.jobDispatched(channel);
       Future<?> future = channel.submit(bundleWrapper);
       selectedBundle.jobDispatched(bundleWrapper, channel, future);
-      jobManager.jobDispatched(bundleWrapper, channel);
     }
   }
 
@@ -396,12 +373,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     boolean b = bundle.isPending();
     if (b) return false;
     b = bundle.isJobExpired();
+    return !b;
+    /*
     if (b) return false;
     int maxNodes = sla.getMaxNodes();
     List<ChannelJobPair> list = jobManager.getNodesForJob(bundle.getUuid());
     int n = list.size();
     if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
     return n < maxNodes;
+    */
   }
 
   /**

@@ -21,7 +21,6 @@ package org.jppf.client.balancer;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.client.balancer.job.JPPFJobManager;
 import org.jppf.client.balancer.queue.*;
 import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
@@ -45,10 +44,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(SubmissionManagerClient.class);
-  /**
-   * The job manager.
-   */
-  private final JPPFJobManager jobManager;
   /**
    * A reference to the tasks queue.
    */
@@ -112,11 +107,15 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 
+    /*
     this.jobManager = new JPPFJobManager();
-    this.queue = new JPPFPriorityQueue(jobManager, this);
     this.jobManager.setQueue(this.queue);
+    this.queue = new JPPFPriorityQueue(jobManager, this);
+    */
+    this.queue = new JPPFPriorityQueue(this);
 
-    taskQueueChecker = new TaskQueueChecker(queue, statsManager, jobManager);
+    //taskQueueChecker = new TaskQueueChecker(queue, statsManager, jobManager);
+    taskQueueChecker = new TaskQueueChecker(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
     this.queue.addQueueListener(new QueueListener()
@@ -446,5 +445,25 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   public ClientConnectionStatusListener getClientConnectionStatusListener()
   {
     return this.statusListener;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close()
+  {
+    setStopped(true);
+    wakeUp();
+    if (taskQueueChecker != null)
+    {
+      taskQueueChecker.setStopped(true);
+      taskQueueChecker.wakeUp();
+    }
+    queue.close();
+    synchronized(this)
+    {
+      for (ChannelWrapper channel: allConnections) channel.close();
+    }
   }
 }

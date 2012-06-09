@@ -18,10 +18,10 @@
 
 package org.jppf.client.submission;
 
+import java.util.Vector;
+
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-
-import java.util.Vector;
 
 /**
  * Interface for an asynchronous job submission manager.
@@ -80,4 +80,8 @@ public interface SubmissionManager extends Runnable
    * @return a {@link ClientConnectionStatusListener} instance.
    */
   ClientConnectionStatusListener getClientConnectionStatusListener();
+  /**
+   * Close this submission manager and all the resources it uses.
+   */
+  void close();
 }
