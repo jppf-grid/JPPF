@@ -205,6 +205,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   @Override
   public void close()
   {
+    if (debugEnabled) log.debug("closing " + name);
     synchronized (listeners)
     {
       listeners.clear();

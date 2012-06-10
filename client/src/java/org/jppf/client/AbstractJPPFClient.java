@@ -231,7 +231,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
     JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-    if (c.getStatus().equals(JPPFClientConnectionStatus.FAILED)) connectionFailed(c);
+    if (c.getStatus() == JPPFClientConnectionStatus.FAILED) connectionFailed(c);
   }
 
   /**
@@ -297,8 +297,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public void close()
   {
-    if (debugEnabled) log.debug("closing all connections");
     List<JPPFClientConnection> list = getAllConnections();
+    if (debugEnabled) log.debug("closing all connections: " + list);
     for (JPPFClientConnection c : list)
     {
       try

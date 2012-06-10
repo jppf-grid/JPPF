@@ -51,10 +51,6 @@ public class JPPFClient extends AbstractGenericClient
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The submission manager.
-   */
-  private SubmissionManager submissionManager;
 
   /**
    * Initialize this client with an automatically generated application UUID.
@@ -131,6 +127,7 @@ public class JPPFClient extends AbstractGenericClient
     if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
             (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
+    SubmissionManager submissionManager = getSubmissionManager();
     submissionManager.submitJob(job);
     if (job.isBlocking())
     {
@@ -161,7 +158,8 @@ public class JPPFClient extends AbstractGenericClient
   {
     super.close();
     if (debugEnabled) log.debug("closing submission manager");
-    submissionManager.close();
+    SubmissionManager submissionManager = getSubmissionManager();
+    if (submissionManager != null) submissionManager.close();
   }
 
   /**
@@ -170,6 +168,32 @@ public class JPPFClient extends AbstractGenericClient
   @Override
   protected void initPools()
   {
+    super.initPools();
+  }
+
+  /**
+   * Invoked when the status of a client connection has changed.
+   * @param event the event to notify of.
+   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+   */
+  @Override
+  public void statusChanged(final ClientConnectionStatusEvent event)
+  {
+    super.statusChanged(event);
+    SubmissionManager submissionManager = getSubmissionManager();
+    if (submissionManager instanceof ThreadSynchronization)
+    {
+      ((ThreadSynchronization) submissionManager).wakeUp();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected SubmissionManager createSubmissionManager()
+  {
+    SubmissionManager submissionManager = null;
     if (config != null && config.getBoolean("experimental.balancer", false))
     {
       try
@@ -187,30 +211,6 @@ public class JPPFClient extends AbstractGenericClient
       submissionManager = new SubmissionManagerImpl(this);
       new Thread(submissionManager, "SubmissionManager").start();
     }
-    super.initPools();
-  }
-
-  /**
-   * Invoked when the status of a client connection has changed.
-   * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-   */
-  @Override
-  public void statusChanged(final ClientConnectionStatusEvent event)
-  {
-    super.statusChanged(event);
-    if (submissionManager instanceof ThreadSynchronization)
-    {
-      ((ThreadSynchronization) submissionManager).wakeUp();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected SubmissionManager getSubmissionManager()
-  {
     return submissionManager;
   }
 
@@ -226,6 +226,7 @@ public class JPPFClient extends AbstractGenericClient
   {
     if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
 
+    SubmissionManager submissionManager = getSubmissionManager();
     if (submissionManager instanceof SubmissionManagerClient)
       return ((SubmissionManagerClient) submissionManager).cancelJob(jobId);
     else

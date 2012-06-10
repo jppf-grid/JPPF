@@ -396,8 +396,11 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
       isShutdown = true;
       try
       {
+        if (debugEnabled) log.debug("closing task server connection " + this);
         if (taskServerConnection != null) taskServerConnection.close();
+        if (debugEnabled) log.debug("closing class server connection " + this);
         if (delegate != null) delegate.close();
+        if (debugEnabled) log.debug("closing jmx connection " + this);
         if (jmxConnection != null) jmxConnection.close();
       }
       catch (Exception e)
@@ -411,5 +414,4 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     if (debugEnabled) log.debug("connection " + this + " closed");
     return list;
   }
-
 }

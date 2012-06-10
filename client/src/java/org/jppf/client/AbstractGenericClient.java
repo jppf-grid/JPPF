@@ -81,6 +81,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Determines whether SSL communication is on or off.
    */
   protected boolean sslEnabled = false;
+  /**
+   * The submission manager.
+   */
+  private SubmissionManager submissionManager;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -96,6 +100,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
+    //getSubmissionManager();
     Runnable r = new Runnable()
     {
       @Override
@@ -239,6 +244,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     log.info("connection [" + c.getName() + "] created");
     //addClientConnection(c);
     c.addClientConnectionStatusListener(getSubmissionManager().getClientConnectionStatusListener());
+    c.addClientConnectionStatusListener(this);
     c.setStatus(JPPFClientConnectionStatus.NEW);
     int n = getAllConnectionsCount() + 2;
     if (executor.getCorePoolSize() < n)
@@ -370,7 +376,23 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Get the submission manager for this JPPF client.
    * @return a <code>JPPFSubmissionManager</code> instance.
    */
-  protected abstract SubmissionManager getSubmissionManager();
+  protected SubmissionManager getSubmissionManager()
+  {
+    synchronized(this)
+    {
+      if (submissionManager == null)
+      {
+        submissionManager = createSubmissionManager();
+      }
+    }
+    return submissionManager;
+  }
+
+  /**
+   * Create the submission manager for this JPPF client.
+   * @return a <code>JPPFSubmissionManager</code> instance.
+   */
+  protected abstract SubmissionManager createSubmissionManager();
 
   /**
    * Cancel the job with the specified id.

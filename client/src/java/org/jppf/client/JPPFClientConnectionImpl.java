@@ -107,8 +107,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
         }
       });
       connect();
-      if (debugEnabled) log.debug("connection [" + name + "] status=" + getStatus());
-      if (getStatus() == ACTIVE) client.addClientConnection(this);
+      JPPFClientConnectionStatus status = getStatus();
+      if (debugEnabled) log.debug("connection [" + name + "] status=" + status);
+      if ((status == ACTIVE) || (status == EXECUTING)) client.addClientConnection(this);
       if (debugEnabled) log.debug("connection [" + name + "] added to the client pool");
     }
     catch (Exception e)

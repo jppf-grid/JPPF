@@ -106,15 +106,8 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     if (client == null) throw new IllegalArgumentException("client is null");
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
-
-    /*
-    this.jobManager = new JPPFJobManager();
-    this.jobManager.setQueue(this.queue);
-    this.queue = new JPPFPriorityQueue(jobManager, this);
-    */
     this.queue = new JPPFPriorityQueue(this);
 
-    //taskQueueChecker = new TaskQueueChecker(queue, statsManager, jobManager);
     taskQueueChecker = new TaskQueueChecker(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
@@ -123,13 +116,11 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       @Override
       public void newBundle(final QueueEvent event)
       {
-//        selector.wakeup();
         taskQueueChecker.wakeUp();
       }
     });
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
 
-    List<JPPFClientConnection> connections = client.getAllConnections();
     client.addClientListener(new ClientListener()
     {
       @Override
@@ -147,6 +138,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 
     updateLocalExecution(this.localEnabled);
 
+    List<JPPFClientConnection> connections = client.getAllConnections();
     for (JPPFClientConnection connection : connections)
     {
       addConnection(connection);
@@ -212,10 +204,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       try
       {
         wrapper = new ChannelWrapperRemote(connection);
-        JPPFClientConnectionImpl i = (JPPFClientConnectionImpl) connection;
-        JMXDriverConnectionWrapper jmxConnection = i.getJmxConnection();
+        JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
 
-        JPPFSystemInformation systemInfo = i.getSystemInfo();
+        JPPFSystemInformation systemInfo = connection.getSystemInfo();
         wrapper.setSystemInfo(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
         info.setSystemInfo(systemInfo);

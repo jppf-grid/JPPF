@@ -88,6 +88,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     if (debugEnabled) log.debug("initializing NodeDataPanel");
     manager = new NodeDataPanelManager(this);
     createTreeTableModel();
+    StatsHandler.getInstance().getJppfClient(null).addClientListener(this);
   }
 
   /**
@@ -314,6 +315,16 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void connectionFailed(final ClientEvent event)
+  {
+    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
+    driverRemoved(c.getJmxConnection().getId(), false);
+  }
+
+  /**
    * Update the number of active servers or nodes in the status bar.
    * @param name the name of the field to update.
    * @param n the number of servers to add or subtract.
@@ -361,16 +372,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   NodeDataPanelManager getManager()
   {
     return manager;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void connectionFailed(final ClientEvent event)
-  {
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
-    driverRemoved(c.getJmxConnection().getId(), false);
   }
 
   /**
