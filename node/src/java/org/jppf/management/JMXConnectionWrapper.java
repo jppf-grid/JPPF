@@ -217,10 +217,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public void close() throws Exception
   {
     if (connectionThread.get() != null) connectionThread.get().close();
-    synchronized(this)
-    {
-      if (jmxc != null) jmxc.close();
-    }
+    if (jmxc != null) jmxc.close();
   }
 
   /**

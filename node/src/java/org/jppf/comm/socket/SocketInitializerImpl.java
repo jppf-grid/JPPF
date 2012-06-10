@@ -20,7 +20,6 @@ package org.jppf.comm.socket;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
-import org.jppf.JPPFError;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -114,12 +113,6 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
       catch(InterruptedException e)
       {
         if (debugEnabled) log.debug(name + e.getMessage(), e);
-        if (!closed)
-        {
-          System.err.println(name + errMsg);
-          if (debugEnabled) log.debug(name + errMsg);
-          throw new JPPFError(name + fatalErrMsg, e);
-        }
       }
       timer.cancel();
       timer.purge();
@@ -127,7 +120,6 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
       {
         if (debugEnabled) log.debug(name + errMsg);
         System.err.println(name + errMsg);
-        //throw new JPPFError(fatalErrMsg);
       }
     }
     finally
