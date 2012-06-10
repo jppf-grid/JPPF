@@ -20,8 +20,6 @@ package org.jppf.management;
 
 import java.io.Serializable;
 
-import org.jppf.utils.NetworkUtils;
-
 
 /**
  * Instances of this class encapsulate the information required to access
@@ -100,7 +98,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public JPPFManagementInfo(final String host, final int port, final String id, final int type, final boolean secure)
   {
-    this.host = NetworkUtils.getHostName(host);
+    this.host = host;
     this.port = port;
     this.id = id;
     this.type = (byte) type;
