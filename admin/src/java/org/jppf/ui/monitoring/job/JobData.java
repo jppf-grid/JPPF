@@ -192,7 +192,8 @@ public class JobData
     switch(type)
     {
       case DRIVER:
-        s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getId();
+        //s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getId();
+        s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getDisplayName();
         break;
       case JOB:
         s = jobInformation.getJobName();

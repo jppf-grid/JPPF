@@ -146,7 +146,8 @@ public class TopologyData
   @Override
   public String toString()
   {
-    return jmxWrapper.getId();
+    //return jmxWrapper.getId();
+    return jmxWrapper.getDisplayName();
   }
 
   /**

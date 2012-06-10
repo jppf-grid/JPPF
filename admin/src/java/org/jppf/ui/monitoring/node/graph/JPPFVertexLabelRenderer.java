@@ -51,7 +51,8 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
     TopologyData data = (TopologyData) vertex;
     renderer.setHorizontalTextPosition(SwingConstants.CENTER);
     renderer.setVerticalTextPosition(SwingConstants.BOTTOM);
-    renderer.setText(data.getId());
+    //renderer.setText(data.getId());
+    renderer.setText(data.toString());
 
     String path = null;
     Color background = Color.white;
@@ -68,7 +69,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
         path = AbstractTreeCellRenderer.DRIVER_ICON;
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
       }
-      else if (c.getStatus() == JPPFClientConnectionStatus.ACTIVE)
+      else if ((c.getStatus() != JPPFClientConnectionStatus.FAILED) && (c.getStatus() != JPPFClientConnectionStatus.DISCONNECTED))
       {
         path = AbstractTreeCellRenderer.DRIVER_ICON;
         background = AbstractTreeCellRenderer.ACTIVE_COLOR;

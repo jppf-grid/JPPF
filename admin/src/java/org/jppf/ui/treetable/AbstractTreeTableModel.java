@@ -176,7 +176,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
   {
     // Guaranteed to return a non-null array
     Object[] listeners = listenerList.getListenerList();
-    TreeModelEvent e = null;
+    TreeModelEvent event = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
     for (int i = listeners.length - 2; i >= 0; i -= 2)
@@ -184,8 +184,15 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
       if (listeners[i] == TreeModelListener.class)
       {
         // Lazily create the event:
-        if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
-        ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
+        if (event == null) event = new TreeModelEvent(source, path, childIndices, children);
+        try
+        {
+          ((TreeModelListener) listeners[i + 1]).treeNodesChanged(event);
+        }
+        catch (Exception e)
+        {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+        }
       }
     }
   }

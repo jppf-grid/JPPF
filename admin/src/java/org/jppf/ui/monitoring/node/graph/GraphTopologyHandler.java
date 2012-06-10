@@ -154,7 +154,7 @@ public class GraphTopologyHandler
     }
     insertDriverVertex(driver);
     graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("added driver " + driver.getId() + " to graph");
+    if (debugEnabled) log.debug("added driver " + driver + " to graph");
   }
 
   /**
@@ -170,7 +170,7 @@ public class GraphTopologyHandler
     }
     removeVertex(driver);
     graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("removed driver " + driver.getId() + " to graph");
+    if (debugEnabled) log.debug("removed driver " + driver + " from graph");
   }
 
   /**
@@ -204,7 +204,7 @@ public class GraphTopologyHandler
     }
     insertNodeVertex(driver, node);
     graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node.getId() + " to driver " + driver.getId());
+    if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node + " to driver " + driver);
   }
 
   /**
@@ -216,7 +216,7 @@ public class GraphTopologyHandler
   {
     removeVertex(node);
     graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("removed node " + node.getId() + " from driver " + driver.getId());
+    if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
   }
 
   /**

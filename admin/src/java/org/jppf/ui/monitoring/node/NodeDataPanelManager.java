@@ -207,6 +207,8 @@ public class NodeDataPanelManager
         if (tmp.getNodeInformation().getType() == JPPFManagementInfo.NODE) panel.getModel().removeNodeFromParent(nodeNode2);
       }
     }
+    TopologyData driverData = (TopologyData) driverNode.getUserObject();
+    if ((driverNode.getChildCount() == 1) && !driverData.isCollapsed()) panel.getTreeTable().expand(driverNode);
     repaintTreeTable();
   }
 

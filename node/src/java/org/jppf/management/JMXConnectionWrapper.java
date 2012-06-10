@@ -20,6 +20,7 @@ package org.jppf.management;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
@@ -78,6 +79,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected String idString = null;
   /**
+   * The host name for the node or driver, may be initially set to the ip address.
+   */
+  protected String hostName = null;
+  /**
+   * A string representing this connection, used for displaying in the admin conosle.
+   */
+  protected String displayName = null;
+  /**
    * Determines whether the connection to the JMX server has been established.
    */
   protected AtomicBoolean connected = new AtomicBoolean(false);
@@ -111,6 +120,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
   {
     this.host = host;
+    this.hostName = host;
     this.port = port;
 
     try
@@ -205,6 +215,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     {
       jmxc = JMXConnectorFactory.connect(url, env);
       mbeanConnection.set(jmxc.getMBeanServerConnection());
+      try
+      {
+        setHostName(InetAddress.getByName(host).getHostName());
+      }
+      catch (UnknownHostException e)
+      {
+      }
     }
     setConnectedStatus(true);
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
@@ -234,27 +251,27 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
     synchronized(this)
     {
-	    Object result = null;
-	    try
-	    {
-	      ObjectName mbeanName = new ObjectName(name);
-	      result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
-	    }
-	    catch(IOException e)
-	    {
-	      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-	      setConnectedStatus(false);
-	      try
-	      {
-	        if (jmxc != null) jmxc.close();
-	      }
-	      catch(Exception e2)
-	      {
-	        if (debugEnabled) log.debug(e2.getMessage(), e2);
-	      }
-	      if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-	    }
-	    return result;
+      Object result = null;
+      try
+      {
+        ObjectName mbeanName = new ObjectName(name);
+        result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
+      }
+      catch(IOException e)
+      {
+        if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+        setConnectedStatus(false);
+        try
+        {
+          if (jmxc != null) jmxc.close();
+        }
+        catch(Exception e2)
+        {
+          if (debugEnabled) log.debug(e2.getMessage(), e2);
+        }
+        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+      }
+      return result;
     }
   }
 
@@ -270,28 +287,28 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
     synchronized(this)
     {
-	    Object result = null;
-	    try
-	    {
-	      ObjectName mbeanName = new ObjectName(name);
-	      result = getMbeanConnection().getAttribute(mbeanName, attribute);
-	    }
-	    catch(IOException e)
-	    {
-	      setConnectedStatus(false);
-	      try
-	      {
-	        if (jmxc != null) jmxc.close();
-	      }
-	      catch(Exception e2)
-	      {
-	        if (debugEnabled) log.debug(e2.getMessage(), e2);
-	      }
-	      if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
-	      if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-	      throw e;
-	    }
-	    return result;
+      Object result = null;
+      try
+      {
+        ObjectName mbeanName = new ObjectName(name);
+        result = getMbeanConnection().getAttribute(mbeanName, attribute);
+      }
+      catch(IOException e)
+      {
+        setConnectedStatus(false);
+        try
+        {
+          if (jmxc != null) jmxc.close();
+        }
+        catch(Exception e2)
+        {
+          if (debugEnabled) log.debug(e2.getMessage(), e2);
+        }
+        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+        if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+        throw e;
+      }
+      return result;
     }
   }
 
@@ -412,5 +429,33 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public JPPFSystemInformation systemInformation() throws Exception
   {
     throw new JPPFException("this method is not implemented");
+  }
+
+  /**
+   * Get the host name for the node or driver.
+   * @return the host name as a string.
+   */
+  public String getHostName()
+  {
+    return hostName;
+  }
+
+  /**
+   * Set the host name for the node or driver.
+   * @param hostName the host name as a string.
+   */
+  public void setHostName(final String hostName)
+  {
+    this.hostName = hostName;
+    displayName = hostName + ':' + port;
+  }
+
+  /**
+   * Get the string representing this connection, used for displaying in the admin conosle.
+   * @return the display name as a string.
+   */
+  public String getDisplayName()
+  {
+    return displayName;
   }
 }
