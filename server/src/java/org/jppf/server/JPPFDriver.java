@@ -68,7 +68,7 @@ public class JPPFDriver
   /**
    * Reference to the local node if it is enabled.
    */
-  private static JPPFNode localNode = null;
+  private JPPFNode localNode = null;
   /**
    * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
    */
@@ -450,7 +450,7 @@ public class JPPFDriver
       sb.append(name);
       sb.append(" initialized");
     }
-    if (ports != null)
+    if (ports != null || sslPorts != null)
     {
       if ((ports != null) && (ports.length > 0))
       {
@@ -469,7 +469,7 @@ public class JPPFDriver
   }
 
   /**
-   * Determine whther management is enabled and if there is an active remote connector server.
+   * Determine whether management is enabled and if there is an active remote connector server.
    * @return <code>true</code> if management is enabled, <code>false</code> otherwise.
    */
   private boolean isManagementEnabled()

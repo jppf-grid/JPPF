@@ -84,7 +84,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The list of listeners registered with this job.
    */
-  private final transient List<JobListener> listeners = new LinkedList<JobListener>();
+  private transient List<JobListener> listeners = new LinkedList<JobListener>();
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
@@ -518,5 +518,14 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager)
   {
     this.persistenceManager = persistenceManager;
+  }
+
+  /**
+   * Resolve this instance after deserialization.
+   * @return an instance of {@link Object}.
+   */
+  protected Object readResolve() {
+    listeners = new LinkedList<JobListener>();
+    return this;
   }
 }

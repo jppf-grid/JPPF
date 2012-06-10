@@ -51,17 +51,17 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * The statistics manager.
    */
-  private JPPFClientStatsManager statsManager = new JPPFClientStatsManager();
+  private final JPPFClientStatsManager statsManager = new JPPFClientStatsManager();
   /**
    * The bundler factory.
    */
-  private JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
+  private final JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory();
   /**
    * Task that dispatches queued jobs to available nodes.
    */
   private final TaskQueueChecker taskQueueChecker;
   /**
-   *
+   * Mapping client connections to channel wrapper.
    */
   private final Map<AbstractJPPFClientConnection, ChannelWrapper<?>> wrapperMap = new HashMap<AbstractJPPFClientConnection, ChannelWrapper<?>>();
   /**
@@ -143,17 +143,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     {
       addConnection(connection);
     }
-  }
-
-  /**
-   * Create and register new local connection.
-   * @return connection wrapper for new local connection.
-   */
-  protected synchronized ChannelWrapper<?> addConnectionLocal()
-  {
-    ChannelWrapper wrapper = new ChannelWrapperLocal();
-    addConnection(wrapper);
-    return wrapper;
   }
 
   /**
@@ -265,7 +254,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE)
       {
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
-        JMXDriverConnectionWrapper jmxConnection = ((JPPFClientConnectionImpl) connection).getJmxConnection();
+        JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
 
         wrapper.setSystemInfo(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);

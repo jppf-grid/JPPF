@@ -257,7 +257,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
         System.out.printf("Thread [%d:%s] terminated with exception: %s%n", thread.getId(), thread.getName(), exception);
         exception.printStackTrace(System.out);
       }
-      threadList.remove(this);
+      threadList.remove(thread);
     }
 
     /**
@@ -312,7 +312,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param classLoader a <code>ClassLoader</code> instance.
      * @return a <code>UsedClassLoader</code> instance. Never return <code>null</code>.
      */
-    public synchronized FJUsedClassLoader useClassLoader(final ClassLoader classLoader)
+    public synchronized UsedClassLoader useClassLoader(final ClassLoader classLoader)
     {
       if (usedClassLoaders.isEmpty())
       {

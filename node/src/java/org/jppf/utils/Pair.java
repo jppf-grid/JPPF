@@ -111,7 +111,7 @@ public class Pair<U, V> implements Serializable
     else if (!first.equals(other.first)) return false;
     if (second == null)
     {
-      if (other.second != null) return false;
+      return  other.second == null;
     }
     return second.equals(other.second);
   }
