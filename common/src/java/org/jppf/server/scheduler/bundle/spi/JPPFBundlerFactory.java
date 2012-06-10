@@ -47,6 +47,13 @@ public class JPPFBundlerFactory
   private Map<String, JPPFBundlerProvider> providerMap = null;
 
   /**
+   * Default constructor.
+   */
+  public JPPFBundlerFactory()
+  {
+  }
+
+  /**
    * Create an instance of the bundler with the specified name and parameters.
    * @param name the name of the bundler's algorithm, such as specified in the bundler provider and in the configuration.
    * @param configuration a map of algorithm parameters to their value.
@@ -71,7 +78,7 @@ public class JPPFBundlerFactory
     TypedProperties props = JPPFConfiguration.getProperties();
     String algorithm = props.getString("jppf.load.balancing.algorithm", null);
     // for compatibility with v1.x configuration files
-    if (algorithm == null) algorithm = props.getString("task.bundle.strategy", "manual");
+    if (algorithm == null) algorithm = props.getString("task.bundle.strategy", "proportional");
     String profileName = props.getString("jppf.load.balancing.strategy", null);
     // for compatibility with v1.x configuration files
     if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
