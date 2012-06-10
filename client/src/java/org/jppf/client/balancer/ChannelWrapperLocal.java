@@ -18,10 +18,12 @@
 
 package org.jppf.client.balancer;
 
+import java.util.*;
+import java.util.concurrent.Executors;
+
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.balancer.utils.JPPFFuture;
-import org.jppf.client.balancer.utils.JPPFFutureTask;
+import org.jppf.client.balancer.utils.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.management.*;
@@ -32,13 +34,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.*;
+import org.slf4j.*;
 
 /**
  * Context associated with a local channel serving state and tasks submission.
@@ -351,5 +347,15 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public void run()
   {
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void close()
+  {
+    super.close();
+    if (executionManager != null) executionManager.shutdown();
   }
 }
