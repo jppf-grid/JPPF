@@ -317,11 +317,16 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
     super.statusChanged(event);
-    JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
     SubmissionManager submissionManager = getSubmissionManager();
-    if(submissionManager instanceof ClientConnectionStatusListener)
+    if(submissionManager != null)
     {
-      ((ClientConnectionStatusListener)submissionManager).statusChanged(event);
+      ClientConnectionStatusListener listener = submissionManager.getClientConnectionStatusListener();
+      if(listener != null) listener.statusChanged(event);
+
+      if (submissionManager instanceof ThreadSynchronization)
+      {
+        ((ThreadSynchronization) submissionManager).wakeUp();
+      }
     }
   }
 
@@ -386,6 +391,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       }
     }
     return submissionManager;
+  }
+
+  /**
+   * Set the submission manager for this JPPF client.
+   * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
+   */
+  protected void setSubmissionManager(final SubmissionManager submissionManager)
+  {
+    synchronized (this)
+    {
+      this.submissionManager = submissionManager;
+    }
   }
 
   /**

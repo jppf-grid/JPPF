@@ -18,7 +18,6 @@
 package org.jppf.client;
 
 import org.jppf.client.balancer.SubmissionManagerClient;
-import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.client.submission.SubmissionManagerImpl;
@@ -26,7 +25,6 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.ThreadSynchronization;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,22 +167,6 @@ public class JPPFClient extends AbstractGenericClient
   protected void initPools()
   {
     super.initPools();
-  }
-
-  /**
-   * Invoked when the status of a client connection has changed.
-   * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-   */
-  @Override
-  public void statusChanged(final ClientConnectionStatusEvent event)
-  {
-    super.statusChanged(event);
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager instanceof ThreadSynchronization)
-    {
-      ((ThreadSynchronization) submissionManager).wakeUp();
-    }
   }
 
   /**

@@ -21,7 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.client.event.ClientConnectionStatusEvent;
+import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
@@ -46,10 +46,6 @@ public class JPPFJcaClient extends AbstractGenericClient
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Manages asynchronous work submission to the JPPF driver.
-   */
-  private JcaSubmissionManager submissionManager = null;
 
   /**
    * Initialize this client with a specified application UUID.
@@ -122,35 +118,37 @@ public class JPPFJcaClient extends AbstractGenericClient
   }
 
   /**
-   * Invoked when the status of a client connection has changed.
-   * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
+   * {@inheritDoc}
    */
   @Override
-  public void statusChanged(final ClientConnectionStatusEvent event)
+  public JcaSubmissionManager getSubmissionManager()
   {
-    super.statusChanged(event);
-    if (submissionManager instanceof ThreadSynchronization)
-    {
-      ((ThreadSynchronization) submissionManager).wakeUp();
-    }
+    SubmissionManager submissionManager = super.getSubmissionManager();
+    if (submissionManager == null)
+      return null;
+    else if (submissionManager instanceof JcaSubmissionManager)
+      return (JcaSubmissionManager) submissionManager;
+    else
+      throw new IllegalStateException("Expected JcaSubmissionManager");
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public JcaSubmissionManager getSubmissionManager()
+  public void setSubmissionManager(final SubmissionManager submissionManager)
   {
-    return submissionManager;
+    if (submissionManager != null && !(submissionManager instanceof JcaSubmissionManager))
+      throw new IllegalArgumentException("submissionManager not instance of JcaSubmissionManager");
+    super.setSubmissionManager(submissionManager);
   }
 
   /**
-   * Set the submission manager for this JPPF client.
-   * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
+   * {@inheritDoc}
    */
-  public void setSubmissionManager(final JcaSubmissionManager submissionManager)
+  @Override
+  protected SubmissionManager createSubmissionManager()
   {
-    this.submissionManager = submissionManager;
+    return null; // submission manager is set by JPPFResourceAdapter
   }
 }
