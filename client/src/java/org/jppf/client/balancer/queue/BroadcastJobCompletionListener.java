@@ -18,7 +18,6 @@
 
 package org.jppf.client.balancer.queue;
 
-import org.jppf.client.balancer.ChannelWrapper;
 import org.jppf.client.balancer.ClientCompletionListener;
 import org.jppf.client.balancer.ClientJob;
 import org.slf4j.Logger;
@@ -53,16 +52,19 @@ public class BroadcastJobCompletionListener implements ClientCompletionListener
   /**
    * Initialize this completion listener with the specified broadcast job and set of node uuids.
    * @param bundleWrapper the broadcast job to dispatch ot each node.
-   * @param connections   list of all connections on which broadcast job is executed.
+   * @param broadcastedJobs list of all broadcasted jobs.
    */
-  public BroadcastJobCompletionListener(final ClientJob bundleWrapper, final List<ChannelWrapper> connections)
+  public BroadcastJobCompletionListener(final ClientJob bundleWrapper, final List<ClientJob> broadcastedJobs)
   {
+    if(bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if(broadcastedJobs == null) throw new IllegalArgumentException("broadcastedJobs is null");
+    if(broadcastedJobs.isEmpty()) throw new IllegalStateException("broadcastedJobs must not be empty");
+
     this.bundleWrapper = bundleWrapper;
     int taskCount = bundleWrapper.getTaskCount();
-    for (ChannelWrapper connection : connections)
+    for (ClientJob broadcastedJob : broadcastedJobs)
     {
-      ChannelWrapper xConnection = (ChannelWrapper) connection;
-      completionMap.put(xConnection.getUuid(), taskCount);
+      completionMap.put(broadcastedJob.getBroadcastUUID(), taskCount);
     }
     if (debugEnabled) log.debug("task count=" + taskCount + ", completionMap=" + completionMap);
   }

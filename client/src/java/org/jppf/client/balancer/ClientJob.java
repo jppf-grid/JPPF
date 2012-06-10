@@ -284,6 +284,16 @@ public class ClientJob extends AbstractClientJob
    */
   public void fireTaskCompleted()
   {
+    if (job.getSLA().isBroadcastJob()) {
+      TaskResultListener listener = job.getResultListener();
+      if (listener != null)
+      {
+        synchronized (listener)
+        {
+          listener.resultsReceived(new TaskResultEvent(job.getTasks()));
+        }
+      }
+    }
     if (this.completionListener != null) this.completionListener.taskCompleted(this);
   }
 

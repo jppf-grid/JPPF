@@ -23,6 +23,7 @@ import static org.jppf.utils.CollectionUtils.*;
 import java.text.ParseException;
 import java.util.*;
 
+import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.management.JPPFManagementInfo;
@@ -389,15 +390,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void processBroadcastJob(final ClientJob bundleWrapper)
   {
-    JPPFDistributedJob bundle = bundleWrapper.getJob();
+    JPPFJob bundle = bundleWrapper.getJob();
     List<ChannelWrapper> connections = submissionManager.getAllConnections();
-//    Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
     if (connections.isEmpty())
     {
       bundleWrapper.fireTaskCompleted();
       return;
     }
-    BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, connections);
     JobSLA sla = bundle.getSLA();
     ExecutionPolicy policy = sla.getExecutionPolicy();
     List<ClientJob> jobList = new ArrayList<ClientJob>(connections.size());
@@ -405,25 +404,26 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     Set<String> uuidSet = new HashSet<String>();
     for (ChannelWrapper connection : connections)
     {
-      String uuid = connection.getUuid();
-      if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
+      JPPFClientConnectionStatus status = connection.getStatus();
+      if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
       {
-        ClientJob newBundle = bundleWrapper.copy();
+        if ((policy != null) && !policy.accepts(connection.getSystemInfo())) continue;
 
-        JPPFManagementInfo info = connection.getManagementInfo();
-        newBundle.setBroadcastUUID(uuid);
-        if ((policy != null) && !policy.accepts(connection.getSystemInfo()))
+        String uuid = connection.getUuid();
+        if(uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
         {
-          continue;
-        }
-        ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
-        newBundle.setSLA(((JPPFJobSLA) sla).copy());
+          ClientJob newBundle = bundleWrapper.copy();
+
+          JPPFManagementInfo info = connection.getManagementInfo();
+          newBundle.setBroadcastUUID(uuid);
+          ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
+          newBundle.setSLA(((JPPFJobSLA) sla).copy());
 //        newBundle.setLocalExecutionPolicy(broadcastPolicy);
-        newBundle.setCompletionListener(completionListener);
-        newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
-        newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
-        if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
-        jobList.add(newBundle);
+          newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
+          newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+          if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
+          jobList.add(newBundle);
+        }
       }
     }
     if (jobList.isEmpty())
@@ -432,7 +432,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
     else
     {
-      for (ClientJob job : jobList) addBundle(job);
+      BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, jobList);
+      for (ClientJob job : jobList) {
+        job.setCompletionListener(completionListener);
+        addBundle(job);
+      }
     }
   }
 
