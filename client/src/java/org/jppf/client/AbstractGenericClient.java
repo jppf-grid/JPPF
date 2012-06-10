@@ -284,7 +284,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public boolean isLocalExecutionEnabled()
   {
     SubmissionManager submissionManager = getSubmissionManager();
-    return submissionManager != null && submissionManager.isLocalExecutionEnabled();
+    return (submissionManager != null) && submissionManager.isLocalExecutionEnabled();
   }
 
   /**
@@ -294,7 +294,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public void setLocalExecutionEnabled(final boolean localExecutionEnabled)
   {
     SubmissionManager submissionManager = getSubmissionManager();
-    if(submissionManager != null) submissionManager.setLocalExecutionEnabled(localExecutionEnabled);
+    if (submissionManager != null) submissionManager.setLocalExecutionEnabled(localExecutionEnabled);
   }
 
   /**
@@ -304,7 +304,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public boolean hasAvailableConnection()
   {
     SubmissionManager submissionManager = getSubmissionManager();
-    return submissionManager.hasAvailableConnection();
+    return (submissionManager != null) && submissionManager.hasAvailableConnection();
   }
 
   @Override
