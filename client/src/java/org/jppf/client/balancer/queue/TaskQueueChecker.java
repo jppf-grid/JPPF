@@ -322,6 +322,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         iterator.remove();
         continue;
       }
+      if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
       if (policy != null)
       {
         JPPFManagementInfo mgtInfo = ch.getManagementInfo();
@@ -359,7 +360,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param bundle the bundle from which to get the job information.
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
-  private boolean checkJobState(final ClientJob bundle)
+  private static boolean checkJobState(final ClientJob bundle)
   {
     JobSLA sla = bundle.getJob().getSLA();
     if (debugEnabled)
