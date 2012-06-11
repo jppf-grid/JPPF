@@ -17,17 +17,20 @@
  */
 package org.jppf.jca.work;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
-
-import org.jppf.client.*;
-import org.jppf.client.event.ClientConnectionStatusEvent;
+import org.jppf.client.AbstractGenericClient;
+import org.jppf.client.AbstractJPPFClientConnection;
+import org.jppf.client.JPPFJob;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.util.List;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -116,22 +119,6 @@ public class JPPFJcaClient extends AbstractGenericClient
   public void close()
   {
     super.close();
-  }
-
-  /**
-   * Invoked when the status of a client connection has changed.
-   * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
-   */
-  @Override
-  public void statusChanged(final ClientConnectionStatusEvent event)
-  {
-    super.statusChanged(event);
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager instanceof ThreadSynchronization)
-    {
-      ((ThreadSynchronization) submissionManager).wakeUp();
-    }
   }
 
   /**
