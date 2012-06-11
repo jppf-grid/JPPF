@@ -70,8 +70,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
       log.info("Starting JPPF resource adapter");
       jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), getClientConfiguration());
       log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
-      submissionManager = new JcaSubmissionManager(jppfClient);
-      jppfClient.setSubmissionManager(submissionManager);
+      submissionManager = jppfClient.getSubmissionManager();
       new Thread(submissionManager, "JPPF SubmissionManager").start();
       log.info("JPPF resource adapter started");
     }

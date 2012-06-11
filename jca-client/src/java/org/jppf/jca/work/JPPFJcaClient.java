@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.client.event.ClientConnectionStatusEvent;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JcaSubmissionManager;
@@ -118,29 +119,28 @@ public class JPPFJcaClient extends AbstractGenericClient
   }
 
   /**
-   * {@inheritDoc}
+   * Invoked when the status of a client connection has changed.
+   * @param event the event to notify of.
+   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
    */
   @Override
-  public JcaSubmissionManager getSubmissionManager()
+  public void statusChanged(final ClientConnectionStatusEvent event)
   {
-    SubmissionManager submissionManager = super.getSubmissionManager();
-    if (submissionManager == null)
-      return null;
-    else if (submissionManager instanceof JcaSubmissionManager)
-      return (JcaSubmissionManager) submissionManager;
-    else
-      throw new IllegalStateException("Expected JcaSubmissionManager");
+    super.statusChanged(event);
+    SubmissionManager submissionManager = getSubmissionManager();
+    if (submissionManager instanceof ThreadSynchronization)
+    {
+      ((ThreadSynchronization) submissionManager).wakeUp();
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setSubmissionManager(final SubmissionManager submissionManager)
+  public JcaSubmissionManager getSubmissionManager()
   {
-    if (submissionManager != null && !(submissionManager instanceof JcaSubmissionManager))
-      throw new IllegalArgumentException("submissionManager not instance of JcaSubmissionManager");
-    super.setSubmissionManager(submissionManager);
+    return (JcaSubmissionManager) super.getSubmissionManager();
   }
 
   /**
@@ -149,6 +149,6 @@ public class JPPFJcaClient extends AbstractGenericClient
   @Override
   protected SubmissionManager createSubmissionManager()
   {
-    return null; // submission manager is set by JPPFResourceAdapter
+    return new JcaSubmissionManager(this);
   }
 }
