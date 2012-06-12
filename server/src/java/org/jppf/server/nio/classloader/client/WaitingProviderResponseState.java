@@ -76,7 +76,8 @@ class WaitingProviderResponseState extends ClassServerState
       ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
       synchronized(nodeChannel)
       {
-        while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
+        //while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
+        while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0)) nodeChannel.wait(0L, 100000);
         if (debugEnabled) log.debug("sending response to node " + nodeChannel); 
         context.setCurrentRequest(null);
         resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
