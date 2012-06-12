@@ -176,23 +176,22 @@ public class JPPFClient extends AbstractGenericClient
   protected SubmissionManager createSubmissionManager()
   {
     SubmissionManager submissionManager = null;
-    if (config != null && config.getBoolean("experimental.balancer", false))
+    try
     {
-      try
+      if (config != null && config.getBoolean("jppf.balancer.old.enabled", false))
+      {
+        submissionManager = new SubmissionManagerImpl(this);
+      }
+      else
       {
         submissionManager = new SubmissionManagerClient(this);
-        new Thread(submissionManager, "SubmissionManager").start();
-      }
-      catch (Exception e)
-      {
-        log.error("Can't initialize SubmissionManagerClient", e);
       }
     }
-    else
+    catch (Exception e)
     {
-      submissionManager = new SubmissionManagerImpl(this);
-      new Thread(submissionManager, "SubmissionManager").start();
+      log.error("Can't initialize Submission Manager", e);
     }
+    if (submissionManager != null) new Thread(submissionManager, "SubmissionManager").start();
     return submissionManager;
   }
 
