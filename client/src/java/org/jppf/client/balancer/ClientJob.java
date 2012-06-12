@@ -108,6 +108,10 @@ public class ClientJob extends AbstractClientJob
    * Number of tasks that hav completed.
    */
   private int completedCount = 0;
+  /**
+   * The listener that receives notifications of completed tasks.
+   */
+  private TaskResultListener resultsListener;
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
@@ -126,9 +130,10 @@ public class ClientJob extends AbstractClientJob
       this.submissionStatus = SubmissionStatus.SUBMITTED;
 
     this.tasks = new ArrayList<JPPFTask>(tasks);
-    this.uuid = getJob().getUuid();
-    this.name = getJob().getName();
-    this.sla = getJob().getSLA();
+    this.uuid = this.job.getUuid();
+    this.name = this.job.getName();
+    this.sla = this.job.getSLA();
+    this.resultsListener = this.job.getResultListener();
   }
 
   /**
@@ -280,12 +285,30 @@ public class ClientJob extends AbstractClientJob
   }
 
   /**
+   * Get the listener that receives notifications of completed tasks.
+   * @return a <code>TaskCompletionListener</code> instance.
+   */
+  public TaskResultListener getResultListener()
+  {
+    return resultsListener;
+  }
+
+  /**
+   * Set the listener that receives notifications of completed tasks.
+   * @param resultsListener a <code>TaskCompletionListener</code> instance.
+   */
+  public void setResultListener(final TaskResultListener resultsListener)
+  {
+    this.resultsListener = resultsListener;
+  }
+
+  /**
    * Notifies that execution of this task has completed.
    */
   public void fireTaskCompleted()
   {
     if (job.getSLA().isBroadcastJob()) {
-      TaskResultListener listener = job.getResultListener();
+      TaskResultListener listener = resultsListener;
       if (listener != null)
       {
         synchronized (listener)
@@ -430,7 +453,7 @@ public class ClientJob extends AbstractClientJob
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
 
-    TaskResultListener listener = getJob().getResultListener();
+    TaskResultListener listener = resultsListener;
     if (listener != null)
     {
       synchronized (listener)
@@ -449,7 +472,7 @@ public class ClientJob extends AbstractClientJob
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
 
-    TaskResultListener listener = getJob().getResultListener();
+    TaskResultListener listener = resultsListener;
     if (listener != null)
     {
       synchronized (listener)
@@ -479,8 +502,9 @@ public class ClientJob extends AbstractClientJob
 
     if(completedCount == job.getTasks().size() && submissionStatus == SubmissionStatus.EXECUTING)
     {
-      job.fireJobEvent(JobEvent.Type.JOB_END);
+      fireTaskCompleted();
       setSubmissionStatus(SubmissionStatus.COMPLETE);
+      job.fireJobEvent(JobEvent.Type.JOB_END);
     } else if(completedCount >= job.getTasks().size())
       throw new IllegalStateException("completedCount > job.tasks.size");
   }
@@ -522,9 +546,9 @@ public class ClientJob extends AbstractClientJob
   public void setSubmissionStatus(final SubmissionStatus submissionStatus)
   {
     this.submissionStatus = submissionStatus;
-    if (getJob().getResultListener() instanceof SubmissionStatusHandler)
+    if (resultsListener instanceof SubmissionStatusHandler)
     {
-      ((SubmissionStatusHandler) getJob().getResultListener()).setStatus(this.submissionStatus);
+      ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
     }
   }
 
@@ -541,7 +565,7 @@ public class ClientJob extends AbstractClientJob
         {
           try
           {
-            future.cancel(false);
+            if(!future.isDone()) future.cancel(false);
           }
           catch (Exception e)
           {

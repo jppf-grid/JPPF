@@ -96,9 +96,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       processBroadcastJob(bundleWrapper);
       return;
     }
+    lock.lock();
     try
     {
-      lock.lock();
       ClientJob other = jobMap.get(jobUuid);
       if (other != null)
       {
@@ -421,6 +421,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 //        newBundle.setLocalExecutionPolicy(broadcastPolicy);
           newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
           newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+          newBundle.setResultListener(null);
           if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
           jobList.add(newBundle);
         }

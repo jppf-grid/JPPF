@@ -315,7 +315,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       newJob.setSLA(job.getSLA());
       newJob.setMetadata(job.getMetadata());
       newJob.setBlocking(job.isBlocking());
-      newJob.setResultListener(job.getResultListener());
+//      newJob.setResultListener(job.getResultListener());
       newJob.setName(job.getName());
       for (JPPFTask task : tasks)
       {
