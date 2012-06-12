@@ -118,11 +118,12 @@ public class J2EEDemo
   public String testConnector(final String jobId, final long duration, final int nbTasks) throws Exception
   {
     JPPFConnection connection = null;
+    JPPFJob job = null;
     String id = null;
     try
     {
       connection = JPPFHelper.getConnection(jndiBinding);
-      JPPFJob job = new JPPFJob();
+      job = new JPPFJob();
       job.setName(jobId);
       for (int i=0; i<nbTasks; i++)
       {
@@ -136,6 +137,7 @@ public class J2EEDemo
     {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
+    JPPFHelper.getStatusMap().put(id, job);
     return id;
   }
 
@@ -151,11 +153,12 @@ public class J2EEDemo
   public String testConnectorBlocking(final String jobId, final long duration, final int nbTasks) throws Exception
   {
     JPPFConnection connection = null;
+    JPPFJob job = null;
     String id = null;
     try
     {
       connection = JPPFHelper.getConnection(jndiBinding);
-      JPPFJob job = new JPPFJob();
+      job = new JPPFJob();
       job.setName(jobId);
       for (int i=0; i<nbTasks; i++)
       {
@@ -171,6 +174,7 @@ public class J2EEDemo
     {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
+    JPPFHelper.getStatusMap().put(id, job);
     return id;
   }
 

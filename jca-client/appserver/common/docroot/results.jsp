@@ -23,7 +23,8 @@
 			</tr>
 <%
 			J2EEDemo demo = new J2EEDemo(jndiName);
-			Map map = demo.getStatusMap();
+      //Map map = demo.getStatusMap();
+      Map map = JPPFHelper.getStatusMap();
 			if (map.isEmpty())
 			{
 %>
@@ -34,11 +35,11 @@
 			}
 			else
 			{
-				Iterator it = map.keySet().iterator();
+				Iterator<String> it = map.keySet().iterator();
 				while (it.hasNext())
 				{
-					String id = (String) it.next();
-					String status = (String) map.get(id);
+					String id = it.next();
+					String status = JPPFHelper.getStatus(id);
 %>
 			<tr>
 <%

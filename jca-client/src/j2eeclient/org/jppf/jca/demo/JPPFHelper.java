@@ -18,11 +18,15 @@
 
 package org.jppf.jca.demo;
 
+import java.util.*;
+
 import javax.naming.*;
 import javax.resource.ResourceException;
 import javax.resource.cci.ConnectionFactory;
 
+import org.jppf.client.*;
 import org.jppf.jca.cci.*;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Utility class for obtaining and releasing Resource adapter connections.
@@ -30,6 +34,10 @@ import org.jppf.jca.cci.*;
  */
 public class JPPFHelper
 {
+  /**
+   * 
+   */
+  private static Map<String, JPPFJob> statusMap = new Hashtable<String, JPPFJob>();
   /**
    * JNDI name of the JPPFConnectionFactory.
    * <p>This value is dependent on the application server used:
@@ -80,5 +88,55 @@ public class JPPFHelper
   public static void closeConnection(final JPPFConnection connection) throws ResourceException
   {
     connection.close();
+  }
+
+  /**
+   * Get the map used to lookup the jobs status.
+   * @return a mapping of jobs to their uuid.
+   */
+  public static Map<String, JPPFJob> getStatusMap()
+  {
+    return statusMap;
+  }
+
+  /**
+   * Get the status of the specified job.
+   * @param id the job uuid.
+   * @return a mapping of jobs to their uuid.
+   */
+  public static String getStatus(final String id)
+  {
+    JPPFJob job = statusMap.get(id);
+    if (job == null) return "no submission with this id";
+    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+    return collector.getStatus().toString();
+  }
+
+  /**
+   * Format the results of the specified job.
+   * @param id the uuid of the job.
+   * @return the formatted resutls as a string.
+   */
+  public static String getMessage(final String id)
+  {
+    JPPFConnection connection = null;
+    String msg = null;
+    JPPFJob job = statusMap.remove(id);
+    if (job == null) return "no submission with this id";
+    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+    List<JPPFTask> results = collector.getResults();
+    if (results == null) msg = "submission is not in queue anymore";
+    else
+    {
+      StringBuilder sb = new StringBuilder();
+      for (JPPFTask task: results)
+      {
+        if (task.getException() == null) sb.append(task.getResult());
+        else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getException().getMessage());
+        sb.append("<br/>");
+      }
+      msg = sb.toString();
+    }
+    return msg;
   }
 }

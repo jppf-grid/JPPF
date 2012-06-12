@@ -29,8 +29,9 @@ import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.client.submission.*;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessorImpl;
-import org.jppf.jca.work.submission.*;
+import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * Implementation of a JCA connection. This class provides an API to send tasks to a JPPF driver.
@@ -39,6 +40,14 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnection
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFConnectionImpl.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether this connection has been closed.
    */
@@ -290,6 +299,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   public List<JPPFTask> waitForResults(final String submissionId) throws Exception
   {
     JPPFResultCollector result = getResultCollector(submissionId);
+    if (debugEnabled) log.debug("result collector = " + result);
     if (result == null) return null;
     result.waitForResults();
     List<JPPFTask> tasks = result.getResults();

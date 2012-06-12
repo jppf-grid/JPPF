@@ -380,8 +380,8 @@
 		-->
     <property name="jboss.deploy" value="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy"/>
 		<copy todir="${jboss.deploy}" file="${build.dir}/jppf_ra_${jboss}.rar"/>
+    <copy todir="${jboss.deploy}" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
 		<!--
-		<copy todir="${jboss.deploy}" file="${build.dir}/${ear.prefix}_${jboss}.ear"/>
 		-->
 	</target>
 
