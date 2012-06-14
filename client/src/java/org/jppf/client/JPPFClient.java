@@ -207,10 +207,10 @@ public class JPPFClient extends AbstractGenericClient
   {
     if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
 
+    boolean result = true;
     SubmissionManager submissionManager = getSubmissionManager();
     if (submissionManager instanceof SubmissionManagerClient)
-      return ((SubmissionManagerClient) submissionManager).cancelJob(jobId);
-    else
-      return super.cancelJob(jobId);
+      result = ((SubmissionManagerClient) submissionManager).cancelJob(jobId);
+    return result && super.cancelJob(jobId);
   }
 }
