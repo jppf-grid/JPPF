@@ -19,7 +19,6 @@
 package org.jppf.client.balancer;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -27,6 +26,7 @@ import org.jppf.task.storage.DataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -55,10 +55,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   private transient List<JPPFTask> tasks = null;
   /**
-   * The tasks execution policy.
-   */
-  private transient ExecutionPolicy localExecutionPolicy = null;
-  /**
    * The broadcast UUID.
    */
   private transient String broadcastUUID = null;
@@ -66,6 +62,10 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * The requeue handler.
    */
   private Runnable onRequeue = null;
+  /**
+   * Job requeue indicator.
+   */
+  private boolean requeued = false;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -89,6 +89,15 @@ public class ClientTaskBundle extends JPPFTaskBundle
   public JPPFJob getJob()
   {
     return job.getJob();
+  }
+
+  /**
+   * Get the client job this submission is for
+   * @return a {@link ClientJob} instance.
+   */
+  public ClientJob getClientJob()
+  {
+    return job;
   }
 
   /**
@@ -172,72 +181,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
 //    return bundle;
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder("[");
-    sb.append("jobId=").append(getName());
-    sb.append(", jobUuid=").append(getUuid());
-    sb.append(", initialTaskCount=").append(getInitialTaskCount());
-    sb.append(", taskCount=").append(getTaskCount());
-    sb.append(", requeue=").append(getParametersMap() == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
-    sb.append(']');
-    return sb.toString();
-  }
-
-
-  /**
-   * Get the tasks execution policy.
-   * @return an <code>ExecutionPolicy</code> instance.
-   */
-  public ExecutionPolicy getExecutionPolicy()
-  {
-    ExecutionPolicy slaPolicy;
-    if (getSLA() == null)
-    {
-      slaPolicy = null;
-    }
-    else
-    {
-      slaPolicy = getSLA().getExecutionPolicy();
-    }
-
-    if (localExecutionPolicy == null)
-    {
-      return slaPolicy;
-    }
-    else if (slaPolicy == null)
-    {
-      return localExecutionPolicy;
-    }
-    else
-    {
-      return localExecutionPolicy.and(slaPolicy);
-    }
-  }
-
-  /**
-   * Get the tasks local execution policy.
-   * @return an <code>ExecutionPolicy</code> instance.
-   */
-  public ExecutionPolicy getLocalExecutionPolicy()
-  {
-    return localExecutionPolicy;
-  }
-
-  /**
-   * Set the tasks local execution policy.
-   * @param localExecutionPolicy an <code>ExecutionPolicy</code> instance.
-   */
-  public void setLocalExecutionPolicy(final ExecutionPolicy localExecutionPolicy)
-  {
-    this.localExecutionPolicy = localExecutionPolicy;
-  }
-
   /**
    * Get the broadcast UUID.
    * @return an <code>String</code> instance.
@@ -254,6 +197,16 @@ public class ClientTaskBundle extends JPPFTaskBundle
   public void setBroadcastUUID(final String broadcastUUID)
   {
     this.broadcastUUID = broadcastUUID;
+  }
+
+  /**
+   * Called when all or part of a job is dispatched to a node.
+   * @param channel the node to which the job is dispatched.
+   * @param future  future assigned to bundle execution.
+   */
+  public void jobDispatched(final ChannelWrapper<?> channel, final Future<?> future)
+  {
+    job.jobDispatched(this, channel, future);
   }
 
   /**
@@ -288,7 +241,17 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   public void resubmit()
   {
+    requeued = true;
     if (onRequeue != null) onRequeue.run();
+  }
+
+  /**
+   * Get the requeued indicator.
+   * @return <code>true</code> if job is requeued, <code>false</code> otherwise.
+   */
+  public boolean isRequeued()
+  {
+    return requeued;
   }
 
   /**
@@ -302,10 +265,26 @@ public class ClientTaskBundle extends JPPFTaskBundle
 
   /**
    * Set the reuque handler.
-   * @param onRequeue {@Link Runnable} executed on requeue.
+   * @param onRequeue {@link Runnable} executed on requeue.
    */
   public void setOnRequeue(final Runnable onRequeue)
   {
     this.onRequeue = onRequeue;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder("[");
+    sb.append("jobId=").append(getName());
+    sb.append(", jobUuid=").append(getUuid());
+    sb.append(", initialTaskCount=").append(getInitialTaskCount());
+    sb.append(", taskCount=").append(getTaskCount());
+    sb.append(", requeue=").append(getParametersMap() == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
+    sb.append(']');
+    return sb.toString();
   }
 }

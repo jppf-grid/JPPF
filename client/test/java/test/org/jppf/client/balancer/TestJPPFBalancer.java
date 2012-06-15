@@ -58,14 +58,17 @@ public class TestJPPFBalancer
 
       job = new JPPFJob();
       job.setBlocking(true);
-      job.addJobListener(new JobListener() {
+      job.addJobListener(new JobListener()
+      {
         @Override
-        public void jobStarted(final JobEvent event) {
+        public void jobStarted(final JobEvent event)
+        {
           System.out.println("jobStarted: " + event.getJob());
         }
 
         @Override
-        public void jobEnded(final JobEvent event) {
+        public void jobEnded(final JobEvent event)
+        {
           System.out.println("jobEnded: " + event.getJob());
         }
       });
@@ -126,7 +129,7 @@ public class TestJPPFBalancer
     String poolSize = "1";
 
     TypedProperties properties = JPPFConfiguration.getProperties();
-    properties.setProperty("experimental.balancer", "true");
+    properties.setProperty("jppf.balancer.old.enabled", "false");
     properties.setProperty("jppf.load.balancing.algorithm", "manual");
     properties.setProperty("jppf.load.balancing.strategy", "manual");
     properties.setProperty("strategy.manual.size", "1");
@@ -198,8 +201,10 @@ public class TestJPPFBalancer
       }
       catch (InterruptedException e)
       {
-        System.out.println("Interrupted: " + new Date());
+        System.out.println("Interrupted: " + text + " - " + new Date());
         e.printStackTrace(System.out);
+      } finally {
+        System.out.println("Task finished: " + text);
       }
     }
 

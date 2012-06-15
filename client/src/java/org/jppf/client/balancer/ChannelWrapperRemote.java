@@ -297,7 +297,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       {
         if (registeredClassLoader != null) registeredClassLoader.dispose();
         bundle.taskCompleted(exception);
-        if(exception == null) setStatus(JPPFClientConnectionStatus.ACTIVE);
+        if(getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
 

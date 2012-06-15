@@ -295,9 +295,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         setBundler(new FixedSizeBundler(profile));
       }
       ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
-//      bundleWrapper.jobDispatched(channel);
       Future<?> future = channel.submit(bundleWrapper);
-      selectedBundle.jobDispatched(bundleWrapper, channel, future);
+      bundleWrapper.jobDispatched(channel, future);
     }
   }
 

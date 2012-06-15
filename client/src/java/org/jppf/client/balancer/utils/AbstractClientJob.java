@@ -51,6 +51,14 @@ public abstract class AbstractClientJob
    * List of all runnables called on job completion.
    */
   private final List<Runnable> onDoneList = new ArrayList<Runnable>();
+  /**
+   * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
+   */
+  private long jobReceivedTime = 0L;
+  /**
+   * The time at which this wrapper was added to the queue.
+   */
+  private transient long queueEntryTime = 0L;
 
   /**
    * Updates status to new value if old value is equal to expect.
@@ -86,16 +94,17 @@ public abstract class AbstractClientJob
 
   /**
    * Cancels this job.
+   * @param mayInterruptIfRunning true if the thread executing this task should be interrupted.
    * @return whether cancellation was successful.
    */
-  public boolean cancel()
+  public boolean cancel(final boolean mayInterruptIfRunning)
   {
     if (status > EXECUTING) return false;
     status = CANCELLED;
     return true;
   }
 
-/**
+  /**
    * Called when task was cancelled or finished.
    */
   protected void done()
@@ -135,7 +144,43 @@ public abstract class AbstractClientJob
 
     synchronized (onDoneList)
     {
-    onDoneList.remove(runnable);
+      onDoneList.remove(runnable);
     }
+  }
+
+  /**
+   * Get the job received time.
+   * @return the time in milliseconds as a long value.
+   */
+  public long getJobReceivedTime()
+  {
+    return jobReceivedTime;
+  }
+
+  /**
+   * Set the job received time.
+   * @param jobReceivedTime the time in milliseconds as a long value.
+   */
+  public void setJobReceivedTime(final long jobReceivedTime)
+  {
+    this.jobReceivedTime = jobReceivedTime;
+  }
+
+  /**
+   * Get the time at which this wrapper was added to the queue.
+   * @return the time in milliseconds as a long value.
+   */
+  public long getQueueEntryTime()
+  {
+    return queueEntryTime;
+  }
+
+  /**
+   * Set the time at which this wrapper was added to the queue.
+   * @param queueEntryTime the time in milliseconds as a long value.
+   */
+  public void setQueueEntryTime(final long queueEntryTime)
+  {
+    this.queueEntryTime = queueEntryTime;
   }
 }
