@@ -203,6 +203,7 @@ public class TestJPPFBalancer
       {
         System.out.println("Interrupted: " + text + " - " + new Date());
         e.printStackTrace(System.out);
+        setException(e);
       } finally {
         System.out.println("Task finished: " + text);
       }

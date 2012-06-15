@@ -127,6 +127,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
             try
             {
               jobMap.remove(jobUuid);
+              removeBundle(bundleWrapper);
             }
             finally
             {

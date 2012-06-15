@@ -162,8 +162,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning)
       {
-        if (super.cancel(false))
-        {
+        if(isDone()) return false;
+        if(isCancelled()) {
+          return true;
+        } else {
           try
           {
             channel.cancelJob(bundle.getJob().getUuid());
@@ -171,10 +173,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           catch (Exception e)
           {
             log.error(e.getMessage(), e);
+          } finally {
+            return super.cancel(false);
           }
-          return true;
         }
-        return false;
       }
     };
     executor.execute(task);
