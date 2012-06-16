@@ -26,6 +26,7 @@ import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.management.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
@@ -308,7 +309,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
-    queue.addBundle(new ClientJob(job, job.getTasks()));
+    List<JPPFTask> pendingTasks = new ArrayList<JPPFTask>();
+    List<JPPFTask> tasks = job.getTasks();
+    for (JPPFTask task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
+    queue.addBundle(new ClientJob(job, pendingTasks));
     return job.getName();
   }
 
