@@ -24,6 +24,7 @@ import java.util.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This implementation of {@link JobPersistence} stores jobs on the file system using
@@ -37,6 +38,14 @@ import org.jppf.utils.*;
  */
 public class DefaultFilePersistenceManager implements JobPersistence<String>
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(DefaultFilePersistenceManager.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The default prefix for the files in the store.
    */
@@ -190,7 +199,9 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
     InputStream is = null;
     try
     {
-      is = new BufferedInputStream(new FileInputStream(fileFromKey(key)));
+      File file = fileFromKey(key);
+      if (debugEnabled) log.debug("loading job key=" + key + ", file=" + file);
+      is = new BufferedInputStream(new FileInputStream(file));
       JPPFJob job = (JPPFJob) serializer.deserialize(is, false);
       int n = 0;
       byte bytes[] = new byte[4];
@@ -207,6 +218,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
         for (int i=0; i<size; i++) tasks.add((JPPFTask) serializer.deserialize(is, false));
         job.getResults().putResults(tasks);
       }
+      if (debugEnabled) log.debug("loaded job " + job);
       return job;
     }
     catch (Exception e)
@@ -241,10 +253,12 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
   @Override
   public synchronized void storeJob(final String key, final JPPFJob job, final List<JPPFTask> tasks) throws JobPersistenceException
   {
+    if (debugEnabled) log.debug("storing job " + job + ", key=" + key + ", nbTasks=" + tasks.size());
     OutputStream os = null;
     try
     {
       File file = fileFromKey(key);
+      if (debugEnabled) log.debug("storing to file " + file);
       boolean isNewFile = !file.exists();
       if (isNewFile)
       {
@@ -285,6 +299,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
   public synchronized void deleteJob(final String key) throws JobPersistenceException
   {
     File file = fileFromKey(key);
+    if (debugEnabled) log.debug("deleting job key=" + key + ", file=" + file);
     if (!file.delete()) throw new JobPersistenceException("could not delete job with key '" + key + '\'');
   }
 

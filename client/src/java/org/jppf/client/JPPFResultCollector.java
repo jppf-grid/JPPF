@@ -132,9 +132,9 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
         setStatus(SubmissionStatus.COMPLETE);
       }
       notifyAll();
-      if ((job != null) && (job.getPersistenceManager() != null))
+      JobPersistence pm = job.getPersistenceManager();
+      if ((job != null) && (pm != null))
       {
-        JobPersistence pm = job.getPersistenceManager();
         try
         {
           pm.storeJob(pm.computeKey(job), job, tasks);
@@ -175,21 +175,22 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     if (millis < 0) throw new IllegalArgumentException("wait time cannot be negative");
     if (log.isTraceEnabled()) log.trace("timeout = " + millis + ", pendingCount = " + pendingCount);
+    long timeout = millis > 0 ? millis : Long.MAX_VALUE;
     long start = System.currentTimeMillis();
     long elapsed = 0;
-    while ((elapsed < millis) && (pendingCount > 0))
+    while ((elapsed < timeout) && (pendingCount > 0))
     {
       try
       {
-        if (elapsed >= millis) return null;
-        wait(millis - elapsed);
+        if (elapsed >= timeout) return null;
+        wait(timeout - elapsed);
       }
       catch(InterruptedException e)
       {
         log.error(e.getMessage(), e);
       }
       elapsed = System.currentTimeMillis() - start;
-      if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed + ", millis = " + millis);
+      if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed + ", millis = " + timeout);
     }
     //if (pendingCount <= 0) buildResults();
     if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed);

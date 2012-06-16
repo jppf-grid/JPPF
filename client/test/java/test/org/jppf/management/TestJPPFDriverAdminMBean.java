@@ -45,7 +45,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
    * Test getting statistics from the server.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000)
   public void testGetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
@@ -67,7 +67,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
    * Test getting statistics from the server.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000)
   public void testResetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
