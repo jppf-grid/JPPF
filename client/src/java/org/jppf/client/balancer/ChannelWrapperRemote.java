@@ -20,7 +20,7 @@ package org.jppf.client.balancer;
 
 import java.io.NotSerializableException;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
@@ -30,7 +30,7 @@ import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.management.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -166,13 +166,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         if(isCancelled()) {
           return true;
         } else {
-          try
-          {
+          try {
             channel.cancelJob(bundle.getJob().getUuid());
-          }
-          catch (Exception e)
-          {
-            log.error(e.getMessage(), e);
+          } catch (Exception e) {
+            if (debugEnabled) log.debug(e.getMessage(), e);
+            else log.warn(ExceptionUtils.getMessage(e));
           } finally {
             return super.cancel(false);
           }
@@ -286,7 +284,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       }
       catch (Throwable t)
       {
-        log.error(t.getMessage(), t);
+        if (debugEnabled) log.debug(t.getMessage(), t);
+        else log.warn(ExceptionUtils.getMessage(t));
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         bundle.resultsReceived(t);
 
