@@ -260,11 +260,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private ChannelWrapper<?> retrieveChannel(final ClientJob bundleWrapper) throws Exception
   {
-    if (checkJobState(bundleWrapper))
-    {
-      return findIdleChannelIndex(bundleWrapper);
-    }
-    return null;
+    return findIdleChannelIndex(bundleWrapper);
   }
 
   /**
