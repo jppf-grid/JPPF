@@ -528,4 +528,22 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     listeners = new LinkedList<JobListener>();
     return this;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("name=").append(name);
+    sb.append(", uuid=").append(uuid);
+    sb.append(", blocking=").append(blocking);
+    sb.append(", nbTasks=").append(tasks.size());
+    sb.append(", nbResults=").append(results.size());
+    sb.append(", jobSLA=").append(jobSLA);
+    sb.append(']');
+    return sb.toString();
+  }
 }
