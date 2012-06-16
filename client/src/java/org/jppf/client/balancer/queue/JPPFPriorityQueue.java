@@ -157,6 +157,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
+  /**
+   * Handle requeuing of the specified job.
+   * @param bundle the job to requeue.
+   */
   protected void requeue(final ClientTaskBundle bundle) {
     lock.lock();
     try {
