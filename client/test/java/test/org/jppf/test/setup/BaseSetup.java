@@ -25,6 +25,7 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.JPPFConfiguration;
 
 import test.org.jppf.test.setup.common.BaseTestHelper;
 
@@ -121,8 +122,21 @@ public class BaseSetup
    */
   public static JPPFClient createClient(final String uuid) throws Exception
   {
+    return createClient(uuid, true);
+  }
+
+  /**
+   * Create a client with the specified uuid.
+   * @param uuid if null, let the client generate its uuid.
+   * @param reset if <code>true</code>, the JPPF ocnfiguration is reloaded.
+   * @return a <code>JPPFClient</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFClient createClient(final String uuid, final boolean reset) throws Exception
+  {
+    if (reset) JPPFConfiguration.reset();
     JPPFClient jppfClient = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
-    System.out.println("waiting for available client connection");
+    //System.out.println("waiting for available client connection");
     while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
     return jppfClient;
   }
@@ -133,18 +147,23 @@ public class BaseSetup
    */
   public static void cleanup() throws Exception
   {
-    if (client != null) client.close();
-    Thread.sleep(500L);
+    if (client != null)
+    {
+      client.close();
+      client = null;
+      Thread.sleep(500L);
+      System.gc();
+    }
     stopProcesses();
     Runtime.getRuntime().removeShutdownHook(shutdownHook);
   }
 
   /**
-   * Check that the drivr and all nodes have been started and are accessible.
+   * Check that the driver and all nodes have been started and are accessible.
    * @param nbNodes the number of nodes that were started.
    * @throws Exception if any error occurs.
    */
-  protected static void checkDriverAndNodesInitialized(final int nbNodes) throws Exception
+  public static void checkDriverAndNodesInitialized(final int nbNodes) throws Exception
   {
     JMXDriverConnectionWrapper wrapper = null;
     try

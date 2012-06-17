@@ -54,7 +54,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   /**
    * Reference to the driver.
    */
-  private transient JPPFDriver driver = JPPFDriver.getInstance();
+  private static final JPPFDriver driver = JPPFDriver.getInstance();
   /**
    * The latest load-balancing information set via JMX.
    */
@@ -95,9 +95,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   {
     try
     {
-      return driver.getStatsUpdater().getStats();
+      JPPFStats  stats = driver.getStatsUpdater().getStats();
+      if (debugEnabled) log.debug("stats request = " + stats);
+      return stats;
     }
-    catch(Exception e)
+    catch(Throwable e)
     {
       log.error(e.getMessage(), e);
       return null;
@@ -123,11 +125,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
       TypedProperties props = new TypedProperties(parameters);
       synchronized(loadBalancingInformationLock)
       {
-        currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, currentLoadBalancingInformation.getAlgorithmNames());
+        currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, loadBalancerInformation().getAlgorithmNames());
       }
       Bundler bundler = factory.createBundler(algorithm, props);
       driver.getNodeNioServer().setBundler(bundler);
-      //return new JPPFManagementResponse(localize((manual ? "manual" : "automatic") + ".settings.changed"), null);
       return localize("load.balancing.updated");
     }
     catch(Exception e)
@@ -174,8 +175,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     synchronized(loadBalancingInformationLock)
     {
       if (currentLoadBalancingInformation == null) currentLoadBalancingInformation = computeCurrentLoadBalancingInformation();
-      return currentLoadBalancingInformation;
     }
+    return currentLoadBalancingInformation;
   }
  
   /**

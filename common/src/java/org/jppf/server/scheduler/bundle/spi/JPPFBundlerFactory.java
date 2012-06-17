@@ -83,6 +83,7 @@ public class JPPFBundlerFactory
     // for compatibility with v1.x configuration files
     if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
     TypedProperties configuration = convertJPPFConfiguration(profileName, props);
+    if (debugEnabled) log.debug("load balancing configuration using algorithm '" + algorithm +"' with parameters: " + configuration);
     return createBundler(algorithm, configuration);
   }
 

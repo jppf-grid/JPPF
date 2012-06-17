@@ -97,15 +97,16 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
     AbstractPrivilegedAction<?> action = null;
     switch(methodType)
     {
-      case INSTANCE:
-      case STATIC:
-        Method m = (Method) ReflectionUtils.getJPPFAnnotatedElement(clazz);
-        action = new PrivilegedMethodAction(m, taskObject, args);
-        break;
-
       case CONSTRUCTOR:
         Constructor c = (Constructor) ReflectionUtils.getJPPFAnnotatedElement(clazz);
         action = new PrivilegedConstructorAction(c, args);
+        break;
+
+      case INSTANCE:
+      case STATIC:
+      default:
+        Method m = (Method) ReflectionUtils.getJPPFAnnotatedElement(clazz);
+        action = new PrivilegedMethodAction(m, taskObject, args);
         break;
     }
     result = AccessController.doPrivileged(action);

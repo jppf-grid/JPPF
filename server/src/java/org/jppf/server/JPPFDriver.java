@@ -100,11 +100,11 @@ public class JPPFDriver
   /**
    * This listener gathers the statistics published through the management interface.
    */
-  private JPPFDriverStatsUpdater statsUpdater = new JPPFDriverStatsUpdater();
+  private final JPPFDriverStatsUpdater statsUpdater;
   /**
    * Generates the statistics events of which all related listeners are notified.
    */
-  private JPPFDriverStatsManager statsManager = new JPPFDriverStatsManager();
+  private final JPPFDriverStatsManager statsManager;
   /**
    * Manages and monitors the jobs throughout their processing within this driver.
    */
@@ -133,6 +133,8 @@ public class JPPFDriver
     // initialize the jmx logger
     new JmxMessageNotifier();
     nodeHandler = new NodeInformationHandler();
+    statsUpdater = new JPPFDriverStatsUpdater();
+    statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);
     initializer = new DriverInitializer(this);
     log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);

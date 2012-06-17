@@ -35,11 +35,6 @@ import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean
 {
   /**
-   * Signature of the method invoked on the MBean.
-   */
-  public static final String[] MBEAN_SIGNATURE = new String[] {Map.class.getName()};
-
-  /**
    * Initialize a local connection to the MBean server.
    */
   public JMXDriverConnectionWrapper()
@@ -91,7 +86,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public JPPFStats statistics() throws Exception
   {
-    return (JPPFStats) invoke(MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
+    JPPFStats stats = (JPPFStats) invoke(MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
+    return stats;
   }
 
   /**

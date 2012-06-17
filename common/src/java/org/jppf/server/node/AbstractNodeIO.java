@@ -53,7 +53,7 @@ public abstract class AbstractNodeIO implements NodeIO
   /**
    * The node who owns this TaskIO.
    */
-  protected JPPFNode node = null;
+  protected final JPPFNode node;
   /**
    * The task bundle currently being processed.
    */

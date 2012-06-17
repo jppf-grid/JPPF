@@ -385,10 +385,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     synchronized(this)
     {
-      if (submissionManager == null)
-      {
-        submissionManager = createSubmissionManager();
-      }
+      if (submissionManager == null) submissionManager = createSubmissionManager();
     }
     return submissionManager;
   }

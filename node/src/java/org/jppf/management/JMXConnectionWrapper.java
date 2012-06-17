@@ -176,16 +176,21 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     }
     else
     {
-      JMXConnectionThread jct = connectionThread.get();
-      if (jct == null)
+      JMXConnectionThread jct = null;
+      boolean jctNull = true;
+      synchronized(this)
       {
-        jct = new JMXConnectionThread(this);
-        connectionThread.set(jct);
-        Thread t = new Thread(jct, "JMX connection " + getId());
-        t.setDaemon(true);
-        t.start();
+        jctNull = (jct = connectionThread.get()) == null;
+        if (jctNull)
+        {
+          jct = new JMXConnectionThread(this);
+          connectionThread.set(jct);
+          Thread t = new Thread(jct, "JMX connection " + getId());
+          t.setDaemon(true);
+          t.start();
+        }
       }
-      else if (!jct.isConnecting()) jct.resume();
+      if (!jctNull && !jct.isConnecting()) jct.resume();
     }
   }
 

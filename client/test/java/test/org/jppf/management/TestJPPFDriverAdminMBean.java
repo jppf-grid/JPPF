@@ -45,10 +45,13 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
    * Test getting statistics from the server.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
+  @Test
   public void testGetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    //waitKeyPressed();
+    driver.resetStatistics();
     JPPFStats stats = driver.statistics();
     assertNotNull(stats);
     long n = stats.getNodes().getLatest();
@@ -219,7 +222,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     }
     finally
     {
-      if (driver != null) driver.close();
+      //if (driver != null) driver.close();
       if (nodes != null) for (JMXNodeConnectionWrapper node: nodes) node.close();
     }
   }
@@ -234,5 +237,15 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     {
       System.out.println("broadcast of " + getClass().getName());
     }
+  }
+
+  /**
+   * Display a message and wait until a key is pressed.
+   * @throws Exception if any I/O error occurs.
+   */
+  public static void waitKeyPressed() throws Exception
+  {
+    System.out.println("press any key to continue ...");
+    System.in.read();
   }
 }

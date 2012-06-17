@@ -92,15 +92,16 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
     AbstractPrivilegedAction<Object> action = null;
     switch(methodType)
     {
-      case INSTANCE:
-      case STATIC:
-        Method m = ReflectionUtils.getMatchingMethod(clazz, method, args);
-        action = new PrivilegedMethodAction(m, taskObject, args);
-        break;
-
       case CONSTRUCTOR:
         Constructor c = ReflectionUtils.getMatchingConstructor(clazz, args);
         action = new PrivilegedConstructorAction(c, args);
+        break;
+
+      case INSTANCE:
+      case STATIC:
+      default:
+        Method m = ReflectionUtils.getMatchingMethod(clazz, method, args);
+        action = new PrivilegedMethodAction(m, taskObject, args);
         break;
     }
     result = AccessController.doPrivileged(action);

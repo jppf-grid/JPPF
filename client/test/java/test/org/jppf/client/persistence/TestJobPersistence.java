@@ -54,7 +54,7 @@ public class TestJobPersistence extends Setup1D1N
       config.setProperty("jppf.load.balancing.algorithm", "manual");
       config.setProperty("jppf.load.balancing.strategy", "test");
       config.setProperty("strategy.test.size", "1");
-      JPPFClient client = BaseSetup.createClient(null);
+      JPPFClient client = BaseSetup.createClient(null, false);
       int nbTasks = 4;
       JPPFJob job = BaseSetup.createJob("TestSubmit", false, false, nbTasks, SimpleTask.class, duration);
       int i=0;
@@ -66,7 +66,7 @@ public class TestJobPersistence extends Setup1D1N
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
       client.submit(job);
-      Thread.sleep(3*duration/2);
+      Thread.sleep(2*duration);
       client.close();
       int n = job.getResults().size();
       assertTrue(n < nbTasks);

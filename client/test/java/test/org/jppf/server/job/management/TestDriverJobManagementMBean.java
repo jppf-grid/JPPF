@@ -21,7 +21,6 @@ package test.org.jppf.server.job.management;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
@@ -29,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.LifeCycleTask;
 
 /**
  * Unit tests for {@link JPPFTask}.
@@ -38,10 +37,6 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestDriverJobManagementMBean extends Setup1D1N1C
 {
-  /**
-   * Count of the number of jobs created.
-   */
-  private static final  AtomicInteger JOB_COUNT = new AtomicInteger(0);
   /**
    * A "short" duration for this test.
    */
@@ -59,7 +54,6 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   public void testCancelJob() throws Exception
   {
     int nbTasks = 10;
-    //JPPFJob job = createJob("testCancelJob", nbTasks, TIME_LONG, false);
     JPPFJob job = BaseSetup.createJob("testCancelJob", false, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submit(job);
@@ -73,8 +67,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     int count = 0;
     for (JPPFTask t: results)
     {
-      LifeCycleTask task = (LifeCycleTask) t;
-      if (task.getResult() == null) count++;
+      if (t.getResult() == null) count++;
     }
     assertTrue(count > 0);
   }
@@ -83,16 +76,14 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
    * We test a job with 1 task, and attempt to cancel it after it has completed.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000L)
   public void testCancelJobAfterCompletion() throws Exception
   {
-    //JPPFJob job = createJob("testCancelJobAfterCompletion", 1, TIME_SHORT, true);
     JPPFJob job = BaseSetup.createJob("testCancelJobAfterCompletion", true, false, 1, LifeCycleTask.class, TIME_SHORT);
     List<JPPFTask> results = client.submit(job);
     assertEquals(results.size(), 1);
     assertNotNull(results.get(0));
-    LifeCycleTask task = (LifeCycleTask) results.get(0);
-    assertNotNull(task.getResult());
+    assertNotNull(results.get(0).getResult());
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
