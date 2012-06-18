@@ -18,6 +18,9 @@
 
 package org.jppf.client.balancer.utils;
 
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.JobSLA;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +62,144 @@ public abstract class AbstractClientJob
    * The time at which this wrapper was added to the queue.
    */
   private transient long queueEntryTime = 0L;
+  /**
+   * The underlying task bundle.
+   */
+  protected final JPPFJob job;
+  /**
+   * The universal unique id for this job.
+   */
+  private String uuid = null;
+  /**
+   * The user-defined display name for this job.
+   */
+  private String name = null;
+  /**
+   * The service level agreement between the job and the server.
+   */
+  private JobSLA sla = null;
+  /**
+   * Job expired indicator, determines whether the job is should be cancelled.
+   */
+  private boolean jobExpired = false;
+  /**
+   * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
+   */
+  private boolean pending = false;
+
+  /**
+   * Initialized abstract client job with task bundle and list of tasks to execute.
+   * @param job   underlying task bundle.
+   */
+  protected AbstractClientJob(final JPPFJob job) {
+    if (job == null) throw new IllegalArgumentException("job is null");
+
+    this.job = job;
+
+    this.uuid = this.job.getUuid();
+    this.name = this.job.getName();
+    this.sla = this.job.getSLA();
+  }
+
+  /**
+   * Get the underlying task bundle.
+   * @return a <code>ClientTaskBundle</code> instance.
+   */
+  public JPPFJob getJob()
+  {
+    return job;
+  }
+
+  /**
+   * Get the universal unique id for this job.
+   * @return the uuid as a string.
+   * @exclude
+   */
+  public String getUuid()
+  {
+    return uuid;
+  }
+
+  /**
+   * Set the universal unique id for this job.
+   * @param uuid the universal unique id.
+   */
+  public void setUuid(final String uuid)
+  {
+    this.uuid = uuid;
+  }
+
+  /**
+   * Get the user-defined display name for this job. This is the name displayed in the administration console.
+   * @return the name as a string.
+   */
+  public String getName()
+  {
+    return name;
+  }
+
+  /**
+   * Set the user-defined display name for this job.
+   * @param name the display name as a string.
+   */
+  public void setName(final String name)
+  {
+    this.name = name;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @return an instance of {@link org.jppf.node.protocol.JobSLA}.
+   */
+  public JobSLA getSLA()
+  {
+    return sla;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param sla an instance of <code>JobSLA</code>.
+   */
+  public void setSLA(final JobSLA sla)
+  {
+    this.sla = sla;
+  }
+
+  /**
+   * Get the job expired indicator.
+   * @return <code>true</code> if job has expired, <code>false</code> otherwise.
+   */
+  public boolean isJobExpired()
+  {
+    return jobExpired;
+  }
+
+  /**
+   * Notifies that job has expired.
+   */
+  public void jobExpired()
+  {
+    this.jobExpired = true;
+    cancel(true);
+  }
+
+  /**
+   * Get the job pending indicator.
+   * @return <code>true</code> if job is pending, <code>false</code> otherwise.
+   */
+  public boolean isPending()
+  {
+    return pending;
+  }
+
+  /**
+   * Set the job pending indicator.
+   * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
+   */
+  public void setPending(final boolean pending)
+  {
+    this.pending = pending;
+  }
 
   /**
    * Updates status to new value if old value is equal to expect.

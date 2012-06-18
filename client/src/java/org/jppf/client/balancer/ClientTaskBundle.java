@@ -19,7 +19,6 @@
 package org.jppf.client.balancer;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.task.storage.DataProvider;
@@ -59,13 +58,13 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   private transient String broadcastUUID = null;
   /**
-   * The requeue handler.
-   */
-  private Runnable onRequeue = null;
-  /**
    * Job requeue indicator.
    */
   private boolean requeued = false;
+  /**
+   * Job cancel indicator
+   */
+  private boolean cancelled  = false;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -239,37 +238,36 @@ public class ClientTaskBundle extends JPPFTaskBundle
   /**
    * Called when this task bundle should be resubmitted
    */
-  public void resubmit()
+  public synchronized void resubmit()
   {
+    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resumbitted.
     requeued = true;
-    if (onRequeue != null) onRequeue.run();
   }
 
   /**
    * Get the requeued indicator.
    * @return <code>true</code> if job is requeued, <code>false</code> otherwise.
    */
-  public boolean isRequeued()
+  public synchronized boolean isRequeued()
   {
     return requeued;
   }
 
   /**
-   * Get the requeue handler.
-   * @return an <code>Runnable</code> instance.
+   * Called when this task bundle is cancelled.
    */
-  public Runnable getOnRequeue()
+  public synchronized void cancel()
   {
-    return onRequeue;
+    this.cancelled = true;
   }
 
   /**
-   * Set the reuque handler.
-   * @param onRequeue {@link Runnable} executed on requeue.
+   * Get the cancelled indicator.
+   * @return <code>true</code> if job is cancelled, <code>false</code> otherwise.
    */
-  public void setOnRequeue(final Runnable onRequeue)
+  public synchronized boolean isCancelled()
   {
-    this.onRequeue = onRequeue;
+    return cancelled;
   }
 
   /**
@@ -283,7 +281,8 @@ public class ClientTaskBundle extends JPPFTaskBundle
     sb.append(", jobUuid=").append(getUuid());
     sb.append(", initialTaskCount=").append(getInitialTaskCount());
     sb.append(", taskCount=").append(getTaskCount());
-    sb.append(", requeue=").append(getParametersMap() == null ? null : getParameter(BundleParameter.JOB_REQUEUE));
+    sb.append(", requeue=").append(isRequeued());
+    sb.append(", cancelled=").append(isCancelled());
     sb.append(']');
     return sb.toString();
   }

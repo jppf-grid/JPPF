@@ -166,8 +166,9 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         if(isCancelled()) {
           return true;
         } else {
+          bundle.cancel();
           try {
-            channel.cancelJob(bundle.getJob().getUuid());
+            channel.cancelJob(bundle.getClientJob().getUuid());
           } catch (Exception e) {
             if (debugEnabled) log.debug(e.getMessage(), e);
             else log.warn(ExceptionUtils.getMessage(e));
@@ -259,7 +260,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         long start = System.nanoTime();
         int count = 0;
         boolean completed = false;
-        JPPFJob newJob = createNewJob(bundle.getJob(), tasks);
+        JPPFJob newJob = createNewJob(bundle, tasks);
         ClassLoader classLoader = getClassLoader(newJob);
         registeredClassLoader = client.registerClassLoader(classLoader, newJob.getUuid());
         while (!completed)
@@ -309,13 +310,13 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
      * @throws Exception if any error occurs.
      */
-    private JPPFJob createNewJob(final JPPFJob job, final List<JPPFTask> tasks) throws Exception
+    private JPPFJob createNewJob(final ClientTaskBundle job, final List<JPPFTask> tasks) throws Exception
     {
-      JPPFJob newJob = new JPPFJob(job.getUuid());
-      newJob.setDataProvider(job.getDataProvider());
+      JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
+      newJob.setDataProvider(job.getJob().getDataProvider());
       newJob.setSLA(job.getSLA());
       newJob.setMetadata(job.getMetadata());
-      newJob.setBlocking(job.isBlocking());
+      newJob.setBlocking(job.getJob().isBlocking());
 //      newJob.setResultListener(job.getResultListener());
       newJob.setName(job.getName());
       for (JPPFTask task : tasks)

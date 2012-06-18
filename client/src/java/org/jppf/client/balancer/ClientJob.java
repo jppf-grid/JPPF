@@ -25,16 +25,11 @@ import org.jppf.client.event.TaskResultEvent;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.client.submission.SubmissionStatusHandler;
-import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -43,41 +38,31 @@ import java.util.concurrent.Future;
 public class ClientJob extends AbstractClientJob
 {
   /**
+   * State for task indicating whether result or execption was received.
+   */
+  protected static enum TaskState {
+    /**
+     * Result was received for task.
+     */
+    RESULT,
+    /**
+     * Exception was received for task.
+     */
+    EXCEPTION
+  }
+
+  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
-  /**
-   * The underlying task bundle.
-   */
-  private final JPPFJob job;
   /**
    * The list of of the tasks.
    */
   private final List<JPPFTask> tasks;
   /**
-   * Job expired indicator, determines whether the job is should be cancelled.
-   */
-  private boolean jobExpired = false;
-  /**
-   * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
-   */
-  private boolean pending = false;
-  /**
    * The broadcast UUID.
    */
   private transient String broadcastUUID = null;
-  /**
-   * The universal unique id for this job.
-   */
-  private String uuid = null;
-  /**
-   * The user-defined display name for this job.
-   */
-  private String name = null;
-  /**
-   * The service level agreement between the job and the server.
-   */
-  private JobSLA sla = null;
   /**
    * Map of all futures in this job.
    */
@@ -86,10 +71,6 @@ public class ClientJob extends AbstractClientJob
    * The status of this submission.
    */
   private SubmissionStatus submissionStatus;
-  /**
-   * Number of tasks that hav completed.
-   */
-  private int completedCount = 0;
   /**
    * The listener that receives notifications of completed tasks.
    */
@@ -102,6 +83,22 @@ public class ClientJob extends AbstractClientJob
    * Map of all dispatched broadcast jobs.
    */
   private final Map<String, ClientJob> broadcastMap;
+  /**
+   * Map of all pending broadcast jobs.
+   */
+  private final Set<ClientJob> broadcastSet = new LinkedHashSet<ClientJob>();
+  /**
+   * Indicator whether this job is executing.
+   */
+  private boolean executing = false;
+  /**
+   * The requeue handler.
+   */
+  private Runnable onRequeue = null;
+  /**
+   * State map for tasks on which resultReceived was called.
+   */
+  private final SortedMap<Integer, TaskState> taskStateMap = new TreeMap<Integer, TaskState>();
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
@@ -122,15 +119,14 @@ public class ClientJob extends AbstractClientJob
    */
   protected ClientJob(final JPPFJob job, final List<JPPFTask> tasks, final ClientJob parentJob, final String broadcastUUID)
   {
-    if (job == null) throw new IllegalArgumentException("job is null");
+    super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
 
-    this.job = job;
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
 
-    if(broadcastUUID == null) {
-      if(job.getSLA().isBroadcastJob())
+    if (broadcastUUID == null) {
+      if (job.getSLA().isBroadcastJob())
         this.broadcastMap = new LinkedHashMap<String, ClientJob>();
       else
         this.broadcastMap = Collections.emptyMap();
@@ -146,64 +142,24 @@ public class ClientJob extends AbstractClientJob
       this.submissionStatus = SubmissionStatus.SUBMITTED;
 
     this.tasks = new ArrayList<JPPFTask>(tasks);
-    this.uuid = this.job.getUuid();
-    this.name = this.job.getName();
-    this.sla = this.job.getSLA();
   }
 
   /**
-   * Get the universal unique id for this job.
-   * @return the uuid as a string.
-   * @exclude
+   * Sets indicator whether is job is executing. Job start or job end is notified when state changes.
+   * @param executing <code>true</code> when this client job is executing. <code>false</code> otherwise.
    */
-  public String getUuid()
-  {
-    return uuid;
-  }
-
-  /**
-   * Set the universal unique id for this job.
-   * @param uuid the universal unique id.
-   */
-  public void setUuid(final String uuid)
-  {
-    this.uuid = uuid;
-  }
-
-  /**
-   * Get the user-defined display name for this job. This is the name displayed in the administration console.
-   * @return the name as a string.
-   */
-  public String getName()
-  {
-    return name;
-  }
-
-  /**
-   * Set the user-defined display name for this job.
-   * @param name the display name as a string.
-   */
-  public void setName(final String name)
-  {
-    this.name = name;
-  }
-
-  /**
-   * Get the service level agreement between the job and the server.
-   * @return an instance of {@link JobSLA}.
-   */
-  public JobSLA getSLA()
-  {
-    return sla;
-  }
-
-  /**
-   * Get the service level agreement between the job and the server.
-   * @param sla an instance of <code>JobSLA</code>.
-   */
-  public void setSLA(final JobSLA sla)
-  {
-    this.sla = sla;
+  protected void setExecuting(final boolean executing) {
+    synchronized (tasks)
+    {
+      if (this.executing == executing) return;
+      this.executing = executing;
+    }
+    if (getBroadcastUUID() == null) {
+      if (executing)
+        job.fireJobEvent(JobEvent.Type.JOB_START);
+      else
+        job.fireJobEvent(JobEvent.Type.JOB_END);
+    }
   }
 
   /**
@@ -212,16 +168,10 @@ public class ClientJob extends AbstractClientJob
    */
   public int getTaskCount()
   {
-    return tasks.size();
-  }
-
-  /**
-   * Get the underlying task bundle.
-   * @return a <code>ClientTaskBundle</code> instance.
-   */
-  public JPPFJob getJob()
-  {
-    return job;
+    synchronized (tasks)
+    {
+      return tasks.size();
+    }
   }
 
   /**
@@ -230,7 +180,10 @@ public class ClientJob extends AbstractClientJob
    */
   public List<JPPFTask> getTasks()
   {
-    return Collections.unmodifiableList(tasks);
+    synchronized (tasks)
+    {
+      return Collections.unmodifiableList(new ArrayList<JPPFTask>(tasks));
+    }
   }
 
   /**
@@ -242,7 +195,16 @@ public class ClientJob extends AbstractClientJob
   {
     if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
 
-    return new ClientJob(job, this.tasks, this, broadcastUUID);
+    ClientJob clientJob;
+    synchronized (tasks)
+    {
+      clientJob = new ClientJob(job, this.tasks, this, broadcastUUID);
+    }
+    synchronized (bundleMap)
+    {
+      broadcastSet.add(clientJob);
+    }
+    return clientJob;
   }
 
   /**
@@ -252,24 +214,27 @@ public class ClientJob extends AbstractClientJob
    */
   public ClientTaskBundle copy(final int nbTasks)
   {
-    if (nbTasks >= this.tasks.size())
+    synchronized (tasks)
     {
-      try {
-        return new ClientTaskBundle(this, this.tasks);
-      } finally {
-        this.tasks.clear();
-      }
-    }
-    else
-    {
-      List<JPPFTask> subList = this.tasks.subList(0, nbTasks);
-      try
+      if (nbTasks >= this.tasks.size())
       {
-        return new ClientTaskBundle(this, subList);
+        try {
+          return new ClientTaskBundle(this, this.tasks);
+        } finally {
+          this.tasks.clear();
+        }
       }
-      finally
+      else
       {
-        subList.clear();
+        List<JPPFTask> subList = this.tasks.subList(0, nbTasks);
+        try
+        {
+          return new ClientTaskBundle(this, subList);
+        }
+        finally
+        {
+          subList.clear();
+        }
       }
     }
   }
@@ -278,11 +243,17 @@ public class ClientJob extends AbstractClientJob
    * Merge this client job wrapper with another.
    * @param taskList list of tasks to merge.
    * @param after determines whether the tasks from other should be added first or last.
+   * @return <code>true</code> when this client job needs to be requeued.
    */
-  public void merge(final List<JPPFTask> taskList, final boolean after)
+  protected boolean merge(final List<JPPFTask> taskList, final boolean after)
   {
-    if (!after) this.tasks.addAll(0, taskList);
-    if (after) this.tasks.addAll(taskList);
+    synchronized (tasks)
+    {
+      boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
+      if (!after) this.tasks.addAll(0, taskList);
+      if (after) this.tasks.addAll(taskList);
+      return requeue;
+    }
   }
 
   /**
@@ -301,46 +272,6 @@ public class ClientJob extends AbstractClientJob
   public void setResultListener(final TaskResultListener resultsListener)
   {
     this.resultsListener = resultsListener;
-  }
-
-  /**
-   * Get the job expired indicator.
-   * @return <code>true</code> if job has expired, <code>false</code> otherwise.
-   */
-  public boolean isJobExpired()
-  {
-    return jobExpired;
-  }
-
-  /**
-   * Notifies that job has expired.
-   */
-  public void jobExpired()
-  {
-    this.jobExpired = true;
-    for (ClientJob broadcastJob : getBroadcastJobs())
-    {
-      broadcastJob.jobExpired();
-    }
-    cancel(true);
-  }
-
-  /**
-   * Get the job pending indicator.
-   * @return <code>true</code> if job is pending, <code>false</code> otherwise.
-   */
-  public boolean isPending()
-  {
-    return pending;
-  }
-
-  /**
-   * Set the job pending indicator.
-   * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
-   */
-  public void setPending(final boolean pending)
-  {
-    this.pending = pending;
   }
 
   /**
@@ -364,14 +295,19 @@ public class ClientJob extends AbstractClientJob
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (future == null) throw new IllegalArgumentException("future is null");
 
-    boolean empty = bundleMap.isEmpty();
-    bundleMap.put(bundle, future);
-    if (updateStatus(NEW, EXECUTING) || empty)
+    boolean empty;
+    synchronized (bundleMap)
     {
-      setSubmissionStatus(SubmissionStatus.EXECUTING);
+      empty = bundleMap.isEmpty();
+      bundleMap.put(bundle, future);
     }
-    if(empty && getBroadcastUUID() == null) job.fireJobEvent(JobEvent.Type.JOB_START);
-    if(parentJob != null) parentJob.broadcastDispatched(this);
+    if (empty)
+    {
+      updateStatus(NEW, EXECUTING);
+      setSubmissionStatus(SubmissionStatus.EXECUTING);
+      setExecuting(true);
+    }
+    if (parentJob != null) parentJob.broadcastDispatched(this);
   }
 
   /**
@@ -381,11 +317,14 @@ public class ClientJob extends AbstractClientJob
    */
   public void resultsReceived(final ClientTaskBundle bundle, final List<JPPFTask> results)
   {
-//    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (results.isEmpty()) return;
 
-    completedCount += results.size();
-//    if(completedCount > dispatchedCount) throw new IllegalStateException("completedCount > dispatchedCount");
-
+    synchronized (tasks)
+    {
+      for (JPPFTask task : results) {
+        taskStateMap.put(task.getPosition(), TaskState.RESULT);
+      }
+    }
     TaskResultListener listener = resultsListener;
     if (listener != null)
     {
@@ -405,6 +344,13 @@ public class ClientJob extends AbstractClientJob
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
 
+    synchronized (tasks)
+    {
+      for (JPPFTask task : bundle.getTasksL()) {
+        TaskState oldState = taskStateMap.get(task.getPosition());
+        if (oldState != TaskState.RESULT) taskStateMap.put(task.getPosition(), TaskState.EXCEPTION);
+      }
+    }
     TaskResultListener listener = resultsListener;
     if (listener != null)
     {
@@ -422,28 +368,99 @@ public class ClientJob extends AbstractClientJob
    */
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
   {
-//    if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    Future future = bundleMap.remove(bundle);
-    if(bundle != null && future == null) throw new IllegalStateException("future already removed");
-
-    if(bundle == null) resultsReceived(null, job.getTasks());
-
-    boolean fire = false;
-    try {
-      if(exception != null)
+    boolean empty;
+    synchronized (bundleMap)
+    {
+      Future future = bundleMap.remove(bundle);
+      if (bundle != null && future == null) throw new IllegalStateException("future already removed");
+      empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
+    }
+    boolean requeue = false;
+    if (getSLA().isBroadcastJob()) {
+      List<JPPFTask> list = new ArrayList<JPPFTask>();
+      synchronized (tasks)
       {
-        setSubmissionStatus(SubmissionStatus.FAILED);
+        if (bundle != null) {
+          for (JPPFTask task : bundle.getTasksL()) {
+            if (taskStateMap.put(task.getPosition(), TaskState.RESULT) != TaskState.RESULT) list.add(task);
+          }
+        }
+        if (isCancelled()) {
+          list.addAll(this.tasks);
+          this.tasks.clear();
+        }
       }
+      resultsReceived(bundle, list);
+    } else if (bundle == null) {
+      if (isCancelled()) {
+        List<JPPFTask> list = new ArrayList<JPPFTask>();
+        synchronized (tasks)
+        {
+          list.addAll(this.tasks);
+          this.tasks.clear();
+        }
+        resultsReceived(bundle, list);
+      }
+    } else {
+      if (bundle.isCancelled()) {
+        List<JPPFTask> list = new ArrayList<JPPFTask>();
+        synchronized (tasks)
+        {
+          for (JPPFTask task : bundle.getTasksL()) {
+            if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
+          }
+          list.addAll(this.tasks);
+          this.tasks.clear();
+        }
+        resultsReceived(bundle, list);
+      }
+      if (bundle.isRequeued()) {
+        List<JPPFTask> list = new ArrayList<JPPFTask>();
+        synchronized (tasks)
+        {
+          for (JPPFTask task : bundle.getTasksL()) {
+            if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
+          }
 
-      if(completedCount == job.getTasks().size() && submissionStatus != SubmissionStatus.FAILED)
+          requeue = merge(list, false);
+        }
+      }
+    }
+
+    if (hasPending()) {
+      if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
+      if (empty) setExecuting(false);
+
+      if (requeue && onRequeue != null) onRequeue.run();
+    } else {
+      boolean callDone = updateStatus(EXECUTING, DONE);
+      if (empty) setExecuting(false);
+      setSubmissionStatus(SubmissionStatus.COMPLETE);
+
+      try {
+        if (callDone) done();
+      } finally {
+        if (parentJob != null) parentJob.broadcastCompleted(this);
+      }
+    }
+  }
+
+  /**
+   * Get indicator whether job has pending tasks.
+   * @return <code>true</code> when job has some penging tasks.
+   */
+  protected boolean hasPending() {
+    synchronized (tasks)
+    {
+      if (tasks.isEmpty() && taskStateMap.size() >= job.getTasks().size())
       {
-        fire = true;
-        done();
-      } else if(completedCount > job.getTasks().size())
-        throw new IllegalStateException("completedCount > job.tasks.size");
-    } finally {
-      if(bundleMap.isEmpty() && getBroadcastUUID() == null) job.fireJobEvent(JobEvent.Type.JOB_END);
-      if(fire) setSubmissionStatus(SubmissionStatus.COMPLETE);
+        for (TaskState state : taskStateMap.values())
+        {
+          if (state == TaskState.EXCEPTION) return true;
+        }
+        return false;
+      } else
+        return true;
     }
   }
 
@@ -462,6 +479,7 @@ public class ClientJob extends AbstractClientJob
    */
   public void setSubmissionStatus(final SubmissionStatus submissionStatus)
   {
+    if (this.submissionStatus == submissionStatus) return;
     this.submissionStatus = submissionStatus;
     if (resultsListener instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
   }
@@ -472,67 +490,46 @@ public class ClientJob extends AbstractClientJob
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning)
   {
-    if(super.cancel(mayInterruptIfRunning)) {
-      try
+    if (super.cancel(mayInterruptIfRunning)) {
+      done();
+      List<ClientJob> list;
+      List<Future>   futureList;
+      synchronized (bundleMap)
       {
-        for (ClientJob broadcastJob : getBroadcastJobs())
+        list = new ArrayList<ClientJob>(broadcastSet.size() + broadcastMap.size());
+        list.addAll(broadcastMap.values());
+        list.addAll(broadcastSet);
+
+        futureList = new ArrayList<Future>(bundleMap.size());
+        futureList.addAll(bundleMap.values());
+      }
+      for (ClientJob broadcastJob : list)
+      {
+        broadcastJob.cancel(mayInterruptIfRunning);
+      }
+      for (Future future : futureList)
+      {
+        try
         {
-          broadcastJob.cancel(mayInterruptIfRunning);
+          if (!future.isDone()) future.cancel(false);
         }
-        for (Future future : bundleMap.values())
+        catch (Exception e)
         {
-          try
-          {
-            if(!future.isDone()) future.cancel(false);
-          }
-          catch (Exception e)
-          {
-            log.error("Error cancelling job " + this, e);
-          }
+          log.error("Error cancelling job " + this, e);
         }
       }
-      finally
+
+      boolean empty;
+      synchronized (bundleMap)
       {
-        done();
+        broadcastSet.clear();
+        empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
       }
+      if (empty) taskCompleted(null, null);
       return true;
     }
     else
       return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void done()
-  {
-    try {
-      super.done();
-    } finally {
-      if (job.getSLA().isBroadcastJob()) {
-        TaskResultListener listener = resultsListener;
-        if (listener != null)
-        {
-          synchronized (listener)
-          {
-            listener.resultsReceived(new TaskResultEvent(job.getTasks()));
-          }
-        }
-      }
-      if (parentJob != null) parentJob.broadcastCompleted(this);
-    }
-  }
-
-  /**
-   * Get the array of dispatched broadcast jobs.
-   * @return an array of {@link ClientJob} instances.
-   */
-  protected ClientJob[] getBroadcastJobs()
-  {
-    synchronized (broadcastMap) {
-      return broadcastMap.values().toArray(new ClientJob[broadcastMap.size()]);
-    }
   }
 
   /**
@@ -541,17 +538,20 @@ public class ClientJob extends AbstractClientJob
    */
   protected void broadcastDispatched(final ClientJob broadcastJob)
   {
-    if(broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
+    if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
 
     boolean empty;
-    synchronized (broadcastMap)
+    synchronized (bundleMap)
     {
+      broadcastSet.remove(broadcastJob);
       empty = broadcastMap.isEmpty();
       broadcastMap.put(broadcastJob.getBroadcastUUID(), broadcastJob);
     }
-
-    if (updateStatus(NEW, EXECUTING) || empty) setSubmissionStatus(SubmissionStatus.EXECUTING);
-    if(empty && getBroadcastUUID() == null) job.fireJobEvent(JobEvent.Type.JOB_START);
+    if (empty) {
+      updateStatus(NEW, EXECUTING);
+      setSubmissionStatus(SubmissionStatus.EXECUTING);
+      setExecuting(true);
+    }
   }
 
   /**
@@ -560,15 +560,24 @@ public class ClientJob extends AbstractClientJob
    */
   protected void broadcastCompleted(final ClientJob broadcastJob)
   {
-    if(broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
+    if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
 
     //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     boolean empty;
-    synchronized (broadcastMap) {
-      if(broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob) throw new IllegalStateException("broadcast job not found");
+    synchronized (bundleMap) {
+      if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) throw new IllegalStateException("broadcast job not found");
       empty = broadcastMap.isEmpty();
     }
+    if (empty) taskCompleted(null, null);
+  }
 
-    if(empty) taskCompleted(null, null);
+  /**
+   * Set the reuque handler.
+   * @param onRequeue {@link Runnable} executed on requeue.
+   */
+  public void setOnRequeue(final Runnable onRequeue)
+  {
+    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be requeud
+    this.onRequeue = onRequeue;
   }
 }
