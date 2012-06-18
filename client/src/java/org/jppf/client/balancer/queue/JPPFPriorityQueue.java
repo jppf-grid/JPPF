@@ -407,7 +407,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       return;
     }
     JobSLA sla = bundle.getSLA();
-    ExecutionPolicy policy = sla.getExecutionPolicy();
+//    ExecutionPolicy policy = sla.getExecutionPolicy();
     List<ClientJob> jobList = new ArrayList<ClientJob>(connections.size());
 
     Set<String> uuidSet = new HashSet<String>();
@@ -416,7 +416,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       JPPFClientConnectionStatus status = connection.getStatus();
       if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
       {
-        if ((policy != null) && !policy.accepts(connection.getSystemInfo())) continue;
+//        if ((policy != null) && !policy.accepts(connection.getSystemInfo())) continue;
 
         String uuid = connection.getUuid();
         if(uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
