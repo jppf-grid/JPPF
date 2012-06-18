@@ -104,7 +104,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
   @Override
   public void cellStart()
   {
-    sb.append("<td>");
+    sb.append("<td valign=\"top\">");
   }
 
   /**
