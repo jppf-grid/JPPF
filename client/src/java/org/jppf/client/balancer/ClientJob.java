@@ -385,7 +385,7 @@ public class ClientJob extends AbstractClientJob
             if (taskStateMap.put(task.getPosition(), TaskState.RESULT) != TaskState.RESULT) list.add(task);
           }
         }
-        if (isCancelled()) {
+        if (isCancelled() || getBroadcastUUID() == null) {
           list.addAll(this.tasks);
           this.tasks.clear();
         }
