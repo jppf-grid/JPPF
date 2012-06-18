@@ -18,14 +18,12 @@
 
 package org.jppf.client.balancer;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.task.storage.DataProvider;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
+
+import org.jppf.client.JPPFJob;
+import org.jppf.server.protocol.*;
+import org.jppf.task.storage.DataProvider;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -73,11 +71,13 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   public ClientTaskBundle(final ClientJob job, final List<JPPFTask> tasks)
   {
-    if (job == null) throw new IllegalArgumentException("job us null");
+    if (job == null) throw new IllegalArgumentException("job is null");
 
     this.job = job;
+    this.setSLA(job.getSLA());
+    this.setMetadata(job.getJob().getMetadata());
     this.tasks = new ArrayList<JPPFTask>(tasks);
-
+    this.setName(job.getJob().getName());
     setTaskCount(this.tasks.size());
   }
 
