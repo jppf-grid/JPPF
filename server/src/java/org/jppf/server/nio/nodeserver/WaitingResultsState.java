@@ -91,7 +91,8 @@ class WaitingResultsState extends NodeServerState
       if (requeue)
       {
         bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
-        bundle.getSLA().setSuspended(true);
+        // why should it be suspended ?
+        bundle.getSLA().setSuspended(newBundle.getSLA().isSuspended());
         context.setBundle(null);
         context.setJobCanceled(false);
         context.resubmitBundle(bundleWrapper);

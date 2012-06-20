@@ -54,6 +54,14 @@ public class NodeListener implements NodeLifeCycleListener
    * The library manager.
    */
   private LibraryManager libraryManager = new LibraryManager(NODE_LIB_DIR);
+  /**
+   * Determines whether the node should be restarted when the current job ends.
+   */
+  private boolean restartNode = false;
+  /**
+   * Wraps a local (same JVM) connection to the node's JMX server.
+   */
+  private JMXNodeConnectionWrapper jmx = null;
 
   /**
    * Perform library management upon connection to the server:
@@ -140,7 +148,7 @@ public class NodeListener implements NodeLifeCycleListener
       saveFilesToDelete();
       Boolean restart  = (Boolean) metadata.getParameter(LibraryManager.RESTART_NODE_FLAG, Boolean.FALSE);
       // restart the node to ensure the changes are taken into account
-      if (restart) restartNode(job.getUuid());
+      if (restart) restartNode(job);
     }
   }
 
@@ -150,6 +158,19 @@ public class NodeListener implements NodeLifeCycleListener
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {
+    if (restartNode)
+    {
+      // restart the node
+      output("*** restarting this node ***");
+      try
+      {
+        getJmx().restart();
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
   }
 
   /**
@@ -281,19 +302,18 @@ public class NodeListener implements NodeLifeCycleListener
  
   /**
    * Restart the node and cancel the specified job.
-   * @param uuid the uuid of the job to cancel.
+   * @param job the job to cancel.
    */
-  private void restartNode(final String uuid)
+  private void restartNode(final JPPFDistributedJob job)
   {
     try
     {
-      JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper();
-      jmx.connect();
       // cancel the job and ensure it is requeued on the server
       output("canceling the job");
-      jmx.cancelJob(uuid, true);
-      output("*** restarting this node ***");
-      jmx.restart();
+      getJmx().cancelJob(job.getUuid(), true);
+      job.getSLA().setSuspended(false);
+      // set the restart node flag for processing in the jobEnded() event
+      this.restartNode = true;
     }
     catch (Exception e)
     {
@@ -311,5 +331,19 @@ public class NodeListener implements NodeLifeCycleListener
     System.out.println(message);
     // comment out this line to remove messages from the log file
     log.info(message);
+  }
+
+  /**
+   * Get a connection ot the node's JMX server, creating it if needed.
+   * @return a <code>JMXNodeConnectionWrapper</code> instance.
+   */
+  private JMXNodeConnectionWrapper getJmx()
+  {
+    if (jmx == null)
+    {
+      jmx = new JMXNodeConnectionWrapper();
+      jmx.connect();
+    }
+    return jmx;
   }
 }

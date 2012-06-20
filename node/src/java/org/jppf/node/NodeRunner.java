@@ -70,14 +70,6 @@ public class NodeRunner
    */
   private static ExecutorService executor = Executors.newFixedThreadPool(1);
   /**
-   * Task used to shutdown the node.
-   */
-  private static final ShutdownOrRestart SHUTDOWN_TASK = new ShutdownOrRestart(false);
-  /**
-   * Task used to restart the node.
-   */
-  private static final ShutdownOrRestart RESTART_TASK = new ShutdownOrRestart(true);
-  /**
    * The JPPF node.
    */
   private static Node node = null;
@@ -102,6 +94,10 @@ public class NodeRunner
    * Loads and invokes node initialization hooks defined via their SPI definition.
    */
   private static InitializationHooksHandler hooksHandler = null;
+  /**
+   * Determines whether this node is currently shutting down.
+   */
+  private static boolean shuttingDown = false;
 
   /**
    * Run a node as a standalone application.
@@ -279,16 +275,16 @@ public class NodeRunner
     {
       if (debugEnabled) log.debug("un-setting security");
       PrivilegedAction<Object> pa = new PrivilegedAction<Object>()
-          {
+      {
         @Override
         public Object run()
         {
           System.setSecurityManager(null);
           return null;
         }
-          };
-          AccessController.doPrivileged(pa);
-          securityManagerSet = false;
+      };
+      AccessController.doPrivileged(pa);
+      securityManagerSet = false;
     }
   }
 
@@ -304,15 +300,15 @@ public class NodeRunner
       if (classLoader == null)
       {
         PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>()
-            {
+        {
           @Override
           public JPPFClassLoader run()
           {
             return new JPPFClassLoader(NodeRunner.class.getClassLoader());
           }
-            };
-            classLoader = AccessController.doPrivileged(pa);
-            Thread.currentThread().setContextClassLoader(classLoader);
+        };
+        classLoader = AccessController.doPrivileged(pa);
+        Thread.currentThread().setContextClassLoader(classLoader);
       }
       return classLoader;
     }
@@ -366,45 +362,38 @@ public class NodeRunner
    */
   public static void shutdown(final Node node, final boolean restart)
   {
-    // close the JMX server connection to avoid
-    // request beuing sent azgain by the client.
-    try
-    {
+    //executor.submit(new ShutdownOrRestart(restart));
+    new ShutdownOrRestart(restart, node).run();
+  }
+
+  /**
+   * Stop the JMX server.
+   */
+  private static void stopJmxServer()
+  {
+    try {
       final JMXServer jmxServer = node.getJmxServer();
-      if (jmxServer != null)
-      {
+      if (jmxServer != null) {
         jmxServer.stop();
-        Runnable r = new Runnable()
-        {
+        Runnable r = new Runnable() {
           @Override
-          public void run()
-          {
-            try
-            {
+          public void run() {
+            try {
               jmxServer.stop();
-            }
-            catch (Exception ignore)
-            {
+            } catch (Exception ignore) {
             }
           }
         };
         Future<?> f = executor.submit(r);
         // we don't want to wait forever for the connection to close
-        try
-        {
+        try {
           f.get(1000L, TimeUnit.MILLISECONDS);
+        } catch (Exception ignore) {
         }
-        catch (Exception ignore)
-        {
-        }
-        if (!f.isDone()) f.cancel(true);
+        //if (!f.isDone()) f.cancel(true);
       }
+    } catch (Exception ignore) {
     }
-    catch (Exception ignore)
-    {
-    }
-    executor.submit(new ShutdownOrRestart(restart));
-    //new ShutdownOrRestart(restart).run();
   }
 
   /**
@@ -417,14 +406,20 @@ public class NodeRunner
      * True if the node is to be restarted, false to only shut it down.
      */
     private boolean restart = false;
+    /**
+     * True if the node is to be restarted, false to only shut it down.
+     */
+    private final Node node;
 
     /**
      * Initialize this task.
      * @param restart true if the node is to be restarted, false to only shut it down.
+     * @param node this node.
      */
-    public ShutdownOrRestart(final boolean restart)
+    public ShutdownOrRestart(final boolean restart, final Node node)
     {
       this.restart = restart;
+      this.node = node;
     }
 
     /**
@@ -439,6 +434,13 @@ public class NodeRunner
         @Override
         public Object run()
         {
+          node.stopNode();
+          // close the JMX server connection to avoid request being sent again by the client.
+          stopJmxServer();
+          try {
+            Thread.sleep(500L);
+          } catch(Exception ignore) {
+          }
           System.exit(restart ? 2 : 0);
           return null;
         }
@@ -453,5 +455,23 @@ public class NodeRunner
   public static String getUuid()
   {
     return uuid;
+  }
+
+  /**
+   * Determine whether this node is currently shutting down.
+   * @return <code>true</code> if the node is shutting down, <code>false</code> otherwise.
+   */
+  public synchronized static boolean isShuttingDown()
+  {
+    return shuttingDown;
+  }
+
+  /**
+   * Specify whether this node is currently shutting down.
+   * @param shuttingDown <code>true</code> if the node is shutting down, <code>false</code> otherwise.
+   */
+  public synchronized static void setShuttingDown(final boolean shuttingDown)
+  {
+    NodeRunner.shuttingDown = shuttingDown;
   }
 }

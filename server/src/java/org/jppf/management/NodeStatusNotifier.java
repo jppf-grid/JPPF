@@ -91,7 +91,8 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
     synchronized(nodeAdmin)
     {
       nodeAdmin.getNodeState().setExecutionStatus(localize("node.idle"));
-      int n = event.getTasks().size() + nodeAdmin.getNodeState().getNbTasksExecuted();
+      int n = event.getTasks().size();
+      n += nodeAdmin.getNodeState().getNbTasksExecuted();
       try
       {
         nodeAdmin.setTaskCounter(n);

@@ -98,6 +98,10 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * The thread manager that is used for execution.
    */
   private final ThreadManager threadManager;
+  /**
+   * Determines whether the current job has been cancelled.
+   */
+  private boolean jobCancelled = false;
 
   /**
    * Initialize this execution manager with the specified node.
@@ -163,8 +167,11 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
     NodeExecutionInfo info = threadManager.isCpuTimeEnabled() ? threadManager.computeExecutionInfo() : null;
     setup(bundle, taskList);
-    for (Task task : taskList) performTask(task);
-    waitForResults();
+    if (!isJobCancelled())
+    {
+      for (Task task : taskList) performTask(task);
+      waitForResults();
+    }
     cleanup();
     if (info != null)
     {
@@ -338,6 +345,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     this.bundle = null;
     this.taskList = null;
     this.uuidList = null;
+    setJobCancelled(false);
     futureMap.clear();
     taskMap.clear();
     timeoutHandler.clear();
@@ -558,5 +566,23 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   public ThreadManager getThreadManager()
   {
     return threadManager;
+  }
+
+  /**
+   * Determine whether the current job has been cancelled, including before starting its execution.
+   * @return <code>true</code> if the job has been cancelled, <code>false</code> otherwise.
+   */
+  public synchronized boolean isJobCancelled()
+  {
+    return jobCancelled;
+  }
+
+  /**
+   * Specify whether the current job has been cancelled, including before starting its execution.
+   * @param jobCancelled <code>true</code> if the job has been cancelled, <code>false</code> otherwise.
+   */
+  public synchronized void setJobCancelled(final boolean jobCancelled)
+  {
+    this.jobCancelled = jobCancelled;
   }
 }

@@ -239,9 +239,17 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
     if (jobId == null) return;
     if (jobId.equals(node.getExecutionManager().getCurrentJobId()))
     {
+      node.getExecutionManager().setJobCancelled(true);
       node.getExecutionManager().cancelAllTasks(true, requeue);
     }
   }
+
+  /*
+  @Override
+  public void cancelJob(final String jobId, final Boolean requeue, final Boolean suspend) throws Exception
+  {
+  }
+  */
 
   /**
    * {@inheritDoc}

@@ -109,6 +109,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     {
       try
       {
+        if (NodeRunner.isShuttingDown()) break;
         init();
         if (!initialized)
         {
@@ -124,7 +125,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       catch(Exception e)
       {
         log.error(e.getMessage(), e);
-        reset();
+        reset(true);
       }
     }
     if (debugEnabled) log.debug("End of node main loop");
@@ -352,7 +353,15 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("stopping node");
     setStopped(true);
     executionManager.shutdown();
-    reset();
+    try
+    {
+      this.closeDataChannel();
+    }
+    catch (Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
+    reset(false);
   }
 
   /**
@@ -361,14 +370,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   public void shutdown(final boolean restart)
   {
+    NodeRunner.setShuttingDown(true);
     lifeCycleEventHandler.fireNodeEnding();
     NodeRunner.shutdown(this, restart);
   }
 
   /**
    * Reset this node for shutdown/restart/reconnection.
+   * @param stopJmx <code>true</code> if the JMX server is to be stopped, <code>false</code> otherwise.
    */
-  private void reset()
+  private void reset(final boolean stopJmx)
   {
     lifeCycleEventHandler.fireNodeEnding();
     lifeCycleEventHandler.removeAllListeners();
@@ -391,14 +402,17 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     {
       log.error(e.getMessage(), e);
     }
-    try
+    if (stopJmx)
     {
-      providerManager.unregisterProviderMBeans();
-      if (jmxServer != null) jmxServer.stop();
-    }
-    catch(Exception e)
-    {
-      log.error(e.getMessage(), e);
+      try
+      {
+        providerManager.unregisterProviderMBeans();
+        if (jmxServer != null) jmxServer.stop();
+      }
+      catch(Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
     }
   }
 
