@@ -54,7 +54,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   private static final Comparator<Integer> PRIORITY_COMPARATOR = new Comparator<Integer>() {
     @Override
     public int compare(final Integer o1, final Integer o2) {
-      return Integer.compare(o2, o1);
+      if (o1 == null) return (o2 == null) ? 0 : 1;
+      else if (o2 == null) return -1;
+      return o2.compareTo(o1);
+      //return Integer.compare(o2, o1);
     }
   };
   /**
