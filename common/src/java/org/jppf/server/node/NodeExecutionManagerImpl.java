@@ -246,31 +246,9 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     if (!future.isDone())
     {
       if (debugEnabled) log.debug("calling future.cancel(true) for task number = " + number);
-      future.cancel(true);
       NodeTaskWrapper taskWrapper = taskMap.remove(number);
-      if (taskWrapper != null)
-      {
-        Task task = taskWrapper.getTask();
-        synchronized(task)
-        {
-          if (task.getException() instanceof InterruptedException) task.setException(null);
-          if (callOnCancel)
-          {
-            ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-            try
-            {
-              // task.onCancel() should have the same context classloader as the task.run()
-              Thread.currentThread().setContextClassLoader(taskWrapper.getClassLoader());
-              task.onCancel();
-            }
-            finally
-            {
-              Thread.currentThread().setContextClassLoader(oldCl);
-            }
-          }
-        }
-      }
-      removeFuture(number);
+      if (taskWrapper != null) taskWrapper.cancel(callOnCancel);
+      future.cancel(true);
     }
   }
 
@@ -296,7 +274,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   private void processTaskExpirationDate(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
-    TimeoutTimerTask tt = new TimeoutTimerTask(this, number, taskWrapper);
+    TimeoutTimerTask tt = new TimeoutTimerTask(future, taskWrapper);
     timeoutHandler.scheduleAction(future, taskWrapper.getTask().getTimeoutSchedule(), tt);
   }
 
@@ -309,7 +287,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   private void processTaskTimeout(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
-    TimeoutTimerTask tt = new TimeoutTimerTask(this, number, taskWrapper);
+    TimeoutTimerTask tt = new TimeoutTimerTask(future, taskWrapper);
     timeoutHandler.scheduleAction(future, taskWrapper.getTask().getTimeoutSchedule(), tt);
   }
 

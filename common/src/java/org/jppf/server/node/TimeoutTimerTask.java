@@ -19,8 +19,6 @@ package org.jppf.server.node;
 
 import java.util.concurrent.Future;
 
-import org.jppf.node.protocol.Task;
-
 /**
  * Instances of this class are scheduled by a timer to execute one time, check
  * whether the corresponding JPPF task timeout has been reached, and abort the
@@ -30,33 +28,25 @@ import org.jppf.node.protocol.Task;
 public class TimeoutTimerTask implements Runnable
 {
   /**
-   * The number identifying the task.
-   */
-  private long number = 0L;
-  /**
    * The future on which to call the cancel() method.
    */
-  private Future<?> future = null;
+  private final Future<?> future;
   /**
    * The task to cancel.
    */
-  private NodeTaskWrapper taskWrapper = null;
-  /**
-   * The execution manager that started this task.
-   */
-  private NodeExecutionManagerImpl executionManager = null;
+  private final NodeTaskWrapper taskWrapper;
 
   /**
    * Initialize this timer task with the specified future.
-   * @param executionManager the execution manager that started this task.
-   * @param number the number identifying the task.
+   * @param future the future on which to call the cancel() method..
    * @param taskWrapper the task to cancel.
    */
-  public TimeoutTimerTask(final NodeExecutionManagerImpl executionManager, final long number, final NodeTaskWrapper taskWrapper)
+  public TimeoutTimerTask(final Future<?> future, final NodeTaskWrapper taskWrapper)
   {
-    this.executionManager = executionManager;
-    this.number = number;
-    this.future = executionManager.getFutureFromNumber(number);
+    if (future == null) throw new IllegalArgumentException("future is null");
+    if (taskWrapper == null) throw new IllegalArgumentException("taskWrapper is null");
+
+    this.future = future;
     this.taskWrapper = taskWrapper;
   }
 
@@ -69,30 +59,8 @@ public class TimeoutTimerTask implements Runnable
   {
     if (!future.isDone())
     {
-      try
-      {
+        taskWrapper.timeout();
         future.cancel(true);
-        Task task = taskWrapper.getTask();
-        synchronized(task)
-        {
-          if (task.getException() instanceof InterruptedException) task.setException(null);
-          ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-          try
-          {
-            // task.onTimeout() should have the same context classloader as the task.run()
-            Thread.currentThread().setContextClassLoader(taskWrapper.getClassLoader());
-            task.onTimeout();
-          }
-          finally
-          {
-            Thread.currentThread().setContextClassLoader(oldCl);
-          }
-        }
-        executionManager.removeFuture(number);
-      }
-      catch(Exception ignore)
-      {
-      }
     }
   }
 }

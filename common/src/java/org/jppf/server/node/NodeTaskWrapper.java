@@ -21,6 +21,8 @@ import org.jppf.*;
 import org.jppf.node.*;
 import org.jppf.node.protocol.Task;
 
+import java.util.concurrent.Future;
+
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
  * @author Domingos Creado
@@ -33,11 +35,23 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   /**
    * The execution manager.
    */
-  private final NodeExecutionManager executionManager;
+  private final NodeExecutionManagerImpl executionManager;
   /**
    * The class loader instance.
    */
   private final ClassLoader classLoader;
+  /**
+   * Indicator whether task was cancelled;
+   */
+  private boolean cancelled = false;
+  /**
+   * Indicator whether <code>onCancel</code> should be called when cancelled.
+   */
+  private boolean callOnCancel = false;
+  /**
+   * Indicator whether task timeout.
+   */
+  private boolean timeout = false;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
@@ -46,11 +60,39 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * @param number the internal number identifying the task for the thread pool.
    * @param classLoader the class loader used as context class loader.
    */
-  public NodeTaskWrapper(final NodeExecutionManager executionManager, final Task task, final long number, final ClassLoader classLoader)
+  public NodeTaskWrapper(final NodeExecutionManagerImpl executionManager, final Task task, final long number, final ClassLoader classLoader)
   {
     super(task, number);
     this.executionManager = executionManager;
     this.classLoader = classLoader;
+  }
+
+  /**
+   * Set cancel indicator and cancel task when it implements <code>Future</code> interface.
+   * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
+   */
+  public synchronized void cancel(final boolean callOnCancel) {
+    this.cancelled = true;
+    this.callOnCancel |= callOnCancel;
+
+    if (task instanceof Future)
+    {
+      Future future = (Future) task;
+      if (!future.isDone()) future.cancel(true);
+    }
+  }
+
+  /**
+   * Set timeout indicator and cancel task when it implements <code>Future</code> interface.
+   */
+  public synchronized void timeout() {
+    this.timeout |= !this.cancelled;
+
+    if (task instanceof Future)
+    {
+      Future future = (Future) task;
+      if (!future.isDone()) future.cancel(true);
+    }
   }
 
   /**
@@ -71,10 +113,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       long id = Thread.currentThread().getId();
       long startTime = System.nanoTime();
       info = threadManager.computeExecutionInfo(id);
-      synchronized(task)
-      {
-        task.run();
-      }
+      task.run();
       try
       {
         // convert cpu time from nanoseconds to milliseconds
@@ -96,7 +135,23 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     }
     finally
     {
+      boolean remove = false;
+      try
+      {
+        remove |= silentTimeout();
+        remove |= silentCancel();
+      }
+      catch (Throwable t)
+      {
+        if (t instanceof Exception) task.setException((Exception) t);
+        else task.setException(new JPPFException(t));
+      }
+      if (task.getException() instanceof InterruptedException) task.setException(null);
+
       if (usedClassLoader != null) usedClassLoader.dispose();
+
+      if (remove) executionManager.removeFuture(number);
+
       if (rn == null)
       {
         try
@@ -110,6 +165,24 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       }
       if (rn != null) executionManager.setReconnectionNotification(rn);
     }
+  }
+
+  /**
+   * Silently call onTimeout() methods;
+   * @return <code>true</code> when task timeout.
+   */
+  protected synchronized boolean silentTimeout() {
+    if (timeout) task.onTimeout();
+    return timeout;
+  }
+
+  /**
+   * Silently call onCancel() methods;
+   * @return <code>true</code> when task was cancelled.
+   */
+  protected synchronized boolean silentCancel() {
+    if (cancelled && callOnCancel) task.onCancel();
+    return cancelled;
   }
 
   /**
