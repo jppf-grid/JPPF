@@ -65,20 +65,18 @@ public class TestJPPFTask extends Setup1D1N1C
    * We test a job with 2 tasks, the 2nd task having a timeout duration set.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000)
   public void testTaskTimeout() throws Exception
   {
-    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDuration", true, false, 2, LifeCycleTask.class, TIME_LONG);
+    int nbTasks = 1;
+    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDuration", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     List<JPPFTask> tasks = job.getTasks();
     JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
-    tasks.get(1).setTimeoutSchedule(schedule);
+    tasks.get(nbTasks-1).setTimeoutSchedule(schedule);
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
-    assertEquals(results.size(), 2);
+    assertEquals(results.size(), nbTasks);
     LifeCycleTask task = (LifeCycleTask) results.get(0);
-    assertNotNull(task.getResult());
-    assertFalse(task.isTimedout());
-    task = (LifeCycleTask) results.get(1);
     assertNull(task.getResult());
     assertTrue(task.isTimedout());
   }
@@ -87,22 +85,20 @@ public class TestJPPFTask extends Setup1D1N1C
    * Simply test that a job does expires at a specified date.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=10000)
   public void testTaskExpirationDate() throws Exception
   {
-    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDate", true, false, 2, LifeCycleTask.class, TIME_LONG);
+    int nbTasks = 1;
+    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDate", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-    Date date = new Date(System.currentTimeMillis() + TIME_LONG + TIME_SHORT + 10L);
+    Date date = new Date(System.currentTimeMillis() + TIME_SHORT + 10L);
     JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
     List<JPPFTask> tasks = job.getTasks();
-    tasks.get(1).setTimeoutSchedule(schedule);
+    tasks.get(0).setTimeoutSchedule(schedule);
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
-    assertEquals(results.size(), 2);
+    assertEquals(results.size(), nbTasks);
     LifeCycleTask task = (LifeCycleTask) results.get(0);
-    assertNotNull(task.getResult());
-    assertFalse(task.isTimedout());
-    task = (LifeCycleTask) results.get(1);
     assertNull(task.getResult());
     assertTrue(task.isTimedout());
   }

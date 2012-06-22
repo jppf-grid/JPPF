@@ -38,7 +38,7 @@ public class TimeoutTimerTask implements Runnable
 
   /**
    * Initialize this timer task with the specified future.
-   * @param future the future on which to call the cancel() method..
+   * @param future the future on which to call the cancel() method.
    * @param taskWrapper the task to cancel.
    */
   public TimeoutTimerTask(final Future<?> future, final NodeTaskWrapper taskWrapper)

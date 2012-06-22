@@ -17,11 +17,12 @@
  */
 package org.jppf.server.node;
 
+import java.util.concurrent.Future;
+
 import org.jppf.*;
 import org.jppf.node.*;
 import org.jppf.node.protocol.Task;
-
-import java.util.concurrent.Future;
+import org.slf4j.*;
 
 /**
  * Wrapper around a JPPF task used to catch exceptions caused by the task execution.
@@ -32,6 +33,14 @@ import java.util.concurrent.Future;
  */
 class NodeTaskWrapper extends AbstractNodeTaskWrapper
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodeTaskWrapper.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * The execution manager.
    */
@@ -87,6 +96,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    */
   public synchronized void timeout() {
     this.timeout |= !this.cancelled;
+    if (!this.cancelled) executionManager.removeFuture(number);
 
     if (task instanceof Future)
     {
@@ -102,6 +112,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   @Override
   public void run()
   {
+    if (traceEnabled) log.trace(toString());
     JPPFNodeReconnectionNotification rn = null;
     ThreadManager.UsedClassLoader usedClassLoader = null;
     ThreadManager threadManager = executionManager.getThreadManager();
@@ -113,7 +124,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
       long id = Thread.currentThread().getId();
       long startTime = System.nanoTime();
       info = threadManager.computeExecutionInfo(id);
-      task.run();
+      if (!isCancelledOrTimedout()) task.run();
       try
       {
         // convert cpu time from nanoseconds to milliseconds
@@ -150,7 +161,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 
       if (usedClassLoader != null) usedClassLoader.dispose();
 
-      if (remove) executionManager.removeFuture(number);
+      //if (remove) executionManager.removeFuture(number);
+      executionManager.removeFuture(number);
 
       if (rn == null)
       {
@@ -193,4 +205,29 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   {
     return classLoader;
   }
+
+  /**
+   * Determine whether this task was cancelled or timed out.
+   * @return <code>true</code> if the task was cancelled or timed out, <code>false</code> otherwise.
+   */
+  public synchronized boolean isCancelledOrTimedout()
+  {
+    return cancelled || timeout;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder("NodeTaskWrapper[");
+    sb.append("task number=").append(number);
+    sb.append(", cancelled=").append(cancelled);
+    sb.append(", callOnCancel=").append(callOnCancel);
+    sb.append(", timeout=").append(timeout);
+    sb.append('[');
+    return sb.toString();
+  }
+
 }

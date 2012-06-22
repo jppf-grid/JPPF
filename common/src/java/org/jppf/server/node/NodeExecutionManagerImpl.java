@@ -249,6 +249,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
       NodeTaskWrapper taskWrapper = taskMap.remove(number);
       if (taskWrapper != null) taskWrapper.cancel(callOnCancel);
       future.cancel(true);
+      removeFuture(number);
     }
   }
 
@@ -380,7 +381,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     {
       tmp = listenersArray;
     }
-    removeFuture(taskNumber);
+    //removeFuture(taskNumber);
     for (TaskExecutionListener listener : tmp) listener.taskExecuted(event);
   }
 
