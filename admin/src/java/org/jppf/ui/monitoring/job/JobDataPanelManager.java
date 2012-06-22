@@ -158,7 +158,7 @@ class JobDataPanelManager
       log.debug("adding job: " + jobInfo.getJobName() + " to driver " + driverName + " at index " + index);
     }
     panel.getModel().insertNodeInto(jobNode, driverNode, index);
-    panel.getTreeTable().expand(driverNode);
+    if (panel.getTreeTable() != null) panel.getTreeTable().expand(driverNode);
   }
 
   /**
@@ -174,7 +174,7 @@ class JobDataPanelManager
     if (jobNode == null) return;
     if (debugEnabled) log.debug("removing job: " + jobName + " from driver " + driverName);
     panel.getModel().removeNodeFromParent(jobNode);
-    panel.getTreeTable().repaint();
+    if (panel.getTreeTable() != null) panel.getTreeTable().repaint();
   }
 
   /**
@@ -218,7 +218,7 @@ class JobDataPanelManager
       log.debug("sub-job: " + jobInfo.getJobName() + " dispatched to node " + nodeInfo.getHost() + ':' + nodeInfo.getPort() + "(index " + index + ')');
     }
     panel.getModel().insertNodeInto(subJobNode, jobNode, index);
-    panel.getTreeTable().expand(jobNode);
+    if (panel.getTreeTable() != null) panel.getTreeTable().expand(jobNode);
   }
 
   /**
@@ -237,7 +237,7 @@ class JobDataPanelManager
     if (subJobNode == null) return;
     if (debugEnabled) log.debug("removing sub-job: " + jobName + " from node " + nodeName);
     panel.getModel().removeNodeFromParent(subJobNode);
-    panel.getTreeTable().repaint();
+    if (panel.getTreeTable() != null) panel.getTreeTable().repaint();
   }
 
   /**
