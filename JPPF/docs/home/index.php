@@ -142,7 +142,7 @@ else
 				<?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
 				<hr/>
 				<?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
 				<?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
 				<?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
 				<?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -159,10 +159,11 @@ else
 	<!--<div style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">-->
 	<div style="vertical-align: middle; height: 150px; width: 750px;">
 		<div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px;">
-			<div><img src="/images/anim/Animation2.gif" border="0" alt="JPPF"/></div>
-			<div><img src="/images/anim/Animation4.gif" border="0" alt="JPPF"/></div>
-			<div><img src="/images/anim/Animation6.gif" border="0" alt="JPPF"/></div>
-			<div><img src="/images/anim/Animation8.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation_02.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation_03.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation_04.gif" border="0" alt="JPPF"/></div>
+			<div><img src="/images/anim/Animation_05.gif" border="0" alt="JPPF"/></div>
 		</div>
 	</div>
 	<div id="slidetabs" align="center">
@@ -170,10 +171,11 @@ else
 		<a href="#"></a>
 		<a href="#"></a>
 		<a href="#"></a>
+		<a href="#"></a>
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<br/><h2 align="center"><i>New</i>: JPPF 3.0.1 is released, check it out!</h2>
+		<br/><h2 align="center"><i>New</i>: JPPF 3.1 brings security to the Grid and more, check it out!</h2>
 		<p style="text-align: center; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
 	</div>
 	<div class="column1">
@@ -219,8 +221,8 @@ else
 			<li>a JPPF grid can be up and running in minutes</li>
 			<li>dynamically scalable on-demand</li>
 			<li>ready for the Cloud, a natural medium for JPPF</li>
+			<li>fully secure SSL / TLS communications</li>
 			<li>connectors with leading J2EE application servers</li>
-			<li>connector with GigaSpaces eXtreme Application Platform</li>
 			<li>easy programming model</li>
 			<li>fine-grained monitoring and administration</li>
 			<li>fault-tolerance and self-repair capabilities</li>

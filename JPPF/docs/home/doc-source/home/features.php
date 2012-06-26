@@ -1,7 +1,7 @@
 <?php $currentPage="Features" ?>
 $template{name="about-page-header" title="Features"}$
 
-<h1>JPPF 3.0 features</h1>
+<h1>JPPF 3.1 features</h1>
 
 <h3>Ease of use</h3>
 <ul>
@@ -12,6 +12,23 @@ $template{name="about-page-header" title="Features"}$
 	<li>automatic server discovery, combinable with manual connection configuration</li>
 	<li>convenient reusable application template to quickly and easily start developing JPPF applications</li>
 	<li>straightforward Executor Service interface to the JPPF grid, with high throughput enhancements</li>
+</ul>
+
+<h3>Security</h3>
+<ul>
+	<li>secure network communications via SSL / TLS</li>
+	<li>data encryption</li>
+	<li>data integrity</li>
+	<li>certificate-based authentication, including 2 ways (server and client) authentication</li>
+	<li>plain and secure communications can be used separately or together</li>
+</ul>
+
+<h3>Cloud ready</h3>
+<ul>
+	<li>JPPF is ideally suited for cloud deployment</li>
+	<li>native dynamic topology makes cloud on-demand scaling transparent</li>
+	<li>multiple extensible options for server discovery in the cloud</li>
+	<li>documented deployment on Amazon EC2</li>
 </ul>
 
 <h3>Self-repair and recovery</h3>
@@ -26,7 +43,7 @@ $template{name="about-page-header" title="Features"}$
 <ul>
 	<li>job execution policies enable rule-based node filtering</li>
 	<li>maximum number of nodes a job can run on (grid partitioning)</li>
-	<li>job prioritization</li>
+	<li>dynamic job prioritization</li>
 	<li>job scheduled start date</li>
 	<li>job scheduled expiration date</li>
 	<li>broadcast jobs</li>
@@ -93,8 +110,8 @@ $template{name="about-page-header" title="Features"}$
 <h3>Third-party connectors</h3>
 <ul>
 	<li>J2EE connector, JCA 1.5 compliant, deployed as a standard resource adapter</li>
-	<li>GigaSpaces XAP connector</li>
 	<li>Apache Tomcat connector</li>
+	<li>GigaSpaces XAP connector</li>
 </ul>
 
 <h3>Ease of integration</h3>

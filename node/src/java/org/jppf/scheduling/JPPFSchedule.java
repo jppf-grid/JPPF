@@ -63,7 +63,7 @@ public class JPPFSchedule implements Serializable
   }
 
   /**
-   * Initialize this schedule configuration with the specified duration.
+   * Initialize this schedule configuration with the specified fixed date annd date format.
    * @param date the schedule date provided as a string.
    * @param format the format in which the date is expressed (including locale and time zone information),
    * as specified in the description of {@link SimpleDateFormat}.
