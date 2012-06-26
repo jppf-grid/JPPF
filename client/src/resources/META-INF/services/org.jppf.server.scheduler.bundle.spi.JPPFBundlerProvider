@@ -1,0 +1,5 @@
+org.jppf.server.scheduler.bundle.providers.RLBundlerProvider
+org.jppf.server.scheduler.bundle.providers.ProportionalBundlerProvider
+org.jppf.server.scheduler.bundle.providers.AutoTunedBundlerProvider
+org.jppf.server.scheduler.bundle.providers.FixedSizeBundlerProvider
+org.jppf.server.scheduler.bundle.providers.NodeThreadsLoadBalancerProvider
