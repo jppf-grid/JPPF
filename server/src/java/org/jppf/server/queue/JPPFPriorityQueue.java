@@ -137,6 +137,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         map.put(bundle.getUuidPath().asString(), bundleWrapper);
         fireQueueEvent(new QueueEvent(this, bundleWrapper, requeued));
       }
+      updateLatestMaxSize();
     }
     finally
     {
@@ -201,6 +202,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundleList.remove(bundleWrapper);
         bundleList.add(bundleWrapper);
       }
+      updateLatestMaxSize();
       jobManager.jobUpdated(bundleWrapper);
       //result.getBundle().setExecutionStartTime(System.currentTimeMillis());
     }
@@ -244,13 +246,21 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
-      latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
+      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
     }
     finally
     {
       lock.unlock();
     }
+  }
+
+  /**
+   * Update the value of the max bundle size.
+   */
+  private void updateLatestMaxSize()
+  {
+    latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
   }
 
   /**

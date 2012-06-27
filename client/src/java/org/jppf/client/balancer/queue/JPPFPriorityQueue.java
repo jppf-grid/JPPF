@@ -149,6 +149,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           handleExpirationJobSchedule(bundleWrapper);
         }
         jobMap.put(jobUuid, bundleWrapper);
+        updateLatestMaxSize();
         fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
       }
       finally
@@ -242,6 +243,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundleList.remove(bundleWrapper);
         bundleList.add(bundleWrapper);
       }
+      updateLatestMaxSize();
     }
     finally
     {
@@ -282,13 +284,21 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
-      latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
+      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
     }
     finally
     {
       lock.unlock();
     }
+  }
+
+  /**
+   * Update the value of the max bundle size.
+   */
+  private void updateLatestMaxSize()
+  {
+    latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
   }
 
   /**
