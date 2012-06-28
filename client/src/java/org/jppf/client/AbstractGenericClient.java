@@ -243,7 +243,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     log.info("connection [" + c.getName() + "] created");
     //addClientConnection(c);
-    c.addClientConnectionStatusListener(getSubmissionManager().getClientConnectionStatusListener());
     c.addClientConnectionStatusListener(this);
     c.setStatus(JPPFClientConnectionStatus.NEW);
     int n = getAllConnectionsCount() + 2;
