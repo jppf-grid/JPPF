@@ -81,7 +81,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public ChannelWrapperLocal()
   {
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper-"));
-    executionManager = new NodeExecutionManagerImpl(this);
+    executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads");
     lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
 
     JPPFSystemInformation info = new JPPFSystemInformation(getConnectionUuid());

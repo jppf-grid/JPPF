@@ -20,10 +20,12 @@ package test.org.jppf.client;
 
 import static org.junit.Assert.*;
 
+import java.lang.management.*;
 import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -111,5 +113,57 @@ public class TestJPPFClient extends Setup1D1N
     }
     assertTrue(count > 0);
     client.close();
+  }
+
+  /**
+   * Test that the number of threads for local execution is the configured one.
+   * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539111&group_id=135654&atid=733518">3539111 - Local execution does not use configured number of threads</a>.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=5000)
+  public void testLocalExecutionNbThreads() throws Exception
+  {
+    int nbThreads = 2;
+    TypedProperties config = JPPFConfiguration.getProperties();
+    config.setProperty("jppf.local.execution.enabled", "true");
+    config.setProperty("jppf.local.execution.threads", "" + nbThreads);
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      while (!client.hasAvailableConnection()) Thread.sleep(10L);
+      
+      // submit a job to ensure all local execution threads are created
+      int nbTasks = 100;
+      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      int i = 0;
+      for (JPPFTask task: job.getTasks()) task.setId("" + i++);
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
+      for (JPPFTask t: results)
+      {
+        Exception e = t.getException();
+        assertNull(e);
+        assertEquals(msg, t.getResult());
+      }
+
+      ThreadMXBean mxbean = ManagementFactory.getThreadMXBean();
+      long[] ids = mxbean.getAllThreadIds();
+      ThreadInfo[] allInfo = mxbean.getThreadInfo(ids);
+      int count = 0;
+      for (ThreadInfo ti: allInfo)
+      {
+        String name = ti.getThreadName();
+        if (name == null) continue;
+        if (name.startsWith("node processing")) count++;
+      }
+      assertEquals(nbThreads, count);
+    }
+    finally
+    {
+      client.close();
+      JPPFConfiguration.reset();
+    }
   }
 }

@@ -109,17 +109,27 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    */
   public NodeExecutionManagerImpl(final Node node)
   {
+    this(node, "processing.threads");
+  }
+
+  /**
+   * Initialize this execution manager with the specified node.
+   * @param node the node that uses this execution manager.
+   * @param nbThreadsProperty the name of the property which configures the number of threads.
+   */
+  public NodeExecutionManagerImpl(final Node node, final String nbThreadsProperty)
+  {
     super();
     if(node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
     TypedProperties props = JPPFConfiguration.getProperties();
-    int poolSize = props.getInt("processing.threads", Runtime.getRuntime().availableProcessors());
-    if (poolSize < 0)
+    int poolSize = props.getInt(nbThreadsProperty, Runtime.getRuntime().availableProcessors());
+    if (poolSize <= 0)
     {
       poolSize = Runtime.getRuntime().availableProcessors();
-      props.setProperty("processing.threads", Integer.toString(poolSize));
+      props.setProperty(nbThreadsProperty, Integer.toString(poolSize));
     }
-    log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
+    log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadManager = createThreadManager(poolSize);
   }
 
