@@ -284,6 +284,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
+      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
     }
     finally
@@ -405,7 +406,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 
   /**
    * Process the specified broadcast job.
-   * <b/>This consists in creating one job per node, each containing the same tasks,
+   * This consists in creating one job per node, each containing the same tasks,
    * and with an execution policy that enforces its execution ont he designated node only.
    * @param bundleWrapper the broadcast job to process.
    */
@@ -419,7 +420,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       return;
     }
     JobSLA sla = bundle.getSLA();
-//    ExecutionPolicy policy = sla.getExecutionPolicy();
     List<ClientJob> jobList = new ArrayList<ClientJob>(connections.size());
 
     Set<String> uuidSet = new HashSet<String>();
@@ -428,8 +428,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       JPPFClientConnectionStatus status = connection.getStatus();
       if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
       {
-//        if ((policy != null) && !policy.accepts(connection.getSystemInfo())) continue;
-
         String uuid = connection.getUuid();
         if(uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
         {
@@ -438,6 +436,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           JPPFManagementInfo info = connection.getManagementInfo();
           ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
           newBundle.setSLA(((JPPFJobSLA) sla).copy());
+          newBundle.setMetadata(bundle.getMetadata());
           newBundle.setName(bundle.getName() + " [driver: " + info.toString() + ']');
           newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
           if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
@@ -445,32 +444,22 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         }
       }
     }
-    if (jobList.isEmpty())
-    {
-      bundleWrapper.taskCompleted(null, null);
-    }
-    else
-    {
+    if (jobList.isEmpty()) bundleWrapper.taskCompleted(null, null);
+    else {
       final String jobUuid = bundleWrapper.getUuid();
       lock.lock();
-      try
-      {
+      try {
         ClientJob other = jobMap.get(jobUuid);
         if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
 
-        bundleWrapper.addOnDone(new Runnable()
-        {
+        bundleWrapper.addOnDone(new Runnable() {
           @Override
-          public void run()
-          {
+          public void run() {
             lock.lock();
-            try
-            {
+            try {
               jobMap.remove(jobUuid);
               removeBundle(bundleWrapper);
-            }
-            finally
-            {
+            } finally {
               lock.unlock();
             }
           }
@@ -481,11 +470,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 
         jobMap.put(jobUuid, bundleWrapper);
         fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
-        for (ClientJob job : jobList) {
-          addBundle(job);
-        }
-      } finally
-      {
+        for (ClientJob job : jobList) addBundle(job);
+      } finally {
         lock.unlock();
       }
     }

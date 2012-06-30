@@ -18,11 +18,13 @@
 
 package org.jppf.client.balancer.utils;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.JobSLA;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.balancer.*;
+import org.jppf.node.protocol.*;
+import org.slf4j.*;
 
 /**
  * Abstract class that support job state management.
@@ -30,6 +32,18 @@ import java.util.List;
  */
 public abstract class AbstractClientJob
 {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Instance count.
+   */
+  private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
   /**
    * Job status is new (just submitted).
    */
@@ -79,6 +93,10 @@ public abstract class AbstractClientJob
    */
   private JobSLA sla = null;
   /**
+   * The job metadata.
+   */
+  private JobMetadata metadata = null;
+  /**
    * Job expired indicator, determines whether the job is should be cancelled.
    */
   private boolean jobExpired = false;
@@ -86,19 +104,32 @@ public abstract class AbstractClientJob
    * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
    */
   private boolean pending = false;
+  /**
+   * The local channel eventually used for this job.
+   */
+  private ChannelWrapper localChannel = null;
+  /**
+   * The remote channels eventually used for this job.
+   * In the next version, this should be declared as a set of channels,
+   * so job dispatching through multiple remote channels can be enabled.
+   */
+  private ChannelWrapper remoteChannel = null;
 
   /**
    * Initialized abstract client job with task bundle and list of tasks to execute.
    * @param job   underlying task bundle.
    */
-  protected AbstractClientJob(final JPPFJob job) {
+  protected AbstractClientJob(final JPPFJob job)
+  {
     if (job == null) throw new IllegalArgumentException("job is null");
+    if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
 
     this.job = job;
 
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
+    this.metadata = this.job.getMetadata();
   }
 
   /**
@@ -154,6 +185,24 @@ public abstract class AbstractClientJob
   public JobSLA getSLA()
   {
     return sla;
+  }
+
+  /**
+   * Get the job metadata.
+   * @return an instance of {@link JobMetadata}.
+   */
+  public JobMetadata getMetadata()
+  {
+    return metadata;
+  }
+
+  /**
+   * Set the job metadata.
+   * @param metadata an instance of {@link JobMetadata}.
+   */
+  public void setMetadata(final JobMetadata metadata)
+  {
+    this.metadata = metadata;
   }
 
   /**
@@ -323,5 +372,51 @@ public abstract class AbstractClientJob
   public void setQueueEntryTime(final long queueEntryTime)
   {
     this.queueEntryTime = queueEntryTime;
+  }
+
+  /**
+   * Add a channel to this job.
+   * See {@link #remoteChannel}.
+   * @param channel the channel to add.
+   */
+  public void addChannel(final ChannelWrapper channel)
+  {
+    if (channel.isLocal()) localChannel = channel;
+    else remoteChannel = channel;
+  }
+
+  /**
+   * Add a channel to this job.
+   * See {@link #remoteChannel}.
+   * @param channel the channel to add.
+   */
+  public void removeChannel(final ChannelWrapper channel)
+  {
+    if (channel.isLocal()) localChannel = null;
+    else remoteChannel = null;
+  }
+
+  /**
+   * Determine whther this job can be sent to the specified channel.
+   * Currently this method only accepts a single remote channel, and it has to always be the same for the same job.
+   * See {@link #remoteChannel}.
+   * @param channel the channel to check for acceptance.
+   * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
+   */
+  public boolean acceptsChannel(final ChannelWrapper channel)
+  {
+    if (channel.isLocal()) return true;
+    // we accept a single channel, always the same
+    if ((remoteChannel == null) || (remoteChannel == channel)) return true;
+    return false;
+  }
+
+  /**
+   * Clear the channels used to duispatch this job.
+   * See {@link #remoteChannel}.
+   */
+  public void clearChannels()
+  {
+    localChannel = remoteChannel = null;
   }
 }

@@ -121,7 +121,6 @@ public class ClientJob extends AbstractClientJob
   {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
-
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
 
@@ -136,11 +135,8 @@ public class ClientJob extends AbstractClientJob
       this.resultsListener = null;
     }
 
-    if (this.job.getResultListener() instanceof SubmissionStatusHandler)
-      this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
-    else
-      this.submissionStatus = SubmissionStatus.SUBMITTED;
-
+    if (this.job.getResultListener() instanceof SubmissionStatusHandler) this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
+    else this.submissionStatus = SubmissionStatus.SUBMITTED;
     this.tasks = new ArrayList<JPPFTask>(tasks);
   }
 
@@ -154,12 +150,7 @@ public class ClientJob extends AbstractClientJob
       if (this.executing == executing) return;
       this.executing = executing;
     }
-    if (getBroadcastUUID() == null) {
-      if (executing)
-        job.fireJobEvent(JobEvent.Type.JOB_START);
-      else
-        job.fireJobEvent(JobEvent.Type.JOB_END);
-    }
+    if (getBroadcastUUID() == null) job.fireJobEvent(executing ? JobEvent.Type.JOB_START: JobEvent.Type.JOB_END);
   }
 
   /**
@@ -321,9 +312,7 @@ public class ClientJob extends AbstractClientJob
 
     synchronized (tasks)
     {
-      for (JPPFTask task : results) {
-        taskStateMap.put(task.getPosition(), TaskState.RESULT);
-      }
+      for (JPPFTask task : results) taskStateMap.put(task.getPosition(), TaskState.RESULT);
     }
     TaskResultListener listener = resultsListener;
     if (listener != null)
@@ -369,12 +358,12 @@ public class ClientJob extends AbstractClientJob
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
   {
     boolean empty;
-    synchronized (bundleMap)
-    {
+    synchronized (bundleMap) {
       Future future = bundleMap.remove(bundle);
       if (bundle != null && future == null) throw new IllegalStateException("future already removed");
       empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
+    //if (empty) clearChannels();
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {
       List<JPPFTask> list = new ArrayList<JPPFTask>();
@@ -421,7 +410,6 @@ public class ClientJob extends AbstractClientJob
           for (JPPFTask task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
           }
-
           requeue = merge(list, false);
         }
       }
@@ -430,13 +418,11 @@ public class ClientJob extends AbstractClientJob
     if (hasPending()) {
       if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
       if (empty) setExecuting(false);
-
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
       boolean callDone = updateStatus(EXECUTING, DONE);
       if (empty) setExecuting(false);
       setSubmissionStatus(SubmissionStatus.COMPLETE);
-
       try {
         if (callDone) done();
       } finally {
@@ -459,8 +445,7 @@ public class ClientJob extends AbstractClientJob
           if (state == TaskState.EXCEPTION) return true;
         }
         return false;
-      } else
-        return true;
+      } else return true;
     }
   }
 
@@ -503,10 +488,7 @@ public class ClientJob extends AbstractClientJob
         futureList = new ArrayList<Future>(bundleMap.size());
         futureList.addAll(bundleMap.values());
       }
-      for (ClientJob broadcastJob : list)
-      {
-        broadcastJob.cancel(mayInterruptIfRunning);
-      }
+      for (ClientJob broadcastJob : list) broadcastJob.cancel(mayInterruptIfRunning);
       for (Future future : futureList)
       {
         try
@@ -528,8 +510,7 @@ public class ClientJob extends AbstractClientJob
       if (empty) taskCompleted(null, null);
       return true;
     }
-    else
-      return false;
+    else return false;
   }
 
   /**
@@ -539,7 +520,6 @@ public class ClientJob extends AbstractClientJob
   protected void broadcastDispatched(final ClientJob broadcastJob)
   {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-
     boolean empty;
     synchronized (bundleMap)
     {
@@ -561,7 +541,6 @@ public class ClientJob extends AbstractClientJob
   protected void broadcastCompleted(final ClientJob broadcastJob)
   {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-
     //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     boolean empty;
     synchronized (bundleMap) {
