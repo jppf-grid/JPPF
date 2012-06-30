@@ -18,7 +18,7 @@
 
 package org.jppf.client.balancer;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.balancer.utils.JPPFFuture;
@@ -50,6 +50,13 @@ public abstract class ChannelWrapper<T>
    * Executor for submitting bundles for processing.
    */
   protected ExecutorService executor;
+
+  /**
+   * Default constructor.
+   */
+  protected ChannelWrapper()
+  {
+  }
 
   /**
    * Get the unique identifier of the client.

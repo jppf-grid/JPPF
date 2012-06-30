@@ -47,9 +47,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether TRACE logging level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Random number generator used to randomize the choice of idle channel.
    */
-  private final Random random = new Random(System.currentTimeMillis());
+  private final Random random = new Random(System.nanoTime());
   /**
    * Reference to the job queue.
    */
@@ -131,8 +135,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   public void addIdleChannel(final ChannelWrapper<?> channel)
   {
-//    System.out.println("TaskQueueChecker.addIdleChannel: " + channel + "\t queue: " + queue.getMaxBundleSize());
-    if (debugEnabled) log.trace("Adding idle channel " + channel);
+    if (traceEnabled) log.trace("Adding idle channel " + channel);
     int count;
     synchronized (idleChannels)
     {
@@ -162,8 +165,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   public ChannelWrapper<?> removeIdleChannel(final ChannelWrapper<?> channel)
   {
-//    System.out.println("TaskQueueChecker.removeIdleChannel: " + channel + "\t queue: " + queue.getMaxBundleSize());
-    if (debugEnabled) log.trace("Removing idle channel " + channel);
+    if (traceEnabled) log.trace("Removing idle channel " + channel);
     int count;
     synchronized (idleChannels)
     {
@@ -291,6 +293,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         setBundler(new FixedSizeBundler(profile));
       }
       ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
+      selectedBundle.addChannel(channel);
       Future<?> future = channel.submit(bundleWrapper);
       bundleWrapper.jobDispatched(channel, future);
     }
@@ -317,6 +320,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         iterator.remove();
         continue;
       }
+      if (!bundle.acceptsChannel(ch)) continue;
       if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
       if (policy != null)
       {
