@@ -102,6 +102,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Determines whether the JMX connection should be secure or not.
    */
   protected boolean ssl = false;
+  /**
+   * 
+   */
+  private final Object connectionLock = new Object();
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -216,9 +220,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   void performConnection() throws Exception
   {
     setConnectedStatus(false);
-    synchronized(this)
+    synchronized(connectionLock)
     {
       jmxc = JMXConnectorFactory.connect(url, env);
+    }
+    synchronized(this)
+    {
       mbeanConnection.set(jmxc.getMBeanServerConnection());
       try
       {
