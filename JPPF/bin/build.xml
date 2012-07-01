@@ -22,6 +22,7 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
+  <!-- JPPF modules -->
 	<property name="common"                value="${basedir}/../common"/>
 	<property name="admin"                 value="${basedir}/../admin"/>
 	<property name="client"                value="${basedir}/../client"/>
@@ -33,6 +34,9 @@
 	<property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="jdk7-addons"           value="${basedir}/../jdk7-addons"/>
+
+  <!-- Unit tests locations -->
+  <property name="client.test"           value="${client}/test"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -143,7 +147,7 @@
 
   <target name="build" depends="init, compile, jar, jar.src"/>
 	<target name="rebuild" depends="clean.all, build"/>
-	<target name="test" depends="clean, init, compile, jar, package, runtime, javadoc"/>
+	<target name="test" depends="init, tests"/>
 	<target name="deploy"
 		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc"/>
 	<target name="deploy.noinstaller"
@@ -164,7 +168,8 @@
 	<import file="build-connectors.xml"/>
 	<import file="build-installer.xml"/>
 	<import file="build-findbugs.xml"/>
-	<import file="build-docs.xml"/>
+  <import file="build-docs.xml"/>
+  <import file="build-tests.xml"/>
 	
 	<!-- ========================================================================= -->
 	<!--                 Package the application for deployment                    -->
