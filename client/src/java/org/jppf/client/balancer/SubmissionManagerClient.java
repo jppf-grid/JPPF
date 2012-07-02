@@ -155,7 +155,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
 
     allConnections.add(wrapper);
-    wrapper.addClientConnectionStatusListener(statusListener);
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
   }
 
@@ -169,7 +168,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 
     try
     {
-      wrapper.removeClientConnectionStatusListener(statusListener);
       updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
     }
     finally
@@ -287,11 +285,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (wrapper == null || oldStatus == newStatus) return;
 
-    boolean oldAvailable = oldStatus == JPPFClientConnectionStatus.ACTIVE;
-    boolean newAvailable = newStatus == JPPFClientConnectionStatus.ACTIVE;
-
-    if (newAvailable && !oldAvailable) taskQueueChecker.addIdleChannel(wrapper);
-    if (oldAvailable && !newAvailable) taskQueueChecker.removeIdleChannel(wrapper);
+    if (newStatus == JPPFClientConnectionStatus.ACTIVE)
+      taskQueueChecker.addIdleChannel(wrapper);
+    else
+      taskQueueChecker.removeIdleChannel(wrapper);
   }
 
   /**
@@ -384,6 +381,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     if (localExecutionEnabled)
     {
       wrapperLocal = new ChannelWrapperLocal();
+      wrapperLocal.addClientConnectionStatusListener(statusListener);
       addConnection(wrapperLocal);
     }
     else
@@ -397,6 +395,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         finally
         {
           removeConnection(wrapperLocal);
+          wrapperLocal.removeClientConnectionStatusListener(statusListener);
           wrapperLocal = null;
         }
       }

@@ -44,6 +44,10 @@ public class ProportionalBundler extends AbstractProportionalBundler implements 
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Holds information about the execution context.
    */
   private JPPFContext jppfContext = null;
@@ -76,7 +80,11 @@ public class ProportionalBundler extends AbstractProportionalBundler implements 
   @Override
   protected int maxSize()
   {
-    return (jppfContext == null ||  jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
+    if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": jppfCOntext=" + jppfContext);
+    if (jppfContext == null) return 300;
+    int n = jppfContext.getMaxBundleSize();
+    if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": maxBundleSize=" + n);
+    return n <= 0 ? 300 : n;
   }
 
   /**
