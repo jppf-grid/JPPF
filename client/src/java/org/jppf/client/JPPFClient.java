@@ -164,15 +164,6 @@ public class JPPFClient extends AbstractGenericClient
    * {@inheritDoc}
    */
   @Override
-  protected void initPools()
-  {
-    super.initPools();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   protected SubmissionManager createSubmissionManager()
   {
     SubmissionManager submissionManager = null;

@@ -129,7 +129,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     if (debugEnabled) log.debug("initializing connections");
     //loadBalancer = new LoadBalancer();
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
-    executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("JPPF Client"));
+    executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     if (config.getBoolean("jppf.remote.execution.enabled", true))
     {
       initRemotePools(config);
@@ -245,12 +245,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     //addClientConnection(c);
     c.addClientConnectionStatusListener(this);
     c.setStatus(JPPFClientConnectionStatus.NEW);
-    int n = getAllConnectionsCount() + 2;
-    if (executor.getCorePoolSize() < n)
-    {
-      executor.setMaximumPoolSize(n);
-      executor.setCorePoolSize(n);
-    }
     executor.submit(new ConnectionInitializer(c));
     fireNewConnection(c);
     if (debugEnabled) log.debug("end of connection [" + c.getName() + "] created");

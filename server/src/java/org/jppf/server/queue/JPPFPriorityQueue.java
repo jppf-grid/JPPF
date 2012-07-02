@@ -246,7 +246,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
-      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
     }
     finally
