@@ -57,7 +57,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       if (o1 == null) return (o2 == null) ? 0 : 1;
       else if (o2 == null) return -1;
       return o2.compareTo(o1);
-      //return Integer.compare(o2, o1);
     }
   };
   /**
@@ -539,6 +538,34 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     finally
     {
       lock.unlock();
+    }
+  }
+
+  /**
+   * Cancels queued broadcast jobs for connection.
+   * @param connectionUUID The connection UUID that failed or was disconnected.
+   */
+  public void cancelBroadcastJobs(final String connectionUUID)
+  {
+    if(connectionUUID == null || connectionUUID.isEmpty()) return;
+
+    Set<String> jobIDs = Collections.emptySet();
+    lock.lock();
+    try
+    {
+      if (jobMap.isEmpty()) return;
+
+      jobIDs = new HashSet<String>();
+      for (Map.Entry<String, ClientJob> entry : jobMap.entrySet())
+      {
+        if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
+      }
+    } finally
+    {
+      lock.unlock();
+    }
+    for (String jobID : jobIDs) {
+      cancelJob(jobID);
     }
   }
 }

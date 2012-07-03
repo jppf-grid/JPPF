@@ -288,7 +288,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     if (newStatus == JPPFClientConnectionStatus.ACTIVE)
       taskQueueChecker.addIdleChannel(wrapper);
     else
+    {
       taskQueueChecker.removeIdleChannel(wrapper);
+      if(newStatus == JPPFClientConnectionStatus.FAILED || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
+    }
   }
 
   /**
