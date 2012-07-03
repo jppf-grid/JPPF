@@ -146,13 +146,13 @@
 	<target name="rebuild" depends="clean.all, build"/>
 	<target name="test" depends="init, tests"/>
 	<target name="deploy"
-		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc, javadoc"/>
 	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, javadoc, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide,            doc"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide,            doc, javadoc"/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc"/>
 	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild,          package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide,            doc"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide,            doc"/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -173,7 +173,6 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<!--<property name="release.file" value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>-->
 		<property name="zip.prefix" value="${app.ver}-full-src"/>
 		<property name="release.file" value="${build}/${zip.prefix}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
@@ -193,7 +192,9 @@
 			<zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
 			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
-			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
+      <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
+	    <zipfileset dir="${jdk7-addons}" prefix="${zip.prefix}/jca-client"/>
+      <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
 		</zip>
 	</target>
 
