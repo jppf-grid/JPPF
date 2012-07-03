@@ -1,0 +1,11 @@
+test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
+test.org.jppf.client.concurrent.TestJPPFExecutorService
+test.org.jppf.client.persistence.TestJobPersistence
+test.org.jppf.client.TestConnectionPool
+test.org.jppf.client.TestJPPFClient
+test.org.jppf.management.TestJMXConnectionWrapper
+test.org.jppf.management.TestJPPFDriverAdminMBean
+test.org.jppf.server.job.management.TestDriverJobManagementMBean
+test.org.jppf.server.protocol.TestJPPFJobSLA
+test.org.jppf.server.protocol.TestJPPFTask
+test.org.jppf.utils.TestJPPFConfiguration
