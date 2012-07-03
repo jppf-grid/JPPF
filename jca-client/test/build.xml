@@ -38,7 +38,15 @@
     <pathelement location="${config.dir}" />
     <pathelement location="${basedir}/../classes/jca" />
     <pathelement location="${basedir}/../../client/test/classes" />
-    <fileset dir="${lib.dir}" includes="**/*.jar" />
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+  </path>
+
+  <path id="generate.classpath">
+    <pathelement location="${classes.dir}"/>
+    <pathelement location="${config.dir}"/>
+    <pathelement location="${basedir}/../classes/jca"/>
+    <pathelement location="${basedir}/../../client/test/classes"/>
+    <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/slf4j-jdk*.jar"/>
   </path>
 
   <!-- ========================================================================= -->
@@ -76,7 +84,7 @@
   <target name="generate.tests.list">
     <echo message="basedir=${basedir}, src.dir=${src.dir}"/>
     <echo message="Generating the list of test classes"/>
-    <java fork="yes" classname="test.org.jppf.test.setup.TestListBuilder" classpathref="project.classpath">
+    <java fork="yes" classname="test.org.jppf.test.runner.TestListBuilder" classpathref="generate.classpath">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx64m"/>
       <!--
@@ -118,11 +126,14 @@
         <attribute name="JPPF-Build" value="${build.number}" />
         <attribute name="JPPF-BuildDate" value="${readable.now}" />
       </manifest>
-      <zipfileset dir="${basedir}/webapp/WEB-INF" excludes="web.xml" prefix="WEB-INF" />
+      <zipfileset dir="${basedir}/webapp/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
       <zipfileset dir="${classes.dir}" prefix="WEB-INF/classes"/>
       <zipfileset dir="${basedir}/../classes/j2eeclient" prefix="WEB-INF/classes"/>
       <zipfileset dir="${basedir}/webapp" includes="*.*" />
-      <zipfileset dir="${basedir}/../lib" includes="junit-4.10.jar" prefix="WEB-INF/lib" />
+      <zipfileset dir="${basedir}/../lib" includes="" prefix="WEB-INF/lib">
+        <include name="junit-4.10.jar"/>
+        <include name="jpf-test-framework.jar"/>
+      </zipfileset>
     </war>
   </target>
 
@@ -141,9 +152,10 @@
 
   <target name="run.tests">
     <echo message="Running the tests"/>
-    <java fork="yes" classname="test.org.jppf.test.setup.JPPFTestRunner" classpathref="project.classpath">
+    <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="project.classpath">
       <jvmarg value="-server"/>
-      <jvmarg value="-Xmx64m"/>
+      <jvmarg value="-Xmx256m"/>
+      <arg value="-u"/>
       <arg value="http://localhost:8080/JPPF_J2EE_Tests/performTests?remoteClient=true"/>
     </java>
   </target>

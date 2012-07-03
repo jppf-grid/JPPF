@@ -34,9 +34,7 @@
 	<property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="jdk7-addons"           value="${basedir}/../jdk7-addons"/>
-
-  <!-- Unit tests locations -->
-  <property name="client.test"           value="${client}/test"/>
+  <property name="tests"                 value="${basedir}/../tests"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -127,7 +125,6 @@
 
 	<target name="init" description="Initialize ressources">
  		<mkdir dir="${build}"/>
-		<available file="${NSIS.home}/makensis.exe" property="NSIS.present"/>
 		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->

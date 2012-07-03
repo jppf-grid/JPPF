@@ -19,71 +19,16 @@
 <project name="JPPF-tests" basedir="..">
 
 	<!-- ========================================================================= -->
-	<!--                     Build the web site content                            -->
+	<!--                     Build and run the JUnit tests                         -->
 	<!-- ========================================================================= -->
 
-  <path id="tests.classpath">
-    <pathelement location="${client}/classes"/>
-    <pathelement location="${client.test}/classes"/>
-    <pathelement location="${common}/classes"/>
-    <pathelement location="${node}/classes"/>
-    <pathelement location="${lib}/slf4j/slf4j-api-1.6.1.jar"/>
-    <pathelement location="${lib}/slf4j/slf4j-log4j12-1.6.1.jar"/>
-    <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
-    <pathelement location="${lib}/JUnit/junit-4.10.jar"/>
-    <pathelement location="${lib}/jmxremote/jmxremote_optional.jar"/>
-    <pathelement location="${node}/classes"/>
-  </path>
-
-  <target name="tests" depends="compile, compile.tests, run.tests"/>
-
-  <target name="compile.tests" description="compile the junit tests classes">
-    <checkstyle config="${basedir}/CheckStyle_JPPF_config.xml">
-      <fileset dir="${client.test}/java" includes="**/*.java"/>
-    </checkstyle>
-    <delete><fileset dir="${client.test}/classes" includes="**/*.*"/></delete>
-    <javac srcdir="" destdir="${client.test}/classes" source="1.6" target="1.6"
-      debug="on" deprecation="off" optimize="on" includes="**/*.java">
-      <classpath refid="tests.classpath"/>
-      <compilerarg line="-Xlint:unchecked"/>
-      <src path="${client.test}/java"/>
-      <src path="${client.test}/resources"/>
-    </javac>
-    <copy todir="${client.test}/classes">
-      <fileset dir="${client.test}/resources" excludes="**/package.html"/>
-    </copy>
-	</target>
-
-  <target name="run.tests" description="compile the junit tests classes">
-    <echo message="JUnit reports will be generated in '${client.test}' directory"/>
-    <junit printsummary="yes" haltonfailure="yes" fork="yes" dir="${client}">
-      <classpath>
-        <path refid="tests.classpath"/>
-      </classpath>
-      <jvmarg value="-Xmx256m"/>
-      <jvmarg value="-Dlog4j.configuration=config/log4j-client.properties"/>
-      <jvmarg value="-Djava.util.logging.config.file=test/classes/config/logging-client.properties"/>
-      <jvmarg value="-Djppf.config=config/client.properties"/>
-      <formatter type="plain"/>
-      <!--<batchtest fork="no" todir="${client.test}">-->
-      <batchtest todir="${client.test}">
-        <fileset dir="${client.test}/java">
-          <include name="**/Test*.java"/>
-          <exclude name="test/jppf/org/tests/setup/**/*.*"/>
-          <exclude name="**/TestJPPFBalancer.*"/>
-          <exclude name="**/TestJobListener.*"/>
-        </fileset>
-      </batchtest>
-    </junit>
-  </target>
-
-	<target name="tmp" description="generates the Readme.php for each sample">
-		<java fork="yes" classname="org.jppf.doc.SamplesPHPReadmeProcessor" classpathref="tests.classpath">
-			<jvmarg value="-Xmx128m" />
-			<arg value="${samples-pack}"/>
-			<arg value="${home}/doc-source/home/samples-pack"/>
-			<arg value="${home}/templates/sample-readme.html"/>
-		</java>
+  <target name="tests" description="build and run the junit tests">
+    <!-- build and the standalone unit tests -->
+    <ant antfile="${tests}/build.xml" target="build" inheritall="false"/>
+    <ant antfile="${tests}/build.xml" target="run" inheritall="false"/>
+    <!-- build the JCA connector test web application -->
+    <copy todir="${jca-client}/lib" file="${tests}/build/jppf-test-framework.jar" overwrite="true"/>
+    <ant antfile="${jca-client}/test/build.xml" target="build" inheritall="false"/>
 	</target>
 
 </project> 

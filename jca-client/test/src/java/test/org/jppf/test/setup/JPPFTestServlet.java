@@ -23,6 +23,8 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
+import test.org.jppf.test.runner.*;
+
 /**
  * 
  * @author Laurent Cohen
