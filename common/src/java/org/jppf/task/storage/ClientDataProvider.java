@@ -18,7 +18,7 @@
 
 package org.jppf.task.storage;
 
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -88,10 +88,10 @@ public class ClientDataProvider extends MemoryMapDataProvider
   private static <V> Object getValueFromClient(final JPPFCallable<V> callable)
   {
     ClassLoader cl = callable.getClass().getClassLoader();
-    if (!(cl instanceof JPPFClassLoader)) return null;
+    if (!(cl instanceof AbstractJPPFClassLoader)) return null;
     try
     {
-      JPPFClassLoader loader = (JPPFClassLoader) cl;
+      AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
       Class clazz = loader.loadClass("org.jppf.utils.ObjectSerializerImpl");
       ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
       byte[] bytes = ser.serialize(callable).getBuffer();
