@@ -76,8 +76,10 @@
       <fileset dir="${framework.src}" includes="**/*.java"/>
       <fileset dir="${tests.src}" includes="**/*.java"/>
     </checkstyle>
-    <delete><fileset dir="${framework.classes}" includes="**/*.*"/></delete>
-    <delete><fileset dir="${tests.classes}" includes="**/*.*"/></delete>
+    <delete dir="${framework.classes}" quiet="true" includes="**/*.*"/>
+    <delete dir="${tests.classes}" quiet="true" includes="**/*.*"/>
+    <mkdir dir="${framework.classes}"/>
+    <mkdir dir="${tests.classes}"/>
     <echo message="compiling framework classes"/>
     <javac destdir="${framework.classes}" source="1.6" target="1.6"
       debug="on" deprecation="off" optimize="on" includes="**/*.java">
