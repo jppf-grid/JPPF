@@ -60,15 +60,6 @@ class SaveFileAction implements PrivilegedAction<File>
   }
 
   /**
-   * Initialize this action with the specified resource definition.
-   * @param definition the resource definition to save.
-   */
-  public SaveFileAction(final byte[] definition)
-  {
-    this.definition = definition;
-  }
-
-  /**
    * Execute this action.
    * @return the abstract path for the created file.
    * @see java.security.PrivilegedAction#run()

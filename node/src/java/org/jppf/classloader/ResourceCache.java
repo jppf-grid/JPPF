@@ -181,8 +181,8 @@ class ResourceCache
       }
       if (base == null) base = "." + File.separator + ROOT_NAME;
       if (traceEnabled) log.trace("base = " + base);
-      int n = findFolderIndex(base);
-      String s = base + File.separator + n;
+      String folderId = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+      String s = base + File.separator + folderId;
       File baseDir = new File(s + File.separator);
       FileUtils.mkdirs(baseDir);
       tempFolders.add(s);
@@ -192,44 +192,6 @@ class ResourceCache
     {
       log.error(e.getMessage(), e);
     }
-  }
-
-  /**
-   * Find an index that doesn't exist for the folder suffix.
-   * @param folder the folder to which the new folder will belong.
-   * @return the maximum existing index + 1, or 0 if no such folder already exists.
-   * @throws Exception if any error occurs.
-   */
-  private int findFolderIndex(final String folder) throws Exception
-  {
-    File dir = new File(folder);
-    FileUtils.mkdirs(dir);
-    File[] subdirs = dir.listFiles(new FileFilter()
-    {
-      @Override
-      public boolean accept(final File path)
-      {
-        if (traceEnabled) log.trace("checking '" + path.getPath() + '\'');
-        return path.isDirectory();
-      }
-    });
-    int max = -1;
-    if(subdirs != null && subdirs.length > 0)
-    {
-      for (File f: subdirs)
-      {
-        try
-        {
-          int n = Integer.valueOf(f.getName());
-          if (n > max) max = n;
-        }
-        catch(Exception e)
-        {
-        }
-      }
-    }
-    if (traceEnabled) log.trace("max index = " + max);
-    return max + 1;
   }
 
   /**
