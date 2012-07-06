@@ -75,7 +75,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * The cache handling resources temporarily stored to file.
    */
-  protected ResourceCache cache = new ResourceCache();
+  protected final ResourceCache cache = new ResourceCache();
   /**
    * The object used to serialize and deserialize resources.
    */
