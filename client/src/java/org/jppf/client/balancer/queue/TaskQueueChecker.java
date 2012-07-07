@@ -57,7 +57,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   /**
    * Reference to the job queue.
    */
-  private final AbstractJPPFQueue queue;
+  private final JPPFPriorityQueue queue;
   /**
    * Reference to the statistics manager.
    */
@@ -84,7 +84,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param queue        the reference queue to use.
    * @param statsManager the reference to statistics manager.
    */
-  public TaskQueueChecker(final AbstractJPPFQueue queue, final JPPFClientStatsManager statsManager)
+  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFClientStatsManager statsManager)
   {
     this.queue = queue;
     this.jppfContext = new JPPFContextClient(queue);
@@ -211,6 +211,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     boolean dispatched = false;
     try
     {
+      queue.processPendingBroadcasts();
       synchronized (idleChannels)
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;

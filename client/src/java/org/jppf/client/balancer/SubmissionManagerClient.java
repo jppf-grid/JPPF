@@ -153,7 +153,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   protected synchronized void addConnection(final ChannelWrapper<?> wrapper)
   {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
-
+    boolean empty = allConnections.isEmpty();
     allConnections.add(wrapper);
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
   }
@@ -224,10 +224,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
 
     ChannelWrapper<?> wrapper = wrapperMap.remove(connection);
-    if (wrapper != null)
-    {
-      removeConnection(wrapper);
-    }
+    if (wrapper != null) removeConnection(wrapper);
     return wrapper;
   }
 
@@ -238,6 +235,15 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   public synchronized List<ChannelWrapper> getAllConnections()
   {
     return new ArrayList<ChannelWrapper>(allConnections);
+  }
+
+  /**
+   * Dtermine whether there is at east one connection, idle or not.
+   * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
+   */
+  public synchronized boolean hasConnection()
+  {
+    return !allConnections.isEmpty();
   }
 
   /**
