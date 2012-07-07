@@ -241,6 +241,15 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   /**
+   * Dtermine whether there is at east one connection, idle or not.
+   * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
+   */
+  public synchronized boolean hasConnection()
+  {
+    return !allConnections.isEmpty();
+  }
+
+  /**
    * @param cnn       the client connection.
    * @param oldStatus the connection status before the change.
    */

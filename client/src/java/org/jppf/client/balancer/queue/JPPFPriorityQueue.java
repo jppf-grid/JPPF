@@ -22,13 +22,14 @@ import static org.jppf.utils.CollectionUtils.*;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.utils.JPPFUuid;
@@ -79,6 +80,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * Handles the expiration schedule of each job that has one.
    */
   private final JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
+  /**
+   * A priority queue holding broadcast jobs that could not be sent due to no available connection. 
+   */
+  private final PriorityBlockingQueue<ClientJob> pendingBroadcasts = new PriorityBlockingQueue<ClientJob>(16, new ClientJobPriorityComparator());
 
   /**
    * Initialize this queue.
@@ -100,10 +105,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     final String jobUuid = bundleWrapper.getUuid();
     if (sla.isBroadcastJob() && (bundleWrapper.getBroadcastUUID() == null))
     {
-      if (debugEnabled)
-      {
-        log.debug("before processing broadcast job with id=" + bundleWrapper.getName() + ", uuid=" + jobUuid + ", task count=" + bundleWrapper.getTaskCount());
-      }
+      if (debugEnabled) log.debug("before processing broadcast job " + bundleWrapper.getJob());
       processBroadcastJob(bundleWrapper);
     } else {
       lock.lock();
@@ -415,7 +417,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     List<ChannelWrapper> connections = submissionManager.getAllConnections();
     if (connections.isEmpty())
     {
-      bundleWrapper.taskCompleted(null, null);
+      //bundleWrapper.taskCompleted(null, null);
+      pendingBroadcasts.offer(bundleWrapper);
       return;
     }
     JobSLA sla = bundle.getSLA();
@@ -425,10 +428,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     for (ChannelWrapper connection : connections)
     {
       JPPFClientConnectionStatus status = connection.getStatus();
-      if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
+      //if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
+      if (status != JPPFClientConnectionStatus.DISCONNECTED && status != JPPFClientConnectionStatus.FAILED)
       {
         String uuid = connection.getUuid();
-        if(uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
+        if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
         {
           ClientJob newBundle = bundleWrapper.createBroadcastJob(uuid);
 
@@ -566,6 +570,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
     for (String jobID : jobIDs) {
       cancelJob(jobID);
+    }
+  }
+
+  /**
+   * Process the jobs in the pending braodcasts queue.
+   * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
+   */
+  void processPendingBroadcasts() {
+    if (!submissionManager.hasConnection()) return;
+    ClientJob clientJob;
+    while ((clientJob = pendingBroadcasts.poll()) != null)
+    {
+      if (debugEnabled) log.debug("queuing job " + clientJob.getJob());
+      addBundle(clientJob);
     }
   }
 }

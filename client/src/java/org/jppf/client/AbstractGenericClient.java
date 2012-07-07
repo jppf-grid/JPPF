@@ -129,6 +129,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     if (debugEnabled) log.debug("initializing connections");
     //loadBalancer = new LoadBalancer();
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
+   //SynchronousQueue queue = new SynchronousQueue();
     executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     if (config.getBoolean("jppf.remote.execution.enabled", true))
     {
