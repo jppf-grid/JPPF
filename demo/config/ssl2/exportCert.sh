@@ -1,4 +1,5 @@
 #! /bin/sh
 
 # use "password" as the keystore password
-keytool -export -alias $1 -keypass password -keystore $1_keystore.ks -storepass password -rfc -file $1.cer
+keytool -export -alias $1 -keypass password -keystore $1"_keystore.ks" -storepass password -rfc -file $1.cer
+

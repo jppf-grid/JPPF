@@ -1,9 +1,11 @@
 #! /bin/sh
 
+echo "before rm"
+
 rm *.cer
 rm *.ks
 
-./createKeystore.sh driver
+./createKeystore.sh "driver"
 ./createKeystore.sh client
 ./createKeystore.sh node
 
@@ -23,3 +25,4 @@ rm *.ks
 # create driver trust store with client and node certificates
 ./createUpdateTruststore.sh node   driver
 ./createUpdateTruststore.sh client driver
+
