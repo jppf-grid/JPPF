@@ -28,7 +28,6 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.policy.*;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.JPPFJobSLA;
@@ -428,21 +427,17 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     for (ChannelWrapper connection : connections)
     {
       JPPFClientConnectionStatus status = connection.getStatus();
-      //if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
-      if (status != JPPFClientConnectionStatus.DISCONNECTED && status != JPPFClientConnectionStatus.FAILED)
+      if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
       {
         String uuid = connection.getUuid();
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
         {
           ClientJob newBundle = bundleWrapper.createBroadcastJob(uuid);
-
           JPPFManagementInfo info = connection.getManagementInfo();
-          ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
           newBundle.setSLA(((JPPFJobSLA) sla).copy());
           newBundle.setMetadata(bundle.getMetadata());
           newBundle.setName(bundle.getName() + " [driver: " + info.toString() + ']');
           newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
-          if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
           jobList.add(newBundle);
         }
       }
@@ -578,7 +573,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
   void processPendingBroadcasts() {
-    if (!submissionManager.hasConnection()) return;
+    if (!submissionManager.hasWorkingConnection()) return;
     ClientJob clientJob;
     while ((clientJob = pendingBroadcasts.poll()) != null)
     {

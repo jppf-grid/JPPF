@@ -19,6 +19,7 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.queue.*;
@@ -87,7 +88,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     }
   };
-
   /**
    * Determines whether local execution is enabled on this client.
    */
@@ -96,6 +96,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Wrapper for local execution node.
    */
   private ChannelWrapperLocal wrapperLocal = null;
+  /**
+   * Counts the current number of connections with ACTIVE or EXECUTING status. 
+   */
+  private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
 
   /**
    * Instantiates client submission manager.
@@ -244,9 +248,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Dtermine whether there is at east one connection, idle or not.
    * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
    */
-  public synchronized boolean hasConnection()
+  public synchronized boolean hasWorkingConnection()
   {
-    return !allConnections.isEmpty();
+    return nbWorkingConnections.get() > 0;
   }
 
   /**
@@ -301,6 +305,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       taskQueueChecker.removeIdleChannel(wrapper);
       if(newStatus == JPPFClientConnectionStatus.FAILED || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
+    boolean bNew = (newStatus == JPPFClientConnectionStatus.ACTIVE) || (newStatus == JPPFClientConnectionStatus.EXECUTING);
+    boolean bOld = (oldStatus == JPPFClientConnectionStatus.ACTIVE) || (oldStatus == JPPFClientConnectionStatus.EXECUTING);
+    if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
+    else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
   }
 
   /**
