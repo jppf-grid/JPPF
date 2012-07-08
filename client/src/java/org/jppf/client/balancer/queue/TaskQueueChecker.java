@@ -317,15 +317,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       ChannelWrapper<?> ch = iterator.next();
       if (ch.getStatus() != JPPFClientConnectionStatus.ACTIVE)
       {
-        if (debugEnabled) log.debug("channel is not opened: " + ch);
+        if (debugEnabled) log.debug("channel is not available: " + ch);
         iterator.remove();
         continue;
       }
       if (!bundle.acceptsChannel(ch)) continue;
       if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
-      if (policy != null)
+      if ((policy != null) && ch.isLocal())
       {
-        JPPFManagementInfo mgtInfo = ch.getManagementInfo();
         JPPFSystemInformation info = ch.getSystemInfo();
         boolean b = false;
         try
@@ -334,11 +333,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         }
         catch (Exception ex)
         {
-          log.error("An error occurred while running the execution policy to determine node participation.", ex);
+          log.error("An error occurred while running the execution policy to determine node participation", ex);
         }
         if (debugEnabled)
         {
-          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + mgtInfo.getId());
+          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
         }
         if (!b) continue;
       }
