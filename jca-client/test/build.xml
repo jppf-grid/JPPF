@@ -1,0 +1,151 @@
+<!--
+	JPPF
+	Copyright (C) 2005-2012 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="J2EE Connector Tests" default="build" basedir=".">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <property name="classes.dir" value="${basedir}/classes" />
+  <property name="src.dir" value="${basedir}/src" />
+  <property name="build.dir" value="${basedir}/build" />
+  <property name="lib.dir" value="${basedir}/../lib" />
+  <property name="war.prefix" value="JPPF_J2EE_Tests" />
+  <property file="${basedir}/../build.number" />
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="project.classpath">
+    <pathelement location="${classes.dir}" />
+    <pathelement location="${config.dir}" />
+    <pathelement location="${basedir}/../classes/jca" />
+    <pathelement location="${basedir}/../../client/test/classes" />
+    <fileset dir="${lib.dir}" includes="**/*.jar" />
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                                    Clean                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete quiet="true">
+      <fileset dir="${classes.dir}" includes="**/*.*" />
+    </delete>
+    <delete quiet="true">
+      <fileset dir="${build.dir}" includes="**/*.*" />
+    </delete>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                                    Init                                   -->
+  <!-- ========================================================================= -->
+
+  <target name="init" depends="clean" description="Initialize ressources">
+    <mkdir dir="${build.dir}" />
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                         Build everything                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="war"/>
+  <target name="build.deploy.jboss" depends="build, deploy.jboss" />
+
+  <!-- ========================================================================= -->
+  <!--                     Genrates the list of test classes                     -->
+  <!-- ========================================================================= -->
+
+  <target name="generate.tests.list">
+    <echo message="basedir=${basedir}, src.dir=${src.dir}"/>
+    <echo message="Generating the list of test classes"/>
+    <java fork="yes" classname="test.org.jppf.test.setup.TestListBuilder" classpathref="project.classpath">
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx64m"/>
+      <!--
+      <arg value="${basedir}/../../client/test/java"/>
+      <arg value="${basedir}/../../client/test/resources/TestClasses.txt"/>
+      -->
+      <arg value="${classes.dir}"/>
+      <arg value="${classes.dir}/TestClasses.txt"/>
+    </java>
+    <copy todir="${src.dir}/resources" file="${classes.dir}/TestClasses.txt" overwrite="true"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                         Compile the application                           -->
+  <!-- ========================================================================= -->
+
+  <target name="compile" depends="init">
+    <echo message="compiling the project..." />
+    <javac srcdir="" destdir="${classes.dir}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="project.classpath" />
+      <compilerarg line="-Xlint:unchecked" />
+      <src path="${src.dir}/java" />
+    </javac>
+    <copy todir="${classes.dir}">
+      <fileset dir="${src.dir}/resources"/>
+    </copy>
+    <antcall target="generate.tests.list"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                     Generate the WAR file                                 -->
+  <!-- ========================================================================= -->
+
+  <target name="war" depends="compile">
+    <echo message="creating the WAR ..." />
+    <war warfile="${build.dir}/${war.prefix}.war" webxml="${basedir}/webapp/WEB-INF/web.xml" >
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}" />
+        <attribute name="JPPF-Build" value="${build.number}" />
+        <attribute name="JPPF-BuildDate" value="${readable.now}" />
+      </manifest>
+      <zipfileset dir="${basedir}/webapp/WEB-INF" excludes="web.xml" prefix="WEB-INF" />
+      <zipfileset dir="${classes.dir}" prefix="WEB-INF/classes"/>
+      <zipfileset dir="${basedir}/../classes/j2eeclient" prefix="WEB-INF/classes"/>
+      <zipfileset dir="${basedir}/webapp" includes="*.*" />
+      <zipfileset dir="${basedir}/../lib" includes="junit-4.10.jar" prefix="WEB-INF/lib" />
+    </war>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                       Deploy the WAR file                                 -->
+  <!-- ========================================================================= -->
+
+  <target name="deploy.jboss">
+		<property name="jboss.deploy" value="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy"/>
+    <copy todir="${jboss.deploy}" file="${build.dir}/${war.prefix}.war"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                          Run the tests                                    -->
+  <!-- ========================================================================= -->
+
+  <target name="run.tests">
+    <echo message="Running the tests"/>
+    <java fork="yes" classname="test.org.jppf.test.setup.JPPFTestRunner" classpathref="project.classpath">
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx64m"/>
+      <arg value="http://localhost:8080/JPPF_J2EE_Tests/performTests?remoteClient=true"/>
+    </java>
+  </target>
+
+</project>

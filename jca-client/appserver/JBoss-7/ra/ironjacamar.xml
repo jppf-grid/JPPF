@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ironjacamar>
+  <connection-definitions>
+    <!--<connection-definition jndi-name="java:/eis/JPPFConnectionFactory" class-name="org.jppf.jca.cci.JPPFConnectionFactory"/>-->
+    <connection-definition jndi-name="java:/eis/JPPFConnectionFactory" class-name="org.jppf.jca.spi.JPPFManagedConnectionFactory"/>
+  </connection-definitions>
+</ironjacamar>

@@ -1,0 +1,5 @@
+Class-Path: lib/jppf-j2ee-client.jar
+Name: JPPF
+Title: JPPF 1.0
+Vendor: JPPF.org
+Version: 1.0
