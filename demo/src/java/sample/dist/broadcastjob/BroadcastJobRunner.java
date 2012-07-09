@@ -36,6 +36,7 @@ public class BroadcastJobRunner {
     try {
       jppfClient = new JPPFClient();
       //while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
+      Thread.sleep(5000L);
       int nbTasks = 1;
       System.out.println("Running Broadcast Job with " + nbTasks + " tasks");
       long start = System.currentTimeMillis();
