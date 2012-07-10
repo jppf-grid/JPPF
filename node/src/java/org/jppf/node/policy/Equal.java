@@ -64,7 +64,7 @@ public class Equal extends ExecutionPolicy
   }
 
   /**
-   * Define an equality comparison between the numeric value of a property and another numeric value.
+   * Define an equality comparison between the string value of a property and another string value.
    * @param propertyName the name of the property to compare.
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param a the value to compare with.
@@ -77,7 +77,7 @@ public class Equal extends ExecutionPolicy
   }
 
   /**
-   * Define an equality comparison between the numeric value of a property and another numeric value.
+   * Define an equality comparison between the boolean value of a property and another boolean value.
    * @param propertyName the name of the property to compare.
    * @param a the value to compare with.
    */

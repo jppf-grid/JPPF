@@ -146,9 +146,13 @@ public class JPPFScheduleHandler
    */
   public void clear(final boolean shutdown)
   {
-    executor.shutdownNow();
+    for (Map.Entry<Object, ScheduledFuture<?>> entry: futureMap.entrySet())
+    {
+      ScheduledFuture<?> f = entry.getValue();
+      f.cancel(true);
+    }
     futureMap.clear();
-    if (!shutdown) createExecutor();
+    if (shutdown) executor.shutdownNow();
   }
 
   /**
@@ -157,5 +161,6 @@ public class JPPFScheduleHandler
   private void createExecutor()
   {
     executor = Executors.newScheduledThreadPool(1, new JPPFThreadFactory(this.name));
+    if (debugEnabled) log.debug("created executor with name=" + name);
   }
 }
