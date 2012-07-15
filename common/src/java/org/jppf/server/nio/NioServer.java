@@ -134,7 +134,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
 
   /**
    * Initialize the underlying server sockets.
-   * @throws Exception if any error occurs w<hile initializing the server sockets.
+   * @throws Exception if any error occurs while initializing the server sockets.
    */
   protected final void init() throws Exception
   {
@@ -310,6 +310,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+      channel.socket().setTcpNoDelay(SocketWrapper.SOCKET_TCP_NO_DELAY);
       if (channel.isBlocking()) channel.configureBlocking(false);
     }
     catch (Exception e)
