@@ -198,6 +198,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   }
 
   /**
+   * Clear all references as memory leak prevention.
+   */
+  public void clearReferences()
+  {
+    JPPFLeakPrevention.clearReferences(this);
+  }
+
+  /**
    * Terminate this classloader and clean the resources it uses.
    */
   public abstract void close();
@@ -226,7 +234,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Encapsulates a remote resource request submitted asynchronously
    * via the single-thread executor.
    */
-  protected abstract class AbstractResourceRequest implements Runnable
+  protected abstract static class AbstractResourceRequest implements Runnable
   {
     /**
      * Used to collect any throwable raised during communication with the server.

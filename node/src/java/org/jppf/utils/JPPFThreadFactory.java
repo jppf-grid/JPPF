@@ -18,6 +18,8 @@
 
 package org.jppf.utils;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,6 +59,10 @@ public class JPPFThreadFactory implements ThreadFactory
    * 
    */
   private static ExceptionHandler defaultExceptionHandler = new ExceptionHandler();
+  /**
+   * Indicates whether new thread should be created in PrivilegedAction.
+   */
+  private final boolean doPrivileged;
 
   /**
    * Initialize this thread factory with the specified name.
@@ -95,11 +101,24 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority)
   {
+    this(name, monitoringEnabled, priority, false);
+  }
+
+  /**
+   * Initialize this thread factory with the specified name.
+   * @param name the name used as prefix for the constructed threads name.
+   * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
+   * @param priority priority assigned to the threads created by this factory.
+   * @param doPrivileged indicates whether thread should be created in PrivilegedAction.
+   */
+  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority, final boolean doPrivileged)
+  {
     this.name = name == null ? "JPPFThreadFactory" : name;
     threadGroup = new ThreadGroup(this.name + " thread group");
     threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
     this.monitoringEnabled = monitoringEnabled;
     this.priority = priority;
+    this.doPrivileged = doPrivileged;
     if (monitoringEnabled) threadIDs = new ArrayList<Long>();
   }
 
@@ -112,7 +131,19 @@ public class JPPFThreadFactory implements ThreadFactory
   @Override
   public synchronized Thread newThread(final Runnable r)
   {
-    Thread thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
+    Thread thread;
+    if(doPrivileged)
+    {
+      thread = AccessController.doPrivileged(new PrivilegedAction<Thread>()
+      {
+        @Override
+        public Thread run()
+        {
+          return new Thread(threadGroup, r, name + "-thread-" + incrementCount());
+        }
+      });
+    } else
+      thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
     if (monitoringEnabled) threadIDs.add(thread.getId());
     thread.setPriority(priority);
     thread.setUncaughtExceptionHandler(defaultExceptionHandler);
