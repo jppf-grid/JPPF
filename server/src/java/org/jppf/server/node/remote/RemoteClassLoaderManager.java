@@ -44,7 +44,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
   /**
    * The node that holds this class loader manager.
    */
-  private JPPFNode node = null;
+  private final JPPFNode node;
 
   /**
    * Initialize this class loader manager with the specified node.
@@ -52,6 +52,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
    */
   RemoteClassLoaderManager(final JPPFNode node)
   {
+    if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
   }
 
@@ -62,8 +63,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
   protected AbstractJPPFClassLoader createClassLoader()
   {
     if (debugEnabled) log.debug("Initializing classloader");
-    if (classLoader == null) classLoader = NodeRunner.getJPPFClassLoader();
-    return classLoader;
+    return NodeRunner.getJPPFClassLoader();
   }
 
   /**

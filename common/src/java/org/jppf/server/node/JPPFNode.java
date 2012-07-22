@@ -384,19 +384,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     lifeCycleEventHandler.fireNodeEnding();
     lifeCycleEventHandler.removeAllListeners();
     setNodeAdmin(null);
-    if (classLoaderManager.classLoader != null)
-    {
-      classLoaderManager.classLoader.close();
-      classLoaderManager.classLoader = null;
-    }
+    classLoaderManager.closeClassLoader();
     try
     {
       synchronized(this)
       {
         closeDataChannel();
-        classLoaderManager.containerMap.clear();
-        classLoaderManager.containerList.clear();
       }
+      classLoaderManager.clearContainers();
     }
     catch(Exception e)
     {
