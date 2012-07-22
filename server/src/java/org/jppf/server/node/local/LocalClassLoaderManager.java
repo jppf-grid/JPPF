@@ -34,7 +34,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
   /**
    * The node that holds this class loader manager.
    */
-  private JPPFLocalNode node = null;
+  private final JPPFLocalNode node;
 
   /**
    * Initialize this class loader manager with the specified I/O handler.
@@ -42,6 +42,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
    */
   LocalClassLoaderManager(final JPPFLocalNode node)
   {
+    if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
   }
 
@@ -51,19 +52,15 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
   @Override
   protected AbstractJPPFClassLoader createClassLoader()
   {
-    if (classLoader == null)
+    PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
     {
-      PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
+      @Override
+      public AbstractJPPFClassLoader run()
       {
-        @Override
-        public AbstractJPPFClassLoader run()
-        {
-          return new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
-        }
-      };
-      classLoader = AccessController.doPrivileged(pa);
-    }
-    return classLoader;
+        return new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
+      }
+    };
+    return AccessController.doPrivileged(pa);
   }
 
   /**

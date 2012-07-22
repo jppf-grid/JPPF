@@ -106,7 +106,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
       {
         synchronized(AbstractJPPFClassLoaderLifeCycle.class)
         {
-          if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests"));
+          if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests", false, Thread.NORM_PRIORITY, true));
         }
         try
         {

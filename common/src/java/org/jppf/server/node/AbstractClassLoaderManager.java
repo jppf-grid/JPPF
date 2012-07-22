@@ -44,47 +44,60 @@ public abstract class AbstractClassLoaderManager
   /**
    * Maximum number of containers kept by this node's cache.
    */
-  private static int maxContainers = JPPFConfiguration.getProperties().getInt("jppf.classloader.cache.size", 50);
+  private static final int maxContainers = JPPFConfiguration.getProperties().getInt("jppf.classloader.cache.size", 50);
   /**
    * Class loader used for dynamic loading and updating of client classes.
    */
-  protected AbstractJPPFClassLoader classLoader = null;
+  private AbstractJPPFClassLoader classLoader = null;
   /**
    * Mapping of containers to their corresponding application uuid.
    */
-  protected Map<String, JPPFContainer> containerMap = new HashMap<String, JPPFContainer>();
+  private final Map<String, JPPFContainer> containerMap = new HashMap<String, JPPFContainer>();
   /**
    * A list retaining the container in chronological order of their creation.
    */
-  protected LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
-  /**
-   * The callback used to create the class loader in each {@link JPPFContainer}.
-   */
-  private Callable<JPPFClassLoader> classLoaderCreator = null;
+  private final LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
 
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @return a <code>ClassLoader</code> used for loading the classes of the framework.
    */
-  public AbstractJPPFClassLoader getClassLoader()
+  public synchronized AbstractJPPFClassLoader getClassLoader()
   {
     if (classLoader == null) classLoader = createClassLoader();
     return classLoader;
   }
 
   /**
-   * Create the class loader for this node.
+   * Create the main class loader for the node.
    * @return a {@link JPPFClassLoader} instance.
    */
   protected abstract AbstractJPPFClassLoader createClassLoader();
 
   /**
-   * Set the main classloader for the node.
+   * Set the main class loader for the node.
    * @param cl the class loader to set.
    */
-  public void setClassLoader(final JPPFClassLoader cl)
+  public synchronized void setClassLoader(final JPPFClassLoader cl)
   {
     classLoader = cl;
+  }
+
+  /**
+   * Close main class loader for the node.
+   */
+  public synchronized void closeClassLoader()
+  {
+    if (classLoader != null)
+    {
+      try
+      {
+        classLoader.close();
+      } finally
+      {
+        classLoader = null;
+      }
+    }
   }
 
   /**
@@ -93,12 +106,10 @@ public abstract class AbstractClassLoaderManager
    * @return a <code>JPPFContainer</code> instance.
    * @throws Exception if an error occurs while getting the container.
    */
-  public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
+  public synchronized JPPFContainer getContainer(final List<String> uuidPath) throws Exception
   {
     String uuid = uuidPath.get(0);
     JPPFContainer container = null;
-    synchronized(this)
-    {
       container = containerMap.get(uuid);
       if (container == null)
       {
@@ -123,13 +134,39 @@ public abstract class AbstractClassLoaderManager
         if (containerList.size() >= maxContainers)
         {
           JPPFContainer toRemove = containerList.removeFirst();
-          containerMap.remove(toRemove.getAppUuid());
+          try {
+            AbstractJPPFClassLoader loader = toRemove.getClassLoader();
+            if (loader != null) loader.clearReferences();
+          } finally {
+            toRemove.helper = null;
+            toRemove.classLoader = null;
+            containerMap.remove(toRemove.getAppUuid());
+          }
         }
         containerList.add(container);
         containerMap.put(uuid, container);
       }
-    }
     return container;
+  }
+
+  /**
+   * Clear all containers associated with applications uuids.
+   */
+  public synchronized void clearContainers()
+  {
+    closeClassLoader();
+    try
+    {
+      for (JPPFContainer container : containerList)
+      {
+        AbstractJPPFClassLoader loader = container.getClassLoader();
+        if (loader != null) loader.clearReferences();
+      }
+    } finally
+    {
+      containerMap.clear();
+      containerList.clear();
+    }
   }
 
   /**
@@ -147,22 +184,4 @@ public abstract class AbstractClassLoaderManager
    * @return a {@link Callable} instance.
    */
   protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
-
-  /**
-   * Get a mapping of containers to their corresponding application uuid.
-   * @return a mapping of <code>String</code> keys to <code>JPPFContainer</code> values.
-   */
-  public Map<String, JPPFContainer> getContainerMap()
-  {
-    return containerMap;
-  }
-
-  /**
-   * Get the list retaining the container in chronological order of their creation.
-   * @return a list of <code>JPPFContainer</code> instances.
-   */
-  public LinkedList<JPPFContainer> getContainerList()
-  {
-    return containerList;
-  }
 }
