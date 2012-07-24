@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/common/src/java/org/jppf/utils/FileReplacer.java"/>
+<listEntry value="/common/src/java/org/jppf/utils/FileReplacerEx.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -17,8 +17,8 @@
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.utils.FileReplacer"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="C:/Workspaces/temp/jppf C:/Workspaces/temp/in.txt C:/Workspaces/temp/out.txt java,xml,xsd,properties,groovy,bat,cmd,conf,sh,css,html,php,js true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.utils.FileReplacerEx"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=log4j-FileReplacer.properties -server -Xmx256m"/>
 </launchConfiguration>

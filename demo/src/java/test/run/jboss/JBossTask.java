@@ -117,6 +117,10 @@ public class JBossTask extends CommandLineTask
     }
   }
 
+  /**
+   * Overriden to redirect the JBoss standard output to the node's oconsole.
+   * @param event a chunk of standard output wrapped as a {@link ProcessWrapperEvent}.
+   */
   @Override
   public void outputStreamAltered(final ProcessWrapperEvent event)
   {
@@ -125,6 +129,10 @@ public class JBossTask extends CommandLineTask
     System.out.print(s);
   }
 
+  /**
+   * Overriden to redirect the JBoss error output to the node's oconsole.
+   * @param event a chunk of error output wrapped as a {@link ProcessWrapperEvent}.
+   */
   @Override
   public void errorStreamAltered(final ProcessWrapperEvent event)
   {
@@ -147,6 +155,7 @@ public class JBossTask extends CommandLineTask
       AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
       URL[] urls = cl.getURLs();
       boolean found = false;
+      // is shutdown.jar already in the classpath ?
       for (URL url: urls)
       {
         if (url.toString().indexOf("shutdown.jar") >= 0)
@@ -155,6 +164,7 @@ public class JBossTask extends CommandLineTask
           break;
         }
       }
+      // if not let's add it dynamically
       if (!found)
       {
         File file = new File(jbossHome + "/bin/shutdown.jar");
@@ -169,12 +179,14 @@ public class JBossTask extends CommandLineTask
         for (String s: libs) cl.addURL(new File(dir, s).toURI().toURL());
         jar.close();
       }
+      // with shutdown.jar in the classpath, we can now invoke the ocmmand
+      // org.jboss.Shutdown.main("-S") to shtudown the server
       System.setProperty("java.naming.factory.initial", "org.jnp.interfaces.NamingContextFactory");
       System.setProperty("jboss.boot.loader.name", "shutdown.bat");
       Class<?> clazz = cl.loadClass("org.jboss.Shutdown");
       Method method = clazz.getDeclaredMethod("main", String[].class);
       System.out.println("shutting down by invoking " + method);
-      method.invoke((Object) null, (Object) new String[] {"-S"});      
+      method.invoke((Object) null, (Object) new String[] {"-S"});
     }
     catch(Exception e)
     {
