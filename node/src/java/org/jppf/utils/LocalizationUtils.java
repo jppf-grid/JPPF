@@ -50,6 +50,21 @@ public final class LocalizationUtils
   }
 
   /**
+   * Get a localized array of property values.
+   * @param baseName the base name to use, in combination with the default locale,
+   * to lookup the appropriate resource bundle.
+   * @param keys the keys for which to lookup a localized value.
+   * @return an array of localized values looked up using the default locale. If a key could not be localized, it is returned.
+   */
+  public static String[] getLocalized(final String baseName, final String...keys)
+  {
+    if (keys == null) return new String[0];
+    String[] localized = new String[keys.length];
+    for (int i=0; i<keys.length; i++) localized[i] = getLocalized(baseName, keys[i], keys[i]);
+    return localized;
+  }
+
+  /**
    * Get a localized property value.
    * @param baseName the base name to use, in combination with the default locale,
    * to lookup the appropriate resource bundle.
