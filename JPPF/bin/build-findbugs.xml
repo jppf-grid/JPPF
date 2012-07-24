@@ -82,7 +82,8 @@
 	</target>
 
 	<target name="findbugs.module">
-    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}">
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}"
+    excludeFilter="${bin}/findbugs-filter.xml">
       <auxClasspath>
       	<fileset dir="${lib}" includes="**/*.jar"/>
       	<fileset dir="${build}" includes="*.jar"/>

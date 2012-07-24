@@ -46,6 +46,7 @@
   <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
 
   <target name="compile.module">
+    <echo message="compiling module '${path}'"/>
     <checkstyle  config="${basedir}/CheckStyle_JPPF_config.xml">
       <fileset dir="${path}/src/java" includes="**/*.java"/>
     </checkstyle>
