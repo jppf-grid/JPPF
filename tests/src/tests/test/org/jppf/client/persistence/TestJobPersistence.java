@@ -47,7 +47,7 @@ public class TestJobPersistence extends Setup1D1N
     String key = null;
     JobPersistence<String> pm = null;
     TypedProperties config = JPPFConfiguration.getProperties();
-    long duration = 1000L;
+    long duration = 750L;
     JPPFClient client = null;
     try
     {
@@ -56,7 +56,7 @@ public class TestJobPersistence extends Setup1D1N
       config.setProperty("jppf.load.balancing.strategy", "test");
       config.setProperty("strategy.test.size", "1");
       client = BaseSetup.createClient(null, false);
-      int nbTasks = 4;
+      int nbTasks = 3;
       JPPFJob job = BaseSetup.createJob("TestSubmit", false, false, nbTasks, SimpleTask.class, duration);
       int i=0;
       for (JPPFTask task: job.getTasks()) task.setId("" + ++i);

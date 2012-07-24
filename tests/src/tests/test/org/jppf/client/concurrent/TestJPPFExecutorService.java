@@ -39,7 +39,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   /**
    * Default duration for tasks that use a duration. Adjust the value for slow hardware.
    */
-  protected static final long TASK_DURATION = 1000L;
+  protected static final long TASK_DURATION = 750L;
   /**
    * The executor we are testing.
    */
@@ -149,7 +149,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   @Test
   public void testInvokeAllWithTimeout() throws Exception
   {
-    int n = 3;
+    int n = 2;
     long timeout = TASK_DURATION / 2L;
     List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
@@ -189,7 +189,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   @Test(timeout=5000)
   public void testInvokeAnyWithTimeout() throws Exception
   {
-    int n = 3;
+    int n = 2;
     long timeout = TASK_DURATION / 2L;
     List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));

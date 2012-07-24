@@ -38,7 +38,7 @@ public class TestJMXConnectionWrapper
   {
     //make sure the host is on an unreachable network
     final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("10.1.1.2", 12345, false);
-    final long duration = 3000L;
+    final long duration = 1400L;
     int nbThreads = 16;
     Thread[] threads = new Thread[nbThreads];
     for (int i=0; i<nbThreads; i++)
@@ -51,7 +51,7 @@ public class TestJMXConnectionWrapper
           long start = System.nanoTime();
           jmx.connectAndWait(duration);
           long elapsed = (System.nanoTime() - start) / 1000000L;
-          System.out.println("[" + getName() + "] connectAndWait() actually waited " + elapsed + " ms");
+          //System.out.println("[" + getName() + "] connectAndWait() actually waited " + elapsed + " ms");
         }
       };
     }

@@ -84,7 +84,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
-    executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(3000L));
+    executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(1500L));
     Callable<String> task = new MyCallableTask(TASK_DURATION);
     Future<String> future = executor.submit(task);
     String s = future.get();
@@ -102,7 +102,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   public void testSubmitCallableWithJobTimeout() throws Exception
   {
     client.setLocalExecutionEnabled(false);
-    executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(3000L));
+    executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
     executor.getConfiguration().getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
     Callable<String> task = new MyCallableTask(TASK_DURATION);
     Future<String> future = executor.submit(task);
