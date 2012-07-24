@@ -40,7 +40,7 @@ import test.org.jppf.test.setup.common.*;
 public class TestJPPFConnection
 {
   /**
-   * A coonection to the JPPF connector.
+   * A connection to the JPPF connector.
    */
   private JPPFConnection connection = null;
 

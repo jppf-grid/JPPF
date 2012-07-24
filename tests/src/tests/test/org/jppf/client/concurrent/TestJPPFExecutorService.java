@@ -69,7 +69,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.submit(Runnable)</code>.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testSubmitRunnable() throws Exception
   {
     TaskResult result = new TaskResult();
@@ -84,7 +84,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.submit(Runnable, T)</code>.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testSubmitRunnableWithResult() throws Exception
   {
     TaskResult result = new TaskResult();
@@ -102,7 +102,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.submit(Callable)</code>.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testSubmitCallable() throws Exception
   {
     SimpleCallable sc = new SimpleCallable();
@@ -119,7 +119,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.invokeAll(List&lt;Callable&gt;)</code>.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testInvokeAll() throws Exception
   {
     int n = 10;
@@ -186,7 +186,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, no task has enough time to complete its execution.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testInvokeAnyWithTimeout() throws Exception
   {
     int n = 3;
@@ -203,7 +203,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, we verify that submitting a task after a shutdown is requested raises a {@link RejectedExecutionException}.
    * @throws Exception if any error occurs
    */
-  @Test(expected = RejectedExecutionException.class)
+  @Test(expected = RejectedExecutionException.class, timeout=5000)
   public void testShutdown() throws Exception
   {
     executor.shutdown();
@@ -216,7 +216,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Test invocation of <code>JPPFExecutorService.shutdownNow()</code>.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testShutdownNow() throws Exception
   {
     executor.submit(new SimpleRunnable());
@@ -230,7 +230,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, the termination occurs before the timeout expires.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testAwaitTermination() throws Exception
   {
     executor.submit(new SimpleCallable(0, TASK_DURATION));
@@ -245,7 +245,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, the timeout expires before the termination occurs.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testAwaitTermination2() throws Exception
   {
     executor.submit(new SimpleCallable(0, TASK_DURATION));

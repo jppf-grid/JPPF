@@ -57,7 +57,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer
    */
   private void renderHeader()
   {
-    header.append("Total tests: ").append(result.getTestsCount());
+    header.append("\nTotal tests: ").append(result.getTestsCount());
     header.append(", successful: ").append(result.getSuccessCount());
     header.append(", failed: ").append(result.getFailureCount());
     header.append(", ignored: ").append(result.getIgnoredCount());

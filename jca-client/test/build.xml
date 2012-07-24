@@ -23,10 +23,10 @@
   <!-- ========================================================================= -->
 
   <property name="classes.dir" value="${basedir}/classes" />
-  <property name="src.dir" value="${basedir}/src" />
-  <property name="build.dir" value="${basedir}/build" />
-  <property name="lib.dir" value="${basedir}/../lib" />
-  <property name="war.prefix" value="JPPF_J2EE_Tests" />
+  <property name="src.dir"     value="${basedir}/src" />
+  <property name="build.dir"   value="${basedir}/build" />
+  <property name="lib.dir"     value="${basedir}/../lib" />
+  <property name="war.prefix"  value="JPPF_J2EE_Tests" />
   <property file="${basedir}/../build.number" />
 
   <!-- ========================================================================= -->
@@ -37,7 +37,6 @@
     <pathelement location="${classes.dir}" />
     <pathelement location="${config.dir}" />
     <pathelement location="${basedir}/../classes/jca" />
-    <pathelement location="${basedir}/../../client/test/classes" />
     <fileset dir="${lib.dir}" includes="**/*.jar"/>
   </path>
 
@@ -45,7 +44,6 @@
     <pathelement location="${classes.dir}"/>
     <pathelement location="${config.dir}"/>
     <pathelement location="${basedir}/../classes/jca"/>
-    <pathelement location="${basedir}/../../client/test/classes"/>
     <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/slf4j-jdk*.jar"/>
   </path>
 
@@ -87,10 +85,6 @@
     <java fork="yes" classname="test.org.jppf.test.runner.TestListBuilder" classpathref="generate.classpath">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx64m"/>
-      <!--
-      <arg value="${basedir}/../../client/test/java"/>
-      <arg value="${basedir}/../../client/test/resources/TestClasses.txt"/>
-      -->
       <arg value="${classes.dir}"/>
       <arg value="${classes.dir}/TestClasses.txt"/>
     </java>

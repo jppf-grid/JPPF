@@ -59,7 +59,7 @@ public class JPPFTestServlet extends HttpServlet
   private void perform(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
   {
     JPPFTestRunner runner = new JPPFTestRunner();
-    ResultHolder result = runner.runTests("TestClasses.txt");
+    ResultHolder result = runner.runTests("TestClasses.txt", null);
     try
     {
       String remoteClient = request.getParameter("remoteClient");

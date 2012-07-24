@@ -39,9 +39,10 @@ public class JPPFTestRunner
   /**
    * Run all the test classes specified in the file.
    * @param classNamesFile contains the names of test classes to run, one per line.
+   * @param out used to log the results during execution of the tests.
    * @return a <code>ResultHolder</code> object.
    */
-  public ResultHolder runTests(final String classNamesFile)
+  public ResultHolder runTests(final String classNamesFile, final PrintStream out)
   {
     ResultHolder result = new ResultHolder();
     InputStream is = null;
@@ -69,7 +70,7 @@ public class JPPFTestRunner
         }
         System.out.println("test classes " + classes);
         JUnitCore core = new JUnitCore();
-        TestRunListener listener = new TestRunListener(result);
+        TestRunListener listener = new TestRunListener(result, out);
         core.addListener(listener);
         core.run(classes.toArray(new Class<?>[classes.size()]));
       }
@@ -129,7 +130,10 @@ public class JPPFTestRunner
       {
         System.out.println("Running standalone tests");
         if ((args.length > 1) && (args[1] != null)) outputFile = args[1];
-        result = new JPPFTestRunner().runTests("TestClasses.txt");
+        PrintStream out = new PrintStream(new FileOutputStream("test-output.txt"));
+        result = new JPPFTestRunner().runTests("TestClasses.txt", out);
+        out.flush();
+        out.close();
       }
       else if ("-u".equals(type))
       {
