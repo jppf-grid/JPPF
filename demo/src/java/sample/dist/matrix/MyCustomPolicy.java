@@ -18,8 +18,8 @@
 
 package sample.dist.matrix;
 
-import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.CustomPolicy;
+import org.jppf.utils.PropertiesCollection;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class MyCustomPolicy extends CustomPolicy
    * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public boolean accepts(final JPPFSystemInformation info)
+  public boolean accepts(final PropertiesCollection info)
   {
     String s = getProperty(info, "processing.thread");
     int n = 1;
