@@ -18,8 +18,8 @@
 
 package org.jppf.example.loadbalancer.common;
 
-import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.CustomPolicy;
+import org.jppf.utils.PropertiesCollection;
 import org.slf4j.*;
 
 /**
@@ -55,12 +55,12 @@ public class MyCustomPolicy extends CustomPolicy
    * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public boolean accepts(final JPPFSystemInformation info)
+  public boolean accepts(final PropertiesCollection info)
   {
     // get the number of processing threads in the node
-    long nbThreads = info.getJppf().getLong("processing.threads");
+    long nbThreads = info.getProperties("jppf").getLong("processing.threads");
     // get the node's max heap size
-    long maxHeap = info.getRuntime().getLong("maxMemory");
+    long maxHeap = info.getProperties("runtime").getLong("maxMemory");
     // we assume that 10 MB is taken by JPPF code and data
     maxHeap -= 10 * 1024 * 1024;
     // return true only if there is at least minimumSizePerThread of memory available for each thread
