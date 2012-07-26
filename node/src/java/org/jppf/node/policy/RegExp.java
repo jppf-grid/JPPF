@@ -20,7 +20,7 @@ package org.jppf.node.policy;
 
 import java.util.regex.*;
 
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.utils.PropertiesCollection;
 
 /**
  * An execution policy rule that encapsulates a test of type <i>property_value matches regular_expression</i>.
@@ -69,7 +69,7 @@ public class RegExp extends ExecutionPolicy
    * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public boolean accepts(final JPPFSystemInformation info)
+  public boolean accepts(final PropertiesCollection info)
   {
     if (regExp == null) return false;
     // the pattern is cached so it doesn't have to be compiled every time.

@@ -18,7 +18,7 @@
 
 package org.jppf.management;
 
-import java.io.Serializable;
+import java.util.*;
 
 import org.jppf.utils.*;
 
@@ -35,44 +35,16 @@ import org.jppf.utils.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class JPPFSystemInformation implements Serializable
+public class JPPFSystemInformation implements PropertiesCollection<String>
 {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Map holding the system properties.
+   * Mapping of all properties containers.
    */
-  private TypedProperties system = null;
-  /**
-   * Map holding the runtime information
-   */
-  private TypedProperties runtime = null;
-  /**
-   * Map holding the environment variables.
-   */
-  private TypedProperties env = null;
-  /**
-   * Map holding the JPPF configuration properties.
-   */
-  private TypedProperties jppf = null;
-  /**
-   * A map of the network configuration.
-   */
-  private TypedProperties network = null;
-  /**
-   * A map of the available storage information.
-   */
-  private TypedProperties storage = null;
-  /**
-   * A <code>TypedProperties</code> wrapper for the uuid of the corresponding JPPF component.
-   */
-  private TypedProperties uuidProps = null;
-  /**
-   * An array of all the sets of properties.
-   */
-  private TypedProperties[] propertiesArray = null;
+  private Map<String, TypedProperties> map = new LinkedHashMap<String, TypedProperties>();
 
   /**
    * Initialize this system information object with the specified uuid.
@@ -80,8 +52,9 @@ public class JPPFSystemInformation implements Serializable
    */
   public JPPFSystemInformation(final String uuid)
   {
-    uuidProps = new TypedProperties();
+    TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
+    addProperties("uuid", uuidProps);
   }
 
   /**
@@ -91,7 +64,7 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getSystem()
   {
-    return system;
+    return getProperties("system");
   }
 
   /**
@@ -110,7 +83,7 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getRuntime()
   {
-    return runtime;
+    return getProperties("runtime");
   }
 
   /**
@@ -120,7 +93,7 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getEnv()
   {
-    return env;
+    return getProperties("env");
   }
 
   /**
@@ -137,7 +110,7 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getNetwork()
   {
-    return network;
+    return getProperties("network");
   }
 
   /**
@@ -147,7 +120,7 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getJppf()
   {
-    return jppf;
+    return getProperties("jppf");
   }
 
   /**
@@ -168,7 +141,7 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getStorage()
   {
-    return storage;
+    return getProperties("storage");
   }
 
   /**
@@ -177,14 +150,13 @@ public class JPPFSystemInformation implements Serializable
    */
   public JPPFSystemInformation populate()
   {
-    system = SystemUtils.getSystemProperties();
-    runtime = SystemUtils.getRuntimeInformation();
-    env = SystemUtils.getEnvironment();
-    jppf = JPPFConfiguration.getProperties();
-    network = SystemUtils.getNetwork();
-    storage = SystemUtils.getStorageInformation();
-    if (uuidProps == null) uuidProps = new TypedProperties();
-    propertiesArray = new TypedProperties[] { uuidProps, jppf, system, env, network, runtime, storage };
+    addProperties("system", SystemUtils.getSystemProperties());
+    addProperties("runtime", SystemUtils.getRuntimeInformation());
+    addProperties("env", SystemUtils.getEnvironment());
+    addProperties("jppf", JPPFConfiguration.getProperties());
+    addProperties("network", SystemUtils.getNetwork());
+    addProperties("storage", SystemUtils.getStorageInformation());
+    if (getProperties("uuid") == null) addProperties("uuid", new TypedProperties());
     return this;
   }
 
@@ -272,15 +244,34 @@ public class JPPFSystemInformation implements Serializable
    */
   public TypedProperties getUuid()
   {
-    return uuidProps;
+    return getProperties("uuid");
   }
 
   /**
    * Get all the properties as an array.
    * @return an array of all the sets of properties.
    */
+  @Override
   public TypedProperties[] getPropertiesArray()
   {
-    return propertiesArray;
+    return map.values().toArray(new TypedProperties[map.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addProperties(final String key, final TypedProperties properties)
+  {
+    map.put(key, properties);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TypedProperties getProperties(final String key)
+  {
+    return map.get(key);
   }
 }

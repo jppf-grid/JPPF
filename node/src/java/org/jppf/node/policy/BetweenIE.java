@@ -18,7 +18,7 @@
 
 package org.jppf.node.policy;
 
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.utils.PropertiesCollection;
 
 /**
  * An execution policy rule that encapsulates a test of type <i>a &lt;= property_value &lt; b</i>.
@@ -64,7 +64,7 @@ public class BetweenIE extends ExecutionPolicy
    * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public boolean accepts(final JPPFSystemInformation info)
+  public boolean accepts(final PropertiesCollection info)
   {
     try
     {

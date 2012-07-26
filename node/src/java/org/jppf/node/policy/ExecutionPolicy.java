@@ -20,8 +20,7 @@ package org.jppf.node.policy;
 
 import java.io.Serializable;
 
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 
 /**
  * Interface for all execution policy implementations.
@@ -48,7 +47,7 @@ public abstract class ExecutionPolicy implements Serializable
    * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
    */
-  public abstract boolean accepts(JPPFSystemInformation info);
+  public abstract boolean accepts(PropertiesCollection info);
 
   /**
    * Create an execution policy that is a logical "AND" combination of this policy and the one specified as operand.
@@ -110,7 +109,7 @@ public abstract class ExecutionPolicy implements Serializable
    * @param name the name of the property to look for.
    * @return the value of the property, or null if it could not be found.
    */
-  public String getProperty(final JPPFSystemInformation info, final String name)
+  public String getProperty(final PropertiesCollection info, final String name)
   {
     for (TypedProperties props: info.getPropertiesArray())
     {
@@ -196,7 +195,7 @@ public abstract class ExecutionPolicy implements Serializable
      * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
-    public boolean accepts(final JPPFSystemInformation info)
+    public boolean accepts(final PropertiesCollection info)
     {
       if ((rules == null) || (rules.length <= 0)) return true;
       boolean b = true;
@@ -244,7 +243,7 @@ public abstract class ExecutionPolicy implements Serializable
      * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
-    public boolean accepts(final JPPFSystemInformation info)
+    public boolean accepts(final PropertiesCollection info)
     {
       if ((rules == null) || (rules.length <= 0)) return true;
       boolean b = false;
@@ -292,7 +291,7 @@ public abstract class ExecutionPolicy implements Serializable
      * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
-    public boolean accepts(final JPPFSystemInformation info)
+    public boolean accepts(final PropertiesCollection info)
     {
       if ((rules == null) || (rules.length <= 0)) return true;
       boolean b = rules[0].accepts(info);
@@ -345,7 +344,7 @@ public abstract class ExecutionPolicy implements Serializable
      * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
-    public boolean accepts(final JPPFSystemInformation info)
+    public boolean accepts(final PropertiesCollection info)
     {
       return !rule.accepts(info);
     }

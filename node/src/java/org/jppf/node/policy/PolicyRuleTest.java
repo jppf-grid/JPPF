@@ -19,6 +19,7 @@
 package org.jppf.node.policy;
 
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.utils.PropertiesCollection;
 import org.slf4j.*;
 
 /**
@@ -43,17 +44,17 @@ public class PolicyRuleTest extends ExecutionPolicy
    * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public boolean accepts(final JPPFSystemInformation info)
+  public boolean accepts(final PropertiesCollection info)
   {
     boolean result = false;
     if (info != null)
     {
-      String s = info.getJppf().getString("node.execution.policy");
+      String s = ((JPPFSystemInformation) info).getJppf().getString("node.execution.policy");
       result = (s != null);
     }
     if (debugEnabled)
     {
-      String s = info.getNetwork().getString("ipv4.addresses");
+      String s = ((JPPFSystemInformation) info).getNetwork().getString("ipv4.addresses");
       log.debug("node [" + s + "] accepted = " + result);
     }
     return result;
