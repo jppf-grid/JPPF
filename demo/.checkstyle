@@ -10,9 +10,7 @@
   <filter name="FileTypesFilter" enabled="true">
     <filter-data value="java"/>
   </filter>
-  <filter name="FilesFromPackage" enabled="false">
-    <filter-data value="src/java/test/classloader"/>
-    <filter-data value="src/java/test/hazelcast"/>
-    <filter-data value="src/java/test/nathalie"/>
+  <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/java/test/jmx"/>
   </filter>
 </fileset-config>
