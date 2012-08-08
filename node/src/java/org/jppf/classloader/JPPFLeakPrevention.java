@@ -57,11 +57,11 @@ final class JPPFLeakPrevention {
   /**
    * Flag that enables preventing JDBC Driver, Introspector and ResourceBundle leaks.
    */
-  private static final boolean preventJVM = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.jvm", true);
+  private static final boolean preventJVM = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.jvm", false);
   /**
    * Flag that enables prevents leaking thread by stopping it and shutting down thread pool executor service when necessary.
    */
-  private static final boolean preventThread = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.thread", true);
+  private static final boolean preventThread = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.thread", false);
   /**
    * Flag enables clearing leaked <code>TimerThreads</code> from scheduled TimerTasks.
    */
@@ -69,11 +69,11 @@ final class JPPFLeakPrevention {
   /**
    * Flag that enables clering thread local and inheritable thread local values.
    */
-  private static final boolean preventThreadLocal = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.thread.local", true);
+  private static final boolean preventThreadLocal = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.thread.local", false);
   /**
    * Flag that enables preventing HTTP keep alive thread leaks.
    */
-  private static final boolean preventKeepAlive = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.keep.alive", true);
+  private static final boolean preventKeepAlive = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.keep.alive", false);
   /**
    * Flag that enables clearing static fields.
    */
@@ -184,7 +184,6 @@ final class JPPFLeakPrevention {
         if (ccl == classLoader)
         {
           if (thread == Thread.currentThread()) continue;
-
           ThreadGroup threadGroup = thread.getThreadGroup();
           if (threadGroup != null && (THREAD_GROUP_SYSTEM.equals(threadGroup.getName()) || THREAD_GROUP_RMI_RUNTIME.equals(threadGroup.getName())))
           {
@@ -201,7 +200,8 @@ final class JPPFLeakPrevention {
           if (preventTimer && "java.util.TimerThread".equals(thread.getClass().getName()))
           {
             clearTimerThread(thread);
-          } else if (preventThread)
+          } 
+          else if (preventThread)
           {
             try {
               Field fieldTarget = getDeclaredAccessibleField(thread.getClass(), "target");
