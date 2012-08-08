@@ -74,6 +74,10 @@ public final class SystemUtils
    * The type of this host's OS.
    */
   private static final int OS_TYPE = determineOSType();
+  /**
+   * Holds and manages the shutdown hooks set on the JVM.
+   */
+  private static Map<String, Thread> shutdownHooks = new Hashtable<String, Thread>();
 
   /**
    * Instantiation of this class is not permitted.
@@ -367,5 +371,27 @@ public final class SystemUtils
       }
     }
     return pid;
+  }
+
+  /**
+   * Add the specified shutdown hook with the specified key.
+   * @param key the hokk's key.
+   * @param hook the shutdown hook to add.
+   */
+  public static void addShutdownHook(final String key, final Thread hook)
+  {
+    shutdownHooks.put(key, hook);
+    Runtime.getRuntime().addShutdownHook(hook);
+  }
+
+
+  /**
+   * Add the specified shutdown hook with the specified key.
+   * @param key the hokk's key.
+   */
+  public static void removeShutdownHook(final String key)
+  {
+    Thread hook = shutdownHooks.remove(key);
+    if (hook != null) Runtime.getRuntime().removeShutdownHook(hook);
   }
 }
