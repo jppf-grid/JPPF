@@ -64,4 +64,16 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
    * @return <code>true</code> if this is an SSL connection, <code>false</code> otherwise.
    */
   boolean isSSL();
+  
+  /**
+   * Get the driver's host name or ip address.
+   * @return the host as a stirng.
+   */
+  String getHost();
+
+  /**
+   * Get the port number on which the dirver is listeneing for connections.
+   * @return the port number as an int.
+   */
+  int getPort();
 }
