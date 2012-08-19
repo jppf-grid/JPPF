@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
+package org.jppf.utils;
 
 
 /**
@@ -36,7 +36,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the prologue for the formatted text.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#start()
+   * @see org.jppf.utils.PropertiesTableFormat#start()
    */
   @Override
   public void start()
@@ -47,7 +47,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the epilogue for the formatted text.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#end()
+   * @see org.jppf.utils.PropertiesTableFormat#end()
    */
   @Override
   public void end()
@@ -58,7 +58,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
   /**
    * Write the prologue of a table.
    * @param title the title for the table.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableStart(java.lang.String)
+   * @see org.jppf.utils.PropertiesTableFormat#tableStart(java.lang.String)
    */
   @Override
   public void tableStart(final String title)
@@ -69,7 +69,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the prologue of a table.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#tableEnd()
+   * @see org.jppf.utils.PropertiesTableFormat#tableEnd()
    */
   @Override
   public void tableEnd()
@@ -79,7 +79,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the prologue of a table row.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowStart()
+   * @see org.jppf.utils.PropertiesTableFormat#rowStart()
    */
   @Override
   public void rowStart()
@@ -89,7 +89,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the prologue of a table row.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#rowEnd()
+   * @see org.jppf.utils.PropertiesTableFormat#rowEnd()
    */
   @Override
   public void rowEnd()
@@ -99,7 +99,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the prologue of a table cell.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellStart()
+   * @see org.jppf.utils.PropertiesTableFormat#cellStart()
    */
   @Override
   public void cellStart()
@@ -109,7 +109,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the prologue of a table cell.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellEnd()
+   * @see org.jppf.utils.PropertiesTableFormat#cellEnd()
    */
   @Override
   public void cellEnd()
@@ -119,7 +119,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat
 
   /**
    * Write the separator between 2 cells.
-   * @see org.jppf.ui.monitoring.node.PropertiesTableFormat#cellSeparator()
+   * @see org.jppf.utils.PropertiesTableFormat#cellSeparator()
    */
   @Override
   public void cellSeparator()

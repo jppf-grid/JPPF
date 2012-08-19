@@ -24,7 +24,7 @@ import javax.swing.*;
 
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.node.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 
 /**
  * This action displays the driver or node environment information in a separate frame.
