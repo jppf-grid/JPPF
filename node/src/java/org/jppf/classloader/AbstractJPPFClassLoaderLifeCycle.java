@@ -221,9 +221,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     return serializer;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addURL(final URL url)
   {
@@ -278,9 +275,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

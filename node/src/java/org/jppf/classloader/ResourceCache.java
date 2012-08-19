@@ -18,7 +18,7 @@
 
 package org.jppf.classloader;
 
-import java.io.*;
+import java.io.File;
 import java.net.*;
 import java.security.AccessController;
 import java.util.*;
@@ -56,14 +56,19 @@ class ResourceCache
   /**
    * List of temp folders used by this cache.
    */
-  private List<String> tempFolders = new LinkedList<String>();
+  private final List<String> tempFolders = new LinkedList<String>();
+  /**
+   * Uuid associated with this cache. This is also the name of the temp folder
+   * it uses for caching and storing remote resources.
+   */
+  private final String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
 
   /**
    * Default initializations.
    */
   ResourceCache()
   {
-    Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
+    SystemUtils.addShutdownHook("ResourceCache-" + uuid, new ShutdownHook(tempFolders));
     initTempFolders();
   }
 
@@ -181,8 +186,7 @@ class ResourceCache
       }
       if (base == null) base = "." + File.separator + ROOT_NAME;
       if (traceEnabled) log.trace("base = " + base);
-      String folderId = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
-      String s = base + File.separator + folderId;
+      String s = base + File.separator + uuid;
       File baseDir = new File(s + File.separator);
       FileUtils.mkdirs(baseDir);
       tempFolders.add(s);
@@ -212,11 +216,22 @@ class ResourceCache
    * A runnable invoked whenever this resource cache is garbage collected or the JVM shuts down,
    * so as to cleanup all cached resources on the file system.
    */
-  private class ShutdownHook implements Runnable
+  private final static class ShutdownHook extends Thread
   {
     /**
-     * {@inheritDoc}
+     * The list of folders to delete.
      */
+    private final List<String> tempFolders;
+
+    /**
+     * Initialize this shutdown hook with the specified list of folders to delete.
+     * @param tempFolders the list of folders to delete.
+     */
+    private ShutdownHook(final List<String> tempFolders)
+    {
+      this.tempFolders = tempFolders;
+    }
+
     @Override
     public void run()
     {
@@ -230,17 +245,9 @@ class ResourceCache
   @Override
   protected void finalize() throws Throwable
   {
-    Runnable r = new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        String[] paths = tempFolders.toArray(StringUtils.ZERO_STRING);
-        tempFolders.clear();
-        for (String path: paths) FileUtils.deletePath(new File(tempFolders.remove(0)));
-      }
-    };
-    new Thread(r).start();
+    System.out.println("Finalizing resource cache " + tempFolders);
+    SystemUtils.removeShutdownHook("ResourceCache-" + uuid);
+    new ShutdownHook(tempFolders).run();
     super.finalize();
   }
 }
