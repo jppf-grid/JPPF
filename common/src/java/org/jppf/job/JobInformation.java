@@ -115,7 +115,7 @@ public class JobInformation implements Serializable
 
   /**
    * Get the user-defined name for the job.
-   * @return the id as a string.
+   * @return the job name as a string.
    */
   public String getJobName()
   {
@@ -124,7 +124,7 @@ public class JobInformation implements Serializable
 
   /**
    * Set the user-defined name for the job.
-   * @param name the id as a string.
+   * @param name the name as a string.
    */
   public void setJobName(final String name)
   {

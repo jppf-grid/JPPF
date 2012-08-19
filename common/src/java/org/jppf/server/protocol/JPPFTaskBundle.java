@@ -327,7 +327,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setSLA(jobSLA);
     bundle.setMetadata(jobMetadata);
     bundle.setParameter("bundle.uuid", uuidPath.getLast() + "-" + copyCount.incrementAndGet());
-    //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
 
     return bundle;
   }
