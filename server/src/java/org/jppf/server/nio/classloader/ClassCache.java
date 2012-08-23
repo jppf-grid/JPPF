@@ -24,7 +24,7 @@ import org.jppf.utils.SoftReferenceValuesMap;
 import org.slf4j.*;
 
 /**
- * 
+ * A cache for resources loaded by client class loaders.
  * @author Laurent Cohen
  */
 public class ClassCache

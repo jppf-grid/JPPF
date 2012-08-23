@@ -112,9 +112,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
     return b;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handleException(final ChannelWrapper<?> channel)
   {
