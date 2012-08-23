@@ -135,18 +135,12 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NioServerFactory<NodeState, NodeTransition> createFactory()
   {
     return new NodeServerFactory(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void postAccept(final ChannelWrapper channel)
   {
@@ -164,27 +158,6 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
       else log.warn(ExceptionUtils.getMessage(e));
       closeNode(channel, context);
     }
-  }
-
-  /**
-   * Add a channel to the list of idle channels.
-   * @param channel the channel to add to the list.
-   */
-  public void addIdleChannel(final ChannelWrapper<?> channel)
-  {
-    if (traceEnabled) log.trace("Adding idle channel " + channel);
-    taskQueueChecker.addIdleChannel(channel);
-  }
-
-  /**
-   * Remove a channel from the list of idle channels.
-   * @param channel the channel to remove from the list.
-   * @return a reference to the removed channel.
-   */
-  public ChannelWrapper<?> removeIdleChannel(final ChannelWrapper<?> channel)
-  {
-    if (traceEnabled) log.trace("Removing idle channel " + channel);
-    return taskQueueChecker.removeIdleChannel(channel);
   }
 
   @Override
@@ -254,7 +227,7 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
       driver.getStatsManager().nodeConnectionClosed();
       NodeNioServer server = driver.getNodeNioServer();
       driver.getNodeHandler().removeNodeInformation(channel);
-      server.removeIdleChannel(channel);
+      server.getTaskQueueChecker().removeIdleChannel(channel);
       if (context != null)
       {
         String uuid = context.getUuid();
@@ -325,9 +298,6 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
     return taskQueueChecker.getIdleChannels();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void connectionFailed(final ReaperEvent event)
   {
@@ -389,12 +359,18 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
   {
     return NodeState.IDLE == channel.getContext().getState();
+  }
+
+  /**
+   * Get task that dispatches queued jobs to available nodes.
+   * @return a {@link TaskQueueChecker} instance.
+   */
+  public TaskQueueChecker getTaskQueueChecker()
+  {
+    return taskQueueChecker;
   }
 }

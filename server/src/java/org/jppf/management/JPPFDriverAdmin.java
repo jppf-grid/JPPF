@@ -178,7 +178,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
     return currentLoadBalancingInformation;
   }
- 
+
   /**
    * Compute the current load balancing parameters form the JPPF configuration.
    * @return a {@link LoadBalancingInformation} instance.
@@ -218,18 +218,12 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     return LocalizationUtils.getLocalized(I18N_BASE, message);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void resetStatistics() throws Exception
   {
     driver.getStatsManager().reset();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
@@ -238,9 +232,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     return info;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Integer matchingNodes(final ExecutionPolicy policy) throws Exception
   {
@@ -248,7 +239,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     Map<ChannelWrapper<?>, JPPFManagementInfo> map = handler.getNodeInformationMap();
     if (debugEnabled) log.debug("Testing policy against " + map.size() + " nodes:\n" + policy );
     if (policy == null) return map.size();
-    
+
     int count = 0;
     for (Map.Entry<ChannelWrapper<?>, JPPFManagementInfo> entry: map.entrySet())
     {
@@ -274,5 +265,25 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
     if (debugEnabled) log.debug("matching nodes = " + count);
     return count;
+  }
+
+  @Override
+  public Integer nbIdleNodes() throws Exception
+  {
+    return driver.getNodeNioServer().getTaskQueueChecker().getNbIdleChannels();
+  }
+
+  @Override
+  public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
+  {
+    List<ChannelWrapper<?>> idleChannels = driver.getNodeNioServer().getTaskQueueChecker().getIdleChannels();
+    List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(idleChannels.size());
+    NodeInformationHandler handler = JPPFDriver.getInstance().getNodeHandler();
+    for (ChannelWrapper<?> channel: idleChannels)
+    {
+      JPPFManagementInfo info = handler.getNodeInformation(channel);
+      if (info != null) list.add(info);
+    }
+    return list;
   }
 }

@@ -54,7 +54,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
   {
     synchronized(nodeAdmin)
     {
-      nodeAdmin.getNodeState().setConnectionStatus(localize("node.connected"));
+      nodeAdmin.getNodeState().setConnectionStatus(JPPFNodeState.ConnectionState.CONNECTED);
     }
   }
 
@@ -66,7 +66,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
   {
     synchronized(nodeAdmin)
     {
-      nodeAdmin.getNodeState().setConnectionStatus(localize("node.disconnected"));
+      nodeAdmin.getNodeState().setConnectionStatus(JPPFNodeState.ConnectionState.DISCONNECTED);
     }
   }
 
@@ -78,7 +78,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
   {
     synchronized(nodeAdmin)
     {
-      nodeAdmin.getNodeState().setExecutionStatus(localize("node.executing"));
+      nodeAdmin.getNodeState().setExecutionStatus(JPPFNodeState.ExecutionState.EXECUTING);
     }
   }
 
@@ -90,7 +90,7 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
   {
     synchronized(nodeAdmin)
     {
-      nodeAdmin.getNodeState().setExecutionStatus(localize("node.idle"));
+      nodeAdmin.getNodeState().setExecutionStatus(JPPFNodeState.ExecutionState.IDLE);
       int n = event.getTasks().size();
       n += nodeAdmin.getNodeState().getNbTasksExecuted();
       try

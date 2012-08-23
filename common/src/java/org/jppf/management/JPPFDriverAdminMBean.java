@@ -81,4 +81,16 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @throws Exception if any error occurs.
    */
   Integer matchingNodes(ExecutionPolicy policy) throws Exception;
+  /**
+   * Get the number of nodes currently idle.
+   * @return the number of idle nodes.
+   * @throws Exception if any error occurs.
+   */
+  Integer nbIdleNodes() throws Exception;;
+  /**
+   * Request the JMX connection information for all the idle nodes attached to the server.
+   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @throws Exception if any error occurs.
+   */
+  Collection<JPPFManagementInfo> idleNodesInformation() throws Exception;
 }

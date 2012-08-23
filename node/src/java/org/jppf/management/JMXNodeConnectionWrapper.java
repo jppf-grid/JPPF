@@ -200,7 +200,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public DelegationModel getDelegationModel() throws Exception
   {
-    return (DelegationModel) invoke(JPPFNodeAdminMBean.MBEAN_NAME, "getDelegationModel", (Object[]) null, (String[]) null);
+    return (DelegationModel) getAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "delegationModel");
   }
 
   /**
@@ -209,6 +209,6 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void setDelegationModel(final DelegationModel model) throws Exception
   {
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "setDelegationModel", new Object[] { model }, new String[] { "org.jppf.classloader.DelegationModel" });
+    setAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "delegationModel", model);
   }
 }

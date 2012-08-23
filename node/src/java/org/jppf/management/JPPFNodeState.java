@@ -30,17 +30,98 @@ import org.jppf.utils.LocalizationUtils;
 public class JPPFNodeState implements Serializable
 {
   /**
+   * Base name for the localizationr esource bundles.
+   */
+  private static final String I18N = "org.jppf.server.i18n.messages";
+
+  /**
+   * Enumeration of connection states.
+   */
+  public enum ConnectionState
+  {
+    /**
+     * The state is not yet known.
+     */
+    UNKNOWN("unknown"),
+    /**
+     * The node is connected.
+     */
+    CONNECTED("node.connected"),
+    /**
+     * The node is disconnected.
+     */
+    DISCONNECTED("node.diconnected");
+
+    /**
+     * The name to display.
+     */
+    private final String displayName;
+    /**
+     * Initialize this enum element witht he specified localized display name.
+     * @param msg the display name ot localize.
+     */
+    private ConnectionState(final String msg)
+    {
+      displayName = LocalizationUtils.getLocalized(I18N, msg);
+    }
+
+    @Override
+    public String toString()
+    {
+      return displayName;
+    }
+  }
+
+  /**
+   * Enumeration of execution states.
+   */
+  public enum ExecutionState
+  {
+    /**
+     * The state is not yet known.
+     */
+    UNKNOWN("unknown"),
+    /**
+     * The node is connected.
+     */
+    IDLE("node.idle"),
+    /**
+     * The node is disconnected.
+     */
+    EXECUTING("node.executing");
+
+    /**
+     * The name to display.
+     */
+    private final String displayName;
+    /**
+     * Initialize this enum element witht he specified localized display name.
+     * @param msg the display name ot localize.
+     */
+    private ExecutionState(final String msg)
+    {
+      displayName = LocalizationUtils.getLocalized(I18N, msg);
+    }
+
+    @Override
+    public String toString()
+    {
+      return displayName;
+    }
+  }
+
+  /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
    * Status of the connection between the node and the server.
    */
-  private String connectionStatus = LocalizationUtils.getLocalized("org.jppf.server.i18n.messages", "unknown");
+  private ConnectionState connectionStatus = ConnectionState.UNKNOWN;
   /**
    * Latest execution status of the node.
    */
-  private String executionStatus = LocalizationUtils.getLocalized("org.jppf.server.i18n.messages", "node.idle");
+  private ExecutionState executionStatus = ExecutionState.IDLE;
   /**
    * The number of tasks executed by the node.
    */
@@ -98,36 +179,36 @@ public class JPPFNodeState implements Serializable
 
   /**
    * Get the status of the connection between the node and the server.
-   * @return a string representing the connection status.
+   * @return the connection status.
    */
-  public synchronized String getConnectionStatus()
+  public synchronized ConnectionState getConnectionStatus()
   {
     return connectionStatus;
   }
 
   /**
    * Set the status of the connection between the node and the server.
-   * @param connectionStatus a string representing the connection status.
+   * @param connectionStatus the connection status.
    */
-  public synchronized void setConnectionStatus(final String connectionStatus)
+  public synchronized void setConnectionStatus(final ConnectionState connectionStatus)
   {
     this.connectionStatus = connectionStatus;
   }
 
   /**
    * Get the latest execution status of the node.
-   * @return a string representing the execution status.
+   * @return the execution status.
    */
-  public synchronized String getExecutionStatus()
+  public synchronized ExecutionState getExecutionStatus()
   {
     return executionStatus;
   }
 
   /**
    * Get the latest execution status of the node.
-   * @param executionStatus a string representing the execution status.
+   * @param executionStatus the execution status.
    */
-  public synchronized void setExecutionStatus(final String executionStatus)
+  public synchronized void setExecutionStatus(final ExecutionState executionStatus)
   {
     this.executionStatus = executionStatus;
   }

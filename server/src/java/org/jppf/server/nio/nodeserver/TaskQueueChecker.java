@@ -37,7 +37,7 @@ import org.slf4j.*;
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  */
-class TaskQueueChecker extends ThreadSynchronization implements Runnable
+public class TaskQueueChecker extends ThreadSynchronization implements Runnable
 {
   /**
    * Logger for this class.
@@ -84,18 +84,15 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Add a channel to the list of idle channels.
-   * @param channel the channel to add to the list.
+   * Get the number of idle channels.
+   * @return the size of the underlying list of idle channels.
    */
-  public void addIdleChannel(final ChannelWrapper<?> channel)
+  public int getNbIdleChannels()
   {
-    if (debugEnabled) log.trace("Adding idle channel " + channel);
-    synchronized(idleChannels)
+    synchronized (idleChannels)
     {
-      idleChannels.add(channel);
+      return idleChannels.size();
     }
-    wakeUp();
-    driver.getStatsManager().idleNodes(idleChannels.size());
   }
 
   /**
@@ -108,6 +105,21 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     {
       return new ArrayList<ChannelWrapper<?>>(idleChannels);
     }
+  }
+
+  /**
+   * Add a channel to the list of idle channels.
+   * @param channel the channel to add to the list.
+   */
+  public void addIdleChannel(final ChannelWrapper<?> channel)
+  {
+    if (debugEnabled) log.trace("Adding idle channel " + channel);
+    synchronized(idleChannels)
+    {
+      idleChannels.add(channel);
+    }
+    wakeUp();
+    driver.getStatsManager().idleNodes(idleChannels.size());
   }
 
   /**

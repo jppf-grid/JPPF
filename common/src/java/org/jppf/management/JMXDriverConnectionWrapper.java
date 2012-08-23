@@ -227,30 +227,33 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     return (NodeJobInformation[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void resetStatistics() throws Exception
   {
     invoke(MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
     return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Integer matchingNodes(final ExecutionPolicy policy) throws Exception
   {
     return (Integer) invoke(MBEAN_NAME, "matchingNodes", new Object[] { policy }, new String[] { ExecutionPolicy.class.getName() });
+  }
+
+  @Override
+  public Integer nbIdleNodes() throws Exception
+  {
+    return (Integer) invoke(MBEAN_NAME, "nbIdleNodes", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
+  {
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation", (Object[]) null, (String[]) null);
   }
 }

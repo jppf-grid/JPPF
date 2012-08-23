@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.util.*;
 
+import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.JPPFStats;
@@ -32,7 +33,7 @@ import org.jppf.utils.TypedProperties;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.LifeCycleTask;
 
 /**
  * Unit tests for {@link JPPFDriverAdminMBean}.
@@ -224,6 +225,45 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       //if (driver != null) driver.close();
       if (nodes != null) for (JMXNodeConnectionWrapper node: nodes) node.close();
     }
+  }
+
+  /**
+   * Test getting idle nodes information from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testIdleNodesInformation() throws Exception
+  {
+    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    assertNotNull(driver);
+    Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
+    assertNotNull(coll);
+    assertEquals(2, coll.size());
+    JPPFJob job = BaseSetup.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 3000L);
+    client.submit(job);
+    Thread.sleep(500L);
+    coll = driver.idleNodesInformation();
+    assertEquals(1, coll.size());
+    ((JPPFResultCollector) job.getResultListener()).waitForResults();
+  }
+
+  /**
+   * Test getting the number of idle nodes from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testNbIdleNodes() throws Exception
+  {
+    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    assertNotNull(driver);
+    int n = driver.nbIdleNodes();
+    assertEquals(2, n);
+    JPPFJob job = BaseSetup.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 3000L);
+    client.submit(job);
+    Thread.sleep(500L);
+    n = driver.nbIdleNodes();
+    assertEquals(1, n);
+    ((JPPFResultCollector) job.getResultListener()).waitForResults();
   }
 
   /**
