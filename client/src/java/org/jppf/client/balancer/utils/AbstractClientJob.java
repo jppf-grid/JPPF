@@ -21,7 +21,7 @@ package org.jppf.client.balancer.utils;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.node.protocol.*;
 import org.slf4j.*;
@@ -406,6 +406,7 @@ public abstract class AbstractClientJob
   public boolean acceptsChannel(final ChannelWrapper channel)
   {
     if (channel.isLocal()) return true;
+    checkRemoteChannel();
     // we accept a single channel, always the same
     if ((remoteChannel == null) || (remoteChannel == channel)) return true;
     return false;
@@ -418,5 +419,28 @@ public abstract class AbstractClientJob
   public void clearChannels()
   {
     localChannel = remoteChannel = null;
+  }
+
+  /**
+   * Check if the remote channel is available.
+   * @return <code>true</code> if the remote channel is available, <code>false</code> otherwise.
+   */
+  private boolean checkRemoteChannel()
+  {
+    boolean b = checkChannel(remoteChannel);
+    if (!b) remoteChannel = null;
+    return b;
+  }
+
+  /**
+   * Check if the specified channel is available.
+   * @param channel the channel to check.
+   * @return <code>true</code> if the channel is available, <code>false</code> otherwise.
+   */
+  private boolean checkChannel(final ChannelWrapper channel)
+  {
+    if (channel == null) return true;
+    JPPFClientConnectionStatus status = channel.getStatus();
+    return (status == JPPFClientConnectionStatus.ACTIVE) || (status == JPPFClientConnectionStatus.EXECUTING);
   }
 }
