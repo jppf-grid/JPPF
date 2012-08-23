@@ -324,6 +324,42 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     }
   }
 
+
+  /**
+   * Get the value of an attribute of the specified MBean.
+   * @param name the name of the MBean.
+   * @param attribute the name of the attribute to read.
+   * @param value the value to set on the attribute.
+   * @throws Exception if the invocation failed.
+   */
+  public void setAttribute(final String name, final String attribute, final Object value) throws Exception
+  {
+    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return;
+    synchronized(this)
+    {
+      try
+      {
+        ObjectName mbeanName = new ObjectName(name);
+        getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
+      }
+      catch(IOException e)
+      {
+        setConnectedStatus(false);
+        try
+        {
+          if (jmxc != null) jmxc.close();
+        }
+        catch(Exception e2)
+        {
+          if (debugEnabled) log.debug(e2.getMessage(), e2);
+        }
+        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+        if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+        throw e;
+      }
+    }
+  }
+
   /**
    * Get the host the server is running on.
    * @return the host as a string.
@@ -421,14 +457,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public <T> T getProxy(final ObjectName objectName, final Class<T> inf) throws Exception
   {
-    // if the connection is not yet established, then connect
-    //if (!isConnected()) connectAndWait(5000L);
     if (!isConnected()) connect();
     if (isConnected())
     {
-      // obtain a connection to the remote MBean server
       MBeanServerConnection mbsc = getMbeanConnection();
-      // finally obtain and return a proxy to the specified remote MBean
       return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
     }
     return null;
