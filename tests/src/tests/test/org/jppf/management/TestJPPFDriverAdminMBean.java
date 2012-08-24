@@ -63,7 +63,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertTrue("nb idle nodes should be 2 but is " + n, n == 2);
     assertTrue(stats.getExecution().getAvg() > 0d);
     assertTrue(stats.getNodeExecution().getMax() > 0d);
-    assertTrue(stats.getTotalTasksExecuted() == 10);
+    assertEquals(10, stats.getTotalTasksExecuted());
   }
 
   /**
@@ -113,6 +113,25 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       assertNotNull(prefix + " id is null", info.getId());
       i++;
     }
+  }
+
+  /**
+   * Test getting the number of nodes attached to the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testNbNodes() throws Exception
+  {
+    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    assertNotNull(driver);
+    int n = driver.nbNodes();
+    assertEquals(2, n);
+    JPPFJob job = BaseSetup.createJob("testNbNodes", false, false, 1, LifeCycleTask.class, 2000L);
+    client.submit(job);
+    Thread.sleep(500L);
+    n = driver.nbNodes();
+    assertEquals(2, n);
+    ((JPPFResultCollector) job.getResultListener()).waitForResults();
   }
 
   /**
@@ -258,7 +277,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertNotNull(driver);
     int n = driver.nbIdleNodes();
     assertEquals(2, n);
-    JPPFJob job = BaseSetup.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 3000L);
+    JPPFJob job = BaseSetup.createJob("testNbIdleNodes", false, false, 1, LifeCycleTask.class, 3000L);
     client.submit(job);
     Thread.sleep(500L);
     n = driver.nbIdleNodes();

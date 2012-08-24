@@ -41,6 +41,12 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    */
   JPPFStats statistics() throws Exception;
   /**
+   * Get the number of nodes attached to the driver.
+   * @return the number of nodes.
+   * @throws Exception if any error occurs.
+   */
+  Integer nbNodes() throws Exception;;
+  /**
    * Request the JMX connection information for all the nodes attached to the server.
    * @return a collection of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.

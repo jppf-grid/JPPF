@@ -64,6 +64,12 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     local = false;
   }
 
+  @Override
+  public Integer nbNodes() throws Exception
+  {
+    return (Integer) invoke(MBEAN_NAME, "nbNodes", (Object[]) null, (String[]) null);
+  }
+
   /**
    * Request the JMX connection information for all the nodes attached to the server.
    * @return a collection of <code>NodeManagementInfo</code> instances.

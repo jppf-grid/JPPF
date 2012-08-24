@@ -113,6 +113,18 @@ public class NodeInformationHandler
   }
 
   /**
+   * Get number of nodes attached to the server.
+   * @return the number of nodes as an <code>int</code> value.
+   */
+  public int getNbNodes()
+  {
+    synchronized (nodeInfo)
+    {
+      return nodeInfo.size();
+    }
+  }
+
+  /**
    * Get the mapping of node uuid to corresponding node information.
    * @return channel a map of <code>String</code> keys to <code>JPPFManagementInfo</code> values.
    */
