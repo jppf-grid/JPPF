@@ -33,10 +33,6 @@ public class RunnableTaskWrapper extends AbstractTaskObjectWrapper
    * The object on which to execute a method, or the class of the object if the method is static.
    */
   private Runnable runnable = null;
-  /**
-   * The name of the method to execute.
-   */
-  private String methodName = null;
 
   /**
    * Initialize this wrapper with the specified <code>Runnable</code> object.

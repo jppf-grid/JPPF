@@ -236,10 +236,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
   public <T> Future<T> submit(final Callable<T> task)
   {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
-    if (task instanceof JPPFTask)
-    {
-      return batchHandler.addTask((JPPFTask) task, (T) null);
-    }
+    if (task instanceof JPPFTask) return batchHandler.addTask((JPPFTask) task, (T) null);
     return batchHandler.addTask(task);
   }
 
@@ -252,12 +249,9 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
   @Override
   public Future<?> submit(final Runnable task)
   {
-    if (task instanceof JPPFTask)
-    {
-      if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
-      return batchHandler.addTask((JPPFTask) task, (Object) null);
-    }
-    return submit(new RunnableWrapper<Object>(task, null));
+    if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
+    if (task instanceof JPPFTask) return batchHandler.addTask((JPPFTask) task, (Object) null);
+    return batchHandler.addTask(task, (Object) null);
   }
 
   /**
@@ -271,7 +265,9 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
   @Override
   public <T> Future<T> submit(final Runnable task, final T result)
   {
-    return submit(new RunnableWrapper<T>(task, result));
+    if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
+    if (task instanceof JPPFTask) return batchHandler.addTask((JPPFTask) task, result);
+    return batchHandler.addTask((Runnable) task, result);
   }
 
   /**

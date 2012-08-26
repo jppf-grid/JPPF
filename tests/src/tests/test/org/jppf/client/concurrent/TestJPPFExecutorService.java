@@ -43,7 +43,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   /**
    * The executor we are testing.
    */
-  private ExecutorService executor = null;
+  private JPPFExecutorService executor = null;
 
   /**
    * Launches a driver and node and start the client.

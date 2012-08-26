@@ -224,7 +224,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Submit a JPPFTask that returns the specified type of result.
+   * Submit a {@link JPPFTask} that returns the specified type of result.
    * @param <T> the type of result returned by the task.
    * @param task the task to submit.
    * @param result this parameter is only here for type inference (I know, it's ugly).
@@ -259,6 +259,43 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   }
 
   /**
+   * Submit a {@link Runnable} that returns the specified type of result.
+   * @param <T> the type of result returned by the task.
+   * @param task the task to submit.
+   * @param result the result for the task.
+   * @return a {@link Future} representing pending completion of the task.
+   */
+  <T> Future<T> addTask(final Runnable task, final T result)
+  {
+    lock.lock();
+    try
+    {
+      if (debugEnabled) log.debug("submitting one Runnable task with result");
+      Future<T> future = null;
+      JPPFJob job = nextJobRef.get();
+      try
+      {
+        FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
+        JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.addTask(task);
+        t.setResult(result);
+        configureTask(t);
+        future = new JPPFTaskFuture<T>(collector, t.getPosition());
+      }
+      catch (JPPFException e)
+      {
+        log.error(e.getMessage(), e);
+        throw new RejectedExecutionException(e);
+      }
+      updateNextJob(true);
+      return future;
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
    * Submit a task for execution.
    * @param <T> the type of results.
    * @param task the task to submit.
@@ -275,8 +312,8 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       try
       {
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-        JPPFTask jppfTask = job.addTask(task);
-        configureTask((JPPFAnnotatedTask) jppfTask);
+        JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.addTask(task);
+        configureTask(jppfTask);
         future = new JPPFTaskFuture<T>(collector, jppfTask.getPosition());
       }
       catch (JPPFException e)

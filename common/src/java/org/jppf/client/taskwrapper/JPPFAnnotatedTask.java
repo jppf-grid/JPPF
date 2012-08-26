@@ -83,7 +83,7 @@ public class JPPFAnnotatedTask extends JPPFTask
     try
     {
       Object result = taskObjectWrapper.execute();
-      setResult(result);
+      if ((getResult() == null) && ((taskObjectWrapper instanceof RunnableTaskWrapper) || (result != null))) setResult(result);
     }
     catch(Exception e)
     {
