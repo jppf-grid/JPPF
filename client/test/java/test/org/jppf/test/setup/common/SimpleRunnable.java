@@ -58,5 +58,6 @@ public class SimpleRunnable implements Runnable, Serializable
   public void run()
   {
     executionResult.message = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
+    System.out.println(this.getClass().getSimpleName() + " result=" + executionResult);
   }
 }

@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.concurrent.JPPFExecutorService;
-import org.jppf.scheduling.JPPFSchedule;
 import org.slf4j.*;
 
 
@@ -50,39 +49,36 @@ public class Main
     JPPFExecutorService executor = new JPPFExecutorService(client);
     try
     {
+      while (!client.hasAvailableConnection()) Thread.sleep(10L);
       executor.setBatchSize(5);
       executor.setBatchTimeout(100L);
-      List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
-      int nbTasks = 20;
-      logger.info("Adding tasks");
+      List<Future<?>> futures = new ArrayList<Future<?>>(20);
+      int nbTasks = 1;
+      print("Adding tasks");
       for (int i = 0; i < nbTasks; i++)
       {
-        futures.add(executor.submit(new SimpleCountTask(i)));
+        futures.add(executor.submit(new MyRunnableTask()));
         //Thread.sleep(1);
       }
-      logger.info("Waiting for pending tasks to complete");
+      print("Waiting for pending tasks to complete");
       /*
       executor.shutdown();
-      while (!executor.isTerminated())
+      while (!executor.isTerminated()) Thread.sleep(1000);
+       */
+      for (int i=0; i<nbTasks; i++)
       {
-        Thread.sleep(1000);
+        print("Checking task {" + i + "}");
+        futures.get(i).get();
+        //if (futures.get(i).get() != i) throw new Exception("Invalid future response");
       }
-      */
-      logger.info("Pending tasks completed");
-      for (int i = 0; i < nbTasks; i++)
-      {
-        logger.info("Checking task {}", i);
-        if (futures.get(i).get() != i)
-        {
-          throw new Exception("Invalid future response");
-        }
-      }
-      logger.info("All completed tasks checked");
+      print("Pending tasks completed");
 
+      /*
       MyTask myTask = new MyTask();
       myTask.setTimeoutSchedule(new JPPFSchedule(5000L));
       Future<String> future = executor.submit((Callable<String>) myTask);
       System.out.println("result: " + future.get());
+       */
     }
     catch (Exception e)
     {
@@ -93,6 +89,16 @@ public class Main
       executor.shutdownNow();
       client.close();
     }
+  }
+
+  /**
+   * Print the specified message.
+   * @param msg the message to print.
+   */
+  private static void print(final String msg)
+  {
+    logger.info(msg);
+    System.out.println(msg);
   }
 
   /**
@@ -140,6 +146,17 @@ public class Main
       logger.info("From stdout " + number);
       return number;
     }
+  }
 
+  /**
+   * 
+   */
+  public static class MyRunnableTask implements Runnable, Serializable
+  {
+    @Override
+    public void run()
+    {
+      System.out.println("running MyRunnableTask");
+    }
   }
 }

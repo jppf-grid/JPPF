@@ -46,6 +46,6 @@ public class TaskResult implements Serializable
   @Override
   public String toString()
   {
-    return "Result[\"" + message + "\", " + position + ']';
+    return "TaskResult[\"" + message + "\", " + position + ']';
   }
 }
