@@ -81,73 +81,51 @@ public abstract class JPPFTask implements Task<Object>
    */
   private String id = null;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Object getResult()
   {
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setResult(final Object  result)
   {
     this.result = result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Exception getException()
   {
     return exception;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setException(final Exception exception)
   {
     this.exception = exception;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataProvider getDataProvider()
   {
     return dataProvider;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setDataProvider(final DataProvider dataProvider)
   {
     this.dataProvider = dataProvider;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public final int getPosition() {
+  public final int getPosition()
+  {
     return position;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public final void setPosition(final int position) {
+  public final void setPosition(final int position)
+  {
     this.position = position;
   }
 
@@ -248,27 +226,18 @@ public abstract class JPPFTask implements Task<Object>
     timeoutSchedule = new JPPFSchedule(timeoutDate, format);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getId()
   {
     return id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setId(final String id)
   {
     this.id = id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void onCancel()
   {
@@ -286,35 +255,23 @@ public abstract class JPPFTask implements Task<Object>
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void onTimeout()
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Object getTaskObject()
   {
-    return null;
+    return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFSchedule getTimeoutSchedule()
   {
     return timeoutSchedule;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule)
   {
