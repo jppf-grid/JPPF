@@ -47,6 +47,7 @@ public class Main
     logger.info("Starting test");
     JPPFClient client = new JPPFClient();
     JPPFExecutorService executor = new JPPFExecutorService(client);
+    ExecutorCompletionService ecs = new ExecutorCompletionService(executor);
     try
     {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
@@ -57,7 +58,8 @@ public class Main
       print("Adding tasks");
       for (int i = 0; i < nbTasks; i++)
       {
-        futures.add(executor.submit(new MyRunnableTask()));
+        //futures.add(executor.submit(new MyRunnableTask()));
+        futures.add(ecs.submit(new MyRunnableTask(), "result"));
         //Thread.sleep(1);
       }
       print("Waiting for pending tasks to complete");
