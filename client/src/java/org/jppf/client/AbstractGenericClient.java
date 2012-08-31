@@ -186,7 +186,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
             int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), sslEnabled ? 11443 : 11111, false);
             if (!sslEnabled) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
-            info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
+            if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
+            else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             int priority = props.getInt(String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
             newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
