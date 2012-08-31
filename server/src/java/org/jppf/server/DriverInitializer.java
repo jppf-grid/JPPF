@@ -164,10 +164,9 @@ public class DriverInitializer
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
       connectionInfo.host = NetworkUtils.getManagementHost();
       if (config.getBoolean("jppf.management.enabled", true))
-      {
         connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
-        connectionInfo.sslManagementPort = config.getInt("jppf.management.port", 11198);
-      }
+      if (config.getBoolean("jppf.management.ssl.enabled", false))
+        connectionInfo.sslManagementPort = config.getInt("jppf.management.ssl.port", 11193);
       boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
       if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
     }
