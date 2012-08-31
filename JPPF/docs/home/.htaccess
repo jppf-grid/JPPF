@@ -1,0 +1,12 @@
+AddType application/x-java-jnlp-file JNLP
+<IfModule mod_security.c>
+   # Turn off mod_security filtering.
+   SecFilterEngine Off
+
+   # The below probably isn't needed, but better safe than sorry.
+   SecFilterScanPOST Off
+</IfModule>
+
+RewriteEngine on
+#RewriteRule ^wiki\/?(.*)$ "\/doc\/v2\/$1" [R]
+RewriteRule ^wiki\/?(.*)$ /doc/v2/$1 [R]
