@@ -208,7 +208,7 @@ public class NodeListener implements NodeLifeCycleListener
         }
       }
       // get a reference to the client class loader, which is used to load the tasks classes
-      AbstractJPPFClassLoader clientCL = (AbstractJPPFClassLoader) tasks.get(0).getClass().getClassLoader();
+      AbstractJPPFClassLoader clientCL = (AbstractJPPFClassLoader) tasks.get(0).getTaskObject().getClass().getClassLoader();
       libraryManager.processUpdates(libsToUpdate, clientCL);
     }
     return libsToUpdate.size();
