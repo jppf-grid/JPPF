@@ -36,23 +36,23 @@ class ResourceCache
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ResourceCache.class);
+  private static final Logger log = LoggerFactory.getLogger(ResourceCache.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Name of the resource cache root.
    */
-  private static String ROOT_NAME = ".jppf";
+  private static final String ROOT_NAME = ".jppf";
   /**
    * Map of resource names to temporary file names to which their content is stored.
    */
-  private Map<String, List<String>> cache = new Hashtable<String, List<String>>();
+  private final Map<String, List<String>> cache = new HashMap<String, java.util.List<String>>();
   /**
    * List of temp folders used by this cache.
    */
@@ -62,6 +62,10 @@ class ResourceCache
    * it uses for caching and storing remote resources.
    */
   private final String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+  /**
+   * Holds state of the cache, Indicates whether cache is alive.
+   */
+  private boolean alive = true;
 
   /**
    * Default initializations.
@@ -79,6 +83,7 @@ class ResourceCache
    */
   public synchronized List<String> getResourcesLocations(final String name)
   {
+    requireAlive();
     return cache.get(name);
   }
 
@@ -89,6 +94,7 @@ class ResourceCache
    */
   public synchronized String getResourceLocation(final String name)
   {
+    requireAlive();
     List<String> locations = cache.get(name);
     if ((locations == null) || locations.isEmpty()) return null;
     return locations.get(0);
@@ -101,6 +107,7 @@ class ResourceCache
    */
   public synchronized void setResourcesLocations(final String name, final List<String> locations)
   {
+    requireAlive();
     cache.put(name, locations);
   }
 
@@ -184,7 +191,7 @@ class ResourceCache
           base += ROOT_NAME;
         }
       }
-      if (base == null) base = "." + File.separator + ROOT_NAME;
+      if (base == null) base = '.' + File.separator + ROOT_NAME;
       if (traceEnabled) log.trace("base = " + base);
       String s = base + File.separator + uuid;
       File baseDir = new File(s + File.separator);
@@ -203,13 +210,30 @@ class ResourceCache
    * @param path the path to verify.
    * @return true if the path is absolute, false otherwise
    */
-  private boolean isAbsolutePath(final String path)
+  private static boolean isAbsolutePath(final String path)
   {
     if (path.startsWith("/") || path.startsWith("\\")) return true;
     if (path.length() < 3) return false;
     char c = path.charAt(0);
     if ((((c >= 'A') && (c <='Z')) || ((c >= 'a') && (c <= 'z'))) && (path.charAt(1) == ':')) return true;
     return false;
+  }
+
+  /**
+   * Checks whether cache is alive.
+   */
+  protected final void requireAlive() {
+    if(!alive) throw new IllegalStateException("ResourceCache " + uuid + " not alive.");
+  }
+
+  /**
+   * Close this resource cache and clean all resources it uses.
+   */
+  public synchronized void close()
+  {
+    alive = false;
+    SystemUtils.removeShutdownHook("ResourceCache-" + uuid);
+    new ShutdownHook(tempFolders).run();
   }
 
   /**
@@ -246,8 +270,7 @@ class ResourceCache
   protected void finalize() throws Throwable
   {
     System.out.println("Finalizing resource cache " + tempFolders);
-    SystemUtils.removeShutdownHook("ResourceCache-" + uuid);
-    new ShutdownHook(tempFolders).run();
+    close();
     super.finalize();
   }
 }

@@ -54,7 +54,11 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   /**
    * Provides a lock in <code>findClass()</code> to avoid duplicate class definition attempts.
    */
-  private Object findClassLock = new Object();
+  private final Object findClassLock = new Object();
+  /**
+   * The cache handling resources temporarily stored to file.
+   */
+  private final ResourceCache cache = new ResourceCache();
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -584,5 +588,21 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public void clearNotFoundCache()
   {
     nfCache.clear();
+  }
+
+  /**
+   * Terminate this classloader and clean the resources it uses.
+   */
+  @Override
+  public void close() {
+    LOCK.lock();
+    try
+    {
+      cache.close();
+    }
+    finally
+    {
+      LOCK.unlock();
+    }
   }
 }

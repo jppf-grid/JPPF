@@ -250,6 +250,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
           socketClient = null;
         }
       }
+      super.close();
     }
     finally
     {

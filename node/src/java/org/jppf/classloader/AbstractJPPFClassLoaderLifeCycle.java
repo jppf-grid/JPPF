@@ -73,10 +73,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected String requestUuid = null;
   /**
-   * The cache handling resources temporarily stored to file.
-   */
-  protected final ResourceCache cache = new ResourceCache();
-  /**
    * The cache handling resources that were not found by this class loader.
    */
   protected final JPPFCache<String, Boolean> nfCache = new JPPFSynchronizedSoftCache<String, Boolean>();

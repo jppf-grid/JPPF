@@ -148,8 +148,12 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     LOCK.lock();
     try
     {
-      requestHandler.close();
-      requestHandler = null;
+      if (requestHandler != null)
+      {
+        requestHandler.close();
+        requestHandler = null;
+      }
+      super.close();
     }
     finally
     {
