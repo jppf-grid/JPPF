@@ -19,7 +19,6 @@ package org.jppf.server.peer;
 
 import java.net.*;
 import java.nio.channels.*;
-import java.util.Vector;
 
 import javax.net.ssl.*;
 
@@ -111,7 +110,6 @@ class PeerResourceProvider
     try
     {
       ClassContext context = (ClassContext) server.createNioContext();
-      context.setPendingRequests(new Vector<ChannelWrapper<?>>());
       context.setPeer(true);
       SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);

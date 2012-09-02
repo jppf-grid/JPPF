@@ -44,19 +44,19 @@ public class NioConstants
   /**
    * Name of the client class server.
    */
-  public static final String CLIENT_CLASS_SERVER = "ClientClassServer";
+  public static final String CLIENT_CLASS_SERVER = "ClientClass";
   /**
    * Name of the node class server.
    */
-  public static final String NODE_CLASS_SERVER = "NodeClassServer";
+  public static final String NODE_CLASS_SERVER = "NodeClass";
   /**
    * Name of the class server.
    */
-  public static final String NODE_SERVER = "TasksServer";
+  public static final String NODE_SERVER = "NodeJob";
   /**
    * Name of the client task server.
    */
-  public static final String CLIENT_SERVER = "ClientServer";
+  public static final String CLIENT_SERVER = "ClientJob";
   /**
    * Name of the acceptor server server.
    */

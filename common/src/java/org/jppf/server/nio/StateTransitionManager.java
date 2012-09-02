@@ -136,7 +136,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit)
   {
     Lock lock = server.getLock();
-    //server.getSelector().wakeup();
     lock.lock();
     try
     {
@@ -152,7 +151,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
         channel.setKeyOps(0);
         submitTransition(channel);
       }
-      //setKeyOps(channel, t.getInterestOps());
       if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2 + " with ops=" + t.getInterestOps());
     }
     finally
@@ -218,9 +216,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    */
   public boolean checkSubmitTransition(final ChannelWrapper<?> channel)
   {
-    /*
-    return checkShouldSubmitTransition(channel, null);
-     */
     if (channel.isLocal()) return false;
     SSLHandler sslHandler = channel.getContext().getSSLHandler();
     if (sslHandler == null) return false;
@@ -237,9 +232,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    */
   public boolean checkSubmitTransition(final ChannelWrapper<?> channel, final T transition)
   {
-    /*
-    return false;
-     */
     if (channel.isLocal()) return false;
     SSLHandler sslHandler = channel.getContext().getSSLHandler();
     if (sslHandler == null) return false;

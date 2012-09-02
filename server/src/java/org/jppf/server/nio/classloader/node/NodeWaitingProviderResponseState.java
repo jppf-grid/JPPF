@@ -20,12 +20,13 @@ package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.classloader.ResourceRequest;
 import org.slf4j.*;
 
 /**
@@ -63,52 +64,39 @@ class NodeWaitingProviderResponseState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    JPPFResourceWrapper resource = context.getResource();
-    if (JPPFResourceWrapper.State.NODE_RESPONSE == resource.getState()) return TO_SENDING_NODE_RESPONSE;
-    String name = resource.getName();
-    //uuidPath.decPosition();
-    String uuid = resource.getUuidPath().getCurrentElement();
-    ChannelWrapper<?> provider = findProviderConnection(uuid);
-    if (provider != null)
+    Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = context.getPendingResponses();
+    if (pendingResponses.isEmpty()) return sendResponse(context);
+    Queue<JPPFResourceWrapper> toRemove = new LinkedBlockingQueue<JPPFResourceWrapper>();
+    CompositeResourceWrapper composite = (CompositeResourceWrapper) context.getResource();
+    for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
     {
-      synchronized(provider)
+      JPPFResourceWrapper resource = entry.getValue().getResource();
+      if (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)
       {
-        if (debugEnabled) log.debug("request resource [" + name + "] from client: " + provider + " for node: " + channel);
-        ClassContext providerContext = (ClassContext) provider.getContext();
-        providerContext.addRequest(channel);
-        return TO_IDLE_NODE;
+        if (debugEnabled) log.debug("got response for resource " + resource);
+        toRemove.add(resource);
+        composite.getResources().remove(resource);
+        composite.getResources().add(resource);
       }
     }
-    if (debugEnabled) log.debug("no available provider for uuid=" + uuid + " : setting null response for node " + channel);
-    resource.setDefinition(null);
-    resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-    context.serializeResource();
-    return TO_SENDING_NODE_RESPONSE;
+    while (!toRemove.isEmpty()) pendingResponses.remove(toRemove.poll());
+    if (pendingResponses.isEmpty())
+    {
+      if (debugEnabled) log.debug("sending final response " + context.getResource());
+      return sendResponse(context);
+    }
+    return TO_IDLE_NODE;
   }
 
   /**
-   * Find a provider connection for the specified provider uuid.
-   * @param uuid the uuid for which to find a conenction.
-   * @return a <code>SelectableChannel</code> instance.
-   * @throws Exception if an error occurs while searching for a connection.
+   * Serialize the resource and send it back to the node.
+   * @param context the context which serializes the resource.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if any error occurs.
    */
-  private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
+  protected ClassTransition sendResponse(final ClassContext context) throws Exception
   {
-    ChannelWrapper<?> result = null;
-    ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
-    List<ChannelWrapper<?>> connections = clientClassServer.getProviderConnections(uuid);
-    if (connections == null) return null;
-    int minRequests = Integer.MAX_VALUE;
-    for (ChannelWrapper<?> channel: connections)
-    {
-      ClassContext ctx = (ClassContext) channel.getContext();
-      int size = ctx.getNbPendingRequests();
-      if (size < minRequests)
-      {
-        minRequests = size;
-        result = channel;
-      }
-    }
-    return result;
+    context.serializeResource();
+    return TO_SENDING_NODE_RESPONSE;
   }
 }

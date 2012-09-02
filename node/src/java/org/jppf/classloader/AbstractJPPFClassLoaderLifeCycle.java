@@ -20,7 +20,6 @@ package org.jppf.classloader;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -57,9 +56,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
   /**
-   * The executor that handles asynchronous resource requests.
+   * 
    */
-  protected static ExecutorService executor;
+  protected static ClassLoaderRequestHandler requestHandler = null;
   /**
    * Determines whether this class loader should handle dynamic class updating.
    */
@@ -225,54 +224,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public void addURL(final URL url)
   {
     super.addURL(url);
-  }
-
-  /**
-   * Encapsulates a remote resource request submitted asynchronously
-   * via the single-thread executor.
-   */
-  protected abstract static class AbstractResourceRequest implements Runnable
-  {
-    /**
-     * Used to collect any throwable raised during communication with the server.
-     */
-    protected Throwable throwable = null;
-    /**
-     * The request to send.
-     */
-    protected JPPFResourceWrapper request = null;
-    /**
-     * The response received.
-     */
-    protected JPPFResourceWrapper response = null;
-
-    /**
-     * Initialize with the specified request.
-     * @param request the request to send.
-     */
-    public AbstractResourceRequest(final JPPFResourceWrapper request)
-    {
-      this.request = request;
-    }
-
-    /**
-     * Get the throwable eventually raised during communication with the server.
-     * @return a {@link Throwable} instance.
-     */
-    public Throwable getThrowable()
-    {
-      return throwable;
-    }
-
-    /**
-     * Get the response received.
-     * @return a {@link JPPFResourceWrapper} instance.
-     * @throws Exception if any error occurs.
-     */
-    public JPPFResourceWrapper getResponse() throws Exception
-    {
-      return response;
-    }
   }
 
   @Override

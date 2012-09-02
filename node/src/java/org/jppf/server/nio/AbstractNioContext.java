@@ -48,17 +48,9 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   protected NioMessage message = null;
   /**
-   * Count of bytes read.
-   */
-  public int readByteCount = -1;
-  /**
-   * Count of bytes written.
-   */
-  public int writeByteCount = -1;
-  /**
    * The associated channel.
    */
-  private ChannelWrapper<?> channel = null;
+  protected ChannelWrapper<?> channel = null;
   /**
    * Unique ID for the corresponding connection on the remote peer.
    */

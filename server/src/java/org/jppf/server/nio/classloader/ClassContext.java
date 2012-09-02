@@ -18,9 +18,10 @@
 
 package org.jppf.server.nio.classloader;
 
-import java.util.List;
+import java.util.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
+import org.jppf.classloader.JPPFResourceWrapper.State;
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -50,11 +51,15 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * The list of pending resource requests for a resource provider.
    */
-  protected List<ChannelWrapper<?>> pendingRequests = null;
+  protected List<ResourceRequest> pendingRequests = new Vector<ResourceRequest>();
+  /**
+   * The list of pending resource reponses for a node.
+   */
+  protected Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = new HashMap<JPPFResourceWrapper, ResourceRequest>();
   /**
    * The request currently processed.
    */
-  protected ChannelWrapper<?> currentRequest = null;
+  protected ResourceRequest currentRequest = null;
   /**
    * Determines whether this context relates to a provider or node connection.
    */
@@ -63,6 +68,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Contains the JPPF peer identifier written the socket channel.
    */
   private NioObject nioObject = null;
+  /**
+   * The lock used to synchronize between node and client class loader channel.
+   */
+  private final Object lock = new Object();
 
   /**
    * Deserialize a resource wrapper from an array of bytes.
@@ -146,7 +155,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @param request the request as a <code>SelectionKey</code> instance.
    */
   @SuppressWarnings("unchecked")
-  public synchronized void addRequest(final ChannelWrapper<?> request)
+  public synchronized void addRequest(final ResourceRequest request)
   {
     pendingRequests.add(request);
     if (ClassState.IDLE_PROVIDER.equals(state))
@@ -160,7 +169,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Get the request currently processed.
    * @return a <code>SelectionKey</code> instance.
    */
-  public synchronized ChannelWrapper<?> getCurrentRequest()
+  public synchronized ResourceRequest getCurrentRequest()
   {
     return currentRequest;
   }
@@ -169,7 +178,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Set the request currently processed.
    * @param currentRequest a <code>SelectionKey</code> instance.
    */
-  public synchronized void setCurrentRequest(final ChannelWrapper<?> currentRequest)
+  public synchronized void setCurrentRequest(final ResourceRequest currentRequest)
   {
     this.currentRequest = currentRequest;
   }
@@ -180,7 +189,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public synchronized int getNbPendingRequests()
   {
-    List<ChannelWrapper<?>> reqs = getPendingRequests();
+    List<ResourceRequest> reqs = getPendingRequests();
     return (reqs == null ? 0 : reqs.size()) + (getCurrentRequest() == null ? 0 : 1);
   }
 
@@ -188,18 +197,9 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Get the list of pending resource requests for a resource provider.
    * @return a <code>List</code> of <code>SelectionKey</code> instances.
    */
-  public synchronized List<ChannelWrapper<?>> getPendingRequests()
+  public synchronized List<ResourceRequest> getPendingRequests()
   {
     return pendingRequests;
-  }
-
-  /**
-   * Set the list of pending resource requests for a resource provider.
-   * @param pendingRequests a <code>List</code> of <code>SelectionKey</code> instances.
-   */
-  public synchronized void setPendingRequests(final List<ChannelWrapper<?>> pendingRequests)
-  {
-    this.pendingRequests = pendingRequests;
   }
 
   /**
@@ -228,11 +228,12 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     try
     {
-      ChannelWrapper<?> currentRequest = getCurrentRequest();
+      ResourceRequest currentRequest = getCurrentRequest();
       if ((currentRequest != null) || !getPendingRequests().isEmpty())
       {
         if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
-        ClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
+        //ClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
+        ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
         if (currentRequest != null)
         {
           setCurrentRequest(null);
@@ -250,16 +251,17 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * Reset the state of the requesting node channel, after an error
    * occurred on the provider which attempted to provide a response.
-   * @param request the requestinhg node channel.
+   * @param request the requesting node channel.
    * @param server the server handling the node.
    */
-  public void resetNodeState(final ChannelWrapper<?> request, final ClassNioServer server)
+  public void resetNodeState(final ResourceRequest request, final ClassNioServer server)
   {
     try
     {
       if (debugEnabled) log.debug("resetting channel state for node " + request);
-      server.getTransitionManager().transitionChannel(request, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
-      server.getTransitionManager().submitTransition(request);
+      request.getResource().setState(State.NODE_RESPONSE);
+      server.getTransitionManager().transitionChannel(request.getChannel(), ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
+      server.getTransitionManager().submitTransition(request.getChannel());
     }
     catch (Exception e)
     {
@@ -268,24 +270,20 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   /**
-   * Send a null response to a request from a node connection. This method is called for a provider
-   * that was disconnected but still has pending requests, so as not to block the requesting channels.
-   * @param request the selection key wrapping the requesting channel.
+   * Get the set of pending resource reponses for a node.
+   * @return a {@link Map} of {@link ResourceRequest} instances.
    */
-  protected void sendNullResponse(final ChannelWrapper<?> request)
+  public Map<JPPFResourceWrapper, ResourceRequest> getPendingResponses()
   {
-    try
-    {
-      if (debugEnabled) log.debug("disconnected provider: sending null response to node " + request);
-      ClassContext requestContext = (ClassContext) request.getContext();
-      requestContext.getResource().setDefinition(null);
-      requestContext.serializeResource();
-      ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
-      server.getTransitionManager().transitionChannel(request, ClassTransition.TO_SENDING_NODE_RESPONSE);
-    }
-    catch (Exception e)
-    {
-      log.error("error while trying to send response to node " + request + ", this node may be unavailable", e);
-    }
+    return pendingResponses;
+  }
+
+  /**
+   * Get the lock used to synchronize between node and client class loader channel.
+   * @return an {@link Object}.
+   */
+  public Object getLock()
+  {
+    return lock;
   }
 }

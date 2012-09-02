@@ -67,10 +67,9 @@ class SendingProviderRequestState extends ClassServerState
     }
     if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
     {
-      ChannelWrapper<?> request = (ChannelWrapper<?>) context.getPendingRequests().remove(0);
-      ClassContext requestContext = (ClassContext) request.getContext();
+      ResourceRequest request = context.getPendingRequests().remove(0);
       context.setMessage(null);
-      context.setResource(requestContext.getResource());
+      context.setResource(request.getResource());
       if (debugEnabled) log.debug("provider " + channel + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
       context.serializeResource();
       context.setCurrentRequest(request);
@@ -85,7 +84,7 @@ class SendingProviderRequestState extends ClassServerState
     if (context.writeMessage(channel))
     {
       if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + context.getCurrentRequest() + 
-        ", resource: " + context.getResource().getName() + ", requestUuid = " + context.getResource().getRequestUuid());
+        ", resource: " + context.getResource().getName());
       context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
       return TO_WAITING_PROVIDER_RESPONSE;
     }

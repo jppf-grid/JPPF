@@ -23,8 +23,6 @@ import java.util.concurrent.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
-import org.jppf.data.transform.*;
-import org.jppf.io.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -47,7 +45,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   /**
    * Wrapper for the underlying socket connection.
    */
-  private static SocketWrapper socketClient = null;
+  static SocketWrapper socketClient = null;
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -105,10 +103,12 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     {
       if (INITIALIZING.compareAndSet(false, true))
       {
+        /*
         synchronized(AbstractJPPFClassLoaderLifeCycle.class)
         {
           if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests", false, Thread.NORM_PRIORITY, true));
         }
+        */
         try
         {
           if (debugEnabled) log.debug("initializing connection");
@@ -168,18 +168,21 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
       socketClient.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       socketClient.flush();
       if (debugEnabled) log.debug("sending node initiation message");
-      JPPFResourceWrapper resource = new JPPFResourceWrapper();
-      resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      resource.setData("node.uuid", NodeRunner.getUuid());
-      ObjectSerializer serializer = socketClient.getSerializer();
-      JPPFBuffer buf = serializer.serialize(resource);
-      byte[] data = buf.getBuffer();
-      data = JPPFDataTransformFactory.transform(true, data);
-      socketClient.sendBytes(new JPPFBuffer(data, data.length));
-      socketClient.flush();
-      if (debugEnabled) log.debug("node initiation message sent, getting response");
-      socketClient.receiveBytes(0);
+      JPPFResourceWrapper request = new JPPFResourceWrapper();
+      request.setState(JPPFResourceWrapper.State.NODE_INITIATION);
+      request.setData("node.uuid", NodeRunner.getUuid());
+      ResourceRequest rr = new RemoteResourceRequest(getSerializer());
+      rr.setRequest(request);
+      rr.run();
+      Throwable t = rr.getThrowable();
+      if (t != null)
+      {
+        if (t instanceof Exception) throw (Exception) t;
+        else throw new RuntimeException(t);
+      }
       if (debugEnabled) log.debug("received node initiation response");
+      rr.reset();
+      requestHandler = new ClassLoaderRequestHandler(rr);
     }
     catch (IOException e)
     {
@@ -225,10 +228,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     {
       synchronized(AbstractJPPFClassLoaderLifeCycle.class)
       {
-        if (executor != null)
+        if (requestHandler != null)
         {
-          executor.shutdownNow();
-          executor = null;
+          requestHandler.close();
+          requestHandler = null;
         }
       }
       synchronized(JPPFClassLoader.class)
@@ -275,49 +278,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     resource.setAsResource(asResource);
     resource.setRequestUuid(requestUuid);
 
-    ResourceRequest request = new ResourceRequest(resource);
-    Future<?> future = executor.submit(request);
-    future.get();
-    Throwable t = request.getThrowable();
-    if (t != null)
-    {
-      if (t instanceof Exception) throw (Exception) t;
-      throw (Error) t;
-    }
-    return request.getResponse();
-  }
-
-  /**
-   * Encapsulates a remote resource request submitted asynchronously
-   * via the single-thread executor.
-   */
-  protected class ResourceRequest extends AbstractResourceRequest
-  {
-    /**
-     * Initialize with the specified request.
-     * @param request the request to send.
-     * @throws Exception if any error occurs.
-     */
-    public ResourceRequest(final JPPFResourceWrapper request) throws Exception
-    {
-      super(request);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void run()
-    {
-      try
-      {
-        IOHelper.sendData(socketClient, request, getSerializer());
-        response = (JPPFResourceWrapper) IOHelper.unwrappedData(socketClient, getSerializer());
-      }
-      catch (Throwable t)
-      {
-        throwable = t;
-      }
-    }
+    Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
+    return f.get();
   }
 }

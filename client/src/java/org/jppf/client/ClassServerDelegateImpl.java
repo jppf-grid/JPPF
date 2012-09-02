@@ -118,8 +118,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
           boolean found = true;
           JPPFResourceWrapper resource = readResource();
           String name = resource.getName();
+          if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + resource);
           ClassLoader cl = getClassLoader(resource.getRequestUuid());
-          if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
+          //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
+          if (debugEnabled) log.debug('[' + this.getName() + "] using classloader=" + cl);
           if (resource.getData("multiple") != null)
           {
             List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);

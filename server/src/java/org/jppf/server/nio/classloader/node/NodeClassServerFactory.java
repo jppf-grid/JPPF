@@ -76,7 +76,7 @@ final class NodeClassServerFactory	extends NioServerFactory<ClassState, ClassTra
     map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));
     map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_IDLE_NODE, transition(IDLE_NODE, 0));
-    map.put(TO_NODE_WAITING_PROVIDER_RESPONSE, transition(NODE_WAITING_PROVIDER_RESPONSE, 0));
+    map.put(TO_NODE_WAITING_PROVIDER_RESPONSE, transition(NODE_WAITING_PROVIDER_RESPONSE, RW));
     return map;
   }
 }

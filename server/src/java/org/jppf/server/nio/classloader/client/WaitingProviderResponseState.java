@@ -66,7 +66,8 @@ class WaitingProviderResponseState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.readMessage(channel))
     {
-      ChannelWrapper<?> nodeChannel = context.getCurrentRequest();
+      ResourceRequest request = context.getCurrentRequest();
+      ChannelWrapper<?> nodeChannel = request.getChannel();
       if (debugEnabled) log.debug("read response from provider: " + channel + ", sending to node " + nodeChannel + ", resource: " + context.getResource().getName());
       JPPFResourceWrapper resource = context.deserializeResource();
       // putting the definition in cache
@@ -74,17 +75,19 @@ class WaitingProviderResponseState extends ClassServerState
         classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
       // fowarding it to channel that requested
       ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
+      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+      StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
       synchronized(nodeChannel)
       {
-        //while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0)) Thread.sleep(0L, 100000);
-        while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0)) nodeChannel.wait(0L, 100000);
-        if (debugEnabled) log.debug("sending response to node " + nodeChannel); 
+        while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0))
+        {
+          nodeChannel.wait(0L, 10000);
+        }
+        if (debugEnabled) log.debug("sending response " + resource + " to node " + nodeChannel); 
         context.setCurrentRequest(null);
-        resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-        nodeContext.setResource(resource);
-        nodeContext.serializeResource();
-        StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
-        tm.transitionChannel(nodeChannel, TO_SENDING_NODE_RESPONSE, tm.checkSubmitTransition(nodeChannel, TO_SENDING_NODE_RESPONSE));
+        ResourceRequest pendingResponse = nodeContext.getPendingResponses().get(resource);
+        pendingResponse.setResource(resource);
+        tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, tm.checkSubmitTransition(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE));
       }
       //context.setMessage(null);
       return TO_SENDING_PROVIDER_REQUEST;

@@ -22,9 +22,10 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.classloader.*;
+import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -69,27 +70,31 @@ class WaitingNodeRequestState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.readMessage(channel))
     {
-      if (debugEnabled) log.debug("read resource request from node: " + channel);
-      JPPFResourceWrapper resource = context.deserializeResource();
-      TraversalList<String> uuidPath = resource.getUuidPath();
-      boolean dynamic = resource.isDynamic();
-      String name = resource.getName();
-      String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
-      ByteTransitionPair p = null;
-      if (!dynamic || (resource.getRequestUuid() == null))
+      CompositeResourceWrapper composite = (CompositeResourceWrapper) context.deserializeResource();
+      if (debugEnabled) log.debug("read resource request " + composite + " from node: " + channel);
+      Collection<JPPFResourceWrapper> requests = composite.getResources();
+      for (JPPFResourceWrapper resource: requests)
       {
-        p = processNonDynamic(channel, resource);
-        if (p.second() != null) return p.second();
+        TraversalList<String> uuidPath = resource.getUuidPath();
+        boolean dynamic = resource.isDynamic();
+        String name = resource.getName();
+        String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
+        ClassTransition t = null;
+        if (!dynamic || (resource.getRequestUuid() == null)) t = processNonDynamic(channel, resource);
+        else t = processDynamic(channel, resource);
+        //if (t == TO_NODE_WAITING_PROVIDER_RESPONSE) context.getPendingResponses().put(resource, new ResourceRequest(channel, resource));
+        //if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + channel);
+        //if (p.first() != null) resource.setDefinition(p.first());
       }
-      else
+      if (context.getPendingResponses().isEmpty())
       {
-        p = processDynamic(channel, resource);
-        if (p.second() != null) return p.second();
+        if (debugEnabled) log.debug("sending response " + composite + " to node: " + channel);
+        context.serializeResource();
+        return TO_SENDING_NODE_RESPONSE;
       }
-      if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + channel);
-      resource.setDefinition(null);
-      context.serializeResource();
-      return TO_SENDING_NODE_RESPONSE;
+      if (debugEnabled) log.debug("pending responses " + context.getPendingResponses() + " for node: " + channel);
+      //return TO_NODE_WAITING_PROVIDER_RESPONSE;
+      return TO_IDLE_NODE;
     }
     return TO_WAITING_NODE_REQUEST;
   }
@@ -101,10 +106,9 @@ class WaitingNodeRequestState extends ClassServerState
    * @return a pair of an array of bytes and the resulting state transition.
    * @throws Exception if any error occurs.
    */
-  private ByteTransitionPair processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
+  private ClassTransition processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
   {
     byte[] b = null;
-    ClassTransition t = null;
     String name = resource.getName();
     ClassContext context = (ClassContext) channel.getContext();
     TraversalList<String> uuidPath = resource.getUuidPath();
@@ -115,21 +119,19 @@ class WaitingNodeRequestState extends ClassServerState
       if (resource.getData("multiple") != null)
       {
         List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null);
+        if (debugEnabled) log.debug("multiple resources " + (list != null ? "" : "not ") + "found [" + name + "] in driver's classpath for node: " + channel);
         if (list != null)
         {
           resource.setData("resource_list", list);
-          context.serializeResource();
-          t = TO_SENDING_NODE_RESPONSE;
+          return TO_SENDING_NODE_RESPONSE;
         }
-        if (debugEnabled) log.debug("multiple resources " + (list != null ? "" : "not ") + "found [" + name + "] in driver's classpath for node: " + channel);
       }
       else if (resource.getData("multiple.resources.names") != null)
       {
         String[] names = (String[]) resource.getData("multiple.resources.names");
         Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, names);
         resource.setData("resource_map", map);
-        context.serializeResource();
-        t = TO_SENDING_NODE_RESPONSE;
+        return TO_SENDING_NODE_RESPONSE;
       }
       else
       {
@@ -146,60 +148,90 @@ class WaitingNodeRequestState extends ClassServerState
         {
           if ((b != null) && !alreadyInCache) classCache.setCacheContent(driver.getUuid(), name, b);
           resource.setDefinition(b);
-          context.serializeResource();
-          t = TO_SENDING_NODE_RESPONSE;
+          return TO_SENDING_NODE_RESPONSE;
         }
       }
     }
-    return new ByteTransitionPair(b, t);
+    resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+    return null;
   }
 
   /**
    * Process a request to the client's resource provider.
    * @param channel encapsulates the context and channel.
    * @param resource the resource request description
-   * @return a pair of an array of bytes and the resulting state transition.
+   * @return the resulting state transition.
    * @throws Exception if any error occurs.
    */
-  private ByteTransitionPair processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
+  private ClassTransition processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
   {
     byte[] b = null;
-    ClassTransition t = null;
     String name = resource.getName();
     TraversalList<String> uuidPath = resource.getUuidPath();
     ClassContext context = (ClassContext) channel.getContext();
+    CompositeResourceWrapper composite = (CompositeResourceWrapper) context.getResource();
 
     if (resource.getCallable() == null) b = classCache.getCacheContent(uuidPath.getFirst(), name);
     if (b != null)
     {
       if (debugEnabled) log.debug("found cached resource [" + name + "] for node: " + channel);
       resource.setDefinition(b);
-      context.serializeResource();
-      t = TO_SENDING_NODE_RESPONSE;
+      return TO_SENDING_NODE_RESPONSE;
+    }
+    uuidPath.decPosition();
+    String uuid = resource.getUuidPath().getCurrentElement();
+    ChannelWrapper<?> provider = findProviderConnection(uuid);
+    if (provider != null)
+    {
+      if (debugEnabled) log.debug("requesting resource " + resource + " from client: " + provider + " for node: " + channel);
+      ClassContext providerContext = (ClassContext) provider.getContext();
+      synchronized(provider)
+      {
+        ResourceRequest request = new ResourceRequest(channel, resource);
+        context.getPendingResponses().put(resource, request);
+        providerContext.addRequest(request);
+        resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
+        /*
+        if ((providerContext.getState() == ClassState.IDLE_PROVIDER) || providerContext.getPendingRequests().isEmpty())
+        {
+          StateTransitionManager tm = driver.getClientClassServer().getTransitionManager();
+          tm.transitionChannel(provider, ClassTransition.TO_SENDING_PROVIDER_REQUEST);
+        }
+        */
+      }
     }
     else
     {
-      // perform lookup(s) on the client side
-      uuidPath.decPosition();
-			t = TO_NODE_WAITING_PROVIDER_RESPONSE;
-			context.resetNodeState(channel, server);
+      if (debugEnabled) log.debug("no available provider for uuid=" + uuid + " : setting null response for node " + channel);
+      resource.setDefinition(null);
+      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
     }
-    return new ByteTransitionPair(b, t);
+		return TO_NODE_WAITING_PROVIDER_RESPONSE;
   }
 
   /**
-   * A pair of array of bytes and class transition.
+   * Find a provider connection for the specified provider uuid.
+   * @param uuid the uuid for which to find a connection.
+   * @return a <code>SelectableChannel</code> instance.
+   * @throws Exception if an error occurs while searching for a connection.
    */
-  private static class ByteTransitionPair extends Pair<byte[], ClassTransition>
+  private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
   {
-    /**
-     * Initialize this pair with the specified array of bytes and class transition.
-     * @param first an array of bytes.
-     * @param second a class transition.
-     */
-    public ByteTransitionPair(final byte[] first, final ClassTransition second)
+    ChannelWrapper<?> result = null;
+    ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
+    List<ChannelWrapper<?>> connections = clientClassServer.getProviderConnections(uuid);
+    if (connections == null) return null;
+    int minRequests = Integer.MAX_VALUE;
+    for (ChannelWrapper<?> channel: connections)
     {
-      super(first, second);
+      ClassContext ctx = (ClassContext) channel.getContext();
+      int size = ctx.getNbPendingRequests();
+      if (size < minRequests)
+      {
+        minRequests = size;
+        result = channel;
+      }
     }
+    return result;
   }
 }

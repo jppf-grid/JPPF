@@ -18,7 +18,6 @@
 package org.jppf.classloader;
 
 import java.io.InputStream;
-import java.nio.channels.SelectionKey;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -44,7 +43,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   /**
    * temporary IO handler.
    */
-  private static LocalClassLoaderChannel channel = null;
+  static LocalClassLoaderChannel channel = null;
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -80,16 +79,16 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     {
       if (INITIALIZING.compareAndSet(false, true))
       {
-        synchronized(AbstractJPPFClassLoaderLifeCycle.class)
-        {
-          if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests", false, Thread.NORM_PRIORITY, true));
-        }
         try
         {
           if (debugEnabled) log.debug("sending node initiation message");
+          ResourceRequest rr = new LocalResourceRequest();
           JPPFResourceWrapper resource = new JPPFResourceWrapper();
           resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
           resource.setData("node.uuid", NodeRunner.getUuid());
+          rr.setRequest(resource);
+          rr.run();
+          /*
           channel.setServerResource(resource);
           channel.setNodeResource(null);
           synchronized(channel)
@@ -104,6 +103,11 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
           }
           while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
           channel.setNodeResource(null);
+          */
+          rr.reset();
+          Throwable t = rr.getThrowable();
+          if (t != null) throw new RuntimeException(t);
+          requestHandler = new ClassLoaderRequestHandler(rr);
           if (debugEnabled) log.debug("received node initiation response");
           System.out.println(getClass().getSimpleName() + ": Reconnected to the class server");
         }
@@ -144,8 +148,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     LOCK.lock();
     try
     {
-      executor.shutdownNow();
-      executor = null;
+      requestHandler.close();
+      requestHandler = null;
     }
     finally
     {
@@ -224,61 +228,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     resource.setAsResource(asResource);
     resource.setRequestUuid(requestUuid);
 
-    ResourceRequest request = new ResourceRequest(resource);
-    Future<?> future = executor.submit(request);
-    future.get();
-    Throwable t = request.getThrowable();
-    if (t != null)
-    {
-      if (t instanceof Exception) throw (Exception) t;
-      throw (Error) t;
-    }
-    return request.getResponse();
-  }
-
-  /**
-   * Encapsulates a remote resource request submitted asynchronously
-   * via the single-thread executor.
-   */
-  protected class ResourceRequest extends AbstractResourceRequest
-  {
-    /**
-     * Initialize with the specified request.
-     * @param request the request to send.
-     */
-    public ResourceRequest(final JPPFResourceWrapper request)
-    {
-      super(request);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void run()
-    {
-      try
-      {
-        if (debugEnabled) log.debug("channel " + channel + " sending request " + request);
-        synchronized(channel.getServerLock())
-        {
-          channel.setServerResource(request);
-          channel.setReadyOps(SelectionKey.OP_READ);
-          while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
-        }
-        synchronized(channel.getNodeLock())
-        {
-          channel.setReadyOps(SelectionKey.OP_WRITE);
-          while ((response = channel.getNodeResource()) == null) channel.getNodeLock().goToSleep();
-          //response = channel.getNodeResource();
-          channel.setNodeResource(null);
-        }
-        if (debugEnabled) log.debug("channel " + channel + " got response " + response);
-      }
-      catch (Throwable t)
-      {
-        throwable = t;
-      }
-    }
+    Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
+    return f.get();
   }
 }

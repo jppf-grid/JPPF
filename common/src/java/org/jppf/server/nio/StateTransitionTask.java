@@ -45,15 +45,11 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
   /**
    * The channel whose state is changing.
    */
-  private ChannelWrapper<?> channel = null;
-  /**
-   * The context attached to the key.
-   */
-  private NioContext<S> ctx = null;
+  private final ChannelWrapper<?> channel;
   /**
    * The factory ofr the server that runs this task.
    */
-  private NioServerFactory<S, T> factory = null;
+  private final NioServerFactory<S, T> factory;
 
   /**
    * Initialize this task with the specified key and factory.
@@ -74,29 +70,28 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
   @SuppressWarnings("unchecked")
   public void run()
   {
-    synchronized(channel)
+    StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
+    NioContext<S> ctx = (NioContext<S>) channel.getContext();
+    try
     {
-      StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
-      this.ctx = (NioContext<S>) channel.getContext();
-      if (traceEnabled) log.trace("performing transition to state " + ctx.getState() + " for " + channel);
-      try
+      T transition = null;
+      synchronized(channel)
       {
         NioState<T> state = factory.getState(ctx.getState());
-        T transition = state.performTransition(channel);
+        if (traceEnabled) log.trace("performing transition to state " + ctx.getState() + " for " + channel);
+        transition = state.performTransition(channel);
         if (transition != null)
         {
-          //transitionManager.transitionChannel(channel, transition);
-          //if (transitionManager.checkShouldSubmitTransition(channel)) transitionManager.submitTransition(channel);
           transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
         }
       }
-      catch(Exception e)
-      {
-        String msg = "error on channel " + channel + " : " + ExceptionUtils.getMessage(e);
-        if (debugEnabled) log.debug(msg, e);
-        else log.warn(msg);
-        ctx.handleException(channel);
-      }
+    }
+    catch(Exception e)
+    {
+      String msg = "error on channel " + channel + " : " + ExceptionUtils.getMessage(e);
+      if (debugEnabled) log.debug(msg, e);
+      else log.warn(msg);
+      ctx.handleException(channel);
     }
   }
 }

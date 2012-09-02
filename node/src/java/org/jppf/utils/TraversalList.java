@@ -188,4 +188,18 @@ public class TraversalList<E> implements Serializable
   {
     return toStr;
   }
+
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (!(obj instanceof TraversalList)) return false;
+    return list.equals(((TraversalList) obj).list);
+    //return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return list.hashCode();
+  }
 }
