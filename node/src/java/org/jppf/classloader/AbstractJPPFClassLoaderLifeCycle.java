@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.caching.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -75,6 +76,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The cache handling resources temporarily stored to file.
    */
   protected final ResourceCache cache = new ResourceCache();
+  /**
+   * The cache handling resources that were not found by this class loader.
+   */
+  protected final JPPFCache<String, Boolean> nfCache = new JPPFSynchronizedSoftCache<String, Boolean>();
   /**
    * The object used to serialize and deserialize resources.
    */
