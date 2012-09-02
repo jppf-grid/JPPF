@@ -204,7 +204,9 @@ final class JPPFLeakPrevention {
           else if (preventThread)
           {
             try {
-              Field fieldTarget = getDeclaredAccessibleField(thread.getClass(), "target");
+              Class clazz = thread.getClass();
+              while(!Thread.class.equals(clazz)) clazz = clazz.getSuperclass();
+              Field fieldTarget = getDeclaredAccessibleField(clazz, "target");
               Object target = fieldTarget.get(thread);
 
               if (target != null && "java.util.concurrent.ThreadPoolExecutor.Worker".equals(target.getClass().getCanonicalName()))
