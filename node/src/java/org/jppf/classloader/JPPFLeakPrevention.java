@@ -184,7 +184,6 @@ final class JPPFLeakPrevention {
         if (ccl == classLoader)
         {
           if (thread == Thread.currentThread()) continue;
-
           ThreadGroup threadGroup = thread.getThreadGroup();
           if (threadGroup != null && (THREAD_GROUP_SYSTEM.equals(threadGroup.getName()) || THREAD_GROUP_RMI_RUNTIME.equals(threadGroup.getName())))
           {
@@ -201,10 +200,13 @@ final class JPPFLeakPrevention {
           if (preventTimer && "java.util.TimerThread".equals(thread.getClass().getName()))
           {
             clearTimerThread(thread);
-          } else if (preventThread)
+          } 
+          else if (preventThread)
           {
             try {
-              Field fieldTarget = getDeclaredAccessibleField(thread.getClass(), "target");
+              Class clazz = thread.getClass();
+              while(!Thread.class.equals(clazz)) clazz = clazz.getSuperclass();
+              Field fieldTarget = getDeclaredAccessibleField(clazz, "target");
               Object target = fieldTarget.get(thread);
 
               if (target != null && "java.util.concurrent.ThreadPoolExecutor.Worker".equals(target.getClass().getCanonicalName()))
