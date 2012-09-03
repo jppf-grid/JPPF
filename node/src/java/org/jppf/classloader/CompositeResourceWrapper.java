@@ -41,6 +41,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
    * Get the list of requests held by this composite request.
    * @return a list of {@link JPPFResourceWrapper} instances.
    */
+  @SuppressWarnings("unchecked")
   public Set<JPPFResourceWrapper> getResources()
   {
     Set<JPPFResourceWrapper> requests = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);

@@ -175,10 +175,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
+  @SuppressWarnings("unchecked")
   public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);

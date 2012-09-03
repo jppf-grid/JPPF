@@ -19,7 +19,6 @@
 package org.jppf.server.node;
 
 import java.lang.management.*;
-import java.util.concurrent.ExecutorService;
 
 import org.jppf.node.*;
 import org.jppf.utils.*;
@@ -69,21 +68,6 @@ public abstract class AbstractThreadManager implements ThreadManager
     log.info("Thread CPU time measurement is " + (cpuTimeEnabled ? "" : "not ") + "supported");
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public abstract void setPoolSize(final int size);
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public abstract int getPoolSize();
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public NodeExecutionInfo computeExecutionInfo()
   {
@@ -93,9 +77,6 @@ public abstract class AbstractThreadManager implements ThreadManager
     return info;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public NodeExecutionInfo computeExecutionInfo(final long threadID)
   {
@@ -108,36 +89,12 @@ public abstract class AbstractThreadManager implements ThreadManager
    */
   protected abstract long[] getThreadIds();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long getCpuTime(final long threadId)
   {
     return cpuTimeEnabled ? threadMXBean.getThreadCpuTime(threadId) : -1L;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public abstract int getPriority();
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public abstract void setPriority(final int newPriority);
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public abstract ExecutorService getExecutorService();
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isCpuTimeEnabled()
   {

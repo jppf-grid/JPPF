@@ -59,27 +59,18 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected long[] getThreadIds()
   {
     return threadFactory.getThreadIDs();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ExecutorService getExecutorService()
   {
     return threadPool;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setPoolSize(final int size)
   {
@@ -104,36 +95,24 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getPoolSize()
   {
     return threadPool.getMaximumPoolSize();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getPriority()
   {
     return threadFactory.getPriority();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setPriority(final int priority)
   {
     threadFactory.updatePriority(priority);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public UsedClassLoader useClassLoader(final ClassLoader classLoader)
   {
@@ -164,9 +143,6 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
       this.oldClassLoader = oldClassLoader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void dispose()
     {

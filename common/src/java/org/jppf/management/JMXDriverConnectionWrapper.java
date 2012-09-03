@@ -258,6 +258,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
   {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation", (Object[]) null, (String[]) null);

@@ -107,6 +107,7 @@ public class ClassLoaderRequestHandler
   private class PeriodicTask extends ThreadSynchronization implements Runnable
   {
     @Override
+    @SuppressWarnings("unchecked")
     public void run()
     {
       long elapsed = 0L;
