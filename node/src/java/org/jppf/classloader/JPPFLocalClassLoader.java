@@ -82,7 +82,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
         try
         {
           if (debugEnabled) log.debug("sending node initiation message");
-          ResourceRequest rr = new LocalResourceRequest();
+          ResourceRequest rr = new LocalResourceRequest(channel);
           JPPFResourceWrapper resource = new JPPFResourceWrapper();
           resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
           resource.setData("node.uuid", NodeRunner.getUuid());

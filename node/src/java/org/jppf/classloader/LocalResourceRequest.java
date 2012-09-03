@@ -31,27 +31,24 @@ class LocalResourceRequest extends AbstractResourceRequest
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFLocalClassLoader.class);
+  private static Logger log = LoggerFactory.getLogger(LocalResourceRequest.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The channel used by the local node's class loader.
+   */
+  private final LocalClassLoaderChannel channel;
 
   /**
    * Initialize.
+   * @param channel the channel used by the local node's class loader.
    */
-  public LocalResourceRequest()
+  public LocalResourceRequest(final LocalClassLoaderChannel channel)
   {
     super();
-  }
-
-  /**
-   * Initialize with the specified request.
-   * @param request the request to send.
-   */
-  public LocalResourceRequest(final JPPFResourceWrapper request)
-  {
-    super(request);
+    this.channel = channel;
   }
 
   /**

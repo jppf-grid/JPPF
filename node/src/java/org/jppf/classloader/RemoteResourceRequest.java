@@ -35,7 +35,7 @@ class RemoteResourceRequest extends AbstractResourceRequest
   /**
    * 
    */
-  private static SocketWrapper socketClient = null;
+  private SocketWrapper socketClient = null;
 
   /**
    * Initialize with the specified request.
