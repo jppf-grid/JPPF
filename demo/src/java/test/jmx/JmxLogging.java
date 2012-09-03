@@ -34,10 +34,23 @@ import org.slf4j.*;
  */
 public class JmxLogging {
 
+  /**
+   * 
+   */
   private static JMXNodeConnectionWrapper[] jmxNodes = null;
+  /**
+   * 
+   */
   private static JPPFClient client = null;
+  /**
+   * 
+   */
   private static MyLoggingHandler loggingHandler = new MyLoggingHandler();
 
+  /**
+   * 
+   * @param args not used.
+   */
   public static void main(final String[] args)
   {
     try {
@@ -63,6 +76,10 @@ public class JmxLogging {
     }
   }
 
+  /**
+   * 
+   * @throws Exception .
+   */
   public static void initJmxLogging() throws Exception {
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
     JMXDriverConnectionWrapper jmxDriver = ((AbstractJPPFClientConnection) client.getClientConnection()).getJmxConnection();
@@ -84,7 +101,9 @@ public class JmxLogging {
     }
   }
 
-  //Logging notification listener that prints remote log messagesto the console
+  /**
+   * Logging notification listener that prints remote log messagesto the console
+   */
   public static class MyLoggingHandler implements NotificationListener {
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
@@ -94,7 +113,13 @@ public class JmxLogging {
     }
   }
 
+  /**
+   * 
+   */
   public static class MyTask extends JPPFTask {
+    /**
+     * 
+     */
     private static Logger log = LoggerFactory.getLogger(MyTask.class);
 
     @Override
