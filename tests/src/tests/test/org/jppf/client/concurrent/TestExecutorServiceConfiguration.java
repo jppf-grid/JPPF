@@ -25,11 +25,12 @@ import java.util.concurrent.*;
 
 import org.jppf.client.concurrent.*;
 import org.jppf.client.persistence.DefaultFilePersistenceManager;
-import org.jppf.client.taskwrapper.JPPFTaskCallback;
+import org.jppf.client.taskwrapper.*;
 import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.task.storage.*;
 import org.junit.*;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.Setup1D1N1C;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -118,6 +119,27 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * @throws Exception if any error occurs
    */
   @Test
+  public void testSubmitWithDataProvider() throws Exception
+  {
+    client.setLocalExecutionEnabled(false);
+    DataProvider dp = new MemoryMapDataProvider();
+    String key = "myKey";
+    String value = "myValue";
+    dp.setValue(key, value);
+    executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
+    MyTask task = new MyTask(key);
+    Future<String> future = executor.submit(task);
+    String s = future.get();
+    assertEquals(value, s);
+    assertTrue(future.isDone());
+    assertFalse(future.isCancelled());
+  }
+
+  /**
+   * Submit a Callable task with a timeout.
+   * @throws Exception if any error occurs
+   */
+  @Test
   public void testResetConfiguration() throws Exception
   {
     client.setLocalExecutionEnabled(false);
@@ -193,6 +215,44 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
       Thread.sleep(duration);
       System.out.println("task executed");
       return BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
+    }
+  }
+
+  /**
+   * 
+   */
+  private static class MyTask implements Callable<String>, Serializable, DataProviderHolder
+  {
+    /**
+     * The key of an object to retrieve from the data provider.
+     */
+    private final String key;
+    /**
+     * DataProvider set onto this task.
+     */
+    private transient DataProvider dataProvider = null;
+
+    /**
+     * Initialize this task with the specified duration.
+     * @param key the key of an object to retrieve from the data provider.
+     */
+    public MyTask(final String key)
+    {
+      this.key = key;
+    }
+
+    @Override
+    public String call() throws Exception
+    {
+      String result = (String) dataProvider.getValue(key);
+      System.out.println("task executed");
+      return result;
+    }
+
+    @Override
+    public void setDataProvider(final DataProvider dataProvider)
+    {
+      this.dataProvider = dataProvider;
     }
   }
 }

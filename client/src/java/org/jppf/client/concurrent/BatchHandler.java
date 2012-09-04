@@ -400,6 +400,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       job.setSLA(jc.getSLA());
       job.setMetadata(jc.getMetadata());
       job.setPersistenceManager(jc.getPersistenceManager());
+      job.setDataProvider(jc.getDataProvider());
     }
   }
 

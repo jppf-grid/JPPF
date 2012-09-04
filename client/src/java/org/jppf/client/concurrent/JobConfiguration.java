@@ -20,6 +20,7 @@ package org.jppf.client.concurrent;
 
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
+import org.jppf.task.storage.DataProvider;
 
 /**
  * This interface defines the properties that can be provided to a task submitted by a {@link JPPFExecutorService}..
@@ -58,4 +59,16 @@ public interface JobConfiguration
    * @param <T> the type of the keys used by the persistence manager.
    */
   <T> void setPersistenceManager(final JobPersistence<T> persistenceManager);
+
+  /**
+   * Get the job's data provider.
+   * @return a {@link DataProvider} instance.
+   */
+  DataProvider getDataProvider();
+
+  /**
+   * Set the job's data provider.
+   * @param dataProvider a {@link DataProvider} instance.
+   */
+  void setDataProvider(DataProvider dataProvider);
 }

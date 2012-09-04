@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.DataProvider;
 
 
 /**
@@ -120,9 +121,6 @@ public class JPPFAnnotatedTask extends JPPFTask
     this.timeoutCallback = timeoutCallback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void onCancel()
   {
@@ -133,9 +131,6 @@ public class JPPFAnnotatedTask extends JPPFTask
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void onTimeout()
   {
@@ -144,5 +139,18 @@ public class JPPFAnnotatedTask extends JPPFTask
       timeoutCallback.setTask(this);
       timeoutCallback.run();
     }
+  }
+
+  /**
+   * Override of {@link JPPFTask#setDataProvider(DataProvider)} to enable setting the data provider
+   * onto tasks that are not subclasses of {@link JPPFTask} and which implement {@link DataProviderHolder}.
+   * @param dataProvider the data provider to set onto the task.
+   */
+  @Override
+  public void setDataProvider(final DataProvider dataProvider)
+  {
+    Object o = taskObjectWrapper.getTaskObject();
+    if (o instanceof DataProviderHolder) ((DataProviderHolder) o).setDataProvider(dataProvider);
+    else super.setDataProvider(dataProvider);
   }
 }

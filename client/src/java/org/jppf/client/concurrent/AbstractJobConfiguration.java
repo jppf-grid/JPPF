@@ -21,6 +21,7 @@ package org.jppf.client.concurrent;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
+import org.jppf.task.storage.DataProvider;
 
 /**
  * Abstract implementation of the <code>JobConfiguration</code> interface.
@@ -41,6 +42,10 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * The persistence manager that enables saving and restoring the state of this job.
    */
   protected JobPersistence<?> persistenceManager = null;
+  /**
+   * 
+   */
+  protected DataProvider dataProvider = null;
 
   /**
    * Default constructor.
@@ -49,9 +54,6 @@ abstract class AbstractJobConfiguration implements JobConfiguration
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobSLA getSLA()
   {
@@ -67,9 +69,6 @@ abstract class AbstractJobConfiguration implements JobConfiguration
     this.jobSLA = jobSLA;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobMetadata getMetadata()
   {
@@ -85,9 +84,6 @@ abstract class AbstractJobConfiguration implements JobConfiguration
     this.jobMetadata = jobMetadata;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @SuppressWarnings("unchecked")
   public <T> JobPersistence<T> getPersistenceManager()
@@ -95,12 +91,21 @@ abstract class AbstractJobConfiguration implements JobConfiguration
     return (JobPersistence<T>) persistenceManager;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager)
   {
     this.persistenceManager = persistenceManager;
+  }
+
+  @Override
+  public DataProvider getDataProvider()
+  {
+    return dataProvider;
+  }
+
+  @Override
+  public void setDataProvider(final DataProvider dataProvider)
+  {
+    this.dataProvider = dataProvider;
   }
 }

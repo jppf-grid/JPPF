@@ -55,18 +55,12 @@ class ExecutorServiceConfigurationImpl implements ExecutorServiceConfiguration
     this.taskConfiguration = taskConfiguration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobConfiguration getJobConfiguration()
   {
     return jobConfiguration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TaskConfiguration getTaskConfiguration()
   {
