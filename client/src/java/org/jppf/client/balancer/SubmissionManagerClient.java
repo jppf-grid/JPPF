@@ -311,31 +311,26 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String submitJob(final JPPFJob job)
   {
     return submitJob(job, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
     List<JPPFTask> pendingTasks = new ArrayList<JPPFTask>();
+    if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector))
+    {
+      ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
+    }
     List<JPPFTask> tasks = job.getTasks();
     for (JPPFTask task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
     queue.addBundle(new ClientJob(job, pendingTasks));
-    return job.getName();
+    return job.getUuid();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String resubmitJob(final JPPFJob job)
   {
@@ -355,35 +350,23 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized boolean hasAvailableConnection()
   {
     return taskQueueChecker.hasIdleChannel() || wrapperLocal != null && wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized boolean isLocalExecutionEnabled()
   {
     return localEnabled;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void setLocalExecutionEnabled(final boolean localExecutionEnabled)
   {
@@ -422,9 +405,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Vector<JPPFClientConnection> getAvailableConnections()
   {
@@ -441,18 +421,12 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     return availableConnections;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ClientConnectionStatusListener getClientConnectionStatusListener()
   {
     return this.statusListener;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close()
   {

@@ -143,20 +143,12 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     return submit(job, listener);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String submit(final JPPFJob job) throws Exception
   {
-    if (job == null) throw new IllegalArgumentException("job cannot be null");
-    if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
-    return getJppfClient().getSubmissionManager().submitJob(job);
+    return submit(job, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String submit(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
   {
@@ -217,7 +209,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public List<JPPFTask> getSubmissionResults(final String submissionId) throws Exception
   {
-    JcaSubmissionManager mgr = getJppfClient().getSubmissionManager();
+    JcaSubmissionManager mgr = (JcaSubmissionManager) getJppfClient().getSubmissionManager();
     JPPFResultCollector res = mgr.peekSubmission(submissionId);
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
@@ -231,7 +223,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    */
   private JPPFResultCollector getResultCollector(final String submissionId)
   {
-    return getJppfClient().getSubmissionManager().peekSubmission(submissionId);
+    return ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).peekSubmission(submissionId);
   }
 
   /**
@@ -241,7 +233,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public Collection<String> getAllSubmissionIds()
   {
-    return getJppfClient().getSubmissionManager().getAllSubmissionIds();
+    return ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).getAllSubmissionIds();
   }
 
   /**
@@ -292,9 +284,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     this.managedConnection = conn;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public List<JPPFTask> waitForResults(final String submissionId) throws Exception
   {
@@ -303,7 +292,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (result == null) return null;
     result.waitForResults();
     List<JPPFTask> tasks = result.getResults();
-    getJppfClient().getSubmissionManager().pollSubmission(submissionId);
+    ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).pollSubmission(submissionId);
     return tasks;
   }
 }

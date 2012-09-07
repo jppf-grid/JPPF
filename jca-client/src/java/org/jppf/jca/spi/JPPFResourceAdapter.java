@@ -25,10 +25,10 @@ import javax.resource.spi.*;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
+import org.jppf.client.submission.SubmissionManager;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.JPPFJcaClient;
-import org.jppf.jca.work.submission.JcaSubmissionManager;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
 
 /**
@@ -53,7 +53,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
   /**
    * The submission manager.
    */
-  private transient JcaSubmissionManager submissionManager;
+  private transient SubmissionManager submissionManager;
 
   /**
    * Start this resource adapter with the specified bootstrap context.
@@ -70,8 +70,9 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
       log.info("Starting JPPF resource adapter");
       jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), getClientConfiguration());
       log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
+      // start the submission manager
       submissionManager = jppfClient.getSubmissionManager();
-      new Thread(submissionManager, "JPPF SubmissionManager").start();
+      //new Thread(submissionManager, "JPPF SubmissionManager").start();
       log.info("JPPF resource adapter started");
     }
     catch (Exception e)
@@ -89,8 +90,8 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
   {
     if (submissionManager != null)
     {
-      submissionManager.setStopped(true);
-      submissionManager.wakeUp();
+      //submissionManager.setStopped(true);
+      //submissionManager.wakeUp();
     }
     if (jppfClient != null) jppfClient.close();
   }

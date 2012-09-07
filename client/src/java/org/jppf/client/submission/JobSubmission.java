@@ -29,12 +29,6 @@ import org.jppf.client.*;
 public interface JobSubmission extends Runnable
 {
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  void run();
-
-  /**
    * Get the unique id of this submission.
    * @return the id as a string.
    */

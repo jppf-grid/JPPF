@@ -143,6 +143,48 @@ public class J2EEDemo
 
   /**
    * Perform a simple call to the JPPF resource adapter.
+   * @param nbJobs the number of jobs to submit.
+   * @param jobNamePrefix the prefix of the name given to each job.
+   * @param duration the duration of each task to submit.
+   * @param nbTasks the number of tasks to submit for each job.
+   * @param blocking whether th jobs are blocking or not.
+   * @return a string reporting either the task execution result or an error message.
+   * @throws Exception if the call to JPPF failed.
+   */
+  public String testMultipleJobs(final int nbJobs, final String jobNamePrefix, final long duration, final int nbTasks, final boolean blocking) throws Exception
+  {
+    if (nbJobs <= 0) return "Error: the number of jobs must be >= 1";
+    if (nbTasks <= 0) return "Error: the number of tasks must be >= 1";
+    if (duration <= 0L) return "Error: the duration must be >= 1";
+    String prefix = (jobNamePrefix == null) ? "(No name)" : jobNamePrefix;
+    JPPFConnection connection = null;
+    String id = null;
+    List<String> idList = new ArrayList<String>();
+    try
+    {
+      connection = JPPFHelper.getConnection(jndiBinding);
+      for (int n=1; n<=nbJobs; n++)
+      {
+        JPPFJob job = new JPPFJob();
+        String name = jobNamePrefix + ' ' + n;
+        job.setName(name);
+        job.setBlocking(false);
+        for (int i=1; i<nbTasks; i++) job.addTask(new DemoTask(duration)).setId(name + " task " + i);
+        id = connection.submit(job);
+        idList.add(id);
+        JPPFHelper.getStatusMap().put(id, job);
+        if (blocking) connection.waitForResults(id);
+      }
+    }
+    finally
+    {
+      if (connection != null) JPPFHelper.closeConnection(connection);
+    }
+    return "success";
+  }
+
+  /**
+   * Perform a simple call to the JPPF resource adapter.
    * This method blocks until all job results have been received.
    * @param jobId the name given to the job.
    * @param duration the duration of the task to submit.
