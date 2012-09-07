@@ -5,7 +5,7 @@
 <%@ include file="header.jsp"%>
 		<div align="center">
 		<h1>Results</h1>
-		<table width="500" cellspacing="0" cellpadding="5">
+		<table width="600" cellspacing="0" cellpadding="5">
 			<tr><td height="5"></td></tr>
 			<tr><td align="center">
 				<h4>To refresh the list, please click on the &quot;Results&quot; button again</h4>
@@ -15,21 +15,21 @@
 
 		<table cellspacing="0" cellpadding="5" border="1">
 			<tr>
-				<th colspan="2">Submissions Queue</th>
+				<th colspan="3">Submissions Queue</th>
 			</tr>
 			<tr>
-				<th>Submission ID</th>
+        <th>Submission ID</th>
+        <th>Job Name</th>
 				<th>Status</th>
 			</tr>
 <%
 			J2EEDemo demo = new J2EEDemo(jndiName);
-      //Map map = demo.getStatusMap();
       Map map = JPPFHelper.getStatusMap();
 			if (map.isEmpty())
 			{
 %>
 			<tr>
-				<td align="center" colspan="2">The submission queue is empty</a></td>
+				<td align="center" colspan="3">The submission queue is empty</a></td>
 			</tr>
 <%
 			}
@@ -39,7 +39,10 @@
 				while (it.hasNext())
 				{
 					String id = it.next();
-					String status = JPPFHelper.getStatus(id);
+          String status = JPPFHelper.getStatus(id);
+          String jobName = JPPFHelper.getJobName(id);
+          String fontWeight = ("COMPLETE".equals(status) || "FAILED".equals(status)) ? "bold" : "normal";
+          String color = "COMPLETE".equals(status) ? "green" : ("FAILED".equals(status) ? "red" : "black");
 %>
 			<tr>
 <%
@@ -56,7 +59,8 @@
 <%
 					}
 %>
-				<td align="center"><%= status %></td>
+        <td align="center"><%= jobName %></td>
+        <td align="center" style="font-weight: <%= fontWeight %>; color: <%= color %>"><%= status %></td>
 			</tr>
 <%
 				}

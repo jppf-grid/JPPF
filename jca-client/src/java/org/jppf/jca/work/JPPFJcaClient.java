@@ -17,20 +17,16 @@
  */
 package org.jppf.jca.work;
 
-import org.jppf.client.AbstractGenericClient;
-import org.jppf.client.AbstractJPPFClientConnection;
-import org.jppf.client.JPPFJob;
+import java.io.ByteArrayInputStream;
+import java.util.List;
+
+import org.jppf.client.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.util.List;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -61,9 +57,6 @@ public class JPPFJcaClient extends AbstractGenericClient
     super(uuid, configuration);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void initConfig(final Object configuration)
   {
@@ -90,9 +83,6 @@ public class JPPFJcaClient extends AbstractGenericClient
     if (log.isDebugEnabled()) log.debug("config properties: " + config);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
@@ -109,33 +99,33 @@ public class JPPFJcaClient extends AbstractGenericClient
   @Override
   public List<JPPFTask> submit(final JPPFJob job) throws Exception
   {
+    if (job == null) throw new IllegalArgumentException("job cannot be null");
+    if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
+    if ((job.getResultListener() == null) ||
+       (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
+    SubmissionManager submissionManager = getSubmissionManager();
+    submissionManager.submitJob(job);
+    if (job.isBlocking())
+    {
+      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      return collector.waitForResults();
+    }
     return null;
   }
 
-  /**
-   * Close this client and release all the resources it is using.
-   */
-  @Override
-  public void close()
-  {
-    super.close();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public JcaSubmissionManager getSubmissionManager()
-  {
-    return (JcaSubmissionManager) super.getSubmissionManager();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected SubmissionManager createSubmissionManager()
   {
-    return new JcaSubmissionManager(this);
+    SubmissionManager submissionManager = null;
+    try
+    {
+      submissionManager = new JcaSubmissionManager(this);
+    }
+    catch (Exception e)
+    {
+      log.error("Can't initialize Submission Manager", e);
+    }
+    if (submissionManager != null) new Thread(submissionManager, "SubmissionManager").start();
+    return submissionManager;
   }
 }

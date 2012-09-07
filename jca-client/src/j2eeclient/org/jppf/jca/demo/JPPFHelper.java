@@ -113,6 +113,18 @@ public class JPPFHelper
   }
 
   /**
+   * Get the name of the specified job.
+   * @param id the job uuid.
+   * @return a mapping of jobs to their uuid.
+   */
+  public static String getJobName(final String id)
+  {
+    JPPFJob job = statusMap.get(id);
+    if (job == null) return "no submission with this id";
+    return job.getName();
+  }
+
+  /**
    * Format the results of the specified job.
    * @param id the uuid of the job.
    * @return the formatted resutls as a string.

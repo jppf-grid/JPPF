@@ -18,13 +18,11 @@
 
 package org.jppf.jca.work.submission;
 
-import static org.jppf.client.submission.SubmissionStatus.PENDING;
-
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.SubmissionStatusListener;
-import org.jppf.client.submission.*;
 import org.jppf.jca.work.JPPFJcaClient;
 import org.slf4j.*;
 
@@ -34,7 +32,7 @@ import org.slf4j.*;
  * It also provides methods to check the status of a submission and retrieve the results.
  * @author Laurent Cohen
  */
-public class JcaSubmissionManager extends AbstractSubmissionManager
+public class JcaSubmissionManager extends SubmissionManagerClient
 {
   /**
    * Logger for this class.
@@ -52,8 +50,9 @@ public class JcaSubmissionManager extends AbstractSubmissionManager
   /**
    * Initialize this submission worker with the specified JPPF client.
    * @param client the JPPF client that manages connections to the JPPF drivers.
+   * @throws Exception if any error occurs.
    */
-  public JcaSubmissionManager(final JPPFJcaClient client)
+  public JcaSubmissionManager(final JPPFJcaClient client) throws Exception
   {
     super(client);
   }
@@ -61,49 +60,16 @@ public class JcaSubmissionManager extends AbstractSubmissionManager
   /**
    * Add a task submission to the execution queue.
    * @param job encapsulation of the execution data.
-   * @return the unique id of the submission.
-   */
-  @Override
-  public String submitJob(final JPPFJob job)
-  {
-    return submitJob(job, null);
-  }
-
-  /**
-   * Add a task submission to the execution queue.
-   * @param job encapsulation of the execution data.
    * @param listener an optional listener to receive submission status change notifications, may be null.
    * @return the unique id of the submission.
-   */
+  */
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
-    int count = job.getTasks().size();
     JPPFResultCollector submission = new JPPFResultCollector(job);
-    if (debugEnabled) log.debug("adding new submission: jobId=" + job.getName() + ", nbTasks=" + count + ", submission id=" + submission.getId());
-    if (listener != null) submission.addSubmissionStatusListener(listener);
     job.setResultListener(submission);
-    submission.setStatus(PENDING);
-    execQueue.add(job);
     submissionMap.put(submission.getId(), submission);
-    wakeUp();
-    return submission.getId();
-  }
-
-  /**
-   * Add an existing submission back into the execution queue.
-   * @param job encapsulation of the execution data.
-   * @return the unique id of the submission.
-   */
-  @Override
-  public String resubmitJob(final JPPFJob job)
-  {
-    JPPFResultCollector submission = (JPPFResultCollector) job.getResultListener();
-    submission.setStatus(PENDING);
-    execQueue.add(job);
-    submissionMap.put(submission.getId(), submission);
-    wakeUp();
-    return submission.getId();
+    return super.submitJob(job, listener);
   }
 
   /**
@@ -132,15 +98,6 @@ public class JcaSubmissionManager extends AbstractSubmissionManager
    */
   public Collection<String> getAllSubmissionIds()
   {
-    return Collections.unmodifiableSet(submissionMap.keySet());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected JobSubmission createSubmission(final JPPFJob job, final AbstractJPPFClientConnection c, final boolean locallyExecuting)
-  {
-    return new JcaJobSubmission(job, c, locallyExecuting, this);
+    return Collections.unmodifiableSet(new HashSet(submissionMap.keySet()));
   }
 }

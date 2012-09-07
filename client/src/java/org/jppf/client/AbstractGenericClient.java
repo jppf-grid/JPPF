@@ -374,8 +374,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Get the submission manager for this JPPF client.
    * @return a <code>JPPFSubmissionManager</code> instance.
+   * @exclude
    */
-  protected SubmissionManager getSubmissionManager()
+  public SubmissionManager getSubmissionManager()
   {
     synchronized(this)
     {

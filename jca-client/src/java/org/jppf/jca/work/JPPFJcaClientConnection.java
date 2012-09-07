@@ -28,6 +28,7 @@ import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -61,6 +62,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   {
     this.client = client;
     this.ssl = ssl;
+    this.serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", "org.jppf.jca.serialization.JcaSerializationHelperImpl");
     configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
     status.set(DISCONNECTED);
     jmxPort = ssl ? info.sslManagementPort : info.managementPort;
@@ -135,9 +137,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
@@ -175,17 +174,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   public void submit(final JPPFJob job) throws Exception
   {
     throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Get the name of the serialization helper implementation class name to use.
-   * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
-   * @see org.jppf.client.AbstractJPPFClientConnection#getSerializationHelperClassName()
-   */
-  @Override
-  protected String getSerializationHelperClassName()
-  {
-    return "org.jppf.jca.serialization.JcaSerializationHelperImpl";
   }
 
   /**

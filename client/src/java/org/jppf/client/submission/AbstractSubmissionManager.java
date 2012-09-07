@@ -109,7 +109,6 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
             ", execQueue.isEmpty()=" + execQueue.isEmpty() + ", broadcastJobsQueue.isEmpty()=" + broadcastJobsQueue.isEmpty());
            */
           JPPFJob job = null;
-          //AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
           AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) client.getClientConnection(true);
           if ((c != null) && !broadcastJobsQueue.isEmpty())
           {

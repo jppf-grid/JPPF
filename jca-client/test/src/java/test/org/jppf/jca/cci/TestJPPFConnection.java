@@ -278,6 +278,8 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
+      // remove existing submissions
+      for (String id: connection.getAllSubmissionIds()) connection.getSubmissionResults(id);
       for (int i=0; i<nbJobs; i++)
       {
         JPPFJob job = new JPPFJob(prefix + i);

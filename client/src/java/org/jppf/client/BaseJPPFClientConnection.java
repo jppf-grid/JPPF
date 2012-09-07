@@ -53,7 +53,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   /**
    * Name of the SerializationHelper implementation class.
    */
-  private static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
+  protected static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
   /**
    * Used to prevent parallel deserialization.
    */
@@ -94,6 +94,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Unique ID for this connection and its two channels.
    */
   protected final String connectionUuid = new JPPFUuid().toString();
+  /**
+   * Fully qualified name of the serilaization helper class to use.
+   */
+  protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
 
   /**
    * Initialize this client connection.
@@ -155,7 +159,16 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser);
     socketClient.flush();
-    return receiveBundleAndResults().first();
+    String name = getSerializationHelperClassName();
+    try
+    {
+      setSerializationHelperClassName(SERIALIZATION_HELPER_IMPL);
+      return receiveBundleAndResults().first();
+    }
+    finally
+    {
+      setSerializationHelperClassName(name);
+    }
   }
 
   /**
@@ -307,7 +320,16 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   protected String getSerializationHelperClassName()
   {
-    return JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
+    return serializationHelperClassName;
+  }
+
+  /**
+   * Set the name of the serialization helper implementation class name to use.
+   * @param name the fully qualified class name of a <code>SerializationHelper</code> implementation.
+   */
+  protected void setSerializationHelperClassName(final String name)
+  {
+    this.serializationHelperClassName = name;
   }
 
   /**
