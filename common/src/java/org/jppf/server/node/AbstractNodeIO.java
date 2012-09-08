@@ -92,6 +92,7 @@ public abstract class AbstractNodeIO implements NodeIO
       {
         JPPFTask task = (JPPFTask) result[2 + i];
         task.setDataProvider(dataProvider);
+        task.setInNode(true);
         taskList.add(task);
       }
     }

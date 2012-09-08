@@ -19,6 +19,7 @@ package org.jppf.classloader;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.TraversalList;
 
@@ -34,6 +35,10 @@ public class JPPFResourceWrapper implements Serializable
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Used to generate locally unique ids for the remote-computed callables.
+   */
+  private static final AtomicLong CALLABLE_ID = new AtomicLong(0);
 
   /**
    * Enumeration of the possible states for this resource wrapper.
@@ -270,6 +275,15 @@ public class JPPFResourceWrapper implements Serializable
   }
 
   /**
+   * Get the ID of an eventual remote-computed callable.
+   * @return the id as a {@link Long}.
+   */
+  protected Long getCallableID()
+  {
+    return (Long) getData("callable.id");
+  }
+
+  /**
    * Get the metadata corresponding to the specified key.
    * @param key the string identifying the metadata.
    * @return an object value or null if the metadata could not be found.
@@ -333,17 +347,29 @@ public class JPPFResourceWrapper implements Serializable
     this.dataMap = dataMap;
   }
 
+  /**
+   * Ensure there is a callableId if needed.
+   */
+  void preProcess()
+  {
+    if ((getCallable() != null) && (getCallableID() == null)) setData("callable.id", CALLABLE_ID.incrementAndGet());
+  }
+
   @Override
   public boolean equals(final Object obj)
   {
     if ((obj == null) || (obj.getClass() != this.getClass())) return false;
     JPPFResourceWrapper other = (JPPFResourceWrapper) obj;
-    return (dynamic == other.dynamic) && uuidPath.equals(other.uuidPath) && (getCallable() == other.getCallable()) && getName().equals(other.getName());
+    Long id = getCallableID();
+    Long id2 = other.getCallableID();
+    if (((id == null) && (id2 != null)) || ((id != null) && (id2 == null))) return false;
+    return (dynamic == other.dynamic) && uuidPath.equals(other.uuidPath) && ((id == null) || id.equals(id2)) && getName().equals(other.getName());
   }
 
   @Override
   public int hashCode()
   {
-    return 31 + (dynamic ? 1 : 0) + uuidPath.hashCode() + (getCallable() != null ? getCallable().hashCode() : 0) + getName().hashCode();
+    Long id = getCallableID();
+    return 31 + (dynamic ? 1 : 0) + uuidPath.hashCode() + (id != null ? id.intValue() : 0) + getName().hashCode();
   }
 }

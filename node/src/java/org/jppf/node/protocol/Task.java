@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.JPPFCallable;
 
 /**
  * Interface for all tasks submitted to the execution server.
@@ -40,7 +41,7 @@ public interface Task<T> extends Runnable, Serializable
    * Set the result of the task execution.
    * @param  result the result of this task's execution.
    */
-  void setResult(T  result);
+  void setResult(T result);
 
   /**
    * Get the exception that was raised by this task's execution. If the task raised a
@@ -133,4 +134,25 @@ public interface Task<T> extends Runnable, Serializable
    * @param position the position of this task as an <code>int</code>.
    */
   void setPosition(int position);
+
+  /**
+   * Determine whether this task is executing within a node, or locally on the client side.
+   * @return <code>true</code> if this task is executing in a node, <code>false</code> if it is on the client side.
+   */
+  boolean isInNode();
+
+  /**
+   * Determine whether this task is executing within a node, or locally on the client side.
+   * @param inNode <code>true</code> if this task is executing in a node, <code>false</code> if it is on the client side.
+   * @exclude
+   */
+  void setInNode(boolean inNode);
+  /**
+   * Compute a value on the client-side, as the result of the execution of a {@link org.jppf.utils.JPPFCallable JPPFCallable}.
+   * @param <V> the type of results returned by the callable.
+   * @param callable the key from which to get the value.
+   * @return the looked-up value, or null if the value could not be found.
+   * @see org.jppf.utils.JPPFCallable
+   */
+  <V> V compute(JPPFCallable<V> callable);
 }

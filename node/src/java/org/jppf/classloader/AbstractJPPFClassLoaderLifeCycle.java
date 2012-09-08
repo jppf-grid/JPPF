@@ -73,6 +73,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected String requestUuid = null;
   /**
+   * The cache handling resources temporarily stored to file.
+   */
+  protected final ResourceCache cache = new ResourceCache();
+  /**
    * The cache handling resources that were not found by this class loader.
    */
   protected final JPPFCache<String, Boolean> nfCache = new JPPFSynchronizedSoftCache<String, Boolean>();
@@ -244,5 +248,126 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     }
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get multiple resources, specified by their names, from the classpath.
+   * This method functions like #getResource(String), except that it look up and returns multiple URLs.
+   * @param names the names of te resources to find.
+   * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
+   * is never null, and results are in the same order as the specified resource names.
+   */
+  @SuppressWarnings("unchecked")
+  protected URL[] findMultipleResources(final String...names)
+  {
+    if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
+    URL[] results = new URL[names.length];
+    boolean[] alreadyNotFound = new boolean[names.length];
+    for (int i=0; i<names.length; i++) {
+      results[i] = null;
+      Boolean b = nfCache.get(names[i]);
+      alreadyNotFound[i] = (b == null) ? false : b;
+    }
+    try {
+      List<Integer> indices = new ArrayList<Integer>();
+      for (int i=0; i<names.length; i++) {
+        if (alreadyNotFound[i]) continue;
+        String name = names[i];
+        List<String> locationsList = cache.getResourcesLocations(name);
+        if ((locationsList != null) && !locationsList.isEmpty()) {
+          results[i] = cache.getURLFromPath(locationsList.get(0));
+          if (debugEnabled) log.debug("resource " + name + " found in local cache as " + results[i]);
+        } else {
+          URL url = super.findResource(names[i]);
+          if (url != null) {
+            results[i] = url;
+            if (debugEnabled) log.debug("resource " + name + " found in URL classpath as " + results[i]);
+          } else {
+            if (debugEnabled) log.debug("resource " + name + " not found locally");
+            indices.add(i);
+          }
+        }
+      }
+      if (indices.isEmpty()) {
+        if (debugEnabled) log.debug("all resources were found locally");
+        return results;
+      }
+      Map<String, Object> map = new HashMap<String, Object>();
+      String[] namesToLookup = new String[indices.size()];
+      for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
+      map.put("name", StringUtils.arrayToString(namesToLookup, ", ", null, null));
+      map.put("multiple.resources.names", namesToLookup);
+      JPPFResourceWrapper resource = loadResourceData(map, true);
+      Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
+      for (Integer index : indices) {
+        String name = names[index];
+        List<byte[]> dataList = dataMap.get(name);
+        boolean found = (dataList != null) && !dataList.isEmpty();
+        if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
+        if (found) {
+          cache.registerResources(name, dataList);
+          URL url = cache.getResourceURL(name);
+          results[index] = url;
+          if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
+        }
+        else nfCache.put(name, Boolean.TRUE);
+      }
+    } catch(Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+    }
+    return results;
+  }
+
+  /**
+   * Get multiple resources, specified by their names, from the classpath.
+   * This method functions like #getResource(String), except that it looks up and returns multiple URLs.
+   * @param names the names of te resources to find.
+   * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
+   * is never null, and results are in the same order as the specified resource names.
+   */
+  public URL[] getMultipleResources(final String...names)
+  {
+    if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
+    int length = names.length;
+    URL[] results = new URL[length];
+    boolean[] alreadyNotFound = new boolean[length];
+    for (int i=0; i<length; i++)
+    {
+      results[i] = null;
+      Boolean b = nfCache.get(names[i]);
+      alreadyNotFound[i] = (b == null) ? false : b;
+    }
+    try
+    {
+      ClassLoader parent = getParent();
+      if (parent == null)
+      {
+        for (int i=0; i<length; i++) if (!alreadyNotFound[i]) results[i] = getSystemResource(names[i]);
+      }
+      else if (!(parent instanceof AbstractJPPFClassLoader))
+      {
+        for (int i=0; i<length; i++) if (!alreadyNotFound[i]) results[i] = parent.getResource(names[i]);
+      }
+      else
+      {
+        results = ((AbstractJPPFClassLoader) parent).getMultipleResources(names);
+      }
+      for (int i=0; i<length; i++) if (results[i] == null) results[i] = super.getResource(names[i]);
+      List<Integer> indices = new ArrayList<Integer>();
+      for (int i=0; i<length; i++) if (results[i] == null) indices.add(i);
+      if (!indices.isEmpty())
+      {
+        String[] namesToFind = new String[indices.size()];
+        for (int i=0; i<namesToFind.length; i++) namesToFind[i] = names[indices.get(i)];
+        URL[] foundURLs = findMultipleResources(namesToFind);
+        for (int i=0; i<namesToFind.length; i++) results[indices.get(i)] = foundURLs[i];
+      }
+    }
+    catch(Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return results;
   }
 }

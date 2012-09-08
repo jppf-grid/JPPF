@@ -27,10 +27,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.client.JPPFJob;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.*;
+import test.org.jppf.test.setup.common.LifeCycleTask;
 
 /**
  * Unit tests for {@link JPPFTask}.
@@ -60,6 +61,10 @@ public class TestJPPFTask extends Setup1D1N1C
    * A the date format used in the tests.
    */
   private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+  /**
+   * Used to test JPPFTask.compute(JPPFCallable) in method {@link #testComputeCallable()}.
+   */
+  static String callableResult = "";
 
   /**
    * We test a job with 2 tasks, the 2nd task having a timeout duration set.
@@ -101,5 +106,132 @@ public class TestJPPFTask extends Setup1D1N1C
     LifeCycleTask task = (LifeCycleTask) results.get(0);
     assertNull(task.getResult());
     assertTrue(task.isTimedout());
+  }
+
+  /**
+   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code>.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testComputeCallable() throws Exception
+  {
+    int nbTasks = 1;
+    JPPFJob job = BaseSetup.createJob("testComputeCallable", true, false, nbTasks, MyComputeCallableTask.class, true);
+    callableResult = "test successful";
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+    assertNotNull(task.getResult());
+    assertEquals("test successful", task.getResult());
+  }
+
+  /**
+   * Test the value of <code>JPPFTask.isInNode()</code> for a task executing in a node.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testIsInNodeTrue() throws Exception
+  {
+    int nbTasks = 1;
+    JPPFJob job = BaseSetup.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+    assertNotNull(task.getResult());
+    assertTrue((Boolean) task.getResult());
+  }
+
+  /**
+   * Test the value of <code>JPPFTask.isInNode()</code> for a task executing locally in the lcient.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testIsInNodeFalse() throws Exception
+  {
+    try
+    {
+      client.close();
+      // enable only local execution
+      TypedProperties config = JPPFConfiguration.getProperties();
+      config.setProperty("jppf.remote.execution.enabled", "false");
+      config.setProperty("jppf.local.execution.enabled", "true");
+      client = BaseSetup.createClient(null, false);
+      int nbTasks = 1;
+      JPPFJob job = BaseSetup.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+      assertNotNull(task.getResult());
+      assertFalse((Boolean) task.getResult());
+    }
+    finally
+    {
+      // rest the client and config
+      client.close();
+      client = BaseSetup.createClient(null, true);
+    }
+  }
+
+  /**
+   * A simple JPPFTask which call its <code>compute()</code> method.
+   */
+  public static class MyComputeCallableTask extends JPPFTask
+  {
+    /**
+     * If true then call the <code>compute()</code> method.
+     */
+    private boolean testCompute = false;
+
+    /**
+     * Iitialize this task.
+     * @param testCompute if true then call the <code>compute()</code> method.
+     */
+    public MyComputeCallableTask(final boolean testCompute)
+    {
+      this.testCompute = testCompute;
+    }
+    @Override
+    public void run()
+    {
+      try
+      {
+        
+        System.out.println("this task's class loader = " + getClass().getClassLoader());
+        if (testCompute)
+        {
+          MyComputeCallable mc = new MyComputeCallable();
+          String s = compute(mc);
+          System.out.println("result of MyCallable.call() = " + s);
+          setResult(s);
+        }
+        else
+        {
+          boolean b = isInNode();
+          System.out.println("isInNode() = " + b);
+          setResult(b);
+        }
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+        setException(e);
+      }
+    }
+  }
+
+  /**
+   * 
+   */
+  public static class MyComputeCallable implements JPPFCallable<String>
+  {
+    @Override
+    public String call() throws Exception
+    {
+      System.out.println("result of MyCallable.call() = " + callableResult);
+      return callableResult;
+    }
   }
 }

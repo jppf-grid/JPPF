@@ -19,9 +19,11 @@ package org.jppf.server.protocol;
 
 import java.io.Serializable;
 
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.task.storage.DataProvider;
+import org.jppf.utils.*;
 
 /**
  * Abstract superclass for all tasks submitted to the execution server.
@@ -66,6 +68,10 @@ public abstract class JPPFTask implements Task<Object>
    * The task timeout schedule configuration.
    */
   private JPPFSchedule timeoutSchedule = null;
+  /**
+   * Determines whether this task is executing within a node, or locally on the client side.
+   */
+  private boolean inNode = false;
 
   /**
    * Default constructor.
@@ -216,7 +222,7 @@ public abstract class JPPFTask implements Task<Object>
    * Set the timeout date for this task.<br>
    * Calling this method will reset the timeout value, as both timeout duration and timeout date are mutually exclusive.
    * @param timeoutDate the date to set in string representation.
-   * @param format the format of of the date to set, as described in the specification for {@link SimpleDateFormat}.
+   * @param format the format of of the date to set, as described in the specification for {@link java.text.SimpleDateFormat SimpleDateFormat}.
    * @see java.text.SimpleDateFormat
    * @deprecated use a {@link JPPFSchedule} object with {@link #setTimeoutSchedule(JPPFSchedule)} instead.
    * @exclude
@@ -276,5 +282,46 @@ public abstract class JPPFTask implements Task<Object>
   public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule)
   {
     this.timeoutSchedule = timeoutSchedule;
+  }
+
+  @Override
+  public boolean isInNode()
+  {
+    return inNode;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
+  @Override
+  public void setInNode(final boolean inNode)
+  {
+    this.inNode = inNode;
+  }
+
+  @Override
+  public <V> V compute(final JPPFCallable<V> callable)
+  {
+    ClassLoader cl = callable.getClass().getClassLoader();
+    if (!(cl instanceof AbstractJPPFClassLoader)) return null;
+    try
+    {
+      AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
+      Class clazz = loader.loadClass("org.jppf.utils.ObjectSerializerImpl");
+      ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
+      byte[] bytes = ser.serialize(callable).getBuffer();
+      bytes = loader.computeRemoteData(bytes);
+      if (bytes == null) return null;
+      V v = (V) ser.deserialize(bytes);
+      System.out.println("result of compute() : " + v);
+      //return (V) ser.deserialize(bytes);
+      return v;
+    }
+    catch(Exception ignored)
+    {
+      ignored.printStackTrace();
+    }
+    return null;
   }
 }

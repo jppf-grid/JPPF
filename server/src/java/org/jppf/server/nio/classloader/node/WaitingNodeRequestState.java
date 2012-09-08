@@ -80,6 +80,10 @@ class WaitingNodeRequestState extends ClassServerState
         String name = resource.getName();
         String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
         ClassTransition t = null;
+        if (resource.getCallable() != null)
+        {
+          boolean breakpoint = true;
+        }
         if (!dynamic || (resource.getRequestUuid() == null)) t = processNonDynamic(channel, resource);
         else t = processDynamic(channel, resource);
         //if (t == TO_NODE_WAITING_PROVIDER_RESPONSE) context.getPendingResponses().put(resource, new ResourceRequest(channel, resource));

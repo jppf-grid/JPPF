@@ -64,8 +64,8 @@ public class ClientDataProvider extends MemoryMapDataProvider
    * Get a value specified by its key and computed by a callable object on the client side.<br>
    * If the value has already been computed on the client side, it is simply retrieved locally from this data provider.
    * @param <V> the type of results returned by the callable.
-   * @param key - the key identifying the value to retrieve in the store.
-   * @param callable - a JPPFCallable object used to compute the value.
+   * @param key the key identifying the value to retrieve in the store.
+   * @param callable a JPPFCallable object used to compute the value.
    * @return the value as an <code>Object</code>.
    * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
    */
@@ -80,8 +80,8 @@ public class ClientDataProvider extends MemoryMapDataProvider
 
   /**
    * Compute a value on the client-side, as the result of the execution of a {@link org.jppf.utils.JPPFCallable JPPFCallable}.
-   * @param <V> - the type of results returned by the callable.
-   * @param callable - the key from which to get the value.
+   * @param <V> the type of results returned by the callable.
+   * @param callable the key from which to get the value.
    * @return the looked-up value, or null if the value could not be found.
    * @see org.jppf.utils.JPPFCallable
    */

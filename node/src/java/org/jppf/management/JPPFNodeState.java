@@ -50,7 +50,7 @@ public class JPPFNodeState implements Serializable
     /**
      * The node is disconnected.
      */
-    DISCONNECTED("node.diconnected");
+    DISCONNECTED("node.disconnected");
 
     /**
      * The name to display.

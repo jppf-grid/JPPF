@@ -32,9 +32,9 @@ public class DriverProcessLauncher extends GenericProcessLauncher
     super("[driver] ");
     setMainClass("org.jppf.server.JPPFDriver");
     //addArgument("noLauncher");
-    setJppfConfig("config/driver.properties");
-    setLog4j("config/log4j-driver.properties");
-    addClasspathElement("classes/tests");
+    setJppfConfig("driver.properties");
+    setLog4j("log4j-driver.properties");
+    addClasspathElement("classes/tests/config");
     addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");

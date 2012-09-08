@@ -82,6 +82,7 @@ public class ClassLoaderRequestHandler
    */
   public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource)
   {
+    resource.preProcess();
     Future<JPPFResourceWrapper> f;
     synchronized(periodicTask)
     {
