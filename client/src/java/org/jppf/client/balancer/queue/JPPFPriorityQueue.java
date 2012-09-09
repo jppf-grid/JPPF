@@ -129,8 +129,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue {
           putInListMap(sla.getPriority(), bundleWrapper, priorityMap);
           putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
           if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
-          handleStartJobSchedule(bundleWrapper);
-          handleExpirationJobSchedule(bundleWrapper);
+          //handleStartJobSchedule(bundleWrapper);
+          //handleExpirationJobSchedule(bundleWrapper);
         }
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
@@ -332,7 +332,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue {
           }
         });
       } catch (ParseException e) {
-        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
+        log.error("Unparsable expiration date for job " + bundleWrapper + " : date = " + schedule.getDate() +
                 ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
