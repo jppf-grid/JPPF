@@ -66,11 +66,11 @@ class JobExpirationAction implements Runnable
 		{
 			if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
 			bundle.setParameter(BundleParameter.JOB_EXPIRED, true);
+      String jobUuid = bundleWrapper.getBundle().getJobUuid();
 			if (bundle.getTaskCount() > 0)
 			{
-				if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
+				//if (bundle.getCompletionListener() != null) bundle.getCompletionListener().taskCompleted(bundleWrapper);
 			}
-			String jobUuid = bundleWrapper.getBundle().getJobUuid();
 			jobManagamentMBean.cancelJob(jobUuid);
 		}
 		catch (Exception e)

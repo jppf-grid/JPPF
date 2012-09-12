@@ -149,7 +149,7 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 		setPendingTasksCount(getPendingTasksCount() - result.getBundle().getTaskCount());
 		if (debugEnabled)
 		{
-			log.debug("Received results for : " + result.getBundle().getTaskCount() + " [size=" + result.getTasks().size() + "] tasks");
+			log.debug("Received results for : " + result.getBundle().getTaskCount() + " [jobId=" + result.getBundle().getId() + ", size=" + result.getTasks().size() + "] tasks");
 			log.debug("Pending tasks: " + getPendingTasksCount());
 		}
 		getResultList().add(result);

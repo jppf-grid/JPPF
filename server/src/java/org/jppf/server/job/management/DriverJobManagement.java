@@ -73,16 +73,17 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 		if (bundleWrapper != null)
 		{
 			if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getBundle().getId() + "'");
-			//cancelJobInNodes(jobUuid, false);
-			//if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
 			JPPFTaskBundle bundle = bundleWrapper.getBundle();
-			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
+      //BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
+			BundleWrapper queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getInitialTaskCount());
+			/*
 			if (queuedWrapper != null)
 			{
 				bundle = queuedWrapper.getBundle();
 				TaskCompletionListener listener = bundle.getCompletionListener();
 				if (listener != null) listener.taskCompleted(queuedWrapper);
 			}
+			*/
 		}
 		else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + "'");
 	}

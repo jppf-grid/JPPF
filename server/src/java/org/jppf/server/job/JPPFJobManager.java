@@ -131,7 +131,7 @@ public class JPPFJobManager implements QueueListener
 		List<ChannelBundlePair> list = jobMap.get(jobUuid);
 		if (list == null)
 		{
-			log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getId());
+		  if (debugEnabled) log.debug("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getId());
 			return;
 		}
 		list.remove(new ChannelBundlePair(channel, bundleWrapper));

@@ -183,6 +183,10 @@ class ApplicationConnection extends JPPFConnection
 			resultSender.run(count);
 		}
 		else resultSender.sendPartialResults(headerWrapper);
+		if ("TemlateJobId_5".equals(header.getId()))
+		{
+		  boolean breakpoint = true;
+		}
 		jobEnded();
 		return;
 	}
