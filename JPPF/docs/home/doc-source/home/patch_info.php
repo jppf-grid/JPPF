@@ -3,9 +3,9 @@ $template{name="about-page-header" title="Patches"}$
 <?php
 	$patch_id = $_REQUEST["patch_id"];
 	// Connecting, selecting database
-	$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
+	$link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
 		 or die('Could not connect: ' . mysql_error());
-	mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
+	mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
 
 	// Performing SQL query
 	$query = "SELECT * FROM patch where id = " . $patch_id;

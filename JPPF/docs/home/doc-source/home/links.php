@@ -3,9 +3,9 @@ $template{name="about-page-header" title="Links"}$
 
 		<h1 align="center">Related Links</h1>
 <?php
-		$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
+		$link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
 			 or die('Could not connect: ' . mysql_error());
-		mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
+		mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
 
 		$query = 'SELECT * FROM links_groups ORDER BY group_id ASC';
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());

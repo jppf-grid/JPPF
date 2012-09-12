@@ -1,3 +1,5 @@
+#php_flag magic_quotes_gpc Off
+#php_value magic_quotes_gpc off
 AddType application/x-java-jnlp-file JNLP
 <IfModule mod_security.c>
    # Turn off mod_security filtering.
@@ -8,5 +10,6 @@ AddType application/x-java-jnlp-file JNLP
 </IfModule>
 
 RewriteEngine on
-#RewriteRule ^wiki\/?(.*)$ "\/doc\/v2\/$1" [R]
-RewriteRule ^wiki\/?(.*)$ /doc/v2/$1 [R]
+#RewriteRule ^jppf\/?(.*)$ "http\:\/\/www\.jppf\.org\/$1" [R=301,L]
+RewriteRule ^wiki\/?(.*)$ "\/doc\/v2\/$1" [R]
+#RewriteRule ^/wiki$ /doc/v2 [R]

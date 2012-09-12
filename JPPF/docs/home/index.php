@@ -180,9 +180,9 @@ else
 	</div>
 	<div class="column1">
 		<?php
-			$link = mysql_connect('localhost', 'pervasiv_jppfadm', 'tri75den')
+			$link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
 				 or die('Could not connect: ' . mysql_error());
-			mysql_select_db('pervasiv_jppfweb') or die('Could not select database');
+			mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
 			$query = 'SELECT * FROM news ORDER BY date DESC';
 			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		?>
@@ -233,8 +233,8 @@ else
 		<h3>Contribute</h3>
 		<b>Browse our <a href="./wiki" target=_top>documentation</a></b><br>
 		<b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
-		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733518&group_id=135654&func=browse" target=_top>bugs database</a></b><br>
-		<b>Browse and contribute to our <a href="http://sourceforge.net/tracker/?atid=733521&group_id=135654&func=browse" target=_top>feature requests database</a></b><br>
+		<b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
+		<b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
 		<b>Gain insight and provide feedback in the <a href="http://www.jroller.com/jppf/" target=_top>JPPF blog</a></b>
 	</div>
 </div>
