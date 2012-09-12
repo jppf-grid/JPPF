@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
@@ -146,5 +146,31 @@ public class TestJPPFJobSLA extends Setup1D1N1C
     assertEquals(results.size(), 1);
     JPPFTask task = results.get(0);
     assertNull(task.getResult());
+  }
+
+  /**
+   * Test that a job queued in the client does not expire there.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testMultipleJobsExpiration() throws Exception
+  {
+    JPPFJob job1 = BaseSetup.createJob("testMultipleJobsExpiration-1", false, false, 1, SimpleTask.class, TIME_LONG);
+    job1.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
+    JPPFJob job2 = BaseSetup.createJob("testMultipleJobsExpiration-2", false, false, 1, SimpleTask.class, TIME_SHORT);
+    job2.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
+    client.submit(job1);
+    client.submit(job2);
+    List<JPPFTask> results = ((JPPFResultCollector) job1.getResultListener()).waitForResults();
+    assertNotNull(results);
+    assertEquals(results.size(), 1);
+    JPPFTask task = results.get(0);
+    assertNull(task.getResult());
+    results = ((JPPFResultCollector) job2.getResultListener()).waitForResults();
+    assertNotNull(results);
+    assertEquals(results.size(), 1);
+    task = results.get(0);
+    assertNotNull(task.getResult());
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
   }
 }

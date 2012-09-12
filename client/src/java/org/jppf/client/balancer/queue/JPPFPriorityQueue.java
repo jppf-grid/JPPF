@@ -145,8 +145,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           putInListMap(sla.getPriority(), bundleWrapper, priorityMap);
           putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
           if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
-          handleStartJobSchedule(bundleWrapper);
-          handleExpirationJobSchedule(bundleWrapper);
+          //handleStartJobSchedule(bundleWrapper);
+          //handleExpirationJobSchedule(bundleWrapper);
         }
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
