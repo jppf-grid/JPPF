@@ -423,4 +423,31 @@ public final class StringUtils
     }
     return sb.toString();
   }
+
+  /**
+   * Convert a set of properties from a String to TypedProperties representation.
+   * @param source the source string.
+   * @return a TypedProperties instance containing the entries of the source string.
+   */
+  public static TypedProperties toProperties(final String source)
+  {
+    TypedProperties props = new TypedProperties();
+    if (source != null)
+    {
+      BufferedReader reader = null;
+      try
+      {
+        reader = new BufferedReader(new StringReader(source));
+        props.load(reader);
+      }
+      catch(Exception ignore)
+      {
+      }
+      finally
+      {
+        if (reader != null) StreamUtils.closeSilent(reader);
+      }
+    }
+    return props;
+  }
 }

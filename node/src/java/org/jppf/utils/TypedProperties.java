@@ -357,19 +357,18 @@ public class TypedProperties extends Properties
    * Get the value of a property with the specified name as a set of properties.
    * @param key the name of the property to look for.
    * Its value is the path to another properties file. Relative paths are evaluated against the current application directory.
+   * If the path is not found in the file system, it is looked up in the claaspath of the class loader which loaded this class.
    * @param def a default value to return if the property is not found.
    * @return the value of the property as another set of properties, or the default value if it is not found.
    */
   public TypedProperties getProperties(final String key, final TypedProperties def)
   {
     String path = getString(key);
-    File file = new File(path);
-    if (!file.exists()) return def;
     TypedProperties res = new TypedProperties();
     InputStream is = null;
     try
     {
-      is = new BufferedInputStream(new FileInputStream(file));
+      is = FileUtils.getFileInputStream(path);
       res.load(is);
     }
     catch(IOException e)
