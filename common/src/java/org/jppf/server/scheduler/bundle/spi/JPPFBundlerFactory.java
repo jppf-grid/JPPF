@@ -42,15 +42,46 @@ public class JPPFBundlerFactory
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Default load-balancer settings for the server.
+   */
+  public static final String SERVER_DEFAULTS = new StringBuilder().append("jppf.load.balancing.algorithm = proportional\n")
+      .append("jppf.load.balancing.strategy = jppf\n")
+      .append("strategy.jppf.performanceCacheSize = 3000\n")
+      .append("strategy.jppf.proportionalityFactor = 1\n")
+      .append("strategy.jppf.initialSize = 10\n")
+      .append("strategy.jppf.initialMeanTime = 1e9\n")
+      .toString();
+  /**
+   * Default load-balancer settings for the client.
+   */
+  public static final String CLIENT_DEFAULTS = new StringBuilder().append("jppf.load.balancing.algorithm = manual\n")
+      .append("jppf.load.balancing.strategy = jppf\n")
+      .append("strategy.jppf.size = 1000000\n")
+      .toString();
+  /**
    * Map of all registered providers.
    */
   private Map<String, JPPFBundlerProvider> providerMap = null;
+  /**
+   * The default values to use if nothing is specified in the JPPF configuration.
+   */
+  private final TypedProperties defaultConfig;
 
   /**
    * Default constructor.
    */
   public JPPFBundlerFactory()
   {
+    this(SERVER_DEFAULTS);
+  }
+
+  /**
+   * Default constructor.
+   * @param def the default values to use if nothing is specified in the JPPF configuration.
+   */
+  public JPPFBundlerFactory(final String def)
+  {
+    defaultConfig = StringUtils.toProperties(def);
   }
 
   /**
@@ -78,10 +109,23 @@ public class JPPFBundlerFactory
     TypedProperties props = JPPFConfiguration.getProperties();
     String algorithm = props.getString("jppf.load.balancing.algorithm", null);
     // for compatibility with v1.x configuration files
-    if (algorithm == null) algorithm = props.getString("task.bundle.strategy", "proportional");
+    if (algorithm == null) algorithm = props.getString("task.bundle.strategy", null);
+    if (algorithm == null) algorithm = defaultConfig.getString("jppf.load.balancing.algorithm", "proportional");
     String profileName = props.getString("jppf.load.balancing.strategy", null);
     // for compatibility with v1.x configuration files
-    if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
+    if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", null);
+    if (profileName == null)
+    {
+      profileName = defaultConfig.getString("jppf.load.balancing.strategy", "jppf");
+      for (Map.Entry<Object, Object> entry: defaultConfig.entrySet())
+      {
+        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
+        {
+          String key = (String) entry.getKey();
+          if (!props.containsKey(key) && key.startsWith("strategy.jppf.")) props.put(key, entry.getValue());
+        }
+      }
+    }
     TypedProperties configuration = convertJPPFConfiguration(profileName, props);
     if (debugEnabled) log.debug("load balancing configuration using algorithm '" + algorithm +"' with parameters: " + configuration);
     return createBundler(algorithm, configuration);
@@ -151,8 +195,8 @@ public class JPPFBundlerFactory
 
   /**
    * Extract the JPPF-prefixed load-balancing parameters from the specified configuration and based on the specified profile name.
-   * @param profileName - the name of the profile to extract.
-   * @param configuration - the JPPF configuration to extract from.
+   * @param profileName the name of the profile to extract.
+   * @param configuration the JPPF configuration to extract from.
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
   public TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration)

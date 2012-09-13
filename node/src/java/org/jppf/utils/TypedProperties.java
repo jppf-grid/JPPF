@@ -23,7 +23,6 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.utils.streams.StreamUtils;
-import org.slf4j.*;
 
 /**
  * Extension of the <code>java.util.Properties</code> class to handle the conversion of
@@ -36,10 +35,6 @@ public class TypedProperties extends Properties
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(TypedProperties.class);
 
   /**
    * Default constructor.
@@ -363,13 +358,11 @@ public class TypedProperties extends Properties
   public TypedProperties getProperties(final String key, final TypedProperties def)
   {
     String path = getString(key);
-    File file = new File(path);
-    if (!file.exists()) return def;
     TypedProperties res = new TypedProperties();
     InputStream is = null;
     try
     {
-      is = new BufferedInputStream(new FileInputStream(file));
+      is = FileUtils.getFileInputStream(path);
       res.load(is);
     }
     catch(IOException e)
@@ -378,7 +371,7 @@ public class TypedProperties extends Properties
     }
     finally
     {
-      StreamUtils.close(is, log);
+      StreamUtils.closeSilent(is);
     }
     return res;
   }
