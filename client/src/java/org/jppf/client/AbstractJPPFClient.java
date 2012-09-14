@@ -19,6 +19,7 @@ package org.jppf.client;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
@@ -63,6 +64,11 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * List of listeners to this JPPF client.
    */
   private final List<ClientListener> listeners = new ArrayList<ClientListener>();
+  /**
+   * Determines whether this JPPF client is closed.
+   * @exclude
+   */
+  protected final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Initialize this client with a specified application UUID.
@@ -384,6 +390,15 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public String getUuid()
   {
     return uuid;
+  }
+
+  /**
+   * Determine whether this JPPF client is closed.
+   * @return <code>true</code> if this client is closed, <code>false</code> otherwise.
+   */
+  public boolean isClosed()
+  {
+    return closed.get();
   }
 
   /**
