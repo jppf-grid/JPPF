@@ -230,7 +230,8 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   @Override
   public synchronized void setStatus(final SubmissionStatus newStatus)
   {
-    if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
+    if (newStatus == this.status) return;
+    if (debugEnabled) log.debug("job " + job + " status changing from '" + this.status + "' to '" + newStatus + "'");
     this.status = newStatus;
     fireStatusChangeEvent(newStatus);
   }
@@ -279,7 +280,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     synchronized(listeners)
     {
-      if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
+      if (debugEnabled) log.debug("job " + job + " fire status changed event for '" + newStatus + "'");
       if (!listeners.isEmpty())
       {
         SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
