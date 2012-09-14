@@ -230,6 +230,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   @Override
   public synchronized void setStatus(final SubmissionStatus newStatus)
   {
+    if (newStatus == this.status) return;
     if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
     this.status = newStatus;
     fireStatusChangeEvent(newStatus);
