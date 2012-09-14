@@ -20,13 +20,15 @@ package test.org.jppf.server.protocol;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.streams.StreamUtils;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -65,7 +67,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
    * Simply test that a job does expires at a specified date.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=8000)
   public void testJobExpirationAtDate() throws Exception
   {
     JPPFJob job = BaseSetup.createJob("testJobExpirationAtDate", true, false, 1, SimpleTask.class, TIME_LONG);
@@ -83,7 +85,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
    * Test that a job does not expires at a specified date, because it completes before that date.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=8000)
   public void testJobExpirationAtDateTooLate() throws Exception
   {
     JPPFJob job = BaseSetup.createJob("testJobExpirationAtDateTooLate", true, false, 1, SimpleTask.class, TIME_SHORT);
@@ -102,7 +104,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
    * Simply test that a job does expires after a specified delay.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=8000)
   public void testJobExpirationAfterDelay() throws Exception
   {
     JPPFJob job = BaseSetup.createJob("testJobExpirationAfterDelay", true, false, 1, SimpleTask.class, TIME_LONG);
@@ -118,7 +120,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
    * Test that a job does not expire after a specified delay, because it completes before that.
    * @throws Exception if any error occurs.
    */
-  @Test
+  @Test(timeout=8000)
   public void testJobExpirationAfterDelayTooLate() throws Exception
   {
     JPPFJob job = BaseSetup.createJob("testJobExpirationAfterDelayTooLate", true, false, 1, SimpleTask.class, TIME_SHORT);
@@ -132,7 +134,7 @@ public class TestJPPFJobSLA extends Setup1D1N1C
   }
 
   /**
-   * Simply test that a job does expires after a specified delay.
+   * Simply test that a suspended job does expires after a specified delay.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
@@ -147,4 +149,82 @@ public class TestJPPFJobSLA extends Setup1D1N1C
     JPPFTask task = results.get(0);
     assertNull(task.getResult());
   }
+
+  /**
+   * Test that a job queued in the client does not expire there.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testMultipleJobsExpiration() throws Exception
+  {
+    JPPFJob job1 = BaseSetup.createJob("testMultipleJobsExpiration-1", false, false, 1, SimpleTask.class, TIME_LONG);
+    job1.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
+    JPPFJob job2 = BaseSetup.createJob("testMultipleJobsExpiration-2", false, false, 1, SimpleTask.class, TIME_SHORT);
+    job2.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
+    client.submit(job1);
+    client.submit(job2);
+    List<JPPFTask> results = ((JPPFResultCollector) job1.getResultListener()).waitForResults();
+    assertNotNull(results);
+    assertEquals(results.size(), 1);
+    JPPFTask task = results.get(0);
+    assertNull(task.getResult());
+    results = ((JPPFResultCollector) job2.getResultListener()).waitForResults();
+    assertNotNull(results);
+    assertEquals(results.size(), 1);
+    task = results.get(0);
+    assertNotNull(task.getResult());
+    assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+  }
+
+  /**
+   * Test that a job is not cancelled when the client connection is closed
+   * and <code>JPPFJob.getSLA().setCancelUponClientDisconnect(false)</code> has been set.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testCancelJobUponClientDisconnect() throws Exception
+  {
+    try
+    {
+      File f = new File("testCancelJobUponClientDisconnect.tmp");
+      if (f.exists()) f.delete();
+      assertFalse(f.exists());
+      JPPFJob job = BaseSetup.createJob("testCancelJobUponClientDisconnect", true, false, 1, FileTask.class);
+      job.getSLA().setCancelUponClientDisconnect(false);
+      job.setBlocking(false);
+      client.submit(job);
+      Thread.sleep(1000L);
+      client.close();
+      Thread.sleep(2000L);
+      assertTrue(f.exists());
+    }
+    finally
+    {
+      client = BaseSetup.createClient(null);
+    }
+  }
+
+  /**
+   * A task that creates a file.
+   */
+  public static class FileTask extends JPPFTask
+  {
+    @Override
+    public void run()
+    {
+      try
+      {
+        File f = new File("testCancelJobUponClientDisconnect.tmp");
+        Thread.sleep(2000L);
+        Writer writer = new FileWriter(f);
+        StreamUtils.closeSilent(writer);
+      }
+      catch (Exception e)
+      {
+        setException(e);
+        e.printStackTrace();
+      }
+    }
+  }
+
 }
