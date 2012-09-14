@@ -78,6 +78,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   {
     try
     {
+      if (closed) throw new IllegalStateException("this client connection is closed");
       try
       {
         //String s = InetAddress.getByName(host).getCanonicalHostName();
@@ -109,8 +110,12 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       connect();
       JPPFClientConnectionStatus status = getStatus();
       if (debugEnabled) log.debug("connection [" + name + "] status=" + status);
-      if ((status == ACTIVE) || (status == EXECUTING)) client.addClientConnection(this);
-      if (debugEnabled) log.debug("connection [" + name + "] added to the client pool");
+      if (client.isClosed()) close();
+      else if ((status == ACTIVE) || (status == EXECUTING))
+      {
+        client.addClientConnection(this);
+        if (debugEnabled) log.debug("connection [" + name + "] added to the client pool");
+      }
     }
     catch (Exception e)
     {

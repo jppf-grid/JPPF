@@ -19,7 +19,7 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.queue.*;
@@ -100,6 +100,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Counts the current number of connections with ACTIVE or EXECUTING status. 
    */
   private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
+  /**
+   * Determines whether this submission manager has been closed. 
+   */
+  private AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Instantiates client submission manager.
@@ -157,6 +161,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   protected synchronized void addConnection(final ChannelWrapper<?> wrapper)
   {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
+    if (closed.get()) throw new IllegalStateException("this submission manager was closed");
 
     allConnections.add(wrapper);
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
@@ -188,6 +193,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   protected synchronized ChannelWrapper<?> addConnection(final JPPFClientConnection cnn)
   {
     if (log.isDebugEnabled()) log.debug("adding connection " + cnn);
+    if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
 
     ChannelWrapper wrapper = wrapperMap.get(connection);
@@ -320,6 +326,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
+    if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     List<JPPFTask> pendingTasks = new ArrayList<JPPFTask>();
     if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector))
     {
@@ -381,6 +388,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   protected synchronized void updateLocalExecution(final boolean localExecutionEnabled)
   {
+    if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     if (localExecutionEnabled)
     {
       wrapperLocal = new ChannelWrapperLocal();
@@ -430,6 +438,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public void close()
   {
+    closed.set(true);
     setStopped(true);
     wakeUp();
     if (taskQueueChecker != null)

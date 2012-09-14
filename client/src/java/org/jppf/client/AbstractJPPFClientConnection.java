@@ -68,7 +68,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Determines whether this connection has been shut down;
    */
-  protected boolean isShutdown = false;
+  protected boolean closed = false;
   /**
    * The name displayed for this connection.
    */
@@ -391,9 +391,9 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     {
       listeners.clear();
     }
-    if (!isShutdown)
+    if (!closed)
     {
-      isShutdown = true;
+      closed = true;
       try
       {
         if (debugEnabled) log.debug("closing task server connection " + this);
@@ -413,5 +413,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + this + " closed");
     return list;
+  }
+
+  /**
+   * Determine whether this connection has been shut down;
+   * @return <code>true</code> if this connection has been closed, <code>false</code> otherwise.
+   */
+  public boolean isClosed()
+  {
+    return closed;
   }
 }

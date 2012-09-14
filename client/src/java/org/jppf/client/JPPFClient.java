@@ -148,21 +148,6 @@ public class JPPFClient extends AbstractGenericClient
     return (conn == null) ? null : conn.getJmxConnection().statistics();
   }
 
-  /**
-   * Close this client and release all the resources it is using.
-   */
-  @Override
-  public void close()
-  {
-    super.close();
-    if (debugEnabled) log.debug("closing submission manager");
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager != null) submissionManager.close();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected SubmissionManager createSubmissionManager()
   {

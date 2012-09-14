@@ -75,6 +75,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
   {
     try
     {
+      if (((AbstractJPPFClientConnection) owner).closed) throw new IllegalStateException("this task server connection is closed");
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
       String msg = "[client: " + name + "] Attempting connection to the JPPF task server at " + host + ':' + port;

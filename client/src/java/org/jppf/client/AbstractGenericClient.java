@@ -271,6 +271,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   @Override
   public void close()
   {
+    if (debugEnabled) log.debug("closing JPPF client");
+    closed.set(true);
+    if (debugEnabled) log.debug("closing submission manager");
+    SubmissionManager submissionManager = getSubmissionManager();
+    if (submissionManager != null) submissionManager.close();
     if (debugEnabled) log.debug("closing broadcast receiver");
     if (receiverThread != null) receiverThread.close();
     if (debugEnabled) log.debug("closing executor");

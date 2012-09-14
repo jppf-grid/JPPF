@@ -73,6 +73,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
   {
     try
     {
+      if (((AbstractJPPFClientConnection) owner).closed) throw new IllegalStateException("this task server connection is closed");
       handshakeDone = false;
       socketInitializer.setName('[' + getName() + " - delegate] ");
       setStatus(CONNECTING);

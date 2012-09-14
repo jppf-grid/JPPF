@@ -77,6 +77,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
   {
     try
     {
+      if (((AbstractJPPFClientConnection) owner).isClosed()) throw new IllegalStateException("this class server connection is closed");
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
       if (debugEnabled) log.debug("[client: " + getName() + "] Attempting connection to the class server");
