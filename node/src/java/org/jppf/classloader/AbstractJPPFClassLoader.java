@@ -51,10 +51,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * Determines whether system classloader was initialized.
    */
   private boolean systemClassLoaderInitialized = false;
-  /**
-   * Provides a lock in <code>findClass()</code> to avoid duplicate class definition attempts.
-   */
-  private final Object findClassLock = new Object();
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -117,38 +113,46 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws ClassNotFoundException if the class could not be loaded.
    * @see java.lang.ClassLoader#findClass(java.lang.String)
    */
-  protected Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
+  protected /*synchronized*/ Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
-    synchronized(findClassLock)
+    Class<?> c = null;
+    if (nfCache.get(name) != null) throw new ClassNotFoundException("Could not load class '" + name + '\'');
+    c = findLoadedClass(name);
+    if (c != null) return c;
+    if (lookupClasspath) c = findClassInURLClasspath(name, false);
+    if (c != null) return c;
+    int i = name.lastIndexOf('.');
+    if (i >= 0)
     {
-      if (nfCache.get(name) != null) throw new ClassNotFoundException("Could not load class '" + name + '\'');
-      Class<?> c = findLoadedClass(name);
-      if (c != null) return c;
-      if (lookupClasspath) c = findClassInURLClasspath(name, false);
-      if (c != null) return c;
-      int i = name.lastIndexOf('.');
-      if (i >= 0)
+      String pkgName = name.substring(0, i);
+      synchronized(this)
       {
-        String pkgName = name.substring(0, i);
         Package pkg = getPackage(pkgName);
         if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
       }
-      if (debugEnabled) log.debug("looking up definition for resource [" + name + ']');
-      byte[] b = null;
-      String resName = name.replace('.', '/') + ".class";
-      Map<String, Object> map = new HashMap<String, Object>();
-      map.put("name", resName);
-      JPPFResourceWrapper resource = loadResourceData(map, false);
-      //if (resource == null) throw new ClassNotFoundException("could not find resource " + name);
-      if (resource != null) b = resource.getDefinition();
-      if ((b == null) || (b.length == 0))
-      {
-        if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-        nfCache.put(name, Boolean.TRUE);
-        throw new ClassNotFoundException("Could not load class '" + name + '\'');
-      }
-      if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + ']');
-      return defineClass(name, b, 0, b.length);
+    }
+    if (debugEnabled) log.debug("looking up definition for resource [" + name + ']');
+    byte[] b = null;
+    String resName = name.replace('.', '/') + ".class";
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("name", resName);
+    JPPFResourceWrapper resource = null;
+    synchronized(this)
+    {
+      resource = loadResourceData(map, false);
+    }
+    if (resource != null) b = resource.getDefinition();
+    if ((b == null) || (b.length == 0))
+    {
+      if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
+      nfCache.put(name, Boolean.TRUE);
+      throw new ClassNotFoundException("Could not load class '" + name + '\'');
+    }
+    if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + ']');
+    synchronized(this)
+    {
+      c = findLoadedClass(name);
+      return c == null ? defineClass(name, b, 0, b.length) : c;
     }
   }
 
@@ -461,9 +465,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     nfCache.clear();
   }
 
-  /**
-   * Terminate this classloader and clean the resources it uses.
-   */
   @Override
   public void close() {
     LOCK.lock();

@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.JPPFUnsupportedOperationException;
 
 /**
- * Abstract superclass for all futures handled by a {@link JPPFExecutorService}.
+ * Future for handling class loading requests.
  * @param <V> the type of result returned by this future.
  * @author Laurent Cohen
  * @exclude
@@ -40,10 +40,6 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    */
   protected AtomicBoolean cancelled = new AtomicBoolean(false);
   /**
-   * The initial request.
-   */
-  protected final V request;
-  /**
    * The execution result.
    */
   protected V response = null;
@@ -51,22 +47,16 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * Lock for synchronization.
    */
   private final Object lock = new Object();
+  /**
+   * 
+   */
+  private ClassLoader cl = null;
 
   /**
    * Initialize this future.
    */
   public ResourceFuture()
   {
-    this.request = null;
-  }
-
-  /**
-   * Initialize this future with the specified request.
-   * @param request the orignal resource loading request.
-   */
-  public ResourceFuture(final V request)
-  {
-    this.request = request;
   }
 
   /**
@@ -83,9 +73,10 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   {
     cancelled.set(true);
     done.set(true);
-    synchronized(lock)
+    Object o = (cl == null) ? lock : cl;
+    synchronized(o)
     {
-      lock.notifyAll();
+      o.notifyAll();
     }
     return false;
   }
@@ -100,9 +91,10 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   @Override
   public V get() throws InterruptedException, ExecutionException
   {
-    synchronized(lock)
+    Object o = (cl == null) ? lock : cl;
+    synchronized(o)
     {
-      lock.wait();
+      while (!isDone()) o.wait();
     }
     return response;
   }
@@ -154,10 +146,20 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   public void setDone(final V response)
   {
     done.set(true);
-    synchronized(lock)
+    Object o = (cl == null) ? lock : cl;
+    synchronized(o)
     {
       this.response = response;
-      lock.notifyAll();
+      o.notifyAll();
     }
+  }
+
+  /**
+   * 
+   * @param cl .
+   */
+  public void setCl(final ClassLoader cl)
+  {
+    this.cl = cl;
   }
 }

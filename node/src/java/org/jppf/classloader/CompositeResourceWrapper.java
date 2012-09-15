@@ -38,6 +38,13 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   private final transient Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = new HashMap<JPPFResourceWrapper, Future<JPPFResourceWrapper>>();
 
   /**
+   * 
+   */
+  public CompositeResourceWrapper()
+  {
+  }
+
+  /**
    * Get the list of requests held by this composite request.
    * @return a list of {@link JPPFResourceWrapper} instances.
    */
@@ -58,7 +65,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
    * @param resource the request to add.
    * @return a future for getting the respone at a later time.
    */
-  public Future<JPPFResourceWrapper>  addResource(final JPPFResourceWrapper resource)
+  public Future<JPPFResourceWrapper> addResource(final JPPFResourceWrapper resource)
   {
     Future<JPPFResourceWrapper> f = futureMap.get(resource);
     if (f == null)

@@ -50,7 +50,7 @@ public class ClassLoaderRequestHandler
   /**
    * The batch request to which resource requests are added.
    */
-  private CompositeResourceWrapper nextRequest = new CompositeResourceWrapper();
+  private CompositeResourceWrapper nextRequest = null;
   /**
    * Object which sends the class loading requets to the driver and receives the response.
    */
@@ -71,6 +71,7 @@ public class ClassLoaderRequestHandler
    */
   public ClassLoaderRequestHandler(final ResourceRequest request)
   {
+    this.nextRequest = new CompositeResourceWrapper();
     this.requestRunner = request;
     new Thread(periodicTask, "PeriodicTask").start();
   }
@@ -87,6 +88,25 @@ public class ClassLoaderRequestHandler
     synchronized(periodicTask)
     {
       f = nextRequest.addResource(resource);
+    }
+    periodicTask.wakeUp();
+    return f;
+  }
+
+  /**
+   * Add a resource request.
+   * @param resource the resource request to add.
+   * @param cl the class loder owning this request handler.
+   * @return a future for getting the respone at a later time.
+   */
+  public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource, final ClassLoader cl)
+  {
+    resource.preProcess();
+    Future<JPPFResourceWrapper> f;
+    synchronized(periodicTask)
+    {
+      f = nextRequest.addResource(resource);
+      ((ResourceFuture<JPPFResourceWrapper>) f).setCl(cl);
     }
     periodicTask.wakeUp();
     return f;
