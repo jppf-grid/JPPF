@@ -173,8 +173,6 @@ class WaitingNodeRequestState extends ClassServerState
     String name = resource.getName();
     TraversalList<String> uuidPath = resource.getUuidPath();
     ClassContext context = (ClassContext) channel.getContext();
-    CompositeResourceWrapper composite = (CompositeResourceWrapper) context.getResource();
-
     if (resource.getCallable() == null) b = classCache.getCacheContent(uuidPath.getFirst(), name);
     if (b != null)
     {
@@ -195,13 +193,6 @@ class WaitingNodeRequestState extends ClassServerState
         context.getPendingResponses().put(resource, request);
         providerContext.addRequest(request);
         resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
-        /*
-        if ((providerContext.getState() == ClassState.IDLE_PROVIDER) || providerContext.getPendingRequests().isEmpty())
-        {
-          StateTransitionManager tm = driver.getClientClassServer().getTransitionManager();
-          tm.transitionChannel(provider, ClassTransition.TO_SENDING_PROVIDER_REQUEST);
-        }
-        */
       }
     }
     else
