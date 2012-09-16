@@ -70,10 +70,6 @@ public class JPPFDriver
    */
   private JPPFNode localNode = null;
   /**
-   * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
-   */
-  private JPPFQueue taskQueue = null;
-  /**
    * Serves the execution requests coming from client applications.
    */
   private ClientNioServer clientNioServer = null;
@@ -112,31 +108,29 @@ public class JPPFDriver
   /**
    * Uuid for this driver.
    */
-  private String uuid = JPPFConfiguration.getProperties().getString("jppf.driver.uuid", new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase());
+  private final String uuid;
   /**
    * Performs initialization of the driver's components.
    */
   private DriverInitializer initializer = null;
-  /**
-   * Manages information about the nodes.
-   */
-  private NodeInformationHandler nodeHandler = null;
 
+  private final TypedProperties config;
   /**
    * Initialize this JPPFDriver.
    * @exclude
    */
   protected JPPFDriver()
   {
+    config = JPPFConfiguration.getProperties();
+    uuid = config.getString("jppf.driver.uuid", new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase());
     int pid = SystemUtils.getPID();
     if (pid > 0) System.out.println("driver process id: " + pid);
     // initialize the jmx logger
     new JmxMessageNotifier();
-    nodeHandler = new NodeInformationHandler();
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);
-    initializer = new DriverInitializer(this);
+    initializer = new DriverInitializer(this, config);
     log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
   }
 
@@ -149,31 +143,28 @@ public class JPPFDriver
   public void run() throws Exception
   {
     jobManager = new JPPFJobManager();
-    taskQueue = new JPPFPriorityQueue();
-    ((JPPFPriorityQueue) taskQueue).addQueueListener(jobManager);
     JPPFConnectionInformation info = initializer.getConnectionInformation();
-    TypedProperties config = JPPFConfiguration.getProperties();
 
     initializer.registerDebugMBean();
     initializer.initRecoveryServer();
 
     initializer.initJmxServer();
-    if (isManagementEnabled()) initializer.registerProviderMBeans();
+    if (isManagementEnabled(config)) initializer.registerProviderMBeans();
     new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(), null, null);
-    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(), null, null);
-    clientNioServer = startServer(recoveryServer, new ClientNioServer(), null, null);
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(), null, null);
+    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this), null, null);
+    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this), null, null);
+    clientNioServer = startServer(recoveryServer, new ClientNioServer(this), null, null);
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this), null, null);
     acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts), info.serverPorts, info.sslServerPorts);
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
       localClassChannel.getContext().setChannel(localClassChannel);
-      LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext());
+      LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
       localNodeChannel.getContext().setChannel(localNodeChannel);
       localNode = new JPPFLocalNode(localNodeChannel, localClassChannel);
       nodeClassServer.initLocalChannel(localClassChannel);
@@ -203,7 +194,7 @@ public class JPPFDriver
    */
   public static JPPFQueue getQueue()
   {
-    return getInstance().taskQueue;
+    return getInstance().nodeNioServer.getQueue();
   }
 
   /**
@@ -298,7 +289,7 @@ public class JPPFDriver
     if (acceptorServer != null) acceptorServer.shutdown();
 
     Timer timer = new Timer();
-    ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay);
+    ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay, this);
     timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
   }
 
@@ -379,16 +370,6 @@ public class JPPFDriver
   public DriverInitializer getInitializer()
   {
     return initializer;
-  }
-
-  /**
-   * Get the object that manages information about the nodes.
-   * @return a {@link NodeInformationHandler} instance.
-   * @exclude
-   */
-  public NodeInformationHandler getNodeHandler()
-  {
-    return nodeHandler;
   }
 
   /**
@@ -473,10 +454,10 @@ public class JPPFDriver
   /**
    * Determine whether management is enabled and if there is an active remote connector server.
    * @return <code>true</code> if management is enabled, <code>false</code> otherwise.
+   * @param config
    */
-  private boolean isManagementEnabled()
+  private static boolean isManagementEnabled(final TypedProperties config)
   {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    return props.getBoolean("jppf.management.enabled", true) || props.getBoolean("jppf.management.ssl.enabled", false);
+    return config.getBoolean("jppf.management.enabled", true) || config.getBoolean("jppf.management.ssl.enabled", false);
   }
 }

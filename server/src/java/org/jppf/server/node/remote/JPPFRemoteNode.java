@@ -44,7 +44,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
    */
   private ClientConnection recoveryConnection = null;
   /**
-   * Determines wheteher SSL is enabled.
+   * Determines whether SSL is enabled.
    */
   private boolean sslEnabled = false;
 

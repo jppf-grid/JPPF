@@ -18,7 +18,6 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
@@ -59,14 +58,12 @@ class JobScheduleAction implements Runnable
   {
     synchronized(bundleWrapper)
     {
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       if (debugEnabled)
       {
-        String jobId = (String) bundle.getName();
+        String jobId = bundleWrapper.getName();
         log.debug("job '" + jobId + "' is resuming");
       }
-      bundle.setParameter(BundleParameter.JOB_PENDING, false);
-      JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
+      bundleWrapper.setPending(false);
     }
   }
 }

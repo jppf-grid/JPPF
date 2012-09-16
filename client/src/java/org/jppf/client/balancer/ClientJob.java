@@ -25,6 +25,7 @@ import org.jppf.client.event.TaskResultEvent;
 import org.jppf.client.event.TaskResultListener;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.client.submission.SubmissionStatusHandler;
+import org.jppf.execute.ExecutorChannel;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,7 +281,7 @@ public class ClientJob extends AbstractClientJob
    * @param channel the node to which the job is dispatched.
    * @param future  future assigned to bundle execution.
    */
-  public void jobDispatched(final ClientTaskBundle bundle, final ChannelWrapper<?> channel, final Future<?> future)
+  public void jobDispatched(final ClientTaskBundle bundle, final ExecutorChannel channel, final Future<?> future)
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (channel == null) throw new IllegalArgumentException("channel is null");
@@ -558,5 +559,12 @@ public class ClientJob extends AbstractClientJob
   {
     if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be requeud
     this.onRequeue = onRequeue;
+  }
+
+  public int getNbChannels() {
+    synchronized (bundleMap)
+    {
+      return bundleMap.size();
+    }
   }
 }

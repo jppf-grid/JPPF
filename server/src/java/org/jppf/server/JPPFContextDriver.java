@@ -18,6 +18,7 @@
 
 package org.jppf.server;
 
+import org.jppf.server.queue.JPPFQueue;
 import org.jppf.server.scheduler.bundle.JPPFContext;
 
 /**
@@ -27,32 +28,24 @@ import org.jppf.server.scheduler.bundle.JPPFContext;
 public class JPPFContextDriver extends JPPFContext
 {
   /**
-   * Singleton instance of the JPPFContextDriver.
+   * Reference to the job queue.
    */
-  private static JPPFContextDriver instance = new JPPFContextDriver();
+  private final JPPFQueue queue;
 
   /**
    * Default initializer.
+   * @param queue        the reference queue to use.
    */
-  protected JPPFContextDriver()
+  public JPPFContextDriver(final JPPFQueue queue)
   {
+    if (queue == null) throw new IllegalArgumentException("queue is null");
+
+    this.queue = queue;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getMaxBundleSize()
   {
-    return JPPFDriver.getQueue().getMaxBundleSize();
-  }
-
-  /**
-   * Get the singleton instance of the JPPFContextDriver.
-   * @return a <code>JPPFContextDriver</code> instance.
-   */
-  public static JPPFContextDriver getInstance()
-  {
-    return instance;
+    return queue.getMaxBundleSize();
   }
 }

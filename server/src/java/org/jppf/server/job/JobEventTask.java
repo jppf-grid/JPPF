@@ -20,8 +20,8 @@ package org.jppf.server.job;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 
 /**
@@ -78,7 +78,7 @@ public class JobEventTask implements Runnable
     JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(),
         bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
     jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = (channel == null) ? null : JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
+    JPPFManagementInfo nodeInfo = (channel == null) ? null : ((AbstractNodeContext) channel.getContext()).getManagementInfo();
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
     if(eventType == JobEventType.JOB_UPDATED)
     {

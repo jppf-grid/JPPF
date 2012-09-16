@@ -46,7 +46,7 @@ public class QueueEvent extends EventObject
    * @param queue - the queue this event originates from.
    * @param bundleWrapper - represents part or the totality of a job that was submitted.
    */
-  public QueueEvent(final JPPFQueue queue, final BundleWrapper bundleWrapper)
+  public QueueEvent(final JPPFQueue queue, final ServerJob bundleWrapper)
   {
     this(queue, bundleWrapper, false);
   }

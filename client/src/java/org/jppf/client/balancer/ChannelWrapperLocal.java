@@ -23,9 +23,10 @@ import java.util.concurrent.Executors;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.balancer.utils.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.execute.JPPFFuture;
+import org.jppf.execute.JPPFFutureTask;
 import org.jppf.management.*;
 import org.jppf.node.Node;
 import org.jppf.node.event.LifeCycleEventHandler;

@@ -26,7 +26,7 @@ import org.jppf.utils.Pair;
  * Instances of this class associate a node channel with a job that is being executed on the corresponding node.
  * @author Laurent Cohen
  */
-public class ChannelJobPair extends Pair<ChannelWrapper, ClientTaskBundle>
+public class ChannelJobPair extends Pair<ChannelWrapper<?>, ClientTaskBundle>
 {
   /**
    * Explicit serialVersionUID.
@@ -38,7 +38,7 @@ public class ChannelJobPair extends Pair<ChannelWrapper, ClientTaskBundle>
    * @param first  - the first object of this pair.
    * @param second - the second object of this pair.
    */
-  public ChannelJobPair(final ChannelWrapper first, final ClientTaskBundle second)
+  public ChannelJobPair(final ChannelWrapper<?> first, final ClientTaskBundle second)
   {
     super(first, second);
   }

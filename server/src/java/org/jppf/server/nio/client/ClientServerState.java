@@ -19,7 +19,6 @@
 package org.jppf.server.nio.client;
 
 import org.jppf.server.*;
-import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.NioState;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -38,14 +37,6 @@ abstract class ClientServerState extends NioState<ClientTransition>
    */
   protected ClientNioServer server = null;
   /**
-   * The driver stats manager.
-   */
-  protected JPPFDriverStatsManager statsManager = null;
-  /**
-   * The job manager.
-   */
-  protected JPPFJobManager jobManager = null;
-  /**
    * Reference to the driver.
    */
   protected JPPFDriver driver = JPPFDriver.getInstance();
@@ -57,7 +48,5 @@ abstract class ClientServerState extends NioState<ClientTransition>
   public ClientServerState(final ClientNioServer server)
   {
     this.server = server;
-    statsManager = driver.getStatsManager();
-    jobManager = driver.getJobManager();
   }
 }

@@ -19,6 +19,7 @@
 package org.jppf.server.queue;
 
 import org.jppf.server.protocol.ServerJob;
+import org.jppf.server.protocol.ServerTaskBundle;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -37,7 +38,7 @@ public interface JPPFQueue extends Iterable<ServerJob>
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
-  ServerJob nextBundle(int nbTasks);
+  ServerTaskBundle nextBundle(int nbTasks);
 
   /**
    * Get the next object in the queue.
@@ -45,7 +46,7 @@ public interface JPPFQueue extends Iterable<ServerJob>
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
-  ServerJob nextBundle(ServerJob bundleWrapper, int nbTasks);
+  ServerTaskBundle nextBundle(ServerJob bundleWrapper, int nbTasks);
 
   /**
    * Determine whether the queue is empty or not.

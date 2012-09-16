@@ -22,13 +22,17 @@ import static org.jppf.utils.CollectionUtils.*;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 
+import org.jppf.execute.ExecutorStatus;
+import org.jppf.server.*;
+import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
-import org.jppf.server.*;
-import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
@@ -48,113 +52,142 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Comparator for job priority.
+   */
+  private static final Comparator<Integer> PRIORITY_COMPARATOR = new Comparator<Integer>() {
+    @Override
+    public int compare(final Integer o1, final Integer o2) {
+      if (o1 == null) return (o2 == null) ? 0 : 1;
+      else if (o2 == null) return -1;
+      return o2.compareTo(o1);
+    }
+  };
+  /**
    * An of task bundles, ordered by descending priority.
    */
-  private TreeMap<JPPFPriority, List<ServerJob>> priorityMap = new TreeMap<JPPFPriority, List<ServerJob>>();
+  private final TreeMap<Integer, List<ServerJob>> priorityMap = new TreeMap<Integer, List<ServerJob>>(PRIORITY_COMPARATOR);
   /**
    * Contains the ids of all queued jobs.
    */
-  private Map<String, Map<String, ServerJob>> jobMap = new HashMap<String, Map<String, ServerJob>>();
+  private final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
   /**
-   * The driver stats manager.
+   * The job submission manager
    */
-  protected JPPFDriverStatsManager statsManager = null;
+  private final NodeNioServer submissionManager;
   /**
-   * The job manager.
+   * The driver stats manager
    */
-  protected JPPFJobManager jobManager = null;
+  private final JPPFDriverStatsManager statsManager;
   /**
    * Handles the schedule of each job that has one.
    */
-  private JPPFScheduleHandler jobScheduleHandler = new JPPFScheduleHandler("Job Schedule Handler");
+  private final JPPFScheduleHandler jobScheduleHandler = new JPPFScheduleHandler("Job Schedule Handler");
   /**
    * Handles the expiration schedule of each job that has one.
    */
-  private JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
+  private final JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
+  /**
+   * A priority queue holding broadcast jobs that could not be sent due to no available connection.
+   */
+  private final PriorityBlockingQueue<ServerJob> pendingBroadcasts = new PriorityBlockingQueue<ServerJob>(16, new JobPriorityComparator());
 
   /**
    * Initialize this queue.
+   * @param submissionManager reference to submission manager.
    */
-  public JPPFPriorityQueue()
+  public JPPFPriorityQueue(final NodeNioServer submissionManager, final JPPFDriverStatsManager statsManager)
   {
-    statsManager = JPPFDriver.getInstance().getStatsManager();
-    jobManager = JPPFDriver.getInstance().getJobManager();
+    this.submissionManager = submissionManager;
+    this.statsManager = statsManager;
   }
 
   /**
    * Add an object to the queue, and notify all listeners about it.
    * @param bundleWrapper the object to add to the queue.
-   * @see org.jppf.server.queue.JPPFQueue#addBundle(org.jppf.server.protocol.BundleWrapper)
    */
   @Override
   public void addBundle(final ServerJob bundleWrapper)
   {
-    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    if (debugEnabled) log.debug("processing bundle " + bundle);
-    JobSLA sla = bundle.getSLA();
-    if (sla.isBroadcastJob() && (bundle.getParameter(BundleParameter.NODE_BROADCAST_UUID) == null))
+    JobSLA sla = bundleWrapper.getSLA();
+    final String jobUuid = bundleWrapper.getUuid();
+    if (sla.isBroadcastJob() && (bundleWrapper.getBroadcastUUID() == null))
     {
-      if (debugEnabled) log.debug("before processing broadcast job " + bundle);
+      if (debugEnabled) log.debug("before processing broadcast job " + bundleWrapper.getJob());
       processBroadcastJob(bundleWrapper);
-      return;
-    }
-    try
-    {
+    } else {
       lock.lock();
-      ServerJob other = null;
-      String jobUuid = bundle.getUuid();
-      Map<String, ServerJob> map = jobMap.get(jobUuid);
-      if (map != null) other = map.get(bundle.getUuidPath().toString());
-      if (other != null)
+      try
       {
-        JPPFTaskBundle otherBundle = (JPPFTaskBundle) other.getJob();
-        if (otherBundle.getCompletionListener() == bundle.getCompletionListener())
+        ServerJob other = jobMap.get(jobUuid);
+        if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
+        bundleWrapper.addOnDone(new Runnable()
         {
-          ((BundleWrapper) other).merge(bundleWrapper, false);
-          if (debugEnabled) log.debug("re-submitting bundle " + bundle);
-          bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundle.getTaskCount());
-          fireQueueEvent(new QueueEvent(this, other, true));
-        }
-      }
-      else
-      {
-        bundle.setQueueEntryTime(System.currentTimeMillis());
-        putInListMap(new JPPFPriority(sla.getPriority()), bundleWrapper, priorityMap);
-        putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
-        Boolean requeued = (Boolean) bundle.removeParameter(BundleParameter.JOB_REQUEUE);
-        if (requeued == null) requeued = false;
-        if (debugEnabled) log.debug("adding bundle " + bundle);
-        if (!requeued)
-        {
+          @Override
+          public void run()
+          {
+            lock.lock();
+            try
+            {
+              jobMap.remove(jobUuid);
+              removeBundle(bundleWrapper);
+            }
+            finally
+            {
+              lock.unlock();
+            }
+          }
+        });
+        bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
+        bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
+        bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
+
+        if(!sla.isBroadcastJob() || bundleWrapper.getBroadcastUUID() != null) {
+          putInListMap(sla.getPriority(), bundleWrapper, priorityMap);
+          putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
+          if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
           handleStartJobSchedule(bundleWrapper);
           handleExpirationJobSchedule(bundleWrapper);
         }
-        if (map == null)
-        {
-          map = new HashMap<String, ServerJob>();
-          jobMap.put(jobUuid, map);
-        }
-        map.put(bundle.getUuidPath().asString(), bundleWrapper);
-        fireQueueEvent(new QueueEvent(this, bundleWrapper, requeued));
+        jobMap.put(jobUuid, bundleWrapper);
+        updateLatestMaxSize();
+        fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
       }
-      updateLatestMaxSize();
+      finally
+      {
+        lock.unlock();
+      }
     }
-    finally
+    if (debugEnabled)
     {
+      log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
+    }
+    statsManager.taskInQueue(bundleWrapper.getTaskCount());
+  }
+
+  /**
+   * Handle requeuing of the specified job.
+   * @param job the job to requeue.
+   */
+  protected void requeue(final ServerJob job) {
+    lock.lock();
+    try {
+      if(!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
+
+      putInListMap(job.getSLA().getPriority(), job, priorityMap);
+      putInListMap(getSize(job), job, sizeMap);
+      fireQueueEvent(new QueueEvent(this, job, true));
+    } finally {
       lock.unlock();
     }
-    if (debugEnabled) log.debug("finished processing bundle " + bundle);
-    statsManager.taskInQueue(bundle.getTaskCount());
   }
 
   /**
    * Get the next object in the queue.
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
-   * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(int)
    */
   @Override
-  public ServerJob nextBundle(final int nbTasks)
+  public ServerTaskBundle nextBundle(final int nbTasks)
   {
     Iterator<ServerJob> it = iterator();
     return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
@@ -165,30 +198,39 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
-   * @see org.jppf.server.queue.AbstractJPPFQueue#nextBundle(org.jppf.server.protocol.BundleWrapper, int)
    */
   @Override
-  public ServerJob nextBundle(final ServerJob bundleWrapper, final int nbTasks)
+  public ServerTaskBundle nextBundle(final ServerJob bundleWrapper, final int nbTasks)
   {
-    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    ServerJob result = null;
+    final ServerTaskBundle result;
+    lock.lock();
     try
     {
-      lock.lock();
-      if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundle.getTaskCount() + " tasks");
+      if (debugEnabled)
+      {
+        log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
+      }
       int size = getSize(bundleWrapper);
       removeFromListMap(size, bundleWrapper, sizeMap);
-      if (nbTasks >= bundle.getTaskCount())
+      if (nbTasks >= bundleWrapper.getTaskCount())
       {
-        result = bundleWrapper;
+        bundleWrapper.setOnRequeue(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            requeue(bundleWrapper);
+          }
+        });
+        result = bundleWrapper.copy(bundleWrapper.getTaskCount());
         removeBundle(bundleWrapper);
-        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, 0);
+//        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, 0);
       }
       else
       {
-        if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle " + bundle);
-        result = ((BundleWrapper) bundleWrapper).copy(nbTasks);
-        int newSize = bundle.getTaskCount();
+        if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
+        result =  bundleWrapper.copy(nbTasks);
+        int newSize = bundleWrapper.getTaskCount();
         List<ServerJob> list = sizeMap.get(newSize);
         if (list == null)
         {
@@ -197,29 +239,28 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           sizeMap.put(size, list);
         }
         list.add(bundleWrapper);
-        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundle.getTaskCount());
-        List<ServerJob> bundleList = priorityMap.get(new JPPFPriority(bundle.getSLA().getPriority()));
+//        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundleWrapper.getTaskCount());
+        List<ServerJob> bundleList = priorityMap.get(bundleWrapper.getSLA().getPriority());
         bundleList.remove(bundleWrapper);
         bundleList.add(bundleWrapper);
       }
       updateLatestMaxSize();
-      jobManager.jobUpdated(bundleWrapper);
-      //result.getBundle().setExecutionStartTime(System.currentTimeMillis());
     }
     finally
     {
       lock.unlock();
     }
-    JPPFTaskBundle resultJob = (JPPFTaskBundle) result.getJob();
-    if (debugEnabled) log.debug("next job is " + resultJob);
-    statsManager.taskOutOfQueue(resultJob.getTaskCount(), System.currentTimeMillis() - resultJob.getQueueEntryTime());
+    if (debugEnabled)
+    {
+      log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
+    }
+    statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
     return result;
   }
 
   /**
    * Determine whether the queue is empty or not.
    * @return true if the queue is empty, false otherwise.
-   * @see org.jppf.server.queue.JPPFQueue#isEmpty()
    */
   @Override
   public boolean isEmpty()
@@ -238,7 +279,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   /**
    * Get the maximum bundle size for the bundles present in the queue.
    * @return the bundle size as an int.
-   * @see org.jppf.server.queue.JPPFQueue#getMaxBundleSize()
    */
   @Override
   public int getMaxBundleSize()
@@ -246,6 +286,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
+      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
     }
     finally
@@ -271,18 +312,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      if (debugEnabled) log.debug("removing bundle from queue: " + bundle);
-      removeFromListMap(new JPPFPriority(bundle.getSLA().getPriority()), bundleWrapper, priorityMap);
-      ServerJob result = null;
-      String uuid = bundle.getUuid();
-      Map<String, ServerJob> map = jobMap.get(uuid);
-      if (map != null)
-      {
-        result = map.remove(bundle.getUuidPath().asString());
-        if (map.isEmpty()) jobMap.remove(uuid);
-      }
-      return result;
+      if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName());
+      removeFromListMap(bundleWrapper.getSLA().getPriority(), bundleWrapper, priorityMap);
+//      jobMap.remove(bundleWrapper.getUuid());
+      return null;
     }
     finally
     {
@@ -293,7 +326,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   /**
    * Get an iterator on the task bundles in this queue.
    * @return an iterator.
-   * @see java.lang.Iterable#iterator()
+   * @see Iterable#iterator()
    */
   @Override
   public Iterator<ServerJob> iterator()
@@ -307,27 +340,37 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void handleStartJobSchedule(final ServerJob bundleWrapper)
   {
-    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    JPPFSchedule schedule = bundle.getSLA().getJobSchedule();
+    JPPFSchedule schedule = bundleWrapper.getSLA().getJobSchedule();
     if (schedule != null)
     {
-      bundle.setParameter(BundleParameter.JOB_PENDING, true);
-      String jobId = bundle.getName();
-      String uuid = bundle.getUuid();
+      bundleWrapper.setPending(true);
+      String jobId = bundleWrapper.getName();
+      final String uuid = bundleWrapper.getUuid();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
       try
       {
-        long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
+        long dt = bundleWrapper.getJobReceivedTime();
         jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
+        bundleWrapper.addOnDone(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            jobScheduleHandler.cancelAction(uuid);
+          }
+        });
       }
       catch(ParseException e)
       {
-        bundle.setParameter(BundleParameter.JOB_PENDING, false);
+        bundleWrapper.setPending(false);
         log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() +
-            ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+                ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
-    else bundle.setParameter(BundleParameter.JOB_PENDING, false);
+    else
+    {
+      bundleWrapper.setPending(false);
+    }
   }
 
   /**
@@ -336,77 +379,110 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void handleExpirationJobSchedule(final ServerJob bundleWrapper)
   {
-    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-    bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
-    JPPFSchedule schedule = bundle.getSLA().getJobExpirationSchedule();
+    JPPFSchedule schedule = bundleWrapper.getSLA().getJobExpirationSchedule();
     if (schedule != null)
     {
-      String jobId = (String) bundle.getName();
-      String uuid = bundle.getUuid();
+      String jobId = bundleWrapper.getName();
+      final String uuid = bundleWrapper.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
-      long dt = (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
+      long dt = bundleWrapper.getJobReceivedTime();
       try
       {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
+        bundleWrapper.addOnDone(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            jobExpirationHandler.cancelAction(uuid);
+          }
+        });
       }
       catch(ParseException e)
       {
-        bundle.setParameter(BundleParameter.JOB_EXPIRED, false);
-        log.error("Unparseable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-            ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+        bundleWrapper.setJobExpired(false);
+        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
+                ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
   }
 
   /**
-   * Clear all the scheduled actions associated with a job.
-   * This method should normally only be called when a job has completed.
-   * @param jobUuid the job uuid.
-   */
-  public void clearSchedules(final String jobUuid)
-  {
-    jobScheduleHandler.cancelAction(jobUuid);
-    jobExpirationHandler.cancelAction(jobUuid);
-  }
-
-  /**
    * Process the specified broadcast job.
-   * <b/>This consists in creating one job per node, each containing the same tasks,
+   * This consists in creating one job per node, each containing the same tasks,
    * and with an execution policy that enforces its execution ont he designated node only.
    * @param bundleWrapper the broadcast job to process.
    */
   private void processBroadcastJob(final ServerJob bundleWrapper)
   {
-    JPPFDistributedJob bundle = bundleWrapper.getJob();
-    Map<String, JPPFManagementInfo> uuidMap = JPPFDriver.getInstance().getNodeHandler().getUuidMap();
-    if (uuidMap.isEmpty())
+    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    List<AbstractNodeContext> connections = submissionManager.getAllChannels();
+    if (connections.isEmpty())
     {
-      ((JPPFTaskBundle) bundle).fireTaskCompleted(bundleWrapper);
+//      bundleWrapper.taskCompleted(null, null);
+      pendingBroadcasts.offer(bundleWrapper);
       return;
     }
-    BroadcastJobCompletionListener completionListener = new BroadcastJobCompletionListener(bundleWrapper, uuidMap.keySet());
     JobSLA sla = bundle.getSLA();
-    ExecutionPolicy policy = sla.getExecutionPolicy();
-    List<ServerJob> jobList = new ArrayList<ServerJob>(uuidMap.size());
-    for (Map.Entry<String, JPPFManagementInfo> entry: uuidMap.entrySet())
+    List<ServerJob> jobList = new ArrayList<ServerJob>(connections.size());
+
+    Set<String> uuidSet = new HashSet<String>();
+    for (AbstractNodeContext connection : connections)
     {
-      BundleWrapper job = ((BundleWrapper) bundleWrapper).copy();
-      JPPFTaskBundle newBundle = (JPPFTaskBundle) job.getJob();
-      String uuid = entry.getKey();
-      JPPFManagementInfo info = entry.getValue();
-      newBundle.setParameter(BundleParameter.NODE_BROADCAST_UUID, uuid);
-      if ((policy != null) && !policy.accepts(info.getSystemInfo())) continue;
-      ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
-      if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
-      newBundle.setSLA(((JPPFJobSLA) sla).copy());
-      newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
-      newBundle.setCompletionListener(completionListener);
-      newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
-      newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
-      if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
-      jobList.add(job);
+      ExecutorStatus status = connection.getExecutionStatus();
+      System.out.println("  " + connection.getUuid() + "\t status: " + status);
+      if(status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
+      {
+        String uuid = connection.getUuid();
+        if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
+        {
+          ServerJob newBundle = bundleWrapper.createBroadcastJob(uuid);
+          JPPFManagementInfo info = connection.getManagementInfo();
+          ExecutionPolicy policy = sla.getExecutionPolicy();
+          if ((policy != null) && !policy.accepts(info.getSystemInfo())) continue;
+          ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
+          if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
+          newBundle.setSLA(((JPPFJobSLA) sla).copy());
+          newBundle.setMetadata(bundle.getMetadata());
+          newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
+          newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
+          newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+          jobList.add(newBundle);
+          if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
+        }
+      }
     }
-    for (ServerJob job: jobList) addBundle(job);
+    if (jobList.isEmpty()) bundleWrapper.taskCompleted(null, null);
+    else {
+      final String jobUuid = bundleWrapper.getUuid();
+      lock.lock();
+      try {
+        ServerJob other = jobMap.get(jobUuid);
+        if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
+
+        bundleWrapper.addOnDone(new Runnable() {
+          @Override
+          public void run() {
+            lock.lock();
+            try {
+              jobMap.remove(jobUuid);
+              removeBundle(bundleWrapper);
+            } finally {
+              lock.unlock();
+            }
+          }
+        });
+        bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
+        bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
+        bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
+
+        jobMap.put(jobUuid, bundleWrapper);
+        fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
+        for (ServerJob job : jobList) addBundle(job);
+      } finally {
+        lock.unlock();
+      }
+    }
   }
 
   /**
@@ -419,21 +495,130 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     lock.lock();
     try
     {
-      Map<String, ServerJob> map = jobMap.get(jobUuid);
-      if (map == null) return;
-      for (Map.Entry<String, ServerJob> entry: map.entrySet())
+      ServerJob job = jobMap.get(jobUuid);
+      if (job == null) return;
+      int oldPriority = job.getJob().getSLA().getPriority();
+      if (oldPriority != newPriority)
       {
-        ServerJob job = entry.getValue();
-        if (job == null) return;
-        int oldPriority = job.getJob().getSLA().getPriority();
-        if (oldPriority != newPriority)
-        {
-          job.getJob().getSLA().setPriority(newPriority);
-          removeFromListMap(new JPPFPriority(oldPriority), job, priorityMap);
-          putInListMap(new JPPFPriority(newPriority), job, priorityMap);
-          jobManager.jobUpdated(job);
-        }
+        job.getJob().getSLA().setPriority(newPriority);
+        removeFromListMap(oldPriority, job, priorityMap);
+        putInListMap(newPriority, job, priorityMap);
+        job.fireJobUpdated();
       }
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Cancel the job with the specified UUID
+   * @param jobId the uuid of the job to cancel.
+   * @return whether cancellation was successful.
+   */
+  public boolean cancelJob(final String jobId)
+  {
+    lock.lock();
+    try
+    {
+      ServerJob job = jobMap.get(jobId);
+      if(job == null)
+        return false;
+      else
+        return job.cancel(false);
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Close this queue and all resources it uses.
+   */
+  public void close()
+  {
+    lock.lock();
+    try
+    {
+      jobScheduleHandler.clear(true);
+      jobExpirationHandler.clear(true);
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Cancels queued broadcast jobs for connection.
+   * @param connectionUUID The connection UUID that failed or was disconnected.
+   */
+  public void cancelBroadcastJobs(final String connectionUUID)
+  {
+    if(connectionUUID == null || connectionUUID.isEmpty()) return;
+
+    Set<String> jobIDs = Collections.emptySet();
+    lock.lock();
+    try
+    {
+      if (jobMap.isEmpty()) return;
+
+      jobIDs = new HashSet<String>();
+      for (Map.Entry<String, ServerJob> entry : jobMap.entrySet())
+      {
+        if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
+      }
+    } finally
+    {
+      lock.unlock();
+    }
+    for (String jobID : jobIDs) {
+      cancelJob(jobID);
+    }
+  }
+
+  /**
+   * Process the jobs in the pending braodcasts queue.
+   * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
+   */
+  public void processPendingBroadcasts() {
+    if (!submissionManager.hasWorkingConnection()) return;
+    ServerJob clientJob;
+    while ((clientJob = pendingBroadcasts.poll()) != null)
+    {
+      if (debugEnabled) log.debug("queuing job " + clientJob.getJob());
+      addBundle(clientJob);
+    }
+  }
+
+  /**
+   *
+   * @param jobId the uuid of the job.
+   * @return
+   */
+  public ServerJob getJob(final String jobId) {
+    lock.lock();
+    try
+    {
+      return jobMap.get(jobId);
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get the set of ids for all the jobs currently queued or executing.
+   * @return a set of ids as strings.
+   */
+  public Set<String> getAllJobIds() {
+    lock.lock();
+    try
+    {
+      return Collections.unmodifiableSet(jobMap.keySet());
     }
     finally
     {

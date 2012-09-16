@@ -61,7 +61,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * Task that dispatches queued jobs to available nodes.
    */
-  private final TaskQueueChecker taskQueueChecker;
+  private final TaskQueueChecker<ChannelWrapper<?>> taskQueueChecker;
   /**
    * Mapping client connections to channel wrapper.
    */
@@ -117,7 +117,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.queue = new JPPFPriorityQueue(this);
 
-    taskQueueChecker = new TaskQueueChecker(queue, statsManager);
+    taskQueueChecker = new TaskQueueChecker<ChannelWrapper<?>>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
     this.queue.addQueueListener(new QueueListener()

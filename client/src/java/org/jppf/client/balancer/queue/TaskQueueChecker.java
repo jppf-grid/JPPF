@@ -18,30 +18,40 @@
 
 package org.jppf.client.balancer.queue;
 
-import java.util.*;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-
-import org.jppf.client.*;
-import org.jppf.client.balancer.*;
+import org.jppf.client.JPPFContextClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.balancer.ClientJob;
+import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.client.balancer.stats.JPPFClientStatsManager;
-import org.jppf.management.*;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.execute.ExecutorStatus;
+import org.jppf.execute.JPPFFuture;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.*;
-import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.fixedsize.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.node.protocol.JobMetadata;
+import org.jppf.node.protocol.JobSLA;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.JPPFContext;
+import org.jppf.server.scheduler.bundle.JobAwareness;
+import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeBundler;
+import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile;
+import org.jppf.utils.StringUtils;
+import org.jppf.utils.ThreadSynchronization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  */
-public class TaskQueueChecker extends ThreadSynchronization implements Runnable
+public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchronization implements Runnable
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(TaskQueueChecker.class);
+  private static final Logger log = LoggerFactory.getLogger(TaskQueueChecker.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -69,7 +79,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   /**
    * The list of idle node channels.
    */
-  private final Set<ChannelWrapper<?>> idleChannels = new LinkedHashSet<ChannelWrapper<?>>();
+  private final Set<T> idleChannels = new LinkedHashSet<T>();
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -130,10 +140,22 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   }
 
   /**
+   * Get the number of idle channels.
+   * @return the size of the underlying list of idle channels.
+   */
+  public int getNbIdleChannels()
+  {
+    synchronized (idleChannels)
+    {
+      return idleChannels.size();
+    }
+  }
+
+  /**
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final ChannelWrapper<?> channel)
+  public void addIdleChannel(final T channel)
   {
     if (traceEnabled) log.trace("Adding idle channel " + channel);
     int count;
@@ -150,11 +172,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<ChannelWrapper<?>> getIdleChannels()
+  public List<T> getIdleChannels()
   {
     synchronized (idleChannels)
     {
-      return new ArrayList<ChannelWrapper<?>>(idleChannels);
+      return new ArrayList<T>(idleChannels);
     }
   }
 
@@ -163,7 +185,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  public ChannelWrapper<?> removeIdleChannel(final ChannelWrapper<?> channel)
+  public T removeIdleChannel(final T channel)
   {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     int count;
@@ -216,7 +238,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
-        ChannelWrapper<?> channel = null;
+        T channel = null;
         ClientJob selectedBundle = null;
         queueLock.lock();
         try
@@ -228,10 +250,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
             channel = retrieveChannel(bundleWrapper);
             if (channel != null) selectedBundle = bundleWrapper;
           }
-          if (debugEnabled)
-          {
-            log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-          }
+          if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
           if (channel != null)
           {
             dispatchJobToChannel(channel, selectedBundle);
@@ -261,7 +280,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @return a channel for a node on which to execute the job.
    * @throws Exception if any error occurs.
    */
-  private ChannelWrapper<?> retrieveChannel(final ClientJob bundleWrapper) throws Exception
+  private T retrieveChannel(final ClientJob bundleWrapper) throws Exception
   {
     return findIdleChannelIndex(bundleWrapper);
   }
@@ -271,14 +290,14 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param channel        the node channel to dispatch the job to.
    * @param selectedBundle the job to dispatch.
    */
-  private void dispatchJobToChannel(final ChannelWrapper<?> channel, final ClientJob selectedBundle)
+  private void dispatchJobToChannel(final T channel, final ClientJob selectedBundle)
   {
     if (debugEnabled)
     {
       log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
               ", nodeUuid=" + channel.getConnectionUuid());
     }
-    synchronized (channel)
+    synchronized (channel.getMonitor())
     {
       int size = 1;
       try
@@ -295,7 +314,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       }
       ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
       selectedBundle.addChannel(channel);
-      Future<?> future = channel.submit(bundleWrapper);
+      JPPFFuture<?> future = channel.submit(bundleWrapper);
       bundleWrapper.jobDispatched(channel, future);
     }
   }
@@ -305,17 +324,17 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param bundle the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
-  private ChannelWrapper<?> findIdleChannelIndex(final ClientJob bundle)
+  private T findIdleChannelIndex(final ClientJob bundle)
   {
     int idleChannelsSize = idleChannels.size();
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
-    List<ChannelWrapper<?>> acceptableChannels = new ArrayList<ChannelWrapper<?>>(idleChannelsSize);
-    Iterator<ChannelWrapper<?>> iterator = idleChannels.iterator();
+    List<T> acceptableChannels = new ArrayList<T>(idleChannelsSize);
+    Iterator<T> iterator = idleChannels.iterator();
     while (iterator.hasNext())
     {
-      ChannelWrapper<?> ch = iterator.next();
-      if (ch.getStatus() != JPPFClientConnectionStatus.ACTIVE)
+      T ch = iterator.next();
+      if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE)
       {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
         iterator.remove();
@@ -333,11 +352,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
         }
         catch (Exception ex)
         {
-          log.error("An error occurred while running the execution policy to determine node participation", ex);
+          log.error("An error occurred while running the execution policy to determine node participation.", ex);
         }
         if (debugEnabled)
         {
-          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on lcoal channel=" + ch);
+          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
         }
         if (!b) continue;
       }
@@ -390,7 +409,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * @param taskBundle the job.
    * @param context    the current node context.
    */
-  private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final ChannelWrapper<?> context)
+  private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final T context)
   {
     context.checkBundler(bundler, jppfContext);
     if (context.getBundler() instanceof JobAwareness)

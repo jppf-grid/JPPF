@@ -16,33 +16,25 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
-
-import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.server.nio.StateTransitionManager;
+package org.jppf.server.submission;
 
 
 /**
- * Context associated with a channel serving tasks to a node.
+ * Interface implemented by {@link org.jppf.client.event.TaskResultListener TaskResultListener} implementations
+ * that wish to handle submission statuses.
  * @author Laurent Cohen
  */
-public class RemoteNodeContext extends AbstractNodeContext
+public interface SubmissionStatusHandler
 {
-  public RemoteNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
-    super(transitionManager);
-  }
+  /**
+   * Get the status of this submission.
+   * @return a {@link SubmissionStatus} enumerated value.
+   */
+  SubmissionStatus getStatus();
 
   /**
-   * {@inheritDoc}.
+   * Set the status of this submission.
+   * @param newStatus a {@link SubmissionStatus} enumerated value.
    */
-  @Override
-  public AbstractTaskBundleMessage newMessage()
-  {
-    return new RemoteNodeMessage(sslHandler != null);
-  }
-
-  @Override
-  public boolean isLocal() {
-    return false;
-  }
+  void setStatus(final SubmissionStatus newStatus);
 }

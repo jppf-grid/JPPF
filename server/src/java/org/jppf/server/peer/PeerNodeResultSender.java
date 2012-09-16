@@ -125,7 +125,7 @@ class PeerNodeResultSender implements TaskCompletionListener
     if (result == null) result = nodeResult;
     else
     {
-      ((BundleWrapper) result).merge(nodeResult, true);
+      result.merge(nodeResult.getTasks(), true); // todo fix
     }
     if (pendingTasksCount <= 0) notify();
   }

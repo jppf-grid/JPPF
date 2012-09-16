@@ -16,33 +16,29 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.nodeserver;
+package org.jppf.server.queue;
 
-import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.server.nio.StateTransitionManager;
+import org.jppf.server.protocol.ServerJob;
 
+import java.util.Comparator;
 
 /**
- * Context associated with a channel serving tasks to a node.
+ * A Comparator which compare CLientJob objects in descending order of their priority.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
-public class RemoteNodeContext extends AbstractNodeContext
+public class JobPriorityComparator implements Comparator<ServerJob>
 {
-  public RemoteNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
-    super(transitionManager);
-  }
-
   /**
-   * {@inheritDoc}.
+   * {@inheritDoc}
    */
   @Override
-  public AbstractTaskBundleMessage newMessage()
+  public int compare(final ServerJob o1, final ServerJob o2)
   {
-    return new RemoteNodeMessage(sslHandler != null);
-  }
-
-  @Override
-  public boolean isLocal() {
-    return false;
+    if (o1 == null) return (o2 == null) ? 0 : -1;
+    if (o2 == null) return 1;
+    int p1 = o1.getJob().getSLA().getPriority();
+    int p2 = o2.getJob().getSLA().getPriority();
+    return (p1 < p2) ? 1 : (p1 > p2 ? -1 : 0);
   }
 }

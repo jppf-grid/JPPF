@@ -20,6 +20,7 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
+import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
@@ -64,57 +65,79 @@ class WaitingResultsState extends NodeServerState
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel))
     {
-      ServerJob bundleWrapper = context.getBundle();
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      BundleWrapper newBundleWrapper = context.deserializeBundle();
-      JPPFTaskBundle newBundle = (JPPFTaskBundle) newBundleWrapper.getJob();
-      if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
-      // if an exception prevented the node from executing the tasks
-      if (newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM) != null)
-      {
-        if (debugEnabled)
+      Exception exception = null;
+      ServerTaskBundle bundleWrapper = context.getBundle();
+      JPPFTaskBundle bundle;
+      JPPFTaskBundle newBundle;
+      boolean requeue = false;
+      try {
+        bundle = bundleWrapper;// (JPPFTaskBundle) bundleWrapper.getJob();
+        ServerTaskBundle newBundleWrapper = context.deserializeBundle(server.getJobManager());
+        newBundle = newBundleWrapper; // (JPPFTaskBundle) newBundleWrapper.getJob();
+        if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
+        // if an exception prevented the node from executing the tasks
+        Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+        if (t != null)
         {
-          Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-          log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
+          if (debugEnabled)
+          {
+            log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
+          }
+//          newBundleWrapper.setTasks(bundleWrapper.getTasks());
+//          newBundle.setTaskCount(bundle.getTaskCount());
+
+          exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+          bundleWrapper.resultsReceived(t);
         }
-        newBundleWrapper.setTasks(bundleWrapper.getTasks());
-        newBundle.setTaskCount(bundle.getTaskCount());
-      }
-      else
+        else
+        {
+          bundleWrapper.resultsReceived(newBundleWrapper.getTasksL());
+          long elapsed = System.nanoTime() - bundle.getExecutionStartTime();
+          if(statsManager != null) statsManager.taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
+          context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
+        }
+        requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
+        JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+        if (systemInfo != null)
+        {
+          context.setNodeInfo(systemInfo, true);
+          Bundler bundler = context.getBundler();
+          if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+        }
+      } catch (Throwable t)
       {
-        long elapsed = System.nanoTime() - bundle.getExecutionStartTime();
-        statsManager.taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
-        context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
+        log.error(t.getMessage(), t);
+        exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+        bundleWrapper.resultsReceived(t);
+      } finally {
+        bundleWrapper.taskCompleted(exception);
+        context.setBundle(null);
       }
-      boolean requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
-      jobManager.jobReturned(bundleWrapper, channel);
       if (requeue)
       {
-        bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
-        // why should it be suspended ?
-        bundle.getSLA().setSuspended(newBundle.getSLA().isSuspended());
-        context.setBundle(null);
-        context.setJobCanceled(false);
-        context.resubmitBundle(bundleWrapper);
+//        bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
+//        // why should it be suspended ?
+//        bundle.getSLA().setSuspended(newBundle.getSLA().isSuspended());
+//        context.resubmitBundle(bundleWrapper);
+        bundleWrapper.resubmit();
       }
-      else
-      {
-        // notify the client thread about the end of a bundle
-        bundle.fireTaskCompleted(context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
-        context.setJobCanceled(false);
-      }
-      JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-      if (systemInfo != null)
-      {
-        driver.getNodeHandler().updateNodeInformation(channel, systemInfo);
-        Bundler bundler = context.getBundler();
-        if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-      }
+//      else
+//      {
+//        // notify the client thread about the end of a bundle
+//        bundleWrapper.taskCompleted(null); //context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
+//        context.setJobCanceled(false);
+//      }
+//      JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+//      if (systemInfo != null)
+//      {
+//        context.setNodeInfo(systemInfo, true);
+//        Bundler bundler = context.getBundler();
+//        if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+//      }
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setMessage(null);
-      context.setBundle(null);
-      server.getTaskQueueChecker().addIdleChannel(channel);
+      server.addIdleChannel(context);
       return TO_IDLE;
     }
     return TO_WAITING;

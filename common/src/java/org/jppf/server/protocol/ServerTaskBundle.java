@@ -1,40 +1,21 @@
-/*
- * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
- * http://www.jppf.org
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package org.jppf.server.protocol;
 
-package org.jppf.client.balancer;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.io.DataLocation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Future;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.server.protocol.*;
-import org.jppf.task.storage.DataProvider;
-
 /**
- * Instances of this class group tasks from the same client together, so they are sent to the same node,
- * avoiding unnecessary transport overhead.<br>
- * The goal is to provide a performance enhancement through an adaptive bundling of tasks originating from the same client.
- * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
- * @author Laurent Cohen
+ * Created with IntelliJ IDEA.
+ * User: jandam
+ * Date: 9/3/12
+ * Time: 12:38 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class ClientTaskBundle extends JPPFTaskBundle
-{
+public class ServerTaskBundle extends JPPFTaskBundle {
   /**
    * Explicit serialVersionUID.
    */
@@ -43,15 +24,15 @@ public class ClientTaskBundle extends JPPFTaskBundle
   /**
    * The job to execute.
    */
-  private final ClientJob job;
+  private final ServerJob job;
   /**
    * The shared data provider for this task bundle.
    */
-  private transient DataProvider dataProvider = null;
+  private transient DataLocation dataProvider = null;
   /**
    * The tasks to be executed by the node.
    */
-  private transient List<JPPFTask> tasks = null;
+  private transient List<DataLocation> tasks = null;
   /**
    * The broadcast UUID.
    */
@@ -65,37 +46,52 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   private boolean cancelled  = false;
 
+  private JPPFTaskBundle taskBundle;
+
   /**
    * Initialize this task bundle and set its build number.
    * @param job   the job to execute.
    * @param tasks the tasks to execute.
    */
-  public ClientTaskBundle(final ClientJob job, final List<JPPFTask> tasks)
+  public ServerTaskBundle(final ServerJob job, final List<DataLocation> tasks) {
+    this(job, null, tasks);
+  }
+
+  public ServerTaskBundle(final ServerJob job, final JPPFTaskBundle taskBundle, final List<DataLocation> tasks)
   {
     if (job == null) throw new IllegalArgumentException("job is null");
 
     this.job = job;
+    if(taskBundle == null)
+      this.taskBundle = job.getJob();
+    else
+      this.taskBundle = taskBundle;
+//    if(getState() == State.INITIAL_BUNDLE)
+//      this.taskBundle = this.job.getJob();
+//    else
+//      this.taskBundle = this.job.getJob().copy(tasks.size());
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
-    this.tasks = new ArrayList<JPPFTask>(tasks);
+    this.tasks = Collections.unmodifiableList(new ArrayList<DataLocation>(tasks));
     this.setName(job.getJob().getName());
+    this.dataProvider = job.getDataProvider();
     setTaskCount(this.tasks.size());
   }
 
   /**
    * Get the job this submission is for.
-   * @return a {@link JPPFJob} instance.
+   * @return a {@link JPPFTaskBundle} instance.
    */
-  public JPPFJob getJob()
+  public JPPFTaskBundle getJob()
   {
-    return job.getJob();
+    return taskBundle;
   }
 
   /**
    * Get the client job this submission is for
-   * @return a {@link ClientJob} instance.
+   * @return a {@link ServerJob} instance.
    */
-  public ClientJob getClientJob()
+  public ServerJob getClientJob()
   {
     return job;
   }
@@ -104,7 +100,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get shared data provider for this task.
    * @return a <code>DataProvider</code> instance.
    */
-  public DataProvider getDataProviderL()
+  public DataLocation getDataProviderL()
   {
     return dataProvider;
   }
@@ -113,7 +109,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Set shared data provider for this task.
    * @param dataProvider a <code>DataProvider</code> instance.
    */
-  public void setDataProviderL(final DataProvider dataProvider)
+  public void setDataProviderL(final DataLocation dataProvider)
   {
     this.dataProvider = dataProvider;
   }
@@ -122,18 +118,9 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<JPPFTask> getTasksL()
+  public List<DataLocation> getTasksL()
   {
     return tasks;
-  }
-
-  /**
-   * Set the tasks to be executed by the node.
-   * @param tasks the tasks as a <code>List</code> of arrays of bytes.
-   */
-  public void setTasksL(final List<JPPFTask> tasks)
-  {
-    this.tasks = tasks;
   }
 
   /**
@@ -141,7 +128,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * @return a new <code>ClientTaskBundle</code> instance.
    */
   @Override
-  public ClientTaskBundle copy()
+  public ServerTaskBundle copy()
   {
     throw new UnsupportedOperationException();
 //    ClientTaskBundle bundle = new ClientTaskBundle(getJob(), tasks);
@@ -172,7 +159,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * @return a new <code>ClientTaskBundle</code> instance.
    */
   @Override
-  public ClientTaskBundle copy(final int nbTasks)
+  public ServerTaskBundle copy(final int nbTasks)
   {
     throw new UnsupportedOperationException();
 //    ClientTaskBundle bundle = copy();
@@ -213,7 +200,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param results the list of tasks whose results have been received from the server.
    */
-  public void resultsReceived(final List<JPPFTask> results)
+  public void resultsReceived(final List<DataLocation> results)
   {
     job.resultsReceived(this, results);
   }

@@ -73,7 +73,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
    * {@inheritDoc}
    */
   @Override
-  public void handleException(final ChannelWrapper<?> channel)
+  public void handleException(final ChannelWrapper<?> channel, final Exception e)
   {
     AcceptorNioServer.closeChannel(channel);
   }

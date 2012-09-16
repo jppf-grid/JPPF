@@ -18,8 +18,6 @@
 
 package org.jppf.server.nio.acceptor;
 
-import org.jppf.server.*;
-import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.NioState;
 
 /**
@@ -32,18 +30,6 @@ abstract class AcceptorServerState extends NioState<AcceptorTransition>
    * The server that handles this state.
    */
   protected AcceptorNioServer server = null;
-  /**
-   * The driver stats manager.
-   */
-  protected JPPFDriverStatsManager statsManager = null;
-  /**
-   * The job manager.
-   */
-  protected JPPFJobManager jobManager = null;
-  /**
-   * Reference to the driver.
-   */
-  protected JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this state.
@@ -52,7 +38,5 @@ abstract class AcceptorServerState extends NioState<AcceptorTransition>
   public AcceptorServerState(final AcceptorNioServer server)
   {
     this.server = server;
-    statsManager = driver.getStatsManager();
-    jobManager = driver.getJobManager();
   }
 }

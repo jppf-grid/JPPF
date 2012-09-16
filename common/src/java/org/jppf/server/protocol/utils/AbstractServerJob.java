@@ -1,43 +1,33 @@
-/*
- * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
- * http://www.jppf.org
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package org.jppf.server.protocol.utils;
 
-package org.jppf.client.balancer.utils;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.node.protocol.JobMetadata;
+import org.jppf.node.protocol.JobSLA;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.ServerJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.*;
-import org.jppf.client.balancer.*;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.execute.ExecutorStatus;
-import org.jppf.node.protocol.*;
-import org.slf4j.*;
-
+/**
+ * Created with IntelliJ IDEA.
+ * User: jandam
+ * Date: 9/3/12
+ * Time: 12:23 PM
+ * To change this template use File | Settings | File Templates.
+ */
 /**
  * Abstract class that support job state management.
  * @author Martin JANDA
  */
-public abstract class AbstractClientJob
-{
+public class AbstractServerJob {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
+  private static final Logger log = LoggerFactory.getLogger(ServerJob.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -81,7 +71,7 @@ public abstract class AbstractClientJob
   /**
    * The underlying task bundle.
    */
-  protected final JPPFJob job;
+  protected final JPPFTaskBundle job;
   /**
    * The universal unique id for this job.
    */
@@ -121,7 +111,7 @@ public abstract class AbstractClientJob
    * Initialized abstract client job with task bundle and list of tasks to execute.
    * @param job   underlying task bundle.
    */
-  protected AbstractClientJob(final JPPFJob job)
+  protected AbstractServerJob(final JPPFTaskBundle job)
   {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
@@ -138,7 +128,7 @@ public abstract class AbstractClientJob
    * Get the underlying task bundle.
    * @return a <code>ClientTaskBundle</code> instance.
    */
-  public JPPFJob getJob()
+  public JPPFTaskBundle getJob()
   {
     return job;
   }
@@ -233,6 +223,13 @@ public abstract class AbstractClientJob
     this.jobExpired = true;
     cancel(true);
   }
+
+  public void setJobExpired(final boolean jobExpired)
+  {
+    this.jobExpired = jobExpired;
+    if(this.jobExpired) cancel(true);
+  }
+
 
   /**
    * Get the job pending indicator.
@@ -439,10 +436,81 @@ public abstract class AbstractClientJob
    * @param channel the channel to check.
    * @return <code>true</code> if the channel is available, <code>false</code> otherwise.
    */
-  private static boolean checkChannel(final ExecutorChannel channel)
+  private boolean checkChannel(final ExecutorChannel channel)
   {
     if (channel == null) return true;
-    ExecutorStatus status = channel.getExecutionStatus();
-    return (status == ExecutorStatus.ACTIVE) || (status == ExecutorStatus.EXECUTING);
+//    JPPFClientConnectionStatus status = channel.getStatus();
+//    return (status == JPPFClientConnectionStatus.ACTIVE) || (status == JPPFClientConnectionStatus.EXECUTING);
+    return true;
   }
+
+//  /**
+//   * Get the broadcast UUID.
+//   * @return an <code>String</code> instance.
+//   */
+//  public String getBroadcastUUID()
+//  {
+//    return (String) getJob_().getParameter(BundleParameter.NODE_BROADCAST_UUID);
+//  }
+//
+//  /**
+//   * Get the job pending indicator.
+//   * @return <code>true</code> if job is pending, <code>false</code> otherwise.
+//   */
+//  public boolean isPending()
+//  {
+//    return Boolean.TRUE.equals(getJob_().getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE));
+//  }
+//
+//  /**
+//   * Set the job pending indicator.
+//   * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
+//   */
+//  public void setPending(final boolean pending)
+//  {
+//    getJob_().setParameter(BundleParameter.JOB_PENDING, pending);
+//  }
+//
+//  /**
+//   * Get the job expired indicator.
+//   * @return <code>true</code> if job has expired, <code>false</code> otherwise.
+//   */
+//  public boolean isJobExpired()
+//  {
+//    return Boolean.TRUE.equals(getJob_().getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
+//  }
+//
+//  /**
+//   * Notifies that job has expired.
+//   */
+//  public void jobExpired()
+//  {
+//    setJobExpired(true);
+//  }
+//
+//  public void setJobExpired(final boolean jobExpired) {
+//    getJob_().setParameter(BundleParameter.JOB_EXPIRED, jobExpired);
+//  }
+//
+//  private JPPFTaskBundle getJob_() {
+//    return ((JPPFTaskBundle) getJob());
+//  }
+//
+//  /**
+//   * Get the job received time.
+//   * @return the time in milliseconds as a long value.
+//   */
+//  public long getJobReceivedTime()
+//  {
+//    return (Long) getJob_().getParameter(BundleParameter.JOB_RECEIVED_TIME);
+//  }
+//
+//  /**
+//   * Set the job received time.
+//   * @param jobReceivedTime the time in milliseconds as a long value.
+//   */
+//  public void setJobReceivedTime(final long jobReceivedTime)
+//  {
+//    getJob_().setParameter(BundleParameter.JOB_RECEIVED_TIME, jobReceivedTime);
+//  }
 }

@@ -102,10 +102,10 @@ public class DriverInitializer
    * Instantiate this initializer with the specified driver.
    * @param driver the driver to initialize.
    */
-  public DriverInitializer(final JPPFDriver driver)
+  public DriverInitializer(final JPPFDriver driver, final TypedProperties config)
   {
     this.driver = driver;
-    config = JPPFConfiguration.getProperties();
+    this.config = config;
   }
 
   /**
@@ -113,7 +113,7 @@ public class DriverInitializer
    */
   void registerDebugMBean()
   {
-    if (JPPFDriver.JPPF_DEBUG)
+    if (config.getBoolean("jppf.debug.enabled", false))
     {
       try
       {
@@ -383,6 +383,10 @@ public class DriverInitializer
   public ServerDebug getServerDebug()
   {
     return serverDebug;
+  }
+
+  public boolean hasServerDebug() {
+    return serverDebug != null;
   }
 
   /**

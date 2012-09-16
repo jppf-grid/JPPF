@@ -21,7 +21,6 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import org.jppf.management.*;
-import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
@@ -69,17 +68,16 @@ class WaitInitialBundleState extends NodeServerState
     if (context.readMessage(channel))
     {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
-      ServerJob bundleWrapper = context.deserializeBundle();
+      ServerTaskBundle bundleWrapper = context.deserializeBundle(server.getJobManager());
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
       context.setUuid(uuid);
-      server.putUuid(uuid, channel);
       Bundler bundler = server.getBundler().copy();
       JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
       context.setNodeInfo(systemInfo);
       if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       if (debugEnabled) log.debug("processing threads for node " + channel + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
-      if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(JPPFContextDriver.getInstance());
+      if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
       context.setBundler(bundler);
       boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
@@ -96,14 +94,14 @@ class WaitInitialBundleState extends NodeServerState
           else ssl = context.getSSLHandler() != null;
           JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE, ssl);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
-          driver.getNodeHandler().addNodeInformation(channel, info);
-          driver.getInitializer().getNodeConnectionEventHandler().fireNodeConnected(info);
+
+          context.setManagementInfo(info);
         }
       }
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setMessage(null);
       context.setBundle(null);
-      server.getTaskQueueChecker().addIdleChannel(channel);
+      server.nodeConnected(context);
       return TO_IDLE;
     }
     return TO_WAIT_INITIAL;

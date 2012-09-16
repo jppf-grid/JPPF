@@ -18,19 +18,24 @@
 
 package org.jppf.server.nio.client;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.jppf.io.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.io.DataLocation;
+import org.jppf.io.IOHelper;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.AbstractNioContext;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.ClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.server.protocol.ServerJob;
+import org.jppf.utils.SerializationHelper;
+import org.jppf.utils.SerializationHelperImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Context associated with a channel receiving jobs from a client, and sending the results back.
@@ -47,10 +52,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Reference to the job manager.
-   */
-  private static JPPFJobManager jobManager = JPPFDriver.getInstance().getJobManager();
-  /**
    * The task bundle to send or receive.
    */
   protected ServerJob bundle = null;
@@ -59,10 +60,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   protected SerializationHelper helper = new SerializationHelperImpl();
   /**
-   * True means the job was cancelled and the task completion listener must not be called.
-   */
-  protected boolean jobCanceled = false;
-  /**
    * List of completed bundles to send to the client.
    */
   protected final LinkedList<ServerJob> completedBundles = new LinkedList<ServerJob>();
@@ -70,10 +67,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Number of tasks that remain to be sent to the client.
    */
   protected AtomicInteger pendingTasksCount = new AtomicInteger(0);
-  /**
-   * The id of the last job submitted via this connection.
-   */
-  private String currentJobId = null;
   /**
    * The job as initially submitted by the client.
    */
@@ -85,7 +78,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 
   /**
    * Get the task bundle to send or receive.
-   * @return a <code>BundleWrapper</code> instance.
+   * @return a <code>ServerJob</code> instance.
    */
   public ServerJob getBundle()
   {
@@ -105,7 +98,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * {@inheritDoc}
    */
   @Override
-  public void handleException(final ChannelWrapper<?> channel)
+  public void handleException(final ChannelWrapper<?> channel, final Exception e)
   {
     ClientNioServer.closeClient(channel);
     if (clientUuid != null)
@@ -150,13 +143,12 @@ public class ClientContext extends AbstractNioContext<ClientState>
   {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
     JPPFTaskBundle bundle = ((ClientMessage) message).getBundle();
-    BundleWrapper wrapper = new BundleWrapper(bundle);
-    wrapper.setDataProvider(locations.get(1));
+    List<DataLocation> tasks = new ArrayList<DataLocation>();
     if (locations.size() > 2)
     {
-      for (int i=2; i<locations.size(); i++) wrapper.addTask(locations.get(i));
+      for (int i=2; i<locations.size(); i++) tasks.add(locations.get(i));
     }
-    return wrapper;
+    return new ServerJob(null, bundle, locations.get(1), tasks);
   }
 
   /**
@@ -224,24 +216,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
   }
 
   /**
-   * Determine whether the job was canceled.
-   * @return true if the job was canceled, false otherwise.
-   */
-  public synchronized boolean isJobCanceled()
-  {
-    return jobCanceled;
-  }
-
-  /**
-   * Specify whether the job was canceled.
-   * @param jobCanceled true if the job was canceled, false otherwise.
-   */
-  public synchronized void setJobCanceled(final boolean jobCanceled)
-  {
-    this.jobCanceled = jobCanceled;
-  }
-
-  /**
    * Add a completed bundle to the queue of bundles to send to the client
    * @param bundleWrapper the bundle to add.
    */
@@ -255,7 +229,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 
   /**
    * Get the next bundle in the queue.
-   * @return A {@link BundleWrapper} instance, or null if the queue is empty.
+   * @return A {@link ServerJob} instance, or null if the queue is empty.
    */
   public ServerJob pollCompletedBundle()
   {
@@ -294,33 +268,15 @@ public class ClientContext extends AbstractNioContext<ClientState>
       return completedBundles.isEmpty();
     }
   }
-  /**
-   * Get the id of the last job submitted via this connection.
-   * @return the id as a string.
-   */
-  public synchronized String getCurrentJobId()
-  {
-    return currentJobId;
-  }
-
-  /**
-   * Set the id of the last job submitted via this connection.
-   * @param currentJobId the id as a string.
-   */
-  public synchronized void setCurrentJobId(final String currentJobId)
-  {
-    this.currentJobId = currentJobId;
-  }
 
   /**
    * Send the job ended notification.
    */
   synchronized void jobEnded()
   {
-    if (currentJobId != null)
+    if (initialBundleWrapper != null)
     {
-      currentJobId = null;
-      jobManager.jobEnded(initialBundleWrapper);
+      initialBundleWrapper.fireJobEnded();
       initialBundleWrapper = null;
     }
   }
@@ -330,35 +286,23 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   private synchronized void cancelJobOnClose()
   {
-    if (currentJobId != null)
+    if (initialBundleWrapper != null)
     {
-      currentJobId = null;
       JPPFTaskBundle header = (JPPFTaskBundle) initialBundleWrapper.getJob();
       header.setCompletionListener(null);
       if (debugEnabled) log.debug("cancelUponClientDisconnect = " + header.getSLA().isCancelUponClientDisconnect() + " for " + header);
       if (header.getSLA().isCancelUponClientDisconnect())
       {
-        JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
-        wrapper.connect();
-        try
-        {
-          wrapper.cancelJob(header.getUuid());
-        }
-        catch (Exception e)
-        {
-          String s = ExceptionUtils.getMessage(e);
-          if (debugEnabled) log.error(s, e);
-          else log.warn(s);
-        }
+        initialBundleWrapper.cancel(true);
       }
-      jobManager.jobEnded(initialBundleWrapper);
+      initialBundleWrapper.fireJobEnded();
       initialBundleWrapper = null;
     }
   }
 
   /**
    * Set the job as initially submitted by the client.
-   * @param initialBundleWrapper <code>BundleWrapper</code> instance.
+   * @param initialBundleWrapper <code>ServerJob</code> instance.
    */
   synchronized void setInitialBundleWrapper(final ServerJob initialBundleWrapper)
   {

@@ -18,6 +18,8 @@
 package org.jppf.server.peer;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
@@ -152,7 +154,7 @@ class PeerNode extends AbstractCommonNode
     if (debugEnabled) log.debug(getName() + "Start of peer node secondary loop");
     while (!stopped)
     {
-      BundleWrapper bundleWrapper = readBundle();
+      ServerJob bundleWrapper = readBundle();
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       if (bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
       {
@@ -180,7 +182,7 @@ class PeerNode extends AbstractCommonNode
       {
         resultSender.sendResults(bundleWrapper);
       }
-      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) driver.getJobManager().jobEnded(bundleWrapper);
+      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) bundleWrapper.fireJobEnded();
     }
     if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
   }
@@ -234,32 +236,27 @@ class PeerNode extends AbstractCommonNode
    * @return an array of deserialized objects.
    * @throws Exception if an error occurs while deserializing.
    */
-  private BundleWrapper readBundle() throws Exception
+  private ServerJob readBundle() throws Exception
   {
     // Read the request header - with task count information
     if (debugEnabled) log.debug("waiting for next request");
     JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, getHelper().getSerializer());
     if (debugEnabled) log.debug("received header from peer driver: " + header);
-    BundleWrapper headerWrapper = new BundleWrapper(header);
 
     int count = header.getTaskCount();
     if (debugEnabled) log.debug("Received " + count + " tasks");
 
-    for (int i=0; i<count+1; i++)
+    DataLocation dataProvider = IOHelper.readData(is);
+    if (debugEnabled) log.debug("received data provider from peer driver, data length = " + dataProvider.getSize());
+
+    List<DataLocation> tasks = new ArrayList<DataLocation>(count);
+    for (int i=1; i<count+1; i++)
     {
       DataLocation dl = IOHelper.readData(is);
-      if (i == 0)
-      {
-        headerWrapper.setDataProvider(dl);
-        if (debugEnabled) log.debug("received data provider from peer driver, data length = " + dl.getSize());
-      }
-      else
-      {
-        headerWrapper.addTask(dl);
-        if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
-      }
+      tasks.add(dl);
+      if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
     }
-    return headerWrapper;
+    return new ServerJob(null, header, dataProvider, tasks);
   }
 
   /**

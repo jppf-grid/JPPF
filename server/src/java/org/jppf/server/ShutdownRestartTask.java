@@ -41,6 +41,7 @@ class ShutdownRestartTask extends TimerTask
    * Delay, starting from shutdown completion, after which the server is restarted.
    */
   private final long restartDelay;
+  private final JPPFDriver driver;
   /**
    * The timer used to schedule this task, and eventually the restart operation.
    */
@@ -56,11 +57,12 @@ class ShutdownRestartTask extends TimerTask
    * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
    * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
    */
-  public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay)
+  public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay, final JPPFDriver driver)
   {
     this.timer = timer;
     this.restart = restart;
     this.restartDelay = restartDelay;
+    this.driver = driver;
   }
 
   /**
@@ -71,7 +73,7 @@ class ShutdownRestartTask extends TimerTask
   public void run()
   {
     log.info("Initiating shutdown");
-    JPPFDriver.getInstance().shutdown();
+    driver.shutdown();
     if (!restart)
     {
       log.info("Performing requested exit");

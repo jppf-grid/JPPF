@@ -23,12 +23,9 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.job.*;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.protocol.*;
-import org.jppf.server.queue.JPPFPriorityQueue;
 import org.slf4j.*;
 
 /**
@@ -49,18 +46,15 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Reference to the driver's job manager.
    */
-  private JPPFJobManager jobManager = null;
-  /**
-   * Reference to the driver.
-   */
-  private JPPFDriver driver = JPPFDriver.getInstance();
+  private JobManager jobManager = null;
 
   /**
    * Initialize this MBean.
    */
   public DriverJobManagement()
   {
-    getJobManager().addJobListener(new JobEventNotifier());
+    JobManager manager = getJobManager();
+    if (manager != null) manager.addJobListener(new JobEventNotifier());
   }
 
   /**
@@ -72,21 +66,11 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public void cancelJob(final String jobUuid) throws Exception
   {
-    cancelJobInNodes(jobUuid, false);
     ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
     if (bundleWrapper != null)
     {
       if (debugEnabled) log.debug("Request to cancel jobId = '" + bundleWrapper.getJob().getName() + '\'');
-      //cancelJobInNodes(jobUuid, false);
-      //if (debugEnabled) log.debug("bundleWrapper=" + bundleWrapper);
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      //ServerJob queuedWrapper = JPPFDriver.getQueue().nextBundle(bundleWrapper, bundle.getTaskCount());
-      ServerJob queuedWrapper = JPPFDriver.getQueue().removeBundle(bundleWrapper);
-      if (queuedWrapper != null)
-      {
-        bundle = (JPPFTaskBundle) queuedWrapper.getJob();
-        bundle.fireTaskCompleted(queuedWrapper);
-      }
+      bundleWrapper.cancel(false);
     }
     else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
   }
@@ -109,11 +93,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       return;
     }
     if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    JobSLA sla = bundleWrapper.getJob().getSLA();
-    if (sla.isSuspended()) return;
-    sla.setSuspended(true);
-    getJobManager().jobUpdated(bundleWrapper);
-    if (requeue) cancelJobInNodes(jobUuid, true);
+    bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
   }
 
   /**
@@ -132,10 +112,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       return;
     }
     if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    JobSLA sla = bundleWrapper.getJob().getSLA();
-    if (!sla.isSuspended()) return;
-    sla.setSuspended(false);
-    getJobManager().jobUpdated(bundleWrapper);
+    bundleWrapper.setSuspended(false);
   }
 
   /**
@@ -155,9 +132,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       return;
     }
     if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    if (maxNodes <= 0) return;
-    bundleWrapper.getJob().getSLA().setMaxNodes(maxNodes);
-    getJobManager().jobUpdated(bundleWrapper);
+    bundleWrapper.setMaxNodes(maxNodes);
   }
 
   /**
@@ -204,40 +179,29 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public NodeJobInformation[] getNodeInformation(final String jobUuid) throws Exception
   {
-    List<ChannelJobPair> nodes = getJobManager().getNodesForJob(jobUuid);
-    if (nodes.isEmpty()) return NodeJobInformation.EMPTY_ARRAY;
-    NodeJobInformation[] result = new NodeJobInformation[nodes.size()];
-    for (int i=0; i<nodes.size(); i++)
-    {
-      JPPFManagementInfo nodeInfo = driver.getNodeHandler().getNodeInformation(nodes.get(i).first());
-      JPPFTaskBundle bundle = (JPPFTaskBundle) nodes.get(i).second().getJob();
-      Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-      JobInformation jobInfo = new JobInformation(jobUuid, bundle.getName(),
-          bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-          bundle.getSLA().isSuspended(), (pending != null) && pending);
-      jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
-      result[i] = new NodeJobInformation(nodeInfo, jobInfo);
-    }
-    return result;
+    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+    if (bundleWrapper == null) return NodeJobInformation.EMPTY_ARRAY;
+
+    return bundleWrapper.getNodeJobInformation();
   }
 
-  /**
-   * Cancel all sub-jobs of the job with the specified id, by issuing a cancel command
-   * to each corresponding node.
-   * @param jobUuid the id of the job to cancel.
-   * @param requeue specifies whether the sub-jobs should be requeued.
-   */
-  private void cancelJobInNodes(final String jobUuid, final boolean requeue)
-  {
-    List<ChannelJobPair> list = getJobManager().getNodesForJob(jobUuid);
-    if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
-
-    for (ChannelJobPair pair : list)
-    {
-      CancelJobTask task = new CancelJobTask(jobUuid, pair.first(), requeue);
-      new Thread(task).start();
-    }
-  }
+//  /**
+//   * Cancel all sub-jobs of the job with the specified id, by issuing a cancel command
+//   * to each corresponding node.
+//   * @param jobUuid the id of the job to cancel.
+//   * @param requeue specifies whether the sub-jobs should be requeued.
+//   */
+//  private void cancelJobInNodes(final String jobUuid, final boolean requeue)
+//  {
+//    List<ChannelJobPair> list = getJobManager().getNodesForJob(jobUuid);
+//    if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
+//
+//    for (ChannelJobPair pair : list)
+//    {
+//      CancelJobTask task = new CancelJobTask(jobUuid, pair.first(), requeue);
+//      new Thread(task).start();
+//    }
+//  }
 
   /**
    * {@inheritDoc}
@@ -246,16 +210,16 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   public void updatePriority(final String jobUuid, final Integer newPriority)
   {
     if (debugEnabled) log.debug("Updating priority of jobId = '" + jobUuid + "' to: " + newPriority);
-    ((JPPFPriorityQueue) JPPFDriver.getQueue()).updatePriority(jobUuid, newPriority);
+    getJobManager().updatePriority(jobUuid, newPriority);
   }
 
   /**
    * Get a reference to the driver's job manager.
    * @return a <code>JPPFJobManager</code> instance.
    */
-  private JPPFJobManager getJobManager()
+  private JobManager getJobManager()
   {
-    if (jobManager == null) jobManager = driver.getJobManager();
+    if (jobManager == null) jobManager = JPPFDriver.getInstance().getNodeNioServer();
     return jobManager;
   }
 

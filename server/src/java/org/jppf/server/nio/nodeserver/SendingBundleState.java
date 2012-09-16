@@ -69,7 +69,7 @@ class SendingBundleState extends NodeServerState
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null)
     {
-      ServerJob bundleWrapper = context.getBundle();
+      ServerTaskBundle bundleWrapper = context.getBundle();
       JPPFTaskBundle bundle = (bundleWrapper == null) ? null : (JPPFTaskBundle) bundleWrapper.getJob();
       if (bundle != null)
       {
@@ -79,8 +79,8 @@ class SendingBundleState extends NodeServerState
         {
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());
           context.setBundle(null);
-          context.resubmitBundle(bundleWrapper);
-          server.getTaskQueueChecker().addIdleChannel(channel);
+          bundleWrapper.resubmit();
+          server.addIdleChannel(context);
           return TO_IDLE;
         }
         bundle.setExecutionStartTime(System.nanoTime());
@@ -89,7 +89,7 @@ class SendingBundleState extends NodeServerState
       else
       {
         if (debugEnabled) log.debug("null bundle for node " + channel);
-        server.getTaskQueueChecker().addIdleChannel(channel);
+        server.addIdleChannel(context);
         return TO_IDLE;
       }
     }

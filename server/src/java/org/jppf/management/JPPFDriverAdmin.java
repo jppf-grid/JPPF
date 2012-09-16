@@ -22,7 +22,8 @@ import java.util.*;
 
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
@@ -67,7 +68,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public Integer nbNodes() throws Exception
   {
-    return driver.getNodeHandler().getNbNodes();
+    return getNodeNioServer().getNbNodes();
   }
 
   /**
@@ -80,7 +81,13 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   {
     try
     {
-      List<JPPFManagementInfo> list = new LinkedList<JPPFManagementInfo>(driver.getNodeHandler().getNodeInformationMap().values());
+      List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+      List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(allChannels.size());
+      for (AbstractNodeContext context : allChannels)
+      {
+        JPPFManagementInfo info = context.getManagementInfo();
+        if (info != null) list.add(info);
+      }
       return list;
     }
     catch(Exception e)
@@ -126,7 +133,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     try
     {
       if (algorithm == null) return "Error: no algorithm specified (null value)";
-      JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
+      NodeNioServer server = getNodeNioServer();
+      JPPFBundlerFactory factory = server.getBundlerFactory();
       if (!factory.getBundlerProviderNames().contains(algorithm)) return "Error: unknown algorithm '" + algorithm + '\'';
       TypedProperties props = new TypedProperties(parameters);
       synchronized(loadBalancingInformationLock)
@@ -134,7 +142,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
         currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, loadBalancerInformation().getAlgorithmNames());
       }
       Bundler bundler = factory.createBundler(algorithm, props);
-      driver.getNodeNioServer().setBundler(bundler);
+      server.setBundler(bundler);
       return localize("load.balancing.updated");
     }
     catch(Exception e)
@@ -158,7 +166,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     try
     {
       if (debugEnabled) log.debug("request to restart/shutdown this driver, shutdownDelay=" + shutdownDelay + ", restartDelay=" + restartDelay);
-      boolean restart = restartDelay >= 0;
+      boolean restart = restartDelay >= 0L;
       driver.initiateShutdownRestart(shutdownDelay, restart, restartDelay);
       return localize("request.acknowledged");
     }
@@ -181,8 +189,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     synchronized(loadBalancingInformationLock)
     {
       if (currentLoadBalancingInformation == null) currentLoadBalancingInformation = computeCurrentLoadBalancingInformation();
+      return currentLoadBalancingInformation;
     }
-    return currentLoadBalancingInformation;
   }
 
   /**
@@ -198,7 +206,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     String profileName = props.getString("jppf.load.balancing.strategy", null);
     // for compatibility with v1.x configuration files
     if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", "jppf");
-    JPPFBundlerFactory factory = driver.getNodeNioServer().getBundlerFactory();
+    JPPFBundlerFactory factory = getNodeNioServer().getBundlerFactory();
     TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
     List<String> algorithmsList = null;
     try
@@ -241,20 +249,19 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public Integer matchingNodes(final ExecutionPolicy policy) throws Exception
   {
-    NodeInformationHandler handler = JPPFDriver.getInstance().getNodeHandler();
-    Map<ChannelWrapper<?>, JPPFManagementInfo> map = handler.getNodeInformationMap();
-    if (debugEnabled) log.debug("Testing policy against " + map.size() + " nodes:\n" + policy );
-    if (policy == null) return map.size();
+    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+
+    if (debugEnabled) log.debug("Testing policy against " + allChannels.size() + " nodes:\n" + policy );
+    if (policy == null) return allChannels.size();
 
     int count = 0;
-    for (Map.Entry<ChannelWrapper<?>, JPPFManagementInfo> entry: map.entrySet())
-    {
-      JPPFManagementInfo mgtInfo = entry.getValue();
+    for (AbstractNodeContext context : allChannels) {
+      JPPFManagementInfo mgtInfo = context.getManagementInfo();
       boolean match = false;
       if (mgtInfo == null) match = true;
       else
       {
-        JPPFSystemInformation info = mgtInfo.getSystemInfo();
+        JPPFSystemInformation info = context.getSystemInfo();
         try
         {
           match = policy.accepts(info);
@@ -276,20 +283,23 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public Integer nbIdleNodes() throws Exception
   {
-    return driver.getNodeNioServer().getTaskQueueChecker().getNbIdleChannels();
+    return getNodeNioServer().getNbIdleChannels();
   }
 
   @Override
   public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
   {
-    List<ChannelWrapper<?>> idleChannels = driver.getNodeNioServer().getTaskQueueChecker().getIdleChannels();
+    List<AbstractNodeContext> idleChannels = getNodeNioServer().getIdleChannels();
     List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(idleChannels.size());
-    NodeInformationHandler handler = JPPFDriver.getInstance().getNodeHandler();
-    for (ChannelWrapper<?> channel: idleChannels)
+    for (AbstractNodeContext context: idleChannels)
     {
-      JPPFManagementInfo info = handler.getNodeInformation(channel);
+      JPPFManagementInfo info = context.getManagementInfo();
       if (info != null) list.add(info);
     }
     return list;
+  }
+
+  private static NodeNioServer getNodeNioServer() {
+    return driver.getNodeNioServer();
   }
 }

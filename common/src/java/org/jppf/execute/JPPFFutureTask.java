@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.client.balancer.utils;
+package org.jppf.execute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,20 +92,6 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
       {
         listenerList.add(listener);
       }
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void removeListener(final Listener listener)
-  {
-    if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList)
-    {
-      listenerList.remove(listener);
     }
   }
 }

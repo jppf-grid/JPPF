@@ -122,7 +122,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel)
+  public void handleException(final ChannelWrapper<?> channel, final Exception e)
   {
     if (isProvider())
     {

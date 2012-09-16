@@ -18,13 +18,19 @@
 
 package org.jppf.client.balancer;
 
-import java.util.concurrent.ExecutorService;
-
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.client.balancer.utils.JPPFFuture;
 import org.jppf.client.event.ClientConnectionStatusListener;
-import org.jppf.management.*;
-import org.jppf.server.scheduler.bundle.*;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.execute.ExecutorStatus;
+import org.jppf.execute.JPPFFuture;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.ContextAwareness;
+import org.jppf.server.scheduler.bundle.JPPFContext;
+import org.jppf.server.scheduler.bundle.NodeAwareness;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * Context associated with a channel serving state and tasks submission.
@@ -32,7 +38,7 @@ import org.jppf.server.scheduler.bundle.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public abstract class ChannelWrapper<T>
+public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBundle>
 {
   /**
    * Bundler used to schedule tasks for the corresponding node.
@@ -62,12 +68,14 @@ public abstract class ChannelWrapper<T>
    * Get the unique identifier of the client.
    * @return the uuid as a string.
    */
+  @Override
   public abstract String getUuid();
 
   /**
    * Get the unique ID for the connection.
    * @return the connection id.
    */
+  @Override
   public abstract String getConnectionUuid();
 
   /**
@@ -75,6 +83,20 @@ public abstract class ChannelWrapper<T>
    * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
    */
   public abstract JPPFClientConnectionStatus getStatus();
+
+  @Override
+  public ExecutorStatus getExecutionStatus() {
+    switch (getStatus()) {
+      case ACTIVE:
+        return ExecutorStatus.ACTIVE;
+      case FAILED:
+        return ExecutorStatus.FAILED;
+      case EXECUTING:
+        return ExecutorStatus.EXECUTING;
+      default:
+        return ExecutorStatus.DISABLED;
+    }
+  }
 
   /**
    * Add a connection status listener to this connection's list of listeners.
@@ -92,18 +114,10 @@ public abstract class ChannelWrapper<T>
    * Get the bundler used to schedule tasks for the corresponding node.
    * @return a {@link Bundler} instance.
    */
+  @Override
   public Bundler getBundler()
   {
     return bundler;
-  }
-
-  /**
-   * Set the bundler used to schedule tasks for the corresponding node.
-   * @param bundler a {@link Bundler} instance.
-   */
-  public void setBundler(final Bundler bundler)
-  {
-    this.bundler = bundler;
   }
 
   /**
@@ -115,6 +129,7 @@ public abstract class ChannelWrapper<T>
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
+  @Override
   public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext)
   {
     if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
@@ -139,6 +154,7 @@ public abstract class ChannelWrapper<T>
    * Get the system information.
    * @return a {@link JPPFSystemInformation} instance.
    */
+  @Override
   public JPPFSystemInformation getSystemInfo()
   {
     return systemInfo;
@@ -157,6 +173,7 @@ public abstract class ChannelWrapper<T>
    * Get the management information.
    * @return a {@link JPPFManagementInfo} instance.
    */
+  @Override
   public JPPFManagementInfo getManagementInfo()
   {
     return managementInfo;
@@ -176,19 +193,27 @@ public abstract class ChannelWrapper<T>
    * @param bundle a {@link ClientTaskBundle} instance.
    * @return a {@link JPPFFuture}.
    */
+  @Override
   public abstract JPPFFuture<?> submit(final ClientTaskBundle bundle);
 
   /**
    * Determine whether this channel is local (for an in-JVM node).
    * @return <code>false</code> if the channel is local, <code>false</code> otherwise.
    */
+  @Override
   public abstract boolean isLocal();
 
   /**
    * Close this channel and release the resources it uses.
    */
+  @Override
   public void close()
   {
     if (executor != null) executor.shutdownNow();
+  }
+
+  @Override
+  public Object getMonitor() {
+    return this;
   }
 }

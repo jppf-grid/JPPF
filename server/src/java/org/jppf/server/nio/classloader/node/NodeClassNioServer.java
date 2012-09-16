@@ -62,9 +62,9 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * Initialize this class server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeClassNioServer() throws Exception
+  public NodeClassNioServer(final JPPFDriver driver) throws Exception
   {
-    super(NioConstants.NODE_CLASS_SERVER);
+    super(NioConstants.NODE_CLASS_SERVER, driver);
   }
 
   /**

@@ -70,8 +70,9 @@ public interface NioContext<S extends Enum<S>>
   /**
    * Handle the cleanup when an exception occurs on the channel.
    * @param channel the channel that threw the exception.
+   * @param e exception.
    */
-  void handleException(ChannelWrapper<?> channel);
+  void handleException(ChannelWrapper<?> channel, final Exception e);
 
   /**
    * Get the associated channel.

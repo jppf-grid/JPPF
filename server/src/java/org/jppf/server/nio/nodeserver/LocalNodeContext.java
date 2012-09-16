@@ -40,8 +40,9 @@ public class LocalNodeContext extends AbstractNodeContext
   /**
    * Default constructor.
    */
-  public LocalNodeContext()
+  public LocalNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager)
   {
+    super(transitionManager);
   }
 
   /**
@@ -92,5 +93,10 @@ public class LocalNodeContext extends AbstractNodeContext
   {
     super.setMessage(nodeMessage);
     ((LocalNodeChannel) getChannel()).wakeUp();
+  }
+
+  @Override
+  public boolean isLocal() {
+    return true;
   }
 }

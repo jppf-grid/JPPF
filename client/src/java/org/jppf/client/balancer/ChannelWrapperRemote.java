@@ -24,9 +24,10 @@ import java.util.concurrent.Executors;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.balancer.utils.*;
 import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.execute.JPPFFuture;
+import org.jppf.execute.JPPFFutureTask;
 import org.jppf.management.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;

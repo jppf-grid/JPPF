@@ -27,6 +27,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.scheduling.*;
@@ -82,7 +83,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   /**
    * A priority queue holding broadcast jobs that could not be sent due to no available connection. 
    */
-  private final PriorityBlockingQueue<ClientJob> pendingBroadcasts = new PriorityBlockingQueue<ClientJob>(16, new ClientJobPriorityComparator());
+  private final PriorityBlockingQueue<ClientJob> pendingBroadcasts = new PriorityBlockingQueue<ClientJob>(16, new JobPriorityComparator());
 
   /**
    * Initialize this queue.
@@ -112,14 +113,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       {
         ClientJob other = jobMap.get(jobUuid);
         if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
-//      {
-//        other.merge(bundleWrapper.getTasks(), false);
-//        if (debugEnabled) log.debug("re-submitting bundle with " + bundleWrapper);
-////        bundle.setParameter(BundleParameter.REAL_TASK_COUNT, bundleWrapper.getTaskCount());
-//        fireQueueEvent(new QueueEvent(this, other, true));
-//      }
-//      else
-//      {
         bundleWrapper.addOnDone(new Runnable()
         {
           @Override
@@ -426,8 +419,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     Set<String> uuidSet = new HashSet<String>();
     for (ChannelWrapper connection : connections)
     {
-      JPPFClientConnectionStatus status = connection.getStatus();
-      if(status == JPPFClientConnectionStatus.ACTIVE || status == JPPFClientConnectionStatus.EXECUTING)
+      ExecutorStatus status = connection.getExecutionStatus();
+      if(status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
       {
         String uuid = connection.getUuid();
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))

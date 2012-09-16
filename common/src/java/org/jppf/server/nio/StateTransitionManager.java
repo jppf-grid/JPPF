@@ -1,3 +1,4 @@
+/*
  * JPPF.
  * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org

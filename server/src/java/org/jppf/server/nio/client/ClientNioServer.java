@@ -46,7 +46,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   /**
    * Reference to the driver.
    */
-  private static JPPFDriver driver = JPPFDriver.getInstance();
+  private static JPPFDriver driver;
   /**
    * 
    */
@@ -56,9 +56,12 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * Initialize this class loader server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientNioServer() throws Exception
+  public ClientNioServer(final JPPFDriver driver) throws Exception
   {
     super(NioConstants.CLIENT_SERVER);
+    if (driver == null) throw new IllegalArgumentException("driver is null");
+
+    this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 

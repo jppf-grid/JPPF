@@ -15,34 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.jppf.server.nio.nodeserver;
-
-import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.server.nio.StateTransitionManager;
-
+package org.jppf.server.submission;
 
 /**
- * Context associated with a channel serving tasks to a node.
- * @author Laurent Cohen
+ * The status of a submission.
  */
-public class RemoteNodeContext extends AbstractNodeContext
+public enum SubmissionStatus
 {
-  public RemoteNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
-    super(transitionManager);
-  }
-
   /**
-   * {@inheritDoc}.
+   * The job was just submitted.
    */
-  @Override
-  public AbstractTaskBundleMessage newMessage()
-  {
-    return new RemoteNodeMessage(sslHandler != null);
-  }
-
-  @Override
-  public boolean isLocal() {
-    return false;
-  }
+  SUBMITTED,
+  /**
+   * The job is currently in the submission queue (on the client side).
+   */
+  PENDING,
+  /**
+   * The job is being executed.
+   */
+  EXECUTING,
+  /**
+   * The job execution is complete.
+   */
+  COMPLETE,
+  /**
+   * The job execution has failed.
+   */
+  FAILED,
 }

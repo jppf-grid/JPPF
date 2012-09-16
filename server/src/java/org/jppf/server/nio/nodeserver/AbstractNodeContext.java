@@ -18,11 +18,17 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.execute.ExecutorStatus;
+import org.jppf.execute.JPPFFuture;
+import org.jppf.execute.JPPFFutureTask;
 import org.jppf.io.*;
+import org.jppf.job.JobNotificationEmitter;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
@@ -32,12 +38,12 @@ import org.jppf.utils.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
+public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements ExecutorChannel<ServerTaskBundle>
 {
   /**
    * The task bundle to send or receive.
    */
-  protected ServerJob bundle = null;
+  protected ServerTaskBundle bundle = null;
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -51,19 +57,30 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    */
   private boolean peer = false;
   /**
-   * True means the job was cancelled and the task completion listener must not be called.
-   */
-  protected boolean jobCanceled = false;
-  /**
    * Represents the node system information.
    */
-  protected JPPFSystemInformation nodeInfo = null;
+  private JPPFSystemInformation systemInfo = null;
+  /**
+   * Represents the management information.
+   */
+  private JPPFManagementInfo managementInfo = null;
+
+  private Runnable onClose = null;
+
+  /**
+   * Performs all operations that relate to channel states.
+   */
+  private final StateTransitionManager<NodeState, NodeTransition> transitionManager;
+
+  protected AbstractNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
+    this.transitionManager = transitionManager;
+  }
 
   /**
    * Get the task bundle to send or receive.
-   * @return a <code>BundleWrapper</code> instance.
+   * @return a <code>ServerJob</code> instance.
    */
-  public ServerJob getBundle()
+  public ServerTaskBundle getBundle()
   {
     return bundle;
   }
@@ -72,15 +89,27 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    * Set the task bundle to send or receive.
    * @param bundle a {@link JPPFTaskBundle} instance.
    */
-  public void setBundle(final ServerJob bundle)
+  public void setBundle(final ServerTaskBundle bundle)
   {
     this.bundle = bundle;
+
+    if(bundle != null) {
+      int bundleTaskCount = bundle.getTaskCount();
+      int jobTaskCount = bundle.getJob().getTaskCount();
+      int realTaskCount = bundle.getTasksL().size();
+      System.out.println("setBundle: Task count - bundle: " + bundleTaskCount + "\t job: " + jobTaskCount + "\t real tasks: " + realTaskCount);
+
+      if(bundleTaskCount != jobTaskCount || bundleTaskCount != realTaskCount) {
+        System.out.println("SOME PROBLEM");
+      }
+    }
   }
 
   /**
    * Get the bundler used to schedule tasks for the corresponding node.
    * @return a {@link Bundler} instance.
    */
+  @Override
   public Bundler getBundler()
   {
     return bundler;
@@ -104,51 +133,49 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
+  @Override
   public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext)
   {
-    if (this.bundler.getTimestamp() < serverBundler.getTimestamp())
+    if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
+
+    if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp())
     {
-      this.bundler.dispose();
-      if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
+      if (this.bundler != null)
+      {
+        this.bundler.dispose();
+        if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
+      }
       this.bundler = serverBundler.copy();
       if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
-      if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(nodeInfo);
+      if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);
       return true;
     }
     return false;
   }
 
   /**
-   * Resubmit a task bundle at the head of the queue. This method is invoked
-   * when a node is disconnected while it was executing a task bundle.
-   * @param bundle the task bundle to resubmit.
-   */
-  public void resubmitBundle(final ServerJob bundle)
-  {
-    JPPFDriver.getQueue().addBundle(bundle);
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
-  public void handleException(final ChannelWrapper<?> channel)
+  public void handleException(final ChannelWrapper<?> channel, final Exception exception)
   {
     if (getBundler() != null) {
       getBundler().dispose();
       if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
     }
-    NodeNioServer.closeNode(channel, this);
-    if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(((JPPFTaskBundle) bundle.getJob()).getState()))
+    if(onClose != null) onClose.run();
+    if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getJob().getState()))
     {
-      JPPFDriver.getInstance().getJobManager().jobReturned(bundle, channel);
-      ServerJob tmpWrapper = bundle;
-      bundle = null;
-      JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
-      // broadcast jobs are not resubmitted.
-      if (tmpBundle.getSLA().isBroadcastJob()) tmpBundle.fireTaskCompleted(tmpWrapper);
-      else resubmitBundle(tmpWrapper);
+      if(exception != null) exception.printStackTrace();
+//      bundle.fireJobReturned((ExecutorChannel) channel.getContext()); // todo fix
+      ServerTaskBundle tmpWrapper = bundle;
+      setBundle(null);
+      tmpWrapper.taskCompleted(new Exception(exception));
+//      JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
+//      // broadcast jobs are not resubmitted.
+//      if (tmpBundle.getSLA().isBroadcastJob()) tmpBundle.t(tmpWrapper);
+//      else resubmitBundle(tmpWrapper);
     }
   }
 
@@ -161,8 +188,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   {
     AbstractTaskBundleMessage message = newMessage();
     message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
-    message.addLocation(bundle.getDataProvider());
-    for (DataLocation dl: bundle.getTasks()) message.addLocation(dl);
+    message.addLocation(bundle.getDataProviderL());
+    for (DataLocation dl: bundle.getTasksL()) message.addLocation(dl);
+    System.out.println("serialize: Task count - bundle: " + bundle.getTaskCount() + "\t job: " + bundle.getJob().getTaskCount() + "\t real tasks: " + bundle.getTasksL().size());
     message.setBundle((JPPFTaskBundle) bundle.getJob());
     setMessage(message);
   }
@@ -171,17 +199,19 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    * Deserialize a task bundle from the message read into this buffer.
    * @return a {@link AbstractNodeContext} instance.
    * @throws Exception if an error occurs during the deserialization.
+   * @param notificationEmitter
    */
-  public BundleWrapper deserializeBundle() throws Exception
+  public ServerTaskBundle deserializeBundle(final JobNotificationEmitter notificationEmitter) throws Exception
   {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
-    BundleWrapper wrapper = new BundleWrapper(bundle);
+    List<DataLocation> tasks = new ArrayList<DataLocation>();
     if (locations.size() > 1)
     {
-      for (int i=1; i<locations.size(); i++) wrapper.addTask(locations.get(i));
+      for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
-    return wrapper;
+    return new ServerJob(notificationEmitter, bundle, null, tasks).copy(tasks.size());
+//    return new ServerJob(notificationEmitter, bundle, null, tasks);
   }
 
   /**
@@ -210,30 +240,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
   }
 
   /**
-   * Determine whether the job was canceled.
-   * @return true if the job was canceled, false otherwise.
-   */
-  public synchronized boolean isJobCanceled()
-  {
-    return jobCanceled;
-  }
-
-  /**
-   * Specify whether the job was canceled.
-   * @param jobCanceled true if the job was canceled, false otherwise.
-   */
-  public synchronized void setJobCanceled(final boolean jobCanceled)
-  {
-    this.jobCanceled = jobCanceled;
-  }
-
-  /**
    * Get the node system information.
    * @return a {@link JPPFSystemInformation} instance.
    */
-  public JPPFSystemInformation getNodeInfo()
+  @Override
+  public JPPFSystemInformation getSystemInfo()
   {
-    return nodeInfo;
+    return systemInfo;
   }
 
   /**
@@ -242,6 +255,83 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState>
    */
   public void setNodeInfo(final JPPFSystemInformation nodeInfo)
   {
-    this.nodeInfo = nodeInfo;
+    setNodeInfo(nodeInfo, false);
+  }
+
+  public void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update)
+  {
+//    if (update && debugEnabled) log.debug("updating node information for " + info + ", channel=" + channel);
+    this.systemInfo = nodeInfo;
+    if(update && managementInfo != null) managementInfo.setSystemInfo(nodeInfo);
+  }
+
+  /**
+   * Get the management information.
+   * @return a {@link JPPFManagementInfo} instance.
+   */
+  @Override
+  public JPPFManagementInfo getManagementInfo()
+  {
+    return managementInfo;
+  }
+
+  /**
+   * Set the management information.
+   * @param managementInfo a {@link JPPFManagementInfo} instance.
+   */
+  public void setManagementInfo(final JPPFManagementInfo managementInfo)
+  {
+    this.managementInfo = managementInfo;
+  }
+
+  @Override
+  public ExecutorStatus getExecutionStatus() {
+    switch (getState()) {
+      case IDLE:
+        if (getChannel().isOpen())
+          return ExecutorStatus.ACTIVE;
+        else
+          return ExecutorStatus.FAILED;
+      case SENDING_BUNDLE:
+        return ExecutorStatus.EXECUTING;
+      case WAITING_RESULTS:
+        return ExecutorStatus.EXECUTING;
+      default:
+        return ExecutorStatus.DISABLED;
+    }
+  }
+
+  @Override
+  public void close() throws Exception {
+    getChannel().close();
+  }
+
+  @Override
+  public Object getMonitor() {
+    return getChannel();
+  }
+
+  @Override
+  public JPPFFuture<?> submit(final ServerTaskBundle bundleWrapper) {
+    JPPFFuture<?> future = new JPPFFutureTask<Object>(new Runnable() {
+      @Override
+      public void run() {
+        //To change body of implemented methods use File | Settings | File Templates.
+      }
+    }, null);
+    setBundle(bundleWrapper);
+    transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING);
+//    bundleWrapper.jobDispatched(getChannel(), future);
+    if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
+
+    return future;
+  }
+
+  public Runnable getOnClose() {
+    return onClose;
+  }
+
+  public void setOnClose(final Runnable onClose) {
+    this.onClose = onClose;
   }
 }

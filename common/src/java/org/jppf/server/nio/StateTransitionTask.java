@@ -91,7 +91,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
       String msg = "error on channel " + channel + " : " + ExceptionUtils.getMessage(e);
       if (debugEnabled) log.debug(msg, e);
       else log.warn(msg);
-      ctx.handleException(channel);
+      ctx.handleException(channel, e);
     }
   }
 }

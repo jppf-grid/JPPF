@@ -44,17 +44,29 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
   /**
    * Reference to the driver.
    */
-  protected static JPPFDriver driver = JPPFDriver.getInstance();
+  protected final JPPFDriver driver;
 
   /**
    * Initialize this class server.
    * @param name the name given to this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClassNioServer(final String name) throws Exception
+  public ClassNioServer(final String name, final JPPFDriver driver) throws Exception
   {
     super(name);
+    if (driver == null) throw new IllegalArgumentException("driver is null");
+
+    this.driver = driver;
     selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
+  }
+
+  /**
+   * Get the soft cache of classes downloaded form the clients r from this driver's classpath.
+   * @return an instance of {@link ClassCache}.
+   */
+  public ClassCache getClassCache()
+  {
+    return driver.getInitializer().getClassCache();
   }
 
   /**

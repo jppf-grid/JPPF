@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.client.balancer.utils;
+package org.jppf.execute;
 
 import java.util.concurrent.Future;
 
@@ -33,13 +33,6 @@ public interface JPPFFuture<V> extends Future<V>
    * @throws IllegalArgumentException when listener is null.
    */
   void addListener(final Listener listener);
-
-  /**
-   * Add a future done listener to this future's list of listeners.
-   * @param listener the listener to remove from the list.
-   * @throws IllegalArgumentException when listener is null.
-   */
-  void removeListener(final Listener listener);
 
   /**
    * Instances of this interface listen transition of Future to done state.

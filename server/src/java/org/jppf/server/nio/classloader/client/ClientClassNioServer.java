@@ -55,9 +55,9 @@ public class ClientClassNioServer extends ClassNioServer
    * Initialize this class server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientClassNioServer() throws Exception
+  public ClientClassNioServer(final JPPFDriver driver) throws Exception
   {
-    super(NioConstants.CLIENT_CLASS_SERVER);
+    super(NioConstants.CLIENT_CLASS_SERVER, driver);
   }
 
   /**

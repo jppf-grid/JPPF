@@ -231,8 +231,8 @@ class ResourceCache
    */
   public synchronized void close()
   {
-    alive = false;
-    SystemUtils.removeShutdownHook("ResourceCache-" + uuid);
+//    alive = false;
+//    SystemUtils.removeShutdownHook("ResourceCache-" + uuid);
     new ShutdownHook(tempFolders).run();
   }
 

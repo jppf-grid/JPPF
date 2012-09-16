@@ -32,7 +32,7 @@ class BundleIterator implements Iterator<ServerJob>
   /**
    * Iterator over the entries in the priority map.
    */
-  private Iterator<Map.Entry<JPPFPriority, List<ServerJob>>> entryIterator = null;
+  private Iterator<Map.Entry<Integer, List<ServerJob>>> entryIterator;
   /**
    * Iterator over the task bundles in the map entry specified by <code>entryIterator</code>.
    */
@@ -47,7 +47,7 @@ class BundleIterator implements Iterator<ServerJob>
    * @param priorityMap the map of prioritized jobs.
    * @param lock used to synchronize with the queue.
    */
-  public BundleIterator(final TreeMap<JPPFPriority, List<ServerJob>> priorityMap, final ReentrantLock lock)
+  public BundleIterator(final TreeMap<Integer, List<ServerJob>> priorityMap, final ReentrantLock lock)
   {
     if (priorityMap == null) throw new IllegalArgumentException("priorityMap is null");
     if (lock == null) throw new IllegalArgumentException("lock is null");

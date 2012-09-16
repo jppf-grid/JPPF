@@ -96,6 +96,9 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   protected void fireQueueEvent(final QueueEvent event)
   {
+    if (!event.isRequeued()) event.getBundleWrapper().fireJobQueued();
+    else event.getBundleWrapper().fireJobUpdated();
+
     synchronized(queueListeners)
     {
       for (QueueListener listener : queueListeners) listener.newBundle(event);
