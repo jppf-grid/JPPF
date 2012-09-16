@@ -98,6 +98,6 @@ public class JcaSubmissionManager extends SubmissionManagerClient
    */
   public Collection<String> getAllSubmissionIds()
   {
-    return Collections.unmodifiableSet(new HashSet(submissionMap.keySet()));
+    return Collections.unmodifiableSet(new HashSet<String>(submissionMap.keySet()));
   }
 }
