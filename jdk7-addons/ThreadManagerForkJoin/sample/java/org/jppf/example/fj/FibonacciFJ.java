@@ -37,7 +37,7 @@ public class FibonacciFJ
   /**
    *
    */
-  public static final int N     = 5;
+  public static final int N     = 10;
 
   /**
    * Main method for demonstration of fork join support
@@ -62,7 +62,7 @@ public class FibonacciFJ
       long dur = System.nanoTime();
       client.submit(job);
       dur = System.nanoTime() - dur;
-      System.out.printf("Job done in %sms%n", dur / 1000000.0);
+      System.out.printf("Job done in %.3f ms%n", dur / 1000000.0);
 
       for (JPPFTask task : job.getResults().getAll())
       {
