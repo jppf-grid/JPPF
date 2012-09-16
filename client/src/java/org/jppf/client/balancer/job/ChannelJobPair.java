@@ -29,6 +29,11 @@ import org.jppf.utils.Pair;
 public class ChannelJobPair extends Pair<ChannelWrapper, ClientTaskBundle>
 {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this object with the specified parameters.
    * @param first  - the first object of this pair.
    * @param second - the second object of this pair.

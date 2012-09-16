@@ -45,7 +45,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @return the number of nodes.
    * @throws Exception if any error occurs.
    */
-  Integer nbNodes() throws Exception;;
+  Integer nbNodes() throws Exception;
   /**
    * Request the JMX connection information for all the nodes attached to the server.
    * @return a collection of <code>NodeManagementInfo</code> instances.
@@ -92,7 +92,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @return the number of idle nodes.
    * @throws Exception if any error occurs.
    */
-  Integer nbIdleNodes() throws Exception;;
+  Integer nbIdleNodes() throws Exception;
   /**
    * Request the JMX connection information for all the idle nodes attached to the server.
    * @return a collection of <code>NodeManagementInfo</code> instances.

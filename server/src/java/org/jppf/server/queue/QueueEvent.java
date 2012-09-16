@@ -75,7 +75,7 @@ public class QueueEvent extends EventObject
 
   /**
    * Get the task bundle that is the cause of the event.
-   * @return  an instance of <code>BundleWrapper</code>.
+   * @return  an instance of <code>ServerJob</code>.
    */
   public ServerJob getBundleWrapper()
   {

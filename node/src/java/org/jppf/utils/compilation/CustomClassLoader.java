@@ -107,7 +107,7 @@ class CustomClassLoader extends URLClassLoader
   }
 
   /**
-   * Determine whther this class loader already has the specified url in its classpath.
+   * Determine whether this class loader already has the specified url in its classpath.
    * @param url the URL to check.
    * @return <code>true</code> if the URL already exists in this class loader's classpath, <code>false</code> otherwise.
    */

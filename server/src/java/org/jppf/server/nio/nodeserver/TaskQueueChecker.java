@@ -42,11 +42,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(TaskQueueChecker.class);
+  private static final Logger log = LoggerFactory.getLogger(TaskQueueChecker.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether TRACE logging level is enabled.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Random number generator used to randomize the choice of idle channel.
    */

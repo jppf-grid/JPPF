@@ -40,7 +40,7 @@ class BundleIterator implements Iterator<ServerJob>
   /**
    * Used for synchronized access to the queue.
    */
-  private ReentrantLock lock = new ReentrantLock();
+  private final ReentrantLock lock;
 
   /**
    * Initialize this iterator.
@@ -49,6 +49,9 @@ class BundleIterator implements Iterator<ServerJob>
    */
   public BundleIterator(final TreeMap<JPPFPriority, List<ServerJob>> priorityMap, final ReentrantLock lock)
   {
+    if (priorityMap == null) throw new IllegalArgumentException("priorityMap is null");
+    if (lock == null) throw new IllegalArgumentException("lock is null");
+
     this.lock = lock;
     lock.lock();
     try

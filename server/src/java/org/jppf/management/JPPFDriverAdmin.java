@@ -42,7 +42,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFDriverAdmin.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFDriverAdmin.class);
   /**
    * Determines whether debug log statements are enabled.
    */
@@ -62,7 +62,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   /**
    * Synchronization lock.
    */
-  private Object loadBalancingInformationLock = new Object();
+  private final Object loadBalancingInformationLock = new Object();
 
   @Override
   public Integer nbNodes() throws Exception

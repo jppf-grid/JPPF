@@ -82,5 +82,5 @@ public enum ClassTransition
   /**
    * Waiting for the initial response from a peer server
    */
-  TO_WAITING_PEER_INITIATION_RESPONSE;
+  TO_WAITING_PEER_INITIATION_RESPONSE
 }

@@ -36,11 +36,11 @@ class ShutdownRestartTask extends TimerTask
   /**
    * Determines whether the server should restart after shutdown is complete.
    */
-  private boolean restart = true;
+  private final boolean restart;
   /**
    * Delay, starting from shutdown completion, after which the server is restarted.
    */
-  private long restartDelay = 0L;
+  private final long restartDelay;
   /**
    * The timer used to schedule this task, and eventually the restart operation.
    */

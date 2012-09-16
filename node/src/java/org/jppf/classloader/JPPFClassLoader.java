@@ -51,7 +51,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    */
   private static SocketInitializer socketInitializer = new SocketInitializerImpl();
   /**
-   * Detrmines whteher SSL is enabled.
+   * Detrmines whether SSL is enabled.
    */
   private static boolean sslEnabled = false;
 

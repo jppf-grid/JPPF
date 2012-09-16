@@ -46,7 +46,7 @@ class PeerResourceProvider
    */
   private boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Determines whther ssl is enabled for peer-to-peer cpmmunication between servers.
+   * Determines whether ssl is enabled for peer-to-peer cpmmunication between servers.
    */
   private static boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
   /**

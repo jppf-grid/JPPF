@@ -1,4 +1,3 @@
-/*
  * JPPF.
  * Copyright (C) 2005-2012 JPPF Team.
  * http://www.jppf.org
@@ -128,7 +127,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   /**
    * Transition the specified channel to the specified state.
    * @param channel the key holding the channel and associated context.
-   * @param submit specifies whther the transition should be submitted immediately,
+   * @param submit specifies whether the transition should be submitted immediately,
    * or if we should wait for the server to submit it.
    * @param transition holds the new state of the channel and associated key ops.
    */

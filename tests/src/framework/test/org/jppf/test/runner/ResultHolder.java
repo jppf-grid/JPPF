@@ -259,7 +259,7 @@ public class ResultHolder implements Serializable
   }
 
   /**
-   * Determine whther this result holder already has the specified test.
+   * Determine whether this result holder already has the specified test.
    * @param desc the description of th etest to look for.
    * @return <code>true</code> if the test already exists, <code>false</code> otherwise.
    */

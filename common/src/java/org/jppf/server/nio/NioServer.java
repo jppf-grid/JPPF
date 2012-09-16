@@ -480,7 +480,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   }
 
   /**
-   * Determines whther the specified channel is in an idle state.
+   * Determines whether the specified channel is in an idle state.
    * @param channel the channel to check.
    * @return <code>true</code> if the channel is idle, <code>false</code> otherwise.
    */

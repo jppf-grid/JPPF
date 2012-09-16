@@ -397,7 +397,7 @@ public abstract class AbstractClientJob
   }
 
   /**
-   * Determine whther this job can be sent to the specified channel.
+   * Determine whether this job can be sent to the specified channel.
    * Currently this method only accepts a single remote channel, and it has to always be the same for the same job.
    * See {@link #remoteChannel}.
    * @param channel the channel to check for acceptance.

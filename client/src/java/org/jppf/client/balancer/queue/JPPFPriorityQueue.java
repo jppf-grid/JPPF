@@ -572,7 +572,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * Process the jobs in the pending braodcasts queue.
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
-  void processPendingBroadcasts() {
+  public void processPendingBroadcasts() {
     if (!submissionManager.hasWorkingConnection()) return;
     ClientJob clientJob;
     while ((clientJob = pendingBroadcasts.poll()) != null)

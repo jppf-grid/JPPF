@@ -29,6 +29,11 @@ import org.jppf.utils.Pair;
 public class ChannelJobPair extends Pair<ChannelWrapper<?>, ServerJob>
 {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Initialize this object with the specified parameters.
    * @param first - the first object of this pair.
    * @param second - the second object of this pair.
@@ -42,7 +47,7 @@ public class ChannelJobPair extends Pair<ChannelWrapper<?>, ServerJob>
    * Indicates whether some other object is "equal to" this one.
    * @param obj - the reference object with which to compare.
    * @return <code>true</code> if this object is the same as the obj.
-   * @see java.lang.Object#equals(java.lang.Object)
+   * @see Object#equals(Object)
    */
   @Override
   public boolean equals(final Object obj)

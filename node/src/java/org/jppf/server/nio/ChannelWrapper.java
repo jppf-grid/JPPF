@@ -93,13 +93,13 @@ public interface ChannelWrapper<S>
 
   /**
    * Get the selector associated with this channel.
-   * @return a {@link LocalChannelSelector} instance.
+   * @return a {@link ChannelSelector} instance.
    */
   ChannelSelector getSelector();
 
   /**
    * Set the selector associated with this channel.
-   * @param selector a {@link LocalChannelSelector} instance.
+   * @param selector a {@link ChannelSelector} instance.
    */
   void setSelector(ChannelSelector selector);
 

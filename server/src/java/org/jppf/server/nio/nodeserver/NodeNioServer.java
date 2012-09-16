@@ -44,15 +44,15 @@ public final class NodeNioServer extends NioServer<NodeState, NodeTransition> im
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NodeNioServer.class);
+  private static final Logger log = LoggerFactory.getLogger(NodeNioServer.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether TRACE logging level is enabled.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * The algorithm that dynamically computes the task bundle size.
    */

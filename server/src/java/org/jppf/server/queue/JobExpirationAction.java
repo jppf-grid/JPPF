@@ -43,7 +43,7 @@ class JobExpirationAction implements Runnable
   /**
    * The bundle wrapper encapsulating the job.
    */
-  private ServerJob bundleWrapper = null;
+  private final ServerJob bundleWrapper;
 
   /**
    * Initialize this action with the specified bundle wrapper.
@@ -51,12 +51,14 @@ class JobExpirationAction implements Runnable
    */
   public JobExpirationAction(final ServerJob bundleWrapper)
   {
+    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+
     this.bundleWrapper = bundleWrapper;
   }
 
   /**
    * Execute this action.
-   * @see java.lang.Runnable#run()
+   * @see Runnable#run()
    */
   @Override
   public void run()

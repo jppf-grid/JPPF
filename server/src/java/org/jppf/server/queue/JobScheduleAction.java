@@ -38,7 +38,7 @@ class JobScheduleAction implements Runnable
   /**
    * The bundle wrapper encapsulating the job.
    */
-  private ServerJob bundleWrapper = null;
+  private final ServerJob bundleWrapper;
 
   /**
    * Initialize this action with the specified bundle wrapper.
@@ -46,6 +46,8 @@ class JobScheduleAction implements Runnable
    */
   public JobScheduleAction(final ServerJob bundleWrapper)
   {
+    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+
     this.bundleWrapper = bundleWrapper;
   }
 

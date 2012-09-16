@@ -20,14 +20,13 @@ package org.jppf.example.loadbalancer.server;
 
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.protocol.JobMetadata;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
  * This implementation of a load-balancing algorithm illustrates the use of
- * the {@link NodeAwareness} and {@link JobAwereness} APIs, allowing the algorithm to work
+ * the {@link NodeAwareness} and {@link JobAwareness} APIs, allowing the algorithm to work
  * based on known information about the nodes and the jobs.
  * <p>In this implementation, we assume each job provides the following metadata:
  * <ul>
@@ -38,7 +37,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness, JobAwareness
+public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness, JobAwareness, ContextAwareness
 {
   /**
    * Logger for this class.
@@ -56,6 +55,10 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
    * The current number of tasks to send to the node.
    */
   private int bundleSize = 1;
+  /**
+   * Holds information about the execution context.
+   */
+  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the specified parameters profile.
@@ -121,12 +124,12 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   @Override
   protected int maxSize()
   {
-    return JPPFDriver.getQueue() == null ? 300 : JPPFDriver.getQueue().getMaxBundleSize();
+    return jppfContext == null ? 300 : jppfContext.getMaxBundleSize();
   }
 
   /**
    * Get the current job's metadata.
-   * @return a {@link JPPFJobMetadata} instance.
+   * @return a {@link JobMetadata} instance.
    * @see org.jppf.server.scheduler.bundle.JobAwareness#getJobMetadata()
    */
   @Override
@@ -137,8 +140,8 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 
   /**
    * Set the current job's metadata.
-   * @param metadata a {@link JPPFJobMetadata} instance.
-   * @see org.jppf.server.scheduler.bundle.JobAwareness#setJobMetadata(org.jppf.server.protocol.JPPFJobMetadata)
+   * @param metadata a {@link JobMetadata} instance.
+   * @see org.jppf.server.scheduler.bundle.JobAwareness#setJobMetadata(JobMetadata)
    */
   @Override
   public void setJobMetadata(final JobMetadata metadata)
@@ -205,5 +208,17 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
     if (log.isDebugEnabled()) log.debug("disposing bundler #" + this.bundlerNumber);
     this.jobMetadata = null;
     this.nodeConfiguration = null;
+  }
+
+  @Override
+  public JPPFContext getJPPFContext()
+  {
+    return jppfContext;
+  }
+
+  @Override
+  public void setJPPFContext(final JPPFContext context)
+  {
+    this.jppfContext = context;
   }
 }

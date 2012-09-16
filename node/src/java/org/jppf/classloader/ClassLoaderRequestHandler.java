@@ -83,6 +83,8 @@ public class ClassLoaderRequestHandler
    */
   public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource)
   {
+    if (resource == null) throw new IllegalArgumentException("resource is null");
+
     resource.preProcess();
     Future<JPPFResourceWrapper> f;
     synchronized(periodicTask)

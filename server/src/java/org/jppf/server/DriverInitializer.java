@@ -409,7 +409,7 @@ public class DriverInitializer
    * @param def the default port number to use if none is specified or valid.
    * @return an array of int port numbers.
    */
-  private int[] parsePorts(final String s, final int def)
+  private static int[] parsePorts(final String s, final int def)
   {
     String[] strPorts = s.split("\\s");
     List<Integer> portsList = new ArrayList<Integer>(strPorts.length);
