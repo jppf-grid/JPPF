@@ -76,9 +76,6 @@ public class LocalNodeIO extends AbstractNodeIO
     node.initHelper();
   }
 
-  /**
-   * {@inheritDoc}.
-   */
   @Override
   protected Object[] deserializeObjects() throws Exception
   {
@@ -101,9 +98,6 @@ public class LocalNodeIO extends AbstractNodeIO
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
   {
@@ -118,6 +112,7 @@ public class LocalNodeIO extends AbstractNodeIO
       {
         JPPFLocalContainer cont = (JPPFLocalContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
+        node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.setCurrentMessage(currentMessage);
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
       }
@@ -140,9 +135,6 @@ public class LocalNodeIO extends AbstractNodeIO
     return list.toArray(new Object[list.size()]);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
   {

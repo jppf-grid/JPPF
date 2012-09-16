@@ -63,9 +63,6 @@ public class RemoteNodeIO extends AbstractNodeIO
     this.socketWrapper = node.getSocketWrapper();
   }
 
-  /**
-   * {@inheritDoc}.
-   */
   @Override
   protected Object[] deserializeObjects() throws Exception
   {
@@ -75,9 +72,6 @@ public class RemoteNodeIO extends AbstractNodeIO
     return deserializeObjects(bundle);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
   {
@@ -92,6 +86,7 @@ public class RemoteNodeIO extends AbstractNodeIO
       {
         JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
         cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
+        node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
       }
       else

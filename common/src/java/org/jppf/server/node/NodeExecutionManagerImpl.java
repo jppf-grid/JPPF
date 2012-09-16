@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
@@ -102,6 +103,10 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * Determines whether the current job has been cancelled.
    */
   private boolean jobCancelled = false;
+  /**
+   * The class loader used to load the tasks and the classes they need from the client.
+   */
+  private AbstractJPPFClassLoader taskClassLoader = null;
 
   /**
    * Initialize this execution manager with the specified node.
@@ -199,8 +204,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   public synchronized long performTask(final Task task) throws Exception
   {
     long number = incTaskCount();
-    ClassLoader classLoader = (node instanceof ClassLoaderProvider) ? ((ClassLoaderProvider)node).getClassLoader(uuidList) : null;
-    NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, number, classLoader);
+    NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, number, taskClassLoader);
     taskMap.put(number, taskWrapper);
 
     Future<?> f = getExecutor().submit(taskWrapper);
@@ -316,21 +320,34 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * @param bundle the bundle whose tasks are to be executed.
    * @param taskList the list of tasks to execute.
    */
+  @SuppressWarnings("unchecked")
   public void setup(final JPPFTaskBundle bundle, final List<? extends Task> taskList)
   {
     this.bundle = bundle;
     this.taskList = taskList;
     this.uuidList = bundle.getUuidPath().getList();
+    try
+    {
+      taskClassLoader = (AbstractJPPFClassLoader) ((node instanceof ClassLoaderProvider) ? ((ClassLoaderProvider)node).getClassLoader(uuidList) : null);
+    }
+    catch (Exception e)
+    {
+      String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
+      if (debugEnabled) log.debug(msg, e);
+      else log.warn(msg);
+    }
     taskCount = new AtomicLong(0L);
-    node.getLifeCycleEventHandler().fireJobStarting();
+    node.getLifeCycleEventHandler().fireJobStarting(bundle, taskClassLoader, (List<Task>) taskList);
   }
 
   /**
    * Cleanup method invoked when all tasks for the current bundle have completed.
    */
+  @SuppressWarnings("unchecked")
   public void cleanup()
   {
-    node.getLifeCycleEventHandler().fireJobEnding();
+    node.getLifeCycleEventHandler().fireJobEnding(bundle, taskClassLoader, (List<Task>) taskList);
+    taskClassLoader = null;
     this.bundle = null;
     this.taskList = null;
     this.uuidList = null;

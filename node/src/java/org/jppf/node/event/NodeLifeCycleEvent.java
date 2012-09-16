@@ -20,7 +20,8 @@ package org.jppf.node.event;
 
 import java.util.*;
 
-import org.jppf.node.NodeExecutionManager;
+import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.node.*;
 import org.jppf.node.protocol.*;
 
 /**
@@ -30,12 +31,50 @@ import org.jppf.node.protocol.*;
 public class NodeLifeCycleEvent extends EventObject
 {
   /**
-   * Initialize this event with the specified execution manager.
-   * @param executionManager the execution that handles the execution of tasks by a node.
+   * The class loader used to load the tasks and the classes they need from the client.
    */
-  public NodeLifeCycleEvent(final NodeExecutionManager executionManager)
+  private final AbstractJPPFClassLoader cl;
+  /**
+   * The tasks currently being executed.
+   */
+  private final List<Task> tasks;
+
+  /**
+   * Initialize this event with the specified execution manager.
+   * @param node an object representing the JPPF node.
+   * If the {@link NodeLifeCycleListener} was deployed in the server's classpath,
+   * then it can be safely cast to a <code>org.jppf.server.node.JPPFNode</code> instance.
+   */
+  public NodeLifeCycleEvent(final Node node)
   {
-    super(executionManager);
+    super(node);
+    this.cl = null;
+    this.tasks = null;
+  }
+
+  /**
+   * Initialize this event with the specified job, task class loader and tasks.
+   * @param job the job that is about to be or has been executed.
+   * @param cl the class loader used to load the tasks and the classes they need from the client.
+   * @param tasks the tasks about to be or which have been executed.
+   */
+  public NodeLifeCycleEvent(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks)
+  {
+    super(job);
+    this.cl = cl;
+    this.tasks = tasks;
+  }
+
+  /**
+   * Get the object representing the current JPPF node.
+   * @return a {@link Node} instance, or null if this event isn't part of a <code>nodeStarting()</code> or <code>nodeEnding()</code> notification.
+   * If the {@link NodeLifeCycleListener} was deployed in the server's classpath,
+   * then this return value can be safely cast to a <code>org.jppf.server.node.JPPFNode</code> instance.
+   */
+  public Node getNode()
+  {
+    Object o = getSource();
+    return (o instanceof Node) ? (Node) o : null;
   }
 
   /**
@@ -44,7 +83,8 @@ public class NodeLifeCycleEvent extends EventObject
    */
   public JPPFDistributedJob getJob()
   {
-    return ((NodeExecutionManager) getSource()).getCurrentJob();
+    Object o = getSource();
+    return (o instanceof JPPFDistributedJob) ? (JPPFDistributedJob) o : null;
   }
 
   /**
@@ -53,6 +93,17 @@ public class NodeLifeCycleEvent extends EventObject
    */
   public List<Task> getTasks()
   {
-    return ((NodeExecutionManager) getSource()).getTasks();
+    return tasks;
+  }
+
+  /**
+   * Get the class loader used to load the tasks and the classes they need from the client.
+   * <br>This method is only relevant the <code>NodeLifeCycleListener</code>'s <code>jobHeaderLoaded()</code>, <code>jobStarting()</code> and <code>jobEnding()</code> notifications.
+   * It will return <code>null</code> in all other cases.
+   * @return an instance of <code>AbstractJPPFClassLoader</code>.
+   */
+  public AbstractJPPFClassLoader getTaskClassLoader()
+  {
+    return cl;
   }
 }

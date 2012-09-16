@@ -92,7 +92,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   {
     uuid = NodeRunner.getUuid();
     executionManager = new NodeExecutionManagerImpl(this);
-    lifeCycleEventHandler = new LifeCycleEventHandler(executionManager);
+    lifeCycleEventHandler = new LifeCycleEventHandler(this);
   }
 
   /**
@@ -480,9 +480,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     return lifeCycleEventHandler;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception
   {

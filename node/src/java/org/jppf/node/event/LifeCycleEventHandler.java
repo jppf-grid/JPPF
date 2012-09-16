@@ -20,7 +20,9 @@ package org.jppf.node.event;
 
 import java.util.*;
 
-import org.jppf.node.NodeExecutionManager;
+import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.node.Node;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.ServiceFinder;
 import org.slf4j.*;
 
@@ -48,15 +50,15 @@ public class LifeCycleEventHandler
   /**
    * The object that manages the job executions for the node.
    */
-  private NodeExecutionManager executionManager = null;
+  private final Node node;
 
   /**
    * Initialize this event handler with the specified execution manager.
-   * @param executionManager the object that manages the job executions for the node.
+   * @param node an object representing the JPPF node.
    */
-  public LifeCycleEventHandler(final NodeExecutionManager executionManager)
+  public LifeCycleEventHandler(final Node node)
   {
-    this.executionManager = executionManager;
+    this.node = node;
   }
 
   /**
@@ -101,7 +103,7 @@ public class LifeCycleEventHandler
    */
   public void fireNodeStarting()
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners) listener.nodeStarting(event);
@@ -113,7 +115,7 @@ public class LifeCycleEventHandler
    */
   public void fireNodeEnding()
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners) listener.nodeEnding(event);
@@ -121,11 +123,31 @@ public class LifeCycleEventHandler
   }
 
   /**
-   * Notify all listeners that the node is starting a job.
+   * Notify all listeners that the node has loaded a job header and before the <code>DataProvider</code> or any of the tasks has been loaded..
+   * @param job the job that is about to be or has been executed.
+   * @param cl the class loader used to load the tasks and the classes they need from the client.
    */
-  public void fireJobStarting()
+  public void fireJobHeaderLoaded(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, null);
+    synchronized (listeners)
+    {
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        if (listener instanceof NodeLifeCycleListenerEx) ((NodeLifeCycleListenerEx) listener).jobHeaderLoaded(event);
+      }
+    }
+  }
+
+  /**
+   * Notify all listeners that the node is starting a job.
+   * @param job the job that is about to be or has been executed.
+   * @param cl the class loader used to load the tasks and the classes they need from the client.
+   * @param tasks the tasks about to be or which have been executed.
+   */
+  public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks)
+  {
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners) listener.jobStarting(event);
@@ -134,10 +156,13 @@ public class LifeCycleEventHandler
 
   /**
    * Notify all listeners that the node is completing a job.
+   * @param job the job that is about to be or has been executed.
+   * @param cl the class loader used to load the tasks and the classes they need from the client.
+   * @param tasks the tasks about to be or which have been executed.
    */
-  public void fireJobEnding()
+  public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(executionManager);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners) listener.jobEnding(event);

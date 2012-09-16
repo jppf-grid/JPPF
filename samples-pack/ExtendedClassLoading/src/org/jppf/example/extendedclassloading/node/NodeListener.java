@@ -36,7 +36,7 @@ import org.slf4j.*;
  * based on the metadata provided by the jobs.
  * @author Laurent Cohen
  */
-public class NodeListener implements NodeLifeCycleListener
+public class NodeListener implements NodeLifeCycleListenerEx
 {
   /**
    * Logger for this class.
@@ -112,18 +112,18 @@ public class NodeListener implements NodeLifeCycleListener
   }
 
   /**
-   * Before the execution of a job, check its metadata and update, download or delete the managed libraries accordingly.
+   * Before the execution of a job, and before its tasks are loaded, check its metadata and update, download or delete the managed libraries accordingly.
    * {@inheritDoc}
    */
   @Override
   @SuppressWarnings("unchecked")
-  public void jobStarting(final NodeLifeCycleEvent event)
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
   {
     JPPFDistributedJob job = event.getJob();
     output("processing metadata for job '" + job.getName() + "'");
     // if the client class loader cannot be obtained, no point in pursuing further
     List<Task> tasks = event.getTasks();
-    if ((tasks == null) || tasks.isEmpty())
+    if (event.getTaskClassLoader() == null)
     {
       output("  could not get the client class loader, aborting the update");
       return;
@@ -134,14 +134,14 @@ public class NodeListener implements NodeLifeCycleListener
     int nbUpdates = 0;
     Map<String, String> updates = (Map<String, String>) metadata.getParameter(LibraryManager.LIBS_TO_UPDATE);
     if ((updates == null) || updates.isEmpty()) output("  no library updates found");
-    else nbUpdates = doUpdates(updates, tasks);
+    else nbUpdates = doUpdates(updates, event.getTaskClassLoader());
 
     // now process the libraries to remove
     int nbDeletes = 0;
     List<String> deletes = (List<String>) metadata.getParameter(LibraryManager.LIBS_TO_DELETE);
     if ((deletes == null) || deletes.isEmpty())  output("  no library to remove");
     else nbDeletes = doDeletes(deletes);
- 
+
     if (nbUpdates + nbDeletes > 0)
     {
       libraryManager.storeIndex();
@@ -152,9 +152,11 @@ public class NodeListener implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  public void jobStarting(final NodeLifeCycleEvent event)
+  {
+  }
+
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {
@@ -176,10 +178,10 @@ public class NodeListener implements NodeLifeCycleListener
   /**
    * Perform the specified library updates.
    * @param updates a mapping of libraries to update or add to the classpath to their corresponding MD5 signature.
-   * @param tasks the tasks from which to obtain the client class loader.
+   * @param clientCL the class laoder used to load the tasks and the classes they need from the client.
    * @return the number of libraries that were actually updated or added.
    */
-  private int doUpdates(final Map<String, String> updates, final List<Task> tasks)
+  private int doUpdates(final Map<String, String> updates, final AbstractJPPFClassLoader clientCL)
   {
     // filter out libraries with matching signature: they don't need to be updated
     List<String> libsToUpdate = libraryManager.computeUpdatesList(updates);
@@ -207,8 +209,6 @@ public class NodeListener implements NodeLifeCycleListener
           filesToDelete.add(libraryManager.getLibFileName(name, oldSignature));
         }
       }
-      // get a reference to the client class loader, which is used to load the tasks classes
-      AbstractJPPFClassLoader clientCL = (AbstractJPPFClassLoader) tasks.get(0).getTaskObject().getClass().getClassLoader();
       libraryManager.processUpdates(libsToUpdate, clientCL);
     }
     return libsToUpdate.size();
@@ -249,7 +249,7 @@ public class NodeListener implements NodeLifeCycleListener
     }
     return nbDeletes;
   }
- 
+
   /**
    * Load the list of old libraries to delete from the file system.
    */
@@ -265,7 +265,7 @@ public class NodeListener implements NodeLifeCycleListener
     {
     }
   }
- 
+
   /**
    * Save the list of old libraries to delete from the file system.
    */
@@ -285,7 +285,7 @@ public class NodeListener implements NodeLifeCycleListener
       StreamUtils.closeSilent(writer);
     }
   }
- 
+
   /**
    * Delete the old libraries if possible.
    */
@@ -299,7 +299,7 @@ public class NodeListener implements NodeLifeCycleListener
       if (!file.exists() || file.delete()) it.remove();
     }
   }
- 
+
   /**
    * Restart the node and cancel the specified job.
    * @param job the job to cancel.

@@ -18,6 +18,8 @@
 
 package org.jppf.example.extendedclassloading.client;
 
+import org.jppf.example.extendedclassloading.clientlib1.MyClientDynamicClass1;
+import org.jppf.example.extendedclassloading.clientlib2.MyClientDynamicClass2;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -27,18 +29,13 @@ import org.jppf.server.protocol.JPPFTask;
  */
 public class MyTask extends JPPFTask
 {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
     try
     {
-      // we use the fully qualified name of the class to avoid having an import statement,
-      // otherwise, this would cause a NoClassDefFoundError when loading this class
-      new org.jppf.example.extendedclassloading.clientlib1.MyClientDynamicClass1().printHello();
-      new org.jppf.example.extendedclassloading.clientlib2.MyClientDynamicClass2().printHello();
+      new MyClientDynamicClass1().printHello();
+      new MyClientDynamicClass2().printHello();
       setResult("Successful execution");
     }
     catch (Exception e)
