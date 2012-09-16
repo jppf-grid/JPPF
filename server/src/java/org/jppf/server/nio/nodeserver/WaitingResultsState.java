@@ -137,7 +137,6 @@ class WaitingResultsState extends NodeServerState
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setMessage(null);
-      server.addIdleChannel(context);
       return TO_IDLE;
     }
     return TO_WAITING;

@@ -101,6 +101,7 @@ public class DriverInitializer
   /**
    * Instantiate this initializer with the specified driver.
    * @param driver the driver to initialize.
+   * @param config the driver's configuration.
    */
   public DriverInitializer(final JPPFDriver driver, final TypedProperties config)
   {

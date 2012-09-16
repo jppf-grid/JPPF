@@ -162,6 +162,9 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   public void addIdleChannel(final T channel)
   {
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
+
     if (traceEnabled) log.trace("Adding idle channel " + channel);
     int count;
     synchronized(idleChannels)

@@ -18,26 +18,17 @@
 
 package org.jppf.execute;
 
+import java.util.EventListener;
+
 /**
- * Status of the channel.
+ * Instances of this class listen to execution status change events on channels.
  * @author Martin JANDA
  */
-public enum ExecutorStatus
+public interface ExecutorChannelStatusListener extends EventListener
 {
   /**
-   * The channel is successfully connected.
+   * Invoked to notify of a executions status change event on a channel.
+   * @param event the event to notify of.
    */
-  ACTIVE,
-  /**
-   * The channel is currently executing a job.
-   */
-  EXECUTING,
-  /**
-   * The channel failed to connect and no further attempt will be made.
-   */
-  FAILED,
-  /**
-   * The channel is disabled or beeing initialized.
-   */
-  DISABLED
+  void executionStatusChanged(final ExecutorChannelStatusEvent event);
 }

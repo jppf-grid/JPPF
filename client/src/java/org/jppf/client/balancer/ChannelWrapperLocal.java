@@ -25,6 +25,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.execute.ExecutorStatus;
 import org.jppf.execute.JPPFFuture;
 import org.jppf.execute.JPPFFutureTask;
 import org.jppf.management.*;
@@ -94,47 +95,35 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     setManagementInfo(managementInfo);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getUuid()
   {
     return connectionUuid;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getConnectionUuid()
   {
     return connectionUuid;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFClientConnectionStatus getStatus()
   {
     return status;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setStatus(final JPPFClientConnectionStatus status)
   {
+    ExecutorStatus oldExecutionStatus = getExecutionStatus();
     JPPFClientConnectionStatus oldValue = this.status;
     this.status = status;
     fireStatusChanged(oldValue, this.status);
+    ExecutorStatus newExecutionStatus = getExecutionStatus();
+    fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
@@ -144,9 +133,6 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
@@ -204,9 +190,6 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     return task;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isLocal()
   {
@@ -282,26 +265,17 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SocketWrapper getSocketWrapper()
   {
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setSocketWrapper(final SocketWrapper socketWrapper)
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void stopNode()
   {
@@ -340,17 +314,11 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     return lifeCycleEventHandler;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close()
   {

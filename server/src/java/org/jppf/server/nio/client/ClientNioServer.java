@@ -54,6 +54,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
 
   /**
    * Initialize this class loader server.
+   * @param driver reference to the driver.
    * @throws Exception if the underlying server socket can't be opened.
    */
   public ClientNioServer(final JPPFDriver driver) throws Exception

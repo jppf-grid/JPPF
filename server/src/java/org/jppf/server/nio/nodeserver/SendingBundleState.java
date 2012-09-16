@@ -80,7 +80,6 @@ class SendingBundleState extends NodeServerState
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());
           context.setBundle(null);
           bundleWrapper.resubmit();
-          server.addIdleChannel(context);
           return TO_IDLE;
         }
         bundle.setExecutionStartTime(System.nanoTime());
@@ -89,7 +88,6 @@ class SendingBundleState extends NodeServerState
       else
       {
         if (debugEnabled) log.debug("null bundle for node " + channel);
-        server.addIdleChannel(context);
         return TO_IDLE;
       }
     }

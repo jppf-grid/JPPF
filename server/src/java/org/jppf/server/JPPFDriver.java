@@ -113,7 +113,9 @@ public class JPPFDriver
    * Performs initialization of the driver's components.
    */
   private DriverInitializer initializer = null;
-
+  /**
+   * Configuration for this driver.
+   */
   private final TypedProperties config;
   /**
    * Initialize this JPPFDriver.
@@ -454,7 +456,7 @@ public class JPPFDriver
   /**
    * Determine whether management is enabled and if there is an active remote connector server.
    * @return <code>true</code> if management is enabled, <code>false</code> otherwise.
-   * @param config
+   * @param config the configuration to test whether management is enabled.
    */
   private static boolean isManagementEnabled(final TypedProperties config)
   {

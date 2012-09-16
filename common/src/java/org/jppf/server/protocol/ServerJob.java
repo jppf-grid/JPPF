@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author Laurent Cohen
+ * @author Martin JANDA
  * @exclude
  */
 public class ServerJob extends AbstractServerJob
@@ -258,7 +259,8 @@ public class ServerJob extends AbstractServerJob
       {
         try {
           if(taskBundle.getTaskCount() != this.tasks.size()) {
-            taskBundle = taskBundle.copy(this.tasks.size());
+            taskBundle = taskBundle.copy();
+            taskBundle.setTaskCount(this.tasks.size());
           }
 
           return new ServerTaskBundle(this, taskBundle, this.tasks);
@@ -272,7 +274,8 @@ public class ServerJob extends AbstractServerJob
         try
         {
           if(taskBundle.getTaskCount() != nbTasks) {
-            taskBundle = taskBundle.copy(nbTasks);
+            taskBundle = taskBundle.copy();
+            taskBundle.setTaskCount(nbTasks);
           }
           return new ServerTaskBundle(this, taskBundle, subList);
         }
@@ -421,7 +424,6 @@ public class ServerJob extends AbstractServerJob
     if (exception != null) {
       exception.printStackTrace(System.out);
     }
-
 
     boolean empty;
     synchronized (bundleMap) {

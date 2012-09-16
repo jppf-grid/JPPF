@@ -94,6 +94,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   /**
    * Initialize this queue.
    * @param submissionManager reference to submission manager.
+   * @param statsManager reference to statistics manager.
    */
   public JPPFPriorityQueue(final NodeNioServer submissionManager, final JPPFDriverStatsManager statsManager)
   {
@@ -594,9 +595,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   }
 
   /**
-   *
+   * Get the job for the jobId.
    * @param jobId the uuid of the job.
-   * @return
+   * @return a <code>ServerJob</code> instance.
    */
   public ServerJob getJob(final String jobId) {
     lock.lock();

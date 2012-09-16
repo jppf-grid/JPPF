@@ -39,6 +39,7 @@ public class LocalNodeContext extends AbstractNodeContext
 
   /**
    * Default constructor.
+   * @param transitionManager instance of transion manager used by this node context.
    */
   public LocalNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager)
   {

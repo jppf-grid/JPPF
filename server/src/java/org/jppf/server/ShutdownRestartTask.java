@@ -56,9 +56,13 @@ class ShutdownRestartTask extends TimerTask
    * If set to false, then the JVM will exit.
    * @param restartDelay delay, starting from shutdown completion, after which the server is restarted.
    * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
+   * @param driver reference to the driver.
    */
   public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay, final JPPFDriver driver)
   {
+    if (timer == null) throw new IllegalArgumentException("timer is null");
+    if (driver == null) throw new IllegalArgumentException("driver is null");
+
     this.timer = timer;
     this.restart = restart;
     this.restartDelay = restartDelay;

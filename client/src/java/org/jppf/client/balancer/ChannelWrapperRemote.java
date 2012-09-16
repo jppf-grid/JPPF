@@ -74,7 +74,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     managementInfo.setSystemInfo(info);
     super.setSystemInfo(info);
     setManagementInfo(managementInfo);
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("channel-" + channel.getName() + "-"));
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("channel-" + channel.getName() + '-'));
   }
 
   @Override
@@ -88,36 +88,24 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     super.setSystemInfo(systemInfo);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getUuid()
   {
     return uuid;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getConnectionUuid()
   {
     return channel.getConnectionUuid();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFClientConnectionStatus getStatus()
   {
     return channel.getStatus();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setStatus(final JPPFClientConnectionStatus status)
   {
@@ -133,18 +121,12 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     return channel;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
     channel.addClientConnectionStatusListener(listener);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
@@ -181,9 +163,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     return task;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isLocal()
   {

@@ -18,7 +18,9 @@
 
 package org.jppf.server.queue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.server.protocol.*;
@@ -27,6 +29,7 @@ import org.slf4j.*;
 /**
  * Abstract superclass for all JPPFQueue implementations.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 public abstract class AbstractJPPFQueue implements JPPFQueue
 {
@@ -61,7 +64,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   public void addQueueListener(final QueueListener listener)
   {
-    synchronized(queueListeners)
+    synchronized (queueListeners)
     {
       queueListeners.add(listener);
     }
@@ -73,7 +76,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   public void removeQueueListener(final QueueListener listener)
   {
-    synchronized(queueListeners)
+    synchronized (queueListeners)
     {
       queueListeners.remove(listener);
     }
@@ -96,10 +99,15 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   protected void fireQueueEvent(final QueueEvent event)
   {
-    if (!event.isRequeued()) event.getBundleWrapper().fireJobQueued();
-    else event.getBundleWrapper().fireJobUpdated();
+    if (!event.isRequeued())
+    {
+      event.getBundleWrapper().fireJobQueued();
+    }
+    else {
+      event.getBundleWrapper().fireJobUpdated();
+    }
 
-    synchronized(queueListeners)
+    synchronized (queueListeners)
     {
       for (QueueListener listener : queueListeners) listener.newBundle(event);
     }

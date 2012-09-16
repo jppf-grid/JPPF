@@ -23,6 +23,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.recovery.*;
+import org.jppf.execute.ExecutorChannelStatusEvent;
+import org.jppf.execute.ExecutorChannelStatusListener;
+import org.jppf.execute.ExecutorStatus;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.job.JobListener;
 import org.jppf.management.JPPFManagementInfo;
@@ -107,8 +110,17 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   private final List<JobListener> jobListeners = new ArrayList<JobListener>();
 
+  private final ExecutorChannelStatusListener statusListener = new ExecutorChannelStatusListener() {
+    @Override
+    public void executionStatusChanged(final ExecutorChannelStatusEvent event) {
+      if(event.getSource() instanceof AbstractNodeContext) {
+        updateConnectionStatus((AbstractNodeContext) event.getSource(), event.getOldValue(), event.getNewValue());
+      }
+    }
+  };
   /**
    * Initialize this node server.
+   * @param driver reference to the driver.
    * @throws Exception if the underlying server socket can't be opened.
    */
   public NodeNioServer(final JPPFDriver driver) throws Exception
@@ -143,10 +155,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     return statsManager;
   }
 
-  public void addIdleChannel(final AbstractNodeContext channel) {
-    taskQueueChecker.addIdleChannel(channel);
-  }
-
   /**
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param wrapper the connection wrapper to add.
@@ -157,7 +165,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (wrapper.getChannel() == null) throw new IllegalArgumentException("wrapper.getChannel() is null");
 
     allConnections.put(wrapper.getUuid(), wrapper);
-    taskQueueChecker.addIdleChannel(wrapper);
+    wrapper.addExecutionStatusListener(statusListener);
+    updateConnectionStatus(wrapper, ExecutorStatus.DISABLED, wrapper.getExecutionStatus());
   }
 
   /**
@@ -171,10 +180,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     try
     {
       taskQueueChecker.removeIdleChannel(wrapper);
+      updateConnectionStatus(wrapper, wrapper.getExecutionStatus(), ExecutorStatus.DISABLED);
     }
     finally
     {
       allConnections.remove(wrapper.getUuid());
+      wrapper.removeExecutionStatusListener(statusListener);
     }
   }
 
@@ -200,6 +211,31 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public synchronized boolean hasWorkingConnection()
   {
     return nbWorkingConnections.get() > 0;
+  }
+
+  /**
+   * @param wrapper   the connection wrapper.
+   * @param oldStatus the connection status before the change.
+   * @param newStatus the connection status after the change.
+   */
+  private void updateConnectionStatus(final AbstractNodeContext wrapper, final ExecutorStatus oldStatus, final ExecutorStatus newStatus)
+  {
+    if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
+    if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
+    if (wrapper == null || oldStatus == newStatus) return;
+
+    System.out.println("updateConnectionStatus: " + wrapper + ": " + oldStatus + "\t -> " + newStatus);
+    if (newStatus == ExecutorStatus.ACTIVE)
+      taskQueueChecker.addIdleChannel(wrapper);
+    else
+    {
+      taskQueueChecker.removeIdleChannel(wrapper);
+      if(newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(wrapper.getUuid());
+    }
+    boolean bNew = (newStatus == ExecutorStatus.ACTIVE) || (newStatus == ExecutorStatus.EXECUTING);
+    boolean bOld = (oldStatus == ExecutorStatus.ACTIVE) || (oldStatus == ExecutorStatus.EXECUTING);
+    if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
+    else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
   }
 
   @Override

@@ -20,9 +20,7 @@ package org.jppf.client.balancer;
 
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.execute.ExecutorStatus;
-import org.jppf.execute.JPPFFuture;
+import org.jppf.execute.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.scheduler.bundle.Bundler;
@@ -30,6 +28,8 @@ import org.jppf.server.scheduler.bundle.ContextAwareness;
 import org.jppf.server.scheduler.bundle.JPPFContext;
 import org.jppf.server.scheduler.bundle.NodeAwareness;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -56,6 +56,10 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
    * Executor for submitting bundles for processing.
    */
   protected ExecutorService executor;
+  /**
+   * List of execution status listeners for this channel.
+   */
+  private final List<ExecutorChannelStatusListener> listenerList = new ArrayList<ExecutorChannelStatusListener>();
 
   /**
    * Default constructor.
@@ -215,5 +219,44 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   @Override
   public Object getMonitor() {
     return this;
+  }
+
+  @Override
+  public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+
+    synchronized (listenerList)
+    {
+      listenerList.add(listener);
+    }
+  }
+
+  @Override
+  public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+
+    synchronized (listenerList)
+    {
+      listenerList.remove(listener);
+    }
+  }
+
+  /**
+   * Notify all listeners that the execution status of this channel has changed.
+   * @param oldValue the channel execution status before the change.
+   * @param newValue the channel execution status after the change.
+   */
+  protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue)
+  {
+    if (oldValue == newValue) return;
+    ExecutorChannelStatusListener[] listeners;
+    synchronized (listenerList)
+    {
+      listeners = listenerList.toArray(new ExecutorChannelStatusListener[listenerList.size()]);
+    }
+    ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
+    for (ExecutorChannelStatusListener listener : listeners) {
+      listener.executionStatusChanged(event);
+    }
   }
 }

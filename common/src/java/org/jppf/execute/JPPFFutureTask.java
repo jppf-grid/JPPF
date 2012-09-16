@@ -58,9 +58,6 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
     super(runnable, result);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void done()
   {
@@ -74,9 +71,6 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addListener(final Listener listener)
   {

@@ -49,6 +49,7 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
   /**
    * Initialize this class server.
    * @param name the name given to this server.
+   * @param driver reference to the driver.
    * @throws Exception if the underlying server socket can't be opened.
    */
   public ClassNioServer(final String name, final JPPFDriver driver) throws Exception

@@ -21,10 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.execute.ExecutorStatus;
-import org.jppf.execute.JPPFFuture;
-import org.jppf.execute.JPPFFutureTask;
+import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.job.JobNotificationEmitter;
 import org.jppf.management.JPPFManagementInfo;
@@ -64,7 +61,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Represents the management information.
    */
   private JPPFManagementInfo managementInfo = null;
-
+  /**
+   * List of execution status listeners for this channel.
+   */
+  private final List<ExecutorChannelStatusListener> listenerList = new ArrayList<ExecutorChannelStatusListener>();
+  /**
+   * <code>Runnable</code> called when node context is closed.
+   */
   private Runnable onClose = null;
 
   /**
@@ -72,6 +75,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   private final StateTransitionManager<NodeState, NodeTransition> transitionManager;
 
+  /**
+   * Initialized abstact node context.
+   * @param transitionManager instance of transion manager used by this node context.
+   */
   protected AbstractNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
     this.transitionManager = transitionManager;
   }
@@ -93,14 +100,15 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   {
     this.bundle = bundle;
 
-    if(bundle != null) {
+    if(bundle != null)
+    {
       int bundleTaskCount = bundle.getTaskCount();
       int jobTaskCount = bundle.getJob().getTaskCount();
       int realTaskCount = bundle.getTasksL().size();
-      System.out.println("setBundle: Task count - bundle: " + bundleTaskCount + "\t job: " + jobTaskCount + "\t real tasks: " + realTaskCount);
 
-      if(bundleTaskCount != jobTaskCount || bundleTaskCount != realTaskCount) {
-        System.out.println("SOME PROBLEM");
+      if(bundleTaskCount != jobTaskCount || bundleTaskCount != realTaskCount)
+      {
+        throw new IllegalStateException("bundle.taskCount <> job.taskCount");
       }
     }
   }
@@ -190,7 +198,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
     message.addLocation(bundle.getDataProviderL());
     for (DataLocation dl: bundle.getTasksL()) message.addLocation(dl);
-    System.out.println("serialize: Task count - bundle: " + bundle.getTaskCount() + "\t job: " + bundle.getJob().getTaskCount() + "\t real tasks: " + bundle.getTasksL().size());
+//    System.out.println("serialize: Task count - bundle: " + bundle.getTaskCount() + "\t job: " + bundle.getJob().getTaskCount() + "\t real tasks: " + bundle.getTasksL().size());
     message.setBundle((JPPFTaskBundle) bundle.getJob());
     setMessage(message);
   }
@@ -258,6 +266,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     setNodeInfo(nodeInfo, false);
   }
 
+  /**
+   * Set the node system information.
+   * @param nodeInfo a {@link JPPFSystemInformation} instance.
+   * @param update a flag indicates whether update system information in management information.
+   */
   public void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update)
   {
 //    if (update && debugEnabled) log.debug("updating node information for " + info + ", channel=" + channel);
@@ -286,19 +299,32 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public ExecutorStatus getExecutionStatus() {
-    switch (getState()) {
-      case IDLE:
-        if (getChannel().isOpen())
-          return ExecutorStatus.ACTIVE;
-        else
-          return ExecutorStatus.FAILED;
-      case SENDING_BUNDLE:
-        return ExecutorStatus.EXECUTING;
-      case WAITING_RESULTS:
-        return ExecutorStatus.EXECUTING;
-      default:
-        return ExecutorStatus.DISABLED;
+    NodeState state = getState();
+    if(state == null)
+      return ExecutorStatus.DISABLED;
+    else {
+      switch (state) {
+        case IDLE:
+          if (getChannel().isOpen())
+            return ExecutorStatus.ACTIVE;
+          else
+            return ExecutorStatus.FAILED;
+        case SENDING_BUNDLE:
+          return ExecutorStatus.EXECUTING;
+        case WAITING_RESULTS:
+          return ExecutorStatus.EXECUTING;
+        default:
+          return ExecutorStatus.DISABLED;
+      }
     }
+  }
+
+  @Override
+  public void setState(final NodeState state) {
+    ExecutorStatus oldExecutionStatus = getExecutionStatus();
+    super.setState(state);
+    ExecutorStatus newExecutionStatus = getExecutionStatus();
+    fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
   }
 
   @Override
@@ -333,5 +359,44 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   public void setOnClose(final Runnable onClose) {
     this.onClose = onClose;
+  }
+
+  @Override
+  public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+
+    synchronized (listenerList)
+    {
+      listenerList.add(listener);
+    }
+  }
+
+  @Override
+  public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+
+    synchronized (listenerList)
+    {
+      listenerList.remove(listener);
+    }
+  }
+
+  /**
+   * Notify all listeners that the execution status of this channel has changed.
+   * @param oldValue the channel execution status before the change.
+   * @param newValue the channel execution status after the change.
+   */
+  protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue)
+  {
+    if (oldValue == newValue) return;
+    ExecutorChannelStatusListener[] listeners;
+    synchronized (listenerList)
+    {
+      listeners = listenerList.toArray(new ExecutorChannelStatusListener[listenerList.size()]);
+    }
+    ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
+    for (ExecutorChannelStatusListener listener : listeners) {
+      listener.executionStatusChanged(event);
+    }
   }
 }

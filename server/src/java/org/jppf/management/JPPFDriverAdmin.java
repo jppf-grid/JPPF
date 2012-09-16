@@ -299,6 +299,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     return list;
   }
 
+  /**
+   * Get the JPPF nodes server.
+   * @return a <code>NodeNioServer</code> instance.
+   * @exclude
+   */
   private static NodeNioServer getNodeNioServer() {
     return driver.getNodeNioServer();
   }

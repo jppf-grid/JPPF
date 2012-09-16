@@ -60,6 +60,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
 
   /**
    * Initialize this class server.
+   * @param driver reference to the driver.
    * @throws Exception if the underlying server socket can't be opened.
    */
   public NodeClassNioServer(final JPPFDriver driver) throws Exception
@@ -85,18 +86,12 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NioServerFactory<ClassState, ClassTransition> createFactory()
   {
     return new NodeClassServerFactory(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void postAccept(final ChannelWrapper<?> channel)
   {
@@ -186,9 +181,6 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void connectionFailed(final ReaperEvent event)
   {
@@ -217,9 +209,6 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
     super.removeAllConnections();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
   {

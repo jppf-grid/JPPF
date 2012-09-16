@@ -1,3 +1,20 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2012 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jppf.server.job;
 
 import org.jppf.job.JobListener;
@@ -6,11 +23,8 @@ import org.jppf.server.protocol.ServerJob;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: jandam
- * Date: 9/4/12
- * Time: 12:36 PM
- * To change this template use File | Settings | File Templates.
+ * Interface for job manager that handles states and monitor the jobs throughout their processing within the JPPF.
+ * @author Martin JANDA
  */
 public interface JobManager {
   /**
@@ -18,6 +32,7 @@ public interface JobManager {
    *
    * @param jobId the uuid of the job to cancel.
    * @return whether cancellation was successful.
+   * @throws <code>Exception</code> when unexpected error occurs.
    */
   boolean cancelJob(final String jobId) throws Exception;
 
@@ -42,6 +57,11 @@ public interface JobManager {
    */
   void removeJobListener(final JobListener listener);
 
+  /**
+   * Get the job for the job unique identificator.
+   * @param jobUuid the uuid of the job.
+   * @return a <code>ServerJob</code> instance.
+   */
   ServerJob getBundleForJob(final String jobUuid);
 
   /**
@@ -51,5 +71,9 @@ public interface JobManager {
    */
   void updatePriority(final String jobUuid, final int newPriority);
 
+  /**
+   * Get the set of all job ids.
+   * @return the unmodifiable <code>Set</code> of all job ids.
+   */
   Set<String> getAllJobIds();
 }
