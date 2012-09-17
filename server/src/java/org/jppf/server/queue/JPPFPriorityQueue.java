@@ -22,17 +22,22 @@ import static org.jppf.utils.CollectionUtils.*;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.execute.ExecutorStatus;
+import org.jppf.job.JobListener;
+import org.jppf.job.JobNotification;
+import org.jppf.job.JobNotificationEmitter;
 import org.jppf.server.*;
+import org.jppf.server.job.JobManager;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.server.nio.nodeserver.NodeNioServer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
@@ -41,7 +46,7 @@ import org.slf4j.*;
  * A JPPF queue whose elements are ordered by decreasing priority.
  * @author Laurent Cohen
  */
-public class JPPFPriorityQueue extends AbstractJPPFQueue
+public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, JobNotificationEmitter
 {
   /**
    * Logger for this class.
@@ -71,13 +76,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
   /**
-   * The job submission manager
-   */
-  private final NodeNioServer submissionManager;
-  /**
    * The driver stats manager
    */
   private final JPPFDriverStatsManager statsManager;
+  /**
+   * The list of registered job listeners.
+   */
+  private final List<JobListener> jobListeners = new ArrayList<JobListener>();
   /**
    * Handles the schedule of each job that has one.
    */
@@ -90,16 +95,43 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * A priority queue holding broadcast jobs that could not be sent due to no available connection.
    */
   private final PriorityBlockingQueue<ServerJob> pendingBroadcasts = new PriorityBlockingQueue<ServerJob>(16, new JobPriorityComparator());
+  /**
+   * Counts the current number of connections with ACTIVE or EXECUTING status.
+   */
+  private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
+  /**
+   * Callback for getting all available connections. Used for processing broadcast jobs.
+   */
+  private Callable<List<AbstractNodeContext>> callableAllConnections = new Callable<List<AbstractNodeContext>>() {
+    @Override
+    public List<AbstractNodeContext> call() throws Exception {
+      return Collections.emptyList();
+    }
+  };
 
   /**
    * Initialize this queue.
-   * @param submissionManager reference to submission manager.
    * @param statsManager reference to statistics manager.
    */
-  public JPPFPriorityQueue(final NodeNioServer submissionManager, final JPPFDriverStatsManager statsManager)
+  public JPPFPriorityQueue(final JPPFDriverStatsManager statsManager)
   {
-    this.submissionManager = submissionManager;
     this.statsManager = statsManager;
+  }
+
+  /**
+   * Set the callable source for all available connections.
+   * @param callableAllConnections a {@link Callable} instance.
+   */
+  public void setCallableAllConnections(final Callable<List<AbstractNodeContext>> callableAllConnections) {
+    if(callableAllConnections == null)
+      this.callableAllConnections = new Callable<List<AbstractNodeContext>>() {
+        @Override
+        public List<AbstractNodeContext> call() throws Exception {
+          return Collections.emptyList();
+        }
+      };
+    else
+      this.callableAllConnections = callableAllConnections;
   }
 
   @Override
@@ -240,7 +272,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     }
-    statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - result.getQueueEntryTime());
+    statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - bundleWrapper.getQueueEntryTime());
     return result;
   }
 
@@ -386,7 +418,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   private void processBroadcastJob(final ServerJob bundleWrapper)
   {
     JPPFTaskBundle bundle = bundleWrapper.getJob();
-    List<AbstractNodeContext> connections = submissionManager.getAllChannels();
+    List<AbstractNodeContext> connections;
+    try {
+      connections = callableAllConnections.call();
+    } catch (Throwable e) {
+      connections = Collections.emptyList();
+    }
     if (connections.isEmpty())
     {
 //      bundleWrapper.taskCompleted(null, null);
@@ -553,7 +590,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
   public void processPendingBroadcasts() {
-    if (!submissionManager.hasWorkingConnection()) return;
+    if (!hasWorkingConnection()) return;
     ServerJob clientJob;
     while ((clientJob = pendingBroadcasts.poll()) != null)
     {
@@ -583,6 +620,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * Get the set of ids for all the jobs currently queued or executing.
    * @return a set of ids as strings.
    */
+  @Override
   public Set<String> getAllJobIds() {
     lock.lock();
     try
@@ -593,5 +631,87 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       lock.unlock();
     }
+  }
+
+  @Override
+  public void addJobListener(final JobListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+
+    synchronized (jobListeners) {
+      jobListeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removeJobListener(final JobListener listener) {
+    if (listener == null) throw new IllegalArgumentException("listener is null");
+
+    synchronized (jobListeners) {
+      jobListeners.remove(listener);
+    }
+  }
+
+  @Override
+  public ServerJob getBundleForJob(final String jobUuid) {
+    return getJob(jobUuid);
+  }
+
+  /**
+   * Fire job listener event.
+   * @param event the event to be fired.
+   */
+  @Override
+  public void fireJobEvent(final JobNotification event)
+  {
+    if(event == null) throw new IllegalArgumentException("event is null");
+
+    synchronized(jobListeners)
+    {
+      switch (event.getEventType())
+      {
+        case JOB_QUEUED:
+          for (JobListener listener: jobListeners) listener.jobQueued(event);
+          break;
+        case JOB_ENDED:
+          for (JobListener listener: jobListeners) listener.jobEnded(event);
+          break;
+
+        case JOB_UPDATED:
+          for (JobListener listener: jobListeners) listener.jobUpdated(event);
+          break;
+
+        case JOB_DISPATCHED:
+          for (JobListener listener: jobListeners) listener.jobDispatched(event);
+          break;
+
+        case JOB_RETURNED:
+          for (JobListener listener: jobListeners) listener.jobReturned(event);
+          break;
+
+        default:
+          throw new IllegalStateException("Unsupported event type: " + event.getEventType());
+      }
+    }
+  }
+
+  /**
+   * Determine whether there is at east one connection, idle or not.
+   * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
+   */
+  public synchronized boolean hasWorkingConnection()
+  {
+    return nbWorkingConnections.get() > 0;
+  }
+
+  /**
+   * Update count of working connections base on status change.
+   * @param oldStatus the connection status before the change.
+   * @param newStatus the connection status after the change.
+   */
+  public void updateWorkingConnections(final ExecutorStatus oldStatus, final ExecutorStatus newStatus) {
+    boolean bNew = (newStatus == ExecutorStatus.ACTIVE) || (newStatus == ExecutorStatus.EXECUTING);
+    boolean bOld = (oldStatus == ExecutorStatus.ACTIVE) || (oldStatus == ExecutorStatus.EXECUTING);
+    if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
+    else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
   }
 }

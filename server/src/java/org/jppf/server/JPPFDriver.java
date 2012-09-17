@@ -25,7 +25,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
-import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.job.JobManager;
 import org.jppf.server.nio.NioServer;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
 import org.jppf.server.nio.classloader.*;
@@ -70,6 +70,10 @@ public class JPPFDriver
    */
   private JPPFNode localNode = null;
   /**
+   * The queue that handles the tasks to execute. Objects are added to, and removed from, this queue, asynchronously and by multiple threads.
+   */
+  private final JPPFPriorityQueue taskQueue;
+  /**
    * Serves the execution requests coming from client applications.
    */
   private ClientNioServer clientNioServer = null;
@@ -102,10 +106,6 @@ public class JPPFDriver
    */
   private final JPPFDriverStatsManager statsManager;
   /**
-   * Manages and monitors the jobs throughout their processing within this driver.
-   */
-  private JPPFJobManager jobManager = null;
-  /**
    * Uuid for this driver.
    */
   private final String uuid;
@@ -132,6 +132,7 @@ public class JPPFDriver
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);
+    taskQueue = new JPPFPriorityQueue(statsManager);
     initializer = new DriverInitializer(this, config);
     log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
   }
@@ -144,7 +145,7 @@ public class JPPFDriver
   @SuppressWarnings("unchecked")
   public void run() throws Exception
   {
-    jobManager = new JPPFJobManager();
+//    jobManager = new JPPFJobManager();
     JPPFConnectionInformation info = initializer.getConnectionInformation();
 
     initializer.registerDebugMBean();
@@ -159,7 +160,7 @@ public class JPPFDriver
     clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this), null, null);
     nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this), null, null);
     clientNioServer = startServer(recoveryServer, new ClientNioServer(this), null, null);
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this), null, null);
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue), null, null);
     acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts), info.serverPorts, info.sslServerPorts);
 
     if (config.getBoolean("jppf.local.node.enabled", false))
@@ -196,7 +197,7 @@ public class JPPFDriver
    */
   public static JPPFQueue getQueue()
   {
-    return getInstance().nodeNioServer.getQueue();
+    return getInstance().taskQueue;
   }
 
   /**
@@ -330,7 +331,7 @@ public class JPPFDriver
       clientNioServer = null;
     }
     initializer.stopJmxServer();
-    jobManager.close();
+//    jobManager.close();
     initializer.stopRecoveryServer();
   }
 
@@ -359,9 +360,9 @@ public class JPPFDriver
    * @return an instance of <code>JPPFJobManager</code>.
    * @exclude
    */
-  public JPPFJobManager getJobManager()
+  public JobManager getJobManager()
   {
-    return jobManager;
+    return taskQueue;
   }
 
   /**

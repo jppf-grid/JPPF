@@ -95,4 +95,16 @@ public class JobNotification extends Notification
   {
     return eventType;
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("JobNotification{");
+    sb.append(super.toString());
+    sb.append(", eventType=").append(eventType);
+    sb.append(", nodeInfo=").append(nodeInfo);
+    sb.append(", timestamp=").append(timestamp);
+    sb.append('}');
+    return sb.toString();
+  }
 }

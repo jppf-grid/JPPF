@@ -339,6 +339,7 @@ public class ServerJob extends AbstractServerJob
       setExecuting(true);
     }
     if (parentJob != null) parentJob.broadcastDispatched(this);
+    fireJobDispatched(channel, bundle);
   }
 
   /**
@@ -359,6 +360,12 @@ public class ServerJob extends AbstractServerJob
         taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
       }
     }
+    ExecutorChannel channel;
+    synchronized (bundleMap) {
+      Pair<ExecutorChannel, Future> pair = bundleMap.get(bundle);
+      channel = pair == null ? null : pair.first();
+    }
+    fireJobReturned(channel, bundle);
   }
 
   /**
@@ -378,6 +385,12 @@ public class ServerJob extends AbstractServerJob
         if (oldState != TaskState.RESULT) taskStateMap.put(task, new Pair<DataLocation, TaskState>(null, TaskState.EXCEPTION));
       }
     }
+    ExecutorChannel channel;
+    synchronized (bundleMap) {
+      Pair<ExecutorChannel, Future> pair = bundleMap.get(bundle);
+      channel = pair == null ? null : pair.first();
+    }
+    fireJobReturned(channel, bundle);
   }
 
   /**
@@ -459,9 +472,10 @@ public class ServerJob extends AbstractServerJob
       try {
         if (callDone) done();
       } finally {
-        if (parentJob != null)
+        if (parentJob != null) {
+          fireJobEnded();
           parentJob.broadcastCompleted(this);
-        else
+        } else
           getJob().fireTaskCompleted(this);
       }
     }

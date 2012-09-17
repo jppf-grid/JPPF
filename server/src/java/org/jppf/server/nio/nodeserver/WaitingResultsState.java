@@ -90,8 +90,8 @@ class WaitingResultsState extends NodeServerState
         else
         {
           bundleWrapper.resultsReceived(newBundleWrapper.getTasksL());
-          long elapsed = System.nanoTime() - bundle.getExecutionStartTime();
-          if(statsManager != null) statsManager.taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
+          long elapsed = System.nanoTime() - bundleWrapper.getExecutionStartTime();
+          server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
           context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
         }
         requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);

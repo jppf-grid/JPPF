@@ -20,7 +20,7 @@ package org.jppf.server.nio.nodeserver;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Callable;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.execute.ExecutorChannelStatusEvent;
@@ -28,13 +28,11 @@ import org.jppf.execute.ExecutorChannelStatusListener;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.io.DataLocation;
 import org.jppf.io.MultipleBuffersLocation;
-import org.jppf.job.JobListener;
+import org.jppf.job.JobNotificationEmitter;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.JPPFDriverStatsManager;
 import org.jppf.server.event.NodeConnectionEventHandler;
-import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.job.JobManager;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.*;
@@ -48,7 +46,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener, JobManager
+public class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener
 {
   /**
    * Logger for this class.
@@ -103,17 +101,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   private ChannelWrapper localChannel = null;
   /**
-   * Counts the current number of connections with ACTIVE or EXECUTING status.
-   */
-  private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
-  /**
    * Handles listeners to node connection events.
    */
   private final NodeConnectionEventHandler nodeConnectionHandler;
-  /**
-   * The list of registered job listeners.
-   */
-  private final List<JobListener> jobListeners = new ArrayList<JobListener>();
   /**
    * Listener used for monitoring state changes.
    */
@@ -128,13 +118,22 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * Initialize this node server.
    * @param driver reference to the driver.
+   * @param queue the reference queue to use.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeNioServer(final JPPFDriver driver) throws Exception
+  public NodeNioServer(final JPPFDriver driver, final JPPFPriorityQueue queue) throws Exception
   {
     super(NioConstants.NODE_SERVER);
     if (driver == null) throw new IllegalArgumentException("driver is null");
+    if (queue == null) throw new IllegalArgumentException("queue is null");
 
+    this.queue = queue;
+    this.queue.setCallableAllConnections(new Callable<List<AbstractNodeContext>>() {
+      @Override
+      public List<AbstractNodeContext> call() throws Exception {
+        return getAllChannels();
+      }
+    });
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
     INITIAL_BUNDLE_UUID = driver.getUuid();
     this.statsManager = driver.getStatsManager();
@@ -142,7 +141,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
-    this.queue = new JPPFPriorityQueue(this, statsManager);
 
     taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
@@ -217,15 +215,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
-   * Dtermine whether there is at east one connection, idle or not.
-   * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
-   */
-  public synchronized boolean hasWorkingConnection()
-  {
-    return nbWorkingConnections.get() > 0;
-  }
-
-  /**
    * @param wrapper   the connection wrapper.
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
@@ -243,10 +232,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       taskQueueChecker.removeIdleChannel(wrapper);
       if(newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
-    boolean bNew = (newStatus == ExecutorStatus.ACTIVE) || (newStatus == ExecutorStatus.EXECUTING);
-    boolean bOld = (oldStatus == ExecutorStatus.ACTIVE) || (oldStatus == ExecutorStatus.EXECUTING);
-    if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
-    else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
+    queue.updateWorkingConnections(oldStatus, newStatus);
   }
 
   @Override
@@ -313,7 +299,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
         bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
-        ServerJob serverJob = new ServerJob(getJobManager(), bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)), Collections.<DataLocation>emptyList());
+        ServerJob serverJob = new ServerJob(queue, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)), Collections.<DataLocation>emptyList());
         initialBundle = serverJob.copy(serverJob.getTaskCount());
       }
       catch(Exception e)
@@ -386,9 +372,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get a reference to the driver's job manager.
    * @return a <code>JPPFQueue</code> instance.
    */
-  protected JPPFJobManager getJobManager()
+  protected JobNotificationEmitter getJobManager()
   {
-    return driver.getJobManager();
+    return queue;
   }
 
   /**
@@ -496,44 +482,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     JPPFManagementInfo info = channel.getManagementInfo();
     if(info != null) nodeConnectionHandler.fireNodeConnected(info);
     addConnection(channel);
-  }
-
-  @Override
-  public boolean cancelJob(final String jobId) throws Exception {
-    return queue.cancelJob(jobId);
-  }
-
-  @Override
-  public void updatePriority(final String jobUuid, final int newPriority) {
-    queue.updatePriority(jobUuid, newPriority);
-  }
-
-  @Override
-  public Set<String> getAllJobIds() {
-    return queue.getAllJobIds();
-  }
-
-  @Override
-  public void addJobListener(final JobListener listener) {
-    if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (jobListeners) {
-      jobListeners.add(listener);
-    }
-  }
-
-  @Override
-  public void removeJobListener(final JobListener listener) {
-    if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (jobListeners) {
-      jobListeners.remove(listener);
-    }
-  }
-
-  @Override
-  public ServerJob getBundleForJob(final String jobUuid) {
-    return queue.getJob(jobUuid);
   }
 
   /**

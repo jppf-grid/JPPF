@@ -82,7 +82,7 @@ class SendingBundleState extends NodeServerState
           bundleWrapper.resubmit();
           return TO_IDLE;
         }
-        bundle.setExecutionStartTime(System.nanoTime());
+        bundleWrapper.setExecutionStartTime(System.nanoTime());
         context.serializeBundle(channel);
       }
       else

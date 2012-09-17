@@ -24,12 +24,15 @@ import java.util.List;
 import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.job.JobNotificationEmitter;
+import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Context associated with a channel serving tasks to a node.
@@ -37,6 +40,22 @@ import org.jppf.utils.*;
  */
 public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements ExecutorChannel<ServerTaskBundle>
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Dummy runnable used for bundle execution.
+   */
+  protected static final Runnable RUNNABLE = new Runnable() {
+    @Override
+    public void run() {
+    }
+  };
   /**
    * The task bundle to send or receive.
    */
@@ -49,10 +68,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Helper used to serialize the bundle objects.
    */
   protected SerializationHelper helper = new SerializationHelperImpl();
-  /**
-   * Determines whether this context is attached to a peer node.
-   */
-  private boolean peer = false;
   /**
    * Represents the node system information.
    */
@@ -74,6 +89,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Performs all operations that relate to channel states.
    */
   private final StateTransitionManager<NodeState, NodeTransition> transitionManager;
+  /**
+   * Provides access to the management functions of the driver.
+   */
+  protected JMXNodeConnectionWrapper jmxConnection = null;
 
   /**
    * Initialized abstract node context.
@@ -294,6 +313,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public void setManagementInfo(final JPPFManagementInfo managementInfo)
   {
     this.managementInfo = managementInfo;
+    initializeJmxConnection();
   }
 
   @Override
@@ -336,14 +356,70 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     return getChannel();
   }
 
+  /**
+   * Initialize the jmx connection using the specified jmx id.
+   */
+  public void initializeJmxConnection()
+  {
+    JPPFManagementInfo info = getManagementInfo();
+    if(info == null)
+      jmxConnection = null;
+    else {
+      jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
+      jmxConnection.connect();
+    }
+  }
+
+  /**
+   * Get the object that provides access to the management functions of the driver.
+   * @return a <code>JMXConnectionWrapper</code> instance.
+   */
+  public JMXNodeConnectionWrapper getJmxConnection()
+  {
+    return jmxConnection;
+  }
+
+  /**
+   * Cancel the job with the specified id.
+   * @param jobId the id of the job to cancel.
+   * @param requeue true if the job should be requeued on the server side, false otherwise.
+   * @throws Exception if any error occurs.
+   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   */
+  public boolean cancelJob(final String jobId, final boolean requeue) throws Exception
+  {
+    JMXNodeConnectionWrapper jmxConnection = getJmxConnection();
+    if (jmxConnection != null && jmxConnection.isConnected())
+    {
+      jmxConnection.cancelJob(jobId, requeue);
+      return true;
+    }
+    return false;
+  }
+
   @Override
   public JPPFFuture<?> submit(final ServerTaskBundle bundleWrapper) {
-    JPPFFuture<?> future = new JPPFFutureTask<Object>(new Runnable() {
+    JPPFFuture<?> future = new JPPFFutureTask<Object>(RUNNABLE, null) {
       @Override
-      public void run() {
-        //To change body of implemented methods use File | Settings | File Templates.
+      public boolean cancel(final boolean mayInterruptIfRunning)
+      {
+        if(isDone()) return false;
+        if(isCancelled()) {
+          return true;
+        } else {
+          bundle.cancel();
+          try {
+            cancelJob(bundle.getClientJob().getUuid(), false);
+          } catch (Exception e) {
+            if (debugEnabled) log.debug(e.getMessage(), e);
+            else log.warn(ExceptionUtils.getMessage(e));
+          } finally {
+            return super.cancel(false);
+          }
+        }
       }
-    }, null);
+    };
     setBundle(bundleWrapper);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING);
 //    bundleWrapper.jobDispatched(getChannel(), future);

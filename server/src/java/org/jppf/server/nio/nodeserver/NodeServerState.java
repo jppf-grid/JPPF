@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.server.*;
 import org.jppf.server.nio.NioState;
 
 /**
@@ -31,10 +30,6 @@ abstract class NodeServerState extends NioState<NodeTransition>
    * The server that handles this state.
    */
   protected NodeNioServer server = null;
-  /**
-   * The driver stats manager.
-   */
-  protected JPPFDriverStatsManager statsManager = null;
 
   /**
    * Initialize this state.
@@ -43,6 +38,5 @@ abstract class NodeServerState extends NioState<NodeTransition>
   public NodeServerState(final NodeNioServer server)
   {
     this.server = server;
-    statsManager = server.getStatsManager();
   }
 }

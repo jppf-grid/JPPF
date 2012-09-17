@@ -53,8 +53,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   public DriverJobManagement()
   {
-    JobManager manager = getJobManager();
-    if (manager != null) manager.addJobListener(new JobEventNotifier());
+    getJobManager().addJobListener(new JobEventNotifier());
   }
 
   /**
@@ -185,24 +184,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     return bundleWrapper.getNodeJobInformation();
   }
 
-//  /**
-//   * Cancel all sub-jobs of the job with the specified id, by issuing a cancel command
-//   * to each corresponding node.
-//   * @param jobUuid the id of the job to cancel.
-//   * @param requeue specifies whether the sub-jobs should be requeued.
-//   */
-//  private void cancelJobInNodes(final String jobUuid, final boolean requeue)
-//  {
-//    List<ChannelJobPair> list = getJobManager().getNodesForJob(jobUuid);
-//    if (debugEnabled) log.debug("Cancelling jobId = '" + jobUuid + "' in nodes: " + list);
-//
-//    for (ChannelJobPair pair : list)
-//    {
-//      CancelJobTask task = new CancelJobTask(jobUuid, pair.first(), requeue);
-//      new Thread(task).start();
-//    }
-//  }
-
   /**
    * {@inheritDoc}
    */
@@ -219,7 +200,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   private JobManager getJobManager()
   {
-    if (jobManager == null) jobManager = JPPFDriver.getInstance().getNodeNioServer();
+    if (jobManager == null) jobManager = JPPFDriver.getInstance().getJobManager();
     return jobManager;
   }
 

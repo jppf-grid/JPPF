@@ -527,17 +527,19 @@ public abstract class AbstractServerJob {
   /**
    * A sub-job was dispatched to a node.
    * @param channel the node to which the job is dispatched.
+   * @param bundle the bundle for job event.
    */
-  public void fireJobDispatched(final ExecutorChannel channel) {
-    fireJobNotification(createJobNotification(JobEventType.JOB_DISPATCHED, channel));
+  public void fireJobDispatched(final ExecutorChannel channel, final JPPFTaskBundle bundle) {
+    fireJobNotification(createJobNotification(JobEventType.JOB_DISPATCHED, channel, bundle));
   }
 
   /**
    * A sub-job returned from a node.
    * @param channel the node from which the job is returned.
+   * @param bundle the bundle for job event.
    */
-  public void fireJobReturned(final ExecutorChannel channel) {
-    fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel));
+  public void fireJobReturned(final ExecutorChannel channel, final JPPFTaskBundle bundle) {
+    if(bundle != null) fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel, bundle));
   }
 
   /**
