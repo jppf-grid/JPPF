@@ -78,7 +78,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws ClassNotFoundException if the class could not be found
    * @exclude
    */
-  public /*synchronized*/ Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
+  public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
   {
     if (debugEnabled) log.debug("looking up resource [" + name + ']');
     Class<?> c = findLoadedClass(name);
@@ -113,7 +113,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws ClassNotFoundException if the class could not be loaded.
    * @see java.lang.ClassLoader#findClass(java.lang.String)
    */
-  protected /*synchronized*/ Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
+  protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
     Class<?> c = null;
     if (nfCache.get(name) != null) throw new ClassNotFoundException("Could not load class '" + name + '\'');
@@ -329,7 +329,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @exclude
    */
   @Override
-  protected /*synchronized*/ Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException
+  protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException
   {
     if (getDelegationModel() == DelegationModel.URL_FIRST)
       return loadClassLocalFirst(name, resolve);
@@ -344,7 +344,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return the resulting Class object.
    * @throws ClassNotFoundException if the class could not be found.
    */
-  private /*synchronized*/ Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException {
+  private synchronized Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException {
     Class<?> c = findLoadedClass(name);
     if(c == null) {
       ClassLoader cl = initSystemClassLoader();
@@ -402,7 +402,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return a <code>Class</code> instance, or null if the class could not be found in the URL classpath.
    * @exclude
    */
-  protected /*synchronized*/ Class<?> findClassInURLClasspath(final String name, final boolean recursive)
+  protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive)
   {
     if (debugEnabled) log.debug("looking up up resource [" + name + "] in the URL classpath for " + this);
     Class<?> c = findLoadedClass(name);
