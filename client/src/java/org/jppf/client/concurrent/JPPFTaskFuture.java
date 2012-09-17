@@ -123,20 +123,24 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   @SuppressWarnings("unchecked")
   void getResult(final long timeout)
   {
-    if (!isDone())
+    JPPFTask task = null;
+    synchronized(collector)
     {
-      JPPFTask task = null;
-      task = (timeout > 0) ? collector.waitForTask(position, timeout) : collector.getTask(position);
-      setDone();
-      if (task == null)
+      if (!isDone())
       {
-        setCancelled();
-        timedout.set(timeout > 0);
-      }
-      else
-      {
-        result = (V) task.getResult();
-        exception = task.getException();
+        task = collector.getTask(position);
+        if ((task == null) && (timeout > 0)) task = collector.waitForTask(position, timeout);
+        setDone();
+        if (task == null)
+        {
+          setCancelled();
+          timedout.set(timeout > 0);
+        }
+        else
+        {
+          result = (V) task.getResult();
+          exception = task.getException();
+        }
       }
     }
   }

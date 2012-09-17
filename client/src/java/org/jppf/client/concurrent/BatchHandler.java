@@ -379,7 +379,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   private JPPFJob createJob()
   {
     JPPFJob job = new JPPFJob();
-    job.setName(getClass().getSimpleName() + " job " + jobCount.incrementAndGet());
+    job.setName(getClass().getSimpleName() + " " + jobCount.incrementAndGet());
     FutureResultCollector collector = new FutureResultCollector(job);
     job.setResultListener(collector);
     job.setBlocking(false);
