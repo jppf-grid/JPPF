@@ -400,7 +400,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     for (AbstractNodeContext connection : connections)
     {
       ExecutorStatus status = connection.getExecutionStatus();
-      System.out.println("  " + connection.getUuid() + "\t status: " + status);
       if(status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
       {
         String uuid = connection.getUuid();

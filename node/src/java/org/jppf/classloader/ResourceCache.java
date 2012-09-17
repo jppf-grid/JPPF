@@ -269,7 +269,6 @@ class ResourceCache
   @Override
   protected void finalize() throws Throwable
   {
-    System.out.println("Finalizing resource cache " + tempFolders);
     close();
     super.finalize();
   }

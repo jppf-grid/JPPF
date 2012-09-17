@@ -236,7 +236,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (wrapper == null || oldStatus == newStatus) return;
 
-    System.out.println("updateConnectionStatus: " + wrapper + ": " + oldStatus + "\t -> " + newStatus);
     if (newStatus == ExecutorStatus.ACTIVE)
       taskQueueChecker.addIdleChannel(wrapper);
     else
