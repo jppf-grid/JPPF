@@ -31,8 +31,8 @@ public interface JobManager {
    * Cancel the job with the specified UUID
    *
    * @param jobId the uuid of the job to cancel.
+   * @throws Exception when unexpected error occurs.
    * @return whether cancellation was successful.
-   * @throws <code>Exception</code> when unexpected error occurs.
    */
   boolean cancelJob(final String jobId) throws Exception;
 
@@ -58,7 +58,7 @@ public interface JobManager {
   void removeJobListener(final JobListener listener);
 
   /**
-   * Get the job for the job unique identificator.
+   * Get the job for the job unique identifier.
    * @param jobUuid the uuid of the job.
    * @return a <code>ServerJob</code> instance.
    */

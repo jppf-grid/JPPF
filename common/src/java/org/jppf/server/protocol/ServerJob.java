@@ -23,12 +23,10 @@ import java.util.concurrent.Future;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-import org.jppf.job.JobEventType;
 import org.jppf.job.JobInformation;
 import org.jppf.job.JobNotification;
 import org.jppf.job.JobNotificationEmitter;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.protocol.utils.AbstractServerJob;
 import org.jppf.server.submission.SubmissionStatus;
@@ -45,20 +43,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ServerJob extends AbstractServerJob
 {
-  /**
-   * State for task indicating whether result or execption was received.
-   */
-  protected static enum TaskState {
-    /**
-     * Result was received for task.
-     */
-    RESULT,
-    /**
-     * Exception was received for task.
-     */
-    EXCEPTION
-  }
-
   /**
    * Logger for this class.
    */
@@ -112,23 +96,19 @@ public class ServerJob extends AbstractServerJob
    */
   private final Map<DataLocation, Pair<DataLocation, TaskState>> taskStateMap = new IdentityHashMap<DataLocation, Pair<DataLocation, TaskState>>();
   /**
-   * The location of the data provider.
+   * The data location of the data provider.
    */
   private final DataLocation dataProvier;
-
-  private final JobNotificationEmitter notificationEmitter;
   /**
-   * Initialized client job with task bundle and list of tasks to execute.
-   * @param job   underlying task bundle.
+   * Handler for job state notifications.
    */
-  public ServerJob(final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider)
-  {
-    this(notificationEmitter, job, dataProvider, Collections.<DataLocation>emptyList());
-  }
+  private final JobNotificationEmitter notificationEmitter;
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
+   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    * @param job   underlying task bundle.
+   * @param dataProvider the data location of the data provider.
    * @param tasks list of tasks to execute.
    */
   public ServerJob(final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider, final List<DataLocation> tasks)
@@ -138,7 +118,9 @@ public class ServerJob extends AbstractServerJob
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
+   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    * @param job   underlying task bundle.
+   * @param dataProvider the data location of the data provider.
    * @param tasks list of tasks to execute.
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID.
@@ -147,7 +129,6 @@ public class ServerJob extends AbstractServerJob
   {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
-//    if (notificationEmitter == null) throw new IllegalArgumentException("notificationEmitter is null");
 
     this.notificationEmitter = notificationEmitter;
     this.dataProvier = dataProvider;
@@ -172,7 +153,12 @@ public class ServerJob extends AbstractServerJob
     this.initialTasks = new ArrayList<DataLocation>(tasks);
   }
 
-  public DataLocation getDataProvider() {
+  /**
+   * Get the location for data shared between tasks.
+   * @return a <code>DataLocation</code> instance.
+   */
+  public DataLocation getDataProvider()
+  {
     return dataProvier;
   }
   /**
@@ -188,10 +174,7 @@ public class ServerJob extends AbstractServerJob
 //    if (getBroadcastUUID() == null) job.fireJobEvent(executing ? JobEvent.Type.JOB_START: JobEvent.Type.JOB_END);
   }
 
-  /**
-   * Get the current number of tasks in the job.
-   * @return the number of tasks as an int.
-   */
+  @Override
   public int getTaskCount()
   {
     synchronized (tasks)
@@ -375,16 +358,7 @@ public class ServerJob extends AbstractServerJob
         DataLocation task = results.get(index);
         taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
       }
-//      for (DataLocation task : results) taskStateMap.put(getPosition(task), TaskState.RESULT);
     }
-//    TaskResultListener listener = resultsListener;
-//    if (listener != null)
-//    {
-//      synchronized (listener)
-//      {
-//        listener.resultsReceived(new TaskResultEvent(results));
-//      }
-//    }
   }
 
   /**
@@ -404,14 +378,6 @@ public class ServerJob extends AbstractServerJob
         if (oldState != TaskState.RESULT) taskStateMap.put(task, new Pair<DataLocation, TaskState>(null, TaskState.EXCEPTION));
       }
     }
-//    TaskResultListener listener = resultsListener;
-//    if (listener != null)
-//    {
-//      synchronized (listener)
-//      {
-//        listener.resultsReceived(new TaskResultEvent(throwable));
-//      }
-//    }
   }
 
   /**
@@ -421,18 +387,12 @@ public class ServerJob extends AbstractServerJob
    */
   public void taskCompleted(final ServerTaskBundle bundle, final Exception exception)
   {
-    if (exception != null) {
-      exception.printStackTrace(System.out);
-    }
-
     boolean empty;
     synchronized (bundleMap) {
       Pair<ExecutorChannel, Future> pair = bundleMap.remove(bundle);
-      Future future = pair == null ? null : pair.second();
-      if (bundle != null && future == null) throw new IllegalStateException("future already removed");
+      if (bundle != null && (pair == null || pair.second() == null)) throw new IllegalStateException("future already removed");
       empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
-    //if (empty) clearChannels();
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {
       List<DataLocation> list = new ArrayList<DataLocation>();
@@ -509,7 +469,7 @@ public class ServerJob extends AbstractServerJob
 
   /**
    * Get indicator whether job has pending tasks.
-   * @return <code>true</code> when job has some penging tasks.
+   * @return <code>true</code> when job has some pending tasks.
    */
   protected boolean hasPending() {
     synchronized (tasks)
@@ -545,9 +505,6 @@ public class ServerJob extends AbstractServerJob
     if (resultsListener instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning)
   {
@@ -613,7 +570,7 @@ public class ServerJob extends AbstractServerJob
   }
 
   /**
-   * Called to notify that the execution of broadcasted job has completed.
+   * Called to notify that the execution of broadcast job has completed.
    * @param broadcastJob    the completed job.
    */
   protected void broadcastCompleted(final ServerJob broadcastJob)
@@ -629,15 +586,19 @@ public class ServerJob extends AbstractServerJob
   }
 
   /**
-   * Set the reuque handler.
+   * Set the requeue handler.
    * @param onRequeue {@link Runnable} executed on requeue.
    */
   public void setOnRequeue(final Runnable onRequeue)
   {
-    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be requeud
+    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be requeued
     this.onRequeue = onRequeue;
   }
 
+  /**
+   * Get count of channels on which this job is executed.
+   * @return the number used for job execution.
+   */
   public int getNbChannels() {
     synchronized (bundleMap)
     {
@@ -645,107 +606,19 @@ public class ServerJob extends AbstractServerJob
     }
   }
 
-  /**
-   * A new job was submitted to the JPPF driver queue.
-   */
-  public void fireJobQueued() {
-    fireJobNotification(createJobNotification(JobEventType.JOB_QUEUED, null));
-  }
-
-  /**
-   * A job was completed and sent back to the client.
-   */
-  public void fireJobEnded() {
-    fireJobNotification(createJobNotification(JobEventType.JOB_ENDED, null));
-  }
-
-  /**
-   * A sub-job was dispatched to a node.
-   */
-  public void fireJobDispatched(final ExecutorChannel channel) {
-    fireJobNotification(createJobNotification(JobEventType.JOB_DISPATCHED, channel));
-  }
-
-  /**
-   * A sub-job returned from a node.
-   * @param channel
-   */
-  public void fireJobReturned(final ExecutorChannel channel) {
-    fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel));
-  }
-
-  /**
-   * The current number of tasks in a job was updated.
-   */
-  public void fireJobUpdated() {
-    fireJobNotification(createJobNotification(JobEventType.JOB_UPDATED, null));
-  }
-
+  @Override
   protected void fireJobNotification(final JobNotification event) {
     if (event == null) throw new IllegalArgumentException("event is null");
-
     if (notificationEmitter != null) notificationEmitter.fireJobEvent(event);
   }
 
-  protected static JobNotification createJobNotification(final JobEventType eventType, final ExecutorChannel channel, final JPPFTaskBundle bundle) {
-    JobSLA sla = bundle.getSLA();
-    Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-    JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(),
-            bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
-    jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
-    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, System.currentTimeMillis());
-    if (eventType == JobEventType.JOB_UPDATED)
-    {
-      Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
-      if (n != null) jobInfo.setTaskCount(n);
-    }
-    return event;
-  }
-
-  protected JobNotification createJobNotification(final JobEventType eventType, final ExecutorChannel channel) {
-    JobSLA sla = getSLA();
-    boolean pending = isPending();
-    JobInformation jobInfo = new JobInformation(getUuid(), getName(), getTaskCount(),
-            getTaskCount(), sla.getPriority(), sla.isSuspended(), pending);
-    jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
-    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, System.currentTimeMillis());
-    if (eventType == JobEventType.JOB_UPDATED)
-    {
-      Integer n = (Integer) getJob().getParameter(BundleParameter.REAL_TASK_COUNT);
-      if (n != null) jobInfo.setTaskCount(n);
-    }
-    return event;
-  }
-
-  @Override
-  public void setPending(final boolean pending) {
-    boolean oldValue = isPending();
-    super.setPending(pending);
-    boolean newValue = isPending();
-    if (oldValue != newValue) fireJobUpdated();
-  }
-
-  public void setSuspended(final boolean suspended) {
-    setSuspended(suspended, false);
-  }
-
-  public void setSuspended(final boolean suspended, final boolean requeue) {
-    JobSLA sla = getJob().getSLA();
-    if (sla.isSuspended() == suspended) return;
-    sla.setSuspended(suspended);
-    fireJobUpdated();
-  }
-
-  public void setMaxNodes(final int maxNodes) {
-    if (maxNodes <= 0) return;
-    getJob().getSLA().setMaxNodes(maxNodes);
-    fireJobUpdated();
-  }
-
+  /**
+   * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
+   * @return array of <code>NodeManagementInfo</code> instances.
+   */
   @SuppressWarnings("unchecked")
-  public NodeJobInformation[] getNodeJobInformation() {
+  public NodeJobInformation[] getNodeJobInformation()
+  {
     Map.Entry<ServerTaskBundle, Pair<ExecutorChannel, Future>>[] entries;
     synchronized (bundleMap)
     {

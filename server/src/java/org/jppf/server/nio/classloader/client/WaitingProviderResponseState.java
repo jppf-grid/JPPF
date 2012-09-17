@@ -73,7 +73,7 @@ class WaitingProviderResponseState extends ClassServerState
       // putting the definition in cache
       if ((resource.getDefinition() != null) && (resource.getCallable() == null))
         classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
-      // fowarding it to channel that requested
+      // forwarding it to channel that requested
       ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
       StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();

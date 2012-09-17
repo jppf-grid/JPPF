@@ -17,7 +17,7 @@
  */
 
 /**
- * Classes supporting the automatic tuning of the task bundle size, using the propertional bundling algorithm.
+ * Classes supporting the automatic tuning of the task bundle size, using the proportional bundling algorithm.
  * @exclude
  */
 package org.jppf.server.scheduler.bundle.impl;

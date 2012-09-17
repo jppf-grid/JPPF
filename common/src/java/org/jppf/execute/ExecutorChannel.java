@@ -104,6 +104,7 @@ public interface ExecutorChannel<T>
 
   /**
    * Close this channel and release the resources it uses.
+   * @throws Exception if any error occurs.
    */
   void close() throws Exception;
 

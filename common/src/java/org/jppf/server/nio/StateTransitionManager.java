@@ -160,7 +160,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   }
 
   /**
-   * Register a channel not opened through this server, with intial interest operation set to 0.
+   * Register a channel not opened through this server, with initial interest operation set to 0.
    * @param channel the channel to register.
    * @param context the context attached to the channel.
    * @return a {@link ChannelWrapper} instance.

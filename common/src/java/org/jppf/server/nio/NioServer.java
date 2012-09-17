@@ -327,7 +327,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * The channel is registered with an empty set of initial interest operations,
    * which means a call to the corresponding {@link SelectionKey}'s <code>interestOps()</code> method will return 0.
    * @param channel the socket channel representing the connection.
-   * @param sslHandler an sslEngine enventually passed on from a different server.
+   * @param sslHandler an sslEngine eventually passed on from a different server.
    * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
    * @return a wrapper for the newly registered channel.
    */

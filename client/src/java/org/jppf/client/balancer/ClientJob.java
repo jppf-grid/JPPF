@@ -39,20 +39,6 @@ import java.util.concurrent.Future;
 public class ClientJob extends AbstractClientJob
 {
   /**
-   * State for task indicating whether result or execption was received.
-   */
-  protected static enum TaskState {
-    /**
-     * Result was received for task.
-     */
-    RESULT,
-    /**
-     * Exception was received for task.
-     */
-    EXCEPTION
-  }
-
-  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
@@ -434,7 +420,7 @@ public class ClientJob extends AbstractClientJob
 
   /**
    * Get indicator whether job has pending tasks.
-   * @return <code>true</code> when job has some penging tasks.
+   * @return <code>true</code> when job has some pending tasks.
    */
   protected boolean hasPending() {
     synchronized (tasks)
@@ -552,15 +538,19 @@ public class ClientJob extends AbstractClientJob
   }
 
   /**
-   * Set the reuque handler.
+   * Set the requeue handler.
    * @param onRequeue {@link Runnable} executed on requeue.
    */
   public void setOnRequeue(final Runnable onRequeue)
   {
-    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be requeud
+    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be requeued
     this.onRequeue = onRequeue;
   }
 
+  /**
+   * Get count of channels on which this job is executed.
+   * @return the number used for job execution.
+   */
   public int getNbChannels() {
     synchronized (bundleMap)
     {

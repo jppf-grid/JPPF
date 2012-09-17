@@ -18,8 +18,13 @@
 package org.jppf.server.protocol.utils;
 
 import org.jppf.execute.ExecutorChannel;
+import org.jppf.job.JobEventType;
+import org.jppf.job.JobInformation;
+import org.jppf.job.JobNotification;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.node.protocol.JobSLA;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.protocol.ServerJob;
 import org.slf4j.Logger;
@@ -33,7 +38,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Abstract class that support job state management.
  * @author Martin JANDA
  */
-public class AbstractServerJob {
+public abstract class AbstractServerJob {
+  /**
+   * State for task indicating whether result or exception was received.
+   */
+  protected static enum TaskState
+  {
+    /**
+     * Result was received for task.
+     */
+    RESULT,
+    /**
+     * Exception was received for task.
+     */
+    EXCEPTION
+  }
+
   /**
    * Logger for this class.
    */
@@ -226,7 +246,7 @@ public class AbstractServerJob {
   }
 
   /**
-   * Notifies that job has expired.
+   * Sets and notifies that job has expired.
    */
   public void jobExpired()
   {
@@ -234,12 +254,15 @@ public class AbstractServerJob {
     cancel(true);
   }
 
+  /**
+   * Set the job expired indicator.
+   * @param jobExpired <code>true</code> to indicate that job has expired. <code>false</code> otherwise.
+   */
   public void setJobExpired(final boolean jobExpired)
   {
     this.jobExpired = jobExpired;
     if(this.jobExpired) cancel(true);
   }
-
 
   /**
    * Get the job pending indicator.
@@ -256,7 +279,34 @@ public class AbstractServerJob {
    */
   public void setPending(final boolean pending)
   {
+    boolean oldValue = isPending();
     this.pending = pending;
+    boolean newValue = isPending();
+    if (oldValue != newValue) fireJobUpdated();
+  }
+
+  /**
+   * Set the job suspended indicator.
+   * @param suspended <code>true</code> to indicate that job is suspended, <code>false</code> otherwise.
+   * @param requeue <code>true</code> to indicate that job should be requeued, <code>false</code> otherwise.
+   */
+  public void setSuspended(final boolean suspended, final boolean requeue)
+  {
+    JobSLA sla = getJob().getSLA();
+    if (sla.isSuspended() == suspended) return;
+    sla.setSuspended(suspended);
+    fireJobUpdated();
+  }
+
+  /**
+   * Set the maximum number of nodes this job can run on.
+   * @param maxNodes the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+   */
+  public void setMaxNodes(final int maxNodes)
+  {
+    if (maxNodes <= 0) return;
+    getJob().getSLA().setMaxNodes(maxNodes);
+    fireJobUpdated();
   }
 
   /**
@@ -417,12 +467,11 @@ public class AbstractServerJob {
     if (channel.isLocal()) return true;
     checkRemoteChannel();
     // we accept a single channel, always the same
-    if ((remoteChannel == null) || (remoteChannel == channel)) return true;
-    return false;
+    return (remoteChannel == null) || (remoteChannel == channel);
   }
 
   /**
-   * Clear the channels used to duispatch this job.
+   * Clear the channels used to dispatch this job.
    * See {@link #remoteChannel}.
    */
   public void clearChannels()
@@ -454,73 +503,98 @@ public class AbstractServerJob {
     return true;
   }
 
-//  /**
-//   * Get the broadcast UUID.
-//   * @return an <code>String</code> instance.
-//   */
-//  public String getBroadcastUUID()
-//  {
-//    return (String) getJob_().getParameter(BundleParameter.NODE_BROADCAST_UUID);
-//  }
-//
-//  /**
-//   * Get the job pending indicator.
-//   * @return <code>true</code> if job is pending, <code>false</code> otherwise.
-//   */
-//  public boolean isPending()
-//  {
-//    return Boolean.TRUE.equals(getJob_().getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE));
-//  }
-//
-//  /**
-//   * Set the job pending indicator.
-//   * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
-//   */
-//  public void setPending(final boolean pending)
-//  {
-//    getJob_().setParameter(BundleParameter.JOB_PENDING, pending);
-//  }
-//
-//  /**
-//   * Get the job expired indicator.
-//   * @return <code>true</code> if job has expired, <code>false</code> otherwise.
-//   */
-//  public boolean isJobExpired()
-//  {
-//    return Boolean.TRUE.equals(getJob_().getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
-//  }
-//
-//  /**
-//   * Notifies that job has expired.
-//   */
-//  public void jobExpired()
-//  {
-//    setJobExpired(true);
-//  }
-//
-//  public void setJobExpired(final boolean jobExpired) {
-//    getJob_().setParameter(BundleParameter.JOB_EXPIRED, jobExpired);
-//  }
-//
-//  private JPPFTaskBundle getJob_() {
-//    return ((JPPFTaskBundle) getJob());
-//  }
-//
-//  /**
-//   * Get the job received time.
-//   * @return the time in milliseconds as a long value.
-//   */
-//  public long getJobReceivedTime()
-//  {
-//    return (Long) getJob_().getParameter(BundleParameter.JOB_RECEIVED_TIME);
-//  }
-//
-//  /**
-//   * Set the job received time.
-//   * @param jobReceivedTime the time in milliseconds as a long value.
-//   */
-//  public void setJobReceivedTime(final long jobReceivedTime)
-//  {
-//    getJob_().setParameter(BundleParameter.JOB_RECEIVED_TIME, jobReceivedTime);
-//  }
+  /**
+   * The current number of tasks in a job was updated.
+   */
+  public void fireJobUpdated() {
+    fireJobNotification(createJobNotification(JobEventType.JOB_UPDATED, null));
+  }
+
+  /**
+   * A new job was submitted to the JPPF driver queue.
+   */
+  public void fireJobQueued() {
+    fireJobNotification(createJobNotification(JobEventType.JOB_QUEUED, null));
+  }
+
+  /**
+   * A job was completed and sent back to the client.
+   */
+  public void fireJobEnded() {
+    fireJobNotification(createJobNotification(JobEventType.JOB_ENDED, null));
+  }
+
+  /**
+   * A sub-job was dispatched to a node.
+   * @param channel the node to which the job is dispatched.
+   */
+  public void fireJobDispatched(final ExecutorChannel channel) {
+    fireJobNotification(createJobNotification(JobEventType.JOB_DISPATCHED, channel));
+  }
+
+  /**
+   * A sub-job returned from a node.
+   * @param channel the node from which the job is returned.
+   */
+  public void fireJobReturned(final ExecutorChannel channel) {
+    fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel));
+  }
+
+  /**
+   * Fire job listener event.
+   * @param event the event to be fired.
+   */
+  protected abstract void fireJobNotification(final JobNotification event);
+
+    /**
+    * Get the current number of tasks in the job.
+    * @return the number of tasks as an int.
+    */
+  public abstract int getTaskCount();
+
+  /**
+   * Create instance of job notification.
+   * @param eventType the type of this job event.
+   * @param channel the node to which the job event is created.
+   * @param bundle the bundle for created job event.
+   * @return {@link JobNotification} instance.
+   */
+  protected static JobNotification createJobNotification(final JobEventType eventType, final ExecutorChannel channel, final JPPFTaskBundle bundle) {
+    JobSLA sla = bundle.getSLA();
+    Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+    JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(),
+            bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
+    jobInfo.setMaxNodes(sla.getMaxNodes());
+    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
+    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, System.currentTimeMillis());
+    if (eventType == JobEventType.JOB_UPDATED)
+    {
+      Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
+      if (n != null) jobInfo.setTaskCount(n);
+    }
+    return event;
+  }
+
+  /**
+   * Create instance of job notification.
+   * @param eventType the type of this job event.
+   * @param channel the node to which the job event is created.
+   * @return {@link org.jppf.job.JobNotification} instance.
+   */
+  protected JobNotification createJobNotification(final JobEventType eventType, final ExecutorChannel channel)
+  {
+    JobSLA sla = getSLA();
+    boolean pending = isPending();
+    JobInformation jobInfo = new JobInformation(getUuid(), getName(), getTaskCount(),
+            getTaskCount(), sla.getPriority(), sla.isSuspended(), pending);
+    jobInfo.setMaxNodes(sla.getMaxNodes());
+    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
+    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, System.currentTimeMillis());
+    if (eventType == JobEventType.JOB_UPDATED)
+    {
+      Integer n = (Integer) getJob().getParameter(BundleParameter.REAL_TASK_COUNT);
+      if (n != null) jobInfo.setTaskCount(n);
+    }
+    return event;
+  }
 }

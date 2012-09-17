@@ -47,10 +47,10 @@ public class JobNotification extends Notification
 
   /**
    * Initialize this event with the specified job and node information.
-   * @param eventType - the type of this job event.
-   * @param jobInfo - information about the job.
-   * @param nodeInfo - information about the node.
-   * @param timestamp - the creation timestamp for this event.
+   * @param eventType the type of this job event.
+   * @param jobInfo information about the job.
+   * @param nodeInfo information about the node.
+   * @param timestamp the creation timestamp for this event.
    */
   public JobNotification(final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp)
   {

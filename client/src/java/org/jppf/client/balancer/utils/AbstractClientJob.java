@@ -35,6 +35,21 @@ import org.slf4j.*;
 public abstract class AbstractClientJob
 {
   /**
+   * State for task indicating whether result or exception was received.
+   */
+  protected static enum TaskState
+  {
+    /**
+     * Result was received for task.
+     */
+    RESULT,
+    /**
+     * Exception was received for task.
+     */
+    EXCEPTION
+  }
+
+  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
@@ -415,7 +430,7 @@ public abstract class AbstractClientJob
   }
 
   /**
-   * Clear the channels used to duispatch this job.
+   * Clear the channels used to dispatch this job.
    * See {@link #remoteChannel}.
    */
   public void clearChannels()

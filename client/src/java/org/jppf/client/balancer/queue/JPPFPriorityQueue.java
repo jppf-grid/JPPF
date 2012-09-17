@@ -562,7 +562,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   }
 
   /**
-   * Process the jobs in the pending braodcasts queue.
+   * Process the jobs in the pending broadcast queue.
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
   public void processPendingBroadcasts() {

@@ -83,8 +83,6 @@ class WaitingResultsState extends NodeServerState
           {
             log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
           }
-//          newBundleWrapper.setTasks(bundleWrapper.getTasks());
-//          newBundle.setTaskCount(bundle.getTaskCount());
 
           exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
           bundleWrapper.resultsReceived(t);

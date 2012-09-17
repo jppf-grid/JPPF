@@ -28,13 +28,14 @@ import org.jppf.server.nio.StateTransitionManager;
  */
 public class RemoteNodeContext extends AbstractNodeContext
 {
+  /**
+   * Default constructor.
+   * @param transitionManager instance of transition manager used by this node context.
+   */
   public RemoteNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
     super(transitionManager);
   }
 
-  /**
-   * {@inheritDoc}.
-   */
   @Override
   public AbstractTaskBundleMessage newMessage()
   {

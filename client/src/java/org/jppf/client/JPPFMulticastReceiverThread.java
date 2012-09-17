@@ -186,7 +186,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   }
 
   /**
-   * Close this multicast receiver and interrupt the thread that rns it.
+   * Close this multicast receiver and interrupt the thread that runs it.
    */
   public void close()
   {

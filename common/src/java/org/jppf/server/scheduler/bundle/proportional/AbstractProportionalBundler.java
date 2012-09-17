@@ -36,7 +36,7 @@ import java.util.Set;
  * The mean execution time is computed as a moving average over a number of tasks, specified in the bundling
  * algorithm profile configuration as &quot;performanceCacheSize&quot;<br>
  * This algorithm is well suited for relatively small networks (a few dozen nodes at most). It generates an overhead
- * everytime the performance data for a node is updated. In the case of a small network, this overhead is not
+ * every time the performance data for a node is updated. In the case of a small network, this overhead is not
  * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
  */

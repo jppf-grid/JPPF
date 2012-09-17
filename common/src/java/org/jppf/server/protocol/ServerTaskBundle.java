@@ -59,7 +59,9 @@ public class ServerTaskBundle extends JPPFTaskBundle {
    * Job cancel indicator
    */
   private boolean cancelled  = false;
-
+  /**
+   * The job this submission is for
+   */
   private JPPFTaskBundle taskBundle;
 
   /**
@@ -71,6 +73,12 @@ public class ServerTaskBundle extends JPPFTaskBundle {
     this(job, null, tasks);
   }
 
+  /**
+   * Initialize this task bundle and set its build number.
+   * @param job   the job to execute.
+   * @param taskBundle the job.
+   * @param tasks the tasks to execute.
+   */
   public ServerTaskBundle(final ServerJob job, final JPPFTaskBundle taskBundle, final List<DataLocation> tasks)
   {
     if (job == null) throw new IllegalArgumentException("job is null");
@@ -242,7 +250,7 @@ public class ServerTaskBundle extends JPPFTaskBundle {
    */
   public synchronized void resubmit()
   {
-    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resumbitted.
+    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
     requeued = true;
   }
 

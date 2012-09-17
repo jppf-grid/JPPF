@@ -386,10 +386,6 @@ public class DriverInitializer
     return serverDebug;
   }
 
-  public boolean hasServerDebug() {
-    return serverDebug != null;
-  }
-
   /**
    * Get the object that handles listeners to node connection events.
    * @return a {@link NodeConnectionEventHandler} instance.

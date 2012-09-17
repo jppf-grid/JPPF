@@ -26,6 +26,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.execute.ExecutorChannelStatusEvent;
 import org.jppf.execute.ExecutorChannelStatusListener;
 import org.jppf.execute.ExecutorStatus;
+import org.jppf.io.DataLocation;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.job.JobListener;
 import org.jppf.management.JPPFManagementInfo;
@@ -105,11 +106,17 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Counts the current number of connections with ACTIVE or EXECUTING status.
    */
   private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
-
+  /**
+   * Handles listeners to node connection events.
+   */
   private final NodeConnectionEventHandler nodeConnectionHandler;
-
+  /**
+   * The list of registered job listeners.
+   */
   private final List<JobListener> jobListeners = new ArrayList<JobListener>();
-
+  /**
+   * Listener used for monitoring state changes.
+   */
   private final ExecutorChannelStatusListener statusListener = new ExecutorChannelStatusListener() {
     @Override
     public void executionStatusChanged(final ExecutorChannelStatusEvent event) {
@@ -150,6 +157,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
   }
 
+  /**
+   * Get a reference to the object that generates the statistics events of which all related listeners are notified.
+   * @return a <code>JPPFDriverStatsManager</code> instance.
+   * @exclude
+   */
   public JPPFDriverStatsManager getStatsManager()
   {
     return statsManager;
@@ -302,7 +314,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
         bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
-        ServerJob serverJob = new ServerJob(getJobManager(), bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
+        ServerJob serverJob = new ServerJob(getJobManager(), bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)), Collections.<DataLocation>emptyList());
         initialBundle = serverJob.copy(serverJob.getTaskCount());
       }
       catch(Exception e)
@@ -417,7 +429,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   /**
    * Get the list of currently idle channels.
-   * @return a list of <code>SelectableChannel</code> instances.
+   * @return a list of <code>AbstractNodeContext</code> instances.
    */
   public List<AbstractNodeContext> getIdleChannels()
   {
@@ -453,7 +465,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Close this server and interrupt the thread that runs it.
    */
   public void close()
   {
@@ -477,6 +489,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     }
   }
 
+  /**
+   * Called when a channel is connected.
+   * @param channel the connected channel.
+   */
   public void nodeConnected(final AbstractNodeContext channel) {
     JPPFManagementInfo info = channel.getManagementInfo();
     if(info != null) nodeConnectionHandler.fireNodeConnected(info);
@@ -493,10 +509,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     queue.updatePriority(jobUuid, newPriority);
   }
 
-  /**
-   * Get the set of ids for all the jobs currently queued or executing.
-   * @return a set of ids as strings.
-   */
   @Override
   public Set<String> getAllJobIds() {
     return queue.getAllJobIds();
@@ -525,6 +537,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     return queue.getJob(jobUuid);
   }
 
+  /**
+   * Get the corresponding node's context information.
+   * @return a {@link JPPFContext} instance.
+   */
   public JPPFContext getJPPFContext() {
     return taskQueueChecker.getJPPFContext();
   }

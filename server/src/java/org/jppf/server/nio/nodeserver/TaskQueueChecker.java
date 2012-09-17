@@ -46,6 +46,7 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
+ * @param <T> type of the <code>ExecutorChannel</code>.
  */
 public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchronization implements Runnable
 {
@@ -104,6 +105,10 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     this.bundler = createDefault();
   }
 
+  /**
+   * Get the corresponding node's context information.
+   * @return a {@link JPPFContext} instance.
+   */
   public JPPFContext getJPPFContext() {
     return jppfContext;
   }
@@ -302,6 +307,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param channel the node channel to dispatch the job to.
    * @param selectedBundle the job to dispatch.
    */
+  @SuppressWarnings("unchecked")
   private void dispatchJobToChannel(final T channel, final ServerJob selectedBundle)
   {
     if (debugEnabled)

@@ -41,7 +41,7 @@ public class ClientMessage extends AbstractTaskBundleMessage
 
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
+   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
   public ClientMessage(final boolean ssl)
   {

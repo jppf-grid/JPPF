@@ -41,6 +41,9 @@ class ShutdownRestartTask extends TimerTask
    * Delay, starting from shutdown completion, after which the server is restarted.
    */
   private final long restartDelay;
+  /**
+   * Reference to the driver.
+   */
   private final JPPFDriver driver;
   /**
    * The timer used to schedule this task, and eventually the restart operation.

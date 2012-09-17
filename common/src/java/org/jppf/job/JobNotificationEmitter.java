@@ -28,5 +28,5 @@ public interface JobNotificationEmitter {
    * Fire job listener event.
    * @param event the event to be fired.
    */
-  public void fireJobEvent(final JobNotification event);
+  void fireJobEvent(final JobNotification event);
 }

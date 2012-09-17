@@ -76,8 +76,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   private final StateTransitionManager<NodeState, NodeTransition> transitionManager;
 
   /**
-   * Initialized abstact node context.
-   * @param transitionManager instance of transion manager used by this node context.
+   * Initialized abstract node context.
+   * @param transitionManager instance of transition manager used by this node context.
    */
   protected AbstractNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
     this.transitionManager = transitionManager;
@@ -207,7 +207,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Deserialize a task bundle from the message read into this buffer.
    * @return a {@link AbstractNodeContext} instance.
    * @throws Exception if an error occurs during the deserialization.
-   * @param notificationEmitter
+   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    */
   public ServerTaskBundle deserializeBundle(final JobNotificationEmitter notificationEmitter) throws Exception
   {
@@ -219,7 +219,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
     return new ServerJob(notificationEmitter, bundle, null, tasks).copy(tasks.size());
-//    return new ServerJob(notificationEmitter, bundle, null, tasks);
   }
 
   /**
@@ -353,10 +352,19 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     return future;
   }
 
+  /**
+   * Get the <code>Runnable</code> that will be called when node context is closed.
+   * @return a <1code>Runnable</code> instance.
+   */
   public Runnable getOnClose() {
     return onClose;
   }
 
+  /**
+   * Set the <code>Runnable</code> that will be called when node context is closed.
+   * <code>Runnable</code> called when node context is closed.
+   * @param onClose a <code>Runnable</code> called when node context is closed or <code>null</code>.
+   */
   public void setOnClose(final Runnable onClose) {
     this.onClose = onClose;
   }

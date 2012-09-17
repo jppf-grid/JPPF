@@ -102,10 +102,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     this.statsManager = statsManager;
   }
 
-  /**
-   * Add an object to the queue, and notify all listeners about it.
-   * @param bundleWrapper the object to add to the queue.
-   */
   @Override
   public void addBundle(final ServerJob bundleWrapper)
   {
@@ -182,11 +178,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  /**
-   * Get the next object in the queue.
-   * @param nbTasks the maximum number of tasks to get out of the bundle.
-   * @return the most recent object that was added to the queue.
-   */
   @Override
   public ServerTaskBundle nextBundle(final int nbTasks)
   {
@@ -194,12 +185,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
   }
 
-  /**
-   * Get the next object in the queue.
-   * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
-   * @param nbTasks the maximum number of tasks to get out of the bundle.
-   * @return the most recent object that was added to the queue.
-   */
   @Override
   public ServerTaskBundle nextBundle(final ServerJob bundleWrapper, final int nbTasks)
   {
@@ -259,10 +244,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     return result;
   }
 
-  /**
-   * Determine whether the queue is empty or not.
-   * @return true if the queue is empty, false otherwise.
-   */
   @Override
   public boolean isEmpty()
   {
@@ -277,10 +258,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  /**
-   * Get the maximum bundle size for the bundles present in the queue.
-   * @return the bundle size as an int.
-   */
   @Override
   public int getMaxBundleSize()
   {
@@ -304,9 +281,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ServerJob removeBundle(final ServerJob bundleWrapper)
   {
@@ -324,11 +298,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  /**
-   * Get an iterator on the task bundles in this queue.
-   * @return an iterator.
-   * @see Iterable#iterator()
-   */
   @Override
   public Iterator<ServerJob> iterator()
   {
@@ -581,7 +550,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   }
 
   /**
-   * Process the jobs in the pending braodcasts queue.
+   * Process the jobs in the pending broadcast queue.
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
   public void processPendingBroadcasts() {

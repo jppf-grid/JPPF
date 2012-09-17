@@ -112,7 +112,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       return;
     }
     if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    bundleWrapper.setSuspended(false);
+    bundleWrapper.setSuspended(false, false);
   }
 
   /**
@@ -172,7 +172,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
    * @param jobUuid the id of the job for which to find node information.
-   * @return a list of <code>NodeManagementInfo</code> instances.
+   * @return array of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.
    * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
    */

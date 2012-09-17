@@ -43,7 +43,7 @@ public interface NioMessage
 
   /**
    * Determines whether this message read from / writes to an SSL connection.
-   * @return <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
+   * @return <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
   boolean isSSL();
 }

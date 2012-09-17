@@ -16,28 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.execute;
-
 /**
- * Status of the channel.
- * @author Martin JANDA
+ * Support for the new load-balancing of local versus remote execution on the server side.
+ * @exclude
  */
-public enum ExecutorStatus
-{
-  /**
-   * The channel is successfully connected.
-   */
-  ACTIVE,
-  /**
-   * The channel is currently executing a job.
-   */
-  EXECUTING,
-  /**
-   * The channel failed to connect and no further attempt will be made.
-   */
-  FAILED,
-  /**
-   * The channel is disabled or being initialized.
-   */
-  DISABLED
-}
+package org.jppf.server.protocol.utils;

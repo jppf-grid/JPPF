@@ -65,7 +65,7 @@ public abstract class AbstractNioMessage implements NioMessage
    */
   protected NioObject currentObject = null;
   /**
-   * <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
+   * <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
   protected boolean ssl = false;
   /**
@@ -75,7 +75,7 @@ public abstract class AbstractNioMessage implements NioMessage
 
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or wirtten an SSL connection, <code>false</code> otherwise.
+   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
   protected AbstractNioMessage(final boolean ssl)
   {

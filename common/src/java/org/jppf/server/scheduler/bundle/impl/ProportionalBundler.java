@@ -29,7 +29,7 @@ import org.slf4j.*;
  * The mean execution time is computed as a moving average over a number of tasks, specified in the bundling
  * algorithm profile configuration as &quot;minSamplesToAnalyse&quot;<br>
  * This algorithm is well suited for relatively small networks (a few dozen nodes at most). It generates an overhead
- * everytime the performance data for a node is updated. In the case of a small network, this overhead is not
+ * every time the performance data for a node is updated. In the case of a small network, this overhead is not
  * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
  */
@@ -80,7 +80,7 @@ public class ProportionalBundler extends AbstractProportionalBundler implements 
   @Override
   protected int maxSize()
   {
-    if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": jppfCOntext=" + jppfContext);
+    if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": jppfContext=" + jppfContext);
     if (jppfContext == null) return 300;
     int n = jppfContext.getMaxBundleSize();
     if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": maxBundleSize=" + n);

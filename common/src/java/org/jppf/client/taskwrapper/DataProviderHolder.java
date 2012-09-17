@@ -24,7 +24,7 @@ import org.jppf.task.storage.DataProvider;
  * This interface must be implemented by tasks that are not subclasses of {@link org.jppf.server.protocol.JPPFTask JPPFTask}
  * when they need access to the job's {@link DataProvider}.
  * <p>Implementations should ensure the DataProvider is not kept as a persistent (on-transient) attribute of the
- * implementing class, otherwise it will be serialized along with the task after execution, causing addtional CPU usage
+ * implementing class, otherwise it will be serialized along with the task after execution, causing additional CPU usage
  * and network traffic. 
  * @author Laurent Cohen
  */

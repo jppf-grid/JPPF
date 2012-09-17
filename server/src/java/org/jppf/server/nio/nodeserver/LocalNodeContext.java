@@ -39,25 +39,19 @@ public class LocalNodeContext extends AbstractNodeContext
 
   /**
    * Default constructor.
-   * @param transitionManager instance of transion manager used by this node context.
+   * @param transitionManager instance of transition manager used by this node context.
    */
   public LocalNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager)
   {
     super(transitionManager);
   }
 
-  /**
-   * {@inheritDoc}.
-   */
   @Override
   public AbstractTaskBundleMessage newMessage()
   {
     return new LocalNodeMessage();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
@@ -74,9 +68,6 @@ public class LocalNodeContext extends AbstractNodeContext
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
   {
@@ -86,9 +77,6 @@ public class LocalNodeContext extends AbstractNodeContext
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setMessage(final NioMessage nodeMessage)
   {
