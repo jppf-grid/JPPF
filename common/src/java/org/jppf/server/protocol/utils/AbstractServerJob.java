@@ -250,8 +250,7 @@ public abstract class AbstractServerJob {
    */
   public void jobExpired()
   {
-    this.jobExpired = true;
-    cancel(true);
+    setJobExpired(true);
   }
 
   /**
@@ -261,7 +260,7 @@ public abstract class AbstractServerJob {
   public void setJobExpired(final boolean jobExpired)
   {
     this.jobExpired = jobExpired;
-    if(this.jobExpired) cancel(true);
+    if (this.jobExpired && !isDone()) cancel(true);
   }
 
   /**
@@ -285,6 +284,14 @@ public abstract class AbstractServerJob {
     if (oldValue != newValue) fireJobUpdated();
   }
 
+  /**
+   * Get the job suspended indicator.
+   * @return <code>true</code> if job is suspended, <code>false</code> otherwise.
+   */
+  public boolean isSuspended() {
+    return getJob().getSLA().isSuspended();
+  }
+  
   /**
    * Set the job suspended indicator.
    * @param suspended <code>true</code> to indicate that job is suspended, <code>false</code> otherwise.

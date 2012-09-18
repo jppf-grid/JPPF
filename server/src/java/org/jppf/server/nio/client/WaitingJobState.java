@@ -67,8 +67,7 @@ class WaitingJobState extends ClientServerState
       JPPFTaskBundle header = (JPPFTaskBundle) bundleWrapper.getJob();
       int count = header.getTaskCount();
       if (debugEnabled) log.debug("read bundle" + header + " from client " + channel + " done: received " + count + " tasks");
-      if (header.getParameter(BundleParameter.JOB_RECEIVED_TIME) == null)
-        header.setParameter(BundleParameter.JOB_RECEIVED_TIME, System.currentTimeMillis());
+      if (bundleWrapper.getJobReceivedTime() == 0L) bundleWrapper.setJobReceivedTime(System.currentTimeMillis());
 
       header.getUuidPath().incPosition();
       header.getUuidPath().add(driver.getUuid());

@@ -194,7 +194,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if(onClose != null) onClose.run();
     if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getJob().getState()))
     {
-      if(exception != null) exception.printStackTrace();
+//      if(exception != null && !(exception instanceof EOFException)) exception.printStackTrace();
 //      bundle.fireJobReturned((ExecutorChannel) channel.getContext()); // todo fix
       ServerTaskBundle tmpWrapper = bundle;
       setBundle(null);

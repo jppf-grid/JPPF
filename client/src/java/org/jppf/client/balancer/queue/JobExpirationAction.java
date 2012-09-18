@@ -38,7 +38,7 @@ class JobExpirationAction implements Runnable
   /**
    * The bundle wrapper encapsulating the job.
    */
-  private ClientJob bundleWrapper = null;
+  private final ClientJob bundleWrapper;
 
   /**
    * Initialize this action with the specified bundle wrapper.

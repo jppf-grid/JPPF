@@ -61,6 +61,10 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * Indicator whether task timeout.
    */
   private boolean timeout = false;
+  /**
+   * Indicator that task was started.
+   */
+  private boolean started = false;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
@@ -96,7 +100,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    */
   public synchronized void timeout() {
     this.timeout |= !this.cancelled;
-    if (!this.cancelled) executionManager.removeFuture(number);
+    if (!this.cancelled && !started) executionManager.removeFuture(number);
 
     if (task instanceof Future)
     {
@@ -113,6 +117,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   public void run()
   {
     if (traceEnabled) log.trace(toString());
+    setStarted();
     JPPFNodeReconnectionNotification rn = null;
     ThreadManager.UsedClassLoader usedClassLoader = null;
     ThreadManager threadManager = executionManager.getThreadManager();
@@ -146,11 +151,10 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     }
     finally
     {
-      boolean remove = false;
       try
       {
-        remove |= silentTimeout();
-        remove |= silentCancel();
+        silentTimeout();
+        silentCancel();
       }
       catch (Throwable t)
       {
@@ -161,7 +165,6 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
 
       if (usedClassLoader != null) usedClassLoader.dispose();
 
-      //if (remove) executionManager.removeFuture(number);
       executionManager.removeFuture(number);
 
       if (rn == null)
@@ -198,6 +201,13 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   }
 
   /**
+   * Set started indicator.
+   */
+  protected synchronized void setStarted() {
+    this.started = true;
+  }
+
+  /**
    * Get the context class loader for this task.
    * @return a {@link ClassLoader} instance.
    */
@@ -226,6 +236,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     sb.append(", cancelled=").append(cancelled);
     sb.append(", callOnCancel=").append(callOnCancel);
     sb.append(", timeout=").append(timeout);
+    sb.append(", started=").append(started);
     sb.append('[');
     return sb.toString();
   }

@@ -67,13 +67,11 @@ class WaitingResultsState extends NodeServerState
     {
       Exception exception = null;
       ServerTaskBundle bundleWrapper = context.getBundle();
-      JPPFTaskBundle bundle;
-      JPPFTaskBundle newBundle;
       boolean requeue = false;
       try {
-        bundle = bundleWrapper;// (JPPFTaskBundle) bundleWrapper.getJob();
+        JPPFTaskBundle bundle = bundleWrapper;// (JPPFTaskBundle) bundleWrapper.getJob();
         ServerTaskBundle newBundleWrapper = context.deserializeBundle(server.getJobManager());
-        newBundle = newBundleWrapper; // (JPPFTaskBundle) newBundleWrapper.getJob();
+        JPPFTaskBundle newBundle = newBundleWrapper.getJob();
         if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
         // if an exception prevented the node from executing the tasks
         Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
@@ -119,19 +117,6 @@ class WaitingResultsState extends NodeServerState
 //        context.resubmitBundle(bundleWrapper);
         bundleWrapper.resubmit();
       }
-//      else
-//      {
-//        // notify the client thread about the end of a bundle
-//        bundleWrapper.taskCompleted(null); //context.isJobCanceled() ? bundleWrapper : newBundleWrapper);
-//        context.setJobCanceled(false);
-//      }
-//      JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-//      if (systemInfo != null)
-//      {
-//        context.setNodeInfo(systemInfo, true);
-//        Bundler bundler = context.getBundler();
-//        if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-//      }
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setMessage(null);

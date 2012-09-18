@@ -354,10 +354,18 @@ public class ServerJob extends AbstractServerJob
     synchronized (tasks)
     {
       List<DataLocation> bundleTasks = bundle == null ? results : bundle.getTasksL();
-      for (int index = 0; index < bundleTasks.size(); index++) {
-        DataLocation location = bundleTasks.get(index);
-        DataLocation task = results.get(index);
-        taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
+      if(isJobExpired() || isCancelled()) {
+        for (int index = 0; index < bundleTasks.size(); index++) {
+          DataLocation location = bundleTasks.get(index);
+          DataLocation task = location;
+          taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
+        }
+      } else {
+        for (int index = 0; index < bundleTasks.size(); index++) {
+          DataLocation location = bundleTasks.get(index);
+          DataLocation task = results.get(index);
+          taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
+        }
       }
     }
     ExecutorChannel channel;
@@ -414,7 +422,6 @@ public class ServerJob extends AbstractServerJob
         if (bundle != null) {
           for (DataLocation task : bundle.getTasksL()) {
             Pair<DataLocation, TaskState> pair = taskStateMap.put(task, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
-
             if (pair == null || pair.second() != TaskState.RESULT) list.add(task);
           }
         }
