@@ -28,6 +28,7 @@ import org.jppf.node.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.*;
+import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -107,6 +108,10 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * The class loader used to load the tasks and the classes they need from the client.
    */
   private AbstractJPPFClassLoader taskClassLoader = null;
+  /**
+   * The data provider for the current job.
+   */
+  private DataProvider dataProvider = null;
 
   /**
    * Initialize this execution manager with the specified node.
@@ -179,6 +184,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    */
   public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception
   {
+    if ((taskList == null) || taskList.isEmpty()) return;
     if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
     NodeExecutionInfo info = threadManager.isCpuTimeEnabled() ? threadManager.computeExecutionInfo() : null;
     setup(bundle, taskList);
@@ -325,6 +331,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   {
     this.bundle = bundle;
     this.taskList = taskList;
+    this.dataProvider = taskList.get(0).getDataProvider();
     this.uuidList = bundle.getUuidPath().getList();
     try
     {
@@ -337,7 +344,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
       else log.warn(msg);
     }
     taskCount = new AtomicLong(0L);
-    node.getLifeCycleEventHandler().fireJobStarting(bundle, taskClassLoader, (List<Task>) taskList);
+    node.getLifeCycleEventHandler().fireJobStarting(bundle, taskClassLoader, (List<Task>) taskList, dataProvider);
   }
 
   /**
@@ -346,7 +353,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   @SuppressWarnings("unchecked")
   public void cleanup()
   {
-    node.getLifeCycleEventHandler().fireJobEnding(bundle, taskClassLoader, (List<Task>) taskList);
+    node.getLifeCycleEventHandler().fireJobEnding(bundle, taskClassLoader, (List<Task>) taskList, dataProvider);
     taskClassLoader = null;
     this.bundle = null;
     this.taskList = null;
@@ -395,9 +402,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     return taskCount.incrementAndGet();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void taskEnded(final Task task, final long taskNumber, final NodeExecutionInfo info, final long elapsedTime)
   {
@@ -484,18 +488,12 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     return configChanged.compareAndSet(true, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized JPPFNodeReconnectionNotification getReconnectionNotification()
   {
     return reconnectionNotification;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification)
   {
@@ -565,9 +563,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     threadManager.setPriority(newPriority);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ThreadManager getThreadManager()
   {

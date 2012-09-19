@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.Node;
 import org.jppf.node.protocol.*;
+import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.ServiceFinder;
 import org.slf4j.*;
 
@@ -129,7 +130,7 @@ public class LifeCycleEventHandler
    */
   public void fireJobHeaderLoaded(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, null);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners)
@@ -144,10 +145,11 @@ public class LifeCycleEventHandler
    * @param job the job that is about to be or has been executed.
    * @param cl the class loader used to load the tasks and the classes they need from the client.
    * @param tasks the tasks about to be or which have been executed.
+   * @param dataProvider the data provider for the current job.
    */
-  public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks)
+  public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks, dataProvider);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners) listener.jobStarting(event);
@@ -159,10 +161,11 @@ public class LifeCycleEventHandler
    * @param job the job that is about to be or has been executed.
    * @param cl the class loader used to load the tasks and the classes they need from the client.
    * @param tasks the tasks about to be or which have been executed.
+   * @param dataProvider the data provider for the current job.
    */
-  public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks)
+  public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks, dataProvider);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners) listener.jobEnding(event);

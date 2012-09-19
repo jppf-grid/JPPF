@@ -33,7 +33,7 @@ public class MemoryMapDataProvider implements DataProvider
   /**
    * The actual store implementation for the shared data.
    */
-  private Map<Object, Object> store = new HashMap<Object, Object>();
+  private final Map<Object, Object> store = new HashMap<Object, Object>();
 
   /**
    * Get a value specified by its key.
@@ -57,5 +57,11 @@ public class MemoryMapDataProvider implements DataProvider
   public void setValue(final Object key, final Object value)
   {
     store.put(key, value);
+  }
+
+  @Override
+  public String toString()
+  {
+    return store.toString();
   }
 }
