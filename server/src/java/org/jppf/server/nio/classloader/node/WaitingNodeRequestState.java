@@ -167,7 +167,7 @@ class WaitingNodeRequestState extends ClassServerState
    * @return the resulting state transition.
    * @throws Exception if any error occurs.
    */
-  private ClassTransition processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
+  private static ClassTransition processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
   {
     byte[] b = null;
     String name = resource.getName();
@@ -187,13 +187,10 @@ class WaitingNodeRequestState extends ClassServerState
     {
       if (debugEnabled) log.debug("requesting resource " + resource + " from client: " + provider + " for node: " + channel);
       ClassContext providerContext = (ClassContext) provider.getContext();
-      synchronized(provider)
-      {
-        ResourceRequest request = new ResourceRequest(channel, resource);
-        context.getPendingResponses().put(resource, request);
-        providerContext.addRequest(request);
-        resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
-      }
+      ResourceRequest request = new ResourceRequest(channel, resource);
+      context.getPendingResponses().put(resource, request);
+      providerContext.addRequest(request);
+      resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
     }
     else
     {
@@ -201,7 +198,7 @@ class WaitingNodeRequestState extends ClassServerState
       resource.setDefinition(null);
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
     }
-		return TO_NODE_WAITING_PROVIDER_RESPONSE;
+    return TO_NODE_WAITING_PROVIDER_RESPONSE;
   }
 
   /**
@@ -210,7 +207,7 @@ class WaitingNodeRequestState extends ClassServerState
    * @return a <code>SelectableChannel</code> instance.
    * @throws Exception if an error occurs while searching for a connection.
    */
-  private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
+  private static ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
   {
     ChannelWrapper<?> result = null;
     ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
