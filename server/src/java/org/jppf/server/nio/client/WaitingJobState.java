@@ -72,7 +72,7 @@ class WaitingJobState extends ClientServerState
       header.getUuidPath().incPosition();
       header.getUuidPath().add(driver.getUuid());
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
-      header.setCompletionListener(new CompletionListener(channel));
+      header.setCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
       context.setPendingTasksCount(header.getTaskCount());
       context.setInitialBundleWrapper(bundleWrapper);
       JPPFDriver.getQueue().addBundle(bundleWrapper);

@@ -91,7 +91,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * Determines whether local execution is enabled on this client.
    */
-  private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", false);
+  private boolean localEnabled;
   /**
    * Wrapper for local execution node.
    */
@@ -103,7 +103,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * Determines whether this submission manager has been closed. 
    */
-  private AtomicBoolean closed = new AtomicBoolean(false);
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Instantiates client submission manager.
@@ -114,6 +114,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   {
     if (client == null) throw new IllegalArgumentException("client is null");
 
+    this.localEnabled = client.getConfig().getBoolean("jppf.local.execution.enabled", false);
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.queue = new JPPFPriorityQueue(this);
 

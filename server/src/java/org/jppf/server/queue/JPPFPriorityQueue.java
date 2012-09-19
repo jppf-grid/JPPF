@@ -402,7 +402,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
       }
       catch(ParseException e)
       {
-        bundleWrapper.setJobExpired(false);
         log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
                 ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }

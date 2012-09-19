@@ -49,11 +49,11 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   /**
    * Maximum wait time in milliseconds in the the submission manager loop.
    */
-  private static final long MAX_WAIT_MILLIS = JPPFConfiguration.getProperties().getLong("jppf.submission.manager.maxwait.millis", 0L);
+  private final long maxWaitMillis;
   /**
    * Maximum wait time in milliseconds in the the submission manager loop.
    */
-  private static final int MAX_WAIT_NANOS = JPPFConfiguration.getProperties().getInt("jppf.submission.manager.maxwait.nanos", 100000);
+  private final int maxWaitNanos;
   /**
    * The queue of submissions pending execution.
    */
@@ -69,7 +69,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
   /**
    * The load balancer for local versus remote execution.
    */
-  protected LoadBalancer loadBalancer = new LoadBalancer();
+  protected final LoadBalancer loadBalancer;
   /**
    * Keeps a list of the valid connections not currently executing tasks.
    */
@@ -81,7 +81,13 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
    */
   protected AbstractSubmissionManager(final AbstractGenericClient client)
   {
+    if (client == null) throw new IllegalArgumentException("client is null");
+
     this.client = client;
+    TypedProperties config = client.getConfig();
+    this.loadBalancer = new LoadBalancer(config);
+    this.maxWaitMillis = config.getLong("jppf.submission.manager.maxwait.millis", 0L);
+    this.maxWaitNanos = config.getInt("jppf.submission.manager.maxwait.nanos", 100000);
   }
 
   /**
@@ -99,7 +105,7 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
         Pair<Boolean, Boolean> execFlags = null;
         while (((execQueue.isEmpty() && broadcastJobsQueue.isEmpty()) || !(execFlags = handleAvailableConnection()).first()) && !isStopped())
         {
-          goToSleep(MAX_WAIT_MILLIS, MAX_WAIT_NANOS);
+          goToSleep(maxWaitMillis, maxWaitNanos);
         }
         if (isStopped()) break;
         synchronized(this)
@@ -261,9 +267,6 @@ public abstract class AbstractSubmissionManager extends ThreadSynchronization im
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close()
   {

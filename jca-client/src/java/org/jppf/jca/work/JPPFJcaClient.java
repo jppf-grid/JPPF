@@ -58,13 +58,13 @@ public class JPPFJcaClient extends AbstractGenericClient
   }
 
   @Override
-  protected void initConfig(final Object configuration)
+  protected TypedProperties initConfig(final Object configuration)
   {
     if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
+    TypedProperties props = JPPFConfiguration.getProperties();
     try
     {
       //TypedProperties props = new TypedProperties();
-      TypedProperties props = JPPFConfiguration.getProperties();
       ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
       try
       {
@@ -74,13 +74,13 @@ public class JPPFJcaClient extends AbstractGenericClient
       {
         bais.close();
       }
-      config = props;
     }
     catch(Exception e)
     {
       log.error("Error while initializing the JPPF client configuration", e);
     }
-    if (log.isDebugEnabled()) log.debug("config properties: " + config);
+    if (log.isDebugEnabled()) log.debug("config properties: " + props);
+    return props;
   }
 
   @Override

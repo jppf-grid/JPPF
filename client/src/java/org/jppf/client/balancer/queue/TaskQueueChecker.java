@@ -105,6 +105,14 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   }
 
   /**
+   * Get the corresponding node's context information.
+   * @return a {@link JPPFContext} instance.
+   */
+  public JPPFContext getJPPFContext() {
+    return jppfContext;
+  }
+
+  /**
    * Create new instance of default bundler.
    * @return a new {@link Bundler} instance.
    */

@@ -18,7 +18,6 @@
 
 package org.jppf.server.nio.client;
 
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
@@ -41,24 +40,23 @@ public class CompletionListener implements TaskCompletionListener
   /**
    * The transition manager for the server to client channels.
    */
-  private static StateTransitionManager transitionManager = JPPFDriver.getInstance().getClientNioServer().getTransitionManager();
+  private final StateTransitionManager transitionManager;
   /**
    * The client channel.
    */
   private final ChannelWrapper<?> channel;
-  /**
-   * The client context associated with the channel.
-   */
-  private final ClientContext context;
 
   /**
    * Initialize this completion listener with the specified channel.
    * @param channel the client channel.
    */
-  public CompletionListener(final ChannelWrapper<?> channel)
+  public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager transitionManager)
   {
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    if (transitionManager == null) throw new IllegalArgumentException("transitionManager is null");
+
     this.channel = channel;
-    context = (ClientContext) channel.getContext();
+    this.transitionManager = transitionManager;
   }
 
   /**
@@ -68,6 +66,7 @@ public class CompletionListener implements TaskCompletionListener
   @SuppressWarnings("unchecked")
   public void taskCompleted(final ServerJob result)
   {
+    ClientContext context = (ClientContext) channel.getContext();
     synchronized(channel)
     {
       context.offerCompletedBundle(result);

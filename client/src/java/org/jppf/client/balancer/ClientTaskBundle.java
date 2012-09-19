@@ -128,15 +128,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
   }
 
   /**
-   * Set the tasks to be executed by the node.
-   * @param tasks the tasks as a <code>List</code> of arrays of bytes.
-   */
-  public void setTasksL(final List<JPPFTask> tasks)
-  {
-    this.tasks = tasks;
-  }
-
-  /**
    * Make a copy of this bundle.
    * @return a new <code>ClientTaskBundle</code> instance.
    */
@@ -241,7 +232,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   public synchronized void resubmit()
   {
-    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resumbitted.
+    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
     requeued = true;
   }
 

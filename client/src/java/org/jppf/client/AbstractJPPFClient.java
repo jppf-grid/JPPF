@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -83,8 +84,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Read all client connection information from the configuration and initialize
    * the connection pools accordingly.
+   * @param config The JPPF configuration properties.
    */
-  protected abstract void initPools();
+  protected abstract void initPools(final TypedProperties config);
 
   /**
    * Get all the client connections handled by this JPPFClient.

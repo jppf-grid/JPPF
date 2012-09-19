@@ -24,7 +24,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -62,8 +62,9 @@ class LocalExecutionThread extends ExecutionThread
   {
     try
     {
-      long accTimeNanos = getAccTime();
-      int accSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.accumulation.size", Integer.MAX_VALUE);
+      TypedProperties config = loadBalancer.getConfig();
+      long accTimeNanos = getAccTime(config);
+      int accSize = config.getInt("jppf.local.execution.accumulation.size", Integer.MAX_VALUE);
       long start = System.nanoTime();
       LinkedList<Future<JPPFTask>> futures = new LinkedList<Future<JPPFTask>>();
       for (JPPFTask task: tasks)
@@ -123,12 +124,13 @@ class LocalExecutionThread extends ExecutionThread
 
   /**
    * Retrieve the accumulation time and convert it to nanoseconds.
+   * @param config the JPPF configuration properties.
    * @return the accumulation time in nanoseconds.
    */
-  private long getAccTime()
+  private static long getAccTime(final TypedProperties config)
   {
-    long time = JPPFConfiguration.getProperties().getLong("jppf.local.execution.accumulation.time", Long.MAX_VALUE);
-    char unitChar = JPPFConfiguration.getProperties().getChar("jppf.local.execution.accumulation.time.unit", 'n');
+    long time = config.getLong("jppf.local.execution.accumulation.time", Long.MAX_VALUE);
+    char unitChar = config.getChar("jppf.local.execution.accumulation.time.unit", 'n');
     TimeUnit unit;
     switch(unitChar)
     {

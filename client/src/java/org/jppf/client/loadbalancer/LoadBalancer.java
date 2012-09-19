@@ -65,7 +65,7 @@ public class LoadBalancer
   /**
    * Determines whether local execution is enabled on this client.
    */
-  private boolean localEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.local.execution.enabled", false);
+  private boolean localEnabled;
   /**
    * Determines whether local execution has already been initialized.
    */
@@ -98,12 +98,31 @@ public class LoadBalancer
     }
   };
   /**
+   * The JPPF configuration properties.
+   */
+  private final TypedProperties config;
+
+  /**
   * Default constructor.
+  * @param config the JPPF configuration properties.
   */
   @SuppressWarnings("unchecked")
-  public LoadBalancer()
+  public LoadBalancer(final TypedProperties config)
   {
+    if (config == null) throw new IllegalArgumentException("config is null");
+    this.config = config;
+
+    this.localEnabled = config.getBoolean("jppf.local.execution.enabled", false);
     if (isLocalEnabled()) initLocal();
+  }
+
+  /**
+   * Get JPPF configuration properties. These properties are unmodifiable.
+   * @return <code>TypedProperties</code> instance. With JPPF configuration.
+   */
+  public TypedProperties getConfig()
+  {
+    return config;
   }
 
   /**
@@ -113,7 +132,7 @@ public class LoadBalancer
   {
     if (localInitialized) return;
     int n = Runtime.getRuntime().availableProcessors();
-    int poolSize = JPPFConfiguration.getProperties().getInt("jppf.local.execution.threads", n);
+    int poolSize = config.getInt("jppf.local.execution.threads", n);
     log.info("local execution enabled with " + poolSize + " processing threads");
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, new JPPFThreadFactory("LocalExec"));

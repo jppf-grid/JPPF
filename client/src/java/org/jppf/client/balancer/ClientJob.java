@@ -456,9 +456,6 @@ public class ClientJob extends AbstractClientJob
     if (resultsListener instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning)
   {
@@ -522,7 +519,7 @@ public class ClientJob extends AbstractClientJob
   }
 
   /**
-   * Called to notify that the execution of broadcasted job has completed.
+   * Called to notify that the execution of broadcast job has completed.
    * @param broadcastJob    the completed job.
    */
   protected void broadcastCompleted(final ClientJob broadcastJob)

@@ -60,7 +60,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * The JPPF configuration properties.
    */
-  protected TypedProperties config = null;
+  private final TypedProperties config;
   /**
    * Performs server discovery.
    */
@@ -96,8 +96,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     super(uuid);
     for (ClientListener listener : listeners) addClientListener(listener);
-    initConfig(configuration);
-    sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
+    this.config = initConfig(configuration);
+    sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
     //getSubmissionManager();
@@ -106,25 +106,31 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       @Override
       public void run()
       {
-        initPools();
+        initPools(config);
       }
     };
     new Thread(r, "InitPools").start();
   }
 
   /**
-   * Initialize this client's configuration.
-   * @param configuration an object holding the JPPF configuration.
+   * Get JPPF configuration properties. These properties are unmodifiable.
+   * @return <code>TypedProperties</code> instance. With JPPF configuration.
    */
-  protected abstract void initConfig(Object configuration);
+  public TypedProperties getConfig()
+  {
+    return config;
+  }
 
   /**
-   * Read all client connection information from the configuration and initialize
-   * the connection pools accordingly.
+   * Initialize this client's configuration.
+   * @param configuration an object holding the JPPF configuration.
+   * @return <code>TypedProperties</code> instance holding JPPF configuration. Never be <code>null</code>.
    */
+  protected abstract TypedProperties initConfig(Object configuration);
+
   @Override
   @SuppressWarnings("unchecked")
-  protected void initPools()
+  protected void initPools(final TypedProperties config)
   {
     if (debugEnabled) log.debug("initializing connections");
     //loadBalancer = new LoadBalancer();

@@ -86,14 +86,10 @@ public class JPPFClient extends AbstractGenericClient
     super(uuid, JPPFConfiguration.getProperties(), listeners);
   }
 
-  /**
-   * Initialize this client's configuration.
-   * @param configuration an object holding the JPPF configuration.
-   */
   @Override
-  protected void initConfig(final Object configuration)
+  protected TypedProperties initConfig(final Object configuration)
   {
-    config = (TypedProperties) configuration;
+    return (TypedProperties) configuration;
   }
 
   /**
@@ -154,6 +150,7 @@ public class JPPFClient extends AbstractGenericClient
     SubmissionManager submissionManager = null;
     try
     {
+      TypedProperties config = getConfig();
       if (config != null && config.getBoolean("jppf.balancer.old.enabled", false))
       {
         submissionManager = new SubmissionManagerImpl(this);
