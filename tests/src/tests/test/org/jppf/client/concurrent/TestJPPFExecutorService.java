@@ -146,7 +146,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * In this test, no task has enough time to execute.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testInvokeAllWithTimeout() throws Exception
   {
     int n = 2;
@@ -169,7 +169,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
    * Invocation of <code>JPPFExecutorService.invokeAny(List&lt;Callable&gt;)</code>.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testInvokeAny() throws Exception
   {
     int n = 10;
