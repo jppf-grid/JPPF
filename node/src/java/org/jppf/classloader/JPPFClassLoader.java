@@ -19,9 +19,9 @@ package org.jppf.classloader;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
 
-import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.*;
 import org.jppf.comm.socket.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.ssl.SSLHelper;
@@ -280,6 +280,14 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     resource.setRequestUuid(requestUuid);
 
     Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
-    return f.get();
+    resource = f.get();
+    Throwable t = ((ResourceFuture) f).getThrowable();
+    if (t != null)
+    {
+      if (t instanceof Exception) throw (Exception) t;
+      else if (t instanceof Error) throw (Error) t;
+      else throw new JPPFException(t);
+    }
+    return resource;
   }
 }

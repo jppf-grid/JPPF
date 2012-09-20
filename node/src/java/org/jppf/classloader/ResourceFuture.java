@@ -51,6 +51,10 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    * 
    */
   private ClassLoader cl = null;
+  /**
+   * Throwable that may have been raised during the class loading request execution.
+   */
+  private Throwable throwable = null;
 
   /**
    * Initialize this future.
@@ -161,5 +165,24 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   public void setCl(final ClassLoader cl)
   {
     this.cl = cl;
+  }
+
+  /**
+   * Get the throwable that may have been raised during the class loading request execution.
+   * @return a <code>Throwable</code> object, or <code>null</code> if no throwable was raised.
+   */
+  public Throwable getThrowable()
+  {
+    return throwable;
+  }
+
+  /**
+   * Set the throwable that may have been raised during the class loading request execution.
+   * @param throwable a <code>Throwable</code> object, or <code>null</code> if no throwable was raised.
+   */
+  public void setThrowable(final Throwable throwable)
+  {
+    this.throwable = throwable;
+    cancel(true);
   }
 }

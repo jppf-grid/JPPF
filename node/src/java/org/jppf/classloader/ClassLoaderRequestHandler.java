@@ -67,12 +67,12 @@ public class ClassLoaderRequestHandler
 
   /**
    * Initialize this request handler.
-   * @param request the periodic task submitted to the scheduled executor.
+   * @param requestRunner the periodic task submitted to the scheduled executor.
    */
-  public ClassLoaderRequestHandler(final ResourceRequest request)
+  public ClassLoaderRequestHandler(final ResourceRequest requestRunner)
   {
     this.nextRequest = new CompositeResourceWrapper();
-    this.requestRunner = request;
+    this.requestRunner = requestRunner;
     new Thread(periodicTask, "PeriodicTask").start();
   }
 
@@ -133,45 +133,62 @@ public class ClassLoaderRequestHandler
     @SuppressWarnings("unchecked")
     public void run()
     {
-      long elapsed = 0L;
-      while (!isStopped())
+      try
       {
-        CompositeResourceWrapper request = null;
-        long start = System.nanoTime();
-        synchronized(this)
+        long elapsed = 0L;
+        while (!isStopped())
         {
-          while (nextRequest.getFutureMap().isEmpty()) goToSleep();
-          while ((elapsed = System.nanoTime() - start) < MAX_WAIT)
+          CompositeResourceWrapper request = null;
+          long start = System.nanoTime();
+          synchronized(this)
           {
-            goToSleep((MAX_WAIT-elapsed) / NANO_RANGE, (int) ((MAX_WAIT-elapsed) % NANO_RANGE));
+            while (nextRequest.getFutureMap().isEmpty()) goToSleep();
+            while ((elapsed = System.nanoTime() - start) < MAX_WAIT)
+            {
+              goToSleep((MAX_WAIT-elapsed) / NANO_RANGE, (int) ((MAX_WAIT-elapsed) % NANO_RANGE));
+            }
+            if (isStopped()) return;
+            request = nextRequest;
+            nextRequest = new CompositeResourceWrapper();
           }
+          Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
+          int n = futureMap.size();
+          if (n > maxBatchSize)
+          {
+            maxBatchSize = n;
+            log.info("maxBatchSize = " + maxBatchSize);
+          }
+          if (debugEnabled) log.debug("sending batch of " + futureMap.size() + " class loading requests: " + request);
           if (isStopped()) return;
-          request = nextRequest;
-          nextRequest = new CompositeResourceWrapper();
+          requestRunner.setRequest(request);
+          requestRunner.run();
+          Throwable t = requestRunner.getThrowable();
+          CompositeResourceWrapper response = (CompositeResourceWrapper) requestRunner.getResponse();
+          if (debugEnabled) log.debug("got response " + response);
+          if (response != null)
+          {
+            for (JPPFResourceWrapper rw: response.getResources())
+            {
+              ResourceFuture f = (ResourceFuture) futureMap.remove(rw);
+              if (f != null) f.setDone(rw);
+            }
+          }
+          for (Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry: futureMap.entrySet())
+          {
+            ResourceFuture future = (ResourceFuture) entry.getValue();
+            if (t != null) future.setThrowable(t);
+            else future.setDone(null);
+          }
+          futureMap.clear();
+          requestRunner.reset();
+          start = System.nanoTime();
+          elapsed = 0L;
         }
-        Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
-        int n = futureMap.size();
-        if (n > maxBatchSize)
-        {
-          maxBatchSize = n;
-          log.info("maxBatchSize = " + maxBatchSize);
-        }
-        if (debugEnabled) log.debug("sending batch of " + futureMap.size() + " class loading requests: " + request);
-        requestRunner.setRequest(request);
-        requestRunner.run();
-        Throwable t = requestRunner.getThrowable();
-        CompositeResourceWrapper response = (CompositeResourceWrapper) requestRunner.getResponse();
-        if (debugEnabled) log.debug("got response " + response);
-        for (JPPFResourceWrapper rw: response.getResources())
-        {
-          ResourceFuture f = (ResourceFuture) futureMap.remove(rw);
-          if (f != null) f.setDone(rw);
-        }
-        for (Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry: futureMap.entrySet()) ((ResourceFuture) entry.getValue()).setDone(null);
-        futureMap.clear();
-        requestRunner.reset();
-        start = System.nanoTime();
-        elapsed = 0L;
+      }
+      catch (Exception e)
+      {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(ExceptionUtils.getMessage(e));
       }
     }
   }

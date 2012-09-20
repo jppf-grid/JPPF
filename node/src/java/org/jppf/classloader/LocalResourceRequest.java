@@ -51,14 +51,12 @@ class LocalResourceRequest extends AbstractResourceRequest
     this.channel = channel;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
     try
     {
+      throwable = null;
       if (debugEnabled) log.debug("channel " + JPPFLocalClassLoader.channel + " sending request " + request);
       LocalClassLoaderChannel channel = JPPFLocalClassLoader.channel;
       synchronized(channel.getServerLock())
