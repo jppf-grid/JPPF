@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.concurrent.JPPFExecutorService;
 import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.task.storage.*;
 import org.slf4j.*;
 
 
@@ -50,6 +51,9 @@ public class Main
     JPPFExecutorService executor = new JPPFExecutorService(client);
     try
     {
+      DataProvider dp = new MemoryMapDataProvider();
+      dp.setValue("testKey", "testValue");
+      executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
       executor.setBatchSize(5);
       executor.setBatchTimeout(100L);
       List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);

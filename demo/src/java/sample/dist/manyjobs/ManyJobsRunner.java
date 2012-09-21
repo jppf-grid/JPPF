@@ -54,11 +54,11 @@ public class ManyJobsRunner
       props.setProperty("jppf.discovery.enabled", "true");
       props.setProperty("jppf.pool.size", "17");
       jppfClient = new JPPFClient();
-      Thread.sleep(5000);
+      while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
       int length = 300;
       int nbTask = 100;
       int nbJobs = 50;
-      print("Running Long Task demo with " + nbTask + " tasks of length = " + length + " ms for " + nbJobs + " iterations");
+      print("Running " + nbJobs+ " jobs with " + nbTask + " tasks of length = " + length + " ms");
       perform(nbTask, length, nbJobs);
       //performLong(size, iterations);
     }

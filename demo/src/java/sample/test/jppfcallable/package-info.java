@@ -16,22 +16,7 @@
  * limitations under the License.
  */
 
-package sample.test.executor;
-
 /**
  * 
  */
-public class MyTask extends JPPFCallableTask<String>
-{
-  @Override
-  public String call() throws Exception
-  {
-    return "Hello World";
-  }
-
-  @Override
-  public void onTimeout()
-  {
-    setResult("Timeout");
-  }
-}
+package sample.test.jppfcallable;
