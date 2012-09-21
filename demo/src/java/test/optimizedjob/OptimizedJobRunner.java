@@ -49,11 +49,8 @@ public class OptimizedJobRunner
     try
     {
       jppfClient = new JPPFClient();
-      /*
-			while (!jppfClient.hasAvailableConnection()) Thread.sleep(50L);
-			jppfClient.setLocalExecutionEnabled(true);
-       */
-      perform();
+      //perform();
+      perform2();
     }
     catch(Exception e)
     {
@@ -107,6 +104,57 @@ public class OptimizedJobRunner
       output("\n***** results for job " + job.getName() + " *****\n");
       for (JPPFTask t: results) output((String) t.getResult());
     }
+    totalTime = System.currentTimeMillis() - totalTime;
+    output("Computation time: " + StringUtils.toStringDuration(totalTime));
+  }
+
+  /**
+   * Perform the test.
+   * @throws Exception if an error is raised during the execution.
+   */
+  private static void perform2() throws Exception
+  {
+    int nbJobs = 1;
+    int nbTasks = 1;
+    long time = 2000L;
+
+    //while (!jppfClient.hasAvailableConnection()) Thread.sleep(50L);
+    Thread.sleep(1000L);
+    output("Running demo with time = " + time + " for " + nbJobs + " jobs");
+    long totalTime = System.currentTimeMillis();
+    List<JPPFJob> jobs = new ArrayList<JPPFJob>();
+    for (int i=0; i<nbJobs; i++)
+    {
+      final JPPFJob job = new JPPFJob();
+      job.addJobListener(new JobListener() {
+        @Override
+        public void jobStarted(final JobEvent event) {
+          output("Job '" + job.getName() + "' starting");
+        }
+        @Override
+        public void jobEnded(final JobEvent event) {
+          output("Job '" + job.getName() + "' ended");
+        }
+      });
+      job.setName("demo job " + (i+1));
+      job.getSLA().setCancelUponClientDisconnect(false);
+      for (int j=0; j<nbTasks; j++) job.addTask(new OptimizedJobTask(time, (j+1)));
+      job.setResultListener(new JPPFResultCollector(job));
+      job.setBlocking(false);
+      jobs.add(job);
+      jppfClient.submit(job);
+    }
+    output("" + nbJobs + " job" + (nbJobs > 1 ? "s" : "") + " submitted");
+    Thread.sleep(50L);
+    /*
+    for (JPPFJob job: jobs)
+    {
+      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      List<JPPFTask> results = collector.waitForResults();
+      output("\n***** results for job " + job.getName() + " *****\n");
+      for (JPPFTask t: results) output((String) t.getResult());
+    }
+    */
     totalTime = System.currentTimeMillis() - totalTime;
     output("Computation time: " + StringUtils.toStringDuration(totalTime));
   }

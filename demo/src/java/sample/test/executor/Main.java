@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.concurrent.JPPFExecutorService;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 
@@ -44,29 +45,26 @@ public class Main
    */
   public static void main(final String[] args)
   {
-    logger.info("Starting test");
+    print("Starting test");
     JPPFClient client = new JPPFClient();
     JPPFExecutorService executor = new JPPFExecutorService(client);
-    ExecutorCompletionService ecs = new ExecutorCompletionService(executor);
+    int nbTasks = 1000;
+    int size = 10;
     try
     {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-      executor.setBatchSize(5);
-      executor.setBatchTimeout(100L);
-      List<Future<?>> futures = new ArrayList<Future<?>>(20);
-      int nbTasks = 1;
+      //executor.setBatchSize(1);
+      //executor.setBatchTimeout(1000L);
+      List<Future<?>> futures = new ArrayList<Future<?>>();
       print("Adding tasks");
-      for (int i = 0; i < nbTasks; i++)
+      for (int i=0; i<nbTasks; i++)
       {
-        //futures.add(executor.submit(new MyRunnableTask()));
-        futures.add(ecs.submit(new MyRunnableTask(), "result"));
-        //Thread.sleep(1);
+        int[] array = new int[size];
+        for (int n=0; n<size; n++) array[n] = i*size + n;
+        MyRunnableTask task = new MyRunnableTask(i, array);
+        futures.add(executor.submit(task));
       }
       print("Waiting for pending tasks to complete");
-      /*
-      executor.shutdown();
-      while (!executor.isTerminated()) Thread.sleep(1000);
-       */
       for (int i=0; i<nbTasks; i++)
       {
         print("Checking task {" + i + "}");
@@ -75,12 +73,6 @@ public class Main
       }
       print("Pending tasks completed");
 
-      /*
-      MyTask myTask = new MyTask();
-      myTask.setTimeoutSchedule(new JPPFSchedule(5000L));
-      Future<String> future = executor.submit((Callable<String>) myTask);
-      System.out.println("result: " + future.get());
-       */
     }
     catch (Exception e)
     {
@@ -104,61 +96,41 @@ public class Main
   }
 
   /**
-   * Simple task.
-   */
-  private static class SimpleCountTask implements Callable<Integer>, Serializable
-  {
-    /**
-     * Logger for this class.
-     */
-    private static Logger logger = LoggerFactory.getLogger(SimpleCountTask.class);
-    /**
-     * Explicit serialVersionUID.
-     */
-    private static final long serialVersionUID = 3044260680117586115L;
-    /**
-     * This task's number.
-     */
-    private int number;
-
-    /**
-     * Default constructor.
-     */
-    public SimpleCountTask()
-    {
-    }
-
-    /**
-     * Initialize this task with its number.
-     * @param number the task number.
-     */
-    public SimpleCountTask(final int number)
-    {
-      this.number = number;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    // @Override
-    @Override
-    public Integer call() throws Exception
-    {
-      logger.info("From logger {}", number);
-      logger.info("From stdout " + number);
-      return number;
-    }
-  }
-
-  /**
    * 
    */
   public static class MyRunnableTask implements Runnable, Serializable
   {
+    /**
+     * 
+     */
+    private int id = -1;
+    /**
+     * 
+     */
+    private int[] array = null;
+
+    /**
+     * 
+     */
+    public MyRunnableTask()
+    {
+    }
+
+    /**
+     * 
+     * @param id the task id.
+     * @param array an array of int values.
+     */
+    public MyRunnableTask(final int id, final int[] array)
+    {
+      this.id = id;
+      this.array = array;
+    }
+
     @Override
     public void run()
     {
-      System.out.println("running MyRunnableTask");
+      System.out.println("MyRunnableTask#" + id + " : array=" + array + " [" + StringUtils.buildString(array) + ']');
     }
   }
 }
