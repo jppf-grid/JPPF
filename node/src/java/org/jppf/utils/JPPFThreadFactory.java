@@ -32,6 +32,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class JPPFThreadFactory implements ThreadFactory
 {
   /**
+   * Prefix used in the thread name.
+   */
+  private static final String THREAD_PREFIX = "-";
+  //private static final String THREAD_PREFIX = "-thread-";
+  /**
    * The name used as prefix for the constructed threads name.
    */
   private String name = null;
@@ -139,11 +144,11 @@ public class JPPFThreadFactory implements ThreadFactory
         @Override
         public Thread run()
         {
-          return new Thread(threadGroup, r, name + "-thread-" + incrementCount());
+          return new Thread(threadGroup, r, name + THREAD_PREFIX + incrementCount());
         }
       });
     } else
-      thread = new Thread(threadGroup, r, name + "-thread-" + incrementCount());
+      thread = new Thread(threadGroup, r, name + THREAD_PREFIX + incrementCount());
     if (monitoringEnabled) threadIDs.add(thread.getId());
     thread.setPriority(priority);
     thread.setUncaughtExceptionHandler(defaultExceptionHandler);

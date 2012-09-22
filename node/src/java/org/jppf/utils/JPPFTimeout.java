@@ -59,4 +59,16 @@ public class JPPFTimeout extends Pair<TimeUnit, Long>
   {
     return second();
   }
+
+  /**
+   * Convert this timeout to the specified time unit.
+   * @param newUnit the time unit in which to convert.
+   * @return a {@link JPPFTimeout} instance where the time unit is the specified unit, and whose value has been converted.
+   */
+  public JPPFTimeout convert(final TimeUnit newUnit)
+  {
+    if (newUnit == null) throw new IllegalArgumentException("Time unit cannot be null");
+    long val = newUnit.convert(value(), unit());
+    return new JPPFTimeout(newUnit, val);
+  }
 }

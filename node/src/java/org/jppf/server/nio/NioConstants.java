@@ -24,6 +24,7 @@ import org.slf4j.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class NioConstants
 {
@@ -44,19 +45,19 @@ public class NioConstants
   /**
    * Name of the client class server.
    */
-  public static final String CLIENT_CLASS_SERVER = "ClientClass";
+  public static final String CLIENT_CLASS_SERVER = "ClientClassServer";
   /**
    * Name of the node class server.
    */
-  public static final String NODE_CLASS_SERVER = "NodeClass";
+  public static final String NODE_CLASS_SERVER = "NodeClassServer";
   /**
    * Name of the class server.
    */
-  public static final String NODE_SERVER = "NodeJob";
+  public static final String NODE_SERVER = "NodeJobServer";
   /**
    * Name of the client task server.
    */
-  public static final String CLIENT_SERVER = "ClientJob";
+  public static final String CLIENT_SERVER = "ClientJobServer";
   /**
    * Name of the acceptor server server.
    */
@@ -79,5 +80,15 @@ public class NioConstants
 		boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
 		log.info("NIO checks are " + (b ? "enabled" : "disabled"));
 		return b;
+	}
+
+	/**
+	 * Get the size of the pool of threads for the state transition manager executor.
+	 * @return the pool size as an int value.
+	 */
+	private static int getTransitionManagerPoolSize()
+	{
+    int size = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", -1);
+    return (size <= 0) ? Runtime.getRuntime().availableProcessors() : size;
 	}
 }

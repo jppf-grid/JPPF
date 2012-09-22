@@ -21,7 +21,6 @@ package org.jppf.server.debug;
 import java.util.*;
 
 import org.jppf.server.nio.*;
-import org.jppf.server.nio.classloader.ClassContext;
 
 /**
  * 
@@ -50,18 +49,12 @@ public class ServerDebug implements ServerDebugMBean
    */
   private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String[] clientClassLoaderChannels()
   {
     return classLoaderChannels(clientClassLoaderSet);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String[] nodeClassLoaderChannels()
   {
@@ -82,6 +75,7 @@ public class ServerDebug implements ServerDebugMBean
       int count = 0;
       for (ChannelWrapper<?> channel: set)
       {
+        /*
         StringBuilder sb = new StringBuilder();
         sb.append(channel.toString());
         ClassContext ctx = (ClassContext) channel.getContext();
@@ -90,24 +84,19 @@ public class ServerDebug implements ServerDebugMBean
         sb.append(", pending requests=").append(ctx.getNbPendingRequests());
         sb.append(", current request=").append(ctx.getCurrentRequest());
         sb.append(", resource=").append(ctx.getResource());
-        result[count++] = sb.toString();
+        */
+        result[count++] = channel.toString();
       }
     }
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String[] nodeDataChannels()
   {
     return viewChannels(nodeSet);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String[] clientDataChannels()
   {
@@ -119,7 +108,7 @@ public class ServerDebug implements ServerDebugMBean
    * @param set the set to view.
    * @return an array of state strings for each channel.
    */
-  private static String[] viewChannels(final Set<ChannelWrapper<?>> set)
+  private String[] viewChannels(final Set<ChannelWrapper<?>> set)
   {
     String[] result = null;
     synchronized(set)
@@ -128,10 +117,12 @@ public class ServerDebug implements ServerDebugMBean
       int count = 0;
       for (ChannelWrapper<?> channel: set)
       {
+        /*
         StringBuilder sb = new StringBuilder();
         sb.append(channel.toString());
         sb.append(", state=").append(channel.getContext().getState());
-        result[count++] = sb.toString();
+        */
+        result[count++] = channel.toString();
       }
     }
     return result;
@@ -177,5 +168,17 @@ public class ServerDebug implements ServerDebugMBean
     else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet;
     else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet;
     return acceptorSet;
+  }
+
+  @Override
+  public String[] allChannels()
+  {
+    int size = clientClassLoaderSet.size() + nodeClassLoaderSet.size() + nodeSet.size() + clientSet.size();
+    List<String> list = new ArrayList<String>(size);
+    for (ChannelWrapper<?> channel: clientClassLoaderSet) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: nodeClassLoaderSet) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: nodeSet) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: clientSet) list.add(channel.toString());
+    return list.toArray(new String[list.size()]);
   }
 }

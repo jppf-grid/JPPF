@@ -286,4 +286,21 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     return lock;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append(", state=").append(getState());
+    sb.append(", resource=").append(resource);
+    sb.append(", pendingRequests=").append(pendingRequests);
+    sb.append(", pendingResponses=").append(pendingResponses);
+    sb.append(", currentRequest=").append(currentRequest);
+    sb.append(", provider=").append(provider);
+    sb.append(", peer=").append(peer);
+    sb.append(", uuid=").append(uuid);
+    sb.append(", connectionUuid=").append(connectionUuid);
+    return sb.toString();
+  }
 }

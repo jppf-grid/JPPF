@@ -46,4 +46,9 @@ public interface ServerDebugMBean extends Serializable
    * @return the states as as an array of strings.
    */
   String[] clientDataChannels();
+  /**
+   * Get the states of all channels.
+   * @return the states as as an array of strings.
+   */
+  String[] allChannels();
 }

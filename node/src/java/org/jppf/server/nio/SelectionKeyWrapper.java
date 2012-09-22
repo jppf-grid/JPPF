@@ -80,13 +80,10 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
     return "[invalid channel]";
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public String getId()
+  public String getStringId()
   {
-    return StringUtils.getRemoteHost(getChannel().channel());
+    return "id=" + id + ", " + StringUtils.getRemoteHost(getChannel().channel());
   }
 
   /**

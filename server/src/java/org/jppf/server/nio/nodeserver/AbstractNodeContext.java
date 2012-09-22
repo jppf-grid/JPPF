@@ -246,9 +246,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public abstract AbstractTaskBundleMessage newMessage();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
@@ -256,9 +253,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     return message.read(channel);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
   {

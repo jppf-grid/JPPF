@@ -59,9 +59,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   public StateTransitionManager(final NioServer<S, T> server)
   {
     this.server = server;
-    int size = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", -1);
-    if (size <= 0) size = Runtime.getRuntime().availableProcessors();
-    executor = Executors.newFixedThreadPool(size, new JPPFThreadFactory(server.getName()));
+    executor = Executors.newFixedThreadPool(NioConstants.THREAD_POOL_SIZE, new JPPFThreadFactory(server.getName()));
   }
 
   /**

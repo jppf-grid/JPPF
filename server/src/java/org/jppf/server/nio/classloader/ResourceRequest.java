@@ -19,7 +19,7 @@
 package org.jppf.server.nio.classloader;
 
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 
 /**
  * 
@@ -29,7 +29,7 @@ public class ResourceRequest
   /**
    * The node class loader channel.
    */
-  private ChannelWrapper<?> channel;
+  private final ChannelWrapper<?> channel;
   /**
    * The resource to lookup in the client.
    */
@@ -56,15 +56,6 @@ public class ResourceRequest
   }
 
   /**
-   * Set the node class loader channel.
-   * @param channel a {@link ChannelWrapper} instance.
-   */
-  public void setChannel(final ChannelWrapper<?> channel)
-  {
-    this.channel = channel;
-  }
-
-  /**
    * Get the resource to lookup in the client.
    * @return a {@link JPPFResourceWrapper} instance.
    */
@@ -80,5 +71,15 @@ public class ResourceRequest
   public void setResource(final JPPFResourceWrapper resource)
   {
     this.resource = resource;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append(", resource=").append(resource);
+    sb.append(']');
+    return sb.toString();
   }
 }

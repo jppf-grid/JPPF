@@ -64,36 +64,24 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   protected boolean peer = false;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public S getState()
   {
     return state;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setState(final S state)
   {
     this.state = state;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getUuid()
   {
     return uuid;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setUuid(final String uuid)
   {
@@ -129,18 +117,12 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     this.message = message;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ChannelWrapper<?> getChannel()
   {
     return channel;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setChannel(final ChannelWrapper<?> channel)
   {
@@ -165,18 +147,12 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     this.connectionUuid = connectionUuid;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SSLHandler getSSLHandler()
   {
     return sslHandler;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setSSLHandler(final SSLHandler sslHandler)
   {
@@ -199,5 +175,17 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   public void setPeer(final boolean peer)
   {
     this.peer = peer;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append(", state=").append(getState());
+    sb.append(", uuid=").append(uuid);
+    sb.append(", connectionUuid=").append(connectionUuid);
+    sb.append(", peer=").append(peer);
+    return sb.toString();
   }
 }

@@ -108,4 +108,10 @@ public interface ChannelWrapper<S>
    * @return <code>false</code> if the channel is local, <code>false</code> otherwise.
    */
   boolean isLocal();
+
+  /**
+   * Get this channel's id.
+   * @return  the id as a long value.
+   */
+  long getId();
 }

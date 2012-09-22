@@ -66,8 +66,10 @@ class NodeWaitingProviderResponseState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = context.getPendingResponses();
     if (pendingResponses.isEmpty()) return sendResponse(context);
+    JPPFResourceWrapper res = context.getResource();
     Queue<JPPFResourceWrapper> toRemove = new LinkedBlockingQueue<JPPFResourceWrapper>();
-    CompositeResourceWrapper composite = (CompositeResourceWrapper) context.getResource();
+    CompositeResourceWrapper composite = null;
+    if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
     for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
     {
       JPPFResourceWrapper resource = entry.getValue().getResource();
@@ -75,8 +77,12 @@ class NodeWaitingProviderResponseState extends ClassServerState
       {
         if (debugEnabled) log.debug("got response for resource " + resource);
         toRemove.add(resource);
-        composite.getResources().remove(resource);
-        composite.getResources().add(resource);
+        if (composite != null)
+        {
+          composite.getResources().remove(resource);
+          composite.getResources().add(resource);
+        }
+        else context.setResource(resource);
       }
     }
     while (!toRemove.isEmpty()) pendingResponses.remove(toRemove.poll());

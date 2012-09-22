@@ -70,37 +70,42 @@ class WaitingNodeRequestState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.readMessage(channel))
     {
-      CompositeResourceWrapper composite = (CompositeResourceWrapper) context.deserializeResource();
-      if (debugEnabled) log.debug("read resource request " + composite + " from node: " + channel);
-      Collection<JPPFResourceWrapper> requests = composite.getResources();
-      for (JPPFResourceWrapper resource: requests)
+      JPPFResourceWrapper res = context.deserializeResource();
+      if (debugEnabled) log.debug("read resource request " + res + " from node: " + channel);
+      if (res instanceof CompositeResourceWrapper)
       {
-        TraversalList<String> uuidPath = resource.getUuidPath();
-        boolean dynamic = resource.isDynamic();
-        String name = resource.getName();
-        String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
-        ClassTransition t = null;
-        if (resource.getCallable() != null)
-        {
-          boolean breakpoint = true;
-        }
-        if (!dynamic || (resource.getRequestUuid() == null)) t = processNonDynamic(channel, resource);
-        else t = processDynamic(channel, resource);
-        //if (t == TO_NODE_WAITING_PROVIDER_RESPONSE) context.getPendingResponses().put(resource, new ResourceRequest(channel, resource));
-        //if (debugEnabled) log.debug("resource [" + name + "] not found for node: " + channel);
-        //if (p.first() != null) resource.setDefinition(p.first());
+        CompositeResourceWrapper composite = (CompositeResourceWrapper) context.deserializeResource();
+        Collection<JPPFResourceWrapper> requests = composite.getResources();
+        for (JPPFResourceWrapper resource: requests) processResource(channel, resource);
       }
+      else processResource(channel, res);
       if (context.getPendingResponses().isEmpty())
       {
-        if (debugEnabled) log.debug("sending response " + composite + " to node: " + channel);
+        if (debugEnabled) log.debug("sending response " + res + " to node: " + channel);
         context.serializeResource();
         return TO_SENDING_NODE_RESPONSE;
       }
       if (debugEnabled) log.debug("pending responses " + context.getPendingResponses() + " for node: " + channel);
-      //return TO_NODE_WAITING_PROVIDER_RESPONSE;
       return TO_IDLE_NODE;
     }
     return TO_WAITING_NODE_REQUEST;
+  }
+
+  /**
+   * Process a resource request.
+   * @param channel encapsulates the context and channel.
+   * @param resource the resource request description
+   * @throws Exception if any error occurs.
+   */
+  private void processResource(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
+  {
+    TraversalList<String> uuidPath = resource.getUuidPath();
+    boolean dynamic = resource.isDynamic();
+    String name = resource.getName();
+    String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
+    ClassTransition t = null;
+    if (!dynamic || (resource.getRequestUuid() == null)) t = processNonDynamic(channel, resource);
+    else t = processDynamic(channel, resource);
   }
 
   /**
