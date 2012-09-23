@@ -200,6 +200,19 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
+   * Remove the specified connection wrapper from the list of connections handled by this manager.
+   * @param uuid the id of the connection to remove.
+   * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
+   */
+  public synchronized AbstractNodeContext removeUuid(final String uuid)
+  {
+    final AbstractNodeContext wrapper = allConnections.get(uuid);
+    if (wrapper == null) return null;
+    removeConnection(wrapper);
+    return wrapper;
+  }
+
+  /**
    * Initialize the local channel connection.
    * @param localChannel the local channel to use.
    */
@@ -425,23 +438,23 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public void connectionFailed(final ReaperEvent event)
   {
     ServerConnection c = event.getConnection();
+    AbstractNodeContext channel = null;
     if (!c.isOk())
     {
       String uuid = c.getUuid();
-      AbstractNodeContext channel =  /*(uuid != null) ? removeUuid(uuid) :*/ null; // todo implement
+      if (uuid != null) channel = removeUuid(uuid);;
       if (channel != null)
       {
         if (debugEnabled) log.debug("about to close channel = " + (channel.getChannel().isOpen() ? channel : channel.getClass().getSimpleName()) + " with uuid = " + uuid);
-        if (channel != null) channel.handleException(channel.getChannel(), null);
-        else
-        {
-          log.warn("found null context - a job may be stuck!");
-          closeNode(channel);
-        }
+        channel.handleException(channel.getChannel(), null);
+      }
+      else
+      {
+        log.warn("found null context - a job may be stuck!");
+        closeNode(channel);
       }
     }
   }
-
 
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
@@ -471,6 +484,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
           log.error(e.getMessage(), e);
         }
       }
+      allConnections.clear();
     }
   }
 
