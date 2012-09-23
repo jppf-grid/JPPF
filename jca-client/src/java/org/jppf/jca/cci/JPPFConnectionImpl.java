@@ -236,28 +236,18 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     return ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).getAllSubmissionIds();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean cancelJob(final String submissionId) throws Exception
   {
     return getJppfClient().cancelJob(submissionId);
   }
 
-  /**
-   * Determine whether this connection has been closed.
-   * @return true if the connection was closed, false otherwise.
-   */
   @Override
   public boolean isClosed()
   {
     return closed;
   }
 
-  /**
-   * Set the closed  state of this connection.
-   */
   @Override
   public void setAvailable()
   {

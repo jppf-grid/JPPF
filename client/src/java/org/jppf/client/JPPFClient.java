@@ -17,19 +17,16 @@
  */
 package org.jppf.client;
 
+import java.util.List;
+
 import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
-import org.jppf.client.submission.SubmissionManagerImpl;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class provides an API to submit execution requests and administration commands,
@@ -150,15 +147,7 @@ public class JPPFClient extends AbstractGenericClient
     SubmissionManager submissionManager = null;
     try
     {
-      TypedProperties config = getConfig();
-      if (config != null && config.getBoolean("jppf.balancer.old.enabled", false))
-      {
-        submissionManager = new SubmissionManagerImpl(this);
-      }
-      else
-      {
-        submissionManager = new SubmissionManagerClient(this);
-      }
+      submissionManager = new SubmissionManagerClient(this);
     }
     catch (Exception e)
     {
