@@ -125,7 +125,6 @@ public class JPPFJcaClient extends AbstractGenericClient
     {
       log.error("Can't initialize Submission Manager", e);
     }
-    if (submissionManager != null) new Thread(submissionManager, "SubmissionManager").start();
     return submissionManager;
   }
 }

@@ -28,7 +28,7 @@ import org.jppf.client.event.*;
  * @author Laurent Cohen
  * @exclude
  */
-public interface SubmissionManager extends Runnable
+public interface SubmissionManager
 {
   /**
    * Add a task submission to the execution queue.
