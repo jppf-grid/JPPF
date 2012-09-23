@@ -138,8 +138,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           putInListMap(sla.getPriority(), bundleWrapper, priorityMap);
           putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
           if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
-          //handleStartJobSchedule(bundleWrapper);
-          //handleExpirationJobSchedule(bundleWrapper);
+          handleStartJobSchedule(bundleWrapper);
+          handleExpirationJobSchedule(bundleWrapper);
         }
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
@@ -331,7 +331,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void handleStartJobSchedule(final ClientJob bundleWrapper)
   {
-    JPPFSchedule schedule = bundleWrapper.getSLA().getJobSchedule();
+    JPPFSchedule schedule = bundleWrapper.getClientSLA().getJobSchedule();
     if (schedule != null)
     {
       bundleWrapper.setPending(true);
@@ -370,7 +370,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private void handleExpirationJobSchedule(final ClientJob bundleWrapper)
   {
-    JPPFSchedule schedule = bundleWrapper.getSLA().getJobExpirationSchedule();
+    JPPFSchedule schedule = bundleWrapper.getClientSLA().getJobExpirationSchedule();
     if (schedule != null)
     {
       String jobId = bundleWrapper.getName();

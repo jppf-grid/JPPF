@@ -73,7 +73,7 @@ public interface ExecutorChannel<T>
 
   /**
    * Submit bundle for execution on corresponding node.
-   * @param bundle an instance.
+   * @param bundle the task bundle to submit.
    * @return a {@link JPPFFuture}.
    */
   JPPFFuture<?> submit(final T bundle);

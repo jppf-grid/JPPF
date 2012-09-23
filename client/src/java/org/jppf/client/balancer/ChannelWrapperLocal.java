@@ -42,7 +42,7 @@ import org.slf4j.*;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, Node
+public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implements ClientConnectionStatusHandler, Node
 {
   /**
    * Logger for this class.
@@ -261,6 +261,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
       {
         bundle.taskCompleted(exception);
         setStatus(JPPFClientConnectionStatus.ACTIVE);
+        bundle.getClientJob().removeChannel(ChannelWrapperLocal.this);
       }
     }
   }

@@ -287,6 +287,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   {
 //    if (update && debugEnabled) log.debug("updating node information for " + info + ", channel=" + channel);
     this.systemInfo = nodeInfo;
+    systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(channel.isLocal()));
     if(update && managementInfo != null) managementInfo.setSystemInfo(nodeInfo);
   }
 

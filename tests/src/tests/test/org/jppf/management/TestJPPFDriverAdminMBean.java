@@ -138,7 +138,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
    * Test getting and setting load-balancer information in the server.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=15000L)
+  @Test(timeout=10000L)
   public void testGetLoadBalancerInformation() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
@@ -172,7 +172,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
    * Test getting and setting load-balancer information in the server.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=15000L)
+  @Test(timeout=10000L)
   public void testSetLoadBalancerInformation() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);

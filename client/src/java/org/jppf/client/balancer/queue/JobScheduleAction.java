@@ -50,9 +50,6 @@ class JobScheduleAction implements Runnable
     this.bundleWrapper = bundleWrapper;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {

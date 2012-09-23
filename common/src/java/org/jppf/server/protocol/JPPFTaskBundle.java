@@ -447,9 +447,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     return parameters;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobSLA getSLA()
   {
@@ -465,9 +462,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     this.jobSLA = jobSLA;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {
@@ -493,9 +487,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     return getName();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName()
   {
@@ -511,9 +502,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     this.name = name;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobMetadata getMetadata()
   {
@@ -539,9 +527,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     return getUuid();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getUuid()
   {

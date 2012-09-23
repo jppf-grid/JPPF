@@ -17,15 +17,12 @@
  */
 package sample.test.jppfcallable;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFCallable;
 import org.slf4j.*;
-
-import test.job.priority.JobPriorityRunner;
-
 
 /**
  * Runner class for the &quot;Long Task&quot; demo.
@@ -36,7 +33,7 @@ public class JPPFCallableRunner
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(JobPriorityRunner.class);
+  static Logger log = LoggerFactory.getLogger(JPPFCallableRunner.class);
   /**
    * JPPF client used to submit execution requests.
    */
@@ -73,12 +70,30 @@ public class JPPFCallableRunner
    */
   private static void perform() throws Exception
   {
-    print("submitting job");
-    JPPFJob job = new JPPFJob("testing JPPFTask.compute(JPPFCallable)");
-    job.addTask(new MyTask());
+    int nbTasks = 40;
+    int nbJobs = 2;
+    int maxNodes = Integer.MAX_VALUE;
+    while (!jppfClient.hasAvailableConnection()) Thread.sleep(20L);
+    print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
+    List<JPPFJob> jobList = new ArrayList<JPPFJob>();
+    for (int n=1; n<=nbJobs; n++)
+    {
+      String name = "job-" + n;
+      JPPFJob job = new JPPFJob(name);
+      job.getClientSLA().setMaxNodes(maxNodes);
+      job.setBlocking(false);
+      for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask()).setId(name + ":task-" + i);
+      job.setResultListener(new JPPFResultCollector(job));
+      jobList.add(job);
+    }
     callableResult = "from MyCallable";
-    List<JPPFTask> results = jppfClient.submit(job);
-    print("result : " + results.get(0).getResult());
+    for (JPPFJob job: jobList) jppfClient.submit(job);
+    for (JPPFJob job: jobList)
+    {
+      JPPFResultCollector coll = (JPPFResultCollector) job.getResultListener();
+      List<JPPFTask> results = coll.waitForResults();
+      print("got results for job '" + job.getName() + "'");
+    }
   }
 
   /**
@@ -101,9 +116,9 @@ public class JPPFCallableRunner
     {
       try
       {
-        MyCallable mc = new MyCallable();
+        MyCallable mc = new MyCallable(getId());
         String s = compute(mc);
-        System.out.println("result of MyCallable.call() = " + s);
+        System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
         setResult(s);
       }
       catch (Exception e)
@@ -119,10 +134,35 @@ public class JPPFCallableRunner
    */
   public static class MyCallable implements JPPFCallable<String>
   {
+    /**
+     * 
+     */
+    private String id = null;
+
+    /**
+     * 
+     */
+    public MyCallable()
+    {
+    }
+
+    /**
+     * 
+     * @param id the id of the task.
+     */
+    public MyCallable(final String id)
+    {
+      this.id = id;
+    }
+
     @Override
     public String call() throws Exception
     {
-      System.out.println("result of MyCallable.call() = " + callableResult);
+      System.out.println("[client] result of MyCallable[id=" + id + "].call() = " + callableResult);
+      synchronized(this)
+      {
+        wait(100L);
+      }
       return callableResult;
     }
   }

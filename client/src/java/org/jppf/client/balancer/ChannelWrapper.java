@@ -69,20 +69,6 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   }
 
   /**
-   * Get the unique identifier of the client.
-   * @return the uuid as a string.
-   */
-  @Override
-  public abstract String getUuid();
-
-  /**
-   * Get the unique ID for the connection.
-   * @return the connection id.
-   */
-  @Override
-  public abstract String getConnectionUuid();
-
-  /**
    * Get the status of this connection.
    * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
    */
@@ -154,10 +140,6 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
     return false;
   }
 
-  /**
-   * Get the system information.
-   * @return a {@link JPPFSystemInformation} instance.
-   */
   @Override
   public JPPFSystemInformation getSystemInfo()
   {
@@ -170,13 +152,13 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
    */
   public void setSystemInfo(final JPPFSystemInformation systemInfo)
   {
-    this.systemInfo = systemInfo;
+    if (systemInfo != null)
+    {
+      this.systemInfo = systemInfo;
+      this.systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(isLocal()));
+    }
   }
 
-  /**
-   * Get the management information.
-   * @return a {@link JPPFManagementInfo} instance.
-   */
   @Override
   public JPPFManagementInfo getManagementInfo()
   {
@@ -192,24 +174,6 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
     this.managementInfo = managementInfo;
   }
 
-  /**
-   * Submit bundle for execution on corresponding node.
-   * @param bundle a {@link ClientTaskBundle} instance.
-   * @return a {@link JPPFFuture}.
-   */
-  @Override
-  public abstract JPPFFuture<?> submit(final ClientTaskBundle bundle);
-
-  /**
-   * Determine whether this channel is local (for an in-JVM node).
-   * @return <code>false</code> if the channel is local, <code>false</code> otherwise.
-   */
-  @Override
-  public abstract boolean isLocal();
-
-  /**
-   * Close this channel and release the resources it uses.
-   */
   @Override
   public void close()
   {

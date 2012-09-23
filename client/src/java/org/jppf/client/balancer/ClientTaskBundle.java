@@ -262,9 +262,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
     return cancelled;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

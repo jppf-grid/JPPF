@@ -18,30 +18,18 @@
 
 package org.jppf.client.balancer.queue;
 
-import org.jppf.client.JPPFContextClient;
-import org.jppf.client.JPPFJob;
-import org.jppf.client.balancer.ClientJob;
-import org.jppf.client.balancer.ClientTaskBundle;
-import org.jppf.client.balancer.stats.JPPFClientStatsManager;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.execute.ExecutorStatus;
-import org.jppf.execute.JPPFFuture;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JobMetadata;
-import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.JPPFContext;
-import org.jppf.server.scheduler.bundle.JobAwareness;
-import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeBundler;
-import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile;
-import org.jppf.utils.StringUtils;
-import org.jppf.utils.ThreadSynchronization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.concurrent.locks.Lock;
+
+import org.jppf.client.*;
+import org.jppf.client.balancer.*;
+import org.jppf.client.balancer.stats.JPPFClientStatsManager;
+import org.jppf.execute.*;
+import org.jppf.node.protocol.*;
+import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.fixedsize.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -304,8 +292,8 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   {
     if (debugEnabled)
     {
-      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
-              ", nodeUuid=" + channel.getConnectionUuid());
+      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to channel " + channel +
+              ", connectionUuid=" + channel.getConnectionUuid());
     }
     synchronized (channel.getMonitor())
     {
@@ -337,8 +325,6 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   private T findIdleChannelIndex(final ClientJob bundle)
   {
     int idleChannelsSize = idleChannels.size();
-    ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
-    if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
     List<T> acceptableChannels = new ArrayList<T>(idleChannelsSize);
     Iterator<T> iterator = idleChannels.iterator();
     while (iterator.hasNext())
@@ -352,24 +338,6 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
       }
       if (!bundle.acceptsChannel(ch)) continue;
       if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
-      if ((policy != null) && ch.isLocal())
-      {
-        JPPFSystemInformation info = ch.getSystemInfo();
-        boolean b = false;
-        try
-        {
-          b = policy.accepts(info);
-        }
-        catch (Exception ex)
-        {
-          log.error("An error occurred while running the execution policy to determine node participation.", ex);
-        }
-        if (debugEnabled)
-        {
-          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
-        }
-        if (!b) continue;
-      }
       acceptableChannels.add(ch);
     }
     int size = acceptableChannels.size();
@@ -390,7 +358,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   private static boolean checkJobState(final ClientJob bundle)
   {
-    JobSLA sla = bundle.getJob().getSLA();
+    JobSLA sla = bundle.getJob().getClientSLA();
     if (debugEnabled)
     {
       String s = StringUtils.buildString("job '", bundle.getName(), "' : ",

@@ -38,7 +38,7 @@ import org.slf4j.*;
  * Context associated with a remote channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler
+public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> implements ClientConnectionStatusHandler
 {
   /**
    * Logger for this class.
@@ -69,6 +69,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     this.uuid = channel.getUuid();
 
     JPPFSystemInformation info = new JPPFSystemInformation(this.uuid);
+    info.populate();
 
     JPPFManagementInfo managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER);
     managementInfo.setSystemInfo(info);
@@ -277,6 +278,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       {
         if (registeredClassLoader != null) registeredClassLoader.dispose();
         bundle.taskCompleted(exception);
+        bundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
         if(getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
@@ -293,6 +295,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
       newJob.setDataProvider(job.getJob().getDataProvider());
       newJob.setSLA(job.getSLA());
+      newJob.setClientSLA(job.getJob().getClientSLA());
       newJob.setMetadata(job.getMetadata());
       newJob.setBlocking(job.getJob().isBlocking());
 //      newJob.setResultListener(job.getResultListener());

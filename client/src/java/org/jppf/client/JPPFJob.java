@@ -74,6 +74,10 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   private JobSLA jobSLA = new JPPFJobSLA();
   /**
+   * The service level agreement on the client side.
+   */
+  private JobSLA jobClientSLA = new JPPFJobSLA();
+  /**
    * The user-defined metadata associated with this job.
    */
   private JobMetadata jobMetadata = new JPPFJobMetadata();
@@ -201,9 +205,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     return getUuid();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getUuid()
   {
@@ -232,9 +233,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     this.name = id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName()
   {
@@ -376,9 +374,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     return (JPPFJobSLA) jobSLA;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobSLA getSLA()
   {
@@ -387,11 +382,29 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
 
   /**
    * Get the service level agreement between the job and the server.
-   * @param jobSLA an instance of <code>JPPFJobSLA</code>.
+   * @param jobSLA an instance of <code>JobSLA</code>.
    */
   public void setSLA(final JobSLA jobSLA)
   {
     this.jobSLA = jobSLA;
+  }
+
+  /**
+   * Get the job SLA for the client side.
+   * @return an instance of <code>JobSLA</code>.
+   */
+  public JobSLA getClientSLA()
+  {
+    return jobClientSLA;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param jobClientSLA an instance of <code>JobSLA</code>.
+   */
+  public void setClientSLA(final JobSLA jobClientSLA)
+  {
+    this.jobClientSLA = jobClientSLA;
   }
 
   /**
@@ -405,9 +418,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     return (JPPFJobMetadata) jobMetadata;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JobMetadata getMetadata()
   {
@@ -423,9 +433,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     this.jobMetadata = jobMetadata;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int hashCode()
   {
@@ -435,9 +442,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean equals(final Object obj)
   {
@@ -529,9 +533,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

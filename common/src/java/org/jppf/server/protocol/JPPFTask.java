@@ -315,8 +315,6 @@ public abstract class JPPFTask implements Task<Object>
       bytes = loader.computeRemoteData(bytes);
       if (bytes == null) return null;
       V v = (V) ser.deserialize(bytes);
-      System.out.println("result of compute() : " + v);
-      //return (V) ser.deserialize(bytes);
       return v;
     }
     catch(Exception ignored)

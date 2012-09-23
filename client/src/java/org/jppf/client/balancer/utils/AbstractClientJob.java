@@ -21,10 +21,10 @@ package org.jppf.client.balancer.utils;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.*;
-import org.jppf.client.balancer.*;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.execute.ExecutorStatus;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.balancer.ClientJob;
+import org.jppf.execute.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.slf4j.*;
 
@@ -110,6 +110,10 @@ public abstract class AbstractClientJob
    */
   private JobSLA sla = null;
   /**
+   * The service level agreement on the client side.
+   */
+  private JobSLA clientSla = null;
+  /**
    * The job metadata.
    */
   private JobMetadata metadata = null;
@@ -122,15 +126,9 @@ public abstract class AbstractClientJob
    */
   private boolean pending = false;
   /**
-   * The local channel eventually used for this job.
+   * Count of channels used by this job.
    */
-  private ExecutorChannel localChannel = null;
-  /**
-   * The remote channels eventually used for this job.
-   * In the next version, this should be declared as a set of channels,
-   * so job dispatching through multiple remote channels can be enabled.
-   */
-  private ExecutorChannel remoteChannel = null;
+  private final AtomicInteger channelsCount = new AtomicInteger(0);
 
   /**
    * Initialized abstract client job with task bundle and list of tasks to execute.
@@ -146,6 +144,7 @@ public abstract class AbstractClientJob
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
+    this.clientSla = this.job.getClientSLA();
     this.metadata = this.job.getMetadata();
   }
 
@@ -205,6 +204,15 @@ public abstract class AbstractClientJob
   }
 
   /**
+   * Get the service level agreement between the job and the client.
+   * @return an instance of {@link org.jppf.node.protocol.JobSLA}.
+   */
+  public JobSLA getClientSLA()
+  {
+    return clientSla;
+  }
+
+  /**
    * Get the job metadata.
    * @return an instance of {@link JobMetadata}.
    */
@@ -229,6 +237,15 @@ public abstract class AbstractClientJob
   public void setSLA(final JobSLA sla)
   {
     this.sla = sla;
+  }
+
+  /**
+   * Get the service level agreement between the job and the client.
+   * @param clientSla an instance of <code>JobSLA</code>.
+   */
+  public void setClientSLA(final JobSLA clientSla)
+  {
+    this.clientSla = clientSla;
   }
 
   /**
@@ -398,8 +415,7 @@ public abstract class AbstractClientJob
    */
   public void addChannel(final ExecutorChannel channel)
   {
-    if (channel.isLocal()) localChannel = channel;
-    else remoteChannel = channel;
+    channelsCount.incrementAndGet();
   }
 
   /**
@@ -409,8 +425,7 @@ public abstract class AbstractClientJob
    */
   public void removeChannel(final ExecutorChannel channel)
   {
-    if (channel.isLocal()) localChannel = null;
-    else remoteChannel = null;
+    channelsCount.decrementAndGet();
   }
 
   /**
@@ -422,11 +437,20 @@ public abstract class AbstractClientJob
    */
   public boolean acceptsChannel(final ExecutorChannel channel)
   {
+    /*
     if (channel.isLocal()) return true;
     checkRemoteChannel();
     // we accept a single channel, always the same
     if ((remoteChannel == null) || (remoteChannel == channel)) return true;
-    return false;
+    */
+    if (channelsCount.get() >= clientSla.getMaxNodes()) return false;
+    ExecutionPolicy policy = clientSla.getExecutionPolicy();
+    if (policy != null)
+    {
+      boolean b = policy.accepts(channel.getSystemInfo());
+      if (!b) return false;
+    }
+    return true;
   }
 
   /**
@@ -435,29 +459,6 @@ public abstract class AbstractClientJob
    */
   public void clearChannels()
   {
-    localChannel = remoteChannel = null;
-  }
-
-  /**
-   * Check if the remote channel is available.
-   * @return <code>true</code> if the remote channel is available, <code>false</code> otherwise.
-   */
-  private boolean checkRemoteChannel()
-  {
-    boolean b = checkChannel(remoteChannel);
-    if (!b) remoteChannel = null;
-    return b;
-  }
-
-  /**
-   * Check if the specified channel is available.
-   * @param channel the channel to check.
-   * @return <code>true</code> if the channel is available, <code>false</code> otherwise.
-   */
-  private static boolean checkChannel(final ExecutorChannel channel)
-  {
-    if (channel == null) return true;
-    ExecutorStatus status = channel.getExecutionStatus();
-    return (status == ExecutorStatus.ACTIVE) || (status == ExecutorStatus.EXECUTING);
+    channelsCount.set(0);
   }
 }
