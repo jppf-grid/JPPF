@@ -24,6 +24,8 @@ import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
+import org.jppf.utils.TypedProperties;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -96,14 +98,20 @@ public class GenericProcessLauncher
    * 
    */
   private String name = "";
+  /**
+   * 
+   */
+  protected int n = 0;
 
   /**
    * Default constructor.
-   * @param name the name for this process.
+   * @param n a number ssigned to this process.
+   * @param processType the type of process (node or driver).
    */
-  public GenericProcessLauncher(final String name)
+  public GenericProcessLauncher(final int n, final String processType)
   {
-    this.name = name;
+    this.n = n;
+    this.name = "[" + processType + '-' + n + "] ";
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
@@ -322,5 +330,36 @@ public class GenericProcessLauncher
       }
     }
     return processPort;
+  }
+
+  /**
+   * Create a temporary file containing the specified configuration.
+   * @param config the configuration to store on file.
+   * @return the path to the created file.
+   */
+  public String createTempConfigFile(final TypedProperties config)
+  {
+    String path = null;
+    try
+    {
+      File file = File.createTempFile("config", ".properties");
+      file.deleteOnExit();
+      BufferedWriter writer = null;
+      try
+      {
+        writer = new BufferedWriter(new FileWriter(file));
+        config.store(writer, null);
+      }
+      finally
+      {
+        if (writer != null) StreamUtils.closeSilent(writer);
+      }
+      path = file.getCanonicalPath();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+    return path;
   }
 }

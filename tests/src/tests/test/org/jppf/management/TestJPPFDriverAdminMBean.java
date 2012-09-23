@@ -143,7 +143,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     assertNotNull(driver);
-    InputStream is = getClass().getClassLoader().getResourceAsStream("config/driver.properties");
+    InputStream is = getClass().getClassLoader().getResourceAsStream("config/driver1.properties");
     assertNotNull(is);
     TypedProperties driverConfig = new TypedProperties();
     driverConfig.load(is);

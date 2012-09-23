@@ -18,6 +18,8 @@
 
 package test.org.jppf.test.setup;
 
+import org.jppf.utils.TypedProperties;
+
 /**
  * Used to launch a driver.
  * @author Laurent Cohen
@@ -26,14 +28,34 @@ public class DriverProcessLauncher extends GenericProcessLauncher
 {
   /**
    * Initialize the driver launcher.
+   * @param n the id of the driver, used to determine which configuration files to use.
    */
-  public DriverProcessLauncher()
+  public DriverProcessLauncher(final int n)
   {
-    super("[driver] ");
+    super(n, "driver");
+    setJppfConfig("driver" + n + ".properties");
+    setupCommon();
+  }
+
+  /**
+   * Initialize the driver launcher.
+   * @param n the id of the driver, used to determine which configuration files to use.
+   * @param jppfConfig the JPPF configuration to use for the process.
+   */
+  public DriverProcessLauncher(final int n, final TypedProperties jppfConfig)
+  {
+    super(n, "driver");
+    setJppfConfig(createTempConfigFile(jppfConfig));
+    setupCommon();
+  }
+
+  /**
+   * Perform setup common to all ocnfigurations.
+   */
+  private void setupCommon()
+  {
     setMainClass("org.jppf.server.JPPFDriver");
-    //addArgument("noLauncher");
-    setJppfConfig("driver.properties");
-    setLog4j("log4j-driver.properties");
+    setLog4j("log4j-driver" + n + ".properties");
     addClasspathElement("classes/tests/config");
     addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");

@@ -46,7 +46,7 @@ public class BaseSetup
   /**
    * The node to lunch for the test.
    */
-  protected static DriverProcessLauncher driver = null;
+  protected static DriverProcessLauncher[] drivers = null;
   /**
    * Shutdown hook used to destroy the driver and node processes, in case the JVM terminates abnormally.
    */
@@ -86,7 +86,7 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbNodes) throws Exception
   {
-    return setup(nbNodes, true);
+    return setup(1, nbNodes, true);
   }
 
   /**
@@ -98,11 +98,31 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbNodes, final boolean initClient) throws Exception
   {
+    return setup(1, nbNodes, initClient);
+  }
+
+  /**
+   * Launches a driver and node and start the client.
+   * @param nbDrivers the number of drivers to launch.
+   * @param nbNodes the number of nodes to launch.
+   * @param initClient if true then start a client.
+   * @return an instance of <code>JPPFClient</code>.
+   * @throws Exception if a process could not be started.
+   */
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception
+  {
     System.out.println("performing setup with 1 driver, " + nbNodes + " nodes" + (initClient ? " and 1 client" : ""));
     createShutdownHook();
-    (driver = new DriverProcessLauncher()).startProcess();
+    drivers = new DriverProcessLauncher[nbDrivers];
+    for (int i=0; i<nbDrivers; i++)
+    {
+      // to avoid driver and node producing the same UUID
+      if (i > 0) Thread.sleep(511L);
+      drivers[i] = new DriverProcessLauncher(i+1);
+      drivers[i].startProcess();
+    }
     nodes = new NodeProcessLauncher[nbNodes];
-    for (int i=0; i<nodes.length; i++)
+    for (int i=0; i<nbNodes; i++)
     {
       // to avoid driver and node producing the same UUID
       if (i > 0) Thread.sleep(511L);
@@ -110,7 +130,7 @@ public class BaseSetup
       nodes[i].startProcess();
     }
     if (initClient) client = createClient(null);
-    checkDriverAndNodesInitialized(nbNodes);
+    checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     return client;
   }
 
@@ -160,26 +180,35 @@ public class BaseSetup
 
   /**
    * Check that the driver and all nodes have been started and are accessible.
+   * @param nbDrivers the number of drivers that were started.
    * @param nbNodes the number of nodes that were started.
    * @throws Exception if any error occurs.
    */
-  public static void checkDriverAndNodesInitialized(final int nbNodes) throws Exception
+  public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
   {
-    JMXDriverConnectionWrapper wrapper = null;
+    JMXDriverConnectionWrapper[] wrappers = new JMXDriverConnectionWrapper[nbDrivers];
     try
     {
-      wrapper = new JMXDriverConnectionWrapper("localhost", 11198);
-      while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
-      while (true)
+      for (int i=0; i<nbDrivers; i++)
       {
-        Collection<JPPFManagementInfo> coll = wrapper.nodesInformation();
-        if ((coll == null) || (coll.size() < nbNodes)) Thread.sleep(10L);
-        else break;
+        wrappers[i] = new JMXDriverConnectionWrapper("localhost", 11190 + drivers[i].n);
+        while (!wrappers[i].isConnected()) wrappers[i].connectAndWait(10L);
+      }
+      int sum = 0;
+      while (sum < nbNodes)
+      {
+        sum = 0;
+        for (int i=0; i<nbDrivers; i++)
+        {
+          Collection<JPPFManagementInfo> coll = wrappers[i].nodesInformation();
+          if (coll != null) sum += coll.size();
+          else break;
+        }
       }
     }
     finally
     {
-      if (wrapper != null) wrapper.close();
+      if (wrappers != null) for (JMXDriverConnectionWrapper wrapper: wrappers) wrapper.close();
     }
   }
 
@@ -191,7 +220,7 @@ public class BaseSetup
     try
     {
       if (nodes != null)  for (NodeProcessLauncher n: nodes) n.stopProcess();
-      if (driver != null) driver.stopProcess();
+      if (drivers != null) for (DriverProcessLauncher d: drivers) d.stopProcess();
     }
     catch(Throwable t)
     {
