@@ -49,6 +49,7 @@ public class CompletionListener implements TaskCompletionListener
   /**
    * Initialize this completion listener with the specified channel.
    * @param channel the client channel.
+   * @param transitionManager the channel's (transition manager.
    */
   public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager transitionManager)
   {

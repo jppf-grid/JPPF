@@ -68,7 +68,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     }
   };
   /**
-   * An of task bundles, ordered by descending priority.
+   * A map of task bundles, ordered by descending priority.
    */
   private final TreeMap<Integer, List<ServerJob>> priorityMap = new TreeMap<Integer, List<ServerJob>>(PRIORITY_COMPARATOR);
   /**
