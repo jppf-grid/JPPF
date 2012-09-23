@@ -43,7 +43,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   /**
    * temporary IO handler.
    */
-  static LocalClassLoaderChannel channel = null;
+  private final LocalClassLoaderChannel channel;
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -65,6 +65,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   public JPPFLocalClassLoader(final ClassLoader parent, final List<String> uuidPath)
   {
     super(parent, uuidPath);
+    this.channel = null;
   }
 
   /**

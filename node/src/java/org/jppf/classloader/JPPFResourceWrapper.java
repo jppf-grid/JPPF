@@ -38,7 +38,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Used to generate locally unique ids for the remote-computed callables.
    */
-  private static final AtomicLong CALLABLE_ID = new AtomicLong(0);
+  private static final AtomicLong CALLABLE_ID = new AtomicLong(0L);
 
   /**
    * Enumeration of the possible states for this resource wrapper.

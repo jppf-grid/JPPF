@@ -47,7 +47,8 @@ class LocalResourceRequest extends AbstractResourceRequest
    */
   public LocalResourceRequest(final LocalClassLoaderChannel channel)
   {
-    super();
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    
     this.channel = channel;
   }
 
@@ -57,8 +58,7 @@ class LocalResourceRequest extends AbstractResourceRequest
     try
     {
       throwable = null;
-      if (debugEnabled) log.debug("channel " + JPPFLocalClassLoader.channel + " sending request " + request);
-      LocalClassLoaderChannel channel = JPPFLocalClassLoader.channel;
+      if (debugEnabled) log.debug("channel " + channel + " sending request " + request);
       synchronized(channel.getServerLock())
       {
         channel.setServerResource(request);

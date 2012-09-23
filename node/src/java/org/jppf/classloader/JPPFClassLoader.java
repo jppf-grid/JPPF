@@ -45,7 +45,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   /**
    * Wrapper for the underlying socket connection.
    */
-  static SocketWrapper socketClient = null;
+  private SocketWrapper socketClient = null;
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -171,7 +171,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
       JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.NODE_INITIATION);
       request.setData("node.uuid", NodeRunner.getUuid());
-      ResourceRequest rr = new RemoteResourceRequest(getSerializer());
+      ResourceRequest rr = new RemoteResourceRequest(getSerializer(), socketClient);
       rr.setRequest(request);
       rr.run();
       Throwable t = rr.getThrowable();
@@ -206,7 +206,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     {
       synchronized(JPPFClassLoader.class)
       {
-        JPPFClassLoader.socketClient = null;
+        socketClient = null;
       }
       init();
     }
