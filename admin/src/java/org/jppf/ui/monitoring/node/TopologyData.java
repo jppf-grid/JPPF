@@ -97,9 +97,9 @@ public class TopologyData
     if (nodeInformation.isNode())
     {
       jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
-      jmxWrapper.connect();
     }
     else jmxWrapper = new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    jmxWrapper.connect();
   }
 
   /**
