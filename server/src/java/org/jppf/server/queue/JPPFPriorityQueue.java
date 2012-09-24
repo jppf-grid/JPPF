@@ -20,26 +20,18 @@ package org.jppf.server.queue;
 
 import static org.jppf.utils.CollectionUtils.*;
 
-import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.execute.ExecutorStatus;
-import org.jppf.job.JobListener;
-import org.jppf.job.JobNotification;
-import org.jppf.job.JobNotificationEmitter;
-import org.jppf.server.*;
+import org.jppf.job.*;
+import org.jppf.node.protocol.JobSLA;
+import org.jppf.server.JPPFDriverStatsManager;
 import org.jppf.server.job.JobManager;
-import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.policy.*;
-import org.jppf.node.protocol.*;
-import org.jppf.scheduling.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.*;
 
 /**
@@ -74,7 +66,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   /**
    * Contains the ids of all queued jobs.
    */
-  private final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
+  final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
   /**
    * The driver stats manager
    */
@@ -84,17 +76,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
    */
   private final List<JobListener> jobListeners = new ArrayList<JobListener>();
   /**
-   * Handles the schedule of each job that has one.
+   * Manages jobs start and expiration scheduling.
    */
-  private final JPPFScheduleHandler jobScheduleHandler = new JPPFScheduleHandler("Job Schedule Handler");
+  private final ScheduleManager scheduleManager = new ScheduleManager();
   /**
-   * Handles the expiration schedule of each job that has one.
+   * Manages operations on broadcast jons.
    */
-  private final JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
-  /**
-   * A priority queue holding broadcast jobs that could not be sent due to no available connection.
-   */
-  private final PriorityBlockingQueue<ServerJob> pendingBroadcasts = new PriorityBlockingQueue<ServerJob>(16, new JobPriorityComparator());
+  private final BroadcastJobManager broadcastJobManager;
   /**
    * Counts the current number of connections with ACTIVE or EXECUTING status.
    */
@@ -102,7 +90,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   /**
    * Callback for getting all available connections. Used for processing broadcast jobs.
    */
-  private Callable<List<AbstractNodeContext>> callableAllConnections = new Callable<List<AbstractNodeContext>>() {
+  Callable<List<AbstractNodeContext>> callableAllConnections = new Callable<List<AbstractNodeContext>>() {
     @Override
     public List<AbstractNodeContext> call() throws Exception {
       return Collections.emptyList();
@@ -116,6 +104,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   public JPPFPriorityQueue(final JPPFDriverStatsManager statsManager)
   {
     this.statsManager = statsManager;
+    broadcastJobManager = new BroadcastJobManager(this);
   }
 
   /**
@@ -142,7 +131,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     if (sla.isBroadcastJob() && (bundleWrapper.getBroadcastUUID() == null))
     {
       if (debugEnabled) log.debug("before processing broadcast job " + bundleWrapper.getJob());
-      processBroadcastJob(bundleWrapper);
+      broadcastJobManager.processBroadcastJob(bundleWrapper);
     } else {
       lock.lock();
       try
@@ -174,8 +163,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
           putInListMap(sla.getPriority(), bundleWrapper, priorityMap);
           putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
           if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
-          handleStartJobSchedule(bundleWrapper);
-          handleExpirationJobSchedule(bundleWrapper);
+          scheduleManager.handleStartJobSchedule(bundleWrapper);
+          scheduleManager.handleExpirationJobSchedule(bundleWrapper);
         }
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
@@ -296,7 +285,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     lock.lock();
     try
     {
-      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
     }
     finally
@@ -334,160 +322,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   public Iterator<ServerJob> iterator()
   {
     return new BundleIterator(priorityMap, lock);
-  }
-
-  /**
-   * Process the start schedule specified in the job SLA.
-   * @param bundleWrapper the job to process.
-   */
-  private void handleStartJobSchedule(final ServerJob bundleWrapper)
-  {
-    JPPFSchedule schedule = bundleWrapper.getSLA().getJobSchedule();
-    if (schedule != null)
-    {
-      bundleWrapper.setPending(true);
-      String jobId = bundleWrapper.getName();
-      final String uuid = bundleWrapper.getUuid();
-      if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
-      try
-      {
-        long dt = bundleWrapper.getJobReceivedTime();
-        jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
-        bundleWrapper.addOnDone(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            jobScheduleHandler.cancelAction(uuid);
-          }
-        });
-      }
-      catch(ParseException e)
-      {
-        bundleWrapper.setPending(false);
-        log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() +
-                ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
-      }
-    }
-    else
-    {
-      bundleWrapper.setPending(false);
-    }
-  }
-
-  /**
-   * Process the expiration schedule specified in the job SLA.
-   * @param bundleWrapper the job to process.
-   */
-  private void handleExpirationJobSchedule(final ServerJob bundleWrapper)
-  {
-    JPPFSchedule schedule = bundleWrapper.getSLA().getJobExpirationSchedule();
-    if (schedule != null)
-    {
-      String jobId = bundleWrapper.getName();
-      final String uuid = bundleWrapper.getUuid();
-      if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
-      long dt = bundleWrapper.getJobReceivedTime();
-      try
-      {
-        jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
-        bundleWrapper.addOnDone(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            jobExpirationHandler.cancelAction(uuid);
-          }
-        });
-      }
-      catch(ParseException e)
-      {
-        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-                ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
-      }
-    }
-  }
-
-  /**
-   * Process the specified broadcast job.
-   * This consists in creating one job per node, each containing the same tasks,
-   * and with an execution policy that enforces its execution ont he designated node only.
-   * @param bundleWrapper the broadcast job to process.
-   */
-  private void processBroadcastJob(final ServerJob bundleWrapper)
-  {
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
-    List<AbstractNodeContext> connections;
-    try {
-      connections = callableAllConnections.call();
-    } catch (Throwable e) {
-      connections = Collections.emptyList();
-    }
-    if (connections.isEmpty())
-    {
-//      bundleWrapper.taskCompleted(null, null);
-      pendingBroadcasts.offer(bundleWrapper);
-      return;
-    }
-    JobSLA sla = bundle.getSLA();
-    List<ServerJob> jobList = new ArrayList<ServerJob>(connections.size());
-
-    Set<String> uuidSet = new HashSet<String>();
-    for (AbstractNodeContext connection : connections)
-    {
-      ExecutorStatus status = connection.getExecutionStatus();
-      if(status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
-      {
-        String uuid = connection.getUuid();
-        if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
-        {
-          ServerJob newBundle = bundleWrapper.createBroadcastJob(uuid);
-          JPPFManagementInfo info = connection.getManagementInfo();
-          ExecutionPolicy policy = sla.getExecutionPolicy();
-          if ((policy != null) && !policy.accepts(info.getSystemInfo())) continue;
-          ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
-          if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
-          newBundle.setSLA(((JPPFJobSLA) sla).copy());
-          newBundle.setMetadata(bundle.getMetadata());
-          newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
-          newBundle.setName(bundle.getName() + " [node: " + info.toString() + ']');
-          newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
-          jobList.add(newBundle);
-          if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + broadcastPolicy);
-        }
-      }
-    }
-    if (jobList.isEmpty()) bundleWrapper.taskCompleted(null, null);
-    else {
-      final String jobUuid = bundleWrapper.getUuid();
-      lock.lock();
-      try {
-        ServerJob other = jobMap.get(jobUuid);
-        if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
-
-        bundleWrapper.addOnDone(new Runnable() {
-          @Override
-          public void run() {
-            lock.lock();
-            try {
-              jobMap.remove(jobUuid);
-              removeBundle(bundleWrapper);
-            } finally {
-              lock.unlock();
-            }
-          }
-        });
-        bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
-        bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
-        bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
-
-        jobMap.put(jobUuid, bundleWrapper);
-        fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
-        for (ServerJob job : jobList) addBundle(job);
-      } finally {
-        lock.unlock();
-      }
-    }
   }
 
   /**
@@ -547,54 +381,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     lock.lock();
     try
     {
-      jobScheduleHandler.clear(true);
-      jobExpirationHandler.clear(true);
+      scheduleManager.close();
     }
     finally
     {
       lock.unlock();
-    }
-  }
-
-  /**
-   * Cancels queued broadcast jobs for connection.
-   * @param connectionUUID The connection UUID that failed or was disconnected.
-   */
-  public void cancelBroadcastJobs(final String connectionUUID)
-  {
-    if(connectionUUID == null || connectionUUID.isEmpty()) return;
-
-    Set<String> jobIDs = Collections.emptySet();
-    lock.lock();
-    try
-    {
-      if (jobMap.isEmpty()) return;
-
-      jobIDs = new HashSet<String>();
-      for (Map.Entry<String, ServerJob> entry : jobMap.entrySet())
-      {
-        if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
-      }
-    } finally
-    {
-      lock.unlock();
-    }
-    for (String jobID : jobIDs) {
-      cancelJob(jobID);
-    }
-  }
-
-  /**
-   * Process the jobs in the pending broadcast queue.
-   * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
-   */
-  public void processPendingBroadcasts() {
-    if (!hasWorkingConnection()) return;
-    ServerJob clientJob;
-    while ((clientJob = pendingBroadcasts.poll()) != null)
-    {
-      if (debugEnabled) log.debug("queuing job " + clientJob.getJob());
-      addBundle(clientJob);
     }
   }
 
@@ -712,5 +503,23 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     boolean bOld = (oldStatus == ExecutorStatus.ACTIVE) || (oldStatus == ExecutorStatus.EXECUTING);
     if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
     else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
+  }
+
+  /**
+   * Cancels queued broadcast jobs for connection.
+   * @param connectionUUID The connection UUID that failed or was disconnected.
+   */
+  public void cancelBroadcastJobs(final String connectionUUID)
+  {
+    broadcastJobManager.cancelBroadcastJobs(connectionUUID);
+  }
+
+  /**
+   * Process the jobs in the pending broadcast queue.
+   * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
+   */
+  public void processPendingBroadcasts()
+  {
+    broadcastJobManager.processPendingBroadcasts();
   }
 }
