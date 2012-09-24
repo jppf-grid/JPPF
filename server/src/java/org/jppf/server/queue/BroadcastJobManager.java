@@ -19,7 +19,7 @@
 package org.jppf.server.queue;
 
 import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorStatus;
@@ -47,6 +47,15 @@ class BroadcastJobManager
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Default callback for getting all available connections. returns an empty collection.
+   */
+  private static final Callable<List<AbstractNodeContext>> CALLABLE_ALL_CONNECTIONS_EMPTY = new Callable<List<AbstractNodeContext>>() {
+    @Override
+    public List<AbstractNodeContext> call() throws Exception {
+      return Collections.emptyList();
+    }
+  };
+  /**
    * A priority queue holding broadcast jobs that could not be sent due to no available connection.
    */
   private final PriorityBlockingQueue<ServerJob> pendingBroadcasts = new PriorityBlockingQueue<ServerJob>(16, new JobPriorityComparator());
@@ -62,6 +71,10 @@ class BroadcastJobManager
    * Contains the ids of all queued jobs.
    */
   private final Map<String, ServerJob> jobMap;
+  /**
+   * Callback for getting all available connections. Used for processing broadcast jobs.
+   */
+  private Callable<List<AbstractNodeContext>> callableAllConnections = CALLABLE_ALL_CONNECTIONS_EMPTY;
 
   /**
    * Initialize this manager witht he specified queue.
@@ -75,6 +88,15 @@ class BroadcastJobManager
   }
 
   /**
+   * Set the callable source for all available connections.
+   * @param callableAllConnections a {@link Callable} instance.
+   */
+  void setCallableAllConnections(final Callable<List<AbstractNodeContext>> callableAllConnections) {
+    if(callableAllConnections == null) this.callableAllConnections = CALLABLE_ALL_CONNECTIONS_EMPTY;
+    else this.callableAllConnections = callableAllConnections;
+  }
+
+  /**
    * Process the specified broadcast job.
    * This consists in creating one job per node, each containing the same tasks,
    * and with an execution policy that enforces its execution ont he designated node only.
@@ -85,7 +107,7 @@ class BroadcastJobManager
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     List<AbstractNodeContext> connections;
     try {
-      connections = queue.callableAllConnections.call();
+      connections = callableAllConnections.call();
     } catch (Throwable e) {
       connections = Collections.emptyList();
     }

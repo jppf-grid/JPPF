@@ -87,15 +87,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
    * Counts the current number of connections with ACTIVE or EXECUTING status.
    */
   private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
-  /**
-   * Callback for getting all available connections. Used for processing broadcast jobs.
-   */
-  Callable<List<AbstractNodeContext>> callableAllConnections = new Callable<List<AbstractNodeContext>>() {
-    @Override
-    public List<AbstractNodeContext> call() throws Exception {
-      return Collections.emptyList();
-    }
-  };
 
   /**
    * Initialize this queue.
@@ -112,15 +103,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
    * @param callableAllConnections a {@link Callable} instance.
    */
   public void setCallableAllConnections(final Callable<List<AbstractNodeContext>> callableAllConnections) {
-    if(callableAllConnections == null)
-      this.callableAllConnections = new Callable<List<AbstractNodeContext>>() {
-        @Override
-        public List<AbstractNodeContext> call() throws Exception {
-          return Collections.emptyList();
-        }
-      };
-    else
-      this.callableAllConnections = callableAllConnections;
+    broadcastJobManager.setCallableAllConnections(callableAllConnections);
   }
 
   @Override
