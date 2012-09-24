@@ -305,22 +305,32 @@ public abstract class JPPFTask implements Task<Object>
   public <V> V compute(final JPPFCallable<V> callable)
   {
     ClassLoader cl = callable.getClass().getClassLoader();
-    if (!(cl instanceof AbstractJPPFClassLoader)) return null;
+    V result = null;
     try
     {
-      AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
-      Class clazz = loader.loadClass("org.jppf.utils.ObjectSerializerImpl");
-      ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
-      byte[] bytes = ser.serialize(callable).getBuffer();
-      bytes = loader.computeRemoteData(bytes);
-      if (bytes == null) return null;
-      V v = (V) ser.deserialize(bytes);
-      return v;
+      if (isInNode())
+      {
+        if (cl instanceof AbstractJPPFClassLoader)
+        {
+          AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
+          Class clazz = loader.loadClass("org.jppf.utils.ObjectSerializerImpl");
+          ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
+          byte[] bytes = ser.serialize(callable).getBuffer();
+          bytes = loader.computeRemoteData(bytes);
+          if (bytes == null) return null;
+          result = (V) ser.deserialize(bytes);
+        }
+      }
+      else
+      {
+        result = callable.call();
+      }
     }
-    catch(Exception ignored)
+    catch(Exception e)
     {
-      ignored.printStackTrace();
+      if (e instanceof RuntimeException) throw (RuntimeException) e;
+      else throw new RuntimeException(e);
     }
-    return null;
+    return result;
   }
 }
