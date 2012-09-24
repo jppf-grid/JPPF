@@ -25,6 +25,8 @@ import org.slf4j.*;
 /**
  * This data provider is an extension of <code>MemoryMapDataProvider</code> that enables executing a callback method on the client side.
  * @author Laurent Cohen
+ * @deprecated use {@link org.jppf.server.protocol.JPPFTask#compute(org.jppf.utils.JPPFCallable) JPPFTask.compute(JPPFCallable)} with
+ * {@link org.jppf.server.protocol.JPPFTask#isInNode() JPPFTask.isInNode()} instead.
  */
 public class ClientDataProvider extends MemoryMapDataProvider
 {

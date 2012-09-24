@@ -19,7 +19,6 @@
 package sample.clientdataprovider;
 
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.ClientDataProvider;
 import org.jppf.utils.JPPFCallable;
 
 /**
@@ -56,8 +55,9 @@ public class DataProviderTestTask extends JPPFTask
   public void run()
   {
     //System.out.println("this should be on the node side");
-    ClientDataProvider dp = (ClientDataProvider) getDataProvider();
-    Object o = dp.computeValue("result", new MyCallable("" + i + ':' + j));
+    //ClientDataProvider dp = (ClientDataProvider) getDataProvider();
+    //Object o = dp.computeValue("result", new MyCallable("" + i + ':' + j));
+    Object o = compute(new MyCallable("" + i + ':' + j));
     byte[] bytes = (byte[]) o;
     System.out.println("Result of client-side execution is a byte[" + bytes.length + ']');
     setResult(o);

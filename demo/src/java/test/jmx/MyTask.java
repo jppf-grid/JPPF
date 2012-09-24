@@ -19,7 +19,6 @@
 package test.jmx;
 
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.ClientDataProvider;
 import org.jppf.utils.JPPFCallable;
 
 /**
@@ -32,8 +31,9 @@ public class MyTask extends JPPFTask {
     // ... some code ...
 
     // Execute some code on the client side via the ClientDataProvider
-    ClientDataProvider dataProvider = (ClientDataProvider) getDataProvider();
-    dataProvider.computeValue("computeResult", new MyCallable(this));
+    //ClientDataProvider dataProvider = (ClientDataProvider) getDataProvider();
+    //dataProvider.computeValue("computeResult", new MyCallable(this));
+    compute(new MyCallable(this));
     // we can now cancel the job
     MyNodeListener.getInstance().cancelJob();
   }

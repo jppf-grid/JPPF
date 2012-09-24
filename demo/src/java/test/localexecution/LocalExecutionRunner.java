@@ -24,7 +24,6 @@ import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.ClientDataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -207,7 +206,7 @@ public class LocalExecutionRunner
       JPPFJob job = new JPPFJob();
       job.setName("test jar download");
       job.addTask(new Task());
-      job.setDataProvider(new ClientDataProvider());
+      //job.setDataProvider(new ClientDataProvider());
       // submit the tasks for execution
       List<JPPFTask> results = jppfClient.submit(job);
       for (JPPFTask task: results)
