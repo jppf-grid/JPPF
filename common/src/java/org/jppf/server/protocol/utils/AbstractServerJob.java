@@ -126,16 +126,6 @@ public abstract class AbstractServerJob {
    * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
    */
   private boolean pending = false;
-  /**
-   * The local channel eventually used for this job.
-   */
-  private ExecutorChannel localChannel = null;
-  /**
-   * The remote channels eventually used for this job.
-   * In the next version, this should be declared as a set of channels,
-   * so job dispatching through multiple remote channels can be enabled.
-   */
-  private ExecutorChannel remoteChannel = null;
 
   /**
    * Initialized abstract client job with task bundle and list of tasks to execute.
@@ -145,9 +135,7 @@ public abstract class AbstractServerJob {
   {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
-
     this.job = job;
-
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
@@ -370,10 +358,7 @@ public abstract class AbstractServerJob {
     {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
     }
-    for (Runnable runnable : runnables)
-    {
-      runnable.run();
-    }
+    for (Runnable runnable : runnables) runnable.run();
   }
 
   /**
@@ -383,7 +368,6 @@ public abstract class AbstractServerJob {
   public void addOnDone(final Runnable runnable)
   {
     if(runnable == null) throw new IllegalArgumentException("runnable is null");
-
     synchronized (onDoneList)
     {
       onDoneList.add(runnable);
@@ -397,7 +381,6 @@ public abstract class AbstractServerJob {
   public void removeOnDone(final Runnable runnable)
   {
     if(runnable == null) throw new IllegalArgumentException("runnable is null");
-
     synchronized (onDoneList)
     {
       onDoneList.remove(runnable);
@@ -438,76 +421,6 @@ public abstract class AbstractServerJob {
   public void setQueueEntryTime(final long queueEntryTime)
   {
     this.queueEntryTime = queueEntryTime;
-  }
-
-  /**
-   * Add a channel to this job.
-   * See {@link #remoteChannel}.
-   * @param channel the channel to add.
-   */
-  public void addChannel(final ExecutorChannel channel)
-  {
-    if (channel.isLocal()) localChannel = channel;
-    else remoteChannel = channel;
-  }
-
-  /**
-   * Add a channel to this job.
-   * See {@link #remoteChannel}.
-   * @param channel the channel to add.
-   */
-  public void removeChannel(final ExecutorChannel channel)
-  {
-    if (channel.isLocal()) localChannel = null;
-    else remoteChannel = null;
-  }
-
-  /**
-   * Determine whether this job can be sent to the specified channel.
-   * Currently this method only accepts a single remote channel, and it has to always be the same for the same job.
-   * See {@link #remoteChannel}.
-   * @param channel the channel to check for acceptance.
-   * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
-   */
-  public boolean acceptsChannel(final ExecutorChannel channel)
-  {
-    if (channel.isLocal()) return true;
-    checkRemoteChannel();
-    // we accept a single channel, always the same
-    return (remoteChannel == null) || (remoteChannel == channel);
-  }
-
-  /**
-   * Clear the channels used to dispatch this job.
-   * See {@link #remoteChannel}.
-   */
-  public void clearChannels()
-  {
-    localChannel = remoteChannel = null;
-  }
-
-  /**
-   * Check if the remote channel is available.
-   * @return <code>true</code> if the remote channel is available, <code>false</code> otherwise.
-   */
-  private boolean checkRemoteChannel()
-  {
-    boolean b = checkChannel(remoteChannel);
-    if (!b) remoteChannel = null;
-    return b;
-  }
-
-  /**
-   * Check if the specified channel is available.
-   * @param channel the channel to check.
-   * @return <code>true</code> if the channel is available, <code>false</code> otherwise.
-   */
-  private boolean checkChannel(final ExecutorChannel channel)
-  {
-    if (channel == null) return true;
-//    JPPFClientConnectionStatus status = channel.getStatus();
-//    return (status == JPPFClientConnectionStatus.ACTIVE) || (status == JPPFClientConnectionStatus.EXECUTING);
-    return true;
   }
 
   /**
