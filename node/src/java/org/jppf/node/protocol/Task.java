@@ -150,8 +150,8 @@ public interface Task<T> extends Runnable, Serializable
   /**
    * Compute a value on the client-side, as the result of the execution of a {@link org.jppf.utils.JPPFCallable JPPFCallable}.
    * @param <V> the type of results returned by the callable.
-   * @param callable the key from which to get the value.
-   * @return the looked-up value, or null if the value could not be found.
+   * @param callable the callable to execute on the client side.
+   * @return the value computed on the client, or null if the value could not be computed.
    * @see org.jppf.utils.JPPFCallable
    */
   <V> V compute(JPPFCallable<V> callable);
