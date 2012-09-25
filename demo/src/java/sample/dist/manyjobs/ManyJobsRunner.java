@@ -55,7 +55,7 @@ public class ManyJobsRunner
       props.setProperty("jppf.pool.size", "17");
       jppfClient = new JPPFClient();
       while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
-      int length = 300;
+      int length = 50;
       int nbTask = 100;
       int nbJobs = 50;
       print("Running " + nbJobs+ " jobs with " + nbTask + " tasks of length = " + length + " ms");
@@ -93,11 +93,10 @@ public class ManyJobsRunner
         jobs[n].setName("JPPF Job " + s);
         jobs[n].setBlocking(false);
         //job.getJobSLA().setMaxNodes(1);
+        jobs[n].getClientSLA().setMaxNodes(1);
         for (int i=0; i<nbTask; i++)
         {
-          LongTask task = new LongTask(length, false);
-          task.setId("" + (n+1) + ':' + (i+1));
-          jobs[n].addTask(task);
+          jobs[n].addTask(new LongTask(length, false)).setId("job-" + (n+1) + ':' + (i+1));
         }
         /*
 				JPPFSchedule schedule = new JPPFSchedule(5000L);
