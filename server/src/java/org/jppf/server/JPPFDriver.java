@@ -25,7 +25,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.process.LauncherListener;
-import org.jppf.server.job.JobManager;
+import org.jppf.server.job.*;
 import org.jppf.server.nio.NioServer;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
 import org.jppf.server.nio.classloader.*;
@@ -106,6 +106,10 @@ public class JPPFDriver
    */
   private final JPPFDriverStatsManager statsManager;
   /**
+   * Manages and monitors the jobs throughout their processing within this driver.
+   */
+  private JPPFJobManager jobManager = null;
+  /**
    * Uuid for this driver.
    */
   private final String uuid;
@@ -132,7 +136,8 @@ public class JPPFDriver
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);
-    taskQueue = new JPPFPriorityQueue(statsManager);
+    jobManager = new JPPFJobManager();
+    taskQueue = new JPPFPriorityQueue(statsManager, jobManager);
     initializer = new DriverInitializer(this, config);
     log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
   }
@@ -145,7 +150,7 @@ public class JPPFDriver
   @SuppressWarnings("unchecked")
   public void run() throws Exception
   {
-//    jobManager = new JPPFJobManager();
+    taskQueue.addQueueListener(jobManager);
     JPPFConnectionInformation info = initializer.getConnectionInformation();
 
     initializer.registerDebugMBean();
@@ -331,7 +336,7 @@ public class JPPFDriver
       clientNioServer = null;
     }
     initializer.stopJmxServer();
-//    jobManager.close();
+    jobManager.close();
     initializer.stopRecoveryServer();
   }
 
@@ -360,9 +365,9 @@ public class JPPFDriver
    * @return an instance of <code>JPPFJobManager</code>.
    * @exclude
    */
-  public JobManager getJobManager()
+  public JPPFJobManager getJobManager()
   {
-    return taskQueue;
+    return jobManager;
   }
 
   /**
@@ -463,4 +468,5 @@ public class JPPFDriver
   {
     return config.getBoolean("jppf.management.enabled", true) || config.getBoolean("jppf.management.ssl.enabled", false);
   }
+
 }

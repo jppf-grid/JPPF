@@ -28,7 +28,7 @@ import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.*;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.JPPFDriverStatsManager;
-import org.jppf.server.job.JobManager;
+import org.jppf.server.job.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
@@ -87,14 +87,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
    * Counts the current number of connections with ACTIVE or EXECUTING status.
    */
   private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
+  /**
+   * The job manager.
+   */
+  private final JPPFJobManager jobManager;
 
   /**
    * Initialize this queue.
    * @param statsManager reference to statistics manager.
+   * @param jobManager the job manager.
    */
-  public JPPFPriorityQueue(final JPPFDriverStatsManager statsManager)
+  public JPPFPriorityQueue(final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
   {
     this.statsManager = statsManager;
+    this.jobManager = jobManager;
     broadcastJobManager = new BroadcastJobManager(this);
   }
 
@@ -235,6 +241,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
         bundleList.add(bundleWrapper);
       }
       updateLatestMaxSize();
+      jobManager.jobUpdated(bundleWrapper);
     }
     finally
     {
@@ -326,6 +333,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
         removeFromListMap(oldPriority, job, priorityMap);
         putInListMap(newPriority, job, priorityMap);
         job.fireJobUpdated();
+        jobManager.jobUpdated(job);
       }
     }
     finally
@@ -504,5 +512,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   public void processPendingBroadcasts()
   {
     broadcastJobManager.processPendingBroadcasts();
+  }
+
+  /**
+   * Clear all the scheduled actions associated with a job.
+   * This method should normally only be called when a job has completed.
+   * @param jobUuid the job uuid.
+   */
+  public void clearSchedules(final String jobUuid)
+  {
+    scheduleManager.clearSchedules(jobUuid);
   }
 }

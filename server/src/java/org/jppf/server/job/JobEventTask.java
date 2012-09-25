@@ -33,7 +33,7 @@ public class JobEventTask implements Runnable
   /**
    * The job manager that submits the events.
    */
-  private final JPPFJobManager jobManager;
+  private final JobNotificationEmitter jobManager;
   /**
    * The type of event to generate.
    */
@@ -53,12 +53,12 @@ public class JobEventTask implements Runnable
 
   /**
    * Initialize this job manager event task with the specified parameters.
-   * @param jobManager - the job manager that submits the events.
-   * @param eventType - the type of event to generate.
-   * @param bundle - the job data.
-   * @param channel - the id of the job source of the event.
+   * @param jobManager the job manager that submits the events.
+   * @param eventType the type of event to generate.
+   * @param bundle the job data.
+   * @param channel the id of the job source of the event.
    */
-  public JobEventTask(final JPPFJobManager jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
+  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
   {
     this.jobManager = jobManager;
     this.eventType = eventType;

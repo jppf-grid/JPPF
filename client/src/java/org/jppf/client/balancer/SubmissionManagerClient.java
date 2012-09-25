@@ -204,10 +204,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       {
         wrapper = new ChannelWrapperRemote(connection);
         JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
-
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         wrapper.setSystemInfo(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
+        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(),
+            ((AbstractJPPFClientConnection) cnn).getUuid(), JPPFManagementInfo.DRIVER, cnn.isSSL());
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }

@@ -79,10 +79,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected String idString = null;
   /**
-   * The host name for the node or driver, may be initially set to the ip address.
-   */
-  protected String hostName = null;
-  /**
    * A string representing this connection, used for displaying in the admin conosle.
    */
   protected String displayName = null;
@@ -101,7 +97,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * Determines whether the JMX connection should be secure or not.
    */
-  protected boolean ssl = false;
+  protected boolean secure = false;
   /**
    * 
    */
@@ -120,16 +116,17 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param host the host the server is running on.
    * @param port the RMI port used by the server.
    * @param rmiSuffix	RMI registry namespace suffix.
+   * @deprecated JPPF no longer uses the RMI remote connector for JMX. 
    */
   private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
   {
     this.host = host;
-    this.hostName = host;
     this.port = port;
 
     try
     {
       idString = host + ':' + port;
+      displayName = idString;
       String s = null;
       if (!JMXServerFactory.isUsingRMIConnector() && JMXServerFactory.isJMXMPPresent()) s = "service:jmx:jmxmp://" + idString;
       else s = "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
@@ -152,11 +149,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   {
     this.host = host;
     this.port = port;
-    this.ssl = ssl;
+    this.secure = ssl;
 
     try
     {
       idString = host + ':' + port;
+      this.displayName = this.idString;
       url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
       if (ssl) SSLHelper.configureJMXProperties(env);
     }
@@ -229,7 +227,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       mbeanConnection.set(jmxc.getMBeanServerConnection());
       try
       {
-        setHostName(InetAddress.getByName(host).getHostName());
+        setHost(InetAddress.getByName(host).getHostName());
       }
       catch (UnknownHostException e)
       {
@@ -376,7 +374,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public void setHost(final String host)
   {
     this.host = host;
-    this.idString = this.host + ':' + this.port;
+    //this.idString = this.host + ':' + this.port;
+    this.displayName = this.host + ':' + this.port;
   }
 
   /**
@@ -466,32 +465,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
     throw new JPPFException("this method is not implemented");
-  }
-
-  /**
-   * Get the host name for the node or driver.
-   * @return the host name as a string.
-   */
-  public String getHostName()
-  {
-    return hostName;
-  }
-
-  /**
-   * Set the host name for the node or driver.
-   * @param hostName the host name as a string.
-   */
-  public void setHostName(final String hostName)
-  {
-    this.hostName = hostName;
-    displayName = hostName + ':' + port;
   }
 
   /**
@@ -501,5 +478,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public String getDisplayName()
   {
     return displayName;
+  }
+
+  /**
+   * Determine whether the JMX connection is secure or not.
+   * @return <code>true</code> if this connection is secure, <code>false</code> otherwise.
+   */
+  public boolean isSecure()
+  {
+    return secure;
   }
 }

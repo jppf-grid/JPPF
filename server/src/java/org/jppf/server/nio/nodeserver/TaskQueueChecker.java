@@ -18,31 +18,21 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.execute.ExecutorStatus;
-import org.jppf.execute.JPPFFuture;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JobMetadata;
-import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.JPPFContextDriver;
-import org.jppf.server.JPPFDriverStatsManager;
-import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.protocol.ServerJob;
-import org.jppf.server.protocol.ServerTaskBundle;
-import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.JPPFContext;
-import org.jppf.server.scheduler.bundle.JobAwareness;
-import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeBundler;
-import org.jppf.server.scheduler.bundle.fixedsize.FixedSizeProfile;
-import org.jppf.utils.StringUtils;
-import org.jppf.utils.ThreadSynchronization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.concurrent.locks.Lock;
+
+import org.jppf.execute.*;
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.*;
+import org.jppf.server.*;
+import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.protocol.*;
+import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.server.scheduler.bundle.*;
+import org.jppf.server.scheduler.bundle.fixedsize.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
@@ -90,15 +80,21 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Holds information about the execution context.
    */
   private final JPPFContext jppfContext;
+  /**
+   * The jpob manager.
+   */
+  private final JPPFJobManager jobManager;
 
   /**
    * Initialize this task queue checker with the specified node server.
    * @param queue        the reference queue to use.
    * @param statsManager the reference to statistics manager.
+   * @param jobManager   the job manager which sends job notifications.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFDriverStatsManager statsManager)
+  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
   {
     this.queue = queue;
+    this.jobManager = jobManager;
     this.jppfContext = new JPPFContextDriver(queue);
     this.statsManager = statsManager;
     this.queueLock = queue.getLock();
@@ -334,6 +330,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
         ServerTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
         JPPFFuture<?> future = channel.submit(bundleWrapper);
         bundleWrapper.jobDispatched(channel, future);
+        jobManager.jobDispatched(bundleWrapper.getClientJob(), ((AbstractNodeContext) channel).getChannel());
       } finally {
         removeIdleChannel(channel);
       }

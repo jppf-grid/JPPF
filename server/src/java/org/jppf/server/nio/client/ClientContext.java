@@ -18,24 +18,18 @@
 
 package org.jppf.server.nio.client;
 
-import org.jppf.io.DataLocation;
-import org.jppf.io.IOHelper;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.AbstractNioContext;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.job.JPPFJobManager;
+import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.ClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.protocol.ServerJob;
-import org.jppf.utils.SerializationHelper;
-import org.jppf.utils.SerializationHelperImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.jppf.server.protocol.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Context associated with a channel receiving jobs from a client, and sending the results back.
@@ -75,6 +69,10 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Unique ID for the client.
    */
   private String clientUuid = null;
+  /**
+   * Reference to the job manager.
+   */
+  private static JPPFJobManager jobManager = JPPFDriver.getInstance().getJobManager();
 
   /**
    * Get the task bundle to send or receive.
@@ -94,9 +92,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
     this.bundle = bundle;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception e)
   {
@@ -277,6 +272,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     if (initialBundleWrapper != null)
     {
       initialBundleWrapper.fireJobEnded();
+      jobManager.jobEnded(initialBundleWrapper);
       initialBundleWrapper = null;
     }
   }
@@ -296,6 +292,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
         initialBundleWrapper.cancel(true);
       }
       initialBundleWrapper.fireJobEnded();
+      jobManager.jobEnded(initialBundleWrapper);
       initialBundleWrapper = null;
     }
   }

@@ -142,7 +142,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 
-    taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager);
+    taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager, driver.getJobManager());
     taskQueueChecker.setBundler(bundler);
 
     this.queue.addQueueListener(new QueueListener() {
@@ -186,7 +186,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public synchronized void removeConnection(final AbstractNodeContext wrapper)
   {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
-
     try
     {
       taskQueueChecker.removeIdleChannel(wrapper);

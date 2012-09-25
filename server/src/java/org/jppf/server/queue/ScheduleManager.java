@@ -119,6 +119,17 @@ class ScheduleManager
   }
 
   /**
+   * Clear all the scheduled actions associated with a job.
+   * This method should normally only be called when a job has completed.
+   * @param jobUuid the job uuid.
+   */
+  void clearSchedules(final String jobUuid)
+  {
+    jobScheduleHandler.cancelAction(jobUuid);
+    jobExpirationHandler.cancelAction(jobUuid);
+  }
+
+  /**
    * Close this this schedule manager and all resources it uses.
    */
   void close()

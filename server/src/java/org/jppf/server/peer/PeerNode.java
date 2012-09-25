@@ -162,6 +162,7 @@ class PeerNode extends AbstractCommonNode
         bundle.setUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+        bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, uuid);
         bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, new JPPFSystemInformation(uuid).populate());
       }
       //boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
@@ -182,7 +183,11 @@ class PeerNode extends AbstractCommonNode
       {
         resultSender.sendResults(bundleWrapper);
       }
-      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) bundleWrapper.fireJobEnded();
+      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE)
+      {
+        bundleWrapper.fireJobEnded();
+        driver.getJobManager().jobEnded(bundleWrapper);
+      }
     }
     if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
   }

@@ -18,14 +18,15 @@
 
 package org.jppf.server.job.management;
 
-import java.util.*;
+import java.util.Set;
 
 import javax.management.*;
 
 import org.jppf.job.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.job.*;
+import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.*;
+import org.jppf.server.queue.JPPFPriorityQueue;
 import org.slf4j.*;
 
 /**
@@ -46,7 +47,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Reference to the driver's job manager.
    */
-  private JobManager jobManager = null;
+  private JPPFJobManager jobManager = null;
 
   /**
    * Initialize this MBean.
@@ -93,6 +94,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
+    getJobManager().jobUpdated(bundleWrapper);
   }
 
   /**
@@ -112,6 +114,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setSuspended(false, false);
+    getJobManager().jobUpdated(bundleWrapper);
   }
 
   /**
@@ -132,6 +135,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setMaxNodes(maxNodes);
+    getJobManager().jobUpdated(bundleWrapper);
   }
 
   /**
@@ -180,25 +184,21 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   {
     ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
     if (bundleWrapper == null) return NodeJobInformation.EMPTY_ARRAY;
-
     return bundleWrapper.getNodeJobInformation();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void updatePriority(final String jobUuid, final Integer newPriority)
   {
     if (debugEnabled) log.debug("Updating priority of jobId = '" + jobUuid + "' to: " + newPriority);
-    getJobManager().updatePriority(jobUuid, newPriority);
+    ((JPPFPriorityQueue) JPPFDriver.getQueue()).updatePriority(jobUuid, newPriority);
   }
 
   /**
    * Get a reference to the driver's job manager.
    * @return a <code>JPPFJobManager</code> instance.
    */
-  private JobManager getJobManager()
+  private JPPFJobManager getJobManager()
   {
     if (jobManager == null) jobManager = JPPFDriver.getInstance().getJobManager();
     return jobManager;
@@ -265,9 +265,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void sendNotification(final Notification notification)
   {
