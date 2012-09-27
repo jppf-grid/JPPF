@@ -87,7 +87,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
 
     JPPFSystemInformation info = new JPPFSystemInformation(getConnectionUuid());
-    info.populate();
+    info.populate(false);
 
     JPPFManagementInfo managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE);
     managementInfo.setSystemInfo(info);

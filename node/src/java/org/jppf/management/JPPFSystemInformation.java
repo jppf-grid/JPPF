@@ -150,11 +150,29 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    */
   public JPPFSystemInformation populate()
   {
+    return populate(true);
+  }
+
+  /**
+   * Populate this node information object.
+   * @param resolveInetAddressesNow if true, then name resolution for <code>InetAddress</code>es should occur immediately,
+   * otherwise it is different and executed in a separate thread.
+   * @return this <code>JPPFSystemInformation</code> object.
+   */
+  public JPPFSystemInformation populate(final boolean resolveInetAddressesNow)
+  {
     addProperties("system", SystemUtils.getSystemProperties());
     addProperties("runtime", SystemUtils.getRuntimeInformation());
     addProperties("env", SystemUtils.getEnvironment());
     addProperties("jppf", JPPFConfiguration.getProperties());
-    addProperties("network", SystemUtils.getNetwork());
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        addProperties("network", SystemUtils.getNetwork());
+      }
+    };
+    if (resolveInetAddressesNow) r.run();
+    else new Thread(r).start();
     addProperties("storage", SystemUtils.getStorageInformation());
     if (getProperties("uuid") == null) addProperties("uuid", new TypedProperties());
     return this;
@@ -254,24 +272,27 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
   @Override
   public TypedProperties[] getPropertiesArray()
   {
-    return map.values().toArray(new TypedProperties[map.size()]);
+    synchronized(map)
+    {
+      return map.values().toArray(new TypedProperties[map.size()]);
+    }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addProperties(final String key, final TypedProperties properties)
   {
-    map.put(key, properties);
+    synchronized(map)
+    {
+      map.put(key, properties);
+    }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TypedProperties getProperties(final String key)
   {
-    return map.get(key);
+    synchronized(map)
+    {
+      return map.get(key);
+    }
   }
 }
