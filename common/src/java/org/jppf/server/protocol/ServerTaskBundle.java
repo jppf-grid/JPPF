@@ -17,13 +17,11 @@
  */
 package org.jppf.server.protocol;
 
+import java.util.*;
+import java.util.concurrent.Future;
+
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * Instances of this class group tasks from the same client together.

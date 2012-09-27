@@ -226,8 +226,10 @@ public class ServerJob extends AbstractServerJob {
         List<DataLocation> subList = this.tasks.subList(0, nbTasks);
         try {
           if(taskBundle.getTaskCount() != nbTasks) {
+            int newSize = taskBundle.getCurrentTaskCount() - nbTasks;
             taskBundle = taskBundle.copy();
             taskBundle.setTaskCount(nbTasks);
+            getJob().setCurrentTaskCount(newSize);            
           }
           return new ServerTaskBundle(this, taskBundle, subList);
         } finally {

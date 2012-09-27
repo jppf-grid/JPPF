@@ -75,6 +75,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   protected int taskCount = 0;
   /**
+   * The current number of tasks in this bundle.
+   */
+  protected int currentTaskCount = 0;
+  /**
    * The initial number of tasks in this bundle.
    */
   private int initialTaskCount = 0;
@@ -259,6 +263,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   {
     this.taskCount = taskCount;
     if (initialTaskCount <= 0) initialTaskCount = taskCount;
+    if (currentTaskCount <= 0) currentTaskCount = taskCount;
   }
 
   /**
@@ -540,5 +545,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public void setUuid(final String jobUuid)
   {
     this.jobUuid = jobUuid;
+  }
+
+  /**
+   * Get the current number of tasks in this bundle.
+   * @return the current number of tasks as an int.
+   */
+  public int getCurrentTaskCount()
+  {
+    return currentTaskCount;
+  }
+
+  /**
+   * Set the current number of tasks in this bundle.
+   * @param currentTaskCount the current number of tasks as an int.
+   */
+  public void setCurrentTaskCount(final int currentTaskCount)
+  {
+    this.currentTaskCount = currentTaskCount;
   }
 }
