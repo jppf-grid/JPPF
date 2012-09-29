@@ -80,7 +80,7 @@ public class NodeRunner
   /**
    * This node's universal identifier.
    */
-  private static String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase();
+  private static String uuid = JPPFConfiguration.getProperties().getString("jppf.node.uuid", new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase());
   /**
    * Handles include and exclude IP filters.
    */
