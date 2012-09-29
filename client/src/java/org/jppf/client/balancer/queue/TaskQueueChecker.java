@@ -350,38 +350,6 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   }
 
   /**
-   * Check if the job state allows it to be dispatched on another node.
-   * There are two cases when this method will return false: when the job is suspended and
-   * when the job is already executing on its maximum allowed number of nodes.
-   * @param bundle the bundle from which to get the job information.
-   * @return true if the job can be dispatched to at least one more node, false otherwise.
-   */
-  private static boolean checkJobState(final ClientJob bundle)
-  {
-    JobSLA sla = bundle.getJob().getClientSLA();
-    if (debugEnabled)
-    {
-      String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
-              "suspended=", sla.isSuspended(), ", pending=", bundle.isPending(),
-              ", expired=", bundle.isJobExpired());
-      log.debug(s);
-    }
-    if (sla.isSuspended()) return false;
-    boolean b = bundle.isPending();
-    if (b) return false;
-    b = bundle.isJobExpired();
-    return !b;
-    /*
-    if (b) return false;
-    int maxNodes = sla.getMaxNodes();
-    List<ChannelJobPair> list = jobManager.getNodesForJob(bundle.getUuid());
-    int n = list.size();
-    if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
-    return n < maxNodes;
-    */
-  }
-
-  /**
    * Perform the checks on the bundler before submitting a job.
    * @param bundler    the bundler to check and update.
    * @param taskBundle the job.

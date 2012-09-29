@@ -18,43 +18,14 @@
 
 package org.jppf.node.protocol;
 
-import java.io.Serializable;
-
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This interface represents the Service Level Agreement between a JPPF job and a server.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
-public interface JobSLA extends Serializable
+public interface JobSLA extends JobCommonSLA
 {
-
-  /**
-   * Get the tasks execution policy.
-   * @return an <code>ExecutionPolicy</code> instance.
-   */
-  ExecutionPolicy getExecutionPolicy();
-
-  /**
-   * Set the tasks execution policy.
-   * @param executionPolicy an <code>ExecutionPolicy</code> instance.
-   */
-  void setExecutionPolicy(ExecutionPolicy executionPolicy);
-
-  /**
-   * Get the priority of this job.
-   * @return the priority as an int.
-   */
-  int getPriority();
-
-  /**
-   * Set the priority of this job.
-   * @param priority the priority as an int.
-   */
-  void setPriority(int priority);
-
   /**
    * Get the maximum number of nodes this job can run on.
    * @return the number of nodes as an int value.
@@ -78,30 +49,6 @@ public interface JobSLA extends Serializable
    * @param suspended true if the job is suspended, false otherwise.
    */
   void setSuspended(boolean suspended);
-
-  /**
-   * Get the job schedule.
-   * @return a <code>JPPFSchedule</code> instance.
-   */
-  JPPFSchedule getJobSchedule();
-
-  /**
-   * Set the job schedule.
-   * @param jobSchedule a <code>JPPFSchedule</code> instance.
-   */
-  void setJobSchedule(JPPFSchedule jobSchedule);
-
-  /**
-   * Get the job expiration schedule configuration.
-   * @return a {@link JPPFSchedule} instance.
-   */
-  JPPFSchedule getJobExpirationSchedule();
-
-  /**
-   * Set the job expiration schedule configuration.
-   * @param jobExpirationSchedule a {@link JPPFSchedule} instance.
-   */
-  void setJobExpirationSchedule(JPPFSchedule jobExpirationSchedule);
 
   /**
    * Determine whether the job is a broadcast job.

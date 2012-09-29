@@ -26,6 +26,7 @@ import org.jppf.client.balancer.ClientJob;
 import org.jppf.execute.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -112,7 +113,7 @@ public abstract class AbstractClientJob
   /**
    * The service level agreement on the client side.
    */
-  private JobSLA clientSla = null;
+  private JobClientSLA clientSla = null;
   /**
    * The job metadata.
    */
@@ -207,7 +208,7 @@ public abstract class AbstractClientJob
    * Get the service level agreement between the job and the client.
    * @return an instance of {@link org.jppf.node.protocol.JobSLA}.
    */
-  public JobSLA getClientSLA()
+  public JobClientSLA getClientSLA()
   {
     return clientSla;
   }
@@ -241,9 +242,9 @@ public abstract class AbstractClientJob
 
   /**
    * Get the service level agreement between the job and the client.
-   * @param clientSla an instance of <code>JobSLA</code>.
+   * @param clientSla an instance of <code>JobClientSLA</code>.
    */
-  public void setClientSLA(final JobSLA clientSla)
+  public void setClientSLA(final JobClientSLA clientSla)
   {
     this.clientSla = clientSla;
   }
@@ -410,7 +411,6 @@ public abstract class AbstractClientJob
 
   /**
    * Add a channel to this job.
-   * See {@link #remoteChannel}.
    * @param channel the channel to add.
    */
   public void addChannel(final ExecutorChannel channel)
@@ -420,7 +420,6 @@ public abstract class AbstractClientJob
 
   /**
    * Add a channel to this job.
-   * See {@link #remoteChannel}.
    * @param channel the channel to add.
    */
   public void removeChannel(final ExecutorChannel channel)
@@ -437,25 +436,20 @@ public abstract class AbstractClientJob
    */
   public boolean acceptsChannel(final ExecutorChannel channel)
   {
-    /*
-    if (channel.isLocal()) return true;
-    checkRemoteChannel();
-    // we accept a single channel, always the same
-    if ((remoteChannel == null) || (remoteChannel == channel)) return true;
-    */
-    if (channelsCount.get() >= clientSla.getMaxNodes()) return false;
-    ExecutionPolicy policy = clientSla.getExecutionPolicy();
-    if (policy != null)
+    if (debugEnabled)
     {
-      boolean b = policy.accepts(channel.getSystemInfo());
-      if (!b) return false;
+      String s = StringUtils.buildString("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired());
+      log.debug(s);
     }
-    return true;
+    if (isPending()) return false;
+    if (isJobExpired()) return false;
+    if (channelsCount.get() >= clientSla.getMaxChannels()) return false;
+    ExecutionPolicy policy = clientSla.getExecutionPolicy();
+    return (policy != null) ? policy.accepts(channel.getSystemInfo()) : true;
   }
 
   /**
    * Clear the channels used to dispatch this job.
-   * See {@link #remoteChannel}.
    */
   public void clearChannels()
   {

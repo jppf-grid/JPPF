@@ -72,7 +72,8 @@ public class JPPFCallableRunner
   {
     int nbTasks = 40;
     int nbJobs = 2;
-    int maxNodes = Integer.MAX_VALUE;
+    //int maxNodes = Integer.MAX_VALUE;
+    int maxChannels = 1;
     while (!jppfClient.hasAvailableConnection()) Thread.sleep(20L);
     print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
     List<JPPFJob> jobList = new ArrayList<JPPFJob>();
@@ -80,7 +81,7 @@ public class JPPFCallableRunner
     {
       String name = "job-" + n;
       JPPFJob job = new JPPFJob(name);
-      job.getClientSLA().setMaxNodes(maxNodes);
+      job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask()).setId(name + ":task-" + i);
       job.setResultListener(new JPPFResultCollector(job));

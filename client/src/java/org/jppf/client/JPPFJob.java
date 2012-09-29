@@ -76,7 +76,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The service level agreement on the client side.
    */
-  private JobSLA jobClientSLA = new JPPFJobSLA();
+  private JobClientSLA jobClientSLA = new JPPFJobClientSLA();
   /**
    * The user-defined metadata associated with this job.
    */
@@ -393,7 +393,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * Get the job SLA for the client side.
    * @return an instance of <code>JobSLA</code>.
    */
-  public JobSLA getClientSLA()
+  public JobClientSLA getClientSLA()
   {
     return jobClientSLA;
   }
@@ -402,7 +402,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * Get the service level agreement between the job and the server.
    * @param jobClientSLA an instance of <code>JobSLA</code>.
    */
-  public void setClientSLA(final JobSLA jobClientSLA)
+  public void setClientSLA(final JobClientSLA jobClientSLA)
   {
     this.jobClientSLA = jobClientSLA;
   }
