@@ -172,6 +172,7 @@ final class JPPFLeakPrevention {
    * Clear references help by threads. That can be HTTP keep alive thread, timer thread and thread pool worker threads.
    * @param classLoader a <code>ClassLoader</code> instance.
    */
+  @SuppressWarnings("deprecation")
   private static void clearThreads(final ClassLoader classLoader)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
