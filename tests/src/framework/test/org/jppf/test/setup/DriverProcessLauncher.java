@@ -32,8 +32,7 @@ public class DriverProcessLauncher extends GenericProcessLauncher
    */
   public DriverProcessLauncher(final int n)
   {
-    super(n, "driver");
-    setJppfConfig("driver" + n + ".properties");
+    super(n, "driver", "classes/tests/config/driver.template.properties", "classes/tests/config/log4j-driver.template.properties");
     setupCommon();
   }
 
@@ -46,6 +45,7 @@ public class DriverProcessLauncher extends GenericProcessLauncher
   {
     super(n, "driver");
     setJppfConfig(createTempConfigFile(jppfConfig));
+    setLog4j("file:/" + createTempConfigFile(createConfigFromTemplate("classes/tests/config/log4j-driver.template.properties", n)));
     setupCommon();
   }
 
@@ -55,10 +55,10 @@ public class DriverProcessLauncher extends GenericProcessLauncher
   private void setupCommon()
   {
     setMainClass("org.jppf.server.JPPFDriver");
-    setLog4j("log4j-driver" + n + ".properties");
     addClasspathElement("classes/tests/config");
     addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");
+    //addJvmOption("-Xrunjdwp:transport=dt_socket,address=localhost:800" + n +",server=y,suspend=y");
   }
 }

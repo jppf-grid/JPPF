@@ -32,8 +32,7 @@ public class NodeProcessLauncher extends GenericProcessLauncher
    */
   public NodeProcessLauncher(final int n)
   {
-    super(n, "  node");
-    setJppfConfig("node" + n + ".properties");
+    super(n, "  node", "classes/tests/config/node.template.properties", "classes/tests/config/log4j-node.template.properties");
     setupCommon();
   }
 
@@ -46,7 +45,7 @@ public class NodeProcessLauncher extends GenericProcessLauncher
   {
     super(n, "  node");
     setJppfConfig(createTempConfigFile(jppfConfig));
-    setMainClass("org.jppf.server.JPPFDriver");
+    setLog4j("file:/" + createTempConfigFile(createConfigFromTemplate("classes/tests/config/log4j-node.template.properties", n)));
     setupCommon();
   }
 
@@ -56,7 +55,6 @@ public class NodeProcessLauncher extends GenericProcessLauncher
   private void setupCommon()
   {
     setMainClass("org.jppf.node.NodeRunner");
-    setLog4j("log4j-node" + n + ".properties");
     addClasspathElement("classes/tests/config");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-node" + n + ".properties");
   }

@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -99,7 +99,7 @@ public class GenericProcessLauncher
    */
   private String name = "";
   /**
-   * 
+   * The driver or node number
    */
   protected int n = 0;
 
@@ -114,6 +114,27 @@ public class GenericProcessLauncher
     this.name = "[" + processType + '-' + n + "] ";
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
+    addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
+    addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
+    addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
+    addClasspathElement(libDir + "jmxremote/jmxremote_optional.jar");
+  }
+
+  /**
+   * Default constructor.
+   * @param n a number ssigned to this process.
+   * @param processType the type of process (node or driver).
+   * @param jppfTemplate the path to the JPPF configuration template file.
+   * @param log4jTemplate the path to the JPPF configuration template file.
+   */
+  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate)
+  {
+    this.n = n;
+    this.name = "[" + processType + '-' + n + "] ";
+    addClasspathElement("../node/classes");
+    String libDir = "../JPPF/lib/";
+    jppfConfig = createTempConfigFile(createConfigFromTemplate(jppfTemplate, n));
+    log4j = "file:/" + createTempConfigFile(createConfigFromTemplate(log4jTemplate, n));
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
@@ -239,7 +260,7 @@ public class GenericProcessLauncher
     command.addAll(jvmOptions);
     command.add("-Djppf.config=" + jppfConfig);
     command.add("-Dlog4j.configuration=" + log4j);
-    command.add("-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger");
+    //command.add("-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger");
     command.add(mainClass);
     //command.addAll(arguments);
     command.add(Integer.toString(processPort));
@@ -295,35 +316,24 @@ public class GenericProcessLauncher
     {
       processServer = new ServerSocket(0);
       processPort = processServer.getLocalPort();
-      Runnable r = new Runnable()
-      {
+      Runnable r = new Runnable() {
         @Override
-        public void run()
-        {
-          while (true)
-          {
-            try
-            {
+        public void run() {
+          while (true) {
+            try {
               Socket s = processServer.accept();
               s.getInputStream().read();
-            }
-            catch(IOException ioe)
-            {
+            } catch(IOException ioe) {
               if (debugEnabled) log.debug(ioe.getMessage(), ioe);
             }
           }
         }
       };
       new Thread(r).start();
-    }
-    catch(Exception e)
-    {
-      try
-      {
+    } catch(Exception e) {
+      try {
         processServer.close();
-      }
-      catch(IOException ioe)
-      {
+      } catch(IOException ioe) {
         ioe.printStackTrace();
         if (debugEnabled) log.debug(ioe.getMessage(), ioe);
         System.exit(1);
@@ -337,14 +347,14 @@ public class GenericProcessLauncher
    * @param config the configuration to store on file.
    * @return the path to the created file.
    */
-  public String createTempConfigFile(final TypedProperties config)
+  public static String createTempConfigFile(final TypedProperties config)
   {
     String path = null;
     try
     {
       File file = File.createTempFile("config", ".properties");
       file.deleteOnExit();
-      BufferedWriter writer = null;
+      Writer writer = null;
       try
       {
         writer = new BufferedWriter(new FileWriter(file));
@@ -354,12 +364,43 @@ public class GenericProcessLauncher
       {
         if (writer != null) StreamUtils.closeSilent(writer);
       }
-      path = file.getCanonicalPath();
+      path = file.getCanonicalPath().replace('\\', '/');
     }
     catch (IOException e)
     {
       e.printStackTrace();
     }
     return path;
+  }
+
+  /**
+   * Load and initialize a configuration based on a template configuration file.
+   * @param templatePath the path to a configuration file template.
+   * @param n the driver or node number to use.
+   * @return a configuration object where the string "${n}" was replace with the driver or node number.
+   */
+  public static TypedProperties createConfigFromTemplate(final String templatePath, final int n)
+  {
+    TypedProperties props = new TypedProperties();
+    Reader reader = null;
+    try
+    {
+      String content = FileUtils.readTextFile(templatePath);
+      if (content != null)
+      {
+        content = content.replace("${n}", String.valueOf(n));
+        reader = new StringReader(content);
+        props.load(reader);
+      }
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+    finally
+    {
+      if (reader != null) StreamUtils.closeSilent(reader);
+    }
+    return props;
   }
 }

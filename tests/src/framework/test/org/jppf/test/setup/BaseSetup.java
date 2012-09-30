@@ -301,7 +301,7 @@ public class BaseSetup
    * @return a <code>constructor</code> instance.
    * @throws Exception if any error occurs if a constructor could not be found.
    */
-  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
+  private static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
   {
     Constructor[] constructors = taskClass.getConstructors();
     Constructor constructor = null;

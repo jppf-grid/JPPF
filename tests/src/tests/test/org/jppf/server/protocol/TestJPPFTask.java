@@ -127,6 +127,33 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
+   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code>.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testComputeCallableInClient() throws Exception
+  {
+    try
+    {
+      configure();
+      int nbTasks = 1;
+      JPPFJob job = BaseSetup.createJob("testComputeCallableInClient", true, false, nbTasks, MyComputeCallableTask.class, true);
+      callableResult = "test successful";
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+      if (task.getException() != null) throw task.getException();
+      assertNotNull(task.getResult());
+      assertEquals("test successful", task.getResult());
+    }
+    finally
+    {
+      reset();
+    }
+  }
+
+  /**
    * Test the value of <code>JPPFTask.isInNode()</code> for a task executing in a node.
    * @throws Exception if any error occurs.
    */
@@ -152,12 +179,7 @@ public class TestJPPFTask extends Setup1D1N1C
   {
     try
     {
-      client.close();
-      // enable only local execution
-      TypedProperties config = JPPFConfiguration.getProperties();
-      config.setProperty("jppf.remote.execution.enabled", "false");
-      config.setProperty("jppf.local.execution.enabled", "true");
-      client = BaseSetup.createClient(null, false);
+      configure();
       int nbTasks = 1;
       JPPFJob job = BaseSetup.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
       List<JPPFTask> results = client.submit(job);
@@ -169,9 +191,7 @@ public class TestJPPFTask extends Setup1D1N1C
     }
     finally
     {
-      // rest the client and config
-      client.close();
-      client = BaseSetup.createClient(null, true);
+      reset();
     }
   }
 
@@ -193,6 +213,7 @@ public class TestJPPFTask extends Setup1D1N1C
     {
       this.testCompute = testCompute;
     }
+
     @Override
     public void run()
     {
@@ -233,5 +254,30 @@ public class TestJPPFTask extends Setup1D1N1C
       System.out.println("result of MyCallable.call() = " + callableResult);
       return callableResult;
     }
+  }
+
+  /**
+   * Configure the client for a local execution.
+   * @throws Exception if any error occurs.
+   */
+  private void configure() throws Exception
+  {
+    client.close();
+    // enable only local execution
+    TypedProperties config = JPPFConfiguration.getProperties();
+    config.setProperty("jppf.remote.execution.enabled", "false");
+    config.setProperty("jppf.local.execution.enabled", "true");
+    client = BaseSetup.createClient(null, false);
+  }
+
+  /**
+   * Reset the confiugration.
+   * @throws Exception if any error occurs.
+   */
+  private void reset() throws Exception
+  {
+    // reset the client and config
+    client.close();
+    client = BaseSetup.createClient(null, true);
   }
 }
