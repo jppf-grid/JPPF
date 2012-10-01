@@ -44,11 +44,11 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether TRACE logging level is enabled.
    */
-  private static boolean traceEnabled = log.isTraceEnabled();
+  private static final boolean traceEnabled = log.isTraceEnabled();
   /**
    * Random number generator used to randomize the choice of idle channel.
    */
@@ -154,6 +154,9 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   public void addIdleChannel(final T channel)
   {
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
+
     if (traceEnabled) log.trace("Adding idle channel " + channel);
     int count;
     synchronized (idleChannels)

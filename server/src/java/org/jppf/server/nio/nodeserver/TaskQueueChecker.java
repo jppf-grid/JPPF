@@ -135,14 +135,14 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   public void setBundler(final Bundler bundler)
   {
-     if (bundler == null)
-     {
-       this.bundler = createDefault();
-     }
-     else
-     {
-       this.bundler = bundler;
-     }
+    if (bundler == null)
+    {
+      this.bundler = createDefault();
+    }
+    else
+    {
+      this.bundler = bundler;
+    }
   }
 
   /**

@@ -192,7 +192,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   public ServerTaskBundle nextBundle(final int nbTasks)
   {
     Iterator<ServerJob> it = iterator();
-    return it.hasNext() ? nextBundle(it.next(),  nbTasks) : null;
+    return it.hasNext() ? nextBundle(it.next(), nbTasks) : null;
   }
 
   @Override
@@ -225,7 +225,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
       else
       {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
-        result =  bundleWrapper.copy(nbTasks);
+        result = bundleWrapper.copy(nbTasks);
         int newSize = bundleWrapper.getTaskCount();
         List<ServerJob> list = sizeMap.get(newSize);
         if (list == null)

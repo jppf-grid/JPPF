@@ -61,7 +61,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   };
   /**
-   * An of task bundles, ordered by descending priority.
+   * A map of task bundles, ordered by descending priority.
    */
   private final TreeMap<Integer, List<ClientJob>> priorityMap = new TreeMap<Integer, List<ClientJob>>(PRIORITY_COMPARATOR);
   /**
@@ -173,11 +173,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  /**
-   * Get the next object in the queue.
-   * @param nbTasks the maximum number of tasks to get out of the bundle.
-   * @return the most recent object that was added to the queue.
-   */
   @Override
   public ClientTaskBundle nextBundle(final int nbTasks)
   {
@@ -185,12 +180,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     return it.hasNext() ? nextBundle(it.next(), nbTasks) : null;
   }
 
-  /**
-   * Get the next object in the queue.
-   * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
-   * @param nbTasks       the maximum number of tasks to get out of the bundle.
-   * @return the most recent object that was added to the queue.
-   */
   @Override
   public ClientTaskBundle nextBundle(final ClientJob bundleWrapper, final int nbTasks)
   {
@@ -249,10 +238,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     return result;
   }
 
-  /**
-   * Determine whether the queue is empty or not.
-   * @return true if the queue is empty, false otherwise.
-   */
   @Override
   public boolean isEmpty()
   {
@@ -267,10 +252,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  /**
-   * Get the maximum bundle size for the bundles present in the queue.
-   * @return the bundle size as an int.
-   */
   @Override
   public int getMaxBundleSize()
   {
@@ -294,9 +275,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ClientJob removeBundle(final ClientJob bundleWrapper)
   {
@@ -314,11 +292,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  /**
-   * Get an iterator on the task bundles in this queue.
-   * @return an iterator.
-   * @see Iterable#iterator()
-   */
   @Override
   public Iterator<ClientJob> iterator()
   {
