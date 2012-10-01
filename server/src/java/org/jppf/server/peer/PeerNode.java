@@ -37,23 +37,28 @@ import org.slf4j.*;
  * Instances of this class encapsulate execution nodes.
  * @author Laurent Cohen
  * @author Domingos Creado
+ * @author Martin JANDA
  */
 class PeerNode extends AbstractCommonNode
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(PeerNode.class);
+  private static final Logger log = LoggerFactory.getLogger(PeerNode.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Used to send the task results back to the requester.
    */
   private PeerNodeResultSender resultSender = null;
   /**
    * The name of the peer in the configuration file.
+   */
+  private final String peerNameBase;
+  /**
+   * The name of the peer with host and port information when connected.
    */
   private String peerName;
   /**
@@ -71,19 +76,20 @@ class PeerNode extends AbstractCommonNode
   /**
    * Determines whether communication with remote peer servers is via SSL.
    */
-  private boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
+  private final boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
 
   /**
    * Initialize this peer node with the specified configuration name.
-   * @param peerName the name of the peer int he configuration file.
+   * @param peerNameBase the name of the peer int he configuration file.
    * @param connectionInfo peer connection information.
    */
-  public PeerNode(final String peerName, final JPPFConnectionInformation connectionInfo)
+  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo)
   {
-    if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+    if(peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerNameBase is blank");
     if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
-    this.peerName = peerName;
+    this.peerNameBase = peerNameBase;
+    this.peerName = peerNameBase;
     this.connectionInfo = connectionInfo;
     this.uuid = driver.getUuid();
     this.helper = new SerializationHelperImpl();
@@ -126,6 +132,7 @@ class PeerNode extends AbstractCommonNode
           {
             socketClient.close();
             socketClient = null;
+            peerName = peerNameBase;
           }
           catch(Exception ex)
           {
@@ -233,7 +240,7 @@ class PeerNode extends AbstractCommonNode
     socketClient.setHost(host);
     socketClient.setPort(port);
     socketClient.setSerializer(helper.getSerializer());
-    peerName = peerName + '@' + host + ':' + port;
+    peerName = peerNameBase + '@' + host + ':' + port;
   }
 
   /**
@@ -294,9 +301,6 @@ class PeerNode extends AbstractCommonNode
     return "[peer: " + peerName +"] ";
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JMXServer getJmxServer() throws Exception
   {
