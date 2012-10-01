@@ -94,12 +94,9 @@ public class TopologyData
     this(TopologyDataType.NODE);
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
-    if (nodeInformation.isNode()) 
-    {
-      jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
-      jmxWrapper.connect();
-    }
+    if (nodeInformation.isNode()) jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
     else jmxWrapper = new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    jmxWrapper.connect();
   }
 
   /**
