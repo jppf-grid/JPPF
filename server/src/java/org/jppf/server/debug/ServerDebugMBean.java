@@ -51,4 +51,9 @@ public interface ServerDebugMBean extends Serializable
    * @return the states as as an array of strings.
    */
   String[] allChannels();
+  /**
+   * Dump the job queue.
+   * @return a string representing the job queue.
+   */
+  String dumpQueue();
 }

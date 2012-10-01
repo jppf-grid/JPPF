@@ -116,7 +116,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param host the host the server is running on.
    * @param port the RMI port used by the server.
    * @param rmiSuffix	RMI registry namespace suffix.
-   * @deprecated JPPF no longer uses the RMI remote connector for JMX. 
+   * @deprecated JPPF no longer uses the RMI remote connector for JMX.
    */
   private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
   {
@@ -487,5 +487,18 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public boolean isSecure()
   {
     return secure;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('[');
+    //sb.append(", idString=").append( idString);
+    sb.append("url=").append( url);
+    sb.append(", connected=").append( connected);
+    sb.append(", local=").append( local);
+    sb.append(", secure=").append( secure);
+    sb.append(']');
+    return sb.toString();
   }
 }

@@ -20,7 +20,9 @@ package org.jppf.server.debug;
 
 import java.util.*;
 
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.server.queue.JPPFPriorityQueue;
 
 /**
  * 
@@ -84,7 +86,7 @@ public class ServerDebug implements ServerDebugMBean
         sb.append(", pending requests=").append(ctx.getNbPendingRequests());
         sb.append(", current request=").append(ctx.getCurrentRequest());
         sb.append(", resource=").append(ctx.getResource());
-        */
+         */
         result[count++] = channel.toString();
       }
     }
@@ -121,7 +123,7 @@ public class ServerDebug implements ServerDebugMBean
         StringBuilder sb = new StringBuilder();
         sb.append(channel.toString());
         sb.append(", state=").append(channel.getContext().getState());
-        */
+         */
         result[count++] = channel.toString();
       }
     }
@@ -180,5 +182,15 @@ public class ServerDebug implements ServerDebugMBean
     for (ChannelWrapper<?> channel: nodeSet) list.add(channel.toString());
     for (ChannelWrapper<?> channel: clientSet) list.add(channel.toString());
     return list.toArray(new String[list.size()]);
+  }
+
+  @Override
+  public String dumpQueue()
+  {
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
+    Set<String> set = queue.getAllJobIds();
+    StringBuilder sb = new StringBuilder();
+    for (String uuid: set) sb.append(queue.getJob(uuid)).append('\n');
+    return sb.toString();
   }
 }

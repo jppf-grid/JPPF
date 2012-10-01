@@ -23,17 +23,13 @@ import java.util.concurrent.Future;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-import org.jppf.job.JobInformation;
-import org.jppf.job.JobNotification;
-import org.jppf.job.JobNotificationEmitter;
+import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.protocol.utils.AbstractServerJob;
-import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.server.submission.SubmissionStatusHandler;
+import org.jppf.server.submission.*;
 import org.jppf.utils.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  *
@@ -46,6 +42,10 @@ public class ServerJob extends AbstractServerJob {
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ServerJob.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The list of of the tasks.
    */
@@ -97,7 +97,7 @@ public class ServerJob extends AbstractServerJob {
   /**
    * The data location of the data provider.
    */
-  private final DataLocation dataProvier;
+  private final DataLocation dataProvider;
   /**
    * Handler for job state notifications.
    */
@@ -127,7 +127,7 @@ public class ServerJob extends AbstractServerJob {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
     this.notificationEmitter = notificationEmitter;
-    this.dataProvier = dataProvider;
+    this.dataProvider = dataProvider;
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
     if (broadcastUUID == null) {
@@ -147,7 +147,7 @@ public class ServerJob extends AbstractServerJob {
    * @return a <code>DataLocation</code> instance.
    */
   public DataLocation getDataProvider() {
-    return dataProvier;
+    return dataProvider;
   }
 
   /**
@@ -195,7 +195,7 @@ public class ServerJob extends AbstractServerJob {
     if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
     ServerJob clientJob;
     synchronized (tasks) {
-      clientJob = new ServerJob(notificationEmitter, job, dataProvier, this.tasks, this, broadcastUUID);
+      clientJob = new ServerJob(notificationEmitter, job, dataProvider, this.tasks, this, broadcastUUID);
     }
     synchronized (bundleMap) {
       broadcastSet.add(clientJob);
@@ -472,6 +472,7 @@ public class ServerJob extends AbstractServerJob {
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
+    if (debugEnabled) log.debug("request to cancel " + this);
     if (super.cancel(mayInterruptIfRunning)) {
       done();
       List<ServerJob> list;
@@ -500,7 +501,8 @@ public class ServerJob extends AbstractServerJob {
         broadcastSet.clear();
         empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
       }
-      if (empty) taskCompleted(null, null);
+      //if (empty) taskCompleted(null, null);
+      taskCompleted(null, null);
       return true;
     }
     else return false;

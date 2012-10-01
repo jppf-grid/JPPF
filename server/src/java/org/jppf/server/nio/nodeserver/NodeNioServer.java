@@ -441,7 +441,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (!c.isOk())
     {
       String uuid = c.getUuid();
-      if (uuid != null) channel = removeUuid(uuid);;
+      if (uuid != null) channel = removeUuid(uuid);
       if (channel != null)
       {
         if (debugEnabled) log.debug("about to close channel = " + (channel.getChannel().isOpen() ? channel : channel.getClass().getSimpleName()) + " with uuid = " + uuid);

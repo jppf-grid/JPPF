@@ -285,7 +285,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update)
   {
-//    if (update && debugEnabled) log.debug("updating node information for " + info + ", channel=" + channel);
+    if (update && debugEnabled) log.debug("updating node information for " + nodeInfo + ", channel=" + channel);
     this.systemInfo = nodeInfo;
     systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(channel.isLocal()));
     if(update && managementInfo != null) managementInfo.setSystemInfo(nodeInfo);
@@ -307,6 +307,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public void setManagementInfo(final JPPFManagementInfo managementInfo)
   {
+    if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
     initializeJmxConnection();
   }
@@ -384,7 +385,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public boolean cancelJob(final String jobId, final boolean requeue) throws Exception
   {
-    JMXNodeConnectionWrapper jmxConnection = getJmxConnection();
+    if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);
     if (jmxConnection != null && jmxConnection.isConnected())
     {
       jmxConnection.cancelJob(jobId, requeue);
@@ -397,12 +398,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public JPPFFuture<?> submit(final ServerTaskBundle bundleWrapper) {
     JPPFFuture<?> future = new JPPFFutureTask<Object>(RUNNABLE, null) {
       @Override
-      public boolean cancel(final boolean mayInterruptIfRunning)
-      {
+      public boolean cancel(final boolean mayInterruptIfRunning) {
+        if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
         if(isDone()) return false;
-        if(isCancelled()) {
-          return true;
-        } else {
+        if(isCancelled()) return true;
+        else {
           bundle.cancel();
           try {
             cancelJob(bundle.getClientJob().getUuid(), false);
