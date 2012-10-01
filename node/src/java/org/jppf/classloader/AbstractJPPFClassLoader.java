@@ -116,7 +116,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
     Class<?> c = null;
-    if (nfCache.get(name) != null) throw new ClassNotFoundException("Could not load class '" + name + '\'');
+    if (nfCache.has(name)) throw new ClassNotFoundException("Could not load class '" + name + '\'');
     c = findLoadedClass(name);
     if (c != null) return c;
     if (lookupClasspath) c = findClassInURLClasspath(name, false);
@@ -145,7 +145,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if ((b == null) || (b.length == 0))
     {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-      nfCache.put(name, Boolean.TRUE);
+      nfCache.add(name);
       throw new ClassNotFoundException("Could not load class '" + name + '\'');
     }
     if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + ']');
@@ -184,7 +184,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public URL findResource(final String name)
   {
     URL url = null;
-    if (nfCache.get(name) != null) return null;
+    if (nfCache.has(name)) return null;
     url = cache.getResourceURL(name);
     if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found in local cache");
     if (url == null)
@@ -207,7 +207,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
       }
     }
-    if (url == null) nfCache.put(name, Boolean.TRUE);
+    if (url == null) nfCache.add(name);
     return url;
   }
 
@@ -254,7 +254,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public Enumeration<URL> findResources(final String name) throws IOException
   {
     List<URL> urlList = new ArrayList<URL>();
-    if (nfCache.get(name) == null)
+    if (!nfCache.has(name))
     {
       if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
       try
@@ -283,7 +283,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         throw (e instanceof IOException) ? (IOException) e : new IOException(e);
       }
     }
-    if (urlList == null || urlList.isEmpty()) nfCache.put(name, Boolean.TRUE);
+    if (urlList == null || urlList.isEmpty()) nfCache.add(name);
     return new IteratorEnumeration<URL>(urlList.iterator());
   }
 
@@ -298,7 +298,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   private List<URL> findRemoteResources(final String name) throws Exception
   {
     List<URL> urlList = new ArrayList<URL>();
-    if (nfCache.get(name) == null)
+    if (!nfCache.has(name))
     {
       List<String> locationsList = null;
       Map<String, Object> map = new HashMap<String, Object>();
@@ -320,7 +320,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
       }
     }
-    if ((urlList == null) || urlList.isEmpty()) nfCache.put(name, Boolean.TRUE);
+    if ((urlList == null) || urlList.isEmpty()) nfCache.add(name);
     return urlList;
   }
 
@@ -458,7 +458,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   /**
    * Clear the cache of resources not found.
-   * The main usage for this method is when libraries or folders have been dynamically added to this class loader's class path.
+   * The main usage for this method is when libraries or folders have been dynamically added to this class loader's classpath.
    */
   public void clearNotFoundCache()
   {
@@ -471,6 +471,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     try
     {
       cache.close();
+      nfCache.clear();
     }
     finally
     {

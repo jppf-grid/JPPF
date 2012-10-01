@@ -19,33 +19,31 @@
 package org.jppf.caching;
 
 /**
- * Interface for caches implementations.
- * @param <K> the type of keys.
- * @param <V> the type of values.
+ * Interface for caches implementations that rely on simple collections (as opposed to maps).
+ * @param <E> the type of elements.
  * @author Laurent Cohen
  */
-public interface JPPFCache<K, V>
+public interface JPPFCollectionCache<E>
 {
   /**
    * Put an element in the cache.
-   * @param key the element's key for retrival.
-   * @param value the element's value.
+   * @param element the element's key for retrival.
    */
-  void put(K key, V value);
+  void add(E element);
 
   /**
-   * Get an element in the cache.
-   * @param key the element's key.
-   * @return the value of the element, or <code>null</code> if the element is not in the cache.
+   * Determine whether an element is in the cache.
+   * @param element the element's to lookup.
+   * @return <code>true</code> if the element is in the cache, <code>false</code> otherwise.
    */
-  V get(K key);
+  boolean has(E element);
 
   /**
    * Remove an element from the cache.
-   * @param key the element's key.
-   * @return the value of the removed element, or <code>null</code> if the element is not in the cache.
+   * @param element the element to remove.
+   * @return the the removed element if it was in the cache, or <code>null</code> if it wasn't.
    */
-  V remove(K key);
+  E remove(E element);
 
   /**
    * Clear the cache. This removes all elements from the cache.

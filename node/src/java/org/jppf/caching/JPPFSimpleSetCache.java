@@ -18,56 +18,55 @@
 
 package org.jppf.caching;
 
-import java.util.Map;
-
-import org.jppf.utils.SoftReferenceValuesMap;
+import java.util.*;
 
 /**
- * Cache implementation which uses a {@link SoftReferenceValuesMap} with synchronized access.
- * @param <K> the type of keys.
- * @param <V> the type of values.
+ * Cache implementation backed by a {@link Set} wihh synchonized access.
+ * @param <E> the type of the cache elements.
  * @author Laurent Cohen
  */
-public class JPPFSynchronizedSoftCache<K, V> implements JPPFMapCache<K, V>
+public class JPPFSimpleSetCache<E> implements JPPFCollectionCache<E>
 {
   /**
-   * The backing map for this cache.
+   * The backing set for this cache.
    */
-  private final Map<K, V> map = new SoftReferenceValuesMap<K, V>();
+  private final Set<E> set = new HashSet<E>();
 
   @Override
-  public void put(final K key, final V value)
+  public void add(final E element)
   {
-    synchronized(map)
+    synchronized(set)
     {
-      map.put(key, value);
+      set.add(element);
     }
   }
 
   @Override
-  public V get(final K key)
+  public boolean has(final E element)
   {
-    synchronized(map)
+    synchronized(set)
     {
-      return map.get(key);
+      return set.contains(element);
     }
   }
 
   @Override
-  public V remove(final K key)
+  public E remove(final E element)
   {
-    synchronized(map)
+    boolean b;
+    synchronized(set)
     {
-      return map.remove(key);
+      b = set.remove(element);
     }
+    return b ? element : null;
   }
 
   @Override
   public void clear()
   {
-    synchronized(map)
+    synchronized(set)
     {
-      map.clear();
+      set.clear();
     }
   }
 }

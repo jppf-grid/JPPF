@@ -79,7 +79,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * The cache handling resources that were not found by this class loader.
    */
-  protected final JPPFCache<String, Boolean> nfCache = new JPPFSynchronizedSoftCache<String, Boolean>();
+  protected final JPPFCollectionCache<String> nfCache = new JPPFSimpleSetCache<String>();
   /**
    * The object used to serialize and deserialize resources.
    */
@@ -265,8 +265,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     boolean[] alreadyNotFound = new boolean[names.length];
     for (int i=0; i<names.length; i++) {
       results[i] = null;
-      Boolean b = nfCache.get(names[i]);
-      alreadyNotFound[i] = (b == null) ? false : b;
+      alreadyNotFound[i] = nfCache.has(names[i]);
     }
     try {
       List<Integer> indices = new ArrayList<Integer>();
@@ -310,7 +309,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
           results[index] = url;
           if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
         }
-        else nfCache.put(name, Boolean.TRUE);
+        else nfCache.add(name);
       }
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -335,8 +334,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     for (int i=0; i<length; i++)
     {
       results[i] = null;
-      Boolean b = nfCache.get(names[i]);
-      alreadyNotFound[i] = (b == null) ? false : b;
+      alreadyNotFound[i] = nfCache.has(names[i]);
     }
     try
     {
