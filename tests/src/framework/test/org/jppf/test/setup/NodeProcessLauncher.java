@@ -45,7 +45,7 @@ public class NodeProcessLauncher extends GenericProcessLauncher
   {
     super(n, "  node");
     setJppfConfig(createTempConfigFile(jppfConfig));
-    setLog4j("file:/" + createTempConfigFile(createConfigFromTemplate("classes/tests/config/log4j-node.template.properties", n)));
+    setLog4j(getFileURL(createTempConfigFile(createConfigFromTemplate("classes/tests/config/log4j-node.template.properties", n))));
     setupCommon();
   }
 

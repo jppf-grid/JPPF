@@ -57,7 +57,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     long n = stats.getNodes().getLatest();
     assertTrue("nb nodes should be 2 but is " + n, n == 2);
     assertTrue(stats.getTotalTasksExecuted() == 0);
-    client.submit(BaseSetup.createJob("TestStatistics", true, false, 10, LifeCycleTask.class, 100L));
+    client.submit(BaseSetup.createJob("TestGetStatistics", true, false, 10, LifeCycleTask.class, 100L));
     stats = driver.statistics();
     n = stats.getIdleNodes().getLatest();
     assertTrue("nb idle nodes should be 2 but is " + n, n == 2);
@@ -74,7 +74,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testResetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
-    client.submit(BaseSetup.createJob("TestStatistics", true, false, 10, LifeCycleTask.class, 100L));
+    client.submit(BaseSetup.createJob("TestResetStatistics", true, false, 10, LifeCycleTask.class, 100L));
     driver.resetStatistics();
     JPPFStats stats = driver.statistics();
     assertNotNull(stats);
@@ -143,7 +143,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     assertNotNull(driver);
-    InputStream is = getClass().getClassLoader().getResourceAsStream("config/driver1.properties");
+    InputStream is = getClass().getClassLoader().getResourceAsStream("config/driver.template.properties");
     assertNotNull(is);
     TypedProperties driverConfig = new TypedProperties();
     driverConfig.load(is);

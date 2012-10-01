@@ -111,13 +111,13 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception
   {
-    System.out.println("performing setup with 1 driver, " + nbNodes + " nodes" + (initClient ? " and 1 client" : ""));
+    System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (initClient ? " and 1 client" : ""));
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++)
     {
       // to avoid driver and node producing the same UUID
-      if (i > 0) Thread.sleep(511L);
+      //if (i > 0) Thread.sleep(511L);
       drivers[i] = new DriverProcessLauncher(i+1);
       drivers[i].startProcess();
     }
@@ -125,7 +125,7 @@ public class BaseSetup
     for (int i=0; i<nbNodes; i++)
     {
       // to avoid driver and node producing the same UUID
-      if (i > 0) Thread.sleep(511L);
+      //if (i > 0) Thread.sleep(511L);
       nodes[i] = new NodeProcessLauncher(i+1);
       nodes[i].startProcess();
     }

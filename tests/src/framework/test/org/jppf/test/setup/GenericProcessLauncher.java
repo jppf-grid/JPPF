@@ -134,7 +134,7 @@ public class GenericProcessLauncher
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     jppfConfig = createTempConfigFile(createConfigFromTemplate(jppfTemplate, n));
-    log4j = "file:/" + createTempConfigFile(createConfigFromTemplate(log4jTemplate, n));
+    log4j = getFileURL(createTempConfigFile(createConfigFromTemplate(log4jTemplate, n)));
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
@@ -402,5 +402,24 @@ public class GenericProcessLauncher
       if (reader != null) StreamUtils.closeSilent(reader);
     }
     return props;
+  }
+
+  /**
+   * Get a url from a file path.
+   * @param path the path to convert to a url.
+   * @return a urm as a string.
+   */
+  public static String getFileURL(final String path)
+  {
+    URL url = null;
+    try
+    {
+      url = new File(path).toURI().toURL();
+    }
+    catch (MalformedURLException e)
+    {
+      throw new RuntimeException(e);
+    }
+    return url.toString();
   }
 }

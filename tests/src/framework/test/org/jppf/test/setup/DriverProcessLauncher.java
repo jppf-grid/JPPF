@@ -45,7 +45,8 @@ public class DriverProcessLauncher extends GenericProcessLauncher
   {
     super(n, "driver");
     setJppfConfig(createTempConfigFile(jppfConfig));
-    setLog4j("file:/" + createTempConfigFile(createConfigFromTemplate("classes/tests/config/log4j-driver.template.properties", n)));
+    String path = createTempConfigFile(createConfigFromTemplate("classes/tests/config/log4j-driver.template.properties", n));
+    setLog4j(getFileURL(path));
     setupCommon();
   }
 
