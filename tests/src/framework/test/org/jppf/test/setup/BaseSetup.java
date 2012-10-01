@@ -19,7 +19,9 @@
 package test.org.jppf.test.setup;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
+import java.util.*;
+
+import javax.management.remote.JMXServiceURL;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
@@ -186,29 +188,43 @@ public class BaseSetup
    */
   public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
   {
-    JMXDriverConnectionWrapper[] wrappers = new JMXDriverConnectionWrapper[nbDrivers];
-    try
+  	if (client == null) return;
+  	Map<Integer, JPPFClientConnection> connectionMap = new HashMap<Integer, JPPFClientConnection>();
+  	boolean allConnected = false;
+  	while (!allConnected)
+  	{
+  		List<JPPFClientConnection> list = client.getAllConnections();
+  		if (list != null)
+  		{
+  			for (JPPFClientConnection c: list)
+  			{
+  				if (!connectionMap.containsKey(c.getPort())) connectionMap.put(c.getPort(), c);
+  			}
+  		}
+  		if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
+  		else allConnected = true; 
+  	}
+  	Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<JMXServiceURL, JMXDriverConnectionWrapper>();
+  	for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
+  	{
+  		JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) entry.getValue();
+  		JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
+  		if (!wrapperMap.containsKey(wrapper.getURL()))
+  		{
+  			while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
+  			wrapperMap.put(wrapper.getURL(), wrapper);
+  		}
+  	}
+    int sum = 0;
+    while (sum < nbNodes)
     {
-      for (int i=0; i<nbDrivers; i++)
+      sum = 0;
+      for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet())
       {
-        wrappers[i] = new JMXDriverConnectionWrapper("localhost", 11190 + drivers[i].n);
-        while (!wrappers[i].isConnected()) wrappers[i].connectAndWait(10L);
+        Collection<JPPFManagementInfo> coll = entry.getValue().nodesInformation();
+        if (coll != null) sum += coll.size();
+        else break;
       }
-      int sum = 0;
-      while (sum < nbNodes)
-      {
-        sum = 0;
-        for (int i=0; i<nbDrivers; i++)
-        {
-          Collection<JPPFManagementInfo> coll = wrappers[i].nodesInformation();
-          if (coll != null) sum += coll.size();
-          else break;
-        }
-      }
-    }
-    finally
-    {
-      if (wrappers != null) for (JMXDriverConnectionWrapper wrapper: wrappers) wrapper.close();
     }
   }
 
