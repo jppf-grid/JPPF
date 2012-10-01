@@ -243,12 +243,12 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     try
     {
       queue.processPendingBroadcasts();
+      T channel = null;
+      ServerTaskBundle taskBundle = null;
       synchronized(idleChannels)
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
-        T channel = null;
-        ServerJob selectedBundle = null;
         queueLock.lock();
         try
         {
@@ -257,14 +257,12 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
           {
             ServerJob bundleWrapper = it.next();
             channel = retrieveChannel(bundleWrapper);
-            if (channel != null) selectedBundle = bundleWrapper;
+            if (channel != null) {
+              taskBundle = prepareJobDispatch(channel, bundleWrapper);
+              removeIdleChannel(channel);
+            }
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-          if (channel != null)
-          {
-            dispatchJobToChannel(channel, selectedBundle);
-            dispatched = true;
-          }
         }
         catch(Exception ex)
         {
@@ -274,6 +272,11 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
         {
           queueLock.unlock();
         }
+      }
+      if (channel != null && taskBundle != null)
+      {
+        dispatchJobToChannel(channel, taskBundle);
+        dispatched = true;
       }
     }
     catch (Exception ex)
@@ -299,41 +302,45 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   }
 
   /**
-   * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
-   * @param channel the node channel to dispatch the job to.
+   * Prepare the specified job for the selected channel, after applying the load balancer to the job.
+   * @param channel the node channel to prepare dispatch the job to.
    * @param selectedBundle the job to dispatch.
    */
-  @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final T channel, final ServerJob selectedBundle)
+  private ServerTaskBundle prepareJobDispatch(final T channel, final ServerJob selectedBundle)
   {
     if (debugEnabled)
     {
       log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
               ", nodeUuid=" + channel.getConnectionUuid());
     }
+    int size = 1;
+    try
+    {
+      updateBundler(getBundler(), selectedBundle.getJob(), channel);
+      size = channel.getBundler().getBundleSize();
+    }
+    catch (Exception e)
+    {
+      log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
+      FixedSizeProfile profile = new FixedSizeProfile();
+      profile.setSize(1);
+      setBundler(new FixedSizeBundler(profile));
+    }
+    return queue.nextBundle(selectedBundle, size);
+  }
+
+  /**
+   * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
+   * @param channel the node channel to dispatch the job to.
+   * @param bundleWrapper the job to dispatch.
+   */
+  @SuppressWarnings("unchecked")
+  private void dispatchJobToChannel(final T channel, final ServerTaskBundle bundleWrapper) {
     synchronized(channel.getMonitor())
     {
-      int size = 1;
-      try
-      {
-        updateBundler(getBundler(), selectedBundle.getJob(), channel);
-        size = channel.getBundler().getBundleSize();
-      }
-      catch (Exception e)
-      {
-        log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
-        FixedSizeProfile profile = new FixedSizeProfile();
-        profile.setSize(1);
-        setBundler(new FixedSizeBundler(profile));
-      }
-      try {
-        ServerTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
-        JPPFFuture<?> future = channel.submit(bundleWrapper);
-        bundleWrapper.jobDispatched(channel, future);
-        jobManager.jobDispatched(bundleWrapper.getClientJob(), ((AbstractNodeContext) channel).getChannel());
-      } finally {
-        removeIdleChannel(channel);
-      }
+      JPPFFuture<?> future = channel.submit(bundleWrapper);
+      bundleWrapper.jobDispatched(channel, future);
+      jobManager.jobDispatched(bundleWrapper.getClientJob(), ((AbstractNodeContext) channel).getChannel());
     }
   }
 
