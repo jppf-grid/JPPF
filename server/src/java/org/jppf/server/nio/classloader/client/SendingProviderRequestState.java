@@ -65,14 +65,17 @@ class SendingProviderRequestState extends ClassServerState
     {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if ((context.getCurrentRequest() == null) && !context.getPendingRequests().isEmpty())
+    if (context.getCurrentRequest() == null)
     {
-      ResourceRequest request = context.getPendingRequests().remove(0);
-      context.setMessage(null);
-      context.setResource(request.getResource());
-      if (debugEnabled) log.debug("provider " + channel + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
-      context.serializeResource();
-      context.setCurrentRequest(request);
+      ResourceRequest request = context.pollPendingRequest();
+      if (request != null)
+      {
+        context.setMessage(null);
+        context.setResource(request.getResource());
+        if (debugEnabled) log.debug("provider " + channel + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
+        context.serializeResource();
+        context.setCurrentRequest(request);
+      }
     }
     if (context.getCurrentRequest() == null)
     {

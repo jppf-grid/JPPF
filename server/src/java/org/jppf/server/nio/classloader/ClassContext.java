@@ -51,7 +51,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * The list of pending resource requests for a resource provider.
    */
-  protected List<ResourceRequest> pendingRequests = new Vector<ResourceRequest>();
+  private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
   /**
    * The list of pending resource reponses for a node.
    */
@@ -165,6 +165,11 @@ public class ClassContext extends SimpleNioContext<ClassState>
     }
   }
 
+  public synchronized ResourceRequest pollPendingRequest() {
+    if(pendingRequests.isEmpty()) return null;
+    else return pendingRequests.remove(0);
+  }
+
   /**
    * Get the request currently processed.
    * @return a <code>SelectionKey</code> instance.
@@ -189,17 +194,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public synchronized int getNbPendingRequests()
   {
-    List<ResourceRequest> reqs = getPendingRequests();
-    return (reqs == null ? 0 : reqs.size()) + (getCurrentRequest() == null ? 0 : 1);
-  }
-
-  /**
-   * Get the list of pending resource requests for a resource provider.
-   * @return a <code>List</code> of <code>SelectionKey</code> instances.
-   */
-  public synchronized List<ResourceRequest> getPendingRequests()
-  {
-    return pendingRequests;
+    return pendingRequests.size() + (getCurrentRequest() == null ? 0 : 1);
   }
 
   /**
@@ -229,7 +224,17 @@ public class ClassContext extends SimpleNioContext<ClassState>
     try
     {
       ResourceRequest currentRequest = getCurrentRequest();
-      if ((currentRequest != null) || !getPendingRequests().isEmpty())
+      List<ResourceRequest> pendingList;
+      synchronized (this)
+      {
+        if(pendingRequests.isEmpty())
+          pendingList = Collections.emptyList();
+        else {
+          pendingList = new ArrayList<ResourceRequest>(pendingRequests);
+          pendingRequests.clear();
+        }
+      }
+      if ((currentRequest != null) || !pendingList.isEmpty())
       {
         if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
         //ClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
@@ -239,7 +244,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
           setCurrentRequest(null);
           resetNodeState(currentRequest, server);
         }
-        for (int i=0; i<getPendingRequests().size(); i++) resetNodeState(getPendingRequests().remove(0), server);
+
+        for (ResourceRequest resourceRequest : pendingList) {
+          resetNodeState(resourceRequest, server);
+        }
       }
     }
     catch (Exception e)
