@@ -206,14 +206,14 @@ public class DriverInitializer
   {
     boolean initPeers;
     TypedProperties props = JPPFConfiguration.getProperties();
-    boolean ssl = props.getBoolean("jppf.peer.ssl.enabled", false);
+    final boolean ssl = props.getBoolean("jppf.peer.ssl.enabled", false);
     if (props.getBoolean("jppf.peer.discovery.enabled", false))
     {
       if (debugEnabled) log.debug("starting peers discovery");
       peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
         @Override
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-          new JPPFPeerInitializer(name, info, classServer).start();
+          new JPPFPeerInitializer(name, info, classServer, ssl).start();
         }
       }, null, getConnectionInformation());
       initPeers = false;
@@ -225,7 +225,7 @@ public class DriverInitializer
     }
 
     String discoveryNames = props.getString("jppf.peers");
-    if ((discoveryNames != null) && !"".equals(discoveryNames.trim()))
+    if ((discoveryNames != null) && !discoveryNames.trim().isEmpty())
     {
       if (debugEnabled) log.debug("found peers in the configuration");
       String[] names = discoveryNames.split("\\s");
@@ -246,7 +246,7 @@ public class DriverInitializer
             if (ssl) info.sslServerPorts = StringUtils.parseIntValues(s);
             else info.serverPorts = StringUtils.parseIntValues(s);
             if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
-            new JPPFPeerInitializer(name, info, classServer).start();
+            new JPPFPeerInitializer(name, info, classServer, ssl).start();
           }
         }
       }

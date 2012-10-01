@@ -26,13 +26,14 @@ import org.slf4j.*;
  * Instances of this class are used to initialize the connections to a peer driver
  * in a separate thread.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 public class JPPFPeerInitializer extends Thread
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFPeerInitializer.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFPeerInitializer.class);
   /**
    * Name of the peer in the configuration file.
    */
@@ -45,14 +46,19 @@ public class JPPFPeerInitializer extends Thread
    * JPPF class server
    */
   private final ClassNioServer classServer;
+  /**
+   * Determines whether communication with remote peer servers should be secure.
+   */
+  private final boolean secure;
 
   /**
    * Initialize this peer initializer from a specified peerName.
    * @param peerName the name of the peer in the configuration file.
    * @param connectionInfo peer connection information.
    * @param classServer JPPF class server
+   * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer)
+  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer, final boolean secure)
   {
     if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
@@ -60,6 +66,7 @@ public class JPPFPeerInitializer extends Thread
     this.peerName       = peerName;
     this.connectionInfo = connectionInfo;
     this.classServer    = classServer;
+    this.secure         = secure;
     setName("Peer Initializer [" + peerName + ']');
   }
 
@@ -73,8 +80,8 @@ public class JPPFPeerInitializer extends Thread
     log.info("start initialization of peer [" + peerName + ']');
     try
     {
-      new PeerResourceProvider(peerName, connectionInfo, classServer).init();
-      new PeerNode(peerName, connectionInfo).run();
+      new PeerResourceProvider(peerName, connectionInfo, classServer, secure).init();
+      new PeerNode(peerName, connectionInfo, secure).run();
     }
     catch(Exception e)
     {

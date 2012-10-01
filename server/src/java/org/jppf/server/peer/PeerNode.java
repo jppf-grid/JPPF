@@ -74,16 +74,17 @@ class PeerNode extends AbstractCommonNode
    */
   private JPPFDriver driver = JPPFDriver.getInstance();
   /**
-   * Determines whether communication with remote peer servers is via SSL.
+   * Determines whether communication with remote peer servers should be secure.
    */
-  private final boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
+  private final boolean secure;
 
   /**
    * Initialize this peer node with the specified configuration name.
    * @param peerNameBase the name of the peer int he configuration file.
    * @param connectionInfo peer connection information.
+   * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo)
+  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure)
   {
     if(peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerNameBase is blank");
     if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
@@ -91,6 +92,7 @@ class PeerNode extends AbstractCommonNode
     this.peerNameBase = peerNameBase;
     this.peerName = peerNameBase;
     this.connectionInfo = connectionInfo;
+    this.secure = secure;
     this.uuid = driver.getUuid();
     this.helper = new SerializationHelperImpl();
   }
@@ -219,7 +221,7 @@ class PeerNode extends AbstractCommonNode
       socketInitializer.initializeSocket(socketClient);
       if (!socketInitializer.isSuccessful()) throw new JPPFException("Unable to reconnect to " + peerName);
       System.out.println("Reconnected to " + peerName);
-      if (sslEnabled) socketClient = SSLHelper.createSSLClientConnection(socketClient);
+      if (secure) socketClient = SSLHelper.createSSLClientConnection(socketClient);
       if (debugEnabled) log.debug("sending channel identifier");
       socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
       is = new SocketWrapperInputSource(socketClient);
@@ -235,7 +237,7 @@ class PeerNode extends AbstractCommonNode
     if (debugEnabled) log.debug(getName() + "initializing socket client");
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
-    int port = sslEnabled ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
+    int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
     socketClient = new SocketClient();
     socketClient.setHost(host);
     socketClient.setPort(port);
@@ -304,6 +306,6 @@ class PeerNode extends AbstractCommonNode
   @Override
   public JMXServer getJmxServer() throws Exception
   {
-    return driver.getInitializer().getJmxServer(sslEnabled);
+    return driver.getInitializer().getJmxServer(secure);
   }
 }

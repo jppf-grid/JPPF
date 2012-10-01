@@ -28,29 +28,33 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
  * This class represents a connection to the class server of a remote JPPF driver (peer driver).
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 class PeerResourceProvider
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(PeerResourceProvider.class);
+  private static final Logger log = LoggerFactory.getLogger(PeerResourceProvider.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether ssl is enabled for peer-to-peer cpmmunication between servers.
    */
-  private static boolean sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.peer.ssl.enabled", false);
+  private final boolean secure;
   /**
    * The name of the peer in the configuration file.
+   */
+  private final String peerNameBase;
+  /**
+   * The name of the peer with host and port information when connected.
    */
   private String peerName;
   /**
@@ -72,18 +76,20 @@ class PeerResourceProvider
 
   /**
    * Initialize this peer provider with the specified configuration name.
-   * @param peerName the name of the peer in the configuration file.
+   * @param peerNameBase the name of the peer in the configuration file.
    * @param connectionInfo peer connection information.
    * @param server the NioServer to which the channel is registered.
    */
-  public PeerResourceProvider(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer server)
+  public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClassNioServer server, final boolean secure)
   {
-    this.server = server;
-    if (peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+    if (peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
 
-    this.peerName = peerName;
+    this.peerNameBase = peerNameBase;
+    this.peerName = peerNameBase;
     this.connectionInfo = connectionInfo;
+    this.server = server;
+    this.secure = secure;
   }
 
   /**
@@ -115,9 +121,10 @@ class PeerResourceProvider
       socketClient.setChannel(null);
       ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
       if (debugEnabled) log.debug("registered class server channel " + channel);
-      if (sslEnabled) configureSSL(channel);
+      if (secure) configureSSL(channel);
       server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_SENDING_PEER_CHANNEL_IDENTIFIER);
       socketClient = null;
+      peerName = peerNameBase;
     }
     catch (Exception e)
     {
@@ -135,8 +142,8 @@ class PeerResourceProvider
   {
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
-    int port = sslEnabled ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
-    peerName = peerName + '@' + host + ':' + port;
+    int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
+    peerName = peerNameBase + '@' + host + ':' + port;
     return new SocketChannelClient(host, port, false);
   }
 
