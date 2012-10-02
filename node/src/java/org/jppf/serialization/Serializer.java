@@ -222,7 +222,6 @@ class Serializer
       {
         String name = (val == null) ? null : ((Enum) val).name();
         writeObject(name);
-        //out.writeUTF(((Enum) val).name());
       }
       else writeObject(val);
     }
@@ -251,15 +250,6 @@ class Serializer
         case 'D': writeDoubleArray((double[]) obj); break;
         case 'C': writeCharArray((char[]) obj); break;
         case 'Z': writeBooleanArray((boolean[]) obj); break;
-        /*
-				case 'S': for (short v: (short[]) obj) out.writeShort(v); break;
-				case 'I': for (int v: (int[]) obj) out.writeInt(v); break;
-				case 'J': for (long v: (long[]) obj) out.writeLong(v); break;
-				case 'F': for (float v: (float[]) obj) out.writeFloat(v); break;
-				case 'D': for (double v: (double[]) obj) out.writeDouble(v); break;
-				case 'C': for (char v: (char[]) obj) out.writeChar(v); break;
-				case 'Z': for (boolean v: (boolean[]) obj) out.writeBoolean(v); break;
-         */
       }
     }
     else if (eltDesc.enumType)
@@ -269,7 +259,6 @@ class Serializer
         Object val = Array.get(obj, i);
         String name = (val == null) ? null : ((Enum) val).name();
         writeObject(name);
-        //out.writeUTF(name);
       }
     }
     else

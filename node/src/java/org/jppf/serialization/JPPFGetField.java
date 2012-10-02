@@ -38,27 +38,18 @@ class JPPFGetField extends GetField
    */
   Map<String, Object> objectFields = new HashMap<String, Object>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ObjectStreamClass getObjectStreamClass()
   {
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean defaulted(final String name) throws IOException
   {
     return (primitiveFields.get(name) == null) && (objectFields.get(name) == null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean get(final String name, final boolean val) throws IOException
   {
@@ -66,9 +57,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public byte get(final String name, final byte val) throws IOException
   {
@@ -76,9 +64,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public char get(final String name, final char val) throws IOException
   {
@@ -86,9 +71,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public short get(final String name, final short val) throws IOException
   {
@@ -96,9 +78,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int get(final String name, final int val) throws IOException
   {
@@ -106,9 +85,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long get(final String name, final long val) throws IOException
   {
@@ -116,9 +92,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public float get(final String name, final float val) throws IOException
   {
@@ -126,9 +99,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public double get(final String name, final double val) throws IOException
   {
@@ -136,9 +106,6 @@ class JPPFGetField extends GetField
     return r == null ? val : r;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Object get(final String name, final Object val) throws IOException
   {

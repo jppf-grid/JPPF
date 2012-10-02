@@ -51,90 +51,60 @@ class JPPFPutField extends PutField
     this.out = out;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final boolean val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final byte val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final char val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final short val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final int val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final long val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final float val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final double val)
   {
     primitiveFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final String name, final Object val)
   {
     objectFields.put(name, val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final ObjectOutput out) throws IOException
   {

@@ -121,7 +121,6 @@ class Deserializer
     else if (cd.enumType)
     {
       String name = (String) readObject();
-      //String name = in.readUTF();
       //if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(Exception e) {}
       Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
       caches.handleToObjectMap.put(handle, val);
@@ -206,7 +205,6 @@ class Deserializer
       else if (typeDesc.enumType)
       {
         String name = (String) readObject();
-        //String name = in.readUTF();
         //if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(Exception e) {}
         Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) typeDesc.clazz, name);
         field.set(obj, val);
@@ -244,15 +242,6 @@ class Deserializer
         case 'D': obj = readDoubleArray(len); break;
         case 'C': obj = readCharArray(len); break;
         case 'Z': obj = readBooleanArray(len); break;
-        /*
-				case 'S': short[] sarray = new short[len];     obj = sarray; for (int i=0; i<len; i++) sarray[i] = in.readShort(); break;
-				case 'I': int[] iarray = new int[len];         obj = iarray; for (int i=0; i<len; i++) iarray[i] = in.readInt(); break;
-				case 'J': long[] larray = new long[len];       obj = larray; for (int i=0; i<len; i++) larray[i] = in.readLong(); break;
-				case 'F': float[] farray = new float[len];     obj = farray; for (int i=0; i<len; i++) farray[i] = in.readFloat(); break;
-				case 'D': double[] darray = new double[len];   obj = darray; for (int i=0; i<len; i++) darray[i] = in.readDouble(); break;
-				case 'C': char[] carray = new char[len];       obj = carray; for (int i=0; i<len; i++) carray[i] = in.readChar(); break;
-				case 'Z': boolean[] zarray = new boolean[len]; obj = zarray; for (int i=0; i<len; i++) zarray[i] = in.readBoolean(); break;
-         */
       }
       caches.handleToObjectMap.put(handle, obj);
     }
@@ -263,7 +252,6 @@ class Deserializer
       for (int i=0; i<len; i++)
       {
         String name = (String) readObject();
-        //String name = in.readUTF();
         //if (traceEnabled) try { log.trace("writing enum[" + eltDesc.signature + "] : " + name); } catch(Exception e) {}
         Object val = (name == null) ? null : Enum.valueOf((Class<Enum>) eltDesc.clazz, name);
         Array.set(obj, i, val);
@@ -318,19 +306,6 @@ class Deserializer
    */
   private Object newInstance(final ClassDescriptor cd) throws Exception
   {
-    /*
-		Constructor<?>[] constructors = cd.clazz.getDeclaredConstructors();
-		//Arrays.sort(constructors, new ConstructorComparator());
-		for (Constructor c: constructors)
-		{
-			if (c.getParameterTypes().length == 0)
-			{
-				if (!c.isAccessible()) c.setAccessible(true);
-				return c.newInstance();
-			}
-		}
-		return null;
-     */
     return ReflectionHelper.create(cd.clazz);
   }
 

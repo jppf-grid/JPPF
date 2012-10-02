@@ -66,28 +66,18 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   public JPPFObjectOutputStream(final OutputStream out) throws IOException
   {
     super();
-    this.out = new DataOutputStream(out);
+    this.out = (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out);
     serializer = new Serializer(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected final void writeObjectOverride(final Object obj) throws IOException
   {
     boolean alreadyWriting = writingObject;
     try
     {
-      if (!alreadyWriting)
-      {
-        writingObject = true;
-        serializer.writeObject(obj);
-      }
-      else
-      {
-        serializer.writeObject(obj);
-      }
+      if (!alreadyWriting) writingObject = true;
+      serializer.writeObject(obj);
     }
     catch (Exception e)
     {
@@ -103,72 +93,48 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final int val) throws IOException
   {
     out.write(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final byte[] buf) throws IOException
   {
     out.write(buf);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final byte[] buf, final int off, final int len) throws IOException
   {
     out.write(buf, off, len);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeBoolean(final boolean val) throws IOException
   {
     out.writeBoolean(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeByte(final int val) throws IOException
   {
     out.writeByte(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeShort(final int val) throws IOException
   {
     out.writeShort(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeChar(final int val) throws IOException
   {
     out.writeChar(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeInt(final int val) throws IOException
   {
@@ -177,27 +143,18 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
     //out.writeInt(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeLong(final long val) throws IOException
   {
     out.writeLong(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeFloat(final float val) throws IOException
   {
     out.writeFloat(val);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeDouble(final double val) throws IOException
   {
@@ -205,36 +162,24 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
     out.writeLong(Double.doubleToLongBits(val));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeBytes(final String str) throws IOException
   {
     out.writeBytes(str);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeChars(final String str) throws IOException
   {
     out.writeChars(str);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeUTF(final String str) throws IOException
   {
     out.writeUTF(str);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void defaultWriteObject() throws IOException
   {
@@ -249,42 +194,28 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flush() throws IOException
   {
     out.flush();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close() throws IOException
   {
     out.close();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public PutField putFields() throws IOException
   {
-    //return super.putFields();
     if (currentPutField == null) currentPutField = new JPPFPutField(this);
     return currentPutField;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeFields() throws IOException
   {
-    //super.writeFields();
     try
     {
       JPPFPutField f = (JPPFPutField) currentPutField;
