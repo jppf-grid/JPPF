@@ -189,7 +189,18 @@ public class NodeDataPanelManager
     int index = nodeInsertIndex(driverNode, nodeName);
     if (index < 0) return;
     if (debugEnabled) log.debug("adding node: " + nodeName + " at index " + index);
-    TopologyData data = new TopologyData(nodeInfo);
+    TopologyData data = null;
+    if (!nodeInfo.isNode())
+    {
+      DefaultMutableTreeNode tmpNode = findDriver(nodeName);
+      if (tmpNode != null)
+      {
+        if (debugEnabled) log.debug("adding peer node: " + nodeName + " at index " + index);
+        TopologyData tmpData = (TopologyData) tmpNode.getUserObject();
+        data = new TopologyData(nodeInfo, tmpData.getJmxWrapper());
+      }
+    }
+    if (data == null) data = new TopologyData(nodeInfo);
     //if (debugEnabled) log.debug("created TopologyData instance");
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
     panel.getModel().insertNodeInto(nodeNode, driverNode, index);

@@ -142,4 +142,13 @@ public abstract class PropertiesTableFormat
   public void cellSeparator()
   {
   }
+
+  /**
+   * Print the specified string.
+   * @param message the string to print.
+   */
+  public void print(final String message)
+  {
+    sb.append(message);
+  }
 }

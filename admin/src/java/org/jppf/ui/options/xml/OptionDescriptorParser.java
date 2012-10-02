@@ -69,10 +69,6 @@ public class OptionDescriptorParser
    */
   public OptionDescriptor parse(final String docPath) throws Exception
   {
-    if (docPath.contains("NodeDataPage"))
-    {
-      log.info("loading doc from path = " + docPath);
-    }
     InputStream is = FileUtils.getFileInputStream(docPath);
     //if (is == null) is = this.getClass().getClassLoader().getResourceAsStream(docPath);
     if (is == null)

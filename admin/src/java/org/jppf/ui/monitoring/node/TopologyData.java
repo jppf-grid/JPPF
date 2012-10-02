@@ -94,9 +94,25 @@ public class TopologyData
     this(TopologyDataType.NODE);
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
-    if (nodeInformation.isNode()) jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    if (nodeInformation.isNode())
+    {
+      jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+      jmxWrapper.connect();
+    }
     else jmxWrapper = new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
-    jmxWrapper.connect();
+  }
+
+  /**
+   * Initialize this topology data as holding information about a peer node.
+   * @param nodeInformation information on the JPPF peer node.
+   * @param peerJmx the JMX wrapper associated with the driver information this peer node represents.
+   */
+  public TopologyData(final JPPFManagementInfo nodeInformation, final JMXConnectionWrapper peerJmx)
+  {
+    this(TopologyDataType.NODE);
+    this.nodeInformation = nodeInformation;
+    this.nodeState = new JPPFNodeState();
+    this.jmxWrapper = peerJmx;
   }
 
   /**
@@ -251,9 +267,6 @@ public class TopologyData
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean equals(final Object obj)
   {

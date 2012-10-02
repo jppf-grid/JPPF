@@ -71,13 +71,20 @@ public class SystemInformationAction extends AbstractTopologyAction
       boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
       PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + connection.getId());
       format.start();
-      format.formatTable(info.getUuid(), "UUID");
-      format.formatTable(info.getSystem(), "System Properties");
-      format.formatTable(info.getEnv(), "Environment Variables");
-      format.formatTable(info.getRuntime(), "Runtime Information");
-      format.formatTable(info.getJppf(), "JPPF configuration");
-      format.formatTable(info.getNetwork(), "Network configuration");
-      format.formatTable(info.getStorage(), "Storage Information");
+      if (info == null)
+      {
+        format.print("<p><b>No information was found</b>");
+      }
+      else
+      {
+        format.formatTable(info.getUuid(), "UUID");
+        format.formatTable(info.getSystem(), "System Properties");
+        format.formatTable(info.getEnv(), "Environment Variables");
+        format.formatTable(info.getRuntime(), "Runtime Information");
+        format.formatTable(info.getJppf(), "JPPF configuration");
+        format.formatTable(info.getNetwork(), "Network configuration");
+        format.formatTable(info.getStorage(), "Storage Information");
+      }
       format.end();
       s = format.getText();
     }
