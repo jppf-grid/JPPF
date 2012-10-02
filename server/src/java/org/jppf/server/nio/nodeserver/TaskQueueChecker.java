@@ -305,6 +305,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Prepare the specified job for the selected channel, after applying the load balancer to the job.
    * @param channel the node channel to prepare dispatch the job to.
    * @param selectedBundle the job to dispatch.
+   * @return the task bundle to dispatch to the specified node.
    */
   private ServerTaskBundle prepareJobDispatch(final T channel, final ServerJob selectedBundle)
   {

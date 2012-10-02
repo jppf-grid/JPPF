@@ -79,6 +79,7 @@ class PeerResourceProvider
    * @param peerNameBase the name of the peer in the configuration file.
    * @param connectionInfo peer connection information.
    * @param server the NioServer to which the channel is registered.
+   * @param secure <code>true</code> if the connection is established over SSL, <code>false</code> otherwise.
    */
   public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClassNioServer server, final boolean secure)
   {

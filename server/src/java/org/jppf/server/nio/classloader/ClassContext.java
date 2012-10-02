@@ -165,6 +165,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
     }
   }
 
+  /**
+   * Get a pending request if any is present.
+   * @return a {@link ResourceRequest} instance.
+   */
   public synchronized ResourceRequest pollPendingRequest() {
     if(pendingRequests.isEmpty()) return null;
     else return pendingRequests.remove(0);
