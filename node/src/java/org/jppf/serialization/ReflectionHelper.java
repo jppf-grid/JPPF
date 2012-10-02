@@ -121,7 +121,8 @@ public final class ReflectionHelper
       sb.append('[');
       tmp = tmp.getComponentType();
     }
-    if (clazz == Byte.TYPE) sb.append('B');
+    //if (clazz == Byte.TYPE) sb.append('B');
+    if (tmp == Byte.TYPE) sb.append('B');
     else if (tmp == Short.TYPE) sb.append('S');
     else if (tmp == Integer.TYPE) sb.append('I');
     else if (tmp == Long.TYPE) sb.append('J');
@@ -385,9 +386,6 @@ public final class ReflectionHelper
    */
   private static class ConstructorComparator implements Comparator<Constructor<?>>, Serializable
   {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compare(final Constructor<?> c1, final Constructor<?> c2)
     {
