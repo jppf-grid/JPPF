@@ -64,9 +64,6 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
     super(source, PatternConfiguration.IPV6_CONFIGURATION);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean matches(final InetAddress ip)
   {
@@ -74,9 +71,6 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
     return super.matches(ip);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

@@ -52,6 +52,10 @@ public class IPFilter
    * The loaded configuration.
    */
   private TypedProperties config = null;
+  /**
+   * Determines whether this filter applies to the driver's broadcaster or to a client's/node's receiver.
+   */
+  private final boolean broadcaster;
 
   /**
    * Initialize this filter with the specified configuration.
@@ -59,7 +63,18 @@ public class IPFilter
    */
   public IPFilter(final TypedProperties config)
   {
+    this(config, false);
+  }
+
+  /**
+   * Initialize this filter with the specified configuration.
+   * @param config the configuration from which to get the include and exclude filters.
+   * @param broadcaster specifies whether this filter applies to the driver's broadcaster or to a client's/node's receiver.
+   */
+  public IPFilter(final TypedProperties config, final boolean broadcaster)
+  {
     this.config = (config == null) ? new TypedProperties() : config;
+    this.broadcaster = broadcaster;
     configure();
   }
 
@@ -68,18 +83,20 @@ public class IPFilter
    */
   public void configure()
   {
-    configureIPAddressPatterns(config.getString("jppf.discovery.include.ipv4"), includePatterns);
-    configureIPAddressPatterns(config.getString("jppf.discovery.include.ipv6"), includePatterns);
-    configureIPAddressPatterns(config.getString("jppf.discovery.exclude.ipv4"), excludePatterns);
-    configureIPAddressPatterns(config.getString("jppf.discovery.exclude.ipv6"), excludePatterns);
+    String prefix = "jppf.discovery." + (broadcaster ? "broadcast" : "") + '.';
+    configureIPAddressPatterns(config.getString(prefix + "include.ipv4"), includePatterns, true);
+    configureIPAddressPatterns(config.getString(prefix + "include.ipv6"), includePatterns, false);
+    configureIPAddressPatterns(config.getString(prefix + "exclude.ipv4"), excludePatterns, true);
+    configureIPAddressPatterns(config.getString(prefix + "exclude.ipv6"), excludePatterns, false);
   }
 
   /**
    * Parse the IP address patterns specified in the source string.
    * @param source contains comma or semicolumn separated patterns.
    * @param addToList the list to add the parsed patterns to.
+   * @param ipv4 specifiies whether the specified patterns apply to ipv4 addresses.
    */
-  private void configureIPAddressPatterns(final String source, final List<AbstractIPAddressPattern> addToList)
+  private void configureIPAddressPatterns(final String source, final List<AbstractIPAddressPattern> addToList, final boolean ipv4)
   {
     if (source == null) return;
     String src = source.trim();
@@ -90,7 +107,7 @@ public class IPFilter
     {
       try
       {
-        addToList.add(new IPv4AddressPattern(s));
+        addToList.add(ipv4 ? new IPv4AddressPattern(s) : new IPv6AddressPattern(s));
       }
       catch (Exception e)
       {

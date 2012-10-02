@@ -79,17 +79,21 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
     int port = props.getInt("jppf.discovery.port", 11111);
 
     List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+    addresses.addAll(NetworkUtils.getNonLocalIPV6Addresses());
     if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
+    IPFilter filter = new IPFilter(props, true);
+    List<InetAddress> filteredAddresses = new LinkedList<InetAddress>();
+    for (InetAddress addr: addresses) if (filter.isAddressAccepted(addr)) filteredAddresses.add(addr);
     if (debugEnabled)
     {
       StringBuilder sb = new StringBuilder();
-      sb.append("Found ").append(addresses.size()).append(" address");
-      if (addresses.size() > 1) sb.append("es");
+      sb.append("Found ").append(filteredAddresses.size()).append(" address");
+      if (filteredAddresses.size() > 1) sb.append("es");
       sb.append(':');
-      for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
+      for (InetAddress addr: filteredAddresses) sb.append(' ').append(addr.getHostAddress());
       log.debug(sb.toString());
     }
-    socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>(addresses.size());
+    socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>(filteredAddresses.size());
     for (InetAddress addr: addresses)
     {
       try
@@ -113,10 +117,6 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
     }
   }
 
-  /**
-   * 
-   * @see java.lang.Runnable#run()
-   */
   @Override
   public void run()
   {

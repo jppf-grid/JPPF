@@ -367,6 +367,9 @@ public final class NetworkUtils
       if (addr instanceof Inet6Address)
       {
         result = new int[8];
+        // special processing for scoped IPv6 addresses
+        int idx = ip.indexOf('%');
+        if (idx >= 0) ip = ip.substring(0, idx); 
         String[] comp = ip.split(":");
         for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
       }
