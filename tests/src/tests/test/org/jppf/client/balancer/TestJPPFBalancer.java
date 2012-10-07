@@ -58,7 +58,7 @@ public class TestJPPFBalancer
 
       job = new JPPFJob();
       job.setBlocking(true);
-      job.addJobListener(new JobListener()
+      job.addJobListener(new JobListenerAdapter()
       {
         @Override
         public void jobStarted(final JobEvent event)

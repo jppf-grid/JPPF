@@ -81,7 +81,7 @@ public class OptimizedJobRunner
     for (int i=0; i<nbJobs; i++)
     {
       final JPPFJob job = new JPPFJob();
-      job.addJobListener(new JobListener() {
+      job.addJobListener(new JobListenerAdapter() {
         @Override
         public void jobStarted(final JobEvent event) {
           output("Job '" + job.getName() + "' starting");

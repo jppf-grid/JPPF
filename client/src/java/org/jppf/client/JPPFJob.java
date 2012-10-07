@@ -25,6 +25,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -492,13 +493,34 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public void fireJobEvent(final JobEvent.Type type)
   {
-    JobEvent event = new JobEvent(this);
+    fireJobEvent(type, null, null);
+  }
+
+  /**
+   * Notify all listeners of the specified event type.
+   * @param type the type of the event.
+   * @param channel the channel to which a job is dispatched or from which it is returned.
+   * @param tasks the tasks that were dispatched or returned.
+   * @exclude
+   */
+  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<JPPFTask> tasks)
+  {
+    JobEvent event = new JobEvent(this, channel, tasks);
     synchronized(listeners)
     {
       for (JobListener listener: listeners)
       {
-        if (JobEvent.Type.JOB_START.equals(type)) listener.jobStarted(event);
-        else if (JobEvent.Type.JOB_END.equals(type)) listener.jobEnded(event);
+        switch(type)
+        {
+          case JOB_START: listener.jobStarted(event);
+            break;
+          case JOB_END: listener.jobEnded(event);
+            break;
+          case JOB_DISPATCH: listener.jobDispatched(event);
+            break;
+          case JOB_RETURN: listener.jobReturned(event);
+            break;
+        }
       }
     }
   }

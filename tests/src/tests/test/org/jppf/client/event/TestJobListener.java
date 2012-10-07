@@ -21,18 +21,17 @@ package test.org.jppf.client.event;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.LifeCycleTask;
+import test.org.jppf.test.setup.common.*;
 
 /**
- * Unit tests for <code>JPPFClient</code> using multiple connections to the same server
+ * Unit tests for <code>JobListener</code> using multiple connections to the same server
  * (connection pool size > 1).
  * @author Laurent Cohen
  */
@@ -47,56 +46,19 @@ public class TestJobListener extends Setup1D1N
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 1</code>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=5000)
-  //@Test
-  public void testJobListenerSingleConnection() throws Exception
-  {
-    doTestJobListener();
-  }
-
-  /**
-   * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 2</code>.
-   * @throws Exception if any error occurs
-   */
-  //@Test(timeout=5000)
-  public void testJobListenerMultipleConnections() throws Exception
-  {
-    configure();
-    doTestJobListener();
-  }
-
-  /**
-   * Test the <code>JobListener</code> notifications.
-   * @throws Exception if any error occurs
-   */
-  public void doTestJobListener() throws Exception
+  @Test(timeout=10000)
+  public void testJobListenerSingleLocalConnection() throws Exception
   {
     try
     {
-      client = BaseSetup.createClient(null, false);
-      int nbTasks = 100;
-      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
-      final AtomicInteger startedCount = new AtomicInteger(0);
-      final AtomicInteger endedCount = new AtomicInteger(0);
-      job.addJobListener(new JobListener()
-      {
-        @Override
-        public void jobStarted(final JobEvent event)
-        {
-          startedCount.incrementAndGet();
-        }
-
-        @Override
-        public void jobEnded(final JobEvent event)
-        {
-          endedCount.incrementAndGet();
-        }
-      });
-      List<JPPFTask> results = client.submit(job);
-      assertNotNull(results);
-      assertEquals(nbTasks, results.size());
-      assertEquals(1, startedCount.get());
-      assertEquals(1, endedCount.get());
+      configure(false, true, 1);
+      CountingJobListener listener = new CountingJobListener();
+      int nbTasks = 20;
+      List<JPPFTask> results = runJob(listener, nbTasks);
+      assertEquals(1, listener.startedCount.get());
+      assertEquals(1, listener.endedCount.get());
+      assertEquals(4, listener.dispatchedCount.get());
+      assertEquals(4, listener.returnedCount.get());
     }
     finally
     {
@@ -105,15 +67,63 @@ public class TestJobListener extends Setup1D1N
   }
 
   /**
-   * Configure the client for a connection pool.
+   * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 2</code>.
+   * @throws Exception if any error occurs
    */
-  private void configure()
+  @Test(timeout=10000)
+  public void testJobListenerMultipleRemoteConnections() throws Exception
+  {
+    try
+    {
+      configure(true, false, 2);
+      CountingJobListener listener = new CountingJobListener();
+      int nbTasks = 20;
+      List<JPPFTask> results = runJob(listener, nbTasks);
+      assertEquals(1, listener.startedCount.get());
+      assertEquals(1, listener.endedCount.get());
+      assertEquals(4, listener.dispatchedCount.get());
+      assertEquals(4, listener.returnedCount.get());
+    }
+    finally
+    {
+      reset();
+    }
+  }
+
+  /**
+   * submit the job with the specified listener and number of tasks.
+   * @param listener the listener to use for the test.
+   * @param nbTasks the number of tasks
+   * @return the execution results.
+   * @throws Exception if any error occurs
+   */
+  public List<JPPFTask> runJob(final CountingJobListener listener, final int nbTasks) throws Exception
+  {
+    client = BaseSetup.createClient(null, false);
+    JPPFJob job = BaseSetup.createJob("TestJobListener", true, false, nbTasks, LifeCycleTask.class, 0L);
+    if (listener != null) job.addJobListener(listener);
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(nbTasks, results.size());
+    return results;
+  }
+
+  /**
+   * Configure the client for a connection pool.
+   * @param remoteEnabled specifies whether remote execution is enabled.
+   * @param localEnabled specifies whether local execution is enabled.
+   * @param poolSize the size of the connection pool.
+   */
+  private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize)
   {
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.load.balancing.algorithm", "proportional");
-    config.setProperty("jppf.load.balancing.strategy", "test");
-    config.setProperty("strategy.test.initialSize", "10");
-    config.setProperty("jppf.pool.size", "2");
+    config.setProperty("jppf.remote.execution.enabled", String.valueOf(remoteEnabled));
+    config.setProperty("jppf.local.execution.enabled", String.valueOf(localEnabled));
+    config.setProperty("jppf.local.execution.threads", "4");
+    config.setProperty("jppf.load.balancing.algorithm", "manual");
+    config.setProperty("jppf.load.balancing.strategy", "manual");
+    config.setProperty("strategy.manual.size", "5");
+    config.setProperty("jppf.pool.size", String.valueOf(poolSize));
   }
 
   /**

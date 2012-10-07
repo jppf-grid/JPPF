@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.balancer.ClientJob;
+import org.jppf.client.event.JobEvent;
 import org.jppf.execute.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
@@ -293,8 +294,10 @@ public abstract class AbstractClientJob
    */
   protected final boolean updateStatus(final int expect, final int newStatus)
   {
-    if(status == expect)
+    if (status == expect)
     {
+      if ((newStatus == EXECUTING) && (status != newStatus)) job.fireJobEvent(JobEvent.Type.JOB_START);
+      else if (newStatus >= DONE) job.fireJobEvent(JobEvent.Type.JOB_END);
       status = newStatus;
       return true;
     }

@@ -18,20 +18,16 @@
 
 package org.jppf.client.balancer;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.client.balancer.utils.AbstractClientJob;
-import org.jppf.client.event.JobEvent;
-import org.jppf.client.event.TaskResultEvent;
-import org.jppf.client.event.TaskResultListener;
-import org.jppf.client.submission.SubmissionStatus;
-import org.jppf.client.submission.SubmissionStatusHandler;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.server.protocol.JPPFTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.concurrent.Future;
+
+import org.jppf.client.JPPFJob;
+import org.jppf.client.balancer.utils.AbstractClientJob;
+import org.jppf.client.event.*;
+import org.jppf.client.submission.*;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * @author Martin JANDA
@@ -137,7 +133,7 @@ public class ClientJob extends AbstractClientJob
       if (this.executing == executing) return;
       this.executing = executing;
     }
-    if (getBroadcastUUID() == null) job.fireJobEvent(executing ? JobEvent.Type.JOB_START: JobEvent.Type.JOB_END);
+    //if (getBroadcastUUID() == null) job.fireJobEvent(executing ? JobEvent.Type.JOB_START: JobEvent.Type.JOB_END);
   }
 
   /**
@@ -285,6 +281,7 @@ public class ClientJob extends AbstractClientJob
       setSubmissionStatus(SubmissionStatus.EXECUTING);
       setExecuting(true);
     }
+    job.fireJobEvent(JobEvent.Type.JOB_DISPATCH, channel, bundle.getTasksL());
     if (parentJob != null) parentJob.broadcastDispatched(this);
   }
 
@@ -309,6 +306,7 @@ public class ClientJob extends AbstractClientJob
         listener.resultsReceived(new TaskResultEvent(results));
       }
     }
+    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, results);
   }
 
   /**
@@ -335,6 +333,7 @@ public class ClientJob extends AbstractClientJob
         listener.resultsReceived(new TaskResultEvent(throwable));
       }
     }
+    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, bundle.getTasksL());
   }
 
   /**

@@ -18,9 +18,11 @@
 
 package org.jppf.client.event;
 
-import java.util.EventObject;
+import java.util.*;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Event emitted by a job when its execution starts or completes.
@@ -30,6 +32,7 @@ public class JobEvent extends EventObject
 {
   /**
    * The type of event.
+   * @exclude
    */
   public enum Type
   {
@@ -40,16 +43,48 @@ public class JobEvent extends EventObject
     /**
      * The job ended.
      */
-    JOB_END
+    JOB_END,
+    /**
+     * The job was disatched to a channel.
+     */
+    JOB_DISPATCH,
+    /**
+     * The returnd from a channel.
+     */
+    JOB_RETURN
+  }
+
+  /**
+   * The channel to which a job is dispatched or from which it returns.
+   */
+  private final ExecutorChannel channel;
+  /**
+   * The tasks that were dispatched or returned.
+   */
+  private final List<JPPFTask> tasks;
+
+  /**
+   * Initialize this event with the specified job as its source.
+   * @param source the source of this event.
+   * @exclude
+   */
+  public JobEvent(final JPPFJob source)
+  {
+    this(source, null, null);
   }
 
   /**
    * Initialize this event with the specified job as its source.
    * @param source the source of this event.
+   * @param channel the channel to which a job is dispatched or from which it returns.
+   * @param tasks the tasks that were dispatched or returned.
+   * @exclude
    */
-  public JobEvent(final JPPFJob source)
+  public JobEvent(final JPPFJob source, final ExecutorChannel channel, final List<JPPFTask> tasks)
   {
     super(source);
+    this.channel = channel;
+    this.tasks = tasks;
   }
 
   /**
@@ -59,5 +94,26 @@ public class JobEvent extends EventObject
   public JPPFJob getJob()
   {
     return (JPPFJob) getSource();
+  }
+
+  /**
+   * Get the channel to which a job is dispatched or from which it returns.
+   * <p>This method returns a non-<code>null</code> value only for <code>jobDispatched()</code> events.
+   * @return an instance of {@link ExecutorChannel}.
+   * @exclude
+   */
+  public ExecutorChannel getChannel()
+  {
+    return channel;
+  }
+
+  /**
+   * Get the tasks that were dispatched or returned.
+   * <p>This method returns a non <code>null</code> value only for <code>jobDispatched()</code> and <code>jobReturned()</code> events.
+   * @return a list of {@link JPPFTask} instances.
+   */
+  public List<JPPFTask> getTasks()
+  {
+    return tasks;
   }
 }

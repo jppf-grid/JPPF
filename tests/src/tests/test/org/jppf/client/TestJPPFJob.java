@@ -18,12 +18,15 @@
 
 package test.org.jppf.client;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.*;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseSetup;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -33,18 +36,52 @@ import test.org.jppf.test.setup.common.*;
 public class TestJPPFJob
 {
   /**
-   * Invocation of the <code>JPPFClient()</code> constructor.
+   * Test that {@link JPPFTask#getTaskObject()} always returns the expected object.
    * @throws Exception if any error occurs
    */
   @Test(timeout=5000)
   public void testGetTaskObject() throws Exception
   {
     JPPFJob job = new JPPFJob();
-    JPPFTask task = (JPPFTask) job.addTask(new SimpleRunnable());
+    JPPFTask task = job.addTask(new SimpleRunnable());
     assertNotNull(task);
     assertNotNull(task.getTaskObject());
-    JPPFTask task2 = (JPPFTask) job.addTask(new SimpleTask());
+    JPPFTask task2 = job.addTask(new SimpleTask());
     assertNotNull(task2);
     assertNotNull(task2.getTaskObject());
+  }
+
+  /**
+   * Test that the expected number of {@link JobListener} notifications are received int he expected order.
+   * @throws Exception if any error occurs
+   */
+  //@Test(timeout=5000)
+  @Test
+  public void testJobListener() throws Exception
+  {
+    int nbTasks = 10;
+    TypedProperties props = JPPFConfiguration.getProperties();
+    props.setProperty("jppf.remote.execution.enabled", "false");
+    props.setProperty("jppf.local.execution.enabled", "true");
+    props.setProperty("jppf.local.execution.threads", "4");
+    props.setProperty("jppf.load.balancing.algorithm", "manual");
+    props.setProperty("jppf.load.balancing.strategy", "manual");
+    props.setProperty("strategy.manual.size", "5");
+
+    JPPFClient client = null;
+    try
+    {
+      client = BaseSetup.createClient(null, false);
+      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 50L);
+      CountingJobListener listener = new CountingJobListener();
+      job.addJobListener(listener);
+      client.submit(job);
+      assertEquals(1, listener.startedCount.get());
+      assertEquals(1, listener.endedCount.get());
+    }
+    finally
+    {
+      if (client != null) client.close();
+    }
   }
 }
