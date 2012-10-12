@@ -21,6 +21,7 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -121,7 +122,6 @@ class Deserializer
     else if (cd.enumType)
     {
       String name = (String) readObject();
-      //String name = in.readUTF();
       //if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(Exception e) {}
       Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
       caches.handleToObjectMap.put(handle, val);
@@ -133,14 +133,8 @@ class Deserializer
       currentClassDescriptor = cd;
       //if (traceEnabled) try { log.trace("reading object " + obj); } catch(Exception e) {}
       caches.handleToObjectMap.put(handle, obj);
-      if (cd.hasWriteObject)
-      {
-        Method m = ReflectionHelper.getReadObjectMethod(cd.clazz);
-        if (!m.isAccessible()) m.setAccessible(true);
-        m.invoke(obj, in);
-      }
-      else if (cd.externalizable) ((Externalizable) obj).readExternal(in);
-      else readFields(cd, obj);
+      //if (traceEnabled) try { log.trace("reading object handle=" + handle); } catch(Exception e) {}
+      readFields(cd, obj);
     }
   }
 
@@ -166,10 +160,23 @@ class Deserializer
   void readFields(final ClassDescriptor cd, final Object obj) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
+    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<ClassDescriptor>();
     while (tmpDesc != null)
     {
-      readDeclaredFields(tmpDesc, obj);
+      stack.addFirst(tmpDesc);
       tmpDesc = caches.getDescriptor(tmpDesc.superClassHandle);
+    }
+    for (ClassDescriptor desc: stack)
+    {
+      if (desc.hasWriteObject)
+      {
+        Method m = ReflectionHelper.getReadObjectMethod(desc.clazz);
+        if (!m.isAccessible()) m.setAccessible(true);
+        //if (traceEnabled) try { log.trace("invoking readObject() for class=" + desc + " on object " + obj); } catch(Exception e) {}
+        m.invoke(obj, in);
+      }
+      else if (desc.externalizable) ((Externalizable) obj).readExternal(in);
+      else readDeclaredFields(desc, obj);
     }
   }
 
@@ -180,7 +187,7 @@ class Deserializer
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception
+  void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception
   {
     for (int i=0; i<cd.fields.length; i++)
     {
@@ -206,7 +213,6 @@ class Deserializer
       else if (typeDesc.enumType)
       {
         String name = (String) readObject();
-        //String name = in.readUTF();
         //if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(Exception e) {}
         Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) typeDesc.clazz, name);
         field.set(obj, val);
@@ -244,15 +250,6 @@ class Deserializer
         case 'D': obj = readDoubleArray(len); break;
         case 'C': obj = readCharArray(len); break;
         case 'Z': obj = readBooleanArray(len); break;
-        /*
-				case 'S': short[] sarray = new short[len];     obj = sarray; for (int i=0; i<len; i++) sarray[i] = in.readShort(); break;
-				case 'I': int[] iarray = new int[len];         obj = iarray; for (int i=0; i<len; i++) iarray[i] = in.readInt(); break;
-				case 'J': long[] larray = new long[len];       obj = larray; for (int i=0; i<len; i++) larray[i] = in.readLong(); break;
-				case 'F': float[] farray = new float[len];     obj = farray; for (int i=0; i<len; i++) farray[i] = in.readFloat(); break;
-				case 'D': double[] darray = new double[len];   obj = darray; for (int i=0; i<len; i++) darray[i] = in.readDouble(); break;
-				case 'C': char[] carray = new char[len];       obj = carray; for (int i=0; i<len; i++) carray[i] = in.readChar(); break;
-				case 'Z': boolean[] zarray = new boolean[len]; obj = zarray; for (int i=0; i<len; i++) zarray[i] = in.readBoolean(); break;
-         */
       }
       caches.handleToObjectMap.put(handle, obj);
     }
@@ -263,7 +260,6 @@ class Deserializer
       for (int i=0; i<len; i++)
       {
         String name = (String) readObject();
-        //String name = in.readUTF();
         //if (traceEnabled) try { log.trace("writing enum[" + eltDesc.signature + "] : " + name); } catch(Exception e) {}
         Object val = (name == null) ? null : Enum.valueOf((Class<Enum>) eltDesc.clazz, name);
         Array.set(obj, i, val);
@@ -295,7 +291,7 @@ class Deserializer
       cd.read(in);
       caches.handleToDescriptorMap.put(cd.handle, cd);
       list.add(cd);
-      if (traceEnabled) try { log.trace("read " + cd); } catch(Exception e) {}
+      //if (traceEnabled) try { log.trace("read " + cd); } catch(Exception e) {}
     }
     caches.initializeDescriptorClasses(list, classloader);
   }
@@ -318,19 +314,6 @@ class Deserializer
    */
   private Object newInstance(final ClassDescriptor cd) throws Exception
   {
-    /*
-		Constructor<?>[] constructors = cd.clazz.getDeclaredConstructors();
-		//Arrays.sort(constructors, new ConstructorComparator());
-		for (Constructor c: constructors)
-		{
-			if (c.getParameterTypes().length == 0)
-			{
-				if (!c.isAccessible()) c.setAccessible(true);
-				return c.newInstance();
-			}
-		}
-		return null;
-     */
     return ReflectionHelper.create(cd.clazz);
   }
 
@@ -347,6 +330,7 @@ class Deserializer
     {
       int n = Math.min(buf.length, len-count);
       readToBuf(n);
+      System.arraycopy(buf, 0, array, count, n);
       count += n;
     }
     return array;

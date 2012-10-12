@@ -240,7 +240,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   {
     try
     {
-      serializer.writeFields(serializer.currentObject, serializer.currentClassDescriptor);
+      serializer.writeDeclaredFields(serializer.currentObject, serializer.currentClassDescriptor);
     }
     catch(Exception e)
     {
@@ -273,7 +273,6 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   @Override
   public PutField putFields() throws IOException
   {
-    //return super.putFields();
     if (currentPutField == null) currentPutField = new JPPFPutField(this);
     return currentPutField;
   }
@@ -284,7 +283,6 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   @Override
   public void writeFields() throws IOException
   {
-    //super.writeFields();
     try
     {
       JPPFPutField f = (JPPFPutField) currentPutField;

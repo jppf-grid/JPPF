@@ -92,6 +92,7 @@ public class JPPFObjectStreamFactory
     {
       try
       {
+        if (debugEnabled) log.debug("using " + BUILDER_CLASS + '=' + builderName);
         return (JPPFObjectStreamBuilder) Class.forName(builderName).newInstance();
       }
       catch(Exception e)
