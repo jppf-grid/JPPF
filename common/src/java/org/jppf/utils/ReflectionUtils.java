@@ -356,4 +356,16 @@ public class ReflectionUtils
     }
     return argTypes;
   }
+
+  /**
+   * Get the name of the method that called this one.
+   * @return the name of the invoking method as a string.
+   */
+  public static String getCurrentMethodName()
+  {
+    Exception e = new Exception();
+    StackTraceElement[] elts = e.getStackTrace();
+    if (elts.length < 2) return "method name not found";
+    return elts[1].getMethodName();
+  }
 }

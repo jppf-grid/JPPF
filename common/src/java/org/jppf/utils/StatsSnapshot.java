@@ -35,19 +35,19 @@ public class StatsSnapshot implements Serializable
   /**
    * The total cumulated time.
    */
-  private long total = 0L;
+  private double total = 0L;
   /**
    * The most recent time / size.
    */
-  private long latest = 0L;
+  private double latest = 0L;
   /**
    * The minimum time / size.
    */
-  private long min = Long.MAX_VALUE;
+  private double min = Long.MAX_VALUE;
   /**
    * The maximum time / size.
    */
-  private long max = 0L;
+  private double max = 0L;
   /**
    * The average time / size.
    */
@@ -118,11 +118,11 @@ public class StatsSnapshot implements Serializable
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append(title).append(" total : ").append(total).append('\n');
-    sb.append(title).append(" latest : ").append(latest).append('\n');
-    sb.append(title).append(" min : ").append(min).append('\n');
-    sb.append(title).append(" max : ").append(max).append('\n');
-    sb.append(title).append(" avg : ").append(avg).append('\n');
+    sb.append(title).append(": total=").append(total);
+    sb.append(", latest=").append(latest);
+    sb.append(", min=").append(min);
+    sb.append(", max=").append(max);
+    sb.append(", avg=").append(avg);
     return sb.toString();
   }
 
@@ -130,7 +130,7 @@ public class StatsSnapshot implements Serializable
    * Set the total cumulated time / size.
    * @param total the total time as a long value.
    */
-  public void setTotal(final long total)
+  public void setTotal(final double total)
   {
     this.total = total;
   }
@@ -139,7 +139,7 @@ public class StatsSnapshot implements Serializable
    * Get the total cumulated time / size.
    * @return the total time as a long value.
    */
-  public long getTotal()
+  public double getTotal()
   {
     return total;
   }
@@ -148,7 +148,7 @@ public class StatsSnapshot implements Serializable
    * Set the most recent time / size observed.
    * @param latest the most recent time as a long value.
    */
-  public void setLatest(final long latest)
+  public void setLatest(final double latest)
   {
     this.latest = latest;
   }
@@ -157,7 +157,7 @@ public class StatsSnapshot implements Serializable
    * Get the minimum time / size observed.
    * @return the minimum time as a long value.
    */
-  public long getLatest()
+  public double getLatest()
   {
     return latest;
   }
@@ -166,7 +166,7 @@ public class StatsSnapshot implements Serializable
    * Set the smallest time / size observed.
    * @param min the minimum time as a long value.
    */
-  public void setMin(final long min)
+  public void setMin(final double min)
   {
     this.min = min;
   }
@@ -175,7 +175,7 @@ public class StatsSnapshot implements Serializable
    * Get the smallest time / size observed.
    * @return the minimum time as a long value.
    */
-  public long getMin()
+  public double getMin()
   {
     return min;
   }
@@ -184,7 +184,7 @@ public class StatsSnapshot implements Serializable
    * Set the peak time / size.
    * @param max the maximum time as a long value.
    */
-  public void setMax(final long max)
+  public void setMax(final double max)
   {
     this.max = max;
   }
@@ -193,7 +193,7 @@ public class StatsSnapshot implements Serializable
    * Get the peak time / size.
    * @return the maximum time as a long value.
    */
-  public long getMax()
+  public double getMax()
   {
     return max;
   }

@@ -63,9 +63,6 @@ public class Range<T extends Comparable<T>>
     return (value.compareTo(lower) >= 0) && (value.compareTo(upper) <= 0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

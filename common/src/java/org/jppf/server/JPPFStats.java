@@ -222,6 +222,8 @@ public class JPPFStats implements Serializable
     nodes.setMin(nodes.getLatest());
     clients.setMax(clients.getLatest());
     clients.setMin(clients.getLatest());
+    idleNodes.setMax(idleNodes.getLatest());
+    idleNodes.setMin(idleNodes.getLatest());
   }
 
   /**

@@ -39,7 +39,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
   public synchronized void newClientConnection()
   {
     StatsSnapshot clients = stats.getClients();
-    long n = clients.getLatest() + 1;
+    long n = (long) clients.getLatest() + 1;
     clients.setLatest(n);
     if (n > clients.getMax()) clients.setMax(n);
   }
@@ -60,7 +60,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
   @Override
   public synchronized void newNodeConnection()
   {
-    long n = stats.getNodes().getLatest() + 1;
+    long n = (long) stats.getNodes().getLatest() + 1;
     stats.getNodes().setLatest(n);
     if (n > stats.getNodes().getMax()) stats.getNodes().setMax(n);
   }
@@ -71,7 +71,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
   @Override
   public synchronized void nodeConnectionClosed()
   {
-    long n = stats.getNodes().getLatest() - 1;
+    long n = (long) stats.getNodes().getLatest() - 1;
     stats.getNodes().setLatest(n);
   }
 
@@ -101,7 +101,7 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
     StatsSnapshot sizes = queue.getSizes();
     sizes.setLatest(sizes.getLatest() - count);
     sizes.setTotal(sizes.getTotal() + count);
-    queue.getTimes().newValues(time, count, sizes.getTotal());
+    queue.getTimes().newValues(time, count, (long) sizes.getTotal());
   }
 
   /**
@@ -130,49 +130,36 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
     return stats.copy();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void reset()
   {
     stats.reset();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void idleNodes(final int nbIdleNodes)
   {
     stats.getIdleNodes().setLatest(nbIdleNodes);
-    //stats.getIdleNodes().newValues(1, inc, n);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void jobQueued(final int nbTasks)
   {
     StatsSnapshot sizes = stats.getJobQueue().getSizes();
-    long n = sizes.getLatest() + 1;
+    long n = (long) sizes.getLatest() + 1;
     StatsSnapshot jobTasks = stats.getJobTasks();
-    jobTasks.newValues(nbTasks, sizes.getTotal());
+    jobTasks.newValues(nbTasks, (long) sizes.getTotal());
     sizes.setLatest(n);
     sizes.setTotal(sizes.getTotal() + 1);
     if (n > sizes.getMax()) sizes.setMax(n);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void jobEnded(final long time)
   {
     StatsSnapshot sizes = stats.getJobQueue().getSizes();
     StatsSnapshot times = stats.getJobQueue().getTimes();
-    times.newValues(time, sizes.getTotal() - 1L);
+    times.newValues(time, (long) (sizes.getTotal() - 1L));
     sizes.setLatest(sizes.getLatest() - 1);
   }
 }

@@ -98,36 +98,24 @@ public final class JPPFDriverStatsManager extends EventEmitter<JPPFDriverListene
     for (JPPFDriverListener listener: eventListeners) listener.taskExecuted(count, time, remoteTime, size);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void reset()
   {
     for (JPPFDriverListener listener: eventListeners) listener.reset();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void idleNodes(final int nbIdleNodes)
   {
     for (JPPFDriverListener listener: eventListeners) listener.idleNodes(nbIdleNodes);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobQueued(final int nbTasks)
   {
     for (JPPFDriverListener listener: eventListeners) listener.jobQueued(nbTasks);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobEnded(final long time)
   {
