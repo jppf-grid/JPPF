@@ -19,8 +19,9 @@
 package org.jppf.serialization;
 
 import java.io.*;
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.jppf.utils.SerializationUtils;
 import org.slf4j.*;
@@ -143,13 +144,7 @@ class Serializer
     out.writeInt(handle);
     out.writeInt(cd.handle);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
-    if (cd.hasWriteObject)
-    {
-      if (!cd.writeObjectMethod.isAccessible()) cd.writeObjectMethod.setAccessible(true);
-      cd.writeObjectMethod.invoke(obj, out);
-    }
-    else if (cd.externalizable) ((Externalizable) obj).writeExternal(out);
-    else if (cd.array) writeArray(obj, cd);
+    if (cd.array) writeArray(obj, cd);
     else if (cd.enumType)
     {
       String name = ((Enum) obj).name();
@@ -183,10 +178,23 @@ class Serializer
   void writeFields(final Object obj, final ClassDescriptor cd) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
+    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<ClassDescriptor>();
     while (tmpDesc != null)
     {
-      writeDeclaredFields(obj, tmpDesc);
+      stack.addFirst(tmpDesc);
       tmpDesc = tmpDesc.superClass;
+    }
+    for (ClassDescriptor desc: stack)
+    {
+      if (desc.hasWriteObject)
+      {
+        Method m = ReflectionHelper.getWriteObjectMethod(desc.clazz);
+        if (!m.isAccessible()) m.setAccessible(true);
+        //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
+        m.invoke(obj, out);
+      }
+      else if (desc.externalizable) ((Externalizable) obj).writeExternal(out);
+      else writeDeclaredFields(obj, desc);
     }
   }
 
@@ -196,7 +204,7 @@ class Serializer
    * @param cd the object's class descriptor.
    * @throws Exception if any error occurs.
    */
-  private void writeDeclaredFields(final Object obj, final ClassDescriptor cd) throws Exception
+  void writeDeclaredFields(final Object obj, final ClassDescriptor cd) throws Exception
   {
     for (int i=0; i<cd.fields.length; i++)
     {

@@ -21,6 +21,7 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -132,14 +133,7 @@ class Deserializer
       currentClassDescriptor = cd;
       //if (traceEnabled) try { log.trace("reading object " + obj); } catch(Exception e) {}
       caches.handleToObjectMap.put(handle, obj);
-      if (cd.hasWriteObject)
-      {
-        Method m = ReflectionHelper.getReadObjectMethod(cd.clazz);
-        if (!m.isAccessible()) m.setAccessible(true);
-        m.invoke(obj, in);
-      }
-      else if (cd.externalizable) ((Externalizable) obj).readExternal(in);
-      else readFields(cd, obj);
+      readFields(cd, obj);
     }
   }
 
@@ -165,10 +159,23 @@ class Deserializer
   void readFields(final ClassDescriptor cd, final Object obj) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
+    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<ClassDescriptor>();
     while (tmpDesc != null)
     {
-      readDeclaredFields(tmpDesc, obj);
+      stack.addFirst(tmpDesc);
       tmpDesc = caches.getDescriptor(tmpDesc.superClassHandle);
+    }
+    for (ClassDescriptor desc: stack)
+    {
+      if (desc.hasWriteObject)
+      {
+        Method m = ReflectionHelper.getReadObjectMethod(desc.clazz);
+        if (!m.isAccessible()) m.setAccessible(true);
+        //if (traceEnabled) try { log.trace("invoking readObject() for class=" + desc + " on object " + obj); } catch(Exception e) {}
+        m.invoke(obj, in);
+      }
+      else if (desc.externalizable) ((Externalizable) obj).readExternal(in);
+      else readDeclaredFields(desc, obj);
     }
   }
 
@@ -179,7 +186,7 @@ class Deserializer
    * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception
+  void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception
   {
     for (int i=0; i<cd.fields.length; i++)
     {
@@ -322,6 +329,7 @@ class Deserializer
     {
       int n = Math.min(buf.length, len-count);
       readToBuf(n);
+      System.arraycopy(buf, 0, array, count, n);
       count += n;
     }
     return array;

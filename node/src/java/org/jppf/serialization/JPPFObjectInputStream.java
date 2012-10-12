@@ -201,7 +201,7 @@ public class JPPFObjectInputStream extends ObjectInputStream
   {
     try
     {
-      deserializer.readFields(deserializer.currentClassDescriptor, deserializer.currentObject);
+      deserializer.readDeclaredFields(deserializer.currentClassDescriptor, deserializer.currentObject);
     }
     catch(Exception e)
     {

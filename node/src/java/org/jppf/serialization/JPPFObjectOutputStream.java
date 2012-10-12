@@ -185,7 +185,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   {
     try
     {
-      serializer.writeFields(serializer.currentObject, serializer.currentClassDescriptor);
+      serializer.writeDeclaredFields(serializer.currentObject, serializer.currentClassDescriptor);
     }
     catch(Exception e)
     {
