@@ -18,6 +18,7 @@
 
 package org.jppf.client.concurrent;
 
+import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
 
@@ -27,6 +28,14 @@ import org.jppf.node.protocol.*;
  */
 class JobConfigurationImpl extends AbstractJobConfiguration
 {
+  /**
+   * Default constructor.
+   */
+  JobConfigurationImpl()
+  {
+    super();
+  }
+
   /**
    * Copy constructor.
    * @param sla the sla configuration.
@@ -47,5 +56,8 @@ class JobConfigurationImpl extends AbstractJobConfiguration
   JobConfigurationImpl(final JobConfiguration config)
   {
     this(config.getSLA(), config.getMetadata(), config.getPersistenceManager());
+    this.setClientSLA(config.getClientSLA());
+    this.setClientSLA(config.getClientSLA());
+    for (JobListener listener: config.getAllJobListeners()) this.addJobListener(listener);
   }
 }

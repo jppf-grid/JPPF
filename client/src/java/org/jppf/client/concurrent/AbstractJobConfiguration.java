@@ -18,6 +18,9 @@
 
 package org.jppf.client.concurrent;
 
+import java.util.*;
+
+import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
@@ -35,6 +38,10 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    */
   protected JobSLA jobSLA = new JPPFJobSLA();
   /**
+   * The service level agreement between the job and the server.
+   */
+  protected JobClientSLA jobClientSLA = new JPPFJobClientSLA();
+  /**
    * The user-defined metadata associated with this job.
    */
   protected JobMetadata jobMetadata = new JPPFJobMetadata();
@@ -43,9 +50,13 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    */
   protected JobPersistence<?> persistenceManager = null;
   /**
-   * 
+   * The data provider to set onto the job.
    */
   protected DataProvider dataProvider = null;
+  /**
+   * The list of listeners to register with the job.
+   */
+  protected List<JobListener> listeners = new LinkedList<JobListener>();
 
   /**
    * Default constructor.
@@ -67,6 +78,21 @@ abstract class AbstractJobConfiguration implements JobConfiguration
   public void setSLA(final JobSLA jobSLA)
   {
     this.jobSLA = jobSLA;
+  }
+
+  @Override
+  public JobClientSLA getClientSLA()
+  {
+    return jobClientSLA;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param jobClientSLA an instance of <code>JPPFJobSLA</code>.
+   */
+  public void setClientSLA(final JobClientSLA jobClientSLA)
+  {
+    this.jobClientSLA = jobClientSLA;
   }
 
   @Override
@@ -107,5 +133,32 @@ abstract class AbstractJobConfiguration implements JobConfiguration
   public void setDataProvider(final DataProvider dataProvider)
   {
     this.dataProvider = dataProvider;
+  }
+
+  @Override
+  public void addJobListener(final JobListener listener)
+  {
+    synchronized(listeners)
+    {
+      listeners.add(listener);
+    }
+  }
+
+  @Override
+  public void removeJobListener(final JobListener listener)
+  {
+    synchronized(listeners)
+    {
+      listeners.remove(listener);
+    }
+  }
+
+  @Override
+  public List<JobListener> getAllJobListeners()
+  {
+    synchronized(listeners)
+    {
+      return listeners;
+    }
   }
 }

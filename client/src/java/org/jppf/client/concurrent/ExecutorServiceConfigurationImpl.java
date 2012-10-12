@@ -18,7 +18,6 @@
 
 package org.jppf.client.concurrent;
 
-import org.jppf.server.protocol.*;
 
 /**
  * Concrete implementation of the {@link ExecutorServiceConfiguration} interface.
@@ -41,7 +40,7 @@ class ExecutorServiceConfigurationImpl implements ExecutorServiceConfiguration
    */
   ExecutorServiceConfigurationImpl()
   {
-    this(new JobConfigurationImpl(new JPPFJobSLA(), new JPPFJobMetadata(), null), new TaskConfigurationImpl());
+    this(new JobConfigurationImpl(), new TaskConfigurationImpl());
   }
 
   /**

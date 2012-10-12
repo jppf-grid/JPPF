@@ -475,7 +475,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   }
 
   /**
-   * Add a listener to the list of job listeners.
+   * Remove a listener from the list of job listeners.
    * @param listener a {@link JobListener} instance.
    */
   public void removeJobListener(final JobListener listener)

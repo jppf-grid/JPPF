@@ -25,6 +25,7 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -398,9 +399,11 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
     {
       JobConfiguration jc = config.getJobConfiguration();
       job.setSLA(jc.getSLA());
+      job.setClientSLA(jc.getClientSLA());
       job.setMetadata(jc.getMetadata());
       job.setPersistenceManager(jc.getPersistenceManager());
       job.setDataProvider(jc.getDataProvider());
+      for (JobListener listener: jc.getAllJobListeners()) job.addJobListener(listener);
     }
   }
 

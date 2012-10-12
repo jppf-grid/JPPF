@@ -18,6 +18,9 @@
 
 package org.jppf.client.concurrent;
 
+import java.util.List;
+
+import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -39,6 +42,12 @@ public interface JobConfiguration
    * @return an instance of {@link JobSLA}.
    */
   JobSLA getSLA();
+
+  /**
+   * Get the service level agreement between the job and the client.
+   * @return an instance of {@link JobClientSLA}.
+   */
+  JobClientSLA getClientSLA();
 
   /**
    * Get the user-defined metadata associated with this job.
@@ -71,4 +80,22 @@ public interface JobConfiguration
    * @param dataProvider a {@link DataProvider} instance.
    */
   void setDataProvider(DataProvider dataProvider);
+
+  /**
+   * Add a listener to the list of job listeners.
+   * @param listener a {@link JobListener} instance.
+   */
+  void addJobListener(JobListener listener);
+
+  /**
+   * Remove a listener from the list of job listeners.
+   * @param listener a {@link JobListener} instance.
+   */
+  void removeJobListener(JobListener listener);
+
+  /**
+   * Get all the job listeners added to this job configuration. 
+   * @return a list of {@link JobListener} instances.
+   */
+  List<JobListener> getAllJobListeners();
 }
