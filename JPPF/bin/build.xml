@@ -133,9 +133,14 @@
 		</propertyfile>
 		<!-- Read the build number -->
 	  <property file="${build.number.file}"/>
-		<tstamp>
-			<format property="now" pattern="yyyyMMdd"/>
-		</tstamp>
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+    <propertyfile file="${node}/src/resources/META-INF/jppf-version.properties">
+      <entry key="version.number" type="string" value="${version.number}"/>
+      <entry key="build.number" type="string" value="${build.number}"/>
+      <entry key="build.date" type="string" value="${readable.now}"/>
+    </propertyfile>
 	</target>
 
 	<!-- ========================================================================= -->

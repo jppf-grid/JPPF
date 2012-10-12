@@ -110,6 +110,7 @@ public class NodeRunner
     {
       // initialize the jmx logger
       new JmxMessageNotifier();
+      log.info(VersionUtils.getVersionInformation());
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
       hooksHandler = new InitializationHooksHandler(initialConfig);

@@ -133,6 +133,7 @@ public class JPPFDriver
     if (pid > 0) System.out.println("driver process id: " + pid);
     // initialize the jmx logger
     new JmxMessageNotifier();
+    log.info(VersionUtils.getVersionInformation());
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);

@@ -36,6 +36,10 @@ public final class VersionUtils
    */
   private static Logger log = LoggerFactory.getLogger(VersionUtils.class);
   /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * The current JPPF build number.
    */
   private static int buildNumber = -1;
@@ -43,6 +47,10 @@ public final class VersionUtils
    * IP address of the current host.
    */
   private static String ip = getLocalIpAddress();
+  /**
+   * 
+   */
+  private static final String VERSION_INFO = readVersionInfo();
 
   /**
    * Instantiation of this class is not permitted.
@@ -109,5 +117,43 @@ public final class VersionUtils
       e.printStackTrace();
     }
     return null;
+  }
+
+  /**
+   * Read the version information properties file and return the information in a single string. 
+   * @return a formatted string containing the JPPF version, build number and build date.
+   */
+  private static String readVersionInfo()
+  {
+    String result = null;
+    TypedProperties props = new TypedProperties();
+    try
+    {
+      InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties");
+      props.load(is);
+      StringBuilder sb = new StringBuilder();
+      sb.append("JPPF version information: ");
+      sb.append("Version: ").append(props.getString("version.number", ""));
+      sb.append(", Build number: ").append(props.getString("build.number", ""));
+      sb.append(", Build date: ").append(props.getString("build.date", ""));
+      result = sb.toString();
+    }
+    catch (Exception e)
+    {
+      String s = "JPPF version information could not be determined";
+      if (debugEnabled) log.debug(s, e);
+      else log.warn(s + ": " + ExceptionUtils.getMessage(e));
+      result = s;
+    }
+    return result;
+  }
+
+  /**
+   * Get the JPPF the version information. 
+   * @return a formatted string containing the JPPF version, build number and build date.
+   */
+  public static String getVersionInformation()
+  {
+    return VERSION_INFO;
   }
 }

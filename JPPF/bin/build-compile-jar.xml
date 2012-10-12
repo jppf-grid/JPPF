@@ -106,9 +106,11 @@
         <isset property="jar"/>
       </not>
     </condition>
+    <!--
     <tstamp>
       <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
     </tstamp>
+    -->
     <jar jarfile="${build}/jppf-${jar}.jar" index="true">
       <fileset dir="${basedir}/../${module}/classes"/>
       <fileset file="${bin}/build.number"/>
