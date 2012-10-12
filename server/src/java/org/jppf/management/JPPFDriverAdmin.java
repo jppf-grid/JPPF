@@ -283,18 +283,23 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public Integer nbIdleNodes() throws Exception
   {
-    return getNodeNioServer().getNbIdleChannels();
+    int n = getNodeNioServer().getNbIdleChannels();
+    if (debugEnabled) log.debug("found " + n + " idle channels");
+    return n;
   }
 
   @Override
   public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
   {
     List<AbstractNodeContext> idleChannels = getNodeNioServer().getIdleChannels();
-    List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(idleChannels.size());
+    int size = idleChannels.size();
+    if (debugEnabled) log.debug("found " + size + " idle channels");
+    List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(size);
     for (AbstractNodeContext context: idleChannels)
     {
       JPPFManagementInfo info = context.getManagementInfo();
       if (info != null) list.add(info);
+      else if (debugEnabled) log.debug("no management info for channel " + context);
     }
     return list;
   }

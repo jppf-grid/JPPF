@@ -147,13 +147,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public JMXConnectionWrapper(final String host, final int port, final boolean ssl)
   {
-    this.host = host;
-    this.port = port;
-    this.secure = ssl;
-
     try
     {
-      idString = host + ':' + port;
+      InetAddress addr = InetAddress.getByName(host);
+      this.host = (addr instanceof Inet6Address) ? "[" + host + "]" : host;
+      this.port = port;
+      this.secure = ssl;
+      idString = this.host + ':' + this.port;
       this.displayName = this.idString;
       url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
       if (ssl) SSLHelper.configureJMXProperties(env);

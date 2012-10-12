@@ -191,9 +191,6 @@ public abstract class AbstractIPAddressPattern
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

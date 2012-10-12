@@ -225,19 +225,16 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     return cancelled || timeout;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder("NodeTaskWrapper[");
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("task number=").append(number);
     sb.append(", cancelled=").append(cancelled);
     sb.append(", callOnCancel=").append(callOnCancel);
     sb.append(", timeout=").append(timeout);
     sb.append(", started=").append(started);
-    sb.append('[');
+    sb.append(']');
     return sb.toString();
   }
 

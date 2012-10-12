@@ -27,6 +27,18 @@ package org.jppf.node.protocol;
 public interface JobSLA extends JobCommonSLA
 {
   /**
+   * Get the priority of this job.
+   * @return the priority as an int.
+   */
+  int getPriority();
+
+  /**
+   * Set the priority of this job.
+   * @param priority the priority as an int.
+   */
+  void setPriority(int priority);
+
+  /**
    * Get the maximum number of nodes this job can run on.
    * @return the number of nodes as an int value.
    */

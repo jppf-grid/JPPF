@@ -54,7 +54,7 @@ public class TestJobListener extends Setup1D1N
       configure(false, true, 1);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
-      List<JPPFTask> results = runJob(listener, nbTasks);
+      List<JPPFTask> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
@@ -78,7 +78,7 @@ public class TestJobListener extends Setup1D1N
       configure(true, false, 2);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
-      List<JPPFTask> results = runJob(listener, nbTasks);
+      List<JPPFTask> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
@@ -92,19 +92,21 @@ public class TestJobListener extends Setup1D1N
 
   /**
    * submit the job with the specified listener and number of tasks.
+   * @param name the name of the job to run.
    * @param listener the listener to use for the test.
    * @param nbTasks the number of tasks
    * @return the execution results.
    * @throws Exception if any error occurs
    */
-  public List<JPPFTask> runJob(final CountingJobListener listener, final int nbTasks) throws Exception
+  public List<JPPFTask> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception
   {
     client = BaseSetup.createClient(null, false);
-    JPPFJob job = BaseSetup.createJob("TestJobListener", true, false, nbTasks, LifeCycleTask.class, 0L);
+    JPPFJob job = BaseSetup.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
+    Thread.sleep(250L);
     return results;
   }
 

@@ -211,7 +211,7 @@ class BroadcastJobManager
    */
   void processPendingBroadcasts()
   {
-    if (!queue.hasWorkingConnection()) return;
+    if (!queue.hasWorkingConnection() || pendingBroadcasts.isEmpty()) return;
     ServerJob clientJob;
     while ((clientJob = pendingBroadcasts.poll()) != null)
     {

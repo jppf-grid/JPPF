@@ -27,9 +27,8 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.server.JPPFStats;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -49,40 +48,48 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000)
   public void testGetStatistics() throws Exception
   {
+    int nbTasks = 10;
+    long duration = 100L;
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     //waitKeyPressed();
     driver.resetStatistics();
     JPPFStats stats = driver.statistics();
     assertNotNull(stats);
-    long n = stats.getNodes().getLatest();
+    double n = stats.getNodes().getLatest();
     assertTrue("nb nodes should be 2 but is " + n, n == 2);
     assertTrue(stats.getTotalTasksExecuted() == 0);
-    client.submit(BaseSetup.createJob("TestGetStatistics", true, false, 10, LifeCycleTask.class, 100L));
+    client.submit(BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
+    while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     stats = driver.statistics();
     n = stats.getIdleNodes().getLatest();
     assertTrue("nb idle nodes should be 2 but is " + n, n == 2);
-    assertTrue(stats.getExecution().getAvg() > 0d);
-    assertTrue(stats.getNodeExecution().getMax() > 0d);
-    assertEquals(10, stats.getTotalTasksExecuted());
+    double nodeAvgTime = stats.getNodeExecution().getAvg();
+    assertTrue(nodeAvgTime > 0);
+    double serverAvgTime = stats.getExecution().getAvg();
+    assertTrue(serverAvgTime > 0);
+    assertTrue(serverAvgTime >= nodeAvgTime);
+    double serverMaxTime = stats.getExecution().getMax();
+    assertTrue(serverMaxTime >= stats.getNodeExecution().getMax());
+    //assertTrue(stats.getNodeExecution().getMax() >= nodeAvgTime);
+    assertEquals(nbTasks, stats.getTotalTasksExecuted());
   }
 
   /**
-   * Test getting statistics from the server.
+   * Test resetting statistics in the server.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
   public void testResetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
-    client.submit(BaseSetup.createJob("TestResetStatistics", true, false, 10, LifeCycleTask.class, 100L));
+    client.submit(BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
+    while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     driver.resetStatistics();
     JPPFStats stats = driver.statistics();
     assertNotNull(stats);
-    long n = stats.getNodes().getLatest();
-    assertTrue("nb nodes should be 2 but is " + n, n == 2);
+    int n = (int) stats.getNodes().getLatest();
+    assertEquals(2, n);
     assertTrue(stats.getTotalTasksExecuted() == 0);
-    n = stats.getIdleNodes().getLatest();
-    assertTrue("nb idle nodes should be 2 but is " + n, n == 2);
     assertTrue(stats.getExecution().getAvg() == 0d);
     assertTrue(stats.getNodeExecution().getMax() == 0d);
     assertTrue(stats.getTotalTasksExecuted() == 0);
@@ -99,19 +106,16 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertNotNull(driver);
     Collection<JPPFManagementInfo> coll = driver.nodesInformation();
     assertNotNull(coll);
-    assertTrue("coll.size() should be 2, but is " + coll.size(), coll.size() == 2);
-    int i = 0;
+    assertEquals(2, coll.size());
     for (JPPFManagementInfo info: coll)
     {
-      String prefix = "node " + i;
-      assertNotNull(prefix + " host is null", info.getHost());
-      assertTrue(prefix + " port is <= 0", info.getPort() > 0);
-      assertFalse(prefix + " is secure", info.isSecure());
-      assertTrue(prefix + " isNode() should be true", info.isNode());
-      assertFalse(prefix + " isDriver() should be false", info.isDriver());
-      assertTrue(prefix + " type should be NODE but is " + info.getType(), info.getType() == JPPFManagementInfo.NODE);
-      assertNotNull(prefix + " id is null", info.getId());
-      i++;
+      assertNotNull(info.getHost());
+      assertTrue(info.getPort() > 0);
+      assertFalse(info.isSecure());
+      assertTrue(info.isNode());
+      assertFalse(info.isDriver());
+      assertEquals(JPPFManagementInfo.NODE, info.getType());
+      assertNotNull(info.getId());
     }
   }
 
@@ -126,12 +130,6 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertNotNull(driver);
     int n = driver.nbNodes();
     assertEquals(2, n);
-    JPPFJob job = BaseSetup.createJob("testNbNodes", false, false, 1, LifeCycleTask.class, 2000L);
-    client.submit(job);
-    Thread.sleep(500L);
-    n = driver.nbNodes();
-    assertEquals(2, n);
-    ((JPPFResultCollector) job.getResultListener()).waitForResults();
   }
 
   /**
@@ -149,7 +147,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     driverConfig.load(is);
     LoadBalancingInformation lbi = driver.loadBalancerInformation();
     assertTrue(lbi.getAlgorithmNames().contains(driverConfig.getString("jppf.load.balancing.algorithm")));
-    assertEquals(lbi.getAlgorithm(), driverConfig.getString("jppf.load.balancing.algorithm"));
+    assertEquals(driverConfig.getString("jppf.load.balancing.algorithm"), lbi.getAlgorithm());
     TypedProperties params = lbi.getParameters();
     assertNotNull(params);
     String profile = driverConfig.getString("jppf.load.balancing.strategy");
@@ -175,29 +173,38 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testSetLoadBalancerInformation() throws Exception
   {
+    LoadBalancingInformation oldLbi = null;
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
-    assertNotNull(driver);
-    TypedProperties newConfig = new TypedProperties();
-    newConfig.setProperty("size", "5");
-    newConfig.setProperty("minSamplesToAnalyse", "100");
-    newConfig.setProperty("minSamplesToCheckConvergence", "50");
-    newConfig.setProperty("maxDeviation", "0.2");
-    newConfig.setProperty("maxGuessToStable", "50");
-    newConfig.setProperty("decreaseRatio", "0.2");
-    driver.changeLoadBalancerSettings("autotuned", newConfig);
-    LoadBalancingInformation lbi = driver.loadBalancerInformation();
-    assertEquals(lbi.getAlgorithm(), "autotuned");
-    TypedProperties params = lbi.getParameters();
-    assertNotNull(params);
-    for (Map.Entry entry: newConfig.entrySet())
+    try
     {
-      if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
-      String name = (String) entry.getKey();
-      String value = (String) entry.getValue();
-      assertTrue("information does not contain '" + name + '\'', params.containsKey(name));
-      String infoValue = params.getString(name);
-      assertNotNull(infoValue);
-      assertEquals("value of '" + name + "' should be '" + value + "' but is '" + infoValue + "'", value, infoValue);
+      assertNotNull(driver);
+      oldLbi = driver.loadBalancerInformation();
+      TypedProperties newConfig = new TypedProperties();
+      newConfig.setProperty("size", "5");
+      newConfig.setProperty("minSamplesToAnalyse", "100");
+      newConfig.setProperty("minSamplesToCheckConvergence", "50");
+      newConfig.setProperty("maxDeviation", "0.2");
+      newConfig.setProperty("maxGuessToStable", "50");
+      newConfig.setProperty("decreaseRatio", "0.2");
+      driver.changeLoadBalancerSettings("autotuned", newConfig);
+      LoadBalancingInformation lbi = driver.loadBalancerInformation();
+      assertEquals(lbi.getAlgorithm(), "autotuned");
+      TypedProperties params = lbi.getParameters();
+      assertNotNull(params);
+      for (Map.Entry entry: newConfig.entrySet())
+      {
+        if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
+        String name = (String) entry.getKey();
+        String value = (String) entry.getValue();
+        assertTrue("information does not contain '" + name + '\'', params.containsKey(name));
+        String infoValue = params.getString(name);
+        assertNotNull(infoValue);
+        assertEquals("value of '" + name + "' should be '" + value + "' but is '" + infoValue + "'", value, infoValue);
+      }
+    }
+    finally
+    {
+      if (oldLbi != null) driver.changeLoadBalancerSettings(oldLbi.getAlgorithm(), oldLbi.getParameters());
     }
   }
 
@@ -208,42 +215,12 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testNodesMatchingExecutionPolicy() throws Exception
   {
-    JMXNodeConnectionWrapper[] nodes = null;
-    JMXDriverConnectionWrapper driver = null;
-    try
-    {
-      driver = BaseSetup.getDriverManagementProxy(client);
-      assertNotNull(driver);
-      Collection<JPPFManagementInfo> coll = driver.nodesInformation();
-      assertNotNull(coll);
-      assertTrue("coll.size() should be 2, but is " + coll.size(), coll.size() == 2);
-      nodes = new JMXNodeConnectionWrapper[2];
-      int count = 0;
-      for (JPPFManagementInfo info: coll)
-      {
-        JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
-        node.connectAndWait(0L);
-        nodes[count++] = node;
-      }
-      for (JMXNodeConnectionWrapper node: nodes) node.updateThreadPoolSize(4);
-      Thread.sleep(500L);
-      client.submit(BaseSetup.createJob("broadcast1", true, true, 1, MyBroadcastTask.class));
-      Thread.sleep(500L);
-      ExecutionPolicy policy = new AtLeast("processing.threads", 4);
-      int n = driver.matchingNodes(policy);
-      assertTrue("n is " + n + " but should be 2", n == 2);
-      nodes[1].updateThreadPoolSize(2);
-      Thread.sleep(500L);
-      client.submit(BaseSetup.createJob("broadcast2", true, true, 1, MyBroadcastTask.class));
-      Thread.sleep(500L);
-      n = driver.matchingNodes(policy);
-      assertTrue("n is " + n + " but should be 1", n == 1);
-    }
-    finally
-    {
-      //if (driver != null) driver.close();
-      if (nodes != null) for (JMXNodeConnectionWrapper node: nodes) node.close();
-    }
+    int nbNodes = 2;
+    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    int n = driver.matchingNodes(new Contains("jppf.node.uuid", false, "n"));
+    assertEquals(nbNodes, n);
+    n = driver.matchingNodes(new Equal("jppf.node.uuid", false, "n1"));
+    assertEquals(1, n);
   }
 
   /**
@@ -255,15 +232,17 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     assertNotNull(driver);
+    Thread.sleep(500L);
     Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
     assertNotNull(coll);
     assertEquals(2, coll.size());
-    JPPFJob job = BaseSetup.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 3000L);
+    JPPFJob job = BaseSetup.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 2000L);
     client.submit(job);
     Thread.sleep(500L);
     coll = driver.idleNodesInformation();
     assertEquals(1, coll.size());
     ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
   /**
@@ -273,28 +252,19 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testNbIdleNodes() throws Exception
   {
+    int nbNodes = 2;
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     assertNotNull(driver);
+    Thread.sleep(500L);
     int n = driver.nbIdleNodes();
-    assertEquals(2, n);
-    JPPFJob job = BaseSetup.createJob("testNbIdleNodes", false, false, 1, LifeCycleTask.class, 3000L);
+    assertEquals(nbNodes, n);
+    JPPFJob job = BaseSetup.createJob("testNbIdleNodes", false, false, 1, LifeCycleTask.class, 2000L);
     client.submit(job);
     Thread.sleep(500L);
     n = driver.nbIdleNodes();
-    assertEquals(1, n);
+    assertEquals(nbNodes - 1, n);
     ((JPPFResultCollector) job.getResultListener()).waitForResults();
-  }
-
-  /**
-   * A simple task.
-   */
-  public static class MyBroadcastTask extends JPPFTask
-  {
-    @Override
-    public void run()
-    {
-      System.out.println("broadcast of " + getClass().getName());
-    }
+    while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
   /**

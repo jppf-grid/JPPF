@@ -43,18 +43,6 @@ public interface JobCommonSLA extends Serializable
   void setExecutionPolicy(ExecutionPolicy executionPolicy);
 
   /**
-   * Get the priority of this job.
-   * @return the priority as an int.
-   */
-  int getPriority();
-
-  /**
-   * Set the priority of this job.
-   * @param priority the priority as an int.
-   */
-  void setPriority(int priority);
-
-  /**
    * Get the job schedule.
    * @return a <code>JPPFSchedule</code> instance.
    */

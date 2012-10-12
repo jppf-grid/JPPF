@@ -20,7 +20,7 @@ package org.jppf.node.protocol;
 
 
 /**
- * This interface represents the Service Level Agreement between a JPPF job and a server.
+ * This interface represents the Service Level Agreement between a JPPF job and a JPPF client.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */

@@ -37,6 +37,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    */
   private int maxNodes = Integer.MAX_VALUE;
   /**
+   * The priority of this job, used by the server to prioritize queued jobs.
+   */
+  protected int priority = 0;
+  /**
    * Determines whether this job is initially suspended.
    * If it is, it will have to be resumed, using either the admin console or the JMX APIs.
    */
@@ -89,6 +93,18 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
     this.priority = priority;
     this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
     this.suspended = suspended;
+  }
+
+  @Override
+  public int getPriority()
+  {
+    return priority;
+  }
+
+  @Override
+  public void setPriority(final int priority)
+  {
+    this.priority = priority;
   }
 
   @Override

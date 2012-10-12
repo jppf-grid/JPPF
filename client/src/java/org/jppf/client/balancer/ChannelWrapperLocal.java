@@ -86,13 +86,12 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads");
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
 
-    JPPFSystemInformation info = new JPPFSystemInformation(getConnectionUuid());
-    info.populate(false);
+    systemInfo = new JPPFSystemInformation(getConnectionUuid());
+    systemInfo.populate(false);
+    systemInfo.getJppf().setProperty("jppf.channel.local", "true");
 
-    JPPFManagementInfo managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE);
-    managementInfo.setSystemInfo(info);
-    setSystemInfo(info);
-    setManagementInfo(managementInfo);
+    managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE);
+    managementInfo.setSystemInfo(systemInfo);
   }
 
   @Override
@@ -200,10 +199,10 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   public String toString()
   {
     final StringBuilder sb = new StringBuilder();
-    sb.append("ChannelWrapperLocal");
-    sb.append("{status=").append(status);
+    sb.append(getClass().getSimpleName());
+    sb.append("[status=").append(status);
     sb.append(", connectionUuid='").append(connectionUuid).append('\'');
-    sb.append('}');
+    sb.append(']');
     return sb.toString();
   }
 

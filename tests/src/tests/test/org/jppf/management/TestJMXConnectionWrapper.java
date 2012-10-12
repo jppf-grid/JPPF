@@ -33,7 +33,6 @@ public class TestJMXConnectionWrapper
    * @throws Exception if any error occurs
    */
   @Test(timeout=5000)
-  //@Test
   public void testConnectAnWaitNonReachableServer() throws Exception
   {
     //make sure the host is on an unreachable network

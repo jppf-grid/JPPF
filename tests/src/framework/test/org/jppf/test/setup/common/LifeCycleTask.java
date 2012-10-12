@@ -19,6 +19,7 @@
 package test.org.jppf.test.setup.common;
 
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,12 +43,16 @@ public class LifeCycleTask extends JPPFTask
   /**
    * used to store the task's execution start time.
    */
-  private transient long start = 0L;
+  private double start = 0L;
+  /**
+   * used to store the task's execution start time.
+   */
+  private long end = 0L;
   /**
    * Measures the time elapsed between the task execution start and either completion
    * or a call to one of the life cycle methods.
    */
-  private transient long elapsed = 0L;
+  private double elapsed = 0L;
   /**
    * Determines whether this task was cancelled.
    */
@@ -56,6 +61,14 @@ public class LifeCycleTask extends JPPFTask
    * Determines whether this task timed out.
    */
   private boolean timedout = false;
+  /**
+   * Determines whether this task was executed in a node or in the client's local executor.
+   */
+  private boolean executedInNode = true;
+  /**
+   * The uuid of the node this task executes on.
+   */
+  private String nodeUuid = null;
 
   /**
    * Initialize this task.
@@ -73,60 +86,65 @@ public class LifeCycleTask extends JPPFTask
     this.duration = duration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
+    double nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
     try
     {
+      executedInNode = isInNode();
+      TypedProperties config = JPPFConfiguration.getProperties();
+      synchronized(config)
+      {
+        nodeUuid = config.getString("jppf.node.uuid");
+        if (nodeUuid == null)
+        {
+          nodeUuid = new JPPFUuid().toString();
+          config.setProperty("jppf.node.uuid", nodeUuid);
+        }
+      }
       if (duration > 0) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
-      elapsed = System.currentTimeMillis() - start;
-      displayElapsed("successful");
+      displayTask("successful");
     }
     catch(Exception e)
     {
       setException(e);
+      //e.printStackTrace();
+    }
+    finally
+    {
+      elapsed = (System.nanoTime() - nanoStart) / 1e6d;
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void onCancel()
   {
-    elapsed = System.currentTimeMillis() - start;
     cancelled = true;
-    displayElapsed("cancelled");
+    displayTask("cancelled");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void onTimeout()
   {
-    elapsed = System.currentTimeMillis() - start;
     timedout = true;
-    displayElapsed("timed out");
+    displayTask("timed out");
   }
 
   /**
    * Log or display a message showing the execution status and elapsed of this task.
    * @param message a short message describing the life cycle status.
    */
-  private void displayElapsed(final String message)
+  private void displayTask(final String message)
   {
-    log.info("task id='" + getId() + "' " + message + ", duration=" + duration + ", result=" + getResult() + ", elapsed=" + elapsed);
+    log.info("displaying task " + this + " (" + message + ')');
   }
 
   /**
    * Determine whether this task was cancelled.
-   * @return true if the task was cancelled, false otherwise.
+   * @return <code>true</code> if the task was cancelled, <code>false</code> otherwise.
    */
   public boolean isCancelled()
   {
@@ -135,10 +153,62 @@ public class LifeCycleTask extends JPPFTask
 
   /**
    * Determine whether this task timed out.
-   * @return true if the task timed out, false otherwise.
+   * @return <code>true</code> if the task timed out, <code>false</code> otherwise.
    */
   public boolean isTimedout()
   {
     return timedout;
+  }
+
+  /**
+   * Determine whether this task was executed in a node or in the client's local executor.
+   * @return <code>true</code> if this task was executed in a node, <code>false</code> otherwise.
+   */
+  public boolean isExecutedInNode()
+  {
+    return executedInNode;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("id=").append(getId());
+    sb.append(", duration=").append(duration);
+    sb.append(", timedout=").append(timedout);
+    sb.append(", cancelled=").append(cancelled);
+    sb.append(", executedInNode=").append(executedInNode);
+    sb.append(", elapsed=").append(elapsed);
+    sb.append(", result=").append(getResult());
+    sb.append(", nodeUuid=").append(nodeUuid);
+    sb.append(']');
+    return sb.toString();
+  }
+
+  /**
+   * Get the task's execution start time.
+   * @return the start time as a <code>long</code> value.
+   */
+  public double getStart()
+  {
+    return start;
+  }
+
+  /**
+   * Get the time elapsed between the task execution start its completion.
+   * @return the elapsed time as a <code>long</code> value.
+   */
+  public double getElapsed()
+  {
+    return elapsed;
+  }
+
+  /**
+   * Get the uuid of the node this task executes on.
+   * @return the uuid as a string.
+   */
+  public String getNodeUuid()
+  {
+    return nodeUuid;
   }
 }

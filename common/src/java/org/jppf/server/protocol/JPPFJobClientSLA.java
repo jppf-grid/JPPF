@@ -54,16 +54,6 @@ public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA
     super(policy);
   }
 
-  /**
-   * Initialize this job SLA with the specified execution policy and priority.
-   * @param policy the tasks execution policy.
-   * @param priority the priority of this job.
-   */
-  public JPPFJobClientSLA(final ExecutionPolicy policy, final int priority)
-  {
-    super(policy, priority);
-  }
-
   @Override
   public int getMaxChannels()
   {

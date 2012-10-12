@@ -24,7 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.balancer.ClientJob;
 import org.jppf.client.event.JobEvent;
-import org.jppf.execute.*;
+import org.jppf.execute.ExecutorChannel;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.StringUtils;
@@ -441,6 +442,7 @@ public abstract class AbstractClientJob
   {
     if (debugEnabled)
     {
+      //String s = StringUtils.buildString("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired(), ", executionPolicy=", clientSla.getExecutionPolicy());
       String s = StringUtils.buildString("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired());
       log.debug(s);
     }
@@ -448,7 +450,19 @@ public abstract class AbstractClientJob
     if (isJobExpired()) return false;
     if (channelsCount.get() >= clientSla.getMaxChannels()) return false;
     ExecutionPolicy policy = clientSla.getExecutionPolicy();
-    return (policy != null) ? policy.accepts(channel.getSystemInfo()) : true;
+    boolean b = true;
+    if (policy != null)
+    {
+      //if (channel.isLocal());
+      JPPFSystemInformation info = channel.getSystemInfo();
+      b = policy.accepts(info);
+      if (b && channel.isLocal())
+      {
+        boolean breakpoint = true;
+      }
+      if (debugEnabled) log.debug("policy result = " + b);
+    }
+    return b;
   }
 
   /**

@@ -55,8 +55,7 @@ public class TestJPPFJob
    * Test that the expected number of {@link JobListener} notifications are received int he expected order.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=5000)
-  @Test
+  @Test(timeout=5000)
   public void testJobListener() throws Exception
   {
     int nbTasks = 10;

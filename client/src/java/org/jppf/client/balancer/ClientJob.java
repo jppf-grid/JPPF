@@ -553,4 +553,17 @@ public class ClientJob extends AbstractClientJob
       return bundleMap.size();
     }
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("job=").append(job);
+    sb.append(", submissionStatus=").append(submissionStatus);
+    sb.append(", broadcastUUID=").append(broadcastUUID);
+    sb.append(", executing=").append(executing);
+    sb.append(']');
+    return sb.toString();
+  }
 }

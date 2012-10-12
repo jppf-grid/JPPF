@@ -18,19 +18,15 @@
 
 package org.jppf.client.balancer;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.execute.*;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.ContextAwareness;
-import org.jppf.server.scheduler.bundle.JPPFContext;
-import org.jppf.server.scheduler.bundle.NodeAwareness;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
+import org.jppf.management.*;
+import org.jppf.server.scheduler.bundle.*;
+import org.slf4j.*;
 
 /**
  * Context associated with a channel serving state and tasks submission.
@@ -41,17 +37,25 @@ import java.util.concurrent.ExecutorService;
 public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBundle>
 {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ChannelWrapper.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Bundler used to schedule tasks for the corresponding node.
    */
   private Bundler bundler = null;
   /**
    * Represents the system information.
    */
-  private JPPFSystemInformation systemInfo = null;
+  protected JPPFSystemInformation systemInfo = null;
   /**
    * Represents the management information.
    */
-  private JPPFManagementInfo managementInfo = null;
+  protected JPPFManagementInfo managementInfo = null;
   /**
    * Executor for submitting bundles for processing.
    */
@@ -143,6 +147,7 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   @Override
   public JPPFSystemInformation getSystemInfo()
   {
+    if (traceEnabled) log.trace("getting system info for " + this + ", jppf.channel.local=" + systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
     return systemInfo;
   }
 
@@ -154,8 +159,17 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   {
     if (systemInfo != null)
     {
+      systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(isLocal()));
       this.systemInfo = systemInfo;
-      this.systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(isLocal()));
+      if (traceEnabled) log.trace("setting system info for " + this + ", jppf.channel.local=" + this.systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
+    }
+    else
+    {
+      if (traceEnabled)
+      {
+        Exception e = new Exception("call stack for setSystemInfo(null)");
+        log.trace(e.getMessage(), e);
+      }
     }
   }
 
@@ -171,7 +185,7 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
    */
   public void setManagementInfo(final JPPFManagementInfo managementInfo)
   {
-    this.managementInfo = managementInfo;
+    if (managementInfo != null) this.managementInfo = managementInfo;
   }
 
   @Override

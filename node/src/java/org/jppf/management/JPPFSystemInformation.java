@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class encapsulates the system information for a node.<br>
@@ -41,6 +42,14 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFSystemInformation.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Mapping of all properties containers.
    */
@@ -161,10 +170,15 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    */
   public JPPFSystemInformation populate(final boolean resolveInetAddressesNow)
   {
+    if (traceEnabled)
+    {
+      Exception e = new Exception("call stack for JPPFSystemInformation.populate(" + resolveInetAddressesNow + ")");
+      log.trace(e.getMessage(), e);
+    }
     addProperties("system", SystemUtils.getSystemProperties());
     addProperties("runtime", SystemUtils.getRuntimeInformation());
     addProperties("env", SystemUtils.getEnvironment());
-    addProperties("jppf", JPPFConfiguration.getProperties());
+    addProperties("jppf", new TypedProperties(JPPFConfiguration.getProperties()));
     Runnable r = new Runnable() {
       @Override
       public void run() {

@@ -38,10 +38,6 @@ public abstract class AbstractCommonSLA implements JobCommonSLA
    */
   protected ExecutionPolicy executionPolicy = null;
   /**
-   * The priority of this job, used by the server to prioritize queued jobs.
-   */
-  protected int priority = 0;
-  /**
    * The job start schedule configuration.
    */
   protected JPPFSchedule jobSchedule = null;
@@ -63,18 +59,7 @@ public abstract class AbstractCommonSLA implements JobCommonSLA
    */
   public AbstractCommonSLA(final ExecutionPolicy policy)
   {
-    this(policy, 0);
-  }
-
-  /**
-   * Initialize this job SLA with the specified execution policy and priority.
-   * @param policy the tasks execution policy.
-   * @param priority the priority of this job.
-   */
-  public AbstractCommonSLA(final ExecutionPolicy policy, final int priority)
-  {
     this.executionPolicy = policy;
-    this.priority = priority;
   }
 
   @Override
@@ -87,18 +72,6 @@ public abstract class AbstractCommonSLA implements JobCommonSLA
   public void setExecutionPolicy(final ExecutionPolicy executionPolicy)
   {
     this.executionPolicy = executionPolicy;
-  }
-
-  @Override
-  public int getPriority()
-  {
-    return priority;
-  }
-
-  @Override
-  public void setPriority(final int priority)
-  {
-    this.priority = priority;
   }
 
   @Override
@@ -135,7 +108,7 @@ public abstract class AbstractCommonSLA implements JobCommonSLA
     sla.setExecutionPolicy(executionPolicy);
     sla.setJobExpirationSchedule(jobExpirationSchedule);
     sla.setJobSchedule(jobSchedule);
-    sla.setPriority(priority);
+    //sla.setPriority(priority);
     return sla;
   }
 }
