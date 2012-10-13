@@ -79,10 +79,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected String idString = null;
   /**
-   * The host name for the node or driver, may be initially set to the ip address.
-   */
-  protected String hostName = null;
-  /**
    * A string representing this connection, used for displaying in the admin conosle.
    */
   protected String displayName = null;
@@ -124,7 +120,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
   {
     this.host = host;
-    this.hostName = host;
     this.port = port;
 
     try
@@ -157,6 +152,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     try
     {
       idString = host + ':' + port;
+      displayName = idString;
       url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
       if (ssl) SSLHelper.configureJMXProperties(env);
     }
@@ -229,7 +225,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       mbeanConnection.set(jmxc.getMBeanServerConnection());
       try
       {
-        setHostName(InetAddress.getByName(host).getHostName());
+        setHost(InetAddress.getByName(host).getHostName());
       }
       catch (UnknownHostException e)
       {
@@ -340,7 +336,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public void setHost(final String host)
   {
     this.host = host;
-    this.idString = this.host + ':' + this.port;
+    //this.idString = this.host + ':' + this.port;
+    this.displayName = this.host + ':' + this.port;
   }
 
   /**
@@ -441,25 +438,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public JPPFSystemInformation systemInformation() throws Exception
   {
     throw new JPPFException("this method is not implemented");
-  }
-
-  /**
-   * Get the host name for the node or driver.
-   * @return the host name as a string.
-   */
-  public String getHostName()
-  {
-    return hostName;
-  }
-
-  /**
-   * Set the host name for the node or driver.
-   * @param hostName the host name as a string.
-   */
-  public void setHostName(final String hostName)
-  {
-    this.hostName = hostName;
-    displayName = hostName + ':' + port;
   }
 
   /**
