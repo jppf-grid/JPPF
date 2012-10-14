@@ -68,7 +68,7 @@ class WaitInitialBundleState extends NodeServerState
     if (context.readMessage(channel))
     {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
-      ServerTaskBundle bundleWrapper = context.deserializeBundle(server.getJobManager());
+      ServerTaskBundleClient bundleWrapper = context.deserializeBundle(server.getJobManager());
       JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
       context.setUuid(uuid);

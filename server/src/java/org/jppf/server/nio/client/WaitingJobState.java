@@ -63,8 +63,8 @@ class WaitingJobState extends ClientServerState
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
     if (context.readMessage(channel))
     {
-      ServerJob bundleWrapper = context.deserializeBundle();
-      JPPFTaskBundle header = (JPPFTaskBundle) bundleWrapper.getJob();
+      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
+      JPPFTaskBundle header = bundleWrapper.getJob();
       int count = header.getTaskCount();
       if (debugEnabled) log.debug("read bundle" + header + " from client " + channel + " done: received " + count + " tasks");
       if (bundleWrapper.getJobReceivedTime() == 0L) bundleWrapper.setJobReceivedTime(System.currentTimeMillis());
@@ -72,8 +72,7 @@ class WaitingJobState extends ClientServerState
       header.getUuidPath().incPosition();
       header.getUuidPath().add(driver.getUuid());
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
-      header.setCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
-      context.setPendingTasksCount(header.getTaskCount());
+      bundleWrapper.addCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
       context.setInitialBundleWrapper(bundleWrapper);
       JPPFDriver.getQueue().addBundle(bundleWrapper);
 

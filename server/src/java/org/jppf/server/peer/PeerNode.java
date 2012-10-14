@@ -163,8 +163,8 @@ class PeerNode extends AbstractCommonNode
     if (debugEnabled) log.debug(getName() + "Start of peer node secondary loop");
     while (!stopped)
     {
-      ServerJob bundleWrapper = readBundle();
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+      ServerTaskBundleClient bundleWrapper = readBundle();
+      JPPFTaskBundle bundle = bundleWrapper.getJob();
       if (bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
       {
         if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
@@ -174,18 +174,16 @@ class PeerNode extends AbstractCommonNode
         bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, uuid);
         bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, new JPPFSystemInformation(uuid).populate());
       }
-      //boolean notEmpty = (bundle.getTasks() != null) && (bundle.getTaskCount() > 0);
-      boolean notEmpty = !bundleWrapper.getTasks().isEmpty();
-      if (notEmpty)
+      if (bundleWrapper.getTaskCount() > 0)
       {
-        int n = bundle.getTaskCount();
         bundle.getUuidPath().add(driver.getUuid());
         if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
-        bundle.setCompletionListener(resultSender);
-        resultSender.pendingTasksCount = n;
+        bundleWrapper.addCompletionListener(resultSender);
+        resultSender.bundle = bundleWrapper;
         JPPFDriver.getQueue().addBundle(bundleWrapper);
         resultSender.waitForExecution();
-        setTaskCount(getTaskCount() + n);
+        resultSender.sendResults(bundleWrapper);
+        setTaskCount(getTaskCount() + bundleWrapper.getTaskCount());
         if (debugEnabled) log.debug(getName() + "tasks executed: " + getTaskCount());
       }
       else
@@ -194,7 +192,6 @@ class PeerNode extends AbstractCommonNode
       }
       if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE)
       {
-        bundleWrapper.fireJobEnded();
         driver.getJobManager().jobEnded(bundleWrapper);
       }
     }
@@ -250,7 +247,7 @@ class PeerNode extends AbstractCommonNode
    * @return an array of deserialized objects.
    * @throws Exception if an error occurs while deserializing.
    */
-  private ServerJob readBundle() throws Exception
+  private ServerTaskBundleClient readBundle() throws Exception
   {
     // Read the request header - with task count information
     if (debugEnabled) log.debug("waiting for next request");
@@ -270,7 +267,7 @@ class PeerNode extends AbstractCommonNode
       tasks.add(dl);
       if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
     }
-    return new ServerJob(null, header, dataProvider, tasks);
+    return new ServerTaskBundleClient(header, dataProvider, tasks);
   }
 
   /**

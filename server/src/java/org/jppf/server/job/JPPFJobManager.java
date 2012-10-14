@@ -159,8 +159,12 @@ public class JPPFJobManager implements QueueListener, JobNotificationEmitter
    * Called when a job is complete and returned to the client.
    * @param bundleWrapper the completed job.
    */
-  public synchronized void jobEnded(final ServerJob bundleWrapper)
+  public synchronized void jobEnded(final ServerTaskBundleClient bundleWrapper)
   {
+    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (bundleWrapper.getJob().getState() == JPPFTaskBundle.State.INITIAL_BUNDLE) return; // skip notifications for initial bundles
+//    bundleWrapper.fireJobEnded();       // todo fire jobEnded
+
     JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
     //long time = System.currentTimeMillis() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
     long time = System.currentTimeMillis() - bundle.getExecutionStartTime();

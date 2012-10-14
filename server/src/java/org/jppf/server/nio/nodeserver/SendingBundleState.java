@@ -69,7 +69,7 @@ class SendingBundleState extends NodeServerState
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null)
     {
-      ServerTaskBundle bundleWrapper = context.getBundle();
+      ServerTaskBundleNode bundleWrapper = context.getBundle();
       JPPFTaskBundle bundle = (bundleWrapper == null) ? null : (JPPFTaskBundle) bundleWrapper.getJob();
       if (bundle != null)
       {

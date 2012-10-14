@@ -81,7 +81,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   private final JPPFContext jppfContext;
   /**
-   * The jpob manager.
+   * The job manager.
    */
   private final JPPFJobManager jobManager;
 
@@ -244,7 +244,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     {
       queue.processPendingBroadcasts();
       T channel = null;
-      ServerTaskBundle taskBundle = null;
+      ServerTaskBundleNode bundle = null;
       synchronized(idleChannels)
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
@@ -258,7 +258,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
             ServerJob bundleWrapper = it.next();
             channel = retrieveChannel(bundleWrapper);
             if (channel != null) {
-              taskBundle = prepareJobDispatch(channel, bundleWrapper);
+              bundle = prepareJobDispatch(channel, bundleWrapper);
               removeIdleChannel(channel);
             }
           }
@@ -273,9 +273,9 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
           queueLock.unlock();
         }
       }
-      if (channel != null && taskBundle != null)
+      if (channel != null && bundle != null)
       {
-        dispatchJobToChannel(channel, taskBundle);
+        dispatchJobToChannel(channel, bundle);
         dispatched = true;
       }
     }
@@ -307,7 +307,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param selectedBundle the job to dispatch.
    * @return the task bundle to dispatch to the specified node.
    */
-  private ServerTaskBundle prepareJobDispatch(final T channel, final ServerJob selectedBundle)
+  private ServerTaskBundleNode prepareJobDispatch(final T channel, final ServerJob selectedBundle)
   {
     if (debugEnabled)
     {
@@ -336,7 +336,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param bundleWrapper the job to dispatch.
    */
   @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final T channel, final ServerTaskBundle bundleWrapper) {
+  private void dispatchJobToChannel(final T channel, final ServerTaskBundleNode bundleWrapper) {
     synchronized(channel.getMonitor())
     {
       JPPFFuture<?> future = channel.submit(bundleWrapper);

@@ -23,7 +23,6 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 import java.util.List;
 
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
@@ -67,8 +66,8 @@ class WaitingHandshakeState extends ClientServerState
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
     if (context.readMessage(channel))
     {
-      ServerJob bundleWrapper = context.deserializeBundle();
-      JPPFTaskBundle header = (JPPFTaskBundle) bundleWrapper.getJob();
+      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
+      JPPFTaskBundle header = bundleWrapper.getJob();
       if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
       context.setConnectionUuid((String) header.getParameter("connection.uuid"));
       header.getUuidPath().incPosition();
@@ -82,17 +81,18 @@ class WaitingHandshakeState extends ClientServerState
         Thread.sleep(1L);
         list = classServer.getProviderConnections(uuid);
       }
-      header.getUuidPath().add(driver.getUuid());
+      String driverUUID = driver.getUuid();
+      header.getUuidPath().add(driverUUID);
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
 
       context.setClientMessage(null);
       context.setBundle(bundleWrapper);
       header.getParametersMap().clear();
       // send system info (and more) back to the client
-      JPPFSystemInformation info = new JPPFSystemInformation(JPPFDriver.getInstance().getUuid());
+      JPPFSystemInformation info = new JPPFSystemInformation(driverUUID);
       info.populate();
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);
-      header.setParameter(BundleParameter.DRIVER_UUID_PARAM, JPPFDriver.getInstance().getUuid());
+      header.setParameter(BundleParameter.DRIVER_UUID_PARAM, driverUUID);
       return TO_SENDING_HANDSHAKE_RESULTS;
     }
     return TO_WAITING_HANDSHAKE;

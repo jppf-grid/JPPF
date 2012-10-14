@@ -70,7 +70,7 @@ class SendingResultsState extends ClientServerState
     }
 
     ClientContext context = (ClientContext) channel.getContext();
-    ServerJob bundleWrapper = context.getBundle();
+    ServerTaskBundleClient bundleWrapper = context.getBundle();
     if (bundleWrapper == null)
     {
       bundleWrapper = context.pollCompletedBundle();
@@ -80,9 +80,7 @@ class SendingResultsState extends ClientServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to client " + channel);
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      context.setPendingTasksCount(context.getPendingTasksCount() - bundle.getTaskCount());
+      if (debugEnabled) log.debug("sent entire bundle" + bundleWrapper.getJob() + " to client " + channel);
       context.setBundle(null);
       context.setClientMessage(null);
       if (context.getPendingTasksCount() <= 0)

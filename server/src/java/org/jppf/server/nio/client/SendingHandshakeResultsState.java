@@ -70,7 +70,7 @@ class SendingHandshakeResultsState extends ClientServerState
     }
 
     ClientContext context = (ClientContext) channel.getContext();
-    ServerJob bundleWrapper = context.getBundle();
+    ServerTaskBundleClient bundleWrapper = context.getBundle();
     if (context.getMessage() == null)
     {
       //context.setBundle(bundleWrapper);
@@ -78,8 +78,7 @@ class SendingHandshakeResultsState extends ClientServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to client " + channel);
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+      if (debugEnabled) log.debug("sent entire bundle" + bundleWrapper.getJob() + " to client " + channel);
       context.setBundle(null);
       context.setClientMessage(null);
       return TO_WAITING_JOB;

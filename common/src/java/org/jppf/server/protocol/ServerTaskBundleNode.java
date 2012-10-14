@@ -24,10 +24,10 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
 
 /**
- * Instances of this class group tasks from the same client together.
+ * Instances of this class group tasks for the same node channel together.
  * @author Martin JANDA
  */
-public class ServerTaskBundle extends JPPFTaskBundle {
+public class ServerTaskBundleNode extends JPPFTaskBundle {
   /**
    * Explicit serialVersionUID.
    */
@@ -40,15 +40,11 @@ public class ServerTaskBundle extends JPPFTaskBundle {
   /**
    * The shared data provider for this task bundle.
    */
-  private transient DataLocation dataProvider = null;
+  private transient final DataLocation dataProvider;
   /**
    * The tasks to be executed by the node.
    */
-  private transient List<DataLocation> tasks = null;
-  /**
-   * The broadcast UUID.
-   */
-  private transient String broadcastUUID = null;
+  private transient final List<ServerTask> taskList;
   /**
    * Job requeue indicator.
    */
@@ -65,37 +61,36 @@ public class ServerTaskBundle extends JPPFTaskBundle {
   /**
    * Initialize this task bundle and set its build number.
    * @param job   the job to execute.
-   * @param tasks the tasks to execute.
+   * @param taskList the tasks to execute.
    */
-  public ServerTaskBundle(final ServerJob job, final List<DataLocation> tasks) {
-    this(job, null, tasks);
+  public ServerTaskBundleNode(final ServerJob job, final List<ServerTask> taskList) {
+    this(job, null, taskList);
   }
 
   /**
    * Initialize this task bundle and set its build number.
    * @param job   the job to execute.
    * @param taskBundle the job.
-   * @param tasks the tasks to execute.
+   * @param taskList the tasks to execute.
    */
-  public ServerTaskBundle(final ServerJob job, final JPPFTaskBundle taskBundle, final List<DataLocation> tasks)
+  public ServerTaskBundleNode(final ServerJob job, final JPPFTaskBundle taskBundle, final List<ServerTask> taskList)
   {
     if (job == null) throw new IllegalArgumentException("job is null");
+    if (taskBundle == null) throw new IllegalArgumentException("taskBundle is null");
+    if (taskList == null) throw new IllegalArgumentException("taskList is null");
 
     this.job = job;
-    if(taskBundle == null)
-      this.taskBundle = job.getJob();
-    else
-      this.taskBundle = taskBundle;
-//    if(getState() == State.INITIAL_BUNDLE)
+    this.taskBundle = taskBundle;
+//    if (getState() == State.INITIAL_BUNDLE)
 //      this.taskBundle = this.job.getJob();
 //    else
 //      this.taskBundle = this.job.getJob().copy(tasks.size());
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
-    this.tasks = Collections.unmodifiableList(new ArrayList<DataLocation>(tasks));
+    this.taskList = Collections.unmodifiableList(new ArrayList<ServerTask>(taskList));
     this.setName(job.getJob().getName());
     this.dataProvider = job.getDataProvider();
-    setTaskCount(this.tasks.size());
+    setTaskCount(this.taskList.size());
   }
 
   /**
@@ -126,21 +121,12 @@ public class ServerTaskBundle extends JPPFTaskBundle {
   }
 
   /**
-   * Set shared data provider for this task.
-   * @param dataProvider a <code>DataProvider</code> instance.
-   */
-  public void setDataProviderL(final DataLocation dataProvider)
-  {
-    this.dataProvider = dataProvider;
-  }
-
-  /**
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<DataLocation> getTasksL()
+  public List<ServerTask> getTaskList()
   {
-    return tasks;
+    return taskList;
   }
 
   /**
@@ -148,7 +134,7 @@ public class ServerTaskBundle extends JPPFTaskBundle {
    * @return a new <code>ClientTaskBundle</code> instance.
    */
   @Override
-  public ServerTaskBundle copy()
+  public ServerTaskBundleNode copy()
   {
     throw new UnsupportedOperationException();
 //    ClientTaskBundle bundle = new ClientTaskBundle(getJob(), tasks);
@@ -179,31 +165,13 @@ public class ServerTaskBundle extends JPPFTaskBundle {
    * @return a new <code>ClientTaskBundle</code> instance.
    */
   @Override
-  public ServerTaskBundle copy(final int nbTasks)
+  public ServerTaskBundleNode copy(final int nbTasks)
   {
     throw new UnsupportedOperationException();
 //    ClientTaskBundle bundle = copy();
 //    bundle.setTaskCount(nbTasks);
 //    taskCount -= nbTasks;
 //    return bundle;
-  }
-
-  /**
-   * Get the broadcast UUID.
-   * @return an <code>String</code> instance.
-   */
-  public String getBroadcastUUID()
-  {
-    return broadcastUUID;
-  }
-
-  /**
-   * Set the broadcast UUID.
-   * @param broadcastUUID the broadcast UUID.
-   */
-  public void setBroadcastUUID(final String broadcastUUID)
-  {
-    this.broadcastUUID = broadcastUUID;
   }
 
   /**
@@ -278,9 +246,6 @@ public class ServerTaskBundle extends JPPFTaskBundle {
     return cancelled;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

@@ -22,12 +22,14 @@ import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
+import java.util.List;
+
 /**
  * Completion listener that is used to notify that results were received from a node,
  * and they should be sent back to the client.
  * @author Laurent Cohen
  */
-public class CompletionListener implements TaskCompletionListener
+public class CompletionListener implements ServerTaskBundleClient.CompletionListener
 {
   /**
    * Logger for this class.
@@ -60,29 +62,36 @@ public class CompletionListener implements TaskCompletionListener
     this.transitionManager = transitionManager;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  @SuppressWarnings("unchecked")
-  public void taskCompleted(final ServerJob result)
+  public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results)
   {
-    ClientContext context = (ClientContext) channel.getContext();
-    synchronized(channel)
+    if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
+
+    if(bundle.isCancelled())
     {
-      context.offerCompletedBundle(result);
-      if (ClientState.IDLE.equals(context.getState()))
+      bundle.removeCompletionListener(this);
+    } else {
+      ClientContext context = (ClientContext) channel.getContext();
+      synchronized(channel)
       {
-        try
+        context.offerCompletedBundle(bundle);
+        if (ClientState.IDLE.equals(context.getState()))
         {
-          transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
-        }
-        catch(Exception e)
-        {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.info(e.getClass().getName() + " : " + e.getMessage());
+          try
+          {
+            transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
+          }
+          catch(Exception e)
+          {
+            if (debugEnabled) log.debug(e.getMessage(), e);
+            else log.info(e.getClass().getName() + " : " + e.getMessage());
+          }
         }
       }
     }
+  }
+
+  @Override
+  public void bundleDone(final ServerTaskBundleClient bundle) {
   }
 }

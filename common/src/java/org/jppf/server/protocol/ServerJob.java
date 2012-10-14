@@ -47,21 +47,40 @@ public class ServerJob extends AbstractServerJob {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The list of of the tasks.
+   * The list of the tasks.
    */
-  private final List<DataLocation> tasks;
+  private final List<ServerTask> tasks = new ArrayList<ServerTask>();
   /**
-   * The list of of the initial tasks.
+   * The list of the incomming bundles.
    */
-  private final List<DataLocation> initialTasks;
+  private final List<ServerTaskBundleClient> bundleList = new ArrayList<ServerTaskBundleClient>();
   /**
-   * The broadcast UUID.
+   * Listener for handling completed bundles.
    */
-  private transient String broadcastUUID = null;
+  private final ServerTaskBundleClient.CompletionListener bundleCompletionListener = new ServerTaskBundleClient.CompletionListener() {
+    @Override
+    public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
+      if(bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
+
+      if (bundle.isCancelled()) cancel(false);
+    }
+
+    @Override
+    public void bundleDone(final ServerTaskBundleClient bundle) {
+      if(bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
+
+      bundle.removeCompletionListener(this);
+      synchronized (tasks) {
+        bundleList.remove(bundle);
+        tasks.removeAll(bundle.getTaskList());
+      }
+    }
+  };
+
   /**
    * Map of all futures in this job.
    */
-  private final Map<ServerTaskBundle, Pair<ExecutorChannel, Future>> bundleMap = new LinkedHashMap<ServerTaskBundle, Pair<ExecutorChannel, Future>>();
+  private final Map<ServerTaskBundleNode, Pair<ExecutorChannel, Future>> bundleMap = new LinkedHashMap<ServerTaskBundleNode, Pair<ExecutorChannel, Future>>();
   /**
    * The status of this submission.
    */
@@ -69,23 +88,7 @@ public class ServerJob extends AbstractServerJob {
   /**
    * The listener that receives notifications of completed tasks.
    */
-  private Object resultsListener;
-  /**
-   * Instance of parent broadcast job.
-   */
-  private transient ServerJob parentJob;
-  /**
-   * Map of all dispatched broadcast jobs.
-   */
-  private final Map<String, ServerJob> broadcastMap;
-  /**
-   * Map of all pending broadcast jobs.
-   */
-  private final Set<ServerJob> broadcastSet = new LinkedHashSet<ServerJob>();
-  /**
-   * Indicator whether this job is executing.
-   */
-  private boolean executing = false;
+  private Object resultsListener = null;
   /**
    * The requeue handler.
    */
@@ -93,7 +96,7 @@ public class ServerJob extends AbstractServerJob {
   /**
    * State map for tasks on which resultReceived was called.
    */
-  private final Map<DataLocation, Pair<DataLocation, TaskState>> taskStateMap = new IdentityHashMap<DataLocation, Pair<DataLocation, TaskState>>();
+  private final Map<ServerTask, Pair<DataLocation, TaskState>> taskStateMap = new IdentityHashMap<ServerTask, Pair<DataLocation, TaskState>>();
   /**
    * The data location of the data provider.
    */
@@ -101,45 +104,29 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Handler for job state notifications.
    */
-  private final JobNotificationEmitter notificationEmitter;
+  protected final JobNotificationEmitter notificationEmitter;
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
    * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
-   * @param tasks list of tasks to execute.
    */
-  public ServerJob(final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider, final List<DataLocation> tasks) {
-    this(notificationEmitter, job, dataProvider, tasks, null, null);
+  public ServerJob(final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+    super(job);
+    this.notificationEmitter = notificationEmitter;
+    this.dataProvider = dataProvider;
+    this.submissionStatus = SubmissionStatus.SUBMITTED;
   }
 
   /**
-   * Initialized client job with task bundle and list of tasks to execute.
-   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
-   * @param job   underlying task bundle.
-   * @param dataProvider the data location of the data provider.
-   * @param tasks list of tasks to execute.
-   * @param parentJob instance of parent broadcast job.
-   * @param broadcastUUID the broadcast UUID.
+   * Get list of bundles received from client.
+   * @return list of bundles received from client.
    */
-  protected ServerJob(final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider, final List<DataLocation> tasks, final ServerJob parentJob, final String broadcastUUID) {
-    super(job);
-    if (tasks == null) throw new IllegalArgumentException("tasks is null");
-    this.notificationEmitter = notificationEmitter;
-    this.dataProvider = dataProvider;
-    this.parentJob = parentJob;
-    this.broadcastUUID = broadcastUUID;
-    if (broadcastUUID == null) {
-      if (job.getSLA().isBroadcastJob()) this.broadcastMap = new LinkedHashMap<String, ServerJob>();
-      else this.broadcastMap = Collections.emptyMap();
-    } else {
-      this.broadcastMap = Collections.emptyMap();
-      this.resultsListener = null;
+  protected List<ServerTaskBundleClient> getBundleList() {
+    synchronized (tasks) {
+      return new ArrayList<ServerTaskBundleClient>(bundleList);
     }
-    this.submissionStatus = SubmissionStatus.SUBMITTED;
-    this.tasks = new ArrayList<DataLocation>(tasks);
-    this.initialTasks = new ArrayList<DataLocation>(tasks);
   }
 
   /**
@@ -150,17 +137,6 @@ public class ServerJob extends AbstractServerJob {
     return dataProvider;
   }
 
-  /**
-   * Sets indicator whether is job is executing. Job start or job end is notified when state changes.
-   * @param executing <code>true</code> when this client job is executing. <code>false</code> otherwise.
-   */
-  protected void setExecuting(final boolean executing) {
-    synchronized (tasks) {
-      if (this.executing == executing) return;
-      this.executing = executing;
-    }
-  }
-
   @Override
   public int getTaskCount() {
     synchronized (tasks) {
@@ -169,72 +145,27 @@ public class ServerJob extends AbstractServerJob {
   }
 
   /**
-   * Get the list of of the tasks.
-   * @return a list of <code>DataLocation</code> instances.
-   */
-  public List<DataLocation> getTasks() {
-    synchronized (tasks) {
-      if(getSubmissionStatus() == SubmissionStatus.COMPLETE) {
-        List<DataLocation> list = new ArrayList<DataLocation>(initialTasks.size());
-        for (DataLocation task : initialTasks) {
-          Pair<DataLocation, TaskState> pair = taskStateMap.get(task);
-          if(pair != null && pair.second() == TaskState.RESULT) list.add(pair.first());
-          else list.add(task);
-        }
-        return list;
-      } else return Collections.unmodifiableList(new ArrayList<DataLocation>(tasks));
-    }
-  }
-
-  /**
-   * Make a copy of this client job wrapper.
-   * @param broadcastUUID the broadcast UUID.
-   * @return a new <code>ServerJob</code> instance.
-   */
-  public ServerJob createBroadcastJob(final String broadcastUUID) {
-    if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
-    ServerJob clientJob;
-    synchronized (tasks) {
-      clientJob = new ServerJob(notificationEmitter, job, dataProvider, this.tasks, this, broadcastUUID);
-    }
-    synchronized (bundleMap) {
-      broadcastSet.add(clientJob);
-    }
-    return clientJob;
-  }
-
-  /**
    * Make a copy of this client job wrapper containing only the first nbTasks tasks it contains.
    * @param nbTasks the number of tasks to include in the copy.
    * @return a new <code>ServerJob</code> instance.
    */
-  public ServerTaskBundle copy(final int nbTasks) {
+  public ServerTaskBundleNode copy(final int nbTasks) {
     JPPFTaskBundle taskBundle = getJob();
     synchronized (tasks) {
-      if (nbTasks >= this.tasks.size()) {
-        try {
-          if(taskBundle.getTaskCount() != this.tasks.size()) {
-            taskBundle = taskBundle.copy();
-            taskBundle.setTaskCount(this.tasks.size());
-          }
-
-          return new ServerTaskBundle(this, taskBundle, this.tasks);
-        } finally {
-          this.tasks.clear();
+      int taskCount;
+      if(nbTasks > this.tasks.size()) taskCount = this.tasks.size();
+      else taskCount = nbTasks;
+      List<ServerTask> subList = this.tasks.subList(0, taskCount);
+      try {
+        if(taskBundle.getTaskCount() != taskCount) {
+          int newSize = taskBundle.getCurrentTaskCount() - taskCount;
+          taskBundle = taskBundle.copy();
+          taskBundle.setTaskCount(taskCount);
+          getJob().setCurrentTaskCount(newSize);
         }
-      } else {
-        List<DataLocation> subList = this.tasks.subList(0, nbTasks);
-        try {
-          if(taskBundle.getTaskCount() != nbTasks) {
-            int newSize = taskBundle.getCurrentTaskCount() - nbTasks;
-            taskBundle = taskBundle.copy();
-            taskBundle.setTaskCount(nbTasks);
-            getJob().setCurrentTaskCount(newSize);            
-          }
-          return new ServerTaskBundle(this, taskBundle, subList);
-        } finally {
-          subList.clear();
-        }
+        return new ServerTaskBundleNode(this, taskBundle, subList);
+      } finally {
+        subList.clear();
       }
     }
   }
@@ -245,7 +176,7 @@ public class ServerJob extends AbstractServerJob {
    * @param after determines whether the tasks from other should be added first or last.
    * @return <code>true</code> when this client job needs to be requeued.
    */
-  public boolean merge(final List<DataLocation> taskList, final boolean after) {
+  protected boolean merge(final List<ServerTask> taskList, final boolean after) {
     synchronized (tasks) {
       boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
       if (!after) this.tasks.addAll(0, taskList);
@@ -275,7 +206,7 @@ public class ServerJob extends AbstractServerJob {
    * @return an <code>String</code> instance.
    */
   public String getBroadcastUUID() {
-    return broadcastUUID;
+    return null;
   }
 
   /**
@@ -284,7 +215,7 @@ public class ServerJob extends AbstractServerJob {
    * @param channel the node to which the job is dispatched.
    * @param future  future assigned to bundle execution.
    */
-  public void jobDispatched(final ServerTaskBundle bundle, final ExecutorChannel channel, final Future<?> future) {
+  public void jobDispatched(final ServerTaskBundleNode bundle, final ExecutorChannel channel, final Future<?> future) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (future == null) throw new IllegalArgumentException("future is null");
@@ -296,9 +227,7 @@ public class ServerJob extends AbstractServerJob {
     if (empty) {
       updateStatus(NEW, EXECUTING);
       setSubmissionStatus(SubmissionStatus.EXECUTING);
-      setExecuting(true);
     }
-    if (parentJob != null) parentJob.broadcastDispatched(this);
     fireJobDispatched(channel, bundle);
   }
 
@@ -307,21 +236,23 @@ public class ServerJob extends AbstractServerJob {
    * @param bundle  the executing job.
    * @param results the list of tasks whose results have been received from the server.
    */
-  public void resultsReceived(final ServerTaskBundle bundle, final List<DataLocation> results) {
+  public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (results.isEmpty()) return;
     synchronized (tasks) {
-      List<DataLocation> bundleTasks = bundle == null ? results : bundle.getTasksL();
+      List<ServerTask> bundleTasks =  bundle == null ? tasks : bundle.getTaskList();
       if(isJobExpired() || isCancelled()) {
         for (int index = 0; index < bundleTasks.size(); index++) {
-          DataLocation location = bundleTasks.get(index);
-          DataLocation task = location;
+          ServerTask location = bundleTasks.get(index);
+          DataLocation task = location.getDataLocation();
           taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
+          location.getBundle().resultReceived(location.getPosition(), location.getDataLocation());
         }
       } else {
         for (int index = 0; index < bundleTasks.size(); index++) {
-          DataLocation location = bundleTasks.get(index);
+          ServerTask location = bundleTasks.get(index);
           DataLocation task = results.get(index);
           taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
+          location.getBundle().resultReceived(location.getPosition(), task);
         }
       }
     }
@@ -338,13 +269,14 @@ public class ServerJob extends AbstractServerJob {
    * @param bundle    the finished job.
    * @param throwable the throwable that was raised while receiving the results.
    */
-  public void resultsReceived(final ServerTaskBundle bundle, final Throwable throwable) {
+  public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     synchronized (tasks) {
-      for (DataLocation task : bundle.getTasksL()) {
+      for (ServerTask task : bundle.getTaskList()) {
         Pair<DataLocation, TaskState> oldPair = taskStateMap.get(task);
         TaskState oldState = oldPair == null ? null : oldPair.second();
         if (oldState != TaskState.RESULT) taskStateMap.put(task, new Pair<DataLocation, TaskState>(null, TaskState.EXCEPTION));
+        task.getBundle().resultReceived(task.getPosition(), throwable);
       }
     }
     ExecutorChannel channel;
@@ -356,85 +288,103 @@ public class ServerJob extends AbstractServerJob {
   }
 
   /**
+   * Utility method - extract DataLocation from list of server tasks and add them to list.
+   * @param dst destination list of <code>DataLocation</code>.
+   * @param src source list of <code>ServerTask</code> objects.
+   */
+  private static void addAll(final List<DataLocation> dst, final List<ServerTask> src) {
+    for (ServerTask item : src) {
+      dst.add(item.getDataLocation());
+    }
+  }
+
+  /**
    * Called to notify that the execution of a task has completed.
    * @param bundle    the completed task.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public void taskCompleted(final ServerTaskBundle bundle, final Exception exception) {
-    boolean empty;
+  public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
+    if(isCancelled()) {
+      List<Future>   futureList;
+      synchronized (bundleMap) {
+        futureList = new ArrayList<Future>(bundleMap.size());
+        for (Pair<ExecutorChannel, Future> pair : bundleMap.values()) {
+          futureList.add(pair.second());
+        }
+      }
+      for (Future future : futureList) {
+        try {
+          if (!future.isDone()) future.cancel(false);
+        } catch (Exception e) {
+          log.error("Error cancelling job " + this, e);
+        }
+      }
+    }
     synchronized (bundleMap) {
       Pair<ExecutorChannel, Future> pair = bundleMap.remove(bundle);
       if (bundle != null && (pair == null || pair.second() == null)) throw new IllegalStateException("future already removed");
-      empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
     boolean requeue = false;
-    if (getSLA().isBroadcastJob()) {
-      List<DataLocation> list = new ArrayList<DataLocation>();
-      synchronized (tasks)
-      {
+    List<DataLocation> list = new ArrayList<DataLocation>();
+    synchronized (tasks)
+    {
+      if (getSLA().isBroadcastJob()) {
         if (bundle != null) {
-          for (DataLocation task : bundle.getTasksL()) {
-            Pair<DataLocation, TaskState> pair = taskStateMap.put(task, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
-            if (pair == null || pair.second() != TaskState.RESULT) list.add(task);
+          for (ServerTask task : bundle.getTaskList()) {
+            Pair<DataLocation, TaskState> pair = taskStateMap.put(task, new Pair<DataLocation, TaskState>(task.getDataLocation(), TaskState.RESULT));
+            if (pair == null || pair.second() != TaskState.RESULT) list.add(task.getDataLocation());
           }
         }
-        if (isCancelled() || getBroadcastUUID() == null) {
-          list.addAll(this.tasks);
-          this.tasks.clear();
+        if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
+      } else if (bundle == null) {
+        if (isCancelled()) {
+          addAll(list, this.tasks);
         }
-      }
-      resultsReceived(bundle, list);
-    } else if (bundle == null) {
-      if (isCancelled()) {
-        List<DataLocation> list = new ArrayList<DataLocation>();
-        synchronized (tasks) {
-          list.addAll(this.tasks);
-          this.tasks.clear();
-        }
-        resultsReceived(bundle, list);
-      }
-    } else {
-      if (bundle.isCancelled()) {
-        List<DataLocation> list = new ArrayList<DataLocation>();
-        synchronized (tasks) {
-          for (DataLocation task : bundle.getTasksL()) {
+      } else {
+        if (bundle.isCancelled()) {
+          for (ServerTask task : bundle.getTaskList()) {
             Pair<DataLocation, TaskState> pair = taskStateMap.get(task);
-            if (pair == null || pair.second() != TaskState.RESULT) list.add(task);
+            if (pair == null || pair.second() != TaskState.RESULT) list.add(task.getDataLocation());
           }
-          list.addAll(this.tasks);
-          this.tasks.clear();
+          addAll(list, this.tasks);
         }
-        resultsReceived(bundle, list);
-      }
-      if (bundle.isRequeued()) {
-        List<DataLocation> list = new ArrayList<DataLocation>();
-        synchronized (tasks) {
-          for (DataLocation task : bundle.getTasksL()) {
+        if (bundle.isRequeued()) {
+          List<ServerTask> taskList = new ArrayList<ServerTask>();
+          for (ServerTask task : bundle.getTaskList()) {
             Pair<DataLocation, TaskState> pair = taskStateMap.get(task);
-            if (pair != null && pair.second() != TaskState.RESULT) list.add(task);
+            if (pair != null && pair.second() != TaskState.RESULT) taskList.add(task);
           }
-          requeue = merge(list, false);
+          requeue = merge(taskList, false);
         }
       }
     }
-
+    if(!list.isEmpty()) {
+      try {
+        resultsReceived(bundle, list);
+      } finally {
+        this.tasks.clear();
+      }
+    }
     if (hasPending()) {
       if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
-      if (empty) setExecuting(false);
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
       boolean callDone = updateStatus(EXECUTING, DONE);
-      if (empty) setExecuting(false);
       setSubmissionStatus(SubmissionStatus.COMPLETE);
       try {
         if (callDone) done();
       } finally {
-        if (parentJob != null) {
-          fireJobEnded();
-          parentJob.broadcastCompleted(this);
-        } else getJob().fireTaskCompleted(this);
+        fireTaskCompleted(this);
       }
     }
+  }
+
+  /**
+   * Notifies that execution of this task has completed.
+   * @param result the result of the task's execution.
+   */
+  protected void fireTaskCompleted(final ServerJob result) {
+    getJob().fireTaskCompleted(result);
   }
 
   /**
@@ -443,13 +393,11 @@ public class ServerJob extends AbstractServerJob {
    */
   protected boolean hasPending() {
     synchronized (tasks) {
-      if (tasks.isEmpty() && taskStateMap.size() >= job.getTaskCount()) {
-        for (Pair<DataLocation, TaskState> pair : taskStateMap.values()) {
-          if (pair.second() == TaskState.EXCEPTION) return true;
-        }
-        return false;
-      } else return true;
+      for (ServerTaskBundleClient bundle : bundleList) {
+        if (bundle.getPendingTasksCount() > 0) return true;
+      }
     }
+    return false;
   }
 
   /**
@@ -475,71 +423,10 @@ public class ServerJob extends AbstractServerJob {
     if (debugEnabled) log.debug("request to cancel " + this);
     if (super.cancel(mayInterruptIfRunning)) {
       done();
-      List<ServerJob> list;
-      List<Future>   futureList;
-      synchronized (bundleMap) {
-        list = new ArrayList<ServerJob>(broadcastSet.size() + broadcastMap.size());
-        list.addAll(broadcastMap.values());
-        list.addAll(broadcastSet);
-
-        futureList = new ArrayList<Future>(bundleMap.size());
-        for (Pair<ExecutorChannel, Future> pair : bundleMap.values()) {
-          futureList.add(pair.second());
-        }
-      }
-      for (ServerJob broadcastJob : list) broadcastJob.cancel(mayInterruptIfRunning);
-      for (Future future : futureList) {
-        try {
-          if (!future.isDone()) future.cancel(false);
-        } catch (Exception e) {
-          log.error("Error cancelling job " + this, e);
-        }
-      }
-
-      boolean empty;
-      synchronized (bundleMap) {
-        broadcastSet.clear();
-        empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
-      }
-      //if (empty) taskCompleted(null, null);
       taskCompleted(null, null);
       return true;
     }
     else return false;
-  }
-
-  /**
-   * Called when all or part of broadcast job is dispatched to a driver.
-   * @param broadcastJob    the dispatched job.
-   */
-  protected void broadcastDispatched(final ServerJob broadcastJob) {
-    if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-    boolean empty;
-    synchronized (bundleMap) {
-      broadcastSet.remove(broadcastJob);
-      empty = broadcastMap.isEmpty();
-      broadcastMap.put(broadcastJob.getBroadcastUUID(), broadcastJob);
-    }
-    if (empty) {
-      updateStatus(NEW, EXECUTING);
-      setSubmissionStatus(SubmissionStatus.EXECUTING);
-      setExecuting(true);
-    }
-  }
-
-  /**
-   * Called to notify that the execution of broadcast job has completed.
-   * @param broadcastJob    the completed job.
-   */
-  protected void broadcastCompleted(final ServerJob broadcastJob) {
-    if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-    //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
-    boolean empty;
-    synchronized (bundleMap) {
-      if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) throw new IllegalStateException("broadcast job not found");
-      empty = broadcastMap.isEmpty();
-    }
-    if (empty) taskCompleted(null, null);
   }
 
   /**
@@ -574,7 +461,7 @@ public class ServerJob extends AbstractServerJob {
    */
   @SuppressWarnings("unchecked")
   public NodeJobInformation[] getNodeJobInformation() {
-    Map.Entry<ServerTaskBundle, Pair<ExecutorChannel, Future>>[] entries;
+    Map.Entry<ServerTaskBundleNode, Pair<ExecutorChannel, Future>>[] entries;
     synchronized (bundleMap) {
       entries = bundleMap.entrySet().toArray(new Map.Entry[bundleMap.size()]);
     }
@@ -582,17 +469,48 @@ public class ServerJob extends AbstractServerJob {
 
     NodeJobInformation[] result = new NodeJobInformation[entries.length];
     int i = 0;
-    for (Map.Entry<ServerTaskBundle, Pair<ExecutorChannel, Future>> entry : entries) {
+    for (Map.Entry<ServerTaskBundleNode, Pair<ExecutorChannel, Future>> entry : entries) {
       ExecutorChannel channel = entry.getValue().first();
       JPPFManagementInfo nodeInfo = channel.getManagementInfo();
-      ServerTaskBundle bundle = entry.getKey();
+      ServerTaskBundleNode bundle = entry.getKey();
       Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
       JobInformation jobInfo = new JobInformation(getUuid(), bundle.getName(),
-        bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-        bundle.getSLA().isSuspended(), (pending != null) && pending);
+              bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
+              bundle.getSLA().isSuspended(), (pending != null) && pending);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i++] = new NodeJobInformation(nodeInfo, jobInfo);
     }
     return result;
+  }
+
+  /**
+   * Add received bundle to this server job.
+   * @param bundle the bundle to add.
+   */
+  public void addBundle(final ServerTaskBundleClient bundle) {
+    if(bundle == null) throw new IllegalArgumentException("bundle is null");
+    bundle.addCompletionListener(bundleCompletionListener);
+    synchronized (tasks) {
+      bundleList.add(bundle);
+      this.tasks.addAll(bundle.getTaskList());
+    }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName());
+    sb.append('{');
+    sb.append("uuid=").append(getUuid());
+    if(getSLA().isBroadcastJob()) sb.append("broadcastID=").append(getBroadcastUUID());
+    sb.append(", status=").append(getSubmissionStatus());
+    sb.append(", tasks=").append(tasks.size());
+    sb.append(", bundlerWrappers=").append(bundleList.size());
+    sb.append(", cancelled=").append(isCancelled());
+    sb.append(", expired=").append(isJobExpired());
+    sb.append(", pending=").append(isPending());
+    sb.append(", suspended=").append(isSuspended());
+    sb.append('}');
+    return sb.toString();
   }
 }

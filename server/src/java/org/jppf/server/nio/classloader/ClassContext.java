@@ -53,7 +53,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
   /**
-   * The list of pending resource reponses for a node.
+   * The list of pending resource responses for a node.
    */
   protected Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = new HashMap<JPPFResourceWrapper, ResourceRequest>();
   /**
@@ -282,7 +282,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   /**
-   * Get the set of pending resource reponses for a node.
+   * Get the set of pending resource responses for a node.
    * @return a {@link Map} of {@link ResourceRequest} instances.
    */
   public Map<JPPFResourceWrapper, ResourceRequest> getPendingResponses()

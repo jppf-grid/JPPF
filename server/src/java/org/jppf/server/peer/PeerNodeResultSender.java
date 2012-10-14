@@ -23,13 +23,15 @@ import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
+import java.util.List;
+
 /**
  * Result sender for a peer driver.<br>
  * Instances of this class are used by a driver to receive task bundles from another driver
  * and send the results back to this driver.
  * @author Laurent Cohen
  */
-class PeerNodeResultSender implements TaskCompletionListener
+class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
 {
   /**
    * Logger for this class.
@@ -42,11 +44,7 @@ class PeerNodeResultSender implements TaskCompletionListener
   /**
    * Output destination wrapping all write operations on the socket client.
    */
-  private OutputDestination destination = null;
-  /**
-   * Number of tasks that haven't yet been executed.
-   */
-  int pendingTasksCount = 0;
+  private final OutputDestination destination;
   /**
    * Used to serialize and deserialize the tasks data.
    */
@@ -56,9 +54,9 @@ class PeerNodeResultSender implements TaskCompletionListener
    */
   protected SocketWrapper socketClient = null;
   /**
-   * 
+   * The bundle being processed.
    */
-  protected ServerJob result = null;
+  ServerTaskBundleClient bundle = null;
 
   /**
    * Initialize this result sender with a specified socket client.
@@ -76,8 +74,9 @@ class PeerNodeResultSender implements TaskCompletionListener
    */
   public synchronized void waitForExecution() throws Exception
   {
-    while (pendingTasksCount > 0) wait();
-    sendResults(result);
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+
+    while (bundle.getPendingTasksCount() > 0) wait();
   }
 
   /**
@@ -85,48 +84,37 @@ class PeerNodeResultSender implements TaskCompletionListener
    * @param bundleWrapper the bundle to get the task results from.
    * @throws Exception if an IO exception occurred while sending the results back.
    */
-  public void sendResults(final ServerJob bundleWrapper) throws Exception
+  public void sendResults(final ServerTaskBundleClient bundleWrapper) throws Exception
   {
-    try
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
+    IOHelper.sendData(socketClient, bundle, helper.getSerializer());
+    for (ServerTask task : bundleWrapper.getTaskList())
     {
-      JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
-      if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
-      IOHelper.sendData(socketClient, bundle, helper.getSerializer());
-      for (DataLocation task : bundleWrapper.getTasks())
-      {
-        destination.writeInt(task.getSize());
-        task.transferTo(destination, true);
-      }
-      socketClient.flush();
-      if (debugEnabled) log.debug("bundle sent");
+      DataLocation dl = task.getResult();
+      destination.writeInt(dl.getSize());
+      dl.transferTo(destination, true);
     }
-    finally
-    {
-      result = null;
-    }
+    socketClient.flush();
+    if (debugEnabled) log.debug("bundle sent");
   }
 
 
-  /**
-   * Callback method invoked when the execution of a task has completed. This
-   * method triggers a check of the request completion status. When all tasks
-   * have completed, this connection sends all results back.
-   * @param nodeResult the result of the task's execution.
-   */
   @Override
-  public synchronized void taskCompleted(final ServerJob nodeResult)
-  {
-    JPPFTaskBundle resultJob = (JPPFTaskBundle) nodeResult.getJob();
-    pendingTasksCount -= resultJob.getTaskCount();
-    if (debugEnabled)
+  public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
+    if (bundle == null) throw new IllegalStateException("bundle is null");
+
+    if (bundle.isCancelled())
     {
-      log.debug("Received results for : " + resultJob.getTaskCount() + " [size=" + nodeResult.getTasks().size() + "] tasks, " + ", pending tasks: " + pendingTasksCount);
+      bundle.removeCompletionListener(this);
+    } else {
+      int pendingTasksCount = this.bundle.getPendingTasksCount();
+      if (pendingTasksCount <= 0) notifyAll();
     }
-    if (result == null) result = nodeResult;
-    else
-    {
-      result.merge(nodeResult.getTasks(), true); // todo fix
-    }
-    if (pendingTasksCount <= 0) notify();
+  }
+
+  @Override
+  public void bundleDone(final ServerTaskBundleClient bundle) {
   }
 }

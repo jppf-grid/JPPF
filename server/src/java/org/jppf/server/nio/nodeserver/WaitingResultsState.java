@@ -66,11 +66,11 @@ class WaitingResultsState extends NodeServerState
     if (context.readMessage(channel))
     {
       Exception exception = null;
-      ServerTaskBundle bundleWrapper = context.getBundle();
+      ServerTaskBundleNode bundleWrapper = context.getBundle();
       boolean requeue = false;
       try {
         JPPFTaskBundle bundle = bundleWrapper;// (JPPFTaskBundle) bundleWrapper.getJob();
-        ServerTaskBundle newBundleWrapper = context.deserializeBundle(server.getJobManager());
+        ServerTaskBundleClient newBundleWrapper = context.deserializeBundle(server.getJobManager());
         JPPFTaskBundle newBundle = newBundleWrapper.getJob();
         if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
         // if an exception prevented the node from executing the tasks
@@ -83,7 +83,7 @@ class WaitingResultsState extends NodeServerState
         }
         else
         {
-          bundleWrapper.resultsReceived(newBundleWrapper.getTasksL());
+          bundleWrapper.resultsReceived(newBundleWrapper.getDataLocationList());
           long elapsed = System.nanoTime() - bundleWrapper.getExecutionStartTime();
           server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
           context.getBundler().feedback(newBundle.getTaskCount(), elapsed);

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements ExecutorChannel<ServerTaskBundle>
+public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements ExecutorChannel<ServerTaskBundleNode>
 {
   /**
    * Logger for this class.
@@ -59,7 +59,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * The task bundle to send or receive.
    */
-  protected ServerTaskBundle bundle = null;
+  protected ServerTaskBundleNode bundle = null;
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -106,7 +106,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Get the task bundle to send or receive.
    * @return a <code>ServerJob</code> instance.
    */
-  public ServerTaskBundle getBundle()
+  public ServerTaskBundleNode getBundle()
   {
     return bundle;
   }
@@ -115,7 +115,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the task bundle to send or receive.
    * @param bundle a {@link JPPFTaskBundle} instance.
    */
-  public void setBundle(final ServerTaskBundle bundle)
+  public void setBundle(final ServerTaskBundleNode bundle)
   {
     this.bundle = bundle;
 
@@ -123,7 +123,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     {
       int bundleTaskCount = bundle.getTaskCount();
       int jobTaskCount = bundle.getJob().getTaskCount();
-      int realTaskCount = bundle.getTasksL().size();
+      int realTaskCount = bundle.getTaskList().size();
 
       if(bundleTaskCount != jobTaskCount || bundleTaskCount != realTaskCount)
       {
@@ -196,7 +196,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     {
 //      if(exception != null && !(exception instanceof EOFException)) exception.printStackTrace();
 //      bundle.fireJobReturned((ExecutorChannel) channel.getContext()); // todo fix
-      ServerTaskBundle tmpWrapper = bundle;
+      ServerTaskBundleNode tmpWrapper = bundle;
       setBundle(null);
       tmpWrapper.taskCompleted(new Exception(exception));
 //      JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
@@ -216,7 +216,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     AbstractTaskBundleMessage message = newMessage();
     message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
     message.addLocation(bundle.getDataProviderL());
-    for (DataLocation dl: bundle.getTasksL()) message.addLocation(dl);
+    for (ServerTask dl: bundle.getTaskList()) message.addLocation(dl.getDataLocation());
 //    System.out.println("serialize: Task count - bundle: " + bundle.getTaskCount() + "\t job: " + bundle.getJob().getTaskCount() + "\t real tasks: " + bundle.getTasksL().size());
     message.setBundle((JPPFTaskBundle) bundle.getJob());
     setMessage(message);
@@ -228,7 +228,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @throws Exception if an error occurs during the deserialization.
    * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    */
-  public ServerTaskBundle deserializeBundle(final JobNotificationEmitter notificationEmitter) throws Exception
+  public ServerTaskBundleClient deserializeBundle(final JobNotificationEmitter notificationEmitter) throws Exception
   {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
@@ -237,7 +237,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
-    return new ServerJob(notificationEmitter, bundle, null, tasks).copy(tasks.size());
+    return new ServerTaskBundleClient(bundle, null, tasks);
   }
 
   /**
@@ -395,7 +395,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public JPPFFuture<?> submit(final ServerTaskBundle bundleWrapper) {
+  public JPPFFuture<?> submit(final ServerTaskBundleNode bundleWrapper) {
     JPPFFuture<?> future = new JPPFFutureTask<Object>(RUNNABLE, null) {
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning) {

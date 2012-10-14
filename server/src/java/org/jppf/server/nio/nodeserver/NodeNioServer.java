@@ -26,7 +26,6 @@ import org.jppf.comm.recovery.*;
 import org.jppf.execute.ExecutorChannelStatusEvent;
 import org.jppf.execute.ExecutorChannelStatusListener;
 import org.jppf.execute.ExecutorStatus;
-import org.jppf.io.DataLocation;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.job.JobNotificationEmitter;
 import org.jppf.management.JPPFManagementInfo;
@@ -67,7 +66,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * The the task bundle sent to a newly connected node.
    */
-  private ServerTaskBundle initialBundle = null;
+  private ServerTaskBundleNode initialBundle = null;
   /**
    * A reference to the driver's tasks queue.
    */
@@ -291,7 +290,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * to wait for an actual request to be sent.
    * @return a <code>ServerJob</code> instance, with no task in it.
    */
-  ServerTaskBundle getInitialBundle()
+  ServerTaskBundleNode getInitialBundle()
   {
     if (initialBundle == null)
     {
@@ -311,7 +310,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
         bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
-        ServerJob serverJob = new ServerJob(queue, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)), Collections.<DataLocation>emptyList());
+        ServerJob serverJob = new ServerJob(queue, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
         initialBundle = serverJob.copy(serverJob.getTaskCount());
       }
       catch(Exception e)

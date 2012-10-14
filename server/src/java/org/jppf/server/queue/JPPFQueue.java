@@ -18,8 +18,9 @@
 
 package org.jppf.server.queue;
 
+import org.jppf.server.protocol.ServerTaskBundleClient;
+import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.server.protocol.ServerJob;
-import org.jppf.server.protocol.ServerTaskBundle;
 
 /**
  * Implementation of a generic non-blocking queue, to allow asynchronous access from a large number of threads.
@@ -31,14 +32,14 @@ public interface JPPFQueue extends Iterable<ServerJob>
    * Add an object to the queue, and notify all listeners about it.
    * @param bundleWrapper the object to add to the queue.
    */
-  void addBundle(ServerJob bundleWrapper);
+  void addBundle(ServerTaskBundleClient bundleWrapper);
 
   /**
    * Get the next object in the queue.
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
-  ServerTaskBundle nextBundle(int nbTasks);
+  ServerTaskBundleNode nextBundle(int nbTasks);
 
   /**
    * Get the next object in the queue.
@@ -46,7 +47,7 @@ public interface JPPFQueue extends Iterable<ServerJob>
    * @param nbTasks the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
    */
-  ServerTaskBundle nextBundle(ServerJob bundleWrapper, int nbTasks);
+  ServerTaskBundleNode nextBundle(ServerJob bundleWrapper, int nbTasks);
 
   /**
    * Determine whether the queue is empty or not.
@@ -63,7 +64,7 @@ public interface JPPFQueue extends Iterable<ServerJob>
   /**
    * Remove the specified bundle from the queue.
    * @param bundleWrapper the bundle to remove.
-   * @return the bundle that was removed.
+   * @param removeFromJobMap flag whether bundle should be removed from job map.
    */
-  ServerJob removeBundle(ServerJob bundleWrapper);
+  void removeBundle(ServerJob bundleWrapper, boolean removeFromJobMap);
 }
