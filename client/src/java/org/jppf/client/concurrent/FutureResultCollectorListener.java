@@ -28,6 +28,12 @@ import java.util.EventListener;
 interface FutureResultCollectorListener extends EventListener
 {
   /**
+   * Called some results from a job have been received.
+   * @param event the event object.
+   */
+  void resultsReceived(FutureResultCollectorEvent event);
+
+  /**
    * Called when all results from a job have been received.
    * @param event the event object.
    */

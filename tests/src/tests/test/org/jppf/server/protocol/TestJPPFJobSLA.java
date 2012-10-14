@@ -25,7 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -206,19 +206,25 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   {
     int nbJobs = 3;
     JPPFJob[] jobs = new JPPFJob[3];
+    ExecutionPolicy policy = new Equal("jppf.node.uuid", false, "n1");
     for (int i=0; i<nbJobs; i++)
     {
-      jobs[i] = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName() + i, false, false, 1, LifeCycleTask.class, 500L);
+      jobs[i] = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName() + i, false, false, 1, LifeCycleTask.class, 750L);
       jobs[i].getSLA().setPriority(i);
+      jobs[i].getSLA().setExecutionPolicy(policy);
     }
-    for (int i=0; i<nbJobs; i++) client.submit(jobs[i]);
+    for (int i=0; i<nbJobs; i++)
+    {
+      client.submit(jobs[i]);
+      if (i == 0) Thread.sleep(500L);
+    }
     List<List<JPPFTask>> results = new ArrayList<List<JPPFTask>>();
     for (int i=0; i<nbJobs; i++) results.add(((JPPFResultCollector) jobs[i].getResultListener()).waitForResults());
     LifeCycleTask t1 = (LifeCycleTask) results.get(1).get(0);
     assertNotNull(t1);
     LifeCycleTask t2 = (LifeCycleTask) results.get(2).get(0);
     assertNotNull(t2);
-    assertTrue("3rd job should have started before the 2nd", t2.getStart() < t1.getStart());
+    assertTrue("3rd job (start=" + t2.getStart() + ") should have started before the 2nd (start=" + t1.getStart() + ")", t2.getStart() < t1.getStart());
   }
 
   /**

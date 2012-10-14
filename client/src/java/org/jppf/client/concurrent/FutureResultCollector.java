@@ -135,7 +135,8 @@ class FutureResultCollector extends JPPFResultCollector
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
     super.resultsReceived(event);
-    if (pendingCount <= 0) fireEvent();
+    fireResultsReceived(event.getTaskList());
+    if (pendingCount <= 0) fireResultsComplete();
   }
 
   /**
@@ -158,10 +159,20 @@ class FutureResultCollector extends JPPFResultCollector
 
   /**
    * Notify all listeners that all results have been received by this collector.
+   * @param results the results that were received.
    */
-  synchronized void fireEvent()
+  synchronized void fireResultsReceived(final List<JPPFTask> results)
   {
-    FutureResultCollectorEvent event = new FutureResultCollectorEvent(this);
+    FutureResultCollectorEvent event = new FutureResultCollectorEvent(this, results);
+    for (FutureResultCollectorListener listener: listeners) listener.resultsReceived(event);
+  }
+
+  /**
+   * Notify all listeners that all results have been received by this collector.
+   */
+  synchronized void fireResultsComplete()
+  {
+    FutureResultCollectorEvent event = new FutureResultCollectorEvent(this, null);
     for (FutureResultCollectorListener listener: listeners) listener.resultsComplete(event);
   }
 

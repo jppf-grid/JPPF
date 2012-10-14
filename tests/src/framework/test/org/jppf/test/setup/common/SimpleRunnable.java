@@ -33,6 +33,10 @@ public class SimpleRunnable implements Runnable, Serializable
    * The result of executing this task.
    */
   private TaskResult executionResult = null;
+  /**
+   * id for this task.
+   */
+  private int id = 0;
 
   /**
    * Default constructor.
@@ -51,6 +55,17 @@ public class SimpleRunnable implements Runnable, Serializable
   }
 
   /**
+   * Initialize this task with the specified result object.
+   * @param result the result to use.
+   * @param id id for this task..
+   */
+  public SimpleRunnable(final int id, final TaskResult result)
+  {
+    this.executionResult = result;
+    this.id = id;
+  }
+
+  /**
    * Execute this task.
    * @see java.lang.Runnable#run()
    */
@@ -58,5 +73,6 @@ public class SimpleRunnable implements Runnable, Serializable
   public void run()
   {
     executionResult.message = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
+    executionResult.position = id;
   }
 }

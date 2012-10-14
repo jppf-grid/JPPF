@@ -41,16 +41,11 @@ public class LifeCycleTask extends JPPFTask
    */
   private long duration = 0L;
   /**
-   * used to store the task's execution start time.
+   * used to store the task's execution start time in nanoseconds.
    */
   private double start = 0L;
   /**
-   * used to store the task's execution start time.
-   */
-  private long end = 0L;
-  /**
-   * Measures the time elapsed between the task execution start and either completion
-   * or a call to one of the life cycle methods.
+   * Measures the time elapsed between the task execution start and its completion in nanoseconds.
    */
   private double elapsed = 0L;
   /**
@@ -89,8 +84,10 @@ public class LifeCycleTask extends JPPFTask
   @Override
   public void run()
   {
-    double nanoStart = System.nanoTime();
+    long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
+    start = start * 1e6 + nanoStart % 1000000L;
+    
     try
     {
       executedInNode = isInNode();
@@ -115,7 +112,7 @@ public class LifeCycleTask extends JPPFTask
     }
     finally
     {
-      elapsed = (System.nanoTime() - nanoStart) / 1e6d;
+      elapsed = System.nanoTime() - nanoStart;
     }
   }
 
@@ -187,7 +184,7 @@ public class LifeCycleTask extends JPPFTask
 
   /**
    * Get the task's execution start time.
-   * @return the start time as a <code>long</code> value.
+   * @return the start time in nanoseconds.
    */
   public double getStart()
   {
@@ -196,7 +193,7 @@ public class LifeCycleTask extends JPPFTask
 
   /**
    * Get the time elapsed between the task execution start its completion.
-   * @return the elapsed time as a <code>long</code> value.
+   * @return the elapsed time in nanoseconds.
    */
   public double getElapsed()
   {

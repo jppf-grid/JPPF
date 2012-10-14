@@ -69,15 +69,16 @@ public class SimpleCallable implements Callable<TaskResult>, Serializable
   /**
    * Execute this task.
    * @return a {@link TaskResult} object.
+   * @throws Exception if any error occurs.
    * @see java.util.concurrent.Callable#call()
    */
   @Override
-  public TaskResult call()
+  public TaskResult call() throws Exception
   {
     TaskResult executionResult = new TaskResult();
     executionResult.message = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
     executionResult.position = position;
-    if (duration > 0)
+    if (duration > 0L)
     {
       try
       {

@@ -31,6 +31,7 @@ public class TaskResultEvent extends EventObject
   /**
    * Index of the first task in the list, relative to the initial execution request.
    * @deprecated use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
+   * @exclude
    */
   private int startIndex = -1;
 
@@ -60,6 +61,7 @@ public class TaskResultEvent extends EventObject
    * request. Used to enable proper ordering of the results.
    * @deprecated the startIndex is not used any more to determine each task's position.
    * Use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
+   * @exclude
    */
   public TaskResultEvent(final List<JPPFTask> taskList, final int startIndex)
   {
@@ -83,6 +85,7 @@ public class TaskResultEvent extends EventObject
    * Get the index of the first task in the list, relative to the initial execution request.
    * @return the index as an int value.
    * @deprecated use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
+   * @exclude
    */
   public int getStartIndex()
   {

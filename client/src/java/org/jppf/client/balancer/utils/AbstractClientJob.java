@@ -453,13 +453,8 @@ public abstract class AbstractClientJob
     boolean b = true;
     if (policy != null)
     {
-      //if (channel.isLocal());
       JPPFSystemInformation info = channel.getSystemInfo();
       b = policy.accepts(info);
-      if (b && channel.isLocal())
-      {
-        boolean breakpoint = true;
-      }
       if (debugEnabled) log.debug("policy result = " + b);
     }
     return b;

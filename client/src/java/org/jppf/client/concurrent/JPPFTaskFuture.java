@@ -43,11 +43,11 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   /**
    * The collector that receives the results from the server.
    */
-  private FutureResultCollector collector = null;
+  private final FutureResultCollector collector;
   /**
    * The position of the task in the job.
    */
-  private int position = -1;
+  private final int position;
 
   /**
    * Initialize this future with the specified parameters.
@@ -69,7 +69,6 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   @Override
   public boolean isDone()
   {
-    //done.compareAndSet(false, collector.isTaskReceived(position));
     return done.get();
   }
 
@@ -119,9 +118,10 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   /**
    * Wait until the execution is complete, or the specified timeout has expired, whichever happens first.
    * @param timeout the maximum time to wait.
+   * @throws TimeoutException if the wait timed out.
    */
   @SuppressWarnings("unchecked")
-  void getResult(final long timeout)
+  void getResult(final long timeout) throws TimeoutException
   {
     if (!isDone())
     {
@@ -132,6 +132,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
       {
         setCancelled();
         timedout.set(timeout > 0);
+        if (timeout > 0) throw new TimeoutException();
       }
       else
       {
@@ -146,7 +147,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    */
   void setDone()
   {
-    done.set(true);
+    done.compareAndSet(false, true);
   }
 
   /**
@@ -164,5 +165,23 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   public JPPFTask getTask()
   {
     return collector.getTask(position);
+  }
+
+  /**
+   * Get the collector that receives the results from the server.
+   * @return a {@link FutureResultCollector} instance.
+   */
+  FutureResultCollector getCollector()
+  {
+    return collector;
+  }
+
+  /**
+   * Get the position of the task in the job.
+   * @return the position as an integer value. 
+   */
+  int getPosition()
+  {
+    return position;
   }
 }

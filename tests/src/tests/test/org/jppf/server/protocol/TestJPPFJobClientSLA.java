@@ -283,7 +283,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
         {
           LifeCycleTask t2 = (LifeCycleTask) results.get(j);
           Range<Double> r2 = new Range<Double>(t2.getStart(), t2.getStart() + t2.getElapsed());
-          assertFalse("r1=" + r1 + ", r2=" + r2, r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
+          assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(), r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
         }
       }
     }

@@ -145,7 +145,13 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
       JPPFTaskFuture future = new JPPFTaskFuture<T>(collector, position);
       futureList.add(future);
       long elapsed = System.currentTimeMillis() - start;
-      future.getResult(millis - elapsed);
+      try
+      {
+        future.getResult(millis - elapsed);
+      }
+      catch(TimeoutException ignore)
+      {
+      }
       position++;
     }
     return futureList;
@@ -430,6 +436,11 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
       jobMap.remove(jobUuid);
       if (isShutdown() && jobMap.isEmpty()) setTerminated();
     }
+  }
+
+  @Override
+  public void resultsReceived(final FutureResultCollectorEvent event)
+  {
   }
 
   /**
