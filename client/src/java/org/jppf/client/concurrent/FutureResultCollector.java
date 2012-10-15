@@ -60,15 +60,6 @@ class FutureResultCollector extends JPPFResultCollector
   }
 
   /**
-   * Set the pending tasks count for this result collector.
-   * @param count the task count ot set.
-   */
-  synchronized void setTaskCount(final int count)
-  {
-    pendingCount = count;
-  }
-
-  /**
    * Get the task at the specified position.
    * @param position the position of the task in the job it is a part of.
    * @return the task whose results were received, or null if the results were not received.
@@ -97,7 +88,7 @@ class FutureResultCollector extends JPPFResultCollector
   synchronized JPPFTask waitForTask(final int position, final long millis)
   {
     long start = System.currentTimeMillis();
-    long elapsed = 0;
+    long elapsed = 0L;
     boolean taskReceived = isTaskReceived(position);
     while ((elapsed < millis) && !taskReceived)
     {
@@ -136,7 +127,12 @@ class FutureResultCollector extends JPPFResultCollector
   {
     super.resultsReceived(event);
     fireResultsReceived(event.getTaskList());
-    if (pendingCount <= 0) fireResultsComplete();
+  }
+
+  @Override
+  protected void onComplete() {
+    super.onComplete();
+    fireResultsComplete();
   }
 
   /**

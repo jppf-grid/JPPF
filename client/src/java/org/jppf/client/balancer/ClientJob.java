@@ -121,6 +121,15 @@ public class ClientJob extends AbstractClientJob
     if (this.job.getResultListener() instanceof SubmissionStatusHandler) this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
     else this.submissionStatus = SubmissionStatus.SUBMITTED;
     this.tasks = new ArrayList<JPPFTask>(tasks);
+
+    for (JPPFTask result : job.getResults().getAll()) {
+        if(result != null) {
+          if(result.getException() == null)
+            taskStateMap.put(result.getPosition(), TaskState.RESULT);
+          else
+            taskStateMap.put(result.getPosition(), TaskState.EXCEPTION);
+        }
+      }
   }
 
   /**

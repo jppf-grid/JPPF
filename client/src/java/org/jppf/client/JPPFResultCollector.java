@@ -49,16 +49,11 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   protected int count;
   /**
-   * Count of results not yet received.
-   * @exclude
-   */
-  protected int pendingCount = 0;
-  /**
    * A map containing the resulting tasks, ordered by ascending position in the
    * submitted list of tasks.
    * @exclude
    */
-  protected Map<Integer, JPPFTask> resultMap = null;
+  protected JobResults jobResults;
   /**
    * The list of final resulting tasks.
    * @exclude
@@ -92,8 +87,8 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   public JPPFResultCollector(final JPPFJob job)
   {
     this.job = job;
-    count = job.getTasks().size() - job.getResults().size();
-    pendingCount = count;
+    count = job.getTasks().size();
+    this.jobResults = job.getResults();
   }
 
   /**
@@ -105,8 +100,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   public JPPFResultCollector(final int count)
   {
     this.count = count;
-    this.pendingCount = count;
-    resultMap = new TreeMap<Integer, JPPFTask>();
+    this.jobResults = new JobResults();
   }
 
   /**
@@ -122,16 +116,8 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
     if (t == null)
     {
       List<JPPFTask> tasks = event.getTaskList();
-      if (job == null) for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
-      else job.getResults().putResults(tasks);
-      pendingCount -= tasks.size();
-      if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + pendingCount);
-      if (pendingCount <= 0)
-      {
-        buildResults();
-        setStatus(SubmissionStatus.COMPLETE);
-      }
-      notifyAll();
+      jobResults.putResults(tasks);
+      if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + (count - jobResults.size()));
       JobPersistence pm = job.getPersistenceManager();
       if ((job != null) && (pm != null))
       {
@@ -144,15 +130,16 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
           log.error(e.getMessage(), e);
         }
       }
+      notifyAll();
     }
     else
     {
       if (debugEnabled) log.debug("received throwable '" + t.getClass().getName() + ": " + t.getMessage() + "', resetting this result collector");
       // reset this object's state to prepare for job resubmission
-      if (job != null) count = job.getTasks().size() - job.getResults().size();
-      pendingCount = count;
-      if (resultMap != null) resultMap.clear();
-      results = null;
+//      if (job != null) count = job.getTasks().size() - job.getResults().size();
+//      pendingCount = count;
+//      if (resultMap != null) resultMap.clear();
+//      results = null;
     }
   }
 
@@ -173,12 +160,12 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   public synchronized List<JPPFTask> waitForResults(final long millis)
   {
-    if (millis < 0) throw new IllegalArgumentException("wait time cannot be negative");
-    if (log.isTraceEnabled()) log.trace("timeout = " + millis + ", pendingCount = " + pendingCount);
+    if (millis < 0L) throw new IllegalArgumentException("wait time cannot be negative");
+    if (log.isTraceEnabled()) log.trace("timeout = " + millis + ", pendingCount = " + (count - jobResults.size()));
     long timeout = millis > 0 ? millis : Long.MAX_VALUE;
     long start = System.currentTimeMillis();
-    long elapsed = 0;
-    while ((elapsed < timeout) && (pendingCount > 0))
+    long elapsed = 0L;
+    while ((elapsed < timeout) && (getStatus() != SubmissionStatus.COMPLETE))
     {
       try
       {
@@ -211,29 +198,37 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   protected void buildResults()
   {
-    if (job == null) results = new ArrayList<JPPFTask>(resultMap.values());
-    else results = new ArrayList<JPPFTask>(job.getResults().getAll());
+    results = new ArrayList<JPPFTask>(jobResults.getAll());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized SubmissionStatus getStatus()
   {
     return status;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized void setStatus(final SubmissionStatus newStatus)
   {
     if (newStatus == this.status) return;
     if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
     this.status = newStatus;
-    fireStatusChangeEvent(newStatus);
+    try {
+      if (newStatus == SubmissionStatus.COMPLETE)
+      {
+        buildResults();
+        onComplete();
+      }
+    } finally {
+      notifyAll();
+      fireStatusChangeEvent(newStatus);
+    }
+  }
+
+  /**
+   * Called when status is changed to <code>COMPLETE</code>.
+   */
+  protected void onComplete() {
   }
 
   /**

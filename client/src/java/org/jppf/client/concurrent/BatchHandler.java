@@ -172,7 +172,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
           JPPFJob job = currentJobRef.get();
           if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getTasks().size() + " tasks");
           FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-          collector.setTaskCount(job.getTasks().size() - job.getResults().size());
           configureJob(job);
           executor.submitJob(job);
           currentJobRef.set(null);
