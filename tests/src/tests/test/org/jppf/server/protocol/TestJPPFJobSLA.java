@@ -177,10 +177,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   @Test(timeout=5000)
   public void testCancelJobUponClientDisconnect() throws Exception
   {
+    String fileName = "testCancelJobUponClientDisconnect";
+    File f = new File(fileName + ".tmp");
+    f.deleteOnExit();
     try
     {
-      String fileName = "testCancelJobUponClientDisconnect";
-      File f = new File(fileName + ".tmp");
       assertFalse(f.exists());
       JPPFJob job = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, FileTask.class, fileName, false);
       job.getSLA().setCancelUponClientDisconnect(false);
@@ -189,10 +190,10 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       client.close();
       Thread.sleep(2000L);
       assertTrue(f.exists());
-      f.delete();
     }
     finally
     {
+      f.delete();
       client = BaseSetup.createClient(null);
     }
   }
