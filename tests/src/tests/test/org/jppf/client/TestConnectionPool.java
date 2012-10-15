@@ -54,7 +54,7 @@ public class TestConnectionPool extends Setup1D1N
       configure(0);
       client = BaseSetup.createClient(null, false);
       int nbTasks = 100;
-      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       List<JPPFTask> results = client.submit(job);
       testJobResults(nbTasks, results);
     }
@@ -76,7 +76,32 @@ public class TestConnectionPool extends Setup1D1N
       configure(2);
       client = BaseSetup.createClient(null, false);
       int nbTasks = 100;
-      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      List<JPPFTask> results = client.submit(job);
+      testJobResults(nbTasks, results);
+    }
+    finally
+    {
+      reset();
+    }
+  }
+
+  /**
+   * Test job submission with <code>jppf.pool.size = 2</code> and getMachChannels() > 1.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=5000)
+  public void testSubmitJobMultipleRemoteChannels() throws Exception
+  {
+    try
+    {
+      configure(0);
+      client = BaseSetup.createClient(null, false);
+      while (client.getAllConnections().size() < 2) Thread.sleep(10L);
+      int nbTasks = 100;
+      JPPFJob job = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+      // default max channels is 1 for backward compatibility with previous versions of the client.
+      job.getClientSLA().setMaxChannels(10);
       List<JPPFTask> results = client.submit(job);
       testJobResults(nbTasks, results);
     }
