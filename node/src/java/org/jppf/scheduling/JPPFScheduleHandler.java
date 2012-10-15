@@ -149,7 +149,7 @@ public class JPPFScheduleHandler
     for (Map.Entry<Object, ScheduledFuture<?>> entry: futureMap.entrySet())
     {
       ScheduledFuture<?> f = entry.getValue();
-      f.cancel(true);
+      if (f != null) f.cancel(true);
     }
     futureMap.clear();
     if (shutdown) executor.shutdownNow();
