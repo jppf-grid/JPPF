@@ -40,21 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractServerJob {
   /**
-   * State for task indicating whether result or exception was received.
-   */
-  protected static enum TaskState
-  {
-    /**
-     * Result was received for task.
-     */
-    RESULT,
-    /**
-     * Exception was received for task.
-     */
-    EXCEPTION
-  }
-
-  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ServerJob.class);
@@ -312,7 +297,7 @@ public abstract class AbstractServerJob {
    */
   protected final boolean updateStatus(final int expect, final int newStatus)
   {
-    if(status == expect)
+    if (status == expect)
     {
       status = newStatus;
       return true;
@@ -367,7 +352,7 @@ public abstract class AbstractServerJob {
    */
   public void addOnDone(final Runnable runnable)
   {
-    if(runnable == null) throw new IllegalArgumentException("runnable is null");
+    if (runnable == null) throw new IllegalArgumentException("runnable is null");
     synchronized (onDoneList)
     {
       onDoneList.add(runnable);
@@ -380,7 +365,7 @@ public abstract class AbstractServerJob {
    */
   public void removeOnDone(final Runnable runnable)
   {
-    if(runnable == null) throw new IllegalArgumentException("runnable is null");
+    if (runnable == null) throw new IllegalArgumentException("runnable is null");
     synchronized (onDoneList)
     {
       onDoneList.remove(runnable);
@@ -459,7 +444,7 @@ public abstract class AbstractServerJob {
    * @param bundle the bundle for job event.
    */
   public void fireJobReturned(final ExecutorChannel channel, final JPPFTaskBundle bundle) {
-    if(bundle != null) fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel, bundle));
+    if (bundle != null) fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel, bundle));
   }
 
   /**

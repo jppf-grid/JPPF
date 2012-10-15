@@ -17,7 +17,6 @@
  */
 package org.jppf.server.protocol;
 
-import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
 import org.jppf.job.JobNotificationEmitter;
 import org.jppf.server.submission.SubmissionStatus;
@@ -25,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.Future;
 
 /**
  *
@@ -113,8 +111,8 @@ public class ServerJobBroadcast extends ServerJob {
   }
 
   @Override
-  public void jobDispatched(final ServerTaskBundleNode bundle, final ExecutorChannel channel, final Future<?> future) {
-    super.jobDispatched(bundle, channel, future);
+  public void jobDispatched(final ServerTaskBundleNode bundle) {
+    super.jobDispatched(bundle);
     if (parentJob != null) parentJob.broadcastDispatched(this);
   }
 
@@ -163,7 +161,7 @@ public class ServerJobBroadcast extends ServerJob {
 
   @Override
   public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
-    if(isCancelled()) {
+    if (isCancelled()) {
       List<ServerJobBroadcast> list;
       synchronized (broadcastSet) {
         list = new ArrayList<ServerJobBroadcast>(broadcastSet.size() + broadcastMap.size());
@@ -178,7 +176,7 @@ public class ServerJobBroadcast extends ServerJob {
 
   @Override
   public void addBundle(final ServerTaskBundleClient bundle) {
-    if(parentJob == null) {
+    if (parentJob == null) {
       super.addBundle(bundle);
       synchronized (broadcastSet) {
         for (ServerJobBroadcast item : broadcastSet) {

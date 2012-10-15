@@ -41,7 +41,11 @@ public class ServerTask {
     /**
      * Result was received for task.
      */
-    RESULT
+    RESULT,
+    /**
+     * Task is cancelled.
+     */
+    CANCELLED
   }
 
   /**
@@ -111,7 +115,9 @@ public class ServerTask {
   public State getState() {
     if (exception != null) return State.EXCEPTION;
     if (result == null)
-       return State.PENDING;
+      return State.PENDING;
+    else if (result == dataLocation)
+      return State.CANCELLED;
     else
       return State.RESULT;
   }
@@ -122,9 +128,9 @@ public class ServerTask {
    */
   public DataLocation getResult() {
     if (result == null)
-      return getDataLocation();
+      return dataLocation;
     else
-    return result;
+      return result;
   }
 
   /**
@@ -160,7 +166,8 @@ public class ServerTask {
   {
     StringBuilder sb = new StringBuilder();
     sb.append("ServerTask");
-    sb.append("{id=").append(position);
+    sb.append("{position=").append(position);
+    sb.append(", state=").append(getState());
     sb.append(", dataLocation=").append(dataLocation);
     sb.append(", result=").append(result);
     sb.append(", exception=").append(exception);

@@ -57,6 +57,14 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    * The job this submission is for
    */
   private JPPFTaskBundle taskBundle;
+  /**
+   * Channel to which is this bundle dispatched.
+   */
+  private ExecutorChannel channel = null;
+  /**
+   * The future from channel dispatch.
+   */
+  private Future<?> future = null;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -181,7 +189,13 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    */
   public void jobDispatched(final ExecutorChannel channel, final Future<?> future)
   {
-    job.jobDispatched(this, channel, future);
+    if (channel == null) throw new IllegalArgumentException("channel is null");
+    if (future == null) throw new IllegalArgumentException("future is null");
+
+    this.channel = channel;
+    this.future  = future;
+
+    job.jobDispatched(this);
   }
 
   /**
@@ -208,7 +222,13 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    */
   public void taskCompleted(final Exception exception)
   {
-    job.taskCompleted(this, exception);
+    try {
+      job.taskCompleted(this, exception);
+    } finally {
+      job.jobReturned(this);
+      this.channel = null;
+      this.future = null;
+    }
   }
 
   /**
@@ -244,6 +264,22 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   public synchronized boolean isCancelled()
   {
     return cancelled;
+  }
+
+  /**
+   * Get the channel to which the job is dispatched.
+   * @return an <code>ExecutorChannel</code> instance.
+   */
+  public ExecutorChannel getChannel() {
+    return channel;
+  }
+
+  /**
+   * Get the future corresponding to the channel dispatch.
+   * @return a <code>Future</code> instance.
+   */
+  public Future<?> getFuture() {
+    return future;
   }
 
   @Override

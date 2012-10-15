@@ -21,14 +21,12 @@ package org.jppf.server.protocol;
 import java.util.*;
 import java.util.concurrent.Future;
 
-import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.protocol.utils.AbstractServerJob;
 import org.jppf.server.submission.*;
-import org.jppf.utils.Pair;
 import org.slf4j.*;
 
 /**
@@ -60,14 +58,14 @@ public class ServerJob extends AbstractServerJob {
   private final ServerTaskBundleClient.CompletionListener bundleCompletionListener = new ServerTaskBundleClient.CompletionListener() {
     @Override
     public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
-      if(bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
+      if (bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
 
       if (bundle.isCancelled()) cancel(false);
     }
 
     @Override
     public void bundleDone(final ServerTaskBundleClient bundle) {
-      if(bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
+      if (bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
 
       bundle.removeCompletionListener(this);
       synchronized (tasks) {
@@ -78,9 +76,9 @@ public class ServerJob extends AbstractServerJob {
   };
 
   /**
-   * Map of all futures in this job.
+   * Set of all dispatched bundles in this job.
    */
-  private final Map<ServerTaskBundleNode, Pair<ExecutorChannel, Future>> bundleMap = new LinkedHashMap<ServerTaskBundleNode, Pair<ExecutorChannel, Future>>();
+  private final Set<ServerTaskBundleNode> dispatchSet = new LinkedHashSet<ServerTaskBundleNode>();
   /**
    * The status of this submission.
    */
@@ -93,10 +91,6 @@ public class ServerJob extends AbstractServerJob {
    * The requeue handler.
    */
   private Runnable onRequeue = null;
-  /**
-   * State map for tasks on which resultReceived was called.
-   */
-  private final Map<ServerTask, Pair<DataLocation, TaskState>> taskStateMap = new IdentityHashMap<ServerTask, Pair<DataLocation, TaskState>>();
   /**
    * The data location of the data provider.
    */
@@ -153,11 +147,11 @@ public class ServerJob extends AbstractServerJob {
     JPPFTaskBundle taskBundle = getJob();
     synchronized (tasks) {
       int taskCount;
-      if(nbTasks > this.tasks.size()) taskCount = this.tasks.size();
+      if (nbTasks > this.tasks.size()) taskCount = this.tasks.size();
       else taskCount = nbTasks;
       List<ServerTask> subList = this.tasks.subList(0, taskCount);
       try {
-        if(taskBundle.getTaskCount() != taskCount) {
+        if (taskBundle.getTaskCount() != taskCount) {
           int newSize = taskBundle.getCurrentTaskCount() - taskCount;
           taskBundle = taskBundle.copy();
           taskBundle.setTaskCount(taskCount);
@@ -212,23 +206,32 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Called when all or part of a job is dispatched to a node.
    * @param bundle  the dispatched job.
-   * @param channel the node to which the job is dispatched.
-   * @param future  future assigned to bundle execution.
    */
-  public void jobDispatched(final ServerTaskBundleNode bundle, final ExecutorChannel channel, final Future<?> future) {
+  public void jobDispatched(final ServerTaskBundleNode bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    if (channel == null) throw new IllegalArgumentException("channel is null");
-    if (future == null) throw new IllegalArgumentException("future is null");
     boolean empty;
-    synchronized (bundleMap) {
-      empty = bundleMap.isEmpty();
-      bundleMap.put(bundle, new Pair<ExecutorChannel, Future>(channel, future));
+    synchronized (dispatchSet) {
+      empty = dispatchSet.isEmpty();
+      dispatchSet.add(bundle);
     }
     if (empty) {
       updateStatus(NEW, EXECUTING);
       setSubmissionStatus(SubmissionStatus.EXECUTING);
     }
-    fireJobDispatched(channel, bundle);
+    fireJobDispatched(bundle.getChannel(), bundle);
+  }
+
+  /**
+   * Called when all or part of a job is returned from node.
+   * @param bundle  the returned job.
+   */
+  public void jobReturned(final ServerTaskBundleNode bundle) {
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
+
+    synchronized (dispatchSet) {
+      dispatchSet.remove(bundle);
+    }
+    fireJobReturned(bundle.getChannel(), bundle.getJob());
   }
 
   /**
@@ -239,29 +242,19 @@ public class ServerJob extends AbstractServerJob {
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (results.isEmpty()) return;
     synchronized (tasks) {
-      List<ServerTask> bundleTasks =  bundle == null ? tasks : bundle.getTaskList();
-      if(isJobExpired() || isCancelled()) {
-        for (int index = 0; index < bundleTasks.size(); index++) {
-          ServerTask location = bundleTasks.get(index);
-          DataLocation task = location.getDataLocation();
-          taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
+      List<ServerTask> bundleTasks =  bundle == null ? new ArrayList<ServerTask>(tasks) : bundle.getTaskList();
+      if (isJobExpired() || isCancelled()) {
+        for (ServerTask location : bundleTasks) {
           location.getBundle().resultReceived(location.getPosition(), location.getDataLocation());
         }
       } else {
         for (int index = 0; index < bundleTasks.size(); index++) {
           ServerTask location = bundleTasks.get(index);
           DataLocation task = results.get(index);
-          taskStateMap.put(location, new Pair<DataLocation, TaskState>(task, TaskState.RESULT));
           location.getBundle().resultReceived(location.getPosition(), task);
         }
       }
     }
-    ExecutorChannel channel;
-    synchronized (bundleMap) {
-      Pair<ExecutorChannel, Future> pair = bundleMap.get(bundle);
-      channel = pair == null ? null : pair.first();
-    }
-    fireJobReturned(channel, bundle);
   }
 
   /**
@@ -273,18 +266,9 @@ public class ServerJob extends AbstractServerJob {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     synchronized (tasks) {
       for (ServerTask task : bundle.getTaskList()) {
-        Pair<DataLocation, TaskState> oldPair = taskStateMap.get(task);
-        TaskState oldState = oldPair == null ? null : oldPair.second();
-        if (oldState != TaskState.RESULT) taskStateMap.put(task, new Pair<DataLocation, TaskState>(null, TaskState.EXCEPTION));
         task.getBundle().resultReceived(task.getPosition(), throwable);
       }
     }
-    ExecutorChannel channel;
-    synchronized (bundleMap) {
-      Pair<ExecutorChannel, Future> pair = bundleMap.get(bundle);
-      channel = pair == null ? null : pair.first();
-    }
-    fireJobReturned(channel, bundle);
   }
 
   /**
@@ -304,12 +288,12 @@ public class ServerJob extends AbstractServerJob {
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
-    if(isCancelled()) {
+    if (isCancelled()) {
       List<Future>   futureList;
-      synchronized (bundleMap) {
-        futureList = new ArrayList<Future>(bundleMap.size());
-        for (Pair<ExecutorChannel, Future> pair : bundleMap.values()) {
-          futureList.add(pair.second());
+      synchronized (dispatchSet) {
+        futureList = new ArrayList<Future>(dispatchSet.size());
+        for (ServerTaskBundleNode item : dispatchSet) {
+          futureList.add(item.getFuture());
         }
       }
       for (Future future : futureList) {
@@ -320,10 +304,6 @@ public class ServerJob extends AbstractServerJob {
         }
       }
     }
-    synchronized (bundleMap) {
-      Pair<ExecutorChannel, Future> pair = bundleMap.remove(bundle);
-      if (bundle != null && (pair == null || pair.second() == null)) throw new IllegalStateException("future already removed");
-    }
     boolean requeue = false;
     List<DataLocation> list = new ArrayList<DataLocation>();
     synchronized (tasks)
@@ -331,8 +311,7 @@ public class ServerJob extends AbstractServerJob {
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) {
           for (ServerTask task : bundle.getTaskList()) {
-            Pair<DataLocation, TaskState> pair = taskStateMap.put(task, new Pair<DataLocation, TaskState>(task.getDataLocation(), TaskState.RESULT));
-            if (pair == null || pair.second() != TaskState.RESULT) list.add(task.getDataLocation());
+            if (task.getState() != ServerTask.State.RESULT) list.add(task.getDataLocation());
           }
         }
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
@@ -343,22 +322,20 @@ public class ServerJob extends AbstractServerJob {
       } else {
         if (bundle.isCancelled()) {
           for (ServerTask task : bundle.getTaskList()) {
-            Pair<DataLocation, TaskState> pair = taskStateMap.get(task);
-            if (pair == null || pair.second() != TaskState.RESULT) list.add(task.getDataLocation());
+            if (task.getState() != ServerTask.State.RESULT) list.add(task.getDataLocation());
           }
           addAll(list, this.tasks);
         }
         if (bundle.isRequeued()) {
           List<ServerTask> taskList = new ArrayList<ServerTask>();
           for (ServerTask task : bundle.getTaskList()) {
-            Pair<DataLocation, TaskState> pair = taskStateMap.get(task);
-            if (pair != null && pair.second() != TaskState.RESULT) taskList.add(task);
+            if (task.getState() != ServerTask.State.RESULT) taskList.add(task);
           }
           requeue = merge(taskList, false);
         }
       }
     }
-    if(!list.isEmpty()) {
+    if (!list.isEmpty()) {
       try {
         resultsReceived(bundle, list);
       } finally {
@@ -443,9 +420,9 @@ public class ServerJob extends AbstractServerJob {
    * @return the number used for job execution.
    */
   public int getNbChannels() {
-    synchronized (bundleMap)
+    synchronized (dispatchSet)
     {
-      return bundleMap.size();
+      return dispatchSet.size();
     }
   }
 
@@ -461,22 +438,20 @@ public class ServerJob extends AbstractServerJob {
    */
   @SuppressWarnings("unchecked")
   public NodeJobInformation[] getNodeJobInformation() {
-    Map.Entry<ServerTaskBundleNode, Pair<ExecutorChannel, Future>>[] entries;
-    synchronized (bundleMap) {
-      entries = bundleMap.entrySet().toArray(new Map.Entry[bundleMap.size()]);
+    ServerTaskBundleNode[] entries;
+    synchronized (dispatchSet) {
+      entries = dispatchSet.toArray(new ServerTaskBundleNode[dispatchSet.size()]);
     }
     if (entries.length == 0) return NodeJobInformation.EMPTY_ARRAY;
 
     NodeJobInformation[] result = new NodeJobInformation[entries.length];
     int i = 0;
-    for (Map.Entry<ServerTaskBundleNode, Pair<ExecutorChannel, Future>> entry : entries) {
-      ExecutorChannel channel = entry.getValue().first();
-      JPPFManagementInfo nodeInfo = channel.getManagementInfo();
-      ServerTaskBundleNode bundle = entry.getKey();
-      Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
+    for (ServerTaskBundleNode bundle : entries) {
+      JPPFManagementInfo nodeInfo = bundle.getChannel().getManagementInfo();
+      boolean pending = Boolean.TRUE.equals(bundle.getParameter(BundleParameter.JOB_PENDING));
       JobInformation jobInfo = new JobInformation(getUuid(), bundle.getName(),
               bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
-              bundle.getSLA().isSuspended(), (pending != null) && pending);
+              bundle.getSLA().isSuspended(), pending);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i++] = new NodeJobInformation(nodeInfo, jobInfo);
     }
@@ -488,7 +463,7 @@ public class ServerJob extends AbstractServerJob {
    * @param bundle the bundle to add.
    */
   public void addBundle(final ServerTaskBundleClient bundle) {
-    if(bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (bundle == null) throw new IllegalArgumentException("bundle is null");
     bundle.addCompletionListener(bundleCompletionListener);
     synchronized (tasks) {
       bundleList.add(bundle);
@@ -502,7 +477,7 @@ public class ServerJob extends AbstractServerJob {
     sb.append(getClass().getSimpleName());
     sb.append('{');
     sb.append("uuid=").append(getUuid());
-    if(getSLA().isBroadcastJob()) sb.append("broadcastID=").append(getBroadcastUUID());
+    if (getSLA().isBroadcastJob()) sb.append("broadcastID=").append(getBroadcastUUID());
     sb.append(", status=").append(getSubmissionStatus());
     sb.append(", tasks=").append(tasks.size());
     sb.append(", bundlerWrappers=").append(bundleList.size());

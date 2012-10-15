@@ -199,9 +199,12 @@ public class ServerTaskBundleClient
    */
   public synchronized void cancel()
   {
-    if(!this.cancelled && !this.done)
+    if (!this.cancelled && !this.done)
     {
       this.cancelled = true;
+      for (ServerTask task : taskList) {
+        task.resultReceived(task.getDataLocation());
+      }
       this.done = true;
       fireTasksCompleted(taskList);
       fireBundleDone();
