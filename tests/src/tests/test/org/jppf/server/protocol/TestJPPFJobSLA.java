@@ -256,7 +256,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   @Test(timeout=8000)
   public void testJobMaxNodes() throws Exception
   {
-    int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
+    int nbTasks = 10;
     JPPFJob job = BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
     job.getSLA().setMaxNodes(1);
     List<JPPFTask> results = client.submit(job);
@@ -271,7 +271,8 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       {
         LifeCycleTask t2 = (LifeCycleTask) results.get(j);
         Range<Double> r2 = new Range<Double>(t2.getStart(), t2.getStart() + t2.getElapsed());
-        assertFalse(r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
+        assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(), 
+          r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
       }
     }
   }

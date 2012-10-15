@@ -37,6 +37,10 @@ public class LifeCycleTask extends JPPFTask
    */
   private static Logger log = LoggerFactory.getLogger(LifeCycleTask.class);
   /**
+   * One million.
+   */
+  private static final int ONE_MILLION = 1000 * 1000;
+  /**
    * The duration of this task;
    */
   private long duration = 0L;
@@ -84,9 +88,12 @@ public class LifeCycleTask extends JPPFTask
   @Override
   public void run()
   {
+    // System.nanoTime() has a different origin on different JVM instances
+    // so this value can't be used to compute the start time.
     long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
-    start = start * 1e6 + nanoStart % 1000000L;
+    //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);
+    start *= ONE_MILLION;
     
     try
     {

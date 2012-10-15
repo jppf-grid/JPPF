@@ -60,7 +60,20 @@ public class Range<T extends Comparable<T>>
    */
   public boolean isValueInRange(final T value)
   {
-    return (value.compareTo(lower) >= 0) && (value.compareTo(upper) <= 0);
+    return isValueInRange(value, true);
+  }
+
+  /**
+   * Determine if the specified value is included in this range.
+   * @param value the value to check.
+   * @param includeBounds specifies whether the bounds of this range shoud be included in the comparisons.
+   * @return true if the value is in range, false otherwise.
+   */
+  public boolean isValueInRange(final T value, final boolean includeBounds)
+  {
+    return includeBounds
+        ? (value.compareTo(lower) >= 0) && (value.compareTo(upper) <= 0)
+            : (value.compareTo(lower) > 0) && (value.compareTo(upper) < 0);
   }
 
   @Override
@@ -99,8 +112,19 @@ public class Range<T extends Comparable<T>>
    */
   public boolean intersects(final Range<T> other)
   {
+    return intersects(other, true);
+  }
+
+  /**
+   * Determine whether this range and the specified one have at least one value in common.
+   * @param other the range to check against.
+   * @param includeBounds specifies whether the bounds of each range shoud be included in the comparisons.
+   * @return true if and only if part of <code>other</code> overlaps this range.
+   */
+  public boolean intersects(final Range<T> other, final boolean includeBounds)
+  {
     if (other == null) return false;
-    return other.isValueInRange(lower) || other.isValueInRange(upper) || includes(other);
+    return other.isValueInRange(lower, includeBounds) || other.isValueInRange(upper, includeBounds) || includes(other);
   }
 
   /**
@@ -147,5 +171,19 @@ public class Range<T extends Comparable<T>>
     T maxLower = lower.compareTo(other.getLower()) >= 0 ? lower : other.getLower();
     T minUpper = upper.compareTo(other.getUpper()) <= 0 ? upper : other.getUpper();
     return new Range<T>(maxLower, minUpper);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return 31 + lower.hashCode() + 3 * upper.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (!(obj instanceof Range)) return false;
+    Range other = (Range) obj; 
+    return lower.equals(other.lower) && upper.equals(other.upper);
   }
 }

@@ -73,7 +73,7 @@ public class TestJPPFCompletionService extends Setup1D1N1C
     int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService cs = new JPPFCompletionService(executor);
+    CompletionService<TaskResult> cs = new JPPFCompletionService<TaskResult>(executor);
     for (int i=0; i<nbTasks; i++)
     {
       Future<TaskResult> f = cs.submit(new SimpleCallable(i, TASK_DURATION));
@@ -105,7 +105,7 @@ public class TestJPPFCompletionService extends Setup1D1N1C
     int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService cs = new JPPFCompletionService(executor);
+    CompletionService<TaskResult> cs = new JPPFCompletionService<TaskResult>(executor);
     for (int i=0; i<nbTasks; i++)
     {
       TaskResult result = new TaskResult();
@@ -172,7 +172,7 @@ public class TestJPPFCompletionService extends Setup1D1N1C
     int nbTasks = 5;
     executor.setBatchSize(3);
     executor.setBatchTimeout(100L);
-    CompletionService cs = new JPPFCompletionService(executor);
+    CompletionService<TaskResult> cs = new JPPFCompletionService<TaskResult>(executor);
     for (int i=0; i<nbTasks; i++)
     {
       Future<TaskResult> f = cs.submit(new SimpleCallable(i, TASK_DURATION));

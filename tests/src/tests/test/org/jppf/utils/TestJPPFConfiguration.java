@@ -35,7 +35,7 @@ public class TestJPPFConfiguration
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test
+  @Test(timeout=5000)
   public void testAlternateConfigurationSource() throws Exception
   {
     JPPFConfiguration.ConfigurationSource source  = new TestConfigurationSource();
