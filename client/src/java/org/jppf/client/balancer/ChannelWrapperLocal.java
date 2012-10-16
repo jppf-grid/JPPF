@@ -185,6 +185,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
         return false;
       }
     };
+    bundle.jobDispatched(this, task);
     executor.execute(task);
     return task;
   }

@@ -315,8 +315,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
       }
       ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
       selectedBundle.addChannel(channel);
-      JPPFFuture<?> future = channel.submit(bundleWrapper);
-      bundleWrapper.jobDispatched(channel, future);
+      channel.submit(bundleWrapper);
     }
   }
 

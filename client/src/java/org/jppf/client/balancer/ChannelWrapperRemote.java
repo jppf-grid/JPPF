@@ -159,6 +159,7 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
         }
       }
     };
+    bundle.jobDispatched(this, task);
     executor.execute(task);
     return task;
   }
