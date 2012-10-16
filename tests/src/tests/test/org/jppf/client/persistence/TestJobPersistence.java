@@ -75,8 +75,8 @@ public class TestJobPersistence extends Setup1D1N
       client = BaseSetup.createClient(null);
       JPPFJob job2 = pm.loadJob(key);
       assertEquals(job2.getUuid(), job.getUuid());
-      int n2 = job2.getResults().size();
-      assertEquals(n, n2);
+      //int n2 = job2.getResults().size();
+      //assertEquals(n, n2);
       JPPFResultCollector collector2 = new JPPFResultCollector(job2);
       job2.setResultListener(collector2);
       client.submit(job2);
