@@ -297,8 +297,8 @@ public abstract class AbstractClientJob
   {
     if (status == expect)
     {
-      if ((newStatus == EXECUTING) && (status != newStatus)) job.fireJobEvent(JobEvent.Type.JOB_START);
-      else if (newStatus >= DONE) job.fireJobEvent(JobEvent.Type.JOB_END);
+      if ((newStatus == EXECUTING) && (status != newStatus)) job.fireJobEvent(JobEvent.Type.JOB_START, null, null);
+      else if (newStatus >= DONE) job.fireJobEvent(JobEvent.Type.JOB_END, null, null);
       status = newStatus;
       return true;
     }

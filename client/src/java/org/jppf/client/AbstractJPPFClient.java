@@ -44,7 +44,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Total count of the tasks submitted by this client.
    */

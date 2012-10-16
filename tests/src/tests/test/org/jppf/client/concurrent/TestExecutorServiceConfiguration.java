@@ -249,6 +249,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
         assertTrue(future.isDone());
         assertFalse(future.isCancelled());
       }
+      Thread.sleep(500L);
       // bath size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
       assertEquals(2, listener.startedCount.get());
       assertEquals(2, listener.endedCount.get());

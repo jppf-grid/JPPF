@@ -417,12 +417,12 @@ public class ClientJob extends AbstractClientJob
     } else {
       boolean callDone = updateStatus(EXECUTING, DONE);
       if (empty) setExecuting(false);
-      setSubmissionStatus(SubmissionStatus.COMPLETE);
       try {
         if (callDone) done();
       } finally {
         if (parentJob != null) parentJob.broadcastCompleted(this);
       }
+      setSubmissionStatus(SubmissionStatus.COMPLETE);
     }
   }
 

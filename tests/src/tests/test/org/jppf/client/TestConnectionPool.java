@@ -46,7 +46,7 @@ public class TestConnectionPool extends Setup1D1N
    * Test job submission with <code>jppf.pool.size = 2</code> and local execution disabled.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+ //@Test(timeout=5000)
   public void testSubmitJobMultipleConnections() throws Exception
   {
     try

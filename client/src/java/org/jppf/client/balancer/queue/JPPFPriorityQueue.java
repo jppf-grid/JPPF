@@ -499,6 +499,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     {
       jobScheduleHandler.clear(true);
       jobExpirationHandler.clear(true);
+      pendingBroadcasts.clear();
+      jobMap.clear();
+      priorityMap.clear();
     }
     finally
     {
@@ -508,7 +511,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
 
   /**
    * Cancels queued broadcast jobs for connection.
-   * @param connectionUUID The connection UUID that failed or was disconnected.
+   * @param connectionUUID The connection UUID that failed or was disconnected.priorityMap
    */
   public void cancelBroadcastJobs(final String connectionUUID)
   {

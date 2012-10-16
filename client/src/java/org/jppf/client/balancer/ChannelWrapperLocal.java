@@ -322,7 +322,18 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   @Override
   public void close()
   {
+    if (debugEnabled) log.debug("closing " + this);
     super.close();
-    if (executionManager != null) executionManager.shutdown();
+    try
+    {
+      stopNode();
+    }
+    finally
+    {
+      synchronized (listeners)
+      {
+        listeners.clear();
+      }
+    }
   }
 }

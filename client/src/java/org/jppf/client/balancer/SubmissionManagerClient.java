@@ -397,12 +397,11 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       {
         try
         {
-          wrapperLocal.stopNode();
+          wrapperLocal.close();
         }
         finally
         {
           removeConnection(wrapperLocal);
-          wrapperLocal.removeClientConnectionStatusListener(statusListener);
           wrapperLocal = null;
         }
       }
@@ -446,6 +445,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     synchronized(this)
     {
       for (ChannelWrapper channel: allConnections) channel.close();
+      allConnections.clear();
     }
   }
 }

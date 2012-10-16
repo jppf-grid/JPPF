@@ -38,12 +38,12 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class BatchHandler extends ThreadSynchronization implements Runnable
+public class CopyOfBatchHandler extends ThreadSynchronization implements Runnable
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(BatchHandler.class);
+  private static Logger log = LoggerFactory.getLogger(CopyOfBatchHandler.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -94,10 +94,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
    */
   private Condition jobReady = lock.newCondition();
   /**
-   * Represents a condition to await for and corresponding to when <code>currentJobRef</code> is not null.
-   */
-  private Condition submittingJob = lock.newCondition();
-  /**
    * The configuration for this batch handler.
    */
   private ExecutorServiceConfiguration config = new ExecutorServiceConfigurationImpl();
@@ -106,7 +102,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
    * Default constructor.
    * @param executor the JPPFExecutorService whose tasks are batched.
    */
-  BatchHandler(final JPPFExecutorService executor)
+  CopyOfBatchHandler(final JPPFExecutorService executor)
   {
     this.executor = executor;
     nextJobRef.set(createJob());
@@ -163,7 +159,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
         try
         {
           while (!isStopped() && (currentJobRef.get() == null))
-          //while (!isStopped() && pendingJobs.isEmpty())
           {
             if (batchTimeout > 0)
             {
@@ -181,8 +176,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
           executor.submitJob(job);
           currentJobRef.set(null);
           elapsed = System.currentTimeMillis() - start;
-          submittingJob.signal();
-          //updateNextJob(false);
         }
         finally
         {
@@ -218,14 +211,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       nextJobRef.set(createJob());
       resetTimeout();
       if (sendSignal) jobReady.signal();
-      try
-      {
-        submittingJob.await();
-      }
-      catch (InterruptedException e)
-      {
-        throw new RejectedExecutionException(e);
-      }
     }
   }
 

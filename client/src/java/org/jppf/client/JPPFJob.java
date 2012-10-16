@@ -489,16 +489,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * Notify all listeners of the specified event type.
    * @param type the type of the event.
-   * @exclude
-   */
-  public void fireJobEvent(final JobEvent.Type type)
-  {
-    fireJobEvent(type, null, null);
-  }
-
-  /**
-   * Notify all listeners of the specified event type.
-   * @param type the type of the event.
    * @param channel the channel to which a job is dispatched or from which it is returned.
    * @param tasks the tasks that were dispatched or returned.
    * @exclude

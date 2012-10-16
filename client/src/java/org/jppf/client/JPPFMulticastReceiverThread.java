@@ -202,6 +202,10 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
         if (debugEnabled) log.debug(e.getMessage(), e);
       }
       runningThread = null;
+      synchronized(this)
+      {
+        infoMap.clear();
+      }
     }
   }
 

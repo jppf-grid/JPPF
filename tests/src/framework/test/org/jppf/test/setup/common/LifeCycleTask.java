@@ -143,7 +143,7 @@ public class LifeCycleTask extends JPPFTask
    */
   private void displayTask(final String message)
   {
-    log.info("displaying task " + this + " (" + message + ')');
+    log.debug("displaying task " + this + " (" + message + ')');
   }
 
   /**
