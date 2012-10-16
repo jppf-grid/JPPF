@@ -225,6 +225,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     for (int i=1; i<=poolSize; i++)
     {
+      if (isClosed()) return;
       AbstractJPPFClientConnection c = createConnection(info.uuid, (poolSize > 1) ? name + '-' + i : name, info, ssl);
       c.setPriority(priority);
       newConnection(c);
@@ -249,6 +250,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   @Override
   public void newConnection(final JPPFClientConnection c)
   {
+    if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
     //addClientConnection(c);
     c.addClientConnectionStatusListener(this);

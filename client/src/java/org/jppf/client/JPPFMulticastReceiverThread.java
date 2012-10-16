@@ -193,7 +193,14 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
     setStopped(true);
     if (runningThread != null)
     {
-      runningThread.interrupt();
+      try
+      {
+        runningThread.interrupt();
+      }
+      catch (Exception e)
+      {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+      }
       runningThread = null;
     }
   }
