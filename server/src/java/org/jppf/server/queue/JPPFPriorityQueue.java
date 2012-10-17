@@ -135,7 +135,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
       } else {
         ServerJob serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
-          serverJob = new ServerJob(null, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+          serverJob = new ServerJob(lock, null, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
           serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
           serverJob.setQueueEntryTime(System.currentTimeMillis());
           serverJob.setJobReceivedTime(serverJob.getQueueEntryTime());
@@ -148,7 +148,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
           jobMap.put(jobUuid, serverJob);
         } else
           removeFromListMap(sla.getPriority(), serverJob, priorityMap);
-        serverJob.addBundle(bundleWrapper);
+        if(!serverJob.addBundle(bundleWrapper)) throw new IllegalStateException("Can't add bundle to job: " + jobUuid);
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
           putInListMap(sla.getPriority(), serverJob, priorityMap);
@@ -440,7 +440,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     final String jobUuid = bundleWrapper.getUuid();
     ServerJob serverJob = jobMap.get(jobUuid);
     if (serverJob == null) {
-      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(null, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, null, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
       broadcastJob.setSubmissionStatus(SubmissionStatus.PENDING);
       broadcastJob.setQueueEntryTime(System.currentTimeMillis());
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());

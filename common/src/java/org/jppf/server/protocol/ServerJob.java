@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.job.*;
@@ -49,7 +50,7 @@ public class ServerJob extends AbstractServerJob {
    */
   private final List<ServerTask> tasks = new ArrayList<ServerTask>();
   /**
-   * The list of the incomming bundles.
+   * The list of the incoming bundles.
    */
   private final List<ServerTaskBundleClient> bundleList = new ArrayList<ServerTaskBundleClient>();
   /**
@@ -59,18 +60,19 @@ public class ServerJob extends AbstractServerJob {
     @Override
     public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
       if (bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
-
       if (bundle.isCancelled()) cancel(false);
     }
 
     @Override
     public void bundleDone(final ServerTaskBundleClient bundle) {
       if (bundle == null) throw new IllegalArgumentException("bundlerWrapper is null");
-
-      bundle.removeCompletionListener(this);
-      synchronized (tasks) {
+      lock.lock();
+      try {
+        bundle.removeCompletionListener(this);
         bundleList.remove(bundle);
         tasks.removeAll(bundle.getTaskList());
+      } finally {
+        lock.unlock();
       }
     }
   };
@@ -99,15 +101,22 @@ public class ServerJob extends AbstractServerJob {
    * Handler for job state notifications.
    */
   protected final JobNotificationEmitter notificationEmitter;
-
+  /**
+   * Used for synchronized access to job.
+   */
+  protected final ReentrantLock lock;
   /**
    * Initialized client job with task bundle and list of tasks to execute.
+   * @param lock used to synchronized access to job.
    * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
-  public ServerJob(final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public ServerJob(final ReentrantLock lock, final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
     super(job);
+    if (lock == null) throw new IllegalArgumentException("lock is null");
+
+    this.lock = lock;
     this.notificationEmitter = notificationEmitter;
     this.dataProvider = dataProvider;
     this.submissionStatus = SubmissionStatus.SUBMITTED;
@@ -118,8 +127,11 @@ public class ServerJob extends AbstractServerJob {
    * @return list of bundles received from client.
    */
   protected List<ServerTaskBundleClient> getBundleList() {
-    synchronized (tasks) {
+    lock.lock();
+    try {
       return new ArrayList<ServerTaskBundleClient>(bundleList);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -133,8 +145,11 @@ public class ServerJob extends AbstractServerJob {
 
   @Override
   public int getTaskCount() {
-    synchronized (tasks) {
+    lock.lock();
+    try {
       return tasks.size();
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -145,7 +160,8 @@ public class ServerJob extends AbstractServerJob {
    */
   public ServerTaskBundleNode copy(final int nbTasks) {
     JPPFTaskBundle taskBundle = getJob();
-    synchronized (tasks) {
+    lock.lock();
+    try {
       int taskCount;
       if (nbTasks > this.tasks.size()) taskCount = this.tasks.size();
       else taskCount = nbTasks;
@@ -161,6 +177,8 @@ public class ServerJob extends AbstractServerJob {
       } finally {
         subList.clear();
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -171,11 +189,14 @@ public class ServerJob extends AbstractServerJob {
    * @return <code>true</code> when this client job needs to be requeued.
    */
   protected boolean merge(final List<ServerTask> taskList, final boolean after) {
-    synchronized (tasks) {
+    lock.lock();
+    try {
       boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
       if (!after) this.tasks.addAll(0, taskList);
       if (after) this.tasks.addAll(taskList);
       return requeue;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -241,7 +262,8 @@ public class ServerJob extends AbstractServerJob {
    */
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (results.isEmpty()) return;
-    synchronized (tasks) {
+    lock.lock();
+    try {
       List<ServerTask> bundleTasks =  bundle == null ? new ArrayList<ServerTask>(tasks) : bundle.getTaskList();
       if (isJobExpired() || isCancelled()) {
         for (ServerTask location : bundleTasks) {
@@ -254,6 +276,8 @@ public class ServerJob extends AbstractServerJob {
           location.getBundle().resultReceived(location.getPosition(), task);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -264,10 +288,13 @@ public class ServerJob extends AbstractServerJob {
    */
   public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    synchronized (tasks) {
+    lock.lock();
+    try {
       for (ServerTask task : bundle.getTaskList()) {
         task.getBundle().resultReceived(task.getPosition(), throwable);
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -288,26 +315,26 @@ public class ServerJob extends AbstractServerJob {
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
-    if (isCancelled()) {
-      List<Future>   futureList;
-      synchronized (dispatchSet) {
-        futureList = new ArrayList<Future>(dispatchSet.size());
-        for (ServerTaskBundleNode item : dispatchSet) {
-          futureList.add(item.getFuture());
+    lock.lock();
+    try {
+      if (isCancelled()) {
+        List<Future>   futureList;
+        synchronized (dispatchSet) {
+          futureList = new ArrayList<Future>(dispatchSet.size());
+          for (ServerTaskBundleNode item : dispatchSet) {
+            futureList.add(item.getFuture());
+          }
+        }
+        for (Future future : futureList) {
+          try {
+            if (!future.isDone()) future.cancel(false);
+          } catch (Exception e) {
+            log.error("Error cancelling job " + this, e);
+          }
         }
       }
-      for (Future future : futureList) {
-        try {
-          if (!future.isDone()) future.cancel(false);
-        } catch (Exception e) {
-          log.error("Error cancelling job " + this, e);
-        }
-      }
-    }
-    boolean requeue = false;
-    List<DataLocation> list = new ArrayList<DataLocation>();
-    synchronized (tasks)
-    {
+      boolean requeue = false;
+      List<DataLocation> list = new ArrayList<DataLocation>();
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) {
           for (ServerTask task : bundle.getTaskList()) {
@@ -334,25 +361,27 @@ public class ServerJob extends AbstractServerJob {
           requeue = merge(taskList, false);
         }
       }
-    }
-    if (!list.isEmpty()) {
-      try {
-        resultsReceived(bundle, list);
-      } finally {
-        this.tasks.clear();
+      if (!list.isEmpty()) {
+        try {
+          resultsReceived(bundle, list);
+        } finally {
+          this.tasks.clear();
+        }
       }
-    }
-    if (hasPending()) {
-      if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
-      if (requeue && onRequeue != null) onRequeue.run();
-    } else {
-      boolean callDone = updateStatus(EXECUTING, DONE);
-      setSubmissionStatus(SubmissionStatus.COMPLETE);
-      try {
-        if (callDone) done();
-      } finally {
-        fireTaskCompleted(this);
+      if (hasPending()) {
+        if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
+        if (requeue && onRequeue != null) onRequeue.run();
+      } else {
+        boolean callDone = updateStatus(EXECUTING, DONE);
+        setSubmissionStatus(SubmissionStatus.COMPLETE);
+        try {
+          if (callDone) done();
+        } finally {
+          fireTaskCompleted(this);
+        }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -369,10 +398,15 @@ public class ServerJob extends AbstractServerJob {
    * @return <code>true</code> when job has some pending tasks.
    */
   protected boolean hasPending() {
-    synchronized (tasks) {
+    lock.lock();
+    try {
       for (ServerTaskBundleClient bundle : bundleList) {
         if (bundle.getPendingTasksCount() > 0) return true;
       }
+
+      if (!tasks.isEmpty()) System.out.println("ServerJob.hasPending: " + tasks.size());
+    } finally {
+      lock.unlock();
     }
     return false;
   }
@@ -382,7 +416,12 @@ public class ServerJob extends AbstractServerJob {
    * @return a {@link SubmissionStatus} enumerated value.
    */
   public SubmissionStatus getSubmissionStatus() {
-    return submissionStatus;
+    lock.lock();
+    try {
+      return submissionStatus;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
@@ -390,20 +429,30 @@ public class ServerJob extends AbstractServerJob {
    * @param submissionStatus a {@link SubmissionStatus} enumerated value.
    */
   public void setSubmissionStatus(final SubmissionStatus submissionStatus) {
-    if (this.submissionStatus == submissionStatus) return;
-    this.submissionStatus = submissionStatus;
+    lock.lock();
+    try {
+      if (this.submissionStatus == submissionStatus) return;
+      this.submissionStatus = submissionStatus;
+    } finally {
+      lock.unlock();
+    }
     if (resultsListener instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
   }
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("request to cancel " + this);
-    if (super.cancel(mayInterruptIfRunning)) {
-      done();
-      taskCompleted(null, null);
-      return true;
+    lock.lock();
+    try {
+      if (super.cancel(mayInterruptIfRunning)) {
+        done();
+        taskCompleted(null, null);
+        return true;
+      }
+      else return false;
+    } finally {
+      lock.unlock();
     }
-    else return false;
   }
 
   /**
@@ -461,13 +510,19 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Add received bundle to this server job.
    * @param bundle the bundle to add.
+   * @return <code>true</code> when bundle was added to job. <code>false</code> when job is COMPLETED.
    */
-  public void addBundle(final ServerTaskBundleClient bundle) {
+  public boolean addBundle(final ServerTaskBundleClient bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    bundle.addCompletionListener(bundleCompletionListener);
-    synchronized (tasks) {
+    lock.lock();
+    try {
+      if (getSubmissionStatus() == SubmissionStatus.COMPLETE) return false;
       bundleList.add(bundle);
       this.tasks.addAll(bundle.getTaskList());
+      bundle.addCompletionListener(bundleCompletionListener);
+      return true;
+    } finally {
+      lock.unlock();
     }
   }
 

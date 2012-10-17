@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.execute.ExecutorChannelStatusEvent;
@@ -310,7 +311,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
         bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
-        ServerJob serverJob = new ServerJob(queue, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
+        ServerJob serverJob = new ServerJob(new ReentrantLock(), queue, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
         initialBundle = serverJob.copy(serverJob.getTaskCount());
       }
       catch(Exception e)

@@ -44,11 +44,11 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   /**
    * Used for synchronized access to the queue.
    */
-  protected ReentrantLock lock = new ReentrantLock();
+  protected final ReentrantLock lock = new ReentrantLock();
   /**
    * An ordered map of bundle sizes, mapping to a list of bundles of this size.
    */
-  protected TreeMap<Integer, List<ServerJob>> sizeMap = new TreeMap<Integer, List<ServerJob>>();
+  protected final TreeMap<Integer, List<ServerJob>> sizeMap = new TreeMap<Integer, List<ServerJob>>();
   /**
    * 
    */
