@@ -41,7 +41,7 @@ public class TestJPPFClient extends Setup1D1N
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testDefaultConstructor() throws Exception
   {
     JPPFClient client = new JPPFClient();
@@ -59,7 +59,7 @@ public class TestJPPFClient extends Setup1D1N
    * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testConstructorWithUuid() throws Exception
   {
     JPPFClient client = new JPPFClient("some_uuid");
@@ -77,7 +77,7 @@ public class TestJPPFClient extends Setup1D1N
    * Test the submission of a job.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testSubmit() throws Exception
   {
     JPPFClient client = BaseSetup.createClient(null);
@@ -144,7 +144,7 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539111&group_id=135654&atid=733518">3539111 - Local execution does not use configured number of threads</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testLocalExecutionNbThreads() throws Exception
   {
     int nbThreads = 2;
@@ -178,6 +178,7 @@ public class TestJPPFClient extends Setup1D1N
       int count = 0;
       for (ThreadInfo ti: allInfo)
       {
+        if (ti == null) continue;
         String name = ti.getThreadName();
         if (name == null) continue;
         if (name.startsWith("node processing")) count++;

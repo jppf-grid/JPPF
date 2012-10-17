@@ -235,7 +235,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   {
     executor.submit(new SimpleCallable(0, TASK_DURATION));
     executor.shutdown();
-    assertTrue(executor.awaitTermination(3L*TASK_DURATION/2L, TimeUnit.MILLISECONDS));
+    assertTrue(executor.awaitTermination(3L*TASK_DURATION, TimeUnit.MILLISECONDS));
     assertTrue(executor.isShutdown());
     assertTrue(executor.isTerminated());
   }
