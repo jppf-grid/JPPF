@@ -217,14 +217,17 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       currentJobRef.set(job);
       nextJobRef.set(createJob());
       resetTimeout();
-      if (sendSignal) jobReady.signal();
-      try
+      if (sendSignal)
       {
-        submittingJob.await();
-      }
-      catch (InterruptedException e)
-      {
-        throw new RejectedExecutionException(e);
+        jobReady.signal();
+        try
+        {
+          submittingJob.await();
+        }
+        catch (InterruptedException e)
+        {
+          throw new RejectedExecutionException(e);
+        }
       }
     }
   }
