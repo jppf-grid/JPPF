@@ -90,7 +90,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     systemInfo.populate(false);
     systemInfo.getJppf().setProperty("jppf.channel.local", "true");
 
-    managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE);
+    managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL);
     managementInfo.setSystemInfo(systemInfo);
   }
 

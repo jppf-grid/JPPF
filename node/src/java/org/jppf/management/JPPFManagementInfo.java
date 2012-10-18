@@ -41,13 +41,21 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public static final byte NODE = 1;
   /**
+   * Information that node is local on DRIVER or CLIENT. Value of this constant can be changed in future!
+   */
+  public static final byte LOCAL = 64;
+  /**
+   * Mask for elimination extended type attributes.
+   */
+  protected static final byte TYPE_MASK = 15;
+  /**
    * The host on which the node is running.
    */
-  private String host = null;
+  private final String host;
   /**
    * The port on which the node's JMX server is listening.
    */
-  private int port = 11198;
+  private final int port;
   /**
    * Unique id for the node.
    */
@@ -55,11 +63,11 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * The type of component this info is for, must be one of {@link #NODE} or {@link #DRIVER}.
    */
-  private byte type = NODE;
+  private final byte type;
   /**
    * Determines whether communication with the node or driver should be secure, i.e. via SSL/TLS.
    */
-  private boolean secure = false;
+  private final boolean secure;
   /**
    * The system information associated with the node at the time of the initial connection.
    */
@@ -94,7 +102,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @param port the port on which the node's JMX server is listening.
    * @param id unique id for the node's mbean server.
    * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
-   * @param secure sepecifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
+   * @param secure specifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
    */
   public JPPFManagementInfo(final String host, final int port, final String id, final int type, final boolean secure)
   {
@@ -123,23 +131,12 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     return port;
   }
 
-  /**
-   * Get the hashcode for this instance.
-   * @return the hashcode as an int.
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode()
   {
     return (id == null) ? 0 : id.hashCode();
   }
 
-  /**
-   * Compare this object with another for equality.
-   * @param obj the object to compare to.
-   * @return true if the two objects are equal, false otherwise.
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(final Object obj)
   {
@@ -151,12 +148,6 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     return (id != null) && id.equals(other.id);
   }
 
-  /**
-   * Compare this object with an other.
-   * @param o the other object to compare to.
-   * @return a negative number if this object is less than the other, 0 if they are equal, a positive number otherwise.
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
   @Override
   public int compareTo(final JPPFManagementInfo o)
   {
@@ -171,17 +162,12 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     return 0;
   }
 
-  /**
-   * Get a string representation of this node information.
-   * @return a string with the host:port format.
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
     sb.append(host).append(':').append(port);
-    sb.append(", type=").append(type);
+    sb.append(", type=").append(type & TYPE_MASK);
     sb.append(", id=").append(id);
     return sb.toString();
   }
@@ -219,26 +205,26 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public int getType()
   {
-    return type;
+    return type & TYPE_MASK;
   }
 
   /**
    * Determine whether this information represents a real node.
-   * @return true if this information represents a node, false otherwise.
+   * @return <code>true</code> if this information represents a node, <code>false</code> otherwise.
    */
   public boolean isNode()
   {
-    return type == NODE;
+    return (type & TYPE_MASK) == NODE;
   }
 
   /**
    * Determine whether this information represents a driver, connected as a peer to the
    * driver from which this information is obtained.
-   * @return true if this information represents a driver, false otherwise.
+   * @return <code>true</code> if this information represents a driver, <code>false</code> otherwise.
    */
   public boolean isDriver()
   {
-    return type == DRIVER;
+    return (type & TYPE_MASK) == DRIVER;
   }
 
   /**
@@ -248,5 +234,13 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   public boolean isSecure()
   {
     return secure;
+  }
+
+  /**
+   * Determine whether this information represents a local node on client or driver.
+   * @return <code>true</code>
+   */
+  public boolean isLocal() {
+    return (type & LOCAL) == LOCAL;
   }
 }
