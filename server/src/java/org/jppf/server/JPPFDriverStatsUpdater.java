@@ -154,6 +154,17 @@ public final class JPPFDriverStatsUpdater implements JPPFDriverListener
     if (n > sizes.getMax()) sizes.setMax(n);
   }
 
+  /**
+   * Called when a new tasks are added to job.
+   * @param nbTasks the number of tasks added to the job.
+   */
+  public synchronized void tasksAdded(final int nbTasks)
+  {
+    StatsSnapshot sizes = stats.getJobQueue().getSizes();
+    StatsSnapshot jobTasks = stats.getJobTasks();
+    jobTasks.newValues(nbTasks, (long) sizes.getTotal());
+  }
+
   @Override
   public synchronized void jobEnded(final long time)
   {

@@ -70,7 +70,7 @@ class SendingBundleState extends NodeServerState
     if (context.getMessage() == null)
     {
       ServerTaskBundleNode bundleWrapper = context.getBundle();
-      JPPFTaskBundle bundle = (bundleWrapper == null) ? null : (JPPFTaskBundle) bundleWrapper.getJob();
+      JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getJob();
       if (bundle != null)
       {
         if (debugEnabled) log.debug("got bundle from the queue for " + channel);

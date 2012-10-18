@@ -31,6 +31,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.JobSLA;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.JPPFDriverStatsManager;
 import org.jppf.server.job.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
@@ -60,7 +61,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
   /**
    * Contains the ids of all queued jobs.
    */
-  final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
+  private final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
   /**
    * The driver stats manager
    */
@@ -160,6 +161,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
         }
         updateLatestMaxSize();
         if (queued) jobManager.jobQueued(serverJob);
+        else JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
         fireQueueEvent(new QueueEvent(this, serverJob, false));
       }
     } finally {

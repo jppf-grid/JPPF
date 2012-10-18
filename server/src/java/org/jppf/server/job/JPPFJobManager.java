@@ -157,7 +157,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     //long time = System.currentTimeMillis() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
-    long time = System.currentTimeMillis() - bundle.getExecutionStartTime();
+    long time = System.currentTimeMillis() - bundleWrapper.getJobReceivedTime();
     String jobUuid = bundle.getUuid();
     jobMap.remove(jobUuid);
     bundleMap.remove(jobUuid);
