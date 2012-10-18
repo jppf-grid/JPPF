@@ -90,8 +90,7 @@ public class TestConnectionPool extends Setup1D1N
    * Test job submission with <code>jppf.pool.size = 2</code> and getMachChannels() > 1.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
-  @Test
+  @Test(timeout=10000)
   public void testSubmitJobMultipleRemoteChannels() throws Exception
   {
     try

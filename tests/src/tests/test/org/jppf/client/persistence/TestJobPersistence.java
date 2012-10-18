@@ -20,9 +20,11 @@ package test.org.jppf.client.persistence;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
+import org.jppf.client.event.TaskResultEvent;
 import org.jppf.client.persistence.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -57,17 +59,22 @@ public class TestJobPersistence extends Setup1D1N
       config.setProperty("strategy.test.size", "1");
       client = BaseSetup.createClient(null, false);
       int nbTasks = 3;
+      final AtomicBoolean resultsReceived = new AtomicBoolean(false);
       JPPFJob job = BaseSetup.createJob("TestSubmit", false, false, nbTasks, SimpleTask.class, duration);
-      int i=0;
-      for (JPPFTask task: job.getTasks()) task.setId("" + ++i);
       pm = new DefaultFilePersistenceManager("root", "job_", ".ser");
       key = pm.computeKey(job);
       assertEquals(key, job.getUuid());
       job.setPersistenceManager(pm);
-      JPPFResultCollector collector = new JPPFResultCollector(job);
+      JPPFResultCollector collector = new JPPFResultCollector(job) {
+        @Override
+        public synchronized void resultsReceived(final TaskResultEvent event) {
+          super.resultsReceived(event);
+          resultsReceived.set(true);
+        }
+      };
       job.setResultListener(collector);
       client.submit(job);
-      Thread.sleep(2*duration);
+      while (!resultsReceived.get()) Thread.sleep(100L);
       client.close();
       int n = job.getResults().size();
       assertTrue(n < nbTasks);
