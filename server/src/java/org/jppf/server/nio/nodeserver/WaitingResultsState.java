@@ -69,8 +69,7 @@ class WaitingResultsState extends NodeServerState
       ServerTaskBundleNode bundleWrapper = context.getBundle();
       boolean requeue = false;
       try {
-        JPPFTaskBundle bundle = bundleWrapper;// (JPPFTaskBundle) bundleWrapper.getJob();
-        ServerTaskBundleClient newBundleWrapper = context.deserializeBundle(server.getJobManager());
+        ServerTaskBundleClient newBundleWrapper = context.deserializeBundle();
         JPPFTaskBundle newBundle = newBundleWrapper.getJob();
         if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
         // if an exception prevented the node from executing the tasks
@@ -88,7 +87,6 @@ class WaitingResultsState extends NodeServerState
           server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
           context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
         }
-        jobManager.jobReturned(bundleWrapper.getClientJob(), channel);
         requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
         JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
         if (systemInfo != null)

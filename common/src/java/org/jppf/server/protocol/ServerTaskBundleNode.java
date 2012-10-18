@@ -223,9 +223,9 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   public void taskCompleted(final Exception exception)
   {
     try {
-      job.taskCompleted(this, exception);
-    } finally {
       job.jobReturned(this);
+    } finally {
+      job.taskCompleted(this, exception);
       this.channel = null;
       this.future = null;
     }

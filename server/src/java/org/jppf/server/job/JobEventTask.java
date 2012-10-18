@@ -17,11 +17,10 @@
  */
 package org.jppf.server.job;
 
+import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.nio.ChannelWrapper;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 
 /**
@@ -41,7 +40,7 @@ public class JobEventTask implements Runnable
   /**
    * The node, if any, for which the event happened.
    */
-  private final ChannelWrapper channel;
+  private final ExecutorChannel channel;
   /**
    * The job data.
    */
@@ -58,7 +57,7 @@ public class JobEventTask implements Runnable
    * @param bundle the job data.
    * @param channel the id of the job source of the event.
    */
-  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ChannelWrapper channel)
+  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ExecutorChannel channel)
   {
     this.jobManager = jobManager;
     this.eventType = eventType;
@@ -78,7 +77,7 @@ public class JobEventTask implements Runnable
     JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(),
         bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
     jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = (channel == null) ? null : ((AbstractNodeContext) channel.getContext()).getManagementInfo();
+    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
     if(eventType == JobEventType.JOB_UPDATED)
     {

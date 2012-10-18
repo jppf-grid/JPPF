@@ -62,6 +62,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     this.transitionManager = transitionManager;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results)
   {
@@ -92,6 +93,6 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   }
 
   @Override
-  public void bundleDone(final ServerTaskBundleClient bundle) {
+  public void bundleEnded(final ServerTaskBundleClient bundle) {
   }
 }

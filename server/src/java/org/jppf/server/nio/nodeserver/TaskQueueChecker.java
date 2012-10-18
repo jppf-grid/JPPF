@@ -26,7 +26,6 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.server.*;
-import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.scheduler.bundle.*;
@@ -80,21 +79,15 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Holds information about the execution context.
    */
   private final JPPFContext jppfContext;
-  /**
-   * The job manager.
-   */
-  private final JPPFJobManager jobManager;
 
   /**
    * Initialize this task queue checker with the specified node server.
    * @param queue        the reference queue to use.
    * @param statsManager the reference to statistics manager.
-   * @param jobManager   the job manager which sends job notifications.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
+  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFDriverStatsManager statsManager)
   {
     this.queue = queue;
-    this.jobManager = jobManager;
     this.jppfContext = new JPPFContextDriver(queue);
     this.statsManager = statsManager;
     this.queueLock = queue.getLock();
@@ -341,7 +334,6 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     {
       JPPFFuture<?> future = channel.submit(bundleWrapper);
       bundleWrapper.jobDispatched(channel, future);
-      jobManager.jobDispatched(bundleWrapper.getClientJob(), ((AbstractNodeContext) channel).getChannel());
     }
   }
 

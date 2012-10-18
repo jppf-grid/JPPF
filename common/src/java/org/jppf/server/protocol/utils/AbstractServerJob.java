@@ -411,47 +411,7 @@ public abstract class AbstractServerJob {
   /**
    * The current number of tasks in a job was updated.
    */
-  public void fireJobUpdated() {
-    fireJobNotification(createJobNotification(JobEventType.JOB_UPDATED, null));
-  }
-
-  /**
-   * A new job was submitted to the JPPF driver queue.
-   */
-  public void fireJobQueued() {
-    fireJobNotification(createJobNotification(JobEventType.JOB_QUEUED, null));
-  }
-
-  /**
-   * A job was completed and sent back to the client.
-   */
-  public void fireJobEnded() {
-    fireJobNotification(createJobNotification(JobEventType.JOB_ENDED, null));
-  }
-
-  /**
-   * A sub-job was dispatched to a node.
-   * @param channel the node to which the job is dispatched.
-   * @param bundle the bundle for job event.
-   */
-  public void fireJobDispatched(final ExecutorChannel channel, final JPPFTaskBundle bundle) {
-    fireJobNotification(createJobNotification(JobEventType.JOB_DISPATCHED, channel, bundle));
-  }
-
-  /**
-   * A sub-job returned from a node.
-   * @param channel the node from which the job is returned.
-   * @param bundle the bundle for job event.
-   */
-  public void fireJobReturned(final ExecutorChannel channel, final JPPFTaskBundle bundle) {
-    if (bundle != null) fireJobNotification(createJobNotification(JobEventType.JOB_RETURNED, channel, bundle));
-  }
-
-  /**
-   * Fire job listener event.
-   * @param event the event to be fired.
-   */
-  protected abstract void fireJobNotification(final JobNotification event);
+  public abstract void fireJobUpdated();
 
     /**
     * Get the current number of tasks in the job.

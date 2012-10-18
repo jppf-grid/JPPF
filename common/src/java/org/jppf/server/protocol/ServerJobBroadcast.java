@@ -18,7 +18,6 @@
 package org.jppf.server.protocol;
 
 import org.jppf.io.DataLocation;
-import org.jppf.job.JobNotificationEmitter;
 import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,24 +59,24 @@ public class ServerJobBroadcast extends ServerJob {
   /**
    * Initialized broadcast job with task bundle and data provider.
    * @param lock used to synchronized access to job.
-   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
+   * @param notificationEmitter an <code>ChangeListener</code> instance that fires job notifications.
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
-  public ServerJobBroadcast(final ReentrantLock lock, final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public ServerJobBroadcast(final ReentrantLock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
     this(lock, notificationEmitter, job, dataProvider, null, null);
   }
 
   /**
    * Initialized broadcast job with task bundle and data provider.
    * @param lock used to synchronized access to job.
-   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
+   * @param notificationEmitter an <code>ChangeListener</code> instance that fires job notifications.
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID.
    */
-  protected ServerJobBroadcast(final ReentrantLock lock, final JobNotificationEmitter notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider, final ServerJobBroadcast parentJob, final String broadcastUUID) {
+  protected ServerJobBroadcast(final ReentrantLock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider, final ServerJobBroadcast parentJob, final String broadcastUUID) {
     super(lock, notificationEmitter, job, dataProvider);
     if (!job.getSLA().isBroadcastJob()) throw new IllegalStateException("Not broadcast job");
 
@@ -150,12 +149,13 @@ public class ServerJobBroadcast extends ServerJob {
   protected void broadcastCompleted(final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
     //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
-    boolean empty;
     lock.lock();
     try {
       if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) throw new IllegalStateException("broadcast job not found");
-      empty = broadcastMap.isEmpty();
-      if (empty) taskCompleted(null, null);
+      if (broadcastMap.isEmpty()) {
+        taskCompleted(null, null);
+        setSubmissionStatus(SubmissionStatus.ENDED);
+      }
     } finally {
       lock.unlock();
     }
@@ -166,27 +166,27 @@ public class ServerJobBroadcast extends ServerJob {
     if (parentJob == null) {
       super.fireTaskCompleted(result);
     } else {
-      fireJobEnded();
+      setSubmissionStatus(SubmissionStatus.ENDED);
       parentJob.broadcastCompleted(this);
     }
   }
 
   @Override
   public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
-    if (isCancelled()) {
-      List<ServerJobBroadcast> list;
-      lock.lock();
-      try {
+    lock.lock();
+    try {
+      if (isCancelled()) {
+        List<ServerJobBroadcast> list;
         list = new ArrayList<ServerJobBroadcast>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
         broadcastSet.clear();
-      } finally {
-        lock.unlock();
+        for (ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
       }
-      for (ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
+      super.taskCompleted(bundle, exception);
+    } finally {
+      lock.unlock();
     }
-    super.taskCompleted(bundle, exception);
   }
 
   @Override

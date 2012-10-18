@@ -90,7 +90,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   protected int getSize(final ServerJob bundleWrapper)
   {
     //return bundle.getTaskCount();
-    return ((JPPFTaskBundle) bundleWrapper.getJob()).getInitialTaskCount();
+    return bundleWrapper.getJob().getInitialTaskCount();
   }
 
   /**
@@ -99,14 +99,6 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   protected void fireQueueEvent(final QueueEvent event)
   {
-    if (!event.isRequeued())
-    {
-      event.getBundleWrapper().fireJobQueued();
-    }
-    else {
-      event.getBundleWrapper().fireJobUpdated();
-    }
-
     synchronized (queueListeners)
     {
       for (QueueListener listener : queueListeners) listener.newBundle(event);

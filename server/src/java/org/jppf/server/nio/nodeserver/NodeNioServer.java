@@ -28,7 +28,6 @@ import org.jppf.execute.ExecutorChannelStatusEvent;
 import org.jppf.execute.ExecutorChannelStatusListener;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.io.MultipleBuffersLocation;
-import org.jppf.job.JobNotificationEmitter;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.JPPFDriverStatsManager;
@@ -142,7 +141,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
 
-    taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager, driver.getJobManager());
+    taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
     this.queue.addQueueListener(new QueueListener() {
@@ -311,7 +310,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
         bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
-        ServerJob serverJob = new ServerJob(new ReentrantLock(), queue, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
+        ServerJob serverJob = new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
         initialBundle = serverJob.copy(serverJob.getTaskCount());
       }
       catch(Exception e)
@@ -376,15 +375,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @return a <code>JPPFQueue</code> instance.
    */
   public JPPFQueue getQueue()
-  {
-    return queue;
-  }
-
-  /**
-   * Get a reference to the driver's job manager.
-   * @return a <code>JPPFQueue</code> instance.
-   */
-  protected JobNotificationEmitter getJobManager()
   {
     return queue;
   }

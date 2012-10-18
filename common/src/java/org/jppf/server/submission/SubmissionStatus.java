@@ -39,6 +39,10 @@ public enum SubmissionStatus
    */
   COMPLETE,
   /**
+   * The job execution ended.
+   */
+  ENDED,
+  /**
    * The job execution has failed.
    */
   FAILED,

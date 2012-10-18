@@ -43,7 +43,7 @@ import org.slf4j.*;
  * A JPPF queue whose elements are ordered by decreasing priority.
  * @author Laurent Cohen
  */
-public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, JobNotificationEmitter
+public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
 {
   /**
    * Logger for this class.
@@ -133,9 +133,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
         if (debugEnabled) log.debug("before processing broadcast job " + bundleWrapper.getJob());
         processBroadcastJob(bundleWrapper);
       } else {
+        boolean queued;
         ServerJob serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
-          serverJob = new ServerJob(lock, null, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+          queued = true;
+          serverJob = new ServerJob(lock, jobManager, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
           serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
           serverJob.setQueueEntryTime(System.currentTimeMillis());
           serverJob.setJobReceivedTime(serverJob.getQueueEntryTime());
@@ -146,8 +148,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
             scheduleManager.handleExpirationJobSchedule(serverJob);
           }
           jobMap.put(jobUuid, serverJob);
-        } else
+        } else {
+          queued = false;
           removeFromListMap(sla.getPriority(), serverJob, priorityMap);
+        }
         if(!serverJob.addBundle(bundleWrapper)) throw new IllegalStateException("Can't add bundle to job: " + jobUuid);
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
@@ -155,6 +159,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
           putInListMap(getSize(serverJob), serverJob, sizeMap);
         }
         updateLatestMaxSize();
+        if (queued) jobManager.jobQueued(serverJob);
         fireQueueEvent(new QueueEvent(this, serverJob, false));
       }
     } finally {
@@ -165,7 +170,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   }
 
   /**
-   * Handle requeuing of the specified job.
+   * Handle requeue of the specified job.
    * @param job the job to requeue.
    */
   void requeue(final ServerJob job) {
@@ -214,7 +219,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
         bundleList.add(bundleWrapper);
       }
       updateLatestMaxSize();
-      jobManager.jobUpdated(bundleWrapper);
     } finally {
       lock.unlock();
     }
@@ -262,6 +266,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     try {
       if (removeFromJobMap) {
         jobMap.remove(bundleWrapper.getUuid());
+        scheduleManager.clearSchedules(bundleWrapper.getUuid());
+        jobManager.jobEnded(bundleWrapper);
       }
 
       if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName());
@@ -296,7 +302,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
         removeFromListMap(oldPriority, job, priorityMap);
         putInListMap(newPriority, job, priorityMap);
         job.fireJobUpdated();
-        jobManager.jobUpdated(job);
       }
     } finally {
       lock.unlock();
@@ -385,39 +390,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
   }
 
   /**
-   * Fire job listener event.
-   * @param event the event to be fired.
-   */
-  @Override
-  public void fireJobEvent(final JobNotification event)
-  {
-    if (event == null) throw new IllegalArgumentException("event is null");
-
-    synchronized(jobListeners) {
-      switch (event.getEventType())
-      {
-        case JOB_QUEUED:
-          for (JobListener listener: jobListeners) listener.jobQueued(event);
-          break;
-        case JOB_ENDED:
-          for (JobListener listener: jobListeners) listener.jobEnded(event);
-          break;
-        case JOB_UPDATED:
-          for (JobListener listener: jobListeners) listener.jobUpdated(event);
-          break;
-        case JOB_DISPATCHED:
-          for (JobListener listener: jobListeners) listener.jobDispatched(event);
-          break;
-        case JOB_RETURNED:
-          for (JobListener listener: jobListeners) listener.jobReturned(event);
-          break;
-        default:
-          throw new IllegalStateException("Unsupported event type: " + event.getEventType());
-      }
-    }
-  }
-
-  /**
    * Update count of working connections base on status change.
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
@@ -440,7 +412,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     final String jobUuid = bundleWrapper.getUuid();
     ServerJob serverJob = jobMap.get(jobUuid);
     if (serverJob == null) {
-      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, null, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, jobManager, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
       broadcastJob.setSubmissionStatus(SubmissionStatus.PENDING);
       broadcastJob.setQueueEntryTime(System.currentTimeMillis());
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
@@ -448,6 +420,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
 
       jobMap.put(jobUuid, broadcastJob);
       broadcastJob.addBundle(bundleWrapper);
+      jobManager.jobQueued(broadcastJob);
       pendingBroadcasts.offer(broadcastJob);
       processPendingBroadcasts();
     } else
@@ -568,6 +541,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager, 
     scheduleManager.handleExpirationJobSchedule(broadcastJob);
     jobMap.put(jobUuid, broadcastJob);
     updateLatestMaxSize();
+    jobManager.jobQueued(broadcastJob);
     fireQueueEvent(new QueueEvent(this, broadcastJob, false));
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));

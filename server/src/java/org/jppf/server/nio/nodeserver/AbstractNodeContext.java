@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.jppf.execute.*;
 import org.jppf.io.*;
-import org.jppf.job.JobNotificationEmitter;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.JPPFSystemInformation;
@@ -218,7 +217,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     message.addLocation(bundle.getDataProviderL());
     for (ServerTask dl: bundle.getTaskList()) message.addLocation(dl.getDataLocation());
 //    System.out.println("serialize: Task count - bundle: " + bundle.getTaskCount() + "\t job: " + bundle.getJob().getTaskCount() + "\t real tasks: " + bundle.getTasksL().size());
-    message.setBundle((JPPFTaskBundle) bundle.getJob());
+    message.setBundle(bundle.getJob());
     setMessage(message);
   }
 
@@ -226,9 +225,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Deserialize a task bundle from the message read into this buffer.
    * @return a {@link AbstractNodeContext} instance.
    * @throws Exception if an error occurs during the deserialization.
-   * @param notificationEmitter an <code>JobNotificationEmitter</code> instance that fires job notifications.
    */
-  public ServerTaskBundleClient deserializeBundle(final JobNotificationEmitter notificationEmitter) throws Exception
+  public ServerTaskBundleClient deserializeBundle() throws Exception
   {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();

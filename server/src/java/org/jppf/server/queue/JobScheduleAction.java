@@ -18,7 +18,6 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.ServerJob;
 import org.slf4j.*;
 
@@ -62,7 +61,6 @@ class JobScheduleAction implements Runnable
         log.debug("job '" + jobId + "' is resuming");
       }
       bundleWrapper.setPending(false);
-      JPPFDriver.getInstance().getJobManager().jobUpdated(bundleWrapper);
     }
   }
 }

@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.ClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
@@ -64,10 +63,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Unique ID for the client.
    */
   private String clientUuid = null;
-  /**
-   * Reference to the job manager.
-   */
-  private static JPPFJobManager jobManager = JPPFDriver.getInstance().getJobManager();
 
   /**
    * Get the task bundle to send or receive.
@@ -250,7 +245,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   {
     if (initialBundleWrapper != null)
     {
-      jobManager.jobEnded(initialBundleWrapper);
+      initialBundleWrapper.bundleEnded();
       initialBundleWrapper = null;
     }
   }
@@ -268,7 +263,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
       {
         initialBundleWrapper.cancel();
       }
-      jobManager.jobEnded(initialBundleWrapper);
+      initialBundleWrapper.bundleEnded();
       initialBundleWrapper = null;
     }
   }

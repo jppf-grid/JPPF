@@ -151,7 +151,6 @@ public class JPPFDriver
   @SuppressWarnings("unchecked")
   public void run() throws Exception
   {
-    taskQueue.addQueueListener(jobManager);
     JPPFConnectionInformation info = initializer.getConnectionInformation();
 
     initializer.registerDebugMBean();

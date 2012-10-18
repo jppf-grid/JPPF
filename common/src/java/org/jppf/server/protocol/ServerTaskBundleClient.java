@@ -161,7 +161,6 @@ public class ServerTaskBundleClient
     if (fire && !done) {
       done = true;
       fireTasksCompleted(taskList);
-      fireBundleDone();
     }
   }
 
@@ -207,7 +206,6 @@ public class ServerTaskBundleClient
       }
       this.done = true;
       fireTasksCompleted(taskList);
-      fireBundleDone();
     }
   }
 
@@ -296,15 +294,15 @@ public class ServerTaskBundleClient
   /**
    * Notifies that bundle is completely executed.
    */
-  protected void fireBundleDone() {
-    if (dataProvider == null) throw new IllegalArgumentException("results is null");
+  public void bundleEnded() {
+    if (dataProvider == null) throw new IllegalArgumentException("dataProvider is null");
 
     CompletionListener[] listeners;
     synchronized (listenerList) {
       listeners = listenerList.toArray(new CompletionListener[listenerList.size()]);
     }
     for (CompletionListener listener : listeners) {
-      listener.bundleDone(this);
+      listener.bundleEnded(this);
     }
   }
 
@@ -363,6 +361,6 @@ public class ServerTaskBundleClient
      * Callback method invoked when execution of the bundle is done.
      * @param bundle the bundle that notifies that finished.
      */
-    void bundleDone(final ServerTaskBundleClient bundle);
+    void bundleEnded(final ServerTaskBundleClient bundle);
   }
 }

@@ -94,7 +94,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
-    getJobManager().jobUpdated(bundleWrapper);
   }
 
   /**
@@ -114,7 +113,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setSuspended(false, false);
-    getJobManager().jobUpdated(bundleWrapper);
   }
 
   /**
@@ -135,7 +133,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setMaxNodes(maxNodes);
-    getJobManager().jobUpdated(bundleWrapper);
   }
 
   /**
@@ -163,7 +160,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   {
     ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
     if (bundleWrapper == null) return null;
-    JPPFTaskBundle bundle = (JPPFTaskBundle) bundleWrapper.getJob();
+    JPPFTaskBundle bundle = bundleWrapper.getJob();
     Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
     JobInformation job = new JobInformation(jobUuid, bundle.getName(),
         bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),

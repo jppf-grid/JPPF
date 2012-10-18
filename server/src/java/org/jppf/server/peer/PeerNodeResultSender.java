@@ -115,6 +115,6 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
   }
 
   @Override
-  public void bundleDone(final ServerTaskBundleClient bundle) {
+  public void bundleEnded(final ServerTaskBundleClient bundle) {
   }
 }

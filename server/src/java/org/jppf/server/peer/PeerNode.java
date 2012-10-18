@@ -192,7 +192,7 @@ class PeerNode extends AbstractCommonNode
       }
       if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE)
       {
-        driver.getJobManager().jobEnded(bundleWrapper);
+        bundleWrapper.bundleEnded();
       }
     }
     if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
