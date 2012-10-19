@@ -31,7 +31,7 @@ import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.LifeCycleTask;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFTask}.
@@ -74,7 +74,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testTaskTimeout() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDuration", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    JPPFJob job = BaseTestHelper.createJob("testTaskTimeoutDuration", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     List<JPPFTask> tasks = job.getTasks();
     JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
     tasks.get(nbTasks-1).setTimeoutSchedule(schedule);
@@ -94,7 +94,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testTaskExpirationDate() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseSetup.createJob("testTaskTimeoutDate", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    JPPFJob job = BaseTestHelper.createJob("testTaskTimeoutDate", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     Date date = new Date(System.currentTimeMillis() + TIME_SHORT + 10L);
     JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
@@ -116,7 +116,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testComputeCallable() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseSetup.createJob("testComputeCallable", true, false, nbTasks, MyComputeCallableTask.class, true);
+    JPPFJob job = BaseTestHelper.createJob("testComputeCallable", true, false, nbTasks, MyComputeCallableTask.class, true);
     callableResult = "test successful";
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
@@ -137,7 +137,7 @@ public class TestJPPFTask extends Setup1D1N1C
     {
       configure();
       int nbTasks = 1;
-      JPPFJob job = BaseSetup.createJob("testComputeCallableInClient", true, false, nbTasks, MyComputeCallableTask.class, true);
+      JPPFJob job = BaseTestHelper.createJob("testComputeCallableInClient", true, false, nbTasks, MyComputeCallableTask.class, true);
       callableResult = "test successful";
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
@@ -161,7 +161,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testIsInNodeTrue() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseSetup.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
+    JPPFJob job = BaseTestHelper.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
@@ -181,7 +181,7 @@ public class TestJPPFTask extends Setup1D1N1C
     {
       configure();
       int nbTasks = 1;
-      JPPFJob job = BaseSetup.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
+      JPPFJob job = BaseTestHelper.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);

@@ -32,7 +32,7 @@ import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.LifeCycleTask;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFDriverAdminMBean}.
@@ -58,7 +58,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     double n = stats.getNodes().getLatest();
     assertTrue("nb nodes should be 2 but is " + n, n == 2);
     assertTrue(stats.getTotalTasksExecuted() == 0);
-    client.submit(BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
+    client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     stats = driver.statistics();
     n = stats.getIdleNodes().getLatest();
@@ -82,7 +82,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testResetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
-    client.submit(BaseSetup.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
+    client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     driver.resetStatistics();
     JPPFStats stats = driver.statistics();
@@ -236,7 +236,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
     assertNotNull(coll);
     assertEquals(2, coll.size());
-    JPPFJob job = BaseSetup.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 2000L);
+    JPPFJob job = BaseTestHelper.createJob("testIdleNodesInformation", false, false, 1, LifeCycleTask.class, 2000L);
     client.submit(job);
     Thread.sleep(500L);
     coll = driver.idleNodesInformation();
@@ -258,7 +258,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     Thread.sleep(500L);
     int n = driver.nbIdleNodes();
     assertEquals(nbNodes, n);
-    JPPFJob job = BaseSetup.createJob("testNbIdleNodes", false, false, 1, LifeCycleTask.class, 2000L);
+    JPPFJob job = BaseTestHelper.createJob("testNbIdleNodes", false, false, 1, LifeCycleTask.class, 2000L);
     client.submit(job);
     Thread.sleep(500L);
     n = driver.nbIdleNodes();

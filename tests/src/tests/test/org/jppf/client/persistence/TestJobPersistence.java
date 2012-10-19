@@ -31,7 +31,7 @@ import org.jppf.utils.*;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.SimpleTask;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Test for the <code>JobPersistence</code> interface.
@@ -60,7 +60,7 @@ public class TestJobPersistence extends Setup1D1N
       client = BaseSetup.createClient(null, false);
       int nbTasks = 3;
       final AtomicBoolean resultsReceived = new AtomicBoolean(false);
-      JPPFJob job = BaseSetup.createJob("TestSubmit", false, false, nbTasks, SimpleTask.class, duration);
+      JPPFJob job = BaseTestHelper.createJob("TestSubmit", false, false, nbTasks, SimpleTask.class, duration);
       pm = new DefaultFilePersistenceManager("root", "job_", ".ser");
       key = pm.computeKey(job);
       assertEquals(key, job.getUuid());

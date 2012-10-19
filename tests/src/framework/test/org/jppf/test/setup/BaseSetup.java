@@ -18,18 +18,14 @@
 
 package test.org.jppf.test.setup;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 import javax.management.remote.JMXServiceURL;
 
 import org.jppf.client.*;
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFConfiguration;
-
-import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
@@ -273,78 +269,5 @@ public class BaseSetup
       }
     };
     Runtime.getRuntime().addShutdownHook(shutdownHook);
-  }
-
-  /**
-   * Create a job with the specified parameters.
-   * The type of the tasks is specified via their class, and the constructor to
-   * use is specified based on the number of parameters.
-   * @param name the job's name.
-   * @param blocking specifies whether the job is blocking.
-   * @param broadcast specifies whether the job is a broadcast job.
-   * @param nbTasks the number of tasks to add to the job.
-   * @param taskClass the class of the tasks to add to the job.
-   * @param params the parameters for the tasks constructor.
-   * @return a <code>JPPFJob</code> instance.
-   * @throws Exception if any error occurs.
-   */
-  public static JPPFJob createJob(final String name, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception
-  {
-    JPPFJob job = new JPPFJob();
-    job.setName(name);
-    int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = BaseTestHelper.findConstructor(taskClass, nbArgs);
-    for (int i=1; i<=nbTasks; i++)
-    {
-      Object o = constructor.newInstance(params);
-      if (o instanceof JPPFTask) ((JPPFTask) o).setId(job.getName() + " - task " + i);
-      job.addTask(o);
-    }
-    job.setBlocking(blocking);
-    job.getSLA().setBroadcastJob(broadcast);
-    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
-    return job;
-  }
-
-  /**
-   * Create a task with the specified parameters.
-   * The type of the task is specified via its class, and the constructor to
-   * use is specified based on the number of parameters.
-   * @param id the task id.
-   * @param taskClass the class of the tasks to add to the job.
-   * @param params the parameters for the tasks constructor.
-   * @return an <code>Object</code> representing a task.
-   * @throws Exception if any error occurs.
-   */
-  public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception
-  {
-    int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
-    Object o = constructor.newInstance(params);
-    if (o instanceof JPPFTask) ((JPPFTask) o).setId(id);
-    return o;
-  }
-
-  /**
-   * Find a constructor with the specified number of parameters for the specified class.
-   * @param taskClass the class of the tasks to add to the job.
-   * @param nbParams the number of parameters for the tasks constructor.
-   * @return a <code>constructor</code> instance.
-   * @throws Exception if any error occurs if a constructor could not be found.
-   */
-  private static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
-  {
-    Constructor[] constructors = taskClass.getConstructors();
-    Constructor constructor = null;
-    for (Constructor c: constructors)
-    {
-      if (c.getParameterTypes().length == nbParams)
-      {
-        constructor = c;
-        break;
-      }
-    }
-    if (constructor == null) throw new IllegalArgumentException("couldn't find a constructor for class " + taskClass.getName() + " with " + nbParams + " arguments");
-    return constructor;
   }
 }

@@ -395,7 +395,8 @@ public class GenericProcessLauncher
     }
     catch (IOException e)
     {
-      e.printStackTrace();
+      //e.printStackTrace();
+      throw new RuntimeException(e);
     }
     finally
     {

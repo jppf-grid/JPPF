@@ -71,7 +71,7 @@ public class TestJPPFJob
     try
     {
       client = BaseSetup.createClient(null, false);
-      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 50L);
+      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 50L);
       CountingJobListener listener = new CountingJobListener();
       job.addJobListener(listener);
       client.submit(job);

@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
-import test.org.jppf.test.setup.common.LifeCycleTask;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFTask}.
@@ -54,7 +54,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   public void testCancelJob() throws Exception
   {
     int nbTasks = 10;
-    JPPFJob job = BaseSetup.createJob("testCancelJob", false, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    JPPFJob job = BaseTestHelper.createJob("testCancelJob", false, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submit(job);
     Thread.sleep(TIME_SHORT);
@@ -79,7 +79,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   @Test(timeout=10000L)
   public void testCancelJobAfterCompletion() throws Exception
   {
-    JPPFJob job = BaseSetup.createJob("testCancelJobAfterCompletion", true, false, 1, LifeCycleTask.class, TIME_SHORT);
+    JPPFJob job = BaseTestHelper.createJob("testCancelJobAfterCompletion", true, false, 1, LifeCycleTask.class, TIME_SHORT);
     List<JPPFTask> results = client.submit(job);
     assertEquals(results.size(), 1);
     assertNotNull(results.get(0));

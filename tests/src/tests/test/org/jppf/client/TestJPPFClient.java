@@ -84,7 +84,7 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       int nbTasks = 10;
-      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (JPPFTask task: job.getTasks()) task.setId("" + i++);
       List<JPPFTask> results = client.submit(job);
@@ -116,7 +116,7 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       int nbTasks = 10;
-      JPPFJob job = BaseSetup.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 5000L);
+      JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 5000L);
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       int i = 0;
       for (JPPFTask task: job.getTasks()) task.setId("" + i++);
@@ -158,7 +158,7 @@ public class TestJPPFClient extends Setup1D1N
       
       // submit a job to ensure all local execution threads are created
       int nbTasks = 100;
-      JPPFJob job = BaseSetup.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (JPPFTask task: job.getTasks()) task.setId("" + i++);
       List<JPPFTask> results = client.submit(job);

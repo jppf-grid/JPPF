@@ -101,7 +101,7 @@ public class TestJobListener extends Setup1D1N
   public List<JPPFTask> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception
   {
     client = BaseSetup.createClient(null, false);
-    JPPFJob job = BaseSetup.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
+    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
