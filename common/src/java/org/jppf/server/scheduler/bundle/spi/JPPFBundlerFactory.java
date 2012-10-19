@@ -82,6 +82,7 @@ public class JPPFBundlerFactory
   public JPPFBundlerFactory(final String def)
   {
     defaultConfig = StringUtils.toProperties(def);
+    if (debugEnabled) log.debug("using default properties: " + defaultConfig);
   }
 
   /**
@@ -162,6 +163,7 @@ public class JPPFBundlerFactory
   private void loadProviders() throws Exception
   {
     Map<String, JPPFBundlerProvider> map = new Hashtable<String, JPPFBundlerProvider>();
+    //Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, getClass().getClassLoader());
     Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
     while (it.hasNext())
     {
@@ -169,6 +171,7 @@ public class JPPFBundlerFactory
       map.put(provider.getAlgorithmName(), provider);
       if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
     }
+    if (debugEnabled) log.debug("found " + map.size() + " load-balancing algorithms in the classpath");
     providerMap = map;
   }
 
