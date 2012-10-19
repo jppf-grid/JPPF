@@ -23,9 +23,10 @@ import java.util.*;
 import javax.management.remote.JMXServiceURL;
 
 import org.jppf.client.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.JPPFConfiguration;
+
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.

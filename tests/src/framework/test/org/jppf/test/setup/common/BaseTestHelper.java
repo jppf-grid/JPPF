@@ -23,7 +23,6 @@ import java.lang.reflect.Constructor;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 
-
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
@@ -34,6 +33,48 @@ public class BaseTestHelper
    * Message used for successful task execution.
    */
   public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
+
+  /**
+   * Find a constructor with the specfied number of parameters for the specified class.
+   * @param taskClass the class of the tasks to add to the job.
+   * @param nbParams the number of parameters for the tasks constructor.
+   * @return a <code>constructor</code> instance.
+   * @throws Exception if any error occurs if a construcotr could not be found.
+   */
+  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
+  {
+    Constructor[] constructors = taskClass.getConstructors();
+    Constructor constructor = null;
+    for (Constructor c: constructors)
+    {
+      if (c.getParameterTypes().length == nbParams)
+      {
+        constructor = c;
+        break;
+      }
+    }
+    if (constructor == null) throw new IllegalArgumentException("couldn't find a constructor for class " + taskClass.getName() + " with " + nbParams + " arguments");
+    return constructor;
+  }
+
+  /**
+   * Create a task with the specified parameters.
+   * The type of the task is specified via its class, and the constructor to
+   * use is specified based on the number of parameters.
+   * @param id the task id.
+   * @param taskClass the class of the tasks to add to the job.
+   * @param params the parameters for the tasks constructor.
+   * @return an <code>Object</code> representing a task.
+   * @throws Exception if any error occurs.
+   */
+  public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception
+  {
+    int nbArgs = (params == null) ? 0 : params.length;
+    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Object o = constructor.newInstance(params);
+    if (o instanceof JPPFTask) ((JPPFTask) o).setId(id);
+    return o;
+  }
 
   /**
    * Create a job with the specified parameters.
@@ -65,47 +106,4 @@ public class BaseTestHelper
     if (!blocking) job.setResultListener(new JPPFResultCollector(job));
     return job;
   }
-
-  /**
-   * Create a task with the specified parameters.
-   * The type of the task is specified via its class, and the constructor to
-   * use is specified based on the number of parameters.
-   * @param id the task id.
-   * @param taskClass the class of the tasks to add to the job.
-   * @param params the parameters for the tasks constructor.
-   * @return an <code>Object</code> representing a task.
-   * @throws Exception if any error occurs.
-   */
-  public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception
-  {
-    int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
-    Object o = constructor.newInstance(params);
-    if (o instanceof JPPFTask) ((JPPFTask) o).setId(id);
-    return o;
-  }
-
-  /**
-   * Find a constructor with the specified number of parameters for the specified class.
-   * @param taskClass the class of the tasks to add to the job.
-   * @param nbParams the number of parameters for the tasks constructor.
-   * @return a <code>constructor</code> instance.
-   * @throws Exception if any error occurs if a constructor could not be found.
-   */
-  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
-  {
-    Constructor[] constructors = taskClass.getConstructors();
-    Constructor constructor = null;
-    for (Constructor c: constructors)
-    {
-      if (c.getParameterTypes().length == nbParams)
-      {
-        constructor = c;
-        break;
-      }
-    }
-    if (constructor == null) throw new IllegalArgumentException("couldn't find a constructor for class " + taskClass.getName() + " with " + nbParams + " arguments");
-    return constructor;
-  }
-
 }
