@@ -26,7 +26,7 @@ import javax.tools.*;
 
 /**
  * This class encapsulates a Java platform compiler and provides an API to compile
- * java sources proivded as string to eithe rthe file system or an in-memory location.
+ * java sources provided as string to either the file system or an in-memory location.
  * @author Laurent Cohen
  */
 public class SourceCompiler implements Closeable
