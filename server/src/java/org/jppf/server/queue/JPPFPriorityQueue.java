@@ -149,11 +149,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
             scheduleManager.handleExpirationJobSchedule(serverJob);
           }
           jobMap.put(jobUuid, serverJob);
-        } else {
-          queued = false;
-          removeFromListMap(sla.getPriority(), serverJob, priorityMap);
-        }
-        if(!serverJob.addBundle(bundleWrapper)) throw new IllegalStateException("Can't add bundle to job: " + jobUuid);
+        } else queued = false;
+        if(serverJob.addBundle(bundleWrapper)) {
+          if(!queued) removeFromListMap(sla.getPriority(), serverJob, priorityMap);
+        } else return;
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
           putInListMap(sla.getPriority(), serverJob, priorityMap);
@@ -274,6 +273,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
 
       if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName());
       removeFromListMap(bundleWrapper.getSLA().getPriority(), bundleWrapper, priorityMap);
+
+      for (ServerTaskBundleClient bundle : bundleWrapper.getCompletionBundles()) {
+        addBundle(bundle);
+      }
     } finally {
       lock.unlock();
     }

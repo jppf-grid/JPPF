@@ -67,10 +67,6 @@ public class ServerJob extends AbstractServerJob {
    */
   private SubmissionStatus submissionStatus;
   /**
-   * The listener that receives notifications of completed tasks.
-   */
-  private Object resultsListener = null;
-  /**
    * The requeue handler.
    */
   private Runnable onRequeue = null;
@@ -86,6 +82,11 @@ public class ServerJob extends AbstractServerJob {
    * Used for synchronized access to job.
    */
   protected final ReentrantLock lock;
+  /**
+   * List of bundles added after submission status set to <code>COMPLETE</code>.
+   */
+  private List<ServerTaskBundleClient> completionBundles = null;
+
   /**
    * Initialized client job with task bundle and list of tasks to execute.
    * @param lock used to synchronized access to job.
@@ -183,22 +184,6 @@ public class ServerJob extends AbstractServerJob {
   }
 
   /**
-   * Get the listener that receives notifications of completed tasks.
-   * @return a <code>TaskCompletionListener</code> instance.
-   */
-  public Object getResultListener() {
-    return resultsListener;
-  }
-
-  /**
-   * Set the listener that receives notifications of completed tasks.
-   * @param resultsListener a <code>TaskCompletionListener</code> instance.
-   */
-  public void setResultListener(final Object resultsListener) {
-    this.resultsListener = resultsListener;
-  }
-
-  /**
    * Get the broadcast UUID.
    * @return an <code>String</code> instance.
    */
@@ -221,8 +206,7 @@ public class ServerJob extends AbstractServerJob {
       updateStatus(NEW, EXECUTING);
       setSubmissionStatus(SubmissionStatus.EXECUTING);
     }
-    ExecutorChannel channel = bundle.getChannel();
-    fireJobDispatched(channel, bundle);
+    fireJobDispatched(bundle.getChannel(), bundle);
   }
 
   /**
@@ -416,7 +400,6 @@ public class ServerJob extends AbstractServerJob {
     } finally {
       lock.unlock();
     }
-    if (resultsListener instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
   }
 
   @Override
@@ -448,8 +431,7 @@ public class ServerJob extends AbstractServerJob {
    * @return the number used for job execution.
    */
   public int getNbChannels() {
-    synchronized (dispatchSet)
-    {
+    synchronized (dispatchSet) {
       return dispatchSet.size();
     }
   }
@@ -515,18 +497,38 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Add received bundle to this server job.
    * @param bundle the bundle to add.
-   * @return <code>true</code> when bundle was added to job. <code>false</code> when job is COMPLETED.
+   * @return <code>true</code> when bundle was added to job. <code>false</code> when job is <code>COMPLETE</code>.
    */
   public boolean addBundle(final ServerTaskBundleClient bundle) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     lock.lock();
     try {
-      if (getSubmissionStatus() == SubmissionStatus.COMPLETE) return false;
-      bundleList.add(bundle);
-      this.tasks.addAll(bundle.getTaskList());
-      bundle.addCompletionListener(bundleCompletionListener);
-      fireJobUpdated();
-      return true;
+      if(getSubmissionStatus() == SubmissionStatus.COMPLETE) {
+        if(completionBundles == null) completionBundles = new ArrayList<ServerTaskBundleClient>();
+        completionBundles.add(bundle);
+        return false;
+      } else if(getSubmissionStatus() == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
+      else {
+        bundleList.add(bundle);
+        this.tasks.addAll(bundle.getTaskList());
+        bundle.addCompletionListener(bundleCompletionListener);
+        fireJobUpdated();
+        return true;
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get list of bundles added after job completion.
+   * @return list of bundles added after job completion.
+   */
+  public List<ServerTaskBundleClient> getCompletionBundles() {
+    lock.lock();
+    try {
+      if(completionBundles == null) return Collections.emptyList();
+      else return completionBundles;
     } finally {
       lock.unlock();
     }
@@ -536,8 +538,7 @@ public class ServerJob extends AbstractServerJob {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
-    sb.append('{');
-    sb.append("uuid=").append(getUuid());
+    sb.append("{uuid=").append(getUuid());
     if (getSLA().isBroadcastJob()) sb.append("broadcastID=").append(getBroadcastUUID());
     sb.append(", status=").append(getSubmissionStatus());
     sb.append(", tasks=").append(tasks.size());
@@ -545,16 +546,14 @@ public class ServerJob extends AbstractServerJob {
     sb.append(", cancelled=").append(isCancelled());
     sb.append(", expired=").append(isJobExpired());
     sb.append(", pending=").append(isPending());
-    sb.append(", suspended=").append(isSuspended());
-    sb.append('}');
+    sb.append(", suspended=").append(isSuspended()).append('}');
     return sb.toString();
   }
 
   /**
    * Listener for handling completed bundles.
    */
-  private class BundleCompletionListener implements ServerTaskBundleClient.CompletionListener
-  {
+  private class BundleCompletionListener implements ServerTaskBundleClient.CompletionListener {
     @Override
     public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
       if (bundle == null) throw new IllegalArgumentException("bundle is null");
