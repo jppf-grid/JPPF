@@ -55,7 +55,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * The list of pending resource responses for a node.
    */
-  protected Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = new HashMap<JPPFResourceWrapper, ResourceRequest>();
+  private final Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = new HashMap<JPPFResourceWrapper, ResourceRequest>();
   /**
    * The request currently processed.
    */
@@ -68,10 +68,18 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Contains the JPPF peer identifier written the socket channel.
    */
   private NioObject nioObject = null;
-  /**
-   * The lock used to synchronize between node and client class loader channel.
-   */
-  private final Object lock = new Object();
+
+  @Override
+  public void setState(final ClassState state) {
+    super.setState(state);
+    int nbPendingRequests = getNbPendingRequests();
+    if (ClassState.IDLE_PROVIDER.equals(state) && nbPendingRequests > 0)
+    {
+//      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests);
+      JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST, true);
+//      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests + " - DONE");
+    }
+  }
 
   /**
    * Deserialize a resource wrapper from an array of bytes.
@@ -288,15 +296,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public Map<JPPFResourceWrapper, ResourceRequest> getPendingResponses()
   {
     return pendingResponses;
-  }
-
-  /**
-   * Get the lock used to synchronize between node and client class loader channel.
-   * @return an {@link Object}.
-   */
-  public Object getLock()
-  {
-    return lock;
   }
 
   @Override
