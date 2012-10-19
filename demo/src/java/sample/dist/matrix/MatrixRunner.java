@@ -27,8 +27,7 @@ import org.jppf.client.*;
 import org.jppf.client.utils.GridMonitor;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
-import org.jppf.node.policy.*;
-import org.jppf.server.JPPFStats;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
@@ -84,11 +83,13 @@ public class MatrixRunner implements NotificationListener
       TypedProperties props = JPPFConfiguration.getProperties();
       int size = props.getInt("matrix.size", 300);
       int iterations = props.getInt("matrix.iterations", 10);
+      int nbChannels = props.getInt("matrix.nbChannels", 1);
+      if (nbChannels < 1) nbChannels = 1;
       int nbRows = props.getInt("task.nbRows", 1);
-      output("Running Matrix demo with matrix size = "+size+ '*'+size+" for "+iterations+" iterations");
+      output("Running Matrix demo with matrix size = "+size+ '*'+size+" for "+iterations+" iterations"  + " with " + nbChannels  + " channels");
       runner = new MatrixRunner();
       //runner.registerToMBeans();
-      runner.perform(size, iterations, nbRows, clientUuid);
+      runner.perform(size, iterations, nbRows, clientUuid, nbChannels);
       //runner.perform2(size, iterations, nbRows, clientUuid);
     }
     catch(Exception e)
@@ -103,13 +104,15 @@ public class MatrixRunner implements NotificationListener
    * @param iterations the number of times the multiplication will be performed.
    * @param nbRows number of rows of matrix a per task.
    * @param clientUuid an optional uuid to set on the JPPF client.
+   * @param nbChannels number of driver channels to use for each job.
    * @throws Exception if an error is raised during the execution.
    */
-  public void perform(final int size, final int iterations, final int nbRows, final String clientUuid) throws Exception
+  public void perform(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception
   {
     GridMonitor monitor = null;
     try
     {
+      JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(nbChannels));
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
       /*
@@ -126,28 +129,27 @@ public class MatrixRunner implements NotificationListener
       b.assignRandomValues();
       if (size <= 500) performSequentialMultiplication(a, b);
       long totalIterationTime = 0L;
+      long min = Long.MAX_VALUE;
+      long max = 0L;
 
-      // determine whether an execution policy should be used
-      ExecutionPolicy policy = null;
-      String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
-      if (s != null)
-      {
-        PolicyParser.validatePolicy(s);
-        policy = PolicyParser.parsePolicy(s);
-      }
       // perform "iteration" times
       for (int iter=0; iter<iterations; iter++)
       {
-        long elapsed = performParallelMultiplication(a, b, nbRows, policy);
+        long elapsed = performParallelMultiplication(a, b, nbRows, null, nbChannels);
+        if (elapsed < min) min = elapsed;
+        if (elapsed > max) max = elapsed;
         totalIterationTime += elapsed;
         output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
       }
-      output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
+      output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
+          ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
+      /*
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
       {
         JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
         output("End statistics :\n" + stats.toString());
       }
+      */
       /*
 			monitor.stopMonitoring();
 			monitor.storeData("./GridMonitoring");
@@ -167,10 +169,11 @@ public class MatrixRunner implements NotificationListener
    * @param b the right-hand matrix.
    * @param nbRows number of rows of matrix a per task.
    * @param policy the execution policy to apply to the submitted job, may be null.
+   * @param nbChannels number of driver channels to use for each job.
    * @return the elapsed time for the computation.
    * @throws Exception if an error is raised during the execution.
    */
-  private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy) throws Exception
+  private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy, final int nbChannels) throws Exception
   {
     //long start = System.currentTimeMillis();
     long start = System.nanoTime();
@@ -178,6 +181,7 @@ public class MatrixRunner implements NotificationListener
     // create a task for each row in matrix a
     JPPFJob job = new JPPFJob();
     job.setName("matrix sample " + (iterationsCount++));
+    job.getClientSLA().setMaxChannels(nbChannels);
     int remaining = size;
     for (int i=0; i<size; i+= nbRows)
     {
@@ -223,9 +227,10 @@ public class MatrixRunner implements NotificationListener
    * @param iterations the number of times the multiplication will be performed.
    * @param nbRows number of rows of matrix a per task.
    * @param clientUuid an optional uuid to set on the JPPF client.
+   * @param nbChannels number of driver channels to use for each job.
    * @throws Exception if an error is raised during the execution.
    */
-  public void perform2(final int size, final int iterations, final int nbRows, final String clientUuid) throws Exception
+  public void perform2(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception
   {
     try
     {
@@ -243,7 +248,7 @@ public class MatrixRunner implements NotificationListener
         {
           if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
           else jppfClient = new JPPFClient();
-          long elapsed = performParallelMultiplication(a, b, nbRows, null);
+          long elapsed = performParallelMultiplication(a, b, nbRows, null, nbChannels);
           totalIterationTime += elapsed;
           output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
         }
