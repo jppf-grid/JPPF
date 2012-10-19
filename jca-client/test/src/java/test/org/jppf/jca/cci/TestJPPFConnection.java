@@ -56,7 +56,7 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
-      JPPFJob job = BaseSetup.createJob("JCA job", true, false, 1, LifeCycleTask.class);
+      JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class);
       String id = connection.submit(job);
       assertNotNull(id);
       List<JPPFTask> results = connection.waitForResults(id);
@@ -89,7 +89,7 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
-      JPPFJob job = BaseSetup.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 500L);
+      JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 500L);
       id = connection.submit(job);
       assertNotNull(id);
     }
@@ -133,7 +133,7 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
-      JPPFJob job = BaseSetup.createJob("JCA job", true, false, 1, LifeCycleTask.class);
+      JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class);
       GatheringStatusListener listener = new GatheringStatusListener();
       String id = connection.submit(job, listener);
       assertNotNull(id);
@@ -163,7 +163,7 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
-      JPPFJob job = BaseSetup.createJob("JCA job", true, false, 1, LifeCycleTask.class, 5000L);
+      JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class, 5000L);
       String id = connection.submit(job);
       assertNotNull(id);
       Thread.sleep(1000L);
@@ -195,7 +195,7 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
-      JPPFJob job = BaseSetup.createJob("JCA job", true, false, 1, LifeCycleTask.class, 100L);
+      JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class, 100L);
       String id = connection.submit(job);
       assertNotNull(id);
       Thread.sleep(3000L);
@@ -230,7 +230,7 @@ public class TestJPPFConnection
     {
       connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
       assertNotNull(connection);
-      JPPFJob job = BaseSetup.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 100L);
+      JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 100L);
       id = connection.submit(job);
       assertNotNull(id);
     }
