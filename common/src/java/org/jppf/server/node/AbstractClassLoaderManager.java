@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -36,15 +37,15 @@ public abstract class AbstractClassLoaderManager
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractClassLoaderManager.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractClassLoaderManager.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Maximum number of containers kept by this node's cache.
    */
-  private static final int maxContainers = JPPFConfiguration.getProperties().getInt("jppf.classloader.cache.size", 50);
+  private final int maxContainers;
   /**
    * Class loader used for dynamic loading and updating of client classes.
    */
@@ -57,6 +58,21 @@ public abstract class AbstractClassLoaderManager
    * A list retaining the container in chronological order of their creation.
    */
   private final LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
+  /**
+   Leak prevention instance.
+   */
+  private final JPPFLeakPrevention leakPrevention;
+
+  /**
+   * Default constructor for class loader manager.
+   */
+  protected AbstractClassLoaderManager()
+  {
+    TypedProperties config = JPPFConfiguration.getProperties();
+
+    this.maxContainers = config.getInt("jppf.classloader.cache.size", 50);
+    this.leakPrevention = new JPPFLeakPrevention(config);
+  }
 
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
@@ -109,43 +125,42 @@ public abstract class AbstractClassLoaderManager
   public synchronized JPPFContainer getContainer(final List<String> uuidPath) throws Exception
   {
     String uuid = uuidPath.get(0);
-    JPPFContainer container = null;
-      container = containerMap.get(uuid);
-      if (container == null)
+    JPPFContainer container = containerMap.get(uuid);
+    if (container == null)
+    {
+      if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
+      AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
       {
-        if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-        AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
+        @Override
+        public AbstractJPPFClassLoader run()
         {
-          @Override
-          public AbstractJPPFClassLoader run()
+          try
           {
-            try
-            {
-              return newClassLoaderCreator(uuidPath).call();
-            }
-            catch(Exception e)
-            {
-              log.error(e.getMessage(), e);
-            }
-            return null;
+            return newClassLoaderCreator(uuidPath).call();
           }
-        });
-        container = newJPPFContainer(uuidPath, cl);
-        if (containerList.size() >= maxContainers)
-        {
-          JPPFContainer toRemove = containerList.removeFirst();
-          try {
-            AbstractJPPFClassLoader loader = toRemove.getClassLoader();
-            if (loader != null) loader.clearReferences();
-          } finally {
-            toRemove.helper = null;
-            toRemove.classLoader = null;
-            containerMap.remove(toRemove.getAppUuid());
+          catch(Exception e)
+          {
+            log.error(e.getMessage(), e);
           }
+          return null;
         }
-        containerList.add(container);
-        containerMap.put(uuid, container);
+      });
+      container = newJPPFContainer(uuidPath, cl);
+      if (containerList.size() >= maxContainers)
+      {
+        JPPFContainer toRemove = containerList.removeFirst();
+        try {
+          AbstractJPPFClassLoader loader = toRemove.getClassLoader();
+          if (loader != null) leakPrevention.clearReferences(loader);
+        } finally {
+          toRemove.helper = null;
+          toRemove.classLoader = null;
+          containerMap.remove(toRemove.getAppUuid());
+        }
       }
+      containerList.add(container);
+      containerMap.put(uuid, container);
+    }
     return container;
   }
 
@@ -160,7 +175,7 @@ public abstract class AbstractClassLoaderManager
       for (JPPFContainer container : containerList)
       {
         AbstractJPPFClassLoader loader = container.getClassLoader();
-        if (loader != null) loader.clearReferences();
+        if (loader != null) leakPrevention.clearReferences(loader);
       }
     } finally
     {

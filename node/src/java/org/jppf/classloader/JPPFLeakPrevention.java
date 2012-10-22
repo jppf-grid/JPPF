@@ -18,7 +18,7 @@
 package org.jppf.classloader;
 
 import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * Implementation for class loader leak prevention.
  * @author Martin JANDA
  */
-final class JPPFLeakPrevention {
+public final class JPPFLeakPrevention {
   /**
    * Logger for this class.
    */
@@ -57,41 +57,49 @@ final class JPPFLeakPrevention {
   /**
    * Flag that enables preventing JDBC Driver, Introspector and ResourceBundle leaks.
    */
-  private static final boolean preventJVM = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.jvm", false);
+  private final boolean preventJVM;
   /**
    * Flag that enables prevents leaking thread by stopping it and shutting down thread pool executor service when necessary.
    */
-  private static final boolean preventThread = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.thread", false);
+  private final boolean preventThread;
   /**
    * Flag enables clearing leaked <code>TimerThreads</code> from scheduled TimerTasks.
    */
-  private static final boolean preventTimer = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.timer", false);
+  private final boolean preventTimer;
   /**
-   * Flag that enables clering thread local and inheritable thread local values.
+   * Flag that enables clearing thread local and inheritable thread local values.
    */
-  private static final boolean preventThreadLocal = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.thread.local", false);
+  private final boolean preventThreadLocal;
   /**
    * Flag that enables preventing HTTP keep alive thread leaks.
    */
-  private static final boolean preventKeepAlive = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.keep.alive", false);
+  private final boolean preventKeepAlive;
   /**
    * Flag that enables clearing static fields.
    */
-  private static final boolean preventStaticReferences = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.clear.static", false);
+  private final boolean preventStaticReferences;
 
   /**
-   * Prevent from creating this instance.
+   * Default constructor for leak prevention.
+   * @param config The JPPF configuration properties.
    */
-  private JPPFLeakPrevention()
+  public JPPFLeakPrevention(final TypedProperties config)
   {
-    throw new IllegalStateException("Should not be instantiated");
+    if (config == null) throw new IllegalArgumentException("config is null");
+
+    this.preventJVM = config.getBoolean("jppf.classloader.clear.jvm", false);
+    this.preventThread = config.getBoolean("jppf.classloader.clear.thread", false);
+    this.preventTimer = config.getBoolean("jppf.classloader.clear.timer", false);
+    this.preventThreadLocal = config.getBoolean("jppf.classloader.clear.thread.local", false);
+    this.preventKeepAlive = config.getBoolean("jppf.classloader.clear.keep.alive", false);
+    this.preventStaticReferences = config.getBoolean("jppf.classloader.clear.static", false);
   }
 
   /**
    * Clears all references as prevention for memory leaks.
    * @param classLoader a <code>ClassLoader</code> instance.
    */
-  public static void clearReferences(final ClassLoader classLoader)
+  public void clearReferences(final ClassLoader classLoader)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
@@ -173,7 +181,7 @@ final class JPPFLeakPrevention {
    * @param classLoader a <code>ClassLoader</code> instance.
    */
   @SuppressWarnings("deprecation")
-  private static void clearThreads(final ClassLoader classLoader)
+  private void clearThreads(final ClassLoader classLoader)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
@@ -260,7 +268,7 @@ final class JPPFLeakPrevention {
    * Clear thread local and inheritable thread local maps in all threads.
    * @param classLoader a <code>ClassLoader</code> instance.
    */
-  private static void clearThreadLocal(final ClassLoader classLoader)
+  private void clearThreadLocal(final ClassLoader classLoader)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
@@ -291,7 +299,7 @@ final class JPPFLeakPrevention {
    * @param fieldTable table in ThreadLocal map that is holding <code>ThreadLocal</code> instances.
    * @throws Exception when error occurs.
    */
-  private static void clearThreadLocalMap(final ClassLoader classLoader, final Object map, final Field fieldTable) throws Exception {
+  private void clearThreadLocalMap(final ClassLoader classLoader, final Object map, final Field fieldTable) throws Exception {
     if (map == null) return;
 
     Method methodRemove = map.getClass().getDeclaredMethod("remove", ThreadLocal.class);
@@ -370,7 +378,7 @@ final class JPPFLeakPrevention {
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
-    // we need to intitialize all loaded classes
+    // we need to initialize all loaded classes
     for (Class clazz : getLoadedClasses(classLoader))
     {
       try {
@@ -428,7 +436,7 @@ final class JPPFLeakPrevention {
   }
 
   /**
-   * Set instacne static final fields to <code>null</code>.
+   * Set instance static final fields to <code>null</code>.
    * @param classLoader a <code>ClassLoader</code> instance.
    * @param instance and object instance to null it's static fields.
    */
@@ -511,7 +519,7 @@ final class JPPFLeakPrevention {
     return member;
   }
   /**
-   * Check wheter object was loaded by this or child loader.
+   * Check whether object was loaded by this or child loader.
    * @param classLoader a <code>ClassLoader</code> instance.
    * @param o object to test.
    * @return true if object is loaded by this or child class loader.
@@ -522,7 +530,7 @@ final class JPPFLeakPrevention {
   }
 
   /**
-   * Check wheter class was loaded by this or child loader.
+   * Check whether class was loaded by this or child loader.
    * @param classLoader a <code>ClassLoader</code> instance.
    * @param clazz class to test.
    * @return true if class is loaded by this or child class loader.

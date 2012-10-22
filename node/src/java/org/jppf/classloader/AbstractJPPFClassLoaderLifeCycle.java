@@ -202,14 +202,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   }
 
   /**
-   * Clear all references as memory leak prevention.
-   */
-  public void clearReferences()
-  {
-    JPPFLeakPrevention.clearReferences(this);
-  }
-
-  /**
    * Terminate this classloader and clean the resources it uses.
    */
   public abstract void close();
