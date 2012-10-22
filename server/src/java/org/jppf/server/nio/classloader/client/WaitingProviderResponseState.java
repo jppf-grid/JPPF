@@ -24,6 +24,8 @@ import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
+import java.util.concurrent.locks.Lock;
+
 /**
  * This class represents the state of waiting for the response from a provider.
  * @author Laurent Cohen
@@ -33,15 +35,15 @@ class WaitingProviderResponseState extends ClassServerState
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(WaitingProviderResponseState.class);
+  private static final Logger log = LoggerFactory.getLogger(WaitingProviderResponseState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The class cache.
    */
-  private static ClassCache classCache = driver.getInitializer().getClassCache();
+  private static final ClassCache classCache = driver.getInitializer().getClassCache();
 
   /**
    * Initialize this state with a specified NioServer.
@@ -85,7 +87,15 @@ class WaitingProviderResponseState extends ClassServerState
         }
         if (debugEnabled) log.debug("sending response " + resource + " to node " + nodeChannel); 
         context.setCurrentRequest(null);
-        ResourceRequest pendingResponse = nodeContext.getPendingResponses().get(resource);
+        ResourceRequest pendingResponse;
+
+        Lock lock = context.getLockResponse();
+        lock.lock();
+        try {
+          pendingResponse = nodeContext.getPendingResponses().get(resource);
+        } finally {
+          lock.unlock();
+        }
         pendingResponse.setResource(resource);
         tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, tm.checkSubmitTransition(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE));
       }

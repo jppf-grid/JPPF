@@ -22,6 +22,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
@@ -38,11 +39,11 @@ class NodeWaitingProviderResponseState extends ClassServerState
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NodeWaitingProviderResponseState.class);
+  private static final Logger log = LoggerFactory.getLogger(NodeWaitingProviderResponseState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this state with a specified NioServer.
@@ -64,29 +65,37 @@ class NodeWaitingProviderResponseState extends ClassServerState
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
     ClassContext context = (ClassContext) channel.getContext();
-    Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = context.getPendingResponses();
-    if (pendingResponses.isEmpty()) return sendResponse(context);
-    JPPFResourceWrapper res = context.getResource();
-    Queue<JPPFResourceWrapper> toRemove = new LinkedBlockingQueue<JPPFResourceWrapper>();
-    CompositeResourceWrapper composite = null;
-    if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
-    for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
-    {
-      JPPFResourceWrapper resource = entry.getValue().getResource();
-      if (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)
+    boolean empty;
+    Lock lock = context.getLockResponse();
+    lock.lock();
+    try {
+      Map<JPPFResourceWrapper, ResourceRequest>  pendingResponses = context.getPendingResponses();
+      if (pendingResponses.isEmpty()) return sendResponse(context);
+      JPPFResourceWrapper res = context.getResource();
+      Queue<JPPFResourceWrapper> toRemove = new LinkedBlockingQueue<JPPFResourceWrapper>();
+      CompositeResourceWrapper composite = null;
+      if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
+      for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
       {
-        if (debugEnabled) log.debug("got response for resource " + resource);
-        toRemove.add(resource);
-        if (composite != null)
+        JPPFResourceWrapper resource = entry.getValue().getResource();
+        if (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)
         {
-          composite.getResources().remove(resource);
-          composite.getResources().add(resource);
+          if (debugEnabled) log.debug("got response for resource " + resource);
+          toRemove.add(resource);
+          if (composite != null)
+          {
+            composite.getResources().remove(resource);
+            composite.getResources().add(resource);
+          }
+          else context.setResource(resource);
         }
-        else context.setResource(resource);
       }
+      while (!toRemove.isEmpty()) pendingResponses.remove(toRemove.poll());
+      empty = pendingResponses.isEmpty();
+    } finally {
+      lock.unlock();
     }
-    while (!toRemove.isEmpty()) pendingResponses.remove(toRemove.poll());
-    if (pendingResponses.isEmpty())
+    if (empty)
     {
       if (debugEnabled) log.debug("sending final response " + context.getResource());
       return sendResponse(context);

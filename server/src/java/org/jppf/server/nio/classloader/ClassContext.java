@@ -19,6 +19,8 @@
 package org.jppf.server.nio.classloader;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.classloader.*;
 import org.jppf.classloader.JPPFResourceWrapper.State;
@@ -39,11 +41,11 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ClassContext.class);
+  private static final Logger log = LoggerFactory.getLogger(ClassContext.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The resource read from or written to the associated channel.
    */
@@ -68,6 +70,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Contains the JPPF peer identifier written the socket channel.
    */
   private NioObject nioObject = null;
+  /**
+   * Used to synchronize pending responses performed by multiple threads.
+   */
+  private final Lock lockResponse = new ReentrantLock();
 
   @Override
   public void setState(final ClassState state) {
@@ -178,8 +184,16 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @return a {@link ResourceRequest} instance.
    */
   public synchronized ResourceRequest pollPendingRequest() {
-    if(pendingRequests.isEmpty()) return null;
+    if (pendingRequests.isEmpty()) return null;
     else return pendingRequests.remove(0);
+  }
+
+  /**
+   * Get the set of pending resource requests for a node.
+   * @return a {@link List} of {@link ResourceRequest} instances.
+   */
+  protected synchronized List<ResourceRequest> getPendingRequests() {
+    return new ArrayList<ResourceRequest>(pendingRequests);
   }
 
   /**
@@ -228,8 +242,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   /**
-   * Handle the scenario where an exception occurs while sendinf a request to
-   * or receiving a response from a provider, and a node channel is wating for the response.
+   * Handle the scenario where an exception occurs while sending a request to
+   * or receiving a response from a provider, and a node channel is waiting for the response.
    */
   protected void handleProviderError()
   {
@@ -239,7 +253,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       List<ResourceRequest> pendingList;
       synchronized (this)
       {
-        if(pendingRequests.isEmpty())
+        if (pendingRequests.isEmpty())
           pendingList = Collections.emptyList();
         else {
           pendingList = new ArrayList<ResourceRequest>(pendingRequests);
@@ -295,7 +309,20 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public Map<JPPFResourceWrapper, ResourceRequest> getPendingResponses()
   {
-    return pendingResponses;
+    lockResponse.lock();
+    try {
+      return pendingResponses;
+    } finally {
+      lockResponse.unlock();
+    }
+  }
+
+  /**
+   * Get the lock used for synchronized access to the pending responses.
+   * @return a <code>Lock</code> instance.
+   */
+  public Lock getLockResponse() {
+    return lockResponse;
   }
 
   @Override
@@ -305,9 +332,14 @@ public class ClassContext extends SimpleNioContext<ClassState>
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource);
-    sb.append(", pendingRequests=").append(pendingRequests);
-    sb.append(", pendingResponses=").append(pendingResponses);
-    sb.append(", currentRequest=").append(currentRequest);
+    sb.append(", pendingRequests=").append(getPendingRequests());
+    lockResponse.lock();
+    try {
+      sb.append(", pendingResponses=").append(pendingResponses);
+    } finally {
+      lockResponse.unlock();
+    }
+    sb.append(", currentRequest=").append(getCurrentRequest());
     sb.append(", provider=").append(provider);
     sb.append(", peer=").append(peer);
     sb.append(", uuid=").append(uuid);

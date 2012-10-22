@@ -21,6 +21,7 @@ package org.jppf.server.nio.classloader.node;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.classloader.*;
 import org.jppf.server.nio.*;
@@ -38,15 +39,15 @@ class WaitingNodeRequestState extends ClassServerState
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(WaitingNodeRequestState.class);
+  private static final Logger log = LoggerFactory.getLogger(WaitingNodeRequestState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The class cache.
    */
-  private static ClassCache classCache = driver.getInitializer().getClassCache();
+  private static final ClassCache classCache = driver.getInitializer().getClassCache();
 
   /**
    * Initialize this state with a specified NioServer.
@@ -79,13 +80,21 @@ class WaitingNodeRequestState extends ClassServerState
         for (JPPFResourceWrapper resource: requests) processResource(channel, resource);
       }
       else processResource(channel, res);
-      if (context.getPendingResponses().isEmpty())
+      Map<JPPFResourceWrapper, ResourceRequest> pendingResponses;
+      Lock lock = context.getLockResponse();
+      lock.lock();
+      try {
+        pendingResponses = new HashMap<JPPFResourceWrapper, ResourceRequest>(context.getPendingResponses());
+      } finally {
+        lock.unlock();
+      }
+      if (pendingResponses.isEmpty())
       {
         if (debugEnabled) log.debug("sending response " + res + " to node: " + channel);
         context.serializeResource();
         return TO_SENDING_NODE_RESPONSE;
       }
-      if (debugEnabled) log.debug("pending responses " + context.getPendingResponses() + " for node: " + channel);
+      if (debugEnabled) log.debug("pending responses " + pendingResponses + " for node: " + channel);
       return TO_IDLE_NODE;
     }
     return TO_WAITING_NODE_REQUEST;
@@ -101,11 +110,10 @@ class WaitingNodeRequestState extends ClassServerState
   {
     TraversalList<String> uuidPath = resource.getUuidPath();
     boolean dynamic = resource.isDynamic();
-    String name = resource.getName();
-    String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
-    ClassTransition t = null;
-    if (!dynamic || (resource.getRequestUuid() == null)) t = processNonDynamic(channel, resource);
-    else t = processDynamic(channel, resource);
+//    String name = resource.getName();
+//    String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
+    if (!dynamic || (resource.getRequestUuid() == null)) processNonDynamic(channel, resource);
+    else processDynamic(channel, resource);
   }
 
   /**
@@ -193,9 +201,15 @@ class WaitingNodeRequestState extends ClassServerState
       if (debugEnabled) log.debug("requesting resource " + resource + " from client: " + provider + " for node: " + channel);
       ClassContext providerContext = (ClassContext) provider.getContext();
       ResourceRequest request = new ResourceRequest(channel, resource);
-      context.getPendingResponses().put(resource, request);
-      providerContext.addRequest(request);
       resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
+      Lock lock = context.getLockResponse();
+      lock.lock();
+      try {
+        context.getPendingResponses().put(resource, request);
+      } finally {
+        lock.unlock();
+      }
+      providerContext.addRequest(request);
     }
     else
     {
