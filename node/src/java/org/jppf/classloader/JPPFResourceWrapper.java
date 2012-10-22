@@ -99,7 +99,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Contains data about the kind of lookup that is to be done.
    */
-  private Map<String, Object> dataMap = new HashMap<String, Object>();
+  private final Map<String, Object> dataMap = new HashMap<String, Object>();
 
   /**
    * Add a uuid to the uuid path of this resource wrapper.
@@ -170,7 +170,9 @@ public class JPPFResourceWrapper implements Serializable
    */
   public State getState()
   {
-    return state;
+    synchronized (dataMap) {
+      return state;
+    }
   }
 
   /**
@@ -179,7 +181,9 @@ public class JPPFResourceWrapper implements Serializable
    */
   public void setState(final State state)
   {
-    this.state = state;
+    synchronized (dataMap) {
+      this.state = state;
+    }
   }
 
   /**
@@ -290,7 +294,9 @@ public class JPPFResourceWrapper implements Serializable
    */
   public Object getData(final String key)
   {
-    return dataMap.get(key);
+    synchronized (dataMap) {
+      return dataMap.get(key);
+    }
   }
 
   /**
@@ -301,8 +307,10 @@ public class JPPFResourceWrapper implements Serializable
    */
   public Object getData(final String key, final Object def)
   {
-    Object o = dataMap.get(key);
-    return o == null ? def : o;
+    synchronized (dataMap) {
+      Object o = dataMap.get(key);
+      return o == null ? def : o;
+    }
   }
 
   /**
@@ -312,39 +320,33 @@ public class JPPFResourceWrapper implements Serializable
    */
   public void setData(final String key, final Object value)
   {
-    dataMap.put(key, value);
+    synchronized (dataMap) {
+      dataMap.put(key, value);
+    }
+  }
+
+  /**
+   * Get the monitor used for synchronized access to data.
+   * @return a <code>Object</code> instance.
+   */
+  protected Object getMonitor() {
+    return dataMap;
   }
 
   @Override
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append("[");
+    sb.append(getClass().getSimpleName()).append('[');
     sb.append("dynamic=").append(dynamic);
     sb.append(", asResource=").append(asResource);
-    sb.append(", state=").append(state);
+    synchronized (dataMap) {
+      sb.append(", state=").append(state);
     //sb.append(", name=").append(dataMap.get("name"));
-    sb.append(", data=").append(dataMap);
+      sb.append(", data=").append(dataMap);
+    }
     sb.append(']');
     return sb.toString();
-  }
-
-  /**
-   * Get the definition data.
-   * @return the data as a map.
-   */
-  public Map<String, Object> getDataMap()
-  {
-    return dataMap;
-  }
-
-  /**
-   * Set the definition data.
-   * @param dataMap the data as a map.
-   */
-  public void setDataMap(final Map<String, Object> dataMap)
-  {
-    this.dataMap = dataMap;
   }
 
   /**

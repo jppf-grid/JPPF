@@ -29,6 +29,10 @@ import java.util.concurrent.Future;
 public class CompositeResourceWrapper extends JPPFResourceWrapper
 {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Key for the list of requests.
    */
   private static final String RESOURCES_KEY = "resources";
@@ -38,7 +42,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   private final transient Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = new HashMap<JPPFResourceWrapper, Future<JPPFResourceWrapper>>();
 
   /**
-   * 
+   *
    */
   public CompositeResourceWrapper()
   {
@@ -51,19 +55,21 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   @SuppressWarnings("unchecked")
   public Set<JPPFResourceWrapper> getResources()
   {
-    Set<JPPFResourceWrapper> requests = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
-    if (requests == null)
-    {
-      requests = new HashSet<JPPFResourceWrapper>();
-      setData(RESOURCES_KEY, requests);
+    synchronized (getMonitor()) {
+      Set<JPPFResourceWrapper> requests = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
+      if (requests == null)
+      {
+        requests = new HashSet<JPPFResourceWrapper>();
+        setData(RESOURCES_KEY, requests);
+      }
+      return requests;
     }
-    return requests;
   }
 
   /**
    * Add a request to this composite request.
    * @param resource the request to add.
-   * @return a future for getting the respone at a later time.
+   * @return a future for getting the response at a later time.
    */
   public Future<JPPFResourceWrapper> addResource(final JPPFResourceWrapper resource)
   {
@@ -79,7 +85,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
 
   /**
    * Get the mapping of futures to corresponding resource requests.
-   * @return a map of resource defintions to their corresponding future.
+   * @return a map of resource definitions to their corresponding future.
    */
   public Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> getFutureMap()
   {

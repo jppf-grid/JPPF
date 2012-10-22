@@ -35,11 +35,11 @@ class SendingProviderRequestState extends ClassServerState
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(SendingProviderRequestState.class);
+  private static final Logger log = LoggerFactory.getLogger(SendingProviderRequestState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this state with a specified NioServer.
@@ -65,9 +65,10 @@ class SendingProviderRequestState extends ClassServerState
     {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if (context.getCurrentRequest() == null)
+    ResourceRequest request = context.getCurrentRequest();
+    if (request == null)
     {
-      ResourceRequest request = context.pollPendingRequest();
+      request = context.pollPendingRequest();
       if (request != null)
       {
         context.setMessage(null);
@@ -77,7 +78,7 @@ class SendingProviderRequestState extends ClassServerState
         context.setCurrentRequest(request);
       }
     }
-    if (context.getCurrentRequest() == null)
+    if (request == null)
     {
       if (debugEnabled) log.debug("provider: " + channel + " has no request to process, returning to idle mode");
       context.setMessage(null);
@@ -86,7 +87,7 @@ class SendingProviderRequestState extends ClassServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + context.getCurrentRequest() + 
+      if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + request +
         ", resource: " + context.getResource().getName());
       context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
       return TO_WAITING_PROVIDER_RESPONSE;

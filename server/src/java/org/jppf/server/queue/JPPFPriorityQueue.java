@@ -43,17 +43,18 @@ import org.slf4j.*;
 /**
  * A JPPF queue whose elements are ordered by decreasing priority.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFPriorityQueue.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFPriorityQueue.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * A map of task bundles, ordered by descending priority.
    */
@@ -163,10 +164,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
         else JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
         fireQueueEvent(new QueueEvent(this, serverJob, false));
       }
+      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
       lock.unlock();
     }
-    if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     statsManager.taskInQueue(bundleWrapper.getTaskCount());
   }
 
@@ -220,10 +221,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
         bundleList.add(bundleWrapper);
       }
       updateLatestMaxSize();
+      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
       lock.unlock();
     }
-    if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - bundleWrapper.getQueueEntryTime());
     return result;
   }
@@ -460,8 +461,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
    * Process the jobs in the pending broadcast queue.
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
-  public void processPendingBroadcasts()
-  {
+  public void processPendingBroadcasts() {
     if (nbWorkingConnections.get() <= 0) return;
     List<AbstractNodeContext> connections;
     try {

@@ -38,17 +38,18 @@ import org.slf4j.*;
 /**
  * A JPPF queue whose elements are ordered by decreasing priority.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 public class JPPFPriorityQueue extends AbstractJPPFQueue
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFPriorityQueue.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFPriorityQueue.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Comparator for job priority.
    */
@@ -81,7 +82,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   private final JPPFScheduleHandler jobExpirationHandler = new JPPFScheduleHandler("Job Expiration Handler");
   /**
-   * A priority queue holding broadcast jobs that could not be sent due to no available connection. 
+   * A priority queue holding broadcast jobs that could not be sent due to no available connection.
    */
   private final PriorityBlockingQueue<ClientJob> pendingBroadcasts = new PriorityBlockingQueue<ClientJob>(16, new JobPriorityComparator());
 
@@ -109,8 +110,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       processBroadcastJob(bundleWrapper);
     } else {
       lock.lock();
-      try
-      {
+      try {
         ClientJob other = jobMap.get(jobUuid);
         if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
         bundleWrapper.addOnDone(new Runnable()
@@ -119,13 +119,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
           public void run()
           {
             lock.lock();
-            try
-            {
+            try {
               jobMap.remove(jobUuid);
               removeBundle(bundleWrapper);
-            }
-            finally
-            {
+            } finally {
               lock.unlock();
             }
           }
@@ -134,7 +131,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
         bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
 
-        if(!sla.isBroadcastJob() || bundleWrapper.getBroadcastUUID() != null) {
+        if (!sla.isBroadcastJob() || bundleWrapper.getBroadcastUUID() != null) {
           putInListMap(sla.getPriority(), bundleWrapper, priorityMap);
           putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
           if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
@@ -144,26 +141,21 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
         fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
-      }
-      finally
-      {
+        if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
+      } finally {
         lock.unlock();
       }
-    }
-    if (debugEnabled)
-    {
-      log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     }
   }
 
   /**
-   * Handle requeuing of the specified job.
+   * Handle requeue of the specified job.
    * @param job the job to requeue.
    */
   protected void requeue(final ClientJob job) {
     lock.lock();
     try {
-      if(!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
+      if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
 
       putInListMap(job.getSLA().getPriority(), job, priorityMap);
       putInListMap(getSize(job), job, sizeMap);
@@ -185,12 +177,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   {
     final ClientTaskBundle result;
     lock.lock();
-    try
-    {
-      if (debugEnabled)
-      {
-        log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
-      }
+    try {
+      if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
       int size = getSize(bundleWrapper);
       removeFromListMap(size, bundleWrapper, sizeMap);
       if (nbTasks >= bundleWrapper.getTaskCount())
@@ -226,14 +214,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
         bundleList.add(bundleWrapper);
       }
       updateLatestMaxSize();
-    }
-    finally
-    {
+      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
+    } finally {
       lock.unlock();
-    }
-    if (debugEnabled)
-    {
-      log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     }
     return result;
   }
@@ -242,12 +225,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   public boolean isEmpty()
   {
     lock.lock();
-    try
-    {
+    try {
       return priorityMap.isEmpty();
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -256,13 +236,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   public int getMaxBundleSize()
   {
     lock.lock();
-    try
-    {
+    try {
       //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
       return latestMaxSize;
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -279,15 +256,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   public ClientJob removeBundle(final ClientJob bundleWrapper)
   {
     lock.lock();
-    try
-    {
+    try {
       if (debugEnabled) log.debug("removing bundle from queue, jobId=" + bundleWrapper.getName());
       removeFromListMap(bundleWrapper.getSLA().getPriority(), bundleWrapper, priorityMap);
 //      jobMap.remove(bundleWrapper.getUuid());
       return null;
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -393,7 +367,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     for (ChannelWrapper connection : connections)
     {
       ExecutorStatus status = connection.getExecutionStatus();
-      if(status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
+      if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
       {
         String uuid = connection.getUuid();
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
@@ -478,7 +452,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     try
     {
       ClientJob job = jobMap.get(jobId);
-      if(job == null)
+      if (job == null)
         return false;
       else
         return job.cancel(false);
@@ -495,16 +469,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
   public void close()
   {
     lock.lock();
-    try
-    {
+    try {
       jobScheduleHandler.clear(true);
       jobExpirationHandler.clear(true);
       pendingBroadcasts.clear();
       jobMap.clear();
       priorityMap.clear();
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -515,12 +486,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    */
   public void cancelBroadcastJobs(final String connectionUUID)
   {
-    if(connectionUUID == null || connectionUUID.isEmpty()) return;
+    if (connectionUUID == null || connectionUUID.isEmpty()) return;
 
     Set<String> jobIDs = Collections.emptySet();
     lock.lock();
-    try
-    {
+    try {
       if (jobMap.isEmpty()) return;
 
       jobIDs = new HashSet<String>();
@@ -528,13 +498,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
       {
         if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
       }
-    } finally
-    {
+    } finally {
       lock.unlock();
     }
-    for (String jobID : jobIDs) {
-      cancelJob(jobID);
-    }
+    for (String jobID : jobIDs) cancelJob(jobID);
   }
 
   /**

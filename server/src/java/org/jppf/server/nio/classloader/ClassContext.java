@@ -169,10 +169,12 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @param request the request as a <code>SelectionKey</code> instance.
    */
   @SuppressWarnings("unchecked")
-  public synchronized void addRequest(final ResourceRequest request)
+  public void addRequest(final ResourceRequest request)
   {
-    pendingRequests.add(request);
-    if (ClassState.IDLE_PROVIDER.equals(state))
+    synchronized (this) {
+      pendingRequests.add(request);
+    }
+    if (ClassState.IDLE_PROVIDER.equals(getState()))
     {
       JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
       if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());

@@ -30,25 +30,26 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Abstract superclass for all JPPFQueue implementations.
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 public abstract class AbstractJPPFQueue implements JPPFQueue
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractJPPFQueue.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractJPPFQueue.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Used for synchronized access to the queue.
    */
-  protected ReentrantLock lock = new ReentrantLock();
+  protected final ReentrantLock lock = new ReentrantLock();
   /**
    * An ordered map of bundle sizes, mapping to a list of bundles of this size.
    */
-  protected TreeMap<Integer, List<ClientJob>> sizeMap = new TreeMap<Integer, List<ClientJob>>();
+  protected final TreeMap<Integer, List<ClientJob>> sizeMap = new TreeMap<Integer, List<ClientJob>>();
   /**
    *
    */
