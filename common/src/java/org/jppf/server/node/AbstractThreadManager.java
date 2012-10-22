@@ -21,8 +21,6 @@ package org.jppf.server.node;
 import java.lang.management.*;
 
 import org.jppf.node.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
  * This class manages the thread for the node's execution manager.
@@ -31,14 +29,6 @@ import org.slf4j.*;
  */
 public abstract class AbstractThreadManager implements ThreadManager
 {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractThreadManager.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The platform MBean used to gather statistics about the JVM threads.
    */
@@ -53,19 +43,9 @@ public abstract class AbstractThreadManager implements ThreadManager
    */
   protected AbstractThreadManager()
   {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    int poolSize = props.getInt("processing.threads", -1);
-    if (poolSize < 0)
-    {
-      poolSize = Runtime.getRuntime().availableProcessors();
-      props.setProperty("processing.threads", Integer.toString(poolSize));
-    }
-    log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadMXBean = ManagementFactory.getThreadMXBean();
     cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
-    props.setProperty("cpuTimeSupported", Boolean.toString(cpuTimeEnabled));
     if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
-    log.info("Thread CPU time measurement is " + (cpuTimeEnabled ? "" : "not ") + "supported");
   }
 
   @Override
