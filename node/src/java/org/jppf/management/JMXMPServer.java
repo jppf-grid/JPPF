@@ -91,7 +91,8 @@ public class JMXMPServer extends AbstractJMXServer
         try
         {
           InetAddress addr = InetAddress.getByName(managementHost);
-          url = new JMXServiceURL("service:jmx:jmxmp://" + managementHost + ':' + managementPort);
+          String host = (addr instanceof Inet6Address) ? "[" + managementHost + "]" : managementHost;
+          url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + managementPort);
           connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
           connectorServer.start();
           found = true;
