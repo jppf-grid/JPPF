@@ -294,7 +294,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       Map<String, Object> map = new HashMap<String, Object>();
       String[] namesToLookup = new String[indices.size()];
       for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
-      map.put("name", StringUtils.arrayToString(namesToLookup, ", ", null, null));
+      map.put("name", StringUtils.arrayToString(", ", null, null, namesToLookup));
       map.put("multiple.resources.names", namesToLookup);
       JPPFResourceWrapper resource = loadResourceData(map, true);
       Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");

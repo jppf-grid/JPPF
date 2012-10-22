@@ -140,8 +140,8 @@ public final class SSLHelper
     env.put("jmx.remote.profiles", "TLS");
     env.put("jmx.remote.tls.socket.factory", factory);
     SSLParameters params = SSLHelper.getSSLParameters();
-    env.put("jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(params.getProtocols(), " ", null, null));
-    env.put("jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(params.getCipherSuites(), " ", null, null));
+    env.put("jmx.remote.tls.enabled.protocols", StringUtils.arrayToString(" ", null, null, params.getProtocols()));
+    env.put("jmx.remote.tls.enabled.cipher.suites", StringUtils.arrayToString(" ", null, null, params.getCipherSuites()));
     env.put("jmx.remote.tls.need.client.authentication", "" + params.getNeedClientAuth());
     env.put("jmx.remote.tls.want.client.authentication", "" + params.getWantClientAuth());
   }

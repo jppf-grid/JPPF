@@ -188,6 +188,7 @@ class PeerNode extends AbstractCommonNode
       }
       else
       {
+        resultSender.bundle = bundleWrapper;
         resultSender.sendResults(bundleWrapper);
       }
       if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE)

@@ -225,9 +225,9 @@ public final class StringUtils
    * @param array the array from which to build a string representation.
    * @return the array's content as a string.
    */
-  public static <T> String arrayToString(final T[] array)
+  public static <T> String arrayToString(final T...array)
   {
-    return arrayToString(array, ",", "[", "]");
+    return arrayToString(",", "[", "]", array);
   }
 
   /**
@@ -239,7 +239,7 @@ public final class StringUtils
    * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
    * @return the array's content as a string.
    */
-  public static <T> String arrayToString(final T[] array, final String sep, final String prefix, final String suffix)
+  public static <T> String arrayToString(final String sep, final String prefix, final String suffix, final T...array)
   {
     StringBuilder sb = new StringBuilder();
     if (array == null) sb.append("null");

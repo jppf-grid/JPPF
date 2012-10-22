@@ -87,6 +87,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
   public void sendResults(final ServerTaskBundleClient bundleWrapper) throws Exception
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
     IOHelper.sendData(socketClient, bundle, helper.getSerializer());
@@ -110,7 +111,14 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
       bundle.removeCompletionListener(this);
     } else {
       int pendingTasksCount = this.bundle.getPendingTasksCount();
-      if (pendingTasksCount <= 0) notifyAll();
+      if (pendingTasksCount <= 0)
+      {
+        synchronized(this)
+        {
+          if (debugEnabled) log.debug("result sender = " + this);
+          notifyAll();
+        }
+      }
     }
   }
 

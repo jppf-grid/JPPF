@@ -20,6 +20,9 @@ package org.jppf.comm.discovery;
 
 import java.io.*;
 
+import org.jppf.utils.StringUtils;
+import org.slf4j.*;
+
 /**
  * This class encapsulates the connection information for a JPPF driver.
  * The information includes the host, class server, application and node server ports.
@@ -27,6 +30,14 @@ import java.io.*;
  */
 public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>, Cloneable
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFConnectionInformation.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Explicit serialVersionUID.
    */
@@ -97,8 +108,8 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   @Override
   public int hashCode()
   {
-    return managementPort + (host == null ? 0 : host.hashCode());
-    //return (uuid == null) ? 0 : uuid.hashCode();
+    //return managementPort + (host == null ? 0 : host.hashCode());
+    return 31 + (uuid == null ? 0 : uuid.hashCode());
   }
 
   /**
@@ -114,15 +125,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (this == obj) return true;
     if (getClass() != obj.getClass()) return false;
     JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
-    //if (host == null) return (other.host == null) && (other.managementPort == managementPort);
-    //return (host.equals(other.host)) && (other.managementPort == managementPort);
     if (uuid == null) return other.uuid == null;
     return uuid.equals(other.uuid);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Object clone() throws CloneNotSupportedException
   {
@@ -132,7 +138,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   /**
    * Get a string representation of this connection information object.
    * @return a string describing this object.
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString()
@@ -141,8 +146,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
     sb.append(", host=").append(host);
-    sb.append(", management=").append(managementPort);
+    sb.append(", managementPort=").append(managementPort);
     sb.append(", recoveryPort=").append(recoveryPort);
+    sb.append(", serverPorts=").append(StringUtils.buildString(serverPorts));
+    sb.append(", sslServerPorts=").append(StringUtils.buildString(sslServerPorts));
     sb.append(']');
     return sb.toString();
   }

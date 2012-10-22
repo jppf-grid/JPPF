@@ -104,7 +104,7 @@ final class JPPFLeakPrevention {
     }
 
     try {
-      clearThreads(classLoader);
+      if (preventKeepAlive || preventTimer || preventThread) clearThreads(classLoader);
     } catch (Throwable t)
     {
       if (debugEnabled) log.debug(t.getMessage(), t);

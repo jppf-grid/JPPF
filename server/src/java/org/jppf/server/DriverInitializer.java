@@ -215,7 +215,7 @@ public class DriverInitializer
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
           new JPPFPeerInitializer(name, info, classServer, ssl).start();
         }
-      }, null, getConnectionInformation());
+      }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
     }
     else

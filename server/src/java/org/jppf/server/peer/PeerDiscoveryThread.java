@@ -18,12 +18,11 @@
 
 package org.jppf.server.peer;
 
-import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
 /**
@@ -40,6 +39,10 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Contains the set of retrieved connection information objects.
    */
@@ -94,7 +97,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
         JPPFConnectionInformation info = receiver.receive();
         if ((info != null) && !hasConnectionInformation(info))
         {
-          if (debugEnabled) log.debug("Found peer connection information: " + info);
+          if (debugEnabled) log.debug("Found peer connection information: " + info + ", infoSet=" + infoSet);
           addConnectionInformation(info);
           onNewConnection("Peer-" + count.incrementAndGet(), info);
         }
@@ -127,7 +130,8 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
    */
   protected boolean hasConnectionInformation(final JPPFConnectionInformation info)
   {
-    return infoSet.contains(info) || info.equals(localInfo) || isSelf(info);
+    //return infoSet.contains(info) || info.equals(localInfo) || isSelf(info);
+    return infoSet.contains(info) || isSelf(info);
   }
 
   /**
@@ -159,8 +163,10 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
    */
   private boolean isSelf(final JPPFConnectionInformation info)
   {
-    List<InetAddress> ipv4Addresses = NetworkUtils.getIPV4Addresses();
-    for (InetAddress addr: ipv4Addresses)
+    /*
+    List<InetAddress> ipAddresses = NetworkUtils.getIPV4Addresses();
+    ipAddresses.addAll(NetworkUtils.getIPV6Addresses());
+    for (InetAddress addr: ipAddresses)
     {
       String ip = addr.getHostAddress();
       if (info.host.equals(ip) && Arrays.equals(info.serverPorts, localInfo.serverPorts))
@@ -169,6 +175,8 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
       }
     }
     return false;
+    */
+    return info.uuid.equals(localInfo.uuid);
   }
 
   /**

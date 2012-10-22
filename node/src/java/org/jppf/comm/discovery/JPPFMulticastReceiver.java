@@ -124,7 +124,8 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
       if (groupInetAddress == null)
       {
         groupInetAddress = InetAddress.getByName(group);
-        List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+        //List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
+        List<InetAddress> addresses = NetworkUtils.getNonLocalIPAddresses();
         if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
         int len = addresses.size();
         if (debugEnabled)
