@@ -36,11 +36,11 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractJPPFQueue.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractJPPFQueue.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Used for synchronized access to the queue.
    */
@@ -89,8 +89,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    */
   protected int getSize(final ServerJob bundleWrapper)
   {
-    //return bundle.getTaskCount();
-    return bundleWrapper.getJob().getInitialTaskCount();
+    return bundleWrapper.getTaskCount();
   }
 
   /**

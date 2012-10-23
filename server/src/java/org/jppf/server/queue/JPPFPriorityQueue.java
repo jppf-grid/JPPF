@@ -202,8 +202,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
-      int size = getSize(bundleWrapper);
-      removeFromListMap(size, bundleWrapper, sizeMap);
+      removeFromListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
       if (nbTasks >= bundleWrapper.getTaskCount())
       {
         bundleWrapper.setOnRequeue(new RequeueBundleAction(this, bundleWrapper));
@@ -214,8 +213,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
       {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
         result = bundleWrapper.copy(nbTasks);
-        int newSize = bundleWrapper.getTaskCount();
-        putInListMap(newSize, bundleWrapper, sizeMap);
+        putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
         List<ServerJob> bundleList = priorityMap.get(bundleWrapper.getSLA().getPriority());
         bundleList.remove(bundleWrapper);
         bundleList.add(bundleWrapper);
@@ -551,15 +549,5 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     statsManager.taskInQueue(broadcastJob.getTaskCount());
-  }
-
-  /**
-   * Clear all the scheduled actions associated with a job.
-   * This method should normally only be called when a job has completed.
-   * @param jobUuid the job uuid.
-   */
-  public void clearSchedules(final String jobUuid)
-  {
-    scheduleManager.clearSchedules(jobUuid);
   }
 }

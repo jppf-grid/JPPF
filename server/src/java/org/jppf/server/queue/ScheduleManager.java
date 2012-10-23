@@ -27,17 +27,18 @@ import org.slf4j.*;
 /**
  * 
  * @author Laurent Cohen
+ * @author Martin JANDA
  */
 class ScheduleManager
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ScheduleManager.class);
+  private static final Logger log = LoggerFactory.getLogger(ScheduleManager.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Handles the schedule of each job that has one.
    */
@@ -64,14 +65,6 @@ class ScheduleManager
       {
         long dt = bundleWrapper.getJobReceivedTime();
         jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
-        bundleWrapper.addOnDone(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            jobScheduleHandler.cancelAction(uuid);
-          }
-        });
       }
       catch(ParseException e)
       {
@@ -101,14 +94,6 @@ class ScheduleManager
       try
       {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
-        bundleWrapper.addOnDone(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            jobExpirationHandler.cancelAction(uuid);
-          }
-        });
       }
       catch(ParseException e)
       {
