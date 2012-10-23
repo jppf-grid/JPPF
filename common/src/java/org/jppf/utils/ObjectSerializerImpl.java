@@ -80,9 +80,12 @@ public class ObjectSerializerImpl implements ObjectSerializer
   public void serialize(final Object o, final OutputStream os) throws Exception
   {
     ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
-    oos.writeObject(o);
-    oos.flush();
-    oos.close();
+    try {
+      oos.writeObject(o);
+      oos.flush();
+    } finally {
+      oos.close();
+    }
   }
 
   /**
@@ -94,13 +97,10 @@ public class ObjectSerializerImpl implements ObjectSerializer
   public static void serialize(final Object o, final DataLocation location) throws Exception
   {
     ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(location.getOutputStream());
-    try
-    {
+    try {
       oos.writeObject(o);
       oos.flush();
-    }
-    finally
-    {
+    } finally {
       oos.close();
     }
   }
@@ -146,9 +146,6 @@ public class ObjectSerializerImpl implements ObjectSerializer
     return deserialize(new ByteArrayInputStream(bytes, offset, length));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Object deserialize(final InputStream is) throws Exception
   {
@@ -164,10 +161,11 @@ public class ObjectSerializerImpl implements ObjectSerializer
    */
   public Object deserialize(final InputStream is, final boolean closeStream) throws Exception
   {
-    Object o = null;
     ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-    o = ois.readObject();
-    if (closeStream) ois.close();
-    return o;
+    try {
+      return ois.readObject();
+    } finally {
+      if (closeStream) ois.close();
+    }
   }
 }
