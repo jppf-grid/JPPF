@@ -35,23 +35,23 @@ public class StatsSnapshot implements Serializable
   /**
    * The total cumulated time.
    */
-  private double total = 0L;
+  private double total = 0.0;
   /**
    * The most recent time / size.
    */
-  private double latest = 0L;
+  private double latest = 0.0;
   /**
    * The minimum time / size.
    */
-  private double min = Long.MAX_VALUE;
+  private double min = Double.POSITIVE_INFINITY;
   /**
    * The maximum time / size.
    */
-  private double max = 0L;
+  private double max = 0.0;
   /**
    * The average time / size.
    */
-  private double avg = 0d;
+  private double avg = 0.0d;
 
   /**
    * Initialize this time snapshot with a specified title.
@@ -71,12 +71,12 @@ public class StatsSnapshot implements Serializable
   public void newValues(final long time, final long count, final long totalCount)
   {
     total += time;
-    if (count > 0)
+    if (count > 0L)
     {
-      latest = time/count;
+      latest = (double) time/ (double) count;
       if (latest > max) max = latest;
       if (latest < min) min = latest;
-      if (totalCount > 0) avg = (double) total / (double) totalCount;
+      if (totalCount > 0L) avg = total / (double) totalCount;
     }
   }
 
@@ -91,7 +91,7 @@ public class StatsSnapshot implements Serializable
     latest = updateCount;
     if (latest > max) max = latest;
     if (latest < min) min = latest;
-    avg = (double) total / (double) (totalUpdates + 1L);
+    avg = total / (double) (totalUpdates + 1L);
   }
 
   /**
@@ -120,9 +120,9 @@ public class StatsSnapshot implements Serializable
     StringBuilder sb = new StringBuilder();
     sb.append(title).append(": total=").append(total);
     sb.append(", latest=").append(latest);
-    sb.append(", min=").append(min);
-    sb.append(", max=").append(max);
-    sb.append(", avg=").append(avg);
+    sb.append(", min=").append(getMin());
+    sb.append(", max=").append(getMax());
+    sb.append(", avg=").append(getAvg());
     return sb.toString();
   }
 
@@ -177,7 +177,8 @@ public class StatsSnapshot implements Serializable
    */
   public double getMin()
   {
-    return min;
+    if (Double.compare(min, Double.POSITIVE_INFINITY) == 0) return latest;
+    else return min;
   }
 
   /**

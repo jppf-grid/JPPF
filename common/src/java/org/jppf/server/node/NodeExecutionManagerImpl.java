@@ -411,7 +411,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   @Override
   public void taskEnded(final Task task, final long taskNumber, final NodeExecutionInfo info, final long elapsedTime)
   {
-    long cpuTime = (info == null) ? 0L : info.cpuTime;
+    long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
     TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime, task.getException() != null);
     TaskExecutionListener[] tmp;
     synchronized(taskExecutionListeners)

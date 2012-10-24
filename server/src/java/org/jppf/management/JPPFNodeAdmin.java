@@ -41,15 +41,15 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFNodeAdmin.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFNodeAdmin.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The latest event that occurred within a task.
    */
-  private JPPFNodeState nodeState = new JPPFNodeState();
+  private final JPPFNodeState nodeState = new JPPFNodeState();
   /**
    * The node whose state is monitored.
    */
@@ -57,7 +57,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * Unique id for this mbean.
    */
-  private String uuid = new JPPFUuid().toString();
+  private final String uuid = new JPPFUuid().toString();
 
   /**
    * Initialize this node management bean with the specified node.
@@ -115,7 +115,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
     JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
     info.populate();
     NodeExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
-    info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime/1000000));
+    info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime / 1000000L));
     return info;
   }
 
@@ -164,7 +164,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public synchronized void setTaskCounter(final Integer n) throws Exception
   {
-    if (debugEnabled) log.debug("node taks counter reset to " + n + " requested");
+    if (debugEnabled) log.debug("node tasks counter reset to " + n + " requested");
     node.setTaskCount(n);
     nodeState.setNbTasksExecuted(n);
   }
@@ -200,7 +200,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   }
 
   /**
-   * Trigger a deconnection/reconnection of this node.
+   * Trigger a disconnection/reconnection of this node.
    * @throws Exception if any error occurs.
    */
   private void triggerReconnect() throws Exception
@@ -251,18 +251,12 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   }
   */
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DelegationModel getDelegationModel() throws Exception
   {
     return AbstractJPPFClassLoader.getDelegationModel();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setDelegationModel(final DelegationModel model) throws Exception
   {
