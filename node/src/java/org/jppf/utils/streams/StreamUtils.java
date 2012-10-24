@@ -150,4 +150,24 @@ public final class StreamUtils
       }
     }
   }
+
+  /**
+   * Display a message and wait until a key is pressed.
+   * @throws Exception if any I/O error occurs.
+   */
+  public static void waitKeyPressed() throws Exception
+  {
+    waitKeyPressed("press any key to continue ...");
+  }
+
+  /**
+   * Display a message and wait until a key is pressed.
+   * @param message the message to dispplay
+   * @throws Exception if any I/O error occurs.
+   */
+  public static void waitKeyPressed(final String message) throws Exception
+  {
+    System.out.println(message);
+    System.in.read();
+  }
 }

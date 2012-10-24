@@ -22,6 +22,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -59,12 +60,15 @@ public class ProfilingRunner
       performSequential(nbTask, true);
       performSequential(nbTask, false);
       perform(nbTask, iterations);
-      System.exit(0);
+      StreamUtils.waitKeyPressed();
     }
     catch(Exception e)
     {
       e.printStackTrace();
-      System.exit(1);
+    }
+    finally
+    {
+      if (jppfClient != null) jppfClient.close();
     }
   }
 

@@ -410,6 +410,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
       }
       if (job != null) list = Collections.singletonList(job);
     }
+    ndclCache.clear();
     if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + this + " closed");
     return list;

@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
+import org.jppf.caching.*;
 import org.jppf.classloader.NonDelegatingClassLoader;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
@@ -98,6 +99,11 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Fully qualified name of the serilaization helper class to use.
    */
   protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
+  /**
+   * Cache of non-delegating classloaders, mapped to originating class loaders (performance optimization).
+   */
+  protected final JPPFMapCache<ClassLoader, NonDelegatingClassLoader> ndclCache = new JPPFHashMapCache<ClassLoader, NonDelegatingClassLoader>();
+  //protected final JPPFMapCache<ClassLoader, NonDelegatingClassLoader> ndclCache = new JPPFSynchronizedSoftCache<ClassLoader, NonDelegatingClassLoader>();
 
   /**
    * Initialize this client connection.
@@ -283,23 +289,36 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     ClassLoader cl = classLoader;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
-    final ClassLoader parent = cl;
-    PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>()
-    {
-      @Override
-      public NonDelegatingClassLoader run()
-      {
-        return new NonDelegatingClassLoader(null, parent);
-      }
-    };
-    NonDelegatingClassLoader ndCl = AccessController.doPrivileged(pa);
     String helperClassName = getSerializationHelperClassName();
     Class clazz = null;
-    if (cl != null)
+    NonDelegatingClassLoader ndCl = ndclCache.get(cl);
+    if (ndCl == null)
     {
+      final ClassLoader parent = cl;
+      PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>()
+      {
+        @Override
+        public NonDelegatingClassLoader run()
+        {
+          return new NonDelegatingClassLoader(null, parent);
+        }
+      };
+      ndCl = AccessController.doPrivileged(pa);
+      ndclCache.put(cl, ndCl);
       try
       {
         clazz = ndCl.loadClassDirect(helperClassName);
+      }
+      catch (ClassNotFoundException e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+    else
+    {
+      try
+      {
+        clazz = ndCl.loadClass(helperClassName);
       }
       catch (ClassNotFoundException e)
       {

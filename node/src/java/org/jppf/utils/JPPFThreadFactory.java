@@ -53,6 +53,10 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   private List<Long> threadIDs = null;
   /**
+   * 
+   */
+  private long[] threadIDsArray = new long[0];
+  /**
    * The thread group that contains the threads of this factory.
    */
   private ThreadGroup threadGroup = null;
@@ -149,7 +153,11 @@ public class JPPFThreadFactory implements ThreadFactory
       });
     } else
       thread = new Thread(threadGroup, r, name + THREAD_PREFIX + incrementCount());
-    if (monitoringEnabled) threadIDs.add(thread.getId());
+    if (monitoringEnabled)
+    {
+      threadIDs.add(thread.getId());
+      computeThreadIDs();
+    }
     thread.setPriority(priority);
     thread.setUncaughtExceptionHandler(defaultExceptionHandler);
     //thread.setDaemon(false);
@@ -162,11 +170,25 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public synchronized long[] getThreadIDs()
   {
-    if (!monitoringEnabled || (threadIDs == null) || threadIDs.isEmpty()) return new long[0];
+    //if (!monitoringEnabled || (threadIDs == null) || threadIDs.isEmpty()) return new long[0];
+    return threadIDsArray;
+    /*
     long[] ids = new long[threadIDs.size()];
     int i = 0;
     for (long id: threadIDs) ids[i++] = id;
     return ids;
+    */
+  }
+
+  /**
+   * Compute the ids of the monitored threads.
+   */
+  private synchronized void computeThreadIDs()
+  {
+    if (!monitoringEnabled || (threadIDs == null) || threadIDs.isEmpty()) return;
+    threadIDsArray = new long[threadIDs.size()];
+    int i = 0;
+    for (long id: threadIDs) threadIDsArray[i++] = id;
   }
 
   /**

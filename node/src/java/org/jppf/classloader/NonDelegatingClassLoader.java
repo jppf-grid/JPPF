@@ -59,6 +59,8 @@ public class NonDelegatingClassLoader extends URLClassLoader
     Class<?> c = null;
     try
     {
+      c = findLoadedClass(name);
+      if (c != null) return c;
       byte[] classBytes = getResourceBytes(name);
       if (classBytes != null) c = defineClass(name, classBytes, 0, classBytes.length);
     }
