@@ -27,6 +27,7 @@ import org.jppf.utils.TraversalList;
  * Instances of this class encapsulate the necessary information used by the network classloader,
  * for sending class definition requests as well as receiving the class definitions.
  * @author Laurent Cohen
+ * @author Martin JANDA
  * @exclude
  */
 public class JPPFResourceWrapper implements Serializable
@@ -39,7 +40,10 @@ public class JPPFResourceWrapper implements Serializable
    * Used to generate locally unique ids for the remote-computed callables.
    */
   private static final AtomicLong CALLABLE_ID = new AtomicLong(0L);
-
+  /**
+   * Constant for an empty <code>JPPFResourceWrapper</code> array.
+   */
+  public static final JPPFResourceWrapper[] EMPTY_RESOURCE_WRAPPER_ARRAY = new JPPFResourceWrapper[0];
   /**
    * Enumeration of the possible states for this resource wrapper.
    * @exclude
@@ -323,6 +327,14 @@ public class JPPFResourceWrapper implements Serializable
     synchronized (dataMap) {
       dataMap.put(key, value);
     }
+  }
+
+  /**
+   * Get the array of requests held by this request. For simple request returns arrays containing <code>this</code>.
+   * @return a array of {@link JPPFResourceWrapper} instances.
+   */
+  public JPPFResourceWrapper[] getResources() {
+    return new JPPFResourceWrapper[] { this };
   }
 
   /**

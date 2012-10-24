@@ -82,11 +82,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
         {
           if (debugEnabled) log.debug("got response for resource " + resource);
           toRemove.add(resource);
-          if (composite != null)
-          {
-            composite.getResources().remove(resource);
-            composite.getResources().add(resource);
-          }
+          if (composite != null) composite.addOrReplaceResource(resource);
           else context.setResource(resource);
         }
       }

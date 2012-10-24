@@ -39,6 +39,9 @@ public class CacheClassKey
    */
   public CacheClassKey(final String uuid, final String res)
   {
+    if (uuid == null) throw new IllegalArgumentException("uuid is null");
+    if (res == null) throw new IllegalArgumentException("res is null");
+
     this.uuid = uuid;
     this.res = res;
   }
@@ -62,7 +65,7 @@ public class CacheClassKey
 
   /**
    * Calculate the hash code of this key.
-   * @return the hashcode as an int value.
+   * @return the hash code as an int value.
    * @see java.lang.Object#hashCode()
    */
   @Override

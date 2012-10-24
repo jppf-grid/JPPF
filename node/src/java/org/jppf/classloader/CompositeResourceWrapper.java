@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 /**
  * Instances of this class are intended for grouping multiple class loading requests together.
  * @author Laurent Cohen
+ * @author Martin JANDA
  * @exclude
  */
 public class CompositeResourceWrapper extends JPPFResourceWrapper
@@ -48,21 +49,30 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   {
   }
 
-  /**
-   * Get the list of requests held by this composite request.
-   * @return a list of {@link JPPFResourceWrapper} instances.
-   */
   @SuppressWarnings("unchecked")
-  public Set<JPPFResourceWrapper> getResources()
+  @Override
+  public JPPFResourceWrapper[] getResources()
   {
     synchronized (getMonitor()) {
-      Set<JPPFResourceWrapper> requests = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
-      if (requests == null)
-      {
-        requests = new HashSet<JPPFResourceWrapper>();
-        setData(RESOURCES_KEY, requests);
-      }
-      return requests;
+      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
+      if(resources == null || resources.isEmpty()) return EMPTY_RESOURCE_WRAPPER_ARRAY;
+      else return resources.toArray(new JPPFResourceWrapper[resources.size()]);
+    }
+  }
+
+  /**
+   * Add or replace request to this composite request.
+   * @param resource the request to add or replace.
+   */
+  @SuppressWarnings("unchecked")
+  public void addOrReplaceResource(final JPPFResourceWrapper resource) {
+    synchronized (getMonitor()) {
+      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
+      if(resources == null) {
+        resources = new HashSet<JPPFResourceWrapper>();
+        setData(RESOURCES_KEY, resources);
+      } else resources.remove(resource);
+      resources.add(resource);
     }
   }
 
@@ -76,7 +86,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
     Future<JPPFResourceWrapper> f = futureMap.get(resource);
     if (f == null)
     {
-      getResources().add(resource);
+      addOrReplaceResource(resource);
       f = new ResourceFuture<JPPFResourceWrapper>();
       futureMap.put(resource, f);
     }

@@ -73,13 +73,7 @@ class WaitingNodeRequestState extends ClassServerState
     {
       JPPFResourceWrapper res = context.deserializeResource();
       if (debugEnabled) log.debug("read resource request " + res + " from node: " + channel);
-      if (res instanceof CompositeResourceWrapper)
-      {
-        CompositeResourceWrapper composite = (CompositeResourceWrapper) context.deserializeResource();
-        Collection<JPPFResourceWrapper> requests = composite.getResources();
-        for (JPPFResourceWrapper resource: requests) processResource(channel, resource);
-      }
-      else processResource(channel, res);
+      for (JPPFResourceWrapper resource: res.getResources()) processResource(channel, resource);
       Map<JPPFResourceWrapper, ResourceRequest> pendingResponses;
       Lock lock = context.getLockResponse();
       lock.lock();
