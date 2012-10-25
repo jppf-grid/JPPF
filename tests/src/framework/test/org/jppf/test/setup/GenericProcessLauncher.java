@@ -24,8 +24,6 @@ import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
-import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -53,51 +51,55 @@ public class GenericProcessLauncher
   /**
    * List of files to have in the classpath.
    */
-  private List<String> classpath = new ArrayList<String>();
+  protected List<String> classpath = new ArrayList<String>();
   /**
    * The JVM options to set.
    */
-  private List<String> jvmOptions = new ArrayList<String>();
+  protected List<String> jvmOptions = new ArrayList<String>();
   /**
    * Path to the JPPF configuration file.
    */
-  private String jppfConfig = null;
+  protected String jppfConfig = null;
   /**
    * The program arguments.
    */
-  private List<String> arguments = new ArrayList<String>();
+  protected List<String> arguments = new ArrayList<String>();
   /**
    * Path to the log4j configuration file.
    */
-  private String log4j = null;
+  protected String log4j = null;
+  /**
+   * Path to the JDK logging configuration file.
+   */
+  protected String logging = null;
   /**
    * Directory in which the program is started.
    */
-  private String dir = DEFAULT_DIR;
+  protected String dir = DEFAULT_DIR;
   /**
    * The process started by this process launcher.
    */
-  private Process process = null;
+  protected Process process = null;
   /**
    * Wrapper around the process.
    */
-  private ProcessWrapper wrapper = null;
+  protected ProcessWrapper wrapper = null;
   /**
    * Fully qualified name of the main class.
    */
-  private String mainClass = null;
+  protected String mainClass = null;
   /**
    * The server socket the driver listens to.
    */
-  private ServerSocket processServer = null;
+  protected ServerSocket processServer = null;
   /**
    * The port number the server socket listens to.
    */
-  private int processPort = 0;
+  protected int processPort = -1;
   /**
    * 
    */
-  private String name = "";
+  protected String name = "";
   /**
    * The driver or node number
    */
@@ -133,8 +135,8 @@ public class GenericProcessLauncher
     this.name = "[" + processType + '-' + n + "] ";
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
-    jppfConfig = createTempConfigFile(createConfigFromTemplate(jppfTemplate, n));
-    log4j = getFileURL(createTempConfigFile(createConfigFromTemplate(log4jTemplate, n)));
+    jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
+    log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
@@ -260,25 +262,22 @@ public class GenericProcessLauncher
     command.addAll(jvmOptions);
     command.add("-Djppf.config=" + jppfConfig);
     command.add("-Dlog4j.configuration=" + log4j);
+    if (logging != null) command.add("-Djava.util.logging.config.file=" + logging);
     //command.add("-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger");
     command.add(mainClass);
-    //command.addAll(arguments);
-    command.add(Integer.toString(processPort));
+    if (processPort > 0) command.add(Integer.toString(processPort));
+    else command.add("noLauncher");
     ProcessBuilder builder = new ProcessBuilder();
     builder.command(command);
     if (dir != null) builder.directory(new File(dir));
     wrapper = new ProcessWrapper();
-    wrapper.addListener(new ProcessWrapperEventListener()
-    {
+    wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
-      public void outputStreamAltered(final ProcessWrapperEvent event)
-      {
+      public void outputStreamAltered(final ProcessWrapperEvent event) {
         System.out.print(name + event.getContent());
       }
-
       @Override
-      public void errorStreamAltered(final ProcessWrapperEvent event)
-      {
+      public void errorStreamAltered(final ProcessWrapperEvent event) {
         System.err.print(name + event.getContent());
       }
     });
@@ -329,7 +328,9 @@ public class GenericProcessLauncher
           }
         }
       };
-      new Thread(r).start();
+      Thread thread = new Thread(r);
+      thread.setDaemon(true);
+      thread.start();
     } catch(Exception e) {
       try {
         processServer.close();
@@ -340,69 +341,6 @@ public class GenericProcessLauncher
       }
     }
     return processPort;
-  }
-
-  /**
-   * Create a temporary file containing the specified configuration.
-   * @param config the configuration to store on file.
-   * @return the path to the created file.
-   */
-  public static String createTempConfigFile(final TypedProperties config)
-  {
-    String path = null;
-    try
-    {
-      File file = File.createTempFile("config", ".properties");
-      file.deleteOnExit();
-      Writer writer = null;
-      try
-      {
-        writer = new BufferedWriter(new FileWriter(file));
-        config.store(writer, null);
-      }
-      finally
-      {
-        if (writer != null) StreamUtils.closeSilent(writer);
-      }
-      path = file.getCanonicalPath().replace('\\', '/');
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
-    }
-    return path;
-  }
-
-  /**
-   * Load and initialize a configuration based on a template configuration file.
-   * @param templatePath the path to a configuration file template.
-   * @param n the driver or node number to use.
-   * @return a configuration object where the string "${n}" was replace with the driver or node number.
-   */
-  public static TypedProperties createConfigFromTemplate(final String templatePath, final int n)
-  {
-    TypedProperties props = new TypedProperties();
-    Reader reader = null;
-    try
-    {
-      String content = FileUtils.readTextFile(templatePath);
-      if (content != null)
-      {
-        content = content.replace("${n}", String.valueOf(n));
-        reader = new StringReader(content);
-        props.load(reader);
-      }
-    }
-    catch (IOException e)
-    {
-      //e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-    finally
-    {
-      if (reader != null) StreamUtils.closeSilent(reader);
-    }
-    return props;
   }
 
   /**
@@ -422,5 +360,23 @@ public class GenericProcessLauncher
       throw new RuntimeException(e);
     }
     return url.toString();
+  }
+
+  /**
+   * Get the path to the JDK logging configuration file.
+   * @return the path as a string.
+   */
+  public String getLogging()
+  {
+    return logging;
+  }
+
+  /**
+   * Set the path to the JDK logging configuration file.
+   * @param logging the path as a string.
+   */
+  public void setLogging(final String logging)
+  {
+    this.logging = logging;
   }
 }
