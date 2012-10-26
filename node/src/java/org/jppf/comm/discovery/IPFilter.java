@@ -83,7 +83,7 @@ public class IPFilter
    */
   public void configure()
   {
-    String prefix = "jppf.discovery." + (broadcaster ? "broadcast" : "") + '.';
+    String prefix = "jppf.discovery." + (broadcaster ? "broadcast." : "");
     configureIPAddressPatterns(config.getString(prefix + "include.ipv4"), includePatterns, true);
     configureIPAddressPatterns(config.getString(prefix + "include.ipv6"), includePatterns, false);
     configureIPAddressPatterns(config.getString(prefix + "exclude.ipv4"), excludePatterns, true);
