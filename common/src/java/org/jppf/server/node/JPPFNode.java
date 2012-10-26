@@ -43,11 +43,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFNode.class);
+  private static final Logger log = LoggerFactory.getLogger(JPPFNode.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The task execution manager for this node.
    */
@@ -188,9 +188,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception
   {
     if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
-    if (executionManager.checkConfigChanged())
+    if (executionManager.checkConfigChanged() || bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
     {
-      if (debugEnabled) log.debug("detected configuration change, sending new system information to the server");
+      if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
       info.populate();
       bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);

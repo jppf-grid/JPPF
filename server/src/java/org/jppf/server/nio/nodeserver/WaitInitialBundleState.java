@@ -37,11 +37,11 @@ class WaitInitialBundleState extends NodeServerState
   /**
    * Logger for this class.
    */
-  protected static Logger log = LoggerFactory.getLogger(WaitInitialBundleState.class);
+  protected static final Logger log = LoggerFactory.getLogger(WaitInitialBundleState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  protected static boolean debugEnabled = log.isDebugEnabled();
+  protected static final boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this state.
@@ -70,13 +70,18 @@ class WaitInitialBundleState extends NodeServerState
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
       ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
       JPPFTaskBundle bundle = bundleWrapper.getJob();
+      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) throw new IllegalStateException("INITIAL_BUNDLE expected.");
+
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
       context.setUuid(uuid);
       Bundler bundler = server.getBundler().copy();
       JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-      context.setNodeInfo(systemInfo);
-      if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-      if (debugEnabled) log.debug("processing threads for node " + channel + " = " + (systemInfo == null ? "?" : systemInfo.getJppf().getInt("processing.threads", -1)));
+      if (systemInfo != null) {
+        context.setNodeInfo(systemInfo);
+        if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+        if (debugEnabled) log.debug("processing threads for node " + channel + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
+      } else if (debugEnabled) log.debug("no system info received for node " + channel);
+
       if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
       context.setBundler(bundler);
