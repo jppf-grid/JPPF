@@ -306,6 +306,7 @@ public abstract class JPPFTask implements Task<Object>
   {
     ClassLoader cl = callable.getClass().getClassLoader();
     V result = null;
+    Object returned = null;
     try
     {
       if (isInNode())
@@ -318,7 +319,9 @@ public abstract class JPPFTask implements Task<Object>
           byte[] bytes = ser.serialize(callable).getBuffer();
           bytes = loader.computeRemoteData(bytes);
           if (bytes == null) return null;
-          result = (V) ser.deserialize(bytes);
+          returned = ser.deserialize(bytes);
+          if (returned instanceof Exception) throw (Exception) returned;
+          result = (V) returned;
         }
       }
       else
