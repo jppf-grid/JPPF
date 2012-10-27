@@ -20,6 +20,7 @@ package sample.test.jppfcallable;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.JPPFCallable;
 import org.slf4j.*;
@@ -51,7 +52,6 @@ public class JPPFCallableRunner
   {
     try
     {
-      jppfClient = new JPPFClient();
       perform();
     }
     catch(Exception e)
@@ -70,10 +70,11 @@ public class JPPFCallableRunner
    */
   private static void perform() throws Exception
   {
-    int nbTasks = 40;
-    int nbJobs = 2;
-    //int maxNodes = Integer.MAX_VALUE;
+    int nbTasks = 4000;
+    int nbJobs = 1;
     int maxChannels = 1;
+    configure();
+    jppfClient = new JPPFClient();
     while (!jppfClient.hasAvailableConnection()) Thread.sleep(20L);
     print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
     List<JPPFJob> jobList = new ArrayList<JPPFJob>();
@@ -85,6 +86,7 @@ public class JPPFCallableRunner
       job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask()).setId(name + ":task-" + i);
       job.setResultListener(new JPPFResultCollector(job));
+      job.addJobListener(new MyJobListener());
       jobList.add(job);
     }
     callableResult = "from MyCallable";
@@ -95,6 +97,13 @@ public class JPPFCallableRunner
       List<JPPFTask> results = coll.waitForResults();
       print("got results for job '" + job.getName() + "'");
     }
+  }
+
+  /**
+   * Perform optional configuration before creating the JPPF client.
+   */
+  public static void configure()
+  {
   }
 
   /**
@@ -119,7 +128,7 @@ public class JPPFCallableRunner
       {
         MyCallable mc = new MyCallable(getId());
         String s = compute(mc);
-        System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
+        //System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
         setResult(s);
       }
       catch (Exception e)
@@ -139,6 +148,10 @@ public class JPPFCallableRunner
      * 
      */
     private String id = null;
+    /**
+     * 
+     */
+    private byte[] data = null;
 
     /**
      * 
@@ -159,12 +172,36 @@ public class JPPFCallableRunner
     @Override
     public String call() throws Exception
     {
-      System.out.println("[client] result of MyCallable[id=" + id + "].call() = " + callableResult);
+      //System.out.println("[client] result of MyCallable[id=" + id + "].call() = " + callableResult);
+      data = new byte[32768];
       synchronized(this)
       {
-        wait(100L);
+        wait(1L);
       }
       return callableResult;
+    }
+  }
+
+  /**
+   * 
+   */
+  public static class MyJobListener extends JobListenerAdapter
+  {
+    /**
+     * 
+     */
+    private int lastCount = 0;
+
+    @Override
+    public void jobReturned(final JobEvent event)
+    {
+      JPPFJob job = event.getJob();
+      int size = job.getResults().size();
+      if (size - lastCount > 100)
+      {
+        System.out.println("received " + size + " tasks for job '" + job.getName() + "'");
+        lastCount = size;
+      }
     }
   }
 }
