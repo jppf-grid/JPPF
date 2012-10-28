@@ -33,9 +33,16 @@ public class MyTask extends JPPFTask {
     // Execute some code on the client side via the ClientDataProvider
     //ClientDataProvider dataProvider = (ClientDataProvider) getDataProvider();
     //dataProvider.computeValue("computeResult", new MyCallable(this));
-    compute(new MyCallable(this));
-    // we can now cancel the job
-    MyNodeListener.getInstance().cancelJob();
+    try
+    {
+      compute(new MyCallable(this));
+      // we can now cancel the job
+      MyNodeListener.getInstance().cancelJob();
+    }
+    catch (Exception e)
+    {
+      setException(e);
+    }
   }
 
   /**

@@ -21,6 +21,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
+import org.jppf.JPPFException;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -153,6 +154,7 @@ public class ResourceProvider
    */
   public byte[] computeCallable(final byte[] serializedCallable)
   {
+    if (debugEnabled) log.debug("before deserialization");
     JPPFCallable callable = null;
     ObjectSerializer ser = new ObjectSerializerImpl();
     Object result = null;
@@ -161,9 +163,9 @@ public class ResourceProvider
       callable = (JPPFCallable) ser.deserialize(serializedCallable);
       result = callable.call();
     }
-    catch(Exception e)
+    catch(Throwable t)
     {
-      result = e;
+      result = (t instanceof Exception) ? t : new JPPFException(t);
     }
     byte[] bytes = null;
     try

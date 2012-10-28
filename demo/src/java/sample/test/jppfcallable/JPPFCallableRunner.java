@@ -19,6 +19,7 @@ package sample.test.jppfcallable;
 
 import java.util.*;
 
+import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
@@ -85,8 +86,16 @@ public class JPPFCallableRunner
       job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask()).setId(name + ":task-" + i);
-      job.setResultListener(new JPPFResultCollector(job));
-      job.addJobListener(new MyJobListener());
+      job.setResultListener(new JPPFResultCollector(job)
+      {
+        @Override
+        public synchronized void resultsReceived(final TaskResultEvent event)
+        {
+          super.resultsReceived(event);
+          if (event.getTaskList() != null) System.out.println("received " + jobResults.size() + " results");
+        }
+      });
+      //job.addJobListener(new MyJobListener());
       jobList.add(job);
     }
     callableResult = "from MyCallable";
@@ -126,15 +135,17 @@ public class JPPFCallableRunner
     {
       try
       {
+        /*
+        */
         MyCallable mc = new MyCallable(getId());
         String s = compute(mc);
         //System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
         setResult(s);
       }
-      catch (Exception e)
+      catch (Throwable t)
       {
-        e.printStackTrace();
-        setException(e);
+        //t.printStackTrace();
+        setException(t instanceof Exception ? (Exception) t : new JPPFException(t));
       }
     }
   }
@@ -173,12 +184,14 @@ public class JPPFCallableRunner
     public String call() throws Exception
     {
       //System.out.println("[client] result of MyCallable[id=" + id + "].call() = " + callableResult);
-      data = new byte[32768];
+      data = new byte[1024];
       synchronized(this)
       {
         wait(1L);
       }
-      return callableResult;
+      //throw new RuntimeException();
+      throw new Error();
+      //return callableResult;
     }
   }
 
@@ -195,6 +208,7 @@ public class JPPFCallableRunner
     @Override
     public void jobReturned(final JobEvent event)
     {
+      System.out.println("job '" + event.getJob().getName() + "' returned");
       JPPFJob job = event.getJob();
       int size = job.getResults().size();
       if (size - lastCount > 100)
@@ -202,6 +216,24 @@ public class JPPFCallableRunner
         System.out.println("received " + size + " tasks for job '" + job.getName() + "'");
         lastCount = size;
       }
+    }
+
+    @Override
+    public void jobStarted(final JobEvent event)
+    {
+      System.out.println("job '" + event.getJob().getName() + "' started");
+    }
+
+    @Override
+    public void jobEnded(final JobEvent event)
+    {
+      System.out.println("job '" + event.getJob().getName() + "' ended");
+    }
+
+    @Override
+    public void jobDispatched(final JobEvent event)
+    {
+      System.out.println("job '" + event.getJob().getName() + "' dispatched");
     }
   }
 }

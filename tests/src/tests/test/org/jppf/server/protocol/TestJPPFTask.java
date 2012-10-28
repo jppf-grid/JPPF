@@ -74,7 +74,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testTaskTimeout() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob("testTaskTimeoutDuration", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     List<JPPFTask> tasks = job.getTasks();
     JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
     tasks.get(nbTasks-1).setTimeoutSchedule(schedule);
@@ -94,7 +94,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testTaskExpirationDate() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob("testTaskTimeoutDate", true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     Date date = new Date(System.currentTimeMillis() + TIME_SHORT + 10L);
     JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
@@ -116,7 +116,8 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testComputeCallable() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob("testComputeCallable", true, false, nbTasks, MyComputeCallableTask.class, true);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
+      MyComputeCallableTask.class, MyComputeCallable.class.getName());
     callableResult = "test successful";
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
@@ -131,13 +132,34 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
+  public void testComputeCallableThrowingException() throws Exception
+  {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
+      MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
+    callableResult = "test successful";
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+    assertNull(task.getResult());
+    assertNotNull(task.getException());
+    assertTrue(task.getException() instanceof UnsupportedOperationException);
+  }
+
+  /**
+   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code>.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
   public void testComputeCallableInClient() throws Exception
   {
     try
     {
       configure();
       int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob("testComputeCallableInClient", true, false, nbTasks, MyComputeCallableTask.class, true);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
+        MyComputeCallableTask.class, MyComputeCallable.class.getName());
       callableResult = "test successful";
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
@@ -161,7 +183,7 @@ public class TestJPPFTask extends Setup1D1N1C
   public void testIsInNodeTrue() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
@@ -181,7 +203,7 @@ public class TestJPPFTask extends Setup1D1N1C
     {
       configure();
       int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob("testIsInNodeTrue", true, false, nbTasks, MyComputeCallableTask.class, false);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
@@ -196,22 +218,30 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * A simple JPPFTask which call its <code>compute()</code> method.
+   * A simple JPPFTask which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends JPPFTask
   {
     /**
-     * If true then call the <code>compute()</code> method.
+     * The class name for the callable to invoke.
      */
-    private boolean testCompute = false;
+    private final String callableClassName;
 
     /**
      * Iitialize this task.
-     * @param testCompute if true then call the <code>compute()</code> method.
      */
-    public MyComputeCallableTask(final boolean testCompute)
+    public MyComputeCallableTask()
     {
-      this.testCompute = testCompute;
+      this.callableClassName = null;
+    }
+
+    /**
+     * Iitialize this task.
+     * @param callableClassName the class name for the callable to invoke.
+     */
+    public MyComputeCallableTask(final String callableClassName)
+    {
+      this.callableClassName = callableClassName;
     }
 
     @Override
@@ -219,12 +249,13 @@ public class TestJPPFTask extends Setup1D1N1C
     {
       try
       {
-        
+
         System.out.println("this task's class loader = " + getClass().getClassLoader());
-        if (testCompute)
+        if (callableClassName != null)
         {
-          MyComputeCallable mc = new MyComputeCallable();
-          String s = compute(mc);
+          Class<?> clazz = Class.forName(callableClassName);
+          JPPFCallable callable = (JPPFCallable) clazz.newInstance();
+          String s = compute(callable);
           System.out.println("result of MyCallable.call() = " + s);
           setResult(s);
         }
@@ -237,14 +268,14 @@ public class TestJPPFTask extends Setup1D1N1C
       }
       catch (Exception e)
       {
-        e.printStackTrace();
+        //e.printStackTrace();
         setException(e);
       }
     }
   }
 
   /**
-   * 
+   * A simple <code>JPPFCallable</code>.
    */
   public static class MyComputeCallable implements JPPFCallable<String>
   {
@@ -253,6 +284,18 @@ public class TestJPPFTask extends Setup1D1N1C
     {
       System.out.println("result of MyCallable.call() = " + callableResult);
       return callableResult;
+    }
+  }
+
+  /**
+   * A <code>JPPFCallable</code> whixh throws an exception in its <code>call()</code> method..
+   */
+  public static class MyExceptionalCallable implements JPPFCallable<String>
+  {
+    @Override
+    public String call() throws Exception
+    {
+      throw new UnsupportedOperationException("this exception is thrown intentionally");
     }
   }
 

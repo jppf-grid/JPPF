@@ -57,10 +57,17 @@ public class DataProviderTestTask extends JPPFTask
     //System.out.println("this should be on the node side");
     //ClientDataProvider dp = (ClientDataProvider) getDataProvider();
     //Object o = dp.computeValue("result", new MyCallable("" + i + ':' + j));
-    Object o = compute(new MyCallable("" + i + ':' + j));
-    byte[] bytes = (byte[]) o;
-    System.out.println("Result of client-side execution is a byte[" + bytes.length + ']');
-    setResult(o);
+    try
+    {
+      Object o = compute(new MyCallable("" + i + ':' + j));
+      byte[] bytes = (byte[]) o;
+      System.out.println("Result of client-side execution is a byte[" + bytes.length + ']');
+      setResult(o);
+    }
+    catch (Exception e)
+    {
+      setException(e);
+    }
   }
 
   /**

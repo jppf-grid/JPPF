@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 /**
- * A serializable callback interface.
+ * A serializable extension of the {@link Callable} interface.
  * @param <V> the type of object returned by the {@link #call() call()} method.
  * @author Laurent Cohen
  */

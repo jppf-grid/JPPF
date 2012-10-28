@@ -147,12 +147,17 @@ public interface Task<T> extends Runnable, Serializable
    * @exclude
    */
   void setInNode(boolean inNode);
+
   /**
-   * Compute a value on the client-side, as the result of the execution of a {@link org.jppf.utils.JPPFCallable JPPFCallable}.
+   * Compute a value on the client-side, as the result of the execution of a {@link JPPFCallable}.
+   * <p>Any {@link Throwable} raised in the callable's <code>call()</code> method will be thrown as the result of this method.
+   * If the Throwable is an instance of <code>Exception</code> or one of its subclasses, it is thrown as such, otherwise it is wrapped
+   * into a {@link org.jppf.JPPFException}.
    * @param <V> the type of results returned by the callable.
    * @param callable the callable to execute on the client side.
    * @return the value computed on the client, or null if the value could not be computed.
+   * @throws Exception if the execution of the callable in the client resulted in a {@link Throwable} being raised.
    * @see org.jppf.utils.JPPFCallable
    */
-  <V> V compute(JPPFCallable<V> callable);
+  <V> V compute(JPPFCallable<V> callable) throws Exception;
 }

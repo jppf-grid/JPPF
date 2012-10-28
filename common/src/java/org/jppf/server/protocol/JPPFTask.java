@@ -302,7 +302,7 @@ public abstract class JPPFTask implements Task<Object>
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V compute(final JPPFCallable<V> callable)
+  public <V> V compute(final JPPFCallable<V> callable) throws Exception
   {
     ClassLoader cl = callable.getClass().getClassLoader();
     V result = null;
