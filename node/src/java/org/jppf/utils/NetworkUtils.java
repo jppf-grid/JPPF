@@ -89,7 +89,7 @@ public final class NetworkUtils
       public boolean accepts(final InetAddress addr)
       {
         return (addr instanceof Inet4Address)
-        && !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
+            && !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
       }
     });
   }
@@ -369,7 +369,7 @@ public final class NetworkUtils
         result = new int[8];
         // special processing for scoped IPv6 addresses
         int idx = ip.indexOf('%');
-        if (idx >= 0) ip = ip.substring(0, idx); 
+        if (idx >= 0) ip = ip.substring(0, idx);
         String[] comp = ip.split(":");
         for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
       }
@@ -385,5 +385,24 @@ public final class NetworkUtils
     {
       return null;
     }
+  }
+
+  /**
+   * Determine whether a textual address is an IP address (as opposed ot a host name) in IPv6 format.
+   * @param host the textual representation of the address.
+   * @return <code>true</code> if the textual address is an IP address in IPv6 format, <code>false</code> otherwise.
+   */
+  public static boolean isIPv6Address(final String host)
+  {
+    try
+    {
+      InetAddress addr = InetAddress.getByName(host);
+      if ((addr instanceof Inet6Address) && addr.getHostAddress().equals(host)) return true;
+    }
+    catch (UnknownHostException e)
+    {
+      //e.printStackTrace();
+    }
+    return false;
   }
 }

@@ -125,12 +125,22 @@ public class ConfigurationHelper
    */
   public static TypedProperties loadProperties(final File path)
   {
-    TypedProperties result = new TypedProperties();
+    return loadProperties(new TypedProperties(), path);
+  }
+
+  /**
+   * Load a properties file from the specified path and put its entries into the specified properties set.
+   * @param properties the properties object to populate.
+   * @param path the path to the file to load.
+   * @return a {@link TypedProperties} with the properties of the specified file.
+   */
+  public static TypedProperties loadProperties(final TypedProperties properties, final File path)
+  {
     Reader reader = null;
     try
     {
       reader = new BufferedReader(new FileReader(path));
-      result.load(reader);
+      properties.load(reader);
     }
     catch (Exception e)
     {
@@ -141,7 +151,7 @@ public class ConfigurationHelper
     {
       if (reader != null) StreamUtils.closeSilent(reader);
     }
-    return result;
+    return properties;
   }
 
   /**

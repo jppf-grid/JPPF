@@ -29,7 +29,7 @@ import javax.management.remote.*;
 
 import org.jppf.JPPFException;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -149,8 +149,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   {
     try
     {
+      /*
       InetAddress addr = InetAddress.getByName(host);
       this.host = (addr instanceof Inet6Address) ? "[" + host + "]" : host;
+      */
+      this.host = (NetworkUtils.isIPv6Address(host)) ? "[" + host + "]" : host;
       this.port = port;
       this.secure = ssl;
       idString = this.host + ':' + this.port;
