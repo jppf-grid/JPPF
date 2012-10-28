@@ -19,12 +19,9 @@ package org.jppf.jca.work;
 
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
-import java.util.*;
-
 import javax.resource.spi.work.Work;
 
 import org.jppf.JPPFException;
-import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.client.*;
 import org.jppf.comm.socket.SocketInitializer;
 import org.slf4j.*;
@@ -117,58 +114,14 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
   {
     try
     {
+      Thread.currentThread().setUncaughtExceptionHandler(this);
       while (!stop)
       {
         try
         {
           if (getStatus().equals(DISCONNECTED)) performConnection();
-          if (getStatus().equals(ACTIVE))
-          {
-            boolean found = true;
-            JPPFResourceWrapper resource = readResource();
-            String name = resource.getName();
-            if  (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name);
-
-            String requestUuid = resource.getRequestUuid();
-            ClassLoader cl = ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(requestUuid);
-            if (debugEnabled) log.debug("attempting resource lookup using classloader=" + cl + " for request uuid = " + requestUuid);
-            if (resource.getData("multiple") != null)
-            {
-              List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
-              if (list != null) resource.setData("resource_list", list);
-            }
-            else if (resource.getData("multiple.resources.names") != null)
-            {
-              String[] names = (String[]) resource.getData("multiple.resources.names");
-              Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
-              resource.setData("resource_map", result);
-            }
-            else
-            {
-              byte[] b;
-              byte[] callable = resource.getCallable();
-              if (callable != null) b = resourceProvider.computeCallable(callable);
-              else
-              {
-                if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
-                else b = resourceProvider.getResourceAsBytes(name, cl);
-              }
-              if (b == null) found = false;
-              if (callable == null) resource.setDefinition(b);
-              else resource.setCallable(b);
-              if (debugEnabled)
-              {
-                if (found) log.debug('[' +this.getName()+"] sent resource: " + name + " (" + b.length + " bytes)");
-                else log.debug('[' +this.getName()+"] resource not found: " + name);
-              }
-            }
-            resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
-            writeResource(resource);
-          }
-          else
-          {
-            Thread.sleep(100);
-          }
+          if (getStatus().equals(ACTIVE)) processNextRequest();
+          else Thread.sleep(100);
         }
         catch(Exception e)
         {

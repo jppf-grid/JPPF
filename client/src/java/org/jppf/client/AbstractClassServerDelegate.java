@@ -31,7 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate
+public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate, Thread.UncaughtExceptionHandler
 {
   /**
    * Logger for this class.
@@ -171,6 +171,64 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   }
 
   /**
+   * Process the next class laodign request from the server.
+   * @throws Exception if any error occcurs.
+   */
+  protected void processNextRequest() throws Exception
+  {
+    boolean found = true;
+    JPPFResourceWrapper resource = readResource();
+    String name = resource.getName();
+    if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + resource);
+    ClassLoader cl = getClassLoader(resource.getRequestUuid());
+    //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
+    if (debugEnabled) log.debug('[' + this.getName() + "] using classloader=" + cl);
+    if (resource.getData("multiple") != null)
+    {
+      List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+      if (list != null) resource.setData("resource_list", list);
+    }
+    else if (resource.getData("multiple.resources.names") != null)
+    {
+      String[] names = (String[]) resource.getData("multiple.resources.names");
+      Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+      resource.setData("resource_map", result);
+    }
+    else
+    {
+      byte[] b;
+      byte[] callable = resource.getCallable();
+      if (callable != null) b = resourceProvider.computeCallable(callable);
+      else
+      {
+        if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
+        else b = resourceProvider.getResourceAsBytes(name, cl);
+      }
+      if (b == null) found = false;
+      if (callable == null) resource.setDefinition(b);
+      else resource.setCallable(b);
+      if (debugEnabled)
+      {
+        if (found) log.debug('[' +this.getName()+"] found resource: " + name + " (" + b.length + " bytes)");
+        else log.debug('[' +this.getName()+"] resource not found: " + name);
+      }
+    }
+    resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
+    writeResource(resource);
+  }
+
+
+  /**
+   * Retrieve the class loader to use from the client.
+   * @param uuid the uuid of the request from which the class loader was obtained.
+   * @return a <code>ClassLoader</code> instance, or null if none could be found.
+   */
+  protected ClassLoader getClassLoader(final String uuid)
+  {
+    return ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(uuid);
+  }
+
+  /**
    * Close the socket connection.
    * @see org.jppf.client.ClassServerDelegate#close()
    */
@@ -185,5 +243,11 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       super.close();
       if (debugEnabled) log.debug(getName() + " closed");
     }
+  }
+
+  @Override
+  public void uncaughtException(final Thread t, final Throwable e)
+  {
+    log.error("uncaught exception", e);
   }
 }
