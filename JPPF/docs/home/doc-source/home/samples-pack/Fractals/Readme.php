@@ -43,7 +43,7 @@ $template{name="samples-page-header" title="Generation of Mandelbrot Fractals"}$
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v3/">The JPPF documentation</a></li>
 					</ul>
 					
 </div>

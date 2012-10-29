@@ -50,7 +50,7 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol class="samplesList">
 						<li>open a command prompt in JPPF-x.y-samples-pack/NodeLifeCycle</li>
@@ -76,7 +76,7 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v3">The JPPF documentation</a></li>
 					</ul>
 					
 </div>

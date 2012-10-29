@@ -47,7 +47,7 @@ $template{name="about-page-header" title="Patches"}$
 			while ($line2 = mysql_fetch_array($result2, MYSQL_ASSOC))
 			{
 ?>
-				<li><a href="<?php echo $line2['bug_url'] ?>"><?php echo $line2['bug_id'] ?> - <?php echo $line2['bug_title'] ?></a></li>
+				<li><a href="<?php echo $line2['bug_url'] ?>"><?php echo $line2['bug_id'] ?>&nbsp;<?php echo $line2['bug_title'] ?></a></li>
 <?php
 			}
 			mysql_free_result($result2);

@@ -4,7 +4,7 @@ $template{name="samples-page-header" title="Custom Load Balancer sample"}$
 <div align="justify">
 
 					<h3>What does the sample do?</h3>
-					This sample illustrates the implementation of a custom load-balancer that uses information about the nodes and the submitted jobs, to dispatch JPPF tasks to the nodes.
+					This sample illustrates the implementation of a <a href="http://www.jppf.org/doc/v3/index.php?title=Creating_a_custom_load-balancer">custom load-balancer</a> that uses information about the nodes and the submitted jobs, to dispatch JPPF tasks to the nodes.
 
 					<h3>Description of the problem to solve</h3>
 					We are in a situation where we need to submit two types of jobs for execution in the JPPF grid:
@@ -52,7 +52,7 @@ $template{name="samples-page-header" title="Custom Load Balancer sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample, you need to install a JPPF server and at least two nodes.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol class="samplesList">
 						<li>To configure the two nodes, there are 2 predefined node configurations we will use:
@@ -107,7 +107,7 @@ $template{name="samples-page-header" title="Custom Load Balancer sample"}$
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul>
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v3/">The JPPF documentation</a></li>
 					</ul>
 					
 </div>
