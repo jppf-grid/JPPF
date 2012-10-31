@@ -198,7 +198,14 @@
 			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
-	    <zipfileset dir="${jdk7-addons}" prefix="${zip.prefix}/jca-client"/>
+      <zipfileset dir="${jdk7-addons}" prefix="${zip.prefix}/jdk7-addons"/>
+      <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
+      <zipfileset dir="${gigaspaces}" prefix="${zip.prefix}/JPPF-GigaSpaces">
+        <exclude name="deployable/*.jar"/>
+        <exclude name="deployable/*.war"/>
+        <exclude name="**/build/*.*"/>
+		    <exclude name="**/pu/*.*"/>
+      </zipfileset>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
 		</zip>
 	</target>
