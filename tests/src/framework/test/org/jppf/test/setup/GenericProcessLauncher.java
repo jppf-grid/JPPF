@@ -97,7 +97,7 @@ public class GenericProcessLauncher
    */
   protected int processPort = -1;
   /**
-   * 
+   * The name given to this process launcher.
    */
   protected String name = "";
   /**
@@ -282,8 +282,8 @@ public class GenericProcessLauncher
       }
     });
     wrapper.setProcess(builder.start());
-    Process process = wrapper.getProcess();
-    log.info("starting process " + process);
+    process = wrapper.getProcess();
+    if (debugEnabled) log.debug(name + "starting process " + process);
   }
 
   /**
@@ -294,7 +294,7 @@ public class GenericProcessLauncher
     if ((wrapper != null) && (wrapper.getProcess() != null))
     {
       Process process = wrapper.getProcess();
-      log.info("stopping process " + process);
+      if (debugEnabled) log.debug(name + "stopping process " + process);
       process.destroy();
     }
   }
@@ -313,31 +313,45 @@ public class GenericProcessLauncher
   {
     try
     {
-      processServer = new ServerSocket(0);
+      if (processServer == null) processServer = new ServerSocket(0);
       processPort = processServer.getLocalPort();
-      Runnable r = new Runnable() {
+      Runnable r = new Runnable()
+      {
         @Override
-        public void run() {
-          while (true) {
-            try {
+        public void run()
+        {
+          try
+          {
+            //while (true)
+            {
               Socket s = processServer.accept();
-              s.getInputStream().read();
-            } catch(IOException ioe) {
-              if (debugEnabled) log.debug(ioe.getMessage(), ioe);
+              int n = s.getInputStream().read();
+              if (n == -1) throw new EOFException();
             }
+          }
+          catch(IOException ioe)
+          {
+            if (debugEnabled) log.debug(name, ioe);
           }
         }
       };
-      Thread thread = new Thread(r);
+      Thread thread = new Thread(r, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
-    } catch(Exception e) {
-      try {
+    }
+    catch(Exception e)
+    {
+      try
+      {
         processServer.close();
-      } catch(IOException ioe) {
-        ioe.printStackTrace();
+      }
+      catch(IOException ioe)
+      {
         if (debugEnabled) log.debug(ioe.getMessage(), ioe);
-        System.exit(1);
+      }
+      finally
+      {
+        processServer = null;
       }
     }
     return processPort;
@@ -378,5 +392,14 @@ public class GenericProcessLauncher
   public void setLogging(final String logging)
   {
     this.logging = logging;
+  }
+
+  /**
+   * Get the name given to this process launcher.
+   * @return the name as a string
+   */
+  public String getName()
+  {
+    return name;
   }
 }
