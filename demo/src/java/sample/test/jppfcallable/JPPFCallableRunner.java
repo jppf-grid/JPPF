@@ -71,7 +71,7 @@ public class JPPFCallableRunner
    */
   private static void perform() throws Exception
   {
-    int nbTasks = 4000;
+    int nbTasks = 400;
     int nbJobs = 1;
     int maxChannels = 1;
     configure();
@@ -187,7 +187,7 @@ public class JPPFCallableRunner
       data = new byte[1024];
       synchronized(this)
       {
-        wait(1L);
+        wait(10L);
       }
       //throw new RuntimeException();
       throw new Error();
