@@ -245,6 +245,7 @@ public class TestJPPFTask extends Setup1D1N1C
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void run()
     {
       try
@@ -254,7 +255,7 @@ public class TestJPPFTask extends Setup1D1N1C
         if (callableClassName != null)
         {
           Class<?> clazz = Class.forName(callableClassName);
-          JPPFCallable callable = (JPPFCallable) clazz.newInstance();
+          JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
           String s = compute(callable);
           System.out.println("result of MyCallable.call() = " + s);
           setResult(s);
