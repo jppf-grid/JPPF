@@ -26,6 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.utils.NetworkUtils;
 import org.slf4j.*;
 
 /**
@@ -183,7 +184,13 @@ public class NodeRefreshHandler
     }
     if (nodesInfo == null) return;
     Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
-    for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getHost() + ':' + info.getPort(), info);
+    for (JPPFManagementInfo info: nodesInfo)
+    {
+      String s = info.getHost();
+      if (NetworkUtils.isIPv6Address(s)) s = '[' + s + ']';
+      //actualMap.put(info.getHost() + ':' + info.getPort(), info);
+      actualMap.put(s + ':' + info.getPort(), info);
+    }
     List<String> nodesToProcess = new ArrayList<String>(panelNames.size());
     for (String name: panelNames)
     {
