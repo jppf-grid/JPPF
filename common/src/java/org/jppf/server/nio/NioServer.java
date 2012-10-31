@@ -204,8 +204,11 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
           lock.unlock();
         }
         int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        if (n > 0) go(selector.selectedKeys());
-        postSelect();
+        if (!isStopped())
+        {
+          if (n > 0) go(selector.selectedKeys());
+          postSelect();
+        }
       }
     }
     catch (Throwable t)
@@ -391,18 +394,31 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     if (!isStopped()) return;
     try
     {
+      lock.lock();
       selector.wakeup();
       Set<SelectionKey> keySet = selector.keys();
-      for (SelectionKey key: keySet)
-      {
-        key.channel().close();
-        key.cancel();
-      }
+      List<SelectableChannel> channels = new ArrayList<SelectableChannel>();
+      for (SelectionKey key: keySet) channels.add(key.channel());
       selector.close();
+      for (SelectableChannel channel: channels)
+      {
+        try
+        {
+          channel.close();
+        }
+        catch(Exception e)
+        {
+          log.error(e.getMessage(), e);
+        }
+      }
     }
     catch (Exception e)
     {
       log.error(e.getMessage(), e);
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 

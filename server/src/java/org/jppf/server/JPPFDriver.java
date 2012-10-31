@@ -133,14 +133,17 @@ public class JPPFDriver
     if (pid > 0) System.out.println("driver process id: " + pid);
     // initialize the jmx logger
     new JmxMessageNotifier();
+    String hrule = StringUtils.padRight("", '-', 80);
+    log.info(hrule);
     log.info(VersionUtils.getVersionInformation());
+    log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
+    log.info(hrule);
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);
     jobManager = new JPPFJobManager();
     taskQueue = new JPPFPriorityQueue(statsManager, jobManager);
     initializer = new DriverInitializer(this, config);
-    log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
   }
 
   /**
@@ -310,6 +313,11 @@ public class JPPFDriver
     log.info("Shutting down");
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
+    if (acceptorServer != null)
+    {
+      acceptorServer.end();
+      acceptorServer = null;
+    }
     if (clientClassServer != null)
     {
       clientClassServer.end();
@@ -324,11 +332,6 @@ public class JPPFDriver
     {
       nodeNioServer.end();
       nodeNioServer = null;
-    }
-    if (acceptorServer != null)
-    {
-      acceptorServer.end();
-      acceptorServer = null;
     }
     if (clientNioServer != null)
     {
