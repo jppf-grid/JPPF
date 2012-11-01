@@ -29,6 +29,10 @@ public enum TopologyDataType
    */
   DRIVER,
   /**
+   * Object is a JPPF peer driver connected as a node.
+   */
+  PEER,
+  /**
    * Object is a JPPF node.
    */
   NODE

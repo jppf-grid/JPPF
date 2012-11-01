@@ -60,10 +60,10 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
     for (Object o: selectedElements)
     {
       TopologyData data = (TopologyData) o;
-      if (TopologyDataType.NODE.equals(data.getType()))
+      if (TopologyDataType.NODE == data.getType())
       {
         JPPFManagementInfo info = data.getNodeInformation();
-        if ((info != null) && (JPPFManagementInfo.NODE == info.getType())) list.add(data);
+        if (info != null) list.add(data);
       }
     }
     dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new TopologyData[list.size()]);

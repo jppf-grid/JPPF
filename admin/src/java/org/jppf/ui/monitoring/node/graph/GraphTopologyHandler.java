@@ -120,7 +120,7 @@ public class GraphTopologyHandler
         {
           DefaultMutableTreeNode child = (DefaultMutableTreeNode) driver.getChildAt(j);
           TopologyData nodeData = (TopologyData) child.getUserObject();
-          nodeAdded(driverData, nodeData);
+          nodeAdded(driverData, nodeData, null);
         }
       }
     }
@@ -140,8 +140,8 @@ public class GraphTopologyHandler
   {
     synchronized(drivers)
     {
-      drivers.put(driver.getId(), driver);
-      java.util.List<TopologyData> list = driversAsNodes.get(driver.getId());
+      if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
+      java.util.List<TopologyData> list = driversAsNodes.get(driver.getUuid());
       if (list != null)
       {
         for (TopologyData tmpDriver: list)
@@ -149,7 +149,7 @@ public class GraphTopologyHandler
           tmpDriver.setClientConnection(driver.getClientConnection());
           tmpDriver.setJmxWrapper(driver.getJmxWrapper());
         }
-        driversAsNodes.remove(driver.getId());
+        driversAsNodes.remove(driver.getUuid());
       }
     }
     insertDriverVertex(driver);
@@ -165,8 +165,8 @@ public class GraphTopologyHandler
   {
     synchronized(drivers)
     {
-      drivers.remove(driver.getId());
-      driversAsNodes.remove(driver.getId());
+      drivers.remove(driver.getUuid());
+      driversAsNodes.remove(driver.getUuid());
     }
     removeVertex(driver);
     graphOption.repaintGraph(graphOption.isAutoLayout());
@@ -177,32 +177,31 @@ public class GraphTopologyHandler
    * Called when a node was added in the topology.
    * @param driver the driver to which the node is added.
    * @param node the data representing the node.
+   * @param peerDriver non-null if the node is a peer driver, rpresents the driver it is connected to.
    */
-  public void nodeAdded(final TopologyData driver, final TopologyData node)
+  public void nodeAdded(final TopologyData driver, final TopologyData node, final TopologyData peerDriver)
   {
-    if (!node.isNode())
+    synchronized(drivers)
     {
-      synchronized(drivers)
+      if (peerDriver != null)
       {
-        TopologyData other = drivers.get(node.getId());
-        if (other != null)
-        {
-          node.setClientConnection(other.getClientConnection());
-          node.setJmxWrapper(other.getJmxWrapper());
-        }
-        else
-        {
-          java.util.List<TopologyData> list = driversAsNodes.get(node.getId());
-          if (list == null)
-          {
-            list = new ArrayList<TopologyData>();
-            driversAsNodes.put(node.getId(), list);
-          }
-          list.add(node);
-        }
+        //TopologyData other = drivers.get(peerDriver.getId());
+        node.setClientConnection(peerDriver.getClientConnection());
+        node.setJmxWrapper(peerDriver.getJmxWrapper());
+        insertPeerVertex(driver, peerDriver);
       }
+      else
+      {
+        java.util.List<TopologyData> list = driversAsNodes.get(node.getUuid());
+        if (list == null)
+        {
+          list = new ArrayList<TopologyData>();
+          driversAsNodes.put(node.getUuid(), list);
+        }
+        list.add(node);
+      }
+      insertNodeVertex(driver, node);
     }
-    insertNodeVertex(driver, node);
     graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node + " to driver " + driver);
   }
@@ -264,6 +263,25 @@ public class GraphTopologyHandler
       if (displayGraph.findEdge(driver, node) == null && (edge != null)) displayGraph.addEdge(edge, driver, node);
     }
     return node;
+  }
+
+  /**
+   * Insert a new vertex for a newly added node.
+   * @param driver vertex representing the driver to which the node is attached.
+   * @param peer data for the newly added node.
+   * @return the new vertex object.
+   */
+  TopologyData insertPeerVertex(final TopologyData driver, final TopologyData peer)
+  {
+    //fullGraph.addVertex(peer);
+    Number edge = null;
+    if (fullGraph.findEdge(driver, peer) == null)
+    {
+      edge = edgeCount.incrementAndGet();
+      fullGraph.addEdge(edge, driver, peer);
+    }
+    if (displayGraph.findEdge(driver, peer) == null && (edge != null)) displayGraph.addEdge(edge, driver, peer);
+    return peer;
   }
 
   /**

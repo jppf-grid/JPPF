@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.*;
 import org.slf4j.*;
 
@@ -39,7 +40,7 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
   /**
    * The name of the connection.
    */
-  String driverName = null;
+  String driverUuid = null;
   /**
    * The node data panel.
    */
@@ -48,11 +49,11 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
   /**
    * Initialize this listener with the specified connection name.
    * @param panel the node data panel.
-   * @param driverName the name of the connection.
+   * @param driverUuid the name of the connection.
    */
-  public ConnectionStatusListener(final NodeDataPanel panel, final String driverName)
+  public ConnectionStatusListener(final NodeDataPanel panel, final String driverUuid)
   {
-    this.driverName = driverName;
+    this.driverUuid = driverUuid;
     this.panel = panel;
   }
 
@@ -64,9 +65,13 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
-    ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
-    if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
-    DefaultMutableTreeNode driverNode = panel.getManager().findDriver(driverName);
-    if (driverNode != null) panel.getModel().changeNode(driverNode);
+    if ((event.getClientConnectionStatusHandler().getStatus() == JPPFClientConnectionStatus.ACTIVE) ||
+        (event.getClientConnectionStatusHandler().getStatus() == JPPFClientConnectionStatus.EXECUTING))
+    {
+      ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
+      if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
+      DefaultMutableTreeNode driverNode = panel.getManager().findDriver(driverUuid);
+      if (driverNode != null) panel.getModel().changeNode(driverNode);
+    }
   }
 }

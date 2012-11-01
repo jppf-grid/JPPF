@@ -64,15 +64,10 @@ public class TopologyData
    * Determines whether the corresponding driver is collapsed in the visualization panel.
    */
   private boolean collapsed = false;
-
   /**
-   * Initialize topology job data with the specified type.
-   * @param type the type of this job data object as a <code>JobDataType</code> enum value.
+   * UUID of the driver or node reprsented by this object.
    */
-  protected TopologyData(final TopologyDataType type)
-  {
-    this.type = type;
-  }
+  private final String uuid;
 
   /**
    * Initialize this topology data as a driver related object.
@@ -80,9 +75,10 @@ public class TopologyData
    */
   public TopologyData(final JPPFClientConnection clientConnection)
   {
-    this(TopologyDataType.DRIVER);
+    this.type = TopologyDataType.DRIVER;
     this.clientConnection = clientConnection;
     this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
+    this.uuid = ((JPPFClientConnectionImpl) clientConnection).getUuid();
   }
 
   /**
@@ -91,15 +87,12 @@ public class TopologyData
    */
   public TopologyData(final JPPFManagementInfo nodeInformation)
   {
-    this(TopologyDataType.NODE);
+    this.type = TopologyDataType.NODE;
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
-    if (nodeInformation.isNode())
-    {
-      jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
-      jmxWrapper.connect();
-    }
-    else jmxWrapper = new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    this.uuid = nodeInformation.getId();
+    jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    jmxWrapper.connect();
   }
 
   /**
@@ -109,10 +102,11 @@ public class TopologyData
    */
   public TopologyData(final JPPFManagementInfo nodeInformation, final JMXConnectionWrapper peerJmx)
   {
-    this(TopologyDataType.NODE);
+    this.type = TopologyDataType.PEER;
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
-    this.jmxWrapper = peerJmx;
+    this.jmxWrapper = peerJmx != null ? peerJmx : new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    this.uuid = nodeInformation.getId();
   }
 
   /**
@@ -255,7 +249,7 @@ public class TopologyData
    */
   public boolean isNode()
   {
-    return (type == TopologyDataType.NODE) && (nodeInformation != null) && nodeInformation.isNode();
+    return (type == TopologyDataType.NODE);
   }
 
   @Override
@@ -298,5 +292,14 @@ public class TopologyData
   public void setCollapsed(final boolean collapsed)
   {
     this.collapsed = collapsed;
+  }
+
+  /**
+   * Get the UUID of the driver or node reprsented by this object.
+   * @return the uuid as a string.
+   */
+  public String getUuid()
+  {
+    return uuid;
   }
 }

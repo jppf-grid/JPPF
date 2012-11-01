@@ -78,7 +78,7 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
         if (o instanceof TopologyData)
         {
           TopologyData data = (TopologyData) o;
-          if (TopologyDataType.NODE.equals(data.getType()))
+          if (TopologyDataType.NODE == data.getType())
           {
             JMXConnectionWrapper wrapper = data.getJmxWrapper();
             if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(AbstractTreeCellRenderer.UNMANAGED_COLOR);

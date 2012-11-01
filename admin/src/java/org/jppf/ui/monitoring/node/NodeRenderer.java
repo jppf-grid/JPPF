@@ -88,29 +88,24 @@ public class NodeRenderer extends AbstractTreeCellRenderer
               font = getBoldItalicFont(f);
             }
             break;
+          case PEER:
+            path = DRIVER_ICON;
+            font = getBoldItalicFont(f);
+            foreground = DIMMED_FOREGROUND;
+            break;
           case NODE:
-            JPPFManagementInfo info = data.getNodeInformation();
-            if ((info != null) && (JPPFManagementInfo.DRIVER == info.getType()))
+            path = NODE_ICON;
+            if (!TopologyDataStatus.UP.equals(data.getStatus()))
             {
-              path = DRIVER_ICON;
-              font = getBoldItalicFont(f);
-              foreground = DIMMED_FOREGROUND;
+              background = INACTIVE_COLOR;
+              backgroundSelected = INACTIVE_SELECTION_COLOR;
+              font = getItalicFont(f);
             }
             else
             {
-              path = NODE_ICON;
-              if (!TopologyDataStatus.UP.equals(data.getStatus()))
-              {
-                background = INACTIVE_COLOR;
-                backgroundSelected = INACTIVE_SELECTION_COLOR;
-                font = getItalicFont(f);
-              }
-              else
-              {
-                JMXConnectionWrapper wrapper = data.getJmxWrapper();
-                boolean b = wrapper != null && wrapper.isConnected();
-                if (!b) foreground = UNMANAGED_COLOR;
-              }
+              JMXConnectionWrapper wrapper = data.getJmxWrapper();
+              boolean b = wrapper != null && wrapper.isConnected();
+              if (!b) foreground = UNMANAGED_COLOR;
             }
             break;
         }

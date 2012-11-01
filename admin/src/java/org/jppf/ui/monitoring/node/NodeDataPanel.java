@@ -188,17 +188,17 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
 
   /**
    * Called to notify that a node was added to a driver.
-   * @param driverName the name of the driver to which the node is added.
+   * @param driverUuid the name of the driver to which the node is added.
    * @param nodeInfo the object that encapsulates the node addition.
    */
-  public void nodeAdded(final String driverName, final JPPFManagementInfo nodeInfo)
+  public void nodeAdded(final String driverUuid, final JPPFManagementInfo nodeInfo)
   {
     Runnable r = new Runnable()
     {
       @Override
       public void run()
       {
-        final DefaultMutableTreeNode driverNode = manager.findDriver(driverName);
+        final DefaultMutableTreeNode driverNode = manager.findDriver(driverUuid);
         if (driverNode == null) return;
         manager.nodeAdded(driverNode, nodeInfo);
       }
@@ -259,7 +259,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
       TopologyData data = (TopologyData) driverNode.getUserObject();
-      map.put(data.getJmxWrapper().getId(), data.getClientConnection());
+      //map.put(data.getJmxWrapper().getId(), data.getClientConnection());
+      map.put(data.getUuid(), data.getClientConnection());
     }
     return map;
   }
@@ -321,7 +322,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   public void connectionFailed(final ClientEvent event)
   {
     JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
-    driverRemoved(c.getJmxConnection().getId(), false);
+    driverRemoved(c.getUuid(), false);
   }
 
   /**

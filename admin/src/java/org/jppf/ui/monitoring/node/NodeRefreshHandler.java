@@ -119,7 +119,8 @@ public class NodeRefreshHandler
       JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) c;
       if (uuidSet.contains(conn.getUuid())) continue;
       uuidSet.add(conn.getUuid());
-      map.put(conn.getJmxConnection().getId(), c);
+      //map.put(conn.getJmxConnection().getId(), c);
+      map.put(conn.getUuid(), c);
     }
     Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
 
@@ -127,27 +128,28 @@ public class NodeRefreshHandler
     List<String> driversToProcess = new ArrayList<String>();
     for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
     {
-      String name = entry.getKey();
-      if (!map.containsKey(name)) driversToProcess.add(name);
-      else refreshNodes(name);
+      //String name = entry.getKey();
+      String uuid = ((AbstractJPPFClientConnection) entry.getValue()).getUuid();
+      if (!map.containsKey(uuid)) driversToProcess.add(uuid);
+      else refreshNodes(uuid);
     }
-    for (String name: driversToProcess)
+    for (String uuid: driversToProcess)
     {
-      if (debugEnabled) log.debug("removing driver " + name);
-      nodeDataPanel.driverRemoved(name, false);
+      if (debugEnabled) log.debug("removing driver " + uuid);
+      nodeDataPanel.driverRemoved(uuid, false);
     }
 
     // handle drivers that were added
     driversToProcess = new ArrayList<String>();
     for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
     {
-      String name = entry.getKey();
-      if (!connectionMap.containsKey(name)) driversToProcess.add(name);
+      String uuid = entry.getKey();
+      if (!connectionMap.containsKey(uuid)) driversToProcess.add(uuid);
     }
-    for (String name: driversToProcess)
+    for (String uuid: driversToProcess)
     {
-      if (debugEnabled) log.debug("adding driver " + name);
-      nodeDataPanel.driverAdded(map.get(name));
+      if (debugEnabled) log.debug("adding driver " + uuid);
+      nodeDataPanel.driverAdded(map.get(uuid));
     }
     nodeDataPanel.refreshNodeStates();
     nodeDataPanel.repaintTreeTable();
@@ -155,11 +157,11 @@ public class NodeRefreshHandler
 
   /**
    * Refresh the nodes currently attached to the specified driver.
-   * @param driverName the name of the driver.
+   * @param driverUuid the name of the driver.
    */
-  private synchronized void refreshNodes(final String driverName)
+  private synchronized void refreshNodes(final String driverUuid)
   {
-    DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverName);
+    DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverUuid);
     //if (debugEnabled) log.debug("driverNode = " + driverNode);
     if (driverNode == null) return;
     Set<String> panelNames = new HashSet<String>();
@@ -167,7 +169,8 @@ public class NodeRefreshHandler
     {
       DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       TopologyData data = (TopologyData) nodeNode.getUserObject();
-      panelNames.add(data.getJmxWrapper().getId());
+      //panelNames.add(data.getJmxWrapper().getId());
+      panelNames.add(data.getUuid());
     }
     TopologyData data = (TopologyData) driverNode.getUserObject();
     JMXDriverConnectionWrapper wrapper = (JMXDriverConnectionWrapper) data.getJmxWrapper();
@@ -189,7 +192,8 @@ public class NodeRefreshHandler
       String s = info.getHost();
       if (NetworkUtils.isIPv6Address(s)) s = '[' + s + ']';
       //actualMap.put(info.getHost() + ':' + info.getPort(), info);
-      actualMap.put(s + ':' + info.getPort(), info);
+      //actualMap.put(s + ':' + info.getPort(), info);
+      actualMap.put(info.getId(), info);
     }
     List<String> nodesToProcess = new ArrayList<String>(panelNames.size());
     for (String name: panelNames)
@@ -199,14 +203,14 @@ public class NodeRefreshHandler
     for (String name: nodesToProcess)
     {
       if (debugEnabled) log.debug("removing node " + name);
-      nodeDataPanel.nodeRemoved(driverName, name);
+      nodeDataPanel.nodeRemoved(driverUuid, name);
     }
     for (Map.Entry<String, JPPFManagementInfo> entry: actualMap.entrySet())
     {
       if (!panelNames.contains(entry.getKey()))
       {
         if (debugEnabled) log.debug("adding node " + entry.getKey());
-        nodeDataPanel.nodeAdded(driverName, entry.getValue());
+        nodeDataPanel.nodeAdded(driverUuid, entry.getValue());
       }
     }
   }

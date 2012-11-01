@@ -41,6 +41,10 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public static final byte NODE = 1;
   /**
+   * Peer driver information type.
+   */
+  public static final byte PEER = 2;
+  /**
    * Information that node is local on DRIVER or CLIENT. Value of this constant can be changed in future!
    */
   public static final byte LOCAL = 64;
@@ -206,6 +210,15 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   public int getType()
   {
     return type & TYPE_MASK;
+  }
+
+  /**
+   * Determine whether this information represents a connection to peer driver.
+   * @return <code>true</code> if this information represents a peer driver, <code>false</code> otherwise.
+   */
+  public boolean isPeer()
+  {
+    return (type & TYPE_MASK) == PEER;
   }
 
   /**

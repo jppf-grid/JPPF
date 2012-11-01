@@ -23,7 +23,6 @@ import java.util.*;
 
 import javax.swing.tree.*;
 
-import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.treetable.*;
 
@@ -61,7 +60,7 @@ public class SelectNodesAction extends AbstractSelectionAction
         {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
           TopologyData data = (TopologyData) node.getUserObject();
-          if ((data == null) || !TopologyDataType.NODE.equals(data.getType()) || (data.getNodeInformation().getType() != JPPFManagementInfo.NODE)) continue;
+          if ((data == null) || !(TopologyDataType.NODE == data.getType())) continue;
           selectionPath.add(treeTable.getPathForNode(node));
         }
       }
