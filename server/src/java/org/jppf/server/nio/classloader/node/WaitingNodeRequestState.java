@@ -140,7 +140,11 @@ class WaitingNodeRequestState extends ClassServerState
         if (!alreadyInCache)
         {
           b = server.getResourceProvider().getResourceAsBytes(name);
-          if (debugEnabled) log.debug("resource " + (b == null ? "not " : "") + "found [" + name + "] in the driver's classpath for node: " + channel);
+          if (debugEnabled)
+          {
+            if (b== null) log.debug("resource not found [" + name + "] in the driver's classpath for node: " + channel);
+            else log.debug("resource found [" + name + ", defintion length=" + b.length + "] in the driver's classpath for node: " + channel);
+          }
         }
         if ((b != null) || !resource.isDynamic())
         {
