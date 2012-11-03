@@ -18,8 +18,6 @@
 
 package org.jppf.server.job.management;
 
-import java.util.Set;
-
 import javax.management.*;
 
 import org.jppf.job.*;
@@ -144,8 +142,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public String[] getAllJobIds() throws Exception
   {
-    Set<String> set = getJobManager().getAllJobIds();
-    return set.toArray(new String[set.size()]);
+    return getJobManager().getAllJobIds();
   }
 
   /**
