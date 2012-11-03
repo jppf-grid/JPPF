@@ -82,11 +82,11 @@ public class JPPFJobManager implements QueueListener
 
   /**
    * Get the set of ids for all the jobs currently queued or executing.
-   * @return a set of ids as strings.
+   * @return an arrayt of ids as strings.
    */
-  public synchronized Set<String> getAllJobIds()
+  public synchronized String[] getAllJobIds()
   {
-    return Collections.unmodifiableSet(jobMap.keySet());
+    return jobMap.keySet().toArray(new String[jobMap.size()]);
   }
 
   /**

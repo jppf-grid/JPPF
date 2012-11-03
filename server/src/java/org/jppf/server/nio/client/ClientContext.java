@@ -354,6 +354,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
       currentJobId = null;
       JPPFTaskBundle header = (JPPFTaskBundle) initialBundleWrapper.getJob();
       header.setCompletionListener(null);
+      if (debugEnabled) log.debug("cancelUponClientDisconnect = " + header.getSLA().isCancelUponClientDisconnect() + " for " + header);
       if (header.getSLA().isCancelUponClientDisconnect())
       {
         JMXDriverConnectionWrapper wrapper = new JMXDriverConnectionWrapper();
