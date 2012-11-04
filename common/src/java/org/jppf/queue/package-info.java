@@ -15,20 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.queue;
-
-import java.util.EventListener;
 
 /**
- * Queue listener interface.
- * @author Domingo Creados
- * @author Laurent Cohen
+ * Common classes providing support for job queuing in the JPPF client and driver.
+ * @exclude
  */
-public interface QueueListener extends EventListener
-{
-  /**
-   * Notify a listener that a queue event occurred.
-   * @param event - a queue event.
-   */
-  void newBundle(QueueEvent event);
-}
+package org.jppf.queue;

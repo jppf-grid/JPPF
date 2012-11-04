@@ -21,18 +21,16 @@ package org.jppf.server.queue;
 import static org.jppf.utils.CollectionUtils.*;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.execute.ExecutorStatus;
-import org.jppf.job.*;
+import org.jppf.job.JobListener;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.policy.Equal;
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.JPPFDriver;
-import org.jppf.server.JPPFDriverStatsManager;
+import org.jppf.queue.*;
+import org.jppf.server.*;
 import org.jppf.server.job.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
@@ -45,7 +43,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
+public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> implements JobManager
 {
   /**
    * Logger for this class.
@@ -55,14 +53,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * A map of task bundles, ordered by descending priority.
-   */
-  private final TreeMap<Integer, List<ServerJob>> priorityMap = new TreeMap<Integer, List<ServerJob>>(PriorityComparator.getInstance());
-  /**
-   * Contains the ids of all queued jobs.
-   */
-  private final Map<String, ServerJob> jobMap = new HashMap<String, ServerJob>();
   /**
    * The driver stats manager
    */
@@ -228,38 +218,24 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
     return result;
   }
 
+  /**
+   * Remove the specified bundle from the queue.
+   * @param bundleWrapper the bundle to remove.
+   * @return the removed bundle.
+   */
   @Override
-  public boolean isEmpty()
+  public ServerJob removeBundle(final ServerJob bundleWrapper)
   {
-    lock.lock();
-    try {
-      return priorityMap.isEmpty();
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
-  public int getMaxBundleSize()
-  {
-    lock.lock();
-    try {
-      return latestMaxSize;
-    } finally {
-      lock.unlock();
-    }
+    return removeBundle(bundleWrapper, true);
   }
 
   /**
-   * Update the value of the max bundle size.
+   * Remove the specified bundle from the queue.
+   * @param bundleWrapper the bundle to remove.
+   * @param removeFromJobMap flag whether bundle should be removed from job map.
+   * @return the removed bundle.
    */
-  private void updateLatestMaxSize()
-  {
-    latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
-  }
-
-  @Override
-  public void removeBundle(final ServerJob bundleWrapper, final boolean removeFromJobMap)
+  public ServerJob removeBundle(final ServerJob bundleWrapper, final boolean removeFromJobMap)
   {
     if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
 
@@ -280,12 +256,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
     } finally {
       lock.unlock();
     }
-  }
-
-  @Override
-  public Iterator<ServerJob> iterator()
-  {
-    return new BundleIterator(priorityMap, lock);
+    return bundleWrapper;
   }
 
   /**
@@ -550,5 +521,16 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     statsManager.taskInQueue(broadcastJob.getTaskCount());
+  }
+
+  /**
+   * Get the bundle size to use for bundle size tuning.
+   * @param bundleWrapper the bundle to get the size from.
+   * @return the bundle size as an int.
+   */
+  @Override
+  protected int getSize(final ServerJob bundleWrapper)
+  {
+    return bundleWrapper.getTaskCount();
   }
 }

@@ -25,10 +25,10 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.execute.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.JobMetadata;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.fixedsize.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
 /**

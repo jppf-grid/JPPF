@@ -27,10 +27,11 @@ import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.management.*;
+import org.jppf.queue.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
-import org.jppf.utils.*;
+import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
 /**
@@ -121,10 +122,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     taskQueueChecker = new TaskQueueChecker<ChannelWrapper<?>>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
-    this.queue.addQueueListener(new QueueListener()
+    this.queue.addQueueListener(new QueueListener<ClientJob, ClientJob, ClientTaskBundle>()
     {
       @Override
-      public void newBundle(final QueueEvent event)
+      public void newBundle(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event)
       {
         taskQueueChecker.wakeUp();
       }

@@ -24,12 +24,13 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.client.balancer.*;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobSLA;
+import org.jppf.queue.*;
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.utils.JPPFUuid;
@@ -40,7 +41,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JPPFPriorityQueue extends AbstractJPPFQueue
+public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, ClientTaskBundle>
 {
   /**
    * Logger for this class.
@@ -50,25 +51,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Comparator for job priority.
-   */
-  private static final Comparator<Integer> PRIORITY_COMPARATOR = new Comparator<Integer>() {
-    @Override
-    public int compare(final Integer o1, final Integer o2) {
-      if (o1 == null) return (o2 == null) ? 0 : 1;
-      else if (o2 == null) return -1;
-      return o2.compareTo(o1);
-    }
-  };
-  /**
-   * A map of task bundles, ordered by descending priority.
-   */
-  private final TreeMap<Integer, List<ClientJob>> priorityMap = new TreeMap<Integer, List<ClientJob>>(PRIORITY_COMPARATOR);
-  /**
-   * Contains the ids of all queued jobs.
-   */
-  private final Map<String, ClientJob> jobMap = new HashMap<String, ClientJob>();
   /**
    * The job submission manager
    */
@@ -232,24 +214,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     }
   }
 
-  @Override
-  public int getMaxBundleSize()
-  {
-    lock.lock();
-    try {
-      //latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
-      return latestMaxSize;
-    } finally {
-      lock.unlock();
-    }
-  }
-
   /**
-   * Update the value of the max bundle size.
+   * Get the bundle size to use for bundle size tuning.
+   * @param bundleWrapper the bundle to get the size from.
+   * @return the bundle size as an int.
    */
-  private void updateLatestMaxSize()
+  protected int getSize(final ClientJob bundleWrapper)
   {
-    latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
+    //return bundle.getTaskCount();
+    return bundleWrapper.getJob().getTasks().size();
   }
 
   @Override
@@ -264,12 +237,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue
     } finally {
       lock.unlock();
     }
-  }
-
-  @Override
-  public Iterator<ClientJob> iterator()
-  {
-    return new BundleIterator(priorityMap, lock);
   }
 
   /**

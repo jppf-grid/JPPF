@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import org.jppf.client.balancer.queue.JPPFQueue;
+import org.jppf.queue.JPPFQueue;
 import org.jppf.server.scheduler.bundle.JPPFContext;
 
 /**
