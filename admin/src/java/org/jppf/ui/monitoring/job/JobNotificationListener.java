@@ -38,11 +38,11 @@ public class JobNotificationListener implements NotificationListener
   /**
    * String identifying the driver that sends the notifications.
    */
-  private String driverName = null;
+  private final String driverName;
   /**
    * The panel to which the notifications are delegated.
    */
-  private JobDataPanel jobDataPanel = null;
+  private final JobDataPanel jobDataPanel;
 
   /**
    * Initialize this listener with the specified driver name.
@@ -66,24 +66,7 @@ public class JobNotificationListener implements NotificationListener
   {
     if (!(notification instanceof JobNotification)) return;
     JobNotification notif = (JobNotification) notification;
-    if (traceEnabled) log.trace("received notification: " + notif);
-    switch(notif.getEventType())
-    {
-      case JOB_QUEUED:
-        jobDataPanel.jobAdded(driverName, notif.getJobInformation());
-        break;
-      case JOB_ENDED:
-        jobDataPanel.jobRemoved(driverName, notif.getJobInformation());
-        break;
-      case JOB_UPDATED:
-        jobDataPanel.jobUpdated(driverName, notif.getJobInformation());
-        break;
-      case JOB_DISPATCHED:
-        jobDataPanel.subJobAdded(driverName, notif.getJobInformation(), notif.getNodeInfo());
-        break;
-      case JOB_RETURNED:
-        jobDataPanel.subJobRemoved(driverName, notif.getJobInformation(), notif.getNodeInfo());
-        break;
-    }
+    if (traceEnabled) log.trace("driver " + driverName + " received notification: " + notif);
+    jobDataPanel.handleNotification(driverName, notif);
   }
 }

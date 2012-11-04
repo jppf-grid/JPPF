@@ -19,6 +19,8 @@ package org.jppf.job;
 
 import java.io.Serializable;
 
+import org.jppf.utils.ReflectionUtils;
+
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
  * avoiding unnecessary transport overhead.<br>
@@ -256,5 +258,11 @@ public class JobInformation implements Serializable
   public void setJobUuid(final String jobUuid)
   {
     this.jobUuid = jobUuid;
+  }
+
+  @Override
+  public String toString()
+  {
+    return ReflectionUtils.dumpObject(this, ", ", true, false);
   }
 }

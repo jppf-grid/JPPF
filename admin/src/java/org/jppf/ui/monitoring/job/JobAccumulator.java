@@ -111,6 +111,7 @@ public class JobAccumulator<T>
     if (this.type == type)
     {
       if (this.type == Type.REMOVE) return true;
+      //if (this.type == Type.ADD) return true;
       if (this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
     }
     if (this.type == Type.REMOVE && type == Type.ADD)

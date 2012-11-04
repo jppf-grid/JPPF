@@ -140,6 +140,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
         if (serverJob == null) {
           queued = true;
           serverJob = new ServerJob(lock, jobManager, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+          jobManager.jobQueued(serverJob);
           serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
           serverJob.setQueueEntryTime(System.currentTimeMillis());
           serverJob.setJobReceivedTime(serverJob.getQueueEntryTime());
@@ -160,8 +161,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue implements JobManager
           putInListMap(getSize(serverJob), serverJob, sizeMap);
         }
         updateLatestMaxSize();
-        if (queued) jobManager.jobQueued(serverJob);
-        else JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
+        //if (queued) jobManager.jobQueued(serverJob);
+        if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
         fireQueueEvent(new QueueEvent(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));

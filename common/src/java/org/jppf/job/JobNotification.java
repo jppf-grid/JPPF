@@ -18,9 +18,13 @@
 
 package org.jppf.job;
 
-import javax.management.Notification;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.management.*;
 
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.ReflectionUtils;
 
 /**
  * Instances of this class represent events emitted by a JPPFJobManager.
@@ -33,17 +37,25 @@ public class JobNotification extends Notification
    */
   private static final long serialVersionUID = 1L;
   /**
+   * Count of instances of this class.
+   */
+  private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
+  /**
+   * Count of instances of this class.
+   */
+  private static final ObjectName SOURCE = createObjectName();
+  /**
    * Information about a node.
    */
-  private JPPFManagementInfo nodeInfo = null;
-  /**
-   * Creation timestamp for this event.
-   */
-  private long timestamp = -1L;
+  private final JPPFManagementInfo nodeInfo;
   /**
    * The type of this job event.
    */
-  private JobEventType eventType = null;
+  private final JobEventType eventType;
+  /**
+   * Information about the job.
+   */
+  private final JobInformation jobInfo;
 
   /**
    * Initialize this event with the specified job and node information.
@@ -54,10 +66,11 @@ public class JobNotification extends Notification
    */
   public JobNotification(final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp)
   {
-    super("jobEvent", jobInfo, timestamp);
+    super("jobEvent", SOURCE, INSTANCE_COUNT.incrementAndGet());
     this.eventType = eventType;
+    this.jobInfo = jobInfo;
     this.nodeInfo = nodeInfo;
-    this.timestamp = timestamp;
+    setTimeStamp(timestamp);
   }
 
   /**
@@ -66,7 +79,7 @@ public class JobNotification extends Notification
    */
   public JobInformation getJobInformation()
   {
-    return (JobInformation) getSource();
+    return jobInfo;
   }
 
   /**
@@ -79,15 +92,6 @@ public class JobNotification extends Notification
   }
 
   /**
-   * Get the creation timestamp for this event.
-   * @return the timestamp as a long value.
-   */
-  public long getTimestamp()
-  {
-    return timestamp;
-  }
-
-  /**
    * Get the type of this job event.
    * @return a <code>JobManagerEventType</code> enum value.
    */
@@ -97,14 +101,25 @@ public class JobNotification extends Notification
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("JobNotification{");
-    sb.append(super.toString());
-    sb.append(", eventType=").append(eventType);
-    sb.append(", nodeInfo=").append(nodeInfo);
-    sb.append(", timestamp=").append(timestamp);
-    sb.append('}');
-    return sb.toString();
+  public String toString()
+  {
+    return ReflectionUtils.dumpObject(this, ", ", true, false);
+  }
+
+  /**
+   * Create an ObjectName for the job management MBean.
+   * @return an instance of {@link ObjectName}.
+   */
+  private static ObjectName createObjectName()
+  {
+    ObjectName name = null;
+    try
+    {
+      name = new ObjectName(DriverJobManagementMBean.MBEAN_NAME);
+    }
+    catch (Exception e)
+    {
+    }
+    return name;
   }
 }

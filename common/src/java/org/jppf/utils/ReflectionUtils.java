@@ -50,28 +50,43 @@ public class ReflectionUtils
    */
   public static String dumpObject(final Object o, final String separator)
   {
-    //String separator = "\n";
-    if (o == null) return "null";
-    Class clazz = o.getClass();
-    StringBuilder sb = new StringBuilder();
+    return dumpObject(o, separator, true, false);
+  }
 
-    sb.append(clazz.getName()).append('@').append(Integer.toHexString(o.hashCode())).append(separator);
+  /**
+   * Generates a string that displays all return values for all getters of an object.
+   * @param o the object whose getter return values are to be dumped into a string.
+   * @param separator separator between field values, like a comma or a new line.
+   * @param displaySimpleClassName whether to use the object's class simple name.
+   * @param displayHashCode whether to append '@hashcode_value' to the name of the class.
+   * @return a string with the classname, hashcode, and the value of  each attribute that has a corresponding getter.
+   */
+  public static String dumpObject(final Object o, final String separator, final boolean displaySimpleClassName, final boolean displayHashCode)
+  {
+    if (o == null) return "null";
+    Class<?> clazz = o.getClass();
+    StringBuilder sb = new StringBuilder();
+    sb.append(displaySimpleClassName ? clazz.getSimpleName() : clazz.getName());
+    if (displayHashCode) sb.append('@').append(Integer.toHexString(o.hashCode()));
+    sb.append('[');
     Method[] methods = clazz.getMethods();
-    Method getter = null;
     // we want the attributes in ascending alphabetical order
     SortedMap<String, Object> attrMap = new TreeMap<String, Object>();
-    for (Method method : methods) {
-      if (isGetter(method)) {
-        getter = method;
+    for (Method method : methods)
+    {
+      if (isGetter(method) && !"getClass".equals(method.getName()))
+      {
         String attrName = null;
-        attrName = getter.getName().substring(getter.getName().startsWith("get") ? 3 : 2);
+        attrName = method.getName().substring(method.getName().startsWith("get") ? 3 : 2);
         attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
         Object value = null;
-        try {
-          value = getter.invoke(o, (Object[]) null);
+        try
+        {
+          value = method.invoke(o, (Object[]) null);
           if (value == null) value = "null";
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
           value = "*Error: " + e.getMessage() + '*';
         }
         attrMap.put(attrName, value);
@@ -84,6 +99,7 @@ public class ReflectionUtils
       sb.append(entry.getKey()).append('=').append(entry.getValue());
       if (it.hasNext()) sb.append(separator);
     }
+    sb.append(']');
     return sb.toString();
   }
 
@@ -167,7 +183,7 @@ public class ReflectionUtils
   public static Method getGetterForAttribute(final Class clazz, final String attrName)
   {
     String basename =
-      attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
+        attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
     Method method = getGetter(clazz, "get"+basename);
     if (method == null) method = getGetter(clazz, "is"+basename);
     return method;
@@ -183,7 +199,7 @@ public class ReflectionUtils
   public static Method getSetterForAttribute(final Class clazz, final String attrName)
   {
     String basename =
-      attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
+        attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
     return getSetter(clazz, "set"+basename);
   }
 
@@ -255,7 +271,6 @@ public class ReflectionUtils
   public static boolean isJPPFAnnotated(final AnnotatedElement annotatedElement)
   {
     if (annotatedElement == null) return false;
-    //Annotation[] annotations = annotatedElement.getDeclaredAnnotations();
     Annotation[] annotations = annotatedElement.getAnnotations();
     for (Annotation a: annotations)
     {

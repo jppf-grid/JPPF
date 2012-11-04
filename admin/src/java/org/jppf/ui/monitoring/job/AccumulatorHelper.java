@@ -20,13 +20,14 @@ package org.jppf.ui.monitoring.job;
 
 import java.util.*;
 
-import javax.swing.*;
-import javax.swing.Timer;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.JPPFClientConnection;
 import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * Helper class for updates accumulation.
@@ -36,9 +37,17 @@ import org.jppf.management.JPPFManagementInfo;
 public class AccumulatorHelper
 {
   /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(AccumulatorHelper.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * Map that accumulates changes between TreeTable updates.
    */
-  final Map<String, AccumulatorDriver> accumulatorMap = new HashMap<String, AccumulatorDriver>();
+  Map<String, AccumulatorDriver> accumulatorMap = new HashMap<String, AccumulatorDriver>();
   /**
    * The GUI panel.
    */
@@ -50,7 +59,15 @@ public class AccumulatorHelper
   /**
    *  Timer that publishes accumulated changes on AWT thread to TreeTable
    */
-  Timer timer = null;
+  private Timer timer = null;
+  /**
+   * The timer task which performs the refresh
+   */
+  private TimerTask timerTask = new MyTimerTask();
+  /**
+   * The period of the refreshing thread.
+   */
+  final int period = JPPFConfiguration.getProperties().getInt("jppf.gui.publish.period", 1000 / 30);
 
   /**
    * Initialize this hleper with the spsecified job panel.
@@ -60,6 +77,7 @@ public class AccumulatorHelper
   {
     this.jobPanel = jobPanel;
     panelManager = jobPanel.panelManager;
+    setup();
   }
 
   /**
@@ -69,7 +87,7 @@ public class AccumulatorHelper
   {
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
     Map<String, AccumulatorDriver> map = getMap();
-
+    boolean changed = false;
     for (Map.Entry<String, AccumulatorDriver> driverEntry : map.entrySet())
     {
       String driverName = driverEntry.getKey();
@@ -79,75 +97,126 @@ public class AccumulatorHelper
       {
         case ADD:
           panelManager.driverAdded(driverAccumulator.getValue());
+          changed = true;
           break;
         case REMOVE:
           panelManager.driverRemoved(driverName);
+          changed = true;
           continue;
         case UPDATE:
           DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
           if (driverNode != null) jobPanel.getModel().changeNode(driverNode);
+          changed = true;
           break;
       }
+      changed |= publishDriverJobs(driverName, driverAccumulator);
+    }
+    if (changed)
+    {
+      jobPanel.refreshUI();
+      if (jobPanel.getActionHandler() != null) jobPanel.getActionHandler().updateActions();
+    }
+    //accumulatorMap.clear();
+  }
 
-      DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
-      for (Map.Entry<String, AccumulatorJob> jobEntry : driverAccumulator.getMap().entrySet())
+  /**
+   * Process the changes that occurred to the jobs executing on the specified driver.
+   * @param driverName the name of the driver where jobs are executing.
+   * @param driverAccumulator the accumulater for the driver's jobs.
+   * @return changed <code>true</code> if any change occurred, <code>false</code> otherwise.
+   */
+  private boolean publishDriverJobs(final String driverName, final AccumulatorDriver driverAccumulator)
+  {
+    DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
+    if (driverNode == null) return false;
+    boolean changed = false;
+    for (Map.Entry<String, AccumulatorJob> jobEntry : driverAccumulator.getMap().entrySet())
+    {
+      String jobName = jobEntry.getKey();
+      AccumulatorJob jobAccumulator = jobEntry.getValue();
+      JobAccumulator.Type jobType = jobAccumulator.getType();
+      switch (jobType)
       {
-        String jobName = jobEntry.getKey();
-        AccumulatorJob jobAccumulator = jobEntry.getValue();
-        JobAccumulator.Type jobType = jobAccumulator.getType();
-        switch (jobType)
-        {
-          case ADD:
-            panelManager.jobAdded(driverName, jobAccumulator.getValue());
-            break;
-          case REMOVE:
-            panelManager.jobRemoved(driverName, jobName);
-            continue;
-          case UPDATE:
-            DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobName);
-            if (jobNode != null) panelManager.jobUpdated(driverName, jobAccumulator.getValue());
-            break;
-        }
+        case ADD:
+          panelManager.jobAdded(driverName, jobAccumulator.getValue());
+          changed = true;
+          break;
+        case REMOVE:
+          panelManager.jobRemoved(driverName, jobName);
+          changed = true;
+          continue;
+        case UPDATE:
+          DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobName);
+          if (jobNode != null) panelManager.jobUpdated(driverName, jobAccumulator.getValue());
+          changed = true;
+          break;
+      }
+      changed |= publishJobNodes(driverName, jobName, jobAccumulator);
+    }
+    return changed;
+  }
 
-        for (Map.Entry<String, AccumulatorNode> nodeEntry : jobAccumulator.getMap().entrySet())
-        {
-          String nodeName = nodeEntry.getKey();
-          AccumulatorNode nodeAccumulator = nodeEntry.getValue();
-          JobAccumulator.Type nodeType = nodeAccumulator.getType();
-          switch (nodeType)
-          {
-            case ADD:
-              panelManager.subJobAdded(driverName, nodeAccumulator.getJobInfo(), nodeAccumulator.getValue());
-              break;
-            case REMOVE:
-              panelManager.subJobRemoved(driverName, jobName, nodeName);
-              continue;
-          }
-        }
+  /**
+   * Publish the changes that ocurred to the subjobs of the specified job.
+   * @param driverName the name of the driver where jobs are executing.
+   * @param jobName the name of the job.
+   * @param jobAccumulator the job whose subjobs have changes to publish.
+   * @return changed <code>true</code> if any change occurred, <code>false</code> otherwise.
+   */
+  private boolean publishJobNodes(final String driverName, final String jobName, final AccumulatorJob jobAccumulator)
+  {
+    boolean changed = false;
+    for (Map.Entry<String, AccumulatorNode> nodeEntry : jobAccumulator.getMap().entrySet())
+    {
+      String nodeName = nodeEntry.getKey();
+      AccumulatorNode nodeAccumulator = nodeEntry.getValue();
+      JobAccumulator.Type nodeType = nodeAccumulator.getType();
+      switch (nodeType)
+      {
+        case ADD:
+          panelManager.subJobAdded(driverName, nodeAccumulator.getJobInfo(), nodeAccumulator.getValue());
+          changed = true;
+          break;
+        case REMOVE:
+          panelManager.subJobRemoved(driverName, jobName, nodeName);
+          changed = true;
+          continue;
       }
     }
-    if (jobPanel.getActionHandler() != null) jobPanel.getActionHandler().updateActions();
+    return changed;
   }
 
   /**
    * Get the map of accumulated driver changes.
    * @return a map of <code>String</code> to <code>AccumulatorDriver</code> instances.
    */
-  public synchronized Map<String, AccumulatorDriver> getMap()
+  private synchronized Map<String, AccumulatorDriver> getMap()
   {
     Map<String, AccumulatorDriver> copy = new HashMap<String, AccumulatorDriver>(accumulatorMap);
     accumulatorMap.clear();
-    timer = null;
     return copy;
+  }
+
+  /**
+   * Start the timer.
+   */
+  synchronized void setup()
+  {
+    if (debugEnabled) log.debug("setup invoked");
+    if (timer == null) timer = new Timer("accumulator timer");
+    timerTask = new MyTimerTask();
+    timer.schedule(timerTask, period, period);
   }
 
   /**
    * Clear the map of accumalator drivers and stop the timer.
    */
-  synchronized void cleanup() {
+  synchronized void cleanup()
+  {
+    if (debugEnabled) log.debug("cleanup invoked");
+    if (timerTask != null) timerTask.cancel();
+    if (timer != null) timer.purge();
     accumulatorMap.clear();
-    if(timer != null) timer.stop();
-    timer = null;
   }
 
   /**
@@ -248,4 +317,27 @@ public class AccumulatorHelper
       return jobInfo;
     }
   }
+
+  /**
+   * Periodic task that publishes changes to the GUI.
+   */
+  private class MyTimerTask extends TimerTask
+  {
+    @Override
+    public void run()
+    {
+      try
+      {
+        SwingUtilities.invokeAndWait(new Runnable() {
+          public void run() {
+            publish();
+          }
+        });
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
+  };
 }
