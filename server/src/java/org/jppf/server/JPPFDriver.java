@@ -36,6 +36,7 @@ import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.JPPFLocalNode;
+import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
@@ -204,7 +205,7 @@ public class JPPFDriver
    * @return a JPPFQueue instance.
    * @exclude
    */
-  public static JPPFQueue getQueue()
+  public static JPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> getQueue()
   {
     return getInstance().taskQueue;
   }

@@ -141,9 +141,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
-    this.queue.addQueueListener(new QueueListener() {
+    this.queue.addQueueListener(new QueueListener<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
-      public void newBundle(final QueueEvent event) {
+      public void newBundle(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
         selector.wakeup();
         taskQueueChecker.wakeUp();
       }

@@ -122,7 +122,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
         }
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
-        fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
+        fireQueueEvent(new QueueEvent<ClientJob, ClientJob, ClientTaskBundle>(this, bundleWrapper, false));
         if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
       } finally {
         lock.unlock();
@@ -141,7 +141,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
 
       putInListMap(job.getSLA().getPriority(), job, priorityMap);
       putInListMap(getSize(job), job, sizeMap);
-      fireQueueEvent(new QueueEvent(this, job, true));
+      fireQueueEvent(new QueueEvent<ClientJob, ClientJob, ClientTaskBundle>(this, job, true));
     } finally {
       lock.unlock();
     }
@@ -374,7 +374,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
         bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
 
         jobMap.put(jobUuid, bundleWrapper);
-        fireQueueEvent(new QueueEvent(this, bundleWrapper, false));
+        fireQueueEvent(new QueueEvent<ClientJob, ClientJob, ClientTaskBundle>(this, bundleWrapper, false));
         for (ClientJob job : jobList) addBundle(job);
       } finally {
         lock.unlock();

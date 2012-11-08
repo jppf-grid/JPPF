@@ -57,7 +57,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   /**
    * The list of registered listeners.
    */
-  private final List<QueueListener> queueListeners = new ArrayList<QueueListener>();
+  private final List<QueueListener<T, U, V>> queueListeners = new ArrayList<QueueListener<T, U, V>>();
   /**
    * Comparator for job priority.
    */

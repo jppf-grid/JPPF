@@ -153,7 +153,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         updateLatestMaxSize();
         //if (queued) jobManager.jobQueued(serverJob);
         if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
-        fireQueueEvent(new QueueEvent(this, serverJob, false));
+        fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
@@ -173,7 +173,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
       putInListMap(job.getSLA().getPriority(), job, priorityMap);
       putInListMap(getSize(job), job, sizeMap);
-      fireQueueEvent(new QueueEvent(this, job, true));
+      fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, job, true));
     } finally {
       lock.unlock();
     }
@@ -488,7 +488,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     else {
       lock.lock();
       try {
-        fireQueueEvent(new QueueEvent(this, broadcastJob, false));
+        fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, broadcastJob, false));
         for (ServerJobBroadcast job : jobList) addBroadcastJob(job);
       } finally {
         lock.unlock();
@@ -517,7 +517,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     jobMap.put(jobUuid, broadcastJob);
     updateLatestMaxSize();
     jobManager.jobQueued(broadcastJob);
-    fireQueueEvent(new QueueEvent(this, broadcastJob, false));
+    fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, broadcastJob, false));
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     statsManager.taskInQueue(broadcastJob.getTaskCount());

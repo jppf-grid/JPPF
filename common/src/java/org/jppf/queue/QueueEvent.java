@@ -59,6 +59,7 @@ public class QueueEvent<T, U, V> extends EventObject
    * Get the queue this event originates from.
    * @return an instance of <code>JPPFQueue</code>.
    */
+  @SuppressWarnings("unchecked")
   public JPPFQueue<T, U, V> getQueue()
   {
     return (AbstractJPPFQueue<T, U, V>) getSource();
