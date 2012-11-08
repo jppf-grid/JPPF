@@ -48,22 +48,8 @@
 	<!--             Package the j2ee connector for deployment                     -->
 	<!-- ========================================================================= -->
 
-	<target name="j2ee.connector" description="" depends="rebuild">
-    <copy todir="${jca-client}" file="${basedir}/CheckStyle_JPPF_config.xml"/>
-    <copy todir="${jca-client}/lib">
-			<fileset dir="${build}">
-				<include name="jppf-client*.jar"/>
-				<include name="jppf-common*.jar"/>
-				<include name="jppf-common-node*.jar"/>
-			</fileset>
-		</copy>
-		<copy todir="${jca-client}">
-			<fileset dir="${bin}">
-				<include name="build.properties"/>
-				<include name="build.number"/>
-			</fileset>
-		</copy>
-		<ant antfile="${basedir}/../jca-client/build.xml" inheritall="false"/>
+	<target name="j2ee.connector" description="" depends="j2ee.connector.build">
+    <ant antfile="${basedir}/../jca-client/build.xml" target="build" inheritall="false"/>
 		<property name="j2ee.prefix" value="${app.ver}-j2ee-connector"/>
 		<property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>
 		<delete file="${connector.release.file}" quiet="true"/>
@@ -76,5 +62,23 @@
 			</zipfileset>
 		</zip>
 	</target>
+
+  <target name="j2ee.connector.build" description="">
+    <copy todir="${jca-client}" file="${basedir}/CheckStyle_JPPF_config.xml"/>
+    <copy todir="${jca-client}/lib">
+      <fileset dir="${build}">
+        <include name="jppf-client*.jar"/>
+        <include name="jppf-common*.jar"/>
+        <include name="jppf-common-node*.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="${jca-client}">
+      <fileset dir="${bin}">
+        <include name="build.properties"/>
+        <include name="build.number"/>
+      </fileset>
+    </copy>
+    <ant antfile="${basedir}/../jca-client/build.xml" target="build.util.jar" inheritall="false"/>
+  </target>
 
 </project> 

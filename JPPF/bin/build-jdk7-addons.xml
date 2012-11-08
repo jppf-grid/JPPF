@@ -19,10 +19,10 @@
 <project name="jdk7-addons" basedir="..">
 
   <!-- ========================================================================= -->
-  <!--                 Generate the JPPF-GigaSpaces integration                  -->
+  <!--                 Generate the JDK 7 addons distributable                   -->
   <!-- ========================================================================= -->
 
-  <target name="jppf.jdk7-addons" description="build the jdk7-addons" depends="init, build">
+  <target name="jppf.jdk7-addons.check" description="build the jdk7-addons" depends="init, build">
     <condition property="jdk1.7+">
       <not>
         <or>
@@ -32,11 +32,14 @@
         </or>
       </not>
     </condition>
+  </target>
+
+  <target name="jppf.jdk7-addons" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jdk1.7+">
     <antcall target="jppf.jdk7-addons.build"/>
     <antcall target="jppf.jdk7-addons.nobuild"/>
   </target>
 
-  <target name="jppf.jdk7-addons.build" description="build the jdk7-addons" if="jdk1.7+">
+  <target name="jppf.jdk7-addons.build" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jdk1.7+">
     <ant antfile="${jdk7-addons}/ThreadManagerForkJoin/build.xml" target="jar" inheritall="false"/>
     <property name="jdk7-addons.prefix" value="${app.ver}-jdk7-addons"/>
     <property name="jdk7-addons.file" value="${build}/${jdk7-addons.prefix}.zip"/>
@@ -55,7 +58,7 @@
   </target>
 
   <target name="jppf.jdk7-addons.nobuild" description="Cannot build because JDK 1.7+ is needed" unless="jdk1.7+">
-    <echo level="warning" mzessage="JDK 1.7 addons could not be built: JDK 1.7+ is needed"/>
+    <echo level="warning" message="JDK 1.7 addons could not be built: JDK 1.7+ is needed"/>
   </target>
 
 </project> 

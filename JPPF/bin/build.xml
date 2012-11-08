@@ -35,6 +35,7 @@
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="jdk7-addons"           value="${basedir}/../jdk7-addons"/>
   <property name="tests"                 value="${basedir}/../tests"/>
+  <property name="stress-tests"          value="${basedir}/../stress-tests"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${gigaspaces}/build.properties"/>
@@ -147,9 +148,8 @@
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->
 
-  <target name="build" depends="init, compile, jar, jar.src"/>
+  <target name="build" depends="init, compile, jar, jar.src, j2ee.connector.build, tests.build"/>
 	<target name="rebuild" depends="clean.all, build"/>
-	<target name="test" depends="init, tests"/>
 	<target name="deploy"
 		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, jppf.jdk7-addons, user.guide, installer, doc, javadoc"/>
 	<target name="deploy.noinstaller"
@@ -207,6 +207,10 @@
 		    <exclude name="**/pu/*.*"/>
       </zipfileset>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
+      <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
+        <exclude name="**/*.log"/>
+        <exclude name="**/diagnostics.txt"/>
+      </zipfileset>
 		</zip>
 	</target>
 

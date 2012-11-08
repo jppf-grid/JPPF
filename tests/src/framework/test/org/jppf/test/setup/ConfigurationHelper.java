@@ -19,8 +19,9 @@
 package test.org.jppf.test.setup;
 
 import java.io.*;
-import java.util.Map;
+import java.util.*;
 
+import org.jppf.scripting.*;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 
@@ -70,6 +71,19 @@ public class ConfigurationHelper
    */
   public static TypedProperties createConfigFromTemplate(final String templatePath, final int n)
   {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("$n", n);
+    return createConfigFromTemplate(templatePath, variables);
+  }
+
+  /**
+   * Load and initialize a configuration based on a template configuration file.
+   * @param templatePath the path to a configuration file template.
+   * @param variables a map of variable names to their value, which can be used in a groovy expression.
+   * @return a configuration object where the string "${n}" was replace with the driver or node number.
+   */
+  public static TypedProperties createConfigFromTemplate(final String templatePath, final Map<String, Object> variables)
+  {
     TypedProperties result = new TypedProperties();
     Reader reader = null;
     try
@@ -84,23 +98,14 @@ public class ConfigurationHelper
         {
           String key = (String) entry.getKey();
           String value = (String) entry.getValue();
-          int idx = value.indexOf("+${n}");
-          if (idx >= 0)
+          try
           {
-            String s = value.substring(0, idx);
-            try
-            {
-              Integer intValue = Integer.valueOf(s) + n;
-              value = intValue.toString();
-            }
-            catch (Exception e)
-            {
-              throw new RuntimeException(e);
-            }
+            String s = "[" + templatePath + ", " + key + "]";
+            value = parseValue(s, value, variables);
           }
-          else if ((idx = value.indexOf("${n}")) >= 0)
+          catch(Exception e)
           {
-            value = value.replace("${n}", String.valueOf(n));
+            throw new RuntimeException("Invalid expression for template file: '" + templatePath + "', property: '" + key + " = " + value + '\'', e);
           }
           result.setProperty(key, value);
         }
@@ -116,6 +121,27 @@ public class ConfigurationHelper
       if (reader != null) StreamUtils.closeSilent(reader);
     }
     return result;
+  }
+
+  /**
+   * Parse the specified property value, performinig templates substitutions where eneded.
+   * @param key a key used to cache the compiled groovy expression.
+   * @param source the string to parse.
+   * @param variables a map of variable names to their value, which can be used in a groovy expression.
+   * @return a string where tmeplate expressions have been replaced.
+   * @throws Exception if any error occurs.
+   */
+  private static String parseValue(final String key, final String source, final Map<String, Object> variables) throws Exception
+  {
+    String value = source.trim();
+    if (value.startsWith("expr:"))
+    {
+      String expr = value.substring("expr:".length()).trim();
+      ScriptRunner runner = ScriptRunnerFactory.makeScriptRunner("groovy");
+      Object o = runner.evaluate(key, expr, variables);
+      if (o != null) value = o.toString();
+    }
+    return value;
   }
 
   /**

@@ -65,11 +65,11 @@ public class GroovyScriptRunner implements ScriptRunner
     {
       //GroovyShell shell = new GroovyShell(binding);
       GroovyShell shell = new GroovyShell();
-      Script groovyScript = scriptMap.get(scriptId);
+      Script groovyScript = scriptId == null ? null : scriptMap.get(scriptId);
       if (groovyScript == null)
       {
         groovyScript = shell.parse(script);
-        scriptMap.put(scriptId, groovyScript);
+        if (scriptId != null) scriptMap.put(scriptId, groovyScript);
       }
       Binding binding = new Binding();
       for (Map.Entry<String, Object> entry: variables.entrySet()) binding.setVariable(entry.getKey(), entry.getValue());

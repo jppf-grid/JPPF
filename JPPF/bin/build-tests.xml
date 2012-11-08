@@ -22,13 +22,19 @@
 	<!--                     Build and run the JUnit tests                         -->
 	<!-- ========================================================================= -->
 
-  <target name="tests" description="build and run the junit tests">
-    <!-- build and the standalone unit tests -->
+  <target name="tests.build" description="build and run the junit tests">
+    <!-- build the standalone unit tests -->
     <ant antfile="${tests}/build.xml" target="build" inheritall="false"/>
-    <ant antfile="${tests}/build.xml" target="run" inheritall="false"/>
+    <!-- build the standalone stress tests -->
+    <ant antfile="${stress-tests}/build.xml" target="build" inheritall="false"/>
     <!-- build the JCA connector test web application -->
     <copy todir="${jca-client}/lib" file="${tests}/build/jppf-test-framework.jar" overwrite="true"/>
     <ant antfile="${jca-client}/test/build.xml" target="build" inheritall="false"/>
-	</target>
+  </target>
+
+  <target name="tests.run" description="build and run the junit tests">
+    <!-- run the standalone unit tests -->
+    <ant antfile="${tests}/build.xml" target="run" inheritall="false"/>
+  </target>
 
 </project> 

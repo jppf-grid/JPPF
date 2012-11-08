@@ -47,7 +47,7 @@ public final class PatternConfiguration
   /**
    * The separator for the components of an address.
    */
-  final char compSeparator;
+  private final char compSeparator;
   /**
    * Regex pattern that matches any one dot.
    */
@@ -81,7 +81,7 @@ public final class PatternConfiguration
    * @param compSeparator the separator for the components of an address.
    * @param valuePrefix the prefix indicating in which base the numbers are represented, i.e. "" for decimal, "0X" for hexadecimal.
    */
-  private PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix)
+  public PatternConfiguration(final int nbComponents, final int minValue, final int maxValue, final char compSeparator, final String valuePrefix)
   {
     this.nbComponents = nbComponents;
     this.minValue = minValue;
@@ -90,5 +90,14 @@ public final class PatternConfiguration
     fullRange = new Range<Integer>(minValue, maxValue);
     compSeparatorPattern = Pattern.compile((compSeparator == '.' ? "\\" : "") + compSeparator);
     this.valuePrefix = valuePrefix;
+  }
+
+  /**
+   * Get the separator for the components of an address.
+   * @return the separator character.
+   */
+  protected char getCompSeparator()
+  {
+    return compSeparator;
   }
 }

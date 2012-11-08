@@ -77,7 +77,7 @@ public class IPv6AddressPattern extends AbstractIPAddressPattern
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<ranges.size(); i++)
     {
-      if (i > 0) sb.append(config.compSeparator);
+      if (i > 0) sb.append(config.getCompSeparator());
       Range<Integer> r = ranges.get(i);
       sb.append(Integer.toHexString(r.getLower()));
       if (!r.getLower().equals(r.getUpper())) sb.append('-').append(Integer.toHexString(r.getUpper()));
