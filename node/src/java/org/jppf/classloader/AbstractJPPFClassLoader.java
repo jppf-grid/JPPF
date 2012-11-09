@@ -145,7 +145,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if ((b == null) || (b.length == 0))
     {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-      nfCache.add(name);
+      if (resource != null) nfCache.add(name);
       throw new ClassNotFoundException("Could not load class '" + name + '\'');
     }
     if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + ']');
@@ -168,7 +168,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", "callable");
     map.put("callable", callable);
-    byte[] b = loadRemoteData(map, false).getCallable();
+    JPPFResourceWrapper resource = loadRemoteData(map, false);
+    byte[] b = (resource == null) ? null : resource.getCallable();
     if (debugEnabled) log.debug("remote definition for callable resource "+ (b==null ? "not " : "") + "found");
     return b;
   }
@@ -298,14 +299,16 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   private List<URL> findRemoteResources(final String name) throws Exception
   {
     List<URL> urlList = new ArrayList<URL>();
+    JPPFResourceWrapper resource = null;
     if (!nfCache.has(name))
     {
       List<String> locationsList = null;
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("name", name);
       map.put("multiple", "true");
-      JPPFResourceWrapper resource = loadResourceData(map, true);
-      List<byte[]> dataList = (List<byte[]>)resource.getData("resource_list");
+      resource = loadResourceData(map, true);
+      List<byte[]> dataList = null;
+      if (resource != null) dataList = (List<byte[]>) resource.getData("resource_list");
       boolean found = (dataList != null) && !dataList.isEmpty();
       if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
       if (found)
@@ -320,7 +323,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
       }
     }
-    if ((urlList == null) || urlList.isEmpty()) nfCache.add(name);
+    if ((urlList == null) || urlList.isEmpty() && (resource != null)) nfCache.add(name);
     return urlList;
   }
 

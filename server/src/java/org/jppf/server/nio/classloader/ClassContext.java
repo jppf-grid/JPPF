@@ -251,17 +251,21 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     try
     {
-      ResourceRequest currentRequest = getCurrentRequest();
+      ResourceRequest currentRequest;
       List<ResourceRequest> pendingList;
       synchronized (this)
       {
-        if (pendingRequests.isEmpty())
-          pendingList = Collections.emptyList();
-        else {
-          pendingList = new ArrayList<ResourceRequest>(pendingRequests);
-          pendingRequests.clear();
+        currentRequest = getCurrentRequest();
+        pendingList = new ArrayList<ResourceRequest>(pendingRequests);
+        if (currentRequest != null)
+        {
+          pendingList.add(currentRequest);
+          setCurrentRequest(null);
         }
+        pendingRequests.clear();
       }
+
+      /*
       if ((currentRequest != null) || !pendingList.isEmpty())
       {
         if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
@@ -277,6 +281,22 @@ public class ClassContext extends SimpleNioContext<ClassState>
           resetNodeState(resourceRequest, server);
         }
       }
+      */
+
+      if (!pendingList.isEmpty())
+      {
+        if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
+        ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
+        Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
+        for (ResourceRequest resourceRequest : pendingList)
+        {
+          ChannelWrapper<?> nodeChannel = resourceRequest.getChannel();
+          if (!nodeSet.contains(nodeChannel)) nodeSet.add(nodeChannel);
+          resourceRequest.getResource().setState(State.NODE_RESPONSE);
+        }
+        for (ChannelWrapper<?> nodeChannel: nodeSet) resetNodeState(nodeChannel, server);
+      }
+
     }
     catch (Exception e)
     {
@@ -290,7 +310,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @param request the requesting node channel.
    * @param server the server handling the node.
    */
-  public void resetNodeState(final ResourceRequest request, final ClassNioServer server)
+  private void resetNodeState(final ResourceRequest request, final ClassNioServer server)
   {
     try
     {
@@ -302,6 +322,26 @@ public class ClassContext extends SimpleNioContext<ClassState>
     catch (Exception e)
     {
       log.error("error while trying to send response to node " + request + ", this node may be unavailable", e);
+    }
+  }
+
+  /**
+   * Reset the state of the requesting node channel, after an error
+   * occurred on the provider which attempted to provide a response.
+   * @param channel the requesting node channel to reset.
+   * @param server the server handling the node.
+   */
+  private void resetNodeState(final ChannelWrapper<?> channel, final ClassNioServer server)
+  {
+    try
+    {
+      if (debugEnabled) log.debug("resetting channel state for node " + channel);
+      server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
+      server.getTransitionManager().submitTransition(channel);
+    }
+    catch (Exception e)
+    {
+      log.error("error while trying to send response to node " + channel+ ", this node may be unavailable", e);
     }
   }
 
