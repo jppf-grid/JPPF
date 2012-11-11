@@ -19,6 +19,7 @@
 package org.jppf.server.queue;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.server.protocol.*;
@@ -45,14 +46,14 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   /**
    * An ordered map of bundle sizes, mapping to a list of bundles of this size.
    */
-  protected TreeMap<Integer, List<ServerJob>> sizeMap = new TreeMap<Integer, List<ServerJob>>();
-  /**
-   * 
-   */
-  protected int latestMaxSize = 0;
-  /**
-   * The list of registered listeners.
-   */
+  protected TreeMap<Integer, Set<ServerJob>> sizeMap = new TreeMap<Integer, Set<ServerJob>>();
+ /**
+  *
+  */
+ protected AtomicInteger latestMaxSize = new AtomicInteger(0);
+ /**
+  * The list of registered listeners.
+  */
   private final List<QueueListener> queueListeners = new ArrayList<QueueListener>();
 
   /**

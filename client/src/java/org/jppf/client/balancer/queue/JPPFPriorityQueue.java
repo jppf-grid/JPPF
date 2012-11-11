@@ -241,19 +241,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue {
    */
   @Override
   public int getMaxBundleSize() {
-    lock.lock();
-    try {
-      return latestMaxSize;
-    } finally {
-      lock.unlock();
-    }
+    return latestMaxSize.get();
   }
 
   /**
    * Update the value of the max bundle size.
    */
   private void updateLatestMaxSize() {
-    latestMaxSize = sizeMap.isEmpty() ? latestMaxSize : sizeMap.lastKey();
+    if (!sizeMap.isEmpty()) latestMaxSize.set(sizeMap.lastKey());
   }
 
   /**

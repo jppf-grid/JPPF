@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -52,7 +53,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   /**
    *
    */
-  protected int latestMaxSize = 0;
+  protected AtomicInteger latestMaxSize = new AtomicInteger(0);
   /**
    * The list of registered listeners.
    */
