@@ -176,7 +176,6 @@
 	<!-- ========================================================================= -->
 
 	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<!--<property name="release.file" value="${build}/${ant.project.name}-full-src-${version.number}-${build.number}-${now}.zip"/>-->
 		<property name="zip.prefix" value="${app.ver}-full-src"/>
 		<property name="release.file" value="${build}/${zip.prefix}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
@@ -185,7 +184,6 @@
 				<include name="build/jppf*.jar"/>
 				<include name="bin/**/*.*"/>
 				<include name="config/**/*.*"/>
-				<!--<include name="docs/api/**/*.*"/>-->
 				<include name="lib/**/*.*"/>
 				<include name="${license.file}"/>
 				<include name="JPPF-3rd-party.html"/>
@@ -197,6 +195,8 @@
 			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
 			<zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
+      <zipfileset dir="${jdk7-addons}" prefix="${zip.prefix}/jdk7-addons"/>
+      <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
 		</zip>
 	</target>
 
