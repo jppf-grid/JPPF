@@ -150,10 +150,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     channel.removeClientConnectionStatusListener(listener);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
+  @SuppressWarnings("unchecked")
   public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);

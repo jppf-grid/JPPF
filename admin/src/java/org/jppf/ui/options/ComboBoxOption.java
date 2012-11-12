@@ -71,6 +71,7 @@ public class ComboBoxOption extends AbstractOption
    * Create the UI components for this option.
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void createUI()
   {
     combo = new JComboBox();

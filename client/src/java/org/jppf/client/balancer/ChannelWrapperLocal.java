@@ -175,9 +175,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @SuppressWarnings("unchecked")
   @Override
   public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {

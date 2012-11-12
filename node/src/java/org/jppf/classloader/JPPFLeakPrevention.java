@@ -485,7 +485,7 @@ final class JPPFLeakPrevention {
    * @return a <code>Field</code> instance with accessible flag set to <code>true</code>.
    * @throws NoSuchFieldException if field doesn't exists.
    */
-  private static Field getDeclaredAccessibleField(final Class clazz, final String name) throws NoSuchFieldException {
+  private static Field getDeclaredAccessibleField(final Class<?> clazz, final String name) throws NoSuchFieldException {
     if (clazz == null) throw new IllegalArgumentException("clazz is null");
     if (name == null || name.isEmpty()) throw new IllegalArgumentException("name is blank");
 
@@ -501,7 +501,7 @@ final class JPPFLeakPrevention {
    * @return a <code>Method</code> instance with accessible flag set to <code>true</code>.
    * @throws NoSuchMethodException if method doesn't exists.
    */
-  private static Method getDeclaredAccessibleMethod(final Class clazz, final String name) throws NoSuchMethodException {
+  private static Method getDeclaredAccessibleMethod(final Class<?> clazz, final String name) throws NoSuchMethodException {
     if (clazz == null) throw new IllegalArgumentException("clazz is null");
     if (name == null || name.isEmpty()) throw new IllegalArgumentException("name is blank");
 
@@ -545,6 +545,7 @@ final class JPPFLeakPrevention {
    * @param classLoader a <code>ClassLoader</code> instance.
    * @return collection of loaded classes by class loader.
    */
+  @SuppressWarnings("unchecked")
   private static Collection<Class> getLoadedClasses(final ClassLoader classLoader)
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
