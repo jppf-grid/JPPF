@@ -20,9 +20,10 @@ package org.jppf.server.queue;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 import org.jppf.server.protocol.*;
+import org.jppf.utils.SetSortedMap;
 import org.slf4j.*;
 
 /**
@@ -42,18 +43,19 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
   /**
    * Used for synchronized access to the queue.
    */
-  protected ReentrantLock lock = new ReentrantLock();
+  protected Lock lock = new ReentrantLock();
   /**
    * An ordered map of bundle sizes, mapping to a list of bundles of this size.
    */
-  protected TreeMap<Integer, Set<ServerJob>> sizeMap = new TreeMap<Integer, Set<ServerJob>>();
- /**
-  *
-  */
- protected AtomicInteger latestMaxSize = new AtomicInteger(0);
- /**
-  * The list of registered listeners.
-  */
+  protected SetSortedMap<Integer, ServerJob> sizeMap = new SetSortedMap<Integer, ServerJob>();
+  //protected TreeMap<Integer, Set<ServerJob>> sizeMap = new TreeMap<Integer, Set<ServerJob>>();
+  /**
+   *
+   */
+  protected AtomicInteger latestMaxSize = new AtomicInteger(0);
+  /**
+   * The list of registered listeners.
+   */
   private final List<QueueListener> queueListeners = new ArrayList<QueueListener>();
 
   /**
@@ -107,7 +109,7 @@ public abstract class AbstractJPPFQueue implements JPPFQueue
    * Get the lock used for synchronized access to the queue.
    * @return a <code>ReentrantLock</code> instance.
    */
-  public ReentrantLock getLock()
+  public Lock getLock()
   {
     return lock;
   }
