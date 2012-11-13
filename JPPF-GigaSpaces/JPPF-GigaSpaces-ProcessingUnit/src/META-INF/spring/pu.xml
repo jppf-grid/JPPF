@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:os-core="http://www.openspaces.org/schema/core"
+       xmlns:os-events="http://www.openspaces.org/schema/events"
+       xmlns:os-remoting="http://www.openspaces.org/schema/remoting"
+       xmlns:os-sla="http://www.openspaces.org/schema/sla"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
+       http://www.openspaces.org/schema/events http://www.openspaces.org/schema/events/openspaces-events.xsd
+       http://www.openspaces.org/schema/remoting http://www.openspaces.org/schema/remoting/openspaces-remoting.xsd
+       http://www.openspaces.org/schema/sla http://www.openspaces.org/schema/sla/openspaces-sla.xsd">
+
+<!-- ===================================================================================================================================== -->
+    <!-- A bean representing a space (an IJSpace implementation). -->
+    <bean id="propertiesConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
+    <os-core:space id="space" url="/./JPPFSpace" >
+      <os-core:filter-provider ref="remotingServiceExporter" />
+    </os-core:space>
+ 
+    <!-- Defines a local Jini transaction manager (will be used for transactional operations with the space). -->
+    <!--<os-core:local-tx-manager id="transactionManager" space="space"/>-->
+
+    <!-- A wrapper bean to the space to provide OpenSpaces simplified space API (built on top of IJSpace/JavaSpace). -->
+    <!--<os-core:giga-space id="gigaSpace" space="space" tx-manager="transactionManager"/>-->
+    <os-core:giga-space id="gigaSpace" space="space" />
+
+    <!-- The processor bean -->
+    <bean id="jppfService" class="org.jppf.gigaspaces.JPPFServiceImpl"/>
+
+    <os-remoting:service-exporter id="remotingServiceExporter">
+        <os-remoting:service ref="jppfService"/>
+    </os-remoting:service-exporter>
+
+<!-- ===================================================================================================== -->
+
+    <!--
+        The settings in the SLA bean define how will the Processing Unit be deployed
+		onto the Service Grid (These settings can be overriden when using the deployment wizard UI).
+        
+        For step three of the tutorial - deploying 1 instance, set:
+        number-of-instances="1"
+    	number-of-backups="0"   (Number of backups per instance)
+    	
+        For step three of the tutorial - deploying 1 instance with 1 backup, set:
+        number-of-instances="1"
+    	number-of-backups="1"
+        
+        For step four of the tutorial - deploying a partition of 3 instances, set:
+        number-of-instances="3"
+    	number-of-backups="0"
+    	
+        For step four of the tutorial - deploying a partition of 2 instances each with 1 backup (toatl 4 instances), set:
+        number-of-instances="2"
+    	number-of-backups="1"
+        
+        Setting maxInstancesPerVM = 1, mandates that an active instance and ITS backup won't run inside the same Grid Container
+    -->
+    <!-- 
+    <os-sla:sla cluster-schema="partitioned-sync2backup"
+    			number-of-instances="1"
+    			number-of-backups="1"
+                max-instances-per-vm="1">
+    </os-sla:sla>
+    -->
+</beans>

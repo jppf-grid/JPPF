@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<connector xmlns="http://geronimo.apache.org/xml/ns/j2ee/connector-1.2" xmlns:dep="http://geronimo.apache.org/xml/ns/deployment-1.2">
+
+	<dep:environment>
+    <dep:moduleId>
+      <dep:groupId>JPPF</dep:groupId>
+      <dep:artifactId>jca-client</dep:artifactId>
+      <dep:version>2.0</dep:version>
+      <dep:type>rar</dep:type>
+    </dep:moduleId>
+    <dep:dependencies/>
+    <dep:hidden-classes/>
+    <dep:non-overridable-classes/>
+  </dep:environment>
+
+  <resourceadapter>
+    <outbound-resourceadapter>
+      <connection-definition>
+        <connectionfactory-interface>javax.resource.cci.ConnectionFactory</connectionfactory-interface>
+        <connectiondefinition-instance>
+          <name>eis/JPPFConnectionFactory</name>
+					<!--
+					<config-property-setting name="ServerHost">localhost</config-property-setting>
+					<config-property-setting name="ClassServerPort">11111</config-property-setting>
+					<config-property-setting name="AppServerPort">11112</config-property-setting>
+					<config-property-setting name="ConnectionPoolSize">5</config-property-setting>
+					-->
+          <connectionmanager>
+            <no-transaction/>
+            <single-pool>
+              <max-size>10</max-size>
+              <min-size>0</min-size>
+              <match-one/>
+            </single-pool>
+          </connectionmanager>
+        </connectiondefinition-instance>
+      </connection-definition>
+    </outbound-resourceadapter>
+  </resourceadapter>
+
+</connector>

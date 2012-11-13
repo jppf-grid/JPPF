@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2012 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
+	<property name="label" value="JPPF Monitoring and Administration Tool"/>
+	<property name="layoutConstraints" value="flowy, fill, insets 0 0 0 0"/>
+	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+	<initializer type="script">
+		<script language="groovy" source="org/jppf/ui/options/xml/jppfAdminTool.groovy"/>
+	</initializer>
+	<finalizer type="script">
+		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));</script>
+	</finalizer>
+
+	<!-- ===================================================================== -->
+	<!--                    Server Chooser Panel                               -->
+	<!-- ===================================================================== -->
+
+	<child name="Tabs" type="page">
+		<property name="tooltip" value="The list of drivers to connect to"/>
+		<property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
+		<property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
+
+		<child name="ServerChooser" type="ComboBox">
+			<property name="label" value="Server connection"/>
+			<property name="tooltip" value="The list of drivers to connect to"/>
+			<property name="value" value=""/>
+			<initializer type="script">
+				<script language="groovy">StatsHandler.getInstance().setServerListOption(option)</script>
+			</initializer>
+			<listener type="script">
+				<script language="groovy">StatsHandler.getInstance().setCurrentConnection(option.getValue())</script>
+			</listener>
+		</child>
+
+	</child>
+
+	<child name="AdminPanels" type="TabbedPane">
+		<property name="componentConstraints" value="push, grow"/>
+		<property name="layoutConstraints" value="fill"/>
+		<property name="bordered" value="false"/>
+		<property name="tooltip" value="Perform the remote administration of the server"/>
+		<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>
+		<!--
+		<import source="file" location="org/jppf/ui/options/xml/NodeDataPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/JobDataPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/StatsPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/ServerChartsPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
+		<import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml"/>
+		-->
+	</child>
+
+	<import source="file" location="org/jppf/ui/options/xml/StatusBarPage.xml"/>
+
+</opt:main>
