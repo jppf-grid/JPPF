@@ -20,8 +20,9 @@ package org.jppf.queue;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -45,11 +46,11 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   /**
    * Used for synchronized access to the queue.
    */
-  protected final ReentrantLock lock = new ReentrantLock();
+  protected final Lock lock = new ReentrantLock();
   /**
    * An ordered map of bundle sizes, mapping to a list of bundles of this size.
    */
-  protected final TreeMap<Integer, List<T>> sizeMap = new TreeMap<Integer, List<T>>();
+  protected final SetSortedMap<Integer, T> sizeMap = new SetSortedMap<Integer, T>();
   /**
    *
    */
@@ -72,7 +73,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   /**
    * A map of task bundles, ordered by descending priority.
    */
-  protected final TreeMap<Integer, List<T>> priorityMap = new TreeMap<Integer, List<T>>(PRIORITY_COMPARATOR);
+  protected final LinkedListSortedMap<Integer, T> priorityMap = new LinkedListSortedMap<Integer, T>(PRIORITY_COMPARATOR);
   /**
    * Contains the ids of all queued jobs.
    */
@@ -123,9 +124,9 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
 
   /**
    * Get the lock used for synchronized access to the queue.
-   * @return a <code>ReentrantLock</code> instance.
+   * @return a <code>Lock</code> instance.
    */
-  public ReentrantLock getLock()
+  public Lock getLock()
   {
     return lock;
   }
@@ -147,7 +148,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   @Override
   public Iterator<T> iterator()
   {
-    return new BundleIterator<T>(priorityMap, lock);
+    return priorityMap.iterator(lock);
   }
 
   @Override

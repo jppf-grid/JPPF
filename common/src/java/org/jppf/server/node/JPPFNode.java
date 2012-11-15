@@ -17,11 +17,12 @@
  */
 package org.jppf.server.node;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.management.*;
 
-import org.jppf.JPPFError;
+import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
@@ -84,6 +85,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
    */
   protected LifeCycleEventHandler lifeCycleEventHandler = null;
+  /**
+   * The connection checker for this node.
+   */
+  protected NodeConnectionChecker connectionChecker = null;
+  /**
+   * Determines whether the node connection checker should be used.
+   */
+  protected final boolean checkConnection = JPPFConfiguration.getProperties().getBoolean("jppf.node.check.connection", false);
 
   /**
    * Default constructor.
@@ -120,11 +129,20 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
       catch(SecurityException e)
       {
+        connectionChecker.stop();
         throw new JPPFError(e);
+      }
+      catch(IOException e)
+      {
+        log.error(e.getMessage(), e);
+        if (checkConnection) connectionChecker.stop();
+        reset(true);
+        throw new JPPFNodeReconnectionNotification(e);
       }
       catch(Exception e)
       {
         log.error(e.getMessage(), e);
+        connectionChecker.stop();
         reset(true);
       }
     }
@@ -157,7 +175,23 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
         else log.debug("received an empty bundle");
       }
-      if (notEmpty) executionManager.execute(bundle, taskList);
+      if (notEmpty)
+      {
+        if (checkConnection)
+        {
+          try
+          {
+            connectionChecker.resume();
+            executionManager.execute(bundle, taskList);
+          }
+          finally
+          {
+            connectionChecker.suspend();
+            if (connectionChecker.getException() != null) throw connectionChecker.getException();
+          }
+        }
+        else executionManager.execute(bundle, taskList);
+      }
       processResults(bundle, taskList);
     }
     if (debugEnabled) log.debug("End of node secondary loop");
@@ -243,6 +277,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     }
     new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
     initDataChannel();
+    if (checkConnection)
+    {
+      connectionChecker = createConnectionChecker();
+      connectionChecker.start();
+    }
     lifeCycleEventHandler.loadListeners();
     lifeCycleEventHandler.fireNodeStarting();
     if (debugEnabled) log.debug("end node initialization");
@@ -485,4 +524,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   {
     return classLoaderManager.getContainer(uuidPath).getClassLoader();
   }
+
+  /**
+   * Cretae the connection checker for this node.
+   * @return an implementation of {@link NodeConnectionChecker}.
+   * @exclude
+   */
+  protected abstract NodeConnectionChecker createConnectionChecker();
 }

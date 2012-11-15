@@ -20,7 +20,7 @@ package org.jppf.server.node.remote;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.recovery.*;
 import org.jppf.comm.socket.*;
-import org.jppf.server.node.JPPFNode;
+import org.jppf.server.node.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -143,5 +143,11 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
     {
       log.error(e.getMessage(), e);
     }
+  }
+
+  @Override
+  protected NodeConnectionChecker createConnectionChecker()
+  {
+    return new RemoteNodeConnectionChecker(this);
   }
 }

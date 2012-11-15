@@ -20,15 +20,15 @@ package org.jppf.server.protocol;
 
 import java.util.*;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-import org.jppf.job.*;
+import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.protocol.utils.AbstractServerJob;
-import org.jppf.server.submission.*;
+import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.*;
 
 /**
@@ -81,7 +81,7 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Used for synchronized access to job.
    */
-  protected final ReentrantLock lock;
+  protected final Lock lock;
   /**
    * List of bundles added after submission status set to <code>COMPLETE</code>.
    */
@@ -94,7 +94,7 @@ public class ServerJob extends AbstractServerJob {
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
-  public ServerJob(final ReentrantLock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public ServerJob(final Lock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
     super(job);
     if (lock == null) throw new IllegalArgumentException("lock is null");
 

@@ -464,4 +464,13 @@ public abstract class AbstractServerJob {
     }
     return event;
   }
+
+  /**
+   * Get the initial task count.
+   * @return the count as an int.
+   */
+  public int getInitialTaskCount()
+  {
+    return job.getInitialTaskCount();
+  }
 }

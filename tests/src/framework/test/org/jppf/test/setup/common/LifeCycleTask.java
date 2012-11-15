@@ -108,7 +108,7 @@ public class LifeCycleTask extends JPPFTask
           config.setProperty("jppf.node.uuid", nodeUuid);
         }
       }
-      if (duration > 0) Thread.sleep(duration);
+      if (duration > 0L) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       displayTask("successful");
     }

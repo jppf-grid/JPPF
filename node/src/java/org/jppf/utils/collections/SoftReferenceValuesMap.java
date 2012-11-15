@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.utils.collections;
 
 import java.lang.ref.*;
 import java.util.*;

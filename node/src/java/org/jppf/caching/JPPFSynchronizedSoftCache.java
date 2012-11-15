@@ -20,7 +20,7 @@ package org.jppf.caching;
 
 import java.util.Map;
 
-import org.jppf.utils.SoftReferenceValuesMap;
+import org.jppf.utils.collections.SoftReferenceValuesMap;
 
 /**
  * Cache implementation which uses a {@link SoftReferenceValuesMap} with synchronized access.

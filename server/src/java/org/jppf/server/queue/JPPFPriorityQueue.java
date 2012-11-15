@@ -143,15 +143,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           jobMap.put(jobUuid, serverJob);
         } else queued = false;
         if(serverJob.addBundle(bundleWrapper)) {
-          if(!queued) removeFromListMap(sla.getPriority(), serverJob, priorityMap);
+          if(!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return;
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
-          putInListMap(sla.getPriority(), serverJob, priorityMap);
-          putInListMap(getSize(serverJob), serverJob, sizeMap);
+          priorityMap.putValue(sla.getPriority(), serverJob);
+          sizeMap.putValue(getSize(serverJob), serverJob);
         }
         updateLatestMaxSize();
-        //if (queued) jobManager.jobQueued(serverJob);
         if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
         fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, serverJob, false));
       }
@@ -171,8 +170,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     try {
       if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
 
-      putInListMap(job.getSLA().getPriority(), job, priorityMap);
-      putInListMap(getSize(job), job, sizeMap);
+      priorityMap.putValue(job.getSLA().getPriority(), job);
+      sizeMap.putValue(getSize(job), job);
       fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, job, true));
     } finally {
       lock.unlock();
@@ -193,7 +192,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
-      removeFromListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
+      sizeMap.removeValue(getSize(bundleWrapper), bundleWrapper);
       if (nbTasks >= bundleWrapper.getTaskCount())
       {
         bundleWrapper.setOnRequeue(new RequeueBundleAction(this, bundleWrapper));
@@ -204,10 +203,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
         result = bundleWrapper.copy(nbTasks);
-        putInListMap(getSize(bundleWrapper), bundleWrapper, sizeMap);
-        List<ServerJob> bundleList = priorityMap.get(bundleWrapper.getSLA().getPriority());
-        bundleList.remove(bundleWrapper);
-        bundleList.add(bundleWrapper);
+        sizeMap.putValue(getSize(bundleWrapper), bundleWrapper);
+        // to ensure that other jobs with same priority are also processed without waiting
+        priorityMap.moveToEndOfList(bundleWrapper.getSLA().getPriority(), bundleWrapper);
       }
       updateLatestMaxSize();
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
@@ -248,7 +246,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       }
 
       if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName());
-      removeFromListMap(bundleWrapper.getSLA().getPriority(), bundleWrapper, priorityMap);
+      priorityMap.removeValue(bundleWrapper.getSLA().getPriority(), bundleWrapper);
 
       for (ServerTaskBundleClient bundle : bundleWrapper.getCompletionBundles()) {
         addBundle(bundle);
@@ -275,8 +273,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (oldPriority != newPriority)
       {
         job.getJob().getSLA().setPriority(newPriority);
-        removeFromListMap(oldPriority, job, priorityMap);
-        putInListMap(newPriority, job, priorityMap);
+        priorityMap.removeValue(oldPriority, job);
+        priorityMap.putValue(newPriority, job);
         job.fireJobUpdated();
       }
     } finally {
@@ -510,7 +508,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
     broadcastJob.addOnDone(new RemoveBundleAction(this, broadcastJob));
 
-    putInListMap(broadcastJob.getSLA().getPriority(), broadcastJob, priorityMap);
+    priorityMap.putValue(broadcastJob.getSLA().getPriority(), broadcastJob);
     if (debugEnabled) log.debug("adding bundle with " + broadcastJob);
     scheduleManager.handleStartJobSchedule(broadcastJob);
     scheduleManager.handleExpirationJobSchedule(broadcastJob);
@@ -531,6 +529,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   protected int getSize(final ServerJob bundleWrapper)
   {
-    return bundleWrapper.getTaskCount();
+    //return bundleWrapper.getTaskCount();
+    return bundleWrapper.getInitialTaskCount();
   }
 }

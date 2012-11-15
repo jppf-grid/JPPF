@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import java.util.Map;
 
-import org.jppf.utils.SoftReferenceValuesMap;
+import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
 /**

@@ -20,7 +20,7 @@ package org.jppf.server.node.local;
 
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.server.nio.nodeserver.LocalNodeChannel;
-import org.jppf.server.node.JPPFNode;
+import org.jppf.server.node.*;
 
 /**
  * Local (in-VM) node implementation.
@@ -82,5 +82,11 @@ public class JPPFLocalNode extends JPPFNode
   LocalClassLoaderChannel getClassLoaderHandler()
   {
     return classLoaderHandler;
+  }
+
+  @Override
+  protected NodeConnectionChecker createConnectionChecker()
+  {
+    return new LocalNodeConnectionChecker();
   }
 }

@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
 /**

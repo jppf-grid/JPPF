@@ -20,6 +20,8 @@ package org.jppf.utils;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import org.jppf.utils.collections.AbstractCollectionMap;
+
 /**
  * This class provides a set of utility methods for manipulating and converting
  * collections and arrays.
@@ -153,6 +155,22 @@ public final class CollectionUtils
     StringBuilder sb = new StringBuilder();
     sb.append(name).append("[shallow size=").append(map.size());
     sb.append(", total elements=").append(sizeOfListMap(map)).append(']');
+    return sb.toString();
+  }
+
+  /**
+   * Format a string with size information about a map whose values are lists of elements.
+   * @param <T> the type of the keys in the map.
+   * @param <U> the type of the values in the map.
+   * @param name an arbitrary name given to the map.
+   * @param map the map from which to get size information.
+   * @return a string containing information about the number of elements in the map.
+   */
+  public static <T, U> String formatSizeMapInfo(final String name, final AbstractCollectionMap<T, U> map)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name).append("[shallow size=").append(map.size());
+    sb.append(", total elements=").append(map.size()).append(']');
     return sb.toString();
   }
 
