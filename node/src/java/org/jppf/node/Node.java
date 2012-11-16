@@ -18,7 +18,7 @@
 package org.jppf.node;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.management.JMXServer;
+import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 
 /**
@@ -56,4 +56,21 @@ public interface Node extends Runnable
    * @throws Exception if any error occurs.
    */
   JMXServer getJmxServer() throws Exception;
+
+  /**
+   * Get this node's UUID.
+   * @return the uuid as a string.
+   */
+  String getUuid();
+
+  /**
+   * Get the system information for this node.
+   * @return a {@link JPPFSystemInformation} instance.
+   */
+  JPPFSystemInformation getSystemInformation();
+  /**
+   * Determine whether this node is local to another component.
+   * @return true if this node is local, false otherwise.
+   */
+  boolean isLocal();
 }

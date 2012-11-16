@@ -20,7 +20,7 @@ package org.jppf.node;
 
 import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.comm.socket.*;
-import org.jppf.management.JMXServer;
+import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
 
@@ -54,6 +54,10 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * This node's universal identifier.
    */
   protected String uuid = null;
+  /**
+   * This node's system information.
+   */
+  protected JPPFSystemInformation systemInformation = null;
 
   /**
    * Get the underlying socket wrapper used by this node.
@@ -129,5 +133,17 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   public JMXServer getJmxServer() throws Exception
   {
     throw new JPPFUnsupportedOperationException("getJmxServer() is not supported on this type of node");
+  }
+
+  @Override
+  public String getUuid()
+  {
+    return uuid;
+  }
+
+  @Override
+  public JPPFSystemInformation getSystemInformation()
+  {
+    return systemInformation;
   }
 }

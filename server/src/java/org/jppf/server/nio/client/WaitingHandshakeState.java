@@ -22,7 +22,6 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 
 import java.util.List;
 
-import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
@@ -89,9 +88,7 @@ class WaitingHandshakeState extends ClientServerState
       context.setBundle(bundleWrapper);
       header.getParametersMap().clear();
       // send system info (and more) back to the client
-      JPPFSystemInformation info = new JPPFSystemInformation(driverUUID);
-      info.populate();
-      header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);
+      header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, driver.getSystemInformation());
       header.setParameter(BundleParameter.DRIVER_UUID_PARAM, driverUUID);
       return TO_SENDING_HANDSHAKE_RESULTS;
     }

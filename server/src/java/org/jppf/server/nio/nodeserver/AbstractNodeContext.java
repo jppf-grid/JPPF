@@ -262,7 +262,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a {@link JPPFSystemInformation} instance.
    */
   @Override
-  public JPPFSystemInformation getSystemInfo()
+  public JPPFSystemInformation getSystemInformation()
   {
     return systemInfo;
   }

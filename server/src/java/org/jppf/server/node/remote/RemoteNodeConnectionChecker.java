@@ -38,6 +38,10 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
    */
   private static final Logger log = LoggerFactory.getLogger(RemoteNodeConnectionChecker.class);
   /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * The node for which to check the connection.
    */
   private JPPFRemoteNode node = null;
@@ -111,7 +115,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
           long start = System.nanoTime();
           suspendedLock.wait();
           double elapsed =  (System.nanoTime() - start) / 1e6d;
-          log.info("suspended time: " + elapsed);
+          if (debugEnabled) log.debug("suspended time: " + elapsed);
         }
         catch(InterruptedException e)
         {
@@ -158,7 +162,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
         catch (SocketTimeoutException ignore)
         {
           double elapsed =  (System.nanoTime() - start) / 1e6d;
-          log.info("receive time: " + elapsed);
+          if (debugEnabled) log.debug("receive time: " + elapsed);
         }
         catch (Exception e)
         {

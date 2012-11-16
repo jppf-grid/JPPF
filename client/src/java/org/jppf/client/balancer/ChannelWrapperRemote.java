@@ -67,25 +67,21 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
 
     this.channel = channel;
     this.uuid = channel.getUuid();
-
-    systemInfo = new JPPFSystemInformation(this.uuid);
-    systemInfo.populate();
-    systemInfo.getJppf().setProperty("jppf.channel.local", "false");
-
+    systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER);
     managementInfo.setSystemInfo(systemInfo);
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName() + '-'));
   }
 
   @Override
-  public void setSystemInfo(final JPPFSystemInformation systemInfo)
+  public void setSystemInformation(final JPPFSystemInformation systemInfo)
   {
     if (systemInfo != null && uuid == null)
     {
       uuid = systemInfo.getUuid().getProperty("jppf.uuid");
       if (uuid != null && uuid.isEmpty()) uuid = null;
     }
-    super.setSystemInfo(systemInfo);
+    super.setSystemInformation(systemInfo);
   }
 
   @Override

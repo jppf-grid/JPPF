@@ -241,9 +241,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
-    JPPFSystemInformation info = new JPPFSystemInformation(driver.getUuid());
-    info.populate();
-    return info;
+    return driver.getSystemInformation();
   }
 
   @Override
@@ -261,7 +259,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
       if (mgtInfo == null) match = true;
       else
       {
-        JPPFSystemInformation info = context.getSystemInfo();
+        JPPFSystemInformation info = context.getSystemInformation();
         try
         {
           match = policy.accepts(info);

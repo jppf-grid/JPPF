@@ -128,9 +128,6 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void clientConnectionFailed(final ClientConnectionEvent event)
   {
@@ -149,5 +146,11 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
   protected NodeConnectionChecker createConnectionChecker()
   {
     return new RemoteNodeConnectionChecker(this);
+  }
+
+  @Override
+  public boolean isLocal()
+  {
+    return false;
   }
 }

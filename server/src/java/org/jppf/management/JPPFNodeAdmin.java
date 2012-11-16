@@ -112,8 +112,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
-    JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
-    info.populate();
+    JPPFSystemInformation info = node.getSystemInformation();
     NodeExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
     info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime / 1000000L));
     return info;

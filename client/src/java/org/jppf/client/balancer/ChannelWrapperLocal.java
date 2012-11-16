@@ -85,11 +85,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper-"));
     executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads");
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
-
-    systemInfo = new JPPFSystemInformation(getConnectionUuid());
-    systemInfo.populate(false);
-    systemInfo.getJppf().setProperty("jppf.channel.local", "true");
-
+    systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL);
     managementInfo.setSystemInfo(systemInfo);
   }

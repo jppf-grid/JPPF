@@ -368,7 +368,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
       if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
       if (policy != null)
       {
-        JPPFSystemInformation info = ch.getSystemInfo();
+        JPPFSystemInformation info = ch.getSystemInformation();
         boolean b = false;
         try
         {

@@ -24,6 +24,7 @@ import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
+import org.jppf.management.JPPFSystemInformation;
 import org.jppf.process.LauncherListener;
 import org.jppf.queue.JPPFQueue;
 import org.jppf.server.job.JPPFJobManager;
@@ -124,6 +125,11 @@ public class JPPFDriver
    */
   private final TypedProperties config;
   /**
+   * System ibnformation for this driver.
+   */
+  private JPPFSystemInformation systemInformation = null;
+
+  /**
    * Initialize this JPPFDriver.
    * @exclude
    */
@@ -140,6 +146,7 @@ public class JPPFDriver
     log.info(VersionUtils.getVersionInformation());
     log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
     log.info(hrule);
+    systemInformation = new JPPFSystemInformation(uuid, false, true);
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();
     statsManager.addListener(statsUpdater);
@@ -474,4 +481,12 @@ public class JPPFDriver
     return config.getBoolean("jppf.management.enabled", true) || config.getBoolean("jppf.management.ssl.enabled", false);
   }
 
+  /**
+   * Get the system ibnformation for this driver.
+   * @return a {@link JPPFSystemInformation} instance.
+   */
+  public JPPFSystemInformation getSystemInformation()
+  {
+    return systemInformation;
+  }
 }

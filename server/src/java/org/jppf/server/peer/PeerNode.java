@@ -18,8 +18,7 @@
 package org.jppf.server.peer;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
@@ -94,6 +93,7 @@ class PeerNode extends AbstractCommonNode
     this.connectionInfo = connectionInfo;
     this.secure = secure;
     this.uuid = driver.getUuid();
+    this.systemInformation = driver.getSystemInformation();
     this.helper = new SerializationHelperImpl();
   }
 
@@ -172,7 +172,7 @@ class PeerNode extends AbstractCommonNode
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
         bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, uuid);
-        bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, new JPPFSystemInformation(uuid).populate());
+        bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
       }
       if (bundleWrapper.getTaskCount() > 0)
       {
@@ -305,5 +305,11 @@ class PeerNode extends AbstractCommonNode
   public JMXServer getJmxServer() throws Exception
   {
     return driver.getInitializer().getJmxServer(secure);
+  }
+
+  @Override
+  public boolean isLocal()
+  {
+    return false;
   }
 }

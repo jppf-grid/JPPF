@@ -145,7 +145,7 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   }
 
   @Override
-  public JPPFSystemInformation getSystemInfo()
+  public JPPFSystemInformation getSystemInformation()
   {
     if (traceEnabled) log.trace("getting system info for " + this + ", jppf.channel.local=" + systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
     return systemInfo;
@@ -155,7 +155,7 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
    * Set the system information.
    * @param systemInfo a {@link JPPFSystemInformation} instance.
    */
-  public void setSystemInfo(final JPPFSystemInformation systemInfo)
+  public void setSystemInformation(final JPPFSystemInformation systemInfo)
   {
     if (systemInfo != null)
     {

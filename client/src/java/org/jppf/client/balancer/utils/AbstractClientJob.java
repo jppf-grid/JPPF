@@ -453,7 +453,7 @@ public abstract class AbstractClientJob
     boolean b = true;
     if (policy != null)
     {
-      JPPFSystemInformation info = channel.getSystemInfo();
+      JPPFSystemInformation info = channel.getSystemInformation();
       b = policy.accepts(info);
       if (debugEnabled) log.debug("policy result = " + b);
     }

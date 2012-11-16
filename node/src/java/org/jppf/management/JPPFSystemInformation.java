@@ -54,17 +54,32 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * Mapping of all properties containers.
    */
   private Map<String, TypedProperties> map = new LinkedHashMap<String, TypedProperties>();
+  /**
+   * <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
+   */
+  private final boolean local;
+  /**
+   * If <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
+   */
+  private final boolean resolveInetAddressesNow;
 
   /**
    * Initialize this system information object with the specified uuid.
    * @param uuid the uuid of the corresponding JPPF component.
+   * @param local <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
+   * @param resolveInetAddressesNow if <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
+   * otherwise it is different and executed in a separate thread.
    */
-  public JPPFSystemInformation(final String uuid)
+  public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow)
   {
+    this.local = local;
+    this.resolveInetAddressesNow = resolveInetAddressesNow;
     TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
     addProperties("uuid", uuidProps);
+    populate();
   }
+ 
 
   /**
    * Get the map holding the system properties.
@@ -154,21 +169,10 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
   }
 
   /**
-   * Populate this node information object.
+   * Populate this system information object.
    * @return this <code>JPPFSystemInformation</code> object.
    */
   public JPPFSystemInformation populate()
-  {
-    return populate(true);
-  }
-
-  /**
-   * Populate this node information object.
-   * @param resolveInetAddressesNow if true, then name resolution for <code>InetAddress</code>es should occur immediately,
-   * otherwise it is different and executed in a separate thread.
-   * @return this <code>JPPFSystemInformation</code> object.
-   */
-  public JPPFSystemInformation populate(final boolean resolveInetAddressesNow)
   {
     if (traceEnabled)
     {
@@ -179,6 +183,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
     addProperties("runtime", SystemUtils.getRuntimeInformation());
     addProperties("env", SystemUtils.getEnvironment());
     addProperties("jppf", new TypedProperties(JPPFConfiguration.getProperties()));
+    getJppf().setProperty("jppf.channel.local", String.valueOf(local));
     Runnable r = new Runnable() {
       @Override
       public void run() {

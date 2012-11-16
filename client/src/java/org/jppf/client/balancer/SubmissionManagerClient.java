@@ -206,7 +206,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         wrapper = new ChannelWrapperRemote(connection);
         JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
-        if (systemInfo != null) wrapper.setSystemInfo(systemInfo);
+        if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(),
             ((AbstractJPPFClientConnection) cnn).getUuid(), JPPFManagementInfo.DRIVER, cnn.isSSL());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
@@ -276,7 +276,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
 
-        wrapper.setSystemInfo(systemInfo);
+        wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER);
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);

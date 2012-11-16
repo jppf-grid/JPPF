@@ -89,4 +89,10 @@ public class JPPFLocalNode extends JPPFNode
   {
     return new LocalNodeConnectionChecker();
   }
+
+  @Override
+  public boolean isLocal()
+  {
+    return true;
+  }
 }

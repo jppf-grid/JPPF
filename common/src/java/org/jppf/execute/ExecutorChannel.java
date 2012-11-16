@@ -63,7 +63,7 @@ public interface ExecutorChannel<T>
    * Get the system information.
    * @return a {@link org.jppf.management.JPPFSystemInformation} instance.
    */
-  JPPFSystemInformation getSystemInfo();
+  JPPFSystemInformation getSystemInformation();
 
   /**
    * Get the management information.

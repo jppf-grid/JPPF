@@ -102,6 +102,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     uuid = NodeRunner.getUuid();
     executionManager = new NodeExecutionManagerImpl(this);
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
+    this.systemInformation = new JPPFSystemInformation(uuid, isLocal(), true);
   }
 
   /**
@@ -225,9 +226,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (executionManager.checkConfigChanged() || bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
     {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
-      JPPFSystemInformation info = new JPPFSystemInformation(NodeRunner.getUuid());
-      info.populate();
-      bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, info);
+      TypedProperties jppf = systemInformation.getJppf();
+      jppf.clear();
+      jppf.putAll(JPPFConfiguration.getProperties());
+      bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
     }
     nodeIO.writeResults(bundle, taskList);
     if ((taskList != null) && (!taskList.isEmpty()))
