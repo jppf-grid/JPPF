@@ -149,10 +149,15 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    */
   public void setDone(final V response)
   {
-    done.set(true);
+    //done.set(true);
+    if (response == null)
+    {
+      boolean breakpoint = true;
+    }
     Object o = (cl == null) ? lock : cl;
     synchronized(o)
     {
+      done.set(true);
       this.response = response;
       o.notifyAll();
     }

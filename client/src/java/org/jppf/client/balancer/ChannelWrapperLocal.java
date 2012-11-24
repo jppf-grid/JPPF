@@ -69,6 +69,10 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
    */
   private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
   /**
+   * Temporary listeners array to allow access to the listeners without synchronization. 
+   */
+  private ClientConnectionStatusListener[] listenersArray;
+  /**
    * The jmx server that handles administration and monitoring functions for this node.
    */
   private static JMXServer jmxServer = null;
@@ -82,7 +86,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
    */
   public ChannelWrapperLocal()
   {
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper-"));
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper"));
     executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads");
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
@@ -125,6 +129,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     synchronized (listeners)
     {
       listeners.add(listener);
+      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
   }
 
@@ -134,6 +139,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     synchronized (listeners)
     {
       listeners.remove(listener);
+      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
   }
 
@@ -145,35 +151,26 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus)
   {
     if (oldStatus == newStatus) return;
-    ClientConnectionStatusListener[] temp;
+    ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
+    ClientConnectionStatusListener[] array;
     synchronized (listeners)
     {
-      temp = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
+      array = listenersArray;
     }
-    ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    for (ClientConnectionStatusListener listener : temp)
-    {
-      listener.statusChanged(event);
-    }
+    for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public JPPFFuture<?> submit(final ClientTaskBundle bundle)
-  {
+  public JPPFFuture<?> submit(final ClientTaskBundle bundle) {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(getBundler(), bundle), null) {
       @Override
-      public boolean cancel(final boolean mayInterruptIfRunning)
-      {
-        if (super.cancel(mayInterruptIfRunning))
-        {
-          try
-          {
+      public boolean cancel(final boolean mayInterruptIfRunning) {
+        if (super.cancel(mayInterruptIfRunning)) {
+          try {
             executionManager.cancelAllTasks(true, false);
-          }
-          catch (Exception e)
-          {
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
           return true;

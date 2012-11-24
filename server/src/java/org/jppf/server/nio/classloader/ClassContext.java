@@ -18,9 +18,11 @@
 
 package org.jppf.server.nio.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.*;
 import org.jppf.classloader.JPPFResourceWrapper.State;
@@ -53,7 +55,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * The list of pending resource requests for a resource provider.
    */
-  private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
+  private final Queue<ResourceRequest> pendingRequests = new ConcurrentLinkedQueue<ResourceRequest>();
+  //private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
   /**
    * The list of pending resource responses for a node.
    */
@@ -84,6 +87,13 @@ public class ClassContext extends SimpleNioContext<ClassState>
 //      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests);
       JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST, true);
 //      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests + " - DONE");
+    }
+    else if (ClassState.IDLE_NODE.equals(state))
+    {
+      synchronized(getChannel())
+      {
+        getChannel().notifyAll();
+      }
     }
   }
 
@@ -130,7 +140,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       else nioObject = new SSLNioObject(dl, sslHandler);
     }
     boolean b = nioObject.write();
-    if (b  && debugEnabled) log.debug("sent channel identifier " + JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL) + " to peer server");
+    if (b  && debugEnabled) log.debug(build("sent channel identifier ", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL), " to peer server"));
     //Thread.sleep(500L);
     return b;
   }
@@ -171,13 +181,19 @@ public class ClassContext extends SimpleNioContext<ClassState>
   @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request)
   {
-    synchronized (this) {
-      pendingRequests.add(request);
-    }
+    pendingRequests.offer(request);
+    processRequests();
+  }
+
+  /**
+   * Ensure the pending requests are processed.
+   */
+  public void processRequests()
+  {
     if (ClassState.IDLE_PROVIDER.equals(getState()))
     {
       JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
-      if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());
+      //if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());
     }
   }
 
@@ -185,16 +201,15 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Get a pending request if any is present.
    * @return a {@link ResourceRequest} instance.
    */
-  public synchronized ResourceRequest pollPendingRequest() {
-    if (pendingRequests.isEmpty()) return null;
-    else return pendingRequests.remove(0);
+  public ResourceRequest pollPendingRequest() {
+    return pendingRequests.poll();
   }
 
   /**
    * Get the set of pending resource requests for a node.
    * @return a {@link List} of {@link ResourceRequest} instances.
    */
-  protected synchronized List<ResourceRequest> getPendingRequests() {
+  protected /*synchronized*/ List<ResourceRequest> getPendingRequests() {
     return new ArrayList<ResourceRequest>(pendingRequests);
   }
 
@@ -265,27 +280,9 @@ public class ClassContext extends SimpleNioContext<ClassState>
         pendingRequests.clear();
       }
 
-      /*
-      if ((currentRequest != null) || !pendingList.isEmpty())
-      {
-        if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
-        //ClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
-        ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
-        if (currentRequest != null)
-        {
-          setCurrentRequest(null);
-          resetNodeState(currentRequest, server);
-        }
-
-        for (ResourceRequest resourceRequest : pendingList) {
-          resetNodeState(resourceRequest, server);
-        }
-      }
-      */
-
       if (!pendingList.isEmpty())
       {
-        if (debugEnabled) log.debug("provider: " + getChannel() + " sending null response(s) for disconnected provider");
+        if (debugEnabled) log.debug(build("provider: ", getChannel(), " sending null response(s) for disconnected provider"));
         ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
         for (ResourceRequest resourceRequest : pendingList)
@@ -314,14 +311,14 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     try
     {
-      if (debugEnabled) log.debug("resetting channel state for node " + request);
+      if (debugEnabled) log.debug(build("resetting channel state for node ", request));
       request.getResource().setState(State.NODE_RESPONSE);
       server.getTransitionManager().transitionChannel(request.getChannel(), ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
       server.getTransitionManager().submitTransition(request.getChannel());
     }
     catch (Exception e)
     {
-      log.error("error while trying to send response to node " + request + ", this node may be unavailable", e);
+      log.error(build("error while trying to send response to node ", request, ", this node may be unavailable"), e);
     }
   }
 
@@ -335,13 +332,13 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     try
     {
-      if (debugEnabled) log.debug("resetting channel state for node " + channel);
+      if (debugEnabled) log.debug(build("resetting channel state for node ", channel));
       server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
       server.getTransitionManager().submitTransition(channel);
     }
     catch (Exception e)
     {
-      log.error("error while trying to send response to node " + channel+ ", this node may be unavailable", e);
+      log.error(build("error while trying to send response to node ", channel, ", this node may be unavailable"), e);
     }
   }
 
@@ -370,14 +367,23 @@ public class ClassContext extends SimpleNioContext<ClassState>
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    StringBuilder sb = new StringBuilder();
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource);
+    /*
     sb.append(", pendingRequests=").append(getPendingRequests());
     lockResponse.lock();
     try {
       sb.append(", pendingResponses=").append(pendingResponses);
+    } finally {
+      lockResponse.unlock();
+    }
+    */
+    sb.append(", pendingRequests=").append(getNbPendingRequests());
+    lockResponse.lock();
+    try {
+      sb.append(", pendingResponses=").append(pendingResponses.size());
     } finally {
       lockResponse.unlock();
     }

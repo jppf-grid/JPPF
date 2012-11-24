@@ -17,6 +17,8 @@
  */
 package org.jppf.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -80,15 +82,15 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
   {
-    if (debugEnabled) log.debug("looking up resource [" + name + ']');
+    if (debugEnabled) log.debug(build("looking up resource [", name, "]"));
     Class<?> c = findLoadedClass(name);
     if ((c != null) && debugEnabled) log.debug("classloader = " + c.getClassLoader());
     if (c == null)
     {
-      if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
+      if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
       c = findClass(name, true);
     }
-    if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
+    if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
     return c;
   }
 
@@ -116,7 +118,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
     Class<?> c = null;
-    if (nfCache.has(name)) throw new ClassNotFoundException("Could not load class '" + name + '\'');
+    if (nfCache.has(name)) throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     c = findLoadedClass(name);
     if (c != null) return c;
     if (lookupClasspath) c = findClassInURLClasspath(name, false);
@@ -131,7 +133,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
       }
     }
-    if (debugEnabled) log.debug("looking up definition for resource [" + name + ']');
+    if (debugEnabled) log.debug(build("looking up definition for resource [", name, "]"));
     byte[] b = null;
     String resName = name.replace('.', '/') + ".class";
     Map<String, Object> map = new HashMap<String, Object>();
@@ -146,9 +148,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
       if (resource != null) nfCache.add(name);
-      throw new ClassNotFoundException("Could not load class '" + name + '\'');
+      throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
-    if (debugEnabled) log.debug("found definition for resource [" + name + ", definitionLength=" + b.length + ']');
+    if (debugEnabled) log.debug(build("found definition for resource [", name, ", definitionLength=", b.length, "]"));
     synchronized(this)
     {
       c = findLoadedClass(name);
@@ -164,13 +166,13 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception
   {
-    if (debugEnabled) log.debug("requesting remote computation, requestUuid = " + requestUuid);
+    if (debugEnabled) log.debug(build("requesting remote computation, requestUuid = ", requestUuid));
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", "callable");
     map.put("callable", callable);
     JPPFResourceWrapper resource = loadRemoteData(map, false);
     byte[] b = (resource == null) ? null : resource.getCallable();
-    if (debugEnabled) log.debug("remote definition for callable resource "+ (b==null ? "not " : "") + "found");
+    if (debugEnabled) log.debug(build("remote definition for callable resource ", b==null ? "not " : "", "found"));
     return b;
   }
 
@@ -187,14 +189,14 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     URL url = null;
     if (nfCache.has(name)) return null;
     url = cache.getResourceURL(name);
-    if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found in local cache");
+    if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
     if (url == null)
     {
       url = super.findResource(name);
-      if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found in URL classpath");
+      if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
       if (url == null)
       {
-        if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
+        if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
         try
         {
           List<URL> urlList = findRemoteResources(name);
@@ -205,7 +207,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }
-        if (debugEnabled) log.debug("resource [" + name + "] " + (url == null ? "not " : "") + "found remotely");
+        if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found remotely"));
       }
     }
     if (url == null) nfCache.add(name);
@@ -257,7 +259,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     List<URL> urlList = new ArrayList<URL>();
     if (!nfCache.has(name))
     {
-      if (debugEnabled) log.debug("resource [" + name + "] not found locally, attempting remote lookup");
+      if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
       try
       {
         List<String> locationsList = cache.getResourcesLocations(name);
@@ -310,7 +312,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       List<byte[]> dataList = null;
       if (resource != null) dataList = (List<byte[]>) resource.getData("resource_list");
       boolean found = (dataList != null) && !dataList.isEmpty();
-      if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
+      if (debugEnabled) log.debug(build("resource [", name, "] ", found ? "" : "not ", "found remotely"));
       if (found)
       {
         cache.registerResources(name, dataList);
@@ -320,7 +322,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if (locationsList != null)
       {
         for (String path: locationsList) urlList.add(new File(path).toURI().toURL());
-        if (debugEnabled) log.debug("found the following URLs for resource [" + name + "] : " + urlList);
+        if (debugEnabled) log.debug(build("found the following URLs for resource [", name, "] : ", urlList));
       }
     }
     if ((urlList == null) || urlList.isEmpty() && (resource != null)) nfCache.add(name);
@@ -407,7 +409,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive)
   {
-    if (debugEnabled) log.debug("looking up up resource [" + name + "] in the URL classpath for " + this);
+    if (debugEnabled) log.debug(build("looking up up resource [", name, "] in the URL classpath for ", this));
     Class<?> c = findLoadedClass(name);
     if (c == null)
     {
@@ -424,7 +426,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         catch(ClassNotFoundException ignore){}
       }
     }
-    if (debugEnabled) log.debug("resource [" + name + "] " + (c == null ? "not " : "") + "found in the URL classpath for " + this);
+    if (debugEnabled) log.debug(build("resource [", name, "] ", c == null ? "not " : "", "found in the URL classpath for ", this));
     return c;
   }
 
@@ -455,7 +457,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   {
     String s = JPPFConfiguration.getProperties().getString("jppf.classloader.delegation", "parent");
     DelegationModel model = "url".equalsIgnoreCase(s) ? DelegationModel.URL_FIRST : DelegationModel.PARENT_FIRST;
-    if (debugEnabled) log.debug("Using " + model + " class loader delegation model");
+    if (debugEnabled) log.debug(build("Using ", model, " class loader delegation model"));
     return model;
   }
 

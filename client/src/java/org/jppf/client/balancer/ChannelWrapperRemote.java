@@ -70,7 +70,7 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER);
     managementInfo.setSystemInfo(systemInfo);
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName() + '-'));
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper" + channel.getName() + '-'));
   }
 
   @Override

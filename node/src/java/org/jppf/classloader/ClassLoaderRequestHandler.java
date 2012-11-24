@@ -18,6 +18,8 @@
 
 package org.jppf.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -156,15 +158,15 @@ public class ClassLoaderRequestHandler
           if (n > maxBatchSize)
           {
             maxBatchSize = n;
-            log.info("maxBatchSize = " + maxBatchSize);
+            log.info(build("maxBatchSize = ", maxBatchSize));
           }
-          if (debugEnabled) log.debug("sending batch of " + futureMap.size() + " class loading requests: " + request);
+          if (debugEnabled) log.debug(build("sending batch of ", futureMap.size(), " class loading requests: ", request));
           if (isStopped()) return;
           requestRunner.setRequest(request);
           requestRunner.run();
           Throwable t = requestRunner.getThrowable();
           CompositeResourceWrapper response = (CompositeResourceWrapper) requestRunner.getResponse();
-          if (debugEnabled) log.debug("got response " + response);
+          if (debugEnabled) log.debug(build("got response ", response));
           if (response != null)
           {
             for (JPPFResourceWrapper rw: response.getResources())

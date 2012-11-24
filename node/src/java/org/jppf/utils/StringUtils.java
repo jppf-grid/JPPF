@@ -302,7 +302,7 @@ public final class StringUtils
    * @param args the tokens composing the string.
    * @return the concatenation of the string values of the tokens.
    */
-  public static String buildString(final Object...args)
+  public static String build(final Object...args)
   {
     if (args == null) return null;
     StringBuilder sb = new StringBuilder();

@@ -18,6 +18,7 @@
 package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.build;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.*;
@@ -70,7 +71,7 @@ class WaitingProviderResponseState extends ClassServerState
     {
       ResourceRequest request = context.getCurrentRequest();
       ChannelWrapper<?> nodeChannel = request.getChannel();
-      if (debugEnabled) log.debug("read response from provider: " + channel + ", sending to node " + nodeChannel + ", resource: " + context.getResource().getName());
+      if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", nodeChannel, ", resource: ", context.getResource().getName()));
       JPPFResourceWrapper resource = context.deserializeResource();
       // putting the definition in cache
       if ((resource.getDefinition() != null) && (resource.getCallable() == null))
@@ -81,15 +82,12 @@ class WaitingProviderResponseState extends ClassServerState
       StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
       synchronized(nodeChannel)
       {
-        while ((ClassState.IDLE_NODE != nodeContext.getState()) || (nodeChannel.getKeyOps() != 0))
-        {
-          nodeChannel.wait(0L, 10000);
-        }
-        if (debugEnabled) log.debug("sending response " + resource + " to node " + nodeChannel); 
+        while (ClassState.IDLE_NODE != nodeContext.getState()) nodeChannel.wait(0L, 10000);
+        if (debugEnabled) log.debug(build("sending response ", resource, " to node ", nodeChannel)); 
         context.setCurrentRequest(null);
         ResourceRequest pendingResponse;
 
-        Lock lock = context.getLockResponse();
+        Lock lock = nodeContext.getLockResponse();
         lock.lock();
         try {
           pendingResponse = nodeContext.getPendingResponses().get(resource);
@@ -97,9 +95,8 @@ class WaitingProviderResponseState extends ClassServerState
           lock.unlock();
         }
         pendingResponse.setResource(resource);
-        tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, tm.checkSubmitTransition(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE));
+        tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, true);
       }
-      //context.setMessage(null);
       return TO_SENDING_PROVIDER_REQUEST;
     }
     return TO_WAITING_PROVIDER_RESPONSE;

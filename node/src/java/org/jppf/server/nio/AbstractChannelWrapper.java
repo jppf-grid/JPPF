@@ -106,13 +106,13 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
   public String toString()
   {
     //return getClass().getSimpleName() + "[id=" + getId() + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(1000);
     sb.append(getClass().getSimpleName());
     sb.append('[');
     sb.append(getStringId());
-    sb.append(',').append(" readyOps=").append(getReadyOps());
-    sb.append(',').append(" keyOps=").append(getKeyOps());
-    sb.append(",").append(" context=").append(getContext());
+    sb.append(", readyOps=").append(getReadyOps());
+    sb.append(", keyOps=").append(getKeyOps());
+    sb.append(", context=").append(getContext());
     sb.append(']');
     return sb.toString();
   }

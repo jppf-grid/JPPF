@@ -221,7 +221,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   {
     while (!isStopped())
     {
-      if (!dispatch()) goToSleep(10L, 10000);
+      if (!dispatch()) goToSleep(100L);
     }
   }
 
@@ -412,7 +412,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     JobSLA sla = bundle.getJob().getSLA();
     if (debugEnabled)
     {
-      String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
+      String s = StringUtils.build("job '", bundle.getName(), "' : ",
         "suspended=", sla.isSuspended(), ", pending=", bundle.isPending(),
         ", expired=", bundle.isJobExpired());
       log.debug(s);

@@ -17,6 +17,8 @@
  */
 package org.jppf.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
@@ -89,28 +91,12 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
           resource.setData("node.uuid", NodeRunner.getUuid());
           rr.setRequest(resource);
           rr.run();
-          /*
-          channel.setServerResource(resource);
-          channel.setNodeResource(null);
-          synchronized(channel)
-          {
-            channel.setReadyOps(SelectionKey.OP_READ);
-          }
-          while (channel.getServerResource() != null) channel.getServerLock().goToSleep();
-          if (debugEnabled) log.debug("node initiation message sent");
-          synchronized(channel)
-          {
-            channel.setReadyOps(SelectionKey.OP_WRITE);
-          }
-          while (channel.getNodeResource() == null) channel.getNodeLock().goToSleep();
-          channel.setNodeResource(null);
-          */
           rr.reset();
           Throwable t = rr.getThrowable();
           if (t != null) throw new RuntimeException(t);
           requestHandler = new ClassLoaderRequestHandler(rr);
           if (debugEnabled) log.debug("received node initiation response");
-          System.out.println(getClass().getSimpleName() + ": Reconnected to the class server");
+          System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
         }
         catch (Exception e)
         {
@@ -129,7 +115,6 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   }
 
   /**
-   * {@inheritDoc}
    * @exclude
    */
   @Override
@@ -172,11 +157,11 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   @Override
   public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
   {
-    if (debugEnabled) log.debug("looking up resource [" + name + ']');
+    if (debugEnabled) log.debug(build("looking up resource [", name, "]"));
     Class<?> c = findLoadedClass(name);
     if (c == null)
     {
-      if (debugEnabled) log.debug("resource [" + name + "] not already loaded");
+      if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
       ClassLoader cl = this;
       while (cl instanceof AbstractJPPFClassLoader) cl = cl.getParent();
       if (cl != null)
@@ -208,7 +193,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     {
       c = findClass(name);
     }
-    if (debugEnabled) log.debug("definition for resource [" + name + "] : " + c);
+    if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
     return c;
   }
 
@@ -234,6 +219,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     resource.setRequestUuid(requestUuid);
 
     Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
+    //Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource, this);
     return f.get();
   }
 }

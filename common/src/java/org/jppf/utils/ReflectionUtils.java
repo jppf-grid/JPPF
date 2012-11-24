@@ -92,12 +92,11 @@ public class ReflectionUtils
         attrMap.put(attrName, value);
       }
     }
-    Iterator<Map.Entry<String, Object>> it = attrMap.entrySet().iterator();
-    while (it.hasNext())
+    int count = 0;
+    for (Map.Entry<String, Object> entry: attrMap.entrySet())
     {
-      Map.Entry<String, Object> entry = it.next();
+      if (count++ > 0) sb.append(separator);
       sb.append(entry.getKey()).append('=').append(entry.getValue());
-      if (it.hasNext()) sb.append(separator);
     }
     sb.append(']');
     return sb.toString();

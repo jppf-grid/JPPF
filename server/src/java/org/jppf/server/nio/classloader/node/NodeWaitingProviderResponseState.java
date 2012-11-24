@@ -19,6 +19,7 @@
 package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -62,8 +63,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     ClassContext context = (ClassContext) channel.getContext();
     boolean empty;
     Lock lock = context.getLockResponse();
@@ -75,12 +75,10 @@ class NodeWaitingProviderResponseState extends ClassServerState
       Queue<JPPFResourceWrapper> toRemove = new LinkedBlockingQueue<JPPFResourceWrapper>();
       CompositeResourceWrapper composite = null;
       if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
-      for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
-      {
+      for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet()) {
         JPPFResourceWrapper resource = entry.getValue().getResource();
-        if (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)
-        {
-          if (debugEnabled) log.debug("got response for resource " + resource);
+        if (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE) {
+          if (debugEnabled) log.debug(build("got response for resource ", resource));
           toRemove.add(resource);
           if (composite != null) composite.addOrReplaceResource(resource);
           else context.setResource(resource);
@@ -91,12 +89,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
     } finally {
       lock.unlock();
     }
-    if (empty)
-    {
-      if (debugEnabled) log.debug("sending final response " + context.getResource());
-      return sendResponse(context);
-    }
-    return TO_IDLE_NODE;
+    return empty ? sendResponse(context) : TO_IDLE_NODE;
   }
 
   /**
@@ -107,6 +100,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
    */
   protected ClassTransition sendResponse(final ClassContext context) throws Exception
   {
+    if (debugEnabled) log.debug(build("preparing to send the response for channel ", context.getChannel()));
     context.serializeResource();
     return TO_SENDING_NODE_RESPONSE;
   }

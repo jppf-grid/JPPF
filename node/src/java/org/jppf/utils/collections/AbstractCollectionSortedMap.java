@@ -38,7 +38,7 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
    */
   public AbstractCollectionSortedMap()
   {
-    super();
+    map = createMap();
   }
 
   /**

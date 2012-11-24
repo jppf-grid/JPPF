@@ -23,7 +23,7 @@ import java.nio.channels.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
@@ -105,23 +105,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   @SuppressWarnings("unchecked")
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition)
   {
-    Lock lock = server.getLock();
-    lock.lock();
-    try
-    {
-      server.getSelector().wakeup();
-      NioContext<S> context = (NioContext<S>) channel.getContext();
-      S s1 = context.getState();
-      NioTransition<S> t = server.getFactory().getTransition(transition);
-      S s2 = t.getState();
-      context.setState(s2);
-      channel.setKeyOps(t.getInterestOps());
-      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2 + " with ops=" + t.getInterestOps());
-    }
-    finally
-    {
-      lock.unlock();
-    }
+    transitionChannel(channel, transition, false);
   }
 
   /**
@@ -141,8 +125,15 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       server.getSelector().wakeup();
       NioContext<S> context = (NioContext<S>) channel.getContext();
       S s1 = context.getState();
-      NioTransition<S> t = server.getFactory().getTransition(transition);
+      NioServerFactory<S, T> factory = server.getFactory();
+      NioTransition<S> t = factory.getTransition(transition);
       S s2 = t.getState();
+      String msg = " from " + s1 + " to " + s2;
+      if (s1 != null)
+      {
+        if (!factory.isTransitionAllowed(s1, s2)) log.warn("unauthorized transition" + msg);
+        else if (debugEnabled) log.debug("transition" + msg);
+      }
       context.setState(s2);
       if (!submit) channel.setKeyOps(t.getInterestOps());
       else
@@ -150,7 +141,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
         channel.setKeyOps(0);
         submitTransition(channel);
       }
-      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + " from " + s1 + " to " + s2 + " with ops=" + t.getInterestOps());
+      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + msg + " with ops=" + t.getInterestOps());
     }
     finally
     {

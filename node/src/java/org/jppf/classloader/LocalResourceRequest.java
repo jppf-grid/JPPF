@@ -18,6 +18,8 @@
 
 package org.jppf.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.nio.channels.SelectionKey;
 
 import org.slf4j.*;
@@ -58,7 +60,7 @@ class LocalResourceRequest extends AbstractResourceRequest
     try
     {
       throwable = null;
-      if (debugEnabled) log.debug("channel " + channel + " sending request " + request);
+      if (debugEnabled) log.debug(build("channel ", channel, " sending request ", request));
       synchronized(channel.getServerLock())
       {
         channel.setServerResource(request);
@@ -69,10 +71,9 @@ class LocalResourceRequest extends AbstractResourceRequest
       {
         channel.setReadyOps(SelectionKey.OP_WRITE);
         while ((response = channel.getNodeResource()) == null) channel.getNodeLock().goToSleep();
-        //response = channel.getNodeResource();
         channel.setNodeResource(null);
       }
-      if (debugEnabled) log.debug("channel " + channel + " got response " + response);
+      if (debugEnabled) log.debug(build("channel ", channel, " got response ", response));
     }
     catch (Throwable t)
     {

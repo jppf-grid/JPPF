@@ -40,60 +40,42 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
     this.channel = (AbstractLocalChannelWrapper) channel;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean select()
   {
     return select(0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean select(final long timeout)
   {
     if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
-    long start = System.currentTimeMillis();
+    //long start = System.currentTimeMillis();
+    long start = System.nanoTime();
+    final long timeoutNanos = timeout * 1000000L;
     long elapsed = 0;
-    boolean selected = false;
-    while (((timeout == 0L) || (elapsed < timeout)) && !(selected = channelSelected()))
+    boolean selected =  channel.isSelectable();
+    //while (((timeout == 0L) || (elapsed < timeout)) && !selected)
+    while (((timeout == 0L) || (elapsed < timeoutNanos)) && !selected)
     {
-      goToSleep(timeout == 0L ? 0 : timeout - elapsed);
-      elapsed = System.currentTimeMillis() - start;
+      //goToSleep(timeout == 0L ? 0L : timeout - elapsed);
+      goToSleep(1000L, 0);
+      //elapsed = System.currentTimeMillis() - start;
+      elapsed = System.nanoTime() - start;
+      selected = channel.isSelectable();
     }
     return selected;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean selectNow()
   {
-    return (channel.getKeyOps() & channel.getReadyOps()) != 0;
+    return channel.isSelectable();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ChannelWrapper<?> getChannel()
   {
     return channel;
-  }
-
-  /**
-   * Determine whether the channel should be set as selected.
-   * @return tre if the channel is selected, false otherwise.
-   */
-  private boolean channelSelected()
-  {
-    synchronized(channel.getOpsLock())
-    {
-      return (channel.getKeyOps() & channel.getReadyOps()) != 0;
-    }
   }
 }

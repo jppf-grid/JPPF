@@ -19,6 +19,7 @@
 package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
 
@@ -63,7 +64,7 @@ class SendingProviderRequestState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (channel.isReadable() && !channel.isLocal())
     {
-      throw new ConnectException("provider " + channel + " has been disconnected");
+      throw new ConnectException(build("provider ", channel, " has been disconnected"));
     }
     ResourceRequest request = context.getCurrentRequest();
     if (request == null)
@@ -73,22 +74,21 @@ class SendingProviderRequestState extends ClassServerState
       {
         context.setMessage(null);
         context.setResource(request.getResource());
-        if (debugEnabled) log.debug("provider " + channel + " serving new resource request [" + context.getResource().getName() + "] from node: " + request);
+        if (debugEnabled) log.debug(build("provider ", channel, " serving new resource request [", context.getResource().getName(), "] from node: ", request));
         context.serializeResource();
         context.setCurrentRequest(request);
       }
     }
     if (request == null)
     {
-      if (debugEnabled) log.debug("provider: " + channel + " has no request to process, returning to idle mode");
+      if (debugEnabled) log.debug(build("provider: ", channel, " has no request to process, returning to idle mode"));
       context.setMessage(null);
       //return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
       return TO_IDLE_PROVIDER;
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("request sent to the provider " + channel + " from node " + request +
-        ", resource: " + context.getResource().getName());
+      if (debugEnabled) log.debug(build("request sent to the provider ", channel, " from node ", request, ", resource: ", context.getResource().getName()));
       context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
       return TO_WAITING_PROVIDER_RESPONSE;
     }

@@ -37,17 +37,11 @@ public class LocalClassContext extends ClassContext
    */
   private static boolean traceEnabled = log.isTraceEnabled();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void serializeResource() throws Exception
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFResourceWrapper deserializeResource() throws Exception
   {
@@ -88,6 +82,7 @@ public class LocalClassContext extends ClassContext
     if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
     LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
     channel.setNodeResource(resource);
+    if (traceEnabled) log.trace("message written for " + wrapper + ", resource=" + resource);
     return true;
   }
 }

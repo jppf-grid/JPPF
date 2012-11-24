@@ -19,11 +19,12 @@ package sample.test.jppfcallable;
 
 import java.util.*;
 
-import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.logging.jmx.JmxLogger;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFCallable;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -43,25 +44,38 @@ public class JPPFCallableRunner
   /**
    * Used to test JPPFTask.compute(JPPFCallable) in method {@link #testComputeCallable()}.
    */
-  private static String callableResult = "";
+  static String callableResult = "";
+  /**
+   * 
+   */
+  private static MyLoggingHandler loggingHandler = null;
 
   /**
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
+   * @throws Exception if an error is raised during the execution.
    */
-  public static void main(final String...args)
+  public static void main(final String...args) throws Exception
   {
-    try
+    int nbRuns = 10;
+    //loggingHandler = new MyLoggingHandler();
+    for (int i=1; i<=nbRuns; i++)
     {
-      perform();
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-    finally
-    {
-      if (jppfClient != null) jppfClient.close();
+      print("*---------- run "  + StringUtils.padLeft(String.valueOf(i), '0', 3) + " ----------*");
+      try
+      {
+        perform();
+      }
+      catch(Exception e)
+      {
+        e.printStackTrace();
+      }
+      finally
+      {
+        restartDriver(1L, i < nbRuns ? 2000L : -1L);
+        if (jppfClient != null) jppfClient.close();
+        if (i < nbRuns) Thread.sleep(3000L);
+      }
     }
   }
 
@@ -72,27 +86,35 @@ public class JPPFCallableRunner
   private static void perform() throws Exception
   {
     int nbTasks = 400;
-    int nbJobs = 1;
+    int nbJobs = 10;
     int maxChannels = 1;
+    int size = 1024;
+    long time = 10L;
     configure();
     jppfClient = new JPPFClient();
     while (!jppfClient.hasAvailableConnection()) Thread.sleep(20L);
+    JmxLogger jmxLogger = null;
+    if (loggingHandler != null)
+    {
+      jmxLogger = getJmxLogger();
+      loggingHandler.register(jmxLogger);
+    }
     print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
     List<JPPFJob> jobList = new ArrayList<JPPFJob>();
     for (int n=1; n<=nbJobs; n++)
     {
-      String name = "job-" + n;
+      String name = "job-" + StringUtils.padLeft(String.valueOf(n), '0', 4);
       JPPFJob job = new JPPFJob(name);
       job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
-      for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask()).setId(name + ":task-" + i);
+      for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
       job.setResultListener(new JPPFResultCollector(job)
       {
         @Override
         public synchronized void resultsReceived(final TaskResultEvent event)
         {
           super.resultsReceived(event);
-          if (event.getTaskList() != null) System.out.println("received " + jobResults.size() + " results");
+          if (event.getTaskList() != null) print("received " + jobResults.size() + " results");
         }
       });
       //job.addJobListener(new MyJobListener());
@@ -106,6 +128,7 @@ public class JPPFCallableRunner
       List<JPPFTask> results = coll.waitForResults();
       print("got results for job '" + job.getName() + "'");
     }
+    if (loggingHandler != null) loggingHandler.unregister(jmxLogger);
   }
 
   /**
@@ -126,73 +149,53 @@ public class JPPFCallableRunner
   }
 
   /**
-   * 
+   * Use JMX to stop the driver.
+   * @param shutdownDelay .
+   * @param restartDelay .
+   * @throws Exception if any error occurs.
    */
-  public static class MyTask extends JPPFTask
+  private static void restartDriver(final long shutdownDelay, final long restartDelay) throws Exception
   {
-    @Override
-    public void run()
+    JMXDriverConnectionWrapper jmx = getDriverJmx();
+    try
+    {
+      jmx.restartShutdown(shutdownDelay, restartDelay);
+    }
+    finally
     {
       try
       {
-        /*
-        */
-        MyCallable mc = new MyCallable(getId());
-        String s = compute(mc);
-        //System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
-        setResult(s);
+        jmx.close();
       }
-      catch (Throwable t)
+      catch (Exception ignore)
       {
-        //t.printStackTrace();
-        setException(t instanceof Exception ? (Exception) t : new JPPFException(t));
       }
     }
   }
 
   /**
-   * 
+   * Get a driver JMX connection.
+   * @return a {@link JMXDriverConnectionWrapper} instance.
+   * @throws Exception if any error occurs.
    */
-  public static class MyCallable implements JPPFCallable<String>
+  private static JMXDriverConnectionWrapper getDriverJmx() throws Exception
   {
-    /**
-     * 
-     */
-    private String id = null;
-    /**
-     * 
-     */
-    private byte[] data = null;
+    JPPFClientConnectionImpl c;
+    while ((c = (JPPFClientConnectionImpl) jppfClient.getClientConnection()) == null) Thread.sleep(10L);
+    JMXDriverConnectionWrapper jmx;
+    while ((jmx = c.getJmxConnection()) == null) Thread.sleep(10L);
+    while (!jmx.isConnected()) Thread.sleep(10L);
+    return jmx;
+  }
 
-    /**
-     * 
-     */
-    public MyCallable()
-    {
-    }
-
-    /**
-     * 
-     * @param id the id of the task.
-     */
-    public MyCallable(final String id)
-    {
-      this.id = id;
-    }
-
-    @Override
-    public String call() throws Exception
-    {
-      //System.out.println("[client] result of MyCallable[id=" + id + "].call() = " + callableResult);
-      data = new byte[1024];
-      synchronized(this)
-      {
-        wait(10L);
-      }
-      //throw new RuntimeException();
-      throw new Error();
-      //return callableResult;
-    }
+  /**
+   * Get a proxy to the JmxLooger.
+   * @return a {@link JmxLogger} instance.
+   * @throws Exception if any error occurs.
+   */
+  private static JmxLogger getJmxLogger() throws Exception
+  {
+    return getDriverJmx().getProxy(JmxLogger.DEFAULT_MBEAN_NAME, JmxLogger.class);
   }
 
   /**

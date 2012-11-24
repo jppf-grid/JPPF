@@ -147,6 +147,6 @@ public class ServerConnection extends AbstractRecoveryConnection
   @Override
   public String toString()
   {
-    return StringUtils.buildString("ServerConnection[socketWrapper=", socketWrapper, ", ok=", ok, ", initialized=", initialized, ", uuid=", uuid, "]");
+    return StringUtils.build("ServerConnection[socketWrapper=", socketWrapper, ", ok=", ok, ", initialized=", initialized, ", uuid=", uuid, "]");
   }
 }

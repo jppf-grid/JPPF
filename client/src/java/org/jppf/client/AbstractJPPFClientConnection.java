@@ -62,6 +62,10 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected final List<ClientConnectionStatusListener> listeners = new LinkedList<ClientConnectionStatusListener>();
   /**
+   * Temporary listeners array to allow access to the listeners without synchronization. 
+   */
+  protected ClientConnectionStatusListener[] listenersArray;
+  /**
    * Holds the tasks, data provider and submission mode for the current execution.
    */
   protected JPPFJob job = null;
@@ -106,23 +110,11 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean ssl)
   {
     this.uuid = uuid;
-    //this.host = NetworkUtils.getHostName(host);
     this.host = host;
     this.port = driverPort;
     this.priority = priority;
     this.name = name;
     this.ssl = ssl;
-    /*
-    try
-    {
-      String s = InetAddress.getByName(host).getCanonicalHostName();
-      displayName = name + '[' + s + ':' + port + ']';
-    }
-    catch (UnknownHostException e)
-    {
-      displayName = name;
-    }
-     */
     displayName = name;
     this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
   }
@@ -193,6 +185,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     synchronized (listeners)
     {
       listeners.add(listener);
+      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
   }
 
@@ -207,6 +200,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     synchronized (listeners)
     {
       listeners.remove(listener);
+      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
     }
   }
 
@@ -217,10 +211,10 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
   {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    ClientConnectionStatusListener[] array = null;
+    ClientConnectionStatusListener[] array;
     synchronized (listeners)
     {
-      array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
+      array = listenersArray;
     }
     for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
   }

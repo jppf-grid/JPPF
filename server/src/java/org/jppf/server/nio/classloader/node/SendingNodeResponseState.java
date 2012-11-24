@@ -19,6 +19,7 @@
 package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
 
@@ -62,12 +63,12 @@ class SendingNodeResponseState extends ClassServerState
   {
     if (channel.isReadable() && !channel.isLocal())
     {
-      throw new ConnectException("node " + channel + " has been disconnected");
+      throw new ConnectException(build("node ", channel, " has been disconnected"));
     }
     ClassContext context = (ClassContext) channel.getContext();
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("node: " + channel + ", response [" + context.getResource() + "] sent to the node");
+      if (debugEnabled) log.debug(build("node: ", channel, ", response [", context.getResource(), "] sent to the node"));
       context.setMessage(null);
       return TO_WAITING_NODE_REQUEST;
     }

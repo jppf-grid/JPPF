@@ -27,7 +27,7 @@ import java.util.concurrent.locks.Lock;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
+public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, CollectionMap<K, V>
 {
   /**
    * The underlying map to which operations are delegated.
@@ -35,11 +35,10 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
   protected Map<K, Collection<V>> map = null;
 
   /**
-   * Defqult constructor.
+   * Default constructor.
    */
   public AbstractCollectionMap()
   {
-    map = createMap();
   }
 
   /**
@@ -47,6 +46,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
    * @param key the key for which to add a value.
    * @param value the value to add.
    */
+  @Override
   public void putValue(final K key, final V value)
   {
     Collection<V> coll = map.get(key);
@@ -59,11 +59,12 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
   }
 
   /**
-   * Add a value for the specified key.
-   * @param key the key for which to add a value.
-   * @param value the value to add.
+   * Remove a value from the specified key.
+   * @param key the key from which to remove a value.
+   * @param value the value to remove.
    * @return <code>true</code> if an element was removed, <code>false</code> otherwise.
    */
+  @Override
   public boolean removeValue(final K key, final V value)
   {
     Collection<V> coll = map.get(key);
@@ -77,9 +78,61 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
   }
 
   /**
+   * Add the specified values to the specified key. This is a bulk operation.
+   * @param key the key to which to add the values.
+   * @param values the values to add to the key.
+   */
+  @Override
+  public void addValues(final K key, final V...values)
+  {
+    Collection<V> coll = map.get(key);
+    if (coll == null)
+    {
+      coll = newCollection();
+      map.put(key, coll);
+    }
+    for (V value: values) coll.add(value);
+  }
+
+  /**
+   * Remove the specified values from the specified key. This is a bulk operation.
+   * @param key the key for which to rmeove the values.
+   * @param values the values to remove.
+   * @return the number of values that were actually removed, possibly zero.
+   */
+  @Override
+  public int removeValues(final K key, final V...values)
+  {
+    Collection<V> coll = map.get(key);
+    if (coll != null)
+    {
+      int count = 0;
+      for (V value: values)
+      {
+        if (coll.remove(value)) count++;
+      }
+      if (coll.isEmpty()) map.remove(key);
+      return count;
+    }
+    return 0;
+  }
+
+  /**
+   * Remove the specified key fromt his maap.
+   * @param key the key to remove.
+   * @return collection of values that were removed, possibly <code>null</code>.
+   */
+  @Override
+  public Collection<V> removeKey(final K key)
+  {
+    return map.remove(key);
+  }
+
+  /**
    * Get the total number of elements in this collection map.
    * @return the number of elemets as an int value.
    */
+  @Override
   public int size()
   {
     int result = 0;
@@ -91,6 +144,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
    * Determine whether this map is empty.
    * @return <code>true</code> if the map is empty, <code>false</code> otherwise.
    */
+  @Override
   public boolean isEmpty()
   {
     return map.isEmpty();
@@ -102,6 +156,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
    * @param value the value to look in the collection.
    * @return <code>true</code> if the map contains the key and the corresponding collection contains the value, <code>false</code> otehrwise.
    */
+  @Override
   public boolean contains(final K key, final V value)
   {
     Collection<V> coll = map.get(key);
@@ -114,6 +169,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
    * @param value the value to look up in the entire map.
    * @return <code>true</code> if the map contains the value, <code>false</code> otehrwise.
    */
+  @Override
   public boolean contains(final V value)
   {
     for (Map.Entry<K, Collection<V>> entry: map.entrySet())
@@ -134,6 +190,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
    * @param lock the lock used to synchronize access to the map.
    * @return an iterator on the values of the map.
    */
+  @Override
   public Iterator<V> iterator(final Lock lock)
   {
     return new CollectionMapIterator(lock);
@@ -142,6 +199,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>
   /**
    * Clear the map.
    */
+  @Override
   public void clear()
   {
     map.clear();

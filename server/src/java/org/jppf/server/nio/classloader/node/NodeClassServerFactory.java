@@ -25,6 +25,7 @@ import java.util.*;
 
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.utils.collections.*;
 
 /**
  * Utility class used to specify the possible states of a class server connection, as well as the possible
@@ -77,6 +78,19 @@ final class NodeClassServerFactory	extends NioServerFactory<ClassState, ClassTra
     map.put(TO_SENDING_NODE_RESPONSE, transition(SENDING_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_IDLE_NODE, transition(IDLE_NODE, 0));
     map.put(TO_NODE_WAITING_PROVIDER_RESPONSE, transition(NODE_WAITING_PROVIDER_RESPONSE, RW));
+    return map;
+  }
+
+  @Override
+  protected CollectionMap<ClassState, ClassState> createAllowedTransitionsMap()
+  {
+    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap(ClassState.class);
+    map.addValues(WAITING_INITIAL_NODE_REQUEST, WAITING_INITIAL_NODE_REQUEST, SENDING_INITIAL_NODE_RESPONSE);
+    map.addValues(SENDING_INITIAL_NODE_RESPONSE, SENDING_INITIAL_NODE_RESPONSE, WAITING_NODE_REQUEST);
+    map.addValues(WAITING_NODE_REQUEST, WAITING_NODE_REQUEST, IDLE_NODE, SENDING_NODE_RESPONSE);
+    map.addValues(IDLE_NODE, NODE_WAITING_PROVIDER_RESPONSE);
+    map.addValues(NODE_WAITING_PROVIDER_RESPONSE, IDLE_NODE, SENDING_NODE_RESPONSE);
+    map.addValues(SENDING_NODE_RESPONSE, SENDING_NODE_RESPONSE, WAITING_NODE_REQUEST);
     return map;
   }
 }

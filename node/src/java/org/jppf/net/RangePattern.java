@@ -19,7 +19,7 @@
 package org.jppf.net;
 
 import static org.jppf.net.PatternConfiguration.*;
-import static org.jppf.utils.StringUtils.buildString;
+import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 
@@ -77,7 +77,7 @@ public class RangePattern
     }
     catch(IllegalArgumentException e)
     {
-      throw new IllegalArgumentException(buildString("error in pattern \"", source, "\" : ", e.getMessage()));
+      throw new IllegalArgumentException(build("error in pattern \"", source, "\" : ", e.getMessage()));
     }
   }
 
@@ -133,7 +133,7 @@ public class RangePattern
     if (src.indexOf('-') < 0) return new Range<Integer>(parseValue(src));
     String[] vals = MINUS_PATTERN.split(src);
     if ((vals == null) || vals.length == 0) return config.fullRange;
-    if (vals.length > 2) throw new IllegalArgumentException(buildString("invalid range pattern (pattern: ", src, ")"));
+    if (vals.length > 2) throw new IllegalArgumentException(build("invalid range pattern (pattern: ", src, ")"));
     int lower = 0;
     int upper = 0;
     if (vals.length == 1)
@@ -154,7 +154,7 @@ public class RangePattern
       lower = "".equals(vals[0]) ? config.minValue : parseValue(vals[0]);
       upper = "".equals(vals[1]) ? config.maxValue : parseValue(vals[1]);
     }
-    if (upper < lower) throw new IllegalArgumentException(buildString("lower bound must be <= upper bound (pattern: ", src, ")"));
+    if (upper < lower) throw new IllegalArgumentException(build("lower bound must be <= upper bound (pattern: ", src, ")"));
     return new Range<Integer>(lower, upper);
   }
 
@@ -170,12 +170,12 @@ public class RangePattern
     {
       int value = Integer.decode(config.valuePrefix + src.toLowerCase());
       if ((value < config.minValue) || (value > config.maxValue))
-        throw new IllegalArgumentException(buildString("value must be in [" , config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
+        throw new IllegalArgumentException(build("value must be in [" , config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
       return value;
     }
     catch(NumberFormatException e)
     {
-      throw new IllegalArgumentException(buildString("invalid value format (value: ", src, ")"));
+      throw new IllegalArgumentException(build("invalid value format (value: ", src, ")"));
     }
   }
 

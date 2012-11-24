@@ -180,9 +180,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception)
   {
@@ -353,11 +350,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Initialize the jmx connection using the specified jmx id.
    */
-  public void initializeJmxConnection()
-  {
+  public void initializeJmxConnection() {
     JPPFManagementInfo info = getManagementInfo();
-    if(info == null)
-      jmxConnection = null;
+    if (info == null) jmxConnection = null;
     else {
       jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
       jmxConnection.connect();
@@ -400,16 +395,14 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
         if(isDone()) return false;
         if(isCancelled()) return true;
-        else {
-          bundle.cancel();
-          try {
-            cancelJob(bundle.getClientJob().getUuid(), false);
-          } catch (Exception e) {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-            else log.warn(ExceptionUtils.getMessage(e));
-          } finally {
-            return super.cancel(false);
-          }
+        bundle.cancel();
+        try {
+          cancelJob(bundle.getClientJob().getUuid(), false);
+        } catch (Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(ExceptionUtils.getMessage(e));
+        } finally {
+          return super.cancel(false);
         }
       }
     };

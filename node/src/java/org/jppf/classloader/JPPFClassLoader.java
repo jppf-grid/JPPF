@@ -280,6 +280,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     resource.setRequestUuid(requestUuid);
 
     Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
+    //Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource, this);
     resource = f.get();
     Throwable t = ((ResourceFuture) f).getThrowable();
     if (t != null)

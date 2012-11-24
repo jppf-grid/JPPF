@@ -76,18 +76,12 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     if (traceEnabled) log.trace("created " + this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public NioContext getContext()
   {
     return getChannel();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getKeyOps()
   {
@@ -97,9 +91,6 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setKeyOps(final int keyOps)
   {
@@ -107,13 +98,10 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     {
       this.keyOps = keyOps;
       if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+      if (selector != null) selector.wakeUp();
     }
-    if (getSelector() != null) getSelector().wakeUp();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getReadyOps()
   {
@@ -133,8 +121,20 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     {
       this.readyOps = readyOps;
       if (traceEnabled) log.debug("id=" + id + ", readyOps=" + readyOps + ", keyOps=" + keyOps);
+      if (selector != null) selector.wakeUp();
     }
-    if (getSelector() != null) getSelector().wakeUp();
+  }
+
+  /**
+   * Fetermine whether this channel can be selected by its selector.
+   * @return <code>true</code> if the channel can be selected, <code>false</code> otherwise.
+   */
+  public boolean isSelectable()
+  {
+    synchronized(opsLock)
+    {
+      return (readyOps & keyOps) != 0;
+    }
   }
 
   /**
@@ -158,8 +158,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     synchronized(nodeLock)
     {
       this.nodeResource = resource;
+      nodeLock.wakeUp();
     }
-    nodeLock.wakeUp();
   }
 
   /**
@@ -183,8 +183,8 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     synchronized(serverLock)
     {
       this.serverResource = serverResource;
+      serverLock.wakeUp();
     }
-    serverLock.wakeUp();
   }
 
 
@@ -222,5 +222,21 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   public boolean isLocal()
   {
     return true;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(1000);
+    sb.append(getClass().getSimpleName());
+    sb.append('[');
+    sb.append(getStringId());
+    sb.append(", readyOps=").append(getReadyOps());
+    sb.append(", keyOps=").append(getKeyOps());
+    sb.append(", serverResource=").append(serverResource);
+    sb.append(", nodeResource=").append(serverResource);
+    sb.append(", context=").append(getContext());
+    sb.append(']');
+    return sb.toString();
   }
 }

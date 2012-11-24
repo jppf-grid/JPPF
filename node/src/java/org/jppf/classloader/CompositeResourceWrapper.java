@@ -101,4 +101,17 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   {
     return futureMap;
   }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    synchronized (getMonitor()) {
+      sb.append("resources=").append(getData(RESOURCES_KEY));
+    }
+    sb.append(']');
+    return sb.toString();
+  }
 }

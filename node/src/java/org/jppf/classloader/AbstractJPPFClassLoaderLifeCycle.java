@@ -17,6 +17,8 @@
  */
 package org.jppf.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
@@ -131,7 +133,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     JPPFResourceWrapper resource = null;
     try
     {
-      if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + ']');
+      if (debugEnabled) log.debug(build("loading remote definition for resource [", map.get("name"), "]"));
       resource = loadResourceData0(map, asResource);
     }
     catch(IOException e)
@@ -159,9 +161,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected  JPPFResourceWrapper loadResourceData0(final Map<String, Object> map, final boolean asResource) throws Exception
   {
-    if (debugEnabled) log.debug("loading remote definition for resource [" + map.get("name") + "], requestUuid = " + requestUuid);
+    if (debugEnabled) log.debug(build("loading remote definition for resource [", map.get("name"), "], requestUuid = ", requestUuid));
     JPPFResourceWrapper resource = loadRemoteData(map, false);
-    if (debugEnabled) log.debug("remote definition for resource [" + map.get("name") + "] "+ (resource.getDefinition()==null ? "not " : "") + "found");
+    if (debugEnabled) log.debug(build("remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
     return resource;
   }
 
@@ -267,14 +269,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         List<String> locationsList = cache.getResourcesLocations(name);
         if ((locationsList != null) && !locationsList.isEmpty()) {
           results[i] = cache.getURLFromPath(locationsList.get(0));
-          if (debugEnabled) log.debug("resource " + name + " found in local cache as " + results[i]);
+          if (debugEnabled) log.debug(build("resource ", name, " found in local cache as ", results[i]));
         } else {
           URL url = super.findResource(names[i]);
           if (url != null) {
             results[i] = url;
-            if (debugEnabled) log.debug("resource " + name + " found in URL classpath as " + results[i]);
+            if (debugEnabled) log.debug(build("resource ", name, " found in URL classpath as ", results[i]));
           } else {
-            if (debugEnabled) log.debug("resource " + name + " not found locally");
+            if (debugEnabled) log.debug(build("resource ", name, " not found locally"));
             indices.add(i);
           }
         }
@@ -294,12 +296,12 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         String name = names[index];
         List<byte[]> dataList = dataMap.get(name);
         boolean found = (dataList != null) && !dataList.isEmpty();
-        if (debugEnabled && !found) log.debug("resource [" + name + "] not found remotely");
+        if (debugEnabled && !found) log.debug(build("resource [", name, "] not found remotely"));
         if (found) {
           cache.registerResources(name, dataList);
           URL url = cache.getResourceURL(name);
           results[index] = url;
-          if (debugEnabled) log.debug("resource [" + name + "] found remotely as " + url);
+          if (debugEnabled) log.debug(build("resource [", name, "] found remotely as ", url));
         }
         else if (resource != null) nfCache.add(name);
       }

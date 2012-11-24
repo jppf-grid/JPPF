@@ -18,6 +18,8 @@
 
 package org.jppf.client.balancer.utils;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,7 +30,6 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -440,12 +441,7 @@ public abstract class AbstractClientJob
    */
   public boolean acceptsChannel(final ExecutorChannel channel)
   {
-    if (debugEnabled)
-    {
-      //String s = StringUtils.buildString("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired(), ", executionPolicy=", clientSla.getExecutionPolicy());
-      String s = StringUtils.buildString("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired());
-      log.debug(s);
-    }
+    if (debugEnabled) log.debug(build("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired()));
     if (isPending()) return false;
     if (isJobExpired()) return false;
     if (channelsCount.get() >= clientSla.getMaxChannels()) return false;

@@ -86,76 +86,55 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   @Test(timeout=5000)
   public void testSubmitCallableWithTimeout() throws Exception
   {
-    try
-    {
-      client.setLocalExecutionEnabled(false);
-      executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
-      executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(1500L));
-      Callable<String> task = new MyCallableTask(TASK_DURATION);
-      Future<String> future = executor.submit(task);
-      String s = future.get();
-      assertTrue(future.isDone());
-      assertFalse(future.isCancelled());
-      assertNotNull(s);
-      assertEquals(TIMEOUT_MESSAGE, s);
-    }
-    finally
-    {
-      executor.resetConfiguration();
-    }
+    client.setLocalExecutionEnabled(false);
+    executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
+    executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(1500L));
+    Callable<String> task = new MyCallableTask(TASK_DURATION);
+    Future<String> future = executor.submit(task);
+    String s = future.get();
+    assertTrue(future.isDone());
+    assertFalse(future.isCancelled());
+    assertNotNull(s);
+    assertEquals(TIMEOUT_MESSAGE, s);
   }
 
   /**
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=15000)
   public void testSubmitCallableWithJobTimeout() throws Exception
   {
-    try
-    {
-      client.setLocalExecutionEnabled(false);
-      executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
-      executor.getConfiguration().getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
-      Callable<String> task = new MyCallableTask(TASK_DURATION);
-      Future<String> future = executor.submit(task);
-      String s = future.get();
-      assertTrue(future.isDone());
-      assertFalse(future.isCancelled());
-      assertNull(s);
-    }
-    finally
-    {
-      executor.resetConfiguration();
-    }
+    client.setLocalExecutionEnabled(false);
+    executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
+    executor.getConfiguration().getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
+    Callable<String> task = new MyCallableTask(TASK_DURATION);
+    Future<String> future = executor.submit(task);
+    String s = future.get();
+    assertTrue(future.isDone());
+    assertFalse(future.isCancelled());
+    assertNull(s);
   }
 
   /**
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testSubmitWithDataProvider() throws Exception
   {
-    try
-    {
-      client.setLocalExecutionEnabled(false);
-      DataProvider dp = new MemoryMapDataProvider();
-      String key = "myKey";
-      String value = "myValue";
-      dp.setValue(key, value);
-      executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
-      MyTask task = new MyTask(key);
-      Future<String> future = executor.submit(task);
-      String s = future.get();
-      assertEquals(value, s);
-      assertTrue(future.isDone());
-      assertFalse(future.isCancelled());
-    }
-    finally
-    {
-      executor.resetConfiguration();
-    }
+    client.setLocalExecutionEnabled(false);
+    DataProvider dp = new MemoryMapDataProvider();
+    String key = "myKey";
+    String value = "myValue";
+    dp.setValue(key, value);
+    executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
+    MyTask task = new MyTask(key);
+    Future<String> future = executor.submit(task);
+    String s = future.get();
+    assertEquals(value, s);
+    assertTrue(future.isDone());
+    assertFalse(future.isCancelled());
   }
 
   /**
@@ -193,34 +172,21 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   @Test(timeout=5000)
   public void testSubmitWithClientExecutionPolicy() throws Exception
   {
-    boolean local = client.isLocalExecutionEnabled();
-    int batchSize = executor.getBatchSize();
-    long batchTimeout = executor.getBatchTimeout();
-    try
+    client.setLocalExecutionEnabled(true);
+    executor.setBatchTimeout(100L);
+    executor.setBatchSize(2);
+    executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
+    int nbTasks = 10;
+    List<Future<String>> futures = new ArrayList<Future<String>>();
+    for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
+    assertEquals(nbTasks, futures.size());
+    for (Future<String> future: futures)
     {
-      client.setLocalExecutionEnabled(true);
-      executor.setBatchTimeout(100L);
-      executor.setBatchSize(2);
-      executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
-      int nbTasks = 10;
-      List<Future<String>> futures = new ArrayList<Future<String>>();
-      for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
-      assertEquals(nbTasks, futures.size());
-      for (Future<String> future: futures)
-      {
-        String s = future.get();
-        assertTrue(future.isDone());
-        assertFalse(future.isCancelled());
-        assertNotNull(s);
-        assertEquals("local_client", s);
-      }
-    }
-    finally
-    {
-      executor.setBatchSize(batchSize);
-      executor.setBatchTimeout(batchTimeout);
-      executor.resetConfiguration();
-      client.setLocalExecutionEnabled(local);
+      String s = future.get();
+      assertTrue(future.isDone());
+      assertFalse(future.isCancelled());
+      assertNotNull(s);
+      assertEquals("local_client", s);
     }
   }
 
@@ -228,40 +194,29 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testSubmitWithJobListener() throws Exception
   {
-    int batchSize = executor.getBatchSize();
-    long batchTimeout = executor.getBatchTimeout();
-    try
+    CountingJobListener listener = new CountingJobListener();
+    executor.setBatchTimeout(1000L);
+    executor.setBatchSize(10);
+    executor.getConfiguration().getJobConfiguration().addJobListener(listener);
+    int nbTasks = 20;
+    List<Future<String>> futures = new ArrayList<Future<String>>();
+    for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
+    assertEquals(nbTasks, futures.size());
+    for (Future<String> future: futures)
     {
-      CountingJobListener listener = new CountingJobListener();
-      executor.setBatchTimeout(1000L);
-      executor.setBatchSize(10);
-      executor.getConfiguration().getJobConfiguration().addJobListener(listener);
-      int nbTasks = 20;
-      List<Future<String>> futures = new ArrayList<Future<String>>();
-      for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
-      assertEquals(nbTasks, futures.size());
-      for (Future<String> future: futures)
-      {
-        String s = future.get();
-        assertTrue(future.isDone());
-        assertFalse(future.isCancelled());
-      }
-      Thread.sleep(500L);
-      // bath size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
-      assertEquals(2, listener.startedCount.get());
-      assertEquals(2, listener.endedCount.get());
-      assertEquals(2, listener.dispatchedCount.get());
-      assertEquals(2, listener.returnedCount.get());
+      String s = future.get();
+      assertTrue(future.isDone());
+      assertFalse(future.isCancelled());
     }
-    finally
-    {
-      executor.setBatchSize(batchSize);
-      executor.setBatchTimeout(batchTimeout);
-      executor.resetConfiguration();
-    }
+    Thread.sleep(500L);
+    // bath size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
+    assertEquals(2, listener.startedCount.get());
+    assertEquals(2, listener.endedCount.get());
+    assertEquals(2, listener.dispatchedCount.get());
+    assertEquals(2, listener.returnedCount.get());
   }
 
   /**

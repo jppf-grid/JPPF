@@ -41,6 +41,10 @@ public class JPPFResourceWrapper implements Serializable
    */
   private static final AtomicLong CALLABLE_ID = new AtomicLong(0L);
   /**
+   * Used to generate locally unique ids for the remote-computed callables.
+   */
+  private static final long NO_CALLABLE_ID = -1L;
+  /**
    * Constant for an empty <code>JPPFResourceWrapper</code> array.
    */
   public static final JPPFResourceWrapper[] EMPTY_RESOURCE_WRAPPER_ARRAY = new JPPFResourceWrapper[0];
@@ -104,6 +108,10 @@ public class JPPFResourceWrapper implements Serializable
    * Contains data about the kind of lookup that is to be done.
    */
   private final Map<String, Object> dataMap = new HashMap<String, Object>();
+  /**
+   * Performance optimization.
+   */
+  private transient JPPFResourceWrapper[] resources = null;
 
   /**
    * Add a uuid to the uuid path of this resource wrapper.
@@ -284,11 +292,12 @@ public class JPPFResourceWrapper implements Serializable
 
   /**
    * Get the ID of an eventual remote-computed callable.
-   * @return the id as a {@link Long}.
+   * @return the id as a long.
    */
-  protected Long getCallableID()
+  protected long getCallableID()
   {
-    return (Long) getData("callable.id");
+    Long id = (Long) getData("callable.id");
+    return id == null ? NO_CALLABLE_ID : id;
   }
 
   /**
@@ -334,7 +343,8 @@ public class JPPFResourceWrapper implements Serializable
    * @return a array of {@link JPPFResourceWrapper} instances.
    */
   public JPPFResourceWrapper[] getResources() {
-    return new JPPFResourceWrapper[] { this };
+    if (resources == null) resources = new JPPFResourceWrapper[] { this };
+    return resources;
   }
 
   /**
@@ -352,10 +362,11 @@ public class JPPFResourceWrapper implements Serializable
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("dynamic=").append(dynamic);
     sb.append(", asResource=").append(asResource);
+    sb.append(", state=").append(state);
+    byte[] callable = getCallable();
     synchronized (dataMap) {
-      sb.append(", state=").append(state);
-    //sb.append(", name=").append(dataMap.get("name"));
-      sb.append(", data=").append(dataMap);
+      if (callable == null) sb.append(", data=").append(dataMap);
+      else sb.append(", callable=").append(callable.toString()).append(", callableID=").append(getCallableID());
     }
     sb.append(']');
     return sb.toString();
@@ -366,7 +377,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   void preProcess()
   {
-    if ((getCallable() != null) && (getCallableID() == null)) setData("callable.id", CALLABLE_ID.incrementAndGet());
+    if ((getCallable() != null) && (getCallableID() == NO_CALLABLE_ID)) setData("callable.id", CALLABLE_ID.incrementAndGet());
   }
 
   @Override
@@ -374,10 +385,7 @@ public class JPPFResourceWrapper implements Serializable
   {
     if ((obj == null) || (obj.getClass() != this.getClass())) return false;
     JPPFResourceWrapper other = (JPPFResourceWrapper) obj;
-    Long id = getCallableID();
-    Long id2 = other.getCallableID();
-    if (((id == null) && (id2 != null)) || ((id != null) && (id2 == null))) return false;
-    return (dynamic == other.dynamic) && uuidPath.equals(other.uuidPath) && ((id == null) || id.equals(id2)) && getName().equals(other.getName());
+    return (dynamic == other.dynamic) && uuidPath.equals(other.uuidPath) && (getCallableID() == other.getCallableID()) && getName().equals(other.getName());
   }
 
   @Override
