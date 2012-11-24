@@ -163,7 +163,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
           }
         }, new IPFilter(props), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
-        //waitForPools(false);
         initPeers = false;
       }
       else
@@ -181,7 +180,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
         initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
       }
 
-      if(initPeers)
+      if (initPeers)
       {
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name))
@@ -199,12 +198,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
             newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
           }
         }
-      }
-
-      if(receiverThread != null)
-      {
-        new Thread(receiverThread, "PeerDiscoveryThread").start();
-        //waitForPools(true);
       }
     }
     catch(Exception e)
