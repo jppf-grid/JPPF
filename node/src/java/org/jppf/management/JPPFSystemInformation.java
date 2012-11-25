@@ -59,7 +59,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    */
   private final boolean local;
   /**
-   * If <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
+   * If <code>true</code>, then the name resolution for <code>InetAddress</code>es should occur immediately,
    */
   private final boolean resolveInetAddressesNow;
 
