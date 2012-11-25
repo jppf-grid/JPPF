@@ -18,13 +18,8 @@
 
 package org.jppf.test.setup;
 
-import java.io.*;
-import java.util.*;
-
-import javax.management.remote.JMXServiceURL;
-
 import org.jppf.client.*;
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.JPPFConfiguration;
@@ -56,9 +51,9 @@ public class Setup
    */
   protected final ScenarioConfiguration config;
   /**
-   * Cache of <i>distinct</i> driver JMX connections. There is one entry per driver to which the client is connected.
+   * Manages the JMX connections to ddrivers and nodes.
    */
-  private final Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<JMXServiceURL, JMXDriverConnectionWrapper>();
+  private JMXHandler jmxHandler = null;
 
   /**
    * Initialize this tests etup with the psecified scenario configuration.
@@ -76,8 +71,7 @@ public class Setup
    */
   public DriverJobManagementMBean getJobManagementProxy() throws Exception
   {
-    JMXDriverConnectionWrapper driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
+    JMXDriverConnectionWrapper driver = getDriverManagementProxy();
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
 
@@ -117,7 +111,7 @@ public class Setup
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
     }
     client = createClient(null, true);
-    checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+    jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     return client;
   }
 
@@ -134,6 +128,7 @@ public class Setup
     client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
     //System.out.println("waiting for available client connection");
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
+    jmxHandler = new JMXHandler(client);
     return client;
   }
 
@@ -152,53 +147,6 @@ public class Setup
     System.gc();
     stopProcesses();
     Runtime.getRuntime().removeShutdownHook(shutdownHook);
-  }
-
-  /**
-   * Check that the driver and all nodes have been started and are accessible.
-   * @param nbDrivers the number of drivers that were started.
-   * @param nbNodes the number of nodes that were started.
-   * @throws Exception if any error occurs.
-   */
-  public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
-  {
-    if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<Integer, JPPFClientConnection>();
-    boolean allConnected = false;
-    while (!allConnected)
-    {
-      List<JPPFClientConnection> list = client.getAllConnections();
-      if (list != null)
-      {
-        for (JPPFClientConnection c: list)
-        {
-          if (!connectionMap.containsKey(c.getPort())) connectionMap.put(c.getPort(), c);
-        }
-      }
-      if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
-      else allConnected = true;
-    }
-    for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
-    {
-      JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) entry.getValue();
-      JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
-      if (!wrapperMap.containsKey(wrapper.getURL()))
-      {
-        while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
-        wrapperMap.put(wrapper.getURL(), wrapper);
-      }
-    }
-    int sum = 0;
-    while (sum < nbNodes)
-    {
-      sum = 0;
-      for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet())
-      {
-        Integer n = entry.getValue().nbNodes();
-        if (n != null) sum += n;
-        else break;
-      }
-    }
   }
 
   /**
@@ -270,55 +218,11 @@ public class Setup
   }
 
   /**
-   * Gets the client confiugration from the scenario configuration.
+   * Get the object which manages the JMX connections to ddrivers and nodes.
+   * @return a {@link JMXHandler} instance.
    */
-  private class ClientConfigSource implements JPPFConfiguration.ConfigurationSource
+  public JMXHandler getJmxHandler()
   {
-    @Override
-    public InputStream getPropertyStream() throws IOException
-    {
-      File configDir = config.getConfigDir();
-      return null;
-    }
-  }
-
-  /**
-   * 
-   * @param <T> .
-   * @param <U> .
-   * @param driverOp .
-   * @param nodeOp .
-   * @return .
-   * @throws Exception if any error occurs.
-   */
-  public <T, U> Map<T, List<U>> performJmxOperations(final JmxAwareCallable<T> driverOp, final JmxAwareCallable<U> nodeOp) throws Exception
-  {
-    Map<T, List<U>> map = new HashMap<T, List<U>>();
-    for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet())
-    {
-      List<U> list = new ArrayList<U>();
-      driverOp.setJmx(entry.getValue());
-      T t = driverOp.call();
-      map.put(t, list);
-      Collection<JPPFManagementInfo> coll = entry.getValue().nodesInformation();
-      for (JPPFManagementInfo info: coll)
-      {
-        if (info.isDriver()) continue; // skip peer driver
-        JMXNodeConnectionWrapper node = null;
-        try
-        {
-          node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
-          node.connect();
-          while (!node.isConnected()) Thread.sleep(10L);
-          nodeOp.setJmx(node);
-          list.add(nodeOp.call());
-        }
-        finally
-        {
-          if ((node != null) && node.isConnected()) node.close();
-        }
-      }
-    }
-    return map;
+    return jmxHandler;
   }
 }

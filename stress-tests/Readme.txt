@@ -78,7 +78,8 @@ The predefined properties are the following:
 - jppf.scenario.nbDrivers: number of drivers to start, must be >= 0, defaults to 1
 - jppf.scenario.runner.class: fully qualified name of a class implementing org.jppf.test.scenario.ScenarioRunner
 - jppf.scenario.diagnostics.output.file = the output file where the diagnostics for all nodes and drivers are written.
-  value can be "out", "err" or any valid file path. Default is "out" (printed to the console as with System.out)
+  value can be "none", "out", "err" or any valid file path. Default is "out" (printed to the console as with System.out)
+  "none" means that diagnostics are not fetched or printed
 
 The predefined values are accessible directly via an API, provided by the interface "org.jppf.test.scenario..ScenarioConfiguration".
 The custom values can be obtained from the TypedProperties object resulting from ScenarioConfiguration.getProperties().

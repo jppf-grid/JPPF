@@ -132,26 +132,27 @@ public class Scenario
    */
   private void printDiagnostics() throws Exception
   {
-    PrintStream out = null;
     String fileName = configuration.getDiagnosticsOutputFilename();
+    if ("none".equals(fileName)) return;
+    PrintStream out = null;
     if ("out".equals(fileName)) out = System.out;
     else if ("err".equals(fileName)) out = System.err;
     else out = new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName)));
     try
     {
-      Map<DiagnosticsResult, List<DiagnosticsResult>> map =
-        setup.performJmxOperations(new DiagnosticsGrabber(true), new DiagnosticsGrabber(false));
-      for (Map.Entry<DiagnosticsResult, List<DiagnosticsResult>> entry: map.entrySet())
+      Map<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> map =
+        setup.getJmxHandler().performJmxOperations(new DiagnosticsGrabber(true), new DiagnosticsGrabber(false));
+      for (Map.Entry<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> entry: map.entrySet())
       {
         out.println("---------------------------------------------------------");
         out.println("results for driver " + entry.getKey().getJmxId());
-        out.println("before GC: " + entry.getKey().getDiagnosticsInfo());
-        out.println("after GC: " + entry.getKey().getDiagnosticsInfoAfterGC());
-        for (DiagnosticsResult dr: entry.getValue())
+        out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo());
+        out.println("after GC: " + entry.getKey().getResult().getDiagnosticsInfoAfterGC());
+        for (JMXResult<DiagnosticsResult> dr: entry.getValue())
         {
           out.println("results for node " + dr.getJmxId());
-          out.println("before GC: " + dr.getDiagnosticsInfo());
-          out.println("after GC: " + dr.getDiagnosticsInfoAfterGC());
+          out.println("before GC: " + dr.getResult().getDiagnosticsInfo());
+          out.println("after GC: " + dr.getResult().getDiagnosticsInfoAfterGC());
         }
       }
     }
@@ -208,13 +209,13 @@ public class Scenario
     }
 
     @Override
-    public DiagnosticsResult call() throws Exception
+    public JMXResult<DiagnosticsResult> call() throws Exception
     {
       String name = driver ? DiagnosticsMBean.MBEAN_NAME_DRIVER : DiagnosticsMBean.MBEAN_NAME_NODE;
       DiagnosticsInfo info = (DiagnosticsInfo) getJmx().getAttribute(name, "DiagnosticsInfo");
       getJmx().invoke(name, "gc", (Object[]) null, (String[]) null);
       DiagnosticsInfo info2 = (DiagnosticsInfo) getJmx().getAttribute(name, "DiagnosticsInfo");
-      return new DiagnosticsResult(getJmx().getURL().toString(), info, info2);
+      return new JMXResult<DiagnosticsResult>(getJmx().getURL().toString(), new DiagnosticsResult(info, info2));
     }
   }
 }

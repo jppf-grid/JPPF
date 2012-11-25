@@ -18,37 +18,40 @@
 
 package org.jppf.test.setup;
 
-import java.util.concurrent.Callable;
-
-import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.utils.Pair;
 
 /**
- * A {@link Callable} implementation which holds a reference to a {@link JMXConnectionWrapper}.
- * @param <V> the type of results returned by this callable.
+ * Result generated when querying nodes and drivers for diagnostics via JMX.
+ * @param <V> the type of results.
  * @author Laurent Cohen
  */
-public abstract class JmxAwareCallable<V> implements Callable<JMXResult<V>>
+public class JMXResult<V> extends Pair<String, V>
 {
   /**
-   * The JMX connection wrapper.
+   * Intiialize this result with the specified jmx id and diagnostics information.
+   * @param jmxId the id of the jmx connection wrapper.
+   * @param result the diagnostics information.
    */
-  protected JMXConnectionWrapper jmx = null;
-
-  /**
-   * Get the JMX connection wrapper.
-   * @return a {@link JMXConnectionWrapper} instance.
-   */
-  public JMXConnectionWrapper getJmx()
+  public JMXResult(final String jmxId, final V result)
   {
-    return jmx;
+    super(jmxId, result);
   }
 
   /**
-   * Set the JMX connection wrapper.
-   * @param jmx a {@link JMXConnectionWrapper} instance.
+   * Get the id of the jmx connection wrapper.
+   * @return the id as a string.
    */
-  public void setJmx(final JMXConnectionWrapper jmx)
+  public String getJmxId()
   {
-    this.jmx = jmx;
+    return first();
+  }
+
+  /**
+   * Get the diagnostics information.
+   * @return a {@link DiagnosticsInfo} instance.
+   */
+  public V getResult()
+  {
+    return second();
   }
 }

@@ -25,32 +25,16 @@ import org.jppf.utils.Pair;
  * Result generated when querying nodes and drivers for diagnostics via JMX.
  * @author Laurent Cohen
  */
-public class DiagnosticsResult extends Pair<String, DiagnosticsInfo>
+public class DiagnosticsResult extends Pair<DiagnosticsInfo, DiagnosticsInfo>
 {
   /**
-   * The diagnostics information after at least one GC has been performed.
-   */
-  private final DiagnosticsInfo diagnosticsInfoAfterGC;
-
-  /**
    * Intiialize this result with the specified jmx id and diagnostics information.
-   * @param jmxId the id of the jmx connection wrapper.
-   * @param diagnosticsInfoAfterGC the diagnostics information after at least one GC has been performed.
-   * @param info the diagnostics information.
+   * @param beforeGC the diagnostics before GC.
+   * @param afterGC the diagnostics after GC.
    */
-  public DiagnosticsResult(final String jmxId, final DiagnosticsInfo info, final DiagnosticsInfo diagnosticsInfoAfterGC)
+  public DiagnosticsResult(final DiagnosticsInfo beforeGC, final DiagnosticsInfo afterGC)
   {
-    super(jmxId, info);
-    this.diagnosticsInfoAfterGC = diagnosticsInfoAfterGC;
-  }
-
-  /**
-   * Get the id of the jmx connection wrapper.
-   * @return the id as a string.
-   */
-  public String getJmxId()
-  {
-    return first();
+    super(beforeGC, afterGC);
   }
 
   /**
@@ -59,7 +43,7 @@ public class DiagnosticsResult extends Pair<String, DiagnosticsInfo>
    */
   public DiagnosticsInfo getDiagnosticsInfo()
   {
-    return second();
+    return first();
   }
 
   /**
@@ -68,6 +52,6 @@ public class DiagnosticsResult extends Pair<String, DiagnosticsInfo>
    */
   public DiagnosticsInfo getDiagnosticsInfoAfterGC()
   {
-    return diagnosticsInfoAfterGC;
+    return second();
   }
 }
