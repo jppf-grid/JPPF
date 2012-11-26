@@ -49,7 +49,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   /**
    * The server for which this transition manager is intended.
    */
-  private NioServer<S, T> server = null;
+  private final NioServer<S, T> server;
 
   /**
    * Initialize this transition manager with the specified server and sequential flag.

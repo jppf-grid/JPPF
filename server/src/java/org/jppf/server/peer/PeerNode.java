@@ -171,7 +171,6 @@ class PeerNode extends AbstractCommonNode
         bundle.setUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
-        bundle.setParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM, uuid);
         bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
       }
       if (bundleWrapper.getTaskCount() > 0)

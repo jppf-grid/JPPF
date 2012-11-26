@@ -188,4 +188,19 @@ public class JPPFUuid implements Serializable
     */
     return new Random(System.nanoTime());
   }
+
+  /**
+   * Create a UUID in a standard format as described in {@link java.util.UUID#toString()}.
+   * @return a normalized UUID reprsented as a string.
+   */
+  public static String normalUUID()
+  {
+    //xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    StringBuilder sb = new StringBuilder(new JPPFUuid(HEXADECIMAL_UPPER_CHAR, 32).toString());
+    sb.insert(20, '-');
+    sb.insert(16, '-');
+    sb.insert(12, '-');
+    sb.insert(8, '-');
+    return sb.toString();
+  }
 }
