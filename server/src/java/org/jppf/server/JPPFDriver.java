@@ -49,6 +49,7 @@ import org.slf4j.*;
  * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server
  * to handle requests to and from remote class loaders.
  * @author Laurent Cohen
+ * @author Lane Schwartz (dynamically allocated server port) 
  */
 public class JPPFDriver
 {
@@ -174,11 +175,11 @@ public class JPPFDriver
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this), null, null);
-    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this), null, null);
-    clientNioServer = startServer(recoveryServer, new ClientNioServer(this), null, null);
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue), null, null);
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts), info.serverPorts, info.sslServerPorts);
+    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this));
+    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this));
+    clientNioServer = startServer(recoveryServer, new ClientNioServer(this));
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue));
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts));
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
@@ -423,19 +424,17 @@ public class JPPFDriver
    * Start server, register it to recovery server if requested and print initialization message.
    * @param recoveryServer Recovery server for nioServers that implements ReaperListener
    * @param nioServer starting nio server
-   * @param ports ports for initialization message
-   * @param sslPorts SSL ports for initialization message.
    * @param <T> the type of the server to start
    * @return started nioServer
    */
-  private static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer, final int[] ports, final int[] sslPorts) {
+  private static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer) {
     if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if(recoveryServer != null && nioServer instanceof ReaperListener) {
       Reaper reaper = recoveryServer.getReaper();
       reaper.addReaperListener((ReaperListener) nioServer);
     }
     nioServer.start();
-    printInitializedMessage(ports, sslPorts, nioServer.getName());
+    printInitializedMessage(nioServer.getPorts(), nioServer.getSSLPorts(), nioServer.getName());
     return nioServer;
   }
 

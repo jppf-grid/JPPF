@@ -76,18 +76,12 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     engine.setSSLParameters(params);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NioServerFactory<AcceptorState, AcceptorTransition> createFactory()
   {
     return new AcceptorServerFactory(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void postAccept(final ChannelWrapper<?> channel)
   {
@@ -127,9 +121,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
   {

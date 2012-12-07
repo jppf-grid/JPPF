@@ -99,6 +99,7 @@ class WaitInitialBundleState extends NodeServerState
           byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
           if(channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
           JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, type, ssl);
+          log.info("setting " + info);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           context.setManagementInfo(info);
         }
