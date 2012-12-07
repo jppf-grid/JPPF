@@ -26,25 +26,9 @@ public interface JPPFDistributedJob
 {
   /**
    * Get the user-defined display name for this job. This is the name displayed in the administration console.
-   * @return the id as a string.
-   * @deprecated use {@link #getName() getName()} instead.
-   * @exclude
-   */
-  String getId();
-
-  /**
-   * Get the user-defined display name for this job. This is the name displayed in the administration console.
    * @return the name as a string.
    */
   String getName();
-
-  /**
-   * Get the universal unique id for this job.
-   * @return the uuid as a string.
-   * @deprecated use {@link #getUuid()} instead.
-   * @exclude
-   */
-  String getJobUuid();
 
   /**
    * Get the universal unique id for this job.

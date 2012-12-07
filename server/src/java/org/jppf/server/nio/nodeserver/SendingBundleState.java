@@ -93,7 +93,7 @@ class SendingBundleState extends NodeServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire bundle" + context.getBundle().getJob() + " to node " + channel);
+      if (debugEnabled) log.debug("sent entire bundle " + context.getBundle().getJob() + " to node " + channel);
       context.setMessage(null);
       //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
       return TO_WAITING;

@@ -354,8 +354,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     JPPFManagementInfo info = getManagementInfo();
     if (info == null) jmxConnection = null;
     else {
-      jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
-      jmxConnection.connect();
+      if ((info.getHost() != null) && (info.getPort() > 0)) {
+        jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
+        jmxConnection.connect();
+      }
+      else jmxConnection = null;
     }
   }
 
@@ -388,7 +391,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public JPPFFuture<?> submit(final ServerTaskBundleNode bundleWrapper) {
+  public JPPFFuture<?> submit(final ServerTaskBundleNode nodeBundle) {
     JPPFFuture<?> future = new JPPFFutureTask<Object>(RUNNABLE, null) {
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning) {
@@ -397,6 +400,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         if(isCancelled()) return true;
         bundle.cancel();
         try {
+          nodeBundle.cancel();
           cancelJob(bundle.getClientJob().getUuid(), false);
         } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
@@ -406,7 +410,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         }
       }
     };
-    setBundle(bundleWrapper);
+    setBundle(nodeBundle);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING);
 //    bundleWrapper.jobDispatched(getChannel(), future);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();

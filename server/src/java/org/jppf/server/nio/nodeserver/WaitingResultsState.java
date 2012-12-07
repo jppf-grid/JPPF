@@ -59,62 +59,47 @@ class WaitingResultsState extends NodeServerState
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null) context.setMessage(context.newMessage());
-    if (context.readMessage(channel))
-    {
+    if (context.readMessage(channel)) {
       Exception exception = null;
-      ServerTaskBundleNode bundleWrapper = context.getBundle();
+      ServerTaskBundleNode nodeBundle = context.getBundle();
       boolean requeue = false;
       try {
         ServerTaskBundleClient newBundleWrapper = context.deserializeBundle();
         JPPFTaskBundle newBundle = newBundleWrapper.getJob();
-        if (debugEnabled) log.debug("read bundle" + newBundle + " from node " + channel + " done");
+        if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + channel);
         // if an exception prevented the node from executing the tasks
         Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-        if (t != null)
-        {
+        if (t != null) {
           if (debugEnabled) log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
           exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-          bundleWrapper.resultsReceived(t);
-        }
-        else
-        {
-          bundleWrapper.resultsReceived(newBundleWrapper.getDataLocationList());
-          long elapsed = System.nanoTime() - bundleWrapper.getExecutionStartTime();
+          nodeBundle.resultsReceived(t);
+        } else {
+          if (debugEnabled) log.debug("*** bundle has " + newBundleWrapper.getDataLocationList().size() + " tasks");
+          nodeBundle.resultsReceived(newBundleWrapper.getDataLocationList());
+          long elapsed = System.nanoTime() - nodeBundle.getExecutionStartTime();
           server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
           context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
         }
         requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
         JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-        if (systemInfo != null)
-        {
+        if (systemInfo != null) {
           context.setNodeInfo(systemInfo, true);
           Bundler bundler = context.getBundler();
           if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
         }
       }
-      catch (Throwable t)
-      {
+      catch (Throwable t) {
         log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        bundleWrapper.resultsReceived(t);
-      }
-      finally 
-      {
-        bundleWrapper.taskCompleted(exception);
+        nodeBundle.resultsReceived(t);
+      } finally {
+        nodeBundle.taskCompleted(exception);
         context.setBundle(null);
       }
-      if (requeue)
-      {
-//        bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
-//        // why should it be suspended ?
-//        bundle.getSLA().setSuspended(newBundle.getSLA().isSuspended());
-//        context.resubmitBundle(bundleWrapper);
-        bundleWrapper.resubmit();
-      }
+      if (requeue) nodeBundle.resubmit();
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setMessage(null);
@@ -122,4 +107,61 @@ class WaitingResultsState extends NodeServerState
     }
     return TO_WAITING;
   }
+  /*
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+    if (context.getMessage() == null) context.setMessage(context.newMessage());
+    if (context.readMessage(channel)) {
+      Exception exception = null;
+      ServerTaskBundleNode nodeBundle = context.getBundle();
+      boolean requeue = nodeBundle.isRequeued();
+      //if (!nodeBundle.isCancelled() && !requeue) {
+      if (!nodeBundle.isCancelled()) {
+        try {
+          ServerTaskBundleClient newBundleWrapper = context.deserializeBundle();
+          JPPFTaskBundle newBundle = newBundleWrapper.getJob();
+          if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + channel);
+          // if an exception prevented the node from executing the tasks
+          Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+          if (t != null) {
+            if (debugEnabled) log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
+            exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+            nodeBundle.resultsReceived(t);
+          } else {
+            if (debugEnabled) log.debug("*** bundle has " + newBundleWrapper.getDataLocationList().size() + " tasks");
+            nodeBundle.resultsReceived(newBundleWrapper.getDataLocationList());
+            long elapsed = System.nanoTime() - nodeBundle.getExecutionStartTime();
+            server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
+            context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
+          }
+          //requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
+          JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+          if (systemInfo != null) {
+            context.setNodeInfo(systemInfo, true);
+            Bundler bundler = context.getBundler();
+            if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+          }
+        }
+        catch (Throwable t) {
+          log.error(t.getMessage(), t);
+          exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+          nodeBundle.resultsReceived(t);
+        } finally {
+          nodeBundle.taskCompleted(exception);
+          context.setBundle(null);
+        }
+      }
+      if (requeue) nodeBundle.resubmit();
+      // there is nothing left to do, so this instance will wait for a task bundle
+      // make sure the context is reset so as not to resubmit the last bundle executed by the node.
+      context.setBundle(null);
+      context.setMessage(null);
+      return TO_IDLE;
+    }
+    return TO_WAITING;
+  }
+  */
+
+  /*
+  */
 }

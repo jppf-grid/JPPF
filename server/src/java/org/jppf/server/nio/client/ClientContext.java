@@ -55,10 +55,15 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * List of completed bundles to send to the client.
    */
   protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<ServerTaskBundleClient>();
+  //protected final Queue<ServerTaskBundleClient> completedBundles = new ConcurrentLinkedQueue<ServerTaskBundleClient>();
   /**
    * The job as initially submitted by the client.
    */
   private ServerTaskBundleClient initialBundleWrapper;
+  /**
+   * The number of tasks remaining to send.
+   */
+  private int nbTasksToSend = 0;
   /**
    * Unique ID for the client.
    */
@@ -127,11 +132,11 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public ServerTaskBundleClient deserializeBundle() throws Exception
   {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
-      JPPFTaskBundle bundle = ((ClientMessage) message).getBundle();
-      if (locations.size() > 2)
-        return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
-       else
-        return new ServerTaskBundleClient(bundle, locations.get(1));
+    JPPFTaskBundle bundle = ((ClientMessage) message).getBundle();
+    if (locations.size() > 2)
+      return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
+    else
+      return new ServerTaskBundleClient(bundle, locations.get(1));
   }
 
   /**
@@ -269,11 +274,45 @@ public class ClientContext extends AbstractNioContext<ClientState>
   }
 
   /**
+   * Get the job as initially submitted by the client.
+   * @return a <code>ServerTaskBundleClient</code> instance.
+   */
+  public synchronized ServerTaskBundleClient getInitialBundleWrapper()
+  {
+    return initialBundleWrapper;
+  }
+
+  /**
    * Set the job as initially submitted by the client.
-   * @param initialBundleWrapper <code>ServerJob</code> instance.
+   * @param initialBundleWrapper <code>ServerTaskBundleClient</code> instance.
    */
   synchronized void setInitialBundleWrapper(final ServerTaskBundleClient initialBundleWrapper)
   {
     this.initialBundleWrapper = initialBundleWrapper;
+    nbTasksToSend = initialBundleWrapper == null ? 0 : initialBundleWrapper.getPendingTasksCount();
+  }
+
+  @Override
+  public String toString()
+  {
+    return new StringBuilder(super.toString()).append(", nbTasksToSend=").append(nbTasksToSend).append(", completedBundles=").append(completedBundles).toString();
+  }
+
+  /**
+   * Get the number of tasks remaining to send.
+   * @return the number of tasks as an <code>int</code>.
+   */
+  synchronized int getNbTasksToSend()
+  {
+    return nbTasksToSend;
+  }
+
+  /**
+   * Set the number of tasks remaining to send.
+   * @param nbTasksToSend the number of tasks as an <code>int</code>.
+   */
+  synchronized void setNbTasksToSend(final int nbTasksToSend)
+  {
+    this.nbTasksToSend = nbTasksToSend;
   }
 }

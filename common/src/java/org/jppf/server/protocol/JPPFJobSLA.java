@@ -53,6 +53,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * Determines whether the job should be canceled by the driver if the client gets disconnected.
    */
   private boolean cancelUponClientDisconnect = true;
+  /**
+   * Get the name of the strategy used to return the results back to the client.
+   */
+  private String resultsStrategy = null;
 
   /**
    * Default constructor.
@@ -168,5 +172,17 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
     sla.setSuspended(suspended);
     sla.setCancelUponClientDisconnect(cancelUponClientDisconnect);
     return sla;
+  }
+
+  @Override
+  public String getResultsStrategy()
+  {
+    return resultsStrategy;
+  }
+
+  @Override
+  public void setResultsStrategy(final String name)
+  {
+    this.resultsStrategy = name;
   }
 }

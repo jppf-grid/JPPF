@@ -25,6 +25,7 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.utils.AbstractServerJob;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
@@ -100,7 +101,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public synchronized void jobDispatched(final ServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
+  public synchronized void jobDispatched(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     String jobUuid = bundle.getUuid();
@@ -116,7 +117,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public synchronized void jobReturned(final ServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
+  public synchronized void jobReturned(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     String jobUuid = bundle.getUuid();
@@ -167,7 +168,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public synchronized void jobUpdated(final ServerJob bundleWrapper)
+  public synchronized void jobUpdated(final AbstractServerJob bundleWrapper)
   {
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' updated");
@@ -175,7 +176,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public void jobStatusChanged(final ServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue)
+  public void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue)
   {
     jobUpdated(source);
   }

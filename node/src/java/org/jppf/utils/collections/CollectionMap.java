@@ -101,6 +101,18 @@ public interface CollectionMap<K, V> extends Iterable<V>
   Iterator<V> iterator(final Lock lock);
 
   /**
+   * Get the set of keys in the map.
+   * @return a {@link Set} of all keys.
+   */
+  Set<K> keySet();
+
+  /**
+   * Get the set map entries.
+   * @return a {@link Set} of all map entries.
+   */
+  Set<Map.Entry<K, Collection<V>>> entrySet();
+
+  /**
    * Clear the map.
    */
   void clear();

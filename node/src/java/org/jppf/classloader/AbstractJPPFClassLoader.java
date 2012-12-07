@@ -171,7 +171,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     map.put("name", "callable");
     map.put("callable", callable);
     JPPFResourceWrapper resource = loadRemoteData(map, false);
-    byte[] b = (resource == null) ? null : resource.getCallable();
+    byte[] b = null;
+    if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) b = resource.getCallable();
     if (debugEnabled) log.debug(build("remote definition for callable resource ", b==null ? "not " : "", "found"));
     return b;
   }

@@ -213,10 +213,11 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     }
     Thread.sleep(500L);
     // bath size = 10 (==> 2 jobs), load-balancing = manual, size=1000000
+    // driver load-balancing: manual, size=5 ==> 4 job returned notifs
     assertEquals(2, listener.startedCount.get());
     assertEquals(2, listener.endedCount.get());
     assertEquals(2, listener.dispatchedCount.get());
-    assertEquals(2, listener.returnedCount.get());
+    assertEquals(4, listener.returnedCount.get());
   }
 
   /**

@@ -57,7 +57,7 @@ public class JPPFCallableRunner
    */
   public static void main(final String...args) throws Exception
   {
-    int nbRuns = 10;
+    int nbRuns = 1;
     //loggingHandler = new MyLoggingHandler();
     for (int i=1; i<=nbRuns; i++)
     {
@@ -72,7 +72,7 @@ public class JPPFCallableRunner
       }
       finally
       {
-        restartDriver(1L, i < nbRuns ? 2000L : -1L);
+        //restartDriver(1L, i < nbRuns ? 2000L : -1L);
         if (jppfClient != null) jppfClient.close();
         if (i < nbRuns) Thread.sleep(3000L);
       }
@@ -86,7 +86,7 @@ public class JPPFCallableRunner
   private static void perform() throws Exception
   {
     int nbTasks = 400;
-    int nbJobs = 10;
+    int nbJobs = 1;
     int maxChannels = 1;
     int size = 1024;
     long time = 10L;

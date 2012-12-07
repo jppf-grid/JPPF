@@ -33,36 +33,30 @@ public class ReflectionUtils
    * Generates a string that displays all return values for all getters of an object.
    * This method uses a new line character a field separator.
    * @param o the object whose getter return values are to be dumped into a string.
+   * @param names the names of the attributes to dump. If null or empty, then all attributes that have a getter, except "class", are dumped.
+   * This parameter is used as a filter on the attributes to dump and defines the order in which the fields are dumped.
    * @return a string with the classname, hashcode, and the value of
    * each attribute that has a corresponding getter.
    */
-  public static String dumpObject(final Object o)
+  public static String dumpObject(final Object o, final String...names)
   {
-    return dumpObject(o, "\n");
+    return dumpObject(o, ", ", true, false, names);
   }
 
   /**
    * Generates a string that displays all return values for all getters of an object.
    * @param o the object whose getter return values are to be dumped into a string.
    * @param separator separator between field values, like a comma or a new line.
-   * @return a string with the classname, hashcode, and the value of
-   * each attribute that has a corresponding getter.
-   */
-  public static String dumpObject(final Object o, final String separator)
-  {
-    return dumpObject(o, separator, true, false);
-  }
-
-  /**
-   * Generates a string that displays all return values for all getters of an object.
-   * @param o the object whose getter return values are to be dumped into a string.
-   * @param separator separator between field values, like a comma or a new line.
-   * @param displaySimpleClassName whether to use the object's class simple name.
+   * @param displaySimpleClassName <code>true</code> to use the object's class simple name, <code>false</code> for the fully qualified name.
    * @param displayHashCode whether to append '@hashcode_value' to the name of the class.
+   * @param names the names of the attributes to dump. If null or empty, then all attributes that have a getter, except "class", are dumped.
+   * This parameter is used as a filter on the attributes to dump and defines the order in which the fields are dumped.
    * @return a string with the classname, hashcode, and the value of  each attribute that has a corresponding getter.
    */
-  public static String dumpObject(final Object o, final String separator, final boolean displaySimpleClassName, final boolean displayHashCode)
+  public static String dumpObject(final Object o, final String separator, final boolean displaySimpleClassName, final boolean displayHashCode, final String...names)
   {
+    Set<String> fieldNames = new LinkedHashSet<String>();
+    if (names != null) Collections.addAll(fieldNames, names);
     if (o == null) return "null";
     Class<?> clazz = o.getClass();
     StringBuilder sb = new StringBuilder();
@@ -71,7 +65,7 @@ public class ReflectionUtils
     sb.append('[');
     Method[] methods = clazz.getMethods();
     // we want the attributes in ascending alphabetical order
-    SortedMap<String, Object> attrMap = new TreeMap<String, Object>();
+    Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap<String, Object>() : new HashMap<String, Object>(names.length);
     for (Method method : methods)
     {
       if (isGetter(method) && !"getClass".equals(method.getName()))
@@ -79,24 +73,32 @@ public class ReflectionUtils
         String attrName = null;
         attrName = method.getName().substring(method.getName().startsWith("get") ? 3 : 2);
         attrName = attrName.substring(0, 1).toLowerCase() + attrName.substring(1);
-        Object value = null;
-        try
+        if (fieldNames.isEmpty() || fieldNames.contains(attrName))
         {
-          value = method.invoke(o, (Object[]) null);
-          if (value == null) value = "null";
+          Object value = null;
+          try
+          {
+            value = method.invoke(o, (Object[]) null);
+            if (value == null) value = "null";
+          }
+          catch (Exception e)
+          {
+            value = "*Error: " + ExceptionUtils.getMessage(e) + '*';
+          }
+          attrMap.put(attrName, value);
         }
-        catch (Exception e)
-        {
-          value = "*Error: " + e.getMessage() + '*';
-        }
-        attrMap.put(attrName, value);
       }
     }
     int count = 0;
-    for (Map.Entry<String, Object> entry: attrMap.entrySet())
+    Set<String> set = fieldNames.isEmpty() ? attrMap.keySet() : fieldNames;
+    for (String attr: set)
     {
-      if (count++ > 0) sb.append(separator);
-      sb.append(entry.getKey()).append('=').append(entry.getValue());
+      Object value = attrMap.get(attr);
+      if (value != null)
+      {
+        if (count++ > 0) sb.append(separator);
+        sb.append(attr).append('=').append(value);
+      }
     }
     sb.append(']');
     return sb.toString();

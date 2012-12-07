@@ -23,11 +23,14 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
+import org.jppf.client.event.TaskResultEvent;
 import org.jppf.node.policy.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.results.SendResultsStrategy;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.Test;
@@ -272,8 +275,8 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       {
         LifeCycleTask t2 = (LifeCycleTask) results.get(j);
         Range<Double> r2 = new Range<Double>(t2.getStart(), t2.getStart() + t2.getElapsed());
-        assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(), 
-          r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
+        assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(),
+            r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
       }
     }
   }
@@ -332,6 +335,61 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   }
 
   /**
+   * Test that results are returned according to the SendNodeResultsStrategy specified in the SLA.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testSendNodeResultsStrategy() throws Exception
+  {
+    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategy.NODE_RESULTS, 4);
+  }
+
+  /**
+   * Test that results are returned according to the SendAllResultsStrategy specified in the SLA.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testSendAllResultsStrategy() throws Exception
+  {
+    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategy.ALL_RESULTS, 1);
+  }
+
+  /**
+   * Test that results are returned according to the default strategy (SendNodeResultsStrategy).
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testDefaultSendResultsStrategy() throws Exception
+  {
+    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), null, 4);
+  }
+
+  /**
+   * Test that results are returned according to specified strategy.
+   * @param jobName the name the job to execute.
+   * @param strategyName the name of the strategy to test.
+   * @param expectedReturnedCount the expected number of 'job returned' notifications.
+   * @throws Exception if any error occurs.
+   */
+  public void checkSendResultsStrategy(final String jobName, final String strategyName, final int expectedReturnedCount) throws Exception
+  {
+    int nbTasks = 20;
+    JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, LifeCycleTask.class, 1L);
+    final AtomicInteger returnedCount = new AtomicInteger(0);
+    JPPFResultCollector collector = new JPPFResultCollector(job) {
+      @Override
+      public synchronized void resultsReceived(final TaskResultEvent event) {
+        super.resultsReceived(event);
+        returnedCount.incrementAndGet();
+      }
+    };
+    job.setResultListener(collector);
+    job.getSLA().setResultsStrategy(strategyName);
+    List<JPPFTask> results = client.submit(job);
+    assertEquals(expectedReturnedCount, returnedCount.get());
+  }
+
+  /**
    * A task that creates a file.
    */
   public static class FileTask extends JPPFTask
@@ -364,7 +422,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
         String name = filePath;
         if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         name = name + ".tmp";
-        
+
         File f = new File(name);
         Thread.sleep(2000L);
         Writer writer = new FileWriter(f);

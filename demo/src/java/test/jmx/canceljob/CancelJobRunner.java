@@ -51,6 +51,7 @@ public class CancelJobRunner
   {
     try
     {
+      configure();
       jppfClient = new JPPFClient();
       long duration = 1000L;
       int nbTasks = 10;
@@ -60,16 +61,16 @@ public class CancelJobRunner
       String name = "[test job]";
       JPPFJob job = new JPPFJob(name);
       job.setBlocking(false);
-      //job.getClientSLA().setMaxChannels(maxChannels);
+      job.getClientSLA().setMaxChannels(maxChannels);
       for (int i=1; i<=nbTasks; i++) job.addTask(new LifeCycleTask(duration)).setId(name + ":task-" + i);
       jppfClient.submit(job);
-      Thread.sleep(2000L);
+      Thread.sleep(900L);
+      print("cancelling job");
       /*
       JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
       JMXDriverConnectionWrapper jmx = c.getJmxConnection();
       DriverJobManagementMBean jobProxy = jmx.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
       */
-      print("cancelling job");
       //jobProxy.cancelJob(job.getUuid());
       jppfClient.cancelJob(job.getUuid());
       print("job cancelled, waiting for results");
@@ -91,6 +92,13 @@ public class CancelJobRunner
     {
       if (jppfClient != null) jppfClient.close();
     }
+  }
+
+  /**
+   * 
+   */
+  private static void configure()
+  {
   }
 
   /**

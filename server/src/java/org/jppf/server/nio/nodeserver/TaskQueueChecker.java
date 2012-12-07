@@ -409,6 +409,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   private static boolean checkJobState(final ServerJob bundle)
   {
+    if (bundle.isCancelled()) return false;
     JobSLA sla = bundle.getJob().getSLA();
     if (debugEnabled)
     {

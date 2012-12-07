@@ -101,7 +101,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public JPPFJob()
   {
-    this(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+    this(JPPFUuid.normalUUID());
   }
 
   /**
@@ -111,7 +111,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public JPPFJob(final String jobUuid)
   {
-    this.uuid = (jobUuid == null) ? new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString() : jobUuid;
+    this.uuid = (jobUuid == null) ? JPPFUuid.normalUUID() : jobUuid;
     name = (jobUuid == null) ? this.uuid : jobUuid;
   }
 
@@ -195,43 +195,10 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     this.blocking = blocking;
   }
 
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getUuid()} instead.
-   * @exclude
-   */
-  @Override
-  public String getJobUuid()
-  {
-    return getUuid();
-  }
-
   @Override
   public String getUuid()
   {
     return uuid;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getName() getName()} instead.
-   * @exclude
-   */
-  @Override
-  public String getId()
-  {
-    return name;
-  }
-
-  /**
-   * Set the user-defined display name for this job.
-   * @param id the display name as a string.
-   * @deprecated use {@link #setName(java.lang.String) setName(String)} instead.
-   * @exclude
-   */
-  public void setId(final String id)
-  {
-    this.name = id;
   }
 
   @Override
@@ -364,17 +331,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     this.blocking = blocking;
   }
 
-  /**
-   * Get the service level agreement between the job and the server.
-   * @return an instance of {@link JobSLA}.
-   * @deprecated use {@link #getSLA() getSLA()} instead
-   * @exclude
-   */
-  public JPPFJobSLA getJobSLA()
-  {
-    return (JPPFJobSLA) jobSLA;
-  }
-
   @Override
   public JobSLA getSLA()
   {
@@ -406,17 +362,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   public void setClientSLA(final JobClientSLA jobClientSLA)
   {
     this.jobClientSLA = jobClientSLA;
-  }
-
-  /**
-   * Get the user-defined metadata associated with this job.
-   * @return a {@link JobMetadata} instance.
-   * @deprecated use {@link #getMetadata() getMetadata()} instead
-   * @exclude
-   */
-  public JPPFJobMetadata getJobMetadata()
-  {
-    return (JPPFJobMetadata) jobMetadata;
   }
 
   @Override

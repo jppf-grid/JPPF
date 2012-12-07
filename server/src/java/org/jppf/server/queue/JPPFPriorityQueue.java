@@ -112,37 +112,37 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public void addBundle(final ServerTaskBundleClient bundleWrapper)
+  public void addBundle(final ServerTaskBundleClient clientBundle)
   {
-    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
 
-    JobSLA sla = bundleWrapper.getSLA();
-    final String jobUuid = bundleWrapper.getUuid();
+    JobSLA sla = clientBundle.getSLA();
+    final String jobUuid = clientBundle.getUuid();
     lock.lock();
     try {
       if (sla.isBroadcastJob())
       {
-        if (debugEnabled) log.debug("before processing broadcast job " + bundleWrapper.getJob());
-        processBroadcastJob(bundleWrapper);
+        if (debugEnabled) log.debug("before processing broadcast job " + clientBundle.getJob());
+        processBroadcastJob(clientBundle);
       } else {
         boolean queued;
         ServerJob serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
           queued = true;
-          serverJob = new ServerJob(lock, jobManager, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+          serverJob = new ServerJob(lock, jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
           jobManager.jobQueued(serverJob);
           serverJob.setSubmissionStatus(SubmissionStatus.PENDING);
           serverJob.setQueueEntryTime(System.currentTimeMillis());
           serverJob.setJobReceivedTime(serverJob.getQueueEntryTime());
           serverJob.addOnDone(new RemoveBundleAction(this, serverJob));
           if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
-            if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
+            if (debugEnabled) log.debug("adding bundle with " + clientBundle);
             scheduleManager.handleStartJobSchedule(serverJob);
             scheduleManager.handleExpirationJobSchedule(serverJob);
           }
           jobMap.put(jobUuid, serverJob);
         } else queued = false;
-        if(serverJob.addBundle(bundleWrapper)) {
+        if(serverJob.addBundle(clientBundle)) {
           if(!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return;
 
@@ -151,14 +151,14 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           sizeMap.putValue(getSize(serverJob), serverJob);
         }
         updateLatestMaxSize();
-        if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(bundleWrapper.getTaskCount());
+        if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(clientBundle.getTaskCount());
         fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
       lock.unlock();
     }
-    statsManager.taskInQueue(bundleWrapper.getTaskCount());
+    statsManager.taskInQueue(clientBundle.getTaskCount());
   }
 
   /**
@@ -245,12 +245,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         jobManager.jobEnded(bundleWrapper);
       }
 
-      if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName());
+      if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName() + ", removeFromJobMap=" + removeFromJobMap);
       priorityMap.removeValue(bundleWrapper.getSLA().getPriority(), bundleWrapper);
 
-      for (ServerTaskBundleClient bundle : bundleWrapper.getCompletionBundles()) {
-        addBundle(bundle);
-      }
+      for (ServerTaskBundleClient bundle : bundleWrapper.getCompletionBundles()) addBundle(bundle);
     } finally {
       lock.unlock();
     }

@@ -19,6 +19,7 @@
 package org.jppf.utils.collections;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -341,5 +342,17 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     {
       if (lock != null) lock.unlock();
     }
+  }
+
+  @Override
+  public Set<K> keySet()
+  {
+    return map == null ? null : map.keySet();
+  }
+
+  @Override
+  public Set<Entry<K, Collection<V>>> entrySet()
+  {
+    return map == null ? null : map.entrySet();
   }
 }

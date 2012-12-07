@@ -45,7 +45,11 @@ public class ServerTask {
     /**
      * Task is cancelled.
      */
-    CANCELLED
+    CANCELLED,
+    /**
+     * The taks was sent back to the client.
+     */
+    SENT
   }
 
   /**
@@ -68,6 +72,10 @@ public class ServerTask {
    * The exception thrown during execution.
    */
   private Throwable            exception;
+  /**
+   * The state of this task.
+   */
+  private State state = State.PENDING;
 
   /**
    *
@@ -113,13 +121,13 @@ public class ServerTask {
    * @return a {@link State} enumerated value.
    */
   public State getState() {
+    /*
     if (exception != null) return State.EXCEPTION;
-    if (result == null)
-      return State.PENDING;
-    else if (result == dataLocation)
-      return State.CANCELLED;
-    else
-      return State.RESULT;
+    if (result == null) return State.PENDING;
+    else if (result == dataLocation) return State.CANCELLED;
+    else return State.RESULT;
+    */
+    return state;
   }
 
   /**
@@ -127,10 +135,7 @@ public class ServerTask {
    * @return the result as <code>DataLocation</code>.
    */
   public DataLocation getResult() {
-    if (result == null)
-      return dataLocation;
-    else
-      return result;
+    return  (result == null) ? dataLocation : result;
   }
 
   /**
@@ -142,6 +147,14 @@ public class ServerTask {
   }
 
   /**
+   * Mark this task as cancelled.
+   */
+  public void cancel() {
+    result = dataLocation;
+    state = State.CANCELLED;
+  }
+  
+  /**
    * Called to notify that the task received result.
    * @param result the result.
    */
@@ -149,6 +162,7 @@ public class ServerTask {
     if (result == null) throw new IllegalArgumentException("result is null");
     this.result = result;
     this.exception = null;
+    this.state = (result == dataLocation) ? State.CANCELLED : State.RESULT;
   }
 
   /**
@@ -159,6 +173,14 @@ public class ServerTask {
     if (exception == null) throw new IllegalArgumentException("exception is null");
     this.result = null;
     this.exception = exception;
+    this.state = State.EXCEPTION;
+  }
+
+  /**
+   * Set this task as sent back to the client.
+   */
+  public void taskSent() {
+    state = State.SENT;
   }
 
   @Override

@@ -85,4 +85,16 @@ public interface JobSLA extends JobCommonSLA
    * @param cancelUponClientDisconnect <code>true</code> if the job should be canceled, <code>false</code> otherwise.
    */
   void setCancelUponClientDisconnect(boolean cancelUponClientDisconnect);
+
+  /**
+   * Get the strategy used to return the results back to the client.
+   * @return the name of the strategy to use.
+   */
+  String getResultsStrategy();
+
+  /**
+   * Set the strategy used to return the results back to the client.
+   * @param name the name of the strategy to use.
+   */
+  void setResultsStrategy(String name);
 }

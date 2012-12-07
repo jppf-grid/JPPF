@@ -66,7 +66,7 @@ class WaitingJobState extends ClientServerState
       ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
       JPPFTaskBundle header = bundleWrapper.getJob();
       int count = header.getTaskCount();
-      if (debugEnabled) log.debug("read bundle" + header + " from client " + channel + " done: received " + count + " tasks");
+      if (debugEnabled) log.debug("read bundle " + header + " from client " + channel + " done: received " + count + " tasks");
       if (bundleWrapper.getJobReceivedTime() == 0L) bundleWrapper.setJobReceivedTime(System.currentTimeMillis());
 
       header.getUuidPath().incPosition();
@@ -80,7 +80,8 @@ class WaitingJobState extends ClientServerState
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setClientMessage(null);
       context.setBundle(null);
-      return TO_SENDING_RESULTS;
+      //return TO_SENDING_RESULTS;
+      return TO_IDLE;
     }
     return TO_WAITING_JOB;
   }

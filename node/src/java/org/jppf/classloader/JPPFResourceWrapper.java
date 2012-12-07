@@ -67,6 +67,10 @@ public class JPPFResourceWrapper implements Serializable
      */
     NODE_RESPONSE,
     /**
+     * State for a node receiving a resource from the class server, when the resonse could not be obtained from the client.
+     */
+    NODE_RESPONSE_ERROR,
+    /**
      * State for a resource provider first contacting the class server.
      */
     PROVIDER_INITIATION,

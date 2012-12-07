@@ -77,11 +77,15 @@ class NodeWaitingProviderResponseState extends ClassServerState
       if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
       for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet()) {
         JPPFResourceWrapper resource = entry.getValue().getResource();
-        if (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE) {
-          if (debugEnabled) log.debug(build("got response for resource ", resource));
-          toRemove.add(resource);
-          if (composite != null) composite.addOrReplaceResource(resource);
-          else context.setResource(resource);
+        switch(resource.getState())
+        {
+          case NODE_RESPONSE:
+          case NODE_RESPONSE_ERROR:
+            if (debugEnabled) log.debug(build("got response for resource ", resource));
+            toRemove.add(resource);
+            if (composite != null) composite.addOrReplaceResource(resource);
+            else context.setResource(resource);
+            break;
         }
       }
       while (!toRemove.isEmpty()) pendingResponses.remove(toRemove.poll());

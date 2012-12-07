@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.io.DataLocation;
+import org.jppf.server.protocol.utils.ServerJobStatus;
 import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.*;
 
@@ -133,7 +134,7 @@ public class ServerJobBroadcast extends ServerJob {
       empty = broadcastMap.isEmpty();
       broadcastMap.put(broadcastJob.getBroadcastUUID(), broadcastJob);
       if (empty) {
-        updateStatus(NEW, EXECUTING);
+        updateStatus(ServerJobStatus.NEW, ServerJobStatus.EXECUTING);
         setSubmissionStatus(SubmissionStatus.EXECUTING);
       }
     } finally {

@@ -63,35 +63,40 @@ class SendingResultsState extends ClientServerState
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-    if (channel.isReadable())
-    {
-      throw new ConnectException("client " + channel + " has been disconnected");
-    }
+    if (channel.isReadable()) throw new ConnectException("client " + channel + " has been disconnected");
 
     ClientContext context = (ClientContext) channel.getContext();
-    ServerTaskBundleClient bundleWrapper = context.getBundle();
-    if (bundleWrapper == null)
+    ServerTaskBundleClient clientBundle = context.getBundle();
+    if (clientBundle == null)
     {
-      bundleWrapper = context.pollCompletedBundle();
-      if (bundleWrapper == null) return TO_IDLE;
-      context.setBundle(bundleWrapper);
+      clientBundle = context.pollCompletedBundle();
+      if (clientBundle == null)
+      {
+        return TO_IDLE;
+      }
+      context.setBundle(clientBundle);
       context.serializeBundle();
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire bundle" + bundleWrapper.getJob() + " to client " + channel);
+      if (debugEnabled) log.debug("*** sent entire bundle " + clientBundle.getJob() + " to client " + channel);
+      if (debugEnabled) log.debug("*** NbTasksToSend=" + context.getNbTasksToSend() + ", TaskCount=" + clientBundle.getTaskCount() + ", CompletedBundlesEmpty=" + context.isCompletedBundlesEmpty());
+      context.setNbTasksToSend(context.getNbTasksToSend() - clientBundle.getTaskCount());
       context.setBundle(null);
       context.setClientMessage(null);
-      if (context.getPendingTasksCount() <= 0)
+      if (context.isCompletedBundlesEmpty())
       {
-        context.jobEnded();
-        return TO_WAITING_JOB;
+        //if (context.getPendingTasksCount() <= 0)
+        if (context.getNbTasksToSend() <= 0)
+        {
+          if (debugEnabled) log.debug("*** client bundle ended " + context.getInitialBundleWrapper());
+          context.jobEnded();
+          context.setInitialBundleWrapper(null);
+          return TO_WAITING_JOB;
+        }
+        return TO_IDLE;
       }
-      else if (context.isCompletedBundlesEmpty()) return TO_IDLE;
-      return TO_SENDING_RESULTS;
     }
-    //if (traceEnabled) log.trace("part yet to send to client " + channel);
     return TO_SENDING_RESULTS;
   }
 }

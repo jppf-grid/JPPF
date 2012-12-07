@@ -289,7 +289,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
         {
           ChannelWrapper<?> nodeChannel = resourceRequest.getChannel();
           if (!nodeSet.contains(nodeChannel)) nodeSet.add(nodeChannel);
-          resourceRequest.getResource().setState(State.NODE_RESPONSE);
+          resourceRequest.getResource().setState(State.NODE_RESPONSE_ERROR);
         }
         for (ChannelWrapper<?> nodeChannel: nodeSet) resetNodeState(nodeChannel, server);
       }
@@ -312,7 +312,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
     try
     {
       if (debugEnabled) log.debug(build("resetting channel state for node ", request));
-      request.getResource().setState(State.NODE_RESPONSE);
+      request.getResource().setState(State.NODE_RESPONSE_ERROR);
       server.getTransitionManager().transitionChannel(request.getChannel(), ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
       server.getTransitionManager().submitTransition(request.getChannel());
     }

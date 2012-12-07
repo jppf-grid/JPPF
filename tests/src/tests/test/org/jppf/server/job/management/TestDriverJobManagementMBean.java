@@ -19,6 +19,7 @@
 package test.org.jppf.server.job.management;
 
 import static org.junit.Assert.*;
+import static org.jppf.utils.ReflectionUtils.getCurrentMethodName;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   public void testCancelJob() throws Exception
   {
     int nbTasks = 10;
-    JPPFJob job = BaseTestHelper.createJob("testCancelJob", false, false, nbTasks, LifeCycleTask.class, TIME_LONG);
+    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submit(job);
     Thread.sleep(TIME_SHORT);
@@ -79,7 +80,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   @Test(timeout=10000L)
   public void testCancelJobAfterCompletion() throws Exception
   {
-    JPPFJob job = BaseTestHelper.createJob("testCancelJobAfterCompletion", true, false, 1, LifeCycleTask.class, TIME_SHORT);
+    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
     List<JPPFTask> results = client.submit(job);
     assertEquals(results.size(), 1);
     assertNotNull(results.get(0));

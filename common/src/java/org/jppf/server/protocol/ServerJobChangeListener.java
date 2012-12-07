@@ -19,6 +19,7 @@
 package org.jppf.server.protocol;
 
 import org.jppf.execute.ExecutorChannel;
+import org.jppf.server.protocol.utils.AbstractServerJob;
 import org.jppf.server.submission.SubmissionStatus;
 
 /**
@@ -32,26 +33,26 @@ public interface ServerJobChangeListener
    * Called when a job is added to the server queue.
    * @param source the updated job.
    */
-  void jobUpdated(final ServerJob source);
+  void jobUpdated(final AbstractServerJob source);
   /**
    * Called when job submission status is changed.
    * @param source the updated job.
    * @param oldValue value before change.
    * @param newValue value after change.
    */
-  void jobStatusChanged(final ServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue);
+  void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue);
   /**
    * Called when all or part of a job is dispatched to a node.
    * @param source the dispatched job.
    * @param channel the node to which the job is dispatched.
    * @param bundleNode the bundle for job event.
    */
-  void jobDispatched(final ServerJob source, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode);
+  void jobDispatched(final AbstractServerJob source, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode);
   /**
    * Called when all or part of a job has returned from a node.
    * @param source the returned job.
    * @param channel the node to which the job is dispatched.
    * @param bundleNode the bundle for job event.
    */
-  void jobReturned(final ServerJob source, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode);
+  void jobReturned(final AbstractServerJob source, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode);
 }

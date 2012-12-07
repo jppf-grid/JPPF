@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.TraversalList;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -81,15 +81,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * The initial number of tasks in this bundle.
    */
-  private int initialTaskCount = 0;
-  /**
-   * The shared data provider for this task bundle.
-   */
-  private transient byte[] dataProvider = null;
-  /**
-   * The tasks to be executed by the node.
-   */
-  private transient List<byte[]> tasks = null;
+  protected int initialTaskCount = 0;
   /**
    * The time at which this wrapper was added to the queue.
    */
@@ -141,10 +133,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public String getRequestUuid()
   {
-    if(requestUuid == null)
-      return getUuid();
-    else
-      return requestUuid;
+    return (requestUuid == null) ? getUuid() : requestUuid;
   }
 
   /**
@@ -154,24 +143,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public void setRequestUuid(final String requestUuid)
   {
     this.requestUuid = requestUuid;
-  }
-
-  /**
-   * Get shared data provider for this task.
-   * @return a <code>DataProvider</code> instance.
-   */
-  public byte[] getDataProvider()
-  {
-    return dataProvider;
-  }
-
-  /**
-   * Set shared data provider for this task.
-   * @param dataProvider a <code>DataProvider</code> instance.
-   */
-  public void setDataProvider(final byte[] dataProvider)
-  {
-    this.dataProvider = dataProvider;
   }
 
   /**
@@ -226,24 +197,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public void setNodeExecutionTime(final long nodeExecutionTime)
   {
     this.nodeExecutionTime = nodeExecutionTime;
-  }
-
-  /**
-   * Get the tasks to be executed by the node.
-   * @return the tasks as a <code>List</code> of arrays of bytes.
-   */
-  public List<byte[]> getTasks()
-  {
-    return tasks;
-  }
-
-  /**
-   * Set the tasks to be executed by the node.
-   * @param tasks the tasks as a <code>List</code> of arrays of bytes.
-   */
-  public void setTasks(final List<byte[]> tasks)
-  {
-    this.tasks = tasks;
   }
 
   /**
@@ -322,7 +275,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setUuid(getUuid());
     bundle.setName(name);
     bundle.setTaskCount(taskCount);
-    bundle.setDataProvider(dataProvider);
     synchronized(bundle.getParametersMap())
     {
       for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
@@ -417,7 +369,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public Object getParameter(final Object name)
   {
-    //if (parameters == null) return null;
     return parameters.get(name);
   }
 
@@ -470,26 +421,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder("[");
-    sb.append("name=").append(getName());
-    sb.append(", uuid=").append(getUuid());
-    sb.append(", initCount=").append(initialTaskCount);
-    sb.append(", count=").append(taskCount);
-    sb.append(", bundle.uuid=").append(getParameter("bundle.uuid"));
-    sb.append(", uuidPath=").append(uuidPath);
-    sb.append(", requeue=").append(parameters.get(BundleParameter.JOB_REQUEUE));
-    sb.append(']');
-    return sb.toString();
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getName() getName()} instead.
-   */
-  @Override
-  public String getId()
-  {
-    return getName();
+    return ReflectionUtils.dumpObject(this, "name", "uuid", "initialTaskCount", "taskCount", "bundleUuid", "uuidPath", "requeue");
   }
 
   @Override
@@ -520,16 +452,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public void setMetadata(final JobMetadata jobMetadata)
   {
     this.jobMetadata = jobMetadata;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getUuid()} instead.
-   */
-  @Override
-  public String getJobUuid()
-  {
-    return getUuid();
   }
 
   @Override
@@ -563,5 +485,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public void setCurrentTaskCount(final int currentTaskCount)
   {
     this.currentTaskCount = currentTaskCount;
+  }
+
+  /**
+   * Get the bundle uuid.
+   * @return the bundle uuid.
+   */
+  public Object getBundleUuid()
+  {
+    return getParameter("bundle.uuid");
+  }
+
+  /**
+   * Get the job requeue flag.
+   * @return job requeue flag.
+   */
+  public Object getRequeue()
+  {
+    return getParameter(BundleParameter.JOB_REQUEUE);
   }
 }

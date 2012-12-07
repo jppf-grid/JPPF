@@ -263,6 +263,6 @@ public class JobInformation implements Serializable
   @Override
   public String toString()
   {
-    return ReflectionUtils.dumpObject(this, ", ", true, false);
+    return ReflectionUtils.dumpObject(this);
   }
 }

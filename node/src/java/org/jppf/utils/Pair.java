@@ -115,4 +115,10 @@ public class Pair<U, V> implements Serializable
     }
     return second.equals(other.second);
   }
+
+  @Override
+  public String toString()
+  {
+    return StringUtils.build("Pair[first=", first, ", second=", second, "]");
+  }
 }

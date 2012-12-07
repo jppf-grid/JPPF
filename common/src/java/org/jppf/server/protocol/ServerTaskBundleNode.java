@@ -22,6 +22,8 @@ import java.util.concurrent.Future;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class group tasks for the same node channel together.
@@ -32,7 +34,14 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ServerTaskBundleNode.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The job to execute.
    */
@@ -69,15 +78,6 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   /**
    * Initialize this task bundle and set its build number.
    * @param job   the job to execute.
-   * @param taskList the tasks to execute.
-   */
-  public ServerTaskBundleNode(final ServerJob job, final List<ServerTask> taskList) {
-    this(job, null, taskList);
-  }
-
-  /**
-   * Initialize this task bundle and set its build number.
-   * @param job   the job to execute.
    * @param taskBundle the job.
    * @param taskList the tasks to execute.
    */
@@ -89,10 +89,6 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
 
     this.job = job;
     this.taskBundle = taskBundle;
-//    if (getState() == State.INITIAL_BUNDLE)
-//      this.taskBundle = this.job.getJob();
-//    else
-//      this.taskBundle = this.job.getJob().copy(tasks.size());
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
     this.taskList = Collections.unmodifiableList(new ArrayList<ServerTask>(taskList));
@@ -145,26 +141,6 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   public ServerTaskBundleNode copy()
   {
     throw new UnsupportedOperationException();
-//    ClientTaskBundle bundle = new ClientTaskBundle(getJob(), tasks);
-//    bundle.setUuidPath(getUuidPath());
-//    bundle.setRequestUuid(getRequestUuid());
-//    bundle.setUuid(getUuid());
-//    bundle.setName(getName());
-//    bundle.setTaskCount(getTaskCount());
-//    bundle.setDataProvider(getDataProvider());
-//    synchronized (bundle.getParametersMap())
-//    {
-//      for (Map.Entry<Object, Object> entry : getParametersMap().entrySet())
-//        bundle.setParameter(entry.getKey(), entry.getValue());
-//    }
-//    bundle.setQueueEntryTime(getQueueEntryTime());
-//    bundle.setCompletionListener(getCompletionListener());
-//    bundle.setSLA(getSLA());
-//    bundle.setLocalExecutionPolicy(localExecutionPolicy);
-//    bundle.setBroadcastUUID(broadcastUUID);
-//    //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
-//
-//    return bundle;
   }
 
   /**
@@ -176,10 +152,6 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   public ServerTaskBundleNode copy(final int nbTasks)
   {
     throw new UnsupportedOperationException();
-//    ClientTaskBundle bundle = copy();
-//    bundle.setTaskCount(nbTasks);
-//    taskCount -= nbTasks;
-//    return bundle;
   }
 
   /**
@@ -222,10 +194,11 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    */
   public void taskCompleted(final Exception exception)
   {
+    if (debugEnabled && (exception != null)) log.debug("received exception for " + this + " : " + ExceptionUtils.getStackTrace(exception));
     try {
       job.jobReturned(this);
     } finally {
-      job.taskCompleted(this, exception);
+      if (!isCancelled()) job.taskCompleted(this, exception);
       this.channel = null;
       this.future = null;
     }
@@ -285,14 +258,6 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder("[");
-    sb.append("jobId=").append(getName());
-    sb.append(", jobUuid=").append(getUuid());
-    sb.append(", initialTaskCount=").append(getInitialTaskCount());
-    sb.append(", taskCount=").append(getTaskCount());
-    sb.append(", requeue=").append(isRequeued());
-    sb.append(", cancelled=").append(isCancelled());
-    sb.append(']');
-    return sb.toString();
+    return ReflectionUtils.dumpObject(this, "name", "uuid", "initialTaskCount", "taskCount", "requeued", "cancelled");
   }
 }

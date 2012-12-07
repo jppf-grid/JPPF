@@ -23,7 +23,7 @@ import java.nio.channels.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -68,7 +68,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
    */
   public void submitTransition(final ChannelWrapper<?> key)
   {
-    if (debugEnabled) log.debug("submitting transition for " + key + ", state=" + key.getContext().getState());
+    //if (debugEnabled) log.debug("submitting transition for " + key + ", state=" + key.getContext().getState());
     setKeyOps(key, 0);
     StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
     //transition.run();
@@ -128,11 +128,12 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       NioServerFactory<S, T> factory = server.getFactory();
       NioTransition<S> t = factory.getTransition(transition);
       S s2 = t.getState();
-      String msg = " from " + s1 + " to " + s2;
+      String msg = StringUtils.build(" from ", s1, " to ", s2, " with ops=", t.getInterestOps(), " for channel ", channel);
       if (s1 != null)
       {
         if (!factory.isTransitionAllowed(s1, s2)) log.warn("unauthorized transition" + msg);
-        else if (debugEnabled) log.debug("transition" + msg);
+        else if (debugEnabled && (s1 != s2)) log.debug("transition" + msg);
+        else log.trace(msg);
       }
       context.setState(s2);
       if (!submit) channel.setKeyOps(t.getInterestOps());
@@ -141,7 +142,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
         channel.setKeyOps(0);
         submitTransition(channel);
       }
-      if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + msg + " with ops=" + t.getInterestOps());
+      //if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + msg + " with ops=" + t.getInterestOps());
     }
     finally
     {

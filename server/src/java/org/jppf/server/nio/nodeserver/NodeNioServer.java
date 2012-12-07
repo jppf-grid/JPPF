@@ -111,6 +111,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       }
     }
   };
+
   /**
    * Initialize this node server.
    * @param driver reference to the driver.

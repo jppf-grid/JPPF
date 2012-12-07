@@ -18,21 +18,16 @@
 package org.jppf.server.protocol.utils;
 
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.job.JobEventType;
-import org.jppf.job.JobInformation;
-import org.jppf.job.JobNotification;
-import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.protocol.BundleParameter;
-import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.protocol.ServerJob;
+import org.jppf.server.protocol.*;
+import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Abstract class that support job state management.
@@ -52,25 +47,9 @@ public abstract class AbstractServerJob {
    */
   private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
   /**
-   * Job status is new (just submitted).
-   */
-  protected static final int NEW = 0;
-  /**
-   * Job status is executing.
-   */
-  protected static final int EXECUTING = 1;
-  /**
-   * Job status is done/complete.
-   */
-  protected static final int DONE = 2;
-  /**
-   * Job status is cancelled.
-   */
-  protected static final int CANCELLED = 3;
-  /**
    * The job status.
    */
-  private volatile int status = NEW;
+  private volatile ServerJobStatus status = ServerJobStatus.NEW;
   /**
    * List of all runnables called on job completion.
    */
@@ -111,20 +90,40 @@ public abstract class AbstractServerJob {
    * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
    */
   private boolean pending = false;
+  /**
+   * Used for synchronized access to job.
+   */
+  protected final Lock lock;
+  /**
+   * The status of this submission.
+   */
+  private SubmissionStatus submissionStatus;
+  /**
+   * Handler for job state notifications.
+   */
+  protected ServerJobChangeListener notificationEmitter;
+  /**
+   * List of bundles added after submission status set to <code>COMPLETE</code>.
+   */
+  protected List<ServerTaskBundleClient> completionBundles = null;
 
   /**
    * Initialized abstract client job with task bundle and list of tasks to execute.
-   * @param job   underlying task bundle.
+   * @param lock used to synchronized access to job.
+   * @param job  underlying task bundle.
    */
-  protected AbstractServerJob(final JPPFTaskBundle job)
+  protected AbstractServerJob(final Lock lock, final JPPFTaskBundle job)
   {
+    if (lock == null) throw new IllegalArgumentException("lock is null");
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
+    this.lock = lock;
     this.job = job;
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
     this.metadata = this.job.getMetadata();
+    this.submissionStatus = SubmissionStatus.SUBMITTED;
   }
 
   /**
@@ -295,7 +294,7 @@ public abstract class AbstractServerJob {
    * @param newStatus the new value.
    * @return <code>true</code> if new status was set.
    */
-  protected final boolean updateStatus(final int expect, final int newStatus)
+  protected final boolean updateStatus(final ServerJobStatus expect, final ServerJobStatus newStatus)
   {
     if (status == expect)
     {
@@ -310,7 +309,7 @@ public abstract class AbstractServerJob {
    */
   public boolean isDone()
   {
-    return status >= EXECUTING;
+    return status.compareTo(ServerJobStatus.EXECUTING) >= 0;
   }
 
   /**
@@ -318,7 +317,7 @@ public abstract class AbstractServerJob {
    */
   public boolean isCancelled()
   {
-    return status >= CANCELLED;
+    return status.compareTo(ServerJobStatus.CANCELLED) >= 0;
   }
 
   /**
@@ -328,8 +327,8 @@ public abstract class AbstractServerJob {
    */
   public boolean cancel(final boolean mayInterruptIfRunning)
   {
-    if (status > EXECUTING) return false;
-    status = CANCELLED;
+    if (status.compareTo(ServerJobStatus.EXECUTING) > 0) return false;
+    status = ServerJobStatus.CANCELLED;
     return true;
   }
 
@@ -408,62 +407,11 @@ public abstract class AbstractServerJob {
     this.queueEntryTime = queueEntryTime;
   }
 
-  /**
-   * The current number of tasks in a job was updated.
-   */
-  public abstract void fireJobUpdated();
-
     /**
     * Get the current number of tasks in the job.
     * @return the number of tasks as an int.
     */
   public abstract int getTaskCount();
-
-  /**
-   * Create instance of job notification.
-   * @param eventType the type of this job event.
-   * @param channel the node to which the job event is created.
-   * @param bundle the bundle for created job event.
-   * @return {@link JobNotification} instance.
-   */
-  protected static JobNotification createJobNotification(final JobEventType eventType, final ExecutorChannel channel, final JPPFTaskBundle bundle) {
-    JobSLA sla = bundle.getSLA();
-    Boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING);
-    JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(),
-            bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), (pending != null) && pending);
-    jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
-    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, System.currentTimeMillis());
-    if (eventType == JobEventType.JOB_UPDATED)
-    {
-      Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
-      if (n != null) jobInfo.setTaskCount(n);
-    }
-    return event;
-  }
-
-  /**
-   * Create instance of job notification.
-   * @param eventType the type of this job event.
-   * @param channel the node to which the job event is created.
-   * @return {@link org.jppf.job.JobNotification} instance.
-   */
-  protected JobNotification createJobNotification(final JobEventType eventType, final ExecutorChannel channel)
-  {
-    JobSLA sla = getSLA();
-    boolean pending = isPending();
-    JobInformation jobInfo = new JobInformation(getUuid(), getName(), getTaskCount(),
-            getTaskCount(), sla.getPriority(), sla.isSuspended(), pending);
-    jobInfo.setMaxNodes(sla.getMaxNodes());
-    JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
-    JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, System.currentTimeMillis());
-    if (eventType == JobEventType.JOB_UPDATED)
-    {
-      Integer n = (Integer) getJob().getParameter(BundleParameter.REAL_TASK_COUNT);
-      if (n != null) jobInfo.setTaskCount(n);
-    }
-    return event;
-  }
 
   /**
    * Get the initial task count.
@@ -472,5 +420,91 @@ public abstract class AbstractServerJob {
   public int getInitialTaskCount()
   {
     return job.getInitialTaskCount();
+  }
+
+  /**
+   * Get the status of this submission.
+   * @return a {@link SubmissionStatus} enumerated value.
+   */
+  public SubmissionStatus getSubmissionStatus() {
+    lock.lock();
+    try {
+      return submissionStatus;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Set the status of this submission.
+   * @param submissionStatus a {@link SubmissionStatus} enumerated value.
+   */
+  public void setSubmissionStatus(final SubmissionStatus submissionStatus) {
+    lock.lock();
+    try {
+      if (this.submissionStatus == submissionStatus) return;
+      SubmissionStatus oldValue = this.submissionStatus;
+      this.submissionStatus = submissionStatus;
+      fireStatusChanged(oldValue, this.submissionStatus);
+      if (submissionStatus == SubmissionStatus.ENDED) done();
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Notify that job submission status has changed.
+   * @param oldValue value before change.
+   * @param newValue value after change.
+   */
+  protected void fireStatusChanged(final SubmissionStatus oldValue, final SubmissionStatus newValue) {
+    if (notificationEmitter != null) notificationEmitter.jobStatusChanged(this, oldValue, newValue);
+  }
+
+  /**
+   * Get the broadcast UUID.
+   * @return an <code>String</code> instance.
+   */
+  public String getBroadcastUUID() {
+    return null;
+  }
+
+  /**
+   * Get list of bundles added after job completion.
+   * @return list of bundles added after job completion.
+   */
+  public List<ServerTaskBundleClient> getCompletionBundles() {
+    lock.lock();
+    try {
+      if(completionBundles == null) return Collections.emptyList();
+      else return completionBundles;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * The current number of tasks in a job was updated.
+   */
+  public void fireJobUpdated() {
+    if (notificationEmitter != null) notificationEmitter.jobUpdated(this);
+  }
+
+  /**
+   * A sub-job was dispatched to a node.
+   * @param channel the node to which the job is dispatched.
+   * @param bundleNode the bundle for job event.
+   */
+  protected void fireJobDispatched(final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
+    if (notificationEmitter != null) notificationEmitter.jobDispatched(this, channel, bundleNode);
+  }
+
+  /**
+   * A sub-job returned from a node.
+   * @param channel the node from which the job is returned.
+   * @param bundleNode the bundle for job event.
+   */
+  protected void fireJobReturned(final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
+    if (notificationEmitter != null) notificationEmitter.jobReturned(this, channel, bundleNode);
   }
 }

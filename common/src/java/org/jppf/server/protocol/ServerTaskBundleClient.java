@@ -17,11 +17,14 @@
  */
 package org.jppf.server.protocol;
 
-import org.jppf.io.DataLocation;
-import org.jppf.node.protocol.JobSLA;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.JobSLA;
+import org.jppf.server.protocol.results.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class group tasks from the same client channel together.
@@ -31,6 +34,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ServerTaskBundleClient
 {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ServerTaskBundleClient.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The job to execute.
    */
@@ -42,7 +53,11 @@ public class ServerTaskBundleClient
   /**
    * The tasks to be executed by the node.
    */
-  private final List<ServerTask> taskList;
+  private final List<ServerTask> taskList = new LinkedList<ServerTask>();
+  /**
+   * The tasks to be sent back to the client.
+   */
+  private final List<ServerTask> tasksToSendList = new LinkedList<ServerTask>();
   /**
    * The count of pending tasks.
    */
@@ -51,6 +66,11 @@ public class ServerTaskBundleClient
    * The list of listeners registered with this bundle.
    */
   private final List<CompletionListener> listenerList = new ArrayList<CompletionListener>();
+  /**
+   * Array constructed each time a listener is added or removed.
+   * This is a performance optimization in the scenario where listners are invoked more often than they are added or removed.
+   */
+  private CompletionListener[] listenerArray = null;
   /**
    * Bundle cancel indicator.
    */
@@ -63,6 +83,11 @@ public class ServerTaskBundleClient
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
   private long jobReceivedTime = 0L;
+  /**
+   * The strategy to use to send the results back tot he client.
+   */
+  //private SendResultsStrategy strategy = new SendAllResultsStrategy();
+  final SendResultsStrategy strategy;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -85,32 +110,32 @@ public class ServerTaskBundleClient
 
     this.job = job;
     this.dataProvider = dataProvider;
-    this.taskList = new ArrayList<ServerTask>(taskList.size());
     for (int index = 0; index < taskList.size(); index++) {
       DataLocation dataLocation = taskList.get(index);
       this.taskList.add(new ServerTask(this, index, dataLocation));
     }
-
-    if (dataProvider != null) this.pendingTasksCount.set(this.taskList.size());
+    this.pendingTasksCount.set(this.taskList.size());
+    this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
   }
 
   /**
    * Initialize task bundle as copy as source bundle.
-   * @param job   the job to execute.
-   * @param source the source bundle to copy.
+   * @param source the source bundle.
+   * @param taskList the tasks to return.
    */
-  protected ServerTaskBundleClient(final JPPFTaskBundle job, final ServerTaskBundleClient source) {
-    if (job == null) throw new IllegalArgumentException("job is null");
+  private ServerTaskBundleClient(final ServerTaskBundleClient source, final List<ServerTask> taskList) {
+    if (source == null) throw new IllegalArgumentException("source is null");
+    if (taskList == null) throw new IllegalArgumentException("taskList is null");
 
-    this.job = job;
+    this.job = source.getJob().copy(taskList.size());
+    job.initialTaskCount = source.getJob().getInitialTaskCount();
+    job.currentTaskCount = job.taskCount;
     this.dataProvider = source.getDataProvider();
-    List<ServerTask> taskList = source.getTaskList();
-    this.taskList = new ArrayList<ServerTask>(taskList.size());
-    for (ServerTask task : taskList) {
-      this.taskList.add(new ServerTask(this, task.getPosition(), task.getDataLocation()));
-    }
-
-    this.pendingTasksCount.set(this.taskList.size());
+    this.taskList.addAll(taskList);
+    this.pendingTasksCount.set(0);
+    this.done = source.isDone();
+    this.cancelled = source.isCancelled();
+    this.strategy = source.strategy;
   }
 
   /**
@@ -147,12 +172,11 @@ public class ServerTaskBundleClient
    */
   public void resultReceived(final int index, final DataLocation result)
   {
-    if (index < 0 || index >= taskList.size()) throw new IllegalArgumentException("index should in range 0.." + taskList.size());
+    if (index < 0 || index >= taskList.size()) throw new IllegalArgumentException("index should in range 0.." + (taskList.size()-1));
 
     boolean fire;
     ServerTask task = taskList.get(index);
-    if (task.getState() == ServerTask.State.RESULT)
-    {
+    if (task.getState() == ServerTask.State.RESULT) {
       fire = false;
     } else {
       fire = pendingTasksCount.decrementAndGet() == 0;
@@ -165,6 +189,28 @@ public class ServerTaskBundleClient
   }
 
   /**
+   * Called to notify that the contained task received result.
+   * @param results the tasks for which results were received.
+   */
+  public synchronized void resultReceived(final Collection<Pair<Integer, DataLocation>> results) {
+    if (isCancelled()) return;
+    if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
+    List<ServerTask> tasks = new ArrayList<ServerTask>(results.size());
+    for (Pair<Integer, DataLocation> result: results) {
+      ServerTask task = taskList.get(result.first());
+      //if (task.getState() != ServerTask.State.RESULT) {
+      if (task.getState() == ServerTask.State.PENDING) {
+        tasksToSendList.add(task);
+        pendingTasksCount.decrementAndGet();
+      }
+      task.resultReceived(result.second());
+    }
+    done = pendingTasksCount.get() <= 0;
+    boolean fire = strategy.sendResults(this, tasks);
+    if (done || fire) fireTasksCompleted();
+  }
+
+  /**
    * Called to notify that the task received exception during execution.
    * @param index the task position for received exception.
    * @param exception the exception.
@@ -173,6 +219,27 @@ public class ServerTaskBundleClient
   {
     if (index < 0 || index >= taskList.size()) throw new IllegalArgumentException("index should in range 0.." + taskList.size());
     taskList.get(index).resultReceived(exception);
+  }
+
+  /**
+   * Called to notify that the task received exception during execution.
+   * @param tasks the tasks for which an exception was received.
+   * @param exception the exception.
+   */
+  public synchronized void resultReceived(final Collection<ServerTask> tasks, final Throwable exception)
+  {
+    if (isCancelled()) return;
+    for (ServerTask task: tasks)
+    {
+      if (task.getState() == ServerTask.State.PENDING) {
+        tasksToSendList.add(task);
+        pendingTasksCount.decrementAndGet();
+      }
+      task.resultReceived(exception);
+    }
+    done = pendingTasksCount.get() <= 0;
+    boolean fire = strategy.sendResults(this, tasks);
+    if (done || fire) fireTasksCompleted();
   }
 
   /**
@@ -198,14 +265,21 @@ public class ServerTaskBundleClient
    */
   public synchronized void cancel()
   {
-    if (!this.cancelled && !this.done)
+    if (!cancelled && !done)
     {
+      if (debugEnabled) log.debug("cancelling client job " + this);
       this.cancelled = true;
-      for (ServerTask task : taskList) {
-        task.resultReceived(task.getDataLocation());
+      for (ServerTask task: taskList)
+      {
+        if (task.getState() == ServerTask.State.PENDING) {
+          task.cancel();
+          tasksToSendList.add(task);
+          pendingTasksCount.decrementAndGet();
+        }
       }
       this.done = true;
-      fireTasksCompleted(taskList);
+      //fireTasksCompleted(taskList);
+      fireTasksCompleted();
     }
   }
 
@@ -219,15 +293,22 @@ public class ServerTaskBundleClient
   }
 
   /**
+   * Get the <code>done</code> indicator.
+   * @return <code>true</code> if this client job is done, <code>false</code> otherwise.
+   */
+  public synchronized boolean isDone()
+  {
+    return done;
+  }
+
+  /**
    * Extract <code>DataLocation</code> list from contained tasks.
    * @return the list of <code>DataLocation</code> instances.
    */
   public List<DataLocation> getDataLocationList()
   {
     List<DataLocation> list = new ArrayList<DataLocation>(taskList.size());
-    for (ServerTask task : taskList) {
-      list.add(task.getDataLocation());
-    }
+    for (ServerTask task : taskList) list.add(task.getDataLocation());
     return list;
   }
 
@@ -266,16 +347,6 @@ public class ServerTaskBundleClient
   }
 
   /**
-   * Make a copy of this bundle.
-   * @param job   the job to copy.
-   * @return a new <code>ServerTaskBundleClient</code> instance.
-   */
-  public ServerTaskBundleClient copy(final JPPFTaskBundle job)
-  {
-    return new ServerTaskBundleClient(job, this);
-  }
-
-  /**
    * Notifies
    * @param results completed tasks.
    */
@@ -284,11 +355,25 @@ public class ServerTaskBundleClient
 
     CompletionListener[] listeners;
     synchronized (listenerList) {
-      listeners = listenerList.toArray(new CompletionListener[listenerList.size()]);
+      listeners = listenerArray;
     }
-    for (CompletionListener listener : listeners) {
-      listener.taskCompleted(this, results);
+    ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, results);
+    for (CompletionListener listener : listeners) listener.taskCompleted(bundle, results);
+  }
+
+  /**
+   * Notifies that tasks have been completed.
+   */
+  protected void fireTasksCompleted() {
+    List<ServerTask> completedTasks = new ArrayList<ServerTask>(tasksToSendList);
+    tasksToSendList.clear();
+
+    CompletionListener[] listeners;
+    synchronized (listenerList) {
+      listeners = listenerArray;
     }
+    ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
+    for (CompletionListener listener : listeners) listener.taskCompleted(bundle, completedTasks);
   }
 
   /**
@@ -299,11 +384,9 @@ public class ServerTaskBundleClient
 
     CompletionListener[] listeners;
     synchronized (listenerList) {
-      listeners = listenerList.toArray(new CompletionListener[listenerList.size()]);
+      listeners = listenerArray;
     }
-    for (CompletionListener listener : listeners) {
-      listener.bundleEnded(this);
-    }
+    for (CompletionListener listener : listeners) listener.bundleEnded(this);
   }
 
   /**
@@ -315,6 +398,7 @@ public class ServerTaskBundleClient
 
     synchronized (listenerList) {
       listenerList.add(listener);
+      listenerArray = listenerList.toArray(new CompletionListener[listenerList.size()]);
     }
   }
 
@@ -326,22 +410,16 @@ public class ServerTaskBundleClient
     if (listener == null) throw new IllegalArgumentException("listener is null");
 
     synchronized (listenerList) {
-      listenerList.add(listener);
+      listenerList.remove(listener);
+      listenerArray = listenerList.toArray(new CompletionListener[listenerList.size()]);
     }
   }
 
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder();
-    sb.append("ServerTaskBundleClient");
-    sb.append("{dataProvider=").append(dataProvider);
-    sb.append(", job=").append(job);
-    sb.append(", pendingTasksCount=").append(pendingTasksCount.get());
-    sb.append(", taskList=").append(taskList);
-    sb.append(", cancelled=").append(isCancelled());
-    sb.append('}');
-    return sb.toString();
+    //return ReflectionUtils.dumpObject(this, "pendingTasksCount", "cancelled", "job", "taskList", "dataProvider");
+    return ReflectionUtils.dumpObject(this, "pendingTasksCount", "cancelled", "done", "job");
   }
 
   /**

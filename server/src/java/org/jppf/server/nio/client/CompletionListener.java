@@ -51,7 +51,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   /**
    * Initialize this completion listener with the specified channel.
    * @param channel the client channel.
-   * @param transitionManager the channel's (transition manager.
+   * @param transitionManager the channel's transition manager.
    */
   public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager transitionManager)
   {
@@ -67,16 +67,23 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results)
   {
     if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
-
-    if(bundle.isCancelled())
+    if (results.isEmpty())
+    {
+      if (debugEnabled) log.debug("empty results list", new Exception());
+      return;
+    }
+    if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
+    if (bundle.isCancelled())
     {
       bundle.removeCompletionListener(this);
-    } else {
+    }
+    else
+    {
       ClientContext context = (ClientContext) channel.getContext();
+      context.offerCompletedBundle(bundle);
       synchronized(channel)
       {
-        context.offerCompletedBundle(bundle);
-        if (ClientState.IDLE.equals(context.getState()))
+        if (context.getState() == ClientState.IDLE)
         {
           try
           {
