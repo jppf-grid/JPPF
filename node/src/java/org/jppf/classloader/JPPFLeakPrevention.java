@@ -105,47 +105,42 @@ public final class JPPFLeakPrevention {
 
     try {
       if (preventJVM) clearJDBCDrivers(classLoader);
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }
 
     try {
       if (preventKeepAlive || preventTimer || preventThread) clearThreads(classLoader);
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }
 
     try {
       if (preventThreadLocal) clearThreadLocal(classLoader);
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }
 
     try {
       if (preventStaticReferences) clearStaticFields(classLoader);
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }
 
     try {
       if (preventJVM) ResourceBundle.clearCache(classLoader);
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }
+
     try {
       if (preventJVM) Introspector.flushCaches();
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }
@@ -185,47 +180,36 @@ public final class JPPFLeakPrevention {
   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
-    for (Thread thread : getThreads())
-    {
-      if (thread != null)
-      {
+    for (Thread thread : getThreads()) {
+      if (thread != null) {
         ClassLoader ccl = thread.getContextClassLoader();
-        if (ccl == classLoader)
-        {
+        if (ccl == classLoader) {
           if (thread == Thread.currentThread()) continue;
           ThreadGroup threadGroup = thread.getThreadGroup();
-          if (threadGroup != null && (THREAD_GROUP_SYSTEM.equals(threadGroup.getName()) || THREAD_GROUP_RMI_RUNTIME.equals(threadGroup.getName())))
-          {
-            if (preventKeepAlive && "Keep-Alive-Timer".equals(thread.getName()))
-            {
+          if (threadGroup != null && (THREAD_GROUP_SYSTEM.equals(threadGroup.getName()) || THREAD_GROUP_RMI_RUNTIME.equals(threadGroup.getName()))) {
+            if (preventKeepAlive && "Keep-Alive-Timer".equals(thread.getName())) {
               thread.setContextClassLoader(classLoader.getParent());
               log.warn("HTTP keep alive timer cleared");
             }
             continue;
           }
-
           if (!thread.isAlive()) continue;
 
-          if (preventTimer && "java.util.TimerThread".equals(thread.getClass().getName()))
-          {
+          if (preventTimer && "java.util.TimerThread".equals(thread.getClass().getName())) {
             clearTimerThread(thread);
-          } 
-          else if (preventThread)
-          {
+          }  else if (preventThread) {
             try {
               Class clazz = thread.getClass();
               while(!Thread.class.equals(clazz)) clazz = clazz.getSuperclass();
               Field fieldTarget = getDeclaredAccessibleField(clazz, "target");
               Object target = fieldTarget.get(thread);
 
-              if (target != null && "java.util.concurrent.ThreadPoolExecutor.Worker".equals(target.getClass().getCanonicalName()))
-              {
+              if (target != null && "java.util.concurrent.ThreadPoolExecutor.Worker".equals(target.getClass().getCanonicalName())) {
                 Field fieldThis = getDeclaredAccessibleField(target.getClass(), "this$0");
                 Object executor = fieldThis.get(target);
                 if (executor instanceof ThreadPoolExecutor) ((ThreadPoolExecutor) executor).shutdownNow();
               }
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
               if (debugEnabled) log.debug(e.getMessage(), e);
               else log.warn(ExceptionUtils.getMessage(e));
             }
@@ -240,8 +224,7 @@ public final class JPPFLeakPrevention {
    * Disable accepting new timer task and clear timer queue.
    * @param thread instance of <code>TimerThread</code> to be cleared.
    */
-  private static void clearTimerThread(final Thread thread)
-  {
+  private static void clearTimerThread(final Thread thread) {
     try {
       Field fieldNewTasks = getDeclaredAccessibleField(thread.getClass(), "newTasksMayBeScheduled");
       Field fieldQueue = getDeclaredAccessibleField(thread.getClass(), "queue");
@@ -257,8 +240,7 @@ public final class JPPFLeakPrevention {
       }
 
       log.warn("Timer thread " + thread.getName() + " leaked.");
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -268,8 +250,7 @@ public final class JPPFLeakPrevention {
    * Clear thread local and inheritable thread local maps in all threads.
    * @param classLoader a <code>ClassLoader</code> instance.
    */
-  private void clearThreadLocal(final ClassLoader classLoader)
-  {
+  private void clearThreadLocal(final ClassLoader classLoader) {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
     try {
@@ -277,16 +258,13 @@ public final class JPPFLeakPrevention {
       Field fieldInheritableThreadLocals = getDeclaredAccessibleField(Thread.class, "inheritableThreadLocals");
       Field fieldTable = getDeclaredAccessibleField(Class.forName("java.lang.ThreadLocal$ThreadLocalMap"), "table");
 
-      for (Thread thread : getThreads())
-      {
-        if (thread != null)
-        {
+      for (Thread thread : getThreads()) {
+        if (thread != null) {
           clearThreadLocalMap(classLoader, fieldThreadLocals.get(thread), fieldTable); // clear thread locals
           clearThreadLocalMap(classLoader, fieldInheritableThreadLocals.get(thread), fieldTable); // clear inheritable thread locals
         }
       }
-    } catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -382,52 +360,41 @@ public final class JPPFLeakPrevention {
     for (Class clazz : getLoadedClasses(classLoader))
     {
       try {
-        for (Field field : clazz.getDeclaredFields())
-        {
-          if (Modifier.isStatic(field.getModifiers()))
-          {
+        for (Field field : clazz.getDeclaredFields()) {
+          if (Modifier.isStatic(field.getModifiers())) {
             field.get(null);
             break;
           }
         }
-      } catch (Throwable ignore)
-      {
-        // ignore
+      } catch (Throwable ignore) {
       }
     }
 
-    for (Class clazz : getLoadedClasses(classLoader))
-    {
+    for (Class clazz : getLoadedClasses(classLoader)) {
       try {
-        for (Field field : clazz.getDeclaredFields())
-        {
+        for (Field field : clazz.getDeclaredFields()) {
           if (field.getType().isPrimitive() || field.getName().contains("$")) continue;
 
           int mods = field.getModifiers();
-          if (Modifier.isStatic(mods))
-          {
+          if (Modifier.isStatic(mods)) {
             try {
               field.setAccessible(true);
-              if (Modifier.isFinal(mods))
-              {
-                if (!(field.getType().getName().startsWith("javax.") || field.getType().getName().startsWith("java.")))
-                {
+              if (Modifier.isFinal(mods)) {
+                if (!(field.getType().getName().startsWith("javax.") || field.getType().getName().startsWith("java."))) {
                   nullInstance(classLoader, field.get(null));
                 }
               } else {
                 field.set(null, null);
                 if (debugEnabled) log.debug("Set " + clazz.getName() + '.' + field.getName() + " to null");
               }
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
               if (debugEnabled) log.debug(t.getMessage(), t);
               else log.warn(ExceptionUtils.getMessage(t));
               if (debugEnabled) log.debug("Could not set " + clazz.getName() + '.' + field.getName() + " to null", t);
             }
           }
         }
-      } catch (Throwable t)
-      {
+      } catch (Throwable t) {
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));
         if (debugEnabled) log.debug("Could not clean fields for class " + clazz.getName(), t);
@@ -440,29 +407,24 @@ public final class JPPFLeakPrevention {
    * @param classLoader a <code>ClassLoader</code> instance.
    * @param instance and object instance to null it's static fields.
    */
-  private static void nullInstance(final ClassLoader classLoader, final Object instance)
-  {
+  private static void nullInstance(final ClassLoader classLoader, final Object instance) {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
     if (instance == null) return;
 
-    for (Field field : instance.getClass().getDeclaredFields())
-    {
+    for (Field field : instance.getClass().getDeclaredFields()) {
       if (field.getType().isPrimitive() || field.getName().contains("$")) continue;
 
       try {
         int mods = field.getModifiers();
-        if (!Modifier.isStatic(mods) || !Modifier.isFinal(mods))
-        {
+        if (!Modifier.isStatic(mods) || !Modifier.isFinal(mods)) {
           field.setAccessible(true);
           Object value = field.get(instance);
-          if (value != null && isLoadedByClassLoader(classLoader, value.getClass()))
-          {
+          if (value != null && isLoadedByClassLoader(classLoader, value.getClass())) {
             field.set(instance, null);
             if (debugEnabled) log.debug("Set " + instance.getClass().getName() + '.' + field.getName() + " to null");
           }
         }
-      } catch (Throwable t)
-      {
+      } catch (Throwable t) {
         if (debugEnabled) log.debug("Could not set " + instance.getClass().getName() + '.' + field.getName() + " to null", t);
       }
     }
@@ -562,13 +524,11 @@ public final class JPPFLeakPrevention {
     Class<?> cls = classLoader.getClass();
     while(cls != null && !ClassLoader.class.equals(cls)) cls = cls.getSuperclass();
     try {
-      if (cls != null)
-      {
+      if (cls != null) {
         Field field = getDeclaredAccessibleField(cls, "classes");
         return Collections.unmodifiableCollection(((Collection<Class>) field.get(classLoader)));
       }
-    } catch (Throwable t)
-    {
+    } catch (Throwable t) {
       if (debugEnabled) log.debug(t.getMessage(), t);
       else log.warn(ExceptionUtils.getMessage(t));
     }

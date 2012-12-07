@@ -113,13 +113,17 @@ public class JPPFUuid implements Serializable
    */
   public JPPFUuid()
   {
-    this(ALPHABET_SUPERSET_CHAR, 20);
+    this.codes_char = HEXADECIMAL_UPPER_CHAR;
+    this.length = 36;
+    this.uuid = generateNormalUuid();
+    //this(ALPHABET_SUPERSET_CHAR, 20);
   }
 
   /**
    * Instantiate this JPPFUuid with a generated unique identifier.
    * @param codes the set of codes from which to choose randomly to build the uuid.
    * @param length number of codes to use to build the uuid.
+   * @deprecated use {@link #JPPFUuid(char[],int)} instead.
    */
   public JPPFUuid(final String[] codes, final int length)
   {
@@ -159,9 +163,25 @@ public class JPPFUuid implements Serializable
   private String generateUuid2()
   {
     int len = codes_char.length;
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(length);
     for (int i=0; i<length; i++) sb.append(codes_char[rand.nextInt(len)]);
     return sb.toString();
+  }
+
+  /**
+   * Generate a unique uuid.
+   * @return the uuid as a string.
+   */
+  private String generateNormalUuid()
+  {
+    int len = codes_char.length;
+    char[] uuidChars = new char[length];
+    for (int i=0; i<length; i++)
+    {
+      if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) uuidChars[i] = '-';
+      else uuidChars[i] = codes_char[rand.nextInt(len)];
+    }
+    return new String(uuidChars);
   }
 
   /**
@@ -196,11 +216,14 @@ public class JPPFUuid implements Serializable
   public static String normalUUID()
   {
     //xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    /*
     StringBuilder sb = new StringBuilder(new JPPFUuid(HEXADECIMAL_UPPER_CHAR, 32).toString());
     sb.insert(20, '-');
     sb.insert(16, '-');
     sb.insert(12, '-');
     sb.insert(8, '-');
     return sb.toString();
+    */
+    return new JPPFUuid().toString();
   }
 }

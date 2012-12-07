@@ -21,7 +21,7 @@ package org.jppf.caching;
 import java.util.*;
 
 /**
- * Cache implementation backed by a {@link Set} wihh synchonized access.
+ * Cache implementation backed by a {@link Set} wihh synchronized access.
  * @param <E> the type of the cache elements.
  * @author Laurent Cohen
  */
