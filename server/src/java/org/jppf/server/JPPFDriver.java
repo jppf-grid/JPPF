@@ -136,7 +136,7 @@ public class JPPFDriver
   protected JPPFDriver()
   {
     config = JPPFConfiguration.getProperties();
-    uuid = config.getString("jppf.driver.uuid", new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString().toUpperCase());
+    uuid = config.getString("jppf.driver.uuid", JPPFUuid.normalUUID());
     int pid = SystemUtils.getPID();
     if (pid > 0) System.out.println("driver process id: " + pid);
     // initialize the jmx logger
