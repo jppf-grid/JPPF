@@ -121,7 +121,8 @@ public final class NetworkUtils
       @Override
       public boolean accepts(final InetAddress addr)
       {
-        return (addr instanceof Inet6Address) && !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || "localhost".equals(addr.getHostName()));
+        return (addr instanceof Inet6Address) && 
+          !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName()));
       }
     });
   }
