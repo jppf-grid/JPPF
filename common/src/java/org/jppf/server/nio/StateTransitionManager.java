@@ -128,12 +128,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
       NioServerFactory<S, T> factory = server.getFactory();
       NioTransition<S> t = factory.getTransition(transition);
       S s2 = t.getState();
-      String msg = StringUtils.build(" from ", s1, " to ", s2, " with ops=", t.getInterestOps(), " for channel ", channel);
       if (s1 != null)
       {
-        if (!factory.isTransitionAllowed(s1, s2)) log.warn("unauthorized transition" + msg);
-        else if (debugEnabled && (s1 != s2)) log.debug("transition" + msg);
-        else log.trace(msg);
+        if (!factory.isTransitionAllowed(s1, s2)) log.warn("unauthorized transition" + getTransitionMessage(s1, s2, t, channel));
+        else if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel));
+        else if (log.isTraceEnabled()) log.trace(getTransitionMessage(s1, s2, t, channel));
       }
       context.setState(s2);
       if (!submit) channel.setKeyOps(t.getInterestOps());
@@ -147,6 +146,26 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
     finally
     {
       lock.unlock();
+    }
+  }
+
+  /**
+   * Build a message for the specified parameter.
+   * @param s1 old channel state.
+   * @param s2 new channel state.
+   * @param t transition.
+   * @param channel the channel.
+   * @return a string message.
+   */
+  private String getTransitionMessage(final S s1, final S s2, final NioTransition<S> t, final ChannelWrapper<?> channel)
+  {
+    try
+    {
+      return StringUtils.build(" from ", s1, " to ", s2, " with ops=", t.getInterestOps(), " for channel ", channel);
+    }
+    catch(Exception e)
+    {
+      return "could not build transition message: " + ExceptionUtils.getMessage(e);
     }
   }
 
