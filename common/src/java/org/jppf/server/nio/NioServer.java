@@ -43,6 +43,7 @@ import org.slf4j.*;
  * @param <S> the type of the states to use.
  * @param <T> the type of the transitions to use.
  * @author Laurent Cohen
+ * @author Lane Schwartz (dynamically allocated server port) 
  */
 public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread
 {
@@ -121,8 +122,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public NioServer(final int[] ports, final int[] sslPorts, final String name) throws Exception
   {
     this(name);
-    if (ports != null) this.ports = Arrays.copyOf(ports, ports.length);
-    if (sslPorts != null) this.sslPorts = Arrays.copyOf(sslPorts, sslPorts.length);
+    this.ports = ports;
+    this.sslPorts = sslPorts;
     init();
   }
 
@@ -138,30 +139,33 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected final void init() throws Exception
   {
-    if ((ports != null) && (ports.length != 0))
-    {
-      for (int port: ports)
-      {
-        if (port <= 0) continue;
-        ServerSocketChannel server = ServerSocketChannel.open();
-        server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-        server.socket().bind(new InetSocketAddress(port));
-        server.configureBlocking(false);
-        server.register(selector, SelectionKey.OP_ACCEPT, Boolean.FALSE);
-      }
-    }
+    if ((ports != null) && (ports.length != 0)) init(ports);
     if ((sslPorts != null) && (sslPorts.length != 0))
     {
       createSSLContext();
-      for (int port: sslPorts)
-      {
-        if (port <= 0) continue;
-        ServerSocketChannel server = ServerSocketChannel.open();
-        server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-        server.socket().bind(new InetSocketAddress(port));
-        server.configureBlocking(false);
-        server.register(selector, SelectionKey.OP_ACCEPT, Boolean.TRUE);
-      }
+      init(sslPorts);
+    }
+  }
+
+  /**
+   * Initialize the underlying server sockets for the spcified array of ports.
+   * @param portsToInit the array of ports to initiialize.
+   * @throws Exception if any error occurs while initializing the server sockets.
+   */
+  private void init(final int[] portsToInit) throws Exception
+  {
+    for (int i=0; i<portsToInit.length; i++)
+    {
+      if (portsToInit[i] < 0) continue;
+      ServerSocketChannel server = ServerSocketChannel.open();
+      server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+      InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
+      server.socket().bind(addr);
+      // If the user specified port zero, the operating system should dynamically allocated a port number.
+      // we store the actual assigned port number so that it can be broadcast.
+      if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
+      server.configureBlocking(false);
+      server.register(selector, SelectionKey.OP_ACCEPT, Boolean.FALSE);
     }
   }
 
@@ -484,6 +488,15 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public int[] getPorts()
   {
     return ports;
+  }
+
+  /**
+   * Get the SSL ports this server is listening to.
+   * @return an array of int values.
+   */
+  public int[] getSSLPorts()
+  {
+    return sslPorts;
   }
 
   /**
