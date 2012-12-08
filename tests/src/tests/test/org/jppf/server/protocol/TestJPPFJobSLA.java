@@ -335,6 +335,47 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   }
 
   /**
+   * Test that a broadcast job is executed on all nodes,
+   * event though another job is already executing at the time it is submitted.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=15000)
+  public void testBroadcastJob2() throws Exception
+  {
+    try
+    {
+      client.close();
+      TypedProperties config = JPPFConfiguration.getProperties();
+      config.setProperty("jppf.pool.size", "2");
+      client = BaseSetup.createClient(null, false);
+      String methodName = ReflectionUtils.getCurrentMethodName();
+      JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 10L);
+      job1.getSLA().setPriority(1000);
+      String suffix = "broadcast-node-";
+      JPPFJob job2 = BaseTestHelper.createJob(methodName + "-broadcast", false, true, 1, FileTask.class, suffix, true);
+      job2.getSLA().setPriority(-1000);
+      client.submit(job1);
+      Thread.sleep(500L);
+      client.submit(job2);
+      JPPFResultCollector collector = (JPPFResultCollector) job1.getResultListener();
+      collector.waitForResults();
+      collector = (JPPFResultCollector) job2.getResultListener();
+      collector.waitForResults();
+      for (int i=1; i<=2; i++)
+      {
+        File file = new File(suffix + "n" + i + ".tmp");
+        assertTrue("file '" + file + "' does not exist", file.exists());
+        file.delete();
+      }
+    }
+    finally
+    {
+      client.close();
+      client = BaseSetup.createClient(null, true);
+    }
+  }
+
+  /**
    * Test that results are returned according to the SendNodeResultsStrategy specified in the SLA.
    * @throws Exception if any error occurs.
    */
