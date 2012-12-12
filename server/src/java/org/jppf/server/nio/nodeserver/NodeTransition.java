@@ -28,11 +28,11 @@ public enum NodeTransition
   /**
    * Transition from a state to SENDING_BUNDLE.
    */
-  TO_SENDING,
+  TO_SENDING_BUNDLE,
   /**
    * Transition from a state to WAITING_RESULTS.
    */
-  TO_WAITING,
+  TO_WAITING_RESULTS,
   /**
    * Transition from a state to SEND_INITIAL_BUNDLE.
    */

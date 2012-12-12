@@ -24,6 +24,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import java.util.*;
 
 import org.jppf.server.nio.*;
+import org.jppf.utils.collections.*;
 
 /**
  * Utility class used to specify the possible states of a node server connection, as well as the possible
@@ -67,14 +68,26 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
   public Map<NodeTransition, NioTransition<NodeState>> createTransitionMap()
   {
     Map<NodeTransition, NioTransition<NodeState>> map =
-      new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
-    map.put(TO_SENDING, transition(SENDING_BUNDLE, NioConstants.CHECK_CONNECTION ? RW : W));
-    map.put(TO_WAITING, transition(WAITING_RESULTS, R));
+        new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
+    map.put(TO_SENDING_BUNDLE, transition(SENDING_BUNDLE, NioConstants.CHECK_CONNECTION ? RW : W));
+    map.put(TO_WAITING_RESULTS, transition(WAITING_RESULTS, R));
     map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAIT_INITIAL, transition(WAIT_INITIAL_BUNDLE, R));
     map.put(TO_IDLE, transition(IDLE, NioConstants.CHECK_CONNECTION ? R : 0));
     //map.put(TO_IDLE, transition(IDLE, 0));
     map.put(TO_IDLE_PEER, transition(IDLE, 0));
+    return map;
+  }
+
+  @Override
+  protected CollectionMap<NodeState, NodeState> createAllowedTransitionsMap()
+  {
+    CollectionMap<NodeState, NodeState> map = new EnumSetEnumMap(NodeState.class);
+    map.addValues(SEND_INITIAL_BUNDLE, SEND_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE);
+    map.addValues(WAIT_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE, IDLE);
+    map.addValues(IDLE, IDLE, SENDING_BUNDLE);
+    map.addValues(SENDING_BUNDLE, SENDING_BUNDLE, WAITING_RESULTS, IDLE);
+    map.addValues(WAITING_RESULTS, WAITING_RESULTS, IDLE);
     return map;
   }
 }

@@ -139,9 +139,8 @@ public class RemoteNodeIO extends AbstractNodeIO
     for (Future<DataLocation> f: futureList)
     {
       DataLocation dl = f.get();
-      if (debugEnabled) log.debug("writing object size = " + dl.getSize());
-      dest.writeInt(dl.getSize());
-      dl.transferTo(dest, true);
+      if (traceEnabled) log.trace("writing object size = " + dl.getSize());
+      IOHelper.writeData(dl, dest);
     }
     socketWrapper.flush();
     if (debugEnabled) log.debug("wrote full results");

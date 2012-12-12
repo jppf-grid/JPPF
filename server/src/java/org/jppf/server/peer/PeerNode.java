@@ -49,6 +49,10 @@ class PeerNode extends AbstractCommonNode
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static final boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Used to send the task results back to the requester.
    */
   private PeerNodeResultSender resultSender = null;
@@ -175,6 +179,7 @@ class PeerNode extends AbstractCommonNode
       }
       if (bundleWrapper.getTaskCount() > 0)
       {
+        //bundle.setTaskCount(bundleWrapper.getTaskCount());
         bundle.getUuidPath().add(driver.getUuid());
         if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
         bundleWrapper.addCompletionListener(resultSender);
@@ -252,20 +257,18 @@ class PeerNode extends AbstractCommonNode
     // Read the request header - with task count information
     if (debugEnabled) log.debug("waiting for next request");
     JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, getHelper().getSerializer());
-    if (debugEnabled) log.debug("received header from peer driver: " + header);
-
     int count = header.getTaskCount();
-    if (debugEnabled) log.debug("Received " + count + " tasks");
+    if (debugEnabled) log.debug("received header from peer driver: " + header + " with " + count + " tasks");
 
     DataLocation dataProvider = IOHelper.readData(is);
-    if (debugEnabled) log.debug("received data provider from peer driver, data length = " + dataProvider.getSize());
+    if (traceEnabled) log.trace("received data provider from peer driver, data length = " + dataProvider.getSize());
 
     List<DataLocation> tasks = new ArrayList<DataLocation>(count);
     for (int i=1; i<count+1; i++)
     {
       DataLocation dl = IOHelper.readData(is);
       tasks.add(dl);
-      if (debugEnabled) log.debug("received task #"+ i + " from peer driver, data length = " + dl.getSize());
+      if (traceEnabled) log.trace("received task #"+ i + " from peer driver, data length = " + dl.getSize());
     }
     return new ServerTaskBundleClient(header, dataProvider, tasks);
   }

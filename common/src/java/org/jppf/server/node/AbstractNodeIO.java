@@ -190,7 +190,7 @@ public abstract class AbstractNodeIO implements NodeIO
     /**
      * The data to send over the network connection.
      */
-    private Object object = null;
+    private final Object object;
 
     /**
      * Initialize this task with the specified data buffer.
@@ -225,7 +225,6 @@ public abstract class AbstractNodeIO implements NodeIO
         try
         {
           JPPFExceptionResult result = new JPPFExceptionResult(t, object);
-          object = null;
           result.setPosition(p);
           dl = IOHelper.serializeData(result, ser);
         }
@@ -234,7 +233,6 @@ public abstract class AbstractNodeIO implements NodeIO
           log.error(e2.getMessage(), e2);
         }
       }
-      object = null;
       return dl;
     }
   }

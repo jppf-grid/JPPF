@@ -80,7 +80,7 @@ class SendingBundleState extends NodeServerState
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());
           context.setBundle(null);
           bundleWrapper.resubmit();
-          return TO_IDLE;
+          return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
         }
         bundleWrapper.setExecutionStartTime(System.nanoTime());
         context.serializeBundle(channel);
@@ -88,7 +88,7 @@ class SendingBundleState extends NodeServerState
       else
       {
         if (debugEnabled) log.debug("null bundle for node " + channel);
-        return TO_IDLE;
+        return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
       }
     }
     if (context.writeMessage(channel))
@@ -96,9 +96,9 @@ class SendingBundleState extends NodeServerState
       if (debugEnabled) log.debug("sent entire bundle " + context.getBundle().getJob() + " to node " + channel);
       context.setMessage(null);
       //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
-      return TO_WAITING;
+      return TO_WAITING_RESULTS;
     }
     if (traceEnabled) log.trace("part yet to send to node " + channel);
-    return TO_SENDING;
+    return TO_SENDING_BUNDLE;
   }
 }

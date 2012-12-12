@@ -27,32 +27,6 @@ import org.jppf.io.DataLocation;
  */
 public class ServerTask {
   /**
-   * State for task indicating whether result or exception was received.
-   */
-  public static enum State {
-    /**
-     * Task was just received - no result or exception.
-     */
-    PENDING,
-    /**
-     * Exception was received for task.
-     */
-    EXCEPTION,
-    /**
-     * Result was received for task.
-     */
-    RESULT,
-    /**
-     * Task is cancelled.
-     */
-    CANCELLED,
-    /**
-     * The taks was sent back to the client.
-     */
-    SENT
-  }
-
-  /**
    * Client bundle that owns this task.
    */
   private final ServerTaskBundleClient bundle;
@@ -75,7 +49,7 @@ public class ServerTask {
   /**
    * The state of this task.
    */
-  private State state = State.PENDING;
+  private TaskState state = TaskState.PENDING;
 
   /**
    *
@@ -118,15 +92,9 @@ public class ServerTask {
 
   /**
    * Get the state of this task.
-   * @return a {@link State} enumerated value.
+   * @return a {@link TaskState} enumerated value.
    */
-  public State getState() {
-    /*
-    if (exception != null) return State.EXCEPTION;
-    if (result == null) return State.PENDING;
-    else if (result == dataLocation) return State.CANCELLED;
-    else return State.RESULT;
-    */
+  public TaskState getState() {
     return state;
   }
 
@@ -135,7 +103,7 @@ public class ServerTask {
    * @return the result as <code>DataLocation</code>.
    */
   public DataLocation getResult() {
-    return  (result == null) ? dataLocation : result;
+    return (result == null) ? dataLocation : result;
   }
 
   /**
@@ -151,7 +119,7 @@ public class ServerTask {
    */
   public void cancel() {
     result = dataLocation;
-    state = State.CANCELLED;
+    state = TaskState.CANCELLED;
   }
   
   /**
@@ -162,7 +130,7 @@ public class ServerTask {
     if (result == null) throw new IllegalArgumentException("result is null");
     this.result = result;
     this.exception = null;
-    this.state = (result == dataLocation) ? State.CANCELLED : State.RESULT;
+    this.state = (result == dataLocation) ? TaskState.CANCELLED : TaskState.RESULT;
   }
 
   /**
@@ -173,14 +141,14 @@ public class ServerTask {
     if (exception == null) throw new IllegalArgumentException("exception is null");
     this.result = null;
     this.exception = exception;
-    this.state = State.EXCEPTION;
+    this.state = TaskState.EXCEPTION;
   }
 
   /**
    * Set this task as sent back to the client.
    */
   public void taskSent() {
-    state = State.SENT;
+    state = TaskState.SENT;
   }
 
   @Override

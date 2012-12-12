@@ -108,7 +108,7 @@ class WaitInitialBundleState extends NodeServerState
       context.setMessage(null);
       context.setBundle(null);
       server.nodeConnected(context);
-      return TO_IDLE;
+      return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
     }
     return TO_WAIT_INITIAL;
   }

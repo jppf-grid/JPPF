@@ -207,7 +207,7 @@ public class ServerJob extends AbstractServerJob {
     CollectionMap<ServerTaskBundleClient, Pair<Integer, DataLocation>> map = new SetIdentityMap<ServerTaskBundleClient, Pair<Integer, DataLocation>>();
     lock.lock();
     try {
-      List<ServerTask> bundleTasks = bundle == null ? new ArrayList<ServerTask>(tasks) : bundle.getTaskList();
+      List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<ServerTask>(tasks) : bundle.getTaskList();
       if (isJobExpired() || isCancelled()) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), new Pair(task.getPosition(), task.getDataLocation()));
       } else {
@@ -259,7 +259,7 @@ public class ServerJob extends AbstractServerJob {
    * @param src source list of <code>ServerTask</code> objects.
    * @param state the state of the server tasks to add.
    */
-  private static void addExcluded(final List<DataLocation> dst, final List<ServerTask> src, final ServerTask.State state) {
+  private static void addExcluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state) {
     for (ServerTask item : src) {
       if (item.getState() != state) dst.add(item.getDataLocation());
     }
@@ -290,7 +290,7 @@ public class ServerJob extends AbstractServerJob {
       boolean requeue = false;
       List<DataLocation> list = new ArrayList<DataLocation>();
       if (getSLA().isBroadcastJob()) {
-        if (bundle != null) addExcluded(list, bundle.getTaskList(), ServerTask.State.RESULT);
+        if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
         //if (isCancelled() || getBroadcastUUID() == null) addExcluded(list, this.tasks, ServerTask.State.RESULT);
       } else if (bundle == null) {
@@ -298,13 +298,13 @@ public class ServerJob extends AbstractServerJob {
         //if (isCancelled()) addExcluded(list, this.tasks, ServerTask.State.RESULT);
       } else {
         if (bundle.isCancelled()) {
-          addExcluded(list, bundle.getTaskList(), ServerTask.State.RESULT);
+          addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
           addAll(list, this.tasks);
         }
         if (bundle.isRequeued()) {
           List<ServerTask> taskList = new ArrayList<ServerTask>();
           for (ServerTask task : bundle.getTaskList()) {
-            if (task.getState() != ServerTask.State.RESULT) taskList.add(task);
+            if (task.getState() != TaskState.RESULT) taskList.add(task);
           }
           requeue = merge(taskList, false);
         }

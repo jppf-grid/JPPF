@@ -18,9 +18,8 @@
 
 package org.jppf.server.protocol;
 
-import java.io.*;
-
 import org.jppf.JPPFException;
+import org.jppf.utils.ExceptionUtils;
 
 /**
  * Instances of this class are used to signal that a task could not be sent back by the node to the server.
@@ -39,11 +38,11 @@ public final class JPPFExceptionResult extends JPPFTask
   /**
    * This captures the result of ("" + object).
    */
-  private String objectDescriptor = null;
+  private final String objectDescriptor;
   /**
    * The fully qualified class name of the object that triggered the error.
    */
-  private String className = null;
+  private final String className;
 
   /**
    * Initialize this task with the specified error context.
@@ -55,7 +54,7 @@ public final class JPPFExceptionResult extends JPPFTask
     if (throwable instanceof Exception) setException((Exception) throwable);
     else setException(new JPPFException(throwable));
     objectDescriptor = String.valueOf(object);
-    if (object != null) className = object.getClass().getName();
+    className = (object != null) ? object.getClass().getName() : "unknown class";
   }
 
   /**
@@ -78,14 +77,25 @@ public final class JPPFExceptionResult extends JPPFTask
   {
     StringBuilder sb = new StringBuilder();
     sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);
-    if (getException() != null)
-    {
-      sb.append(" :\n");
-      StringWriter sw = new StringWriter();
-      PrintWriter writer = new PrintWriter(sw);
-      getException().printStackTrace(writer);
-      sb.append(sw.toString());
-    }
+    if (getException() != null) sb.append(" :\n").append(ExceptionUtils.getStackTrace(getException()));
     return sb.toString();
+  }
+
+  /**
+   * Get a string describing the object on which the error occurred.
+   * @return "null" if the task was null, the result of its <code>toString()</code> method otherwise.
+   */
+  public String getObjectDescriptor()
+  {
+    return objectDescriptor;
+  }
+
+  /**
+   * Get the fully qualified class name of the intiial task object on which the error occurred.
+   * @return "unknown class" if the task object was null, its class name otherwise.
+   */
+  public String getTaskClassName()
+  {
+    return className;
   }
 }

@@ -127,9 +127,14 @@ public class ServerTaskBundleClient
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
 
-    this.job = source.getJob().copy(taskList.size());
+    job = source.getJob().copy(taskList.size());
     job.initialTaskCount = source.getJob().getInitialTaskCount();
     job.currentTaskCount = job.taskCount;
+    if ((job.getTaskCount() == 0) && (job.getName().indexOf("handshake") < 0))
+    {
+      boolean breakpoint = true;
+    }
+    //job.currentTaskCount = job.taskCount = taskList.size();
     this.dataProvider = source.getDataProvider();
     this.taskList.addAll(taskList);
     this.pendingTasksCount.set(0);
@@ -176,7 +181,7 @@ public class ServerTaskBundleClient
 
     boolean fire;
     ServerTask task = taskList.get(index);
-    if (task.getState() == ServerTask.State.RESULT) {
+    if (task.getState() == TaskState.RESULT) {
       fire = false;
     } else {
       fire = pendingTasksCount.decrementAndGet() == 0;
@@ -199,7 +204,7 @@ public class ServerTaskBundleClient
     for (Pair<Integer, DataLocation> result: results) {
       ServerTask task = taskList.get(result.first());
       //if (task.getState() != ServerTask.State.RESULT) {
-      if (task.getState() == ServerTask.State.PENDING) {
+      if (task.getState() == TaskState.PENDING) {
         tasksToSendList.add(task);
         pendingTasksCount.decrementAndGet();
       }
@@ -231,7 +236,7 @@ public class ServerTaskBundleClient
     if (isCancelled()) return;
     for (ServerTask task: tasks)
     {
-      if (task.getState() == ServerTask.State.PENDING) {
+      if (task.getState() == TaskState.PENDING) {
         tasksToSendList.add(task);
         pendingTasksCount.decrementAndGet();
       }
@@ -271,7 +276,7 @@ public class ServerTaskBundleClient
       this.cancelled = true;
       for (ServerTask task: taskList)
       {
-        if (task.getState() == ServerTask.State.PENDING) {
+        if (task.getState() == TaskState.PENDING) {
           task.cancel();
           tasksToSendList.add(task);
           pendingTasksCount.decrementAndGet();

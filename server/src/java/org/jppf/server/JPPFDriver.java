@@ -142,10 +142,11 @@ public class JPPFDriver
     if (pid > 0) System.out.println("driver process id: " + pid);
     // initialize the jmx logger
     new JmxMessageNotifier();
+    Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     String hrule = StringUtils.padRight("", '-', 80);
     log.info(hrule);
     log.info(VersionUtils.getVersionInformation());
-    log.info("starting JPPF driver with PID=" + pid + " , uuid=" + uuid);
+    log.info("starting JPPF driver with PID=" + pid + " , UUID=" + uuid);
     log.info(hrule);
     systemInformation = new JPPFSystemInformation(uuid, false, true);
     statsUpdater = new JPPFDriverStatsUpdater();

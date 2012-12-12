@@ -411,7 +411,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       }
     };
     setBundle(nodeBundle);
-    transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING);
+    transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
 //    bundleWrapper.jobDispatched(getChannel(), future);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
 

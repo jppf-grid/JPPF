@@ -81,36 +81,35 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
 
   /**
    * Send the results of the tasks in a bundle back to the client who submitted the request.
-   * @param bundleWrapper the bundle to get the task results from.
+   * @param clientBundle the bundle to get the task results from.
    * @throws Exception if an IO exception occurred while sending the results back.
    */
-  public void sendResults(final ServerTaskBundleClient bundleWrapper) throws Exception
+  public void sendResults(final ServerTaskBundleClient clientBundle) throws Exception
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
-    if (debugEnabled) log.debug("Sending bundle with " + bundle.getTaskCount() + " tasks");
+    if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
+    JPPFTaskBundle bundle = clientBundle.getJob();
+    // i don't know why bundle.getTaskCount() = 0 at this point
+    bundle.setTaskCount(clientBundle.getTaskCount());
+    if (debugEnabled) log.debug("Sending bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
     IOHelper.sendData(socketClient, bundle, helper.getSerializer());
-    for (ServerTask task : bundleWrapper.getTaskList())
-    {
-      DataLocation dl = task.getResult();
-      destination.writeInt(dl.getSize());
-      dl.transferTo(destination, true);
-    }
+    for (ServerTask task : clientBundle.getTaskList()) IOHelper.writeData(task.getResult(), destination);
     socketClient.flush();
     if (debugEnabled) log.debug("bundle sent");
   }
 
-
   @Override
-  public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
-    if (bundle == null) throw new IllegalStateException("bundle is null");
+  public void taskCompleted(final ServerTaskBundleClient clientBundle, final List<ServerTask> results) {
+    if (clientBundle == null) throw new IllegalStateException("bundle is null");
 
-    if (bundle.isCancelled())
+    if (clientBundle.isCancelled())
     {
-      bundle.removeCompletionListener(this);
-    } else {
+      clientBundle.removeCompletionListener(this);
+    }
+    else
+    {
       int pendingTasksCount = this.bundle.getPendingTasksCount();
+      if (debugEnabled) log.debug("Sending notification of bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
       if (pendingTasksCount <= 0)
       {
         synchronized(this)

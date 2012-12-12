@@ -129,17 +129,12 @@ public abstract class AbstractClassLoaderManager
     if (container == null)
     {
       if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-      AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>()
-      {
+      AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>() {
         @Override
-        public AbstractJPPFClassLoader run()
-        {
-          try
-          {
+        public AbstractJPPFClassLoader run() {
+          try {
             return newClassLoaderCreator(uuidPath).call();
-          }
-          catch(Exception e)
-          {
+          } catch(Exception e) {
             log.error(e.getMessage(), e);
           }
           return null;
@@ -149,10 +144,13 @@ public abstract class AbstractClassLoaderManager
       if (containerList.size() >= maxContainers)
       {
         JPPFContainer toRemove = containerList.removeFirst();
-        try {
+        try
+        {
           AbstractJPPFClassLoader loader = toRemove.getClassLoader();
           if (loader != null) leakPrevention.clearReferences(loader);
-        } finally {
+        }
+        finally
+        {
           toRemove.helper = null;
           toRemove.classLoader = null;
           containerMap.remove(toRemove.getAppUuid());
@@ -177,7 +175,8 @@ public abstract class AbstractClassLoaderManager
         AbstractJPPFClassLoader loader = container.getClassLoader();
         if (loader != null) leakPrevention.clearReferences(loader);
       }
-    } finally
+    }
+    finally
     {
       containerMap.clear();
       containerList.clear();
