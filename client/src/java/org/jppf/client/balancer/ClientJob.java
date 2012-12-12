@@ -18,15 +18,17 @@
 
 package org.jppf.client.balancer;
 
+import java.io.NotSerializableException;
 import java.util.*;
 import java.util.concurrent.Future;
 
+import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.balancer.utils.AbstractClientJob;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.*;
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
 /**
@@ -38,6 +40,10 @@ public class ClientJob extends AbstractClientJob
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The list of of the tasks.
    */
@@ -123,13 +129,8 @@ public class ClientJob extends AbstractClientJob
     this.tasks = new ArrayList<JPPFTask>(tasks);
 
     for (JPPFTask result : job.getResults().getAll()) {
-        if(result != null) {
-          if(result.getException() == null)
-            taskStateMap.put(result.getPosition(), TaskState.RESULT);
-          else
-            taskStateMap.put(result.getPosition(), TaskState.EXCEPTION);
-        }
-      }
+      if(result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
+    }
   }
 
   /**
@@ -301,6 +302,7 @@ public class ClientJob extends AbstractClientJob
    */
   public void resultsReceived(final ClientTaskBundle bundle, final List<JPPFTask> results)
   {
+    if (debugEnabled) log.debug("received " + results.size() + " results for bundle " + bundle);
     if (results.isEmpty()) return;
 
     synchronized (tasks)
@@ -312,7 +314,7 @@ public class ClientJob extends AbstractClientJob
     {
       synchronized (listener)
       {
-        listener.resultsReceived(new TaskResultEvent(results));
+        listener.resultsReceived(new TaskResultEvent(results, null));
       }
     }
     job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, results);
@@ -326,12 +328,17 @@ public class ClientJob extends AbstractClientJob
   public void resultsReceived(final ClientTaskBundle bundle, final Throwable throwable)
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-
+    if (debugEnabled) log.debug("received  throwable " + throwable + " for bundle " + bundle);
     synchronized (tasks)
     {
+      Exception e = throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
       for (JPPFTask task : bundle.getTasksL()) {
         TaskState oldState = taskStateMap.get(task.getPosition());
-        if (oldState != TaskState.RESULT) taskStateMap.put(task.getPosition(), TaskState.EXCEPTION);
+        if (oldState != TaskState.RESULT)
+        {
+          taskStateMap.put(task.getPosition(), TaskState.EXCEPTION);
+          task.setException(e);
+        }
       }
     }
     TaskResultListener listener = resultsListener;
@@ -339,7 +346,7 @@ public class ClientJob extends AbstractClientJob
     {
       synchronized (listener)
       {
-        listener.resultsReceived(new TaskResultEvent(throwable));
+        listener.resultsReceived(new TaskResultEvent(bundle.getTasksL(), throwable));
       }
     }
     job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, bundle.getTasksL());
@@ -352,6 +359,7 @@ public class ClientJob extends AbstractClientJob
    */
   public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
   {
+    if (debugEnabled) log.debug("bundle=" + bundle + ", exception=" + exception + " for " + this);
     boolean empty;
     synchronized (bundleMap) {
       Future future = bundleMap.remove(bundle);
@@ -411,7 +419,9 @@ public class ClientJob extends AbstractClientJob
     }
 
     if (hasPending()) {
-      if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
+      if (exception != null) {
+        setSubmissionStatus(exception instanceof NotSerializableException ? SubmissionStatus.COMPLETE : SubmissionStatus.FAILED);
+      }
       if (empty) setExecuting(false);
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
@@ -572,6 +582,8 @@ public class ClientJob extends AbstractClientJob
     sb.append(", submissionStatus=").append(submissionStatus);
     sb.append(", broadcastUUID=").append(broadcastUUID);
     sb.append(", executing=").append(executing);
+    sb.append(", nbTasks=").append(tasks.size());
+    sb.append(", taskStateMap=").append(taskStateMap);
     sb.append(']');
     return sb.toString();
   }

@@ -110,7 +110,14 @@ public class NodeRunner
     {
       // initialize the jmx logger
       new JmxMessageNotifier();
+      Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
+      int pid = SystemUtils.getPID();
+      if (pid > 0) System.out.println("node process id: " + pid);
+      String hrule = StringUtils.padRight("", '-', 80);
+      log.info(hrule);
       log.info(VersionUtils.getVersionInformation());
+      log.info("starting node with PID=" + pid + ", UUID=" + uuid);
+      log.info(hrule);
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
       hooksHandler = new InitializationHooksHandler(initialConfig);
@@ -130,11 +137,6 @@ public class NodeRunner
     }
     try
     {
-      int pid = SystemUtils.getPID();
-      if (pid > 0) System.out.println("node process id: " + pid);
-      log.info("starting node, uuid=" + uuid + ", PID=" + pid);
-      // to ensure VersionUtils is loaded by the same class loader as this class.
-      VersionUtils.getBuildNumber();
       while (true)
       {
         try

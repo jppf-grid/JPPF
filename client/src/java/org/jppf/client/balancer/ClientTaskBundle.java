@@ -135,26 +135,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
   public ClientTaskBundle copy()
   {
     throw new UnsupportedOperationException();
-//    ClientTaskBundle bundle = new ClientTaskBundle(getJob(), tasks);
-//    bundle.setUuidPath(getUuidPath());
-//    bundle.setRequestUuid(getRequestUuid());
-//    bundle.setUuid(getUuid());
-//    bundle.setName(getName());
-//    bundle.setTaskCount(getTaskCount());
-//    bundle.setDataProvider(getDataProvider());
-//    synchronized (bundle.getParametersMap())
-//    {
-//      for (Map.Entry<Object, Object> entry : getParametersMap().entrySet())
-//        bundle.setParameter(entry.getKey(), entry.getValue());
-//    }
-//    bundle.setQueueEntryTime(getQueueEntryTime());
-//    bundle.setCompletionListener(getCompletionListener());
-//    bundle.setSLA(getSLA());
-//    bundle.setLocalExecutionPolicy(localExecutionPolicy);
-//    bundle.setBroadcastUUID(broadcastUUID);
-//    //bundle.setParameter(BundleParameter.JOB_METADATA, getJobMetadata());
-//
-//    return bundle;
   }
 
   /**
@@ -166,10 +146,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
   public ClientTaskBundle copy(final int nbTasks)
   {
     throw new UnsupportedOperationException();
-//    ClientTaskBundle bundle = copy();
-//    bundle.setTaskCount(nbTasks);
-//    taskCount -= nbTasks;
-//    return bundle;
   }
 
   /**

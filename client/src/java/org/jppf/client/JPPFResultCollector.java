@@ -113,9 +113,9 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
     Throwable t = event.getThrowable();
-    if (t == null)
+    List<JPPFTask> tasks = event.getTaskList();
+    if (tasks != null)
     {
-      List<JPPFTask> tasks = event.getTaskList();
       jobResults.putResults(tasks);
       if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + (count - jobResults.size()));
       JobPersistence pm = job.getPersistenceManager();
@@ -130,7 +130,6 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
           log.error(e.getMessage(), e);
         }
       }
-      notifyAll();
     }
     else
     {
@@ -141,6 +140,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
 //      if (resultMap != null) resultMap.clear();
 //      results = null;
     }
+    notifyAll();
   }
 
   /**

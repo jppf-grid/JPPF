@@ -29,44 +29,19 @@ import org.jppf.server.protocol.JPPFTask;
 public class TaskResultEvent extends EventObject
 {
   /**
-   * Index of the first task in the list, relative to the initial execution request.
-   * @deprecated use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
-   * @exclude
+   * An eventual throwable that was raised while receiving the results.
    */
-  private int startIndex = -1;
+  private final Throwable throwable;
 
   /**
    * Initialize this event with a specified list of tasks.
    * @param taskList the list of tasks whose results have been received from the server.
-   */
-  public TaskResultEvent(final List<JPPFTask> taskList)
-  {
-    super(taskList);
-  }
-
-  /**
-   * Initialize this event with a throwable eventually raised while receiving the results.
-   * A <code>TaskResultListener</code> can use this information to reset its state before the job is resubmitted.
    * @param throwable the throwable that was raised while receiving the results.
    */
-  public TaskResultEvent(final Throwable throwable)
-  {
-    super(throwable);
-  }
-
-  /**
-   * Initialize this event with a specified list of tasks and start index.
-   * @param taskList the list of tasks whose results have been received from the server.
-   * @param startIndex index of the first task in the list, relative to the initial execution
-   * request. Used to enable proper ordering of the results.
-   * @deprecated the startIndex is not used any more to determine each task's position.
-   * Use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
-   * @exclude
-   */
-  public TaskResultEvent(final List<JPPFTask> taskList, final int startIndex)
+  public TaskResultEvent(final List<JPPFTask> taskList, final Throwable throwable)
   {
     super(taskList);
-    this.startIndex = startIndex;
+    this.throwable = throwable;
   }
 
   /**
@@ -77,19 +52,7 @@ public class TaskResultEvent extends EventObject
   @SuppressWarnings("unchecked")
   public List<JPPFTask> getTaskList()
   {
-    Object o = getSource();
-    return (o instanceof List) ? (List<JPPFTask>) getSource() : Collections.<JPPFTask>emptyList();
-  }
-
-  /**
-   * Get the index of the first task in the list, relative to the initial execution request.
-   * @return the index as an int value.
-   * @deprecated use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} instead.
-   * @exclude
-   */
-  public int getStartIndex()
-  {
-    return startIndex;
+    return (List<JPPFTask>) getSource();
   }
 
   /**
@@ -98,7 +61,6 @@ public class TaskResultEvent extends EventObject
    */
   public Throwable getThrowable()
   {
-    Object o = getSource();
-    return (o instanceof Throwable) ? (Throwable) o : null;
+    return throwable;
   }
 }

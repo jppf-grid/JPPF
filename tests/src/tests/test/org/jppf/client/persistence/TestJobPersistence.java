@@ -43,7 +43,8 @@ public class TestJobPersistence extends Setup1D1N
    * Test the recovery of a job by closing the JPPF client before it completes.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=15000)
+  //@Test(timeout=15000)
+  @Test
   public void testJobRecovery() throws Exception
   {
     String key = null;
@@ -60,7 +61,7 @@ public class TestJobPersistence extends Setup1D1N
       client = BaseSetup.createClient(null, false);
       int nbTasks = 3;
       final AtomicBoolean resultsReceived = new AtomicBoolean(false);
-      JPPFJob job = BaseTestHelper.createJob("TestSubmit", false, false, nbTasks, SimpleTask.class, duration);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, SimpleTask.class, duration);
       pm = new DefaultFilePersistenceManager("root", "job_", ".ser");
       key = pm.computeKey(job);
       assertEquals(key, job.getUuid());

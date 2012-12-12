@@ -170,9 +170,11 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
     sb.append(host).append(':').append(port);
     sb.append(", type=").append(type & TYPE_MASK);
     sb.append(", id=").append(id);
+    sb.append(']');
     return sb.toString();
   }
 

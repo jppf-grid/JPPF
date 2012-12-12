@@ -20,11 +20,12 @@ package test.org.jppf.client;
 
 import static org.junit.Assert.*;
 
+import java.io.NotSerializableException;
 import java.lang.management.*;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -155,7 +156,7 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-      
+
       // submit a job to ensure all local execution threads are created
       int nbTasks = 100;
       JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
@@ -190,5 +191,97 @@ public class TestJPPFClient extends Setup1D1N
       client.close();
       JPPFConfiguration.reset();
     }
+  }
+
+  /**
+   * Test that a {@link java.io.NotSerializableException} occurring when submitting a job to a driver is properly handled.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testNotSerializableExceptionFromClient() throws Exception
+  {
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, true);
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(1, results.size());
+      JPPFTask task = results.get(0);
+      assertNotNull(task.getException());
+      assertTrue(task.getException() instanceof NotSerializableException);
+    }
+    finally
+    {
+      client.close();
+    }
+  }
+
+  /**
+   * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testNotSerializableExceptionFromNode() throws Exception
+  {
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, false);
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(1, results.size());
+      JPPFTask task = results.get(0);
+      assertTrue(task instanceof JPPFExceptionResult);
+      assertNotNull(task.getException());
+      assertTrue(task.getException() instanceof NotSerializableException);
+    }
+    finally
+    {
+      client.close();
+    }
+  }
+
+  /**
+   * A task which holds a non-serializable object.
+   */
+  public static class NotSerializableTask extends JPPFTask
+  {
+    /**
+     * A non-serializable object.
+     */
+    private NotSerializableObject nso = null;
+    /**
+     *  <code>true</code> if the non-serializable object should be created in the constructor, <code>false</code> if it should be created in the client.
+     */
+    private final boolean instantiateInClient;
+
+    /**
+     * Initialize with the specified flag.
+     * @param instantiateInClient <code>true</code> if the non-serializable object should be created in the constructor (client side),
+     * <code>false</code> if it should be created in the <code>run()</code> method (node side).
+     */
+    public NotSerializableTask(final boolean instantiateInClient)
+    {
+      this.instantiateInClient = instantiateInClient;
+      if (instantiateInClient) nso = new NotSerializableObject();
+    }
+
+    @Override
+    public void run()
+    {
+      if (!instantiateInClient) nso = new NotSerializableObject();
+    }
+  }
+
+  /**
+   * A task which holds a non-serializable object.
+   */
+  public static class NotSerializableObject
+  {
+    /**
+     * Any attribute will do.
+     */
+    public String name = "NotSerializableObject";
   }
 }

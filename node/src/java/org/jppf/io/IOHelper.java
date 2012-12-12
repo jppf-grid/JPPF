@@ -87,7 +87,7 @@ public final class IOHelper
    * The data may be stored in memory or on another medium depending on its size and the available memory.
    * @param source the input source from which to read the data.
    * @return A data location containing the data provider or task data.
-   * @throws Exception if an error occurs while deserializing.
+   * @throws Exception if an error occurs while reading the data.
    */
   public static DataLocation readData(final InputSource source) throws Exception
   {
@@ -96,6 +96,18 @@ public final class IOHelper
     DataLocation dl = createDataLocationMemorySensitive(n);
     dl.transferFrom(source, true);
     return dl;
+  }
+
+  /**
+   * Write the specified data to the specified destination.
+   * @param data the data to write.
+   * @param destination tyhe destination to write to.
+   * @throws Exception if any error occurs.
+   */
+  public static void writeData(final DataLocation data, final OutputDestination destination) throws Exception
+  {
+    destination.writeInt(data.getSize());
+    data.transferTo(destination, true);
   }
 
   /**

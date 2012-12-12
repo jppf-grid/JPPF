@@ -250,7 +250,6 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
             count += n;
             if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
             this.bundle.resultsReceived(results);
-//            else log.warn("result listener is null for job " + newJob);
           }
           completed = true;
         }
