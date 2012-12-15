@@ -154,6 +154,10 @@ public enum Fields
    */
   JOBS_MAX,
   /**
+   * Execution time of the latest job in the server.
+   */
+  JOBS_LATEST_TIME,
+  /**
    * Minimum execution time of a job in the server.
    */
   JOBS_MIN_TIME,

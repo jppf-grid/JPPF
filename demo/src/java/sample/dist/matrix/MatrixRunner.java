@@ -153,7 +153,7 @@ public class MatrixRunner implements NotificationListener
       /*
 			monitor.stopMonitoring();
 			monitor.storeData("./GridMonitoring");
-       */
+      */
     }
     finally
     {
@@ -207,7 +207,11 @@ public class MatrixRunner implements NotificationListener
     // Get the matrix values from the tasks results
     int rowIdx = 0;
     for (JPPFTask matrixTask : results) {
-      if (matrixTask.getException() != null) throw matrixTask.getException();
+      if (matrixTask.getException() != null)
+      {
+        output("got exception: " + ExceptionUtils.getStackTrace(matrixTask.getException()));
+        throw matrixTask.getException();
+      }
       double[][] rows = (double[][]) matrixTask.getResult();
       for (int j = 0; j < rows.length; j++) {
         for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);

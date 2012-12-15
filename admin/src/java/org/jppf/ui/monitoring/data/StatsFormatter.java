@@ -122,6 +122,7 @@ public final class StatsFormatter implements StatsConstants
     stringValueMap.put(JOBS_TOTAL, formatInt((long) queue.getSizes().getTotal()));
     stringValueMap.put(JOBS_LATEST, formatInt((long) queue.getSizes().getLatest()));
     stringValueMap.put(JOBS_MAX, formatInt((long) queue.getSizes().getMax()));
+    stringValueMap.put(JOBS_LATEST_TIME, formatDouble(queue.getTimes().getLatest()));
     stringValueMap.put(JOBS_MIN_TIME, formatDouble(queue.getTimes().getMin()));
     stringValueMap.put(JOBS_MAX_TIME, formatDouble(queue.getTimes().getMax()));
     stringValueMap.put(JOBS_AVG_TIME, formatDouble(queue.getTimes().getAvg()));
@@ -173,6 +174,7 @@ public final class StatsFormatter implements StatsConstants
     doubleValueMap.put(JOBS_TOTAL, (double) queue.getSizes().getTotal());
     doubleValueMap.put(JOBS_LATEST, (double) queue.getSizes().getLatest());
     doubleValueMap.put(JOBS_MAX, (double) queue.getSizes().getMax());
+    doubleValueMap.put(JOBS_LATEST_TIME, (double) queue.getTimes().getLatest());
     doubleValueMap.put(JOBS_MIN_TIME, (double) queue.getTimes().getMin());
     doubleValueMap.put(JOBS_MAX_TIME, (double) queue.getTimes().getMax());
     doubleValueMap.put(JOBS_AVG_TIME, queue.getTimes().getAvg());

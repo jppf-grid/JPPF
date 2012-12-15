@@ -18,6 +18,8 @@
 
 package org.jppf.ui.monitoring.node;
 
+import java.text.NumberFormat;
+
 import javax.swing.tree.*;
 
 import org.jppf.management.*;
@@ -48,6 +50,10 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    * Column number for the node's number of tasks executed.
    */
   static final int NB_TASKS = 4;
+  /**
+   * 
+   */
+  static NumberFormat nf = createNumberFormat();
 
   /**
    * Initialize this model with the specified tree.
@@ -112,7 +118,8 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
             if (isNode) res = state.getExecutionStatus();
             break;
           case NB_TASKS:
-            if (isNode) res = Integer.toString(state.getNbTasksExecuted());
+            //if (isNode) res = Integer.toString(state.getNbTasksExecuted());
+            if (isNode) res = nf.format(state.getNbTasksExecuted());
             break;
         }
       }
@@ -153,5 +160,16 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
         break;
     }
     return res;
+  }
+
+  /**
+   * Get a number formatter for the number of tasks for each node.
+   * @return a <code>NumberFormat</code> instance.
+   */
+  private static NumberFormat createNumberFormat()
+  {
+    NumberFormat nf = NumberFormat.getIntegerInstance();
+    nf.setGroupingUsed(true);
+    return nf;
   }
 }

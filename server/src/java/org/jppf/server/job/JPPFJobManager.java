@@ -103,7 +103,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   @Override
   public synchronized void jobDispatched(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    JPPFTaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
@@ -119,7 +119,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   @Override
   public synchronized void jobReturned(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    JPPFTaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)

@@ -41,11 +41,15 @@ public final class GuiUtils
   /**
    * Keywords to look for and replace in the legend items of the charts.
    */
-  private static final String[] KEYWORDS = { "Execution", "Maximum", "Minimum", "Average", "Cumulated" };
+  private static final String[] KEYWORDS = { "Execution", "execution", "Maximum", "Minimum", "Average", "Cumulated" };
   /**
    * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
    */
-  private static final String[] REPLACEMENTS = { "Exec", "Max", "Min", "Avg", "Cumul" };
+  private static final String[] REPLACEMENTS = { "Exec", "exec", "Max", "Min", "Avg", "Cumul" };
+  /**
+   * 
+   */
+  private static Map<String, String> shortenerMap = createShortener();
 
   /**
    * Create a chartPanel with a box layout with the specified orientation.
@@ -141,11 +145,41 @@ public final class GuiUtils
    */
   public static String shortenLabel(final String key)
   {
-    String result = key;
-    for (int i=0; i<KEYWORDS.length; i++)
+    String[] words = key.split("\\s");
+    StringBuilder sb = new StringBuilder();
+    int count = 0;
+    for (String word: words)
     {
-      if (result.contains(KEYWORDS[i])) result = result.replace(KEYWORDS[i], REPLACEMENTS[i]);
+      String result = shortenerMap.get(word);
+      if (result == null) result = word;
+      sb.append(result);
+      if ((count < words.length-1) && !"".equals(result)) sb.append(' ');
+      count++;
     }
-    return result;
+    return sb.toString();
+  }
+
+  /**
+   * Create a map to shorten labels in the charts.
+   * @return a map of keyword to shorter replacements.
+   */
+  private static Map<String, String> createShortener()
+  {
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("Execution", "Exec");
+    map.put("execution", "exec");
+    map.put("Maximum", "Max");
+    map.put("maximum", "max");
+    map.put("Minimum", "Min");
+    map.put("minimum", "min");
+    map.put("Average", "Avg");
+    map.put("average", "avg");
+    map.put("Cumulated", "Cumul.");
+    map.put("cumulated", "cumul.");
+    map.put("Number", "Nb");
+    map.put("number", "nb");
+    map.put("Of", "");
+    map.put("of", "");
+    return map;
   }
 }

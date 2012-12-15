@@ -89,6 +89,7 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
 
     this.job = job;
     this.taskBundle = taskBundle;
+    this.taskBundle.setCurrentTaskCount(taskList.size());
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
     this.taskList = Collections.unmodifiableList(new ArrayList<ServerTask>(taskList));

@@ -81,8 +81,8 @@ public class JobEventTask implements Runnable
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
     if(eventType == JobEventType.JOB_UPDATED)
     {
-      Integer n = (Integer) bundle.getParameter(BundleParameter.REAL_TASK_COUNT);
-      if (n != null) jobInfo.setTaskCount(n);
+      int n = bundle.getCurrentTaskCount();
+      jobInfo.setTaskCount(n);
     }
 
     jobManager.fireJobEvent(event);

@@ -121,7 +121,7 @@ public class DriverInitializer
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         serverDebug = new ServerDebug();
         StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
-        server.registerMBean(mbean, new ObjectName("org.jppf:name=debug,type=driver"));
+        server.registerMBean(mbean, new ObjectName(ServerDebugMBean.MBEAN_NAME));
       }
       catch (Exception e)
       {

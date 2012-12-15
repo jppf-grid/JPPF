@@ -190,15 +190,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if(onClose != null) onClose.run();
     if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getJob().getState()))
     {
-//      if(exception != null && !(exception instanceof EOFException)) exception.printStackTrace();
-//      bundle.fireJobReturned((ExecutorChannel) channel.getContext()); // todo fix
       ServerTaskBundleNode tmpWrapper = bundle;
       setBundle(null);
+      tmpWrapper.resubmit();
       tmpWrapper.taskCompleted(new Exception(exception));
-//      JPPFTaskBundle tmpBundle = (JPPFTaskBundle) tmpWrapper.getJob();
-//      // broadcast jobs are not resubmitted.
-//      if (tmpBundle.getSLA().isBroadcastJob()) tmpBundle.t(tmpWrapper);
-//      else resubmitBundle(tmpWrapper);
     }
   }
 
@@ -213,7 +208,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
     message.addLocation(bundle.getDataProviderL());
     for (ServerTask dl: bundle.getTaskList()) message.addLocation(dl.getDataLocation());
-//    System.out.println("serialize: Task count - bundle: " + bundle.getTaskCount() + "\t job: " + bundle.getJob().getTaskCount() + "\t real tasks: " + bundle.getTasksL().size());
     message.setBundle(bundle.getJob());
     setMessage(message);
   }
