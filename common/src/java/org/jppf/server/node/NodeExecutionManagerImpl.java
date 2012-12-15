@@ -459,6 +459,14 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   }
 
   /**
+   * Set the config changed flag to true.
+   */
+  public void triggerConfigChanged()
+  {
+    configChanged.set(true);
+  }
+
+  /**
    * Determines whether the configuration has changed and resets the flag if it has.
    * @return true if the config was changed, false otherwise.
    */
