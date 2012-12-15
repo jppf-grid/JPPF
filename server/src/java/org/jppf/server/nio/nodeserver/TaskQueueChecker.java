@@ -23,8 +23,7 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFContextDriver;
-import org.jppf.server.JPPFDriver;
+import org.jppf.server.*;
 import org.jppf.server.job.ChannelJobPair;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
@@ -71,6 +70,10 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * Reference to the driver.
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Default value to return if there is an execution policy but the system information for the node is unavailable
+   */
+  private static final boolean DEFAULT_POLICY_VALUE = JPPFConfiguration.getProperties().getBoolean("jppf.default.policy.outcome", true);
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -242,8 +245,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
   {
     if (debugEnabled)
     {
-      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + 
-        ", nodeUuid=" + ((AbstractNodeContext) channel.getContext()).getUuid());
+      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
+          ", nodeUuid=" + ((AbstractNodeContext) channel.getContext()).getUuid());
     }
     synchronized(channel)
     {
@@ -301,18 +304,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
       }
       if (policy != null)
       {
-        JPPFManagementInfo mgtInfo = driver.getNodeHandler().getNodeInformation(ch);
-        JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
-        boolean b = false;
-        try
-        {
-          b = policy.accepts(info);
-        }
-        catch(Exception ex)
-        {
-          log.error("An error occurred while running the execution policy to determine node participation.", ex);
-        }
-        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + mgtInfo.getId());
+        boolean b = evaluateExecutionPolicy(policy, ch);
+        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + ", node=" + ch + ", nodeUuid=" + ch.getContext().getUuid());
         if (!b) continue;
       }
       // add a bias toward local node
@@ -334,6 +327,35 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
   }
 
   /**
+   * Evaluate the specified execution policy against the specified node channel.
+   * @param policy the execution policy to evaluate.
+   * @param channel the node to match against the execution policy.
+   * @return <code>true</code> if the node matches the execution policy, <code>false</code> otherwise.
+   */
+  private boolean evaluateExecutionPolicy(final ExecutionPolicy policy, final ChannelWrapper<?> channel)
+  {
+    JPPFManagementInfo mgtInfo = driver.getNodeHandler().getNodeInformation(channel);
+    JPPFSystemInformation info = (mgtInfo == null) ? null : mgtInfo.getSystemInfo();
+    if (info == null)
+    {
+      log.warn("system information is not available for node " + channel + ", returning default evaluation outcome '" + DEFAULT_POLICY_VALUE + '\'');
+      return DEFAULT_POLICY_VALUE;
+    }
+    boolean b = false;
+    try
+    {
+      b = policy.accepts(info);
+    }
+    catch(Exception ex)
+    {
+      log.error("An error occurred while running the execution policy to determine participation of node " + channel +
+        ", returning default evaluation outcome '" + DEFAULT_POLICY_VALUE + '\'', ex);
+      return DEFAULT_POLICY_VALUE;
+    }
+    return b;
+  }
+
+  /**
    * Check if the job state allows it to be dispatched on another node.
    * There are two cases when this method will return false: when the job is suspended and
    * when the job is already executing on its maximum allowed number of nodes.
@@ -346,8 +368,8 @@ class TaskQueueChecker extends ThreadSynchronization implements Runnable
     if (debugEnabled)
     {
       String s = StringUtils.buildString("job '", bundle.getName(), "' : ",
-        "suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
-        ", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
+          "suspended=", sla.isSuspended(), ", pending=", bundle.getParameter(BundleParameter.JOB_PENDING, Boolean.FALSE),
+          ", expired=", bundle.getParameter(BundleParameter.JOB_EXPIRED, Boolean.FALSE));
       log.debug(s);
     }
     if (sla.isSuspended()) return false;

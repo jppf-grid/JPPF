@@ -86,15 +86,14 @@ class WaitInitialBundleState extends NodeServerState
       context.setPeer(isPeer);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
       {
-        String id = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_ID_PARAM);
-        if (id != null)
+        if (uuid != null)
         {
           String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
-          int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM);
+          int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, -1);
           boolean ssl = false;
           if (channel.isLocal()) ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
           else ssl = context.getSSLHandler() != null;
-          JPPFManagementInfo info = new JPPFManagementInfo(host, port, id, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE, ssl);
+          JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, isPeer ? JPPFManagementInfo.DRIVER : JPPFManagementInfo.NODE, ssl);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           driver.getNodeHandler().addNodeInformation(channel, info);
           driver.getInitializer().getNodeConnectionEventHandler().fireNodeConnected(info);
