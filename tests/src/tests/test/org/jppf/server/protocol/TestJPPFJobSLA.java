@@ -349,7 +349,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       config.setProperty("jppf.pool.size", "2");
       client = BaseSetup.createClient(null, false);
       String methodName = ReflectionUtils.getCurrentMethodName();
-      JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 10L);
+      JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 1000L);
       job1.getSLA().setPriority(1000);
       String suffix = "broadcast-node-";
       JPPFJob job2 = BaseTestHelper.createJob(methodName + "-broadcast", false, true, 1, FileTask.class, suffix, true);

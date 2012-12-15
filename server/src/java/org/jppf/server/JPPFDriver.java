@@ -19,7 +19,7 @@ package org.jppf.server;
 
 import java.util.Timer;
 
-import org.jppf.JPPFException;
+import org.jppf.*;
 import org.jppf.classloader.LocalClassLoaderChannel;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
@@ -53,6 +53,10 @@ import org.slf4j.*;
  */
 public class JPPFDriver
 {
+  static 
+  {
+    JPPFInitializer.init();
+  }
   /**
    * Logger for this class.
    */

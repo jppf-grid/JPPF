@@ -39,6 +39,10 @@ import org.slf4j.*;
  */
 public class NodeRunner
 {
+  static 
+  {
+    JPPFInitializer.init();
+  }
   /**
    * Logger for this class.
    */

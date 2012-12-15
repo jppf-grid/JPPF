@@ -266,9 +266,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       for (int i=0; i<names.length; i++) {
         if (alreadyNotFound[i]) continue;
         String name = names[i];
-        List<String> locationsList = cache.getResourcesLocations(name);
+        List<URL> locationsList = cache.getResourcesURLs(name);
         if ((locationsList != null) && !locationsList.isEmpty()) {
-          results[i] = cache.getURLFromPath(locationsList.get(0));
+          results[i] = locationsList.get(0);
           if (debugEnabled) log.debug(build("resource ", name, " found in local cache as ", results[i]));
         } else {
           URL url = super.findResource(names[i]);

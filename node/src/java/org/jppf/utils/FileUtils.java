@@ -528,4 +528,39 @@ public final class FileUtils
       if (!folder.mkdirs()) throw new IOException("could not create folder " + folder);
     }
   }
+
+  /**
+   * Transform a file path into a URL.
+   * @param path the path to transform.
+   * @return the path expressed as a URL.
+   */
+  public static URL getURLFromFilePath(final String path)
+  {
+    File file = new File(path);
+    try
+    {
+      return file.toURI().toURL();
+    }
+    catch (MalformedURLException ignore)
+    {
+    }
+    return null;
+  }
+
+  /**
+   * Transform a file path into a URL.
+   * @param path the path to transform.
+   * @return the path expressed as a URL.
+   */
+  public static URL getURLFromFilePath(final File path)
+  {
+    try
+    {
+      return path.toURI().toURL();
+    }
+    catch (MalformedURLException ignore)
+    {
+      return null;
+    }
+  }
 }

@@ -28,7 +28,6 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.classloader.ResourceRequest;
 import org.slf4j.*;
 
 /**

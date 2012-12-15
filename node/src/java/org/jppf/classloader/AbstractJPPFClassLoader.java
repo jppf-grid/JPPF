@@ -257,23 +257,16 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @SuppressWarnings("unchecked")
   public Enumeration<URL> findResources(final String name) throws IOException
   {
-    List<URL> urlList = new ArrayList<URL>();
+    List<URL> urlList = null;
     if (!nfCache.has(name))
     {
       if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
       try
       {
-        List<String> locationsList = cache.getResourcesLocations(name);
-        if (locationsList != null)
-        {
-          urlList = new ArrayList<URL>();
-          for (String path: locationsList) urlList.add(new File(path).toURI().toURL());
-        }
-        else
-        {
-          List<URL> tempList = findRemoteResources(name);
-          if (tempList != null) urlList.addAll(tempList);
-        }
+        urlList = cache.getResourcesURLs(name);
+        if (urlList == null) urlList = new ArrayList<URL>();
+        List<URL> tempList = findRemoteResources(name);
+        if (tempList != null) urlList.addAll(tempList);
         Enumeration<URL> tempEnum = super.findResources(name);
         if (tempEnum != null)
         {
@@ -317,13 +310,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if (found)
       {
         cache.registerResources(name, dataList);
-        urlList = new ArrayList<URL>();
-        locationsList = cache.getResourcesLocations(name);
-      }
-      if (locationsList != null)
-      {
-        for (String path: locationsList) urlList.add(new File(path).toURI().toURL());
-        if (debugEnabled) log.debug(build("found the following URLs for resource [", name, "] : ", urlList));
+        urlList = cache.getResourcesURLs(name);
       }
     }
     if ((urlList == null) || urlList.isEmpty() && (resource != null)) nfCache.add(name);
