@@ -401,4 +401,22 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   {
     return connectionUuid;
   }
+
+  /**
+   * The name or IP address of the host the JPPF driver is running on.
+   * @return the host as a string.
+   */
+  public String getHost()
+  {
+    return host;
+  }
+
+  /**
+   * The TCP port the JPPF driver listening to for submitted tasks.
+   * @return the port as an int.
+   */
+  public int getPort()
+  {
+    return port;
+  }
 }
