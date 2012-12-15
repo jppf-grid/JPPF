@@ -78,12 +78,14 @@ class CancelJobTask implements Runnable
       JPPFManagementInfo nodeInfo = JPPFDriver.getInstance().getNodeHandler().getNodeInformation(channel);
       if (debugEnabled) log.debug("Request to cancel jobUuid = '" + jobUuid + "' on node " + channel + ", requeue = " + requeue);
       if (nodeInfo == null) return;
-      JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort(), nodeInfo.isSecure());
-      node.connect();
-      while (!node.isConnected()) Thread.sleep(10);
-      node.cancelJob(jobUuid, requeue);
-      //node.invoke(JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
-      node.close();
+      if ((nodeInfo.getHost() != null) && (nodeInfo.getPort() > 0))
+      {
+        JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(nodeInfo.getHost(), nodeInfo.getPort(), nodeInfo.isSecure());
+        node.connect();
+        while (!node.isConnected()) Thread.sleep(10L);
+        node.cancelJob(jobUuid, requeue);
+        node.close();
+      }
     }
     catch(Exception e)
     {

@@ -17,18 +17,31 @@
  */
 package org.jppf.classloader;
 
-import java.io.*;
+import java.io.File;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-import org.jppf.utils.FileUtils;
+import org.jppf.classloader.resource.*;
+import org.jppf.utils.*;
 
 /**
  * Privileged action wrapper for saving a resource definition to a temporary file.
  * @exclude
  */
-class SaveFileAction implements PrivilegedAction<File>
+public class SaveResourceAction implements PrivilegedAction<Resource>
 {
+  /**
+   * Indicates storage is on the file system, with fallback to memory storage.
+   */
+  private static final String FILE_STORAGE = "file";
+  /**
+   * Indicates storage is in memory, with no fallback.
+   */
+  private static final String MEMORY_STORAGE = "memory";
+  /**
+   * Determines whether resources should be stored in memory.
+   */
+  private static final boolean IS_MEMORY_STORAGE = isMemoryStorageType();
   /**
    * The name of the temp folder in which to save the file.
    */
@@ -52,21 +65,29 @@ class SaveFileAction implements PrivilegedAction<File>
    * @param name the original name of the resource to find.
    * @param definition the resource definition to save.
    */
-  public SaveFileAction(final List<String> tmpDirs, final String name, final byte[] definition)
+  public SaveResourceAction(final List<String> tmpDirs, final String name, final byte[] definition)
   {
     this.tmpDirs = tmpDirs;
     this.name = name;
     this.definition = definition;
   }
 
-  /**
-   * Execute this action.
-   * @return the abstract path for the created file.
-   * @see java.security.PrivilegedAction#run()
-   */
   @Override
-  public File run()
+  public Resource run()
   {
+    Resource resource = null;
+    if (!IS_MEMORY_STORAGE) resource = saveToFileResource();
+    if (resource == null) resource = saveToMemoryResource();
+    return resource;
+  }
+
+  /**
+   * Save the resource to a temporary file.
+   * @return an instance of {@link FileResource}.
+   */
+  private Resource saveToFileResource()
+  {
+    Resource resource = null;
     File tmp = null;
     try
     {
@@ -91,12 +112,38 @@ class SaveFileAction implements PrivilegedAction<File>
       FileUtils.mkdirs(tmp);
       tmp.deleteOnExit();
       FileUtils.writeBytesToFile(definition, tmp);
+      resource = new FileResource(tmp);
+      exception = null;
     }
     catch(Exception e)
     {
       exception = e;
+      if ((tmp != null) && tmp.exists())
+      {
+        tmp.delete();
+        tmp = null;
+      }
     }
-    return tmp;
+    return resource;
+  }
+
+  /**
+   * Save the resource to memory.
+   * @return an instance of {@link MemoryResource}.
+   */
+  private Resource saveToMemoryResource()
+  {
+    Resource resource = null;
+    try
+    {
+      resource = new MemoryResource(definition);
+      exception = null;
+    }
+    catch (Exception e)
+    {
+      exception = e;
+    }
+    return resource;
   }
 
   /**
@@ -106,5 +153,15 @@ class SaveFileAction implements PrivilegedAction<File>
   public Exception getException()
   {
     return exception;
+  }
+
+  /**
+   * Determine if resources should be stored in memory.
+   * @return <code>true</code> if resources should be stored in memory, <code>false</code> otherwise.
+   */
+  private static boolean isMemoryStorageType()
+  {
+    String s = JPPFConfiguration.getProperties().getString("jppf.resource.cache.storage", FILE_STORAGE);
+    return MEMORY_STORAGE.equalsIgnoreCase(s);
   }
 }

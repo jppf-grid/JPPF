@@ -106,35 +106,24 @@ public final class SystemUtils
   {
     try
     {
-      // run as privileged so we don't have to set write access on all properties
-      // in the security policy file.
-      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
-          {
+      // run as privileged so we don't have to set write access on all properties in the security policy file.
+      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>(){
         @Override
-        public Properties run()
-        {
+        public Properties run(){
           return System.getProperties();
         }
-          });
+      });
       Enumeration en = sysProps.propertyNames();
       while (en.hasMoreElements())
       {
         String name = (String) en.nextElement();
-        try
-        {
-          if (!props.contains(name)) props.setProperty(name, System.getProperty(name));
-        }
-        catch(SecurityException e)
-        {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.info(e.getMessage());
-        }
+        if (!props.containsKey(name)) props.setProperty(name, sysProps.getProperty(name));
       }
     }
-    catch(SecurityException e)
+    catch(Exception e)
     {
       if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.info(e.getMessage());
+      else log.warn(e.getMessage());
     }
   }
 
@@ -160,7 +149,7 @@ public final class SystemUtils
     catch(SecurityException e)
     {
       if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.info(e.getMessage());
+      else log.warn(e.getMessage());
     }
 
     return props;

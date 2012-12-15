@@ -172,23 +172,17 @@ final class JPPFLeakPrevention {
    * Clear references help by threads. That can be HTTP keep alive thread, timer thread and thread pool worker threads.
    * @param classLoader a <code>ClassLoader</code> instance.
    */
-  private static void clearThreads(final ClassLoader classLoader)
-  {
+  private static void clearThreads(final ClassLoader classLoader)   {
     if (classLoader == null) throw new IllegalArgumentException("classLoader is null");
 
-    for (Thread thread : getThreads())
-    {
-      if (thread != null)
-      {
+    for (Thread thread : getThreads())     {
+      if (thread != null) {
         ClassLoader ccl = thread.getContextClassLoader();
-        if (ccl == classLoader)
-        {
+        if (ccl == classLoader) {
           if (thread == Thread.currentThread()) continue;
           ThreadGroup threadGroup = thread.getThreadGroup();
-          if (threadGroup != null && (THREAD_GROUP_SYSTEM.equals(threadGroup.getName()) || THREAD_GROUP_RMI_RUNTIME.equals(threadGroup.getName())))
-          {
-            if (preventKeepAlive && "Keep-Alive-Timer".equals(thread.getName()))
-            {
+          if (threadGroup != null && (THREAD_GROUP_SYSTEM.equals(threadGroup.getName()) || THREAD_GROUP_RMI_RUNTIME.equals(threadGroup.getName()))) {
+            if (preventKeepAlive && "Keep-Alive-Timer".equals(thread.getName())) {
               thread.setContextClassLoader(classLoader.getParent());
               log.warn("HTTP keep alive timer cleared");
             }
@@ -197,30 +191,32 @@ final class JPPFLeakPrevention {
 
           if (!thread.isAlive()) continue;
 
-          if (preventTimer && "java.util.TimerThread".equals(thread.getClass().getName()))
-          {
+          if (preventTimer && "java.util.TimerThread".equals(thread.getClass().getName())) {
             clearTimerThread(thread);
-          } 
-          else if (preventThread)
-          {
+          }  else if (preventThread) {
             try {
               Class clazz = thread.getClass();
               while(!Thread.class.equals(clazz)) clazz = clazz.getSuperclass();
               Field fieldTarget = getDeclaredAccessibleField(clazz, "target");
               Object target = fieldTarget.get(thread);
 
-              if (target != null && "java.util.concurrent.ThreadPoolExecutor.Worker".equals(target.getClass().getCanonicalName()))
-              {
+              if (target != null && "java.util.concurrent.ThreadPoolExecutor.Worker".equals(target.getClass().getCanonicalName())) {
                 Field fieldThis = getDeclaredAccessibleField(target.getClass(), "this$0");
                 Object executor = fieldThis.get(target);
                 if (executor instanceof ThreadPoolExecutor) ((ThreadPoolExecutor) executor).shutdownNow();
               }
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
               if (debugEnabled) log.debug(e.getMessage(), e);
               else log.warn(ExceptionUtils.getMessage(e));
             }
-            thread.stop();
+            try {
+              //thread.stop();
+              Method m = Thread.class.getMethod("stop");
+              m.invoke(thread);
+            } catch (Exception e) {
+              if (debugEnabled) log.debug(e.getMessage(), e);
+              else log.warn(ExceptionUtils.getMessage(e));
+            }
           }
         }
       }

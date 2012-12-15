@@ -27,6 +27,10 @@ import java.io.Serializable;
 public interface ServerDebugMBean extends Serializable
 {
   /**
+   * The name of this mbean.
+   */
+  String MBEAN_NAME = "org.jppf:name=debug,type=driver";
+  /**
    * Get the states of the class loader channels.
    * @return the states as as an array of strings.
    */
@@ -46,4 +50,9 @@ public interface ServerDebugMBean extends Serializable
    * @return the states as as an array of strings.
    */
   String[] clientDataChannels();
+  /**
+   * Get a dump of all the jobs currently int he queue.
+   * @return the jobs as as an array of strings.
+   */
+  String[] allJobs();
 }

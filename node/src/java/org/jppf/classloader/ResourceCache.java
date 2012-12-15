@@ -18,11 +18,12 @@
 
 package org.jppf.classloader;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.net.URL;
 import java.security.AccessController;
 import java.util.*;
 
+import org.jppf.classloader.resource.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -31,7 +32,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class ResourceCache
+public class ResourceCache
 {
   /**
    * Logger for this class.
@@ -46,24 +47,37 @@ class ResourceCache
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * A map of all resource caches to their uuid.
+   */
+  private static final Map<String, ResourceCache> cacheMap = new Hashtable<String, ResourceCache>();
+  /**
    * Name of the resource cache root.
    */
   private static String ROOT_NAME = ".jppf";
   /**
    * Map of resource names to temporary file names to which their content is stored.
    */
-  private Map<String, List<String>> cache = new Hashtable<String, List<String>>();
+  private Map<String, List<Resource>> cache = new Hashtable<String, List<Resource>>();
   /**
    * List of temp folders used by this cache.
    */
   private List<String> tempFolders = new LinkedList<String>();
+  /**
+   * The unique identifier for this resource cache.
+   */
+  private final String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+  /**
+   * Shutdown hook for cleaning up this cache instance.
+   */
+  private final Thread shutdownHook = new Thread(new ShutdownHook(tempFolders, uuid));
 
   /**
    * Default initializations.
    */
-  ResourceCache()
+  public ResourceCache()
   {
-    Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
+    Runtime.getRuntime().addShutdownHook(shutdownHook);
+    cacheMap.put(uuid, this);
     initTempFolders();
   }
 
@@ -72,9 +86,28 @@ class ResourceCache
    * @param name the name of the resource to lookup.
    * @return a list of file paths, or null if the resource is not found in the cache.
    */
-  public synchronized List<String> getResourcesLocations(final String name)
+  public synchronized List<Resource> getResourcesLocations(final String name)
   {
     return cache.get(name);
+  }
+
+  /**
+   * Get the list of locations for the resource with the specified name.
+   * @param name the name of the resource to lookup.
+   * @return a list of file paths, or null if the resource is not found in the cache.
+   */
+  public synchronized List<URL> getResourcesURLs(final String name)
+  {
+    List<Resource> resources = getResourcesLocations(name);
+    if (resources == null) return null;
+    List<URL> urls = new ArrayList<URL>(resources.size());
+    int count = 0;
+    for (Resource res: resources)
+    {
+      URL url = getResourceURL(name, res, count++);
+      if (url != null) urls.add(url);
+    }
+    return urls;
   }
 
   /**
@@ -82,9 +115,9 @@ class ResourceCache
    * @param name the name of the resource to lookup.
    * @return a file path, or null if the resource is not found in the cache.
    */
-  public synchronized String getResourceLocation(final String name)
+  private synchronized Resource getResourceLocation(final String name)
   {
-    List<String> locations = cache.get(name);
+    List<Resource> locations = cache.get(name);
     if ((locations == null) || locations.isEmpty()) return null;
     return locations.get(0);
   }
@@ -94,7 +127,7 @@ class ResourceCache
    * @param name the name of the resource to lookup.
    * @param locations a list of file paths.
    */
-  public synchronized void setResourcesLocations(final String name, final List<String> locations)
+  private synchronized void setResourcesLocations(final String name, final List<Resource> locations)
   {
     cache.put(name, locations);
   }
@@ -103,14 +136,24 @@ class ResourceCache
    * Save the definitions for a resource to temporary files, and register their location with this cache.
    * @param name the name of the resource to register.
    * @param definitions a list of byte array definitions.
-   * @throws Exception if any I/O error occurs.
    */
-  public synchronized void registerResources(final String name, final List<byte[]> definitions) throws Exception
+  public synchronized void registerResources(final String name, final List<byte[]> definitions)
   {
     if (isAbsolutePath(name)) return;
-    List<String> locations = new LinkedList<String>();
-    //for (byte[] def: definitions) locations.add(saveToTempFile(def));
-    for (byte[] def: definitions) locations.add(saveToTempFile(name, def));
+    List<Resource> locations = new LinkedList<Resource>();
+    for (byte[] def: definitions)
+    {
+      try
+      {
+        locations.add(saveToTempFile(name, def));
+      }
+      catch (Exception e)
+      {
+        String s = "Exception caught while saving resource named '" + name + "' : ";
+        if (debugEnabled) log.debug(s, e);
+        else log.warn(s + ExceptionUtils.getMessage(e));
+      }
+    }
     if (!locations.isEmpty()) setResourcesLocations(name, locations);
   }
 
@@ -121,13 +164,13 @@ class ResourceCache
    * @return the path to the created file.
    * @throws Exception if any I/O error occurs.
    */
-  private String saveToTempFile(final String name, final byte[] definition) throws Exception
+  private Resource saveToTempFile(final String name, final byte[] definition) throws Exception
   {
-    SaveFileAction action = new SaveFileAction(tempFolders, name, definition);
-    File file = AccessController.doPrivileged(action);
+    SaveResourceAction action = new SaveResourceAction(tempFolders, name, definition);
+    Resource file = AccessController.doPrivileged(action);
     if (action.getException() != null) throw action.getException();
     if (traceEnabled) log.trace("saved resource [" + name + "] to file " + file);
-    return file.getCanonicalPath();
+    return file;
   }
 
   /**
@@ -137,25 +180,35 @@ class ResourceCache
    */
   public URL getResourceURL(final String name)
   {
-    String path = getResourceLocation(name);
-    if (path == null) return null;
-    return getURLFromPath(path);
+    return getResourceURL(name,  getResourceLocation(name), 0);
   }
 
   /**
-   * Transform a file path into a URL.
-   * @param path the path to transform.
-   * @return the path expressed as a URL.
+   * Get the URL for a cached resource.
+   * @param name the name of the resource to find.
+   * @param res the cached resource.
+   * @param id the position of the url to fetch.
+   * @return resource location expressed as a URL.
    */
-  public URL getURLFromPath(final String path)
+  public URL getResourceURL(final String name, final Resource res, final int id)
   {
-    File file = new File(path);
-    try
+    if (res instanceof FileResource)
     {
-      return file.toURI().toURL();
+      File path = ((FileResource) res).getPath();
+      if (path == null) return null;
+      return FileUtils.getURLFromFilePath(path);
     }
-    catch (MalformedURLException ignore)
+    else if (res instanceof MemoryResource)
     {
+      String s = "jppfres://" + uuid + '/' + name + "?id=" + id;
+      try
+      {
+        return new URL(s);
+      }
+      catch(Exception e)
+      {
+        return null;
+      }
     }
     return null;
   }
@@ -181,8 +234,7 @@ class ResourceCache
       }
       if (base == null) base = "." + File.separator + ROOT_NAME;
       if (traceEnabled) log.trace("base = " + base);
-      String folderId = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
-      String s = base + File.separator + folderId;
+      String s = base + File.separator + uuid;
       File baseDir = new File(s + File.separator);
       FileUtils.mkdirs(baseDir);
       tempFolders.add(s);
@@ -212,35 +264,66 @@ class ResourceCache
    * A runnable invoked whenever this resource cache is garbage collected or the JVM shuts down,
    * so as to cleanup all cached resources on the file system.
    */
-  private class ShutdownHook implements Runnable
+  private final static class ShutdownHook extends Thread
   {
     /**
-     * {@inheritDoc}
+     * The list of folders to delete.
      */
+    private final List<String> tempFolders;
+    /**
+     * The uuid of the cache to clear.
+     */
+    private final String uuid;
+
+    /**
+     * Initialize this shutdown hook with the specified list of folders to delete.
+     * @param tempFolders the list of folders to delete.
+     * @param uuid the unique id of the cahce to remove.
+     */
+    private ShutdownHook(final List<String> tempFolders, final String uuid)
+    {
+      this.tempFolders = tempFolders;
+      this.uuid = uuid;
+    }
+
     @Override
     public void run()
     {
+      cacheMap.remove(uuid);
       while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
+      
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void finalize() throws Throwable
   {
-    Runnable r = new Runnable()
+    try
     {
-      @Override
-      public void run()
-      {
-        String[] paths = tempFolders.toArray(StringUtils.ZERO_STRING);
-        tempFolders.clear();
-        for (String path: paths) FileUtils.deletePath(new File(tempFolders.remove(0)));
-      }
-    };
-    new Thread(r).start();
+      Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    }
+    catch (Exception ignore)
+    {
+    }
+    new ShutdownHook(tempFolders, uuid).run();
     super.finalize();
+  }
+
+  /**
+   * Get the unique identifier for this resource cache.
+   * @return the uuid as a string.
+   */
+  public String getUuid()
+  {
+    return uuid;
+  }
+
+  /**
+   * get the map of all resource caches to their uuid.
+   * @return a map of strings to <code>ResourceCache</code> instances.
+   */
+  public static Map<String, ResourceCache> getCachemap()
+  {
+    return cacheMap;
   }
 }

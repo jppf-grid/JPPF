@@ -20,8 +20,11 @@ package org.jppf.server.debug;
 
 import java.util.*;
 
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.ClassContext;
+import org.jppf.server.protocol.ServerJob;
+import org.jppf.server.queue.JPPFPriorityQueue;
 
 /**
  * 
@@ -177,5 +180,22 @@ public class ServerDebug implements ServerDebugMBean
     else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet;
     else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet;
     return acceptorSet;
+  }
+
+  @Override
+  public String[] allJobs()
+  {
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
+    List<String> list = new LinkedList<String>();
+    queue.getLock().lock();
+    try
+    {
+      for (ServerJob job: queue) list.add(job.toString());
+    }
+    finally
+    {
+      queue.getLock().unlock();
+    }
+    return list.toArray(new String[list.size()]);
   }
 }
