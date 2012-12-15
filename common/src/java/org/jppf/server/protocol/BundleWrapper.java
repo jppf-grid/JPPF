@@ -60,9 +60,6 @@ public class BundleWrapper implements ServerJob
     this.job = bundle;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFDistributedJob getJob()
   {
@@ -78,9 +75,6 @@ public class BundleWrapper implements ServerJob
     this.job = job;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataLocation getDataProvider()
   {
@@ -105,9 +99,6 @@ public class BundleWrapper implements ServerJob
     tasks.add(task);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public List<DataLocation> getTasks()
   {
@@ -175,5 +166,11 @@ public class BundleWrapper implements ServerJob
     {
       for (int i=n-1; i>=0; i--) tasks.add(0, other.getTasks().get(i));
     }
+  }
+
+  @Override
+  public String toString()
+  {
+    return job.toString();
   }
 }
