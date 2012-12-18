@@ -61,6 +61,7 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
    * Get the last key in this sorted map.
    * @return the last key based on the order of the map.
    */
+  @SuppressWarnings("unchecked")
   public K lastKey()
   {
     return ((SortedMap<K, V>) map).lastKey();

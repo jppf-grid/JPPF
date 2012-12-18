@@ -121,7 +121,7 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                     Genrates the list of test classes                     -->
+  <!--                     Generates the list of test classes                     -->
   <!-- ========================================================================= -->
 
   <target name="generate.tests.list">

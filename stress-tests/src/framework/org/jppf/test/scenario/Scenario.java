@@ -60,7 +60,7 @@ public class Scenario
       Scenario scenario = new Scenario(args[0]);
       scenario.execute();
     }
-    catch (Exception e)
+    catch (Throwable e)
     {
       e.printStackTrace();
     }

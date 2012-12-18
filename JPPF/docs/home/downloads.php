@@ -136,13 +136,10 @@ else
 				<?php if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br></div>
 				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
 				<?php if ($currentPage == "v2.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-2.0" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v2.x</a><br></div>
-				<!--
-				<?php if ($currentPage == "Faq") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/faq" class="<?php echo $itemClass; ?>">&raquo; Faq</a><br></div>
-				-->
 				<?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
 				<hr/>
 				<?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
 				<?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
 				<?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
 				<?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -153,7 +150,7 @@ else
 				</div>
 				<div class="jppf_content">
 	<?php
-		$jppfVersion = "3.1.2";
+		$jppfVersion = "3.2";
 		$base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
 	?>
 	<a name="2.0"></a>
@@ -167,8 +164,8 @@ else
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
 	<h3>Source code and documentation</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
-	User Guide: <a href="/wiki">view online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
-	API documentation: <a href="/api-2.0">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
+	User Guide: <a href="/doc/v3">view online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
+	API documentation: <a href="/api-3">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
 	<h3>Connectors and add-ons</h3>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
 	<a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-jdk7-addons.zip/download'; ?>">JDK 7+ add-ons</a><br>
@@ -178,7 +175,11 @@ else
 	Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
 	<hr>
 	<h3>All JPPF releases</h3>
-	All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.
+	All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
+	<hr>
+	<h3>Feeling curious or adventurous about JPPF's latest advances?</h3>
+	<a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version</b></a>.
+	<p><span style="color: #FF7F00">Warning: this is not recommended for production environments</span>
 </div>
 				</td>
 				</tr>

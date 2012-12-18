@@ -65,26 +65,6 @@
 
 	<target name="init" description="Initialize ressources">
  		<mkdir dir="${classes.dir}"/>
-		<available file="${lib.dir}/jna.jar" property="jna.jar.present"/>
-		<available file="${lib.dir}/platform.jar" property="platform.jar.present"/>
-	</target>
-
-
-	<!-- ========================================================================= -->
-	<!--                    Download JNA lib files                                 -->
-	<!-- ========================================================================= -->
-
-	<target name="download" description="Download the JNA lib files">
-		<!--<property name="jna.lib.url" value="https://jna.dev.java.net/source/browse/*checkout*/jna/trunk/jnalib/dist"/>-->
-		<!--<property name="jna.lib.url" value="http://java.net/projects/jna/sources/svn/content/trunk/jnalib/dist"/>-->
-		<property name="jna.lib.url" value="https://github.com/twall/jna/raw/master/dist"/>
-		<antcall target="get.lib"><param name="prefix" value="jna"/></antcall>
-		<antcall target="get.lib"><param name="prefix" value="platform"/></antcall>
-	</target>
-
-	<target name="get.lib" unless="${prefix}.jar.present">
-		<echo message="downloading ${prefix}.jar from ${jna.lib.url}/${prefix}.jar"/>
-		<get src="${jna.lib.url}/${prefix}.jar" dest="${lib.dir}/${prefix}.jar" verbose="on"/>
 	</target>
 
 
@@ -92,7 +72,7 @@
 	<!--                                  Compile                                  -->
 	<!-- ========================================================================= -->
 
-	<target name="compile" depends="clean, init, download">
+	<target name="compile" depends="clean, init">
 		<path id="compile.classpath">
 			<path refid="base.classpath"/>
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>

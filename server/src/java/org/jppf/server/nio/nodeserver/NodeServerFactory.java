@@ -82,7 +82,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
   @Override
   protected CollectionMap<NodeState, NodeState> createAllowedTransitionsMap()
   {
-    CollectionMap<NodeState, NodeState> map = new EnumSetEnumMap(NodeState.class);
+    CollectionMap<NodeState, NodeState> map = new EnumSetEnumMap<NodeState>(NodeState.class);
     map.addValues(SEND_INITIAL_BUNDLE, SEND_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE);
     map.addValues(WAIT_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE, IDLE);
     map.addValues(IDLE, IDLE, SENDING_BUNDLE);

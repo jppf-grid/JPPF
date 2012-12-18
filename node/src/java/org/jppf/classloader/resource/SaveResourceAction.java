@@ -15,13 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.classloader;
+package org.jppf.classloader.resource;
 
 import java.io.File;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-import org.jppf.classloader.resource.*;
 import org.jppf.utils.*;
 
 /**

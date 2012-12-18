@@ -22,8 +22,7 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 
-import org.jppf.classloader.ResourceCache;
-import org.jppf.classloader.resource.Resource;
+import org.jppf.classloader.resource.*;
 
 /**
  * Implementation of a {@link URLConnection} for the &quot;jppfres:&quot; URL protocol.
@@ -54,7 +53,7 @@ public class JPPFResourceConnection extends URLConnection
   {
     try
     {
-      ResourceCache rc = ResourceCache.getCachemap().get(url.getHost());
+      ResourceCache rc = ResourceCache.getCacheInstance(url.getHost());
       StringBuilder path = new StringBuilder(url.getPath());
       char c;
       while (((c = path.charAt(0)) == '/') || (c == '\\')) path.deleteCharAt(0);

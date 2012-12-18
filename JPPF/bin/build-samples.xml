@@ -53,7 +53,7 @@
 		<zip destfile="${samples.pack.file}">
 			<zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
 				<exclude name="**/*.log"/>
-				<exclude name="**/IdleSystem/lib/*.*"/>
+				<exclude name="**/IdleSystem/lib/IdleSystem.*"/>
 				<exclude name="**/javadoc/**/*.*"/>
 			</zipfileset>
 			<zipfileset dir="${build}/" prefix="${samples.pack.prefix}/shared/lib-src">

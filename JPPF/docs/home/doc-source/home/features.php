@@ -1,7 +1,7 @@
 <?php $currentPage="Features" ?>
 $template{name="about-page-header" title="Features"}$
 
-<h1>JPPF 3.1 features</h1>
+<h1>JPPF 3.2 features</h1>
 
 <h3>Ease of use</h3>
 <ul>

@@ -87,7 +87,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   @Override
   protected CollectionMap<ClassState, ClassState> createAllowedTransitionsMap()
   {
-    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap(ClassState.class);
+    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap<ClassState>(ClassState.class);
     map.addValues(WAITING_INITIAL_PROVIDER_REQUEST, WAITING_INITIAL_PROVIDER_REQUEST, SENDING_INITIAL_PROVIDER_RESPONSE);
     map.addValues(SENDING_INITIAL_PROVIDER_RESPONSE, SENDING_INITIAL_PROVIDER_RESPONSE, IDLE_PROVIDER);
     map.addValues(SENDING_PROVIDER_REQUEST, SENDING_PROVIDER_REQUEST, WAITING_PROVIDER_RESPONSE, IDLE_PROVIDER);

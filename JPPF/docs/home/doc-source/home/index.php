@@ -23,7 +23,7 @@ $template{name="about-page-header" title="Home"}$
 	</div>
 	<script>anim_main2();</script>
 	<div style="margin: 15px; ">
-		<br/><h2 align="center"><i>New</i>: JPPF 3.1 brings security to the Grid and more, check it out!</h2>
+		<br/><h2 align="center"><i>New</i>: JPPF 3.2 is here, <a href="/release_notes.php?version=3.2">check it out!</a></h2>
 		<p style="text-align: center; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
 	</div>
 
@@ -83,6 +83,7 @@ $template{name="about-page-header" title="Home"}$
 			<li>fine-grained monitoring and administration</li>
 			<li>fault-tolerance and self-repair capabilities</li>
 			<li>exceptional level of service and reliability</li>
+			<li>full, comprehensive documentation</li>
 			<li>fully documented samples, using JPPF on real-life problems</li>
 			<li>flexible open-source licensing with <a href="/license.php"><b>Apache License v2.0</b></a></li>
 		</ul>

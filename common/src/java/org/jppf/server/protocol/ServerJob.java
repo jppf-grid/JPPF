@@ -201,6 +201,7 @@ public class ServerJob extends AbstractServerJob {
    * @param bundle  the executing job.
    * @param results the list of tasks whose results have been received from the server.
    */
+  @SuppressWarnings("unchecked")
   public synchronized void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (results.isEmpty()) return;
     if (debugEnabled) log.debug("*** received " + results.size() + " results from " + bundle);

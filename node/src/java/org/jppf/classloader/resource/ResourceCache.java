@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.classloader;
+package org.jppf.classloader.resource;
 
 import java.io.File;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.*;
 
-import org.jppf.classloader.resource.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -190,7 +189,7 @@ public class ResourceCache
    * @param id the position of the url to fetch.
    * @return resource location expressed as a URL.
    */
-  public URL getResourceURL(final String name, final Resource res, final int id)
+  private URL getResourceURL(final String name, final Resource res, final int id)
   {
     if (res instanceof FileResource)
     {
@@ -327,11 +326,12 @@ public class ResourceCache
   }
 
   /**
-   * get the map of all resource caches to their uuid.
-   * @return a map of strings to <code>ResourceCache</code> instances.
+   * Get a cache instance form its uuid.
+   * @param uuid the uuid of the cache to find.
+   * @return a <code>ResourceCache</code> instance.
    */
-  public static Map<String, ResourceCache> getCachemap()
+  public static ResourceCache getCacheInstance(final String uuid)
   {
-    return cacheMap;
+    return cacheMap.get(uuid);
   }
 }

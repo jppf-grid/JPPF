@@ -58,7 +58,7 @@ public class LinkedListSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
    */
   public void moveToEndOfList(final K key, final V value)
   {
-    LinkedList list = (LinkedList) map.get(key);
+    LinkedList<V> list = (LinkedList<V>) map.get(key);
     if ((list == null) || list.isEmpty() || list.getLast().equals(value)) return;
     list.remove(value);
     list.add(value);

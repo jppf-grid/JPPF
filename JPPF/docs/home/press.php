@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="3.1" ?>
+<?php $jppfVersion="3.2" ?>
 <html>
 		<head>
 		<title>JPPF Press Kit
@@ -137,13 +137,10 @@ else
 				<?php if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br></div>
 				<?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-3" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v3.x</a><br></div>
 				<?php if ($currentPage == "v2.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api-2.0" class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;v2.x</a><br></div>
-				<!--
-				<?php if ($currentPage == "Faq") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/faq" class="<?php echo $itemClass; ?>">&raquo; Faq</a><br></div>
-				-->
 				<?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
 				<hr/>
 				<?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
 				<?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
 				<?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
 				<?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -167,12 +164,19 @@ else
 	<br>
 	<a name="original_release"></a>
 <h3>Latest press release: JPPF <?php echo $jppfVersion ?></h3>
-<p align="justify"><b>Security</b>: JPPF 3.1 brings a new security layer by performing all <a href="http://www.jppf.org/doc/v3/index.php?title=Configuring_SSL/TLS_communications">network communications through SSL/TLS</a>, providing data encryption, data integrity and certificate-based authentication.
-<p align="justify"><b>Management and monitoring</b>: this version adds a new graph view of the grid topology to the administration console, the ability to <a href="http://www.jppf.org/doc/v3/index.php?title=Server_management#Testing_an_execution_policy">test execution policies</a> against the current grid state,
-and the possibility to cancel jobs directly from a standalone JPPF client or from the J2EE connector.
-<p align="justify"><b>Executor services</b>: Job SLAs and metadata, along with task timeout and cancel handlers, can now be <a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_Executor_Services#Configuring_jobs_and_tasks">dynamically configured</a>.
-<p align="justify"><b>Clients</b>: the load balancing between local and remote execution is now <a href="http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client">fully configurable</a>.
-<p><b>Nodes</b>: the execution model can now be switched to a <a href="http://www.jppf.org/doc/v3/index.php?title=Fork/Join_thread_pool_in_the_nodes">local fork/join model</a>.
+<p><b>Load balancing in the client</b>:
+As for the server with the nodes, <a href="/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client">the client can now distribute jobs</a> over multiple server channels and the local execution channel.
+Load-balancing / scheduling is applied in exactly the same way as within the server, with the same APIs and configuration properties and the ability to implement custom class loaders.
+<p><b>Client-side SLA</b>:
+All jobs now have a distinct <a href="/doc/v3/index.php?title=Job_Service_Level_Agreement">service level agreement</a> for the client-side dispatching of their tasks.
+<p><b>Executor services enhancements</b>:
+data providers can now be sent with the jobs submitted by the executor services, job listeners can be registered and completion listeners can be attached to the jobs.
+<p><b>Class loading improvements</b>: 
+new optimizations bring a new level of performance and resilience to the JPPF class loading mechanism
+<p><b>IPv6 ready</b>:
+All areas of JPPF networking have been updated to handle IPv6 addresses properly and transparently.
+<p><b>Automated testing</b>:
+A major effort has taken place to provide automated testing of the JPPF features, to ensure that the quality of each release meets the expectations.
 <a name="features"></a>
 	<h3>Features</h3>
 	<div class="u_link" style="margin-left: 10px">
@@ -185,7 +189,7 @@ and the possibility to cancel jobs directly from a standalone JPPF client or fro
 	A <a href="/download/jppf_ws.jnlp">web installer</a> allows you to select and download only the specific modules you want to install (requires Java Web Start 1.5 or later).
 	<a name="documentation"></a>
 	<h3>Documentation</h3>
-	The JPPF documentation can be found online on our <a href="/wiki">wiki pages</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
+	The JPPF documentation can be found <a href="/doc/v3">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
 	<a name="license"></a>
 	<h3>License</h3>
 	JPPF is released under the terms of the <a href="license.php">Apachache v2.0</a> license.

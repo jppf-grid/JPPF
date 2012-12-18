@@ -124,9 +124,9 @@
       <zipfileset dir="${classes.dir}" prefix="WEB-INF/classes"/>
       <zipfileset dir="${basedir}/../classes/j2eeclient" prefix="WEB-INF/classes"/>
       <zipfileset dir="${basedir}/webapp" includes="*.*" />
-      <zipfileset dir="${basedir}/../lib" includes="" prefix="WEB-INF/lib">
+      <zipfileset dir="${lib.dir}" includes="" prefix="WEB-INF/lib">
         <include name="junit-4.10.jar"/>
-        <include name="jpf-test-framework.jar"/>
+        <include name="jppf-test-framework.jar"/>
       </zipfileset>
     </war>
   </target>

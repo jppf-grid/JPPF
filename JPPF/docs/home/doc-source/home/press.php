@@ -1,20 +1,28 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="3.1" ?>
+<?php $jppfVersion="3.2" ?>
 $template{name="about-page-header" title="Press Kit"}$
 $template{name="press-header"}$
 
 <h3>Latest press release: JPPF <?php echo $jppfVersion ?></h3>
 
-<p align="justify"><b>Security</b>: JPPF 3.1 brings a new security layer by performing all <a href="http://www.jppf.org/doc/v3/index.php?title=Configuring_SSL/TLS_communications">network communications through SSL/TLS</a>, providing data encryption, data integrity and certificate-based authentication.
+<p><b>Load balancing in the client</b>:
+As for the server with the nodes, <a href="/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client">the client can now distribute jobs</a> over multiple server channels and the local execution channel.
+Load-balancing / scheduling is applied in exactly the same way as within the server, with the same APIs and configuration properties and the ability to implement custom class loaders.
 
-<p align="justify"><b>Management and monitoring</b>: this version adds a new graph view of the grid topology to the administration console, the ability to <a href="http://www.jppf.org/doc/v3/index.php?title=Server_management#Testing_an_execution_policy">test execution policies</a> against the current grid state,
-and the possibility to cancel jobs directly from a standalone JPPF client or from the J2EE connector.
+<p><b>Client-side SLA</b>:
+All jobs now have a distinct <a href="/doc/v3/index.php?title=Job_Service_Level_Agreement">service level agreement</a> for the client-side dispatching of their tasks.
 
-<p align="justify"><b>Executor services</b>: Job SLAs and metadata, along with task timeout and cancel handlers, can now be <a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_Executor_Services#Configuring_jobs_and_tasks">dynamically configured</a>.
+<p><b>Executor services enhancements</b>:
+data providers can now be sent with the jobs submitted by the executor services, job listeners can be registered and completion listeners can be attached to the jobs.
 
-<p align="justify"><b>Clients</b>: the load balancing between local and remote execution is now <a href="http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client">fully configurable</a>.
+<p><b>Class loading improvements</b>: 
+new optimizations bring a new level of performance and resilience to the JPPF class loading mechanism
 
-<p><b>Nodes</b>: the execution model can now be switched to a <a href="http://www.jppf.org/doc/v3/index.php?title=Fork/Join_thread_pool_in_the_nodes">local fork/join model</a>.
+<p><b>IPv6 ready</b>:
+All areas of JPPF networking have been updated to handle IPv6 addresses properly and transparently.
+
+<p><b>Automated testing</b>:
+A major effort has taken place to provide automated testing of the JPPF features, to ensure that the quality of each release meets the expectations.
 
 $template{name="press-footer"}$
 $template{name="about-page-footer"}$
