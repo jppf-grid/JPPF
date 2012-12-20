@@ -21,6 +21,7 @@ package org.jppf.io;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.streams.StreamConstants;
 import org.slf4j.*;
@@ -28,6 +29,7 @@ import org.slf4j.*;
 /**
  * Data location backed by a file.
  * @author Laurent Cohen
+ * @author Juan Manuel Rodriguez
  */
 public class FileDataLocation extends AbstractDataLocation
 {
@@ -63,6 +65,11 @@ public class FileDataLocation extends AbstractDataLocation
    * The current count of bytes read from/written to the block of data currently being transferred.
    */
   private int blockCount = 0;
+  /**
+   * Count of instances of this class which refer to the same underlying file.
+   * This is a fix for bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-105">JPPF-105 Temporary files disappear when setting a large MemoryMapDataProvider as data provider in a JPPFJob</a>.
+   */
+  final AtomicLong copyCount;
 
   /**
    * Initialize this file location with the specified file path and an unknown size.
@@ -82,6 +89,21 @@ public class FileDataLocation extends AbstractDataLocation
   {
     filePath = path;
     this.size = size;
+    copyCount = new AtomicLong(1L);
+  }
+
+  /**
+   * Copy constructor.
+   * @param path the path to the underlying file.
+   * @param size the size of the data represented by this file location.
+   * @param copyCount .
+   */
+  private FileDataLocation(final String path, final int size, final AtomicLong copyCount)
+  {
+    filePath = path;
+    this.size = size;
+    this.copyCount = copyCount;
+    copyCount.incrementAndGet();
   }
 
   /**
@@ -177,7 +199,7 @@ public class FileDataLocation extends AbstractDataLocation
           return -1;
         }
         tempCount += tmp;
-        if (traceEnabled) log.trace("written " + tmp + " bytes (total: " + tempCount + '/' + n + ')');
+        //if (traceEnabled) log.trace("written " + tmp + " bytes (total: " + tempCount + '/' + n + ')');
       }
       buffer.clear();
     }
@@ -334,11 +356,18 @@ public class FileDataLocation extends AbstractDataLocation
   @Override
   protected void finalize() throws Throwable
   {
-    try {
-      File file = new File(filePath);
-      if (file.exists()) file.delete();
-    } finally {
-      super.finalize();
+    if (traceEnabled) log.trace("finalizing " + this);
+    if (copyCount.decrementAndGet() <= 0)
+    {
+      try
+      {
+        File file = new File(filePath);
+        if (file.exists()) file.delete();
+      }
+      finally
+      {
+        super.finalize();
+      }
     }
   }
 
@@ -375,6 +404,7 @@ public class FileDataLocation extends AbstractDataLocation
   @Override
   public DataLocation copy()
   {
-    return new FileDataLocation(filePath, size);
+    if (traceEnabled) log.trace("copying " + this);
+    return new FileDataLocation(filePath, size, copyCount);
   }
 }

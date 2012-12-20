@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -141,6 +142,13 @@ public class GenericProcessLauncher
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "jmxremote/jmxremote_optional.jar");
+    TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
+    String s = config.getString("jppf.jvm.options", null);
+    if (s != null)
+    {
+      String[] options = s.split("\\s");
+      for (String opt: options) addJvmOption(opt);
+    }
   }
 
   /**
