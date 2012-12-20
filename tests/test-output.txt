@@ -1,6 +1,6 @@
 performing setup with 1 drivers, 1 nodes and 1 client
-[driver-1] driver process id: 3252
-[  node-1] node process id: 2960
+[driver-1] driver process id: 3236
+[  node-1] node process id: 4568
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -14,8 +14,8 @@ performing setup with 1 drivers, 1 nodes and 1 client
 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
 [client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
 [client: driver-1 - ClassServer] Reconnected to the class server
-[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [  node-1] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [client: driver-1 - TasksServer] Reconnected to the JPPF task server
 [  node-1] JPPF Node management initialized
 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
@@ -27,8 +27,8 @@ performing setup with 1 drivers, 1 nodes and 1 client
 [  node-1] this task has timed out
 [  node-1] task executed
 performing setup with 1 drivers, 1 nodes and 1 client
-[driver-1] driver process id: 1012
-[  node-1] node process id: 3340
+[driver-1] driver process id: 5848
+[  node-1] node process id: 3464
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -53,8 +53,8 @@ performing setup with 1 drivers, 1 nodes and 1 client
 ---------- end of output for class test.org.jppf.client.concurrent.TestJPPFCompletionService ----------
 
 performing setup with 1 drivers, 1 nodes and 1 client
-[driver-1] driver process id: 1144
-[  node-1] node process id: 2876
+[driver-1] driver process id: 3180
+[  node-1] node process id: 4004
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -82,8 +82,8 @@ performing setup with 1 drivers, 1 nodes
 
 ---------- end of output for class test.org.jppf.client.event.TestJobListener ----------
 
-[driver-1] driver process id: 3648
-[  node-1] node process id: 1256
+[driver-1] driver process id: 5744
+[  node-1] node process id: 3816
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -95,8 +95,8 @@ performing setup with 1 drivers, 1 nodes
 [driver-1] - accepting secure connections on port 12001
 [driver-1] JPPF Driver initialization complete
 [client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
-[client: driver-1-1 - ClassServer] Reconnected to the class server
 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
 [client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [  node-1] Reconnected to the class server
 [client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
@@ -112,8 +112,8 @@ performing setup with 1 drivers, 1 nodes
 
 ---------- end of output for class test.org.jppf.client.persistence.TestJobPersistence ----------
 
-[driver-1] driver process id: 1132
-[  node-1] node process id: 3796
+[driver-1] driver process id: 5280
+[  node-1] node process id: 1156
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -142,8 +142,8 @@ performing setup with 1 drivers, 1 nodes
 
 ---------- end of output for class test.org.jppf.client.TestConnectionPool ----------
 
-[driver-1] driver process id: 2248
-[  node-1] node process id: 3960
+[driver-1] driver process id: 1824
+[  node-1] node process id: 2816
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -157,8 +157,8 @@ performing setup with 1 drivers, 1 nodes
 [client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
 [client: driver-1-1 - ClassServer] Reconnected to the class server
-[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [  node-1] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
 [client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
 [client: driver-1-2 - ClassServer] Reconnected to the class server
@@ -180,8 +180,8 @@ performing setup with 1 drivers, 1 nodes
 
 ---------- end of output for class test.org.jppf.client.TestJPPFClient ----------
 
-[driver-1] driver process id: 4112
-[  node-1] node process id: 4140
+[driver-1] driver process id: 5924
+[  node-1] node process id: 3236
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -225,13 +225,45 @@ performing setup with 1 drivers, 1 nodes
 
 ---------- end of output for class test.org.jppf.client.TestJPPFJob ----------
 
+performing setup with 1 drivers, 1 nodes and 1 client
+[driver-1] driver process id: 4328
+[  node-1] node process id: 4396
+[driver-1] management initialized and listening on port 11201
+[driver-1] secure management initialized and listening on port 12201
+[driver-1] ClientClassServer initialized
+[driver-1] NodeClassServer initialized
+[driver-1] ClientJobServer initialized
+[driver-1] NodeJobServer initialized
+[driver-1] Acceptor initialized
+[driver-1] -  accepting plain connections on port 11101
+[driver-1] - accepting secure connections on port 12001
+[driver-1] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
+[  node-1] Attempting connection to the class server at 192.168.1.14:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
+[  node-1] Reconnected to the class server
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1] JPPF Node management initialized
+[  node-1] Attempting connection to the node server at 192.168.1.14:11101
+[  node-1] Reconnected to the node server
+[  node-1] Node successfully initialized
+
+---------- end of output for class test.org.jppf.io.TestFileDataLocation ----------
+
+runtime driver info: {totalMemory=128647168, availableProcessors=8, freeMemory=123260192, maxMemory=128647168}
+Exception in thread "Receiver@192.168.1.14:11111" java.lang.OutOfMemoryError: Java heap space
+	at java.io.ObjectInputStream$BlockDataInputStream.<init>(ObjectInputStream.java:2347)
+	at java.io.ObjectInputStream.<init>(ObjectInputStream.java:294)
+	at org.jppf.comm.discovery.JPPFConnectionInformation.fromBytes(JPPFConnectionInformation.java:165)
+	at org.jppf.comm.discovery.JPPFMulticastReceiver$Receiver.run(JPPFMulticastReceiver.java:257)
 
 ---------- end of output for class test.org.jppf.management.TestJMXConnectionWrapper ----------
 
 performing setup with 1 drivers, 2 nodes and 1 client
-[driver-1] driver process id: 5108
-[  node-1] node process id: 3288
-[  node-2] node process id: 2764
+[driver-1] driver process id: 1796
+[  node-1] node process id: 2736
+[  node-2] node process id: 3524
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -253,17 +285,17 @@ performing setup with 1 drivers, 2 nodes and 1 client
 [  node-2] JPPF Node management initialized
 [  node-1] JPPF Node management initialized
 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
-[  node-2] Reconnected to the node server
 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
-[  node-1] Reconnected to the node server
+[  node-2] Reconnected to the node server
 [  node-2] Node successfully initialized
+[  node-1] Reconnected to the node server
 [  node-1] Node successfully initialized
 
 ---------- end of output for class test.org.jppf.management.TestJPPFDriverAdminMBean ----------
 
 performing setup with 1 drivers, 1 nodes and 1 client
-[driver-1] driver process id: 4788
-[  node-1] node process id: 4816
+[driver-1] driver process id: 4148
+[  node-1] node process id: 5328
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -275,8 +307,8 @@ performing setup with 1 drivers, 1 nodes and 1 client
 [driver-1] - accepting secure connections on port 12001
 [driver-1] JPPF Driver initialization complete
 [client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
-[client: driver-1 - ClassServer] Reconnected to the class server
 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
 [client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [  node-1] Reconnected to the class server
 [client: driver-1 - TasksServer] Reconnected to the JPPF task server
@@ -291,8 +323,8 @@ performing setup with 1 drivers, 1 nodes
 
 ---------- end of output for class test.org.jppf.server.protocol.TestJPPFJobClientSLA ----------
 
-[driver-1] driver process id: 4580
-[  node-1] node process id: 4648
+[driver-1] driver process id: 5148
+[  node-1] node process id: 6072
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -304,8 +336,8 @@ performing setup with 1 drivers, 1 nodes
 [driver-1] - accepting secure connections on port 12001
 [driver-1] JPPF Driver initialization complete
 [client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
-[client: driver-1 - ClassServer] Reconnected to the class server
 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
 [client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [  node-1] Reconnected to the class server
 [client: driver-1 - TasksServer] Reconnected to the JPPF task server
@@ -326,9 +358,9 @@ performing setup with 1 drivers, 1 nodes
 [client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
 [client: driver-1 - TasksServer] Reconnected to the JPPF task server
 performing setup with 1 drivers, 2 nodes and 1 client
-[driver-1] driver process id: 4692
-[  node-1] node process id: 5116
-[  node-2] node process id: 4856
+[driver-1] driver process id: 5604
+[  node-1] node process id: 2228
+[  node-2] node process id: 3076
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -340,21 +372,21 @@ performing setup with 1 drivers, 2 nodes and 1 client
 [driver-1] - accepting secure connections on port 12001
 [driver-1] JPPF Driver initialization complete
 [client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
+[  node-1] Attempting connection to the class server at 192.168.1.14:11101
 [client: driver-1 - ClassServer] Reconnected to the class server
 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
-[  node-1] Attempting connection to the class server at 192.168.1.14:11101
-[  node-2] Reconnected to the class server
 [client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.14:11101
+[  node-2] Reconnected to the class server
 [  node-1] Reconnected to the class server
 [client: driver-1 - TasksServer] Reconnected to the JPPF task server
-[  node-2] JPPF Node management initialized
 [  node-1] JPPF Node management initialized
+[  node-2] JPPF Node management initialized
+[  node-1] Attempting connection to the node server at 192.168.1.14:11101
 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
 [  node-2] Reconnected to the node server
-[  node-1] Attempting connection to the node server at 192.168.1.14:11101
-[  node-2] Node successfully initialized
 [  node-1] Reconnected to the node server
 [  node-1] Node successfully initialized
+[  node-2] Node successfully initialized
 
 ---------- end of output for class test.org.jppf.server.protocol.TestJPPFJobSLA ----------
 
@@ -376,8 +408,8 @@ performing setup with 1 drivers, 2 nodes and 1 client
 [client: driver-1 - TasksServer] Reconnected to the JPPF task server
 performing setup with 1 drivers, 1 nodes and 1 client
 [client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
-[driver-1] driver process id: 4632
-[  node-1] node process id: 1464
+[driver-1] driver process id: 3832
+[  node-1] node process id: 2872
 [driver-1] management initialized and listening on port 11201
 [driver-1] secure management initialized and listening on port 12201
 [driver-1] ClientClassServer initialized
@@ -424,8 +456,7 @@ isInNode() = false
 
 ---------- end of output for class test.org.jppf.utils.TestJPPFConfiguration ----------
 
-[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
-[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
 
 ---------- end of output for class test.org.jppf.utils.TestRange ----------
 
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600:11101
