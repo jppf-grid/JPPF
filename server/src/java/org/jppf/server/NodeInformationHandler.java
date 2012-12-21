@@ -62,7 +62,7 @@ public class NodeInformationHandler
     }
     synchronized (uuidMap)
     {
-      uuidMap.put(info.getId(), info);
+      uuidMap.put(info.getUuid(), info);
     }
   }
 
@@ -80,7 +80,7 @@ public class NodeInformationHandler
     }
     synchronized (uuidMap)
     {
-      if (info != null) uuidMap.remove(info.getId());
+      if (info != null) uuidMap.remove(info.getUuid());
     }
   }
 

@@ -43,9 +43,6 @@ public class SelectDriversAction extends AbstractSelectionAction
     setupNameAndTooltip("select.drivers");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void actionPerformed(final ActionEvent e)
   {

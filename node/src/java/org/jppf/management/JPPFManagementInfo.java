@@ -63,7 +63,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Unique id for the node.
    */
-  private String id = null;
+  private String uuid = null;
   /**
    * The type of component this info is for, must be one of {@link #NODE} or {@link #DRIVER}.
    */
@@ -76,43 +76,24 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * The system information associated with the node at the time of the initial connection.
    */
   private transient JPPFSystemInformation systemInfo = null;
-
   /**
-   * Initialize this information with the specified parameters, using {@link #NODE NODE} as type.
-   * @param host the host on which the node is running.
-   * @param port the port on which the node's JMX server is listening.
-   * @param id unique id for the node's mbean server.
+   * Determines whether the node is active or inactive.
    */
-  public JPPFManagementInfo(final String host, final int port, final String id)
-  {
-    this(host, port, id, NODE, false);
-  }
+  private boolean active = true;
 
   /**
    * Initialize this information with the specified parameters.
    * @param host the host on which the node is running.
    * @param port the port on which the node's JMX server is listening.
-   * @param id unique id for the node's mbean server.
-   * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
-   */
-  public JPPFManagementInfo(final String host, final int port, final String id, final int type)
-  {
-    this(host, port, id, type, false);
-  }
-
-  /**
-   * Initialize this information with the specified parameters.
-   * @param host the host on which the node is running.
-   * @param port the port on which the node's JMX server is listening.
-   * @param id unique id for the node's mbean server.
+   * @param uuid unique id for the node's mbean server.
    * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
    * @param secure specifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
    */
-  public JPPFManagementInfo(final String host, final int port, final String id, final int type, final boolean secure)
+  public JPPFManagementInfo(final String host, final int port, final String uuid, final int type, final boolean secure)
   {
     this.host = host;
     this.port = port;
-    this.id = id;
+    this.uuid = uuid;
     this.type = (byte) type;
     this.secure = secure;
   }
@@ -138,7 +119,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   @Override
   public int hashCode()
   {
-    return (id == null) ? 0 : id.hashCode();
+    return (uuid == null) ? 0 : uuid.hashCode();
   }
 
   @Override
@@ -148,8 +129,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     final JPPFManagementInfo other = (JPPFManagementInfo) obj;
-    if (other.id == null) return id == null;
-    return (id != null) && id.equals(other.id);
+    if (other.uuid == null) return uuid == null;
+    return (uuid != null) && uuid.equals(other.uuid);
   }
 
   @Override
@@ -161,8 +142,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     int n = -1 * host.compareTo(o.getHost());
     if (n != 0) return n;
 
-    if(port > o.getPort()) return +1;
-    if(port < o.getPort()) return -1;
+    if (port > o.getPort()) return +1;
+    if (port < o.getPort()) return -1;
     return 0;
   }
 
@@ -173,7 +154,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     sb.append(getClass().getSimpleName()).append('[');
     sb.append(host).append(':').append(port);
     sb.append(", type=").append(type & TYPE_MASK);
-    sb.append(", id=").append(id);
+    sb.append(", uuid=").append(uuid);
     sb.append(']');
     return sb.toString();
   }
@@ -199,10 +180,20 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Get the unique id for the node's mbean server.
    * @return the id as a string.
+   * @deprecated use {@link #getUuid()} instead.
    */
   public String getId()
   {
-    return id;
+    return uuid;
+  }
+
+  /**
+   * Get the unique id for the node's mbean server.
+   * @return the id as a string.
+   */
+  public String getUuid()
+  {
+    return uuid;
   }
 
   /**
@@ -257,5 +248,23 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public boolean isLocal() {
     return (type & LOCAL) == LOCAL;
+  }
+
+  /**
+   * Determine whether the node is active or inactive.
+   * @return <code>true</code> if the node is active, <code>false</code> if it is inactve.
+   */
+  public boolean isActive()
+  {
+    return active;
+  }
+
+  /**
+   * Specify whether the node is active or inactive.
+   * @param active <code>true</code> if the node is active, <code>false</code> if it is inactve.
+   */
+  public void setActive(final boolean active)
+  {
+    this.active = active;
   }
 }

@@ -99,4 +99,11 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> idleNodesInformation() throws Exception;
+  /**
+   * Set the activate state of the specified node. If the node is already in the specified state, this method has no effect.
+   * @param uuid the uuid of the node to activate or deactivate.
+   * @param active <code>true</code> to activate the node, <code>false</code> to deactivate it.
+   * @throws Exception if any error occurs.
+   */
+  void activateNode(String uuid, Boolean active) throws Exception;
 }

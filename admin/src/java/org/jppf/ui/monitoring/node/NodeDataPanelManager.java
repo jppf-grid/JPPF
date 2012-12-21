@@ -173,7 +173,7 @@ public class NodeDataPanelManager
    */
   void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo)
   {
-    if (findNode(driverNode, nodeInfo.getId()) != null) return;
+    if (findNode(driverNode, nodeInfo.getUuid()) != null) return;
     String nodeName = nodeInfo.getHost() + ':' + nodeInfo.getPort();
     if (debugEnabled) log.debug("attempting to add node=" + nodeName + " to driver=" + driverNode);
     int index = nodeInsertIndex(driverNode, nodeName);
@@ -183,7 +183,7 @@ public class NodeDataPanelManager
     TopologyData peerData = null;
     if (nodeInfo.isPeer())
     {
-      DefaultMutableTreeNode tmpNode = findDriver(nodeInfo.getId());
+      DefaultMutableTreeNode tmpNode = findDriver(nodeInfo.getUuid());
       if (tmpNode != null)
       {
         if (debugEnabled) log.debug("adding peer node: " + nodeName + " at index " + index);
@@ -202,11 +202,11 @@ public class NodeDataPanelManager
     {
       DefaultMutableTreeNode driverNode2 = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
       if (driverNode2 == driverNode) continue;
-      DefaultMutableTreeNode nodeNode2 = findNode(driverNode2, nodeInfo.getId());
+      DefaultMutableTreeNode nodeNode2 = findNode(driverNode2, nodeInfo.getUuid());
       if (nodeNode2 != null)
       {
         TopologyData tmp = (TopologyData) nodeNode2.getUserObject();
-        if (tmp.getNodeInformation().getType() == JPPFManagementInfo.NODE) panel.getModel().removeNodeFromParent(nodeNode2);
+        if (tmp.getNodeInformation().isNode()) panel.getModel().removeNodeFromParent(nodeNode2);
       }
     }
     TopologyData driverData = (TopologyData) driverNode.getUserObject();
@@ -264,6 +264,22 @@ public class NodeDataPanelManager
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       TopologyData nodeData = (TopologyData) node.getUserObject();
       if (nodeUuid.equals(nodeData.getUuid())) return node;
+    }
+    return null;
+  }
+
+  /**
+   * Find the driver to which the specified node is attached.
+   * @param nodeUuid the uuid of the node to look for.
+   * @return a {@link DefaultMutableTreeNode} instance, or null if node driver could be found for the node.
+   */
+  public DefaultMutableTreeNode findDriverForNode(final String nodeUuid)
+  {
+    for (int i=0; i<panel.getTreeTableRoot().getChildCount(); i++)
+    {
+      DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
+      DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) findNode(driverNode, nodeUuid);
+      if (nodeNode != null) return driverNode;
     }
     return null;
   }

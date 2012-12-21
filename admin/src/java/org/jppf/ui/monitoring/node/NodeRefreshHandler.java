@@ -26,7 +26,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.utils.NetworkUtils;
 import org.slf4j.*;
 
 /**
@@ -159,58 +158,51 @@ public class NodeRefreshHandler
    * Refresh the nodes currently attached to the specified driver.
    * @param driverUuid the name of the driver.
    */
-  private synchronized void refreshNodes(final String driverUuid)
-  {
+  private synchronized void refreshNodes(final String driverUuid) {
     DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverUuid);
     //if (debugEnabled) log.debug("driverNode = " + driverNode);
     if (driverNode == null) return;
     Set<String> panelNames = new HashSet<String>();
-    for (int i=0; i<driverNode.getChildCount(); i++)
-    {
+    for (int i=0; i<driverNode.getChildCount(); i++) {
       DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       TopologyData data = (TopologyData) nodeNode.getUserObject();
-      //panelNames.add(data.getJmxWrapper().getId());
       panelNames.add(data.getUuid());
     }
     TopologyData data = (TopologyData) driverNode.getUserObject();
     JMXDriverConnectionWrapper wrapper = (JMXDriverConnectionWrapper) data.getJmxWrapper();
     if (!wrapper.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
-    try
-    {
+    try {
       nodesInfo = wrapper.nodesInformation();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       return;
     }
     if (nodesInfo == null) return;
     Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
-    for (JPPFManagementInfo info: nodesInfo)
-    {
-      String s = info.getHost();
-      if (NetworkUtils.isIPv6Address(s)) s = '[' + s + ']';
-      //actualMap.put(info.getHost() + ':' + info.getPort(), info);
-      //actualMap.put(s + ':' + info.getPort(), info);
-      actualMap.put(info.getId(), info);
-    }
+    for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getUuid(), info);
     List<String> nodesToProcess = new ArrayList<String>(panelNames.size());
-    for (String name: panelNames)
-    {
+    for (String name: panelNames) {
       if (!actualMap.containsKey(name)) nodesToProcess.add(name);
     }
-    for (String name: nodesToProcess)
-    {
+    for (String name: nodesToProcess) {
       if (debugEnabled) log.debug("removing node " + name);
       nodeDataPanel.nodeRemoved(driverUuid, name);
     }
-    for (Map.Entry<String, JPPFManagementInfo> entry: actualMap.entrySet())
-    {
-      if (!panelNames.contains(entry.getKey()))
-      {
+    for (Map.Entry<String, JPPFManagementInfo> entry: actualMap.entrySet()) {
+      if (!panelNames.contains(entry.getKey())) {
         if (debugEnabled) log.debug("adding node " + entry.getKey());
         nodeDataPanel.nodeAdded(driverUuid, entry.getValue());
+      }
+      else {
+        DefaultMutableTreeNode nodeNode = nodeDataPanel.getManager().findNode(driverNode, entry.getKey());
+        if (nodeNode != null) {
+          TopologyData nodeData = (TopologyData) nodeNode.getUserObject();
+          if (entry.getValue().isActive() != nodeData.getNodeInformation().isActive()) {
+            nodeData.getNodeInformation().setActive(entry.getValue().isActive());
+            nodeDataPanel.nodeDataUpdated(driverUuid, entry.getKey());
+          }
+        }
       }
     }
   }

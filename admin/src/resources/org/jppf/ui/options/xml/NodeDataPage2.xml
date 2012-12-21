@@ -37,7 +37,8 @@
 		<child name="update.threads" type="Button"/>
 		<child name="reset.counter" type="Button"/>
 		<child name="restart.node" type="Button"/>
-		<child name="shutdown.node" type="Button"/>
+    <child name="shutdown.node" type="Button"/>
+    <child name="toggle.active" type="Button"/>
 
 		<child name="sep2" type="ToolbarSeparator"/>
 		<child name="Auto" type="Boolean">

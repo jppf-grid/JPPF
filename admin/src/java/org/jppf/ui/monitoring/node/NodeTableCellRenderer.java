@@ -18,6 +18,8 @@
 
 package org.jppf.ui.monitoring.node;
 
+import static org.jppf.ui.treetable.AbstractTreeCellRenderer.*;
+
 import java.awt.Component;
 
 import javax.swing.*;
@@ -26,7 +28,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.*;
 
 import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.ui.treetable.*;
+import org.jppf.ui.treetable.JPPFTreeTable;
 
 /**
  * Table cell renderer used to render the alignment of cell values in the table.
@@ -78,12 +80,22 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
         if (o instanceof TopologyData)
         {
           TopologyData data = (TopologyData) o;
-          if (TopologyDataType.NODE == data.getType())
+          if (data.isNode())
           {
             JMXConnectionWrapper wrapper = data.getJmxWrapper();
-            if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(AbstractTreeCellRenderer.UNMANAGED_COLOR);
-            else renderer.setForeground(
-                isSelected ? AbstractTreeCellRenderer.DEFAULT_SELECTION_FOREGROUND : AbstractTreeCellRenderer.DEFAULT_FOREGROUND);
+            if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(UNMANAGED_COLOR);
+            else
+            {
+              if (!data.getNodeInformation().isActive())
+                renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
+              else renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+              renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+            }
+          }
+          else
+          {
+            renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+            renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
           }
         }
       }

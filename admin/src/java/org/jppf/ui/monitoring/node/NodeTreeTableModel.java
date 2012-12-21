@@ -94,7 +94,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
       {
         TopologyData info = (TopologyData) defNode.getUserObject();
         JPPFManagementInfo mgtInfo = info.getNodeInformation();
-        boolean isNode = ((mgtInfo != null) && (mgtInfo.getType() == JPPFManagementInfo.NODE));
+        boolean isNode = (mgtInfo != null) && mgtInfo.isNode();
         if (TopologyDataType.DRIVER.equals(info.getType()) && (column > 0)) return res;
         JPPFNodeState state = info.getNodeState();
         if (state == null) return res;

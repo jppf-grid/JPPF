@@ -40,6 +40,7 @@
 		<child name="graph.reset.counter" type="Button"/>
 		<child name="graph.restart.node" type="Button"/>
 		<child name="graph.shutdown.node" type="Button"/>
+    <child name="graph.toggle.active" type="Button"/>
 
 		<child name="sep2" type="ToolbarSeparator"/>
 		<child name="graph.button.refresh" type="Button">

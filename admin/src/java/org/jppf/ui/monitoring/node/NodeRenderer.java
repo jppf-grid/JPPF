@@ -101,6 +101,11 @@ public class NodeRenderer extends AbstractTreeCellRenderer
               backgroundSelected = INACTIVE_SELECTION_COLOR;
               font = getItalicFont(f);
             }
+            else if (!data.getNodeInformation().isActive())
+            {
+              background = SUSPENDED_COLOR;
+              backgroundSelected = INACTIVE_SELECTION_COLOR;
+            }
             else
             {
               JMXConnectionWrapper wrapper = data.getJmxWrapper();

@@ -90,7 +90,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads");
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
-    managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL);
+    managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
     managementInfo.setSystemInfo(systemInfo);
   }
 

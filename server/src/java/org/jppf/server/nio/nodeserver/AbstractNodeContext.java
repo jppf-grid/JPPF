@@ -18,20 +18,17 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.execute.*;
 import org.jppf.io.*;
-import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Context associated with a channel serving tasks to a node.
@@ -50,7 +47,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Dummy runnable used for bundle execution.
    */
-  protected static final Runnable RUNNABLE = new Runnable() {
+  protected static final Runnable NOOP_RUNNABLE = new Runnable() {
     @Override
     public void run() {
     }
@@ -83,7 +80,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * <code>Runnable</code> called when node context is closed.
    */
   private Runnable onClose = null;
-
+  /**
+   * Determines whether the node is active or inactive.
+   */
+  private AtomicBoolean active = new AtomicBoolean(true);
   /**
    * Performs all operations that relate to channel states.
    */
@@ -92,6 +92,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Provides access to the management functions of the driver.
    */
   protected JMXNodeConnectionWrapper jmxConnection = null;
+  /**
+   * Execution status for the node.
+   */
+  protected ExecutorStatus executionStatus = ExecutorStatus.DISABLED;
 
   /**
    * Initialized abstract node context.
@@ -131,10 +135,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     }
   }
 
-  /**
-   * Get the bundler used to schedule tasks for the corresponding node.
-   * @return a {@link Bundler} instance.
-   */
   @Override
   public Bundler getBundler()
   {
@@ -303,30 +303,25 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public ExecutorStatus getExecutionStatus() {
-    NodeState state = getState();
-    if(state == null)
-      return ExecutorStatus.DISABLED;
-    else {
-      switch (state) {
-        case IDLE:
-          if (getChannel().isOpen())
-            return ExecutorStatus.ACTIVE;
-          else
-            return ExecutorStatus.FAILED;
-        case SENDING_BUNDLE:
-          return ExecutorStatus.EXECUTING;
-        case WAITING_RESULTS:
-          return ExecutorStatus.EXECUTING;
-        default:
-          return ExecutorStatus.DISABLED;
-      }
-    }
+    return executionStatus;
   }
 
   @Override
   public void setState(final NodeState state) {
     ExecutorStatus oldExecutionStatus = getExecutionStatus();
     super.setState(state);
+    switch (state) {
+      case IDLE: 
+        executionStatus = getChannel().isOpen() ? ExecutorStatus.ACTIVE : ExecutorStatus.FAILED;
+        break;
+      case SENDING_BUNDLE:
+      case WAITING_RESULTS:
+        executionStatus = ExecutorStatus.EXECUTING;
+        break;
+      default:
+        executionStatus = ExecutorStatus.DISABLED;
+        break;
+    }
     ExecutorStatus newExecutionStatus = getExecutionStatus();
     fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
   }
@@ -386,7 +381,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public JPPFFuture<?> submit(final ServerTaskBundleNode nodeBundle) {
-    JPPFFuture<?> future = new JPPFFutureTask<Object>(RUNNABLE, null) {
+    JPPFFuture<?> future = new JPPFFutureTask<Object>(NOOP_RUNNABLE, null) {
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning) {
         if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
@@ -406,7 +401,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     };
     setBundle(nodeBundle);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
-//    bundleWrapper.jobDispatched(getChannel(), future);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
 
     return future;
@@ -432,9 +426,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList)
-    {
+    synchronized (listenerList) {
       listenerList.add(listener);
     }
   }
@@ -442,9 +434,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList)
-    {
+    synchronized (listenerList) {
       listenerList.remove(listener);
     }
   }
@@ -466,5 +456,24 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     for (ExecutorChannelStatusListener listener : listeners) {
       listener.executionStatusChanged(event);
     }
+  }
+
+  /**
+   * Determine whether the node is active or inactive.
+   * @return <code>true</code> if the node is active, <code>false</code> if it is inactive.
+   */
+  public boolean isActive()
+  {
+    return active.get();
+  }
+
+  /**
+   * Activate or deactivate the node.
+   * @param active <code>true</code> to activate the node, <code>false</code> to deactivate it.
+   */
+  public void setActive(final boolean active)
+  {
+    this.active.set(active);
+    if (managementInfo != null) managementInfo.setActive(active);
   }
 }

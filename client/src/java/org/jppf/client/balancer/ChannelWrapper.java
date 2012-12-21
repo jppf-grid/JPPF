@@ -237,4 +237,10 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
       listener.executionStatusChanged(event);
     }
   }
+
+  @Override
+  public boolean isActive()
+  {
+    return true;
+  }
 }

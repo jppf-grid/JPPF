@@ -35,9 +35,9 @@ import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
- * @param <T> type of the <code>ExecutorChannel</code>.
+ * @param <C> type of the <code>ExecutorChannel</code>.
  */
-public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchronization implements Runnable
+public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchronization implements Runnable
 {
   /**
    * Logger for this class.
@@ -70,7 +70,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   /**
    * The list of idle node channels.
    */
-  private final Set<T> idleChannels = new LinkedHashSet<T>();
+  private final Set<C> idleChannels = new LinkedHashSet<C>();
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -154,7 +154,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final T channel)
+  public void addIdleChannel(final C channel)
   {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
@@ -174,11 +174,11 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<T> getIdleChannels()
+  public List<C> getIdleChannels()
   {
     synchronized (idleChannels)
     {
-      return new ArrayList<T>(idleChannels);
+      return new ArrayList<C>(idleChannels);
     }
   }
 
@@ -187,7 +187,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  public T removeIdleChannel(final T channel)
+  public C removeIdleChannel(final C channel)
   {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     int count;
@@ -236,7 +236,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     try
     {
       queue.processPendingBroadcasts();
-      T channel = null;
+      C channel = null;
       ServerTaskBundleNode bundle = null;
       synchronized(idleChannels)
       {
@@ -285,7 +285,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @return a channel for a node on which to execute the job.
    * @throws Exception if any error occurs.
    */
-  private T retrieveChannel(final ServerJob bundleWrapper) throws Exception
+  private C retrieveChannel(final ServerJob bundleWrapper) throws Exception
   {
     if (checkJobState(bundleWrapper))
     {
@@ -300,7 +300,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param selectedBundle the job to dispatch.
    * @return the task bundle to dispatch to the specified node.
    */
-  private ServerTaskBundleNode prepareJobDispatch(final T channel, final ServerJob selectedBundle)
+  private ServerTaskBundleNode prepareJobDispatch(final C channel, final ServerJob selectedBundle)
   {
     if (debugEnabled)
     {
@@ -329,7 +329,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param bundleWrapper the job to dispatch.
    */
   @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final T channel, final ServerTaskBundleNode bundleWrapper) {
+  private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode bundleWrapper) {
     synchronized(channel.getMonitor())
     {
       JPPFFuture<?> future = channel.submit(bundleWrapper);
@@ -342,23 +342,24 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param bundle the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
-  private T findIdleChannelIndex(final ServerJob bundle)
+  private C findIdleChannelIndex(final ServerJob bundle)
   {
     int idleChannelsSize = idleChannels.size();
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
-    List<T> acceptableChannels = new ArrayList<T>(idleChannelsSize);
+    List<C> acceptableChannels = new ArrayList<C>(idleChannelsSize);
     List<String> uuidPath = bundle.getJob().getUuidPath().getList();
-    Iterator<T> iterator = idleChannels.iterator();
+    Iterator<C> iterator = idleChannels.iterator();
     while (iterator.hasNext())
     {
-      T ch = iterator.next();
+      C ch = iterator.next();
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE)
       {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
         iterator.remove();
         continue;
       }
+      if (!ch.isActive()) continue;
       if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + ch.getUuid());
       if (uuidPath.contains(ch.getUuid()))
       {
@@ -435,7 +436,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param taskBundle the job.
    * @param context the current node context.
    */
-  private void updateBundler(final Bundler bundler, final JPPFTaskBundle taskBundle, final T context)
+  private void updateBundler(final Bundler bundler, final JPPFTaskBundle taskBundle, final C context)
   {
     context.checkBundler(bundler, jppfContext);
     if (context.getBundler() instanceof JobAwareness)

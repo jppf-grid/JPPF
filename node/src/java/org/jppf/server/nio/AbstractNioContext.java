@@ -189,4 +189,13 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     sb.append(']');
     return sb.toString();
   }
+
+  /**
+   * Determine whether the associated channel is secured via SSL/TLS.
+   * @return <code>true</code> if the channel is secure, <code>false</code> otherwise.
+   */
+  public boolean isSecure()
+  {
+    return sslHandler != null;
+  }
 }

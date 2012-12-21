@@ -164,34 +164,34 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   /**
    * Add the specified connection wrapper to the list of connections handled by this manager.
-   * @param wrapper the connection wrapper to add.
+   * @param nodeContext the connection wrapper to add.
    */
-  public synchronized void addConnection(final AbstractNodeContext wrapper)
+  public synchronized void addConnection(final AbstractNodeContext nodeContext)
   {
-    if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
-    if (wrapper.getChannel() == null) throw new IllegalArgumentException("wrapper.getChannel() is null");
+    if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
+    if (nodeContext.getChannel() == null) throw new IllegalArgumentException("wrapper.getChannel() is null");
 
-    allConnections.put(wrapper.getUuid(), wrapper);
-    wrapper.addExecutionStatusListener(statusListener);
-    updateConnectionStatus(wrapper, ExecutorStatus.DISABLED, wrapper.getExecutionStatus());
+    allConnections.put(nodeContext.getUuid(), nodeContext);
+    nodeContext.addExecutionStatusListener(statusListener);
+    updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
   }
 
   /**
    * Remove the specified connection wrapper from the list of connections handled by this manager.
-   * @param wrapper the connection wrapper to remove.
+   * @param nodeContext the connection wrapper to remove.
    */
-  public synchronized void removeConnection(final AbstractNodeContext wrapper)
+  public synchronized void removeConnection(final AbstractNodeContext nodeContext)
   {
-    if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
+    if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
     try
     {
-      taskQueueChecker.removeIdleChannel(wrapper);
-      updateConnectionStatus(wrapper, wrapper.getExecutionStatus(), ExecutorStatus.DISABLED);
+      taskQueueChecker.removeIdleChannel(nodeContext);
+      updateConnectionStatus(nodeContext, nodeContext.getExecutionStatus(), ExecutorStatus.DISABLED);
     }
     finally
     {
-      allConnections.remove(wrapper.getUuid());
-      wrapper.removeExecutionStatusListener(statusListener);
+      allConnections.remove(nodeContext.getUuid());
+      nodeContext.removeExecutionStatusListener(statusListener);
     }
   }
 
@@ -200,12 +200,26 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param uuid the id of the connection to remove.
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext removeUuid(final String uuid)
+  public synchronized AbstractNodeContext removeConnection(final String uuid)
   {
-    final AbstractNodeContext wrapper = allConnections.get(uuid);
-    if (wrapper == null) return null;
-    removeConnection(wrapper);
-    return wrapper;
+    final AbstractNodeContext nodeContext = allConnections.get(uuid);
+    if (nodeContext == null) return null;
+    removeConnection(nodeContext);
+    return nodeContext;
+  }
+
+  /**
+   * Remove the specified connection wrapper from the list of connections handled by this manager.
+   * @param uuid the id of the node to activate or deactivate.
+   * @param activate <code>true</code> to activate the node, <code>false</code> to deactivate it.
+   * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
+   */
+  public synchronized AbstractNodeContext activateNode(final String uuid, final boolean activate)
+  {
+    final AbstractNodeContext nodeContext = allConnections.get(uuid);
+    if (nodeContext == null) return null;
+    if (activate != nodeContext.isActive()) nodeContext.setActive(activate);
+    return nodeContext;
   }
 
   /**
@@ -224,22 +238,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
-   * @param wrapper   the connection wrapper.
+   * @param nodeContext   the connection wrapper.
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
    */
-  private void updateConnectionStatus(final AbstractNodeContext wrapper, final ExecutorStatus oldStatus, final ExecutorStatus newStatus)
+  private void updateConnectionStatus(final AbstractNodeContext nodeContext, final ExecutorStatus oldStatus, final ExecutorStatus newStatus)
   {
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
-    if (wrapper == null || oldStatus == newStatus) return;
+    if (nodeContext == null || oldStatus == newStatus) return;
 
-    if (newStatus == ExecutorStatus.ACTIVE)
-      taskQueueChecker.addIdleChannel(wrapper);
+    if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannel(nodeContext);
     else
     {
-      taskQueueChecker.removeIdleChannel(wrapper);
-      if(newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(wrapper.getUuid());
+      taskQueueChecker.removeIdleChannel(nodeContext);
+      if(newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
     }
     queue.updateWorkingConnections(oldStatus, newStatus);
   }
@@ -338,7 +351,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     try
     {
       JPPFManagementInfo info = context.getManagementInfo();
-      if (info == null) info = new JPPFManagementInfo("unknown host", -1, "unknown id");
+      if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
       nodeConnectionHandler.fireNodeDisconnected(info);
       driver.getStatsManager().nodeConnectionClosed();
       removeConnection(context);
@@ -429,7 +442,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (!c.isOk())
     {
       String uuid = c.getUuid();
-      if (uuid != null) channel = removeUuid(uuid);
+      if (uuid != null) channel = removeConnection(uuid);
       if (channel != null)
       {
         if (debugEnabled) log.debug("about to close channel = " + (channel.getChannel().isOpen() ? channel : channel.getClass().getSimpleName()) + " with uuid = " + uuid);
@@ -455,7 +468,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public void close()
   {
     setStopped(true);
-//    wakeUp();
     if (taskQueueChecker != null)
     {
       taskQueueChecker.setStopped(true);

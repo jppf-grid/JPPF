@@ -90,7 +90,7 @@ public class TopologyData
     this.type = TopologyDataType.NODE;
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
-    this.uuid = nodeInformation.getId();
+    this.uuid = nodeInformation.getUuid();
     jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
     jmxWrapper.connect();
   }
@@ -106,7 +106,7 @@ public class TopologyData
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
     this.jmxWrapper = peerJmx != null ? peerJmx : new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
-    this.uuid = nodeInformation.getId();
+    this.uuid = nodeInformation.getUuid();
   }
 
   /**

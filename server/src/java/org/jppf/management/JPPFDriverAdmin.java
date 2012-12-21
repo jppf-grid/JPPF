@@ -22,8 +22,7 @@ import java.util.*;
 
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.*;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.server.nio.nodeserver.NodeNioServer;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
@@ -309,5 +308,11 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
    */
   private static NodeNioServer getNodeNioServer() {
     return driver.getNodeNioServer();
+  }
+
+  @Override
+  public void activateNode(final String uuid, final Boolean active) throws Exception
+  {
+    getNodeNioServer().activateNode(uuid, active);
   }
 }

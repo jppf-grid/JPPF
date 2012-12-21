@@ -26,10 +26,9 @@ import javax.swing.*;
 
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.jppf.ui.actions.*;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
-import org.jppf.ui.treetable.AbstractTreeTableOption;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -60,7 +59,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
   /**
    * The tree view.
    */
-  protected AbstractTreeTableOption treeTableOption = null;
+  protected NodeDataPanel treeTableOption = null;
   /**
    * The graph visualization component.
    */
@@ -167,7 +166,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Set the corresponding tree view onto this graph.
    * @param treeTableOption a {@link AbstractTreeTableOption} instance.
    */
-  public void setTreeTableOption(final AbstractTreeTableOption treeTableOption)
+  public void setTreeTableOption(final NodeDataPanel treeTableOption)
   {
     this.treeTableOption = treeTableOption;
   }
@@ -223,6 +222,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
       actionHandler.putAction("graph.reset.counter", new ResetTaskCounterAction());
       actionHandler.putAction("graph.restart.node", new RestartNodeAction());
       actionHandler.putAction("graph.shutdown.node", new ShutdownNodeAction());
+      actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction(treeTableOption));
       actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
       actionHandler.putAction("graph.select.nodes", new SelectGraphNodesAction(this));
       actionHandler.putAction("graph.button.collapse", new ExpandOrCollapseGraphAction(this, true));

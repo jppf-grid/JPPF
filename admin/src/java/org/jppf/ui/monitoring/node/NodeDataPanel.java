@@ -296,6 +296,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     actionHandler.putAction("reset.counter", new ResetTaskCounterAction());
     actionHandler.putAction("restart.node", new RestartNodeAction());
     actionHandler.putAction("shutdown.node", new ShutdownNodeAction());
+    actionHandler.putAction("toggle.active", new ToggleNodeActiveAction(this));
     actionHandler.putAction("select.drivers", new SelectDriversAction(this));
     actionHandler.putAction("select.nodes", new SelectNodesAction(this));
     actionHandler.updateActions();
@@ -370,7 +371,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Get the tree table updates manager.
    * @return a {@link NodeDataPanelManager} instance.
    */
-  NodeDataPanelManager getManager()
+  public NodeDataPanelManager getManager()
   {
     return manager;
   }

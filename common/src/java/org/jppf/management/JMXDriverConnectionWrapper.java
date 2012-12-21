@@ -263,4 +263,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation", (Object[]) null, (String[]) null);
   }
+
+  @Override
+  public void activateNode(final String uuid, final Boolean active) throws Exception
+  {
+    invoke(MBEAN_NAME, "activateNode", new Object[] {uuid, active}, new String[] {String.class.getName(), Boolean.class.getName()});
+  }
 }
