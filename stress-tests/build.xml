@@ -69,12 +69,23 @@
   <target name="build" depends="compile"/>
 
   <!-- ========================================================================= -->
+  <!--                           Init                                            -->
+  <!-- ========================================================================= -->
+
+  <target name="init" depends="" description="Initialize ressources">
+    <mkdir dir="${classes}"/>
+    <mkdir dir="${framework.classes}"/>
+    <mkdir dir="${addons.classes}"/>
+    <mkdir dir="${scenarios.classes}"/>
+  </target>
+
+  <!-- ========================================================================= -->
   <!--                           Compile                                         -->
   <!-- ========================================================================= -->
 
   <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
 
-  <target name="compile" description="compile the junit tests classes">
+  <target name="compile" depends="init" description="compile the junit tests classes">
     <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml">
       <fileset dir="${framework.src}" includes="**/*.java"/>
       <fileset dir="${scenarios.src}" includes="**/*.java"/>
