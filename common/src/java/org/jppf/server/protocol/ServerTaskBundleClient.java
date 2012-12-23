@@ -268,24 +268,26 @@ public class ServerTaskBundleClient
   /**
    * Called when this task bundle is cancelled.
    */
-  public synchronized void cancel()
+  public void cancel()
   {
-    if (!cancelled && !done)
+    synchronized(this)
     {
-      if (debugEnabled) log.debug("cancelling client job " + this);
-      this.cancelled = true;
-      for (ServerTask task: taskList)
+      if (!cancelled && !done)
       {
-        if (task.getState() == TaskState.PENDING) {
-          task.cancel();
-          tasksToSendList.add(task);
-          pendingTasksCount.decrementAndGet();
+        if (debugEnabled) log.debug("cancelling client job " + this);
+        this.cancelled = true;
+        for (ServerTask task: taskList)
+        {
+          if (task.getState() == TaskState.PENDING) {
+            task.cancel();
+            tasksToSendList.add(task);
+            pendingTasksCount.decrementAndGet();
+          }
         }
+        this.done = true;
       }
-      this.done = true;
-      //fireTasksCompleted(taskList);
-      fireTasksCompleted();
     }
+    fireTasksCompleted();
   }
 
   /**
