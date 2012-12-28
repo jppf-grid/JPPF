@@ -24,7 +24,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.Node;
 import org.jppf.node.protocol.*;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,7 +42,10 @@ public class LifeCycleEventHandler
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-
+  /**
+   * If <code>true</code> (the default), then {@link Error}s caught in the listeners methods will be propagated, otherwise they will be just logged.
+   */
+  private static final boolean propagateErrors = JPPFConfiguration.getProperties().getBoolean("jppf.node.listener.errors.propagate", true);
   /**
    * The list of listeners to this object's events.
    */
@@ -107,7 +110,17 @@ public class LifeCycleEventHandler
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(node);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.nodeStarting(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.nodeStarting(event);
+        }
+        catch(Throwable t)
+        {
+          handleError("nodeStarting", listener, t);
+        }
+      }
     }
   }
 
@@ -119,7 +132,17 @@ public class LifeCycleEventHandler
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(node);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.nodeEnding(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.nodeEnding(event);
+        }
+        catch(Throwable t)
+        {
+          handleError("nodeEnding", listener, t);
+        }
+      }
     }
   }
 
@@ -135,7 +158,14 @@ public class LifeCycleEventHandler
     {
       for (NodeLifeCycleListener listener : listeners)
       {
-        if (listener instanceof NodeLifeCycleListenerEx) ((NodeLifeCycleListenerEx) listener).jobHeaderLoaded(event);
+        try
+        {
+          if (listener instanceof NodeLifeCycleListenerEx) ((NodeLifeCycleListenerEx) listener).jobHeaderLoaded(event);
+        }
+        catch(Throwable t)
+        {
+          handleError("jobHeaderLoaded", listener, t);
+        }
       }
     }
   }
@@ -152,7 +182,17 @@ public class LifeCycleEventHandler
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks, dataProvider);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.jobStarting(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.jobStarting(event);
+        }
+        catch(Throwable t)
+        {
+          handleError("jobStarting", listener, t);
+        }
+      }
     }
   }
 
@@ -168,7 +208,17 @@ public class LifeCycleEventHandler
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks, dataProvider);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.jobEnding(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.jobEnding(event);
+        }
+        catch(Throwable t)
+        {
+          handleError("jobEnding", listener, t);
+        }
+      }
     }
   }
 
@@ -191,5 +241,19 @@ public class LifeCycleEventHandler
         log.error(e.getMessage(), e);
       }
     }
+  }
+
+  /**
+   * Log an error message when an uncaught exception is raised in one of the methods of a listener.
+   * @param method the name of method that was invoked.
+   * @param listener the listener on which the method was invoked.
+   * @param t the exception that was raised.
+   */
+  private void handleError(final String method, final NodeLifeCycleListener listener, final Throwable t)
+  {
+    String s = "error executing " + method + "() on an instance of " + listener.getClass() + " : ";
+    if (debugEnabled) log.debug(s, t);
+    else log.error(s + ExceptionUtils.getMessage(t));
+    if (propagateErrors && (t instanceof Error)) throw (Error) t;
   }
 }
