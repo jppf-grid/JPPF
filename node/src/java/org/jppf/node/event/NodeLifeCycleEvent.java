@@ -34,56 +34,66 @@ public class NodeLifeCycleEvent extends EventObject
   /**
    * The class loader used to load the tasks and the classes they need from the client.
    */
-  private final AbstractJPPFClassLoader cl;
+  private AbstractJPPFClassLoader cl = null;
   /**
    * The tasks currently being executed.
    */
-  private final List<Task> tasks;
+  private List<Task> tasks = null;
   /**
    * The data provider for the current job, if any.
    */
-  private final DataProvider dataProvider;
+  private DataProvider dataProvider = null;
+  /**
+   * The job that is about to be or has been executed.
+   */
+  private JPPFDistributedJob job = null;
+  /**
+   * The type of this event.
+   */
+  private final NodeLifeCycleEventType type;
 
   /**
    * Initialize this event with the specified execution manager.
    * <br>This constructor is used for <code>nodeStarting()</code> and <code>nodeEnding()</code> notifications only.
-   * @param node an object representing the JPPF node.
-   * If the {@link NodeLifeCycleListener} was deployed in the server's classpath,
+   * @param node an object representing the JPPF node. If the {@link NodeLifeCycleListener} was deployed in the server's classpath,
    * then it can be safely cast to a <code>org.jppf.server.node.JPPFNode</code> instance.
+   * @param type the type of this event.
    */
-  public NodeLifeCycleEvent(final Node node)
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type)
   {
     super(node);
-    this.cl = null;
-    this.tasks = null;
-    this.dataProvider = null;
+    this.type = type;
   }
 
   /**
    * Initialize this event with the specified job, task class loader and tasks.
    * <br>This constructor is used for <code>jobHeaderLoaded()</code> notifications only.
+   * @param node an object representing the JPPF node.
+   * @param type the type of this event.
    * @param job the job that is about to be or has been executed.
    * @param cl the class loader used to load the tasks and the classes they need from the client.
    */
-  public NodeLifeCycleEvent(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl)
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl)
   {
-    super(job);
+    this(node, type);
+    this.job = job;
     this.cl = cl;
-    this.tasks = null;
-    this.dataProvider = null;
   }
 
   /**
    * Initialize this event with the specified job, task class loader and tasks.
    * <br>This constructor is used for <code>jobStarting()</code> and <code>jobEnding()</code> notifications only.
+   * @param node an object representing the JPPF node.
+   * @param type the type of this event.
    * @param job the job that is about to be or has been executed.
    * @param cl the class loader used to load the tasks and the classes they need from the client.
    * @param tasks the tasks about to be or which have been executed.
    * @param dataProvider the data provider for the current job, if any.
    */
-  public NodeLifeCycleEvent(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
   {
-    super(job);
+    this(node, type);
+    this.job = job;
     this.cl = cl;
     this.tasks = tasks;
     this.dataProvider = dataProvider;
@@ -91,16 +101,14 @@ public class NodeLifeCycleEvent extends EventObject
 
   /**
    * Get the object representing the current JPPF node.
-   * <br>The node is available within <code>nodeStarting()</code> and <code>nodeEnding()</code> notifications only.
-   * It will be <code>null</code> in all other cases.
+   * <br>The node is available for all notifications.
    * @return a {@link Node} instance, or null if this event isn't part of a <code>nodeStarting()</code> or <code>nodeEnding()</code> notification.
    * If the {@link NodeLifeCycleListener} was deployed in the server's classpath,
    * then this return value can be safely cast to a <code>org.jppf.server.node.JPPFNode</code> instance.
    */
   public Node getNode()
   {
-    Object o = getSource();
-    return (o instanceof Node) ? (Node) o : null;
+    return (Node) getSource();
   }
 
   /**
@@ -111,8 +119,7 @@ public class NodeLifeCycleEvent extends EventObject
    */
   public JPPFDistributedJob getJob()
   {
-    Object o = getSource();
-    return (o instanceof JPPFDistributedJob) ? (JPPFDistributedJob) o : null;
+    return job;
   }
 
   /**
@@ -153,12 +160,22 @@ public class NodeLifeCycleEvent extends EventObject
   {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    sb.append("node=").append(getNode());
+    sb.append("type=").append(getType());
+    sb.append(", node=").append(getNode());
     sb.append(", job=").append(getJob());
     sb.append(", dataProvider=").append(getDataProvider());
     sb.append(", taskClassLoader=").append(getTaskClassLoader());
     sb.append(", tasks=").append(getTasks());
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the type of this event.
+   * @return the event type as an instance of the typesafe enum {@link NodeLifeCycleEventType}.
+   */
+  public NodeLifeCycleEventType getType()
+  {
+    return type;
   }
 }

@@ -18,13 +18,15 @@
 
 package org.jppf.node.event;
 
+import static org.jppf.node.event.NodeLifeCycleEventType.*;
+
 import java.util.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.Node;
 import org.jppf.node.protocol.*;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,7 +44,14 @@ public class LifeCycleEventHandler
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-
+  /**
+   * If <code>true</code> (the default), then {@link Error}s caught in the listeners methods will be propagated, otherwise they will be just logged.
+   */
+  private static final boolean propagateErrors = JPPFConfiguration.getProperties().getBoolean("jppf.node.listener.errors.propagate", true);
+  /**
+   * The default node life cycle error handler, used when the life cycle listener implementation does not implement {@link NodeLifeCycleErrorHandler}.
+   */
+  private static final NodeLifeCycleErrorHandler DEFAULT_ERROR_HANDLER = new DefaultLifeCycleErrorHandler();
   /**
    * The list of listeners to this object's events.
    */
@@ -104,10 +113,20 @@ public class LifeCycleEventHandler
    */
   public void fireNodeStarting()
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_STARTING);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.nodeStarting(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.nodeStarting(event);
+        }
+        catch(Throwable t)
+        {
+          handleError(listener, event, t);
+        }
+      }
     }
   }
 
@@ -116,10 +135,20 @@ public class LifeCycleEventHandler
    */
   public void fireNodeEnding()
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_ENDING);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.nodeEnding(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.nodeEnding(event);
+        }
+        catch(Throwable t)
+        {
+          handleError(listener, event, t);
+        }
+      }
     }
   }
 
@@ -130,12 +159,19 @@ public class LifeCycleEventHandler
    */
   public void fireJobHeaderLoaded(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_HEADER_LOADED, job, cl);
     synchronized (listeners)
     {
       for (NodeLifeCycleListener listener : listeners)
       {
-        if (listener instanceof NodeLifeCycleListenerEx) ((NodeLifeCycleListenerEx) listener).jobHeaderLoaded(event);
+        try
+        {
+          if (listener instanceof NodeLifeCycleListenerEx) ((NodeLifeCycleListenerEx) listener).jobHeaderLoaded(event);
+        }
+        catch(Throwable t)
+        {
+          handleError(listener, event, t);
+        }
       }
     }
   }
@@ -149,10 +185,20 @@ public class LifeCycleEventHandler
    */
   public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks, dataProvider);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_STARTING, job, cl, tasks, dataProvider);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.jobStarting(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.jobStarting(event);
+        }
+        catch(Throwable t)
+        {
+          handleError(listener, event, t);
+        }
+      }
     }
   }
 
@@ -165,10 +211,20 @@ public class LifeCycleEventHandler
    */
   public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
   {
-    NodeLifeCycleEvent event = new NodeLifeCycleEvent(job, cl, tasks, dataProvider);
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_ENDING, job, cl, tasks, dataProvider);
     synchronized (listeners)
     {
-      for (NodeLifeCycleListener listener : listeners) listener.jobEnding(event);
+      for (NodeLifeCycleListener listener : listeners)
+      {
+        try
+        {
+          listener.jobEnding(event);
+        }
+        catch(Throwable t)
+        {
+          handleError(listener, event, t);
+        }
+      }
     }
   }
 
@@ -190,6 +246,27 @@ public class LifeCycleEventHandler
       {
         log.error(e.getMessage(), e);
       }
+    }
+  }
+
+  /**
+   * Handle an uncaught throwable raised in one of the methods of a listener.
+   * @param listener the listener whose method was being executed when the thowable was raised.
+   * @param event the event notification for which an error was raised.
+   * @param t the uncaught throwable that was raised during the notification. 
+   */
+  private void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t)
+  {
+    NodeLifeCycleErrorHandler handler = (listener instanceof NodeLifeCycleErrorHandler) ? (NodeLifeCycleErrorHandler) listener : DEFAULT_ERROR_HANDLER;
+    try
+    {
+      handler.handleError(listener, event, t);
+    }
+    catch (Exception e)
+    {
+      String msg = "exception occurred while invoking error handler "  + handler + " : ";
+      if (debugEnabled) log.debug(msg, e);
+      else log.error(msg + ExceptionUtils.getMessage(e));
     }
   }
 }
