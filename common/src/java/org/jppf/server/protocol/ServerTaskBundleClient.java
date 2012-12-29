@@ -130,11 +130,6 @@ public class ServerTaskBundleClient
     job = source.getJob().copy(taskList.size());
     job.initialTaskCount = source.getJob().getInitialTaskCount();
     job.currentTaskCount = job.taskCount;
-    if ((job.getTaskCount() == 0) && (job.getName().indexOf("handshake") < 0))
-    {
-      boolean breakpoint = true;
-    }
-    //job.currentTaskCount = job.taskCount = taskList.size();
     this.dataProvider = source.getDataProvider();
     this.taskList.addAll(taskList);
     this.pendingTasksCount.set(0);
@@ -172,29 +167,6 @@ public class ServerTaskBundleClient
 
   /**
    * Called to notify that the contained task received result.
-   * @param index the task position for received result.
-   * @param result the result.
-   */
-  public void resultReceived(final int index, final DataLocation result)
-  {
-    if (index < 0 || index >= taskList.size()) throw new IllegalArgumentException("index should in range 0.." + (taskList.size()-1));
-
-    boolean fire;
-    ServerTask task = taskList.get(index);
-    if (task.getState() == TaskState.RESULT) {
-      fire = false;
-    } else {
-      fire = pendingTasksCount.decrementAndGet() == 0;
-    }
-    task.resultReceived(result);
-    if (fire && !done) {
-      done = true;
-      fireTasksCompleted(taskList);
-    }
-  }
-
-  /**
-   * Called to notify that the contained task received result.
    * @param results the tasks for which results were received.
    */
   public synchronized void resultReceived(final Collection<Pair<Integer, DataLocation>> results) {
@@ -213,17 +185,6 @@ public class ServerTaskBundleClient
     done = pendingTasksCount.get() <= 0;
     boolean fire = strategy.sendResults(this, tasks);
     if (done || fire) fireTasksCompleted();
-  }
-
-  /**
-   * Called to notify that the task received exception during execution.
-   * @param index the task position for received exception.
-   * @param exception the exception.
-   */
-  public void resultReceived(final int index, final Throwable exception)
-  {
-    if (index < 0 || index >= taskList.size()) throw new IllegalArgumentException("index should in range 0.." + taskList.size());
-    taskList.get(index).resultReceived(exception);
   }
 
   /**
@@ -351,21 +312,6 @@ public class ServerTaskBundleClient
   public int getPendingTasksCount()
   {
     return pendingTasksCount.get();
-  }
-
-  /**
-   * Notifies
-   * @param results completed tasks.
-   */
-  protected void fireTasksCompleted(final List<ServerTask> results) {
-    if (results == null) throw new IllegalArgumentException("results is null");
-
-    CompletionListener[] listeners;
-    synchronized (listenerList) {
-      listeners = listenerArray;
-    }
-    ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, results);
-    for (CompletionListener listener : listeners) listener.taskCompleted(bundle, results);
   }
 
   /**
