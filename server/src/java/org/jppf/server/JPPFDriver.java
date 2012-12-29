@@ -53,7 +53,8 @@ import org.slf4j.*;
  */
 public class JPPFDriver
 {
-  static 
+  // this static block must be the first thing executed when this class is loaded
+  static
   {
     JPPFInitializer.init();
   }

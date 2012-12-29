@@ -39,7 +39,8 @@ import org.slf4j.*;
  */
 public class NodeRunner
 {
-  static 
+  // this static block must be the first thing executed when this class is loaded
+  static
   {
     JPPFInitializer.init();
   }
@@ -434,13 +435,10 @@ public class NodeRunner
      * @see java.lang.Runnable#run()
      */
     @Override
-    public void run()
-    {
-      AccessController.doPrivileged(new PrivilegedAction<Object>()
-      {
+    public void run() {
+      AccessController.doPrivileged(new PrivilegedAction<Object>() {
         @Override
-        public Object run()
-        {
+        public Object run() {
           node.stopNode();
           // close the JMX server connection to avoid request being sent again by the client.
           stopJmxServer();

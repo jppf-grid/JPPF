@@ -28,6 +28,10 @@ public final class JPPFInitializer
    * Name of hte package in which custom URL protocols are implemented.
    */
   private static final String PROTOCOL_PACKAGE = "org.jppf.classloader.resource.protocol";
+  /**
+   * Indicates whether <code>init()</code> has already been called.
+   */
+  private static boolean initCalled = false;
 
   /**
    * Prevent any instanciation of this class.
@@ -41,8 +45,10 @@ public final class JPPFInitializer
    */
   public static void init()
   {
+    if (initCalled) return;
     try
     {
+      initCalled = true;
       String protocolHandlerProperty = "java.protocol.handler.pkgs";
       String s = System.getProperty(protocolHandlerProperty, null);
       if (s == null) System.setProperty(protocolHandlerProperty, PROTOCOL_PACKAGE);
