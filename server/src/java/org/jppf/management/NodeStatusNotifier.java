@@ -26,7 +26,7 @@ import org.jppf.utils.LocalizationUtils;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeStatusNotifier implements NodeLifeCycleListener
+public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements NodeLifeCycleListener
 {
   /**
    * Base name used for localization lookups.
@@ -46,9 +46,6 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
     this.nodeAdmin = nodeAdmin;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event)
   {
@@ -58,9 +55,6 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event)
   {
@@ -70,9 +64,6 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobStarting(final NodeLifeCycleEvent event)
   {
@@ -82,9 +73,6 @@ public class NodeStatusNotifier implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {
