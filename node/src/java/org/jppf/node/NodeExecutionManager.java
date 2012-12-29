@@ -65,18 +65,21 @@ public interface NodeExecutionManager
    * @param taskNumber identifier for the task future.
    * @param info the cpu time and wall clock time taken by the task.
    * @param elapsedTime the wall clock time taken by the task
+   * @exclude
    */
   void taskEnded(Task task, long taskNumber, NodeExecutionInfo info, long elapsedTime);
 
   /**
    * Get the notification that the node must reconnect to the driver.
    * @return a {@link JPPFNodeReconnectionNotification} instance.
+   * @exclude
    */
   JPPFNodeReconnectionNotification getReconnectionNotification();
 
   /**
    * Set the notification that the node must reconnect to the driver.
    * @param reconnectionNotification a {@link JPPFNodeReconnectionNotification} instance.
+   * @exclude
    */
   void setReconnectionNotification(JPPFNodeReconnectionNotification reconnectionNotification);
 }

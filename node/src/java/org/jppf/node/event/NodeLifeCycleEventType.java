@@ -25,7 +25,7 @@ package org.jppf.node.event;
 public enum NodeLifeCycleEventType
 {
   /**
-   * The node is starting and, before any job processing.
+   * The node is starting and before any job processing.
    */
   NODE_STARTING,
   /**
