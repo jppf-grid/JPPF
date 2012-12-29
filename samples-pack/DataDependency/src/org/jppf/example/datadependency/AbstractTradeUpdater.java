@@ -150,7 +150,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
     while (!driver.isConnected()) Thread.sleep(1L);
     Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
     List<String> idList = new ArrayList<String>();
-    for (JPPFManagementInfo info: nodesInfo) idList.add(info.getId());
+    for (JPPFManagementInfo info: nodesInfo) idList.add(info.getUuid());
     return idList;
   }
 
