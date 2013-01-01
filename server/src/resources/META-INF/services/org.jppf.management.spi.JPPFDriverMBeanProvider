@@ -1,2 +1,3 @@
 org.jppf.server.spi.JPPFDefaultDriverMBeanProvider               # Driver-level management
 org.jppf.server.job.management.DriverJobManagementMBeanProvider  # Job-level management
+org.jppf.server.spi.JPPFNodeForwardingMBeanProvider              # Nodes management via the driver

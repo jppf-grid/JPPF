@@ -327,9 +327,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
 
 
   /**
-   * Get the value of an attribute of the specified MBean.
+   * Set the value of an attribute of the specified MBean.
    * @param name the name of the MBean.
-   * @param attribute the name of the attribute to read.
+   * @param attribute the name of the attribute to write.
    * @param value the value to set on the attribute.
    * @throws Exception if the invocation failed.
    */

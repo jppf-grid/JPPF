@@ -141,6 +141,14 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
     return uuid;
   }
 
+  /**
+   * Update the current system information.
+   */
+  protected void updateSystemInformation()
+  {
+    this.systemInformation = new JPPFSystemInformation(uuid, isLocal(), true);
+  }
+
   @Override
   public JPPFSystemInformation getSystemInformation()
   {

@@ -408,12 +408,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
-   * Get all the client connections handled by this manager.
+   * Get all the node connections handled by this server.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
   public synchronized List<AbstractNodeContext> getAllChannels()
   {
     return new ArrayList<AbstractNodeContext>(allConnections.values());
+  }
+
+  /**
+   * Get all the node connections handled by this server.
+   * @return a set of <code>ChannelWrapper</code> instances.
+   */
+  public synchronized Set<AbstractNodeContext> getAllChannelsAsSet()
+  {
+    return new HashSet<AbstractNodeContext>(allConnections.values());
   }
 
   /**

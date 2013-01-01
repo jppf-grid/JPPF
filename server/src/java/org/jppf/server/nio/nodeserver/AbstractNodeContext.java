@@ -346,9 +346,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if ((info.getHost() != null) && (info.getPort() > 0)) {
         jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
         jmxConnection.connect();
-      }
-      else jmxConnection = null;
+      } else jmxConnection = null;
     }
+    if (debugEnabled && (jmxConnection == null)) log.debug("could not establish JMX connection for " + info);
   }
 
   /**

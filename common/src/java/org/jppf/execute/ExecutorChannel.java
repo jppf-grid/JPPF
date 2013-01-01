@@ -115,7 +115,7 @@ public interface ExecutorChannel<T>
   Object getMonitor();
 
   /**
-   * Determinewhether this channel is active.
+   * Determine whether this channel is active.
    * @return <code>true</code> if the channel is active, <code>false</code> if it is inactive.
    */
   boolean isActive();

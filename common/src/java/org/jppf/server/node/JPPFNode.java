@@ -102,7 +102,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     uuid = NodeRunner.getUuid();
     executionManager = new NodeExecutionManagerImpl(this);
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
-    this.systemInformation = new JPPFSystemInformation(uuid, isLocal(), true);
+    updateSystemInformation();
   }
 
   /**
@@ -533,4 +533,13 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @exclude
    */
   protected abstract NodeConnectionChecker createConnectionChecker();
+
+  /**
+   * Trigger the configuration changed flag.
+   */
+  public void triggerConfigChanged()
+  {
+    updateSystemInformation();
+    executionManager.triggerConfigChanged();
+  }
 }

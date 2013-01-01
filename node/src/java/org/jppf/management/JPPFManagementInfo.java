@@ -34,14 +34,17 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   private static final long serialVersionUID = 1L;
   /**
    * DRIVER information type.
+   * @exclude
    */
   public static final byte DRIVER = 0;
   /**
    * Node information type.
+   * @exclude
    */
   public static final byte NODE = 1;
   /**
    * Peer driver information type.
+   * @exclude
    */
   public static final byte PEER = 2;
   /**
@@ -63,9 +66,10 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Unique id for the node.
    */
-  private String uuid = null;
+  private final String uuid;
   /**
    * The type of component this info is for, must be one of {@link #NODE} or {@link #DRIVER}.
+   * @exclude
    */
   private final byte type;
   /**
@@ -88,6 +92,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @param uuid unique id for the node's mbean server.
    * @param type the type of component this info is for, must be one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
    * @param secure specifies whether communication with the node or driver should be secure, i.e. via SSL/TLS.
+   * @exclude
    */
   public JPPFManagementInfo(final String host, final int port, final String uuid, final int type, final boolean secure)
   {
@@ -142,9 +147,12 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     int n = -1 * host.compareTo(o.getHost());
     if (n != 0) return n;
 
+    /*
     if (port > o.getPort()) return +1;
     if (port < o.getPort()) return -1;
     return 0;
+    */
+    return port - o.getPort();
   }
 
   @Override
@@ -171,6 +179,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Set the system information associated with the node at the time of the initial connection.
    * @param systemInfo a <code>JPPFSystemInformation</code> instance.
+   * @exclude
    */
   public synchronized void setSystemInfo(final JPPFSystemInformation systemInfo)
   {
@@ -181,6 +190,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * Get the unique id for the node's mbean server.
    * @return the id as a string.
    * @deprecated use {@link #getUuid()} instead.
+   * @exclude
    */
   public String getId()
   {
@@ -194,15 +204,6 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   public String getUuid()
   {
     return uuid;
-  }
-
-  /**
-   * Get the type of component this info is for.
-   * @return one of {@link #NODE NODE} or {@link #DRIVER DRIVER}.
-   */
-  public int getType()
-  {
-    return type & TYPE_MASK;
   }
 
   /**
@@ -262,6 +263,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Specify whether the node is active or inactive.
    * @param active <code>true</code> if the node is active, <code>false</code> if it is inactve.
+   * @exclude
    */
   public void setActive(final boolean active)
   {

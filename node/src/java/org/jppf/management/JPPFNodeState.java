@@ -282,4 +282,19 @@ public class JPPFNodeState implements Serializable
     s.setCpuTime(getCpuTime());
     return s;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("threadPoolSize=").append(threadPoolSize);
+    sb.append(", threadPriority=").append(threadPriority);
+    sb.append(", nbTasksExecuted=").append(nbTasksExecuted);
+    sb.append(", executionStatus=").append(executionStatus);
+    sb.append(", connectionStatus=").append(connectionStatus);
+    sb.append(", cpuTime=").append(cpuTime);
+    sb.append(']');
+    return sb.toString();
+  }
 }

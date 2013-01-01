@@ -75,7 +75,7 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
   /**
    * Update the configuration properties of the node.
    * @param config the set of properties to update.
-   * @param reconnect - specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
    * @throws Exception if any error occurs.
    */
   void updateConfiguration(Map<Object, Object> config, Boolean reconnect) throws Exception;
@@ -86,14 +86,6 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
    * @throws Exception if any error occurs.
    */
   void cancelJob(String jobId, Boolean requeue) throws Exception;
-  /**
-   * Cancel the job with the specified id and set it in the specified suspended state.
-   * @param jobId the id of the job to cancel.
-   * @param requeue true if the job should be requeued on the server side, false otherwise.
-   * @param suspend <code>true</code> to suspend the job upon requeuing on the server, <code>false</code> otherwise.
-   * @throws Exception if any error occurs.
-   */
-  //void cancelJob(String jobId, Boolean requeue, Boolean suspend) throws Exception;
   /**
    * Get the current class loader delegation model for the node.
    * @return either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.

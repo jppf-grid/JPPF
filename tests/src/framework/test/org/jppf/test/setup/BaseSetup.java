@@ -78,7 +78,7 @@ public class BaseSetup
   }
 
   /**
-   * Launches a driver and node and start the client.
+   * Launches a driver and the specified number of node and start the client.
    * @param nbNodes the number of nodes to launch.
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
