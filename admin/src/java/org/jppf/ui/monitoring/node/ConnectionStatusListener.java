@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.slf4j.*;
 
@@ -65,13 +65,18 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
-    if ((event.getClientConnectionStatusHandler().getStatus() == JPPFClientConnectionStatus.ACTIVE) ||
-        (event.getClientConnectionStatusHandler().getStatus() == JPPFClientConnectionStatus.EXECUTING))
+    JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
+    if ((status == JPPFClientConnectionStatus.ACTIVE) || (status == JPPFClientConnectionStatus.EXECUTING))
     {
-      ClientConnectionStatusHandler ccsh =  event.getClientConnectionStatusHandler();
-      if (debugEnabled) log.debug("Received connection status changed event for " + ccsh + " : " + ccsh.getStatus());
-      DefaultMutableTreeNode driverNode = panel.getManager().findDriver(driverUuid);
-      if (driverNode != null) panel.getModel().changeNode(driverNode);
+      BaseJPPFClientConnection c = (BaseJPPFClientConnection) event.getClientConnectionStatusHandler();
+      if (debugEnabled) log.debug("Received connection status changed event for " + c + " : " + c.getStatus());
+      DefaultMutableTreeNode driverNode = panel.getManager().findDriver(c);
+      if (driverNode != null)
+      {
+        TopologyData data = (TopologyData) driverNode.getUserObject();
+        if (data.getUuid() == null) data.setUuid(c.getUuid());
+        panel.getModel().changeNode(driverNode);
+      }
     }
   }
 }

@@ -252,6 +252,24 @@ public class NodeDataPanelManager
   }
 
   /**
+   * Find the driver tree node with the specified connection.
+   * @param driverConnection the driver connection to find.
+   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
+   */
+  DefaultMutableTreeNode findDriver(final JPPFClientConnection driverConnection)
+  {
+    if (driverConnection == null) return null;
+    for (int i=0; i<panel.getTreeTableRoot().getChildCount(); i++)
+    {
+      DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
+      TopologyData data = (TopologyData) driverNode.getUserObject();
+      //String name = data.getJmxWrapper().getId();
+      if (data.getClientConnection() == driverConnection) return driverNode;
+    }
+    return null;
+  }
+
+  /**
    * Find the node tree node with the specified driver name and node information.
    * @param driverNode name the parent of the node to find.
    * @param nodeUuid the name of the node to find.
