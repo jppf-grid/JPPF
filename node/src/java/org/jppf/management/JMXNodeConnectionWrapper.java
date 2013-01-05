@@ -152,7 +152,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void setTaskCounter(final Integer n) throws Exception
   {
-    invoke(JPPFNodeAdminMBean.MBEAN_NAME, "setTaskCounter", new Object[] { n }, new String[] { "java.lang.Integer" });
+    setAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "TaskCounter", n);
   }
 
   /**
@@ -194,13 +194,10 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
     invoke(JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DelegationModel getDelegationModel() throws Exception
   {
-    return (DelegationModel) getAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "delegationModel");
+    return (DelegationModel) getAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "DelegationModel");
   }
 
   /**
@@ -209,6 +206,6 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public void setDelegationModel(final DelegationModel model) throws Exception
   {
-    setAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "delegationModel", model);
+    setAttribute(JPPFNodeAdminMBean.MBEAN_NAME, "DelegationModel", model);
   }
 }

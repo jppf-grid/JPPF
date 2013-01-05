@@ -56,4 +56,8 @@ public interface JPPFNodeTaskMonitorMBean extends NotificationEmitter
    * @return the elapsed time as long value.
    */
   Long getTotalTaskElapsedTime();
+  /**
+   * Reset the statitcs maintained by this MBean.
+   */
+  void reset();
 }

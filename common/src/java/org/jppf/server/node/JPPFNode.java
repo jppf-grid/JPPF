@@ -533,4 +533,13 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @exclude
    */
   protected abstract NodeConnectionChecker createConnectionChecker();
+
+  /**
+   * Trigger the configuration changed flag.
+   */
+  public void triggerConfigChanged()
+  {
+    updateSystemInformation();
+    executionManager.triggerConfigChanged();
+  }
 }

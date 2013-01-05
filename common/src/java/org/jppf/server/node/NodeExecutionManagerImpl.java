@@ -153,7 +153,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   {
     ThreadManager result = null;
     String s = config.getString("jppf.thread.manager.class", "default");
-
     if(!"default".equalsIgnoreCase(s) && !"org.jppf.server.node.ThreadManagerThreadPool".equals(s) && s != null)
     {
       try
@@ -170,7 +169,8 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
         log.error(e.getMessage(), e);
       }
     }
-    if(result == null) {
+    if (result == null)
+    {
       log.info("Using default thread manager");
       return new ThreadManagerThreadPool(poolSize);
     }
@@ -218,7 +218,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     long number = incTaskCount();
     NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, number, taskClassLoader);
     taskMap.put(number, taskWrapper);
-
     Future<?> f = getExecutor().submit(taskWrapper);
     if (!f.isDone()) futureMap.put(number, f);
     JPPFSchedule schedule = task.getTimeoutSchedule();
@@ -249,19 +248,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
 
   /**
    * Cancel the execution of the tasks with the specified id.
-   * @param id the id of the tasks to cancel.
-   * @deprecated the task cancel feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement.
-   * Tasks can still be cancelled, but only as part of job cancel.
-   * As a consequence, this method does not do anything anymore.
-   */
-  public synchronized void cancelTask(final String id)
-  {
-  }
-
-  /**
-   * Cancel the execution of the tasks with the specified id.
    * @param number the index of the task to cancel.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
    */
@@ -277,19 +263,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
       future.cancel(true);
       removeFuture(number);
     }
-  }
-
-  /**
-   * Restart the execution of the tasks with the specified id.<br>
-   * The task(s) will be restarted even if their execution has already completed.
-   * @param id the id of the task or tasks to restart.
-   * @deprecated the task restart feature is inherently unsafe, as it depends on the task
-   * having a unique id among all the tasks running in the grid, which cannot be guaranteed.
-   * This feature has been removed from the management APIs, with no replacement.
-   * As a consequence, this method does not do anything anymore.
-   */
-  public synchronized void restartTask(final String id)
-  {
   }
 
   /**
@@ -376,10 +349,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    */
   public synchronized void waitForResults() throws Exception
   {
-    while (!futureMap.isEmpty() && (getReconnectionNotification() == null))
-    {
-      goToSleep();
-    }
+    while (!futureMap.isEmpty() && (getReconnectionNotification() == null)) goToSleep();
     if (getReconnectionNotification() != null)
     {
       cancelAllTasks(true, false);
@@ -418,7 +388,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     {
       tmp = listenersArray;
     }
-    //removeFuture(taskNumber);
     for (TaskExecutionListener listener : tmp) listener.taskExecuted(event);
   }
 
@@ -492,6 +461,14 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   public boolean checkConfigChanged()
   {
     return configChanged.compareAndSet(true, false);
+  }
+
+  /**
+   * Trigger the configuration changed flag.
+   */
+  public void triggerConfigChanged()
+  {
+    configChanged.compareAndSet(false, true);
   }
 
   @Override

@@ -47,32 +47,26 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The current count of tasks executed.
    */
-  //private AtomicInteger taskCount = new AtomicInteger(0);
   private int taskCount = 0;
   /**
    * The current count of tasks executed.
    */
-  //private AtomicInteger taskInErrorCount = new AtomicInteger(0);
   private int taskInErrorCount = 0;
   /**
    * The current count of tasks executed.
    */
-  //private AtomicInteger taskSuccessfulCount = new AtomicInteger(0);
   private int taskSucessfullCount = 0;
   /**
    * The current count of tasks executed.
    */
-  //private AtomicLong totalCpuTime = new AtomicLong(0L);
   private long totalCpuTime = 0L;
   /**
    * The current count of tasks executed.
    */
-  //private AtomicLong totalElapsedTime = new AtomicLong(0L);
   private long totalElapsedTime = 0L;
   /**
    * The sequence number for notifications.
    */
-  //private AtomicLong sequence = new AtomicLong(0L);
   private long sequence = 0L;
   /**
    * The count of notification listeners registered with this MBean.
@@ -108,20 +102,11 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   public synchronized void taskExecuted(final TaskExecutionEvent event)
   {
     TaskInformation info = event.getTaskInformation();
-    /*
-		taskCount.incrementAndGet();
-		if (info.hasError()) taskInErrorCount.incrementAndGet();
-		else taskSucessfullCount.incrementAndGet();
-		totalCpuTime.addAndGet(info.getCpuTime());
-		totalElapsedTime.addAndGet(info.getElapsedTime());
-		sendNotification(new TaskExecutionNotification(OBJECT_NAME, sequence.getAndIncrement(), info));
-     */
     taskCount++;
     if (info.hasError()) taskInErrorCount++;
     else taskSucessfullCount++;
     totalCpuTime += info.getCpuTime();
     totalElapsedTime += info.getElapsedTime();
-    //if (listenerCount > 0) sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info));
     if (listenerCount > 0) executor.submit(new NotificationSender(info));
   }
 
@@ -133,7 +118,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   @Override
   public synchronized Integer getTotalTasksExecuted()
   {
-    //return taskCount.get();
     return taskCount;
   }
 
@@ -145,7 +129,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   @Override
   public synchronized Long getTotalTaskCpuTime()
   {
-    //return totalCpuTime.get();
     return totalCpuTime;
   }
 
@@ -157,7 +140,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   @Override
   public synchronized Long getTotalTaskElapsedTime()
   {
-    //return totalElapsedTime.get();
     return totalElapsedTime;
   }
 
@@ -169,7 +151,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   @Override
   public synchronized Integer getTotalTasksInError()
   {
-    //return taskInErrorCount.get();
     return taskInErrorCount;
   }
 
@@ -181,13 +162,9 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   @Override
   public synchronized Integer getTotalTasksSucessfull()
   {
-    //return taskSuccessfulCount.get();
     return taskSucessfullCount;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback)
   {
@@ -198,9 +175,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException
   {
@@ -211,9 +185,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException
   {
@@ -222,6 +193,16 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     {
       listenerCount--;
     }
+  }
+
+  @Override
+  public synchronized void reset()
+  {
+    this.taskCount = 0;
+    this.taskInErrorCount = 0;
+    this.taskSucessfullCount = 0;
+    this.totalCpuTime = 0L;
+    this.totalElapsedTime = 0L;
   }
 
   /**
