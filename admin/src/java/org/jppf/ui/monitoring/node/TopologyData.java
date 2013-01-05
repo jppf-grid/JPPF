@@ -67,7 +67,7 @@ public class TopologyData
   /**
    * UUID of the driver or node reprsented by this object.
    */
-  private final String uuid;
+  private String uuid = null;
 
   /**
    * Initialize this topology data as a driver related object.
@@ -301,5 +301,14 @@ public class TopologyData
   public String getUuid()
   {
     return uuid;
+  }
+
+  /**
+   * Set the connection uuuid.
+   * @param uuid the uuid as a string.
+   */
+  public void setUuid(final String uuid)
+  {
+    this.uuid = uuid;
   }
 }
