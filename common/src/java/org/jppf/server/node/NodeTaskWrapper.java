@@ -123,22 +123,13 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     ThreadManager threadManager = executionManager.getThreadManager();
     NodeExecutionInfo info = null;
     long elapsedTime = 0L;
+    long id = Thread.currentThread().getId();
+    long startTime = System.nanoTime();
     try
     {
       usedClassLoader = threadManager.useClassLoader(classLoader);
-      long id = Thread.currentThread().getId();
-      long startTime = System.nanoTime();
       info = threadManager.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
-      try
-      {
-        // convert cpu time from nanoseconds to milliseconds
-        if (info != null) info = threadManager.computeExecutionInfo(id).subtract(info);
-        elapsedTime = (System.nanoTime() - startTime) / 1000000L;
-      }
-      catch(Throwable ignore)
-      {
-      }
     }
     catch(JPPFNodeReconnectionNotification t)
     {
@@ -153,6 +144,15 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     {
       try
       {
+        // convert cpu time from nanoseconds to milliseconds
+        if (info != null) info = threadManager.computeExecutionInfo(id).subtract(info);
+        elapsedTime = (System.nanoTime() - startTime) / 1000000L;
+      }
+      catch(Throwable ignore)
+      {
+      }
+      try
+      {
         silentTimeout();
         silentCancel();
       }
@@ -162,11 +162,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
         else task.setException(new JPPFException(t));
       }
       if (task.getException() instanceof InterruptedException) task.setException(null);
-
       if (usedClassLoader != null) usedClassLoader.dispose();
-
       executionManager.removeFuture(number);
-
       if (rn == null)
       {
         try

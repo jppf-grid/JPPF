@@ -39,35 +39,35 @@ public class LifeCycleTask extends JPPFTask
   /**
    * One million.
    */
-  private static final int ONE_MILLION = 1000 * 1000;
+  protected static final int ONE_MILLION = 1000 * 1000;
   /**
    * The duration of this task;
    */
-  private long duration = 0L;
+  protected long duration = 0L;
   /**
    * used to store the task's execution start time in nanoseconds.
    */
-  private double start = 0L;
+  protected double start = 0L;
   /**
    * Measures the time elapsed between the task execution start and its completion in nanoseconds.
    */
-  private double elapsed = 0L;
+  protected double elapsed = 0L;
   /**
    * Determines whether this task was cancelled.
    */
-  private boolean cancelled = false;
+  protected boolean cancelled = false;
   /**
    * Determines whether this task timed out.
    */
-  private boolean timedout = false;
+  protected boolean timedout = false;
   /**
    * Determines whether this task was executed in a node or in the client's local executor.
    */
-  private boolean executedInNode = true;
+  protected boolean executedInNode = true;
   /**
    * The uuid of the node this task executes on.
    */
-  private String nodeUuid = null;
+  protected String nodeUuid = null;
 
   /**
    * Initialize this task.
