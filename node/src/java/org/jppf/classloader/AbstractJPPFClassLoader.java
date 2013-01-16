@@ -257,7 +257,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @SuppressWarnings("unchecked")
   public Enumeration<URL> findResources(final String name) throws IOException
   {
-    List<URL> urlList = null;
+    List<URL> urlList = new ArrayList<URL>();
     if (!nfCache.has(name))
     {
       if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
@@ -280,7 +280,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         throw (e instanceof IOException) ? (IOException) e : new IOException(e);
       }
     }
-    if (urlList == null || urlList.isEmpty()) nfCache.add(name);
+    if (urlList.isEmpty()) nfCache.add(name);
     return new IteratorEnumeration<URL>(urlList.iterator());
   }
 
