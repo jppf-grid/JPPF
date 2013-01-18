@@ -144,10 +144,7 @@ public class ExcludeDoclet
         return null;
       }
     }
-    else
-    {
-      return obj;
-    }
+    return obj;
   }
 
   /**
