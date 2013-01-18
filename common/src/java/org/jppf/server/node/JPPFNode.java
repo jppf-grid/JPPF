@@ -130,7 +130,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
       catch(SecurityException e)
       {
-        connectionChecker.stop();
+        if (checkConnection) connectionChecker.stop();
         throw new JPPFError(e);
       }
       catch(IOException e)
