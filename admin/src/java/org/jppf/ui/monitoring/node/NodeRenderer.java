@@ -119,6 +119,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer
         renderer.setIcon(icon);
         if (highlightingEnabled)
         {
+          renderer.setBackground(sel ? backgroundSelected : background);
           renderer.setBackgroundNonSelectionColor(background);
           renderer.setBackgroundSelectionColor(backgroundSelected);
           renderer.setForeground(foreground);
