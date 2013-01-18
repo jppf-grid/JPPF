@@ -18,8 +18,17 @@
 
 package test.jmx;
 
+import java.util.*;
+
+import javax.management.*;
+
+import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.server.JPPFStats;
+import org.jppf.management.forwarding.*;
+import org.jppf.server.protocol.JPPFTask;
+
+import sample.dist.tasklength.LongTask;
+
 
 /**
  * 
@@ -33,85 +42,65 @@ public class TestJMX
    */
   public static void main(final String...args)
   {
+    JPPFClient client = null;
+    JPPFNodeForwardingMBean forwarder = null;
     try
     {
-      TestJMX t = new TestJMX();
-      t.testConnectAndWait();
+      client = new JPPFClient();
+      while (!client.hasAvailableConnection()) Thread.sleep(10L);
+      AbstractJPPFClientConnection conn = (AbstractJPPFClientConnection) client.getClientConnection();
+      JMXDriverConnectionWrapper driverJmx = conn.getJmxConnection();
+      System.out.println("waiting till jmx is connected ...");
+      while (!driverJmx.isConnected()) Thread.sleep(10L);
+      System.out.println("... jmx connected");
+      Thread.sleep(500L);
+      NodeNotificationListener listener = new NodeNotificationListener();
+      String listenerID = driverJmx.registerForwardingNotificationListener(new NodeSelector.AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+      JPPFJob job = new JPPFJob();
+      for (int i=0; i<5; i++) job.addTask(new LongTask(100L)).setId(String.valueOf(i+1));
+      List<JPPFTask> results = client.submit(job);
+      Thread.sleep(500L);
+      driverJmx.unregisterForwardingNotificationListener(listenerID);
+      Thread.sleep(500L);
     }
-    catch(Exception e)
+    catch(Throwable e)
     {
       e.printStackTrace();
     }
+    finally
+    {
+      if (client != null) client.close();
+    }
   }
 
   /**
-   * Test the method that gets the number of nodes.
-   * @throws Exception if any error occurs.
+   * 
    */
-  public void testNumberOfNodes() throws Exception
+  public static class NodeNotificationListener implements NotificationListener
   {
-    int success = 0;
-    int failure = 0;
-    int firstFailure = -1;
-    for (int i=0; i<1000; i++)
+    /**
+     * The task information received as notifications from the node.
+     */
+    public List<Notification> notifs = new ArrayList<Notification>();
+    /**
+     * 
+     */
+    public Exception exception = null;
+
+    @Override
+    public void handleNotification(final Notification notification, final Object handback)
     {
       try
       {
-        int n = getNumberOfNodes();
-        //System.out.println("nb nodes: " + n);
-        success++;
+        System.out.println("received notification " + notification);
+        JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
+        System.out.println("nodeUuid=" + notif.getNodeUuid() + ", mBeanName='" + notif.getMBeanName() + "', inner notification=" + notif.getNotification());
+        notifs.add(notification);
       }
-      catch(Exception ignore)
+      catch (Exception e)
       {
-        failure++;
-        if (firstFailure < 0) firstFailure = i;
+        if (exception == null) exception = e;
       }
     }
-    System.out.println("successes: " + success + ", failures: " + failure + ", first failure: " + firstFailure);
-  }
-
-  /**
-   * Test the connectAndWait() method with the JMXMP connector.
-   * @throws Exception if any error occurs.
-   */
-  public void testConnectAndWait() throws Exception
-  {
-    // for this test, make sure the corresponding node is NOT started.
-    JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("118.1.1.10", 12001);
-    long start = System.nanoTime();
-    System.out.println("before connectAndWait()");
-    jmx.connectAndWait(2000L);
-    long elapsed = System.nanoTime() - start;
-    System.out.println("actually waited for " + (elapsed/1000000) + " ms");
-    /*
-		System.out.println("*** press any key to terminate ***");
-		System.in.read();
-     */
-  }
-
-  /**
-   * Retrieve the number of nodes from the server.
-   * @return the number rof nodes as an int.
-   * @throws Exception if any error occurs.
-   */
-  public int getNumberOfNodes() throws Exception
-  {
-    // create a JMX connection to the driver
-    // replace "your_host_address" and "your_port" with the appropriate values for your configuration
-    JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
-    // start the connection process and wait until the connection is established
-    jmxConnection.connectAndWait(1000);
-    // request the statistics from the driver
-    JPPFStats stats = jmxConnection.statistics();
-    /*
-	  while (stats == null)
-    {
-	    Thread.currentThread().sleep(50);
-    	stats = jmxConnection.statistics();
-    }
-     */
-    jmxConnection.close();
-    // return the current number of nodes
-    return (int) stats.getNodes().getLatest();
   }
 }

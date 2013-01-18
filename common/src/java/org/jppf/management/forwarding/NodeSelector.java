@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.management;
+package org.jppf.management.forwarding;
 
 import java.io.Serializable;
 import java.util.*;
@@ -35,6 +35,11 @@ public interface NodeSelector extends Serializable
   public final static class AllNodesSelector implements NodeSelector
   {
     /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Default constructor.
      */
     public AllNodesSelector()
@@ -48,12 +53,17 @@ public interface NodeSelector extends Serializable
   public final static class ExecutionPolicySelector implements NodeSelector
   {
     /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The execution policy to use to select the nodes.
      */
     private final ExecutionPolicy policy;
 
     /**
-     * Default constructor.
+     * Initialize this selector with the specified execution policy.
      * @param policy the execution policy to use to select the nodes.
      */
     public ExecutionPolicySelector(final ExecutionPolicy policy)
@@ -77,12 +87,17 @@ public interface NodeSelector extends Serializable
   public final static class UuidSelector implements NodeSelector
   {
     /**
+     * Explicit serialVersionUID.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The list of uuids of the nodes to select. This list is immutable.
      */
     private final List<String> uuidList;
 
     /**
-     * Default constructor.
+     * Initialize this selector with the specified list of node UUIDs.
      * @param uuidList the uuids of the nodes to select.
      */
     public UuidSelector(final List<String> uuidList)
@@ -91,7 +106,7 @@ public interface NodeSelector extends Serializable
     }
 
     /**
-     * Default constructor.
+     * Initialize this selector with the specified array of node UUIDs.
      * @param uuids the uuids of the nodes to select.
      */
     public UuidSelector(final String...uuids)

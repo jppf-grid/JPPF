@@ -16,23 +16,29 @@
  * limitations under the License.
  */
 
-package org.jppf.management;
+package org.jppf.management.forwarding;
+
+import static org.jppf.utils.CollectionUtils.array;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.NotificationBroadcasterSupport;
+import javax.management.*;
 
 import org.jppf.classloader.DelegationModel;
+import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
  * Implementation of the <code>JPPFNodeForwardingMBean</code> interface.
  * @author Laurent Cohen
+ * @exclude
  */
-public class JPPFNodeForwarding extends NotificationBroadcasterSupport implements JPPFNodeForwardingMBean
+public class JPPFNodeForwarding extends NotificationBroadcasterSupport implements JPPFNodeForwardingMBean, NodeForwardingHelper.NodeSelectionProvider
 {
   /**
    * Logger for this class.
@@ -47,15 +53,26 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    */
   private static final String I18N_BASE = "org.jppf.server.i18n.server_messages";
   /**
-   * Reference to the JPPF drvier.
+   * Used to generate listener IDs.
    */
-  private final JPPFDriver driver = JPPFDriver.getInstance();
+  private final AtomicLong listenerSequence = new AtomicLong(0L);
+  /**
+   * Reference to the JPPF driver.
+   */
+  final JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * 
+   */
+  final ForwardingNotificationManager manager;
 
   /**
    * Initialize this MBean implementation.
    */
   public JPPFNodeForwarding()
   {
+    NodeForwardingHelper.getInstance().setSelectionProvider(this);
+    manager = new ForwardingNotificationManager(this);
+    if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }
 
   @Override
@@ -70,7 +87,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
       {
         JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
         Object o = wrapper.invoke(name, methodName, params, signature);
-        if (debugEnabled) log.debug("invoking '" + methodName + "()' on node " + uuid + ", result = " + o);
+        //if (debugEnabled) log.debug("invoking '" + methodName + "()' on node " + uuid + ", result = " + o);
         map.put(uuid, o);
       }
       catch (Exception e)
@@ -136,11 +153,38 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   }
 
   /**
+   * Determine whether the specified selector accepts the specified node.
+   * @param node the node to check.
+   * @param selector the node selector used as a filter.
+   * @return a set of {@link AbstractNodeContext} instances.
+   * @exclude
+   */
+  public boolean isNodeAccepted(final AbstractNodeContext node, final NodeSelector selector)
+  {
+    if (selector == null) throw new IllegalArgumentException("selector cannot be null");
+    if (selector instanceof NodeSelector.AllNodesSelector) return true;
+    else if (selector instanceof NodeSelector.UuidSelector)
+      return ((NodeSelector.UuidSelector) selector).getUuidList().contains(node.getUuid());
+    else if (selector instanceof NodeSelector.ExecutionPolicySelector)
+      return ((NodeSelector.ExecutionPolicySelector) selector).getPolicy().accepts(node.getSystemInformation());
+    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
+  }
+
+  @Override
+  public boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector)
+  {
+    if (nodeUuid == null) throw new IllegalArgumentException("node uuid cannot be null");
+    AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
+    if (node == null) throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
+    return isNodeAccepted(node, selector);
+  }
+
+  /**
    * Get a set of channels based on a NodeSelector.
    * @param selector the node selector used as a filter.
    * @return a set of {@link AbstractNodeContext} instances.
    */
-  private Set<AbstractNodeContext> getChannels(final NodeSelector selector)
+  Set<AbstractNodeContext> getChannels(final NodeSelector selector)
   {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof NodeSelector.AllNodesSelector) return getNodeNioServer().getAllChannelsAsSet();
@@ -170,7 +214,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
 
   /**
    * Get the available channels for the specified nodes.
-   * @param policy an execution to matrch against the nodes.
+   * @param policy an execution to match against the nodes.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
   private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy)
@@ -205,13 +249,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> updateThreadPoolSize(final NodeSelector selector, final Integer size) throws Exception
   {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateThreadPoolSize", new Object[] { size }, new String[] { "java.lang.Integer" });
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateThreadPoolSize", array(size), array("java.lang.Integer"));
   }
 
   @Override
   public Map<String, Object> updateThreadsPriority(final NodeSelector selector, final Integer newPriority) throws Exception
   {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateThreadsPriority", new Object[] { newPriority }, new String[] { "java.lang.Integer" });
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateThreadsPriority", array(newPriority), array("java.lang.Integer"));
   }
 
   @Override
@@ -241,14 +285,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> config, final Boolean reconnect) throws Exception
   {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration",
-        new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" });
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration", array(config, reconnect), array("java.util.Map", "java.lang.Boolean"));
   }
 
   @Override
   public Map<String, Object> cancelJob(final NodeSelector selector, final String jobUuid, final Boolean requeue) throws Exception
   {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] { jobUuid, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", array(jobUuid, requeue), array("java.lang.String", "java.lang.Boolean"));
   }
 
   @Override
@@ -267,5 +310,43 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> systemInformation(final NodeSelector selector) throws Exception
   {
     return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "systemInformation");
+  }
+
+  /**
+   * Register a listener with the specified node selector and MBean.
+   * @param selector the node slector to apply to the listener.
+   * @param mBeanName the name of the node mbeans to receive notifications from.
+   * @return a unique id for the listener.
+   * @throws IllegalArgumentException if <code>selector</code> or <code>mBeanName</code> is null.
+   */
+  @Override
+  public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName) throws IllegalArgumentException
+  {
+    if (debugEnabled) log.debug("before registering listener with selector=" + selector + ", mbean=" + mBeanName);
+    if (selector == null) throw new IllegalArgumentException("selector cannot be null");
+    if (mBeanName == null) throw new IllegalArgumentException("mBeanName cannot be null");
+    String id = StringUtils.build(driver.getUuid(), ':', listenerSequence.incrementAndGet());
+    this.manager.addNotificationListener(id, selector, mBeanName);
+    if (debugEnabled) log.debug("registered listener id=" + id);
+    return id;
+  }
+
+  /**
+   * Unregister the specified listener.
+   * @param listenerID the ID of the listener to unregister.
+   * @throws ListenerNotFoundException if the listener could not be found.
+   */
+  @Override
+  public void unregisterForwardingNotificationListener(final String listenerID) throws ListenerNotFoundException
+  {
+    if (debugEnabled) log.debug("before unregistering listener id=" + listenerID);
+    manager.removeNotificationListener(listenerID);
+  }
+
+  @Override
+  public void sendNotification(final Notification notification)
+  {
+    if (debugEnabled) log.debug("sending notif: " + notification);
+    super.sendNotification(notification);
   }
 }

@@ -42,11 +42,6 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
   {
   }
 
-  /**
-   * Add a value for the specified key.
-   * @param key the key for which to add a value.
-   * @param value the value to add.
-   */
   @Override
   public void putValue(final K key, final V value)
   {
@@ -59,12 +54,6 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     coll.add(value);
   }
 
-  /**
-   * Remove a value from the specified key.
-   * @param key the key from which to remove a value.
-   * @param value the value to remove.
-   * @return <code>true</code> if an element was removed, <code>false</code> otherwise.
-   */
   @Override
   public boolean removeValue(final K key, final V value)
   {
@@ -78,11 +67,6 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     return false;
   }
 
-  /**
-   * Add the specified values to the specified key. This is a bulk operation.
-   * @param key the key to which to add the values.
-   * @param values the values to add to the key.
-   */
   @Override
   public void addValues(final K key, final V...values)
   {
@@ -95,12 +79,6 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     for (V value: values) coll.add(value);
   }
 
-  /**
-   * Remove the specified values from the specified key. This is a bulk operation.
-   * @param key the key for which to rmeove the values.
-   * @param values the values to remove.
-   * @return the number of values that were actually removed, possibly zero.
-   */
   @Override
   public int removeValues(final K key, final V...values)
   {
@@ -118,21 +96,18 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     return 0;
   }
 
-  /**
-   * Remove the specified key fromt his maap.
-   * @param key the key to remove.
-   * @return collection of values that were removed, possibly <code>null</code>.
-   */
   @Override
   public Collection<V> removeKey(final K key)
   {
     return map.remove(key);
   }
 
-  /**
-   * Get the total number of elements in this collection map.
-   * @return the number of elemets as an int value.
-   */
+  @Override
+  public Collection<V> getValues(final K key)
+  {
+    return map.get(key);
+  }
+
   @Override
   public int size()
   {
@@ -141,37 +116,28 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     return result;
   }
 
-  /**
-   * Determine whether this map is empty.
-   * @return <code>true</code> if the map is empty, <code>false</code> otherwise.
-   */
   @Override
   public boolean isEmpty()
   {
     return map.isEmpty();
   }
 
-  /**
-   * Determine whether the collection mapped to the specified key contains the specified value.
-   * @param key the key whose mapped collection is looked up^.
-   * @param value the value to look in the collection.
-   * @return <code>true</code> if the map contains the key and the corresponding collection contains the value, <code>false</code> otehrwise.
-   */
   @Override
-  public boolean contains(final K key, final V value)
+  public boolean containsKey(final K key)
+  {
+    return map.containsKey(key);
+  }
+
+  @Override
+  public boolean containsValue(final K key, final V value)
   {
     Collection<V> coll = map.get(key);
     if (coll == null) return false;
     return coll.contains(value);
   }
 
-  /**
-   * Determine whether at least one of the collections in the map contains the specified value.
-   * @param value the value to look up in the entire map.
-   * @return <code>true</code> if the map contains the value, <code>false</code> otehrwise.
-   */
   @Override
-  public boolean contains(final V value)
+  public boolean containsValue(final V value)
   {
     for (Map.Entry<K, Collection<V>> entry: map.entrySet())
     {
@@ -186,20 +152,12 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     return new CollectionMapIterator();
   }
 
-  /**
-   * Get an iterator which uses the specified lock.
-   * @param lock the lock used to synchronize access to the map.
-   * @return an iterator on the values of the map.
-   */
   @Override
   public Iterator<V> iterator(final Lock lock)
   {
     return new CollectionMapIterator(lock);
   }
 
-  /**
-   * Clear the map.
-   */
   @Override
   public void clear()
   {
@@ -324,7 +282,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
     @Override
     public void remove() throws UnsupportedOperationException
     {
-      throw new UnsupportedOperationException("remove() is not supported on a BundleIterator");
+      throw new UnsupportedOperationException("remove() is not supported on a CollectionMapIterator");
     }
 
     /**

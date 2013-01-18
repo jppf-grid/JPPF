@@ -20,11 +20,15 @@ package org.jppf.management;
 
 import java.util.*;
 
+import javax.management.*;
+
 import org.jppf.job.JobInformation;
+import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFStats;
 import org.jppf.server.job.management.*;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
+import org.slf4j.*;
 
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
@@ -34,6 +38,18 @@ import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
  */
 public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JMXDriverConnectionWrapper.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * 
+   */
+  private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<String, Map<String, ListenerWrapper>>();
   /**
    * Initialize a local connection to the MBean server.
    */
@@ -67,7 +83,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public Integer nbNodes() throws Exception
   {
-    return (Integer) invoke(MBEAN_NAME, "nbNodes", (Object[]) null, (String[]) null);
+    return (Integer) invoke(MBEAN_NAME, "nbNodes");
   }
 
   /**
@@ -80,7 +96,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> nodesInformation() throws Exception
   {
-    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation", (Object[]) null, (String[]) null);
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation");
   }
 
   /**
@@ -92,7 +108,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public JPPFStats statistics() throws Exception
   {
-    JPPFStats stats = (JPPFStats) invoke(MBEAN_NAME, "statistics", (Object[]) null, (String[]) null);
+    JPPFStats stats = (JPPFStats) invoke(MBEAN_NAME, "statistics");
     return stats;
   }
 
@@ -135,7 +151,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public LoadBalancingInformation loadBalancerInformation() throws Exception
   {
-    return (LoadBalancingInformation) invoke(MBEAN_NAME, "loadBalancerInformation", (Object[]) null, (String[]) null);
+    return (LoadBalancingInformation) invoke(MBEAN_NAME, "loadBalancerInformation");
   }
 
   /**
@@ -205,7 +221,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   public String[] getAllJobIds() throws Exception
   {
-    //return (String[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getAllJobIds", (Object[]) null, (String[]) null);
     return (String[]) getAttribute(DriverJobManagementMBean.MBEAN_NAME, "AllJobIds");
   }
 
@@ -236,13 +251,13 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public void resetStatistics() throws Exception
   {
-    invoke(MBEAN_NAME, "resetStatistics", (Object[]) null, (String[]) null);
+    invoke(MBEAN_NAME, "resetStatistics");
   }
 
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
   {
-    return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation", (Object[]) null, (String[]) null);
+    return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation");
   }
 
   @Override
@@ -254,19 +269,140 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public Integer nbIdleNodes() throws Exception
   {
-    return (Integer) invoke(MBEAN_NAME, "nbIdleNodes", (Object[]) null, (String[]) null);
+    return (Integer) invoke(MBEAN_NAME, "nbIdleNodes");
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
   {
-    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation", (Object[]) null, (String[]) null);
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation");
   }
 
   @Override
   public void activateNode(final String uuid, final Boolean active) throws Exception
   {
     invoke(MBEAN_NAME, "activateNode", new Object[] {uuid, active}, new String[] {String.class.getName(), Boolean.class.getName()});
+  }
+
+  /**
+   * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
+   * @param selector determines which nodes will be selected.
+   * @param mBeanName the name of the MBean from which to receive notificaztions from the selected nodes.
+   * @param listener the listener to register.
+   * @param filter the notification filter.
+   * @param handback the handback object.
+   * @return the id of the registered listener, to use with {@link #unregisterForwardingNotificationListener()}.
+   * @throws Exception if any error occurss.
+   */
+  public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName,
+      final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception
+  {
+    String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName},
+      new String[] {NodeSelector.class.getName(), String.class.getName()});
+    InternalNotificationFilter internalFilter = new InternalNotificationFilter(listenerID, filter);
+    addNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, listener, internalFilter, handback);
+    ListenerWrapper wrapper = new ListenerWrapper(listener, internalFilter, handback);
+    synchronized(listeners)
+    {
+      Map<String, ListenerWrapper> map = listeners.get(getId());
+      if (map == null)
+      {
+        map = new HashMap<String, ListenerWrapper>();
+        listeners.put(getId(), map);
+      }
+      map.put(listenerID, new ListenerWrapper(listener, internalFilter, handback));
+    }
+    return listenerID;
+  }
+
+  /**
+   * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
+   * @param listenerID the id of a listener previously registered with {@link #registerForwardingNotificationListener(NodeSelector,String,NotificationListener,NotificationFilter,Object)}.
+   * @throws Exception if the listener with this id was not found or if any other error occurss.
+   */
+  public void unregisterForwardingNotificationListener(final String listenerID) throws Exception
+  {
+    synchronized(listeners)
+    {
+      Map<String, ListenerWrapper> map = listeners.get(getId());
+      if (map != null)
+      {
+        ListenerWrapper wrapper = map.get(listenerID);
+        if (wrapper != null)
+        {
+          map.remove(listenerID);
+          if (map.isEmpty()) listeners.remove(getId());
+          try
+          {
+            removeNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
+          }
+          catch (Exception e)
+          {
+            log.error(e.getMessage(), e);
+          }
+        }
+      }
+    }
+    invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
+  }
+
+  /**
+   * Wraps the information for each registered node forwarding listener.
+   */
+  private static class ListenerWrapper
+  {
+    /**
+     * The registered listener.
+     */
+    private final NotificationListener listener;
+    /**
+     * The notification filter.
+     */
+    private final InternalNotificationFilter filter;
+    /**
+     * the handback object.
+     */
+    private final Object handback;
+
+    /**
+     * Initialize this wrapper with the specified listener information.
+     * @param listener the registered listener.
+     * @param filter the notification filter.
+     * @param handback the handback object.
+     */
+    ListenerWrapper(final NotificationListener listener, final InternalNotificationFilter filter, final Object handback)
+    {
+      this.listener = listener;
+      this.filter = filter;
+      this.handback = handback;
+    }
+
+    /**
+     * Get the registered listener.
+     * @return a {@link NotificationListener} instance.
+     */
+    public NotificationListener getListener()
+    {
+      return listener;
+    }
+
+    /**
+     * Get the notification filter.
+     * @return an <code>InternalNotificationFilter</code> instance.
+     */
+    public InternalNotificationFilter getFilter()
+    {
+      return filter;
+    }
+
+    /**
+     * Get the handback object.
+     * @return the handback object.
+     */
+    public Object getHandback()
+    {
+      return handback;
+    }
   }
 }

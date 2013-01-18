@@ -138,10 +138,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
-
     taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
-
     this.queue.addQueueListener(new QueueListener<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void newBundle(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
@@ -206,6 +204,16 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (nodeContext == null) return null;
     removeConnection(nodeContext);
     return nodeContext;
+  }
+
+  /**
+   * Get the connection wrapper for the specified uuid.
+   * @param uuid the id of the connection to get.
+   * @return the context of the cpnnect that was found, or <code>null</code> if the channel was not found.
+   */
+  public synchronized AbstractNodeContext getConnection(final String uuid)
+  {
+    return allConnections.get(uuid);
   }
 
   /**
@@ -335,7 +343,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * Close a connection to a node.
    * @param context a <code>SocketChannel</code> that encapsulates the connection.
-   *
    */
   public void closeNode(final AbstractNodeContext context)
   {
@@ -447,20 +454,20 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public void connectionFailed(final ReaperEvent event)
   {
     ServerConnection c = event.getConnection();
-    AbstractNodeContext channel = null;
+    AbstractNodeContext context = null;
     if (!c.isOk())
     {
       String uuid = c.getUuid();
-      if (uuid != null) channel = removeConnection(uuid);
-      if (channel != null)
+      if (uuid != null) context = removeConnection(uuid);
+      if (context != null)
       {
-        if (debugEnabled) log.debug("about to close channel = " + (channel.getChannel().isOpen() ? channel : channel.getClass().getSimpleName()) + " with uuid = " + uuid);
-        channel.handleException(channel.getChannel(), null);
+        if (debugEnabled) log.debug("about to close channel = " + (context.getChannel().isOpen() ? context : context.getClass().getSimpleName()) + " with uuid = " + uuid);
+        context.handleException(context.getChannel(), null);
       }
       else
       {
         log.warn("found null context - a job may be stuck!");
-        closeNode(channel);
+        closeNode(context);
       }
     }
   }

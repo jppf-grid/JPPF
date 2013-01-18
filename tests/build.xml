@@ -27,10 +27,12 @@
   <property name="src"               value="${basedir}/src"/>
   <property name="framework.src"     value="${src}/framework"/>
   <property name="tests.src"         value="${src}/tests"/>
+  <property name="addons.src"         value="${src}/addons"/>
   <property name="resources.src"     value="${src}/resources"/>
   <property name="classes"           value="${basedir}/classes"/>
   <property name="framework.classes" value="${classes}/framework"/>
   <property name="tests.classes"     value="${classes}/tests"/>
+  <property name="addons.classes"     value="${classes}/addons"/>
   <property name="build"             value="${basedir}/build"/>
 
   <!-- JPPF modules -->
@@ -49,6 +51,7 @@
     <pathelement location="${tests.classes}/config"/>
     <pathelement location="${framework.classes}"/>
     <pathelement location="${tests.classes}"/>
+    <pathelement location="${addons.classes}"/>
     <pathelement location="${client}/classes"/>
     <pathelement location="${common}/classes"/>
     <pathelement location="${node}/classes"/>
@@ -75,6 +78,7 @@
   <target name="compile" description="compile the junit tests classes">
     <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml">
       <fileset dir="${framework.src}" includes="**/*.java"/>
+      <fileset dir="${addons.src}" includes="**/*.java"/>
       <fileset dir="${tests.src}" includes="**/*.java"/>
     </checkstyle>
     <delete dir="${framework.classes}" quiet="true" includes="**/*.*"/>
@@ -82,15 +86,19 @@
     <mkdir dir="${framework.classes}"/>
     <mkdir dir="${tests.classes}"/>
     <echo message="compiling framework classes"/>
-    <javac destdir="${framework.classes}" source="1.6" target="1.6"
-      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac destdir="${framework.classes}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${framework.src}"/>
     </javac>
+    <echo message="compiling addons classes : addons.classes=${addons.classes}"/>
+    <javac destdir="${addons.classes}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${addons.src}"/>
+    </javac>
     <echo message="compiling unit test classes : tests.classes=${tests.classes}"/>
-    <javac destdir="${tests.classes}" source="1.6" target="1.6"
-      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac destdir="${tests.classes}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="tests.classpath"/>
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${tests.src}"/>

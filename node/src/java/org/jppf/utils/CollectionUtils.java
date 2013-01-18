@@ -17,6 +17,7 @@
  */
 package org.jppf.utils;
 
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -188,5 +189,26 @@ public final class CollectionUtils
     List<T> result = new ArrayList<T>(size);
     for (int i=0; i<size; i++) result.add(source.get(i+start));
     return result;
+  }
+
+  /**
+   * Return the parameters as an array.
+   * @param <T> the ytpe of the elements in the array. Inferred as the common supertype of all the elements.
+   * @param elts the elements of the array.
+   * @return an array of the specified type.
+   */
+  public static <T> T[] array(final T...elts)
+  {
+    return elts;
+  }
+
+  /**
+   * Return the parameters as an array of Objects.
+   * @param elts the elements of the array.
+   * @return an array of <code>Object</code> instances.
+   */
+  public static Object[] objects(final Object...elts)
+  {
+    return elts;
   }
 }

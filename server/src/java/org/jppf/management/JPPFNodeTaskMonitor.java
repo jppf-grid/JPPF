@@ -69,10 +69,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    */
   private long sequence = 0L;
   /**
-   * The count of notification listeners registered with this MBean.
-   */
-  private long listenerCount = 0L;
-  /**
    * 
    */
   private ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -107,7 +103,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     else taskSucessfullCount++;
     totalCpuTime += info.getCpuTime();
     totalElapsedTime += info.getElapsedTime();
-    if (listenerCount > 0) executor.submit(new NotificationSender(info));
+    executor.submit(new NotificationSender(info));
   }
 
   /**
@@ -166,36 +162,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   }
 
   @Override
-  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback)
-  {
-    synchronized(this)
-    {
-      super.addNotificationListener(listener, filter, handback);
-      listenerCount++;
-    }
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener listener) throws ListenerNotFoundException
-  {
-    synchronized(this)
-    {
-      super.removeNotificationListener(listener);
-      listenerCount--;
-    }
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) throws ListenerNotFoundException
-  {
-    super.removeNotificationListener(listener, filter, handback);
-    synchronized(this)
-    {
-      listenerCount--;
-    }
-  }
-
-  @Override
   public synchronized void reset()
   {
     this.taskCount = 0;
@@ -224,9 +190,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
       this.info = info;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void run()
     {

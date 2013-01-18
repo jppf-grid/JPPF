@@ -142,6 +142,6 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
    */
   public boolean isTransitionAllowed(final S currentState, final S newState)
   {
-    return (allowedTransitions == null) || allowedTransitions.contains(currentState, newState);
+    return (allowedTransitions == null) || allowedTransitions.containsValue(currentState, newState);
   }
 }

@@ -18,7 +18,7 @@
 
 package org.jppf.server.spi;
 
-import org.jppf.management.*;
+import org.jppf.management.forwarding.*;
 import org.jppf.management.spi.JPPFDriverMBeanProvider;
 
 /**

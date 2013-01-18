@@ -1,3 +1,4 @@
+test.org.jppf.classloader.TestAbstractJPPFClassLoader
 test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
 test.org.jppf.client.concurrent.TestJPPFCompletionService
 test.org.jppf.client.concurrent.TestJPPFExecutorService
@@ -11,6 +12,8 @@ test.org.jppf.management.TestJMXConnectionWrapper
 test.org.jppf.management.TestJPPFDriverAdminMBean
 test.org.jppf.management.TestJPPFNodeAdminMBean
 test.org.jppf.management.TestJPPFNodeForwardingMBean
+test.org.jppf.management.TestJPPFNodeForwardingMBean2
+test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
 test.org.jppf.server.job.management.TestDriverJobManagementMBean
 test.org.jppf.server.protocol.TestJPPFJobClientSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA

@@ -60,11 +60,18 @@ public interface CollectionMap<K, V> extends Iterable<V>
   int removeValues(final K key, final V... values);
 
   /**
-   * Remove the specified key fromt his maap.
+   * Remove the specified key from this map.
    * @param key the key to remove.
    * @return collection of values that were removed, possibly <code>null</code>.
    */
   Collection<V> removeKey(final K key);
+
+  /**
+   * Get the collection of values maped to the specified key.
+   * @param key the key to lookup.
+   * @return a collection of values that mapped to the key, or <code>null</code> if no mapping exists for the key.
+   */
+  Collection<V> getValues(final K key);
 
   /**
    * Get the total number of elements in this collection map.
@@ -79,19 +86,26 @@ public interface CollectionMap<K, V> extends Iterable<V>
   boolean isEmpty();
 
   /**
+   * Determine whether this map contains the specified key.
+   * @param key the key to lookup.
+   * @return <code>true</code> if there is a mapping for the key, <code>false</code> otherwise.
+   */
+  boolean containsKey(final K key);
+
+  /**
    * Determine whether the collection mapped to the specified key contains the specified value.
    * @param key the key whose mapped collection is looked up^.
    * @param value the value to look in the collection.
    * @return <code>true</code> if the map contains the key and the corresponding collection contains the value, <code>false</code> otehrwise.
    */
-  boolean contains(final K key, final V value);
+  boolean containsValue(final K key, final V value);
 
   /**
    * Determine whether at least one of the collections in the map contains the specified value.
    * @param value the value to look up in the entire map.
    * @return <code>true</code> if the map contains the value, <code>false</code> otehrwise.
    */
-  boolean contains(final V value);
+  boolean containsValue(final V value);
 
   /**
    * Get an iterator which uses the specified lock.

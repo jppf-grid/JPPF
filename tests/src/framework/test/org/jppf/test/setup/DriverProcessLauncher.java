@@ -56,6 +56,7 @@ public class DriverProcessLauncher extends GenericProcessLauncher
   private void setupCommon()
   {
     setMainClass("org.jppf.server.JPPFDriver");
+    addClasspathElement("classes/addons");
     addClasspathElement("classes/tests/config");
     addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");

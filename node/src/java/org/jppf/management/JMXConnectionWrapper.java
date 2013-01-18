@@ -109,6 +109,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   public JMXConnectionWrapper()
   {
     local = true;
+    idString = displayName = "local";
+    host = "local";
   }
 
   /**
@@ -117,6 +119,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param port the RMI port used by the server.
    * @param rmiSuffix	RMI registry namespace suffix.
    * @deprecated JPPF no longer uses the RMI remote connector for JMX.
+   * @exclude
    */
   private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
   {
@@ -149,10 +152,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   {
     try
     {
-      /*
-      InetAddress addr = InetAddress.getByName(host);
-      this.host = (addr instanceof Inet6Address) ? "[" + host + "]" : host;
-      */
       this.host = (NetworkUtils.isIPv6Address(host)) ? "[" + host + "]" : host;
       this.port = port;
       this.secure = ssl;
@@ -289,6 +288,20 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   }
 
   /**
+   * Invoke a method on the specified MBean.
+   * This is a convenience method to be used when invoking a remote MBean method with no parameters.<br/>
+   * This is equivalent to calling <code>invoke(name, methodName, (Object[]) null, (String[]) null)</code>. 
+   * @param name the name of the MBean.
+   * @param methodName the name of the method to invoke.
+   * @return an object or null.
+   * @throws Exception if the invocation failed.
+   */
+  public Object invoke(final String name, final String methodName) throws Exception
+  {
+    return invoke(name, methodName, (Object[]) null, (String[]) null);
+  }
+
+  /**
    * Get the value of an attribute of the specified MBean.
    * @param name the name of the MBean.
    * @param attribute the name of the attribute to read.
@@ -382,7 +395,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   }
 
   /**
-   * Get the RMI port used by the server.
+   * Get the JMX remote port used by the server.
    * @return the port as an int.
    */
   public int getPort()
@@ -466,6 +479,54 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
     }
     return null;
+  }
+
+  /**
+   * Adds a listener to the specified MBean.
+   * @param mBeanName the name of the MBean on which the listener should be added.
+   * @param listener the listener to add.
+   * @throws Exception if any error occurs.
+   */
+  public void addNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception
+  {
+    mbeanConnection.get().addNotificationListener(new ObjectName(mBeanName), listener, null, null);
+  }
+
+  /**
+   * Adds a listener to the specified MBean.
+   * @param mBeanName the name of the MBean on which the listener should be added.
+   * @param listener the listener to add.
+   * @param filter the filter object.
+   * @param handback the handback object to use.
+   * @throws Exception if any error occurs.
+   */
+  public void addNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception
+  {
+    mbeanConnection.get().addNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
+  }
+
+  /**
+   * Remove a listener from the specified MBean.
+   * @param mBeanName the name of the MBean from which the listener should be removed.
+   * @param listener the listener to remove.
+   * @throws Exception if any error occurs.
+   */
+  public void removeNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception
+  {
+    mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, null, null);
+  }
+
+  /**
+   * Remove a listener from the specified MBean.
+   * @param mBeanName the name of the MBean from which the listener should be removed.
+   * @param listener the listener to remove.
+   * @param filter the filter object.
+   * @param handback the handback object used.
+   * @throws Exception if any error occurs.
+   */
+  public void removeNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception
+  {
+    mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
   }
 
   @Override

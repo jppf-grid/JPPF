@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="classes/framework" path="src/framework"/>
+	<classpathentry kind="src" output="classes/addons" path="src/addons"/>
 	<classpathentry kind="src" output="classes/tests" path="src/tests"/>
 	<classpathentry kind="src" output="classes/tests" path="src/resources"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
