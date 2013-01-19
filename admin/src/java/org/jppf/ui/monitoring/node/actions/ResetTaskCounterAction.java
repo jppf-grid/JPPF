@@ -18,10 +18,10 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
+import java.util.*;
 
-import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.management.forwarding.*;
+import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
 /**
@@ -67,17 +67,20 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    for (TopologyData data: dataArray)
-    {
-      try
-      {
-        JMXNodeConnectionWrapper jmx = (JMXNodeConnectionWrapper) data.getJmxWrapper();
-        jmx.resetTaskCounter();
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        CollectionMap<JPPFNodeForwardingMBean, String> map = getNodeForwarderMap();
+        for (Map.Entry<JPPFNodeForwardingMBean, Collection<String>> entry: map.entrySet()) {
+          try {
+            NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
+            entry.getKey().resetTaskCounter(selector);
+          } catch (Exception e) {
+            log.error(e.getMessage(), e);
+          }
+        }
       }
-      catch(Exception e)
-      {
-        log.error(e.getMessage(), e);
-      }
-    }
+    };
+    runAction(r);
   }
 }

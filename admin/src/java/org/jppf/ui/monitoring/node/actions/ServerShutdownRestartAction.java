@@ -186,6 +186,6 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
         OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
       }
     };
-    new Thread(r).start();
+    runAction(r);
   }
 }

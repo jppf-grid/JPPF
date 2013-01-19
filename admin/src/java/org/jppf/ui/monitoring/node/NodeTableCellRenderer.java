@@ -27,7 +27,6 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.*;
 
-import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.ui.treetable.JPPFTreeTable;
 
 /**
@@ -75,15 +74,13 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
       if (path != null)
       {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        //System.out.println("row="+row+", col="+column+", node="+node);
         Object o = node.getUserObject();
         if (o instanceof TopologyData)
         {
           TopologyData data = (TopologyData) o;
           if (data.isNode())
           {
-            JMXConnectionWrapper wrapper = data.getJmxWrapper();
-            if ((wrapper == null) || !wrapper.isConnected()) renderer.setForeground(UNMANAGED_COLOR);
+            if (data.getStatus() == TopologyDataStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
             else
             {
               if (!data.getNodeInformation().isActive())

@@ -18,19 +18,30 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.*;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.*;
 
 import org.jppf.management.*;
+import org.jppf.management.forwarding.NodeSelector;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This action displays the driver or node environment information in a separate frame.
  */
 public class SystemInformationAction extends AbstractTopologyAction
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SystemInformationAction.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+
   /**
    * Initialize this action.
    */
@@ -66,10 +77,9 @@ public class SystemInformationAction extends AbstractTopologyAction
     String s = null;
     try
     {
-      JMXConnectionWrapper connection = dataArray[0].getJmxWrapper();
-      JPPFSystemInformation info = connection.systemInformation();
+      JPPFSystemInformation info = retrieveInfo(dataArray[0]);
       boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
-      PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + connection.getId());
+      PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + dataArray[0].getUuid());
       format.start();
       if (info == null)
       {
@@ -113,5 +123,31 @@ public class SystemInformationAction extends AbstractTopologyAction
     frame.setLocation(location);
     frame.setSize(400, 400);
     frame.setVisible(true);
+  }
+
+  /**
+   * Retrieve the system information for the specified topology object.
+   * @param data the topology object for which to get the information.
+   * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
+   */
+  private JPPFSystemInformation retrieveInfo(final TopologyData data)
+  {
+    JPPFSystemInformation info = null;
+    try
+    {
+      if (TopologyDataType.NODE == data.getType())
+      {
+        TopologyData parent = data.getParent();
+        Map<String, Object> result = parent.getNodeForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
+        Object o = result.get(data.getUuid());
+        if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
+      }
+      else info = data.getJmxWrapper().systemInformation();
+    }
+    catch (Exception e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return info;
   }
 }

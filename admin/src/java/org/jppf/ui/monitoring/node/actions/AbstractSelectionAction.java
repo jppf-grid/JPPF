@@ -50,7 +50,6 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
     setEnabled(true);
   }
 
-
   /**
    * Get the list of all tree nodes representing a driver.
    * @return a list of {@link DefaultMutableTreeNode} instances.
@@ -67,5 +66,4 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
     }
     return list;
   }
-
 }

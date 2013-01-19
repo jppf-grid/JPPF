@@ -97,7 +97,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
           }
         }
       };
-      new Thread(r).start();
+      runAction(r);
     }
     catch(Exception e)
     {

@@ -163,6 +163,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof NodeSelector.AllNodesSelector) return true;
+    if (node.isPeer()) return false;
     else if (selector instanceof NodeSelector.UuidSelector)
       return ((NodeSelector.UuidSelector) selector).getUuidList().contains(node.getUuid());
     else if (selector instanceof NodeSelector.ExecutionPolicySelector)
@@ -187,7 +188,16 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   Set<AbstractNodeContext> getChannels(final NodeSelector selector)
   {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof NodeSelector.AllNodesSelector) return getNodeNioServer().getAllChannelsAsSet();
+    if (selector instanceof NodeSelector.AllNodesSelector)
+    {
+      Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
+      Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
+      for (AbstractNodeContext ctx: fullSet)
+      {
+        if (!ctx.isPeer()) result.add(ctx);
+      }
+      return result;
+    }
     else if (selector instanceof NodeSelector.UuidSelector)
       return getChannels(new HashSet<String>(((NodeSelector.UuidSelector) selector).getUuidList()));
     else if (selector instanceof NodeSelector.ExecutionPolicySelector)
@@ -206,6 +216,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     for (AbstractNodeContext context: allChannels)
     {
+      if (context.isPeer()) continue;
       if (uuids.contains(context.getUuid())) result.add(context);
     }
     return result;
@@ -223,6 +234,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     for (AbstractNodeContext context: allChannels)
     {
+      if (context.isPeer()) continue;
       JPPFSystemInformation info = context.getSystemInformation();
       if (info == null) continue;
       if (policy.accepts(info)) result.add(context);

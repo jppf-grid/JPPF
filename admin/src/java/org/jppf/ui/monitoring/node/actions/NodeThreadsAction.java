@@ -18,15 +18,15 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.*;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.*;
 
-import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.management.forwarding.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
 /**
@@ -147,21 +147,16 @@ public class NodeThreadsAction extends AbstractTopologyAction
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("threadPriority");
     nbThreads = (Integer) nbThreadsOption.getValue();
     priority = (Integer) priorityOption.getValue();
-    Runnable r = new Runnable()
-    {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        for (TopologyData data: dataArray)
-        {
-          try
-          {
-            JMXNodeConnectionWrapper jmx = (JMXNodeConnectionWrapper) data.getJmxWrapper();
-            jmx.updateThreadPoolSize(nbThreads);
-            jmx.updateThreadsPriority(priority);
-          }
-          catch(Exception e)
-          {
+      public void run() {
+        CollectionMap<JPPFNodeForwardingMBean, String> map = getNodeForwarderMap();
+        for (Map.Entry<JPPFNodeForwardingMBean, Collection<String>> entry: map.entrySet()) {
+          try {
+            NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
+            entry.getKey().updateThreadPoolSize(selector, nbThreads);
+            entry.getKey().updateThreadsPriority(selector, priority);
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }

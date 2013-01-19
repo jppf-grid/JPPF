@@ -21,8 +21,10 @@ package org.jppf.ui.monitoring.node.actions;
 import java.util.*;
 
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.ui.actions.AbstractUpdatableAction;
 import org.jppf.ui.monitoring.node.*;
+import org.jppf.utils.collections.*;
 
 /**
  * Abstract superclass for all actions in the topology panel.
@@ -67,5 +69,21 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
       }
     }
     dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new TopologyData[list.size()]);
+  }
+
+  /**
+   * Get a mapping of driver node forwarder MBeans to corresponding selected nodes.
+   * @return a mapping of {@link JPPFNodeForwardingMBean} keys to lists of node uuid values.
+   */
+  protected CollectionMap<JPPFNodeForwardingMBean, String> getNodeForwarderMap()
+  {
+    CollectionMap<JPPFNodeForwardingMBean, String> map = new ArrayListHashMap<JPPFNodeForwardingMBean, String>();
+    for (TopologyData data: dataArray)
+    {
+      if (data.getType() != TopologyDataType.NODE) continue;
+      TopologyData parent = data.getParent();
+      if (parent != null) map.putValue(parent.getNodeForwarder(), data.getUuid());
+    }
+    return map;
   }
 }

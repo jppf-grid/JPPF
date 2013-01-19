@@ -27,13 +27,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
+import org.jppf.management.forwarding.NodeSelector;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.monitoring.node.graph.GraphOption;
 import org.jppf.ui.options.FormattedNumberOption;
 import org.jppf.ui.treetable.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -273,11 +275,36 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     for (int i=0; i<treeTableRoot.getChildCount(); i++)
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
+      TopologyData driverData = (TopologyData) driverNode.getUserObject();
+      if (driverNode.getChildCount() <= 0) continue;
+      if (driverData.getNodeForwarder() == null) continue;
+      Map<String, TopologyData> uuidMap = new HashMap<String, TopologyData>();
       for (int j=0; j<driverNode.getChildCount(); j++)
       {
         DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
         TopologyData data = (TopologyData) nodeNode.getUserObject();
-        data.refreshNodeState();
+        uuidMap.put(data.getUuid(), data);
+      }
+      Map<String, Object> result = null;
+      try
+      {
+        result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet(uuidMap.keySet())));
+      }
+      catch(Exception e)
+      {
+        log.error("error getting node states for driver " + driverData.getUuid(), e);
+      }
+      if (result == null) continue;
+      for (Map.Entry<String, Object> entry: result.entrySet())
+      {
+        TopologyData data = uuidMap.get(entry.getKey());
+        if (data == null) continue;
+        if (entry.getValue() instanceof Exception)
+        {
+          data.setStatus(TopologyDataStatus.DOWN);
+          log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
+        }
+        else if (entry.getValue() instanceof JPPFNodeState) data.refreshNodeState((JPPFNodeState) entry.getValue());
       }
     }
   }
@@ -313,12 +340,25 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   @Override
   public synchronized void newConnection(final ClientEvent event)
   {
-    driverAdded(event.getConnection());
+    final AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) event.getConnection();
+    if (c.getUuid() == null)
+    {
+      c.addClientConnectionStatusListener(new ClientConnectionStatusListener()
+      {
+        @Override
+        public void statusChanged(final ClientConnectionStatusEvent event)
+        {
+          if (c.getStatus() == JPPFClientConnectionStatus.ACTIVE)
+          {
+            c.removeClientConnectionStatusListener(this);
+            driverAdded(c);
+          }
+        }
+      });
+    }
+    else driverAdded(c);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void connectionFailed(final ClientEvent event)
   {

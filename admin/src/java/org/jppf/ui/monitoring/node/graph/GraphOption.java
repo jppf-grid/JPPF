@@ -153,9 +153,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JComponent getUIComponent()
   {
@@ -198,9 +195,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
     setLayout("Radial");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ActionHandler getActionHandler()
   {

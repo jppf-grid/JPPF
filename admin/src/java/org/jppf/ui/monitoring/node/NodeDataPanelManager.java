@@ -18,7 +18,7 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.util.Collection;
+import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -46,6 +46,18 @@ public class NodeDataPanelManager
    * The container for the tree table.
    */
   private NodeDataPanel panel;
+  /**
+   * Mapping of driver uuids to the corresponding {@link TopologyData} objects.
+   */
+  private final Map<String, TopologyData> driverMap = new Hashtable<String, TopologyData>();
+  /**
+   * Mapping of peer driver uuids to the corresponding {@link TopologyData} objects.
+   */
+  private final Map<String, TopologyData> peerMap = new Hashtable<String, TopologyData>();
+  /**
+   * Mapping of node uuids to the corresponding {@link TopologyData} objects.
+   */
+  private final Map<String, TopologyData> nodeMap = new Hashtable<String, TopologyData>();
 
   /**
    * Initialize this manager.
@@ -80,12 +92,15 @@ public class NodeDataPanelManager
    */
   void driverAdded(final JPPFClientConnection connection)
   {
-    if (findDriver(((AbstractJPPFClientConnection) connection).getUuid()) != null) return;
-    JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) connection).getJmxConnection();
-    String driverName = wrapper.getId();
+    AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) connection;
+    if (findDriver(c.getUuid()) != null) return;
+    JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
+    //String driverName = wrapper.getId();
+    String driverName = c.getUuid();
     int index = driverInsertIndex(driverName);
     if (index < 0) return;
     TopologyData driverData = new TopologyData(connection);
+    driverMap.put(driverData.getUuid(), driverData);
     DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
     if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
     panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
@@ -128,6 +143,7 @@ public class NodeDataPanelManager
     final DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
     TopologyData driverData = (TopologyData) driverNode.getUserObject();
+    driverMap.remove(driverData.getUuid());
     try
     {
       int n = driverNode.getChildCount();
@@ -174,11 +190,12 @@ public class NodeDataPanelManager
   void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo)
   {
     if (findNode(driverNode, nodeInfo.getUuid()) != null) return;
-    String nodeName = nodeInfo.getHost() + ':' + nodeInfo.getPort();
-    if (debugEnabled) log.debug("attempting to add node=" + nodeName + " to driver=" + driverNode);
-    int index = nodeInsertIndex(driverNode, nodeName);
+    //String nodeName = nodeInfo.getHost() + ':' + nodeInfo.getPort();
+    String nodeUuid = nodeInfo.getUuid();
+    if (debugEnabled) log.debug("attempting to add node=" + nodeUuid + " to driver=" + driverNode);
+    int index = nodeInsertIndex(driverNode, nodeUuid);
     if (index < 0) return;
-    if (debugEnabled) log.debug("adding node: " + nodeName + " at index " + index);
+    if (debugEnabled) log.debug("adding node: " + nodeUuid + " at index " + index);
     TopologyData data = null;
     TopologyData peerData = null;
     if (nodeInfo.isPeer())
@@ -186,12 +203,18 @@ public class NodeDataPanelManager
       DefaultMutableTreeNode tmpNode = findDriver(nodeInfo.getUuid());
       if (tmpNode != null)
       {
-        if (debugEnabled) log.debug("adding peer node: " + nodeName + " at index " + index);
+        if (debugEnabled) log.debug("adding peer node: " + nodeUuid + " at index " + index);
         peerData = (TopologyData) tmpNode.getUserObject();
       }
       data = new TopologyData(nodeInfo, peerData == null ? null : peerData.getJmxWrapper());
+      peerMap.put(data.getUuid(), data);
     }
-    else data = new TopologyData(nodeInfo);
+    else
+    {
+      data = new TopologyData(nodeInfo);
+      nodeMap.put(data.getUuid(), data);
+    }
+    data.setParent((TopologyData) driverNode.getUserObject());
     //if (debugEnabled) log.debug("created TopologyData instance");
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
     panel.getModel().insertNodeInto(nodeNode, driverNode, index);
@@ -206,7 +229,11 @@ public class NodeDataPanelManager
       if (nodeNode2 != null)
       {
         TopologyData tmp = (TopologyData) nodeNode2.getUserObject();
-        if (tmp.getNodeInformation().isNode()) panel.getModel().removeNodeFromParent(nodeNode2);
+        if (tmp.getNodeInformation().isNode())
+        {
+          tmp.setParent(null);
+          panel.getModel().removeNodeFromParent(nodeNode2);
+        }
       }
     }
     TopologyData driverData = (TopologyData) driverNode.getUserObject();
@@ -216,21 +243,30 @@ public class NodeDataPanelManager
 
   /**
    * Called to notify that a node was removed from a driver.
-   * @param driverName the name of the driver from which the node is removed.
-   * @param nodeName the name of the node to remove.
+   * @param driverUuid the name of the driver from which the node is removed.
+   * @param nodeUuid the name of the node to remove.
    */
-  void nodeRemoved(final String driverName, final String nodeName)
+  void nodeRemoved(final String driverUuid, final String nodeUuid)
   {
-    if (debugEnabled) log.debug("attempting to remove node=" + nodeName + " from driver=" + driverName);
-    DefaultMutableTreeNode driverNode = findDriver(driverName);
+    if (debugEnabled) log.debug("attempting to remove node=" + nodeUuid + " from driver=" + driverUuid);
+    DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
-    final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
+    final DefaultMutableTreeNode node = findNode(driverNode, nodeUuid);
     if (node == null) return;
-    if (debugEnabled) log.debug("removing node: " + nodeName);
+    if (debugEnabled) log.debug("removing node: " + nodeUuid);
     panel.getModel().removeNodeFromParent(node);
     TopologyData data = (TopologyData) node.getUserObject();
-    if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().nodeRemoved((TopologyData) driverNode.getUserObject(), data);
-    if ((data != null) && (data.getType() == TopologyDataType.NODE)) panel.updateStatusBar("/StatusNbNodes", -1);
+    if (data != null)
+    {
+      data.setParent(null);
+      if (panel.getGraphOption() != null) panel.getGraphOption().getGraphHandler().nodeRemoved((TopologyData) driverNode.getUserObject(), data);
+      if (data.getType() == TopologyDataType.NODE)
+      {
+        nodeMap.remove(data.getUuid());
+        panel.updateStatusBar("/StatusNbNodes", -1);
+      }
+      else peerMap.remove(data.getUuid());
+    }
     repaintTreeTable();
   }
 
@@ -245,7 +281,6 @@ public class NodeDataPanelManager
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
       TopologyData data = (TopologyData) driverNode.getUserObject();
-      //String name = data.getJmxWrapper().getId();
       if (data.getUuid().equals(driverUuid)) return driverNode;
     }
     return null;
@@ -263,7 +298,6 @@ public class NodeDataPanelManager
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
       TopologyData data = (TopologyData) driverNode.getUserObject();
-      //String name = data.getJmxWrapper().getId();
       if (data.getClientConnection() == driverConnection) return driverNode;
     }
     return null;
@@ -315,9 +349,8 @@ public class NodeDataPanelManager
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
       TopologyData data = (TopologyData) driverNode.getUserObject();
-      String name = data.getJmxWrapper().getId();
       if (data.getUuid().equals(driverUuid)) return -1;
-      else if (driverUuid.compareTo(name) < 0) return i;
+      else if (driverUuid.compareTo(data.getUuid()) < 0) return i;
     }
     return n;
   }
@@ -335,7 +368,7 @@ public class NodeDataPanelManager
     {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       TopologyData nodeData = (TopologyData) node.getUserObject();
-      String name = nodeData.getJmxWrapper().getId();
+      String name = nodeData.getUuid();
       if (nodeName.equals(name)) return -1;
       else if (nodeName.compareTo(name) < 0) return i;
     }
@@ -353,5 +386,33 @@ public class NodeDataPanelManager
       treeTable.invalidate();
       treeTable.repaint();
     }
+  }
+
+
+  /**
+   * Get the mapping of driver uuids to the corresponding {@link TopologyData} objects.
+   * @return a map of driver uuids.
+   */
+  public Map<String, TopologyData> getDriverMap()
+  {
+    return driverMap;
+  }
+
+  /**
+   * Get the mapping of peer driver uuids to the corresponding {@link TopologyData} objects.
+   * @return a map of peer driver uuids.
+   */
+  public Map<String, TopologyData> getPeerMap()
+  {
+    return peerMap;
+  }
+
+  /**
+   * Get the mapping of node uuids to the corresponding {@link TopologyData} objects.
+   * @return a map of node uuids.
+   */
+  public Map<String, TopologyData> getNodeMap()
+  {
+    return nodeMap;
   }
 }

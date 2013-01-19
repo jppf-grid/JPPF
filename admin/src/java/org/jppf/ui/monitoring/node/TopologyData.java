@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.slf4j.*;
 
 /**
@@ -49,9 +50,14 @@ public class TopologyData
    */
   private JPPFClientConnection clientConnection = null;
   /**
+   * Forwards node management requests via the driver.
+   */
+  private JPPFNodeForwardingMBean nodeForwarder = null;
+  /**
    * Wrapper holding the connection to the JMX server on a driver or a node.
    */
-  private JMXConnectionWrapper jmxWrapper = null;
+  private JMXDriverConnectionWrapper jmxWrapper = null;
+  //private JMXConnectionWrapper jmxWrapper = null;
   /**
    * Information on the JPPF node .
    */
@@ -68,6 +74,10 @@ public class TopologyData
    * UUID of the driver or node reprsented by this object.
    */
   private String uuid = null;
+  /**
+   * The parent driver for a node or peer.
+   */
+  protected TopologyData parent = null;
 
   /**
    * Initialize this topology data as a driver related object.
@@ -79,6 +89,18 @@ public class TopologyData
     this.clientConnection = clientConnection;
     this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
     this.uuid = ((JPPFClientConnectionImpl) clientConnection).getUuid();
+    new Thread(new ForwarderSettingTask()).start();
+    /*
+    try
+    {
+      this.nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+      if (this.nodeForwarder == null) log.error("could not get node forwarder proxy for driver " + uuid);
+    }
+    catch (Exception e)
+    {
+      log.error("could not get node forwarder proxy for driver " + uuid, e);
+    }
+    */
   }
 
   /**
@@ -91,8 +113,6 @@ public class TopologyData
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
     this.uuid = nodeInformation.getUuid();
-    jmxWrapper = new JMXNodeConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
-    jmxWrapper.connect();
   }
 
   /**
@@ -100,7 +120,7 @@ public class TopologyData
    * @param nodeInformation information on the JPPF peer node.
    * @param peerJmx the JMX wrapper associated with the driver information this peer node represents.
    */
-  public TopologyData(final JPPFManagementInfo nodeInformation, final JMXConnectionWrapper peerJmx)
+  public TopologyData(final JPPFManagementInfo nodeInformation, final JMXDriverConnectionWrapper peerJmx)
   {
     this.type = TopologyDataType.PEER;
     this.nodeInformation = nodeInformation;
@@ -122,7 +142,7 @@ public class TopologyData
    * Get the wrapper holding the connection to the JMX server on a driver or node.
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
-  public JMXConnectionWrapper getJmxWrapper()
+  public JMXDriverConnectionWrapper getJmxWrapper()
   {
     return jmxWrapper;
   }
@@ -131,7 +151,7 @@ public class TopologyData
    * Set the wrapper holding the connection to the JMX server on a driver or node.
    * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
    */
-  public void setJmxWrapper(final JMXConnectionWrapper jmxWrapper)
+  public void setJmxWrapper(final JMXDriverConnectionWrapper jmxWrapper)
   {
     this.jmxWrapper = jmxWrapper;
   }
@@ -153,8 +173,7 @@ public class TopologyData
   @Override
   public String toString()
   {
-    //return jmxWrapper.getId();
-    return jmxWrapper.getDisplayName();
+    return (type == TopologyDataType.NODE) ? nodeInformation.getHost() + ':' + nodeInformation.getPort() : jmxWrapper.getDisplayName();
   }
 
   /**
@@ -195,25 +214,21 @@ public class TopologyData
 
   /**
    * Refresh the state of the node represented by this topology data.
+   * @deprecated
    */
   public void refreshNodeState()
   {
+  }
+
+  /**
+   * Refresh the state of the node represented by this topology data.
+   * @param newState the new node state fetched from the grid.
+   */
+  public void refreshNodeState(final JPPFNodeState newState)
+  {
     if (!TopologyDataType.NODE.equals(type)) return;
-    try
-    {
-      if (!jmxWrapper.isConnected()) return;
-      if (jmxWrapper instanceof JMXNodeConnectionWrapper)
-      {
-        nodeState = ((JMXNodeConnectionWrapper) jmxWrapper).state();
-        if (nodeState == null) setStatus(TopologyDataStatus.DOWN);
-        else setStatus(TopologyDataStatus.UP);
-      }
-    }
-    catch(Exception e)
-    {
-      setStatus(TopologyDataStatus.DOWN);
-      if (debugEnabled) log.debug(e.getMessage(), e);
-    }
+    this.nodeState = newState;
+    setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
   }
 
   /**
@@ -231,6 +246,10 @@ public class TopologyData
    */
   public void setStatus(final TopologyDataStatus status)
   {
+    if (status == TopologyDataStatus.DOWN)
+    {
+      boolean breakpoint = true;
+    }
     this.status = status;
   }
 
@@ -257,7 +276,7 @@ public class TopologyData
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     return result;
   }
 
@@ -268,12 +287,11 @@ public class TopologyData
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     TopologyData other = (TopologyData) obj;
-    if (getId() == null)
+    if (uuid == null)
     {
-      if (other.getId() != null) return false;
+      if (other.uuid != null) return false;
     }
-    else if (!getId().equals(other.getId())) return false;
-    return true;
+    return uuid.equals(other.uuid);
   }
 
   /**
@@ -310,5 +328,55 @@ public class TopologyData
   public void setUuid(final String uuid)
   {
     this.uuid = uuid;
+  }
+
+  /**
+   * Get the proxy to the driver MBean that forwards node management requests.
+   * @return an instance of {@link JPPFNodeForwardingMBean}.
+   */
+  public JPPFNodeForwardingMBean getNodeForwarder()
+  {
+    return nodeForwarder;
+  }
+
+  /**
+   * Get the parent driver data.
+   * @return a <code>TopologyData</code> instance, or null if no parent was set.
+   */
+  public TopologyData getParent()
+  {
+    return parent;
+  }
+
+  /**
+   * Set the parent driver data.
+   * @param parent a <code>TopologyData</code> instance, or null to remove the parent.
+   */
+  public void setParent(final TopologyData parent)
+  {
+    this.parent = parent;
+  }
+
+  /**
+   * 
+   */
+  private class ForwarderSettingTask implements Runnable
+  {
+    @Override
+    public void run()
+    {
+      while (nodeForwarder == null)
+      {
+        try
+        {
+          nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+          if (nodeForwarder == null) Thread.sleep(500L);
+        }
+        catch (Exception ignore)
+        {
+          //log.error("could not get node forwarder proxy for driver " + uuid, e);
+        }
+      }
+    }
   }
 }

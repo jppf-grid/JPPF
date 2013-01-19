@@ -125,4 +125,14 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
   {
     return LocalizationUtils.getLocalized(BASE, message);
   }
+
+  /**
+   * Execute the specified runnable in a new thread.
+   * The thread name is <code>this.getClass().getSimpleName()</code>.
+   * @param r the <code>Runnable</code> to execute.
+   */
+  protected void runAction(final Runnable r)
+  {
+    new Thread(r, getClass().getSimpleName()).start();
+  }
 }

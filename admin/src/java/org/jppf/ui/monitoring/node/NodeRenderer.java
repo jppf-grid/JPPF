@@ -24,7 +24,6 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.management.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -105,12 +104,6 @@ public class NodeRenderer extends AbstractTreeCellRenderer
             {
               background = SUSPENDED_COLOR;
               backgroundSelected = INACTIVE_SELECTION_COLOR;
-            }
-            else
-            {
-              JMXConnectionWrapper wrapper = data.getJmxWrapper();
-              boolean b = wrapper != null && wrapper.isConnected();
-              if (!b) foreground = UNMANAGED_COLOR;
             }
             break;
         }

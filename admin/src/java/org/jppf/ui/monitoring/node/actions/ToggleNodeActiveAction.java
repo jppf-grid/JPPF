@@ -85,13 +85,13 @@ public class ToggleNodeActiveAction extends AbstractTopologyAction
             TopologyData driverData = (TopologyData) driverNode.getUserObject();
             JPPFManagementInfo info = data.getNodeInformation();
             boolean b = info.isActive();
-            ((JMXDriverConnectionWrapper) driverData.getJmxWrapper()).activateNode(info.getUuid(), !b);
+            driverData.getJmxWrapper().activateNode(info.getUuid(), !b);
           } catch(Exception e) {
             log.error(e.getMessage(), e);
           }
         }
       }
     };
-    new Thread(r).start();
+    runAction(r);
   }
 }

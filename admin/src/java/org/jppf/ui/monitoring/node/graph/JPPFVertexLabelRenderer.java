@@ -23,7 +23,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import org.jppf.client.*;
-import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
@@ -92,12 +91,14 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
         backgroundSelected = AbstractTreeCellRenderer.INACTIVE_SELECTION_COLOR;
         font = AbstractTreeCellRenderer.getItalicFont(f);
       }
+      /*
       else
       {
         JMXConnectionWrapper wrapper = data.getJmxWrapper();
         boolean b = wrapper != null && wrapper.isConnected();
         if (!b) foreground = AbstractTreeCellRenderer.UNMANAGED_COLOR;
       }
+      */
       //renderer.setToolTipText(computeNodeText(data));
     }
 

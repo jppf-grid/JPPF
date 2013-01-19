@@ -94,15 +94,15 @@ public interface NodeSelector extends Serializable
     /**
      * The list of uuids of the nodes to select. This list is immutable.
      */
-    private final List<String> uuidList;
+    private final Collection<String> uuidList;
 
     /**
      * Initialize this selector with the specified list of node UUIDs.
      * @param uuidList the uuids of the nodes to select.
      */
-    public UuidSelector(final List<String> uuidList)
+    public UuidSelector(final Collection<String> uuidList)
     {
-      this.uuidList = (uuidList == null) ? Collections.EMPTY_LIST : Collections.unmodifiableList(uuidList);
+      this.uuidList = (uuidList == null) ? Collections.EMPTY_LIST : Collections.unmodifiableCollection(uuidList);
     }
 
     /**
@@ -116,9 +116,9 @@ public interface NodeSelector extends Serializable
 
     /**
      * Get the list of uuids of the nodes to select. This list is immutable.
-     * @return a list of uuids as strings.
+     * @return a collection of uuids as strings.
      */
-    public List<String> getUuidList()
+    public Collection<String> getUuidList()
     {
       return uuidList;
     }

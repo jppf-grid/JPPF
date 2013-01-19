@@ -25,10 +25,12 @@ import java.util.*;
 import javax.swing.*;
 
 import org.jppf.management.*;
+import org.jppf.management.forwarding.NodeSelector;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -52,7 +54,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
   /**
    * Panel containing the dialog for entering the number of threads and their priority.
    */
-  private OptionElement panel = null;
+  private OptionElement thisPanel = null;
   /**
    * Location at which to display the entry dialog.
    */
@@ -87,47 +89,40 @@ public class NodeConfigurationAction extends AbstractTopologyAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    try
-    {
-      AbstractButton btn = (AbstractButton) event.getSource();
-      if (btn.isShowing()) location = btn.getLocationOnScreen();
-      panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
-      TextAreaOption textArea = (TextAreaOption) panel.findFirstWithName("configProperties");
-      textArea.setValue(getPropertiesAsString());
+    AbstractButton btn = (AbstractButton) event.getSource();
+    if (btn.isShowing()) location = btn.getLocationOnScreen();
+    thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
+    TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
+    textArea.setValue(getPropertiesAsString());
 
-      JButton okBtn = (JButton) panel.findFirstWithName("/nodeThreadsOK").getUIComponent();
-      JButton cancelBtn = (JButton) panel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
-      final JFrame frame = new JFrame("Update the JPPF configuration");
-      frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
-      okBtn.addActionListener(new ActionListener()
-      {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          frame.setVisible(false);
-          frame.dispose();
-          doOK();
-        }
-      });
-      cancelBtn.addActionListener(new ActionListener()
-      {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          frame.setVisible(false);
-          frame.dispose();
-        }
-      });
-      frame.getContentPane().add(panel.getUIComponent());
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      if (location != null) frame.setLocation(location);
-      frame.setVisible(true);
-    }
-    catch(Exception e)
+    JButton okBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsOK").getUIComponent();
+    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
+    final JFrame frame = new JFrame("Update the JPPF configuration");
+    frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
+    okBtn.addActionListener(new ActionListener()
     {
-      log.error(e.getMessage(), e);
-    }
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        frame.setVisible(false);
+        frame.dispose();
+        doOK();
+      }
+    });
+    cancelBtn.addActionListener(new ActionListener()
+    {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        frame.setVisible(false);
+        frame.dispose();
+      }
+    });
+    frame.getContentPane().add(thisPanel.getUIComponent());
+    frame.pack();
+    frame.setLocationRelativeTo(null);
+    if (location != null) frame.setLocation(location);
+    frame.setVisible(true);
   }
 
   /**
@@ -135,9 +130,9 @@ public class NodeConfigurationAction extends AbstractTopologyAction
    */
   private void doOK()
   {
-    TextAreaOption textArea = (TextAreaOption) panel.findFirstWithName("configProperties");
-    final Map<String, String> map = getPropertiesAsMap((String) textArea.getValue());
-    final Boolean b = (Boolean) ((BooleanOption) panel.findFirstWithName("forceReconnect")).getValue();
+    TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
+    final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
+    final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceReconnect")).getValue();
     Runnable r = new Runnable()
     {
       @Override
@@ -145,7 +140,10 @@ public class NodeConfigurationAction extends AbstractTopologyAction
       {
         try
         {
-          ((JMXNodeConnectionWrapper) dataArray[0].getJmxWrapper()).updateConfiguration(map, b);
+          TopologyData data = dataArray[0];
+          TopologyData parent = data.getParent();
+          if (parent == null) return;
+          parent.getNodeForwarder().updateConfiguration(new NodeSelector.UuidSelector(data.getUuid()), map, b);
         }
         catch(Exception e)
         {
@@ -153,23 +151,36 @@ public class NodeConfigurationAction extends AbstractTopologyAction
         }
       }
     };
-    new Thread(r).start();
+    runAction(r);
   }
 
   /**
    * Obtain the JPPF configuration as a string, one property per line.
    * @return the properties as a string.
-   * @throws Exception if an error occurs while attempting to obtain the JPPF properties.
    */
-  private String getPropertiesAsString() throws Exception
+  private String getPropertiesAsString()
   {
     StringBuilder sb = new StringBuilder();
-    JMXNodeConnectionWrapper wrapper = ((JMXNodeConnectionWrapper) dataArray[0].getJmxWrapper());
-    JPPFSystemInformation info = wrapper.systemInformation();
-    TypedProperties props = info.getJppf();
-    Set<String> keys = new TreeSet<String>();
-    for (Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
-    for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
+    try
+    {
+      TopologyData data = dataArray[0];
+      TopologyData parent = data.getParent();
+      if (parent == null) return "could not get the parent driver for the selected node";
+      Map<String, Object> result = parent.getNodeForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
+      if (result == null) return "could not retrieve system information for the selected node";
+      Object o = result.get(data.getUuid());
+      if (o == null) return "could not retrieve system information for the selected node";
+      else if (o instanceof Exception) throw (Exception) o;
+      JPPFSystemInformation info = (JPPFSystemInformation) o;
+      TypedProperties props = info.getJppf();
+      Set<String> keys = new TreeSet<String>();
+      for (Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
+      for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
+    }
+    catch (Exception e)
+    {
+      sb.append("an error occurred while retrieving the system information for the selected node: " + ExceptionUtils.getMessage(e));
+    }
     return sb.toString();
   }
 
@@ -178,11 +189,11 @@ public class NodeConfigurationAction extends AbstractTopologyAction
    * @param source - the text from which to read the properties.
    * @return a map of string keys to string values.
    */
-  private static Map<String, String> getPropertiesAsMap(final String source)
+  private static Map<Object, Object> getPropertiesAsMap(final String source)
   {
     try
     {
-      Map<String, String> map = new HashMap<String, String>();
+      Map<Object, Object> map = new HashMap<Object, Object>();
       BufferedReader reader = new BufferedReader(new StringReader(source));
       try {
         while (true)

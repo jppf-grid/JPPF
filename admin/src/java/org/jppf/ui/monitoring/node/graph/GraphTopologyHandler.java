@@ -42,7 +42,7 @@ public class GraphTopologyHandler
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(GraphOption.class);
+  private static Logger log = LoggerFactory.getLogger(GraphTopologyHandler.class);
   /**
    * Determines whether debug log statements are enabled.
    */
