@@ -295,7 +295,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   @Override
   public String toString()
   {
-    return new StringBuilder(super.toString()).append(", nbTasksToSend=").append(nbTasksToSend).append(", completedBundles=").append(completedBundles).toString();
+    return new StringBuilder(super.toString()).append(", nbTasksToSend=").append(nbTasksToSend).toString();
   }
 
   /**
