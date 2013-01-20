@@ -94,7 +94,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   /**
    * Unique ID for this connection and its two channels.
    */
-  protected final String connectionUuid = new JPPFUuid().toString();
+  protected final String connectionUuid = JPPFUuid.normalUUID();
   /**
    * Fully qualified name of the serilaization helper class to use.
    */

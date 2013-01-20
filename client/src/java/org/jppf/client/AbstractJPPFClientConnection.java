@@ -100,7 +100,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
 
   /**
    * Configure this client connection with the specified parameters.
-   * @param uuid the unique identifier for this local client.
+   * @param uuid the remote driver's UUID.
    * @param name configuration name for this local client.
    * @param host the name or IP address of the host the JPPF driver is running on.
    * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
@@ -341,9 +341,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     return systemInfo;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFTaskBundle sendHandshakeJob() throws Exception
   {
