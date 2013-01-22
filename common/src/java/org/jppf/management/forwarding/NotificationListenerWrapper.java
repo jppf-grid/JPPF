@@ -18,6 +18,8 @@
 
 package org.jppf.management.forwarding;
 
+import org.jppf.management.NodeSelector;
+
 
 /**
  * Instances of this class represent an association between a notification listener id

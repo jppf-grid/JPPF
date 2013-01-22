@@ -63,6 +63,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
    * Synchronization lock.
    */
   private final Object loadBalancingInformationLock = new Object();
+  /**
+   * 
+   */
+  private final NodeSelectionHelper selectionHelper = new NodeSelectionHelper();
 
   @Override
   public Integer nbNodes() throws Exception
@@ -311,8 +315,9 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   }
 
   @Override
-  public void activateNode(final String uuid, final Boolean active) throws Exception
+  public void toggleActiveState(final NodeSelector selector) throws Exception
   {
-    getNodeNioServer().activateNode(uuid, active);
+    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector);
+    for (AbstractNodeContext node: nodes) getNodeNioServer().activateNode(node.getUuid(), !node.isActive());
   }
 }

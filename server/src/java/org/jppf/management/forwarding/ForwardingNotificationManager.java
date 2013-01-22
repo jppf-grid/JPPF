@@ -23,6 +23,7 @@ import java.util.concurrent.locks.*;
 
 import javax.management.ListenerNotFoundException;
 
+import org.jppf.management.NodeSelector;
 import org.jppf.server.event.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.collections.*;
@@ -98,7 +99,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   private void addNotificationListener(final NotificationListenerWrapper wrapper)
   {
     NodeSelector selector = wrapper.getSelector();
-    Set<AbstractNodeContext> nodes = forwarder.getChannels(selector);
+    Set<AbstractNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
     lock.lock();
     try
     {
@@ -161,7 +162,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   public void removeNotificationListener(final NotificationListenerWrapper wrapper) throws ListenerNotFoundException
   {
     NodeSelector selector = wrapper.getSelector();
-    Set<AbstractNodeContext> nodes = forwarder.getChannels(selector);
+    Set<AbstractNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
     lock.lock();
     try
     {
@@ -206,7 +207,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     {
       for (NotificationListenerWrapper wrapper: helper.allListeners())
       {
-        if (forwarder.isNodeAccepted(node, wrapper.getSelector())) addNotificationListener(node, wrapper);
+        if (forwarder.getSelectionHelper().isNodeAccepted(node, wrapper.getSelector())) addNotificationListener(node, wrapper);
       }
     }
     finally
@@ -226,7 +227,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     {
       for (NotificationListenerWrapper wrapper: helper.allListeners())
       {
-        if (forwarder.isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
+        if (forwarder.getSelectionHelper().isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
       }
     }
     finally

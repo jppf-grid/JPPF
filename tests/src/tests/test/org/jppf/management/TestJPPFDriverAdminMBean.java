@@ -279,6 +279,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     String[] nodeUuids = new String[2];
     assertNotNull(driver);
+    NodeSelector selector = null;
     try
     {
       Collection<JPPFManagementInfo> nodesList = driver.nodesInformation();
@@ -298,7 +299,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       assertEquals(2, executedOnUuids.size());
       executedOnUuids.clear();
       // deactivate one node and make sure the job is only executed on the other node
-      driver.activateNode(nodeUuids[1], false);
+      selector = new NodeSelector.UuidSelector(nodeUuids[1]);
+      driver.toggleActiveState(selector);
       job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, nbTasks, LifeCycleTask.class, 0L);
       results = client.submit(job);
       for (JPPFTask t: results)
@@ -314,7 +316,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     {
       for (String uuid: nodeUuids)
       {
-        if (uuid != null) driver.activateNode(uuid, true);
+        if (uuid != null) driver.toggleActiveState(selector);
       }
     }
   }

@@ -27,7 +27,6 @@ import javax.management.*;
 
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.*;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.StringUtils;
@@ -38,7 +37,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFNodeForwarding extends NotificationBroadcasterSupport implements JPPFNodeForwardingMBean, NodeForwardingHelper.NodeSelectionProvider
+public class JPPFNodeForwarding extends NotificationBroadcasterSupport implements JPPFNodeForwardingMBean
 {
   /**
    * Logger for this class.
@@ -64,13 +63,18 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * 
    */
   final ForwardingNotificationManager manager;
+  /**
+   * Provides an API for selecting nodes based on a {@link NodeSelector}.
+   */
+  final NodeSelectionHelper selectionHelper;
 
   /**
    * Initialize this MBean implementation.
    */
   public JPPFNodeForwarding()
   {
-    NodeForwardingHelper.getInstance().setSelectionProvider(this);
+    selectionHelper = new NodeSelectionHelper();
+    NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
     if (debugEnabled) log.debug("initialized JPPFNodeForwarding");
   }
@@ -78,7 +82,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
   {
-    Set<AbstractNodeContext> channels = getChannels(selector);
+    Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     Map<String, Object> map = new HashMap<String, Object>();
     for (AbstractNodeContext context: channels)
     {
@@ -108,7 +112,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception
   {
-    Set<AbstractNodeContext> channels = getChannels(selector);
+    Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     Map<String, Object> map = new HashMap<String, Object>();
     for (AbstractNodeContext context: channels)
     {
@@ -132,7 +136,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception
   {
-    Set<AbstractNodeContext> channels = getChannels(selector);
+    Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     Map<String, Object> map = new HashMap<String, Object>();
     for (AbstractNodeContext context: channels)
     {
@@ -150,96 +154,6 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
       }
     }
     return map;
-  }
-
-  /**
-   * Determine whether the specified selector accepts the specified node.
-   * @param node the node to check.
-   * @param selector the node selector used as a filter.
-   * @return a set of {@link AbstractNodeContext} instances.
-   * @exclude
-   */
-  public boolean isNodeAccepted(final AbstractNodeContext node, final NodeSelector selector)
-  {
-    if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof NodeSelector.AllNodesSelector) return true;
-    if (node.isPeer()) return false;
-    else if (selector instanceof NodeSelector.UuidSelector)
-      return ((NodeSelector.UuidSelector) selector).getUuidList().contains(node.getUuid());
-    else if (selector instanceof NodeSelector.ExecutionPolicySelector)
-      return ((NodeSelector.ExecutionPolicySelector) selector).getPolicy().accepts(node.getSystemInformation());
-    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
-  }
-
-  @Override
-  public boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector)
-  {
-    if (nodeUuid == null) throw new IllegalArgumentException("node uuid cannot be null");
-    AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
-    if (node == null) throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
-    return isNodeAccepted(node, selector);
-  }
-
-  /**
-   * Get a set of channels based on a NodeSelector.
-   * @param selector the node selector used as a filter.
-   * @return a set of {@link AbstractNodeContext} instances.
-   */
-  Set<AbstractNodeContext> getChannels(final NodeSelector selector)
-  {
-    if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof NodeSelector.AllNodesSelector)
-    {
-      Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
-      Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
-      for (AbstractNodeContext ctx: fullSet)
-      {
-        if (!ctx.isPeer()) result.add(ctx);
-      }
-      return result;
-    }
-    else if (selector instanceof NodeSelector.UuidSelector)
-      return getChannels(new HashSet<String>(((NodeSelector.UuidSelector) selector).getUuidList()));
-    else if (selector instanceof NodeSelector.ExecutionPolicySelector)
-      return getChannels(((NodeSelector.ExecutionPolicySelector) selector).getPolicy());
-    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
-  }
-
-  /**
-   * Get the available channels with the specified node uuids.
-   * @param uuids the node uuids for which we want a channel reference.
-   * @return a {@link Set} of {@link AbstractNodeContext} instances.
-   */
-  private Set<AbstractNodeContext> getChannels(final Set<String> uuids)
-  {
-    Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-    for (AbstractNodeContext context: allChannels)
-    {
-      if (context.isPeer()) continue;
-      if (uuids.contains(context.getUuid())) result.add(context);
-    }
-    return result;
-  }
-
-
-  /**
-   * Get the available channels for the specified nodes.
-   * @param policy an execution to match against the nodes.
-   * @return a {@link Set} of {@link AbstractNodeContext} instances.
-   */
-  private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy)
-  {
-    Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-    for (AbstractNodeContext context: allChannels)
-    {
-      if (context.isPeer()) continue;
-      JPPFSystemInformation info = context.getSystemInformation();
-      if (info == null) continue;
-      if (policy.accepts(info)) result.add(context);
-    }
-    return result;
   }
 
   /**
@@ -360,5 +274,14 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   {
     if (debugEnabled) log.debug("sending notif: " + notification);
     super.sendNotification(notification);
+  }
+
+  /**
+   * Get the object that provides an API for selecting nodes based on a {@link NodeSelector}.
+   * @return a {@link NodeSelectionHelper} instance.
+   */
+  NodeSelectionHelper getSelectionHelper()
+  {
+    return selectionHelper;
   }
 }

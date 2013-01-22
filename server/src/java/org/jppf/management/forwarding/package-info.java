@@ -18,7 +18,7 @@
 
 /**
  * Support for forwarding JMX requests to the nodes, along with receiving notifications from them,
- * via the JPPF driver's JMX server. Which nodes are impacted is determined by a user-provided {@link org.jppf.management.forwarding.NodeSelector node selector}.
+ * via the JPPF driver's JMX server. Which nodes are impacted is determined by a user-provided {@link org.jppf.management.NodeSelector node selector}.
  * <p>This provides two major benefits:
  * <ul>
  * <li>this allows managing and monitoring the nodes in situations where the nodes are not reachable from the client,
@@ -113,3 +113,4 @@
  * </pre>
  */
 package org.jppf.management.forwarding;
+

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.management.forwarding;
+package org.jppf.management;
 
 import java.io.Serializable;
 import java.util.*;
@@ -29,6 +29,11 @@ import org.jppf.node.policy.ExecutionPolicy;
  */
 public interface NodeSelector extends Serializable
 {
+  /**
+   * Constant for a selector which accepts all nodes.
+   */
+  NodeSelector ALL_NODES = new AllNodesSelector();
+
   /**
    * Selects all nodes.
    */
@@ -94,15 +99,15 @@ public interface NodeSelector extends Serializable
     /**
      * The list of uuids of the nodes to select. This list is immutable.
      */
-    private final Collection<String> uuidList;
+    private final Collection<String> uuids;
 
     /**
      * Initialize this selector with the specified list of node UUIDs.
-     * @param uuidList the uuids of the nodes to select.
+     * @param uuids the uuids of the nodes to select.
      */
-    public UuidSelector(final Collection<String> uuidList)
+    public UuidSelector(final Collection<String> uuids)
     {
-      this.uuidList = (uuidList == null) ? Collections.EMPTY_LIST : Collections.unmodifiableCollection(uuidList);
+      this.uuids = (uuids == null) ? Collections.EMPTY_LIST : Collections.unmodifiableCollection(uuids);
     }
 
     /**
@@ -111,16 +116,16 @@ public interface NodeSelector extends Serializable
      */
     public UuidSelector(final String...uuids)
     {
-      this.uuidList = (uuids == null) ? Collections.EMPTY_LIST : Collections.unmodifiableList(Arrays.asList(uuids));
+      this.uuids = (uuids == null) ? Collections.EMPTY_LIST : Collections.unmodifiableList(Arrays.asList(uuids));
     }
 
     /**
      * Get the list of uuids of the nodes to select. This list is immutable.
      * @return a collection of uuids as strings.
      */
-    public Collection<String> getUuidList()
+    public Collection<String> getUuids()
     {
-      return uuidList;
+      return uuids;
     }
   }
 }

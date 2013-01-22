@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.management.*;
 
 import org.jppf.classloader.DelegationModel;
+import org.jppf.management.NodeSelector;
 
 /**
  * MBean interface for forwarding node management requests and monitoring notfications via the driver.

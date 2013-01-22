@@ -24,8 +24,8 @@ import java.util.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
+import org.jppf.management.NodeSelector.AllNodesSelector;
 import org.jppf.management.forwarding.*;
-import org.jppf.management.forwarding.NodeSelector.AllNodesSelector;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.TypedProperties;
 import org.junit.*;

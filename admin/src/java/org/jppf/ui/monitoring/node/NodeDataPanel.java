@@ -28,7 +28,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.NodeSelector;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;

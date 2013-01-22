@@ -26,10 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.*;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.management.NodeSelector;
+import org.jppf.management.NodeSelector.*;
 import org.jppf.management.forwarding.*;
-import org.jppf.management.forwarding.NodeSelector.AllNodesSelector;
-import org.jppf.management.forwarding.NodeSelector.ExecutionPolicySelector;
-import org.jppf.management.forwarding.NodeSelector.UuidSelector;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.policy.Equal;
 import org.jppf.server.protocol.JPPFTask;

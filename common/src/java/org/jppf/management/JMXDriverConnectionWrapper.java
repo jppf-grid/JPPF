@@ -280,9 +280,9 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
-  public void activateNode(final String uuid, final Boolean active) throws Exception
+  public void toggleActiveState(final NodeSelector selector) throws Exception
   {
-    invoke(MBEAN_NAME, "activateNode", new Object[] {uuid, active}, new String[] {String.class.getName(), Boolean.class.getName()});
+    invoke(MBEAN_NAME, "toggleActiveState", new Object[] {selector}, new String[] {NodeSelector.class.getName()});
   }
 
   /**

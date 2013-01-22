@@ -20,6 +20,8 @@ package org.jppf.management.forwarding;
 
 import java.util.*;
 
+import org.jppf.management.NodeSelector;
+
 /**
  * This class provides helper methods that help implementing the selection of JMX notifications
  * within a notification filter that wraps the user defined one (including null filters).
@@ -114,19 +116,5 @@ public final class NodeForwardingHelper
   boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector)
   {
     return (selectionProvider != null) && selectionProvider.isNodeAccepted(nodeUuid, selector);
-  }
-
-  /**
-   * Interface that provides a semantic of matching a node against a selector.
-   */
-  interface NodeSelectionProvider
-  {
-    /**
-     * Determine whether the specified selector accepts the specified node.
-     * @param nodeUuid the uuid of the node to check.
-     * @param selector the node selector used as a filter.
-     * @return a set of {@link AbstractNodeContext} instances.
-     */
-    boolean isNodeAccepted(String nodeUuid, NodeSelector selector);
   }
 }
