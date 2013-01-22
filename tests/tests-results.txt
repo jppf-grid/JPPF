@@ -1,9 +1,11 @@
 
-Total tests: 87, successful: 87, failed: 0, ignored: 0
-Start time: Thu Dec 20 09:00:26 CET 2012, total elapsed: 00:02:09.036
+Total tests: 102, successful: 102, failed: 0, ignored: 0
+Start time: Tue Jan 22 05:32:23 CET 2013, total elapsed: 00:02:18.210
 
 Tests results:
 
+class test.org.jppf.classloader.TestAbstractJPPFClassLoader
+  testGetResources() : OK
 class test.org.jppf.client.TestConnectionPool
   testSubmitJobMultipleConnections() : OK
   testSubmitJobMultipleConnectionsAndLocalExec() : OK
@@ -13,9 +15,9 @@ class test.org.jppf.client.TestJPPFClient
   testConstructorWithUuid() : OK
   testCancelJob() : OK
   testLocalExecutionNbThreads() : OK
+  testSubmit() : OK
   testNotSerializableExceptionFromClient() : OK
   testNotSerializableExceptionFromNode() : OK
-  testSubmit() : OK
 class test.org.jppf.client.TestJPPFJob
   testGetTaskObject() : OK
   testJobListener() : OK
@@ -27,10 +29,10 @@ class test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
   testResetConfiguration() : OK
   testSubmitWithJobListener() : OK
 class test.org.jppf.client.concurrent.TestJPPFCompletionService
-  testPoll() : OK
   testSubmitCallables() : OK
   testSubmitRunnables() : OK
   testPollWithTimeout() : OK
+  testPoll() : OK
 class test.org.jppf.client.concurrent.TestJPPFExecutorService
   testSubmitRunnable() : OK
   testSubmitRunnableWithResult() : OK
@@ -58,10 +60,25 @@ class test.org.jppf.management.TestJPPFDriverAdminMBean
   testNodesInformation() : OK
   testIdleNodesInformation() : OK
   testNbIdleNodes() : OK
+  testNbNodes() : OK
   testGetLoadBalancerInformation() : OK
   testSetLoadBalancerInformation() : OK
   testNodesMatchingExecutionPolicy() : OK
-  testNbNodes() : OK
+class test.org.jppf.management.TestJPPFNodeAdminMBean
+  testCancelJob() : OK
+  testUpdateThreadPoolSize() : OK
+  testUpdateThreadPriority() : OK
+  testResetTaskCounter() : OK
+  testSetTaskCounter() : OK
+  testSystemInformation() : OK
+  testUpdateConfiguration() : OK
+  testGetDelegationModel() : OK
+  testSetDelegationModel() : OK
+  testState() : OK
+class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
+  testNotifications() : OK
+  testSnapshot() : OK
+  testReset() : OK
 class test.org.jppf.server.job.management.TestDriverJobManagementMBean
   testCancelJob() : OK
   testCancelJobAfterCompletion() : OK
@@ -94,6 +111,7 @@ class test.org.jppf.server.protocol.TestJPPFJobSLA
   testDefaultSendResultsStrategy() : OK
 class test.org.jppf.server.protocol.TestJPPFTask
   testTaskTimeout() : OK
+  testTaskTimeoutStart() : OK
   testTaskExpirationDate() : OK
   testComputeCallable() : OK
   testComputeCallableInClient() : OK
@@ -103,8 +121,8 @@ class test.org.jppf.server.protocol.TestJPPFTask
 class test.org.jppf.utils.TestJPPFConfiguration
   testAlternateConfigurationSource() : OK
 class test.org.jppf.utils.TestRange
+  testIncludes() : OK
+  testMerge() : OK
   testIsValueInRange() : OK
   testIntersects() : OK
   testIntersection() : OK
-  testIncludes() : OK
-  testMerge() : OK

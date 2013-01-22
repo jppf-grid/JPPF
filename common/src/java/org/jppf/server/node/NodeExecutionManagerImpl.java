@@ -220,12 +220,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
     taskMap.put(number, taskWrapper);
     Future<?> f = getExecutor().submit(taskWrapper);
     if (!f.isDone()) futureMap.put(number, f);
-    JPPFSchedule schedule = task.getTimeoutSchedule();
-    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null)))
-    {
-      if (schedule.getDuration() > 0L) processTaskTimeout(taskWrapper, number);
-      else if (schedule.getDate() != null) processTaskExpirationDate(taskWrapper, number);
-    }
+    //taskWrapper.handleTimeout();
     return number;
   }
 
@@ -271,7 +266,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
-  private void processTaskExpirationDate(final NodeTaskWrapper taskWrapper, final long number) throws Exception
+  void processTaskExpirationDate(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
     TimeoutTimerTask tt = new TimeoutTimerTask(future, taskWrapper);
@@ -284,7 +279,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
-  private void processTaskTimeout(final NodeTaskWrapper taskWrapper, final long number) throws Exception
+  void processTaskTimeout(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
     TimeoutTimerTask tt = new TimeoutTimerTask(future, taskWrapper);

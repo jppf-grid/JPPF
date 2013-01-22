@@ -18,15 +18,10 @@
 
 package org.jppf.server.scheduler.bundle.proportional;
 
-import org.jppf.server.scheduler.bundle.AbstractBundler;
-import org.jppf.server.scheduler.bundle.BundleDataHolder;
-import org.jppf.server.scheduler.bundle.BundlePerformanceSample;
-import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.jppf.server.scheduler.bundle.*;
+import org.slf4j.*;
 
 /**
  * This bundler implementation computes bundle sizes proportional to the mean execution
@@ -161,6 +156,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
     synchronized(bundlers)
     {
       bundlers.add(this);
+      if (debugEnabled) log.debug("added " + this + ", bundlers set = " + bundlers);
     }
   }
 
@@ -174,6 +170,7 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
     synchronized(bundlers)
     {
       bundlers.remove(this);
+      if (debugEnabled) log.debug("removed " + this + ", bundlers set = " + bundlers);
     }
   }
 
@@ -258,5 +255,17 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
     return 1.0d /r;
     /*
      */
+  }
+
+  @Override
+  public Bundler copy()
+  {
+    return null;
+  }
+
+  @Override
+  protected int maxSize()
+  {
+    return 0;
   }
 }
