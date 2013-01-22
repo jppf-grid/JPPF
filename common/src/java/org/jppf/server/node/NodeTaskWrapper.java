@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 import org.jppf.*;
 import org.jppf.node.*;
 import org.jppf.node.protocol.Task;
+import org.jppf.scheduling.JPPFSchedule;
 import org.slf4j.*;
 
 /**
@@ -128,6 +129,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     try
     {
       usedClassLoader = threadManager.useClassLoader(classLoader);
+      handleTimeout();
       info = threadManager.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
     }
@@ -222,6 +224,20 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     return cancelled || timeout;
   }
 
+  /**
+   * Handle the task expiration/timeout if any is specified. 
+   * @throws Exception if any error occurs.
+   */
+  void handleTimeout() throws Exception
+  {
+    JPPFSchedule schedule = task.getTimeoutSchedule();
+    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null)))
+    {
+      if (schedule.getDuration() > 0L) executionManager.processTaskTimeout(this, number);
+      else if (schedule.getDate() != null) executionManager.processTaskExpirationDate(this, number);
+    }
+  }
+
   @Override
   public String toString()
   {
@@ -234,5 +250,4 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     sb.append(']');
     return sb.toString();
   }
-
 }

@@ -58,7 +58,7 @@ public class TestJPPFTask extends Setup1D1N1C
    */
   private static final long TIME_REST = 1L;
   /**
-   * A the date format used in the tests.
+   * The date format used in the tests.
    */
   private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
   /**
@@ -67,7 +67,7 @@ public class TestJPPFTask extends Setup1D1N1C
   static String callableResult = "";
 
   /**
-   * We test a job with 2 tasks, the 2nd task having a timeout duration set.
+   * Test the timeout of task with a timeout duration set.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -87,7 +87,30 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Simply test that a job does expires at a specified date.
+   * Test that the timeout countdown for a task starts when the task execution starts.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testTaskTimeoutStart() throws Exception
+  {
+    int nbTasks = 2;
+    long timeout = 200L;
+    JPPFJob job = new JPPFJob(ReflectionUtils.getCurrentMethodName());
+    job.addTask(new LifeCycleTask(2*timeout)).setId("task 1");
+    MyTask task = new MyTask(2*timeout);
+    task.setTimeoutSchedule(new JPPFSchedule(timeout));
+    job.addTask(task).setId("task 2");
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    task = (MyTask) results.get(1);
+    assertNotNull(task.getResult());
+    assertEquals("result is set", task.getResult());
+    assertTrue(task.isTimedout());
+  }
+
+  /**
+   * Test that a task expires at a specified date.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -117,7 +140,7 @@ public class TestJPPFTask extends Setup1D1N1C
   {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
-      MyComputeCallableTask.class, MyComputeCallable.class.getName());
+        MyComputeCallableTask.class, MyComputeCallable.class.getName());
     callableResult = "test successful";
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
@@ -128,7 +151,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code>.
+   * Test the exception handling of a JPPFCallable which calls its <code>JPPFTask.compute()</code> method.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -136,7 +159,7 @@ public class TestJPPFTask extends Setup1D1N1C
   {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
-      MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
+        MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
     callableResult = "test successful";
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
@@ -148,7 +171,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code>.
+   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code> in the client.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -159,7 +182,7 @@ public class TestJPPFTask extends Setup1D1N1C
       configure();
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
-        MyComputeCallableTask.class, MyComputeCallable.class.getName());
+          MyComputeCallableTask.class, MyComputeCallable.class.getName());
       callableResult = "test successful";
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
@@ -193,7 +216,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the value of <code>JPPFTask.isInNode()</code> for a task executing locally in the lcient.
+   * Test the value of <code>JPPFTask.isInNode()</code> for a task executing locally in the client.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -269,7 +292,6 @@ public class TestJPPFTask extends Setup1D1N1C
       }
       catch (Exception e)
       {
-        //e.printStackTrace();
         setException(e);
       }
     }
@@ -323,5 +345,27 @@ public class TestJPPFTask extends Setup1D1N1C
     // reset the client and config
     client.close();
     client = BaseSetup.createClient(null, true);
+  }
+
+  /**
+   * An extension of LifeCycleTask which sets the result before calling {@link super.run()}.
+   */
+  public static class MyTask extends LifeCycleTask
+  {
+    /**
+     * Initialize this task.
+     * @param duration the  task duration.
+     */
+    public MyTask(final long duration)
+    {
+      super(duration);
+    }
+
+    @Override
+    public void run()
+    {
+      setResult("result is set");
+      super.run();
+    }
   }
 }
