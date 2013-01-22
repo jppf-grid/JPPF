@@ -18,12 +18,11 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
-
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.*;
 
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.node.*;
+import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
 /**
@@ -78,15 +77,14 @@ public class ToggleNodeActiveAction extends AbstractTopologyAction
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        for (TopologyData data: dataArray) {
+        CollectionMap<TopologyData, String> map = getDriverMap();
+        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
           try {
-            DefaultMutableTreeNode driverNode = panel.getManager().findDriverForNode(data.getUuid());
-            if (driverNode == null) continue;
-            TopologyData driverData = (TopologyData) driverNode.getUserObject();
-            JPPFManagementInfo info = data.getNodeInformation();
-            boolean b = info.isActive();
-            driverData.getJmxWrapper().activateNode(info.getUuid(), !b);
-          } catch(Exception e) {
+            JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmxWrapper();
+            if (driverJmx == null) continue;
+            NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
+            driverJmx.toggleActiveState(selector);
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }

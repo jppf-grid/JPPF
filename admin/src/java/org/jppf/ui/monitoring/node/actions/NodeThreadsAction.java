@@ -22,7 +22,9 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.jppf.management.forwarding.*;
+import org.jppf.management.NodeSelector;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -150,12 +152,14 @@ public class NodeThreadsAction extends AbstractTopologyAction
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<JPPFNodeForwardingMBean, String> map = getNodeForwarderMap();
-        for (Map.Entry<JPPFNodeForwardingMBean, Collection<String>> entry: map.entrySet()) {
+        CollectionMap<TopologyData, String> map = getDriverMap();
+        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
           try {
+            JPPFNodeForwardingMBean forwarder = entry.getKey().getNodeForwarder();
+            if (forwarder == null) continue;
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
-            entry.getKey().updateThreadPoolSize(selector, nbThreads);
-            entry.getKey().updateThreadsPriority(selector, priority);
+            forwarder.updateThreadPoolSize(selector, nbThreads);
+            forwarder.updateThreadsPriority(selector, priority);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }

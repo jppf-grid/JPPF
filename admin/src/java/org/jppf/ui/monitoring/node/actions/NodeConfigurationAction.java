@@ -25,7 +25,6 @@ import java.util.*;
 import javax.swing.*;
 
 import org.jppf.management.*;
-import org.jppf.management.forwarding.NodeSelector;
 import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;

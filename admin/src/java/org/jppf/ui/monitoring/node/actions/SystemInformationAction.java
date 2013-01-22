@@ -23,7 +23,6 @@ import java.util.*;
 import javax.swing.*;
 
 import org.jppf.management.*;
-import org.jppf.management.forwarding.NodeSelector;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
