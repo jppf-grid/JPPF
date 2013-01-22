@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 
@@ -48,23 +48,26 @@ public class JobFromTaskRunner
   {
     try
     {
+      TypedProperties config = JPPFConfiguration.getProperties();
+      int poolSize = config.getInt("jppf.pool.size", 1);
+      // ensure we have at least 2 connections to the server
+      if (poolSize < 2) config.setProperty("jppf.pool.size", "2");
       jppfClient = new JPPFClient();
       print("Running Long Task demo with");
       long start = System.currentTimeMillis();
       JPPFJob job = new JPPFJob();
-      job.setName("Source job");
+      job.setName("source job");
+      job.addTask(new SourceTask()).setId("source");
       job.getSLA().setMaxNodes(1);
-      SourceTask task = new SourceTask();
-      task.setId("source");
-      job.addTask(task);
       List<JPPFTask> results = jppfClient.submit(job);
       for (JPPFTask t: results)
       {
         Exception e = t.getException();
         if (e != null) throw e;
+        else print("task '" + t.getId() + "' result: " + t.getResult());
       }
       long elapsed = System.currentTimeMillis() - start;
-      print("processing  performed in "+StringUtils.toStringDuration(elapsed));
+      print("processing  performed in " + StringUtils.toStringDuration(elapsed));
     }
     catch(Exception e)
     {
@@ -74,6 +77,22 @@ public class JobFromTaskRunner
     {
       if (jppfClient != null) jppfClient.close();
     }
+  }
+
+  /**
+   * Submit a job with a single {@link DestinationTask}.
+   * @param input an input string.
+   * @return a string showing successful execution.
+   * @throws Exception if any error occurs.
+   */
+  public static String submitDestinationJob(final String input) throws Exception
+  {
+    JPPFJob job = new JPPFJob();
+    job.setName("destination job");
+    job.addTask(new DestinationTask(input)).setId("destination task");
+    job.getSLA().setMaxNodes(1);
+    List<JPPFTask> result = jppfClient.submit(job);
+    return (String) result.get(0).getResult();
   }
 
   /**

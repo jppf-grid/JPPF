@@ -17,11 +17,8 @@
  */
 package test.jobfromtask;
 
-import java.util.List;
-
-import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
@@ -44,29 +41,15 @@ public class SourceTask extends JPPFTask
   public void run()
   {
     System.out.println("Starting source task '" + getId() + '\'');
-    print("starting JPPF client");
-    JPPFClient client = new JPPFClient();
     try
     {
-      long start = System.currentTimeMillis();
-      print("creating destination job");
-      JPPFJob job = new JPPFJob();
-      job.setName("Destination job");
-      job.getSLA().setMaxNodes(1);
-      DestinationTask task = new DestinationTask();
-      task.setId("destination");
-      job.addTask(task);
-      print("submitting job");
-      List<JPPFTask> results = client.submit(job);
-      print("got job results");
-      for (JPPFTask t: results)
-      {
-        Exception e = t.getException();
-        if (e != null) throw e;
-        else print("destination task result: " + t.getResult());
-      }
-      long elapsed = System.currentTimeMillis() - start;
-      print("processing  performed in "+StringUtils.toStringDuration(elapsed));
+      long start = System.nanoTime();
+      print("submitting new remote job");
+      String result = compute(new MyCallable());
+      long elapsed = System.nanoTime() - start;
+      String s = "processing  performed in "+StringUtils.toStringDuration(elapsed/1000000L);
+      print(s);
+      setResult(s);
     }
     catch(Exception e)
     {
@@ -74,8 +57,7 @@ public class SourceTask extends JPPFTask
     }
     finally
     {
-      print("closing JPPF client");
-      client.close();
+      print("source task ended");
     }
   }
 
@@ -99,5 +81,17 @@ public class SourceTask extends JPPFTask
   {
     //log.info(msg);
     System.out.println(msg);
+  }
+
+  /**
+   * 
+   */
+  public static class MyCallable implements JPPFCallable<String>
+  {
+    @Override
+    public String call() throws Exception
+    {
+      return JobFromTaskRunner.submitDestinationJob("from source callable");
+    }
   }
 }

@@ -26,10 +26,17 @@ import org.jppf.server.protocol.JPPFTask;
 public class DestinationTask extends JPPFTask
 {
   /**
-   * Initialize this task.
+   * The input string.
    */
-  public DestinationTask()
+  private final String input;
+
+  /**
+   * Initialize this task.
+   * @param input the input string.
+   */
+  public DestinationTask(final String input)
   {
+    this.input = input;
   }
 
   /**
@@ -39,7 +46,7 @@ public class DestinationTask extends JPPFTask
   @Override
   public void run()
   {
-    System.out.println("Starting destination task '" + getId() + '\'');
+    System.out.println("Starting destination task '" + getId() + "' : input = " + input);
     String s = "task '" + getId() + "' completed";
     System.out.println(s);
     setResult(s);
