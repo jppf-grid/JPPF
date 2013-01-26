@@ -29,6 +29,7 @@ import javax.net.ssl.*;
 
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.utils.StringUtils;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -43,7 +44,7 @@ import org.slf4j.*;
  * @param <S> the type of the states to use.
  * @param <T> the type of the transitions to use.
  * @author Laurent Cohen
- * @author Lane Schwartz (dynamically allocated server port) 
+ * @author Lane Schwartz (dynamically allocated server port)
  */
 public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread
 {
@@ -51,6 +52,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(NioServer.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * the selector of all socket channels open with providers or nodes.
    */
@@ -139,21 +144,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected final void init() throws Exception
   {
-    if ((ports != null) && (ports.length != 0)) init(ports);
+    if ((ports != null) && (ports.length != 0)) init(ports, false);
     if ((sslPorts != null) && (sslPorts.length != 0))
     {
       createSSLContext();
-      init(sslPorts);
+      init(sslPorts, true);
     }
   }
 
   /**
    * Initialize the underlying server sockets for the spcified array of ports.
    * @param portsToInit the array of ports to initiialize.
+   * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  private void init(final int[] portsToInit) throws Exception
+  private void init(final int[] portsToInit, final Boolean ssl) throws Exception
   {
+    if (debugEnabled) log.debug("initializing ports=[" + StringUtils.buildString(portsToInit) + "], ssl=" + ssl);
     for (int i=0; i<portsToInit.length; i++)
     {
       if (portsToInit[i] < 0) continue;
@@ -165,7 +172,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       // we store the actual assigned port number so that it can be broadcast.
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
       server.configureBlocking(false);
-      server.register(selector, SelectionKey.OP_ACCEPT, Boolean.FALSE);
+      server.register(selector, SelectionKey.OP_ACCEPT, ssl);
+      if (debugEnabled) log.debug("registered server channel=" + server);
     }
   }
 
@@ -194,6 +202,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   @Override
   public void run()
   {
+    if (debugEnabled) log.debug("starting server=" + this);
     try
     {
       boolean hasTimeout = selectTimeout > 0L;
@@ -300,6 +309,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   @SuppressWarnings("unchecked")
   private void doAccept(final SelectionKey key)
   {
+    if (debugEnabled) log.debug("accepting key=" + key);
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
     boolean ssl = (Boolean) key.attachment();
     SocketChannel channel;
@@ -341,6 +351,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   @SuppressWarnings("unchecked")
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl)
   {
+    if (debugEnabled) log.debug("accepting channel=" + channel + ", ssl=" + ssl);
     NioContext context = createNioContext();
     SelectionKeyWrapper wrapper = null;
     try
