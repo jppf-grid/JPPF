@@ -139,20 +139,21 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected final void init() throws Exception
   {
-    if ((ports != null) && (ports.length != 0)) init(ports);
+    if ((ports != null) && (ports.length != 0)) init(ports, false);
     if ((sslPorts != null) && (sslPorts.length != 0))
     {
       createSSLContext();
-      init(sslPorts);
+      init(sslPorts, true);
     }
   }
 
   /**
    * Initialize the underlying server sockets for the spcified array of ports.
    * @param portsToInit the array of ports to initiialize.
+   * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  private void init(final int[] portsToInit) throws Exception
+  private void init(final int[] portsToInit, final Boolean ssl) throws Exception
   {
     for (int i=0; i<portsToInit.length; i++)
     {
@@ -165,7 +166,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       // we store the actual assigned port number so that it can be broadcast.
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
       server.configureBlocking(false);
-      server.register(selector, SelectionKey.OP_ACCEPT, Boolean.FALSE);
+      server.register(selector, SelectionKey.OP_ACCEPT, ssl);
     }
   }
 
