@@ -511,10 +511,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     return jmxServer;
   }
 
-  /**
-   * Get the object that handles the firing of node life cycle events and the listeners that subscribe to these events.
-   * @return an instance of <code>LifeCycleEventHandler</code>.
-   */
   @Override
   public LifeCycleEventHandler getLifeCycleEventHandler()
   {
@@ -528,7 +524,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Cretae the connection checker for this node.
+   * Create the connection checker for this node.
    * @return an implementation of {@link NodeConnectionChecker}.
    * @exclude
    */

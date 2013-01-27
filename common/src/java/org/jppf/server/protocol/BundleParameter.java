@@ -84,5 +84,9 @@ public enum  BundleParameter
   /**
    * Parameter for the driver's uuid.
    */
-  DRIVER_UUID_PARAM
+  DRIVER_UUID_PARAM,
+  /**
+   * Parameter the total accumulated task execution elapsed time in a bundle.
+   */
+  NODE_BUNDLE_ELAPSED_PARAM
 }

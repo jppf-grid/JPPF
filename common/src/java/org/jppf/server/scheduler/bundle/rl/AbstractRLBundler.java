@@ -25,7 +25,7 @@ import org.slf4j.*;
  * Bundler based on a reinforcement learning algorithm.
  * @author Laurent Cohen
  */
-public abstract class AbstractRLBundler extends AbstractBundler
+public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
 {
   /**
    * Logger for this class.
@@ -48,10 +48,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
    */
   protected BundleDataHolder dataHolder = null;
   /**
-   * The current bundle size.
-   */
-  protected int bundleSize = 1;
-  /**
    * The previous bundle size.
    */
   protected int prevBundleSize = 1;
@@ -68,17 +64,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
         ", performanceVariationThreshold = " + ((RLProfile) profile).getPerformanceVariationThreshold());
     this.dataHolder = new BundleDataHolder(((RLProfile) profile).getPerformanceCacheSize());
     this.action = ((RLProfile) profile).getMaxActionRange();
-  }
-
-  /**
-   * Get the current size of bundle.
-   * @return  the bundle size as an int value.
-   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
-   */
-  @Override
-  public int getBundleSize()
-  {
-    return bundleSize;
   }
 
   /**
@@ -109,6 +94,31 @@ public abstract class AbstractRLBundler extends AbstractBundler
    * Compute the new bundle size.
    */
   protected void computeBundleSize()
+  {
+    double d = dataHolder.getPreviousMean() - dataHolder.getMean();
+    double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
+    prevBundleSize = bundleSize;
+    if (action == 0) action = (int) -Math.signum(d);
+    if ((d < -threshold) || (d > threshold))
+    {
+      action = (int) Math.signum(action) * (int) Math.round(d / threshold);
+    }
+    else action = 0;
+    if (debugEnabled) log.debug("bundler #" + getBundlerNumber() + ": d = " + d + ", threshold = " + threshold + ", action = " + action);
+    int maxActionRange = ((RLProfile) profile).getMaxActionRange();
+    if (action > maxActionRange) action = maxActionRange;
+    else if (action < -maxActionRange) action = -maxActionRange;
+    bundleSize += action;
+    //int max = Math.max(1, maxSize());
+    int max = maxSize();
+    if (bundleSize > max) bundleSize = max;
+    if (bundleSize <= 0) bundleSize = 1;
+  }
+
+  /**
+   * Compute the new bundle size.
+   */
+  protected void computeBundleSize2()
   {
     double d = dataHolder.getPreviousMean() - dataHolder.getMean();
     double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();

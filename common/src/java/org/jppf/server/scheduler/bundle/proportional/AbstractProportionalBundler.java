@@ -18,15 +18,10 @@
 
 package org.jppf.server.scheduler.bundle.proportional;
 
-import org.jppf.server.scheduler.bundle.AbstractBundler;
-import org.jppf.server.scheduler.bundle.BundleDataHolder;
-import org.jppf.server.scheduler.bundle.BundlePerformanceSample;
-import org.jppf.server.scheduler.bundle.LoadBalancingProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.jppf.server.scheduler.bundle.*;
+import org.slf4j.*;
 
 /**
  * This bundler implementation computes bundle sizes proportional to the mean execution
@@ -40,7 +35,7 @@ import java.util.Set;
  * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
  */
-public abstract class AbstractProportionalBundler extends AbstractBundler
+public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundler
 {
   /**
    * Logger for this class.
@@ -66,10 +61,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
    * Bounded memory of the past performance updates.
    */
   protected final BundleDataHolder dataHolder;
-  /**
-   * The current bundle size.
-   */
-  protected int bundleSize = 1;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -109,17 +100,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
   protected final Set<AbstractProportionalBundler> getBundlers()
   {
     return bundlers;
-  }
-
-  /**
-   * Get the current size of bundle.
-   * @return the bundle size as an int value.
-   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
-   */
-  @Override
-  public int getBundleSize()
-  {
-    return bundleSize;
   }
 
   /**

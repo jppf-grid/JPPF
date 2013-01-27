@@ -80,7 +80,7 @@ public class RemoteNodeIO extends AbstractNodeIO
     list.add(bundle);
     try
     {
-      bundle.setNodeExecutionTime(System.nanoTime());
+      initializePerformanceData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
       if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
       {
@@ -130,8 +130,7 @@ public class RemoteNodeIO extends AbstractNodeIO
   {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
-    long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime()) / 1000000L;
-    bundle.setNodeExecutionTime(elapsed);
+    finalizePerformanceData(bundle);
     List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));

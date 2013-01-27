@@ -32,7 +32,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public class AutoTunedBundler extends AbstractAutoTunedBundler implements ContextAwareness
+public class AutoTunedBundler extends AbstractAutoTunedBundler
 {
   /**
    * Logger for this class.
@@ -46,10 +46,6 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler implements Contex
    * Determines whether trace level is set for logging.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Holds information about the execution context.
-   */
-  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -59,17 +55,6 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler implements Contex
   public AutoTunedBundler(final LoadBalancingProfile profile)
   {
     super((AnnealingTuneProfile) profile);
-  }
-
-  /**
-   * Get the latest bundle size computed by this bundler.
-   * @return the bundle size as an int.
-   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
-   */
-  @Override
-  public int getBundleSize()
-  {
-    return currentSize;
   }
 
   /**
@@ -116,7 +101,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler implements Contex
     if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
     {
       performAnalysis();
-      if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
+      if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
     }
   }
 
@@ -140,25 +125,25 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler implements Contex
           // the second part is there to ensure the size is > 0
           if (rnd.nextBoolean()) diff = -diff;
         }
-        currentSize = bestSize + diff;
-        if (samplesMap.get(currentSize) == null)
+        bundleSize = bestSize + diff;
+        if (samplesMap.get(bundleSize) == null)
         {
-          if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
+          if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + bundleSize);
           return;
         }
         counter++;
       }
 
-      currentSize = Math.max(1, bestSize);
-      BundlePerformanceSample sample = samplesMap.get(currentSize);
+      bundleSize = Math.max(1, bestSize);
+      BundlePerformanceSample sample = samplesMap.get(bundleSize);
       if (sample != null)
       {
         stableMean = sample.mean;
         samplesMap.clear();
-        samplesMap.put(currentSize, sample);
+        samplesMap.put(bundleSize, sample);
       }
     }
-    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
+    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize
         + " with the mean execution of " + stableMean);
   }
 
@@ -194,33 +179,10 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler implements Contex
     return new AutoTunedBundler(profile.copy());
   }
 
-  /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
-   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
-   */
   @Override
   protected int maxSize()
   {
-    if(jppfContext == null) throw new IllegalStateException("jppfContext not set");
+    if (jppfContext == null) throw new IllegalStateException("jppfContext not set");
     return jppfContext.getMaxBundleSize() / 2;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public JPPFContext getJPPFContext()
-  {
-    return jppfContext;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setJPPFContext(final JPPFContext context)
-  {
-    this.jppfContext = context;
   }
 }
