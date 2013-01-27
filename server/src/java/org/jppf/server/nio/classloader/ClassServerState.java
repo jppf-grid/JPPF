@@ -43,7 +43,7 @@ public abstract class ClassServerState extends NioState<ClassTransition>
   /**
    * Reference to the driver.
    */
-  protected static JPPFDriver driver = JPPFDriver.getInstance();
+  protected JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this state.

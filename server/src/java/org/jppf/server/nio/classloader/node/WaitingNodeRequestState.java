@@ -48,7 +48,7 @@ class WaitingNodeRequestState extends ClassServerState
   /**
    * The class cache.
    */
-  private static final ClassCache classCache = driver.getInitializer().getClassCache();
+  private final ClassCache classCache = driver.getInitializer().getClassCache();
 
   /**
    * Initialize this state with a specified NioServer.
@@ -161,7 +161,7 @@ class WaitingNodeRequestState extends ClassServerState
    * @return <code>true</code> if the resource definition was found in the cache, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  private static boolean processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
+  private boolean processDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception
   {
     byte[] b = null;
     String name = resource.getName();
@@ -206,7 +206,7 @@ class WaitingNodeRequestState extends ClassServerState
    * @return a <code>SelectableChannel</code> instance.
    * @throws Exception if an error occurs while searching for a connection.
    */
-  private static ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
+  private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception
   {
     ChannelWrapper<?> result = null;
     ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();

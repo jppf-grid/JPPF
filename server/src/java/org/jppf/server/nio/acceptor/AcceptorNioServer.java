@@ -47,7 +47,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   /**
    * Reference to the driver.
    */
-  private static JPPFDriver driver = JPPFDriver.getInstance();
+  private JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this server with the specified port numbers.
@@ -108,7 +108,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * Close a connection to a node.
    * @param channel a <code>SocketChannel</code> that encapsulates the connection.
    */
-  public static void closeChannel(final ChannelWrapper<?> channel)
+  public void closeChannel(final ChannelWrapper<?> channel)
   {
     if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.ACCEPTOR);
     try

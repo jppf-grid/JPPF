@@ -141,6 +141,7 @@ public class JPPFDriver
    */
   protected JPPFDriver()
   {
+    instance = this;
     config = JPPFConfiguration.getProperties();
     uuid = config.getString("jppf.driver.uuid", JPPFUuid.normalUUID());
     int pid = SystemUtils.getPID();
@@ -415,8 +416,7 @@ public class JPPFDriver
         int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
-      instance = new JPPFDriver();
-      instance.run();
+      new JPPFDriver().run();
     }
     catch(Exception e)
     {

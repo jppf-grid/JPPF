@@ -60,6 +60,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * The list of registered listeners.
    */
   private final List<JobListener> eventListeners = new ArrayList<JobListener>();
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Default constructor.
@@ -144,7 +148,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
     submitEvent(JobEventType.JOB_QUEUED, bundle, null);
-    JPPFDriver.getInstance().getStatsUpdater().jobQueued(bundle.getTaskCount());
+    driver.getStatsUpdater().jobQueued(bundle.getTaskCount());
   }
 
   /**
@@ -164,7 +168,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     bundleMap.remove(jobUuid);
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
     submitEvent(JobEventType.JOB_ENDED, bundle, null);
-    JPPFDriver.getInstance().getStatsUpdater().jobEnded(time);
+    driver.getStatsUpdater().jobEnded(time);
   }
 
   @Override

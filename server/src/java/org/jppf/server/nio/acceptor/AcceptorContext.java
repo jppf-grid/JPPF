@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio.acceptor;
 
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -44,6 +45,10 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
    * Contains the data read from the socket channel.
    */
   private NioObject nioObject = null;
+  /**
+   * Reference to the driver.
+   */
+  private JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Read data from a channel. This method reads a single integer which identifies the type of the channel.
@@ -69,13 +74,10 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
     return b;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception e)
   {
-    AcceptorNioServer.closeChannel(channel);
+    driver.getAcceptorServer().closeChannel(channel);
   }
 
   /**

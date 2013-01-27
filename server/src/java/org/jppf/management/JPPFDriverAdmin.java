@@ -54,7 +54,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   /**
    * Reference to the driver.
    */
-  private static final JPPFDriver driver = JPPFDriver.getInstance();
+  private final JPPFDriver driver = JPPFDriver.getInstance();
   /**
    * The latest load-balancing information set via JMX.
    */
@@ -310,7 +310,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
    * @return a <code>NodeNioServer</code> instance.
    * @exclude
    */
-  private static NodeNioServer getNodeNioServer() {
+  private NodeNioServer getNodeNioServer() {
     return driver.getNodeNioServer();
   }
 

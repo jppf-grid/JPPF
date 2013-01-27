@@ -43,7 +43,7 @@ class WaitingPeerInitiationResponseState extends ClassServerState
   /**
    * The class cache.
    */
-  private static ClassCache classCache = driver.getInitializer().getClassCache();
+  private ClassCache classCache = driver.getInitializer().getClassCache();
 
   /**
    * Initialize this state with a specified NioServer.

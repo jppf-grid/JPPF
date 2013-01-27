@@ -43,7 +43,7 @@ class IdentifyingPeerState extends AcceptorServerState
   /**
    * Reference to the driver.
    */
-  private static JPPFDriver driver = JPPFDriver.getInstance();
+  private JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this state.

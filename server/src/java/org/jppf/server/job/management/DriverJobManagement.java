@@ -46,6 +46,10 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * Reference to the driver's job manager.
    */
   private JPPFJobManager jobManager = null;
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this MBean.
@@ -194,7 +198,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   private JPPFJobManager getJobManager()
   {
-    if (jobManager == null) jobManager = JPPFDriver.getInstance().getJobManager();
+    if (jobManager == null) jobManager = driver.getJobManager();
     return jobManager;
   }
 

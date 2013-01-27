@@ -77,6 +77,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Used to synchronize pending responses performed by multiple threads.
    */
   private final Lock lockResponse = new ReentrantLock();
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver = JPPFDriver.getInstance();
 
   @Override
   public void setState(final ClassState state) {
@@ -84,9 +88,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
     int nbPendingRequests = getNbPendingRequests();
     if (ClassState.IDLE_PROVIDER.equals(state) && nbPendingRequests > 0)
     {
-//      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests);
-      JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST, true);
-//      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests + " - DONE");
+      driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST, true);
     }
     else if (ClassState.IDLE_NODE.equals(state))
     {
@@ -192,7 +194,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     if (ClassState.IDLE_PROVIDER.equals(getState()))
     {
-      JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
+      driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
       //if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());
     }
   }
@@ -283,7 +285,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       if (!pendingList.isEmpty())
       {
         if (debugEnabled) log.debug(build("provider: ", getChannel(), " sending null response(s) for disconnected provider"));
-        ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
+        ClassNioServer server = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
         for (ResourceRequest resourceRequest : pendingList)
         {

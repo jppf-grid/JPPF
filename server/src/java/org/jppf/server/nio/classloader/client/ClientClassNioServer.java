@@ -61,18 +61,12 @@ public class ClientClassNioServer extends ClassNioServer
     super(NioConstants.CLIENT_CLASS_SERVER, driver);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NioServerFactory<ClassState, ClassTransition> createFactory()
   {
     return new ClientClassServerFactory(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void postAccept(final ChannelWrapper<?> channel)
   {
