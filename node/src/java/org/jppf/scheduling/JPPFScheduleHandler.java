@@ -132,6 +132,7 @@ public class JPPFScheduleHandler
     if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", future=" + future);
     if (future != null) future.cancel(true);
   }
+
   /**
    * Cleanup this schedule handler.
    */

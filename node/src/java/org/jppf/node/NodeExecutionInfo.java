@@ -33,17 +33,18 @@ public class NodeExecutionInfo implements Serializable
   /**
    * Total cpu time used by the tasks.
    */
-  public long cpuTime = 0L;
+  public long cpuTime;
   /**
    * Total user time used by the tasks.
    */
-  public long userTime = 0L;
+  public long userTime;
 
   /**
    * Default no-arg constructor.
    */
   public NodeExecutionInfo()
   {
+    this(0L, 0L);
   }
 
   /**

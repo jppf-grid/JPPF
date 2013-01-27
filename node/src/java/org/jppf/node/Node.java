@@ -51,7 +51,7 @@ public interface Node extends Runnable
   LifeCycleEventHandler getLifeCycleEventHandler();
 
   /**
-   * Get the JMX connecter server aossicated with the node.
+   * Get the JMX connecter server associated with the node.
    * @return a JMXServer instance.
    * @throws Exception if any error occurs.
    */

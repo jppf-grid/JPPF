@@ -141,9 +141,6 @@ public class JPPFSchedule implements Serializable
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {
