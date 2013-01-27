@@ -51,7 +51,7 @@ public class TestFileDataLocation extends Setup1D1N1C
   @Test(timeout=20000)
   public void testSubmitLargeDataProvider() throws Exception
   {
-    int size = 200 * 1024 * 1024;
+    int size = 128 * 1024 * 1024;
     int nbTasks = 3;
     try
     {
