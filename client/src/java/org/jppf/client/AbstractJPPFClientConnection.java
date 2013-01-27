@@ -350,6 +350,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     JPPFTaskBundle bundle = super.sendHandshakeJob();
     this.systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
     this.uuid = (String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
+    if (debugEnabled) log.debug("got driver uuid: " + uuid);
     return bundle;
   }
 

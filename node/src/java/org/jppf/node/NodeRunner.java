@@ -236,7 +236,7 @@ public class NodeRunner
   }
 
   /**
-   * Restore the configuration from the sna^shot taken at startup time.
+   * Restore the configuration from the snapshot taken at startup time.
    */
   private static void restoreInitialConfig()
   {

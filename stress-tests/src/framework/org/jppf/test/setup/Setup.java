@@ -146,7 +146,13 @@ public class Setup
     }
     System.gc();
     stopProcesses();
-    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    try
+    {
+      Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    }
+    catch(Throwable ignore)
+    {
+    }
   }
 
   /**

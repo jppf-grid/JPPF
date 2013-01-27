@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -47,7 +48,7 @@ public class OOMEJobRunner
     try
     {
       jppfClient = new JPPFClient();
-      for (int i=1; i<=1000; i++) perform(i);
+      for (int i=1; i<=1; i++) perform(i);
     }
     catch(Exception e)
     {
@@ -68,8 +69,12 @@ public class OOMEJobRunner
   {
     output("Start of iteration " + i);
     long totalTime = System.currentTimeMillis();
+    submitJob("OOOME job 1", 1, 0L, true, 0);
+    submitJob("OOOME job 2", 1, 0L, true, 0);
+    /*
     submitJob("OOOME job " + i + "/1", 200, 0L, true, 200*1024);
     submitJob("OOOME job " + i + "/2",   2, 1L, false, 2*1024*1024);
+    */
     totalTime = System.currentTimeMillis() - totalTime;
     //output("Computation time for iteration " + i + ": " + StringUtils.toStringDuration(totalTime));
   }
@@ -94,7 +99,11 @@ public class OOMEJobRunner
       output("* submitting job '" + job.getName() + "'");
       List<JPPFTask> results = jppfClient.submit(job);
       output("+ got results for job " + job.getName());
-      //for (JPPFTask t: results) output((String) t.getResult());
+      for (JPPFTask t: results)
+      {
+        if (t.getException() == null) output((String) t.getResult());
+        else output(ExceptionUtils.getStackTrace(t.getException()));
+      }
     }
     else
     {

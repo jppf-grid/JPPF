@@ -98,6 +98,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     }
     catch (Exception e)
     {
+      if (debugEnabled) log.debug(e.getMessage(), e);
       setStatus(FAILED);
       throw e;
     }

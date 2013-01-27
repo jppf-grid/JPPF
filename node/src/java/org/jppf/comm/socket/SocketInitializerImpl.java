@@ -88,7 +88,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     {
       try
       {
-        if (debugEnabled) log.debug(name + "about to close socket wrapper");
+        if (debugEnabled) log.debug(name + "about to close socket wrapper " + socketWrapper);
         /*if(socketWrapper.isOpened())*/ socketWrapper.close();
       }
       catch(Exception e)
@@ -191,7 +191,12 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
       }
       catch(Exception e)
       {
-        if (traceEnabled) log.trace(name + " socket connection open failed: " + e.getClass().getName() + " : " + e.getMessage());
+        //if (traceEnabled) log.trace("socket connection open failed for " + socketWrapper + " : ", e);
+        if (traceEnabled)
+        {
+          if (attemptCount > 1) log.trace("socket connection open failed for " + socketWrapper + " : " + ExceptionUtils.getMessage(e));
+          else log.trace("socket connection open failed for " + socketWrapper, e);
+        }
         if (latestAttemptDate != null)
         {
           Date now = new Date();

@@ -17,6 +17,9 @@
  */
 package test.oome;
 
+import java.net.URL;
+import java.util.Enumeration;
+
 import org.jppf.server.protocol.JPPFTask;
 
 
@@ -53,10 +56,6 @@ public class OOMEJobTask extends JPPFTask
     data = new byte[(size <= 0) ? 0 : size];
   }
 
-  /**
-   * Perform the multiplication of a matrix row by another matrix.
-   * @see sample.BaseDemoTask#doWork()
-   */
   @Override
   public void run()
   {
@@ -64,6 +63,8 @@ public class OOMEJobTask extends JPPFTask
     try
     {
       if (time > 0L) Thread.sleep(time);
+      Enumeration<URL> res = getClass().getClassLoader().getResources("some_dummy_resource.dfg");
+      System.out.println("found resources: " + res);
       s = "task #" + id + " execution successful";
     }
     catch(Exception e)

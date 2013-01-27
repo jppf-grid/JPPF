@@ -86,6 +86,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     String host = props.getString("jppf.server.host", "localhost");
     // for backward compatibility with v2.x configurations
     int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", sslEnabled ? 11443 : 11111, false);
+    if (debugEnabled) log.debug("host=" + host + ", port=" + port + ", ssl=" + sslEnabled);
     socketClient = new BootstrapSocketClient();
     socketClient.setHost(host);
     socketClient.setPort(port);
@@ -103,12 +104,6 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
     {
       if (INITIALIZING.compareAndSet(false, true))
       {
-        /*
-        synchronized(AbstractJPPFClassLoaderLifeCycle.class)
-        {
-          if (executor == null) executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ClassloaderRequests", false, Thread.NORM_PRIORITY, true));
-        }
-        */
         try
         {
           if (debugEnabled) log.debug("initializing connection");

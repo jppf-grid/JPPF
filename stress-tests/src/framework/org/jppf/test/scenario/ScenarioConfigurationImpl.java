@@ -19,6 +19,7 @@
 package org.jppf.test.scenario;
 
 import java.io.File;
+import java.util.Collections;
 
 import org.jppf.utils.TypedProperties;
 
@@ -41,8 +42,9 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
    */
   public ScenarioConfigurationImpl(final File configDir)
   {
+    super(ConfigurationHelper.createConfigFromTemplate(new File(configDir, SCENARIO_FILE).getPath(), Collections.<String, Object>emptyMap()));
     this.configDir = configDir;
-    ConfigurationHelper.loadProperties(this, new File(configDir, SCENARIO_FILE));
+    //ConfigurationHelper.loadProperties(this, new File(configDir, SCENARIO_FILE));
   }
 
   @Override

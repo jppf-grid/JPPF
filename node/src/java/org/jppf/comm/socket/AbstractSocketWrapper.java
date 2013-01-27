@@ -89,13 +89,13 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @throws IOException if there is an issue with the socket streams.
    */
   public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer)
-  throws ConnectException, IOException
-  {
+      throws ConnectException, IOException
+      {
     this.host = host;
     this.port = port;
     this.serializer = serializer;
     open();
-  }
+      }
 
   /**
    * Initialize this socket client with an already opened and connected socket.
@@ -295,10 +295,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   {
     OutputStream os = socket.getOutputStream();
     InputStream is = socket.getInputStream();
-    //BufferedOutputStream bos = new BufferedOutputStream(os, SOCKET_RECEIVE_BUFFER_SIZE);
     BufferedOutputStream bos = new BufferedOutputStream(os);
     dos = new DataOutputStream(bos);
-    //dos.flush();
     BufferedInputStream bis = new BufferedInputStream(is);
     dis = new DataInputStream(bis);
   }
@@ -459,5 +457,11 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    */
   protected void updateSocketTimestamp() {
     socketTimestamp = System.currentTimeMillis();
+  }
+
+  @Override
+  public String toString()
+  {
+    return "AbstractSocketWrapper [socket=" + socket + ", host=" + host + ", port=" + port + ", opened=" + opened + "]";
   }
 }
