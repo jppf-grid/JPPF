@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.node.*;
+import org.jppf.node.NodeRunner;
 import org.jppf.node.event.*;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -185,8 +185,7 @@ public class NodeSystemTray implements NodeLifeCycleListener
     {
       try
       {
-        NodeExecutionManager execManager = (NodeExecutionManager) event.getSource();
-        jmxServer = execManager.getNode().getJmxServer();
+        jmxServer = event.getNode().getJmxServer();
       }
       catch (Exception e)
       {
