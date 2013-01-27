@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+
+  <info>
+		<appname>@{ant.project.name}</appname>
+		<appversion>@{version.number}</appversion>
+		<authors>
+			<author name="The JPPF Team" email=""/>
+		</authors>
+		<!--<url>http://www.jppf.org</url>-->
+		<url>@{installer.url}</url>
+		<javaversion>1.5</javaversion>
+		<webdir>@{installer.url}download/@{version.number}</webdir>
+  </info>
+
+	<guiprefs width="600" height="400" resizable="yes">
+		<modifier key="useButtonIcons" value="no"/>
+	  <modifier key="useLabelIcons" value="no"/>
+	  <modifier key="labelGap" value="2"/>
+	  <modifier key="layoutAnchor" value="NORTHWEST"/>
+	  <modifier key="useHeadingPanel" value="yes"/>
+	  <modifier key="useHeadingForSummary" value="yes"/>
+	  <modifier key="headingImageOnLeft" value="yes"/>
+	  <modifier key="headingLineCount" value="1"/>
+	  <modifier key="headingFontSize" value="1.5"/>
+	  <modifier key="headingBackgroundColor" value="0x00ffffff"/>
+	  <modifier key="headingPanelCounter" value="text"/>
+	  <modifier key="headingPanelCounterPos" value="inHeading"/>
+    <laf name="looks" decorate.frames="yes" decorate.dialogs="yes">
+    	<os family="mac"/>
+    	<os family="unix"/>
+    	<os family="windows"/>
+    </laf>
+	</guiprefs>
+
+  <locale>
+		<langpack iso3="eng"/>
+  </locale>
+
+  <resources>
+    <res id="LicencePanel.licence" src="LICENSE.txt"/>
+    <!--<res id="InfoPanel.info" src="readme.txt"/>-->
+		<res id="Heading.image" src="docs/home/images/logo1.gif" />
+		<res id="CustomLangpack.xml_eng" src="@{installer}/eng.xml"/>
+  </resources>
+
+  <panels>
+    <panel classname="HelloPanel"/>
+    <!--<panel classname="InfoPanel"/>-->
+    <panel classname="LicencePanel"/>
+    <panel classname="TargetPanel"/>
+    <panel classname="PacksPanel"/>
+    <panel classname="InstallPanel"/>
+    <panel classname="FinishPanel"/>
+  </panels>
+
+  <packs>
+    <pack name="Full_sources" required="no" preselected="no">
+      <description>All JPPF modules with their source code</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-full-src" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-full-src">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Driver" required="no" preselected="yes">
+      <description>The JPPF server librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-driver" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Node" required="no" preselected="yes">
+      <description>The JPPF node librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Console" required="no" preselected="yes">
+      <description>The JPPF administration and monitoring console librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-admin-ui" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Application_Template" required="no" preselected="yes">
+      <description>A fully working JPPF template application to use as a starting point</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-application-template" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_User_Guide" required="no" preselected="yes">
+      <description>Full user guide in PDF format</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-User-Guide" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-User-Guide">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_API" required="no" preselected="no">
+      <description>Full Javadoc (source code documentation) in HTML format</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-api" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-api">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="Samples_Pack" required="no" preselected="no">
+      <description>A set of full-fledged applications using JPPF</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-samples-pack" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="J2EE_Connector" required="no" preselected="no">
+      <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-j2ee-connector" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-j2ee-connector">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JDK7_Addons" required="no" preselected="no">
+      <description>A set of addons using the JDK 7 APIs and language extensions</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-jdk7-addons" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-jdk7-addons">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="GigaSpaces_Connector" required="no" preselected="no">
+      <description></description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-GigaSpaces" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-GigaSpaces">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <!--
+    <pack name="TCP_Multiplexer" required="no" preselected="no">
+      <description>A tool that routes all JPPF traffic through a single TCP port to work in firewalled environments</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-multiplexer" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-multiplexer">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    -->
+
+  </packs>
+
+</installation>

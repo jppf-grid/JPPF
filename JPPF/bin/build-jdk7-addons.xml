@@ -1,0 +1,64 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2012 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="jdk7-addons" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                 Generate the JDK 7 addons distributable                   -->
+  <!-- ========================================================================= -->
+
+  <target name="jppf.jdk7-addons.check" description="build the jdk7-addons" depends="init, build">
+    <condition property="jdk1.7+">
+      <not>
+        <or>
+          <contains string="${java.version}" substring="1.4" casesensitive="false" />
+          <contains string="${java.version}" substring="1.5" casesensitive="false" />
+          <contains string="${java.version}" substring="1.6" casesensitive="false" />
+        </or>
+      </not>
+    </condition>
+  </target>
+
+  <target name="jppf.jdk7-addons" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jdk1.7+">
+    <antcall target="jppf.jdk7-addons.build"/>
+    <antcall target="jppf.jdk7-addons.nobuild"/>
+  </target>
+
+  <target name="jppf.jdk7-addons.build" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jdk1.7+">
+    <ant antfile="${jdk7-addons}/ThreadManagerForkJoin/build.xml" target="jar" inheritall="false"/>
+    <property name="jdk7-addons.prefix" value="${app.ver}-jdk7-addons"/>
+    <property name="jdk7-addons.file" value="${build}/${jdk7-addons.prefix}.zip"/>
+    <delete file="jdk7-addons.file" quiet="true"/>
+    <zip destfile="${jdk7-addons.file}">
+      <zipfileset dir="${jdk7-addons}" prefix="${jdk7-addons.prefix}">
+        <exclude name=".*"/>
+        <exclude name="**/*.log"/>
+        <exclude name="classes"/>
+        <exclude name="**/*.classpath"/>
+        <exclude name="**/*.project"/>
+        <exclude name="**/.settings/*.*"/>
+      </zipfileset>
+    </zip>
+    <delete dir="${jdk7-addons}" includes="**/*.jar" quiet="true"/>
+  </target>
+
+  <target name="jppf.jdk7-addons.nobuild" description="Cannot build because JDK 1.7+ is needed" unless="jdk1.7+">
+    <echo level="warning" message="JDK 1.7 addons could not be built: JDK 1.7+ is needed"/>
+  </target>
+
+</project> 
