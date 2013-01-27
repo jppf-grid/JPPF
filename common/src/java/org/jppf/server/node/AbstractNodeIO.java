@@ -165,6 +165,25 @@ public abstract class AbstractNodeIO implements NodeIO
   public abstract void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
 
   /**
+   * Prepare the task bundle's performance data that will be sent back to the server.
+   * @param bundle the bundle to process.
+   */
+  protected void initializePerformanceData(final JPPFTaskBundle bundle)
+  {
+    bundle.setNodeExecutionTime(System.nanoTime());
+  }
+
+  /**
+   * Compute the task bundle's performance data before it is sent back to the server.
+   * @param bundle the bundle to process.
+   */
+  protected void finalizePerformanceData(final JPPFTaskBundle bundle)
+  {
+    long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime());
+    bundle.setNodeExecutionTime(elapsed);
+  }
+
+  /**
    * A pairing of a list of buffers and the total length of their usable data.
    * @exclude
    */

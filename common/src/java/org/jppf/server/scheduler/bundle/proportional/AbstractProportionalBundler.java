@@ -35,7 +35,7 @@ import org.slf4j.*;
  * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
  */
-public abstract class AbstractProportionalBundler extends AbstractBundler
+public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundler
 {
   /**
    * Logger for this class.
@@ -61,10 +61,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
    * Bounded memory of the past performance updates.
    */
   protected final BundleDataHolder dataHolder;
-  /**
-   * The current bundle size.
-   */
-  protected int bundleSize = 1;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -104,17 +100,6 @@ public abstract class AbstractProportionalBundler extends AbstractBundler
   protected final Set<AbstractProportionalBundler> getBundlers()
   {
     return bundlers;
-  }
-
-  /**
-   * Get the current size of bundle.
-   * @return the bundle size as an int value.
-   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
-   */
-  @Override
-  public int getBundleSize()
-  {
-    return bundleSize;
   }
 
   /**

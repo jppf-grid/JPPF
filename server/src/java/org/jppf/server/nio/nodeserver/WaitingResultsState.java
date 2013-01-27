@@ -69,6 +69,7 @@ class WaitingResultsState extends NodeServerState
       try {
         ServerTaskBundleClient newBundleWrapper = context.deserializeBundle();
         JPPFTaskBundle newBundle = newBundleWrapper.getJob();
+        Bundler bundler = context.getBundler();
         if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + channel);
         // if an exception prevented the node from executing the tasks
         Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
@@ -80,14 +81,16 @@ class WaitingResultsState extends NodeServerState
           if (debugEnabled) log.debug("*** bundle has " + newBundleWrapper.getTaskList().size() + " tasks, taskCount=" + newBundle.getTaskCount());
           nodeBundle.resultsReceived(newBundleWrapper.getDataLocationList());
           long elapsed = System.nanoTime() - nodeBundle.getExecutionStartTime();
-          server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime(), ((AbstractTaskBundleMessage) context.getMessage()).getLength());
-          context.getBundler().feedback(newBundle.getTaskCount(), elapsed);
+          server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000, ((AbstractTaskBundleMessage) context.getMessage()).getLength());
+          if (bundler instanceof BundlerEx) {
+            Long accumulatedTime = (Long) newBundle.getParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, -1L);
+            ((BundlerEx) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
+          } else bundler.feedback(newBundle.getTaskCount(), elapsed);
         }
         requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
         JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
         if (systemInfo != null) {
           context.setNodeInfo(systemInfo, true);
-          Bundler bundler = context.getBundler();
           if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
         }
       }

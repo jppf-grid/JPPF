@@ -25,7 +25,7 @@ import org.slf4j.*;
  * Bundler based on a reinforcement learning algorithm.
  * @author Laurent Cohen
  */
-public abstract class AbstractRLBundler extends AbstractBundler
+public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
 {
   /**
    * Logger for this class.
@@ -48,10 +48,6 @@ public abstract class AbstractRLBundler extends AbstractBundler
    */
   protected BundleDataHolder dataHolder = null;
   /**
-   * The current bundle size.
-   */
-  protected int bundleSize = 1;
-  /**
    * The previous bundle size.
    */
   protected int prevBundleSize = 1;
@@ -71,31 +67,14 @@ public abstract class AbstractRLBundler extends AbstractBundler
   }
 
   /**
-   * Get the current size of bundle.
-   * @return  the bundle size as an int value.
-   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
-   */
-  @Override
-  public int getBundleSize()
-  {
-    return bundleSize;
-  }
-
-  /**
    * set the current size of bundle.
-   * @param bundleSize - the bundle size as an int value.
+   * @param bundleSize the bundle size as an int value.
    */
   public void setBundleSize(final int bundleSize)
   {
     this.bundleSize = bundleSize;
   }
 
-  /**
-   * This method computes the bundle size based on the new state of the server.
-   * @param size the number of tasks executed.
-   * @param totalTime the time in nanoseconds it took to execute the tasks.
-   * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
-   */
   @Override
   public void feedback(final int size, final double totalTime)
   {

@@ -34,7 +34,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * 
  */
-public abstract class AbstractAutoTunedBundler extends AbstractBundler
+public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
 {
   /**
    * Logger for this class.
@@ -44,10 +44,6 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
    * Determines whether debugging level is set for logging.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The current bundle size.
-   */
-  protected int currentSize = 1;
   /**
    * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
    * towards a good solution.
@@ -67,8 +63,8 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
   {
     super(profile);
     log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
-    if (currentSize < 1) currentSize = 1;
-    log.info("Bundler#" + bundlerNumber + ": The initial size is " + currentSize);
+    if (bundleSize < 1) bundleSize = 1;
+    log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
   }
 
   /**
@@ -79,7 +75,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
   @Override
   public int getBundleSize()
   {
-    return currentSize;
+    return bundleSize;
   }
 
   /**
@@ -102,8 +98,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
     assert bundleSize > 0;
     if (debugEnabled)
     {
-      log.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize="
-          + bundleSize + " and totalTime=" + time);
+      log.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize + " and totalTime=" + time);
     }
 
     // retrieving the record of the bundle size
@@ -127,7 +122,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
     if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
     {
       performAnalysis();
-      if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + currentSize);
+      if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
     }
   }
 
@@ -151,29 +146,28 @@ public abstract class AbstractAutoTunedBundler extends AbstractBundler
           // the second part is there to ensure the size is > 0
           if (rnd.nextBoolean()) diff = -diff;
         }
-        currentSize = bestSize + diff;
-        if (samplesMap.get(currentSize) == null)
+        bundleSize = bestSize + diff;
+        if (samplesMap.get(bundleSize) == null)
         {
           if (debugEnabled)
           {
-            log.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + currentSize);
+            log.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + bundleSize);
           }
           return;
         }
         counter++;
       }
 
-      currentSize = Math.max(1, bestSize);
-      BundlePerformanceSample sample = samplesMap.get(currentSize);
+      bundleSize = Math.max(1, bestSize);
+      BundlePerformanceSample sample = samplesMap.get(bundleSize);
       if (sample != null)
       {
         stableMean = sample.mean;
         samplesMap.clear();
-        samplesMap.put(currentSize, sample);
+        samplesMap.put(bundleSize, sample);
       }
     }
-    log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + currentSize
-        + " with the mean execution of " + stableMean);
+    log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize + " with the mean execution of " + stableMean);
   }
 
   /**

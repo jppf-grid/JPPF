@@ -26,7 +26,7 @@ import org.slf4j.*;
  * Bundler based on a reinforcement learning algorithm.
  * @author Laurent Cohen
  */
-public class RLBundler extends AbstractRLBundler implements ContextAwareness
+public class RLBundler extends AbstractRLBundler
 {
   /**
    * Logger for this class.
@@ -36,10 +36,6 @@ public class RLBundler extends AbstractRLBundler implements ContextAwareness
    * Determines whether debugging level is set for logging.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Holds information about the execution context.
-   */
-  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the specified parameters.
@@ -50,44 +46,16 @@ public class RLBundler extends AbstractRLBundler implements ContextAwareness
     super(profile);
   }
 
-  /**
-   * Make a copy of this bundler
-   * @return a <code>Bundler</code> instance.
-   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
-   */
   @Override
   public Bundler copy()
   {
     return new RLBundler(profile);
   }
 
-  /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
-   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
-   */
   @Override
   protected int maxSize()
   {
     if(jppfContext == null) throw new IllegalStateException("jppfContext not set");
     return jppfContext.getMaxBundleSize();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public JPPFContext getJPPFContext()
-  {
-    return jppfContext;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setJPPFContext(final JPPFContext context)
-  {
-    this.jppfContext = context;
   }
 }

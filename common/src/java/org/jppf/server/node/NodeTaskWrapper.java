@@ -146,9 +146,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     {
       try
       {
-        // convert cpu time from nanoseconds to milliseconds
+        elapsedTime = System.nanoTime() - startTime;
         if (info != null) info = threadManager.computeExecutionInfo(id).subtract(info);
-        elapsedTime = (System.nanoTime() - startTime) / 1000000L;
       }
       catch(Throwable ignore)
       {
@@ -231,11 +230,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   void handleTimeout() throws Exception
   {
     JPPFSchedule schedule = task.getTimeoutSchedule();
-    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null)))
-    {
-      if (schedule.getDuration() > 0L) executionManager.processTaskTimeout(this, number);
-      else if (schedule.getDate() != null) executionManager.processTaskExpirationDate(this, number);
-    }
+    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null))) executionManager.processTaskTimeout(this, number);
   }
 
   @Override

@@ -112,6 +112,10 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * The data provider for the current job.
    */
   private DataProvider dataProvider = null;
+  /**
+   * The total accumulated elapsed time of the tasks in the current bundle.
+   */
+  private final AtomicLong accumulatedElapsed = new AtomicLong(0L);
 
   /**
    * Initialize this execution manager with the specified node.
@@ -266,19 +270,6 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
    * @param number a number identifying the task submitted to the thread pool.
    * @throws Exception if any error occurs.
    */
-  void processTaskExpirationDate(final NodeTaskWrapper taskWrapper, final long number) throws Exception
-  {
-    Future<?> future = getFutureFromNumber(number);
-    TimeoutTimerTask tt = new TimeoutTimerTask(future, taskWrapper);
-    timeoutHandler.scheduleAction(future, taskWrapper.getTask().getTimeoutSchedule(), tt);
-  }
-
-  /**
-   * Notify the timer that a task must be aborted if its timeout period expired.
-   * @param taskWrapper the JPPF task for which to set the timeout.
-   * @param number a number identifying the task submitted to the thread pool.
-   * @throws Exception if any error occurs.
-   */
   void processTaskTimeout(final NodeTaskWrapper taskWrapper, final long number) throws Exception
   {
     Future<?> future = getFutureFromNumber(number);
@@ -318,6 +309,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
       else log.warn(msg);
     }
     taskCount.set(0L);
+    accumulatedElapsed.set(0L);
     node.getLifeCycleEventHandler().fireJobStarting(bundle, taskClassLoader, (List<Task>) taskList, dataProvider);
   }
 
@@ -327,6 +319,7 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   @SuppressWarnings("unchecked")
   public void cleanup()
   {
+    bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     node.getLifeCycleEventHandler().fireJobEnding(bundle, taskClassLoader, (List<Task>) taskList, dataProvider);
     taskClassLoader = null;
     this.bundle = null;
@@ -376,8 +369,9 @@ public class NodeExecutionManagerImpl extends ThreadSynchronization implements N
   @Override
   public void taskEnded(final Task task, final long taskNumber, final NodeExecutionInfo info, final long elapsedTime)
   {
+    accumulatedElapsed.addAndGet(elapsedTime);
     long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
-    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime, task.getException() != null);
+    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getException() != null);
     TaskExecutionListener[] tmp;
     synchronized(taskExecutionListeners)
     {
