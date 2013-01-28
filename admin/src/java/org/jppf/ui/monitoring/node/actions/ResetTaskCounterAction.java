@@ -18,6 +18,7 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.*;
 
 import org.jppf.management.NodeSelector;
@@ -79,6 +80,9 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
             if (forwarder == null) continue;
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             forwarder.resetTaskCounter(selector);
+          } catch(IOException e) {
+            entry.getKey().initializeFowarder();
+            log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }

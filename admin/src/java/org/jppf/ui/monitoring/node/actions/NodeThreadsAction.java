@@ -18,6 +18,7 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.*;
 
 import javax.swing.*;
@@ -160,6 +161,9 @@ public class NodeThreadsAction extends AbstractTopologyAction
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             forwarder.updateThreadPoolSize(selector, nbThreads);
             forwarder.updateThreadsPriority(selector, priority);
+          } catch(IOException e) {
+            entry.getKey().initializeFowarder();
+            log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }

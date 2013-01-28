@@ -132,20 +132,19 @@ public class NodeConfigurationAction extends AbstractTopologyAction
     TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
     final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceReconnect")).getValue();
-    Runnable r = new Runnable()
-    {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        try
-        {
+      public void run() {
+        TopologyData parent = null;
+        try {
           TopologyData data = dataArray[0];
-          TopologyData parent = data.getParent();
+          parent = data.getParent();
           if (parent == null) return;
           parent.getNodeForwarder().updateConfiguration(new NodeSelector.UuidSelector(data.getUuid()), map, b);
-        }
-        catch(Exception e)
-        {
+        } catch(IOException e) {
+          parent.initializeFowarder();
+          log.error(e.getMessage(), e);
+        } catch(Exception e) {
           log.error(e.getMessage(), e);
         }
       }

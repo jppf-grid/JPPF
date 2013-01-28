@@ -18,6 +18,8 @@
 
 package org.jppf.ui.monitoring.node;
 
+import java.util.concurrent.atomic.*;
+
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
@@ -78,6 +80,10 @@ public class TopologyData
    * The parent driver for a node or peer.
    */
   protected TopologyData parent = null;
+  /**
+   * 
+   */
+  private AtomicBoolean initializing = new AtomicBoolean(false);
 
   /**
    * Initialize this topology data as a driver related object.
@@ -89,18 +95,7 @@ public class TopologyData
     this.clientConnection = clientConnection;
     this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
     this.uuid = ((JPPFClientConnectionImpl) clientConnection).getUuid();
-    new Thread(new ForwarderSettingTask()).start();
-    /*
-    try
-    {
-      this.nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
-      if (this.nodeForwarder == null) log.error("could not get node forwarder proxy for driver " + uuid);
-    }
-    catch (Exception e)
-    {
-      log.error("could not get node forwarder proxy for driver " + uuid, e);
-    }
-    */
+    initializeFowarder();
   }
 
   /**
@@ -358,6 +353,19 @@ public class TopologyData
   }
 
   /**
+   * Reset the forwarder; this method should be called when an I/O error occurs
+   * when invoking a method of the forwarder.
+   */
+  public void initializeFowarder()
+  {
+    if (initializing.compareAndSet(false, true))
+    {
+      nodeForwarder = null;
+      new Thread(new ForwarderSettingTask()).start();
+    }
+  }
+
+  /**
    * 
    */
   private class ForwarderSettingTask implements Runnable
@@ -365,17 +373,24 @@ public class TopologyData
     @Override
     public void run()
     {
-      while (nodeForwarder == null)
+      try
       {
-        try
+        while (nodeForwarder == null)
         {
-          nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
-          if (nodeForwarder == null) Thread.sleep(500L);
+          try
+          {
+            nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+            if (nodeForwarder == null) Thread.sleep(500L);
+          }
+          catch (Exception ignore)
+          {
+            //log.error("could not get node forwarder proxy for driver " + uuid, e);
+          }
         }
-        catch (Exception ignore)
-        {
-          //log.error("could not get node forwarder proxy for driver " + uuid, e);
-        }
+      }
+      finally
+      {
+        initializing.set(false);
       }
     }
   }

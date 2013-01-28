@@ -18,6 +18,7 @@
 
 package org.jppf.ui.monitoring.node;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -288,6 +289,11 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       try
       {
         result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet(uuidMap.keySet())));
+      }
+      catch(IOException e)
+      {
+        log.error("error getting node states for driver " + driverData.getUuid() + ", reinitializing the connection", e);
+        driverData.initializeFowarder();
       }
       catch(Exception e)
       {
