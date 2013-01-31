@@ -56,7 +56,7 @@ public class ClassLoaderRequestHandler
   /**
    * Object which sends the class loading requets to the driver and receives the response.
    */
-  private ResourceRequest requestRunner;
+  private ResourceRequestRunner requestRunner;
   /**
    * A task run at constant intervals, which runs the class loading send/receive tto the server and notifies
    * waiting threads when the reponse is received.
@@ -71,7 +71,7 @@ public class ClassLoaderRequestHandler
    * Initialize this request handler.
    * @param requestRunner the periodic task submitted to the scheduled executor.
    */
-  public ClassLoaderRequestHandler(final ResourceRequest requestRunner)
+  public ClassLoaderRequestHandler(final ResourceRequestRunner requestRunner)
   {
     this.nextRequest = new CompositeResourceWrapper();
     this.requestRunner = requestRunner;

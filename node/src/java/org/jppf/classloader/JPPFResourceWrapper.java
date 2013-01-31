@@ -102,7 +102,9 @@ public class JPPFResourceWrapper implements Serializable
   private String providerUuid = null;
   /**
    * Determines whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
+   * @deprectaed this attribute is not used meaningfully anywhere in the code and should be removed in the next major version (v4.0).
    */
+  @Deprecated
   private boolean asResource = false;
   /**
    * Uuid of the original task bundle that triggered this resource request.
@@ -238,24 +240,6 @@ public class JPPFResourceWrapper implements Serializable
   public void setProviderUuid(final String providerUuid)
   {
     this.providerUuid = providerUuid;
-  }
-
-  /**
-   * Determine whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
-   * @return true if the resource is loaded using getResource(), false otherwise.
-   */
-  public boolean isAsResource()
-  {
-    return asResource;
-  }
-
-  /**
-   * Set whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
-   * @param asResource true if the resource is loaded using getResource(), false otherwise.
-   */
-  public void setAsResource(final boolean asResource)
-  {
-    this.asResource = asResource;
   }
 
   /**

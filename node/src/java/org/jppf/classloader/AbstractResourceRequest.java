@@ -22,7 +22,7 @@ package org.jppf.classloader;
  * Encapsulates a remote resource request submitted asynchronously
  * via the single-thread executor.
  */
-abstract class AbstractResourceRequest implements ResourceRequest
+abstract class AbstractResourceRequest implements ResourceRequestRunner
 {
   /**
    * Used to collect any throwable raised during communication with the server.

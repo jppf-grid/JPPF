@@ -22,8 +22,7 @@ import static org.jppf.utils.StringUtils.build;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.atomic.*;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.caching.*;
@@ -47,29 +46,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Used to synchronize access to the underlying socket from multiple threads.
-   * @exclude
-   */
-  protected static final ReentrantLock LOCK = new ReentrantLock();
-  /**
-   * Determines whether this class loader should handle dynamic class updating.
-   * @exclude
-   */
-  protected static final AtomicBoolean INITIALIZING = new AtomicBoolean(false);
-  /**
    * Determines whether this class loader should handle dynamic class updating.
    * @exclude
    */
   private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
   /**
-   * 
-   * @exclude
-   */
-  protected static ClassLoaderRequestHandler requestHandler = null;
-  /**
    * Determines whether this class loader should handle dynamic class updating.
    */
-  protected boolean dynamic = false;
+  protected final boolean dynamic;
   /**
    * The unique identifier for the submitting application.
    * @exclude
@@ -91,36 +75,38 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected final JPPFCollectionCache<String> nfCache = new JPPFSimpleSetCache<String>();
   /**
-   * The object used to serialize and deserialize resources.
-   * @exclude
-   */
-  protected ObjectSerializer serializer = null;
-  /**
    * Uniquely identifies this class loader instance.
    * @exclude
    */
   protected final int instanceNumber = INSTANCE_COUNT.incrementAndGet();
+  /**
+   * The connection to the driver.
+   */
+  protected ClassLoaderConnection connection;
 
   /**
    * Initialize this class loader with a parent class loader.
+   * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    * @exclude
    */
-  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent)
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection connection, final ClassLoader parent)
   {
     super(StringUtils.ZERO_URL, parent);
-    if (parent instanceof AbstractJPPFClassLoaderLifeCycle) dynamic = true;
+    this.connection = connection;
+    this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
   }
 
   /**
    * Initialize this class loader with a parent class loader.
    * @param parent a ClassLoader instance.
+   * @param connection the connection to the driver.
    * @param uuidPath unique identifier for the submitting application.
    * @exclude
    */
-  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoader parent, final List<String> uuidPath)
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath)
   {
-    this(parent);
+    this(connection, parent);
     this.uuidPath = uuidPath;
   }
 
@@ -129,8 +115,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @exclude
    */
   protected abstract void init();
+
   /**
-   * Reset and reinitialize the connection ot the server.
+   * Reset and reinitialize the connection to the server.
    * @exclude
    */
   public abstract void reset();
@@ -138,18 +125,18 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * Load the specified class from a socket connection.
    * @param map contains the necessary resource request data.
-   * @param asResource true if the resource is loaded using getResource(), false otherwise.
    * @return a <code>JPPFResourceWrapper</code> containing the resource content.
    * @throws ClassNotFoundException if the class could not be loaded from the remote server.
    * @exclude
    */
-  protected JPPFResourceWrapper loadResourceData(final Map<String, Object> map, final boolean asResource) throws ClassNotFoundException
+  protected JPPFResourceWrapper loadResource(final Map<String, Object> map) throws ClassNotFoundException
   {
     JPPFResourceWrapper resource = null;
     try
     {
       if (debugEnabled) log.debug(build("loading remote definition for resource [", map.get("name"), "]"));
-      resource = loadResourceData0(map, asResource);
+      resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
+      if (debugEnabled) log.debug(build("remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
     }
     catch(IOException e)
     {
@@ -168,52 +155,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   }
 
   /**
-   * Load the specified class from a socket connection.
-   * @param map contains the necessary resource request data.
-   * @param asResource true if the resource is loaded using getResource(), false otherwise.
-   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-   * @throws Exception if the connection was lost and could not be reestablished.
-   * @exclude
-   */
-  protected  JPPFResourceWrapper loadResourceData0(final Map<String, Object> map, final boolean asResource) throws Exception
-  {
-    if (debugEnabled) log.debug(build("loading remote definition for resource [", map.get("name"), "], requestUuid = ", requestUuid));
-    JPPFResourceWrapper resource = loadRemoteData(map, false);
-    if (debugEnabled) log.debug(build("remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
-    return resource;
-  }
-
-  /**
-   * Load the specified class from a socket connection.
-   * @param map contains the necessary resource request data.
-   * @param asResource true if the resource is loaded using getResource(), false otherwise.
-   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-   * @throws Exception if the connection was lost and could not be reestablished.
-   * @exclude
-   */
-  protected abstract JPPFResourceWrapper loadRemoteData(Map<String, Object> map, boolean asResource) throws Exception;
-
-  /**
-   * Determine whether the socket client is being initialized.
-   * @return true if the socket client is being initialized, false otherwise.
-   * @exclude
-   */
-  static boolean isInitializing()
-  {
-    return INITIALIZING.get();
-  }
-
-  /**
-   * Set the socket client initialization status.
-   * @param initFlag true if the socket client is being initialized, false otherwise.
-   * @exclude
-   */
-  static void setInitializing(final boolean initFlag)
-  {
-    INITIALIZING.set(initFlag);
-  }
-
-  /**
    * Set the uuid for the original task bundle that triggered this resource request.
    * @param requestUuid the uuid as a string.
    * @exclude
@@ -227,19 +168,8 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Terminate this classloader and clean the resources it uses.
    * @exclude
    */
+  @Override
   public abstract void close();
-
-  /**
-   * Get the object used to serialize and deserialize resources.
-   * @return an {@link ObjectSerializer} instance.
-   * @throws Exception if any error occurs.
-   * @exclude
-   */
-  protected ObjectSerializer getSerializer() throws Exception
-  {
-    if (serializer == null) serializer = (ObjectSerializer) getParent().loadClass("org.jppf.comm.socket.BootstrapObjectSerializer").newInstance();
-    return serializer;
-  }
 
   @Override
   public void addURL(final URL url)
@@ -252,10 +182,11 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append("[id=").append(instanceNumber).append(", type=").append(dynamic ? "client" : "server");
+    sb.append(", uuidPath=").append(uuidPath);
     URL[] urls = getURLs();
+    sb.append(", classpath=");
     if ((urls != null) && (urls.length > 0))
     {
-      sb.append(", classpath=");
       for (int i=0; i<urls.length; i++)
       {
         if (i > 0) sb.append(';');
@@ -313,7 +244,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
       map.put("name", StringUtils.arrayToString(", ", null, null, namesToLookup));
       map.put("multiple.resources.names", namesToLookup);
-      JPPFResourceWrapper resource = loadResourceData(map, true);
+      JPPFResourceWrapper resource = loadResource(map);
       Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
       for (Integer index : indices) {
         String name = names[index];
@@ -384,5 +315,15 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return results;
+  }
+
+  /**
+   * Get the connection to the driver.
+   * @return a {@link ClassLoaderConnection} instance.
+   * @exclude 
+   */
+  public ClassLoaderConnection getConnection()
+  {
+    return connection;
   }
 }

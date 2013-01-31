@@ -20,11 +20,8 @@ package org.jppf.classloader;
 import static org.jppf.utils.StringUtils.build;
 
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
 
-import org.jppf.node.NodeRunner;
-import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -42,76 +39,37 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * temporary IO handler.
-   */
-  private final LocalClassLoaderChannel channel;
 
   /**
    * Initialize this class loader with a parent class loader.
-   * @param ioHandler wraps the communication channel with the driver.
+   * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    */
-  public JPPFLocalClassLoader(final LocalClassLoaderChannel ioHandler, final ClassLoader parent)
+  public JPPFLocalClassLoader(final ClassLoaderConnection connection, final ClassLoader parent)
   {
-    super(parent);
-    channel = ioHandler;
+    super(connection, parent);
     init();
   }
 
   /**
    * Initialize this class loader with a parent class loader.
+   * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
    */
-  public JPPFLocalClassLoader(final ClassLoader parent, final List<String> uuidPath)
+  public JPPFLocalClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath)
   {
-    super(parent, uuidPath);
-    this.channel = null;
+    super(connection, parent, uuidPath);
   }
 
   /**
-   * Initialize the underlying socket connection.
+   * Initialize the connection to the driver.
    * @exclude
    */
   @Override
   protected void init()
   {
-    LOCK.lock();
-    try
-    {
-      if (INITIALIZING.compareAndSet(false, true))
-      {
-        try
-        {
-          if (debugEnabled) log.debug("sending node initiation message");
-          ResourceRequest rr = new LocalResourceRequest(channel);
-          JPPFResourceWrapper resource = new JPPFResourceWrapper();
-          resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-          resource.setData("node.uuid", NodeRunner.getUuid());
-          rr.setRequest(resource);
-          rr.run();
-          rr.reset();
-          Throwable t = rr.getThrowable();
-          if (t != null) throw new RuntimeException(t);
-          requestHandler = new ClassLoaderRequestHandler(rr);
-          if (debugEnabled) log.debug("received node initiation response");
-          System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
-        }
-        catch (Exception e)
-        {
-          throw new RuntimeException(e);
-        }
-        finally
-        {
-          INITIALIZING.set(false);
-        }
-      }
-    }
-    finally
-    {
-      LOCK.unlock();
-    }
+    connection.init();
   }
 
   /**
@@ -131,20 +89,8 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   @Override
   public void close()
   {
-    LOCK.lock();
-    try
-    {
-      if (requestHandler != null)
-      {
-        requestHandler.close();
-        requestHandler = null;
-      }
-      super.close();
-    }
-    finally
-    {
-      LOCK.unlock();
-    }
+    connection.close();
+    super.close();
   }
 
   /**
@@ -195,31 +141,5 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
     }
     if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
     return c;
-  }
-
-  /**
-   * Load the specified class from a socket connection.
-   * @param map contains the necessary resource request data.
-   * @param asResource true if the resource is loaded using getResource(), false otherwise.
-   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-   * @throws Exception if the connection was lost and could not be reestablished.
-   * @exclude
-   */
-  @Override
-  protected JPPFResourceWrapper loadRemoteData(final Map<String, Object> map, final boolean asResource) throws Exception
-  {
-    JPPFResourceWrapper resource = new JPPFResourceWrapper();
-    resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
-    resource.setDynamic(dynamic);
-    TraversalList<String> list = new TraversalList<String>(uuidPath);
-    resource.setUuidPath(list);
-    if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-    for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
-    resource.setAsResource(asResource);
-    resource.setRequestUuid(requestUuid);
-
-    Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
-    //Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource, this);
-    return f.get();
   }
 }

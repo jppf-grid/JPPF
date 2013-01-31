@@ -56,21 +56,23 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   /**
    * Initialize this class loader with a parent class loader.
+   * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    */
-  public AbstractJPPFClassLoader(final ClassLoader parent)
+  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent)
   {
-    super(parent);
+    super(connection, parent);
   }
 
   /**
    * Initialize this class loader with a parent class loader.
+   * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
    */
-  public AbstractJPPFClassLoader(final ClassLoader parent, final List<String> uuidPath)
+  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath)
   {
-    super(parent, uuidPath);
+    super(connection, parent, uuidPath);
   }
 
   /**
@@ -114,6 +116,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return a defined <code>Class</code> instance.
    * @throws ClassNotFoundException if the class could not be loaded.
    * @see java.lang.ClassLoader#findClass(java.lang.String)
+   * @exclude
    */
   protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
@@ -141,7 +144,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     JPPFResourceWrapper resource = null;
     synchronized(this)
     {
-      resource = loadResourceData(map, false);
+      resource = loadResource(map);
     }
     if (resource != null) b = resource.getDefinition();
     if ((b == null) || (b.length == 0))
@@ -163,6 +166,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param callable the serialized callable to execute remotely.
    * @return an array of bytes containing the result of the callable's execution.
    * @throws Exception if the connection was lost and could not be reestablished.
+   * @exclude
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception
   {
@@ -170,7 +174,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", "callable");
     map.put("callable", callable);
-    JPPFResourceWrapper resource = loadRemoteData(map, false);
+    JPPFResourceWrapper resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
     byte[] b = null;
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) b = resource.getCallable();
     if (debugEnabled) log.debug(build("remote definition for callable resource ", b==null ? "not " : "", "found"));
@@ -302,7 +306,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("name", name);
       map.put("multiple", "true");
-      resource = loadResourceData(map, true);
+      resource = loadResource(map);
       List<byte[]> dataList = null;
       if (resource != null) dataList = (List<byte[]>) resource.getData("resource_list");
       boolean found = (dataList != null) && !dataList.isEmpty();
@@ -324,10 +328,13 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @Override
   protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException
   {
-    if (getDelegationModel() == DelegationModel.URL_FIRST)
-      return loadClassLocalFirst(name, resolve);
-    else
-      return super.loadClass(name, resolve);
+    DelegationModel model = getDelegationModel();
+    switch(model)
+    {
+      case URL_FIRST: return loadClassLocalFirst(name, resolve);
+      case PARENT_FIRST: return super.loadClass(name, resolve);
+    }
+    throw new IllegalStateException("unknown class loader delegation model " + model);
   }
 
   /**
@@ -460,15 +467,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   @Override
   public void close() {
-    LOCK.lock();
-    try
-    {
-      cache.close();
-      nfCache.clear();
-    }
-    finally
-    {
-      LOCK.unlock();
-    }
+    cache.close();
+    nfCache.clear();
   }
 }
