@@ -46,9 +46,6 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
     this.node = node;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected AbstractJPPFClassLoader createClassLoader()
   {
@@ -57,24 +54,19 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
       @Override
       public AbstractJPPFClassLoader run()
       {
-        return new JPPFLocalClassLoader(node.getClassLoaderHandler(), this.getClass().getClassLoader());
+        LocalClassLoaderConnection connection = new LocalClassLoaderConnection(node.getClassLoaderHandler());
+        return new JPPFLocalClassLoader(connection, this.getClass().getClassLoader());
       }
     };
     return AccessController.doPrivileged(pa);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
   {
     return new JPPFLocalContainer(node.getChannel(), uuidPath, cl);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
   {
@@ -88,7 +80,8 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
           @Override
           public AbstractJPPFClassLoader run()
           {
-            return new JPPFLocalClassLoader(getClassLoader(), uuidPath);
+            AbstractJPPFClassLoader cl = getClassLoader();
+            return new JPPFLocalClassLoader(cl.getConnection(), cl, uuidPath);
           }
         };
         return AccessController.doPrivileged(pa);

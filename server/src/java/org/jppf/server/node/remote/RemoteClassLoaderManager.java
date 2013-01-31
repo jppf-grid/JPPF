@@ -91,7 +91,8 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
           @Override
           public AbstractJPPFClassLoader run()
           {
-            return new JPPFClassLoader(getClassLoader(), uuidPath);
+            AbstractJPPFClassLoader cl = getClassLoader();
+            return new JPPFClassLoader(cl.getConnection(), cl, uuidPath);
           }
         };
         return AccessController.doPrivileged(pa);
