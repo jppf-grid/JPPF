@@ -199,11 +199,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       byte[] b;
       byte[] callable = resource.getCallable();
       if (callable != null) b = resourceProvider.computeCallable(callable);
-      else
-      {
-        if (resource.isAsResource()) b = resourceProvider.getResource(name, cl);
-        else b = resourceProvider.getResourceAsBytes(name, cl);
-      }
+      else b = resourceProvider.getResource(name, cl);
       if (b == null) found = false;
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);

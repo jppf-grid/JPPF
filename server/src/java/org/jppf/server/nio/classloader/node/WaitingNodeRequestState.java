@@ -140,7 +140,7 @@ class WaitingNodeRequestState extends ClassServerState
         if (debugEnabled) log.debug(build("resource ", alreadyInCache ? "" : "not ", "found [", name, "] in cache for node: ", channel));
         if (!alreadyInCache)
         {
-          b = server.getResourceProvider().getResourceAsBytes(name);
+          b = server.getResourceProvider().getResource(name);
           if (debugEnabled) log.debug(build("resource ", b == null ? "not " : "", "found [", name, "] in the driver's classpath for node: ", channel));
         }
         if ((b != null) || !resource.isDynamic())

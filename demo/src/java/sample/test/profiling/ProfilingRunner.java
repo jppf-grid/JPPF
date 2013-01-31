@@ -22,7 +22,6 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -52,15 +51,18 @@ public class ProfilingRunner
   {
     try
     {
+      TypedProperties config = JPPFConfiguration.getProperties();
+      int nbTask = config.getInt("profiling.nbTasks");
+      int iterations = config.getInt("profiling.iterations");
+      int nbChannels = config.getInt("profiling.channels");
+      if (nbChannels < 1) nbChannels = 1;
+      config.setProperty("jppf.pool.size", String.valueOf(nbChannels));
       jppfClient = new JPPFClient();
-      TypedProperties props = JPPFConfiguration.getProperties();
-      int nbTask = props.getInt("profiling.nbTasks");
-      int iterations = props.getInt("profiling.iterations");
-      System.out.println("Running with " + nbTask + " tasks of size=" + dataSize + " for " + iterations + " iterations");
-      performSequential(nbTask, true);
-      performSequential(nbTask, false);
+      System.out.println("Running with " + nbTask + " tasks of size=" + dataSize + " for " + iterations + " iterations, nb channels = " + nbChannels);
+      //performSequential(nbTask, true);
+      //performSequential(nbTask, false);
       perform(nbTask, iterations);
-      StreamUtils.waitKeyPressed();
+      //StreamUtils.waitKeyPressed();
     }
     catch(Exception e)
     {

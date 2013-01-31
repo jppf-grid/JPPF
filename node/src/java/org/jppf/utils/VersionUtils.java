@@ -120,7 +120,7 @@ public final class VersionUtils
   }
 
   /**
-   * Read the version information properties file and return the information in a single string. 
+   * Read the version information properties file and return the information in a single string.
    * @return a formatted string containing the JPPF version, build number and build date.
    */
   private static String readVersionInfo()
@@ -149,11 +149,27 @@ public final class VersionUtils
   }
 
   /**
-   * Get the JPPF the version information. 
+   * Get the JPPF the version information.
    * @return a formatted string containing the JPPF version, build number and build date.
    */
   public static String getVersionInformation()
   {
     return VERSION_INFO;
+  }
+
+  /**
+   * Log the process ID and version information for a JPPF node or driver.
+   * @param component either "node" or "driver".
+   * @param uuid the "node or driver uuid.
+   */
+  public static void printJPPFInformation(final String component, final String uuid)
+  {
+    int pid = SystemUtils.getPID();
+    if (pid > 0) System.out.println(component + " process id: " + pid);
+    String hrule = StringUtils.padRight("", '-', 80);
+    log.info(hrule);
+    log.info(VersionUtils.getVersionInformation());
+    log.info("starting JPPF " + component + " with PID=" + pid + ", UUID=" + uuid);
+    log.info(hrule);
   }
 }

@@ -69,7 +69,6 @@ public abstract class AbstractClassLoaderManager
   protected AbstractClassLoaderManager()
   {
     TypedProperties config = JPPFConfiguration.getProperties();
-
     this.maxContainers = config.getInt("jppf.classloader.cache.size", 50);
     this.leakPrevention = new JPPFLeakPrevention(config);
   }
@@ -109,7 +108,8 @@ public abstract class AbstractClassLoaderManager
       try
       {
         classLoader.close();
-      } finally
+      }
+      finally
       {
         classLoader = null;
       }

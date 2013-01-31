@@ -57,10 +57,11 @@ public class ResourceProvider
    * with a null class loader.
    * @param resName the name of the resource to load.
    * @return an array of bytes, or nll if the resource could not be found.
+   * @deprecated use {@link #getResource(String)} instead.
    */
   public byte[] getResourceAsBytes(final String resName)
   {
-    return getResourceAsBytes(resName, null);
+    return getResource(resName, null);
   }
 
   /**
@@ -71,32 +72,11 @@ public class ResourceProvider
    * @param resName the name of the resource to load.
    * @param classLoader the class loader to use to load the request resource.
    * @return an array of bytes, or nll if the resource could not be found.
+   * @deprecated use {@link #getResource(String, ClassLoader)} instead.
    */
   public byte[] getResourceAsBytes(final String resName, final ClassLoader classLoader)
   {
-    ClassLoader cl = classLoader;
-    try
-    {
-      if (cl == null) cl = Thread.currentThread().getContextClassLoader();
-      if (cl == null) cl = getClass().getClassLoader();
-      InputStream is = cl.getResourceAsStream(resName);
-      if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
-      {
-        File file = new File(resName);
-        if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
-      }
-      if (is != null)
-      {
-        if (debugEnabled) log.debug("resource [" + resName + "] found");
-        return StreamUtils.getInputStreamAsByte(is);
-      }
-    }
-    catch (Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-    if (debugEnabled) log.debug("resource [" + resName + "] not found");
-    return null;
+    return getResource(resName, classLoader);
   }
 
   /**

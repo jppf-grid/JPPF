@@ -30,23 +30,27 @@ public interface Node extends Runnable
   /**
    * Get the underlying socket used by this node.
    * @return a SocketWrapper instance.
+   * @exclude
    */
   SocketWrapper getSocketWrapper();
 
   /**
    * Set the underlying socket to be used by this node.
    * @param socketWrapper a SocketWrapper instance.
+   * @exclude
    */
   void setSocketWrapper(SocketWrapper socketWrapper);
 
   /**
    * Stop this node and release the resources it is using.
+   * @exclude
    */
   void stopNode();
 
   /**
    * Get the object that manages the node life cycle events.
    * @return a {@link LifeCycleEventHandler} instance.
+   * @exclude
    */
   LifeCycleEventHandler getLifeCycleEventHandler();
 
@@ -54,6 +58,7 @@ public interface Node extends Runnable
    * Get the JMX connecter server associated with the node.
    * @return a JMXServer instance.
    * @throws Exception if any error occurs.
+   * @exclude
    */
   JMXServer getJmxServer() throws Exception;
 

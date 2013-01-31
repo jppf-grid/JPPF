@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
-import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JMXServer;
 import org.jppf.node.initialization.InitializationHooksHandler;
@@ -61,12 +60,6 @@ public class NodeRunner
    */
   private static boolean securityManagerSet = false;
   /**
-   * The actual socket connection used by the node.
-   * Provided as a means to reuse it when the node updates its own code, therefore removing the need to
-   * disconnect from the server.
-   */
-  private static SocketWrapper nodeSocket = null;
-  /**
    * Container for data stored at the JVM level.
    */
   private static Hashtable<Object, Object> persistentData = new Hashtable<Object, Object>();
@@ -86,10 +79,6 @@ public class NodeRunner
    * This node's universal identifier.
    */
   private static String uuid = JPPFConfiguration.getProperties().getString("jppf.node.uuid", JPPFUuid.normalUUID());
-  /**
-   * Handles include and exclude IP filters.
-   */
-  private static IPFilter ipFilter = new IPFilter(JPPFConfiguration.getProperties());
   /**
    * The initial configuration, such as read from the config file.
    * The JPPF config is modified by the discovery mechanism, so we want to store the initial values somewhere.
@@ -116,13 +105,7 @@ public class NodeRunner
       // initialize the jmx logger
       new JmxMessageNotifier();
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-      int pid = SystemUtils.getPID();
-      if (pid > 0) System.out.println("node process id: " + pid);
-      String hrule = StringUtils.padRight("", '-', 80);
-      log.info(hrule);
-      log.info(VersionUtils.getVersionInformation());
-      log.info("starting node with PID=" + pid + ", UUID=" + uuid);
-      log.info(hrule);
+      VersionUtils.printJPPFInformation("node", uuid);
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
       hooksHandler = new InitializationHooksHandler(initialConfig);
@@ -202,7 +185,6 @@ public class NodeRunner
     Class clazz = getJPPFClassLoader().loadJPPFClass(className);
     Node node = (Node) clazz.newInstance();
     if (debugEnabled) log.debug("Created new node instance: " + node);
-    node.setSocketWrapper(nodeSocket);
     return node;
   }
 
@@ -214,7 +196,8 @@ public class NodeRunner
    */
   private static void discoverDriver()
   {
-    JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(ipFilter);
+    TypedProperties config = JPPFConfiguration.getProperties();
+    JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(new IPFilter(config));
     JPPFConnectionInformation info = receiver.receive();
     receiver.setStopped(true);
     if (info == null)
@@ -224,15 +207,11 @@ public class NodeRunner
       return;
     }
     if (debugEnabled) log.debug("Discovered driver: " + info);
-    TypedProperties config = JPPFConfiguration.getProperties();
     boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     config.setProperty("jppf.server.host", info.host);
     config.setProperty("jppf.server.port", String.valueOf(ssl ? info.sslServerPorts[0] : info.serverPorts[0]));
     if (info.managementHost != null) config.setProperty("jppf.management.host", info.managementHost);
-    if (info.recoveryPort >= 0)
-    {
-      config.setProperty("jppf.recovery.server.port", "" + info.recoveryPort);
-    }
+    if (info.recoveryPort >= 0) config.setProperty("jppf.recovery.server.port", "" + info.recoveryPort);
     else config.setProperty("jppf.recovery.enabled", "false");
   }
 
@@ -282,11 +261,9 @@ public class NodeRunner
     if (securityManagerSet)
     {
       if (debugEnabled) log.debug("un-setting security");
-      PrivilegedAction<Object> pa = new PrivilegedAction<Object>()
-      {
+      PrivilegedAction<Object> pa = new PrivilegedAction<Object>() {
         @Override
-        public Object run()
-        {
+        public Object run() {
           System.setSecurityManager(null);
           return null;
         }
@@ -301,18 +278,13 @@ public class NodeRunner
    * @return a <code>AbstractJPPFClassLoader</code> used for loading the classes of the framework.
    * @exclude
    */
-  public static AbstractJPPFClassLoader getJPPFClassLoader()
-  {
-    synchronized(JPPFClassLoader.class)
-    {
-      if (classLoader == null)
-      {
-        PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>()
-        {
+  public static AbstractJPPFClassLoader getJPPFClassLoader() {
+    synchronized(JPPFClassLoader.class) {
+      if (classLoader == null) {
+        PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>() {
           @Override
-          public JPPFClassLoader run()
-          {
-            return new JPPFClassLoader(NodeRunner.class.getClassLoader());
+          public JPPFClassLoader run() {
+            return new JPPFClassLoader(new RemoteClassLoaderConnection(), NodeRunner.class.getClassLoader());
           }
         };
         classLoader = AccessController.doPrivileged(pa);
@@ -327,7 +299,7 @@ public class NodeRunner
    * @param key the key associated with the object's value.
    * @param value the object to persist.
    */
-  public static synchronized void setPersistentData(final Object key, final Object value)
+  public static void setPersistentData(final Object key, final Object value)
   {
     persistentData.put(key, value);
   }
@@ -337,7 +309,7 @@ public class NodeRunner
    * @param key the key used to retrieve the persistent object.
    * @return the value associated with the key.
    */
-  public static synchronized Object getPersistentData(final Object key)
+  public static Object getPersistentData(final Object key)
   {
     return persistentData.get(key);
   }
@@ -347,7 +319,7 @@ public class NodeRunner
    * @param key the key associated with the object to remove.
    * @return the value associated with the key, or null if the key was not found.
    */
-  public static synchronized Object removePersistentData(final Object key)
+  public static Object removePersistentData(final Object key)
   {
     return persistentData.remove(key);
   }
@@ -408,8 +380,7 @@ public class NodeRunner
    * Task used to terminate the JVM.
    * @exclude
    */
-  public static class ShutdownOrRestart implements Runnable
-  {
+  public static class ShutdownOrRestart implements Runnable {
     /**
      * True if the node is to be restarted, false to only shut it down.
      */
@@ -424,8 +395,7 @@ public class NodeRunner
      * @param restart true if the node is to be restarted, false to only shut it down.
      * @param node this node.
      */
-    public ShutdownOrRestart(final boolean restart, final Node node)
-    {
+    public ShutdownOrRestart(final boolean restart, final Node node) {
       this.restart = restart;
       this.node = node;
     }
