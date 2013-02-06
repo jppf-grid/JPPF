@@ -17,10 +17,10 @@
  */
 package org.jppf.server;
 
-import java.util.Timer;
+import java.util.*;
 
 import org.jppf.*;
-import org.jppf.classloader.LocalClassLoaderChannel;
+import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
@@ -36,7 +36,7 @@ import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
-import org.jppf.server.node.local.JPPFLocalNode;
+import org.jppf.server.node.local.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.startup.*;
@@ -180,7 +180,7 @@ public class JPPFDriver
     nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this));
     clientNioServer = startServer(recoveryServer, new ClientNioServer(this));
     nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue));
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts));
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), extractValidPorts(info.sslServerPorts)));
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
@@ -188,7 +188,7 @@ public class JPPFDriver
       localClassChannel.getContext().setChannel(localClassChannel);
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
       localNodeChannel.getContext().setChannel(localNodeChannel);
-      localNode = new JPPFLocalNode(localNodeChannel, localClassChannel);
+      localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), new LocalClassLoaderConnection(localClassChannel));
       nodeClassServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
       new Thread(localNode, "Local node").start();
@@ -487,5 +487,23 @@ public class JPPFDriver
   public JPPFSystemInformation getSystemInformation()
   {
     return systemInformation;
+  }
+
+  /**
+   * Extract only th valid ports from the input array.
+   * @param ports the array of port numbers to check.
+   * @return an array, possibly of length 0, containing all the valid port numbers in the input array.
+   */
+  private int[] extractValidPorts(final int[] ports)
+  {
+    if ((ports == null) || (ports.length == 0)) return ports;
+    List<Integer> list = new ArrayList<Integer>();
+    for (int port: ports)
+    {
+      if (port >= 0) list.add(port);
+    }
+    int[] result = new int[list.size()];
+    for (int i=0; i<result.length; i++) result[i] = list.get(i);
+    return result;
   }
 }
