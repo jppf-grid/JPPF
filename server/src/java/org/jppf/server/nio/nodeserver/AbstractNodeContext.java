@@ -334,6 +334,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void close() throws Exception {
     getChannel().close();
+    if ((jmxConnection != null) && jmxConnection.isConnected()) jmxConnection.close();
   }
 
   @Override

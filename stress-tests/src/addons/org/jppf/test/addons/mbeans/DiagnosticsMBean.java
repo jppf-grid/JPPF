@@ -40,6 +40,12 @@ public interface DiagnosticsMBean
   DiagnosticsInfo getDiagnosticsInfo();
 
   /**
+   * Get the names of all live threads in the current JVM.
+   * @return an arrray of thread names as strings.
+   */
+  String[] threadNames();
+
+  /**
    * Perform a garbage collection. This method calls <code>System.gc()</code>.
    */
   void gc();
