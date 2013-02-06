@@ -18,6 +18,8 @@
 
 package org.jppf.test.addons.mbeans;
 
+import java.lang.management.*;
+
 /**
  * 
  * @author Laurent Cohen
@@ -45,5 +47,16 @@ public class Diagnostics implements DiagnosticsMBean
   public void gc()
   {
     System.gc();
+  }
+
+  @Override
+  public String[] threadNames()
+  {
+    ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
+    long[] ids = threadsBean.getAllThreadIds();
+    ThreadInfo[] infos = threadsBean.getThreadInfo(ids, 0);
+    String[] result = new String[infos.length];
+    for (int i=0; i<infos.length; i++) result[i] = infos[i].getThreadName();
+    return result;
   }
 }
