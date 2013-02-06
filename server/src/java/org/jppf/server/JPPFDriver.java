@@ -17,7 +17,7 @@
  */
 package org.jppf.server;
 
-import java.util.Timer;
+import java.util.*;
 
 import org.jppf.*;
 import org.jppf.classloader.LocalClassLoaderChannel;
@@ -49,11 +49,11 @@ import org.slf4j.*;
  * <p>It also holds a server for incoming client connections, a server for incoming node connections, along with a class server
  * to handle requests to and from remote class loaders.
  * @author Laurent Cohen
- * @author Lane Schwartz (dynamically allocated server port) 
+ * @author Lane Schwartz (dynamically allocated server port)
  */
 public class JPPFDriver
 {
-  static 
+  static
   {
     JPPFInitializer.init();
   }
@@ -184,7 +184,7 @@ public class JPPFDriver
     nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this));
     clientNioServer = startServer(recoveryServer, new ClientNioServer(this));
     nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue));
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(info.serverPorts, info.sslServerPorts));
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), extractValidPorts(info.sslServerPorts)));
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
@@ -492,5 +492,23 @@ public class JPPFDriver
   public JPPFSystemInformation getSystemInformation()
   {
     return systemInformation;
+  }
+
+  /**
+   * Extract only th valid ports from the input array.
+   * @param ports the array of port numbers to check.
+   * @return an array, possibly of length 0, containing all the valid port numbers in the input array.
+   */
+  private int[] extractValidPorts(final int[] ports)
+  {
+    if ((ports == null) || (ports.length == 0)) return ports;
+    List<Integer> list = new ArrayList<Integer>();
+    for (int port: ports)
+    {
+      if (port >= 0) list.add(port);
+    }
+    int[] result = new int[list.size()];
+    for (int i=0; i<result.length; i++) result[i] = list.get(i);
+    return result;
   }
 }
