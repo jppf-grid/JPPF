@@ -293,10 +293,8 @@ public class ServerJob extends AbstractServerJob {
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
-        //if (isCancelled() || getBroadcastUUID() == null) addExcluded(list, this.tasks, ServerTask.State.RESULT);
       } else if (bundle == null) {
         if (isCancelled()) addAll(list, this.tasks);
-        //if (isCancelled()) addExcluded(list, this.tasks, ServerTask.State.RESULT);
       } else {
         if (bundle.isCancelled()) {
           addExcluded(list, bundle.getTaskList(), TaskState.RESULT);

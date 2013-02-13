@@ -199,7 +199,7 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
     try {
       job.jobReturned(this);
     } finally {
-      if (!isCancelled()) job.taskCompleted(this, exception);
+      job.taskCompleted(this, exception);
       this.channel = null;
       this.future = null;
     }
