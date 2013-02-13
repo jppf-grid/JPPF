@@ -89,4 +89,31 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
   }
+
+  /**
+   * We test that no job remains in the server's queue after resuming, then cancelling an initially suspended job.
+   * See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-126">JPPF-126 Job cancelled from the admin console may get stuck in the server queue</a>.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testResumeAndCancelSuspendedJob() throws Exception
+  {
+    int nbTasks = 2;
+    DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
+    assertNotNull(proxy);
+    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+    job.getSLA().setSuspended(true);
+    client.submit(job);
+    Thread.sleep(1500L);
+    proxy.resumeJob(job.getUuid());
+    Thread.sleep(500L);
+    proxy.cancelJob(job.getUuid());
+    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+    List<JPPFTask> results = collector.waitForResults();
+    assertEquals(results.size(), nbTasks);
+    Thread.sleep(1000L);
+    String[] ids = proxy.getAllJobIds();
+    assertNotNull(ids);
+    assertEquals("the driver's job queue should be empty", 0, ids.length);
+  }
 }
