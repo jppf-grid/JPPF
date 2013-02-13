@@ -55,18 +55,19 @@ public class ResumeJobAction extends AbstractJobAction
   public void updateState(final List<Object> selectedElements)
   {
     super.updateState(selectedElements);
+    boolean enabled = false;
     if (jobDataArray.length > 0)
     {
       for (JobData data: jobDataArray)
       {
         if (data.getJobInformation().isSuspended())
         {
-          setEnabled(true);
-          return;
+          enabled = true;
+          break;
         }
       }
     }
-    setEnabled(false);
+    setEnabled(enabled);
   }
 
   /**
