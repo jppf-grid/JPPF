@@ -27,9 +27,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.job.*;
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.*;
-import org.jppf.ui.actions.ActionsInitializer;
+import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorDriver;
 import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorJob;
@@ -97,7 +97,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   public synchronized void refresh()
   {
     SwingUtilities.invokeLater(new RefreshTask());
-    //new RefreshTask().run();
   }
 
   /**
@@ -412,19 +411,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   public void refreshUI()
   {
-    /*
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        treeTable.invalidate();
-        treeTable.doLayout();
-        treeTable.updateUI();
-        notifyChange();
-      }
-    });
-     */
     treeTable.invalidate();
     treeTable.doLayout();
     treeTable.updateUI();
@@ -435,7 +421,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   public void setupActions()
   {
-    actionHandler = new JobDataPanelActionManager(treeTable);
+    actionHandler = new JTreeTableActionHandler(treeTable);
     synchronized(actionHandler)
     {
       actionHandler.putAction("cancel.job", new CancelJobAction());
