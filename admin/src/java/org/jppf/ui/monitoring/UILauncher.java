@@ -17,7 +17,9 @@
  */
 package org.jppf.ui.monitoring;
 
-import javax.swing.UIManager;
+import java.awt.Frame;
+
+import javax.swing.*;
 
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
@@ -94,6 +96,8 @@ public class UILauncher
       OptionsHandler.loadPreferences();
       OptionsHandler.getBuilder().triggerInitialEvents(elt);
       if (showSplash) splash.stop();
+      Frame[] frames = JFrame.getFrames();
+      for (Frame f: frames) f.setVisible(true);
     }
     catch(Exception e)
     {

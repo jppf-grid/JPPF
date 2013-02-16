@@ -74,7 +74,7 @@ public class JPPFSplash extends Window
     setLayout(new MigLayout("fill, ins 0 0 0 0"));
     add(label, "grow, push");
     pack();
-    getOwner().setVisible(true);
+    setVisible(true);
   }
 
   /**

@@ -7,4 +7,4 @@ def statsHandler = StatsHandler.getInstance();
 comp.setSelectedIndex(0);
 frame.getContentPane().add(option.getUIComponent());
 OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
-frame.setVisible(true);
+//frame.setVisible(true);
