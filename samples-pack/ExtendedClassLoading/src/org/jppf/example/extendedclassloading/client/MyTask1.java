@@ -19,7 +19,6 @@
 package org.jppf.example.extendedclassloading.client;
 
 import org.jppf.example.extendedclassloading.clientlib1.MyClientDynamicClass1;
-import org.jppf.example.extendedclassloading.clientlib2.MyClientDynamicClass2;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -27,19 +26,13 @@ import org.jppf.server.protocol.JPPFTask;
  * the use of classes downloaded via the library repository management facility.
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask
-{
+public class MyTask1 extends JPPFTask {
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       new MyClientDynamicClass1().printHello();
-      new MyClientDynamicClass2().printHello();
       setResult("Successful execution");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
       setException(e);
     }

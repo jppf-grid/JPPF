@@ -96,7 +96,7 @@
 	<target name="compile" depends="clean, init, compile.2, compile.1"/>
 
 	<target name="compile.2">
-		<javac srcdir="" destdir="${classes2.dir}"
+		<javac srcdir="" destdir="${classes2.dir}" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
@@ -105,7 +105,7 @@
   </target>
 
 	<target name="compile.1">
-		<javac srcdir="" destdir="${classes.dir}"
+		<javac srcdir="" destdir="${classes.dir}" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>
