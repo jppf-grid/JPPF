@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
+ * Copyright (C) 2005-2013 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,8 @@ public class FileReplacerEx
   private static String[][] arguments = {
     //{ "C:/Workspaces/temp/jppf", "C:/Workspaces/temp", exts, "pervasiv_", "lolocohe_" },
     //{ "C:/Workspaces/SourceForgeSVN", "C:/Workspaces/temp", exts, "pervasiv_", "lolocohe_" },
-    { "C:/Workspaces/temp/jppf", "C:/Workspaces/temp", "php,tpl,htaccess", "pervasiv", "lolocohe" },
+    //{ "C:/Workspaces/temp/jppf", "C:/Workspaces/temp", "php,tpl,htaccess", "pervasiv", "lolocohe" },
+    { "C:/Workspaces/temp/jppf", "C:/Workspaces/temp", "java,xml,xsd,css,html,properties,php", "pervasiv", "lolocohe" },
   };
 
   /**

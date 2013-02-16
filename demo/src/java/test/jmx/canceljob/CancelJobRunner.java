@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
+ * Copyright (C) 2005-2013 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,6 +62,7 @@ public class CancelJobRunner
       JPPFJob job = new JPPFJob(name);
       job.setBlocking(false);
       job.getClientSLA().setMaxChannels(maxChannels);
+      job.getSLA().setSuspended(true);
       for (int i=1; i<=nbTasks; i++) job.addTask(new LifeCycleTask(duration)).setId(name + ":task-" + i);
       jppfClient.submit(job);
       Thread.sleep(900L);
@@ -72,7 +73,7 @@ public class CancelJobRunner
       DriverJobManagementMBean jobProxy = jmx.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
       */
       //jobProxy.cancelJob(job.getUuid());
-      jppfClient.cancelJob(job.getUuid());
+      //jppfClient.cancelJob(job.getUuid());
       print("job cancelled, waiting for results");
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       List<JPPFTask> results = collector.waitForResults();

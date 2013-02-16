@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
+ * Copyright (C) 2005-2013 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,9 +77,10 @@ public class FileReplacer
    * @param destFile file containing the replacement content.
    * @param ext comma-separated list of file extensions to process.
    * @param searchOnly determines whether only the search is performed (no replacement).
+   * @param regex if true, then interpret the source as a regular expressison.
    * @throws Exception if an error occurs while performing the replacements.
    */
-  public void replace(final String rootDir, final String srcFile, final String destFile, final String ext, final boolean searchOnly) throws Exception
+  public void replace(final String rootDir, final String srcFile, final String destFile, final String ext, final boolean searchOnly, final boolean regex) throws Exception
   {
     src = FileUtils.readTextFile(srcFile);
     dest = FileUtils.readTextFile(destFile);
@@ -89,7 +90,8 @@ public class FileReplacer
       dest = dest.substring(0, dest.length() - 1);
     }
     this.searchOnly = searchOnly;
-    pattern = Pattern.compile(src, Pattern.LITERAL);
+    if (regex) pattern = Pattern.compile(src);
+    else pattern = Pattern.compile(src, Pattern.LITERAL);
     filter = new ReplacerFilter(ext);
     File f = new File(rootDir);
     nbFilesChanged = 0;
@@ -97,8 +99,7 @@ public class FileReplacer
     if (f.isDirectory()) replaceFolder(f);
     else replaceFile(f);
     log.info("Total number of occurrences found: " + nbReplacements);
-    log.info("Total number of files" + (searchOnly ? " would have been" : "") +
-        " changed: " + nbFilesChanged);
+    log.info("Total number of files" + (searchOnly ? " would have been" : "") + " changed: " + nbFilesChanged);
   }
 
   /**
@@ -147,7 +148,7 @@ public class FileReplacer
     {
       nbFilesChanged++;
       nbReplacements += nbFound;
-      log.info("Found "+nbFound+" occurrence"+(nbFound > 1 ? "s" : "")+" of the sequence in file '"+file+ '\'');
+      log.info("Found "+nbFound+" occurrence" + (nbFound > 1 ? "s" : "") + " of the sequence in file '" + file + '\'');
       String s = matcher.replaceAll(dest);
       if (debugEnabled) log.debug("Content with replacements performed:\n" + s);
       if (!searchOnly) FileUtils.writeTextFile(file.getPath(), s);
@@ -168,18 +169,80 @@ public class FileReplacer
   {
     try
     {
+      /*
       String rootFolder = args[0];
       String find = args[1];
       String replace = args[2];
       String ext = args[3];
       boolean searchOnly = Boolean.valueOf(args[4]);
+       */
+      Arguments a = parseArguments(args);
+      System.out.println("using " + a);
       FileReplacer replacer = new FileReplacer();
-      replacer.replace(rootFolder, find, replace, ext, searchOnly);
+      replacer.replace(a.root, a.in, a.out, a.exts, a.searchOnly, a.regex);
     }
     catch(Exception e)
     {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Encapsulates the command-line arguments.
+   */
+  public static class Arguments
+  {
+    /**
+     * The input file containing the the text or expression to match.
+     */
+    public String in = null;
+    /**
+     * The input file containing the the replacement text.
+     */
+    public String out = null;
+    /**
+     * The root folder in which to perform the search.
+     */
+    public String root = null;
+    /**
+     * The file extensions to look for.
+     */
+    public String exts = null;
+    /**
+     * If true, then only find matches but do not actually replace in the matching files.
+     */
+    public boolean searchOnly = true;
+    /**
+     * If true, then interpret the content of 'in' as a regular expression.
+     */
+    public boolean regex = false;
+
+    @Override
+    public String toString()
+    {
+      return "Arguments[in=" + in + ", out=" + out + ", root=" + root + ", exts=" + exts + ", searchOnly=" + searchOnly + ", regex=" + regex + "]";
+    }
+  }
+
+  /**
+   * Parse the command-line arguments into a usable object.
+   * @param args the command-line arguments to parse.
+   * @return an <code>Arguments</code> instance.
+   * @throws Exception if any erorr occurs.
+   */
+  private static Arguments parseArguments(final String...args) throws Exception
+  {
+    Arguments ag = new Arguments();
+    for (int i=0; i<args.length; i++)
+    {
+      if ("-i".equals(args[i])) ag.in = args[++i];
+      else if ("-o".equals(args[i])) ag.out = args[++i];
+      else if ("-f".equals(args[i])) ag.root = args[++i];
+      else if ("-e".equals(args[i])) ag.exts = args[++i];
+      else if ("-p".equals(args[i])) ag.searchOnly = false;
+      else if ("-r".equals(args[i])) ag.regex = true;
+    }
+    return ag;
   }
 
   /**

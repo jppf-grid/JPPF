@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
+ * Copyright (C) 2005-2013 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -288,7 +288,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       Map<String, Object> result = null;
       try
       {
-        result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet(uuidMap.keySet())));
+        result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet<String>(uuidMap.keySet())));
       }
       catch(IOException e)
       {

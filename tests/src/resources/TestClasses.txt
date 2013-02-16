@@ -8,11 +8,11 @@ test.org.jppf.client.TestConnectionPool
 test.org.jppf.client.TestJPPFClient
 test.org.jppf.client.TestJPPFJob
 test.org.jppf.io.TestFileDataLocation
+test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
+test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean2
 test.org.jppf.management.TestJMXConnectionWrapper
 test.org.jppf.management.TestJPPFDriverAdminMBean
 test.org.jppf.management.TestJPPFNodeAdminMBean
-test.org.jppf.management.TestJPPFNodeForwardingMBean
-test.org.jppf.management.TestJPPFNodeForwardingMBean2
 test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
 test.org.jppf.server.job.management.TestDriverJobManagementMBean
 test.org.jppf.server.protocol.TestJPPFJobClientSLA

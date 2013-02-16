@@ -1,6 +1,6 @@
 <!--
 	JPPF
-  Copyright (C) 2005-2012 JPPF Team. 
+  Copyright (C) 2005-2013 JPPF Team. 
 	http://www.jppf.org
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -235,4 +235,21 @@
 		</zip>
 	</target>
 
+  <!--
+  -->
+  <target name="unzip.to.temp" depends="deploy.nojavadoc.noinstaller">
+    <property name="temp" value="${basedir}/../../temp"/>
+    <delete dir="${temp}" quiet="true" includes="**/*.*" excludes="*.bat"/>
+    <unzip dest="${temp}">
+      <fileset dir="${build}">
+        <include name="*-driver.zip"/>
+        <include name="*-node.zip"/>
+        <include name="*-samples-pack.zip"/>
+      </fileset>
+    </unzip>
+    <property name="ecl.dir" value="${temp}/${app.ver}-samples-pack/ExtendedClassLoading"/>
+    <ant dir="${ecl.dir}"/>
+    <copy todir="${temp}/${app.ver}-driver/lib" file="${ecl.dir}/NodeListener.jar"/>
+  </target>
+  
 </project> 

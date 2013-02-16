@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
+ * Copyright (C) 2005-2013 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +22,12 @@ import java.util.*;
 import java.util.concurrent.Executors;
 
 import org.jppf.JPPFException;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.*;
-import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.execute.ExecutorStatus;
-import org.jppf.execute.JPPFFuture;
-import org.jppf.execute.JPPFFutureTask;
+import org.jppf.execute.*;
 import org.jppf.management.*;
-import org.jppf.node.Node;
+import org.jppf.node.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.server.node.NodeExecutionManagerImpl;
 import org.jppf.server.protocol.JPPFTask;
@@ -42,7 +40,7 @@ import org.slf4j.*;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implements ClientConnectionStatusHandler, Node
+public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implements ClientConnectionStatusHandler, NodeInternal
 {
   /**
    * Logger for this class.
@@ -69,7 +67,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
    */
   private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
   /**
-   * Temporary listeners array to allow access to the listeners without synchronization. 
+   * Temporary listeners array to allow access to the listeners without synchronization.
    */
   private ClientConnectionStatusListener[] listenersArray;
   /**
@@ -260,14 +258,9 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   }
 
   @Override
-  public SocketWrapper getSocketWrapper()
+  public NodeConnection getNodeConnection()
   {
     return null;
-  }
-
-  @Override
-  public void setSocketWrapper(final SocketWrapper socketWrapper)
-  {
   }
 
   @Override
@@ -329,5 +322,15 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
         listeners.clear();
       }
     }
+  }
+
+  /**
+   * This implementation does nothing.
+   * @return <code>null</code>.
+   */
+  @Override
+  public AbstractJPPFClassLoader resetTaskClassLoader()
+  {
+    return null;
   }
 }

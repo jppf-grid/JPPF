@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2012 JPPF Team.
+ * Copyright (C) 2005-2013 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.management.*;
 
 import org.jppf.management.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.node.*;
 import org.jppf.node.event.*;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -174,9 +174,6 @@ public class NodeSystemTray implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event)
   {
@@ -185,7 +182,7 @@ public class NodeSystemTray implements NodeLifeCycleListener
     {
       try
       {
-        jmxServer = event.getNode().getJmxServer();
+        jmxServer = ((AbstractNode) event.getNode()).getJmxServer();
       }
       catch (Exception e)
       {
@@ -206,9 +203,6 @@ public class NodeSystemTray implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event)
   {
@@ -225,17 +219,11 @@ public class NodeSystemTray implements NodeLifeCycleListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobStarting(final NodeLifeCycleEvent event)
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {
