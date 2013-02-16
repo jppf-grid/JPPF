@@ -21,11 +21,9 @@ package org.jppf.classloader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.node.*;
 import org.jppf.utils.TraversalList;
 import org.slf4j.*;
 
@@ -35,7 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractClassLoaderConnection<C> implements ClassLoaderConnection<C>
+public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConnection<C> implements ClassLoaderConnection<C>
 {
   /**
    * Logger for this class.
@@ -46,21 +44,9 @@ public abstract class AbstractClassLoaderConnection<C> implements ClassLoaderCon
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The channel used to communicate witht he driver.
-   */
-  protected C channel = null;
-  /**
    * The object which sends the class laoding requests and receives the responses.
    */
   protected ClassLoaderRequestHandler requestHandler = null;
-  /**
-   * Used to synchronize access to the communication channel from multiple threads.
-   */
-  protected final ReentrantLock lock = new ReentrantLock();
-  /**
-   * Determines whether this connection is initializing.
-   */
-  protected final AtomicBoolean initializing = new AtomicBoolean(false);
 
   /**
    * Perform the part of the handshake common to remote and local nodes. This consists in:
@@ -124,12 +110,6 @@ public abstract class AbstractClassLoaderConnection<C> implements ClassLoaderCon
     return resource;
   }
 
-  @Override
-  public C getChannel()
-  {
-    return channel;
-  }
-
   /**
    * Get the object which sends the class laoding requests and receives the responses.
    * @return a {@link ClassLoaderRequestHandler} instance.
@@ -137,5 +117,23 @@ public abstract class AbstractClassLoaderConnection<C> implements ClassLoaderCon
   public ClassLoaderRequestHandler getRequestHandler()
   {
     return requestHandler;
+  }
+
+  @Override
+  public void reset() throws Exception
+  {
+    lock.lock();
+    try
+    {
+      init();
+    }
+    catch (Exception e)
+    {
+      throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
+    }
+    finally
+    {
+      lock.unlock();
+    }
   }
 }

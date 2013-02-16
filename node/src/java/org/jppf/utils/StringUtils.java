@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.utils.streams.StreamUtils;
 
 
@@ -449,5 +450,60 @@ public final class StringUtils
       }
     }
     return props;
+  }
+
+  /**
+   * Print a top-down representation of a class loader hierarchy into a string.
+   * @param leafClassLoader the class loader at the bottom of the hierarchy.
+   * @return a string representation of the class loader hierarchy.
+   */
+  public static String printClassLoaderHierarchy(final ClassLoader leafClassLoader)
+  {
+    StringBuilder sb = new StringBuilder();
+    ClassLoader cl = leafClassLoader;
+    if (cl != null)
+    {
+      sb.append("class loader hierarchy:\n");
+      Stack<String> stack = new Stack<String>();
+      while (cl != null)
+      {
+        if (cl instanceof AbstractJPPFClassLoader) stack.push(cl.toString());
+        else if (cl instanceof URLClassLoader) stack.push(toString((URLClassLoader) cl));
+        else  stack.push(cl.toString());
+        cl = cl.getParent();
+      }
+      int count = 0;
+      while (!stack.isEmpty())
+      {
+        for (int i=0; i<2*count; i++) sb.append(' ');
+        sb.append(stack.pop());
+        if (!stack.isEmpty()) sb.append('\n');
+        count++;
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Print a representation of a <code>URLClassLoader</code> into a string.
+   * The resulting string includes the class loader's classpath.
+   * @param cl  the classloader to print.
+   * @return a string representation of the input class loader.
+   */
+  public static String toString(final URLClassLoader cl)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(cl.getClass().getSimpleName()).append("[classpath=");
+    URL[] urls = cl.getURLs();
+    if ((urls != null) && (urls.length > 0))
+    {
+      for (int i=0; i<urls.length; i++)
+      {
+        if (i > 0) sb.append(';');
+        sb.append(urls[i]);
+      }
+    }
+    sb.append(']');
+    return sb.toString();
   }
 }

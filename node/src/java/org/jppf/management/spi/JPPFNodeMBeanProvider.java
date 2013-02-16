@@ -29,7 +29,7 @@ public interface JPPFNodeMBeanProvider extends JPPFMBeanProvider
   /**
    * Return a concrete MBean.<br>
    * The class of this MBean must implement the interface defined by {@link JPPFMBeanProvider#getMBeanInterfaceName() getMBeanInterfaceName()}.
-   * @param node - the JPPF node that is managed or monitored by the MBean.
+   * @param node the JPPF node that is managed or monitored by the MBean.
    * @return an <code>Object</code> that is an implementation of the MBean interface.
    */
   Object createMBean(Node node);

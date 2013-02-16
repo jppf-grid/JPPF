@@ -110,46 +110,35 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     setStopped(false);
     boolean initialized = false;
     if (debugEnabled) log.debug("Start of node main loop, nodeUuid=" + uuid);
-    while (!isStopped())
-    {
-      try
-      {
+    while (!isStopped()) {
+      try {
         if (NodeRunner.isShuttingDown()) break;
         init();
-        if (!initialized)
-        {
+        if (!initialized) {
           System.out.println("Node successfully initialized");
           initialized = true;
         }
         perform();
-      }
-      catch(SecurityException e)
-      {
+      } catch(SecurityException e) {
         if (checkConnection) connectionChecker.stop();
         throw new JPPFError(e);
-      }
-      catch(IOException e)
-      {
+      } catch(IOException e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
         reset(true);
         throw new JPPFNodeReconnectionNotification(e);
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
         reset(true);
       }
     }
     if (debugEnabled) log.debug("End of node main loop");
-    if (exitAction != null)
-    {
+    if (exitAction != null) {
       Runnable r = exitAction;
       setExitAction(null);
       r.run();
@@ -161,8 +150,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * receives it, executes it and sends the results back.
    * @throws Exception if an error was raised from the underlying socket connection or the class loader.
    */
-  public void perform() throws Exception
-  {
+  public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
     while (!isStopped())
     {
@@ -171,22 +159,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       checkInitialBundle(bundle);
       List<Task> taskList = pair.second();
       boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
-      if (debugEnabled)
-      {
+      if (debugEnabled) {
         if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
         else log.debug("received an empty bundle");
       }
-      if (notEmpty)
-      {
-        if (checkConnection)
-        {
-          try
-          {
+      if (notEmpty) {
+        if (checkConnection) {
+          try {
             connectionChecker.resume();
             executionManager.execute(bundle, taskList);
-          }
-          finally
-          {
+          } finally {
             connectionChecker.suspend();
             if (connectionChecker.getException() != null) throw connectionChecker.getException();
           }
@@ -220,11 +202,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param taskList the tasks results.
    * @throws Exception if any error occurs.
    */
-  private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception
-  {
+  private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception {
     if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
-    if (executionManager.checkConfigChanged() || bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
-    {
+    if (executionManager.checkConfigChanged() || bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       TypedProperties jppf = systemInformation.getJppf();
       jppf.clear();
@@ -232,8 +212,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
     }
     nodeIO.writeResults(bundle, taskList);
-    if ((taskList != null) && (!taskList.isEmpty()))
-    {
+    if ((taskList != null) && (!taskList.isEmpty())) {
       //getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
       // if jmx is enabled, this is done by the status notifier
       if (!isJmxEnabled()) setTaskCount(getTaskCount() + taskList.size());
@@ -245,32 +224,21 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  private synchronized void init() throws Exception
-  {
+  private synchronized void init() throws Exception {
     if (debugEnabled) log.debug("start node initialization");
     initHelper();
-    if (isJmxEnabled())
-    {
+    if (isJmxEnabled()) {
       JMXServer jmxServer = null;
-      try
-      {
+      try {
         jmxServer = getJmxServer();
-        if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME)))
-        {
-          registerProviderMBeans();
-        }
-      }
-      catch(Exception e)
-      {
+        if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME))) registerProviderMBeans();
+      } catch(Exception e) {
         jmxEnabled = false;
         System.out.println("JMX initialization failure - management is disabled for this node");
         System.out.println("see the log file for details");
-        try
-        {
+        try {
           if (jmxServer != null) jmxServer.stop();
-        }
-        catch(Exception e2)
-        {
+        } catch(Exception e2) {
           log.error("Error stopping the JMX server", e2);
         }
         jmxServer = null;
@@ -279,8 +247,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     }
     new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
     initDataChannel();
-    if (checkConnection)
-    {
+    if (checkConnection) {
       connectionChecker = createConnectionChecker();
       connectionChecker.start();
     }
@@ -389,17 +356,13 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @see org.jppf.node.Node#stopNode()
    */
   @Override
-  public synchronized void stopNode()
-  {
+  public synchronized void stopNode() {
     if (debugEnabled) log.debug("stopping node");
     setStopped(true);
     executionManager.shutdown();
-    try
-    {
+    try {
       this.closeDataChannel();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
     reset(false);
@@ -420,33 +383,24 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Reset this node for shutdown/restart/reconnection.
    * @param stopJmx <code>true</code> if the JMX server is to be stopped, <code>false</code> otherwise.
    */
-  private void reset(final boolean stopJmx)
-  {
+  private void reset(final boolean stopJmx) {
     lifeCycleEventHandler.fireNodeEnding();
     lifeCycleEventHandler.removeAllListeners();
     setNodeAdmin(null);
     classLoaderManager.closeClassLoader();
-    try
-    {
-      synchronized(this)
-      {
+    try {
+      synchronized(this) {
         closeDataChannel();
       }
       classLoaderManager.clearContainers();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
-    if (stopJmx)
-    {
-      try
-      {
+    if (stopJmx) {
+      try {
         providerManager.unregisterProviderMBeans();
         if (jmxServer != null) jmxServer.stop();
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -466,26 +420,21 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if the registration failed.
    */
   @SuppressWarnings("unchecked")
-  private void registerProviderMBeans() throws Exception
-  {
+  private void registerProviderMBeans() throws Exception {
     ClassLoader cl = getClass().getClassLoader();
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     MBeanServer server = getJmxServer().getServer();
     if (providerManager == null) providerManager = new JPPFMBeanProviderManager<JPPFNodeMBeanProvider>(JPPFNodeMBeanProvider.class, server);
-    try
-    {
+    try {
       Thread.currentThread().setContextClassLoader(cl);
       List<JPPFNodeMBeanProvider> list = providerManager.getAllProviders(cl);
-      for (JPPFNodeMBeanProvider provider: list)
-      {
+      for (JPPFNodeMBeanProvider provider: list) {
         Object o = provider.createMBean(this);
         Class inf = Class.forName(provider.getMBeanInterfaceName());
         boolean b = providerManager.registerProviderMBean(o, inf, provider.getMBeanName());
         if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + ']');
       }
-    }
-    finally
-    {
+    } finally {
       Thread.currentThread().setContextClassLoader(tmp);
     }
   }
@@ -496,12 +445,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   @Override
-  public JMXServer getJmxServer() throws Exception
-  {
-    synchronized(this)
-    {
-      if ((jmxServer == null) || jmxServer.isStopped())
-      {
+  public JMXServer getJmxServer() throws Exception {
+    synchronized(this) {
+      if ((jmxServer == null) || jmxServer.isStopped()) {
         boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
         jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl);
         jmxServer.start(getClass().getClassLoader());
@@ -537,5 +483,23 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   {
     updateSystemInformation();
     executionManager.triggerConfigChanged();
+  }
+
+  @Override
+  public AbstractJPPFClassLoader resetTaskClassLoader() {
+    JPPFTaskBundle bundle = executionManager.getBundle();
+    if (bundle == null) return null;
+    try {
+      JPPFContainer cont = classLoaderManager.getContainer(bundle.getUuidPath().getList());
+      AbstractJPPFClassLoader oldCL = cont.getClassLoader();
+      String requestUuid = oldCL.getRequestUuid();
+      AbstractJPPFClassLoader newCL = classLoaderManager.newClientClassLoader(cont.uuidPath);
+      newCL.setRequestUuid(requestUuid);
+      cont.setClassLoader(newCL);
+      return newCL;
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return null;
   }
 }

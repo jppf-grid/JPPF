@@ -63,16 +63,6 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   }
 
   /**
-   * Initialize the connection to the driver.
-   * @exclude
-   */
-  @Override
-  protected void init()
-  {
-    connection.init();
-  }
-
-  /**
    * @exclude
    */
   @Override
@@ -89,7 +79,14 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   @Override
   public void close()
   {
-    connection.close();
+    try
+    {
+      connection.close();
+    }
+    catch (Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
     super.close();
   }
 

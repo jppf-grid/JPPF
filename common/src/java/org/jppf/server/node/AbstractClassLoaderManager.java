@@ -23,8 +23,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -129,17 +128,7 @@ public abstract class AbstractClassLoaderManager
     if (container == null)
     {
       if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-      AbstractJPPFClassLoader cl = AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>() {
-        @Override
-        public AbstractJPPFClassLoader run() {
-          try {
-            return newClassLoaderCreator(uuidPath).call();
-          } catch(Exception e) {
-            log.error(e.getMessage(), e);
-          }
-          return null;
-        }
-      });
+      AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath);
       container = newJPPFContainer(uuidPath, cl);
       if (containerList.size() >= maxContainers)
       {
@@ -160,6 +149,26 @@ public abstract class AbstractClassLoaderManager
       containerMap.put(uuid, container);
     }
     return container;
+  }
+
+  /**
+   * Create a new client class loader instance for the specified uuid path.
+   * @param uuidPath the uuid path uniquely identifying the client.
+   * @return a {@link AbstractJPPFClassLoader} instance or <code>null</code> if the class laoder could not be created.
+   */
+  protected AbstractJPPFClassLoader newClientClassLoader(final List<String> uuidPath)
+  {
+    return AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>() {
+      @Override
+      public AbstractJPPFClassLoader run() {
+        try {
+          return newClassLoaderCreator(uuidPath).call();
+        } catch(Exception e) {
+          log.error(e.getMessage(), e);
+        }
+        return null;
+      }
+    });
   }
 
   /**

@@ -28,7 +28,7 @@ class NodeThread extends Thread
   /**
    * Reference to the underlying JPPF node.
    */
-  private Node node = null;
+  private NodeInternal node = null;
   /**
    * Receives event notifications from the node.
    */

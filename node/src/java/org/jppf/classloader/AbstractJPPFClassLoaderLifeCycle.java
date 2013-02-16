@@ -82,7 +82,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * The connection to the driver.
    */
-  protected ClassLoaderConnection connection;
+  protected ClassLoaderConnection<?> connection;
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -111,10 +111,21 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   }
 
   /**
-   * Initialize the underlying socket connection.
+   * Initialize the connection to the driver.
    * @exclude
    */
-  protected abstract void init();
+  protected void init()
+  {
+    try
+    {
+      connection.init();
+    }
+    catch (Exception e)
+    {
+      throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
+    }
+  }
+
 
   /**
    * Reset and reinitialize the connection to the server.
@@ -152,6 +163,15 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return resource;
+  }
+
+  /**
+   * Get the uuid for the original task bundle that triggered this resource request.
+   * @return the uuid as a string.
+   */
+  public String getRequestUuid()
+  {
+    return requestUuid;
   }
 
   /**
@@ -325,5 +345,15 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public ClassLoaderConnection getConnection()
   {
     return connection;
+  }
+
+  /**
+   * Get the uuid of the JPPF client this class laoder gets resources from.
+   * @return a client uuid as a string, or <code>null</code> if this class cloader is not a client class loader.
+   */
+  public String getClientUuid()
+  {
+    if (!dynamic) return null;
+    return uuidPath.get(0);
   }
 }

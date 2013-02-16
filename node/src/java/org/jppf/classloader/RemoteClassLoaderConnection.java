@@ -55,7 +55,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   private ObjectSerializer serializer = null;
 
   @Override
-  public void init()
+  public void init() throws Exception
   {
     lock.lock();
     try
@@ -65,7 +65,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
         try
         {
           if (debugEnabled) log.debug("initializing connection");
-          if (channel == null) initChannel();
+          initChannel();
           System.out.println("Attempting connection to the class server at " + channel.getHost() + ':' + channel.getPort());
           socketInitializer.initializeSocket(channel);
           if (!socketInitializer.isSuccessful())
@@ -148,21 +148,6 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   }
 
   @Override
-  public void reset()
-  {
-    lock.lock();
-    try
-    {
-      channel = null;
-      init();
-    }
-    finally
-    {
-      lock.unlock();
-    }
-  }
-
-  @Override
   public void close()
   {
     lock.lock();
@@ -199,7 +184,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
    * @throws Exception if any error occurs.
    * @exclude
    */
-  protected ObjectSerializer getSerializer() throws Exception
+  private ObjectSerializer getSerializer() throws Exception
   {
     if (serializer == null) serializer = new BootstrapObjectSerializer();
     return serializer;

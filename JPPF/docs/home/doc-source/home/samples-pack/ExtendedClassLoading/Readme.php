@@ -59,7 +59,7 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
           	<li>The same is performed upon "node ending" events</li>
           	<li>On "job header loaded" events, the node reads the metadata associated with the jobs and performs repository updates accordingly:
 						<ol class="samplesList">
-							<li>if a <a href="src/org/jppf/example/extendedclassloading/RepositoryFilter.java.html">RepositoryFilter</a> is provided, the repository's <tt>delete()</tt> method will rmeove the jar files that match the filter.
+							<li>if a <a href="src/org/jppf/example/extendedclassloading/RepositoryFilter.java.html">RepositoryFilter</a> is provided, the repository's <tt>delete()</tt> method will remove the jar files that match the filter.
 							This is a repository maintenance operation, which we recommend to perform via a <a href="http://www.jppf.org/doc/v3/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs">broadcast job</a></li>
 							<li>if a <a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath</a> is provided, then the node will download the specified libraries that are not in the repository, then add them to the
 							client class loader's classpath. If necessary, it will create a new class loader instance, without disconnecting form the driver, using the node's <a href="http://www.jppf.org/api-3/org/jppf/node/Node.html#resetTaskClassLoader()">resetTaskClassLoader()</a> method.

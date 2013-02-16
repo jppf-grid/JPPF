@@ -107,7 +107,7 @@ public interface NodeSelector extends Serializable
      */
     public UuidSelector(final Collection<String> uuids)
     {
-      this.uuids = (uuids == null) ? Collections.EMPTY_LIST : Collections.unmodifiableCollection(uuids);
+      this.uuids = (uuids == null) ? Collections.<String>emptyList() : Collections.unmodifiableCollection(uuids);
     }
 
     /**
@@ -116,7 +116,7 @@ public interface NodeSelector extends Serializable
      */
     public UuidSelector(final String...uuids)
     {
-      this.uuids = (uuids == null) ? Collections.EMPTY_LIST : Collections.unmodifiableList(Arrays.asList(uuids));
+      this.uuids = (uuids == null) ? Collections.<String>emptyList() : Collections.unmodifiableList(Arrays.asList(uuids));
     }
 
     /**

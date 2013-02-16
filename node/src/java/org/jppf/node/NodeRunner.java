@@ -70,7 +70,7 @@ public class NodeRunner
   /**
    * The JPPF node.
    */
-  private static Node node = null;
+  private static NodeInternal node = null;
   /**
    * Used to synchronize start and stop methods when the node is run as a service.
    */
@@ -176,14 +176,14 @@ public class NodeRunner
    * @throws Exception if the node failed to run or couldn't connect to the server.
    * @exclude
    */
-  public static Node createNode() throws Exception
+  public static NodeInternal createNode() throws Exception
   {
     hooksHandler.callHooks();
     if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     Class clazz = getJPPFClassLoader().loadJPPFClass(className);
-    Node node = (Node) clazz.newInstance();
+    NodeInternal node = (NodeInternal) clazz.newInstance();
     if (debugEnabled) log.debug("Created new node instance: " + node);
     return node;
   }
@@ -340,7 +340,7 @@ public class NodeRunner
    * @param restart determines whether this node should be restarted by the node launcher.
    * @exclude
    */
-  public static void shutdown(final Node node, final boolean restart)
+  public static void shutdown(final NodeInternal node, final boolean restart)
   {
     //executor.submit(new ShutdownOrRestart(restart));
     new ShutdownOrRestart(restart, node).run();
@@ -388,14 +388,14 @@ public class NodeRunner
     /**
      * True if the node is to be restarted, false to only shut it down.
      */
-    private final Node node;
+    private final NodeInternal node;
 
     /**
      * Initialize this task.
      * @param restart true if the node is to be restarted, false to only shut it down.
      * @param node this node.
      */
-    public ShutdownOrRestart(final boolean restart, final Node node) {
+    public ShutdownOrRestart(final boolean restart, final NodeInternal node) {
       this.restart = restart;
       this.node = node;
     }

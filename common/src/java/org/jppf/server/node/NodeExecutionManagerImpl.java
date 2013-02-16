@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.*;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -51,7 +51,7 @@ public class NodeExecutionManagerImpl
   /**
    * The node that uses this execution manager.
    */
-  private Node node = null;
+  private NodeInternal node = null;
   /**
    * Timer managing the tasks timeout.
    */
@@ -104,16 +104,12 @@ public class NodeExecutionManagerImpl
    * The total accumulated elapsed time of the tasks in the current bundle.
    */
   private final AtomicLong accumulatedElapsed = new AtomicLong(0L);
-  /**
-   * 
-   */
-  private ExecutorCompletionService ecs;
 
   /**
    * Initialize this execution manager with the specified node.
    * @param node the node that uses this execution manager.
    */
-  public NodeExecutionManagerImpl(final Node node) {
+  public NodeExecutionManagerImpl(final AbstractNode node) {
     this(node, "processing.threads");
   }
 
@@ -122,7 +118,7 @@ public class NodeExecutionManagerImpl
    * @param node the node that uses this execution manager.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    */
-  public NodeExecutionManagerImpl(final Node node, final String nbThreadsProperty) {
+  public NodeExecutionManagerImpl(final NodeInternal node, final String nbThreadsProperty) {
     super();
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
@@ -134,7 +130,6 @@ public class NodeExecutionManagerImpl
     }
     log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadManager = createThreadManager(config, poolSize);
-    ecs = new ExecutorCompletionService(getExecutor());
   }
 
   /**
@@ -182,6 +177,7 @@ public class NodeExecutionManagerImpl
     if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
     setup(bundle, taskList);
     if (!isJobCancelled()) {
+      ExecutorCompletionService<Object> ecs = new ExecutorCompletionService<Object>(getExecutor());
       for (Task task : taskList) {
         NodeTaskWrapper taskWrapper = new NodeTaskWrapper(this, task, taskClassLoader);
         Future<?> f =  ecs.submit(taskWrapper, null);
@@ -261,7 +257,7 @@ public class NodeExecutionManagerImpl
    * @param taskList the list of tasks to execute.
    */
   @SuppressWarnings("unchecked")
-  public void setup(final JPPFTaskBundle bundle, final List<? extends Task> taskList) {
+  private void setup(final JPPFTaskBundle bundle, final List<? extends Task> taskList) {
     this.bundle = bundle;
     this.taskList = taskList;
     this.futureMap = new ConcurrentHashMap<NodeTaskWrapper, Future<?>>(taskList.size(), 0.75f, threadManager.getPoolSize());
@@ -282,7 +278,7 @@ public class NodeExecutionManagerImpl
    * Cleanup method invoked when all tasks for the current bundle have completed.
    */
   @SuppressWarnings("unchecked")
-  public void cleanup() {
+  private void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     node.getLifeCycleEventHandler().fireJobEnding(bundle, taskClassLoader, (List<Task>) taskList, dataProvider);
     taskClassLoader = null;
@@ -371,7 +367,6 @@ public class NodeExecutionManagerImpl
    * @exclude
    */
   public void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification) {
-    
     this.reconnectionNotification.compareAndSet(null, reconnectionNotification);
   }
 
@@ -440,5 +435,21 @@ public class NodeExecutionManagerImpl
    */
   public void setJobCancelled(final boolean jobCancelled) {
     this.jobCancelled.set(jobCancelled);
+  }
+
+  /**
+   * Get the bundle whose tasks are currently being executed.
+   * @return a {@link JPPFTaskBundle} instance.
+   */
+  public JPPFTaskBundle getBundle() {
+    return bundle;
+  }
+
+  /**
+   * Set the bundle whose tasks are currently being executed.
+   * @param bundle a {@link JPPFTaskBundle} instance.
+   */
+  public void setBundle(final JPPFTaskBundle bundle) {
+    this.bundle = bundle;
   }
 }

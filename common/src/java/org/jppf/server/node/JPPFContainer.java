@@ -112,6 +112,23 @@ public abstract class JPPFContainer
   }
 
   /**
+   * Get the main class loader for this container.
+   * @param classLoader a <code>ClassLoader</code> used for loading the classes of the framework.
+   */
+  public void setClassLoader(final AbstractJPPFClassLoader classLoader)
+  {
+    this.classLoader = classLoader;
+    try
+    {
+      initHelper();
+    }
+    catch (Exception e)
+    {
+      log.error("error setting new class loader", e);
+    }
+  }
+
+  /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @throws Exception if an error occurs while instantiating the class loader.
    */

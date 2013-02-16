@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.server.node.JPPFContainer;
 import org.slf4j.*;
@@ -50,19 +49,19 @@ public class JPPFRemoteContainer extends JPPFContainer
   /**
    * The socket connection wrapper.
    */
-  private SocketWrapper socketClient = null;
+  private RemoteNodeConnection nodeConnection = null;
 
   /**
    * Initialize this container with a specified application uuid.
-   * @param socketClient the socket connection wrapper.
+   * @param nodeConnection the connection to the job server.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFRemoteContainer(final SocketWrapper socketClient, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
+  public JPPFRemoteContainer(final RemoteNodeConnection nodeConnection, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
   {
     super(uuidPath, classLoader);
-    this.socketClient = socketClient;
+    this.nodeConnection = nodeConnection;
     //init();
   }
 
@@ -82,7 +81,7 @@ public class JPPFRemoteContainer extends JPPFContainer
     {
       Thread.currentThread().setContextClassLoader(classLoader);
       List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
-      InputSource is = new SocketWrapperInputSource(socketClient);
+      InputSource is = new SocketWrapperInputSource(nodeConnection.getChannel());
       for (int i=0; i<count; i++)
       {
         DataLocation dl = IOHelper.readData(is);

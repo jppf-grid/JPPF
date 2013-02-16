@@ -19,7 +19,7 @@
 package org.jppf.node;
 
 import org.jppf.JPPFUnsupportedOperationException;
-import org.jppf.comm.socket.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
@@ -28,7 +28,7 @@ import org.jppf.utils.*;
  * Abstract implementation of the {@link Node} interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractNode extends ThreadSynchronization implements Node, Runnable
+public abstract class AbstractNode extends ThreadSynchronization implements NodeInternal, Runnable
 {
   /**
    * Utility for deserialization and serialization.
@@ -38,14 +38,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * Utility for deserialization and serialization.
    */
   protected ObjectSerializer serializer = null;
-  /**
-   * Wrapper around the underlying server connection.
-   */
-  protected SocketWrapper socketClient = null;
-  /**
-   * Used to synchronize access to the underlying socket from multiple threads.
-   */
-  protected SocketInitializer socketInitializer = new SocketInitializerImpl();
   /**
    * Total number of tasks executed.
    */
@@ -58,25 +50,15 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * This node's system information.
    */
   protected JPPFSystemInformation systemInformation = null;
-
   /**
-   * Get the underlying socket wrapper used by this node.
-   * @return a <code>SocketWrapper</code> instance.
+   * Get the connection used by this node.
    */
-  @Override
-  public SocketWrapper getSocketWrapper()
-  {
-    return socketClient;
-  }
+  protected NodeConnection<?> nodeConnection = null;
 
-  /**
-   * Get the underlying socket wrapper used by this node.
-   * @param wrapper a <code>SocketWrapper</code> instance.
-   */
   @Override
-  public void setSocketWrapper(final SocketWrapper wrapper)
+  public NodeConnection<?> getNodeConnection()
   {
-    this.socketClient = wrapper;
+    return nodeConnection;
   }
 
   /**
@@ -153,5 +135,15 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   public JPPFSystemInformation getSystemInformation()
   {
     return systemInformation;
+  }
+
+  /**
+   * This implementation does nothing.
+   * @return <code>null</code>.
+   */
+  @Override
+  public AbstractJPPFClassLoader resetTaskClassLoader()
+  {
+    return null;
   }
 }

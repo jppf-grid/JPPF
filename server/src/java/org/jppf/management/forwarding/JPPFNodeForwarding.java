@@ -211,13 +211,13 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   @Override
   public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> config, final Boolean reconnect) throws Exception
   {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration", array(config, reconnect), array("java.util.Map", "java.lang.Boolean"));
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration", new Object[] {config, reconnect}, array("java.util.Map", "java.lang.Boolean"));
   }
 
   @Override
   public Map<String, Object> cancelJob(final NodeSelector selector, final String jobUuid, final Boolean requeue) throws Exception
   {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", array(jobUuid, requeue), array("java.lang.String", "java.lang.Boolean"));
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelJob", new Object[] {jobUuid, requeue}, array("java.lang.String", "java.lang.Boolean"));
   }
 
   @Override

@@ -65,7 +65,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
   public RemoteNodeConnectionChecker(final JPPFRemoteNode node)
   {
     this.node = node;
-    this.socketWrapper = node.getSocketWrapper();
+    this.socketWrapper = ((RemoteNodeConnection) node.getNodeConnection()).getChannel();
   }
 
   @Override
@@ -141,10 +141,8 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
       {
         if (RemoteNodeConnectionChecker.this.isSuspended())
         {
-          //if (!this.suspended.get())
           if (this.suspended.compareAndSet(false, true))
           {
-            //this.suspended.set(true);
             synchronized(suspendedLock)
             {
               suspendedLock.notify();
@@ -153,7 +151,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
           goToSleep();
         }
         if (isStopped()) return;
-        if (RemoteNodeConnectionChecker.this.isSuspended()) continue;
+        if (isSuspended()) continue;
         long start = System.nanoTime();
         try
         {
@@ -166,7 +164,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
         }
         catch (Exception e)
         {
-          RemoteNodeConnectionChecker.this.exception = e;
+          exception = e;
           node.getExecutionManager().cancelAllTasks(false, false);
         }
       }

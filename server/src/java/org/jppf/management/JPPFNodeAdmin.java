@@ -207,23 +207,21 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    */
   private void triggerReconnect() throws Exception
   {
+    node.setExitAction(new Runnable() {
+      @Override
+      public void run() {
+        throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
+      }
+    });
     try
     {
       // we close the socket connection in case the node is waiting for data from the server.
-      node.getSocketWrapper().close();
+      node.getNodeConnection().close();
     }
     catch(Exception e)
     {
       log.error(e.getMessage(), e);
     }
-    node.setExitAction(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
-      }
-    });
     node.setStopped(true);
   }
 

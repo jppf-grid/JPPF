@@ -36,7 +36,7 @@ public class LocalClassLoaderConnection extends AbstractClassLoaderConnection<Lo
   }
 
   @Override
-  public void init()
+  public void init() throws Exception
   {
     lock.lock();
     try
@@ -63,12 +63,6 @@ public class LocalClassLoaderConnection extends AbstractClassLoaderConnection<Lo
     {
       lock.unlock();
     }
-  }
-
-  @Override
-  public void reset()
-  {
-    init();
   }
 
   @Override

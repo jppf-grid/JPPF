@@ -61,7 +61,7 @@ public class LocalNodeIO extends AbstractNodeIO
   public LocalNodeIO(final JPPFNode node)
   {
     super(node);
-    this.channel = ((JPPFLocalNode) node).getChannel();
+    this.channel = ((LocalNodeConnection) node.getNodeConnection()).getChannel();
   }
 
   /**
@@ -93,6 +93,7 @@ public class LocalNodeIO extends AbstractNodeIO
     DataLocation location = currentMessage.getLocations().get(0);
     JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
+    node.getExecutionManager().setBundle(bundle);
     result = deserializeObjects(bundle);
     if (debugEnabled) log.debug("got all data");
     return result;

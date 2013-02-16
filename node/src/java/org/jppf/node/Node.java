@@ -17,9 +17,8 @@
  */
 package org.jppf.node;
 
-import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.management.*;
-import org.jppf.node.event.LifeCycleEventHandler;
+import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.management.JPPFSystemInformation;
 
 /**
  * Interface for a node that provides information about its activity.
@@ -27,41 +26,6 @@ import org.jppf.node.event.LifeCycleEventHandler;
  */
 public interface Node extends Runnable
 {
-  /**
-   * Get the underlying socket used by this node.
-   * @return a SocketWrapper instance.
-   * @exclude
-   */
-  SocketWrapper getSocketWrapper();
-
-  /**
-   * Set the underlying socket to be used by this node.
-   * @param socketWrapper a SocketWrapper instance.
-   * @exclude
-   */
-  void setSocketWrapper(SocketWrapper socketWrapper);
-
-  /**
-   * Stop this node and release the resources it is using.
-   * @exclude
-   */
-  void stopNode();
-
-  /**
-   * Get the object that manages the node life cycle events.
-   * @return a {@link LifeCycleEventHandler} instance.
-   * @exclude
-   */
-  LifeCycleEventHandler getLifeCycleEventHandler();
-
-  /**
-   * Get the JMX connecter server associated with the node.
-   * @return a JMXServer instance.
-   * @throws Exception if any error occurs.
-   * @exclude
-   */
-  JMXServer getJmxServer() throws Exception;
-
   /**
    * Get this node's UUID.
    * @return the uuid as a string.
@@ -73,9 +37,16 @@ public interface Node extends Runnable
    * @return a {@link JPPFSystemInformation} instance.
    */
   JPPFSystemInformation getSystemInformation();
+
   /**
    * Determine whether this node is local to another component.
    * @return true if this node is local, false otherwise.
    */
   boolean isLocal();
+
+  /**
+   * Reset the current task class loader if any is present (i.e. if a job is being executed), without reconnecting to the server.
+   * @return the newly created class loader, or <code>null</code> if none could be created at this time. 
+   */
+  AbstractJPPFClassLoader resetTaskClassLoader();
 }

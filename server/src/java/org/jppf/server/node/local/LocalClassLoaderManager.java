@@ -54,7 +54,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
       @Override
       public AbstractJPPFClassLoader run()
       {
-        LocalClassLoaderConnection connection = new LocalClassLoaderConnection(node.getClassLoaderHandler());
+        LocalClassLoaderConnection connection = node.getClassLoaderConnection();
         return new JPPFLocalClassLoader(connection, this.getClass().getClassLoader());
       }
     };
@@ -64,7 +64,7 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
   @Override
   protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
   {
-    return new JPPFLocalContainer(node.getChannel(), uuidPath, cl);
+    return new JPPFLocalContainer(uuidPath, cl);
   }
 
   @Override

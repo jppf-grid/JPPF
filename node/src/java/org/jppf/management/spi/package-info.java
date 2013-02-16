@@ -18,6 +18,5 @@
 
 /**
  * Support for service provider interface, to provide pluggable management beans, including user-defined ones.
- * @exclude
  */
 package org.jppf.management.spi;

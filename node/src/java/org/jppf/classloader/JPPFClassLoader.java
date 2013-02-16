@@ -59,23 +59,20 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   }
 
   /**
-   * Initialize the underlying socket connection.
-   * @exclude
-   */
-  @Override
-  protected void init()
-  {
-    connection.init();
-  }
-
-  /**
    * {@inheritDoc}
    * @exclude
    */
   @Override
   public void reset()
   {
-    connection.reset();
+    try
+    {
+      connection.reset();
+    }
+    catch (Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
   }
 
   /**
@@ -85,7 +82,14 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   @Override
   public void close()
   {
-    connection.close();
+    try
+    {
+      connection.close();
+    }
+    catch (Exception e)
+    {
+      log.error(e.getMessage(), e);
+    }
     super.close();
   }
 }

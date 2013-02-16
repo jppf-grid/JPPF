@@ -17,11 +17,8 @@
  */
 package org.jppf.server.node.remote;
 
-import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.recovery.*;
-import org.jppf.comm.socket.*;
 import org.jppf.server.node.*;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -65,34 +62,10 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
   @Override
   protected void initDataChannel() throws Exception
   {
-    if (socketClient == null)
-    {
-      if (debugEnabled) log.debug("Initializing socket");
-      TypedProperties props = JPPFConfiguration.getProperties();
-      sslEnabled = props.getBoolean("jppf.ssl.enabled", false);
-      String host = props.getString("jppf.server.host", "localhost");
-      // for backward compatibility with v2.x configurations
-      int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", 11111, false);
-      socketClient = new SocketClient();
-      socketClient.setHost(host);
-      socketClient.setPort(port);
-      socketClient.setSerializer(serializer);
-      if (debugEnabled) log.debug("end socket client initialization");
-      System.out.println("Attempting connection to the node server at " + host + ':' + port);
-      socketInitializer.initializeSocket(socketClient);
-      if (!socketInitializer.isSuccessful())
-      {
-        if (debugEnabled) log.debug("socket initializer failed");
-        throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
-      }
-      if (sslEnabled) socketClient = SSLHelper.createSSLClientConnection(socketClient);
-      System.out.println("Reconnected to the node server");
-      if (debugEnabled) log.debug("sending channel identifier");
-      socketClient.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
-      if (debugEnabled) log.debug("end socket initializer");
-    }
+    TypedProperties config = JPPFConfiguration.getProperties();
+    (nodeConnection = new RemoteNodeConnection(serializer)).init();
     nodeIO = new RemoteNodeIO(this);
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false))
+    if (config.getBoolean("jppf.recovery.enabled", false))
     {
       if (recoveryConnection == null)
       {
@@ -112,13 +85,8 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
   @Override
   protected void closeDataChannel() throws Exception
   {
-    if (debugEnabled) log.debug("closing data channel: socketClient=" + socketClient + ", clientConnection=" + recoveryConnection);
-    if (socketClient != null)
-    {
-      SocketWrapper tmp = socketClient;
-      socketClient = null;
-      tmp.close();
-    }
+    if (debugEnabled) log.debug("closing data channel: nodeConnection=" + nodeConnection + ", recoveryConnection=" + recoveryConnection);
+    nodeConnection.close();
     if (recoveryConnection != null)
     {
       //clientConnection.removeClientConnectionListener(this);

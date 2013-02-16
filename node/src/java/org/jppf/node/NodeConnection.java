@@ -16,28 +16,38 @@
  * limitations under the License.
  */
 
-package org.jppf.classloader;
+package org.jppf.node;
 
-import java.util.*;
-
-import org.jppf.node.NodeConnection;
 
 /**
  * Instances of this class represent the connection between a node's class loader and the driver.
  * @param <C> the type of communication channel used by this connection.
  * @author Laurent Cohen
  */
-public interface ClassLoaderConnection<C> extends NodeConnection<C>
+public interface NodeConnection<C>
 {
   /**
-   * Load the specified class from a driver connection.
-   * @param map contains the necessary resource request data.
-   * @param dynamic true for a client class loader, false otherwise.
-   * @param requestUuid identifies for which job the request is made.
-   * @param uuidPath identifies the path to the driver or client that wil lookup and send back the requested resource.
-   * @return a <code>JPPFResourceWrapper</code> containing the resource content.
-   * @throws Exception if the connection was lost and could not be reestablished.
+   * Initialize this connection.
+   * @throws Exception if any error occurs.
    */
-  JPPFResourceWrapper loadResource(final Map<String, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception;
+  void init() throws Exception;
+
+  /**
+   * Reset this connection.
+   * @throws Exception if any error occurs.
+   */
+  void reset() throws Exception;
+
+  /**
+   * Close this connection.
+   * @throws Exception if any error occurs.
+   */
+  void close() throws Exception;
+
+  /**
+   * Get the communication channel for this connection.
+   * @return an object trpesenting the channel.
+   */
+  C getChannel();
 }
 

@@ -60,7 +60,7 @@ public class RemoteNodeIO extends AbstractNodeIO
   public RemoteNodeIO(final JPPFNode node)
   {
     super(node);
-    this.socketWrapper = node.getSocketWrapper();
+    this.socketWrapper = ((RemoteNodeConnection) node.getNodeConnection()).getChannel();
   }
 
   @Override
@@ -69,6 +69,7 @@ public class RemoteNodeIO extends AbstractNodeIO
     if (debugEnabled) log.debug("waiting for next request");
     JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketWrapper, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
+    node.getExecutionManager().setBundle(bundle);
     return deserializeObjects(bundle);
   }
 

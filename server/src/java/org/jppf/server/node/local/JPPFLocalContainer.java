@@ -44,25 +44,19 @@ public class JPPFLocalContainer extends JPPFContainer
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * The I/O handler for this node.
-   */
-  private LocalNodeChannel channel = null;
-  /**
    * The message to deserialize.
    */
   private LocalNodeMessage currentMessage = null;
 
   /**
    * Initialize this container with a specified application uuid.
-   * @param channel the I/O channel of the node.
    * @param uuidPath the unique identifier of a submitting application.
    * @param classLoader the class loader for this container.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFLocalContainer(final LocalNodeChannel channel, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
+  public JPPFLocalContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
   {
     super(uuidPath, classLoader);
-    this.channel = channel;
   }
 
   /**

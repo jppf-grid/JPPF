@@ -18,11 +18,8 @@
 
 package org.jppf.management;
 
-import java.net.*;
-
-import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.event.*;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -118,45 +115,6 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event)
   {
-    if (debugEnabled)
-    {
-      ClassLoader cl = event.getTaskClassLoader();
-      int count = 0;
-      StringBuilder sb = new StringBuilder();
-      if (cl != null) sb.append('\n');
-      while (cl != null)
-      {
-        for (int i=0; i<2*count; i++) sb.append(' ');
-        if (cl instanceof AbstractJPPFClassLoader) sb.append(cl);
-        else if (cl instanceof URLClassLoader) sb.append(toString((URLClassLoader) cl));
-        else  sb.append(cl);
-        cl = cl.getParent();
-        if (cl != null) sb.append('\n');
-        count++;
-      }
-      log.debug(sb.toString());
-    }
-  }
-
-  /**
-   * 
-   * @param cl .
-   * @return .
-   */
-  private String toString(final URLClassLoader cl)
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append(cl.getClass().getSimpleName()).append("[classpath=");
-    URL[] urls = cl.getURLs();
-    if ((urls != null) && (urls.length > 0))
-    {
-      for (int i=0; i<urls.length; i++)
-      {
-        if (i > 0) sb.append(';');
-        sb.append(urls[i]);
-      }
-    }
-    sb.append(']');
-    return sb.toString();
+    if (log.isTraceEnabled()) log.trace(StringUtils.printClassLoaderHierarchy(event.getTaskClassLoader()));
   }
 }
