@@ -20,7 +20,7 @@ package org.jppf.server.scheduler.bundle.fixedsize;
 import org.jppf.server.scheduler.bundle.*;
 
 /**
- * This class provide a used defined bundle size strategy.
+ * This class provide a used defined bundle size jppf.load.balancing.profile.
  * It uses the size defined by admin in property file or the size defined by admin application.
  * @author Domingos Creado
  * @author Laurent Cohen

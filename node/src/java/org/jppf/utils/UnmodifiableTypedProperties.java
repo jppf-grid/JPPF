@@ -69,12 +69,12 @@ public class UnmodifiableTypedProperties extends TypedProperties
 
   /**
    * This method does nothing as modification is not permitted.
-   * @param source not used.
-   * @throws IOException never thrown.
+   * {@inheritDoc}
    */
   @Override
-  public void loadString(final String source) throws IOException
+  public TypedProperties loadString(final CharSequence source) throws IOException
   {
+    return this;
   }
 
   /**

@@ -58,7 +58,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * The bundler factory.
    */
-  private final JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.CLIENT_DEFAULTS);
+  private final JPPFBundlerFactory bundlerFactory = new JPPFBundlerFactory(JPPFBundlerFactory.Defaults.CLIENT);
   /**
    * Task that dispatches queued jobs to available nodes.
    */

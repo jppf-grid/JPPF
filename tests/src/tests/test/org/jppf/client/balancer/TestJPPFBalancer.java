@@ -131,8 +131,8 @@ public class TestJPPFBalancer
     TypedProperties properties = JPPFConfiguration.getProperties();
     properties.setProperty("jppf.balancer.old.enabled", "false");
     properties.setProperty("jppf.load.balancing.algorithm", "manual");
-    properties.setProperty("jppf.load.balancing.strategy", "manual");
-    properties.setProperty("strategy.manual.size", "1");
+    properties.setProperty("jppf.load.balancing.profile", "manual");
+    properties.setProperty("jppf.load.balancing.profile.manual.size", "1");
     properties.setProperty("jppf.local.execution.enabled", "true");
     properties.setProperty("driver1.jppf.server.host", "localhost");
     properties.setProperty("driver1.jppf.pool.size", poolSize);

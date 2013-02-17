@@ -56,8 +56,8 @@ public class TestJobPersistence extends Setup1D1N
     {
       // send tasks 1 at a time
       config.setProperty("jppf.load.balancing.algorithm", "manual");
-      config.setProperty("jppf.load.balancing.strategy", "test");
-      config.setProperty("strategy.test.size", "1");
+      config.setProperty("jppf.load.balancing.profile", "test");
+      config.setProperty("jppf.load.balancing.profile.test.size", "1");
       client = BaseSetup.createClient(null, false);
       int nbTasks = 3;
       final AtomicBoolean resultsReceived = new AtomicBoolean(false);
@@ -95,8 +95,8 @@ public class TestJobPersistence extends Setup1D1N
     finally
     {
       config.remove("jppf.load.balancing.algorithm");
-      config.remove("jppf.load.balancing.strategy");
-      config.remove("strategy.test.size");
+      config.remove("jppf.load.balancing.profile");
+      config.remove("jppf.load.balancing.profile.test.size");
       if ((pm != null) && (key != null)) pm.deleteJob(key);
       if (client != null) client.close();
     }

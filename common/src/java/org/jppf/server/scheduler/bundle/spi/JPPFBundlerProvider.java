@@ -51,8 +51,8 @@ public interface JPPFBundlerProvider
    * <p>Create a bundler profile containing the parameters of the algorithm.
    * <p>The configuration parameter contains a set of properties that define the parameters names and values.<br>
    * The parameter names are provided <i>without any JPPF configuration-specific prefix</i>.
-   * <p>For example: if the JPPF configuration file specifies a profile named "myProfile" (through the property "jppf.load.balancing.strategy = myProfile"),
-   * and the algorithm has a parameter named "myParameter", then in the configuration file it will be specified as "strategy.myProfile.myParameter = some_value".<br>
+   * <p>For example: if the JPPF configuration file specifies a profile named "myProfile" (through the property "jppf.load.balancing.profile = myProfile"),
+   * and the algorithm has a parameter named "myParameter", then in the configuration file it will be specified as "jppf.load.balancing.profile.myProfile.myParameter = some_value".<br>
    * When this method is called, only the parameter name is kept, and its definition becomes "myParameter = some_value".
    * @param configuration - a set of properties defining the algorithm's parameters.
    * @return an <code>AutoTuneProfile</code> instance.

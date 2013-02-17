@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 
 /**
  * This class implements the basis of a profile based on simulated annealing
- * strategy. The possible move from the best known solution get smaller each
+ * jppf.load.balancing.profile. The possible move from the best known solution get smaller each
  * time it make a move.
  * This strategy let the algorithm explore the universe of bundle size with
  * an almost known end. Check method getDecreaseRatio about the maximum number
@@ -94,7 +94,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
    */
   public AnnealingTuneProfile(final String profileName)
   {
-    String prefix = "strategy." + profileName + '.';
+    String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     minSamplesToAnalyse = props.getInt(prefix + "minSamplesToAnalyse", 500);
     minSamplesToCheckConvergence = props.getInt(prefix + "minSamplesToCheckConvergence", 300);

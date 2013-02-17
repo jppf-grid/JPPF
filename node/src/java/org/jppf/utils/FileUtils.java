@@ -501,7 +501,7 @@ public final class FileUtils
       if (path.isDirectory())
       {
         File[] files = path.listFiles();
-        if(files != null)
+        if (files != null)
         {
           for (File child: files) success &= deletePath(child);
         }

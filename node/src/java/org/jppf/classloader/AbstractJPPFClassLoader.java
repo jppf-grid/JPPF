@@ -76,7 +76,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   }
 
   /**
-   * Load a JPPF class from the server.
+   * Load a JPPF class from the server. This method bypasses the class loader delegation model
+   * and the URL classpath and attempts to load the class definition directly from the server.
+   * <p>In principle, this method is only used to load the class that performs object serialization
+   * and deserialization, to ensure that classes available only remotely are properly downloaded from the server or client.
    * @param name the binary name of the class
    * @return the resulting <tt>Class</tt> object
    * @throws ClassNotFoundException if the class could not be found
@@ -90,7 +93,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (c == null)
     {
       if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
-      c = findClass(name, true);
+      c = findClass(name, false);
     }
     if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
     return c;
@@ -121,7 +124,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
   {
     Class<?> c = null;
-    if (nfCache.has(name)) throw new ClassNotFoundException(build("Could not load class '", name, "'"));
+    if (notFoundCache.has(name)) throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     c = findLoadedClass(name);
     if (c != null) return c;
     if (lookupClasspath) c = findClassInURLClasspath(name, false);
@@ -150,7 +153,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if ((b == null) || (b.length == 0))
     {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-      if (resource != null) nfCache.add(name);
+      if (resource != null) notFoundCache.add(name);
       throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
     if (debugEnabled) log.debug(build("found definition for resource [", name, ", definitionLength=", b.length, "]"));
@@ -159,6 +162,32 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       c = findLoadedClass(name);
       return c == null ? defineClass(name, b, 0, b.length) : c;
     }
+  }
+
+  /**
+   * Compute a value on the client-side, as the result of the execution of a {@link JPPFCallable}.
+   * <p>Any {@link Throwable} raised in the callable's <code>call()</code> method will be thrown as the result of this method.
+   * If the Throwable is an instance of <code>Exception</code> or one of its subclasses, it is thrown as such, otherwise it is wrapped
+   * into a {@link org.jppf.JPPFException}.
+   * @param <V> the type of results returned by the callable.
+   * @param callable the callable to execute on the client side.
+   * @return the value computed on the client, or null if the value could not be computed.
+   * @throws Exception if the execution of the callable in the client resulted in a {@link Throwable} being raised.
+   */
+  @SuppressWarnings("unchecked")
+  public <V> V computeCallable(final JPPFCallable<V> callable) throws Exception
+  {
+    V result = null;
+    Object returned = null;
+    Class clazz = loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
+    ClassLoader cl = clazz.getClassLoader();
+    ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
+    byte[] bytes = ser.serialize(callable).getBuffer();
+    bytes = computeRemoteData(bytes);
+    if (bytes == null) return null;
+    returned = ser.deserialize(bytes);
+    if (returned instanceof Exception) throw (Exception) returned;
+    return (V) returned;
   }
 
   /**
@@ -192,7 +221,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public URL findResource(final String name)
   {
     URL url = null;
-    if (nfCache.has(name)) return null;
+    if (notFoundCache.has(name)) return null;
     url = cache.getResourceURL(name);
     if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
     if (url == null)
@@ -215,7 +244,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found remotely"));
       }
     }
-    if (url == null) nfCache.add(name);
+    if (url == null) notFoundCache.add(name);
     return url;
   }
 
@@ -262,7 +291,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public Enumeration<URL> findResources(final String name) throws IOException
   {
     List<URL> urlList = new ArrayList<URL>();
-    if (!nfCache.has(name))
+    if (!notFoundCache.has(name))
     {
       if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
       try
@@ -284,7 +313,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         throw (e instanceof IOException) ? (IOException) e : new IOException(e);
       }
     }
-    if (urlList.isEmpty()) nfCache.add(name);
+    if (urlList.isEmpty()) notFoundCache.add(name);
     return new IteratorEnumeration<URL>(urlList.iterator());
   }
 
@@ -300,7 +329,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   {
     List<URL> urlList = new ArrayList<URL>();
     JPPFResourceWrapper resource = null;
-    if (!nfCache.has(name))
+    if (!notFoundCache.has(name))
     {
       List<String> locationsList = null;
       Map<String, Object> map = new HashMap<String, Object>();
@@ -317,7 +346,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         urlList = cache.getResourcesURLs(name);
       }
     }
-    if ((urlList == null) || urlList.isEmpty() && (resource != null)) nfCache.add(name);
+    if ((urlList == null) || urlList.isEmpty() && (resource != null)) notFoundCache.add(name);
     return urlList;
   }
 
@@ -462,12 +491,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   public void clearNotFoundCache()
   {
-    nfCache.clear();
+    notFoundCache.clear();
   }
 
   @Override
   public void close() {
     cache.close();
-    nfCache.clear();
+    notFoundCache.clear();
   }
 }

@@ -64,8 +64,8 @@ public class TestJPPFJob
     props.setProperty("jppf.local.execution.enabled", "true");
     props.setProperty("jppf.local.execution.threads", "4");
     props.setProperty("jppf.load.balancing.algorithm", "manual");
-    props.setProperty("jppf.load.balancing.strategy", "manual");
-    props.setProperty("strategy.manual.size", "5");
+    props.setProperty("jppf.load.balancing.profile", "manual");
+    props.setProperty("jppf.load.balancing.profile.manual.size", "5");
 
     JPPFClient client = null;
     try

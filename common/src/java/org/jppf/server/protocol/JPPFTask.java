@@ -81,9 +81,7 @@ public abstract class JPPFTask implements Task<Object>
   }
 
   /**
-   * A user-assigned id for this task.<br>
-   * This id is used as a task identifier when cancelling or restarting a task
-   * using the remote management functionalities.
+   * A user-assigned id for this task.
    */
   private String id = null;
 
@@ -304,36 +302,17 @@ public abstract class JPPFTask implements Task<Object>
   @SuppressWarnings("unchecked")
   public <V> V compute(final JPPFCallable<V> callable) throws Exception
   {
-    ClassLoader cl = callable.getClass().getClassLoader();
     V result = null;
-    Object returned = null;
-    try
+    if (isInNode())
     {
-      if (isInNode())
+      ClassLoader cl = callable.getClass().getClassLoader();
+      if (cl instanceof AbstractJPPFClassLoader)
       {
-        if (cl instanceof AbstractJPPFClassLoader)
-        {
-          AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
-          Class clazz = loader.loadClass("org.jppf.utils.ObjectSerializerImpl");
-          ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
-          byte[] bytes = ser.serialize(callable).getBuffer();
-          bytes = loader.computeRemoteData(bytes);
-          if (bytes == null) return null;
-          returned = ser.deserialize(bytes);
-          if (returned instanceof Exception) throw (Exception) returned;
-          result = (V) returned;
-        }
-      }
-      else
-      {
-        result = callable.call();
+        AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
+        result = loader.computeCallable(callable);
       }
     }
-    catch(Exception e)
-    {
-      if (e instanceof RuntimeException) throw (RuntimeException) e;
-      else throw new RuntimeException(e);
-    }
+    else result = callable.call();
     return result;
   }
 }

@@ -48,10 +48,6 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    */
   private final Object lock = new Object();
   /**
-   * 
-   */
-  private ClassLoader cl = null;
-  /**
    * Throwable that may have been raised during the class loading request execution.
    */
   private Throwable throwable = null;
@@ -77,10 +73,9 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   {
     cancelled.set(true);
     done.set(true);
-    Object o = (cl == null) ? lock : cl;
-    synchronized(o)
+    synchronized(lock)
     {
-      o.notifyAll();
+      lock.notifyAll();
     }
     return false;
   }
@@ -95,10 +90,9 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
   @Override
   public V get() throws InterruptedException, ExecutionException
   {
-    Object o = (cl == null) ? lock : cl;
-    synchronized(o)
+    synchronized(lock)
     {
-      while (!isDone()) o.wait();
+      while (!isDone()) lock.wait();
     }
     return response;
   }
@@ -149,27 +143,12 @@ public class ResourceFuture<V extends JPPFResourceWrapper> implements Future<V>
    */
   public void setDone(final V response)
   {
-    //done.set(true);
-    if (response == null)
-    {
-      boolean breakpoint = true;
-    }
-    Object o = (cl == null) ? lock : cl;
-    synchronized(o)
+    synchronized(lock)
     {
       done.set(true);
       this.response = response;
-      o.notifyAll();
+      lock.notifyAll();
     }
-  }
-
-  /**
-   * 
-   * @param cl .
-   */
-  public void setCl(final ClassLoader cl)
-  {
-    this.cl = cl;
   }
 
   /**

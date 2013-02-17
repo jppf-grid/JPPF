@@ -17,12 +17,8 @@
  */
 package org.jppf.classloader;
 
-import static org.jppf.utils.StringUtils.build;
-
-import java.io.InputStream;
 import java.util.List;
 
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -88,55 +84,5 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
       log.error(e.getMessage(), e);
     }
     super.close();
-  }
-
-  /**
-   * Load a JPPF class from the server.
-   * @param name the binary name of the class
-   * @return the resulting <tt>Class</tt> object
-   * @throws ClassNotFoundException if the class could not be found
-   * @exclude
-   */
-  @Override
-  public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
-  {
-    if (debugEnabled) log.debug(build("looking up resource [", name, "]"));
-    Class<?> c = findLoadedClass(name);
-    if (c == null)
-    {
-      if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
-      ClassLoader cl = this;
-      while (cl instanceof AbstractJPPFClassLoader) cl = cl.getParent();
-      if (cl != null)
-      {
-        int i = name.lastIndexOf('.');
-        if (i >= 0)
-        {
-          String pkgName = name.substring(0, i);
-          Package pkg = getPackage(pkgName);
-          if (pkg == null)
-          {
-            definePackage(pkgName, null, null, null, null, null, null, null);
-          }
-        }
-        String resName = name.replace(".", "/") + ".class";
-        InputStream is = cl.getResourceAsStream(resName);
-        try
-        {
-          byte[] definition = StreamUtils.getInputStreamAsByte(is);
-          c = defineClass(name, definition, 0, definition.length);
-        }
-        catch(Exception e)
-        {
-          log.warn(e.getMessage(), e);
-        }
-      }
-    }
-    if (c == null)
-    {
-      c = findClass(name);
-    }
-    if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
-    return c;
   }
 }

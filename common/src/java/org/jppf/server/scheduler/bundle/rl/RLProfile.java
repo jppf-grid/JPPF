@@ -54,7 +54,7 @@ public class RLProfile extends AbstractAutoTuneProfile
    */
   public RLProfile(final String profileName)
   {
-    String prefix = "strategy." + profileName + '.';
+    String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
     performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.05);

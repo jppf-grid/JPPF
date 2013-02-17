@@ -151,8 +151,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertEquals(driverConfig.getString("jppf.load.balancing.algorithm"), lbi.getAlgorithm());
     TypedProperties params = lbi.getParameters();
     assertNotNull(params);
-    String profile = driverConfig.getString("jppf.load.balancing.strategy");
-    String prefix = "strategy." + profile + '.';
+    String profile = driverConfig.getString("jppf.load.balancing.profile");
+    String prefix = "jppf.load.balancing.profile." + profile + '.';
     for (Map.Entry entry: driverConfig.entrySet())
     {
       if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;

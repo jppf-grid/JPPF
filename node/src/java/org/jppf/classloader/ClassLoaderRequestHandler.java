@@ -30,6 +30,7 @@ import org.slf4j.*;
 /**
  * This class manages the batching of class loading requests at regular intervals.
  * @author Laurent Cohen
+ * @exclude
  */
 public class ClassLoaderRequestHandler
 {
@@ -92,25 +93,6 @@ public class ClassLoaderRequestHandler
     synchronized(periodicTask)
     {
       f = nextRequest.addResource(resource);
-    }
-    periodicTask.wakeUp();
-    return f;
-  }
-
-  /**
-   * Add a resource request.
-   * @param resource the resource request to add.
-   * @param cl the class loder owning this request handler.
-   * @return a future for getting the respone at a later time.
-   */
-  public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource, final ClassLoader cl)
-  {
-    resource.preProcess();
-    Future<JPPFResourceWrapper> f;
-    synchronized(periodicTask)
-    {
-      f = nextRequest.addResource(resource);
-      ((ResourceFuture<JPPFResourceWrapper>) f).setCl(cl);
     }
     periodicTask.wakeUp();
     return f;

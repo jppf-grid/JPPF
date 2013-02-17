@@ -29,8 +29,7 @@ import org.jppf.utils.streams.StreamUtils;
  * string values to other types.
  * @author Laurent Cohen
  */
-public class TypedProperties extends Properties
-{
+public class TypedProperties extends Properties {
   /**
    * Explicit serialVersionUID.
    */
@@ -39,8 +38,7 @@ public class TypedProperties extends Properties
   /**
    * Default constructor.
    */
-  public TypedProperties()
-  {
+  public TypedProperties() {
   }
 
   /**
@@ -48,15 +46,10 @@ public class TypedProperties extends Properties
    * This will copy into the present object all map entries such that both key and value are strings.
    * @param map the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
    */
-  public TypedProperties(final Map<Object, Object> map)
-  {
-    if (map != null)
-    {
-      Set<Map.Entry<Object, Object>> entries = map.entrySet();
-      for (Map.Entry<Object, Object> entry: entries)
-      {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-        {
+  public TypedProperties(final Map<Object, Object> map) {
+    if (map != null) {
+      for (Map.Entry<Object, Object> entry: map.entrySet()) {
+        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
           setProperty((String) entry.getKey(), (String) entry.getValue());
         }
       }
@@ -68,8 +61,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as a string, or null if it is not found.
    */
-  public String getString(final String key)
-  {
+  public String getString(final String key) {
     return getString(key, null);
   }
 
@@ -79,8 +71,7 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as a string, or the default value if it is not found.
    */
-  public String getString(final String key, final String defValue)
-  {
+  public String getString(final String key, final String defValue) {
     String val = getProperty(key);
     return (val == null) ? defValue : val;
   }
@@ -90,8 +81,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as an int, or zero if it is not found.
    */
-  public int getInt(final String key)
-  {
+  public int getInt(final String key) {
     return getInt(key, 0);
   }
 
@@ -101,18 +91,13 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as an int, or the default value if it is not found.
    */
-  public int getInt(final String key, final int defValue)
-  {
+  public int getInt(final String key, final int defValue) {
     int intVal = defValue;
     String val = getProperty(key, null);
-    if (val != null)
-    {
-      try
-      {
+    if (val != null) {
+      try {
         intVal = Integer.parseInt(val.trim());
-      }
-      catch(NumberFormatException e)
-      {
+      } catch(NumberFormatException e) {
       }
     }
     return intVal;
@@ -126,8 +111,7 @@ public class TypedProperties extends Properties
    * @param max the maximum value the property can have.
    * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
    */
-  public int getInt(final String key, final int defValue, final int min, final int max)
-  {
+  public int getInt(final String key, final int defValue, final int min, final int max) {
     if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
     int val = getInt(key, defValue);
     if (val > max) val = max;
@@ -140,8 +124,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as a long, or zero if it is not found.
    */
-  public long getLong(final String key)
-  {
+  public long getLong(final String key) {
     return getLong(key, 0L);
   }
 
@@ -151,18 +134,13 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as a long, or the default value if it is not found.
    */
-  public long getLong(final String key, final long defValue)
-  {
+  public long getLong(final String key, final long defValue) {
     long longVal = defValue;
     String val = getProperty(key, null);
-    if (val != null)
-    {
-      try
-      {
+    if (val != null) {
+      try {
         longVal = Long.parseLong(val.trim());
-      }
-      catch(NumberFormatException e)
-      {
+      } catch(NumberFormatException e) {
       }
     }
     return longVal;
@@ -176,8 +154,7 @@ public class TypedProperties extends Properties
    * @param max the maximum value the property can have.
    * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
    */
-  public long getLong(final String key, final long defValue, final long min, final long max)
-  {
+  public long getLong(final String key, final long defValue, final long min, final long max) {
     if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
     long val = getLong(key, defValue);
     if (val > max) val = max;
@@ -190,8 +167,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as a float, or zero if it is not found.
    */
-  public float getFloat(final String key)
-  {
+  public float getFloat(final String key) {
     return getFloat(key, 0.0f);
   }
 
@@ -201,18 +177,13 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as a float, or the default value if it is not found.
    */
-  public float getFloat(final String key, final float defValue)
-  {
+  public float getFloat(final String key, final float defValue) {
     float floatVal = defValue;
     String val = getProperty(key, null);
-    if (val != null)
-    {
-      try
-      {
+    if (val != null) {
+      try {
         floatVal = Float.parseFloat(val.trim());
-      }
-      catch(NumberFormatException e)
-      {
+      } catch(NumberFormatException e) {
       }
     }
     return floatVal;
@@ -226,8 +197,7 @@ public class TypedProperties extends Properties
    * @param max the maximum value the property can have.
    * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
    */
-  public float getFloat(final String key, final float defValue, final float min, final float max)
-  {
+  public float getFloat(final String key, final float defValue, final float min, final float max) {
     if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
     float val = getFloat(key, defValue);
     if (val > max) val = max;
@@ -241,8 +211,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as a double, or zero if it is not found.
    */
-  public double getDouble(final String key)
-  {
+  public double getDouble(final String key) {
     return getDouble(key, 0.0d);
   }
 
@@ -252,18 +221,13 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as a double, or the default value if it is not found.
    */
-  public double getDouble(final String key, final double defValue)
-  {
+  public double getDouble(final String key, final double defValue) {
     double doubleVal = defValue;
     String val = getProperty(key, null);
-    if (val != null)
-    {
-      try
-      {
+    if (val != null) {
+      try {
         doubleVal = Double.parseDouble(val.trim());
-      }
-      catch(NumberFormatException e)
-      {
+      } catch(NumberFormatException e) {
       }
     }
     return doubleVal;
@@ -277,8 +241,7 @@ public class TypedProperties extends Properties
    * @param max the maximum value the property can have.
    * @return the value of the property as a double, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
    */
-  public double getDouble(final String key, final double defValue, final double min, final double max)
-  {
+  public double getDouble(final String key, final double defValue, final double min, final double max) {
     if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
     double val = getDouble(key, defValue);
     if (val > max) val = max;
@@ -292,8 +255,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as a boolean, or <code>false</code> if it is not found.
    */
-  public boolean getBoolean(final String key)
-  {
+  public boolean getBoolean(final String key) {
     return getBoolean(key, false);
   }
 
@@ -303,8 +265,7 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as a boolean, or the default value if it is not found.
    */
-  public boolean getBoolean(final String key, final boolean defValue)
-  {
+  public boolean getBoolean(final String key, final boolean defValue) {
     boolean booleanVal = defValue;
     String val = getProperty(key, null);
     if (val != null) booleanVal = Boolean.valueOf(val.trim()).booleanValue();
@@ -317,8 +278,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to look for.
    * @return the value of the property as a char, or the default value ' ' (space character) if it is not found.
    */
-  public char getChar(final String key)
-  {
+  public char getChar(final String key) {
     return getChar(key, ' ');
   }
 
@@ -329,8 +289,7 @@ public class TypedProperties extends Properties
    * @param defValue a default value to return if the property is not found.
    * @return the value of the property as a char, or the default value if it is not found.
    */
-  public char getChar(final String key, final char defValue)
-  {
+  public char getChar(final String key, final char defValue) {
     char charVal = defValue;
     String val = getProperty(key, null);
     if ((val != null) && (val.length() > 0)) charVal = val.charAt(0);
@@ -343,8 +302,7 @@ public class TypedProperties extends Properties
    * Its value is the path to another properties file. Relative paths are evaluated against the current application directory.
    * @return the value of the property as another set of properties, or null if it is not found.
    */
-  public TypedProperties getProperties(final String key)
-  {
+  public TypedProperties getProperties(final String key) {
     return getProperties(key, null);
   }
 
@@ -355,22 +313,16 @@ public class TypedProperties extends Properties
    * @param def a default value to return if the property is not found.
    * @return the value of the property as another set of properties, or the default value if it is not found.
    */
-  public TypedProperties getProperties(final String key, final TypedProperties def)
-  {
+  public TypedProperties getProperties(final String key, final TypedProperties def) {
     String path = getString(key);
     TypedProperties res = new TypedProperties();
     InputStream is = null;
-    try
-    {
+    try {
       is = FileUtils.getFileInputStream(path);
       res.load(is);
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
       return def;
-    }
-    finally
-    {
+    } finally {
       StreamUtils.closeSilent(is);
     }
     return res;
@@ -381,8 +333,7 @@ public class TypedProperties extends Properties
    * @param key the name of the property to retrieve.
    * @return the property as an {@link InetAddress} instance, or null if the property is not defined or the host doesn't exist.
    */
-  public InetAddress getInetAddress(final String key)
-  {
+  public InetAddress getInetAddress(final String key) {
     return getInetAddress(key, null);
   }
 
@@ -392,16 +343,12 @@ public class TypedProperties extends Properties
    * @param def the default value to use if the property is not defined.
    * @return the property as an {@link InetAddress} instance, or the specified default value if the property is not defined.
    */
-  public InetAddress getInetAddress(final String key, final InetAddress def)
-  {
+  public InetAddress getInetAddress(final String key, final InetAddress def) {
     String val = getString(key);
     if (val == null) return def;
-    try
-    {
+    try {
       return InetAddress.getByName(val);
-    }
-    catch(UnknownHostException e)
-    {
+    } catch(UnknownHostException e) {
       return def;
     }
   }
@@ -410,14 +357,11 @@ public class TypedProperties extends Properties
    * Convert this set of properties into a string.
    * @return a representation of this object as a string.
    */
-  public String asString()
-  {
+  public String asString() {
     StringBuilder sb = new StringBuilder();
     Set<Map.Entry<Object, Object>> entries = entrySet();
-    for (Map.Entry<Object, Object> entry: entries)
-    {
-      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-      {
+    for (Map.Entry<Object, Object> entry: entries) {
+      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
       }
     }
@@ -427,14 +371,16 @@ public class TypedProperties extends Properties
   /**
    * Load this set of properties from a string.
    * @param source the string to load from.
+   * @return this object.
    * @throws IOException if any error occurs.
    */
-  public void loadString(final String source) throws IOException
-  {
-    if (source == null) return;
-    ByteArrayInputStream bais = new ByteArrayInputStream(source.getBytes());
-    load(bais);
-    bais.close();
+  public TypedProperties loadString(final CharSequence source) throws IOException {
+    if (source != null) {
+      ByteArrayInputStream bais = new ByteArrayInputStream(source.toString().getBytes());
+      load(bais);
+      StreamUtils.closeSilent(bais);
+    }
+    return this;
   }
 
   /**
@@ -448,11 +394,9 @@ public class TypedProperties extends Properties
    * @param doRemove <code>true</code> to force the remove of the second property, <code>false</code> otherwise.
    * @return the value of the first property, or the value of the second if it is not found, or the default value.
    */
-  public int getAndReplaceInt(final String name1, final String name2, final int def, final boolean doRemove)
-  {
+  public int getAndReplaceInt(final String name1, final String name2, final int def, final boolean doRemove) {
     int value = getInt(name1, -1);
-    if (value < 0)
-    {
+    if (value < 0) {
       value = getInt(name2, def);
       setProperty(name1, "" + value);
     }
@@ -474,12 +418,40 @@ public class TypedProperties extends Properties
   public String getAndReplaceString(final String name1, final String name2, final String def, final boolean doRemove)
   {
     String value = getString(name1, null);
-    if (value == null)
-    {
+    if (value == null) {
       value = getString(name2, def);
       setProperty(name1, "" + value);
     }
     if (doRemove) remove(name2);
     return value;
+  }
+
+  /**
+   * Extract the properties that passs the specfied filter.
+   * @param filter the filter to use, if <code>null</code> then all properties are retruned.
+   * @return a new <code>TypedProperties</code> object containing only the properties matching the filter.
+   */
+  public TypedProperties filter(final Filter filter) {
+    TypedProperties result = new TypedProperties();
+    for (Map.Entry<Object, Object> entry: entrySet()) {
+      if ((entry.getKey() instanceof String) && (entry.getKey() instanceof String)) {
+        if ((filter == null) || filter.accepts((String) entry.getKey(), (String) entry.getValue()))
+          result.put(entry.getKey(), entry.getValue());
+      }
+    }
+    return result;
+  }
+
+  /**
+   * A filter for <code>TypedProperties</code> objects.
+   */
+  public interface Filter {
+    /**
+     * Determine whether this filter accepts a property with the specirfied name and value.
+     * @param name the name of the property.
+     * @param value the value of the property.
+     * @return <code>true</code> if the property is accepted, <code>false</code> otherwise.
+     */
+    boolean accepts(String name, String value);
   }
 }

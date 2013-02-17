@@ -406,7 +406,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   }
 
   /**
-   * Test that results are returned according to specified strategy.
+   * Test that results are returned according to the specified strategy.
    * @param jobName the name the job to execute.
    * @param strategyName the name of the strategy to test.
    * @param expectedReturnedCount the expected number of 'job returned' notifications.

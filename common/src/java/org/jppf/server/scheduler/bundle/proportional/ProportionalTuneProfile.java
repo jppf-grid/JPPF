@@ -80,7 +80,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
   {
     if (debugEnabled) log.debug("in constructor with profile name");
     this.name = profileName;
-    String prefix = "strategy." + profileName + '.';
+    String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000, 1, Integer.MAX_VALUE);
     proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 1, 1, Integer.MAX_VALUE);

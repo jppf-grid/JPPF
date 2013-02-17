@@ -119,8 +119,8 @@ public class TestConnectionPool extends Setup1D1N
   {
     TypedProperties config = JPPFConfiguration.getProperties();
     config.setProperty("jppf.load.balancing.algorithm", "proportional");
-    config.setProperty("jppf.load.balancing.strategy", "test");
-    config.setProperty("strategy.test.initialSize", "10");
+    config.setProperty("jppf.load.balancing.profile", "test");
+    config.setProperty("jppf.load.balancing.profile.test.initialSize", "10");
     config.setProperty("jppf.pool.size", "2");
     if (localThreads > 0)
     {

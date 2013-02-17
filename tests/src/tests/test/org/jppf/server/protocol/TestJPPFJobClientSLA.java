@@ -351,8 +351,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
     config.setProperty("jppf.local.execution.enabled", String.valueOf(localEnabled));
     config.setProperty("jppf.local.execution.threads", String.valueOf(Runtime.getRuntime().availableProcessors()));
     config.setProperty("jppf.load.balancing.algorithm", "manual");
-    config.setProperty("jppf.load.balancing.strategy", "manual");
-    config.setProperty("strategy.manual.size", "5");
+    config.setProperty("jppf.load.balancing.profile", "manual");
+    config.setProperty("jppf.load.balancing.profile.manual.size", "5");
     config.setProperty("jppf.pool.size", String.valueOf(poolSize));
     client = BaseSetup.createClient(null, false);
   }

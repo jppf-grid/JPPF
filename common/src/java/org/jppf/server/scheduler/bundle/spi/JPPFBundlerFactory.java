@@ -42,22 +42,61 @@ public class JPPFBundlerFactory
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Default load-balancer settings for the server.
+   * This enum defines the available default load balancing configurations.
    */
-  public static final String SERVER_DEFAULTS = new StringBuilder().append("jppf.load.balancing.algorithm = proportional\n")
-      .append("jppf.load.balancing.strategy = jppf\n")
-      .append("strategy.jppf.performanceCacheSize = 3000\n")
-      .append("strategy.jppf.proportionalityFactor = 1\n")
-      .append("strategy.jppf.initialSize = 10\n")
-      .append("strategy.jppf.initialMeanTime = 1e9\n")
-      .toString();
-  /**
-   * Default load-balancer settings for the client.
-   */
-  public static final String CLIENT_DEFAULTS = new StringBuilder().append("jppf.load.balancing.algorithm = manual\n")
-      .append("jppf.load.balancing.strategy = jppf\n")
-      .append("strategy.jppf.size = 1000000\n")
-      .toString();
+  public enum Defaults
+  {
+    /**
+     * Default load-balancing configuration for JPPF servers.
+     */
+    SERVER(new StringBuilder().append("jppf.load.balancing.algorithm = proportional\n")
+      .append("jppf.load.balancing.profile = jppf\n")
+      .append("jppf.load.balancing.profile.jppf.performanceCacheSize = 3000\n")
+      .append("jppf.load.balancing.profile.jppf.proportionalityFactor = 1\n")
+      .append("jppf.load.balancing.profile.jppf.initialSize = 10\n")
+      .append("jppf.load.balancing.profile.jppf.initialMeanTime = 1e9\n")),
+    /**
+     * Default load-balancing configuration for JPPF clients.
+     */
+    CLIENT(new StringBuilder().append("jppf.load.balancing.algorithm = manual\n")
+      .append("jppf.load.balancing.profile = jppf\n")
+      .append("jppf.load.balancing.profile.jppf.size = 1000000\n"));
+
+    /**
+     * The configuration as a string.
+     */
+    private TypedProperties config = null;
+
+    /**
+     * Initialize with the specified configuration as a string.
+     * @param config the configuration as a string.
+     */
+    Defaults(final CharSequence config)
+    {
+      try
+      {
+        this.config = new TypedProperties().loadString(config);
+      }
+      catch (Exception ignore)
+      {
+      }
+    }
+ 
+    /**
+     * Get the value of this configuration default.
+     * @return the value as a {@link TypedProperties} object.
+     */
+    public TypedProperties config()
+    {
+      return config;
+    }
+
+    @Override
+    public String toString()
+    {
+      return name() + (config == null ? ":null" : config);
+    }
+  }
   /**
    * Map of all registered providers.
    */
@@ -65,23 +104,23 @@ public class JPPFBundlerFactory
   /**
    * The default values to use if nothing is specified in the JPPF configuration.
    */
-  private final TypedProperties defaultConfig;
+  private final Defaults defaultConfig;
 
   /**
    * Default constructor.
    */
   public JPPFBundlerFactory()
   {
-    this(SERVER_DEFAULTS);
+    this(Defaults.SERVER);
   }
 
   /**
    * Default constructor.
    * @param def the default values to use if nothing is specified in the JPPF configuration.
    */
-  public JPPFBundlerFactory(final String def)
+  public JPPFBundlerFactory(final Defaults def)
   {
-    defaultConfig = StringUtils.toProperties(def);
+    defaultConfig = def;
     if (debugEnabled) log.debug("using default properties: " + defaultConfig);
   }
 
@@ -107,27 +146,26 @@ public class JPPFBundlerFactory
    */
   public Bundler createBundlerFromJPPFConfiguration() throws Exception
   {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    String algorithm = props.getString("jppf.load.balancing.algorithm", null);
-    // for compatibility with v1.x configuration files
-    if (algorithm == null) algorithm = props.getString("task.bundle.strategy", null);
-    if (algorithm == null) algorithm = defaultConfig.getString("jppf.load.balancing.algorithm", "proportional");
-    String profileName = props.getString("jppf.load.balancing.strategy", null);
-    // for compatibility with v1.x configuration files
-    if (profileName == null) profileName = props.getString("task.bundle.autotuned.strategy", null);
+    TypedProperties config = JPPFConfiguration.getProperties();
+    String algorithm = config.getString("jppf.load.balancing.algorithm", null);
+    if (algorithm == null) algorithm = defaultConfig.config().getString("jppf.load.balancing.algorithm");
+    String profileName = config.getString("jppf.load.balancing.strategy", null);
+    if (profileName == null) profileName = config.getString("jppf.load.balancing.profile", null);
     if (profileName == null)
     {
-      profileName = defaultConfig.getString("jppf.load.balancing.strategy", "jppf");
-      for (Map.Entry<Object, Object> entry: defaultConfig.entrySet())
+      String prefix = "jppf.load.balancing.profile";
+      profileName = defaultConfig.config().getString(prefix, "jppf");
+      String prefixDot = prefix + '.';
+      for (Map.Entry<Object, Object> entry: defaultConfig.config().entrySet())
       {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
         {
           String key = (String) entry.getKey();
-          if (!props.containsKey(key) && key.startsWith("strategy.jppf.")) props.put(key, entry.getValue());
+          if (!config.containsKey(key) && key.startsWith(prefixDot)) config.put(key, entry.getValue());
         }
       }
     }
-    TypedProperties configuration = convertJPPFConfiguration(profileName, props);
+    TypedProperties configuration = convertJPPFConfiguration(profileName, config);
     if (debugEnabled) log.debug("load balancing configuration using algorithm '" + algorithm +"' with parameters: " + configuration);
     return createBundler(algorithm, configuration);
   }
@@ -163,7 +201,6 @@ public class JPPFBundlerFactory
   private void loadProviders() throws Exception
   {
     Map<String, JPPFBundlerProvider> map = new Hashtable<String, JPPFBundlerProvider>();
-    //Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, getClass().getClassLoader());
     Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
     while (it.hasNext())
     {
@@ -185,7 +222,7 @@ public class JPPFBundlerFactory
   public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration)
   {
     TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
-    String prefix = "strategy." + profileName + '.';
+    String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties result = new TypedProperties();
     for (Map.Entry<Object, Object> entry: profile.entrySet())
     {
@@ -197,22 +234,28 @@ public class JPPFBundlerFactory
   }
 
   /**
-   * Extract the JPPF-prefixed load-balancing parameters from the specified configuration and based on the specified profile name.
+   * Extract the JPPF-prefixed load-balancing parameters from the specified configuration and based on the specified profile name.<br/>
+   * All entries in the resulting map have a key starting with "<code>jppf.load.balancing.profile.&lt;profileName&gt;</code>"
    * @param profileName the name of the profile to extract.
    * @param configuration the JPPF configuration to extract from.
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
-  public TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration)
+  private TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration)
   {
     TypedProperties profile = new TypedProperties();
     String prefix = "strategy." + profileName + '.';
-    Set<Map.Entry<Object, Object>> entries = configuration.entrySet();
-    for (Map.Entry<Object, Object> entry: entries)
+    String prefix2 = "jppf.load.balancing.profile." + profileName + '.';
+    for (Map.Entry<Object, Object> entry: configuration.entrySet())
     {
       if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
       {
         String key = (String) entry.getKey();
-        if (key.startsWith(prefix)) profile.setProperty(key, (String) entry.getValue());
+        if (key.startsWith(prefix))
+        {
+          String propName = key.substring(prefix.length());
+          profile.setProperty(prefix2 + propName, (String) entry.getValue());
+        }
+        else if (key.startsWith(prefix2)) profile.setProperty(key, (String) entry.getValue());
       }
     }
     return profile;
