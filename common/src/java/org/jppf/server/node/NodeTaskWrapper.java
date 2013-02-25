@@ -30,9 +30,10 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Laurent Cohen
  * @author Martin JANDA
+ * @author Paul Woodward
  * @exclude
  */
-class NodeTaskWrapper extends AbstractNodeTaskWrapper
+class NodeTaskWrapper implements Runnable
 {
   /**
    * Logger for this class.
@@ -66,17 +67,23 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * Indicator that task was started.
    */
   private boolean started = false;
+  /**
+   * The task to execute within a try/catch block.
+   */
+  private final Task task;
+  /**
+   * 
+   */
+  Future<?> future = null;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param executionManager reference to the execution manager.
    * @param task the task to execute within a try/catch block.
-   * @param number the internal number identifying the task for the thread pool.
    * @param classLoader the class loader used as context class loader.
    */
-  public NodeTaskWrapper(final NodeExecutionManagerImpl executionManager, final Task task, final long number, final ClassLoader classLoader)
-  {
-    super(task, number);
+  public NodeTaskWrapper(final NodeExecutionManagerImpl executionManager, final Task task, final ClassLoader classLoader) {
+    this.task = task;
     this.executionManager = executionManager;
     this.classLoader = classLoader;
   }
@@ -88,9 +95,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   public synchronized void cancel(final boolean callOnCancel) {
     this.cancelled = true;
     this.callOnCancel |= callOnCancel;
-
-    if (task instanceof Future)
-    {
+    if (task instanceof Future) {
       Future future = (Future) task;
       if (!future.isDone()) future.cancel(true);
     }
@@ -101,10 +106,8 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    */
   public synchronized void timeout() {
     this.timeout |= !this.cancelled;
-    if (!this.cancelled && !started) executionManager.removeFuture(number);
-
-    if (task instanceof Future)
-    {
+    if (!this.cancelled && !started) executionManager.cancelTimeoutAction(this);
+    if (task instanceof Future) {
       Future future = (Future) task;
       if (!future.isDone()) future.cancel(true);
     }
@@ -118,7 +121,7 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   public void run()
   {
     if (traceEnabled) log.trace(toString());
-    setStarted();
+    started = true;
     JPPFNodeReconnectionNotification rn = null;
     ThreadManager.UsedClassLoader usedClassLoader = null;
     ThreadManager threadManager = executionManager.getThreadManager();
@@ -126,53 +129,36 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
     long elapsedTime = 0L;
     long id = Thread.currentThread().getId();
     long startTime = System.nanoTime();
-    try
-    {
+    try {
       usedClassLoader = threadManager.useClassLoader(classLoader);
       handleTimeout();
       info = threadManager.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
-    }
-    catch(JPPFNodeReconnectionNotification t)
-    {
+    } catch(JPPFNodeReconnectionNotification t) {
       rn = t;
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       if (t instanceof Exception) task.setException((Exception) t);
       else task.setException(new JPPFException(t));
-    }
-    finally
-    {
-      try
-      {
+    } finally {
+      try {
         elapsedTime = System.nanoTime() - startTime;
         if (info != null) info = threadManager.computeExecutionInfo(id).subtract(info);
+      } catch(Throwable ignore) {
       }
-      catch(Throwable ignore)
-      {
-      }
-      try
-      {
+      try {
         silentTimeout();
         silentCancel();
-      }
-      catch (Throwable t)
-      {
+      } catch (Throwable t) {
         if (t instanceof Exception) task.setException((Exception) t);
         else task.setException(new JPPFException(t));
       }
       if (task.getException() instanceof InterruptedException) task.setException(null);
       if (usedClassLoader != null) usedClassLoader.dispose();
-      executionManager.removeFuture(number);
-      if (rn == null)
-      {
-        try
-        {
-          executionManager.taskEnded(task, number, info, elapsedTime);
-        }
-        catch(JPPFNodeReconnectionNotification t)
-        {
+      executionManager.cancelTimeoutAction(this);
+      if (rn == null) {
+        try {
+          executionManager.taskEnded(task, info, elapsedTime);
+        } catch(JPPFNodeReconnectionNotification t) {
           rn = t;
         }
       }
@@ -181,10 +167,18 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
   }
 
   /**
+   * Get the task this wrapper executes within a try/catch block.
+   * @return the task as a <code>JPPFTask</code> instance.
+   */
+  public Task getTask() {
+    return task;
+  }
+
+  /**
    * Silently call onTimeout() methods;
    * @return <code>true</code> when task timeout.
    */
-  protected synchronized boolean silentTimeout() {
+  private boolean silentTimeout() {
     if (timeout) task.onTimeout();
     return timeout;
   }
@@ -193,33 +187,16 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * Silently call onCancel() methods;
    * @return <code>true</code> when task was cancelled.
    */
-  protected synchronized boolean silentCancel() {
+  private boolean silentCancel() {
     if (cancelled && callOnCancel) task.onCancel();
     return cancelled;
-  }
-
-  /**
-   * Set started indicator.
-   */
-  protected synchronized void setStarted() {
-    this.started = true;
-  }
-
-  /**
-   * Get the context class loader for this task.
-   * @return a {@link ClassLoader} instance.
-   */
-  public ClassLoader getClassLoader()
-  {
-    return classLoader;
   }
 
   /**
    * Determine whether this task was cancelled or timed out.
    * @return <code>true</code> if the task was cancelled or timed out, <code>false</code> otherwise.
    */
-  public synchronized boolean isCancelledOrTimedout()
-  {
+  private boolean isCancelledOrTimedout() {
     return cancelled || timeout;
   }
 
@@ -227,17 +204,14 @@ class NodeTaskWrapper extends AbstractNodeTaskWrapper
    * Handle the task expiration/timeout if any is specified. 
    * @throws Exception if any error occurs.
    */
-  void handleTimeout() throws Exception
-  {
+  void handleTimeout() throws Exception {
     JPPFSchedule schedule = task.getTimeoutSchedule();
-    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null))) executionManager.processTaskTimeout(this, number);
+    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null))) executionManager.processTaskTimeout(this);
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("task number=").append(number);
     sb.append(", cancelled=").append(cancelled);
     sb.append(", callOnCancel=").append(callOnCancel);
     sb.append(", timeout=").append(timeout);
