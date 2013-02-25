@@ -23,8 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.*;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFUuid;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -79,6 +78,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   {
     this.uuid = (uuid == null) ? new JPPFUuid().toString() : uuid;
     if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + this.uuid);
+    VersionUtils.logVersionInformation("client", uuid);
   }
 
   /**

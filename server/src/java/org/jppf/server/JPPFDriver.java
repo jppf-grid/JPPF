@@ -147,7 +147,7 @@ public class JPPFDriver
     // initialize the jmx logger
     new JmxMessageNotifier();
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-    VersionUtils.printJPPFInformation("driver", uuid);
+    VersionUtils.logVersionInformation("driver", uuid);
     systemInformation = new JPPFSystemInformation(uuid, false, true);
     statsUpdater = new JPPFDriverStatsUpdater();
     statsManager = new JPPFDriverStatsManager();

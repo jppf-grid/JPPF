@@ -105,7 +105,7 @@ public class NodeRunner
       // initialize the jmx logger
       new JmxMessageNotifier();
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-      VersionUtils.printJPPFInformation("node", uuid);
+      VersionUtils.logVersionInformation("node", uuid);
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
       hooksHandler = new InitializationHooksHandler(initialConfig);
