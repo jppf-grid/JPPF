@@ -17,7 +17,7 @@
  */
 package org.jppf.utils;
 
-import java.io.InputStream;
+import java.io.*;
 import java.net.*;
 
 import org.jppf.utils.streams.StreamUtils;
@@ -48,9 +48,9 @@ public final class VersionUtils
    */
   private static String ip = getLocalIpAddress();
   /**
-   * 
+   * The singleton instance holding the version information.
    */
-  private static final String VERSION_INFO = readVersionInfo();
+  private static final Version VERSION = createVersionInfo();
 
   /**
    * Instantiation of this class is not permitted.
@@ -120,40 +120,124 @@ public final class VersionUtils
   }
 
   /**
-   * Read the version information properties file and return the information in a single string. 
-   * @return a formatted string containing the JPPF version, build number and build date.
+   * Read the version information properties file and return the information in a dedicated object.
+   * @return a {@link Version} instance.
    */
-  private static String readVersionInfo()
+  private static Version createVersionInfo()
   {
     String result = null;
     TypedProperties props = new TypedProperties();
+    Version v = null;
     try
     {
       InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties");
       props.load(is);
-      StringBuilder sb = new StringBuilder();
-      sb.append("JPPF version information: ");
-      sb.append("Version: ").append(props.getString("version.number", ""));
-      sb.append(", Build number: ").append(props.getString("build.number", ""));
-      sb.append(", Build date: ").append(props.getString("build.date", ""));
-      result = sb.toString();
+      v = new Version(props.getString("version.number", ""), props.getString("build.number", ""), props.getString("build.date", ""));
     }
     catch (Exception e)
     {
       String s = "JPPF version information could not be determined";
       if (debugEnabled) log.debug(s, e);
       else log.warn(s + ": " + ExceptionUtils.getMessage(e));
-      result = s;
+      v = new Version(s, "", "");
     }
-    return result;
+    return v;
   }
 
   /**
-   * Get the JPPF the version information. 
-   * @return a formatted string containing the JPPF version, build number and build date.
+   * Log the JPPF version information and process id.
+   * @param component the JPPF component type: driver, node or client.
+   * @param uuid the ocmponent uuuid.
    */
-  public static String getVersionInformation()
+  public static void logVersionInformation(final String component, final String uuid)
   {
-    return VERSION_INFO;
+    String comp = component == null ? "<unknown component type>" : component;
+    int pid = SystemUtils.getPID();
+    if (pid > 0) System.out.println(comp + " process id: " + pid);
+    String hrule = StringUtils.padRight("", '-', 80);
+    log.info(hrule);
+    log.info(VersionUtils.VERSION.toString());
+    log.info("starting "+ comp + " with PID=" + pid + ", UUID=" + uuid);
+    log.info(hrule);
+  }
+
+  /**
+   * Return the singleton object which provides the JPPF version information. 
+   * @return a {@link Version} instance.
+   */
+  public static Version getVersion()
+  {
+    return VERSION;
+  }
+
+  /**
+   * Describes the avialble vrsion information.
+   */
+  public static class Version implements Serializable
+  {
+    /**
+     * The JPPF version number.
+     */
+    private final String versionNumber;
+    /**
+     * The JPPF build number.
+     */
+    private final String buildNumber;
+    /**
+     * The JPPF build date.
+     */
+    private final String buildDate;
+
+    /**
+     * Initialize this version object.
+     * @param versionNumber the JPPF version number.
+     * @param buildNumber the JPPF build number.
+     * @param buildDate the JPPF build date.
+     */
+    public Version(final String versionNumber, final String buildNumber, final String buildDate)
+    {
+      super();
+      this.versionNumber = versionNumber;
+      this.buildNumber = buildNumber;
+      this.buildDate = buildDate;
+    }
+
+    /**
+     * Get the JPPF version number.
+     * @return the version number as a string.
+     */
+    public String getVersionNumber()
+    {
+      return versionNumber;
+    }
+
+    /**
+     * Get the JPPF build number.
+     * @return the build number as a string.
+     */
+    public String getBuildNumber()
+    {
+      return buildNumber;
+    }
+
+    /**
+     * Get the JPPF build date.
+     * @return the build date as a string.
+     */
+    public String getBuildDate()
+    {
+      return buildDate;
+    }
+
+    @Override
+    public String toString()
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.append("JPPF version information: ");
+      sb.append("Version: ").append(versionNumber);
+      sb.append(", Build number: ").append(buildNumber);
+      sb.append(", Build date: ").append(buildDate);
+      return sb.toString();
+    }
   }
 }

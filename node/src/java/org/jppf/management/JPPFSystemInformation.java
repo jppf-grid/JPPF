@@ -76,6 +76,10 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
     this.resolveInetAddressesNow = resolveInetAddressesNow;
     TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
+    VersionUtils.Version v = VersionUtils.getVersion();
+    uuidProps.setProperty("jppf.version.number", v.getVersionNumber());
+    uuidProps.setProperty("jppf.build.number", v.getBuildNumber());
+    uuidProps.setProperty("jppf.build.date", v.getBuildDate());
     addProperties("uuid", uuidProps);
     populate();
   }
@@ -159,7 +163,6 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * <li>root.<i>i</i>.space.total = <i>space_in_bytes</i> : total space for the root</li>
    * <li>root.<i>i</i>.space.usable = <i>space_in_bytes</i> : space available to the user the JVM is running under</li>
    * </ul>
-   * If the JVM version is prior to 1.6, the space information will not be available.
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.SystemUtils#getStorageInformation()
    */
@@ -276,8 +279,15 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
   }
 
   /**
-   * Get the properties object holding the uuid.
-   * @return a <code>TypedProperties</code> wrapper for the uuid of the corresponding JPPF component.
+   * Get the properties object holding the JPPF uuid and evrsion information.
+   * The following properties are provided:
+   * <ul>
+   * <li>"jppf.uuid" : the uuid of the node or driver</li>
+   * <li>"jppf.version.number" : the current JPPF version number</li>
+   * <li>"jppf.build.number" : the current build number</li>
+   * <li>"jppf.build.date" : the build date, including the time zone, in the format “yyyy-MM-dd hh:mm z” </li>
+   * </ul>
+   * @return a <code>TypedProperties</code> wrapper for the uuid and version information of the corresponding JPPF component.
    */
   public TypedProperties getUuid()
   {
