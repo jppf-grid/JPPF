@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.client.balancer.ClientJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.management.JPPFSystemInformation;
@@ -41,7 +40,7 @@ public abstract class AbstractClientJob
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(ClientJob.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractClientJob.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */

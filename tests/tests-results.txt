@@ -1,6 +1,6 @@
 
-Total tests: 102, successful: 102, failed: 0, ignored: 0
-Start time: Sun Jan 27 06:50:27 CET 2013, total elapsed: 00:02:08.170
+Total tests: 104, successful: 104, failed: 0, ignored: 0
+Start time: Wed Feb 27 20:03:48 CET 2013, total elapsed: 00:02:21.492
 
 Tests results:
 
@@ -15,9 +15,10 @@ class test.org.jppf.client.TestJPPFClient
   testConstructorWithUuid() : OK
   testCancelJob() : OK
   testLocalExecutionNbThreads() : OK
-  testSubmit() : OK
   testNotSerializableExceptionFromClient() : OK
   testNotSerializableExceptionFromNode() : OK
+  testNoJMXConnectionThreadsLeak() : OK
+  testSubmit() : OK
 class test.org.jppf.client.TestJPPFJob
   testGetTaskObject() : OK
   testJobListener() : OK
@@ -71,20 +72,19 @@ class test.org.jppf.management.TestJPPFNodeAdminMBean
   testResetTaskCounter() : OK
   testSetTaskCounter() : OK
   testSystemInformation() : OK
+  testState() : OK
   testUpdateConfiguration() : OK
   testGetDelegationModel() : OK
   testSetDelegationModel() : OK
-  testState() : OK
 class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
-  testNotifications() : OK
   testSnapshot() : OK
   testReset() : OK
+  testNotifications() : OK
 class test.org.jppf.server.job.management.TestDriverJobManagementMBean
   testCancelJob() : OK
+  testResumeAndCancelSuspendedJob() : OK
   testCancelJobAfterCompletion() : OK
 class test.org.jppf.server.protocol.TestJPPFJobClientSLA
-  testJobMaxChannelsClient() : OK
-  testJobMaxChannels2Client() : OK
   testJobExpirationAtDateClient() : OK
   testJobExpirationAtDateTooLateClient() : OK
   testJobExpirationAfterDelayClient() : OK
@@ -92,7 +92,13 @@ class test.org.jppf.server.protocol.TestJPPFJobClientSLA
   testMultipleJobsExpirationClient() : OK
   testJobInNodeExecutionPolicyClient() : OK
   testJobLocalExecutionPolicyClient() : OK
+  testJobMaxChannelsClient() : OK
+  testJobMaxChannels2Client() : OK
 class test.org.jppf.server.protocol.TestJPPFJobSLA
+  testJobExpirationAtDateTooLate() : OK
+  testJobExpirationAfterDelayTooLate() : OK
+  testCancelJobUponClientDisconnect() : OK
+  testDefaultSendResultsStrategy() : OK
   testJobExpirationAtDate() : OK
   testJobExpirationAfterDelay() : OK
   testSuspendedJobExpiration() : OK
@@ -105,11 +111,8 @@ class test.org.jppf.server.protocol.TestJPPFJobSLA
   testBroadcastJob2() : OK
   testSendNodeResultsStrategy() : OK
   testSendAllResultsStrategy() : OK
-  testJobExpirationAtDateTooLate() : OK
-  testJobExpirationAfterDelayTooLate() : OK
-  testCancelJobUponClientDisconnect() : OK
-  testDefaultSendResultsStrategy() : OK
 class test.org.jppf.server.protocol.TestJPPFTask
+  testComputeCallableThrowingException() : OK
   testTaskTimeout() : OK
   testTaskTimeoutStart() : OK
   testTaskExpirationDate() : OK
@@ -117,12 +120,11 @@ class test.org.jppf.server.protocol.TestJPPFTask
   testComputeCallableInClient() : OK
   testIsInNodeTrue() : OK
   testIsInNodeFalse() : OK
-  testComputeCallableThrowingException() : OK
 class test.org.jppf.utils.TestJPPFConfiguration
   testAlternateConfigurationSource() : OK
 class test.org.jppf.utils.TestRange
-  testIncludes() : OK
-  testMerge() : OK
   testIsValueInRange() : OK
   testIntersects() : OK
   testIntersection() : OK
+  testIncludes() : OK
+  testMerge() : OK

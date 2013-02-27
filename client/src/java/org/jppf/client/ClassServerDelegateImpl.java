@@ -21,6 +21,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -70,7 +71,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
   {
     try
     {
-      if (((AbstractJPPFClientConnection) owner).closed) throw new IllegalStateException("this task server connection is closed");
+      if (((AbstractJPPFClientConnection) owner).isClosed()) throw new IllegalStateException("this task server connection is closed");
       handshakeDone = false;
       socketInitializer.setName('[' + getName() + " - delegate] ");
       setStatus(CONNECTING);
@@ -94,6 +95,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
     }
     catch(Exception e)
     {
+      if (debugEnabled) log.debug(ExceptionUtils.getMessage(e));
       setStatus(FAILED);
       throw e;
     }
@@ -120,9 +122,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
         {
           if (!closed)
           {
-            log.warn('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
+            if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
+            else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");
             init();
-            if  (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
+            if (debugEnabled) log.debug('[' + this.getName() + "] : successfully initialized");
           }
         }
       }

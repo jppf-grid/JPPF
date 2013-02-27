@@ -323,9 +323,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isSSL()
   {
@@ -341,9 +338,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     return systemInfo;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFTaskBundle sendHandshakeJob() throws Exception
   {

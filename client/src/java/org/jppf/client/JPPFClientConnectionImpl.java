@@ -78,10 +78,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   {
     try
     {
-      if (closed) throw new IllegalStateException("this client connection is closed");
+      if (isClosed()) throw new IllegalStateException("this client connection is closed");
       try
       {
-        //String s = InetAddress.getByName(host).getCanonicalHostName();
         host = InetAddress.getByName(host).getHostName();
         displayName = name + '[' + host + ':' + port + ']';
         getJmxConnection().setHost(host);
@@ -138,9 +137,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
     delegate.init();
     if (!delegate.isClosed())
     {
-      Thread t = new Thread(delegate);
-      t.setName('[' + delegate.getName() + " : class delegate]");
-      t.start();
+      new Thread(delegate, delegate.getName()).start();
       taskServerConnection.init();
     }
   }
