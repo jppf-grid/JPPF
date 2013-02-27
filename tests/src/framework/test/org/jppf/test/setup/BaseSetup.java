@@ -116,17 +116,15 @@ public class BaseSetup
     for (int i=0; i<nbDrivers; i++)
     {
       // to avoid driver and node producing the same UUID
-      //if (i > 0) Thread.sleep(511L);
       drivers[i] = new DriverProcessLauncher(i+1);
-      drivers[i].startProcess();
+      new Thread(drivers[i], drivers[i].getName() + "process launcher").start(); 
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++)
     {
       // to avoid driver and node producing the same UUID
-      //if (i > 0) Thread.sleep(511L);
       nodes[i] = new NodeProcessLauncher(i+1);
-      nodes[i].startProcess();
+      new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
     }
     if (initClient)
     {

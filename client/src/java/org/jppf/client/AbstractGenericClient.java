@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -100,12 +101,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
-    //getSubmissionManager();
-    Runnable r = new Runnable()
-    {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         initPools(config);
       }
     };
@@ -133,21 +131,16 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected void initPools(final TypedProperties config)
   {
     if (debugEnabled) log.debug("initializing connections");
-    //loadBalancer = new LoadBalancer();
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
-   //SynchronousQueue queue = new SynchronousQueue();
     executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
-    if (config.getBoolean("jppf.remote.execution.enabled", true))
-    {
-      initRemotePools(config);
-    }
+    if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
   }
 
   /**
    * Initialize remote connection pools according to configuration.
    * @param props The JPPF configuration properties.
    */
-  private void initRemotePools(final TypedProperties props)
+  protected void initRemotePools(final TypedProperties props)
   {
     try
     {
@@ -261,7 +254,19 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected void connectionFailed(final JPPFClientConnection c)
   {
     log.info("Connection [" + c.getName() + "] failed");
-    if (receiverThread != null) receiverThread.removeConnectionInformation(((AbstractJPPFClientConnection) c).getUuid());
+    AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) c;
+    if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getUuid());
+    try
+    {
+      JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
+      if (jmx != null) jmx.close();
+    }
+    catch(Exception e)
+    {
+      if (debugEnabled) log.debug("could not close JMX connection for " + c, e);
+      else log.warn("could not close JMX connection for " + c + " : " + ExceptionUtils.getMessage(e));
+    }
+    c.close();
     removeClientConnection(c);
     fireConnectionFailed(c);
   }

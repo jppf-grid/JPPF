@@ -18,9 +18,12 @@
 
 package org.jppf.client;
 
+import static org.jppf.client.JPPFClientConnectionStatus.CREATED;
+
 import java.nio.channels.AsynchronousCloseException;
 import java.security.*;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
@@ -64,6 +67,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   private static final boolean SEQUENTIAL_DESERIALIZATION = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
   /**
+   * 
+   */
+  protected static AtomicInteger connectionCount = new AtomicInteger(0);
+  /**
    * Handler for the connection to the task server.
    */
   protected TaskServerConnectionHandler taskServerConnection = null;
@@ -94,7 +101,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   /**
    * Unique ID for this connection and its two channels.
    */
-  protected final String connectionUuid = JPPFUuid.normalUUID();
+  protected String connectionUuid = null;
   /**
    * Fully qualified name of the serilaization helper class to use.
    */
@@ -104,6 +111,14 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   protected final JPPFMapCache<ClassLoader, NonDelegatingClassLoader> ndclCache = new JPPFHashMapCache<ClassLoader, NonDelegatingClassLoader>();
   //protected final JPPFMapCache<ClassLoader, NonDelegatingClassLoader> ndclCache = new JPPFSynchronizedSoftCache<ClassLoader, NonDelegatingClassLoader>();
+  /**
+   * Holds the tasks, data provider and submission mode for the current execution.
+   */
+  protected JPPFJob job = null;
+  /**
+   * Status of the connection.
+   */
+  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CREATED);
 
   /**
    * Initialize this client connection.
@@ -131,7 +146,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-    if (debugEnabled) log.debug("[client: " + name + "] sending job " + header);
+    if (debugEnabled) log.debug(this.toDebugString() + " sending job " + header);
 
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
@@ -156,7 +171,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug("[client: " + name + "] sending handshake job, uuidPath=" + uuidPath);
+    if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
     header.setRequestUuid(new JPPFUuid().toString());
     header.setName("handshake job");
     header.setUuid("handshake job");
@@ -196,7 +211,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       ObjectSerializer ser = makeHelper(cl).getSerializer();
       bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
-      if (debugEnabled) log.debug("received bundle " + bundle);
+      if (debugEnabled) log.debug(this.toDebugString() + " : received bundle " + bundle);
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try
       {
@@ -211,7 +226,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
       if (t != null)
       {
-        if (debugEnabled) log.debug("server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
+        if (debugEnabled) log.debug(this.toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         for (JPPFTask task : taskList) task.setException(e);
       }
@@ -439,5 +454,20 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   public int getPort()
   {
     return port;
+  }
+
+  /**
+   * Get a string representing this connection for debugging purposes.
+   * @return a string representing this connection.
+   */
+  protected String toDebugString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("connectionUuid=").append(connectionUuid);
+    sb.append(", status=").append(status);
+    sb.append(", jobUuid=").append(job == null ? "null" : job.getUuid());
+    sb.append(']');
+    return sb.toString();
   }
 }

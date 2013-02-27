@@ -31,7 +31,7 @@ import org.slf4j.*;
  * Super class for launching a JPPF driver or node.
  * @author Laurent Cohen
  */
-public class GenericProcessLauncher
+public class GenericProcessLauncher implements Runnable
 {
   /**
    * Logger for this class.
@@ -248,6 +248,45 @@ public class GenericProcessLauncher
   public void addArgument(final String arg)
   {
     arguments.add(arg);
+  }
+
+  @Override
+  public void run()
+  {
+    boolean end = false;
+    try
+    {
+      while (!end)
+      {
+        if (debugEnabled) log.debug(name + "starting process");
+        startProcess();
+        int exitCode = process.waitFor();
+        if (debugEnabled) log.debug(name + "exited with code " + exitCode);
+        end = onProcessExit(exitCode);
+      }
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+    catch (Error e)
+    {
+      e.printStackTrace();
+    }
+    if (process != null) process.destroy();
+    //System.exit(0);
+  }
+
+  /**
+   * Called when the subprocess has exited with exit value n.
+   * This allows for printing the residual output (both standard and error) to this pJVM's console and log file,
+   * in order to get additional information if a problem occurred.
+   * @param exitCode the exit value of the subprocess.
+   * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
+   */
+  private boolean onProcessExit(final int exitCode)
+  {
+    return exitCode != 2;
   }
 
   /**

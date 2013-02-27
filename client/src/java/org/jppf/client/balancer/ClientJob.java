@@ -527,7 +527,7 @@ public class ClientJob extends AbstractClientJob
     sb.append(", broadcastUUID=").append(broadcastUUID);
     sb.append(", executing=").append(executing);
     sb.append(", nbTasks=").append(tasks.size());
-    sb.append(", taskStateMap=").append(taskStateMap);
+    //sb.append(", taskStateMap=").append(taskStateMap);
     sb.append(']');
     return sb.toString();
   }

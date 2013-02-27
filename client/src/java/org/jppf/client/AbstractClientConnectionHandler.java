@@ -199,9 +199,6 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     socketClient = SSLHelper.createSSLClientConnection(socketClient);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close()
   {

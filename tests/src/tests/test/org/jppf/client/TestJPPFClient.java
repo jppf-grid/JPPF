@@ -22,9 +22,11 @@ import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
 import java.lang.management.*;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
@@ -243,6 +245,119 @@ public class TestJPPFClient extends Setup1D1N
   }
 
   /**
+   * Test that JMX connection threads are properly terminated when the JPPF connection fails.
+   * This relates to the bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-131">JPPF-131 JPPF client does not release JMX thread upon connection failure</a>
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=15000)
+  public void testNoJMXConnectionThreadsLeak() throws Exception
+  {
+    String name = Thread.currentThread().getName();
+    MyClient client = null;
+    TypedProperties config = JPPFConfiguration.getProperties();
+    try {
+      Thread.currentThread().setName("JPPF-test");
+      int poolSize = 2;
+      int maxReconnect = 3;
+      config.setProperty("reconnect.max.time", Integer.toString(maxReconnect));
+      config.setProperty("jppf.discovery.enabled", Boolean.toString(false));
+      config.setProperty("jppf.pool.size", Integer.toString(poolSize));
+      config.setProperty("jppf.drivers", "driver1");
+      config.setProperty("driver1.jppf.server.host", "localhost");
+      config.setProperty("driver1.jppf.server.port", Integer.toString(11101));
+      config.setProperty("driver1.jppf.pool.size", Integer.toString(poolSize));
+      config.setProperty("driver1.jppf.management.port", Integer.toString(11201));
+      client = new MyClient();
+      waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
+      restartDriver(client, poolSize, 1000L * maxReconnect + 500L);
+      String[] threads = threadNames("^JMX connection .*");
+      assertEquals(poolSize, threads.length);
+    } finally {
+      System.out.println("connections: " + client.getAllConnections());
+      if (client != null) client.close();
+      JPPFConfiguration.reset();
+      Thread.currentThread().setName(name);
+    }
+  }
+
+  /**
+   * Restart the driver.
+   * @param client the JPPF client.
+   * @param poolSize the number of expected connections.
+   * @param restartDelay the driver restart delay in milliseconds.
+   * @throws Exception if any error occurs.
+   */
+  private void restartDriver(final MyClient client, final int poolSize, final long restartDelay) throws Exception {
+    JMXDriverConnectionWrapper jmx = getJmxConnection(client);
+    jmx.restartShutdown(100L, restartDelay);
+    waitForNbConnections(client, 0, null);
+    client.initRemotePools(JPPFConfiguration.getProperties());
+    waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
+  }
+
+  /**
+   * Wait until the client has the specified number of connections.
+   * @param client the JPPF client.
+   * @param status the expected status of each connection.
+   * @param nbConnections the number of connections to reach.
+   * @throws Exception if any error occurs.
+   */
+  private void waitForNbConnections(final JPPFClient client, final int nbConnections, final JPPFClientConnectionStatus status) throws Exception {
+    int count = -1;
+    while (count != nbConnections) {
+      try {
+        count = 0;
+        Thread.sleep(10L);
+        List<JPPFClientConnection> list = client.getAllConnections();
+        for (JPPFClientConnection conn: list) {
+          if ((status == null) || ((AbstractJPPFClientConnection) conn).getStatus() == status) count++;
+        }
+      } catch (Exception ignore) {
+        throw ignore;
+      }
+    }
+    if (nbConnections > 0) getJmxConnection(client);
+  }
+
+  /**
+   * Get a connected JMX connection for the psecified client.
+   * @param client the JPPF client.
+   * @return a {@link JMXDriverConnectionWrapper} instance.
+   * @throws Exception if any error occurs.
+   */
+  private JMXDriverConnectionWrapper getJmxConnection(final JPPFClient client) throws Exception {
+    JMXDriverConnectionWrapper jmx = null;
+    while (jmx == null) {
+      try {
+        jmx = ((AbstractJPPFClientConnection) client.getClientConnection()).getJmxConnection();
+        while (!jmx.isConnected()) Thread.sleep(10L);
+      } catch (Exception e) {
+        Thread.sleep(10L);
+      }
+    }
+    return jmx;
+  }
+
+  /**
+   * Get the names of all threads in this JVM matching the specified regex pattern.
+   * @param pattern the pattern to match against.
+   * @return an array of thread names.
+   */
+  private String[] threadNames(final String pattern)
+  {
+    Pattern p = pattern == null ? null : Pattern.compile(pattern);
+    ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
+    long[] ids = threadsBean.getAllThreadIds();
+    ThreadInfo[] infos = threadsBean.getThreadInfo(ids, 0);
+    List<String> result = new ArrayList<String>();
+    for (int i=0; i<infos.length; i++)
+    {
+      if ((p == null) || p.matcher(infos[i].getThreadName()).matches())
+        result.add(infos[i].getThreadName());
+    }
+    return result.toArray(new String[result.size()]);
+  }
+  /**
    * A task which holds a non-serializable object.
    */
   public static class NotSerializableTask extends JPPFTask
@@ -283,5 +398,16 @@ public class TestJPPFClient extends Setup1D1N
      * Any attribute will do.
      */
     public String name = "NotSerializableObject";
+  }
+
+  /**
+   * 
+   */
+  public static class MyClient extends JPPFClient
+  {
+    @Override
+    public void initRemotePools(final TypedProperties props) {
+      super.initRemotePools(props);
+    }
   }
 }

@@ -21,7 +21,6 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
@@ -54,10 +53,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected int priority = 0;
   /**
-   * Status of the connection.
-   */
-  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CREATED);
-  /**
    * List of status listeners for this connection.
    */
   protected final List<ClientConnectionStatusListener> listeners = new LinkedList<ClientConnectionStatusListener>();
@@ -65,10 +60,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Temporary listeners array to allow access to the listeners without synchronization. 
    */
   protected ClientConnectionStatusListener[] listenersArray;
-  /**
-   * Holds the tasks, data provider and submission mode for the current execution.
-   */
-  protected JPPFJob job = null;
   /**
    * Determines whether this connection has been shut down;
    */
@@ -323,9 +314,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isSSL()
   {
@@ -376,7 +364,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public List<JPPFJob> close()
   {
-    if (debugEnabled) log.debug("closing connection " + this);
+    if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     synchronized(listeners)
     {
@@ -403,7 +391,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     }
     ndclCache.clear();
     if (list == null) list = Collections.emptyList();
-    if (debugEnabled) log.debug("connection " + this + " closed");
+    if (debugEnabled) log.debug("connection " + toDebugString() + " closed");
     return list;
   }
 

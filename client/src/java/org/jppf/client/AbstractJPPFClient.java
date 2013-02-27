@@ -78,7 +78,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   {
     this.uuid = (uuid == null) ? new JPPFUuid().toString() : uuid;
     if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + this.uuid);
-    VersionUtils.logVersionInformation("client", uuid);
+    VersionUtils.logVersionInformation("client", this.uuid);
   }
 
   /**
@@ -290,12 +290,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
         pool.remove(connection);
         if (pool.isEmpty()) pools.remove(priority);
         allConnections.remove(connection);
-        //if (pools.isEmpty()) throw new JPPFError("FATAL ERROR: No more driver connection available for this client");
-        if (pools.isEmpty())
-        {
-          log.error("FATAL ERROR: No more driver connection available for this client");
-          emptyPools = true;
-        }
+        if (pools.isEmpty()) log.warn("No more driver connection available for this client");
       }
     }
   }
