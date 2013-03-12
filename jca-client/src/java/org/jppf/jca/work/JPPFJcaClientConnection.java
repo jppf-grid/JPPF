@@ -78,7 +78,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   {
     try
     {
-      if (closed) throw new IllegalStateException("this client connection is closed");
+      if (isClosed()) throw new IllegalStateException("this client connection is closed");
       try
       {
         //String s = InetAddress.getByName(host).getCanonicalHostName();

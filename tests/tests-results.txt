@@ -1,6 +1,6 @@
 
 Total tests: 104, successful: 104, failed: 0, ignored: 0
-Start time: Wed Feb 27 20:03:48 CET 2013, total elapsed: 00:02:21.492
+Start time: Tue Mar 12 20:49:19 CET 2013, total elapsed: 00:02:21.375
 
 Tests results:
 
