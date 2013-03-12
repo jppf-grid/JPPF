@@ -37,11 +37,6 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
     super(channel);
   }
 
-  /**
-   * Get the {@link AbstractNioContext} attached to the channel.
-   * @return a {@link AbstractNioContext} instance.
-   * @see org.jppf.server.nio.AbstractChannelWrapper#getContext()
-   */
   @Override
   public NioContext getContext()
   {
@@ -76,8 +71,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public String toString()
   {
-    if (channel.isValid()) return super.toString();
-    return "[invalid channel]";
+    return super.toString();
   }
 
   @Override

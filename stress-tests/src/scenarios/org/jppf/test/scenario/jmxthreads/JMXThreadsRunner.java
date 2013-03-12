@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClientConnectionImpl;
 import org.jppf.management.*;
-import org.jppf.test.addons.mbeans.DiagnosticsMBean;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;

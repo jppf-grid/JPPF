@@ -22,7 +22,6 @@ import org.jppf.io.IOHelper;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.SerializationHelperImpl;
-import org.slf4j.*;
 
 /**
  * Representation of a message sent or received by a remote node.
@@ -31,16 +30,7 @@ import org.slf4j.*;
 public class ClientMessage extends AbstractTaskBundleMessage
 {
   /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(ClientMessage.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-
-  /**
-   * Initialize this nio message with the specified sll flag.
+   * Initialize this nio message with the specified ssl flag.
    * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
   public ClientMessage(final boolean ssl)
@@ -69,9 +59,6 @@ public class ClientMessage extends AbstractTaskBundleMessage
     nbObjects = bundle.getTaskCount() + 1;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

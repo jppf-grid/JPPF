@@ -67,6 +67,16 @@ public class IdleProviderState extends ClassServerState
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
     if (context.getNbPendingRequests() > 0) return TO_SENDING_PROVIDER_REQUEST;
+    /*
+    else
+    {
+      synchronized(this)
+      {
+        //wait(0L, 50000);
+        wait(0L, 1000);
+      }
+    }
+    */
     return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
   }
 }

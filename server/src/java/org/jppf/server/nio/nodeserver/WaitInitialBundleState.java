@@ -20,11 +20,14 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
+import java.util.List;
+
+import org.jppf.io.DataLocation;
 import org.jppf.management.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -68,8 +71,8 @@ class WaitInitialBundleState extends NodeServerState
     if (context.readMessage(channel))
     {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
-      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
-      JPPFTaskBundle bundle = bundleWrapper.getJob();
+      Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
+      JPPFTaskBundle bundle = received.first();
       if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) throw new IllegalStateException("INITIAL_BUNDLE expected.");
 
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);

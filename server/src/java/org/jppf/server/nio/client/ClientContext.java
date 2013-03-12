@@ -19,6 +19,7 @@
 package org.jppf.server.nio.client;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.jppf.io.*;
 import org.jppf.server.JPPFDriver;
@@ -54,8 +55,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
   /**
    * List of completed bundles to send to the client.
    */
-  protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<ServerTaskBundleClient>();
-  //protected final Queue<ServerTaskBundleClient> completedBundles = new ConcurrentLinkedQueue<ServerTaskBundleClient>();
+  //protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<ServerTaskBundleClient>();
+  protected final Queue<ServerTaskBundleClient> completedBundles = new ConcurrentLinkedQueue<ServerTaskBundleClient>();
   /**
    * The job as initially submitted by the client.
    */
@@ -203,7 +204,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public void offerCompletedBundle(final ServerTaskBundleClient bundleWrapper)
   {
-    synchronized(completedBundles)
+    //synchronized(completedBundles)
     {
       completedBundles.offer(bundleWrapper);
     }
@@ -215,7 +216,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ServerTaskBundleClient pollCompletedBundle()
   {
-    synchronized(completedBundles)
+    //synchronized(completedBundles)
     {
       return completedBundles.poll();
     }
@@ -237,7 +238,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public boolean isCompletedBundlesEmpty()
   {
-    synchronized (completedBundles)
+    //synchronized (completedBundles)
     {
       return completedBundles.isEmpty();
     }

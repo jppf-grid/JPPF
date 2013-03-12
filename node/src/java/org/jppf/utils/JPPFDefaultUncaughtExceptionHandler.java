@@ -41,6 +41,6 @@ public class JPPFDefaultUncaughtExceptionHandler implements UncaughtExceptionHan
   public void uncaughtException(final Thread t, final Throwable e)
   {
     if (debugEnabled) log.debug("Uncaught exception in thread " + t, e);
-    else log.debug("Uncaught exception in thread " + t + ": " + ExceptionUtils.getMessage(e));
+    else log.warn("Uncaught exception in thread " + t + ": " + ExceptionUtils.getMessage(e));
   }
 }

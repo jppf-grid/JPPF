@@ -349,13 +349,8 @@ public class JPPFResourceWrapper implements Serializable
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("dynamic=").append(dynamic);
-    sb.append(", asResource=").append(asResource);
+    sb.append(", name=").append(getName());
     sb.append(", state=").append(state);
-    byte[] callable = getCallable();
-    synchronized (dataMap) {
-      if (callable == null) sb.append(", data=").append(dataMap);
-      else sb.append(", callable=").append(callable.toString()).append(", callableID=").append(getCallableID());
-    }
     sb.append(']');
     return sb.toString();
   }

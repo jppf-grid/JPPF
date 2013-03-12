@@ -46,6 +46,10 @@ public abstract class AbstractClientJob
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Instance count.
    */
   private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
@@ -425,7 +429,7 @@ public abstract class AbstractClientJob
    */
   public boolean acceptsChannel(final ExecutorChannel channel)
   {
-    if (debugEnabled) log.debug(build("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired()));
+    if (traceEnabled) log.trace(build("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired()));
     if (isPending()) return false;
     if (isJobExpired()) return false;
     if (channelsCount.get() >= clientSla.getMaxChannels()) return false;
@@ -435,7 +439,7 @@ public abstract class AbstractClientJob
     {
       JPPFSystemInformation info = channel.getSystemInformation();
       b = policy.accepts(info);
-      if (debugEnabled) log.debug("policy result = " + b);
+      if (traceEnabled) log.trace("policy result = " + b);
     }
     return b;
   }

@@ -91,9 +91,6 @@ public abstract class AbstractNioMessage implements NioMessage
     locations.add(location);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean read(final ChannelWrapper<?> channel) throws Exception
   {
@@ -111,9 +108,6 @@ public abstract class AbstractNioMessage implements NioMessage
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean write(final ChannelWrapper<?> channel) throws Exception
   {

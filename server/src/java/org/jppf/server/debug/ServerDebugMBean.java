@@ -60,4 +60,14 @@ public interface ServerDebugMBean extends Serializable
    * @return a string representing the job queue.
    */
   String dumpQueue();
+  /**
+   * Dump the job queue with fine details of the jobs.
+   * @return a string representing the job queue.
+   */
+  String dumpQueueDetails();
+  /**
+   * View all debuig info in a formatted string.
+   * @return a string rpesenting all the debug information.
+   */
+  String all();
 }

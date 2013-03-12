@@ -18,12 +18,13 @@
 package org.jppf.server.protocol;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.protocol.results.*;
-import org.jppf.utils.*;
+import org.jppf.utils.Pair;
 import org.slf4j.*;
 
 /**
@@ -42,6 +43,14 @@ public class ServerTaskBundleClient
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Count of instances of this class.
+   */
+  private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
+  /**
+   * A unique id for this client bundle.
+   */
+  private final long id = INSTANCE_COUNT.incrementAndGet();
   /**
    * The job to execute.
    */
@@ -65,12 +74,7 @@ public class ServerTaskBundleClient
   /**
    * The list of listeners registered with this bundle.
    */
-  private final List<CompletionListener> listenerList = new ArrayList<CompletionListener>();
-  /**
-   * Array constructed each time a listener is added or removed.
-   * This is a performance optimization in the scenario where listners are invoked more often than they are added or removed.
-   */
-  private CompletionListener[] listenerArray = null;
+  private final List<CompletionListener> listenerList = new CopyOnWriteArrayList<CompletionListener>();
   /**
    * Bundle cancel indicator.
    */
@@ -126,10 +130,12 @@ public class ServerTaskBundleClient
   private ServerTaskBundleClient(final ServerTaskBundleClient source, final List<ServerTask> taskList) {
     if (source == null) throw new IllegalArgumentException("source is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
-
-    job = source.getJob().copy(taskList.size());
-    job.initialTaskCount = source.getJob().getInitialTaskCount();
-    job.currentTaskCount = job.taskCount;
+    int size = taskList.size();
+    //job = source.getJob().copy(size);
+    this.job = source.getJob().copy();
+    this.job.setTaskCount(size); 
+    this.job.initialTaskCount = source.getJob().getInitialTaskCount();
+    this.job.currentTaskCount = size;
     this.dataProvider = source.getDataProvider();
     this.taskList.addAll(taskList);
     this.pendingTasksCount.set(0);
@@ -184,6 +190,7 @@ public class ServerTaskBundleClient
     }
     done = pendingTasksCount.get() <= 0;
     boolean fire = strategy.sendResults(this, tasks);
+    if (debugEnabled) log.debug("*** done=" + done + ", fire=" + fire + " for " + this);
     if (done || fire) fireTasksCompleted();
   }
 
@@ -321,12 +328,9 @@ public class ServerTaskBundleClient
     List<ServerTask> completedTasks = new ArrayList<ServerTask>(tasksToSendList);
     tasksToSendList.clear();
 
-    CompletionListener[] listeners;
-    synchronized (listenerList) {
-      listeners = listenerArray;
-    }
     ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
-    for (CompletionListener listener : listeners) listener.taskCompleted(bundle, completedTasks);
+    if (debugEnabled) log.debug("*** created bundle id=" + bundle.id + " for " + this);
+    for (CompletionListener listener : listenerList) listener.taskCompleted(bundle, completedTasks);
   }
 
   /**
@@ -334,12 +338,7 @@ public class ServerTaskBundleClient
    */
   public void bundleEnded() {
     if (dataProvider == null) throw new IllegalArgumentException("dataProvider is null");
-
-    CompletionListener[] listeners;
-    synchronized (listenerList) {
-      listeners = listenerArray;
-    }
-    for (CompletionListener listener : listeners) listener.bundleEnded(this);
+    for (CompletionListener listener : listenerList) listener.bundleEnded(this);
   }
 
   /**
@@ -348,11 +347,7 @@ public class ServerTaskBundleClient
    */
   public void addCompletionListener(final CompletionListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList) {
-      listenerList.add(listener);
-      listenerArray = listenerList.toArray(new CompletionListener[listenerList.size()]);
-    }
+    listenerList.add(listener);
   }
 
   /**
@@ -361,18 +356,21 @@ public class ServerTaskBundleClient
    */
   public void removeCompletionListener(final CompletionListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList) {
-      listenerList.remove(listener);
-      listenerArray = listenerList.toArray(new CompletionListener[listenerList.size()]);
-    }
+    listenerList.remove(listener);
   }
 
   @Override
   public String toString()
   {
-    //return ReflectionUtils.dumpObject(this, "pendingTasksCount", "cancelled", "job", "taskList", "dataProvider");
-    return ReflectionUtils.dumpObject(this, "pendingTasksCount", "cancelled", "done", "job");
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("id=").append(id);
+    sb.append(", pendingTasks=").append(pendingTasksCount);
+    sb.append(", cancelled=").append(cancelled); 
+    sb.append(", done=").append(done); 
+    sb.append(", job=").append(job);
+    sb.append(']');
+    return sb.toString();
   }
 
   /**

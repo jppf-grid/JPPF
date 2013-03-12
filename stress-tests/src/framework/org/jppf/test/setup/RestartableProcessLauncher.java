@@ -71,6 +71,11 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
     variables.put("$n", n);
     variables.put("$scenario_dir", config.getConfigDir().getPath());
     variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
+    if (streamsConfigured.compareAndSet(false, true))
+    {
+      stdout = configureOutput(config.getStdoutFilename());
+      stderr = configureOutput(config.getStderrFilename());
+    }
   }
 
   @Override
@@ -97,7 +102,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
     {
       e.printStackTrace();
     }
-    System.exit(0);
+    //System.exit(0);
   }
 
   /**
@@ -110,44 +115,6 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
   private boolean onProcessExit(final int exitCode)
   {
     return exitCode != 2;
-  }
-
-  /**
-   * Get the output of the driver process.
-   * @param process the process to get the standard or error output from.
-   * @param streamType determines whether to obtain the standard or error output.
-   * @return the output as a string.
-   */
-  public String getOutput(final Process process, final String streamType)
-  {
-    StringBuilder sb = new StringBuilder();
-    try
-    {
-      if (traceEnabled) log.trace(name + "starting reading " + streamType);
-      InputStream is = "std".equals(streamType) ? process.getInputStream() : process.getErrorStream();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-      try
-      {
-        boolean end = false;
-        while (!end)
-        {
-          int c = reader.read();
-          if (c == -1) break;      // end of file (the process has exited)
-          if (c == '\r') continue; // skip the line feed
-          sb.append((char) c);
-        }
-      }
-      finally
-      {
-        reader.close();
-      }
-    }
-    catch(Exception e)
-    {
-      //log.error(e.getMessage(), e);
-      e.printStackTrace();
-    }
-    return sb.toString();
   }
 
   /**
@@ -177,9 +144,10 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
       File file = new File(path);
       if (file.exists())
       {
-        if (!file.delete() && debugEnabled) log.debug("could not delete file '" + file + '\''); 
+        if (!file.delete() && debugEnabled) log.debug("could not delete file '" + file + '\'');
       }
     }
+    tempFileCache.clear();
   }
 
   /**
@@ -198,5 +166,29 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
         else jvmOptions.add(options[i]);
       }
     }
+  }
+
+  /**
+   * Create a print stream from a specified name or path.
+   * @param outputName the path to create the stream from.
+   * @return a <code>PrintStream</code> instance.
+   */
+  private PrintStream configureOutput(final String outputName)
+  {
+    PrintStream result = null;
+    try
+    {
+      if ((outputName == null) || "out".equalsIgnoreCase(outputName)) result = System.out;
+      else if ("err".equalsIgnoreCase(outputName)) result = System.err;
+      else
+      {
+        File file = new File(outputName);
+        result = new PrintStream(new FileOutputStream(file));
+      }
+    }
+    catch (Exception e)
+    {
+    }
+    return result;
   }
 }

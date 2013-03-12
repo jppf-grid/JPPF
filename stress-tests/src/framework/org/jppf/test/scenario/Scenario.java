@@ -23,9 +23,9 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 
-import org.jppf.test.addons.mbeans.*;
+import org.jppf.management.diagnostics.*;
 import org.jppf.test.setup.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 
 import test.org.jppf.test.setup.ConfigurationHelper;
@@ -50,8 +50,8 @@ public class Scenario
   private Setup setup;
 
   /**
-   * 
-   * @param args .
+   * Execute the scenario whose root folder is specified as argument.
+   * @param args the first argument contains the scenario's toor folder path.
    */
   public static void main(final String[] args)
   {
@@ -85,6 +85,26 @@ public class Scenario
    * @throws Exception if any error occurs.
    */
   public void execute() throws Exception
+  {
+    int iterations = configuration.getNbIterations();
+    for (int i=1; i<=iterations; i++)
+    {
+      if (iterations > 1)
+      {
+        String hr = StringUtils.padRight("", '-', 15);
+        System.out.println(hr);
+        System.out.println("Iteration #" + i);
+        System.out.println(hr);
+      }
+      executeIteration();
+    }
+  }
+
+  /**
+   * Execute one iteration of this scenario.
+   * @throws Exception if any error occurs.
+   */
+  public void executeIteration() throws Exception
   {
     try
     {
@@ -142,17 +162,20 @@ public class Scenario
     {
       Map<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> map =
         setup.getJmxHandler().performJmxOperations(new DiagnosticsGrabber(true), new DiagnosticsGrabber(false));
+      String rule = "---------------------------------------------------------";
       for (Map.Entry<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> entry: map.entrySet())
       {
-        out.println("---------------------------------------------------------");
+        out.println(rule);
         out.println("results for driver " + entry.getKey().getJmxId());
-        out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo());
-        out.println("after GC: " + entry.getKey().getResult().getDiagnosticsInfoAfterGC());
+        out.println(rule);
+        out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo().toFormattedString(null));
+        out.println("after GC:  " + entry.getKey().getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
         for (JMXResult<DiagnosticsResult> dr: entry.getValue())
         {
+          out.println(rule);
           out.println("results for node " + dr.getJmxId());
-          out.println("before GC: " + dr.getResult().getDiagnosticsInfo());
-          out.println("after GC: " + dr.getResult().getDiagnosticsInfoAfterGC());
+          out.println("before GC: " + dr.getResult().getDiagnosticsInfo().toFormattedString(null));
+          out.println("after GC:  " + dr.getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
         }
       }
     }
@@ -212,9 +235,9 @@ public class Scenario
     public JMXResult<DiagnosticsResult> call() throws Exception
     {
       String name = driver ? DiagnosticsMBean.MBEAN_NAME_DRIVER : DiagnosticsMBean.MBEAN_NAME_NODE;
-      DiagnosticsInfo info = (DiagnosticsInfo) getJmx().getAttribute(name, "DiagnosticsInfo");
+      HealthSnapshot info = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
       getJmx().invoke(name, "gc", (Object[]) null, (String[]) null);
-      DiagnosticsInfo info2 = (DiagnosticsInfo) getJmx().getAttribute(name, "DiagnosticsInfo");
+      HealthSnapshot info2 = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
       return new JMXResult<DiagnosticsResult>(getJmx().getURL().toString(), new DiagnosticsResult(info, info2));
     }
   }

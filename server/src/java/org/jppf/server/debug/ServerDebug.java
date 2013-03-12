@@ -22,7 +22,9 @@ import java.util.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.utils.StringUtils;
 
 /**
  * 
@@ -75,20 +77,7 @@ public class ServerDebug implements ServerDebugMBean
     {
       result = new String[set.size()];
       int count = 0;
-      for (ChannelWrapper<?> channel: set)
-      {
-        /*
-        StringBuilder sb = new StringBuilder();
-        sb.append(channel.toString());
-        ClassContext ctx = (ClassContext) channel.getContext();
-        sb.append(", type=").append(ctx.isProvider() ? "provider" : "node");
-        sb.append(", state=").append(ctx.getState());
-        sb.append(", pending requests=").append(ctx.getNbPendingRequests());
-        sb.append(", current request=").append(ctx.getCurrentRequest());
-        sb.append(", resource=").append(ctx.getResource());
-         */
-        result[count++] = channel.toString();
-      }
+      for (ChannelWrapper<?> channel: set) result[count++] = channel.toString();
     }
     return result;
   }
@@ -103,6 +92,23 @@ public class ServerDebug implements ServerDebugMBean
   public String[] clientDataChannels()
   {
     return viewChannels(clientSet);
+  }
+
+  @Override
+  public String all()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("jobs in queue:").append('\n');
+    sb.append(dumpQueueDetails()).append('\n');
+    sb.append('\n').append("node class loader channels:").append('\n');
+    for (String s: nodeClassLoaderChannels()) sb.append(s).append('\n');
+    sb.append('\n').append("client class loader channels:").append('\n');
+    for (String s: clientClassLoaderChannels()) sb.append(s).append('\n');
+    sb.append('\n').append("node job channels:").append('\n');
+    for (String s: nodeDataChannels()) sb.append(s).append('\n');
+    sb.append('\n').append("client job channels:").append('\n');
+    for (String s: clientDataChannels()) sb.append(s).append('\n');
+    return sb.toString();
   }
 
   /**
@@ -187,10 +193,49 @@ public class ServerDebug implements ServerDebugMBean
   @Override
   public String dumpQueue()
   {
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
+    JPPFDriver.getInstance();
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
     Set<String> set = queue.getAllJobIds();
     StringBuilder sb = new StringBuilder();
     for (String uuid: set) sb.append(queue.getJob(uuid)).append('\n');
+    return sb.toString();
+  }
+
+  @Override
+  public String dumpQueueDetails()
+  {
+    JPPFDriver.getInstance();
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    Set<String> set = queue.getAllJobIds();
+    StringBuilder sb = new StringBuilder();
+    String hr = StringUtils.padRight("", '-', 80) + '\n';
+    for (String uuid: set)
+    {
+      sb.append(hr);
+      ServerJob serverJob = queue.getJob(uuid);
+      sb.append(serverJob).append('\n');
+      List<ServerTaskBundleClient> bundleList = serverJob.getBundleList();
+      if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
+      else
+      {
+      sb.append("client bundles:\n");
+      for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
+      }
+      List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
+      if (completionBundles.isEmpty()) sb.append("client completion bundles: empty\n");
+      else
+      {
+        sb.append("client completion bundles:\n");
+        for (ServerTaskBundleClient clientBundle: completionBundles) sb.append("- ").append(clientBundle).append("\n");
+      }
+      Set<ServerTaskBundleNode> dispatchSet = serverJob.getDispatchSet();
+      if (dispatchSet.isEmpty()) sb.append("node bundles: empty\n");
+      else
+      {
+        sb.append("node bundles:\n");
+        for (ServerTaskBundleNode nodeBundle: dispatchSet) sb.append("- ").append(nodeBundle).append("\n");
+      }
+    }
     return sb.toString();
   }
 }

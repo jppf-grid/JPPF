@@ -37,9 +37,6 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
     super(false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean read(final ChannelWrapper<?> wrapper) throws Exception
   {
@@ -47,18 +44,12 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected synchronized boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
   {
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean write(final ChannelWrapper<?> wrapper) throws Exception
   {
@@ -66,9 +57,6 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
   {

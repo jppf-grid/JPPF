@@ -20,11 +20,15 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
+import java.util.List;
+
 import org.jppf.JPPFException;
+import org.jppf.io.DataLocation;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.Pair;
 import org.slf4j.*;
 
 /**
@@ -67,9 +71,9 @@ class WaitingResultsState extends NodeServerState
       ServerTaskBundleNode nodeBundle = context.getBundle();
       boolean requeue = false;
       try {
-        ServerTaskBundleClient newBundleWrapper = context.deserializeBundle();
-        JPPFTaskBundle newBundle = newBundleWrapper.getJob();
-        if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + channel);
+        Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
+        JPPFTaskBundle newBundle = received.first();
+        if (debugEnabled) log.debug("*** read bundle " + received + " from node " + channel);
         // if an exception prevented the node from executing the tasks
         Throwable t = (Throwable) newBundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
         Bundler bundler = context.getBundler();
@@ -78,9 +82,9 @@ class WaitingResultsState extends NodeServerState
           exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
           nodeBundle.resultsReceived(t);
         } else {
-          if (debugEnabled) log.debug("*** bundle has " + newBundleWrapper.getTaskList().size() + " tasks, taskCount=" + newBundle.getTaskCount());
-          nodeBundle.resultsReceived(newBundleWrapper.getDataLocationList());
-          long elapsed = System.nanoTime() - nodeBundle.getExecutionStartTime();
+          if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received);
+          nodeBundle.resultsReceived(received.second());
+          long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
           server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L, ((AbstractTaskBundleMessage) context.getMessage()).getLength());
           if (bundler instanceof BundlerEx) {
             Long accumulatedTime = (Long) newBundle.getParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, -1L);

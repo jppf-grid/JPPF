@@ -18,6 +18,8 @@
 
 package org.jppf.test.setup;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
@@ -54,6 +56,10 @@ public class Setup
    * Manages the JMX connections to ddrivers and nodes.
    */
   private JMXHandler jmxHandler = null;
+  /**
+   * 
+   */
+  private AtomicInteger clientCount = new AtomicInteger(0);
 
   /**
    * Initialize this tests etup with the psecified scenario configuration.
@@ -110,7 +116,7 @@ public class Setup
       nodes[i] = new RestartableNodeProcessLauncher(i+1, config);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
     }
-    client = createClient(null, true);
+    client = createClient("c" + clientCount.incrementAndGet(), true);
     jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     return client;
   }
@@ -142,6 +148,7 @@ public class Setup
     {
       client.close();
       client = null;
+      jmxHandler = null;
       Thread.sleep(500L);
     }
     System.gc();
@@ -156,12 +163,17 @@ public class Setup
   {
     try
     {
-      if (nodes != null) for (RestartableNodeProcessLauncher n: nodes) n.stopProcess();
-      if (drivers != null) for (RestartableDriverProcessLauncher d: drivers) d.stopProcess();
+      if (nodes != null) for (RestartableNodeProcessLauncher n: nodes) if (n != null) n.stopProcess();
+      if (drivers != null) for (RestartableDriverProcessLauncher d: drivers) if (d != null) d.stopProcess();
     }
     catch(Throwable t)
     {
       t.printStackTrace();
+    }
+    finally
+    {
+      nodes = null;
+      drivers = null;
     }
   }
 

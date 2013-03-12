@@ -186,33 +186,33 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public ServerTaskBundleNode nextBundle(final ServerJob bundleWrapper, final int nbTasks)
+  public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks)
   {
     final ServerTaskBundleNode result;
     lock.lock();
     try {
-      if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
-      sizeMap.removeValue(getSize(bundleWrapper), bundleWrapper);
-      if (nbTasks >= bundleWrapper.getTaskCount())
+      if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + serverJob.getTaskCount() + " tasks");
+      sizeMap.removeValue(getSize(serverJob), serverJob);
+      if (nbTasks >= serverJob.getTaskCount())
       {
-        bundleWrapper.setOnRequeue(new RequeueBundleAction(this, bundleWrapper));
-        result = bundleWrapper.copy(bundleWrapper.getTaskCount());
-        removeBundle(bundleWrapper, false);
+        serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
+        result = serverJob.copy(serverJob.getTaskCount());
+        removeBundle(serverJob, false);
       }
       else
       {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
-        result = bundleWrapper.copy(nbTasks);
-        sizeMap.putValue(getSize(bundleWrapper), bundleWrapper);
+        result = serverJob.copy(nbTasks);
+        sizeMap.putValue(getSize(serverJob), serverJob);
         // to ensure that other jobs with same priority are also processed without waiting
-        priorityMap.moveToEndOfList(bundleWrapper.getSLA().getPriority(), bundleWrapper);
+        priorityMap.moveToEndOfList(serverJob.getSLA().getPriority(), serverJob);
       }
       updateLatestMaxSize();
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
       lock.unlock();
     }
-    statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - bundleWrapper.getQueueEntryTime());
+    statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - serverJob.getQueueEntryTime());
     return result;
   }
 
@@ -229,30 +229,30 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
   /**
    * Remove the specified bundle from the queue.
-   * @param bundleWrapper the bundle to remove.
+   * @param serverJob the bundle to remove.
    * @param removeFromJobMap flag whether bundle should be removed from job map.
    * @return the removed bundle.
    */
-  public ServerJob removeBundle(final ServerJob bundleWrapper, final boolean removeFromJobMap)
+  public ServerJob removeBundle(final ServerJob serverJob, final boolean removeFromJobMap)
   {
-    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
 
     lock.lock();
     try {
       if (removeFromJobMap) {
-        jobMap.remove(bundleWrapper.getUuid());
-        scheduleManager.clearSchedules(bundleWrapper.getUuid());
-        jobManager.jobEnded(bundleWrapper);
+        jobMap.remove(serverJob.getUuid());
+        scheduleManager.clearSchedules(serverJob.getUuid());
+        jobManager.jobEnded(serverJob);
       }
 
-      if (debugEnabled) log.debug("removing bundle from queue, jobId= " + bundleWrapper.getName() + ", removeFromJobMap=" + removeFromJobMap);
-      priorityMap.removeValue(bundleWrapper.getSLA().getPriority(), bundleWrapper);
+      if (debugEnabled) log.debug("removing bundle from queue, jobId= " + serverJob.getName() + ", removeFromJobMap=" + removeFromJobMap);
+      priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob);
 
-      for (ServerTaskBundleClient bundle : bundleWrapper.getCompletionBundles()) addBundle(bundle);
+      for (ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) addBundle(clientBundle);
     } finally {
       lock.unlock();
     }
-    return bundleWrapper;
+    return serverJob;
   }
 
   /**

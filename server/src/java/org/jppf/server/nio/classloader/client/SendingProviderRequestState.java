@@ -74,22 +74,16 @@ class SendingProviderRequestState extends ClassServerState
       {
         context.setMessage(null);
         context.setResource(request.getResource());
-        if (debugEnabled) log.debug(build("provider ", channel, " serving new resource request [", context.getResource().getName(), "] from node: ", request));
+        if (debugEnabled) log.debug(build("provider ", channel, " serving new request [", context.getResource().getName(), "] from node: ", request.getChannel()));
         context.serializeResource();
         context.setCurrentRequest(request);
       }
     }
-    if (request == null)
-    {
-      if (debugEnabled) log.debug(build("provider: ", channel, " has no request to process, returning to idle mode"));
-      context.setMessage(null);
-      //return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
-      return TO_IDLE_PROVIDER;
-    }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug(build("request sent to the provider ", channel, " from node ", request, ", resource: ", context.getResource().getName()));
-      context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
+      if (debugEnabled) log.debug(build("request sent to provider ", channel, " from node ", request, ", resource: ", context.getResource().getName()));
+      //context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
+      context.setMessage(null);
       return TO_WAITING_PROVIDER_RESPONSE;
     }
     return TO_SENDING_PROVIDER_REQUEST;

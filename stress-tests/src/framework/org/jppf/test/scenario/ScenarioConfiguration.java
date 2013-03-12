@@ -69,6 +69,12 @@ public interface ScenarioConfiguration
   int getNbNodes();
 
   /**
+   * Get the number of iterations of the scenario.
+   * @return the number of iterations as an int.
+   */
+  int getNbIterations();
+
+  /**
    * Get the raw properties for this configuration.
    * @return an instance of {@link TypedProperties}.
    */
@@ -93,4 +99,16 @@ public interface ScenarioConfiguration
    * @return the diagnostics out file name.
    */
   String getDiagnosticsOutputFilename();
+
+  /**
+   * Get the name of the file to which the processes' stdout is redirected.
+   * @return 'out', 'err' or a valid file path.
+   */
+  String getStdoutFilename();
+
+  /**
+   * Get the name of the file to which the processes' stderr is redirected.
+   * @return 'out', 'err' or a valid file path.
+   */
+  String getStderrFilename();
 }

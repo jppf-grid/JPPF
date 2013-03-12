@@ -72,6 +72,7 @@ class SendingResultsState extends ClientServerState
       clientBundle = context.pollCompletedBundle();
       if (clientBundle == null)
       {
+        if (debugEnabled) log.debug("*** clientBundle = null for " + channel);
         return TO_IDLE;
       }
       context.setBundle(clientBundle);
@@ -79,7 +80,7 @@ class SendingResultsState extends ClientServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("*** sent entire bundle " + clientBundle.getJob() + " to client " + channel);
+      if (debugEnabled) log.debug("*** sent entire bundle " + clientBundle + " to client " + channel);
       if (debugEnabled) log.debug("*** NbTasksToSend=" + context.getNbTasksToSend() + ", TaskCount=" + clientBundle.getTaskCount() + ", CompletedBundlesEmpty=" + context.isCompletedBundlesEmpty());
       context.setNbTasksToSend(context.getNbTasksToSend() - clientBundle.getTaskCount());
       context.setBundle(null);

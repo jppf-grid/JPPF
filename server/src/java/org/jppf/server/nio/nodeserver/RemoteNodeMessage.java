@@ -57,11 +57,9 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
   protected void beforeFirstWrite() throws Exception
   {
     nbObjects = bundle.getTaskCount() + 2;
+    //nbObjects = bundle.getCurrentTaskCount() + 2;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

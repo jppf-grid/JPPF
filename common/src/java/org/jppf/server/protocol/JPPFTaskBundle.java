@@ -267,7 +267,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Make a copy of this bundle.
    * @return a new <code>JPPFTaskBundle</code> instance.
    */
-  public JPPFTaskBundle copy()
+  public synchronized JPPFTaskBundle copy()
   {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setUuidPath(uuidPath);
@@ -275,6 +275,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setUuid(getUuid());
     bundle.setName(name);
     bundle.setTaskCount(taskCount);
+    bundle.setCurrentTaskCount(currentTaskCount);
+    bundle.initialTaskCount = initialTaskCount;
     synchronized(bundle.getParametersMap())
     {
       for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
@@ -283,6 +285,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
     bundle.setMetadata(jobMetadata);
+    bundle.setState(state);
     bundle.setParameter("bundle.uuid", uuidPath.getLast() + '-' + copyCount.incrementAndGet());
 
     return bundle;
@@ -421,7 +424,16 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   @Override
   public String toString()
   {
-    return ReflectionUtils.dumpObject(this, "name", "uuid", "initialTaskCount", "taskCount", "bundleUuid", "uuidPath", "requeue");
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("name=").append(name);
+    sb.append(", uuid=").append(jobUuid);
+    sb.append(", initialTaskCount=").append(initialTaskCount);
+    sb.append(", taskCount=").append(taskCount);
+    sb.append(", bundleUuid=").append(getParameter("bundle.uuid"));
+    sb.append(", uuidPath=").append(uuidPath);
+    sb.append(']');
+    return sb.toString();
   }
 
   @Override

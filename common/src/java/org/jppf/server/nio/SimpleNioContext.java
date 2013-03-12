@@ -58,6 +58,7 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
   @Override
   public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
+    //if (message == null) message = new BaseNioMessage(sslHandler != null);
     return message.write(wrapper);
   }
 }

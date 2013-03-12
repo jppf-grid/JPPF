@@ -73,16 +73,14 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
       return;
     }
     if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
-    if (bundle.isCancelled())
-    {
-      bundle.removeCompletionListener(this);
-    }
+    if (bundle.isCancelled()) bundle.removeCompletionListener(this);
     else
     {
       ClientContext context = (ClientContext) channel.getContext();
       context.offerCompletedBundle(bundle);
       synchronized(channel)
       {
+        if (debugEnabled) log.debug("*** context state=" + context.getState() + " for " + bundle + ", channel=" + channel);
         if (context.getState() == ClientState.IDLE)
         {
           try

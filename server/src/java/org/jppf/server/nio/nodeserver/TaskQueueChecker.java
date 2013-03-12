@@ -230,50 +230,38 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @return true if a job was dispatched, false otherwise.
    * @see Runnable#run()
    */
-  public boolean dispatch()
-  {
+  public boolean dispatch() {
     boolean dispatched = false;
-    try
-    {
+    try {
       queue.processPendingBroadcasts();
       C channel = null;
-      ServerTaskBundleNode bundle = null;
-      synchronized(idleChannels)
-      {
+      ServerTaskBundleNode nodeBundle = null;
+      synchronized(idleChannels) {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
         queueLock.lock();
-        try
-        {
+        try {
           Iterator<ServerJob> it = queue.iterator();
-          while ((channel == null) && it.hasNext() && !idleChannels.isEmpty())
-          {
-            ServerJob bundleWrapper = it.next();
-            channel = retrieveChannel(bundleWrapper);
+          while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
+            ServerJob serverJob = it.next();
+            channel = retrieveChannel(serverJob);
             if (channel != null) {
-              bundle = prepareJobDispatch(channel, bundleWrapper);
+              nodeBundle = prepareJobDispatch(channel, serverJob);
               removeIdleChannel(channel);
             }
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-        }
-        catch(Exception ex)
-        {
+        } catch(Exception ex) {
           log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", ex);
-        }
-        finally
-        {
+        } finally {
           queueLock.unlock();
         }
       }
-      if (channel != null && bundle != null)
-      {
-        dispatchJobToChannel(channel, bundle);
+      if (channel != null && nodeBundle != null) {
+        dispatchJobToChannel(channel, nodeBundle);
         dispatched = true;
       }
-    }
-    catch (Exception ex)
-    {
+    } catch (Exception ex) {
       log.error("An error occurred while preparing for bundle creation and dispatching.", ex);
     }
     return dispatched;
@@ -302,11 +290,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    */
   private ServerTaskBundleNode prepareJobDispatch(final C channel, final ServerJob selectedBundle)
   {
-    if (debugEnabled)
-    {
-      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
-              ", nodeUuid=" + channel.getConnectionUuid());
-    }
+    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
     try
     {
@@ -326,14 +310,13 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
   /**
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
    * @param channel the node channel to dispatch the job to.
-   * @param bundleWrapper the job to dispatch.
+   * @param nodeBundle the job to dispatch.
    */
   @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode bundleWrapper) {
-    synchronized(channel.getMonitor())
-    {
-      JPPFFuture<?> future = channel.submit(bundleWrapper);
-      bundleWrapper.jobDispatched(channel, future);
+  private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) {
+    synchronized(channel.getMonitor()) {
+      JPPFFuture<?> future = channel.submit(nodeBundle);
+      nodeBundle.jobDispatched(channel, future);
     }
   }
 

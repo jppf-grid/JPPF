@@ -64,13 +64,13 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
 
   /**
    * Submit the next state transition for a specified channel.
-   * @param key the selection key that references the channel.
+   * @param channel the selection key that references the channel.
    */
-  public void submitTransition(final ChannelWrapper<?> key)
+  public void submitTransition(final ChannelWrapper<?> channel)
   {
     //if (debugEnabled) log.debug("submitting transition for " + key + ", state=" + key.getContext().getState());
-    setKeyOps(key, 0);
-    StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(key, server.getFactory());
+    setKeyOps(channel, 0);
+    StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(channel, server.getFactory());
     //transition.run();
     executor.submit(transition);
   }
@@ -111,9 +111,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   /**
    * Transition the specified channel to the specified state.
    * @param channel the key holding the channel and associated context.
+   * @param transition holds the new state of the channel and associated key ops.
    * @param submit specifies whether the transition should be submitted immediately,
    * or if we should wait for the server to submit it.
-   * @param transition holds the new state of the channel and associated key ops.
    */
   @SuppressWarnings("unchecked")
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit)
@@ -123,6 +123,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
     try
     {
       server.getSelector().wakeup();
+      channel.setKeyOps(0);
       NioContext<S> context = (NioContext<S>) channel.getContext();
       S s1 = context.getState();
       NioServerFactory<S, T> factory = server.getFactory();
@@ -134,14 +135,17 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
         else if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel));
         else if (log.isTraceEnabled()) log.trace(getTransitionMessage(s1, s2, t, channel));
       }
-      context.setState(s2);
-      if (!submit) channel.setKeyOps(t.getInterestOps());
-      else
+      if (context.setState(s2))
       {
-        channel.setKeyOps(0);
-        submitTransition(channel);
+        if (!submit) channel.setKeyOps(t.getInterestOps());
+        else submitTransition(channel);
       }
-      //if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + msg + " with ops=" + t.getInterestOps());
+    }
+    catch (RuntimeException e)
+    {
+      //if (debugEnabled) log.debug(e.getMessage(), e);
+      log.info(e.getMessage(), e);
+      throw e;
     }
     finally
     {

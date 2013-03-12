@@ -59,9 +59,6 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
     this.bundle = bundle;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

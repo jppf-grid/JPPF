@@ -20,7 +20,7 @@ package org.jppf.server.nio;
 
 import static java.nio.channels.SelectionKey.*;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.utils.ThreadSynchronization;
 
@@ -47,6 +47,10 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * The selector for this channel.
    */
   protected ChannelSelector selector = null;
+  /**
+   * Determines whether this channel is executing a transition.
+   */
+  protected AtomicBoolean executing = new AtomicBoolean(false);
 
   /**
    * Initialize this channel wrapper with the specified channel.
@@ -188,6 +192,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * Get this channel's id.
    * @return  the id as a long value.
    */
+  @Override
   public long getId()
   {
     return id;

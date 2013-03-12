@@ -38,8 +38,8 @@ public interface ChannelWrapper<S>
   void close() throws Exception;
 
   /**
-   * Get the {@link AbstractNioContext} attached to the channel.
-   * @return a {@link AbstractNioContext} instance.
+   * Get the {@link NioContext} attached to the channel.
+   * @return a {@link NioContext} instance.
    */
   NioContext<?> getContext();
 

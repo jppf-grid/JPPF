@@ -69,20 +69,20 @@ class SendingBundleState extends NodeServerState
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null)
     {
-      ServerTaskBundleNode bundleWrapper = context.getBundle();
-      JPPFTaskBundle bundle = (bundleWrapper == null) ? null : bundleWrapper.getJob();
+      ServerTaskBundleNode nodeBundle = context.getBundle();
+      JPPFTaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
       if (bundle != null)
       {
-        if (debugEnabled) log.debug("got bundle from the queue for " + channel);
+        if (debugEnabled) log.debug("got bundle " + nodeBundle + " from the queue for " + channel);
         // to avoid cycles in peer-to-peer routing of jobs.
         if (bundle.getUuidPath().contains(context.getUuid()))
         {
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());
           context.setBundle(null);
-          bundleWrapper.resubmit();
+          nodeBundle.resubmit();
           return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
         }
-        bundleWrapper.setExecutionStartTime(System.nanoTime());
+        nodeBundle.getJob().setExecutionStartTime(System.nanoTime());
         context.serializeBundle(channel);
       }
       else
@@ -93,7 +93,7 @@ class SendingBundleState extends NodeServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("sent entire bundle " + context.getBundle().getJob() + " to node " + channel);
+      if (debugEnabled) log.debug("sent entire bundle " + context.getBundle() + " to node " + channel);
       context.setMessage(null);
       //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
       return TO_WAITING_RESULTS;

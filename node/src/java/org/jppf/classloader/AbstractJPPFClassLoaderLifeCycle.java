@@ -188,7 +188,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Terminate this classloader and clean the resources it uses.
    * @exclude
    */
-  @Override
+  //@Override
   public abstract void close();
 
   @Override
