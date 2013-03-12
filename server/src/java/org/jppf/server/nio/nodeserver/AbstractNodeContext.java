@@ -117,18 +117,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public void setBundle(final ServerTaskBundleNode bundle)
   {
     this.bundle = bundle;
-
-    if(bundle != null)
-    {
-      int bundleTaskCount = bundle.getTaskCount();
-      int jobTaskCount = bundle.getJob().getTaskCount();
-      int realTaskCount = bundle.getTaskList().size();
-
-      if(bundleTaskCount != jobTaskCount || bundleTaskCount != realTaskCount)
-      {
-        throw new IllegalStateException("bundle.taskCount <> job.taskCount");
-      }
-    }
+    if (bundle != null) bundle.checkTaskCount();
   }
 
   /**
@@ -214,10 +203,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   /**
    * Deserialize a task bundle from the message read into this buffer.
-   * @return a {@link AbstractNodeContext} instance.
+   * @return a pairing of the received result head and the serialized tasks.
    * @throws Exception if an error occurs during the deserialization.
    */
-  public ServerTaskBundleClient deserializeBundle() throws Exception
+  public Pair<JPPFTaskBundle, List<DataLocation>> deserializeBundle() throws Exception
   {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
@@ -226,7 +215,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
-    return new ServerTaskBundleClient(bundle, null, tasks);
+    return new Pair<JPPFTaskBundle, List<DataLocation>>(bundle, tasks);
   }
 
   /**
@@ -324,11 +313,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public void setState(final NodeState state) {
+  public boolean setState(final NodeState state) {
     ExecutorStatus oldExecutionStatus = getExecutionStatus();
     super.setState(state);
     ExecutorStatus newExecutionStatus = getExecutionStatus();
     fireExecutionStatusChanged(oldExecutionStatus, newExecutionStatus);
+    return true;
   }
 
   @Override

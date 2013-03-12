@@ -22,6 +22,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.*;
@@ -64,7 +65,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * The request currently processed.
    */
-  protected ResourceRequest currentRequest = null;
+  protected AtomicReference<ResourceRequest> currentRequest = new AtomicReference<ResourceRequest>(null);
   /**
    * Determines whether this context relates to a provider or node connection.
    */
@@ -77,16 +78,19 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Used to synchronize pending responses performed by multiple threads.
    */
   private final Lock lockResponse = new ReentrantLock();
+  /**
+   * Reference to the driver.
+   */
+  private final JPPFDriver driver = JPPFDriver.getInstance();
 
   @Override
-  public void setState(final ClassState state) {
-    super.setState(state);
-    int nbPendingRequests = getNbPendingRequests();
-    if (ClassState.IDLE_PROVIDER.equals(state) && nbPendingRequests > 0)
+  public boolean setState(final ClassState state) {
+    ClassState oldState = this.state;
+    boolean b = super.setState(state);
+    if (ClassState.IDLE_PROVIDER.equals(state))
     {
-//      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests);
-      JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST, true);
-//      System.out.println("ClassContext:WakeUp from IDLE_PROVIDER: " + nbPendingRequests + " - DONE");
+      processRequests();
+      return false;
     }
     else if (ClassState.IDLE_NODE.equals(state))
     {
@@ -95,6 +99,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
         getChannel().notifyAll();
       }
     }
+    return b;
   }
 
   /**
@@ -141,7 +146,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
     }
     boolean b = nioObject.write();
     if (b  && debugEnabled) log.debug(build("sent channel identifier ", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL), " to peer server"));
-    //Thread.sleep(500L);
     return b;
   }
 
@@ -188,12 +192,12 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * Ensure the pending requests are processed.
    */
-  public void processRequests()
+  private synchronized void processRequests()
   {
-    if (ClassState.IDLE_PROVIDER.equals(getState()))
+    if (ClassState.IDLE_PROVIDER.equals(getState()) && (currentRequest.get() == null) && (getNbPendingRequests() > 0))
     {
-      JPPFDriver.getInstance().getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
-      //if (debugEnabled) log.debug("node " + request + " transitioned provider " + getChannel());
+      if (debugEnabled) log.debug("state changing from {} to {} for {}", new Object[] {ClassState.IDLE_PROVIDER, ClassState.SENDING_PROVIDER_REQUEST, this});
+      driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
     }
   }
 
@@ -217,27 +221,28 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Get the request currently processed.
    * @return a <code>SelectionKey</code> instance.
    */
-  public synchronized ResourceRequest getCurrentRequest()
+  public ResourceRequest getCurrentRequest()
   {
-    return currentRequest;
+    return currentRequest.get();
   }
 
   /**
    * Set the request currently processed.
    * @param currentRequest a <code>SelectionKey</code> instance.
    */
-  public synchronized void setCurrentRequest(final ResourceRequest currentRequest)
+  public void setCurrentRequest(final ResourceRequest currentRequest)
   {
-    this.currentRequest = currentRequest;
+    this.currentRequest.set(currentRequest);
   }
 
   /**
    * Get the number of pending resource requests for a resource provider.
    * @return a the number of requests as an int.
    */
-  public synchronized int getNbPendingRequests()
+  public int getNbPendingRequests()
   {
-    return pendingRequests.size() + (getCurrentRequest() == null ? 0 : 1);
+    //return pendingRequests.size() + (getCurrentRequest() == null ? 0 : 1);
+    return pendingRequests.size();
   }
 
   /**
@@ -283,7 +288,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       if (!pendingList.isEmpty())
       {
         if (debugEnabled) log.debug(build("provider: ", getChannel(), " sending null response(s) for disconnected provider"));
-        ClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
+        ClassNioServer server = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
         for (ResourceRequest resourceRequest : pendingList)
         {
@@ -293,7 +298,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
         }
         for (ChannelWrapper<?> nodeChannel: nodeSet) resetNodeState(nodeChannel, server);
       }
-
     }
     catch (Exception e)
     {
@@ -350,48 +354,106 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     lockResponse.lock();
     try {
-      return pendingResponses;
+      return new HashMap<JPPFResourceWrapper, ResourceRequest>(pendingResponses);
     } finally {
       lockResponse.unlock();
     }
   }
 
   /**
-   * Get the lock used for synchronized access to the pending responses.
-   * @return a <code>Lock</code> instance.
+   * Add a pending response.
+   * @param resource the requets resource.
+   * @param request the request.
    */
-  public Lock getLockResponse() {
-    return lockResponse;
+  public void addPendingResponse(final JPPFResourceWrapper resource, final ResourceRequest request)
+  {
+    lockResponse.lock();
+    try {
+      pendingResponses.put(resource, request);
+    } finally {
+      lockResponse.unlock();
+    }
+  }
+
+  /**
+   * Remove the specified pending responses.
+   * @param toRemove the pending responses to remove.
+   */
+  public void removePendingResponses(final Collection<JPPFResourceWrapper> toRemove)
+  {
+    lockResponse.lock();
+    try {
+      for (JPPFResourceWrapper resource: toRemove) pendingResponses.remove(resource);
+      toRemove.clear();
+    } finally {
+      lockResponse.unlock();
+    }
+  }
+
+  /**
+   * Get the number of pending responses.
+   * @return the number of pending responses as an int.
+   */
+  public int getNbPendingResponses() {
+    lockResponse.lock();
+    try {
+      return pendingResponses.size();
+    } finally {
+      lockResponse.unlock();
+    }
+  }
+
+  /**
+   * Determine whether this context has a pending response.
+   * @return <code>true</code> if there is at least one pending response, <code>false</code> otherwise.
+   */
+  public boolean hasPendingResponse()
+  {
+    lockResponse.lock();
+    try {
+      return !pendingResponses.isEmpty();
+    } finally {
+      lockResponse.unlock();
+    }
+  }
+
+  /**
+   * Get the pending responce for the specified resource.
+   * @param resource the resource to lookup.
+   * @return a {@link ResourceRequest} instance.
+   */
+  public ResourceRequest getPendingResponse(final JPPFResourceWrapper resource) {
+    lockResponse.lock();
+    try {
+      return pendingResponses.get(resource);
+    } finally {
+      lockResponse.unlock();
+    }
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
-    sb.append(", resource=").append(resource);
-    /*
-    sb.append(", pendingRequests=").append(getPendingRequests());
-    lockResponse.lock();
-    try {
-      sb.append(", pendingResponses=").append(pendingResponses);
-    } finally {
-      lockResponse.unlock();
+    sb.append(", resource=").append(resource == null ? "null" : resource.getName());
+    if (provider) {
+      sb.append(", pendingRequests=").append(getNbPendingRequests());
+      sb.append(", currentRequest=").append(getCurrentRequest());
+      sb.append(", connectionUuid=").append(connectionUuid);
+      sb.append(", type=client");
+    } else {
+      if (lockResponse.tryLock()) {
+        try {
+          sb.append(", pendingResponses=").append(pendingResponses.size());
+        } finally {
+          lockResponse.unlock();
+        }
+      }
+      sb.append(", type=node");
     }
-    */
-    sb.append(", pendingRequests=").append(getNbPendingRequests());
-    lockResponse.lock();
-    try {
-      sb.append(", pendingResponses=").append(pendingResponses.size());
-    } finally {
-      lockResponse.unlock();
-    }
-    sb.append(", currentRequest=").append(getCurrentRequest());
-    sb.append(", provider=").append(provider);
     sb.append(", peer=").append(peer);
     sb.append(", uuid=").append(uuid);
-    sb.append(", connectionUuid=").append(connectionUuid);
     return sb.toString();
   }
 }

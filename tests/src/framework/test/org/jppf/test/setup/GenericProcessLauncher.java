@@ -21,6 +21,7 @@ package test.org.jppf.test.setup;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
@@ -31,8 +32,7 @@ import org.slf4j.*;
  * Super class for launching a JPPF driver or node.
  * @author Laurent Cohen
  */
-public class GenericProcessLauncher implements Runnable
-{
+public class GenericProcessLauncher implements Runnable {
   /**
    * Logger for this class.
    */
@@ -105,14 +105,25 @@ public class GenericProcessLauncher implements Runnable
    * The driver or node number
    */
   protected int n = 0;
+  /**
+   * The output stream where the stdout of the started process is to be redirected.
+   */
+  protected static PrintStream stdout = System.out;
+  /**
+   * The output stream where the stdout of the started process is to be redirected.
+   */
+  protected static PrintStream stderr = System.out;
+  /**
+   * 
+   */
+  protected static AtomicBoolean streamsConfigured = new AtomicBoolean(false);
 
   /**
    * Default constructor.
    * @param n a number ssigned to this process.
    * @param processType the type of process (node or driver).
    */
-  public GenericProcessLauncher(final int n, final String processType)
-  {
+  public GenericProcessLauncher(final int n, final String processType) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
     addClasspathElement("../node/classes");
@@ -130,8 +141,7 @@ public class GenericProcessLauncher implements Runnable
    * @param jppfTemplate the path to the JPPF configuration template file.
    * @param log4jTemplate the path to the JPPF configuration template file.
    */
-  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate)
-  {
+  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
     addClasspathElement("../node/classes");
@@ -144,8 +154,7 @@ public class GenericProcessLauncher implements Runnable
     addClasspathElement(libDir + "jmxremote/jmxremote_optional.jar");
     TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
     String s = config.getString("jppf.jvm.options", null);
-    if (s != null)
-    {
+    if (s != null) {
       String[] options = s.split("\\s");
       for (String opt: options) addJvmOption(opt);
     }
@@ -155,8 +164,7 @@ public class GenericProcessLauncher implements Runnable
    * Get the path to the JPPF configuration file.
    * @return the path as a string.
    */
-  public String getJppfConfig()
-  {
+  public String getJppfConfig() {
     return jppfConfig;
   }
 
@@ -164,8 +172,7 @@ public class GenericProcessLauncher implements Runnable
    * Set the path to the JPPF configuration file.
    * @param jppfConfig the path as a string.
    */
-  public void setJppfConfig(final String jppfConfig)
-  {
+  public void setJppfConfig(final String jppfConfig) {
     this.jppfConfig = jppfConfig;
   }
 
@@ -173,8 +180,7 @@ public class GenericProcessLauncher implements Runnable
    * Get the path to the log4j configuration file.
    * @return the path as a string.
    */
-  public String getLog4j()
-  {
+  public String getLog4j() {
     return log4j;
   }
 
@@ -182,8 +188,7 @@ public class GenericProcessLauncher implements Runnable
    * Set the path to the log4j configuration file.
    * @param log4j the path as a string.
    */
-  public void setLog4j(final String log4j)
-  {
+  public void setLog4j(final String log4j) {
     this.log4j = log4j;
   }
 
@@ -191,8 +196,7 @@ public class GenericProcessLauncher implements Runnable
    * Get the directory in which the program runs.
    * @return the directory as a string.
    */
-  public String getDir()
-  {
+  public String getDir() {
     return dir;
   }
 
@@ -200,8 +204,7 @@ public class GenericProcessLauncher implements Runnable
    * Set the directory in which the program runs.
    * @param dir the directory as a string.
    */
-  public void setDir(final String dir)
-  {
+  public void setDir(final String dir) {
     this.dir = dir;
   }
 
@@ -209,8 +212,7 @@ public class GenericProcessLauncher implements Runnable
    * Get the main class.
    * @return the main class as a string.
    */
-  public String getMainClass()
-  {
+  public String getMainClass() {
     return mainClass;
   }
 
@@ -218,8 +220,7 @@ public class GenericProcessLauncher implements Runnable
    * Set the main class.
    * @param mainClass the main class as a string.
    */
-  public void setMainClass(final String mainClass)
-  {
+  public void setMainClass(final String mainClass) {
     this.mainClass = mainClass;
   }
 
@@ -227,8 +228,7 @@ public class GenericProcessLauncher implements Runnable
    * Add an element (jar or folder) to the classpath.
    * @param element the classpath element to add.
    */
-  public void addClasspathElement(final String element)
-  {
+  public void addClasspathElement(final String element) {
     classpath.add(element);
   }
 
@@ -236,8 +236,7 @@ public class GenericProcessLauncher implements Runnable
    * Add a JVM option (including system property definitions).
    * @param option the option to add.
    */
-  public void addJvmOption(final String option)
-  {
+  public void addJvmOption(final String option) {
     jvmOptions.add(option);
   }
 
@@ -245,34 +244,27 @@ public class GenericProcessLauncher implements Runnable
    * Add a program argument.
    * @param arg the argument to add.
    */
-  public void addArgument(final String arg)
-  {
+  public void addArgument(final String arg) {
     arguments.add(arg);
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     boolean end = false;
-    try
-    {
-      while (!end)
-      {
+    try {
+      while (!end) {
         if (debugEnabled) log.debug(name + "starting process");
         startProcess();
         int exitCode = process.waitFor();
         if (debugEnabled) log.debug(name + "exited with code " + exitCode);
         end = onProcessExit(exitCode);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
+      e.printStackTrace();
+    } catch (Error e) {
       e.printStackTrace();
     }
-    catch (Error e)
-    {
-      e.printStackTrace();
-    }
+    if (process != null) process.destroy();
   }
 
   /**
@@ -282,8 +274,7 @@ public class GenericProcessLauncher implements Runnable
    * @param exitCode the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
    */
-  private boolean onProcessExit(final int exitCode)
-  {
+  private boolean onProcessExit(final int exitCode) {
     return exitCode != 2;
   }
 
@@ -291,15 +282,13 @@ public class GenericProcessLauncher implements Runnable
    * Start the process.
    * @throws IOException if the process fails to start.
    */
-  public void startProcess() throws IOException
-  {
+  public void startProcess() throws IOException {
     startDriverSocket();
     List<String> command = new ArrayList<String>();
     command.add(System.getProperty("java.home")+"/bin/java");
     command.add("-cp");
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<classpath.size(); i++)
-    {
+    for (int i=0; i<classpath.size(); i++) {
       if (i > 0) sb.append(PATH_SEPARATOR);
       sb.append(classpath.get(i));
     }
@@ -319,11 +308,11 @@ public class GenericProcessLauncher implements Runnable
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {
-        System.out.print(name + event.getContent());
+        stdout.print(name + event.getContent());
       }
       @Override
       public void errorStreamAltered(final ProcessWrapperEvent event) {
-        System.err.print(name + event.getContent());
+        stderr.print(name + event.getContent());
       }
     });
     wrapper.setProcess(builder.start());
@@ -334,14 +323,14 @@ public class GenericProcessLauncher implements Runnable
   /**
    * Stop the process.
    */
-  public void stopProcess()
-  {
-    if ((wrapper != null) && (wrapper.getProcess() != null))
-    {
+  public void stopProcess() {
+    if ((wrapper != null) && (wrapper.getProcess() != null)) {
       Process process = wrapper.getProcess();
       if (debugEnabled) log.debug(name + "stopping process " + process);
       process.destroy();
     }
+    //if ((stdout != System.out) && (stdout != System.err)) StreamUtils.closeSilent(stdout);
+    //if ((stderr != System.out) && (stderr != System.err)) StreamUtils.closeSilent(stderr);
   }
 
   /**
@@ -354,28 +343,18 @@ public class GenericProcessLauncher implements Runnable
    * <code>Socket.getInputStream().read()</code> in the same thread.
    * @return the port number on which the server socket is listening.
    */
-  protected int startDriverSocket()
-  {
-    try
-    {
+  protected int startDriverSocket() {
+    try {
       if (processServer == null) processServer = new ServerSocket(0);
       processPort = processServer.getLocalPort();
-      Runnable r = new Runnable()
-      {
+      Runnable r = new Runnable() {
         @Override
-        public void run()
-        {
-          try
-          {
-            //while (true)
-            {
-              Socket s = processServer.accept();
-              int n = s.getInputStream().read();
-              if (n == -1) throw new EOFException();
-            }
-          }
-          catch(IOException ioe)
-          {
+        public void run() {
+          try {
+            Socket s = processServer.accept();
+            int n = s.getInputStream().read();
+            if (n == -1) throw new EOFException();
+          } catch(IOException ioe) {
             if (debugEnabled) log.debug(name, ioe);
           }
         }
@@ -383,19 +362,12 @@ public class GenericProcessLauncher implements Runnable
       Thread thread = new Thread(r, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
-    }
-    catch(Exception e)
-    {
-      try
-      {
+    } catch(Exception e) {
+      try {
         processServer.close();
-      }
-      catch(IOException ioe)
-      {
+      } catch(IOException ioe) {
         if (debugEnabled) log.debug(ioe.getMessage(), ioe);
-      }
-      finally
-      {
+      } finally {
         processServer = null;
       }
     }
@@ -407,15 +379,11 @@ public class GenericProcessLauncher implements Runnable
    * @param path the path to convert to a url.
    * @return a urm as a string.
    */
-  public static String getFileURL(final String path)
-  {
+  public static String getFileURL(final String path) {
     URL url = null;
-    try
-    {
+    try {
       url = new File(path).toURI().toURL();
-    }
-    catch (MalformedURLException e)
-    {
+    } catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }
     return url.toString();
@@ -425,8 +393,7 @@ public class GenericProcessLauncher implements Runnable
    * Get the path to the JDK logging configuration file.
    * @return the path as a string.
    */
-  public String getLogging()
-  {
+  public String getLogging() {
     return logging;
   }
 
@@ -434,8 +401,7 @@ public class GenericProcessLauncher implements Runnable
    * Set the path to the JDK logging configuration file.
    * @param logging the path as a string.
    */
-  public void setLogging(final String logging)
-  {
+  public void setLogging(final String logging) {
     this.logging = logging;
   }
 
@@ -443,8 +409,7 @@ public class GenericProcessLauncher implements Runnable
    * Get the name given to this process launcher.
    * @return the name as a string
    */
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 }

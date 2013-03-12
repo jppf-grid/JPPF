@@ -36,8 +36,9 @@ public interface NioContext<S extends Enum<S>>
   /**
    * Set the current state of the channel this context is associated with.
    * @param state a state enum value.
+   * @return true if the state was effectively changed to the specified value, false if the channel was transitioned to a different state.
    */
-  void setState(S state);
+  boolean setState(S state);
 
   /**
    * Read data from a channel.

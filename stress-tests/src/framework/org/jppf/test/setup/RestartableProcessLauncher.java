@@ -71,6 +71,11 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
     variables.put("$n", n);
     variables.put("$scenario_dir", config.getConfigDir().getPath());
     variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
+    if (streamsConfigured.compareAndSet(false, true))
+    {
+      stdout = configureOutput(config.getStdoutFilename());
+      stderr = configureOutput(config.getStderrFilename());
+    }
   }
 
   @Override
@@ -97,7 +102,6 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
     {
       e.printStackTrace();
     }
-    System.exit(0);
   }
 
   /**
@@ -198,5 +202,29 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
         else jvmOptions.add(options[i]);
       }
     }
+  }
+
+  /**
+   * Create a print stream from a specified name or path.
+   * @param outputName the path to create the stream from.
+   * @return a <code>PrintStream</code> instance.
+   */
+  private PrintStream configureOutput(final String outputName)
+  {
+    PrintStream result = null;
+    try
+    {
+      if ((outputName == null) || "out".equalsIgnoreCase(outputName)) result = System.out;
+      else if ("err".equalsIgnoreCase(outputName)) result = System.err;
+      else
+      {
+        File file = new File(outputName);
+        result = new PrintStream(new FileOutputStream(file));
+      }
+    }
+    catch (Exception e)
+    {
+    }
+    return result;
   }
 }

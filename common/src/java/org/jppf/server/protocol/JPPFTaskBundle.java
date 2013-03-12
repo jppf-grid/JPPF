@@ -283,6 +283,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
     bundle.setMetadata(jobMetadata);
+    bundle.setState(state);
     bundle.setParameter("bundle.uuid", uuidPath.getLast() + '-' + copyCount.incrementAndGet());
 
     return bundle;

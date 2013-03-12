@@ -90,7 +90,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
       return;
     }
-    if (debugEnabled) log.debug("Request to suspend jobId = '" + bundleWrapper.getJob().getName() + '\'');
+    if (debugEnabled) log.debug("Request to suspend job '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setSuspended(true, Boolean.TRUE.equals(requeue));
   }
 

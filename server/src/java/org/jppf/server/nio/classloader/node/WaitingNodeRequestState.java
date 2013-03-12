@@ -22,13 +22,12 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
 
-import org.jppf.classloader.*;
-import org.jppf.server.nio.*;
+import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.utils.*;
+import org.jppf.utils.TraversalList;
 import org.slf4j.*;
 
 /**
@@ -184,13 +183,7 @@ class WaitingNodeRequestState extends ClassServerState
       ClassContext providerContext = (ClassContext) provider.getContext();
       ResourceRequest request = new ResourceRequest(channel, resource);
       resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
-      Lock lock = context.getLockResponse();
-      lock.lock();
-      try {
-        context.getPendingResponses().put(resource, request);
-      } finally {
-        lock.unlock();
-      }
+      context.addPendingResponse(resource, request);
       providerContext.addRequest(request);
       return false;
     }

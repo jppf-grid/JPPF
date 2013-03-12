@@ -82,7 +82,7 @@ class SendingBundleState extends NodeServerState
           bundleWrapper.resubmit();
           return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
         }
-        bundleWrapper.setExecutionStartTime(System.nanoTime());
+        bundleWrapper.getJob().setExecutionStartTime(System.nanoTime());
         context.serializeBundle(channel);
       }
       else

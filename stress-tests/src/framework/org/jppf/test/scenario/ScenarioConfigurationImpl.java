@@ -19,7 +19,7 @@
 package org.jppf.test.scenario;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.*;
 
 import org.jppf.utils.TypedProperties;
 
@@ -42,7 +42,7 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
    */
   public ScenarioConfigurationImpl(final File configDir)
   {
-    super(ConfigurationHelper.createConfigFromTemplate(new File(configDir, SCENARIO_FILE).getPath(), Collections.<String, Object>emptyMap()));
+    super(ConfigurationHelper.createConfigFromTemplate(new File(configDir, SCENARIO_FILE).getPath(), createVariables(configDir.getPath())));
     this.configDir = configDir;
     //ConfigurationHelper.loadProperties(this, new File(configDir, SCENARIO_FILE));
   }
@@ -93,5 +93,35 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
   public String getDiagnosticsOutputFilename()
   {
     return getString("jppf.scenario.diagnostics.output.file", "out");
+  }
+
+  @Override
+  public int getNbIterations()
+  {
+    return getInt("jppf.scenario.iterations", 1);
+  }
+
+  @Override
+  public String getStdoutFilename()
+  {
+    return getString("jppf.scenario.process.stdout.file", "out");
+  }
+
+  @Override
+  public String getStderrFilename()
+  {
+    return getString("jppf.scenario.process.stderr.file", "out");
+  }
+
+  /**
+   * Create a map with the variable $scenario_dir with the specified value.
+   * @param dir the root directory for the scenario.
+   * @return a map of string names to object values.
+   */
+  private static Map<String, Object> createVariables(final String dir)
+  {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("$scenario_dir", dir);
+    return vars;
   }
 }

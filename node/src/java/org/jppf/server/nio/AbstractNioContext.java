@@ -71,9 +71,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   }
 
   @Override
-  public void setState(final S state)
+  public boolean setState(final S state)
   {
     this.state = state;
+    return true;
   }
 
   @Override

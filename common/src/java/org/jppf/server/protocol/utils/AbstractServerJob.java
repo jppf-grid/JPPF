@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -45,23 +45,27 @@ public abstract class AbstractServerJob {
   /**
    * Instance count.
    */
-  private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
+  private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
+  /**
+   * A unique id for this client bundle.
+   */
+  protected final long id = INSTANCE_COUNT.incrementAndGet();
   /**
    * The job status.
    */
-  private volatile ServerJobStatus status = ServerJobStatus.NEW;
+  protected volatile ServerJobStatus status = ServerJobStatus.NEW;
   /**
    * List of all runnables called on job completion.
    */
-  private final List<Runnable> onDoneList = new ArrayList<Runnable>();
+  protected final List<Runnable> onDoneList = new ArrayList<Runnable>();
   /**
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
-  private long jobReceivedTime = 0L;
+  protected long jobReceivedTime = 0L;
   /**
    * The time at which this wrapper was added to the queue.
    */
-  private transient long queueEntryTime = 0L;
+  protected transient long queueEntryTime = 0L;
   /**
    * The underlying task bundle.
    */
@@ -69,27 +73,27 @@ public abstract class AbstractServerJob {
   /**
    * The universal unique id for this job.
    */
-  private String uuid = null;
+  protected String uuid = null;
   /**
    * The user-defined display name for this job.
    */
-  private String name = null;
+  protected String name = null;
   /**
    * The service level agreement between the job and the server.
    */
-  private JobSLA sla = null;
+  protected JobSLA sla = null;
   /**
    * The job metadata.
    */
-  private JobMetadata metadata = null;
+  protected JobMetadata metadata = null;
   /**
    * Job expired indicator, determines whether the job is should be cancelled.
    */
-  private boolean jobExpired = false;
+  protected boolean jobExpired = false;
   /**
    * Job pending indicator, determines whether the job is waiting for its scheduled time to start.
    */
-  private boolean pending = false;
+  protected boolean pending = false;
   /**
    * Used for synchronized access to job.
    */
@@ -97,7 +101,7 @@ public abstract class AbstractServerJob {
   /**
    * The status of this submission.
    */
-  private SubmissionStatus submissionStatus;
+  protected SubmissionStatus submissionStatus;
   /**
    * Handler for job state notifications.
    */
@@ -116,7 +120,7 @@ public abstract class AbstractServerJob {
   {
     if (lock == null) throw new IllegalArgumentException("lock is null");
     if (job == null) throw new IllegalArgumentException("job is null");
-    if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
+    if (debugEnabled) log.debug("creating ClientJob #" + id);
     this.lock = lock;
     this.job = job;
     this.uuid = this.job.getUuid();

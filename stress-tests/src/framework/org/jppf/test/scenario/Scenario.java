@@ -25,7 +25,7 @@ import java.util.*;
 
 import org.jppf.test.addons.mbeans.*;
 import org.jppf.test.setup.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 
 import test.org.jppf.test.setup.ConfigurationHelper;
@@ -50,8 +50,8 @@ public class Scenario
   private Setup setup;
 
   /**
-   * 
-   * @param args .
+   * Execute the scenario whose root folder is specified as argument.
+   * @param args the first argument contains the scenario's toor folder path.
    */
   public static void main(final String[] args)
   {
@@ -86,6 +86,26 @@ public class Scenario
    */
   public void execute() throws Exception
   {
+    int iterations = configuration.getNbIterations();
+    for (int i=1; i<=iterations; i++)
+    {
+      if (iterations > 1)
+      {
+        String hr = StringUtils.padRight("", '-', 15);
+        System.out.println(hr);
+        System.out.println("Iteration #" + i);
+        System.out.println(hr);
+      }
+      executeIteration();
+    }
+  }
+
+  /**
+   * Execute one iteration of this scenario.
+   * @throws Exception if any error occurs.
+   */
+  public void executeIteration() throws Exception
+  {
     try
     {
       Map<String, Object> variables = new HashMap<String, Object>();
@@ -117,7 +137,7 @@ public class Scenario
     {
       try
       {
-        printDiagnostics();
+        //printDiagnostics();
       }
       finally
       {
@@ -147,12 +167,12 @@ public class Scenario
         out.println("---------------------------------------------------------");
         out.println("results for driver " + entry.getKey().getJmxId());
         out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo());
-        out.println("after GC: " + entry.getKey().getResult().getDiagnosticsInfoAfterGC());
+        out.println("after GC:  " + entry.getKey().getResult().getDiagnosticsInfoAfterGC());
         for (JMXResult<DiagnosticsResult> dr: entry.getValue())
         {
           out.println("results for node " + dr.getJmxId());
           out.println("before GC: " + dr.getResult().getDiagnosticsInfo());
-          out.println("after GC: " + dr.getResult().getDiagnosticsInfoAfterGC());
+          out.println("after GC:  " + dr.getResult().getDiagnosticsInfoAfterGC());
         }
       }
     }

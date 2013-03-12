@@ -123,6 +123,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
     try
     {
       server.getSelector().wakeup();
+      channel.setKeyOps(0);
       NioContext<S> context = (NioContext<S>) channel.getContext();
       S s1 = context.getState();
       NioServerFactory<S, T> factory = server.getFactory();
@@ -134,14 +135,17 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
         else if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel));
         else if (log.isTraceEnabled()) log.trace(getTransitionMessage(s1, s2, t, channel));
       }
-      context.setState(s2);
-      if (!submit) channel.setKeyOps(t.getInterestOps());
-      else
+      if (context.setState(s2))
       {
-        channel.setKeyOps(0);
-        submitTransition(channel);
+        if (!submit) channel.setKeyOps(t.getInterestOps());
+        else submitTransition(channel);
       }
-      //if (debugEnabled && (s1 != s2)) log.debug("transitioned " + channel + msg + " with ops=" + t.getInterestOps());
+    }
+    catch (RuntimeException e)
+    {
+      //if (debugEnabled) log.debug(e.getMessage(), e);
+      log.info(e.getMessage(), e);
+      throw e;
     }
     finally
     {

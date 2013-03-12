@@ -18,14 +18,15 @@
 
 package org.jppf.test.scenario.jmxthreads;
 
+import java.lang.management.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.client.JPPFClientConnectionImpl;
+import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.test.addons.mbeans.DiagnosticsMBean;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -54,7 +55,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
     {
       TypedProperties config = getConfiguration().getProperties();
       int nbNodes = getConfiguration().getNbNodes();
-      executor = Executors.newFixedThreadPool(nbNodes, new JPPFThreadFactory("NodeRestart"));
+      executor = Executors.newFixedThreadPool(nbNodes, new JPPFThreadFactory("DriverRestart"));
       int iterations = config.getInt("iterations", 10);
       output("performing test with " + nbNodes + " nodes, for " + iterations + " iterations");
       JMXDriverConnectionWrapper jmxDriver = ((JPPFClientConnectionImpl) getSetup().getClient().getClientConnection()).getJmxConnection();
@@ -62,27 +63,39 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
       {
         long start = System.nanoTime();
         getSetup().getJmxHandler().checkDriverAndNodesInitialized(1, nbNodes);
-        restartNodes(jmxDriver.nodesInformation());
+        //restartNodes(jmxDriver.nodesInformation());
+        restartDriver();
         long elapsed = System.nanoTime() - start;
         output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
       }
       Thread.sleep(3000L);
+      /*
       DiagnosticsMBean proxy = jmxDriver.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
       String[] threadNames = proxy.threadNames();
-      int count = 0;
-      for (String name: threadNames)
-      {
-        if (name.startsWith("JMX connection ")) count++;
-      }
-      output("*** found " + count + " 'JMX connection ...' threads ***");
+      */
       //StreamUtils.waitKeyPressed("press [Enter]");
     }
     catch (Exception e)
     {
-      e.printStackTrace();
+      //e.printStackTrace();
     }
     finally
     {
+      try
+      {
+        String[] threadNames = threadNames();
+        int count = 0;
+        for (String name: threadNames)
+        {
+          if (name.startsWith("JMX connection ")) count++;
+        }
+        output("*** found " + count + " 'JMX connection ...' threads ***");
+        StreamUtils.waitKeyPressed("press [Enter]");
+      }
+      catch (Exception e2)
+      {
+        e2.printStackTrace();
+      }
       if (executor != null) executor.shutdownNow();
     }
   }
@@ -109,6 +122,29 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
   }
 
   /**
+   * Restart the driver.
+   * @throws Exception if any error occurs.
+   */
+  private void restartDriver() throws Exception
+  {
+    JMXDriverConnectionWrapper jmx = getSetup().getDriverManagementProxy();
+    jmx.restartShutdown(100L, 100L);
+    Thread.sleep(500L);
+    int n = getConfiguration().getProperties().getInt("jppf.pool.size");
+    int count = 0;
+    while (count < n)
+    {
+      count = 0;
+      List<JPPFClientConnection> list = getSetup().getClient().getAllConnections();
+      for (JPPFClientConnection conn: list)
+      {
+        if (((AbstractJPPFClientConnection) conn).getStatus() == JPPFClientConnectionStatus.ACTIVE) count++;
+      }
+      if (count < n) Thread.sleep(100L);
+    }
+  }
+
+  /**
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
@@ -116,6 +152,20 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
   {
     System.out.println(message);
     log.info(message);
+  }
+
+  /**
+   * Get the names of all threads in this JVM.
+   * @return an array of thread names.
+   */
+  public String[] threadNames()
+  {
+    ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
+    long[] ids = threadsBean.getAllThreadIds();
+    ThreadInfo[] infos = threadsBean.getThreadInfo(ids, 0);
+    String[] result = new String[infos.length];
+    for (int i=0; i<infos.length; i++) result[i] = infos[i].getThreadName();
+    return result;
   }
 
   /**

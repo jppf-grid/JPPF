@@ -18,7 +18,7 @@
 package org.jppf.server.protocol;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.JobSLA;
@@ -42,6 +42,14 @@ public class ServerTaskBundleClient
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Count of instances of this class.
+   */
+  private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
+  /**
+   * A unique id for this client bundle.
+   */
+  private final long id = INSTANCE_COUNT.incrementAndGet();
   /**
    * The job to execute.
    */
@@ -386,8 +394,15 @@ public class ServerTaskBundleClient
   @Override
   public String toString()
   {
-    //return ReflectionUtils.dumpObject(this, "pendingTasksCount", "cancelled", "job", "taskList", "dataProvider");
-    return ReflectionUtils.dumpObject(this, "pendingTasksCount", "cancelled", "done", "job");
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("id=").append(id);
+    sb.append(", pendingTasks=").append(pendingTasksCount);
+    sb.append(", cancelled=").append(cancelled); 
+    sb.append(", done=").append(done); 
+    sb.append(", job=").append(job);
+    sb.append(']');
+    return sb.toString();
   }
 
   /**

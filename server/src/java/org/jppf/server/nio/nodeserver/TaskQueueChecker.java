@@ -287,11 +287,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   private T retrieveChannel(final ServerJob bundleWrapper) throws Exception
   {
-    if (checkJobState(bundleWrapper))
-    {
-      return findIdleChannelIndex(bundleWrapper);
-    }
-    return null;
+    return checkJobState(bundleWrapper) ? findIdleChannelIndex(bundleWrapper) : null;
   }
 
   /**
@@ -302,11 +298,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   private ServerTaskBundleNode prepareJobDispatch(final T channel, final ServerJob selectedBundle)
   {
-    if (debugEnabled)
-    {
-      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel +
-              ", nodeUuid=" + channel.getConnectionUuid());
-    }
+    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
     try
     {

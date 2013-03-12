@@ -19,17 +19,18 @@ package org.jppf.server.protocol;
 
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
  * Instances of this class group tasks for the same node channel together.
  * @author Martin JANDA
  */
-public class ServerTaskBundleNode extends JPPFTaskBundle {
+public class ServerTaskBundleNode {
   /**
    * Explicit serialVersionUID.
    */
@@ -42,6 +43,14 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Count of instances of this class.
+   */
+  private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
+  /**
+   * A unique id for this client bundle.
+   */
+  private final long id = INSTANCE_COUNT.incrementAndGet();
   /**
    * The job to execute.
    */
@@ -74,6 +83,10 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    * The future from channel dispatch.
    */
   private Future<?> future = null;
+  /**
+   * The number of tasks in this node bundle.
+   */
+  private final int taskCount; 
 
   /**
    * Initialize this task bundle and set its build number.
@@ -89,13 +102,13 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
 
     this.job = job;
     this.taskBundle = taskBundle;
-    this.taskBundle.setCurrentTaskCount(taskList.size());
-    this.setSLA(job.getSLA());
-    this.setMetadata(job.getJob().getMetadata());
     this.taskList = Collections.unmodifiableList(new ArrayList<ServerTask>(taskList));
-    this.setName(job.getJob().getName());
-    this.dataProvider = job.getDataProvider();
-    setTaskCount(this.taskList.size());
+    int size = this.taskList.size();
+    this.taskBundle.setTaskCount(size);
+    this.taskBundle.setCurrentTaskCount(size);
+    this.dataProvider = (job.getDataProvider() == null) ? null : job.getDataProvider().copy();
+    this.taskCount = size;
+    checkTaskCount();
   }
 
   /**
@@ -132,27 +145,6 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   public List<ServerTask> getTaskList()
   {
     return taskList;
-  }
-
-  /**
-   * Make a copy of this bundle.
-   * @return a new <code>ClientTaskBundle</code> instance.
-   */
-  @Override
-  public ServerTaskBundleNode copy()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Make a copy of this bundle containing only the first nbTasks tasks it contains.
-   * @param nbTasks the number of tasks to include in the copy.
-   * @return a new <code>ClientTaskBundle</code> instance.
-   */
-  @Override
-  public ServerTaskBundleNode copy(final int nbTasks)
-  {
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -210,7 +202,7 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
    */
   public synchronized void resubmit()
   {
-    if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
+    if (job.getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
     requeued = true;
   }
 
@@ -259,6 +251,32 @@ public class ServerTaskBundleNode extends JPPFTaskBundle {
   @Override
   public String toString()
   {
-    return ReflectionUtils.dumpObject(this, "name", "uuid", "initialTaskCount", "taskCount", "requeued", "cancelled");
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("id=").append(id);
+    sb.append(", name=").append(job.getName());
+    sb.append(", uuid=").append(job.getUuid());
+    sb.append(", initialTaskCount=").append(job.getInitialTaskCount());
+    sb.append(", taskCount=").append(taskCount);
+    sb.append(", cancelled=").append(cancelled); 
+    sb.append(", requeued=").append(requeued); 
+    sb.append(']');
+    return sb.toString();
+  }
+
+  /**
+   * Check the task count in this node bundle is equal to the one in its <code>JPPFTaskBundle</code>.
+   */
+  public void checkTaskCount() {
+    if (taskCount != taskBundle.getTaskCount()) throw new IllegalStateException("task counts do not match");
+  }
+
+  /**
+   * Get the number of tasks in this node bundle.
+   * @return the number of tasks as an int.
+   */
+  public int getTaskCount()
+  {
+    return taskCount;
   }
 }

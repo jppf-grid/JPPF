@@ -92,12 +92,15 @@ It contains a number of predefined properties, as well as any number of custom p
 The predefined properties are the following:
 - jppf.scenario.name: name given to this scenario
 - jppf.scenario.description: description for this scenario, can be multi-lines using the \ continuation character
+- jppf.scenario.iterations = the number of times this scenario is executed, must be > 0, defaults to 1
 - jppf.scenario.nbNodes: number of nodes to start, must be >= 0, defaults to 1
 - jppf.scenario.nbDrivers: number of drivers to start, must be >= 0, defaults to 1
 - jppf.scenario.runner.class: fully qualified name of a class implementing org.jppf.test.scenario.ScenarioRunner
-- jppf.scenario.diagnostics.output.file = the output file where the diagnostics for all nodes and drivers are written.
+- jppf.scenario.diagnostics.file = the output file where the diagnostics for all nodes and drivers are written.
   value can be "none", "out", "err" or any valid file path. Default is "out" (printed to the console as with System.out)
   "none" means that diagnostics are not fetched or printed
+
+The values for these properties can be defined as Groovy expressions, which can use the variable $scenario_dir
 
 The predefined values are accessible directly via an API, provided by the interface "org.jppf.test.scenario.ScenarioConfiguration".
 The custom values can be obtained from the TypedProperties object resulting from ScenarioConfiguration.getProperties().

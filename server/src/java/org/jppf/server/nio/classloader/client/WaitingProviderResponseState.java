@@ -25,8 +25,6 @@ import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
-import java.util.concurrent.locks.Lock;
-
 /**
  * This class represents the state of waiting for the response from a provider.
  * @author Laurent Cohen
@@ -69,35 +67,32 @@ class WaitingProviderResponseState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.readMessage(channel))
     {
-      ResourceRequest request = context.getCurrentRequest();
+      //ResourceRequest request = context.getCurrentRequest();
+      ResourceRequest request;
+      JPPFResourceWrapper resource;
+      //synchronized(context)
+      {
+        request = context.getCurrentRequest();
+        resource = context.deserializeResource();
+        if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", request.getChannel(), ", resource: ", resource.getName()));
+        if ((resource.getDefinition() != null) && (resource.getCallable() == null)) classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
+        resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+      }
       ChannelWrapper<?> nodeChannel = request.getChannel();
-      if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", nodeChannel, ", resource: ", context.getResource().getName()));
-      JPPFResourceWrapper resource = context.deserializeResource();
-      // putting the definition in cache
-      if ((resource.getDefinition() != null) && (resource.getCallable() == null))
-        classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
-      // forwarding it to channel that requested
       ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
-      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
       StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
       synchronized(nodeChannel)
       {
         while (ClassState.IDLE_NODE != nodeContext.getState()) nodeChannel.wait(0L, 10000);
-        if (debugEnabled) log.debug(build("sending response ", resource, " to node ", nodeChannel)); 
-        context.setCurrentRequest(null);
-        ResourceRequest pendingResponse;
-
-        Lock lock = nodeContext.getLockResponse();
-        lock.lock();
-        try {
-          pendingResponse = nodeContext.getPendingResponses().get(resource);
-        } finally {
-          lock.unlock();
-        }
+        if (debugEnabled) log.debug(build("client ", channel, " sending response ", resource, " to node ", nodeChannel)); 
+        ResourceRequest pendingResponse = nodeContext.getPendingResponse(resource);
         pendingResponse.setResource(resource);
         tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, true);
       }
-      return TO_SENDING_PROVIDER_REQUEST;
+      context.setCurrentRequest(null);
+      context.setMessage(null);
+      context.setResource(null);
+      return context.getNbPendingRequests() > 0 ? TO_SENDING_PROVIDER_REQUEST : TO_IDLE_PROVIDER;
     }
     return TO_WAITING_PROVIDER_RESPONSE;
   }

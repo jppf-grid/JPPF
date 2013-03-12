@@ -123,21 +123,23 @@ public class ServerJob extends AbstractServerJob {
    * @return a new <code>ServerJob</code> instance.
    */
   public ServerTaskBundleNode copy(final int nbTasks) {
-    JPPFTaskBundle taskBundle = getJob();
+    JPPFTaskBundle newTaskBundle;
     lock.lock();
     try {
-      int taskCount;
-      if (nbTasks > this.tasks.size()) taskCount = this.tasks.size();
-      else taskCount = nbTasks;
+      int taskCount = (nbTasks > this.tasks.size()) ? this.tasks.size() : nbTasks;
       List<ServerTask> subList = this.tasks.subList(0, taskCount);
       try {
-        if (taskBundle.getTaskCount() != taskCount) {
-          int newSize = taskBundle.getCurrentTaskCount() - taskCount;
-          taskBundle = taskBundle.copy();
-          taskBundle.setTaskCount(taskCount);
-          getJob().setCurrentTaskCount(newSize);
+        if (job.getCurrentTaskCount() > taskCount) {
+          int newSize = job.getCurrentTaskCount() - taskCount;
+          newTaskBundle = job.copy();
+          newTaskBundle.setTaskCount(taskCount);
+          newTaskBundle.setCurrentTaskCount(taskCount);
+          job.setCurrentTaskCount(newSize);
+        } else {
+          newTaskBundle = job.copy();
+          job.setCurrentTaskCount(0);
         }
-        return new ServerTaskBundleNode(this, taskBundle, subList);
+        return new ServerTaskBundleNode(this, newTaskBundle, subList);
       } finally {
         subList.clear();
         fireJobUpdated();
@@ -202,7 +204,7 @@ public class ServerJob extends AbstractServerJob {
    * @param results the list of tasks whose results have been received from the server.
    */
   @SuppressWarnings("unchecked")
-  public synchronized void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
+  public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (results.isEmpty()) return;
     if (debugEnabled) log.debug("*** received " + results.size() + " results from " + bundle);
     CollectionMap<ServerTaskBundleClient, Pair<Integer, DataLocation>> map = new SetIdentityMap<ServerTaskBundleClient, Pair<Integer, DataLocation>>();
@@ -231,7 +233,7 @@ public class ServerJob extends AbstractServerJob {
    * @param bundle    the finished job.
    * @param throwable the throwable that was raised while receiving the results.
    */
-  public synchronized void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
+  public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<ServerTaskBundleClient, ServerTask>();
     lock.lock();
@@ -400,8 +402,9 @@ public class ServerJob extends AbstractServerJob {
 
     NodeJobInformation[] result = new NodeJobInformation[entries.length];
     int i = 0;
-    for (ServerTaskBundleNode bundle : entries) {
-      JPPFManagementInfo nodeInfo = bundle.getChannel().getManagementInfo();
+    for (ServerTaskBundleNode nodeBundle : entries) {
+      JPPFManagementInfo nodeInfo = nodeBundle.getChannel().getManagementInfo();
+      JPPFTaskBundle bundle = nodeBundle.getJob();
       boolean pending = Boolean.TRUE.equals(bundle.getParameter(BundleParameter.JOB_PENDING));
       JobInformation jobInfo = new JobInformation(getUuid(), bundle.getName(),
           bundle.getTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(),
@@ -440,8 +443,26 @@ public class ServerJob extends AbstractServerJob {
 
   @Override
   public String toString() {
-    return ReflectionUtils.dumpObject(this,
-        "uuid", "broadcastJob", "broadcastUUID", "submissionStatus", "taskCount", "nbBundles", "nbCHannels", "cancelled", "expired", "pending", "suspended");
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("id=").append(id);
+    sb.append(", job uuid=").append(uuid);
+    sb.append(", name=").append(name);
+    sb.append(", status=").append(status);
+    if (lock.tryLock()) {
+      try {
+        sb.append(", taskCount=").append(tasks.size());
+      } finally {
+        lock.unlock();
+      }
+    }
+    sb.append(", nbBundles=").append(getNbBundles()); 
+    //sb.append(", nbChannels=").append(getNbChannels());
+    sb.append(']');
+    sb.append(", jobExpired=").append(jobExpired); 
+    sb.append(", pending=").append(pending); 
+    sb.append(", suspended=").append(isSuspended()); 
+    return sb.toString();
   }
 
   /**

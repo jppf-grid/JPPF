@@ -37,6 +37,10 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    */
   static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether trace log statements are enabled.
+   */
+  static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Determines the suspended state of this connection thread.
    */
   private boolean suspended = false;
@@ -48,6 +52,10 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * The connection that holds this thread.
    */
   private JMXConnectionWrapper connectionWrapper = null;
+  /**
+   * 
+   */
+  private Thread currentThread = null;
 
   /**
    * Initialize this thread with the specified connection.
@@ -65,6 +73,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
   @Override
   public void run()
   {
+    currentThread = Thread.currentThread();
     while (!isStopped())
     {
       if (isSuspended())
@@ -77,15 +86,15 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
       {
         try
         {
-          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
+          if (traceEnabled) log.trace(connectionWrapper.getId() + " about to perform connection attempts");
           connectionWrapper.performConnection();
-          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
+          if (traceEnabled) log.trace(connectionWrapper.getId() + " about to suspend connection attempts");
           suspend();
           connectionWrapper.wakeUp();
         }
         catch(Exception ignored)
         {
-          if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
+          if (traceEnabled) log.trace(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
           try
           {
             Thread.sleep(100);
@@ -130,9 +139,12 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    */
   public synchronized void close()
   {
+    if (debugEnabled) log.debug("closing this connection thread");
     setConnecting(false);
+    setSuspended(false);
     setStopped(true);
     wakeUp();
+    if ((currentThread != null) && currentThread.isAlive()) currentThread.interrupt();
   }
 
   /**
