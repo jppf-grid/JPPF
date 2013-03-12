@@ -192,6 +192,7 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   public void close()
   {
     if (executor != null) executor.shutdownNow();
+    if (bundler != null) bundler.dispose();
   }
 
   @Override
