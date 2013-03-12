@@ -1,0 +1,115 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2012 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-findbugs" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                    Generate the findbugs reports                          -->
+	<!-- ========================================================================= -->
+	<!-- This requires the property ${findbugs.home} defined in build.properties   -->
+	<!-- It must point to the root installation directory of findbugs              -->
+	<!-- ========================================================================= -->
+
+	<target name="findbugs">
+		<available file="${findbugs.home}/lib/findbugs-ant.jar" property="findbugs.present"/>
+		<antcall target="findbugs.package"/>
+	</target>
+
+	<property name="findbug.jvm.flags" value="-server -Xmx512m -Duser.language=en -Duser.country=US"/>
+
+	<target name="findbugs.package" description="run findbugs on all modules" if="findbugs.present">
+		<path id="findbugs.classpath">
+			<fileset dir="${findbugs.home}/lib" includes="*.jar"/>
+		</path>
+		<taskdef onerror="ignore" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="findbugs.classpath"/>
+
+		<property name="output.type" value="xml"/>
+		<delete dir="${build}/findbugs" quiet="true"/>
+		<mkdir dir="${build}/findbugs"/>
+
+		<antcall target="findbugs.module"><param name="path" value="node"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="common"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="client"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="admin"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="server"/></antcall>
+		<antcall target="findbugs.module"><param name="path" value="demo"/></antcall>
+
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="application-template"/>
+			<param name="fsrc" value="${application.template}/src"/>
+			<param name="fclass" value="${application.template}/classes"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="jca-client-jca"/>
+			<param name="fsrc" value="${jca-client}/src/java"/>
+			<param name="fclass" value="${jca-client}/classes/jca"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="jca-client-j2eeclient"/>
+			<param name="fsrc" value="${jca-client}/src/j2eeclient"/>
+			<param name="fclass" value="${jca-client}/classes/j2eeclient"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="gigaspaces-common"/>
+			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
+			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-Common/classes"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="gigaspaces-client"/>
+			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
+			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-Client/classes"/>
+		</antcall>
+		<antcall target="findbugs.generic">
+			<param name="foutput" value="gigaspaces-pu"/>
+			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
+			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/classes"/>
+		</antcall>
+	</target>
+
+	<target name="findbugs.module">
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}"
+    excludeFilter="${bin}/findbugs-filter.xml">
+      <auxClasspath>
+      	<fileset dir="${lib}" includes="**/*.jar"/>
+      	<fileset dir="${build}" includes="*.jar"/>
+      </auxClasspath>
+      <sourcePath path="${basedir}/../${path}/src/java"/>
+      <class location="${basedir}/../${path}/classes"/>
+    </findbugs>
+	</target>
+
+  <path id="findbugs.generic.classpath">
+		<pathelement location="${jca-client}/classes/j2eeclient"/>
+		<pathelement location="${jca-client}/classes/jca"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Common/classes"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Common/lib/spring.jar"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Client/classes"/>
+		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/classes"/>
+  	<fileset dir="${lib}" includes="**/*.jar"/>
+  	<fileset dir="${build}" includes="*.jar"/>
+  </path>
+
+	<target name="findbugs.generic">
+    <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${foutput}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}">
+    	<auxClasspath refid="findbugs.generic.classpath"/>
+      <sourcePath path="${fsrc}"/>
+      <class location="${fclass}"/>
+    </findbugs>
+	</target>
+
+</project> 

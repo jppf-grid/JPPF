@@ -1,0 +1,35 @@
+permission java.lang.RuntimePermission "createClassLoader";
+permission java.lang.RuntimePermission "setContextClassLoader";
+permission java.lang.RuntimePermission "accessClassInPackage.*";
+permission java.lang.RuntimePermission "defineClassInPackage.*";
+permission java.lang.RuntimePermission "accessDeclaredMembers";
+permission java.lang.RuntimePermission "modifyThread";
+permission java.lang.RuntimePermission "getStackTrace";
+permission java.lang.RuntimePermission "getProtectionDomain";
+permission java.lang.RuntimePermission "getenv.*";
+permission java.lang.RuntimePermission "getFileSystemAttributes";
+permission java.lang.RuntimePermission "getClassLoader";
+
+permission java.io.FilePermission "/", "read";
+permission java.io.FilePermission "${user.dir}/jppf-node.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/jppf-node1.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/jppf-node2.log", "read,write,delete";
+
+permission java.util.PropertyPermission "*", "read";
+
+permission java.lang.management.ManagementPermission "control";
+permission java.lang.management.ManagementPermission "monitor";
+
+permission javax.management.MBeanTrustPermission "register";
+permission java.io.FilePermission "${java.io.tmpdir}/-" "read,write,delete";
+
+// getting denied on this, but doesn't seem to matter
+// permission java.io.FilePermission "/path/to/jppf-server.jar", "read";
+
+// stupid OS X Java
+permission java.lang.RuntimePermission "loadLibrary.j2pkcs11";
+permission java.io.FilePermission "/usr/libexec/SmartCardServices/pkcs11/tokendPKCS11.so", "read";
+permission java.io.FilePermission "/System/Library/Java/JavaVirtualMachines/-", "read";
+permission java.io.FilePermission "/Library/Java/JavaVirtualMachines/-", "read";
+permission java.io.FilePermission "/Library/Java/Extensions/-", "read";
+permission java.io.FilePermission "/System/Library/Java/Extensions/-", "read";

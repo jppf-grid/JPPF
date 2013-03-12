@@ -1,0 +1,37 @@
+---------------------------------------------------------
+results for driver service:jmx:jmxmp://192.168.1.14:11201
+before GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=27 857 608, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=12 174 176, max=136 314 880]
+
+after GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=4 001 920, max=477 233 152]
+  non-heap : [init=24 313 856, committed=25 952 256, used=12 177 864, max=136 314 880]
+
+results for node service:jmx:jmxmp://192.168.1.14:11301
+before GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=23 161 144, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=9 348 720, max=136 314 880]
+
+after GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=6 024 560, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=9 367 032, max=136 314 880]
+
+results for node service:jmx:jmxmp://192.168.1.14:11303
+before GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=23 161 232, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=9 349 936, max=136 314 880]
+
+after GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=6 024 984, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=9 368 464, max=136 314 880]
+
+results for node service:jmx:jmxmp://192.168.1.14:11302
+before GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=23 161 352, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=9 347 784, max=136 314 880]
+
+after GC: Memory pool [name=global, type=null]
+  heap : [init=201 038 976, committed=192 741 376, used=6 024 552, max=477 233 152]
+  non-heap : [init=24 313 856, committed=24 313 856, used=9 366 264, max=136 314 880]
+
