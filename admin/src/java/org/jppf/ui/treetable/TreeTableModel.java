@@ -76,6 +76,13 @@ public interface TreeTableModel extends TreeModel
   String getColumnName(int column);
 
   /**
+   * Returns the tooltip for column number <code>column</code>.
+   * @param column the column number.
+   * @return the name of the column as a string.
+   */
+  String getColumnTooltip(int column);
+
+  /**
    * Returns the type for column number <code>column</code>.
    * @param column the column number.
    * @return the type of the column.

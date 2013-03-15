@@ -102,35 +102,23 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
   // Default implementations for methods in the TreeModel interface.
   //
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Object getRoot()
   {
     return root;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isLeaf(final Object node)
   {
     return getChildCount(node) == 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void valueForPathChanged(final TreePath path, final Object newValue)
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getIndexOfChild(final Object parent, final Object child)
   {
@@ -145,18 +133,12 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
     return -1;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addTreeModelListener(final TreeModelListener l)
   {
     listenerList.add(TreeModelListener.class, l);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void removeTreeModelListener(final TreeModelListener l)
   {
@@ -289,9 +271,6 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
   // Default implementations for methods in the TreeTableModel interface.
   //
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Class getColumnClass(final int column)
   {
@@ -309,12 +288,15 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
     return getColumnClass(column) == TreeTableModel.class;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setValueAt(final Object aValue, final Object node, final int column)
   {
+  }
+
+  @Override
+  public String getColumnTooltip(final int column)
+  {
+    return null;
   }
 
   // Left to be implemented in the subclass:

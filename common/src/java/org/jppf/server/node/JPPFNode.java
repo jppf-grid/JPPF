@@ -203,7 +203,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception {
-    if (debugEnabled) log.debug("processing results for job '" + bundle.getName() + '\'');
+    if (debugEnabled) log.debug("processing      " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     if (executionManager.checkConfigChanged() || bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       TypedProperties jppf = systemInformation.getJppf();
@@ -216,7 +216,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       //getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
       // if jmx is enabled, this is done by the status notifier
       if (!isJmxEnabled()) setTaskCount(getTaskCount() + taskList.size());
-      if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
+     // if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
     }
   }
 

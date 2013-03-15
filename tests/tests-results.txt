@@ -1,6 +1,6 @@
 
-Total tests: 120, successful: 120, failed: 0, ignored: 0
-Start time: Sat Feb 16 09:11:28 CET 2013, total elapsed: 00:02:31.307
+Total tests: 121, successful: 120, failed: 1, ignored: 0
+Start time: Tue Mar 12 20:45:20 CET 2013, total elapsed: 00:02:36.124
 
 Tests results:
 
@@ -18,6 +18,7 @@ class test.org.jppf.client.TestJPPFClient
   testSubmit() : OK
   testNotSerializableExceptionFromClient() : OK
   testNotSerializableExceptionFromNode() : OK
+  testNoJMXConnectionThreadsLeak() : OK
 class test.org.jppf.client.TestJPPFJob
   testGetTaskObject() : OK
   testJobListener() : OK
@@ -78,8 +79,8 @@ class test.org.jppf.management.TestJPPFNodeAdminMBean
   testState() : OK
 class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
   testNotifications() : OK
-  testSnapshot() : OK
   testReset() : OK
+  testSnapshot() : OK
 class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
   testCancelJob() : OK
   testUpdateThreadPoolSize() : OK
@@ -92,18 +93,29 @@ class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
   testSetDelegationModel() : OK
   testState() : OK
 class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean2
+  testNoNotifcationReceivedExecutionPolicySelector() : OK
   testNotifcationsAllNodes() : OK
   testNotifcationsUuidSelector() : OK
   testNotifcationsExecutionPolicySelector() : OK
   testNoNotifcationReceivedAllNodesSelector() : OK
   testNoNotifcationReceivedUuidSelector() : OK
-  testNoNotifcationReceivedExecutionPolicySelector() : OK
 class test.org.jppf.server.job.management.TestDriverJobManagementMBean
   testCancelJob() : OK
   testCancelJobAfterCompletion() : OK
   testResumeAndCancelSuspendedJob() : OK
 class test.org.jppf.server.protocol.TestJPPFJobClientSLA
-  testJobMaxChannelsClient() : OK
+  testJobMaxChannelsClient() : Failure
+    java.lang.AssertionError: r1=[1.36311762140099994E18, 1.36311762166610944E18], r2=[1.36311762166599987E18, 1.36311762191879501E18], uuid1=n1, uuid2=local_client
+    	at test.org.jppf.server.protocol.TestJPPFJobClientSLA.testJobMaxChannelsClient(TestJPPFJobClientSLA.java:286)
+    	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+    	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    	at java.lang.reflect.Method.invoke(Method.java:601)
+    	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
+    	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
+    	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
+    	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
+    	at org.junit.internal.runners.statements.FailOnTimeout$StatementThread.run(FailOnTimeout.java:62)
   testJobMaxChannels2Client() : OK
   testJobExpirationAtDateClient() : OK
   testJobExpirationAtDateTooLateClient() : OK
@@ -122,15 +134,14 @@ class test.org.jppf.server.protocol.TestJPPFJobSLA
   testJobMaxNodes() : OK
   testJobMaxNodes2() : OK
   testBroadcastJob() : OK
+  testBroadcastJob2() : OK
+  testSendNodeResultsStrategy() : OK
+  testSendAllResultsStrategy() : OK
   testJobExpirationAtDateTooLate() : OK
   testJobExpirationAfterDelayTooLate() : OK
   testCancelJobUponClientDisconnect() : OK
   testDefaultSendResultsStrategy() : OK
-  testBroadcastJob2() : OK
-  testSendNodeResultsStrategy() : OK
-  testSendAllResultsStrategy() : OK
 class test.org.jppf.server.protocol.TestJPPFTask
-  testComputeCallableThrowingException() : OK
   testTaskTimeout() : OK
   testTaskTimeoutStart() : OK
   testTaskExpirationDate() : OK
@@ -138,11 +149,12 @@ class test.org.jppf.server.protocol.TestJPPFTask
   testComputeCallableInClient() : OK
   testIsInNodeTrue() : OK
   testIsInNodeFalse() : OK
+  testComputeCallableThrowingException() : OK
 class test.org.jppf.utils.TestJPPFConfiguration
   testAlternateConfigurationSource() : OK
 class test.org.jppf.utils.TestRange
-  testIncludes() : OK
-  testMerge() : OK
   testIsValueInRange() : OK
   testIntersects() : OK
   testIntersection() : OK
+  testIncludes() : OK
+  testMerge() : OK

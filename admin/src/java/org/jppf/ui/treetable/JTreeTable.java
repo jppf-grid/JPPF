@@ -123,6 +123,7 @@ public class JTreeTable extends JTable
       // Metal looks better like this.
       setRowHeight(18);
     }
+    //setTableHeader(new TreeTableHeader());
   }
 
   /**
@@ -137,8 +138,7 @@ public class JTreeTable extends JTable
     {
       tree.updateUI();
     }
-    // Use the tree's default foreground and background colors in the
-    // table.
+    // Use the tree's default foreground and background colors in the table.
     LookAndFeel.installColorsAndFont(this, "Tree.background", "Tree.foreground", "Tree.font");
   }
 
@@ -525,5 +525,37 @@ public class JTreeTable extends JTable
         updateSelectedTableRows();
       }
     }
+  }
+
+  /**
+   * A table header providing customizable tooltips.
+   */
+  class TreeTableHeader extends JTableHeader
+  {
+    /**
+     * Default constructor.
+     * @param tcm .
+     */
+    public TreeTableHeader(final TableColumnModel tcm)
+    {
+      super(tcm);
+      boolean breakpoint = true;
+    }
+
+    @Override
+    public String getToolTipText(final MouseEvent event)
+    {
+      Point p = event.getPoint();
+      int index = getColumnModel().getColumnIndexAtX(p.x);
+      int realIndex = getColumnModel().getColumn(index).getModelIndex();
+      TreeTableModelAdapter model = (TreeTableModelAdapter) getModel();
+      return model.treeTableModel.getColumnTooltip(realIndex);
+    }
+  }
+
+  @Override
+  protected JTableHeader createDefaultTableHeader()
+  {
+    return new TreeTableHeader(getColumnModel());
   }
 }

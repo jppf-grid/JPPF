@@ -222,7 +222,7 @@ public class NodeExecutionManagerImpl
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
    */
   private void cancelTask(final NodeTaskWrapper taskWrapper, final boolean callOnCancel) {
-    if (debugEnabled) log.debug("cancelling task number = " + taskWrapper);
+    if (debugEnabled) log.debug("cancelling task = " + taskWrapper);
     Future<?> future = futureMap.get(taskWrapper);
     if (!future.isDone()) {
       if (debugEnabled) log.debug("calling future.cancel(true) for task = " + taskWrapper);

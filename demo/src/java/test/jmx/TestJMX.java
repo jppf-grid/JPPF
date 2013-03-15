@@ -18,14 +18,18 @@
 
 package test.jmx;
 
+import java.io.StringWriter;
 import java.util.*;
 
 import javax.management.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.*;
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
 
@@ -37,31 +41,35 @@ import sample.dist.tasklength.LongTask;
 public class TestJMX
 {
   /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(TestJMX.class);
+  /**
+   * 
+   */
+  private static JMXDriverConnectionWrapper driverJmx = null;
+  /**
+   * 
+   */
+  private static JPPFClient client = null;
+
+  /**
    * Entry point.
-   * @param args - not used.
+   * @param args not used.
    */
   public static void main(final String...args)
   {
-    JPPFClient client = null;
     JPPFNodeForwardingMBean forwarder = null;
     try
     {
       client = new JPPFClient();
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       AbstractJPPFClientConnection conn = (AbstractJPPFClientConnection) client.getClientConnection();
-      JMXDriverConnectionWrapper driverJmx = conn.getJmxConnection();
+      driverJmx = conn.getJmxConnection();
       System.out.println("waiting till jmx is connected ...");
       while (!driverJmx.isConnected()) Thread.sleep(10L);
-      System.out.println("... jmx connected");
-      Thread.sleep(500L);
-      NodeNotificationListener listener = new NodeNotificationListener();
-      String listenerID = driverJmx.registerForwardingNotificationListener(new NodeSelector.AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
-      JPPFJob job = new JPPFJob();
-      for (int i=0; i<5; i++) job.addTask(new LongTask(100L)).setId(String.valueOf(i+1));
-      List<JPPFTask> results = client.submit(job);
-      Thread.sleep(500L);
-      driverJmx.unregisterForwardingNotificationListener(listenerID);
-      Thread.sleep(500L);
+
+      perform3();
     }
     catch(Throwable e)
     {
@@ -71,6 +79,73 @@ public class TestJMX
     {
       if (client != null) client.close();
     }
+  }
+
+  /**
+   * Test diagnostics.
+   * @throws Exception if any error occurs.
+   */
+  private static void perform1() throws Exception
+  {
+    DiagnosticsMBean diag = driverJmx.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+    ThreadDump td = diag.threadDump();
+    StringWriter sw = new StringWriter();
+    HTMLThreadDumpWriter writer = new HTMLThreadDumpWriter(sw, "driver " + driverJmx.getDisplayName());
+    writer.printThreadDump(td);
+    writer.close();
+    output("driver thread dump:");
+    output(sw.toString());
+    output("... jmx connected");
+  }
+
+  /**
+   * Test notification forwarding.
+   * @throws Exception if any error occurs.
+   */
+  private static void perform2() throws Exception
+  {
+    Thread.sleep(500L);
+    NodeNotificationListener listener = new NodeNotificationListener();
+    String listenerID = driverJmx.registerForwardingNotificationListener(new NodeSelector.AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+    JPPFJob job = new JPPFJob();
+    for (int i=0; i<5; i++) job.addTask(new LongTask(100L)).setId(String.valueOf(i+1));
+    List<JPPFTask> results = client.submit(job);
+    Thread.sleep(500L);
+    driverJmx.unregisterForwardingNotificationListener(listenerID);
+    Thread.sleep(500L);
+  }
+
+  /**
+   * Test cancelling tasks from node listener.
+   * @throws Exception if any error occurs.
+   */
+  private static void perform3() throws Exception
+  {
+    int nbJobs = 10;
+    int nbTasks = 100;
+    for (int i=0; i<nbJobs;i++)
+    {
+      JPPFJob job = new JPPFJob();
+      job.setName("job" + (i+1));
+      for (int j=0; j<nbTasks; j++)
+      {
+        JPPFTask task = new LongTask(100L);
+        task.setTimeoutSchedule(new JPPFSchedule(50L));
+        job.addTask(task).setId(String.valueOf(j+1));
+      }
+      List<JPPFTask> results = client.submit(job);
+      output(job.getName() + " : received " + results.size() + " results");
+    }
+  }
+
+  /**
+   * Prints qnd logs the specified ;essqge.
+   * @param message ;essqge to print.
+   */
+  private static void output(final String message)
+  {
+    System.out.println(message);
+    log.info(message);
   }
 
   /**

@@ -18,10 +18,11 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.slf4j.*;
 
@@ -56,10 +57,13 @@ public class TopologyData
    */
   private JPPFNodeForwardingMBean nodeForwarder = null;
   /**
+   * Driver diagnostics MBean proxy.
+   */
+  private DiagnosticsMBean diagnostics = null;
+  /**
    * Wrapper holding the connection to the JMX server on a driver or a node.
    */
   private JMXDriverConnectionWrapper jmxWrapper = null;
-  //private JMXConnectionWrapper jmxWrapper = null;
   /**
    * Information on the JPPF node .
    */
@@ -68,6 +72,10 @@ public class TopologyData
    * Object describing the current state of a node.
    */
   private JPPFNodeState nodeState = null;
+  /**
+   * Object describing the current health of a node or driver.
+   */
+  private HealthSnapshot healthSnapshot = new HealthSnapshot();
   /**
    * Determines whether the corresponding driver is collapsed in the visualization panel.
    */
@@ -95,7 +103,7 @@ public class TopologyData
     this.clientConnection = clientConnection;
     this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
     this.uuid = ((JPPFClientConnectionImpl) clientConnection).getUuid();
-    initializeFowarder();
+    initializeProxies();
   }
 
   /**
@@ -181,12 +189,34 @@ public class TopologyData
   }
 
   /**
-   * Set the object describing the current state of a node.
-   * @param nodeState a <code>JPPFNodeState</code> instance.
+   * Refresh the state of the node represented by this topology data.
+   * @param newState the new node state fetched from the grid.
    */
-  public void setNodeState(final JPPFNodeState nodeState)
+  public void refreshNodeState(final JPPFNodeState newState)
   {
-    this.nodeState = nodeState;
+    if (!TopologyDataType.NODE.equals(type)) return;
+    this.nodeState = newState;
+    setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
+  }
+
+
+  /**
+   * Get the object describing the health of a node or driver.
+   * @return a <code>HealthSnapshot</code> instance.
+   */
+  public HealthSnapshot getHealthSnapshot()
+  {
+    return healthSnapshot;
+  }
+
+  /**
+   * Refresh the health snapshot state of the driver or node represented by this topology data.
+   * @param newSnapshot the new health snapshot fetched from the grid.
+   */
+  public void refreshHealthSnapshot(final HealthSnapshot newSnapshot)
+  {
+    if (type == TopologyDataType.PEER) return;
+    this.healthSnapshot = newSnapshot;
   }
 
   /**
@@ -205,25 +235,6 @@ public class TopologyData
   public void setClientConnection(final JPPFClientConnection clientConnection)
   {
     this.clientConnection = clientConnection;
-  }
-
-  /**
-   * Refresh the state of the node represented by this topology data.
-   * @deprecated
-   */
-  public void refreshNodeState()
-  {
-  }
-
-  /**
-   * Refresh the state of the node represented by this topology data.
-   * @param newState the new node state fetched from the grid.
-   */
-  public void refreshNodeState(final JPPFNodeState newState)
-  {
-    if (!TopologyDataType.NODE.equals(type)) return;
-    this.nodeState = newState;
-    setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
   }
 
   /**
@@ -335,6 +346,15 @@ public class TopologyData
   }
 
   /**
+   * Get the driver diagnostics MBean proxy.
+   * @return an instance of {@link DiagnosticsMBean}.
+   */
+  public DiagnosticsMBean getDiagnostics()
+  {
+    return diagnostics;
+  }
+
+  /**
    * Get the parent driver data.
    * @return a <code>TopologyData</code> instance, or null if no parent was set.
    */
@@ -353,43 +373,43 @@ public class TopologyData
   }
 
   /**
-   * Reset the forwarder; this method should be called when an I/O error occurs
-   * when invoking a method of the forwarder.
+   * Reset the forwarder and diagnostics mbeans. This method should be called when an I/O error occurs
+   * when invoking a method of the driver jmx connection wwrapper.
    */
-  public void initializeFowarder()
+  public void initializeProxies()
   {
     if (initializing.compareAndSet(false, true))
     {
       nodeForwarder = null;
-      new Thread(new ForwarderSettingTask()).start();
+      diagnostics = null;
+      new Thread(new ProxySettingTask()).start();
     }
   }
 
   /**
-   * 
+   * Initialize the driver proxies in a separate thread.
    */
-  private class ForwarderSettingTask implements Runnable
-  {
+  private class ProxySettingTask implements Runnable {
     @Override
-    public void run()
-    {
-      try
-      {
-        while (nodeForwarder == null)
-        {
-          try
-          {
-            nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
-            if (nodeForwarder == null) Thread.sleep(500L);
+    public void run() {
+      try {
+        boolean hasNullProxy = true;
+        while (hasNullProxy) {
+          try {
+            if (nodeForwarder == null) nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+          } catch (Exception ignore) {
           }
-          catch (Exception ignore)
-          {
-            //log.error("could not get node forwarder proxy for driver " + uuid, e);
+          try {
+            if (diagnostics == null) diagnostics = jmxWrapper.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+          } catch (Exception ignore) {
+          }
+          hasNullProxy = (nodeForwarder == null) || (diagnostics == null);
+          try {
+            if (hasNullProxy) Thread.sleep(500L);
+          } catch (InterruptedException ignore) {
           }
         }
-      }
-      finally
-      {
+      } finally {
         initializing.set(false);
       }
     }

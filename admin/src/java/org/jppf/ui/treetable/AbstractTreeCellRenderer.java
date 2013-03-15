@@ -55,6 +55,18 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    */
   public static final String JOB_ICON = RESOURCES + "rack.gif";
   /**
+   * Crititcal icon.
+   */
+  public static final String CRITICAL_ICON = RESOURCES + "critical.gif";
+  /**
+   * Happy smiley.
+   */
+  public static final String HAPPY_ICON = RESOURCES + "happy.gif";
+  /**
+   * Unhappy smiley.
+   */
+  public static final String UNHAPPY_ICON = RESOURCES + "unhappy.gif";
+  /**
    * Highlighting color for active driver connections.
    */
   public static final Color ACTIVE_COLOR = new Color(144, 213, 149);

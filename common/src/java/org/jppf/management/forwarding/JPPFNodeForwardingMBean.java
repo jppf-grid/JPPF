@@ -204,6 +204,33 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
   Map<String, Object> systemInformation(NodeSelector selector) throws Exception;
 
   /**
+   * Get the JVM health snapshot for the specified nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> healthSnapshot(NodeSelector selector) throws Exception;
+
+  /**
+   * Invoke <code>System.gc()</code> on the specified nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> gc(NodeSelector selector) throws Exception;
+
+  /**
+   * Get a JVM thread dump for the specified nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> threadDump(NodeSelector selector) throws Exception;
+
+  /**
    * Register a listener with the specified node selector and MBean.
    * @param selector the node slector to apply to the listener.
    * @param mBeanName the name of the node mbeans to receive notifications from.

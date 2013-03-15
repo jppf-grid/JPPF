@@ -286,7 +286,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * <li>"jppf.uuid" : the uuid of the node or driver</li>
    * <li>"jppf.version.number" : the current JPPF version number</li>
    * <li>"jppf.build.number" : the current build number</li>
-   * <li>"jppf.build.date" : the build date, including the time zone, in the format “yyyy-MM-dd hh:mm z” </li>
+   * <li>"jppf.build.date" : the build date, including the time zone, in the format "yyyy-MM-dd hh:mm z" </li>
    * </ul>
    * @return a <code>TypedProperties</code> wrapper for the uuid and version information of the corresponding JPPF component.
    */

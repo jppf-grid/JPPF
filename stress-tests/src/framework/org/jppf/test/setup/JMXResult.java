@@ -48,7 +48,7 @@ public class JMXResult<V> extends Pair<String, V>
 
   /**
    * Get the diagnostics information.
-   * @return a {@link DiagnosticsInfo} instance.
+   * @return a {@link MemoryInformation} instance.
    */
   public V getResult()
   {

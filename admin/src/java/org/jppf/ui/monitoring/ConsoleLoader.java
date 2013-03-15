@@ -71,7 +71,7 @@ public class ConsoleLoader
     {
       System.out.println("Default charset: " + Charset.defaultCharset());
       startWithCheckNoDownload();
-      //startWithCheckAndDownload();
+      log.info("terminating");
     }
     catch(Exception e)
     {

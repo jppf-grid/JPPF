@@ -16,25 +16,20 @@
  * limitations under the License.
  */
 
-package org.jppf.test.addons.mbeans;
+package org.jppf.management.diagnostics.spi;
 
-import org.jppf.management.spi.JPPFDriverMBeanProvider;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
+import org.jppf.management.spi.JPPFMBeanProvider;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class DriverDiagnosticsMBeanProvider extends AbstractDiagnosticsMBeanProvider implements JPPFDriverMBeanProvider
+public abstract class AbstractDiagnosticsMBeanProvider implements JPPFMBeanProvider
 {
   @Override
-  public Object createMBean()
+  public String getMBeanInterfaceName()
   {
-    return new Diagnostics();
-  }
-
-  @Override
-  public String getMBeanName()
-  {
-    return DiagnosticsMBean.MBEAN_NAME_DRIVER;
+    return DiagnosticsMBean.class.getName();
   }
 }

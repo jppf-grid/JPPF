@@ -52,45 +52,35 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
    * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
   @Override
-  public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column)
-  {
+  public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
     DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    if (column != 0)
-    {
+    if (column >= 0) {
       int alignment = SwingConstants.LEFT;
-      switch(column)
-      {
+      switch(column) {
         case NodeTreeTableModel.NB_TASKS:
           alignment = SwingConstants.RIGHT;
           break;
+
         case NodeTreeTableModel.NODE_THREADS:
           alignment = SwingConstants.CENTER;
-          break;
-        default:
           break;
       }
       JPPFTreeTable treeTable = (JPPFTreeTable) table;
       TreePath path = treeTable.getPathForRow(row);
-      if (path != null)
-      {
+      if (path != null) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object o = node.getUserObject();
-        if (o instanceof TopologyData)
-        {
+        if (o instanceof TopologyData) {
           TopologyData data = (TopologyData) o;
-          if (data.isNode())
-          {
+          if (data.isNode()) {
             if (data.getStatus() == TopologyDataStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
-            else
-            {
+            else {
               if (!data.getNodeInformation().isActive())
                 renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
               else renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
               renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
             }
-          }
-          else
-          {
+          } else {
             renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
           }

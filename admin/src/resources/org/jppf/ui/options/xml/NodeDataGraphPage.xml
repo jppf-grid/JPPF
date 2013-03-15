@@ -54,26 +54,6 @@
 			</listener>
 		</child>
 
-		<!--
-		<child name="Layout" type="ComboBox">
-			<property name="label" value="Layout"/>
-			<property name="tooltip" value="choose a graph layout form the list"/>
-			<property name="value" value="Radial"/>
-			<property name="persistent" value="true"/>
-			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/NodeGraph").setLayout(option.getValue())</script>
-			</listener>
-			<item name="Radial" selected="false"/>
-			<item name="Circle" selected="true"/>
-			<item name="Fruchterman-Reingold" selected="false"/>
-			<item name="Fruchterman-Reingold-2" selected="false"/>
-			<item name="Self Organizing Map" selected="false"/>
-			<item name="Kamada-Kawai" selected="false"/>
-			<item name="Spring" selected="false"/>
-			<item name="Spring-2" selected="false"/>
-			<item name="Static" selected="false"/>
-		</child>
-		-->
     <child name="graph.toggle.layout" type="Button">
       <property name="toggle" value="true"/>
     </child>

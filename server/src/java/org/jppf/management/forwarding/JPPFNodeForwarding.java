@@ -27,6 +27,7 @@ import javax.management.*;
 
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.*;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.StringUtils;
@@ -283,5 +284,23 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   NodeSelectionHelper getSelectionHelper()
   {
     return selectionHelper;
+  }
+
+  @Override
+  public Map<String, Object> healthSnapshot(final NodeSelector selector) throws Exception
+  {
+    return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "healthSnapshot");
+  }
+
+  @Override
+  public Map<String, Object> threadDump(final NodeSelector selector) throws Exception
+  {
+    return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "threadDump");
+  }
+
+  @Override
+  public Map<String, Object> gc(final NodeSelector selector) throws Exception
+  {
+    return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "gc");
   }
 }

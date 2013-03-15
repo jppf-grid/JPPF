@@ -103,9 +103,11 @@
 					option.setupTableColumns();
 					option.refreshStatusBar();
 					option.setupActions();
-					def graph = option.findFirstWithName("/NodeGraph");
-					option.setGraphOption(graph);
-					graph.setTreeTableOption(option);
+          def graph = option.findFirstWithName("/NodeGraph");
+          option.setGraphOption(graph);
+          //graph.setTreeTableOption(option);
+          def healthPanel = option.findFirstWithName("/health.treetable");
+          option.setJVMHealthPanel(healthPanel);
 				</script>
 			</initializer>
 			<finalizer type="script">

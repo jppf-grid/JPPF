@@ -112,12 +112,13 @@ public class SystemInformationAction extends AbstractTopologyAction
         frame.dispose();
       }
     });
-    JEditorPane textArea = new JEditorPane("text/html", s);
+    JEditorPane editor = new JEditorPane("text/html", s);
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
-    textArea.setEditable(false);
-    textArea.setOpaque(false);
-    frame.getContentPane().add(new JScrollPane(textArea));
+    editor.setEditable(false);
+    editor.setOpaque(false);
+    editor.setCaretPosition(0);
+    frame.getContentPane().add(new JScrollPane(editor));
     frame.setLocationRelativeTo(null);
     frame.setLocation(location);
     frame.setSize(400, 400);

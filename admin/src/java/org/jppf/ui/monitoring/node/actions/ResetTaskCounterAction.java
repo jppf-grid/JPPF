@@ -81,7 +81,7 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             forwarder.resetTaskCounter(selector);
           } catch(IOException e) {
-            entry.getKey().initializeFowarder();
+            entry.getKey().initializeProxies();
             log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -31,6 +31,7 @@ import org.jppf.client.event.*;
 import org.jppf.management.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.diagnostics.JVMHealthPanel;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.monitoring.node.graph.GraphOption;
 import org.jppf.ui.options.FormattedNumberOption;
@@ -80,6 +81,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * The graph view of the topology.
    */
   private GraphOption graphOption;
+  /**
+   * Reference to the JVM health view.
+   */
+  private JVMHealthPanel jvmHealthPanel;
 
   /**
    * Initialize this panel with the specified information.
@@ -293,7 +298,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       catch(IOException e)
       {
         log.error("error getting node states for driver " + driverData.getUuid() + ", reinitializing the connection", e);
-        driverData.initializeFowarder();
+        driverData.initializeProxies();
       }
       catch(Exception e)
       {
@@ -443,9 +448,56 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       populateTreeTableModel();
       refreshNodeStates();
       if (graphOption != null) graphOption.populate();
+      addTopologyChangeListener(graphOption.getGraphHandler());
       refreshHandler = new NodeRefreshHandler(this);
     }
     this.graphOption = graphOption;
     if (debugEnabled) log.debug("end");
+  }
+
+  /**
+   * Get the JVM health view of the topology.
+   * @return a {@link JVMHealthPanel} instance.
+   */
+  public JVMHealthPanel getJVMHealthPanel()
+  {
+    return jvmHealthPanel;
+  }
+
+  /**
+   * Set the JVM health view of the topology.
+   * @param jvmHealthPanel a {@link JVMHealthPanel} instance.
+   */
+  public void setJVMHealthPanel(final JVMHealthPanel jvmHealthPanel)
+  {
+    if (debugEnabled) log.debug("start");
+    if (this.jvmHealthPanel == null)
+    {
+      if (jvmHealthPanel != null)
+      {
+        jvmHealthPanel.setNodePanel(this);
+        jvmHealthPanel.populate();
+        this.jvmHealthPanel = jvmHealthPanel;
+        addTopologyChangeListener(jvmHealthPanel);
+        jvmHealthPanel.initRefreshHandler();
+      }
+    }
+    if (debugEnabled) log.debug("end");
+  }
+
+  /**
+   * Add a topology change listener.
+   * @param listener the listener to add.
+   */
+  public void addTopologyChangeListener(final TopologyChangeListener listener) {
+    manager.addTopologyChangeListener(listener);
+  }
+
+  /**
+   * Remove a topology change listener.
+   * @param listener the listener to remove.
+   */
+  public void removeTopologyChangeListener(final TopologyChangeListener listener) {
+    manager.removeTopologyChangeListener(listener);
   }
 }

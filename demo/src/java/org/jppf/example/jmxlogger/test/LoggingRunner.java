@@ -199,9 +199,6 @@ public class LoggingRunner implements NotificationListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handleNotification(final Notification notification, final Object handback)
   {

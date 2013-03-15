@@ -36,7 +36,7 @@ public class SelectNodesAction extends AbstractSelectionAction
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public SelectNodesAction(final NodeDataPanel panel)
+  public SelectNodesAction(final AbstractTreeTableOption panel)
   {
     super(panel);
     setupIcon("/org/jppf/ui/resources/select_nodes.gif");

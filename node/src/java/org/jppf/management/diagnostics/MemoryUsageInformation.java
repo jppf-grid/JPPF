@@ -16,18 +16,23 @@
  * limitations under the License.
  */
 
-package org.jppf.test.addons.mbeans;
+package org.jppf.management.diagnostics;
 
 import java.io.Serializable;
 import java.lang.management.MemoryUsage;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * A <code>Serializable</code> implementation of {@link MemoryUsage}.
  * @author Laurent Cohen
  */
-public class JPPFMemoryUsage implements Serializable
+public class MemoryUsageInformation implements Serializable
 {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * Initial memory size.
    */
@@ -49,7 +54,7 @@ public class JPPFMemoryUsage implements Serializable
    * Initialize this object from a {@link MemoryUsage} instance.
    * @param memUsage contains the memroy usage information to use.
    */
-  public JPPFMemoryUsage(final MemoryUsage memUsage)
+  public MemoryUsageInformation(final MemoryUsage memUsage)
   {
     this.init = memUsage.getInit();
     this.committed = memUsage.getCommitted();
@@ -93,11 +98,22 @@ public class JPPFMemoryUsage implements Serializable
     return max;
   }
 
+  /**
+   * Retrun the ratio of used memory over maximum available memory.
+   * @return the ratio as a double value in the range [0, 1], or -1 if the maximum memory information is not available. 
+   */
+  public double getUsedRatio()
+  {
+    if (max <= 0) return -1d;
+    return (double) used / (double) max;
+  }
+
   @Override
   public String toString()
   {
-    NumberFormat nf = NumberFormat.getIntegerInstance();
+    NumberFormat nf = NumberFormat.getIntegerInstance(Locale.US);
     nf.setGroupingUsed(true);
+    nf.setMinimumIntegerDigits(9);
     StringBuilder sb = new StringBuilder();
     sb.append('[');
     sb.append("init=").append(nf.format(init));

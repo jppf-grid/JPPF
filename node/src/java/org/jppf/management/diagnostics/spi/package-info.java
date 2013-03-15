@@ -16,19 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.test.addons.mbeans;
-
-import org.jppf.management.spi.JPPFMBeanProvider;
-
 /**
- * 
- * @author Laurent Cohen
+ * Support for the JMX-based management of JPPF components.
  */
-public abstract class AbstractDiagnosticsMBeanProvider implements JPPFMBeanProvider
-{
-  @Override
-  public String getMBeanInterfaceName()
-  {
-    return DiagnosticsMBean.class.getName();
-  }
-}
+package org.jppf.management.diagnostics.spi;

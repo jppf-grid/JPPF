@@ -62,6 +62,7 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   {
     this.client = client;
     this.ssl = ssl;
+    this.connectionUuid = client.getUuid() + '_' + connectionCount.incrementAndGet();
     this.serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", "org.jppf.jca.serialization.JcaSerializationHelperImpl");
     configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
     status.set(DISCONNECTED);

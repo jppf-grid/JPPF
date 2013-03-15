@@ -100,9 +100,6 @@ public class GraphOption extends AbstractOption implements ActionHolder
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @SuppressWarnings("unchecked")
   public synchronized void createUI()
@@ -295,17 +292,11 @@ public class GraphOption extends AbstractOption implements ActionHolder
     return graphHandler;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setEnabled(final boolean enabled)
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void setupValueChangeNotifications()
   {

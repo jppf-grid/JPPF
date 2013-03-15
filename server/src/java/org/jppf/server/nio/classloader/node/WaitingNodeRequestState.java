@@ -167,9 +167,8 @@ class WaitingNodeRequestState extends ClassServerState
     TraversalList<String> uuidPath = resource.getUuidPath();
     ClassContext context = (ClassContext) channel.getContext();
     if (resource.getCallable() == null) b = classCache.getCacheContent(uuidPath.getFirst(), name);
-    if (b != null)
+    if ((b != null) && (resource.getData("multiple") == null) && !(resource.getData("multiple.resources.names") == null))
     {
-      if (debugEnabled) log.debug(build("found cached resource [", name, "] for node: ", channel));
       resource.setDefinition(b);
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
       return true;

@@ -272,6 +272,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     {
       URL url = getResource(name);
       if (url != null) is = url.openStream();
+      if (debugEnabled) log.debug(build("lookup for '", name, "' = ", url, " for ", this));
     }
     catch(IOException e)
     {

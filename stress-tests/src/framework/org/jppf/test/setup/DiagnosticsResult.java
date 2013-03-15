@@ -18,39 +18,39 @@
 
 package org.jppf.test.setup;
 
-import org.jppf.test.addons.mbeans.DiagnosticsInfo;
+import org.jppf.management.diagnostics.*;
 import org.jppf.utils.Pair;
 
 /**
  * Result generated when querying nodes and drivers for diagnostics via JMX.
  * @author Laurent Cohen
  */
-public class DiagnosticsResult extends Pair<DiagnosticsInfo, DiagnosticsInfo>
+public class DiagnosticsResult extends Pair<HealthSnapshot, HealthSnapshot>
 {
   /**
    * Intiialize this result with the specified jmx id and diagnostics information.
    * @param beforeGC the diagnostics before GC.
    * @param afterGC the diagnostics after GC.
    */
-  public DiagnosticsResult(final DiagnosticsInfo beforeGC, final DiagnosticsInfo afterGC)
+  public DiagnosticsResult(final HealthSnapshot beforeGC, final HealthSnapshot afterGC)
   {
     super(beforeGC, afterGC);
   }
 
   /**
    * Get the diagnostics information.
-   * @return a {@link DiagnosticsInfo} instance.
+   * @return a {@link HealthSnapshot} instance.
    */
-  public DiagnosticsInfo getDiagnosticsInfo()
+  public HealthSnapshot getDiagnosticsInfo()
   {
     return first();
   }
 
   /**
    * Get the diagnostics information after at least one GC has been performed.
-   * @return an instance of {@link DiagnosticsInfo}.
+   * @return an instance of {@link HealthSnapshot}.
    */
-  public DiagnosticsInfo getDiagnosticsInfoAfterGC()
+  public HealthSnapshot getDiagnosticsInfoAfterGC()
   {
     return second();
   }

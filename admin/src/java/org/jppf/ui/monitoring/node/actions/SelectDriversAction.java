@@ -23,7 +23,6 @@ import java.util.*;
 
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.treetable.*;
 
 /**
@@ -36,7 +35,7 @@ public class SelectDriversAction extends AbstractSelectionAction
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public SelectDriversAction(final NodeDataPanel panel)
+  public SelectDriversAction(final AbstractTreeTableOption panel)
   {
     super(panel);
     setupIcon("/org/jppf/ui/resources/select_drivers.gif");

@@ -22,7 +22,6 @@ import java.util.*;
 
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.node.NodeDataPanel;
 import org.jppf.ui.treetable.*;
 
 /**
@@ -38,13 +37,13 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
   /**
    * The tree table panel to which this action applies.
    */
-  protected final NodeDataPanel panel;
+  protected final AbstractTreeTableOption panel;
 
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public AbstractSelectionAction(final NodeDataPanel panel)
+  public AbstractSelectionAction(final AbstractTreeTableOption panel)
   {
     this.panel = panel;
     setEnabled(true);

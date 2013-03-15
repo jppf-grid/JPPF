@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.node.*;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -32,12 +32,12 @@ import edu.uci.ics.jung.graph.SparseMultigraph;
  * This class handles operations on the graph.
  * <p>It actually holds 2 graphs:
  * <ul>
- * <li>one, the full graph, which contains the entire set of vertices (representing drviers and nodes)</li>  
+ * <li>one, the full graph, which contains the entire set of vertices (representing drviers and nodes)</li>
  * <li>another one, the displayed graph, where the collapsed nodes are filtered out</li>
- * </ul>  
+ * </ul>
  * @author Laurent Cohen
  */
-public class GraphTopologyHandler
+public class GraphTopologyHandler implements TopologyChangeListener
 {
   /**
    * Logger for this class.
@@ -115,12 +115,12 @@ public class GraphTopologyHandler
       {
         DefaultMutableTreeNode driver = (DefaultMutableTreeNode) root.getChildAt(i);
         TopologyData driverData = (TopologyData) driver.getUserObject();
-        driverAdded(driverData);
+        driverAdded(new TopologyChangeEvent(graphOption.treeTableOption, driverData, null, null));
         for (int j=0; j<driver.getChildCount(); j++)
         {
           DefaultMutableTreeNode child = (DefaultMutableTreeNode) driver.getChildAt(j);
           TopologyData nodeData = (TopologyData) child.getUserObject();
-          nodeAdded(driverData, nodeData, null);
+          nodeAdded(new TopologyChangeEvent(graphOption.treeTableOption, driverData, nodeData, null));
         }
       }
     }
@@ -132,12 +132,10 @@ public class GraphTopologyHandler
     if (debugEnabled) log.debug("end populate");
   }
 
-  /**
-   * Called when a driver was added in the topology.
-   * @param driver the data representing the driver.
-   */
-  public void driverAdded(final TopologyData driver)
+  @Override
+  public void driverAdded(final TopologyChangeEvent event)
   {
+    TopologyData driver = event.getDriverData();
     synchronized(drivers)
     {
       if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
@@ -157,12 +155,10 @@ public class GraphTopologyHandler
     if (debugEnabled) log.debug("added driver " + driver + " to graph");
   }
 
-  /**
-   * Called when a driver was removed from the topology.
-   * @param driver the data representing the driver.
-   */
-  public void driverRemoved(final TopologyData driver)
+  @Override
+  public void driverRemoved(final TopologyChangeEvent event)
   {
+    TopologyData driver = event.getDriverData();
     synchronized(drivers)
     {
       drivers.remove(driver.getUuid());
@@ -173,19 +169,16 @@ public class GraphTopologyHandler
     if (debugEnabled) log.debug("removed driver " + driver + " from graph");
   }
 
-  /**
-   * Called when a node was added in the topology.
-   * @param driver the driver to which the node is added.
-   * @param node the data representing the node.
-   * @param peerDriver non-null if the node is a peer driver, rpresents the driver it is connected to.
-   */
-  public void nodeAdded(final TopologyData driver, final TopologyData node, final TopologyData peerDriver)
+  @Override
+  public void nodeAdded(final TopologyChangeEvent event)
   {
+    TopologyData driver = event.getDriverData();
+    TopologyData node = event.getNodeData();
+    TopologyData peerDriver = event.getPeerData();
     synchronized(drivers)
     {
       if (peerDriver != null)
       {
-        //TopologyData other = drivers.get(peerDriver.getId());
         node.setClientConnection(peerDriver.getClientConnection());
         node.setJmxWrapper(peerDriver.getJmxWrapper());
         insertPeerVertex(driver, peerDriver);
@@ -206,13 +199,11 @@ public class GraphTopologyHandler
     if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node + " to driver " + driver);
   }
 
-  /**
-   * Called when a node was removed from the topology.
-   * @param driver the driver to which the node is added.
-   * @param node the data representing the node.
-   */
-  public void nodeRemoved(final TopologyData driver, final TopologyData node)
+  @Override
+  public void nodeRemoved(final TopologyChangeEvent event)
   {
+    TopologyData driver = event.getDriverData();
+    TopologyData node = event.getNodeData();
     removeVertex(node);
     graphOption.repaintGraph(graphOption.isAutoLayout());
     if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
@@ -220,14 +211,15 @@ public class GraphTopologyHandler
 
   /**
    * Called when the state information of a node has changed.
-   * @param driver the driver to which the node is attached.
-   * @param node the node to update.
+   * {@inheritDoc}
    */
-  public void nodeDataUpdated(final TopologyData driver, final TopologyData node)
+  @Override
+  public void dataUpdated(final TopologyChangeEvent event)
   {
+    TopologyData driver = event.getDriverData();
+    TopologyData node = event.getNodeData();
     if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
     graphOption.repaintGraph(false);
-    //graphOption.repaintGraph(graphOption.isAutoLayout());
   }
 
   /**

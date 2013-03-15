@@ -162,7 +162,7 @@ public class NodeThreadsAction extends AbstractTopologyAction
             forwarder.updateThreadPoolSize(selector, nbThreads);
             forwarder.updateThreadsPriority(selector, priority);
           } catch(IOException e) {
-            entry.getKey().initializeFowarder();
+            entry.getKey().initializeProxies();
             log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
