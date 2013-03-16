@@ -21,12 +21,12 @@ package org.jppf.test.scenario.s3;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.client.utils.JobHelper;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
-import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * 
@@ -62,7 +62,7 @@ public class S3Runner extends AbstractScenarioRunner
       for (int i=1; i<=nbJobs; i++)
       {
         long start = System.nanoTime();
-        JPPFJob job = BaseTestHelper.createJob("S3-job-" + i, true, false, nbTasks, MyTask.class, count);
+        JPPFJob job = JobHelper.createJob("S3-job-" + i, true, false, nbTasks, MyTask.class, count);
         job.getMetadata().setParameter("job.name", "job-" + i);
         List<JPPFTask> results = getSetup().getClient().submit(job);
         long elapsed = (System.nanoTime() - start) / 1000000L;

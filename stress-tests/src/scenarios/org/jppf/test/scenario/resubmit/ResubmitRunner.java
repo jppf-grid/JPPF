@@ -23,12 +23,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.client.utils.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.test.scenario.AbstractScenarioRunner;
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
-
-import test.org.jppf.test.setup.common.*;
 
 /**
  * Testing the resubmission of a job when the driver is disconnected.
@@ -55,7 +54,7 @@ public class ResubmitRunner extends AbstractScenarioRunner
     try
     {
       long start = System.nanoTime();
-      JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
+      JPPFJob job = JobHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
       job.addJobListener(new MyJobListener());
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       getSetup().getClient().submit(job);

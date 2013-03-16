@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.test.scenario.ScenarioConfiguration;
 
 /**
  * 
@@ -51,11 +52,13 @@ public class JMXHandler
    * Check that the driver and all nodes have been started and are accessible.
    * @param nbDrivers the number of drivers that were started.
    * @param nbNodes the number of nodes that were started.
+   * @param config the configuration of the scenario.
    * @throws Exception if any error occurs.
    */
-  public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
+  public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes, final ScenarioConfiguration config) throws Exception
   {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
+    if (!config.getProperties().getBoolean("jppf.scenario.check.drivers", true)) return;
     Map<Integer, JPPFClientConnection> connectionMap = new HashMap<Integer, JPPFClientConnection>();
     boolean allConnected = false;
     while (!allConnected)
@@ -72,6 +75,7 @@ public class JMXHandler
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
+    if (!config.getProperties().getBoolean("jppf.scenario.check.jmx", true)) return;
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
     {
       JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) entry.getValue();

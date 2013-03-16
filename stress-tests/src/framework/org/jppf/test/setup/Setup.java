@@ -111,7 +111,7 @@ public class Setup
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
     }
     client = createClient(null, true);
-    jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+    jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes, config);
     return client;
   }
 

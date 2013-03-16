@@ -62,7 +62,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
       for (int i=1; i<=iterations; i++)
       {
         long start = System.nanoTime();
-        getSetup().getJmxHandler().checkDriverAndNodesInitialized(1, nbNodes);
+        getSetup().getJmxHandler().checkDriverAndNodesInitialized(1, nbNodes, getConfiguration());
         //restartNodes(jmxDriver.nodesInformation());
         restartDriver();
         long elapsed = System.nanoTime() - start;
