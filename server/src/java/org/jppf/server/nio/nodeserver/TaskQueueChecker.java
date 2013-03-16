@@ -298,7 +298,6 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    */
   private ServerTaskBundleNode prepareJobDispatch(final T channel, final ServerJob selectedBundle)
   {
-    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
     try
     {
@@ -312,6 +311,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
       profile.setSize(1);
       setBundler(new FixedSizeBundler(profile));
     }
+    if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " (" + size + " task) to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     return queue.nextBundle(selectedBundle, size);
   }
 
@@ -351,7 +351,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
         iterator.remove();
         continue;
       }
-      if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + ch.getUuid());
+      if (traceEnabled) log.trace("uuid path=" + uuidPath + ", node uuid=" + ch.getUuid());
       if (uuidPath.contains(ch.getUuid()))
       {
         if (debugEnabled) log.debug("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + ch.getUuid());
@@ -370,10 +370,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
         {
           log.error("An error occurred while running the execution policy to determine node participation.", ex);
         }
-        if (debugEnabled)
-        {
-          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
-        }
+        if (traceEnabled) log.trace("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
         if (!b) continue;
       }
       // add a bias toward local node
@@ -384,7 +381,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
       acceptableChannels.add(ch);
     }
     int size = acceptableChannels.size();
-    if (debugEnabled) log.debug("found " + size + " acceptable channels");
+    if (traceEnabled) log.trace("found " + size + " acceptable channels");
     if (size > 0)
     {
       return acceptableChannels.get(size > 1 ? random.nextInt(size) : 0);
@@ -403,12 +400,12 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   {
     if (bundle.isCancelled()) return false;
     JobSLA sla = bundle.getJob().getSLA();
-    if (debugEnabled)
+    if (traceEnabled)
     {
       String s = StringUtils.build("job '", bundle.getName(), "' : ",
         "suspended=", sla.isSuspended(), ", pending=", bundle.isPending(),
         ", expired=", bundle.isJobExpired());
-      log.debug(s);
+      log.trace(s);
     }
     if (sla.isSuspended()) return false;
     boolean b = bundle.isPending();
@@ -417,7 +414,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     if (b) return false;
     int maxNodes = sla.getMaxNodes();
     int n = bundle.getNbChannels();
-    if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
+    if (traceEnabled) log.trace("current nodes = " + n + ", maxNodes = " + maxNodes);
     return n < maxNodes;
   }
 

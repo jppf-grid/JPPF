@@ -523,7 +523,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   protected int getSize(final ServerJob bundleWrapper)
   {
-    //return bundleWrapper.getTaskCount();
-    return bundleWrapper.getInitialTaskCount();
+    return bundleWrapper.getTaskCount();
+    //return bundleWrapper.getInitialTaskCount();
   }
 }
