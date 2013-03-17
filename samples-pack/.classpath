@@ -8,6 +8,7 @@
 	<classpathentry kind="src" output="ExtendedClassLoading/classes2" path="ExtendedClassLoading/src2"/>
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
+	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
 	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
 	<classpathentry kind="src" output="InitializationHook/classes" path="InitializationHook/src"/>
 	<classpathentry kind="src" path="JobRecovery/src"/>
@@ -58,5 +59,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
+	<classpathentry kind="lib" path="GPU/lib/aparapi.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>

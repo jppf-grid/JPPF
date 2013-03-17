@@ -40,7 +40,8 @@
 		<antcall target="include.code"><param name="sample" value="CustomLoadBalancer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
 		<antcall target="include.code"><param name="sample" value="ExtendedClassLoading"/></antcall>
-		<antcall target="include.code"><param name="sample" value="FTPServer"/></antcall>
+    <antcall target="include.code"><param name="sample" value="FTPServer"/></antcall>
+    <antcall target="include.code"><param name="sample" value="GPU"/></antcall>
 		<antcall target="include.code"><param name="sample" value="IdleSystem"/></antcall>
 		<antcall target="include.code"><param name="sample" value="InitializationHook"/></antcall>
 		<antcall target="include.code"><param name="sample" value="JobRecovery"/></antcall>
@@ -79,7 +80,8 @@
 				<include name="shared/images/*.*"/>
 				<include name="DataDependency/images/*.gif"/>
 				<include name="NodeTray/images/*.gif"/>
-				<include name="Nbody/images/*.gif"/>
+        <include name="Nbody/images/*.gif"/>
+        <include name="GPU/**/*.c"/>
 			</fileset>
 		</copy>
 		<!-- remove HTML-converted files after the zip is created -->

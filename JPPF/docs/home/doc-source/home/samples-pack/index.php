@@ -26,6 +26,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
 	<li><a href="JobRecovery/Readme.php">Job recovery after an application crash</a></li>
 	<li><a href="InitializationHook/Readme.php">Using a node initialization hook to implement a sophisticated failover mechanism</a></li>
 	<li><a href="ExtendedClassLoading/Readme.php">On-demand management and deployment of appplication libraries in the Grid</a></li>
+	<li><a href="GPU/Readme.php">Harnessing the power of the GPU with APARAPI</a></li>
 </ul>
 <br>
 
