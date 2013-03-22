@@ -112,22 +112,22 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public void addBundle(final ServerTaskBundleClient clientBundle)
-  {
+  public void addBundle(final ServerTaskBundleClient clientBundle) {
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
 
     JobSLA sla = clientBundle.getSLA();
     final String jobUuid = clientBundle.getUuid();
     lock.lock();
     try {
-      if (sla.isBroadcastJob())
-      {
+      if (sla.isBroadcastJob()) {
         if (debugEnabled) log.debug("before processing broadcast job " + clientBundle.getJob());
         processBroadcastJob(clientBundle);
       } else {
         boolean queued;
         ServerJob serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
+          int n = clientBundle.getJob().getTaskCount();
+          clientBundle.getJob().setParameter("driverQueueTaskCount", n);
           queued = true;
           serverJob = new ServerJob(lock, jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
           jobManager.jobQueued(serverJob);
@@ -523,7 +523,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   protected int getSize(final ServerJob bundleWrapper)
   {
-    return bundleWrapper.getTaskCount();
-    //return bundleWrapper.getInitialTaskCount();
+    Integer n = (Integer) bundleWrapper.getJob().getParameter("driverQueueTaskCount");
+    if (n == null) n = bundleWrapper.getTaskCount();
+    return n;
+    //return bundleWrapper.getTaskCount();
   }
 }
