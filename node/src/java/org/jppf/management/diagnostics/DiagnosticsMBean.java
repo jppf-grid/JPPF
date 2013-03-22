@@ -70,37 +70,16 @@ public interface DiagnosticsMBean extends NotificationEmitter
   Boolean hasDeadlock() throws Exception;
 
   /**
-   * Get the threshold of the used/max ratio for issuing memory usage warnings.
-   * @return the threshold as a double value in the range [0, 1].
-   * @throws Exception if any error occurs.
-   */
-  Double getMemoryWarningThreshold() throws Exception;
-
-  /**
-   * Set the threshold of the used/max ratio for issuing memory usage warnings.
-   * @param threshold the threshold as a double value in the range [0, 1].
-   * @throws Exception if any error occurs.
-   */
-  void setMemoryWarningThreshold(Double threshold) throws Exception;
-
-  /**
-   * Get the threshold of the used/max ratio for issuing memory usage critical alerts.
-   * @return the threshold as a double value in the range [0, 1].
-   * @throws Exception if any error occurs.
-   */
-  Double getMemoryCriticalThreshold() throws Exception;
-  
-  /**
-   * Set the threshold of the used/max ratio for issuing memory usage critical alerts.
-   * @param threshold the threshold as a double value in the range [0, 1].
-   * @throws Exception if any error occurs.
-   */
-  void setMemoryCriticalThreshold(Double threshold) throws Exception;
-
-  /**
    * Get a summarized snapshot of the JVM health.
    * @return a {@link HealthSnapshot} instance.
    * @throws Exception if any error occurs.
    */
   HealthSnapshot healthSnapshot() throws Exception;
+
+  /**
+   * Trigger a heap dump of the JVM.
+   * @return a message describing the outcome.
+   * @throws Exception if any error occurs. 
+   */
+  String heapDump() throws Exception;
 }

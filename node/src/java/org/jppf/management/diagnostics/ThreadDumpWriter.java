@@ -18,11 +18,13 @@
 
 package org.jppf.management.diagnostics;
 
+import java.io.Closeable;
+
 /**
  * Interface for printing a thread dump.
  * @author Laurent Cohen
  */
-public interface ThreadDumpWriter
+public interface ThreadDumpWriter extends Closeable
 {
   /**
    * Print the specified string without line terminator.

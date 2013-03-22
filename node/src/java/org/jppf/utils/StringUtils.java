@@ -21,6 +21,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
 import java.nio.charset.Charset;
+import java.text.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -62,8 +63,7 @@ public final class StringUtils
   /**
    * Instantiation of this class is not permitted.
    */
-  private StringUtils()
-  {
+  private StringUtils() {
   }
 
   /**
@@ -75,14 +75,12 @@ public final class StringUtils
    * @param maxLen the length of the formatted string.
    * @return a string formatted to the specified length.
    */
-  public static String padLeft(final String source, final char padChar, final int maxLen)
-  {
+  public static String padLeft(final String source, final char padChar, final int maxLen) {
     StringBuilder sb = new StringBuilder();
     String src = (source == null) ? "" : source;
     int length = src.length();
     if (length > maxLen) return source;
-    else
-    {
+    else {
       for (int i=0; i<maxLen-length; i++) sb.append(padChar);
       sb.append(src);
     }
@@ -99,8 +97,7 @@ public final class StringUtils
    * if its length is greater than the padding length
    * @return the padded (or truncated) string
    */
-  public static String padRight(final String source, final char padChar, final int maxLen)
-  {
+  public static String padRight(final String source, final char padChar, final int maxLen) {
     String s = source;
     if (s == null) s = "";
     if (s.length() > maxLen) s = s.substring(0, maxLen);
@@ -114,8 +111,7 @@ public final class StringUtils
    * @param bytes the array that contains the sequence of byte values to convert.
    * @return the converted bytes as a string of space-separated hexadecimal numbers.
    */
-  public static String toHexString(final byte[] bytes)
-  {
+  public static String toHexString(final byte[] bytes) {
     return toHexString(bytes, 0, bytes.length, null);
   }
 
@@ -128,14 +124,11 @@ public final class StringUtils
    * @param sep the separator between hexadecimal numbers in the resulting string. If null, then no separator is used.
    * @return the converted bytes as a string of space-separated hexadecimal numbers.
    */
-  public static String toHexString(final byte[] bytes, final int start, final int length, final String sep)
-  {
+  public static String toHexString(final byte[] bytes, final int start, final int length, final String sep) {
     StringBuilder sb = new StringBuilder();
-    if (length >= 0)
-    {
+    if (length >= 0) {
       boolean sepNotNull = sep != null;
-      for (int i=start; i<Math.min(bytes.length, start+length); i++)
-      {
+      for (int i=start; i<Math.min(bytes.length, start+length); i++) {
         if (sepNotNull && (i > start)) sb.append(sep);
         byte b = bytes[i];
         sb.append(HEX_DIGITS[(b & 0xF0) >> 4]);
@@ -150,13 +143,11 @@ public final class StringUtils
    * @param hexString the string to convert.
    * @return the resulting array of bytes.
    */
-  public static byte[] toBytes(final String hexString)
-  {
+  public static byte[] toBytes(final String hexString) {
     String[] bytes = hexString.split("\\s");
     List<Byte> list = new ArrayList<Byte>(bytes.length);
     byte[] result = new byte[list.size()];
-    for (int i=0; i<bytes.length; i++)
-    {
+    for (int i=0; i<bytes.length; i++) {
       int n = Byte.parseByte(bytes[i].substring(0, 1), 16);
       n = 16 * n + Byte.parseByte(bytes[i].substring(1), 16);
       result[i] = Byte.valueOf((byte) n);
@@ -187,19 +178,14 @@ public final class StringUtils
    * @param channel the channel to get the host from.
    * @return an IP address as a string.
    */
-  public static String getRemoteHost(final Channel channel)
-  {
+  public static String getRemoteHost(final Channel channel) {
     StringBuilder sb = new StringBuilder();
-    if (channel instanceof SocketChannel)
-    {
-      if (channel.isOpen())
-      {
+    if (channel instanceof SocketChannel) {
+      if (channel.isOpen()) {
         Socket s = ((SocketChannel)channel).socket();
         sb.append(getRemoteHost(s.getRemoteSocketAddress()));
-      }
-      else sb.append("[channel closed]");
-    }
-    else sb.append("[JVM-local]");
+      } else sb.append("[channel closed]");
+    } else sb.append("[JVM-local]");
     return sb.toString();
   }
 
@@ -208,11 +194,9 @@ public final class StringUtils
    * @param address the address to get the host from.
    * @return an IP address as a string.
    */
-  public static String getRemoteHost(final SocketAddress address)
-  {
+  public static String getRemoteHost(final SocketAddress address) {
     StringBuilder sb = new StringBuilder();
-    if (address instanceof InetSocketAddress)
-    {
+    if (address instanceof InetSocketAddress) {
       InetSocketAddress add = (InetSocketAddress) address;
       sb.append(add.getHostName()).append(':').append(add.getPort());
     }
@@ -226,8 +210,7 @@ public final class StringUtils
    * @param array the array from which to build a string representation.
    * @return the array's content as a string.
    */
-  public static <T> String arrayToString(final T...array)
-  {
+  public static <T> String arrayToString(final T...array) {
     return arrayToString(",", "[", "]", array);
   }
 
@@ -240,15 +223,12 @@ public final class StringUtils
    * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
    * @return the array's content as a string.
    */
-  public static <T> String arrayToString(final String sep, final String prefix, final String suffix, final T...array)
-  {
+  public static <T> String arrayToString(final String sep, final String prefix, final String suffix, final T...array) {
     StringBuilder sb = new StringBuilder();
     if (array == null) sb.append("null");
-    else
-    {
+    else {
       if (prefix != null) sb.append(prefix);
-      for (int i=0; i<array.length; i++)
-      {
+      for (int i=0; i<array.length; i++) {
         if ((i > 0) && (sep != null)) sb.append(sep);
         sb.append(array[i]);
       }
@@ -262,19 +242,14 @@ public final class StringUtils
    * @param s list of space-separated port numbers
    * @return an array of int port numbers.
    */
-  public static int[] parseIntValues(final String s)
-  {
+  public static int[] parseIntValues(final String s) {
     String[] strPorts = s.split("\\s");
     int[] ports = new int[strPorts.length];
-    for (int i=0; i<strPorts.length; i++)
-    {
-      try
-      {
+    for (int i=0; i<strPorts.length; i++) {
+      try {
         int n = Integer.valueOf(strPorts[i].trim());
         ports[i] = n;
-      }
-      catch(NumberFormatException e)
-      {
+      } catch(NumberFormatException e) {
         return null;
       }
     }
@@ -286,12 +261,10 @@ public final class StringUtils
    * @param ports list of port numbers
    * @return a space-separated list of ports.
    */
-  public static String buildString(final int[] ports)
-  {
+  public static String buildString(final int[] ports) {
     if ((ports == null) || (ports.length == 0)) return "";
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<ports.length; i++)
-    {
+    for (int i=0; i<ports.length; i++) {
       if (i > 0) sb.append(' ');
       sb.append(ports[i]);
     }
@@ -303,8 +276,7 @@ public final class StringUtils
    * @param args the tokens composing the string.
    * @return the concatenation of the string values of the tokens.
    */
-  public static String build(final Object...args)
-  {
+  public static String build(final Object...args) {
     if (args == null) return null;
     StringBuilder sb = new StringBuilder();
     for (Object o: args) sb.append(o);
@@ -318,12 +290,10 @@ public final class StringUtils
    * @param values the values to match the source with.
    * @return true if the source matches one of the values, false otherwise.
    */
-  public static boolean startsWithOneOf(final String source, final boolean ignoreCase, final String...values)
-  {
+  public static boolean startsWithOneOf(final String source, final boolean ignoreCase, final String...values) {
     if ((source == null) || (values == null)) return false;
     String s = ignoreCase ? source.toLowerCase(): source;
-    for (String val: values)
-    {
+    for (String val: values) {
       if (val == null) continue;
       String s2 = ignoreCase ? val.toLowerCase() : val;
       if (s.startsWith(s2)) return true;
@@ -338,12 +308,10 @@ public final class StringUtils
    * @param values the values to match the source with.
    * @return true if the source matches one of the values, false otherwise.
    */
-  public static boolean isOneOf(final String source, final boolean ignoreCase, final String...values)
-  {
+  public static boolean isOneOf(final String source, final boolean ignoreCase, final String...values) {
     if ((source == null) || (values == null)) return false;
     String s = ignoreCase ? source.toLowerCase(): source;
-    for (String val: values)
-    {
+    for (String val: values) {
       if (val == null) continue;
       String s2 = ignoreCase ? val.toLowerCase() : val;
       if (s.equals(s2)) return true;
@@ -359,15 +327,12 @@ public final class StringUtils
    */
   public static int[] toIntArray(final String source, final Pattern separatorPattern)
   {
-    try
-    {
+    try {
       String[] vals = separatorPattern.split(source);
       int[] result = new int[vals.length];
       for (int i=0; i<vals.length; i++) result[i] = Integer.valueOf(vals[i]);
       return result;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
   }
@@ -376,15 +341,11 @@ public final class StringUtils
    * Create an instance of the UTF-8 charset.
    * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.
    */
-  private static Charset makeUTF8()
-  {
+  private static Charset makeUTF8() {
     Charset utf8 = null;
-    try
-    {
+    try {
       utf8 = Charset.forName("UTF-8");
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       //log.error("Charset UTF-8 could not be instantiated", e);
       return null;
     }
@@ -398,28 +359,19 @@ public final class StringUtils
    * @param indentation the indentation to use.
    * @return the indented string.
    */
-  public static String indent(final String source, final String indentation)
-  {
+  public static String indent(final String source, final String indentation) {
     if (source == null) throw new IllegalArgumentException("source can't be null");
     if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
     boolean endsWithNewline = source.endsWith("\n") || source.endsWith("\r");
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = null;
-    try
-    {
+    try {
       reader = new BufferedReader(new StringReader(source));
       String s;
-      while ((s = reader.readLine()) != null)
-      {
-        sb.append(indentation).append(s).append('\n');
-      }
+      while ((s = reader.readLine()) != null) sb.append(indentation).append(s).append('\n');
       if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
-    }
-    catch(Exception e)
-    {
-    }
-    finally
-    {
+    } catch(Exception ignore) {
+    } finally {
       if (reader != null) StreamUtils.closeSilent(reader);
     }
     return sb.toString();
@@ -430,22 +382,15 @@ public final class StringUtils
    * @param source the source string.
    * @return a TypedProperties instance containing the entries of the source string.
    */
-  public static TypedProperties toProperties(final String source)
-  {
+  public static TypedProperties toProperties(final String source) {
     TypedProperties props = new TypedProperties();
-    if (source != null)
-    {
+    if (source != null) {
       BufferedReader reader = null;
-      try
-      {
+      try {
         reader = new BufferedReader(new StringReader(source));
         props.load(reader);
-      }
-      catch(Exception ignore)
-      {
-      }
-      finally
-      {
+      } catch(Exception ignore) {
+      } finally {
         if (reader != null) StreamUtils.closeSilent(reader);
       }
     }
@@ -457,24 +402,20 @@ public final class StringUtils
    * @param leafClassLoader the class loader at the bottom of the hierarchy.
    * @return a string representation of the class loader hierarchy.
    */
-  public static String printClassLoaderHierarchy(final ClassLoader leafClassLoader)
-  {
+  public static String printClassLoaderHierarchy(final ClassLoader leafClassLoader) {
     StringBuilder sb = new StringBuilder();
     ClassLoader cl = leafClassLoader;
-    if (cl != null)
-    {
+    if (cl != null) {
       sb.append("class loader hierarchy:\n");
       Stack<String> stack = new Stack<String>();
-      while (cl != null)
-      {
+      while (cl != null) {
         if (cl instanceof AbstractJPPFClassLoader) stack.push(cl.toString());
         else if (cl instanceof URLClassLoader) stack.push(toString((URLClassLoader) cl));
         else  stack.push(cl.toString());
         cl = cl.getParent();
       }
       int count = 0;
-      while (!stack.isEmpty())
-      {
+      while (!stack.isEmpty()) {
         for (int i=0; i<2*count; i++) sb.append(' ');
         sb.append(stack.pop());
         if (!stack.isEmpty()) sb.append('\n');
@@ -490,20 +431,43 @@ public final class StringUtils
    * @param cl  the classloader to print.
    * @return a string representation of the input class loader.
    */
-  public static String toString(final URLClassLoader cl)
-  {
+  public static String toString(final URLClassLoader cl) {
     StringBuilder sb = new StringBuilder();
     sb.append(cl.getClass().getSimpleName()).append("[classpath=");
     URL[] urls = cl.getURLs();
-    if ((urls != null) && (urls.length > 0))
-    {
-      for (int i=0; i<urls.length; i++)
-      {
+    if ((urls != null) && (urls.length > 0)) {
+      for (int i=0; i<urls.length; i++) {
         if (i > 0) sb.append(';');
         sb.append(urls[i]);
       }
     }
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Parse a Number from a String.
+   * @param source the string to parse.
+   * @return the source parsed as a number or <code>null</code> if it could not be parsed as a number.
+   */
+  public static Number parseNumber(final String source) {
+    return parseNumber(source, null);
+  }
+
+  /**
+   * Parse a Number from a String.
+   * @param source the string to parse.
+   * @param def the default value to return if the source cannot be parsed.
+   * @return the source parsed as a number or <code>def</code> if it could not be parsed as a number.
+   */
+  public static Number parseNumber(final String source, final Number def) {
+    if (source == null) return def;
+    NumberFormat nf = NumberFormat.getInstance();
+    try {
+      return nf.parse(source);
+    } catch (ParseException ignore) {
+      //ignore.printStackTrace();
+    }
+    return null;
   }
 }

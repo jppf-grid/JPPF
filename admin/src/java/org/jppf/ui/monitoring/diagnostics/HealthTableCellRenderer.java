@@ -20,15 +20,16 @@ package org.jppf.ui.monitoring.diagnostics;
 
 import static org.jppf.ui.treetable.AbstractTreeCellRenderer.*;
 
-import java.awt.Component;
+import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.*;
 
-import org.jppf.management.diagnostics.*;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.ui.monitoring.diagnostics.Thresholds.Name;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -42,6 +43,19 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    * The insets for this renderer.
    */
   private Border border = BorderFactory.createEmptyBorder(0, 2, 0, 2);
+  /**
+   * The JVM Health Panel option.
+   */
+  private final JVMHealthPanel healthPanel;
+
+  /**
+   * Initialize this renderer.
+   * @param healthPanel the JVM Health Panel option.
+   */
+  public HealthTableCellRenderer(final JVMHealthPanel healthPanel)
+  {
+    this.healthPanel = healthPanel;
+  }
 
   /**
    * Returns the default table cell renderer.
@@ -62,12 +76,12 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
       switch(column) {
         case JVMHealthTreeTableModel.HEAP_MEM_MB:
         case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
-        case JVMHealthTreeTableModel.LIVE_THREADS:
+        case JVMHealthTreeTableModel.THREADS:
           alignment = SwingConstants.RIGHT;
           break;
 
         case JVMHealthTreeTableModel.CPU_LOAD:
-        case JVMHealthTreeTableModel.DEADLOCK_STATUS:
+        //case JVMHealthTreeTableModel.DEADLOCK_STATUS:
         case JVMHealthTreeTableModel.HEAP_MEM_PCT:
         case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
           alignment = SwingConstants.CENTER;
@@ -84,21 +98,27 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
           TopologyData data = (TopologyData) o;
           HealthSnapshot health = data.getHealthSnapshot();
           switch(column) {
-            case JVMHealthTreeTableModel.DEADLOCK_STATUS:
+            case JVMHealthTreeTableModel.THREADS:
               if (health.isDeadlocked()) {
                 renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
                 iconPath = CRITICAL_ICON;
+                Rectangle r = table.getCellRect(row, column, false);
+                int n = r == null ? 4 : r.width - 36;
+                renderer.setIconTextGap(n < 4 ? 4 : n);
               } else {
                 renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
               }
               break;
             case JVMHealthTreeTableModel.HEAP_MEM_MB:
             case JVMHealthTreeTableModel.HEAP_MEM_PCT:
-              computeColor(renderer, table, health.getHeapLevel(), selected);
+              computeColor(renderer, table, health.getHeapUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
             case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
             case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
-              computeColor(renderer, table, health.getNonheapLevel(), selected);
+              computeColor(renderer, table, health.getNonheapUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              break;
+            case JVMHealthTreeTableModel.CPU_LOAD:
+              computeColor(renderer, table, health.getCpuLoad(), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             default:
               renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());
@@ -118,25 +138,16 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    * Compute a background and foreground color based on an alert level and selection state.
    * @param renderer the component onto which to set the colors.
    * @param table the JTable to render.
-   * @param level the alert level.
+   * @param value the value to compare to thresholds.
    * @param selected the selection state.
+   * @param warning name of the threshold for warning level of the value.
+   * @param critical name of the threshold for critical level of the value.
    */
-  private void computeColor(final DefaultTableCellRenderer renderer, final JTable table, final AlertLevel level, final boolean selected)
+  private void computeColor(final DefaultTableCellRenderer renderer, final JTable table, final double value, final boolean selected, final Name warning, final Name critical)
   {
-    switch(level)
-    {
-      case UNKNOWN:
-        renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());
-        break;
-      case NORMAL:
-        renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
-        break;
-      case WARNING:
-        renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
-        break;
-      case CRITICAL:
-        renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
-        break;
-    }
+    Thresholds thr = healthPanel.thresholds;
+    if (value < thr.getValue(warning)) renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
+    else if (value < thr.getValue(critical)) renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
+    else renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);
   }
 }

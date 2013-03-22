@@ -57,7 +57,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
   /**
    * Crititcal icon.
    */
-  public static final String CRITICAL_ICON = RESOURCES + "critical.gif";
+  public static final String CRITICAL_ICON = RESOURCES + "critical2.gif";
   /**
    * Happy smiley.
    */

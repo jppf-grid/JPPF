@@ -31,7 +31,8 @@
 		<property name="layoutConstraints" value="insets 4 2 0 2"/>
 
 		<child name="health.gc" type="Button"/>
-		<child name="health.thread.dump" type="Button"/>
+    <child name="health.thread.dump" type="Button"/>
+    <child name="health.heap.dump" type="Button"/>
 
 		<!--
 		<child name="sep2" type="ToolbarSeparator"/>
@@ -45,6 +46,9 @@
 			</listener>
 		</child>
 		-->
+
+    <child name="sep2" type="ToolbarSeparator"/>
+    <child name="health.update.thresholds" type="Button"/>
 
     <child name="sep3" type="ToolbarSeparator"/>
     <child name="health.expand" type="Button">
@@ -84,6 +88,7 @@
       <initializer type="script">
         <script language="groovy">
           option.setupTableColumns();
+          option.loadThresholds();
           option.setupActions();
         </script>
       </initializer>

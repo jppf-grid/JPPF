@@ -19,11 +19,12 @@
 package org.jppf.ui.actions;
 
 import java.awt.Point;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
 
+import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.event.ValueChangeEvent;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LocalizationUtils;
@@ -134,5 +135,22 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
   protected void runAction(final Runnable r)
   {
     new Thread(r, getClass().getSimpleName()).start();
+  }
+
+  /**
+   * Associate a keybord virtual key with an action.
+   * @param option contains the {@link JComponent} whose {@link InputMap} and {@link ActionMap} this method modifies.
+   * @param vkey the virtual key code to associate with the action, built from
+   * one of the values in {@link KeyEvent}, for instance: <code>KeyEvent.VK_ENTER</code>.
+   * @param action the action to trigger upon pressing the keyboard key.
+   * @param actionKey a key to use int he {@link ActionMap}.
+   */
+  protected void setKeyAction(final OptionElement option, final KeyStroke vkey, final Action action, final Object actionKey )
+  {
+    JComponent comp = option.getUIComponent();
+    InputMap inputMap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    inputMap.put(vkey, actionKey);
+    ActionMap map = comp.getActionMap();
+    map.put(actionKey, action);
   }
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.diagnostics;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -24,19 +24,20 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 
 import org.jppf.ui.actions.JTreeTableActionHandler;
+import org.jppf.ui.monitoring.node.AbstractTopologyMouseListener;
 
 /**
- * Mouse listener for the node data panel.
+ * Mouse listener for the JVM health panel.
  * Processes right-click events to display popup menus.
  * @author Laurent Cohen
  */
-public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener
+public class JVMHealthTreeTableMouseListener extends AbstractTopologyMouseListener
 {
   /**
    * Initialize this mouse listener.
    * @param actionHandler the object that handles toolbar and menu actions.
    */
-  public NodeTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
+  public JVMHealthTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
   {
     super(actionHandler);
   }
@@ -47,15 +48,9 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener
     Component comp = event.getComponent();
     Point p = comp.getLocationOnScreen();
     JPopupMenu menu = new JPopupMenu();
-    addItem(menu, "shutdown.restart.driver", p);
-    addItem(menu, "driver.reset.statistics", p);
-    menu.addSeparator();
-    addItem(menu, "show.information", p);
-    addItem(menu, "update.configuration", p);
-    addItem(menu, "update.threads", p);
-    addItem(menu, "restart.node", p);
-    addItem(menu, "shutdown.node", p);
-    addItem(menu, "reset.counter", p);
+    addItem(menu, "health.gc", p);
+    addItem(menu, "health.thread.dump", p);
+    addItem(menu, "health.heap.dump", p);
     return menu;
   }
 }

@@ -19,13 +19,13 @@ package org.jppf.ui.monitoring.diagnostics;
 
 import java.awt.Color;
 import java.awt.event.*;
-import java.io.StringWriter;
 import java.util.*;
 
 import javax.swing.*;
 
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
+import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 import org.jppf.utils.ExceptionUtils;
@@ -69,42 +69,38 @@ public class ThreadDumpAction extends AbstractTopologyAction
     String s = null;
     String title = "";
     try {
-      ThreadDump info = retrieveInfo(dataArray[0]);
+      ThreadDump info = retrieveThreadDump(dataArray[0]);
       boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
       title = "Thread dump for " + (isNode ? "node " : "driver ") + dataArray[0];
       if (info == null) s = "<p><b>No thread dump was generated</b>";
-      else {
-        StringWriter sw = new StringWriter();
-        HTMLThreadDumpWriter writer = new HTMLThreadDumpWriter(sw, title, 14);
-        writer.printThreadDump(info);
-        s = sw.toString();
-        writer.close();
-      }
+      else s = HTMLThreadDumpWriter.printToString(info, title);
+      final JFrame frame = new JFrame(title);
+      frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
+      frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+      //frame.get
+      frame.addWindowListener(new WindowAdapter() {
+        @Override
+        public void windowClosing(final WindowEvent e) {
+          frame.dispose();
+        }
+      });
+      JEditorPane editor = new JEditorPane("text/html", "");
+      editor.setBackground(Color.WHITE);
+      editor.setText(s);
+      editor.setCaretPosition(0);
+      editor.addMouseListener(new EditorMouseListener(TextThreadDumpWriter.printToString(info, title)));
+      AbstractButton btn = (AbstractButton) event.getSource();
+      if (btn.isShowing()) location = btn.getLocationOnScreen();
+      editor.setEditable(false);
+      editor.setOpaque(true);
+      frame.getContentPane().add(new JScrollPane(editor));
+      frame.setLocationRelativeTo(null);
+      frame.setLocation(location);
+      frame.setSize(600, 600);
+      frame.setVisible(true);
     } catch(Exception e) {
       s = ExceptionUtils.getStackTrace(e).replace("\n", "<br>");
     }
-    final JFrame frame = new JFrame(title);
-    frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
-    frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-    frame.addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(final WindowEvent e) {
-        frame.dispose();
-      }
-    });
-    JEditorPane editor = new JEditorPane("text/html", "");
-    editor.setBackground(Color.WHITE);
-    editor.setText(s);
-    editor.setCaretPosition(0);
-    AbstractButton btn = (AbstractButton) event.getSource();
-    if (btn.isShowing()) location = btn.getLocationOnScreen();
-    editor.setEditable(false);
-    editor.setOpaque(true);
-    frame.getContentPane().add(new JScrollPane(editor));
-    frame.setLocationRelativeTo(null);
-    frame.setLocation(location);
-    frame.setSize(600, 600);
-    frame.setVisible(true);
   }
 
   /**
@@ -112,7 +108,7 @@ public class ThreadDumpAction extends AbstractTopologyAction
    * @param data the topology object for which to get the information.
    * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
    */
-  private ThreadDump retrieveInfo(final TopologyData data)
+  private ThreadDump retrieveThreadDump(final TopologyData data)
   {
     ThreadDump info = null;
     try

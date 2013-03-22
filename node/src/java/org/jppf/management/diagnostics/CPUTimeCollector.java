@@ -97,6 +97,8 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
    */
   public double getLoad()
   {
-    return Double.longBitsToDouble(load.get());
+    double d = Double.longBitsToDouble(load.get());
+    if (d > 1d) d = 1d;
+    return d;
   }
 }

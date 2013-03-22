@@ -62,15 +62,15 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
   /**
    * Column number for the node's last event.
    */
-  static final int LIVE_THREADS = 5;
+  static final int THREADS = 5;
   /**
    * Column number for the node's last event.
    */
-  static final int DEADLOCK_STATUS = 6;
+  //static final int DEADLOCK_STATUS = 6;
   /**
    * Column number for the node's last event.
    */
-  static final int CPU_LOAD = 7;
+  static final int CPU_LOAD = 6;
   /**
    * A number formatter for the used memory %.
    */
@@ -89,7 +89,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
   @Override
   public int getColumnCount()
   {
-    return 8;
+    return 7;
   }
 
   @Override
@@ -125,13 +125,15 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
             d = health.getNonheapUsed();
             res = d < 0d ? NA : nf.format(d / MB);
             break;
-          case LIVE_THREADS:
+          case THREADS:
             int n = health.getLiveThreads();
             res = n < 0 ? NA : Integer.toString(n);
             break;
+          /*
           case DEADLOCK_STATUS:
             res = health.isDeadlocked() ? "yes" : "no";
             break;
+          */
           case CPU_LOAD:
             d = health.getCpuLoad();
             res = d < 0d ? NA : nf.format(d * 100d) + " %";
@@ -167,10 +169,12 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
       case NON_HEAP_MEM_MB:
         res = localize("column.health.nonheap.mb");
         break;
+      /*
       case DEADLOCK_STATUS:
         res = localize("column.health.deadlocked");
         break;
-      case LIVE_THREADS:
+      */
+      case THREADS:
         res = localize("column.health.livethreads");
         break;
       case CPU_LOAD:
@@ -214,10 +218,12 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
       case NON_HEAP_MEM_MB:
         res = localize("column.health.nonheap.mb.tooltip");
         break;
+      /*
       case DEADLOCK_STATUS:
         res = localize("column.health.deadlocked.tooltip");
         break;
-      case LIVE_THREADS:
+      */
+      case THREADS:
         res = localize("column.health.livethreads.tooltip");
         break;
       case CPU_LOAD:

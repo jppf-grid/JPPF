@@ -17,8 +17,12 @@
  */
 package org.jppf.ui.options;
 
+import java.text.NumberFormat;
+
 import javax.swing.*;
 import javax.swing.event.*;
+
+import org.jppf.utils.StringUtils;
 
 /**
  * An option that uses a JSpinner control to edit its value.
@@ -31,17 +35,29 @@ public class SpinnerNumberOption extends AbstractOption
    */
   private JSpinner spinner = null;
   /**
-   * Label associated with the text field.
+   * Label associated with the <code>JSpinner</code> field.
    */
   protected JLabel spinnerLabel = null;
   /**
    * Minimum value for the spinner control.
    */
-  protected Integer min = Integer.valueOf(0);
+  protected Number min = Integer.valueOf(0);
   /**
    * Maximum value for the spinner control.
    */
-  protected Integer max = Integer.valueOf(0);
+  protected Number max = Integer.valueOf(0);
+  /**
+   * Step size for the spinner control.
+   */
+  protected Number step = Integer.valueOf(0);
+  /**
+   * Use to parse from string values to <code>Number</code> instances.
+   */
+  protected NumberFormat nf = NumberFormat.getInstance();
+  /**
+   * The number format pattern.
+   */
+  protected String pattern = "0";
 
   /**
    * Constructor provided as a convenience to facilitate the creation of
@@ -59,8 +75,9 @@ public class SpinnerNumberOption extends AbstractOption
    * @param value the initial value of this component.
    * @param min the minimum value that can be set in the spinner.
    * @param max the maximum value that can be set in the spinner.
+   * @param step the step size for the spinner.
    */
-  public SpinnerNumberOption(final String name, final String label, final String tooltip, final Integer value, final Integer min, final Integer max)
+  public SpinnerNumberOption(final String name, final String label, final String tooltip, final Number value, final Number min, final Number max, final Number step)
   {
     this.name = name;
     this.label = label;
@@ -68,19 +85,17 @@ public class SpinnerNumberOption extends AbstractOption
     this.value = value;
     this.min = min;
     this.max = max;
+    this.step = step;
     createUI();
   }
 
-  /**
-   * Create the UI components for this option.
-   */
   @Override
   public void createUI()
   {
-    SpinnerNumberModel model =
-      new SpinnerNumberModel(((Integer) value).intValue(), min.intValue(), max.intValue(), 1);
+    SpinnerNumberModel model = new SpinnerNumberModel((Number) value, (Comparable) min, (Comparable) max, step);
     spinner = new JSpinner(model);
-    JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
+    JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
+    editor.getFormat().applyPattern(pattern);
     if (editor.getTextField().getColumns() < 5) editor.getTextField().setColumns(5);
     spinnerLabel = new JLabel(label);
     if (toolTipText != null)
@@ -112,23 +127,10 @@ public class SpinnerNumberOption extends AbstractOption
   @Override
   public void setValue(final Object value)
   {
-    if (value instanceof String)
-    {
-      try
-      {
-        this.value = Integer.valueOf((String) value);
-      }
-      catch(NumberFormatException e)
-      {
-        this.value = Integer.valueOf(min);
-      }
-    }
-    else if (!(value instanceof Number)) this.value = Integer.valueOf(min);
-    else this.value = Integer.valueOf(((Number) value).intValue());
-    if (spinner != null)
-    {
-      spinner.getModel().setValue(this.value);
-    }
+    if (value instanceof String) this.value = StringUtils.parseNumber((String) value, min);
+    else if (!(value instanceof Number)) this.value = min;
+    else this.value = value;
+    if (spinner != null) spinner.getModel().setValue(this.value);
   }
 
   /**
@@ -164,37 +166,98 @@ public class SpinnerNumberOption extends AbstractOption
 
   /**
    * Get the maximum value for the spinner control.
-   * @return the value as an Integer value.
+   * @return the value as a <code>Number</code>.
    */
-  public Integer getMax()
+  public Number getMax()
   {
     return max;
   }
 
   /**
    * Set the maximum value for the spinner control.
-   * @param max the value as an Integer value.
+   * @param max the value as a <code>Number</code>.
    */
-  public void setMax(final Integer max)
+  public void setMax(final Number max)
   {
     this.max = max;
   }
 
   /**
    * Get the minimum value for the spinner control.
-   * @return the value as an Integer value.
+   * @return the value as a <code>Number</code>.
    */
-  public Integer getMin()
+  public Number getMin()
   {
     return min;
   }
 
   /**
    * Set the minimum value for the spinner control.
-   * @param min the value as an Integer value.
+   * @param min the value a <code>Number</code>.
    */
-  public void setMin(final Integer min)
+  public void setMin(final Number min)
   {
     this.min = min;
+  }
+
+  /**
+   * Get ttep size for the spinner control.
+   * @return the step size as a <code>Number</code>.
+   */
+  public Number getStep()
+  {
+    return step;
+  }
+
+  /**
+   * Set ttep size for the spinner control.
+   * @param step the step size as a <code>Number</code>.
+   */
+  public void setStep(final Number step)
+  {
+    this.step = step;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "SpinnerNumberOption [label=" + label + ", min=" + asString(min) + ", max=" + asString(max) + ", step=" + asString(step) + ", value=" + asString((Number) value) + "]";
+  }
+
+  /**
+   * 
+   * @param n .
+   * @return .
+   */
+  private String asString(final Number n)
+  {
+    return n.getClass().getSimpleName() + '(' + n.doubleValue() + ')';
+  }
+
+  /**
+   * Get the number format pattern.
+   * @return the pattern as a string.
+   */
+  public String getPattern()
+  {
+    return pattern;
+  }
+
+  /**
+   * Set the number format pattern.
+   * @param pattern the pattern as a string.
+   */
+  public void setPattern(final String pattern)
+  {
+    this.pattern = pattern;
+  }
+
+  /**
+   * Get tabel associated with the <code>JSpinner</code> field.
+   * @return a <code>JLabel</code> instance.
+   */
+  public JLabel getSpinnerLabel()
+  {
+    return spinnerLabel;
   }
 }

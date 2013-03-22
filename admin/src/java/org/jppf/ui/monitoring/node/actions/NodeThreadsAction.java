@@ -110,29 +110,30 @@ public class NodeThreadsAction extends AbstractTopologyAction
       JButton cancelBtn = (JButton) panel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
       final JFrame frame = new JFrame("Enter the number of threads and their priority");
       frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/threads.gif").getImage());
-      okBtn.addActionListener(new ActionListener()
-      {
+      AbstractAction okAction = new AbstractAction() {
         @Override
-        public void actionPerformed(final ActionEvent event)
-        {
+        public void actionPerformed(final ActionEvent event) {
           frame.setVisible(false);
           frame.dispose();
           doOK();
         }
-      });
-      cancelBtn.addActionListener(new ActionListener()
-      {
+      };
+      okBtn.addActionListener(okAction);
+      AbstractAction cancelAction = new AbstractAction() {
         @Override
-        public void actionPerformed(final ActionEvent event)
-        {
+        public void actionPerformed(final ActionEvent event) {
           frame.setVisible(false);
           frame.dispose();
         }
-      });
-      frame.getContentPane().add(panel.getUIComponent());
+      };
+      cancelBtn.addActionListener(cancelAction);
+      JComponent comp = panel.getUIComponent();
+      frame.getContentPane().add(comp);
       frame.pack();
       frame.setLocationRelativeTo(null);
       frame.setLocation(location);
+      setKeyAction(panel, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
+      setKeyAction(panel, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
       frame.setVisible(true);
     }
     catch(Exception e)
@@ -148,8 +149,8 @@ public class NodeThreadsAction extends AbstractTopologyAction
   {
     AbstractOption nbThreadsOption = (AbstractOption) panel.findFirstWithName("nbThreads");
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("threadPriority");
-    nbThreads = (Integer) nbThreadsOption.getValue();
-    priority = (Integer) priorityOption.getValue();
+    nbThreads = ((Number) nbThreadsOption.getValue()).intValue();
+    priority = ((Number) priorityOption.getValue()).intValue();
     Runnable r = new Runnable() {
       @Override
       public void run() {

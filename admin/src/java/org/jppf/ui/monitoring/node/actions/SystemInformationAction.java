@@ -17,12 +17,14 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
+import java.awt.Color;
 import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
 
 import org.jppf.management.*;
+import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -73,33 +75,20 @@ public class SystemInformationAction extends AbstractTopologyAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    String s = null;
+    String html = null;
+    String toClipboard = null;
     try
     {
       JPPFSystemInformation info = retrieveInfo(dataArray[0]);
       boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
-      PropertiesTableFormat format = new HTMLPropertiesTableFormat("information for " + (isNode ? "node " : "driver ") + dataArray[0].getUuid());
-      format.start();
-      if (info == null)
-      {
-        format.print("<p><b>No information was found</b>");
-      }
-      else
-      {
-        format.formatTable(info.getUuid(), "UUID");
-        format.formatTable(info.getSystem(), "System Properties");
-        format.formatTable(info.getEnv(), "Environment Variables");
-        format.formatTable(info.getRuntime(), "Runtime Information");
-        format.formatTable(info.getJppf(), "JPPF configuration");
-        format.formatTable(info.getNetwork(), "Network configuration");
-        format.formatTable(info.getStorage(), "Storage Information");
-      }
-      format.end();
-      s = format.getText();
+      String title = "information for " + (isNode ? "node " : "driver ") + dataArray[0];
+      html = formatProperties(info, new HTMLPropertiesTableFormat(title));
+      toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
     }
     catch(Exception e)
     {
-      s = ExceptionUtils.getStackTrace(e).replace("\n", "<br>");
+      toClipboard = ExceptionUtils.getStackTrace(e);
+      html = toClipboard.replace("\n", "<br>");
     }
     final JFrame frame = new JFrame("System Information");
     frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
@@ -112,16 +101,18 @@ public class SystemInformationAction extends AbstractTopologyAction
         frame.dispose();
       }
     });
-    JEditorPane editor = new JEditorPane("text/html", s);
+    JEditorPane editor = new JEditorPane("text/html", html);
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     editor.setEditable(false);
-    editor.setOpaque(false);
+    editor.setOpaque(true);
+    editor.setBackground(Color.WHITE);
     editor.setCaretPosition(0);
     frame.getContentPane().add(new JScrollPane(editor));
     frame.setLocationRelativeTo(null);
     frame.setLocation(location);
-    frame.setSize(400, 400);
+    frame.setSize(600, 600);
+    editor.addMouseListener(new EditorMouseListener(toClipboard));
     frame.setVisible(true);
   }
 
@@ -149,5 +140,29 @@ public class SystemInformationAction extends AbstractTopologyAction
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return info;
+  }
+
+  /**
+   * Print the specified system info to a string.
+   * @param info the information to print.
+   * @param format the formatter to use.
+   * @return a String with the formatted information.
+   */
+  private String formatProperties(final JPPFSystemInformation info, final PropertiesTableFormat format)
+  {
+    format.start();
+    if (info == null) format.print("No information was found");
+    else
+    {
+      format.formatTable(info.getUuid(), "UUID");
+      format.formatTable(info.getSystem(), "System Properties");
+      format.formatTable(info.getEnv(), "Environment Variables");
+      format.formatTable(info.getRuntime(), "Runtime Information");
+      format.formatTable(info.getJppf(), "JPPF configuration");
+      format.formatTable(info.getNetwork(), "Network configuration");
+      format.formatTable(info.getStorage(), "Storage Information");
+    }
+    format.end();
+    return format.getText();
   }
 }

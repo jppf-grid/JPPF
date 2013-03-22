@@ -21,11 +21,13 @@ package org.jppf.management.diagnostics;
 import java.io.*;
 import java.util.*;
 
+import org.jppf.utils.streams.StreamUtils;
+
 /**
  * 
  * @author Laurent Cohen
  */
-public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter implements Closeable
+public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter
 {
   /**
    * 
@@ -181,5 +183,29 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter implements Cl
       case TERMINATED: return "t_terminated";
     }
     return "";
+  }
+
+  /**
+   * Print the specified thread dump directly to a string.
+   * @param dump the thread dump to print.
+   * @param title title given to the dump.
+   * @return the thread dump printed to a strin, or null if it could not be printed.
+   */
+  public static String printToString(final ThreadDump dump, final String title)
+  {
+    String result = null;
+    HTMLThreadDumpWriter writer = null;
+    try
+    {
+      StringWriter sw = new StringWriter();
+      writer = new HTMLThreadDumpWriter(sw, title, 14);
+      writer.printThreadDump(dump);
+      result = sw.toString();
+    }
+    finally
+    {
+      if (writer != null) StreamUtils.closeSilent(writer);
+    }
+    return result;
   }
 }

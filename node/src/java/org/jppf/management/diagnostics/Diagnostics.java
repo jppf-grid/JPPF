@@ -19,14 +19,14 @@
 package org.jppf.management.diagnostics;
 
 import java.lang.management.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.NotificationBroadcasterSupport;
 
+import org.jppf.JPPFException;
 import org.slf4j.*;
 
 /**
- * Implementation of the {@link DiagnosticsMBean}.
+ * Implementation of the {@link DiagnosticsMBean} interface.
  * @author Laurent Cohen
  */
 public class Diagnostics extends NotificationBroadcasterSupport implements DiagnosticsMBean
@@ -48,17 +48,13 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
    */
   private final OperatingSystemMXBean systemMXBean = ManagementFactory.getOperatingSystemMXBean();
   /**
-   * 
-   */
-  private final AtomicLong memoryWarningThreshold = new AtomicLong(Double.doubleToLongBits(0.6d));
-  /**
-   * 
-   */
-  private final AtomicLong memoryCriticalThreshold = new AtomicLong(Double.doubleToLongBits(0.8d));
-  /**
-   * 
+   * Collects regular snapshots of the total CPU time.
    */
   private CPUTimeCollector cpuTimeCollector = null;
+  /**
+   * Triggers a heap dump based on the JVM implementation.
+   */
+  private HeapDumpCollector heapDumpCollector = null;
 
   /**
    * Initialize this MBean.
@@ -76,6 +72,11 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
       thread.start();
     }
     else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
+    heapDumpCollector = HeapDumpCollector.Factory.newInstance();
+    if (heapDumpCollector == null)
+    {
+      if (debugEnabled) log.debug("a heap dump collector could not be created for this JVM - no heap dumps will be available");
+    }
   }
 
   @Override
@@ -124,30 +125,6 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
   }
 
   @Override
-  public Double getMemoryWarningThreshold() throws Exception
-  {
-    return Double.longBitsToDouble(memoryWarningThreshold.get());
-  }
-
-  @Override
-  public void setMemoryWarningThreshold(final Double threshold) throws Exception
-  {
-    memoryWarningThreshold.set(Double.doubleToLongBits(threshold));
-  }
-
-  @Override
-  public Double getMemoryCriticalThreshold() throws Exception
-  {
-    return Double.longBitsToDouble(memoryCriticalThreshold.get());
-  }
-
-  @Override
-  public void setMemoryCriticalThreshold(final Double threshold)
-  {
-    memoryCriticalThreshold.set(Double.doubleToLongBits(threshold));
-  }
-
-  @Override
   public HealthSnapshot healthSnapshot() throws Exception
   {
     HealthSnapshot snapshot = new HealthSnapshot();
@@ -155,11 +132,9 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
     MemoryUsageInformation mem = memInfo.getHeapMemoryUsage();
     snapshot.heapUsedRatio = mem.getUsedRatio();
     snapshot.heapUsed = mem.getUsed();
-    snapshot.heapLevel = computeAlertLevel(snapshot.heapUsedRatio);
     mem = memInfo.getNonHeapMemoryUsage();
     snapshot.nonheapUsedRatio = mem.getUsedRatio();
     snapshot.nonheapUsed = mem.getUsed();
-    snapshot.nonheapLevel = computeAlertLevel(snapshot.nonheapUsedRatio);
     snapshot.deadlocked = hasDeadlock();
     snapshot.liveThreads = threadsMXBean.getThreadCount();
     //snapshot.cpuLoad = systemMXBean.getSystemLoadAverage();
@@ -169,27 +144,18 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
   }
 
   /**
-   * Compute the alert level for a given memory usage ratio.
-   * @param ratio the ratio for which to compute the alert level.
-   * @return an {@link AlertLevel} instance.
-   * @throws Exception if any error occurs.
-   */
-  private AlertLevel computeAlertLevel(final double ratio) throws Exception
-  {
-    if (ratio < 0d) return AlertLevel.UNKNOWN;
-    double wt = getMemoryWarningThreshold();
-    double ct = getMemoryCriticalThreshold();
-    if ((ratio >= wt) && (ratio < ct)) return AlertLevel.WARNING;
-    else if (ratio >= ct) return AlertLevel.CRITICAL;
-    return AlertLevel.NORMAL;
-  }
-
-  /**
    * Get the number of live threads i the JVM.
    * @return the number of threads as an int.
    */
   private int liveThreads()
   {
     return threadsMXBean.getThreadCount();
+  }
+
+  @Override
+  public String heapDump() throws Exception
+  {
+    if (heapDumpCollector == null) throw new JPPFException("heap dumps are not available for this JVM");
+    return heapDumpCollector.dumpHeap();
   }
 }

@@ -119,29 +119,29 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
       JButton cancelBtn = (JButton) panel.findFirstWithName("serverShutdownRestartCancel").getUIComponent();
       final JFrame frame = new JFrame(localize("shutdown.restart.driver.label"));
       frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/server_restart.gif").getImage());
-      okBtn.addActionListener(new ActionListener()
-      {
+      Action okAction = new AbstractAction() {
         @Override
-        public void actionPerformed(final ActionEvent event)
-        {
+        public void actionPerformed(final ActionEvent event) {
           frame.setVisible(false);
           frame.dispose();
           doOK(list);
         }
-      });
-      cancelBtn.addActionListener(new ActionListener()
-      {
+      };
+      okBtn.addActionListener(okAction);
+      Action cancelAction = new AbstractAction() {
         @Override
-        public void actionPerformed(final ActionEvent event)
-        {
+        public void actionPerformed(final ActionEvent event) {
           frame.setVisible(false);
           frame.dispose();
         }
-      });
+      };
+      cancelBtn.addActionListener(cancelAction);
       frame.getContentPane().add(panel.getUIComponent());
       frame.pack();
       frame.setLocationRelativeTo(null);
       frame.setLocation(location);
+      setKeyAction(panel, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
+      setKeyAction(panel, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
       frame.setVisible(true);
     }
     catch(Exception e)

@@ -43,10 +43,6 @@ public class HealthSnapshot implements Serializable
    */
   long heapUsed = -1L;
   /**
-   * Alert level for heap memory.
-   */
-  AlertLevel heapLevel = AlertLevel.UNKNOWN;
-  /**
    * Ratio of used / max for non-heap memory.
    */
   double nonheapUsedRatio = -1d;
@@ -54,10 +50,6 @@ public class HealthSnapshot implements Serializable
    * Used non-heap memory in bytes.
    */
   long nonheapUsed = -1L;
-  /**
-   * Alert level for non-heap memory.
-   */
-  AlertLevel nonheapLevel = AlertLevel.UNKNOWN;
   /**
    * Determines whether a deadlock was detected.
    */
@@ -88,30 +80,12 @@ public class HealthSnapshot implements Serializable
   }
 
   /**
-   * Get the alert level for heap memory.
-   * @return an {@link AlertLevel} typesafe enum value.
-   */
-  public AlertLevel getHeapLevel()
-  {
-    return heapLevel;
-  }
-
-  /**
    * Get the ratio of used / max for non-heap memory.
    * @return the ratio as a double value in the range [0, 1].
    */
   public double getNonheapUsedRatio()
   {
     return nonheapUsedRatio;
-  }
-
-  /**
-   * Get the alert level for non-heap memory.
-   * @return an {@link AlertLevel} typesafe enum value.
-   */
-  public AlertLevel getNonheapLevel()
-  {
-    return nonheapLevel;
   }
 
   /**

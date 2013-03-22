@@ -138,7 +138,7 @@ public class UpdatePriorityAction extends AbstractJobAction
   private void doOK()
   {
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
-    priority = (Integer) priorityOption.getValue();
+    priority = ((Number) priorityOption.getValue()).intValue();
     Runnable r = new Runnable()
     {
       @Override

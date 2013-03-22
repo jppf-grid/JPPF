@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.diagnostics;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -29,6 +30,7 @@ import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -55,6 +57,10 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    * 
    */
   protected RefreshHandler refreshHandler = null;
+  /**
+   * The threshold values.
+   */
+  protected Thresholds thresholds = new Thresholds();
 
   /**
    * Initialize this panel with the specified information.
@@ -113,7 +119,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
     treeTable.doLayout();
     treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     treeTable.getTree().setCellRenderer(new HealthTreeCellRenderer());
-    treeTable.setDefaultRenderer(Object.class, new HealthTableCellRenderer());
+    treeTable.setDefaultRenderer(Object.class, new HealthTableCellRenderer(this));
     JScrollPane sp = new JScrollPane(treeTable);
     setUIComponent(sp);
     treeTable.expandAll();
@@ -190,11 +196,15 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   {
     actionHandler = new JTreeTableActionHandler(treeTable);
     actionHandler.putAction("health.gc", new GCAction());
+    actionHandler.putAction("health.heap.dump", new HeapDumpAction());
     actionHandler.putAction("health.thread.dump", new ThreadDumpAction());
     actionHandler.putAction("health.select.drivers", new SelectDriversAction(this));
     actionHandler.putAction("health.select.nodes", new SelectNodesAction(this));
     actionHandler.putAction("health.select.all", new SelectAllAction(this));
-    treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
+    actionHandler.putAction("health.update.thresholds", new ThresholdSettingsAction(this));
+    actionHandler.updateActions();
+    treeTable.addMouseListener(new JVMHealthTreeTableMouseListener(actionHandler));
+    //
     Runnable r = new ActionsInitializer(this, "/health.toolbar");
     new Thread(r).start();
   }
@@ -304,5 +314,30 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   public void initRefreshHandler()
   {
     refreshHandler = new RefreshHandler(this);
+  }
+
+  /**
+   * Save the threshold values to the preferences store.
+   */
+  public void saveThresholds()
+  {
+    Preferences pref = OptionsHandler.getPreferences().node("thresholds");
+    for (Map.Entry<Thresholds.Name, Double> entry: thresholds.getValues().entrySet()) pref.putDouble(entry.getKey().toString().toLowerCase(), entry.getValue());
+  }
+
+  /**
+   * Load the threshold values from the preferences store.
+   */
+  public void loadThresholds()
+  {
+    Preferences pref = OptionsHandler.getPreferences().node("thresholds");
+    Map<Thresholds.Name, Double> values = thresholds.getValues();
+    List<Thresholds.Name> list = new ArrayList<Thresholds.Name>(values.keySet());
+    for (Thresholds.Name name: list)
+    {
+      Double value = pref.getDouble(name.toString().toLowerCase(), -1d);
+      if (value <= 0d) continue;
+      values.put(name, value);
+    }
   }
 }
