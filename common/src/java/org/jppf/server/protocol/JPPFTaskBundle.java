@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.TraversalList;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -32,8 +32,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>, JPPFDistributedJob
-{
+public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>, JPPFDistributedJob {
   /**
    * Explicit serialVersionUID.
    */
@@ -42,8 +41,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * Type safe enumeration for the values of the bundle state.
    */
-  public enum State
-  {
+  public enum State {
     /**
      * Means the bundle is used for handshake with the server (initial bundle).
      */
@@ -70,6 +68,10 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * The unique identifier for the submitting application.
    */
   private TraversalList<String> uuidPath = new TraversalList<String>();
+  /**
+   * The number of tasks in this bundle at the time it is received by a driver.
+   */
+  protected int driverQueueTaskCount = 0;
   /**
    * The number of tasks in this bundle.
    */
@@ -123,16 +125,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * Initialize this task bundle and set its build number.
    */
-  public JPPFTaskBundle()
-  {
+  public JPPFTaskBundle() {
   }
 
   /**
    * Get the unique identifier for the request this task is a part of.
    * @return the request uuid as a string.
    */
-  public String getRequestUuid()
-  {
+  public String getRequestUuid() {
     return (requestUuid == null) ? getUuid() : requestUuid;
   }
 
@@ -140,8 +140,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the unique identifier for the request this task is a part of.
    * @param requestUuid the request uuid as a string.
    */
-  public void setRequestUuid(final String requestUuid)
-  {
+  public void setRequestUuid(final String requestUuid) {
     this.requestUuid = requestUuid;
   }
 
@@ -149,8 +148,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the uuid path of the applications (driver or client) in whose classpath the class definition may be found.
    * @return the uuid path as a list of string elements.
    */
-  public TraversalList<String> getUuidPath()
-  {
+  public TraversalList<String> getUuidPath() {
     return uuidPath;
   }
 
@@ -158,8 +156,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the uuid path of the applications (driver or client) in whose classpath the class definition may be found.
    * @param uuidPath the uuid path as a list of string elements.
    */
-  public void setUuidPath(final TraversalList<String> uuidPath)
-  {
+  public void setUuidPath(final TraversalList<String> uuidPath) {
     this.uuidPath = uuidPath;
   }
 
@@ -167,8 +164,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the time at which this wrapper was added to the queue.
    * @return the time in milliseconds as a long value.
    */
-  public long getQueueEntryTime()
-  {
+  public long getQueueEntryTime() {
     return queueEntryTime;
   }
 
@@ -176,8 +172,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the time at which this wrapper was added to the queue.
    * @param queueEntryTime the time in milliseconds as a long value.
    */
-  public void setQueueEntryTime(final long queueEntryTime)
-  {
+  public void setQueueEntryTime(final long queueEntryTime) {
     this.queueEntryTime = queueEntryTime;
   }
 
@@ -185,8 +180,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the time it took a node to execute this task.
    * @return the time in milliseconds as a long value.
    */
-  public long getNodeExecutionTime()
-  {
+  public long getNodeExecutionTime() {
     return nodeExecutionTime;
   }
 
@@ -194,8 +188,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the time it took a node to execute this task.
    * @param nodeExecutionTime the time in milliseconds as a long value.
    */
-  public void setNodeExecutionTime(final long nodeExecutionTime)
-  {
+  public void setNodeExecutionTime(final long nodeExecutionTime) {
     this.nodeExecutionTime = nodeExecutionTime;
   }
 
@@ -203,8 +196,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the number of tasks in this bundle.
    * @return the number of tasks as an int.
    */
-  public int getTaskCount()
-  {
+  public int getTaskCount() {
     return taskCount;
   }
 
@@ -212,19 +204,25 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the number of tasks in this bundle.
    * @param taskCount the number of tasks as an int.
    */
-  public void setTaskCount(final int taskCount)
-  {
+  public void setTaskCount(final int taskCount) {
     this.taskCount = taskCount;
     if (initialTaskCount <= 0) initialTaskCount = taskCount;
     if (currentTaskCount <= 0) currentTaskCount = taskCount;
   }
 
   /**
+   * Set the initial number of tasks in this bundle.
+   * @param initialTaskCount the number of tasks as an int.
+   */
+  public void setInitialTaskCount(final int initialTaskCount) {
+    this.initialTaskCount = initialTaskCount;
+  }
+
+  /**
    * Get the task completion listener to notify, once the execution of this task has completed.
    * @return a <code>TaskCompletionListener</code> instance.
    */
-  public TaskCompletionListener getCompletionListener()
-  {
+  public TaskCompletionListener getCompletionListener() {
     return completionListener;
   }
 
@@ -232,8 +230,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the task completion listener to notify, once the execution of this task has completed.
    * @param listener a <code>TaskCompletionListener</code> instance.
    */
-  public void setCompletionListener(final TaskCompletionListener listener)
-  {
+  public void setCompletionListener(final TaskCompletionListener listener) {
     this.completionListener = listener;
   }
 
@@ -242,7 +239,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param result the result of the task's execution.
    */
   public void fireTaskCompleted(final ServerJob result) {
-    if(this.completionListener != null) this.completionListener.taskCompleted(result);
+    if (this.completionListener != null) this.completionListener.taskCompleted(result);
   }
 
   /**
@@ -254,8 +251,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
-  public int compareTo(final JPPFTaskBundle bundle)
-  {
+  public int compareTo(final JPPFTaskBundle bundle) {
     if (bundle == null) return 1;
     int otherPriority = bundle.getSLA().getPriority();
     if (jobSLA.getPriority() < otherPriority) return -1;
@@ -267,8 +263,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Make a copy of this bundle.
    * @return a new <code>JPPFTaskBundle</code> instance.
    */
-  public synchronized JPPFTaskBundle copy()
-  {
+  public synchronized JPPFTaskBundle copy() {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setUuidPath(uuidPath);
     bundle.setRequestUuid(getRequestUuid());
@@ -277,8 +272,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setTaskCount(taskCount);
     bundle.setCurrentTaskCount(currentTaskCount);
     bundle.initialTaskCount = initialTaskCount;
-    synchronized(bundle.getParametersMap())
-    {
+    synchronized(bundle.getParametersMap()) {
       for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
     }
     bundle.setQueueEntryTime(queueEntryTime);
@@ -287,7 +281,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setMetadata(jobMetadata);
     bundle.setState(state);
     bundle.setParameter("bundle.uuid", uuidPath.getLast() + '-' + copyCount.incrementAndGet());
-
     return bundle;
   }
 
@@ -296,11 +289,9 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param nbTasks the number of tasks to include in the copy.
    * @return a new <code>JPPFTaskBundle</code> instance.
    */
-  public JPPFTaskBundle copy(final int nbTasks)
-  {
+  public JPPFTaskBundle copy(final int nbTasks) {
     JPPFTaskBundle bundle = copy();
-    synchronized(this)
-    {
+    synchronized(this) {
       bundle.setTaskCount(nbTasks);
       taskCount -= nbTasks;
     }
@@ -311,8 +302,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the state of this bundle.
    * @return a <code>State</code> type safe enumeration value.
    */
-  public State getState()
-  {
+  public State getState() {
     return state;
   }
 
@@ -320,8 +310,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the state of this bundle.
    * @param state a <code>State</code> type safe enumeration value.
    */
-  public void setState(final State state)
-  {
+  public void setState(final State state) {
     this.state = state;
   }
 
@@ -329,8 +318,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the time at which the bundle is taken out of the queue for sending to a node.
    * @return the time as a long value.
    */
-  public long getExecutionStartTime()
-  {
+  public long getExecutionStartTime() {
     return executionStartTime;
   }
 
@@ -338,8 +326,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the time at which the bundle is taken out of the queue for sending to a node.
    * @param executionStartTime the time as a long value.
    */
-  public void setExecutionStartTime(final long executionStartTime)
-  {
+  public void setExecutionStartTime(final long executionStartTime) {
     this.executionStartTime = executionStartTime;
   }
 
@@ -347,8 +334,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the initial task count of this bundle.
    * @return the task count as an int.
    */
-  public int getInitialTaskCount()
-  {
+  public int getInitialTaskCount() {
     return initialTaskCount;
   }
 
@@ -357,10 +343,8 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param name the name of the parameter to set.
    * @param value the value of the parameter to set.
    */
-  public void setParameter(final Object name, final Object value)
-  {
-    synchronized(parameters)
-    {
+  public void setParameter(final Object name, final Object value) {
+    synchronized(parameters) {
       parameters.put(name, value);
     }
   }
@@ -370,8 +354,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param name the name of the parameter to get.
    * @return the value of the parameter, or null if the parameter is not set.
    */
-  public Object getParameter(final Object name)
-  {
+  public Object getParameter(final Object name) {
     return parameters.get(name);
   }
 
@@ -381,8 +364,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param defaultValue the default value to return if the parameter is not set.
    * @return the value of the parameter, or <code>defaultValue</code> if the parameter is not set.
    */
-  public Object getParameter(final Object name, final Object defaultValue)
-  {
+  public Object getParameter(final Object name, final Object defaultValue) {
     Object res = parameters.get(name);
     return res == null ? defaultValue : res;
   }
@@ -392,8 +374,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param name the name of the parameter to remove.
    * @return the value of the parameter to remove, or null if the parameter is not set.
    */
-  public Object removeParameter(final Object name)
-  {
+  public Object removeParameter(final Object name) {
     return parameters.remove(name);
   }
 
@@ -401,14 +382,12 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the map holding the parameters of the request.
    * @return a map of string keys to object values.
    */
-  public Map<Object, Object> getParametersMap()
-  {
+  public Map<Object, Object> getParametersMap() {
     return parameters;
   }
 
   @Override
-  public JobSLA getSLA()
-  {
+  public JobSLA getSLA() {
     return jobSLA;
   }
 
@@ -416,8 +395,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the service level agreement between the job and the server.
    * @param jobSLA an instance of <code>JPPFJobSLA</code>.
    */
-  public void setSLA(final JobSLA jobSLA)
-  {
+  public void setSLA(final JobSLA jobSLA) {
     this.jobSLA = jobSLA;
   }
 
@@ -437,8 +415,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   }
 
   @Override
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -446,14 +423,12 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the user-defined display name for the job.
    * @param name the display name as a string.
    */
-  public void setName(final String name)
-  {
+  public void setName(final String name) {
     this.name = name;
   }
 
   @Override
-  public JobMetadata getMetadata()
-  {
+  public JobMetadata getMetadata() {
     return jobMetadata;
   }
 
@@ -461,14 +436,12 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set this bundle's metadata.
    * @param jobMetadata a {@link JPPFJobMetadata} instance.
    */
-  public void setMetadata(final JobMetadata jobMetadata)
-  {
+  public void setMetadata(final JobMetadata jobMetadata) {
     this.jobMetadata = jobMetadata;
   }
 
   @Override
-  public String getUuid()
-  {
+  public String getUuid() {
     return jobUuid;
   }
 
@@ -476,8 +449,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the uuid of the initial job.
    * @param jobUuid the uuid as a string.
    */
-  public void setUuid(final String jobUuid)
-  {
+  public void setUuid(final String jobUuid) {
     this.jobUuid = jobUuid;
   }
 
@@ -485,8 +457,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the current number of tasks in this bundle.
    * @return the current number of tasks as an int.
    */
-  public int getCurrentTaskCount()
-  {
+  public int getCurrentTaskCount() {
     return currentTaskCount;
   }
 
@@ -494,8 +465,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Set the current number of tasks in this bundle.
    * @param currentTaskCount the current number of tasks as an int.
    */
-  public void setCurrentTaskCount(final int currentTaskCount)
-  {
+  public void setCurrentTaskCount(final int currentTaskCount) {
     this.currentTaskCount = currentTaskCount;
   }
 
@@ -503,8 +473,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the bundle uuid.
    * @return the bundle uuid.
    */
-  public Object getBundleUuid()
-  {
+  public Object getBundleUuid() {
     return getParameter("bundle.uuid");
   }
 
@@ -512,8 +481,23 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Get the job requeue flag.
    * @return job requeue flag.
    */
-  public Object getRequeue()
-  {
+  public Object getRequeue() {
     return getParameter(BundleParameter.JOB_REQUEUE);
+  }
+
+  /**
+   * Get the number of tasks in this bundle at the time it is received by a driver.
+   * @return the number of tasks as an int.
+   */
+  public int getDriverQueueTaskCount() {
+    return driverQueueTaskCount;
+  }
+
+  /**
+   * Set the number of tasks in this bundle at the time it is received by a driver.
+   * @param driverQueueTaskCount the number of tasks as an int.
+   */
+  public void setDriverQueueTaskCount(final int driverQueueTaskCount) {
+    this.driverQueueTaskCount = driverQueueTaskCount;
   }
 }

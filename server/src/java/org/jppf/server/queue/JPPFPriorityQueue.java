@@ -128,6 +128,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         boolean queued;
         ServerJob serverJob = jobMap.get(jobUuid);
         if (serverJob == null) {
+          int n = clientBundle.getJob().getTaskCount();
+          clientBundle.getJob().setDriverQueueTaskCount(n);
           queued = true;
           serverJob = new ServerJob(lock, jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
           jobManager.jobQueued(serverJob);
@@ -403,18 +405,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Cancels queued broadcast jobs for connection.
    * @param connectionUUID The connection UUID that failed or was disconnected.
    */
-  public void cancelBroadcastJobs(final String connectionUUID)
-  {
+  public void cancelBroadcastJobs(final String connectionUUID) {
     if (connectionUUID == null || connectionUUID.isEmpty()) return;
 
     Set<String> jobIDs = Collections.emptySet();
     lock.lock();
     try {
       if (jobMap.isEmpty()) return;
-
       jobIDs = new HashSet<String>();
-      for (Map.Entry<String, ServerJob> entry : jobMap.entrySet())
-      {
+      for (Map.Entry<String, ServerJob> entry : jobMap.entrySet()) {
         if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
       }
     } finally {
@@ -437,8 +436,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     }
     if (connections.isEmpty()) return;
     ServerJobBroadcast clientJob;
-    while ((clientJob = pendingBroadcasts.poll()) != null)
-    {
+    while ((clientJob = pendingBroadcasts.poll()) != null) {
       if (debugEnabled) log.debug("queuing job " + clientJob.getJob());
       processPendingBroadcast(connections, clientJob);
     }
@@ -456,14 +454,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     List<ServerJobBroadcast> jobList = new ArrayList<ServerJobBroadcast>(connections.size());
 
     Set<String> uuidSet = new HashSet<String>();
-    for (AbstractNodeContext connection : connections)
-    {
+    for (AbstractNodeContext connection : connections) {
       ExecutorStatus status = connection.getExecutionStatus();
-      if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING)
-      {
+      if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
         String uuid = connection.getUuid();
-        if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid))
-        {
+        if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid)) {
           ServerJobBroadcast newBundle = broadcastJob.createBroadcastJob(uuid);
           JPPFManagementInfo info = connection.getManagementInfo();
           ExecutionPolicy policy = sla.getExecutionPolicy();
@@ -527,7 +522,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   protected int getSize(final ServerJob bundleWrapper)
   {
-    //return bundleWrapper.getTaskCount();
-    return bundleWrapper.getInitialTaskCount();
+    return bundleWrapper.getJob().getDriverQueueTaskCount();
+    //return bundleWrapper.getInitialTaskCount();
   }
 }
