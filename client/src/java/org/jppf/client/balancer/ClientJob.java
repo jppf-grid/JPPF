@@ -88,6 +88,10 @@ public class ClientJob extends AbstractClientJob
    * State map for tasks on which resultReceived was called.
    */
   private final SortedMap<Integer, TaskState> taskStateMap = new TreeMap<Integer, TaskState>();
+  /**
+   * The original number of tasks in the job.
+   */
+  protected final int initialTaskCount;
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
@@ -110,6 +114,7 @@ public class ClientJob extends AbstractClientJob
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
+    this.initialTaskCount = tasks.size();
 
     if (broadcastUUID == null) {
       if (job.getSLA().isBroadcastJob())
