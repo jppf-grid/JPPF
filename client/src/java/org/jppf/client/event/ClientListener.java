@@ -21,7 +21,8 @@ package org.jppf.client.event;
 import java.util.EventListener;
 
 /**
- * 
+ * Listener interface for receiving notifications when  a new connection to a server
+ * is established and when an existing connections fails and is removed from the client. 
  * @author Laurent Cohen
  */
 public interface ClientListener extends EventListener
@@ -31,6 +32,7 @@ public interface ClientListener extends EventListener
    * @param event the event to notify this listener of.
    */
   void newConnection(ClientEvent event);
+
   /**
    * Notify this listener that a driver connection has failed.
    * @param event the event to notify this listener of.
