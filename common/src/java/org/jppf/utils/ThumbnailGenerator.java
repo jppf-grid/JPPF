@@ -160,6 +160,8 @@ public class ThumbnailGenerator
       sb.append(name1);
       sb.append("\" thumbnail=\"");
       sb.append(name2);
+      sb.append("\" shot_title=\"");
+      sb.append(titleFromFilename(name1));
       sb.append("\"}$\n");
       count++;
     }
@@ -204,6 +206,29 @@ public class ThumbnailGenerator
     Graphics2D g = thumbnail.createGraphics();
     g.drawImage(img.getScaledInstance((int) (w/r), (int) (h/r), Image.SCALE_AREA_AVERAGING), 0, 0, null);
     return thumbnail;
+  }
+
+  /**
+   * Generate a title from an image ffile name, assuming a cmael-case notiation.
+   * @param source the source from which to geenrate a title.
+   * @return the generated title as a string.
+   */
+  private String titleFromFilename(final String source)
+  {
+    String name = FileUtils.getFileName(source);
+    int idx = name.lastIndexOf('.');
+    if (idx >= 0) name = name.substring(0, idx);
+    char[] chars = name.toCharArray();
+    StringBuilder sb = new StringBuilder();
+    int count = 0;
+    for (char c: chars)
+    {
+      if ((c == '-') || (c == '-')) sb.append(' ');
+      else if (Character.isUpperCase(c) && (count > 0)) sb.append(' ').append(c);
+      else sb.append(c);
+      count++;
+    }
+    return sb.toString();
   }
 
   /**
