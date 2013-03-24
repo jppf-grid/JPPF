@@ -25,6 +25,7 @@ import org.slf4j.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class LocalNodeConnection extends AbstractNodeConnection<LocalNodeChannel>
 {

@@ -286,6 +286,7 @@ public final class NetworkUtils
 
   /**
    * A pair grouping an {@link InetAddress} and the corresponding subnet mask length.
+   * @exclude
    */
   public static class SubnetInformation extends Pair<InetAddress, Integer>
   {

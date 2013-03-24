@@ -22,6 +22,7 @@ import org.jppf.management.NodeSelector;
 
 /**
  * Interface that provides a semantic of matching a node against a selector.
+ * @exclude
  */
 public interface NodeSelectionProvider
 {

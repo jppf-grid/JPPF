@@ -189,6 +189,7 @@ public class FileReplacer
 
   /**
    * Encapsulates the command-line arguments.
+   * @exclude
    */
   public static class Arguments
   {

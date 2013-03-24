@@ -23,6 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class LocalClassLoaderConnection extends AbstractClassLoaderConnection<LocalClassLoaderChannel>
 {

@@ -31,6 +31,7 @@ import org.slf4j.*;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
 {

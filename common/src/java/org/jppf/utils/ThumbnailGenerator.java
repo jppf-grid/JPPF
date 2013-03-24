@@ -39,7 +39,7 @@ public class ThumbnailGenerator
   /**
    * The name prefix for the generated thumbnails.
    */
-  private  static final String DEFAULT_INCLUDE_PATH = "C:/Workspaces/SourceForge/JPPF/docs/home/templates";
+  private  static final String DEFAULT_INCLUDE_PATH = "../JPPF/docs/home/templates";
   /**
    * Default number of thumbnails per row.
    */
@@ -170,6 +170,7 @@ public class ThumbnailGenerator
     FileUtils.writeTextFile(includePath + "/shots.html", sb.toString());
     File file = fileMap.keySet().iterator().next();
     FileUtils.writeTextFile(includePath + "/first-shot.html", file.getName());
+    FileUtils.writeTextFile(includePath + "/first-shot-title.html", titleFromFilename(file.getName()));
   }
 
   /**
@@ -233,6 +234,7 @@ public class ThumbnailGenerator
 
   /**
    * File filter that only accepts GIF, JPG and PNG files.
+   * @exclude
    */
   public static class ImageFileFilter implements FileFilter
   {

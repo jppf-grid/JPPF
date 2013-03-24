@@ -101,7 +101,7 @@ public final class VersionUtils
   }
 
   /**
-   * Describes the avialble vrsion information.
+   * Describes the available version information.
    */
   public static class Version implements Serializable
   {

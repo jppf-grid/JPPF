@@ -21,6 +21,7 @@ package org.jppf.utils;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class FileReplacerEx
 {

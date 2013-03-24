@@ -23,6 +23,7 @@ import java.util.*;
 /**
  * This class manages the loading and use of strategies for sending results back to the JPPF clients.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SendResultsStrategyManager
 {

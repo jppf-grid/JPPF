@@ -26,6 +26,7 @@ import org.jppf.node.NodeConnection;
  * Instances of this class represent the connection between a node's class loader and the driver.
  * @param <C> the type of communication channel used by this connection.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface ClassLoaderConnection<C> extends NodeConnection<C>
 {
