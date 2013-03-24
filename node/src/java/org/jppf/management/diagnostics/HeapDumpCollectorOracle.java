@@ -29,6 +29,7 @@ import org.jppf.JPPFException;
 /**
  * Generate a heap dump for an Oracle JVM.
  * @author Laurent Cohen
+ * @exclude
  */
 public class HeapDumpCollectorOracle implements HeapDumpCollector
 {

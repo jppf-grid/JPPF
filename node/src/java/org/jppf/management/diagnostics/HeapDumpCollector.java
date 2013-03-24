@@ -22,6 +22,7 @@ package org.jppf.management.diagnostics;
  * Interface for classes that which to programmatically trigger a heap dump of the current JVM.
  * Currrently, this only works with Oracle's "standard" and JRockit, along with IBM's, JVMs.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface HeapDumpCollector
 {
@@ -35,6 +36,7 @@ public interface HeapDumpCollector
   /**
    * This factory class generates instances of <code>HeapDumpCollector</code> based on
    * the vendor name found in <code>System.getProperty("java.vm.vendor")</code>.
+   * @exclude
    */
   public static class Factory
   {
@@ -44,9 +46,9 @@ public interface HeapDumpCollector
      */
     public static HeapDumpCollector newInstance()
     {
-      String vendor = System.getProperty("java.vm.vendor", "");
-      if (vendor.toLowerCase().indexOf("ibm") >= 0) return new HeapDumpCollectorIBM();
-      else if (vendor.toLowerCase().indexOf("oracle") >= 0) return new HeapDumpCollectorOracle();
+      String vendor = System.getProperty("java.vm.vendor", "").toLowerCase();
+      if (vendor.indexOf("ibm") >= 0) return new HeapDumpCollectorIBM();
+      else if (vendor.indexOf("oracle") >= 0) return new HeapDumpCollectorOracle();
       return null;
     }
   }

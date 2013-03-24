@@ -65,7 +65,7 @@ public class ThreadDump implements Serializable
 
   /**
    * Get the ids of the deadlock threads, if any.
-   * @return the ids as an array of long value, or null if none exists.
+   * @return the ids as an array of <code>long</code> values, or <code>null</code> if none exists.
    */
   public long[] getDeadlockedThreads()
   {

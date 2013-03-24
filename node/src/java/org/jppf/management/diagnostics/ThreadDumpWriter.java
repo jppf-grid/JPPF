@@ -21,7 +21,7 @@ package org.jppf.management.diagnostics;
 import java.io.Closeable;
 
 /**
- * Interface for printing a thread dump.
+ * Interface for printing a {@link ThreadDump}.
  * @author Laurent Cohen
  */
 public interface ThreadDumpWriter extends Closeable

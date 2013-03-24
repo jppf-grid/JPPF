@@ -17,6 +17,6 @@
  */
 
 /**
- * Support for the JMX-based management of JPPF components.
+ * Support for the JVM health monitoring and diagnostics.
  */
 package org.jppf.management.diagnostics;

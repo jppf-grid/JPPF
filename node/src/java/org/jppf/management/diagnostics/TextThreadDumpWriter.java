@@ -25,7 +25,7 @@ import org.jppf.utils.StringUtils;
 import org.jppf.utils.streams.StreamUtils;
 
 /**
- * 
+ * This class prints a thread dump nicely formatted as plain text to a character stream.
  * @author Laurent Cohen
  */
 public class TextThreadDumpWriter extends AbstractThreadDumpWriter
@@ -128,12 +128,11 @@ public class TextThreadDumpWriter extends AbstractThreadDumpWriter
     out.close();
   }
 
-
   /**
-   * Print the specified thread dump directly to a string.
+   * Print the specified thread dump directly to a plain text string.
    * @param dump the thread dump to print.
    * @param title title given to the dump.
-   * @return the thread dump printed to a strin, or null if it could not be printed.
+   * @return the thread dump printed to a string, or null if it could not be printed.
    */
   public static String printToString(final ThreadDump dump, final String title)
   {

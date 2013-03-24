@@ -20,8 +20,6 @@ package org.jppf.management.diagnostics;
 
 import java.lang.management.*;
 
-import javax.management.NotificationBroadcasterSupport;
-
 import org.jppf.JPPFException;
 import org.slf4j.*;
 
@@ -29,7 +27,7 @@ import org.slf4j.*;
  * Implementation of the {@link DiagnosticsMBean} interface.
  * @author Laurent Cohen
  */
-public class Diagnostics extends NotificationBroadcasterSupport implements DiagnosticsMBean
+public class Diagnostics implements DiagnosticsMBean
 {
   /**
    * Logger for this class.
@@ -57,7 +55,7 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
   private HeapDumpCollector heapDumpCollector = null;
 
   /**
-   * Initialize this MBean.
+   * Initialize this MBean implementation.
    */
   public Diagnostics()
   {
@@ -157,5 +155,11 @@ public class Diagnostics extends NotificationBroadcasterSupport implements Diagn
   {
     if (heapDumpCollector == null) throw new JPPFException("heap dumps are not available for this JVM");
     return heapDumpCollector.dumpHeap();
+  }
+
+  @Override
+  public Double cpuLoad()
+  {
+    return cpuTimeCollector == null ? -1d : cpuTimeCollector.getLoad();
   }
 }

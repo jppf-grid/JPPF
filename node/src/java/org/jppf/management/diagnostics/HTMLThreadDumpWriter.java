@@ -24,17 +24,18 @@ import java.util.*;
 import org.jppf.utils.streams.StreamUtils;
 
 /**
- * 
+ * This class prints a thread dump nicely formatted as HTML to a character stream.
+ * <br/>This is used by the adminsitration console to display a thread dump for a selected driver or node.
  * @author Laurent Cohen
  */
 public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter
 {
   /**
-   * 
+   * End of line character sequence.
    */
   private static final String BR = "<br/>\n";
   /**
-   * 
+   * The title given to the printed thread dump.
    */
   private final String title;
   /**
@@ -189,7 +190,7 @@ public class HTMLThreadDumpWriter extends AbstractThreadDumpWriter
    * Print the specified thread dump directly to a string.
    * @param dump the thread dump to print.
    * @param title title given to the dump.
-   * @return the thread dump printed to a strin, or null if it could not be printed.
+   * @return the thread dump printed to an HTML string, or null if it could not be printed.
    */
   public static String printToString(final ThreadDump dump, final String title)
   {

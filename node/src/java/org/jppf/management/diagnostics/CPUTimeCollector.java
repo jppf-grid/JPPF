@@ -21,11 +21,16 @@ package org.jppf.management.diagnostics;
 import java.lang.management.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class computes, at regular intervals, the approximative value of the CPU load
+ * for the current JVM. 
+ * <p>The computed value is equal to <code>sum<sub>i</sub>(thread_used_cpu<sub>i</sub>) / interval</code>, for all the
+ * live threads of the JVM at the time of the computation.
+ * <p>Thus, errors may occur, since many threads may have been created then died between two computations.
+ * However, in most cases this is a reasonable approximation, whose computation does not tax the CPU too heavily.
  * @author Laurent Cohen
  */
 public class CPUTimeCollector extends ThreadSynchronization implements Runnable
@@ -39,9 +44,11 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * 
+   * The interval between two computations in milliseconds.
+   * Taken form the value of configuration property "jppf.cpu.load.compuation.interval".
+   * It defaults to 1000 (1 second) if the property is unspecified.
    */
-  static long INTERVAL = 1L * 1000L;
+  protected static long INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.cpu.load.compuation.interval", 1L * 1000L);
   /**
    * The total CPU time in milliseconds.
    */
@@ -51,11 +58,11 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
    */
   private AtomicLong load = new AtomicLong(0L);
   /**
-   * 
+   * Reference to the platform's thread MXBean.
    */
   ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
   /**
-   * 
+   * Reference to the platform's operating system MXBean.
    */
   OperatingSystemMXBean systemMXBean = ManagementFactory.getOperatingSystemMXBean();
 
@@ -92,8 +99,8 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Get the total CPU time in milliseconds.
-   * @return the cpu time as a long value.
+   * Get the CPU load as the ratio of <code>totalCpuTime / computationInterval</code>.
+   * @return the CPU load as a double value in the range <code>[0, 1]</code>.
    */
   public double getLoad()
   {

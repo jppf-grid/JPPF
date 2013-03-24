@@ -18,25 +18,24 @@
 
 package org.jppf.management.diagnostics;
 
-import javax.management.NotificationEmitter;
 
 /**
  * Interface for the diagnostics MBean.
  * @author Laurent Cohen
  */
-public interface DiagnosticsMBean extends NotificationEmitter
+public interface DiagnosticsMBean
 {
   /**
-   * The name of this mbean in a driver.
+   * The name of this MBean in a driver.
    */
   String MBEAN_NAME_DRIVER = "org.jppf:name=diagnostics,type=driver";
   /**
-   * The name of this mbean in a node.
+   * The name of this MBean in a node.
    */
   String MBEAN_NAME_NODE = "org.jppf:name=diagnostics,type=node";
 
   /**
-   * Get the diagnostifcs info for the whole JVM.
+   * Get the diagnostics info for the whole JVM.
    * @return a {@link MemoryInformation} instance.
    * @throws Exception if any error occurs.
    */
@@ -77,9 +76,22 @@ public interface DiagnosticsMBean extends NotificationEmitter
   HealthSnapshot healthSnapshot() throws Exception;
 
   /**
-   * Trigger a heap dump of the JVM.
+   * Trigger a heap dump of the JVM. This will not work with all JVM implementations.
+   * It should work with Oracle standard and JRockit JVMs, along with IBM JVM.
    * @return a message describing the outcome.
    * @throws Exception if any error occurs. 
    */
   String heapDump() throws Exception;
+
+  /**
+   * Get an approximation of the current CPU load. The computed value is equal to
+   * <code>sum<sub>i</sub>(thread_used_cpu<sub>i</sub>) / interval</code>, for all the
+   * live threads of the JVM at the time of the computation. Thus, errors may occur,
+   * since many threads may have been created then died between two computations.
+   * However, in most cases this is a reasonable approximation, whose computation does not
+   * tax the CPU too heavily.
+   * @return the cpu load as a double value in the range <code>[0, 1]</code> (ratio of <code>totalCpuTime / computationInterval</code>),
+   * or -1d if CPU time measurement is not available for the JVM.
+   */
+  Double cpuLoad();
 }

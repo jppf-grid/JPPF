@@ -99,7 +99,7 @@ public class MemoryUsageInformation implements Serializable
   }
 
   /**
-   * Retrun the ratio of used memory over maximum available memory.
+   * Return the ratio of used memory over maximum available memory.
    * @return the ratio as a double value in the range [0, 1], or -1 if the maximum memory information is not available. 
    */
   public double getUsedRatio()

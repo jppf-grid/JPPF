@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.Map;
 
 /**
- * 
+ * Abstract implementation of a {@link ThreadDumpWriter}.
  * @author Laurent Cohen
  */
 public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
@@ -32,15 +32,15 @@ public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
    */
   protected final PrintWriter out;
   /**
-   * 
+   * The character sequence used for the indentation, for instance spaces or tabs.
    */
   protected final String indentString;
   /**
-   * 
+   * The current identation level of the output.
    */
   protected int indentLevel = 0;
   /**
-   * 
+   * The current identation to use before writing each line of the output.
    */
   protected StringBuilder indent = new StringBuilder();
 
@@ -103,7 +103,7 @@ public abstract class AbstractThreadDumpWriter implements ThreadDumpWriter
   }
 
   /**
-   * Increment the current indentation level.
+   * Decrement the current indentation level.
    */
   protected void decIndent()
   {

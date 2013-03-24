@@ -142,8 +142,17 @@ public class HealthSnapshot implements Serializable
   }
 
   /**
+   * Get this snapshot in an easily readable format, according to the default locale.
+   * @return a string representation of this snapshot.
+   */
+  public String toFormattedString()
+  {
+    return toFormattedString(Locale.getDefault());
+  }
+
+  /**
    * Get this snapshot in an easily readable format.
-   * @param locale the locle to use for formatting.
+   * @param locale the locale to use for formatting.
    * @return a string representation of this snapshot.
    */
   public String toFormattedString(final Locale locale)
@@ -171,7 +180,7 @@ public class HealthSnapshot implements Serializable
   }
 
   /**
-   * Format a vlaue.
+   * Format a value.
    * @param value the value to format.
    * @param nf the number format to use.
    * @return a formatted string.
