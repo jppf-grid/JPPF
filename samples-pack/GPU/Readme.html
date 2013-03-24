@@ -39,7 +39,7 @@
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you must have a JPPF server and at least one node running.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3">JPPF documentation</a>.<br>
 
 					<p>The node will require some additional configuration. In effect, since the APARAPI library load a native library, the file "aparapi.jar" must be added directly to the node's classpath.
 					If you simply keep it in the client's classpath, the node will attempt to load it for each distinct client. This will only work the first time, and fail on subsequent attempts.<br/>
@@ -82,7 +82,7 @@ execMode = GPU</pre>
 					<h3>Sample's source files</h3>
 					<ul class="samplesList">
 						<li><a href="src/org/jppf/example/aparapi/MatrixKernel.java.html">MatrixKernel.java</a>: this is the class that will be translated into OpenCL code</li>
-						<li><a href="src/org/jppf/example/aparapi/GeneratedOpenCL.c">GeneratedOpenCL.c</a>: the OpenCL code fgenrated from MatrixKernel which will be actuallyexecuted on the GPU</li>
+						<li><a href="src/org/jppf/example/aparapi/GeneratedOpenCL.c">GeneratedOpenCL.c</a>: the OpenCL code generated from MatrixKernel which will be actually executed on the GPU</li>
 						<li><a href="src/org/jppf/example/aparapi/AparapiTask.java.html">AparapiTask.java</a>: the JPPF task which invokes the GPU bindings API</li>
 						<li><a href="src/org/jppf/example/aparapi/AparapiRunner.java.html">AparapiRunner.java</a>: the JPPF client application which submits the jobs to the grid</li>
 						<li><a href="src/org/jppf/example/aparapi/SquareMatrix.java.html">SquareMatrix.java</a>: a simple representation of a square dense matrix, whose values are stored in a one-dimensional float array</li>
