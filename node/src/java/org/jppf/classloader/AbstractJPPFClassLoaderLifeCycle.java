@@ -22,6 +22,7 @@ import static org.jppf.utils.StringUtils.build;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.JPPFNodeReconnectionNotification;
@@ -83,19 +84,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The connection to the driver.
    */
   protected ClassLoaderConnection<?> connection;
-
   /**
-   * Initialize this class loader with a parent class loader.
-   * @param connection the connection to the driver.
-   * @param parent a ClassLoader instance.
-   * @exclude
+   * The list of listeners to this class loader.
    */
-  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection connection, final ClassLoader parent)
-  {
-    super(StringUtils.ZERO_URL, parent);
-    this.connection = connection;
-    this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
-  }
+  protected final List<ClassLoaderListener> listeners = new CopyOnWriteArrayList<ClassLoaderListener>();
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -104,24 +96,22 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @param uuidPath unique identifier for the submitting application.
    * @exclude
    */
-  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath)
-  {
-    this(connection, parent);
-    this.uuidPath = uuidPath;
+  protected AbstractJPPFClassLoaderLifeCycle(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath) {
+    super(StringUtils.ZERO_URL, parent);
+    this.connection = connection;
+    this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
+    if (uuidPath != null) this.uuidPath = uuidPath;
+    listeners.addAll(ClassLoaderListenerHandler.getInstance().getListeners());
   }
 
   /**
    * Initialize the connection to the driver.
    * @exclude
    */
-  protected void init()
-  {
-    try
-    {
+  protected void init() {
+    try {
       connection.init();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
     }
   }
@@ -140,26 +130,18 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @throws ClassNotFoundException if the class could not be loaded from the remote server.
    * @exclude
    */
-  protected JPPFResourceWrapper loadResource(final Map<String, Object> map) throws ClassNotFoundException
-  {
+  protected JPPFResourceWrapper loadResource(final Map<String, Object> map) throws ClassNotFoundException {
     JPPFResourceWrapper resource = null;
-    try
-    {
+    try {
       if (debugEnabled) log.debug(build("loading remote definition for resource [", map.get("name"), "]"));
       resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
       if (debugEnabled) log.debug(build("remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
       if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
       throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
-    }
-    catch(ClassNotFoundException e)
-    {
+    } catch(ClassNotFoundException e) {
       throw e;
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return resource;
@@ -169,8 +151,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Get the uuid for the original task bundle that triggered this resource request.
    * @return the uuid as a string.
    */
-  public String getRequestUuid()
-  {
+  public String getRequestUuid() {
     return requestUuid;
   }
 
@@ -179,8 +160,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @param requestUuid the uuid as a string.
    * @exclude
    */
-  public void setRequestUuid(final String requestUuid)
-  {
+  public void setRequestUuid(final String requestUuid) {
     this.requestUuid = requestUuid;
   }
 
@@ -192,23 +172,19 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public abstract void close();
 
   @Override
-  public void addURL(final URL url)
-  {
+  public void addURL(final URL url) {
     super.addURL(url);
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append("[id=").append(instanceNumber).append(", type=").append(dynamic ? "client" : "server");
     sb.append(", uuidPath=").append(uuidPath);
     URL[] urls = getURLs();
     sb.append(", classpath=");
-    if ((urls != null) && (urls.length > 0))
-    {
-      for (int i=0; i<urls.length; i++)
-      {
+    if ((urls != null) && (urls.length > 0)) {
+      for (int i=0; i<urls.length; i++) {
         if (i > 0) sb.append(';');
         sb.append(urls[i]);
       }
@@ -293,45 +269,34 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @return an array of URLs, one for each looked up resources. Some URLs may be null, however the returned array
    * is never null, and results are in the same order as the specified resource names.
    */
-  public URL[] getMultipleResources(final String...names)
-  {
+  public URL[] getMultipleResources(final String...names) {
     if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
     int length = names.length;
     URL[] results = new URL[length];
     boolean[] alreadyNotFound = new boolean[length];
-    for (int i=0; i<length; i++)
-    {
+    for (int i=0; i<length; i++) {
       results[i] = null;
       alreadyNotFound[i] = notFoundCache.has(names[i]);
     }
-    try
-    {
+    try {
       ClassLoader parent = getParent();
-      if (parent == null)
-      {
+      if (parent == null) {
         for (int i=0; i<length; i++) if (!alreadyNotFound[i]) results[i] = getSystemResource(names[i]);
-      }
-      else if (!(parent instanceof AbstractJPPFClassLoader))
-      {
+      } else if (!(parent instanceof AbstractJPPFClassLoader)) {
         for (int i=0; i<length; i++) if (!alreadyNotFound[i]) results[i] = parent.getResource(names[i]);
-      }
-      else
-      {
+      } else {
         results = ((AbstractJPPFClassLoader) parent).getMultipleResources(names);
       }
       for (int i=0; i<length; i++) if (results[i] == null) results[i] = super.getResource(names[i]);
       List<Integer> indices = new ArrayList<Integer>();
       for (int i=0; i<length; i++) if (results[i] == null) indices.add(i);
-      if (!indices.isEmpty())
-      {
+      if (!indices.isEmpty()) {
         String[] namesToFind = new String[indices.size()];
         for (int i=0; i<namesToFind.length; i++) namesToFind[i] = names[indices.get(i)];
         URL[] foundURLs = findMultipleResources(namesToFind);
         for (int i=0; i<namesToFind.length; i++) results[indices.get(i)] = foundURLs[i];
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return results;
@@ -342,8 +307,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @return a {@link ClassLoaderConnection} instance.
    * @exclude 
    */
-  public ClassLoaderConnection getConnection()
-  {
+  public ClassLoaderConnection getConnection() {
     return connection;
   }
 
@@ -351,9 +315,26 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Get the uuid of the JPPF client this class laoder gets resources from.
    * @return a client uuid as a string, or <code>null</code> if this class cloader is not a client class loader.
    */
-  public String getClientUuid()
-  {
+  public String getClientUuid() {
     if (!dynamic) return null;
     return uuidPath.get(0);
+  }
+
+  /**
+   * Add the specified listener to the list of listeners.
+   * @param listener the listener to add.
+   */
+  public void addClassLoaderListener(final ClassLoaderListener listener) {
+    if (listener == null) throw new IllegalArgumentException("cannot add a null listener");
+    listeners.add(listener);
+  }
+
+  /**
+   * Remove the specified listener from the list of listeners.
+   * @param listener the listener to remove.
+   */
+  public void removeClassLoaderListener(final ClassLoaderListener listener) {
+    if (listener == null) throw new IllegalArgumentException("cannot remove a null listener");
+    listeners.remove(listener);
   }
 }

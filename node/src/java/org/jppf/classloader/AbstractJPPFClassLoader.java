@@ -31,8 +31,7 @@ import org.slf4j.*;
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLifeCycle
-{
+public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLifeCycle {
   /**
    * Logger for this class.
    */
@@ -59,9 +58,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    */
-  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent)
-  {
-    super(connection, parent);
+  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent) {
+    super(connection, parent, null);
   }
 
   /**
@@ -70,8 +68,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
    */
-  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath)
-  {
+  public AbstractJPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath) {
     super(connection, parent, uuidPath);
   }
 
@@ -85,13 +82,11 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws ClassNotFoundException if the class could not be found
    * @exclude
    */
-  public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException
-  {
+  public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException {
     if (debugEnabled) log.debug(build("looking up resource [", name, "]"));
     Class<?> c = findLoadedClass(name);
     if ((c != null) && debugEnabled) log.debug("classloader = " + c.getClassLoader());
-    if (c == null)
-    {
+    if (c == null) {
       if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
       c = findClass(name, false);
     }
@@ -107,8 +102,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @see java.lang.ClassLoader#findClass(java.lang.String)
    */
   @Override
-  protected Class<?> findClass(final String name) throws ClassNotFoundException
-  {
+  protected Class<?> findClass(final String name) throws ClassNotFoundException {
     return findClass(name, true);
   }
 
@@ -121,20 +115,22 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @see java.lang.ClassLoader#findClass(java.lang.String)
    * @exclude
    */
-  protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException
-  {
+  protected synchronized Class<?> findClass(final String name, final boolean lookupClasspath) throws ClassNotFoundException {
     Class<?> c = null;
     if (notFoundCache.has(name)) throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     c = findLoadedClass(name);
     if (c != null) return c;
-    if (lookupClasspath) c = findClassInURLClasspath(name, false);
-    if (c != null) return c;
+    if (lookupClasspath) {
+      c = findClassInURLClasspath(name, false);
+      if (c != null) {
+        fireEvent(c, null, true);
+        return c;
+      }
+    }
     int i = name.lastIndexOf('.');
-    if (i >= 0)
-    {
+    if (i >= 0) {
       String pkgName = name.substring(0, i);
-      synchronized(this)
-      {
+      synchronized(this) {
         Package pkg = getPackage(pkgName);
         if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
       }
@@ -145,22 +141,22 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", resName);
     JPPFResourceWrapper resource = null;
-    synchronized(this)
-    {
+    synchronized(this) {
       resource = loadResource(map);
     }
     if (resource != null) b = resource.getDefinition();
-    if ((b == null) || (b.length == 0))
-    {
+    if ((b == null) || (b.length == 0)) {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
       if (resource != null) notFoundCache.add(name);
+      fireEvent(null, name, false);
       throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
     if (debugEnabled) log.debug(build("found definition for resource [", name, ", definitionLength=", b.length, "]"));
-    synchronized(this)
-    {
+    synchronized(this) {
       c = findLoadedClass(name);
-      return c == null ? defineClass(name, b, 0, b.length) : c;
+      if (c == null) c = defineClass(name, b, 0, b.length);
+      fireEvent(c, null, false);
+      return c;
     }
   }
 
@@ -175,8 +171,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws Exception if the execution of the callable in the client resulted in a {@link Throwable} being raised.
    */
   @SuppressWarnings("unchecked")
-  public <V> V computeCallable(final JPPFCallable<V> callable) throws Exception
-  {
+  public <V> V computeCallable(final JPPFCallable<V> callable) throws Exception {
     V result = null;
     Object returned = null;
     Class clazz = loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
@@ -197,8 +192,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws Exception if the connection was lost and could not be reestablished.
    * @exclude
    */
-  public byte[] computeRemoteData(final byte[] callable) throws Exception
-  {
+  public byte[] computeRemoteData(final byte[] callable) throws Exception {
     if (debugEnabled) log.debug(build("requesting remote computation, requestUuid = ", requestUuid));
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", "callable");
@@ -218,26 +212,20 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @see java.lang.ClassLoader#findResource(java.lang.String)
    */
   @Override
-  public URL findResource(final String name)
-  {
+  public URL findResource(final String name) {
     URL url = null;
     if (notFoundCache.has(name)) return null;
     url = cache.getResourceURL(name);
     if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
-    if (url == null)
-    {
+    if (url == null) {
       url = super.findResource(name);
       if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
-      if (url == null)
-      {
+      if (url == null) {
         if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
-        try
-        {
+        try {
           List<URL> urlList = findRemoteResources(name);
           if ((urlList != null) && !urlList.isEmpty()) url = urlList.get(0);
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }
@@ -265,17 +253,13 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
    */
   @Override
-  public InputStream getResourceAsStream(final String name)
-  {
+  public InputStream getResourceAsStream(final String name) {
     InputStream is = null;
-    try
-    {
+    try {
       URL url = getResource(name);
       if (url != null) is = url.openStream();
       if (debugEnabled) log.debug(build("lookup for '", name, "' = ", url, " for ", this));
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
     }
     return is;
   }
@@ -289,26 +273,20 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   @Override
   @SuppressWarnings("unchecked")
-  public Enumeration<URL> findResources(final String name) throws IOException
-  {
+  public Enumeration<URL> findResources(final String name) throws IOException {
     List<URL> urlList = new ArrayList<URL>();
-    if (!notFoundCache.has(name))
-    {
+    if (!notFoundCache.has(name)) {
       if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
-      try
-      {
+      try {
         urlList = cache.getResourcesURLs(name);
         if (urlList == null) urlList = new ArrayList<URL>();
         List<URL> tempList = findRemoteResources(name);
         if (tempList != null) urlList.addAll(tempList);
         Enumeration<URL> tempEnum = super.findResources(name);
-        if (tempEnum != null)
-        {
+        if (tempEnum != null) {
           while (tempEnum.hasMoreElements()) urlList.add(tempEnum.nextElement());
         }
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
         throw (e instanceof IOException) ? (IOException) e : new IOException(e);
@@ -326,12 +304,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @see java.lang.ClassLoader#findResources(java.lang.String)
    */
   @SuppressWarnings("unchecked")
-  private List<URL> findRemoteResources(final String name) throws Exception
-  {
+  private List<URL> findRemoteResources(final String name) throws Exception {
     List<URL> urlList = new ArrayList<URL>();
     JPPFResourceWrapper resource = null;
-    if (!notFoundCache.has(name))
-    {
+    if (!notFoundCache.has(name)) {
       List<String> locationsList = null;
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("name", name);
@@ -341,8 +317,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if (resource != null) dataList = (List<byte[]>) resource.getData("resource_list");
       boolean found = (dataList != null) && !dataList.isEmpty();
       if (debugEnabled) log.debug(build("resource [", name, "] ", found ? "" : "not ", "found remotely"));
-      if (found)
-      {
+      if (found) {
         cache.registerResources(name, dataList);
         urlList = cache.getResourcesURLs(name);
       }
@@ -356,11 +331,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @exclude
    */
   @Override
-  protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException
-  {
+  protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
     DelegationModel model = getDelegationModel();
-    switch(model)
-    {
+    switch(model) {
       case URL_FIRST: return loadClassLocalFirst(name, resolve);
       case PARENT_FIRST: return super.loadClass(name, resolve);
     }
@@ -432,23 +405,18 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return a <code>Class</code> instance, or null if the class could not be found in the URL classpath.
    * @exclude
    */
-  protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive)
-  {
+  protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive){
     if (debugEnabled) log.debug(build("looking up up resource [", name, "] in the URL classpath for ", this));
     Class<?> c = findLoadedClass(name);
-    if (c == null)
-    {
-      if (recursive && (getParent() instanceof AbstractJPPFClassLoader))
-      {
+    if (c == null) {
+      if (recursive && (getParent() instanceof AbstractJPPFClassLoader)) {
         c = ((AbstractJPPFClassLoader) getParent()).findClassInURLClasspath(name, recursive);
       }
-      if (c == null)
-      {
-        try
-        {
+      if (c == null) {
+        try {
           c = super.findClass(name);
+        } catch(ClassNotFoundException ignore) {
         }
-        catch(ClassNotFoundException ignore){}
       }
     }
     if (debugEnabled) log.debug(build("resource [", name, "] ", c == null ? "not " : "", "found in the URL classpath for ", this));
@@ -459,8 +427,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * Determine the class loading delegation model currently in use.
    * @return an int value representing the model, either {@link DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link DelegationModel#URL_FIRST URL_FIRST}.
    */
-  public static synchronized DelegationModel getDelegationModel()
-  {
+  public static synchronized DelegationModel getDelegationModel() {
     return delegationModel;
   }
 
@@ -469,8 +436,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param model an int value, either {@link DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link DelegationModel#URL_FIRST URL_FIRST}.
    * If any other value is specified then calling this method has no effect.
    */
-  public static synchronized void setDelegationModel(final DelegationModel model)
-  {
+  public static synchronized void setDelegationModel(final DelegationModel model) {
     if (model != null) AbstractJPPFClassLoader.delegationModel = model;
   }
 
@@ -478,8 +444,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * Initialize the delegation model from the JPPF configuration.
    * @return the delegation model indicator as computed from the configuration.
    */
-  private static synchronized DelegationModel initDelegationModel()
-  {
+  private static synchronized DelegationModel initDelegationModel() {
     String s = JPPFConfiguration.getProperties().getString("jppf.classloader.delegation", "parent");
     DelegationModel model = "url".equalsIgnoreCase(s) ? DelegationModel.URL_FIRST : DelegationModel.PARENT_FIRST;
     if (debugEnabled) log.debug(build("Using ", model, " class loader delegation model"));
@@ -490,8 +455,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * Clear the cache of resources not found.
    * The main usage for this method is when libraries or folders have been dynamically added to this class loader's classpath.
    */
-  public void clearNotFoundCache()
-  {
+  public void clearNotFoundCache() {
     notFoundCache.clear();
   }
 
@@ -499,5 +463,38 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public void close() {
     cache.close();
     notFoundCache.clear();
+  }
+
+  /**
+   * Notify all listeners that a class was either loaded or not found.
+   * @param c the class object if the class was successfully loaded, <code>null</code> otherwise.
+   * @param name the name of the class if it was not found, this parameter is ignored if the class was found.
+   * @param foundInURLClassPath <code>true</code> if the class was loaded from the class loader's URL classpath,
+   * <code>false</code> if it was loaded from a remote JPPF driver or client.
+   */
+  protected void fireEvent(final Class<?> c, final String name, final boolean foundInURLClassPath) {
+    boolean found = c != null;
+    ClassLoaderEvent event = found ? new ClassLoaderEvent(this, c, foundInURLClassPath) : new ClassLoaderEvent(this, name);
+    if (found) {
+      for (ClassLoaderListener listener: listeners) listener.classLoaded(event);
+    } else {
+      for (ClassLoaderListener listener: listeners) listener.classNotFound(event);
+    }
+  }
+
+  /**
+   * Determine whether this class loader accesses the classpath of a remote client.
+   * @return <code>true</code> if this class loader is a client class loader, <code>false</code> if it is a server class loader.
+   */
+  public boolean isClientClassLoader() {
+    return dynamic;
+  }
+
+  /**
+   * Determine whether this class loader accesses the classpath of a remote driver/server.
+   * @return <code>true</code> if this class loader is a server class loader, <code>false</code> if it is a client class loader.
+   */
+  public boolean isServerClassLoader() {
+    return !dynamic;
   }
 }
