@@ -394,7 +394,7 @@ public class ServerJob extends AbstractServerJob {
    */
   public Set<ServerTaskBundleNode> getDispatchSet() {
     synchronized (dispatchSet) {
-      return new LinkedHashSet(dispatchSet);
+      return new LinkedHashSet<ServerTaskBundleNode>(dispatchSet);
     }
   }
 

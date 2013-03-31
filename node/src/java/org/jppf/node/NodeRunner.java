@@ -39,8 +39,7 @@ import org.slf4j.*;
 public class NodeRunner
 {
   // this static block must be the first thing executed when this class is loaded
-  static
-  {
+  static {
     JPPFInitializer.init();
   }
   /**
@@ -97,11 +96,9 @@ public class NodeRunner
    * Run a node as a standalone application.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String...args) {
     node = null;
-    try
-    {
+    try {
       // initialize the jmx logger
       new JmxMessageNotifier();
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
@@ -112,28 +109,20 @@ public class NodeRunner
       hooksHandler.loadHooks();
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
-      if (!"noLauncher".equals(args[0]))
-      {
+      if (!"noLauncher".equals(args[0])) {
         int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       System.exit(1);
     }
-    try
-    {
-      while (true)
-      {
-        try
-        {
+    try {
+      while (true) {
+        try {
           node = createNode();
           node.run();
-        }
-        catch(JPPFNodeReconnectionNotification e)
-        {
+        } catch(JPPFNodeReconnectionNotification e) {
           if (debugEnabled) log.debug("received reconnection notification");
           if (classLoader != null) classLoader.close();
           classLoader = null;
@@ -141,9 +130,7 @@ public class NodeRunner
           unsetSecurity();
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
     }
   }
@@ -153,8 +140,7 @@ public class NodeRunner
    * @param args not used.
    * @exclude
    */
-  public static void start(final String...args)
-  {
+  public static void start(final String...args) {
     main(args);
     serviceLock.goToSleep();
   }
@@ -164,8 +150,7 @@ public class NodeRunner
    * @param args not used.
    * @exclude
    */
-  public static void stop(final String...args)
-  {
+  public static void stop(final String...args) {
     serviceLock.wakeUp();
     System.exit(0);
   }
@@ -194,14 +179,12 @@ public class NodeRunner
    * account the discovered information. If no information could be received, the node relies on
    * the static information in the configuration file.
    */
-  private static void discoverDriver()
-  {
+  private static void discoverDriver() {
     TypedProperties config = JPPFConfiguration.getProperties();
     JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(new IPFilter(config));
     JPPFConnectionInformation info = receiver.receive();
     receiver.setStopped(true);
-    if (info == null)
-    {
+    if (info == null) {
       if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
       restoreInitialConfig();
       return;
@@ -218,13 +201,10 @@ public class NodeRunner
   /**
    * Restore the configuration from the sna^shot taken at startup time.
    */
-  private static void restoreInitialConfig()
-  {
+  private static void restoreInitialConfig() {
     TypedProperties config = JPPFConfiguration.getProperties();
-    for (Map.Entry<Object, Object> entry: initialConfig.entrySet())
-    {
-      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-      {
+    for (Map.Entry<Object, Object> entry: initialConfig.entrySet()) {
+      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         config.setProperty((String) entry.getKey(), (String) entry.getValue());
       }
     }
@@ -234,14 +214,11 @@ public class NodeRunner
    * Set the security manager with the permission granted in the policy file.
    * @throws Exception if the security could not be set.
    */
-  private static void setSecurity() throws Exception
-  {
-    if (!securityManagerSet)
-    {
+  private static void setSecurity() throws Exception {
+    if (!securityManagerSet) {
       TypedProperties props = JPPFConfiguration.getProperties();
       String s = props.getString("jppf.policy.file");
-      if (s != null)
-      {
+      if (s != null) {
         if (debugEnabled) log.debug("setting security");
         //java.rmi.server.hostname
         String rmiHostName = props.getString("jppf.management.host", "localhost");
@@ -256,10 +233,8 @@ public class NodeRunner
   /**
    * Set the security manager with the permission granted in the policy file.
    */
-  private static void unsetSecurity()
-  {
-    if (securityManagerSet)
-    {
+  private static void unsetSecurity() {
+    if (securityManagerSet) {
       if (debugEnabled) log.debug("un-setting security");
       PrivilegedAction<Object> pa = new PrivilegedAction<Object>() {
         @Override
@@ -299,8 +274,7 @@ public class NodeRunner
    * @param key the key associated with the object's value.
    * @param value the object to persist.
    */
-  public static void setPersistentData(final Object key, final Object value)
-  {
+  public static void setPersistentData(final Object key, final Object value) {
     persistentData.put(key, value);
   }
 
@@ -309,8 +283,7 @@ public class NodeRunner
    * @param key the key used to retrieve the persistent object.
    * @return the value associated with the key.
    */
-  public static Object getPersistentData(final Object key)
-  {
+  public static Object getPersistentData(final Object key) {
     return persistentData.get(key);
   }
 
@@ -319,8 +292,7 @@ public class NodeRunner
    * @param key the key associated with the object to remove.
    * @return the value associated with the key, or null if the key was not found.
    */
-  public static Object removePersistentData(final Object key)
-  {
+  public static Object removePersistentData(final Object key) {
     return persistentData.remove(key);
   }
 
@@ -329,8 +301,7 @@ public class NodeRunner
    * @return a <code>Node</code> instance.
    * @exclude
    */
-  public static Node getNode()
-  {
+  public static Node getNode() {
     return node;
   }
 
@@ -340,8 +311,7 @@ public class NodeRunner
    * @param restart determines whether this node should be restarted by the node launcher.
    * @exclude
    */
-  public static void shutdown(final NodeInternal node, final boolean restart)
-  {
+  public static void shutdown(final NodeInternal node, final boolean restart) {
     //executor.submit(new ShutdownOrRestart(restart));
     new ShutdownOrRestart(restart, node).run();
   }
@@ -349,8 +319,7 @@ public class NodeRunner
   /**
    * Stop the JMX server.
    */
-  private static void stopJmxServer()
-  {
+  private static void stopJmxServer() {
     try {
       final JMXServer jmxServer = node.getJmxServer();
       if (jmxServer != null) {
@@ -427,8 +396,7 @@ public class NodeRunner
    * This node's universal identifier.
    * @return a uuid as a string.
    */
-  public static String getUuid()
-  {
+  public static String getUuid() {
     return uuid;
   }
 
@@ -436,8 +404,7 @@ public class NodeRunner
    * Determine whether this node is currently shutting down.
    * @return <code>true</code> if the node is shutting down, <code>false</code> otherwise.
    */
-  public synchronized static boolean isShuttingDown()
-  {
+  public synchronized static boolean isShuttingDown() {
     return shuttingDown;
   }
 
@@ -445,8 +412,7 @@ public class NodeRunner
    * Specify whether this node is currently shutting down.
    * @param shuttingDown <code>true</code> if the node is shutting down, <code>false</code> otherwise.
    */
-  public synchronized static void setShuttingDown(final boolean shuttingDown)
-  {
+  public synchronized static void setShuttingDown(final boolean shuttingDown) {
     NodeRunner.shuttingDown = shuttingDown;
   }
 }

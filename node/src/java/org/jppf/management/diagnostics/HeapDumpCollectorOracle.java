@@ -50,7 +50,7 @@ public class HeapDumpCollectorOracle implements HeapDumpCollector
   public String dumpHeap() throws Exception
   {
     if (hotspotDiagnosticsMXBean == null) throw new JPPFException("hotspot diagnostics MBean is not avaialable - no heap dump taken");
-    Class clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+    Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
     Method m = clazz.getMethod("dumpHeap", String.class, boolean.class);
     String filename = "heapdump-" + dumpCount.incrementAndGet() + ".hprof";
     m.invoke(hotspotDiagnosticsMXBean, filename, true);
@@ -65,7 +65,7 @@ public class HeapDumpCollectorOracle implements HeapDumpCollector
   {
     try
     {
-      Class clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+      Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
       MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       Object bean = ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
       return bean;
