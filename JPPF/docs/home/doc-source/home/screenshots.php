@@ -4,7 +4,13 @@ $template{name="about-page-header" title="Screenshots"}$
 	$screenshot = $_REQUEST["screenshot"];
 	if (($screenshot == NULL) || ($screenshot == ""))
 	{
-		$screenshot = "$template{name="first-shot"}$";
+		$screenshot = '$template{name="first-shot"}$';
+	}
+	$shot_title = $_REQUEST["shotTitle"];
+	if (($shot_title == NULL) || ($shot_title == ""))
+	{
+		//$shot_title = "Screenshot";
+		$shot_title = '$template{name="first-shot-title"}$';
 	}
 ?>
 	<div align="center">
@@ -16,7 +22,7 @@ $template{name="about-page-header" title="Screenshots"}$
 			</tr>
 		</table>
 		<br>
-				$template{name="block-header" title="<?php echo $screenshot; ?>"}$
+				$template{name="block-header" title="<?php echo $shot_title; ?>"}$
 				<div  style="margin: 1px">
 				<br>
 				<img src="screenshots/<?php echo $screenshot; ?>" border="0" alt="screenshot"/>
