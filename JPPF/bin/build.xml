@@ -172,6 +172,7 @@
 	<import file="build-findbugs.xml"/>
   <import file="build-docs.xml"/>
   <import file="build-tests.xml"/>
+  <import file="build-maven.xml"/>
 	
 	<!-- ========================================================================= -->
 	<!--                 Package the application for deployment                    -->

@@ -27,7 +27,6 @@
 		<antcall target="runtime.node"/>
 		<antcall target="runtime.gui"/>
 		<antcall target="application.template"/>
-		<!--<antcall target="runtime.multiplexer"/>-->
 	</target>
 
 	<macrodef name="package-module">
@@ -45,8 +44,10 @@
 				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" />
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-node.jar"/>
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
+        <!--
 				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib/jmxremote-license" includes="*.html"/>
+				-->
 				<zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib">
 					<include name="slf4j-api-*.jar"/>
@@ -72,6 +73,7 @@
 				</zipfileset>
 				<zipfileset dir="${application.template}/src" prefix="${application-template.prefix}/src" includes="**/*.*"/>
 				<zipfileset dir="${application.template}/classes" prefix="${application-template.prefix}/classes" includes="**/*.*"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${application-template.prefix}/lib" includes="*.jar"/>
 			</module-elements>
 		</package-module>
 	</target>
@@ -90,6 +92,7 @@
 					<include name="jppf-common-src.jar"/>
 					<include name="jppf-server-src.jar"/>
 				</zipfileset>
+        <zipfileset dir="${lib}/jmxremote" prefix="${driver.prefix}/lib" includes="*.jar"/>
 			</module-elements>
 		</package-module>
 	</target>
@@ -121,21 +124,7 @@
 				<zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/Jung" prefix="${gui.prefix}/lib" includes="*.jar"/>
-			</module-elements>
-		</package-module>
-	</target>
-
-	<!-- =========== Multiplexer packaging =========== -->
-
-	<target name="runtime.multiplexer">
-		<package-module module="multiplexer">
-			<module-elements>
-				<zipfileset dir="${build}" prefix="${multiplexer.prefix}/lib">
-					<include name="jppf-common.jar"/>
-				</zipfileset>
-				<zipfileset dir="${build}" prefix="${multiplexer.prefix}/lib-src">
-					<include name="jppf-common-src.jar"/>
-				</zipfileset>
+        <zipfileset dir="${lib}/jmxremote" prefix="${gui.prefix}/lib" includes="*.jar"/>
 			</module-elements>
 		</package-module>
 	</target>

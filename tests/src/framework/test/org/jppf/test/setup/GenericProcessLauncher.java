@@ -131,7 +131,7 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
-    addClasspathElement(libDir + "jmxremote/jmxremote_optional.jar");
+    addClasspathElement(libDir + "jmxremote/jmxremote_optional-1.0_01-ea.jar");
   }
 
   /**
@@ -151,7 +151,7 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
-    addClasspathElement(libDir + "jmxremote/jmxremote_optional.jar");
+    addClasspathElement(libDir + "jmxremote/jmxremote_optional-1.0_01-ea.jar");
     TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
     String s = config.getString("jppf.jvm.options", null);
     if (s != null) {
