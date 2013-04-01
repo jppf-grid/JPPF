@@ -287,13 +287,16 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     map.put("name", name);
     map.put("multiple", "true");
     JPPFResourceWrapper resource = loadResourceData(map, true);
-    List<byte[]> dataList = (List<byte[]>)resource.getData("resource_list");
-    boolean found = (dataList != null) && !dataList.isEmpty();
-    if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
-    if (found)
+    if (resource != null)
     {
-      cache.registerResources(name, dataList);
-      urlList = cache.getResourcesURLs(name);
+      List<byte[]> dataList = (List<byte[]>)resource.getData("resource_list");
+      boolean found = (dataList != null) && !dataList.isEmpty();
+      if (debugEnabled) log.debug("resource [" + name + "] " + (found ? "" : "not ") + "found remotely");
+      if (found)
+      {
+        cache.registerResources(name, dataList);
+        urlList = cache.getResourcesURLs(name);
+      }
     }
     return urlList;
   }

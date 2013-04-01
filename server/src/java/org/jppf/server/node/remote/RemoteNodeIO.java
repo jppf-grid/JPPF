@@ -20,9 +20,12 @@ package org.jppf.server.node.remote;
 
 import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
@@ -70,7 +73,15 @@ public class RemoteNodeIO extends AbstractNodeIO
   protected Object[] deserializeObjects() throws Exception
   {
     if (debugEnabled) log.debug("waiting for next request");
-    JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketWrapper, node.getHelper().getSerializer());
+    JPPFTaskBundle bundle = null;
+    try
+    {
+      bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketWrapper, node.getHelper().getSerializer());
+    }
+    catch (IOException e)
+    {
+      throw new JPPFNodeReconnectionNotification(e);
+    }
     if (debugEnabled) log.debug("got bundle " + bundle);
     return deserializeObjects(bundle);
   }
@@ -141,14 +152,25 @@ public class RemoteNodeIO extends AbstractNodeIO
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
     OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
-    for (Future<DataLocation> f: futureList)
+    try
     {
-      DataLocation dl = f.get();
-      if (debugEnabled) log.debug("writing object size = " + dl.getSize());
-      dest.writeInt(dl.getSize());
-      dl.transferTo(dest, true);
+      for (Future<DataLocation> f: futureList)
+      {
+        DataLocation dl = f.get();
+        if (debugEnabled) log.debug("writing object size = " + dl.getSize());
+        dest.writeInt(dl.getSize());
+        dl.transferTo(dest, true);
+      }
+      socketWrapper.flush();
     }
-    socketWrapper.flush();
+    catch (SocketException e)
+    {
+      for (Future<DataLocation> f: futureList)
+      {
+        if (!f.isDone()) f.cancel(true);
+      }
+      throw new JPPFNodeReconnectionNotification(e);
+    }
     if (debugEnabled) log.debug("wrote full results");
   }
 }

@@ -18,8 +18,17 @@
 
 package test.jmx;
 
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jppf.client.*;
+import org.jppf.client.event.TaskResultEvent;
 import org.jppf.management.*;
-import org.jppf.server.JPPFStats;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.*;
+import org.slf4j.*;
+
+import sample.dist.tasklength.LongTask;
 
 /**
  * 
@@ -28,90 +37,140 @@ import org.jppf.server.JPPFStats;
 public class TestJMX
 {
   /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(TestJMX.class);
+  /**
+   * The JPPF client.
+   */
+  private static JPPFClient client = null;
+  /**
+   * 
+   */
+  private static final AtomicInteger RESTART_COUNT = new AtomicInteger(0);
+  /**
+   * 
+   */
+  private static Timer timer = null;
+
+  /**
    * Entry point.
-   * @param args - not used.
+   * @param args not used.
    */
   public static void main(final String...args)
   {
     try
     {
-      TestJMX t = new TestJMX();
-      t.testConnectAndWait();
+      configureClient();
+      client = new JPPFClient();
+      int iterations = 1;
+      for (int i=1; i<=iterations; i++)
+      {
+        JPPFJob job = createJPPFJob("test_job_" + i, 1000, 100L, false);
+        JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+        client.submit(job);
+        List<JPPFTask> results;
+        while ((results = collector.waitForResults(5000L)) == null)
+        {
+          new KillDriverTask().run();
+          RESTART_COUNT.incrementAndGet();
+        }
+        print(job.getName() + " done, total driver restarts: " + RESTART_COUNT);
+        RESTART_COUNT.set(0);
+      }
     }
     catch(Exception e)
     {
       e.printStackTrace();
     }
+    finally
+    {
+      if (client != null) client.close();
+    }
   }
 
   /**
-   * Test the method that gets the number of nodes.
+   * Create a job with the specified parameters.
+   * @param name the name given to the job.
+   * @param nbTasks the number of tasks in the job.
+   * @param duration the duration of each of task in the job.
+   * @param blocking whether the job is block.
+   * @return the created {@link JPPFJob}.
    * @throws Exception if any error occurs.
    */
-  public void testNumberOfNodes() throws Exception
+  private static JPPFJob createJPPFJob(final String name, final int nbTasks, final long duration, final boolean blocking) throws Exception
   {
-    int success = 0;
-    int failure = 0;
-    int firstFailure = -1;
-    for (int i=0; i<1000; i++)
-    {
-      try
-      {
-        int n = getNumberOfNodes();
-        //System.out.println("nb nodes: " + n);
-        success++;
+    JPPFJob job = new JPPFJob();
+    job.setName(name);
+    job.setBlocking(blocking);
+    for (int i=0; i<nbTasks; i++) job.addTask(new LongTask(1000L, true)).setId("task_" + (i+1));
+    job.setResultListener(new JPPFResultCollector(job) {
+      @Override
+      public synchronized void resultsReceived(final TaskResultEvent event) {
+        super.resultsReceived(event);
+        if (event.getThrowable() == null) {
+          List<JPPFTask> list = event.getTaskList();
+          print("received " + list.size() + " tasks, startPosition=" + list.get(0).getPosition() + ", endPosition=" + list.get(list.size()-1).getPosition()
+            + ", pending=" + pendingCount);
+        }
       }
-      catch(Exception ignore)
-      {
-        failure++;
-        if (firstFailure < 0) firstFailure = i;
-      }
-    }
-    System.out.println("successes: " + success + ", failures: " + failure + ", first failure: " + firstFailure);
+    });
+    return job;
   }
 
   /**
    * Test the connectAndWait() method with the JMXMP connector.
+   * @return a {@link JPPFDriverAdminMBean} instance.
    * @throws Exception if any error occurs.
    */
-  public void testConnectAndWait() throws Exception
+  public static JPPFDriverAdminMBean getDriverJmx() throws Exception
   {
-    // for this test, make sure the corresponding node is NOT started.
-    JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("118.1.1.10", 12001);
+    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection();
+    JMXDriverConnectionWrapper jmx = c.getJmxConnection();
     long start = System.nanoTime();
-    System.out.println("before connectAndWait()");
-    jmx.connectAndWait(2000L);
+    while (!jmx.isConnected()) Thread.sleep(10L);
     long elapsed = System.nanoTime() - start;
-    System.out.println("actually waited for " + (elapsed/1000000) + " ms");
-    /*
-		System.out.println("*** press any key to terminate ***");
-		System.in.read();
-     */
+    //System.out.println("actually waited for " + (elapsed/1000000) + " ms");
+    return jmx;
   }
 
   /**
-   * Retrieve the number of nodes from the server.
-   * @return the number rof nodes as an int.
-   * @throws Exception if any error occurs.
+   * 
    */
-  public int getNumberOfNodes() throws Exception
+  private static class KillDriverTask extends TimerTask
   {
-    // create a JMX connection to the driver
-    // replace "your_host_address" and "your_port" with the appropriate values for your configuration
-    JMXDriverConnectionWrapper jmxConnection = new JMXDriverConnectionWrapper("localhost", 11198);
-    // start the connection process and wait until the connection is established
-    jmxConnection.connectAndWait(1000);
-    // request the statistics from the driver
-    JPPFStats stats = jmxConnection.statistics();
-    /*
-	  while (stats == null)
+    @Override
+    public void run()
     {
-	    Thread.currentThread().sleep(50);
-    	stats = jmxConnection.statistics();
+      try
+      {
+        JPPFDriverAdminMBean jmx = getDriverJmx();
+        jmx.restartShutdown(10L, 10L);
+      }
+      catch (Exception e)
+      {
+      }
     }
-     */
-    jmxConnection.close();
-    // return the current number of nodes
-    return (int) stats.getNodes().getLatest();
+  }
+
+  /**
+   * Configure the JPPF client.
+   */
+  private static void configureClient()
+  {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    config.setProperty("jppf.discovery.enabled", "true");
+    config.setProperty("jppf.pool.size", "1");
+    config.setProperty("driver1.jppf.pool.size", "1");
+  }
+
+  /**
+   * Prints and logs the specified message.
+   * @param message the message to print.
+   */
+  private static void print(final String message)
+  {
+    log.info(message);
+    System.out.println(message);
   }
 }
