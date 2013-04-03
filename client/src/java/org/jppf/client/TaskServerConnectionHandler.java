@@ -23,7 +23,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.JPPFIdentifiers;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -76,25 +76,38 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     try
     {
       if (((AbstractJPPFClientConnection) owner).isClosed()) throw new IllegalStateException("this task server connection is closed");
-      setStatus(CONNECTING);
-      if (socketClient == null) initSocketClient();
-      String msg = "[client: " + name + "] Attempting connection to the JPPF task server at " + host + ':' + port;
-      System.out.println(msg);
-      if (debugEnabled) log.debug(msg);
-      socketInitializer.initializeSocket(socketClient);
-      if (!socketInitializer.isSuccessful())
+      boolean done = false;
+      while (!done)
       {
-        throw new JPPFException('[' + name + "] Could not reconnect to the JPPF task server");
+        setStatus(CONNECTING);
+        if (socketClient == null) initSocketClient();
+        String msg = "[client: " + name + "] Attempting connection to the JPPF task server at " + host + ':' + port;
+        System.out.println(msg);
+        if (debugEnabled) log.debug(msg);
+        socketInitializer.initializeSocket(socketClient);
+        if (!socketInitializer.isSuccessful())
+        {
+          throw new JPPFException('[' + name + "] Could not reconnect to the JPPF task server");
+        }
+        try
+        {
+          if (owner.isSSL()) createSSLConnection();
+          if (debugEnabled) log.debug("sending JPPF identifier");
+          socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
+          // TODO do something with the information sent by the driver in the bundle 
+          JPPFTaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
+          msg = "[client: " + name + "] Reconnected to the JPPF task server";
+          System.out.println(msg);
+          if (debugEnabled) log.debug(msg);
+          setStatus(ACTIVE);
+          done = true;
+        }
+        catch (Exception e)
+        {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(ExceptionUtils.getMessage(e));
+        }
       }
-      if (owner.isSSL()) createSSLConnection();
-      if (debugEnabled) log.debug("sending JPPF identifier");
-      socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
-      // TODO do something with the information sent by the driver in the bundle 
-      JPPFTaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
-      msg = "[client: " + name + "] Reconnected to the JPPF task server";
-      System.out.println(msg);
-      if (debugEnabled) log.debug(msg);
-      setStatus(ACTIVE);
     }
     catch (Exception e)
     {

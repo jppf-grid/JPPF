@@ -262,9 +262,11 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        bundle.resultsReceived(t);
-
-        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) return;
+        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException))
+        {
+          bundle.resultsReceived(t);
+          return;
+        }
 
         bundle.resubmit();
         reconnect();
@@ -326,10 +328,7 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
     private ClassLoader getClassLoader(final JPPFJob job)
     {
       if (job == null) throw new IllegalArgumentException("job is null");
-      if (job.getTasks().isEmpty())
-      {
-        return null;
-      }
+      if (job.getTasks().isEmpty()) return null;
       else
       {
         Object task = job.getTasks().get(0);
