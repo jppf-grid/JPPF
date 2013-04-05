@@ -97,6 +97,9 @@
       <compilerarg line="-Xlint:unchecked"/>
       <src path="${addons.src}"/>
     </javac>
+    <copy todir="${addons.classes}">
+      <fileset dir="${addons.src}/META-INF"/>
+    </copy>
     <echo message="compiling unit test classes : tests.classes=${tests.classes}"/>
     <javac destdir="${tests.classes}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="tests.classpath"/>
