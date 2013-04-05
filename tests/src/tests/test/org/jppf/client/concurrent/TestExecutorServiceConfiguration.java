@@ -197,8 +197,9 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   @Test(timeout=10000)
   public void testSubmitWithJobListener() throws Exception
   {
+    client.setLocalExecutionEnabled(false);
     CountingJobListener listener = new CountingJobListener();
-    executor.setBatchTimeout(1000L);
+    executor.setBatchTimeout(2000L);
     executor.setBatchSize(10);
     executor.getConfiguration().getJobConfiguration().addJobListener(listener);
     int nbTasks = 20;
