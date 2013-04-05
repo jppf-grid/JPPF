@@ -56,7 +56,7 @@ public class JPPFTestRunner
         for (String name: list)
         {
           String s = name.trim();
-          if ("".equals(s)) continue;
+          if ("".equals(s) || s.startsWith("#")) continue;
           try
           {
             System.out.println("instantiating " + s);
