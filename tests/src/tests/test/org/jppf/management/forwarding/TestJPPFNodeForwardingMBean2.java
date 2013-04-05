@@ -97,7 +97,7 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
       String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
       JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotificationTask.class, 100L);
       client.submit(job);
-      Thread.sleep(500L);
+      Thread.sleep(1500L);
       checkNotifs(listener.notifs, nbTasks, expectedNodes);
     }
     finally
