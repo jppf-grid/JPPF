@@ -136,7 +136,6 @@
   <!-- ========================================================================= -->
 
   <target name="generate.tests.list">
-    <!--
     <echo message="Generating the list of test classes"/>
     <java fork="yes" classname="test.org.jppf.test.runner.TestListBuilder" classpathref="tests.classpath">
       <jvmarg value="-server"/>
@@ -145,7 +144,6 @@
       <arg value="${tests.classes}/TestClasses.txt"/>
     </java>
     <copy todir="${resources.src}" file="${tests.classes}/TestClasses.txt" overwrite="true"/>
-    -->
   </target>
 
   <!-- ========================================================================= -->
