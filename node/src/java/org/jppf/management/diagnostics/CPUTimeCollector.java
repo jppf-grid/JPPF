@@ -48,7 +48,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
    * Taken form the value of configuration property "jppf.cpu.load.compuation.interval".
    * It defaults to 1000 (1 second) if the property is unspecified.
    */
-  protected static long INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.cpu.load.compuation.interval", 1L * 1000L);
+  protected static long INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.cpu.load.computation.interval", 1L * 1000L);
   /**
    * The total CPU time in milliseconds.
    */
