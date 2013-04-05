@@ -26,6 +26,9 @@
 
     <target name="maven.init" depends="">
       <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
+      <loadfile property="jppf.maven.header" srcFile="${bin}/maven/pom-header.xml"/>
+      <loadfile property="jppf.maven.common" srcFile="${bin}/maven/pom-common.xml"/>
+      <loadfile property="jppf.maven.common-dep" srcFile="${bin}/maven/pom-common-dep.xml"/>
       <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
       <property name="maven.dist" value="${build}/maven"/>
       <!-- defined maven snapshots and staging repository id and url -->
@@ -56,7 +59,6 @@
         <param name="module" value="${server}"/>
         <param name="file" value="server"/>
       </antcall>
-      
     </target>
 
   <!-- ========================================================================= -->
@@ -102,15 +104,22 @@
     <delete file="${pom.file}" quiet="true"/>
     <copy file="${build}/jppf-${file}.jar" toFile="${maven.dist}/${artifact.prefix}.jar"/>
     <copy file="${build}/jppf-${file}-src.jar" toFile="${maven.dist}/${artifact.prefix}-sources.jar"/>
-    <copy toFile="${pom.file}" file="${bin}/pom-${file}.xml"/>
+    <copy toFile="${pom.file}" file="${bin}/maven/jppf-${file}.xml"/>
     <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
-    <jar jarfile="${maven.dist}/${file}-bundle.jar">
+	  <replace file="${pom.file}">
+      <replacefilter token="@header@" value="${jppf.maven.header}"/>
+      <replacefilter token="@common@" value="${jppf.maven.common}"/>
+      <replacefilter token="@common-dep@" value="${jppf.maven.common-dep}"/>
+      <replacefilter token="@module@" value="${file}"/>
+      <replacefilter token="@version@" value="${maven.version}"/>
+	  </replace>
+	  <jar jarfile="${maven.dist}/${file}-bundle.jar">
       <fileset dir="${maven.dist}" includes="jppf-${file}*.*,pom.xml"/>
     </jar>
     <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
     <antcall target="maven.staging"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
 
-    <delete dir="${maven.dist}" quiet="true" includes="jppf-${file}*.*,pom.xml"/>
+	  <delete dir="${maven.dist}" quiet="true" includes="jppf-${file}*.*,pom.xml"/>
 	</target>
 
   <target name="maven.snapshot" depends="" if="maven.snapshot">
