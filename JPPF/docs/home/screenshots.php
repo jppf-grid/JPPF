@@ -147,7 +147,7 @@ else
 				<?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
 				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
 				<?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-				<?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+				<?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
 				<?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
 				<hr/>
 				<?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -159,8 +159,15 @@ else
 	$screenshot = $_REQUEST["screenshot"];
 	if (($screenshot == NULL) || ($screenshot == ""))
 	{
-		$screenshot = "Charts-01.gif
-";
+		$screenshot = 'AlertThresholds.gif
+';
+	}
+	$shot_title = $_REQUEST["shotTitle"];
+	if (($shot_title == NULL) || ($shot_title == ""))
+	{
+		//$shot_title = "Screenshot";
+		$shot_title = 'Alert Thresholds
+';
 	}
 ?>
 	<div align="center">
@@ -170,126 +177,141 @@ else
 										<table align="center" border="0" cellspacing="0" cellpadding="5">
 						<tr>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-01.gif">
+								<a href="screenshots.php?screenshot=AlertThresholds.gif&shotTitle=Alert Thresholds">
+									<img src="screenshots/_th_AlertThresholds.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=Charts-01.gif&shotTitle=Charts 01">
 									<img src="screenshots/_th_Charts-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-02.gif">
+								<a href="screenshots.php?screenshot=Charts-02.gif&shotTitle=Charts 02">
 									<img src="screenshots/_th_Charts-02.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-03.gif">
+								<a href="screenshots.php?screenshot=Charts-03.gif&shotTitle=Charts 03">
 									<img src="screenshots/_th_Charts-03.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=ConnectionsStatistics.gif">
+								<a href="screenshots.php?screenshot=ConnectionsStatistics.gif&shotTitle=Connections Statistics">
 									<img src="screenshots/_th_ConnectionsStatistics.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=DriverSystemInformation.gif">
+								<a href="screenshots.php?screenshot=DeadlockMonitoring.gif&shotTitle=Deadlock Monitoring">
+									<img src="screenshots/_th_DeadlockMonitoring.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=DriverSystemInformation.gif&shotTitle=Driver System Information">
 									<img src="screenshots/_th_DriverSystemInformation.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=JobPriority.gif">
+								<a href="screenshots.php?screenshot=JobPriority.gif&shotTitle=Job Priority">
 									<img src="screenshots/_th_JobPriority.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=JobStatistics.gif">
+								<a href="screenshots.php?screenshot=JobStatistics.gif&shotTitle=Job Statistics">
 									<img src="screenshots/_th_JobStatistics.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
-								<a href="screenshots.php?screenshot=LoadBalancerSettings-01.gif">
+								<a href="screenshots.php?screenshot=LoadBalancerSettings-01.gif&shotTitle=Load Balancer Settings 01">
 									<img src="screenshots/_th_LoadBalancerSettings-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=MandelbrotFractals.jpg">
+								<a href="screenshots.php?screenshot=MandelbrotFractals.jpg&shotTitle=Mandelbrot Fractals">
 									<img src="screenshots/_th_MandelbrotFractals.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-01.gif">
+								<a href="screenshots.php?screenshot=ManyJobs-01.gif&shotTitle=Many Jobs 01">
 									<img src="screenshots/_th_ManyJobs-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-02.gif">
+								<a href="screenshots.php?screenshot=ManyJobs-02.gif&shotTitle=Many Jobs 02">
 									<img src="screenshots/_th_ManyJobs-02.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-03.gif">
+								<a href="screenshots.php?screenshot=ManyJobs-03.gif&shotTitle=Many Jobs 03">
 									<img src="screenshots/_th_ManyJobs-03.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=MaxtrixSample-01.gif">
+								<a href="screenshots.php?screenshot=MaxtrixSample-01.gif&shotTitle=Maxtrix Sample 01">
 									<img src="screenshots/_th_MaxtrixSample-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=NodeSystemInformation.gif">
+								<a href="screenshots.php?screenshot=NodeSystemInformation.gif&shotTitle=Node System Information">
 									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=NodeThreads-01.gif">
+								<a href="screenshots.php?screenshot=NodeThreads-01.gif&shotTitle=Node Threads 01">
 									<img src="screenshots/_th_NodeThreads-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-01.gif">
+								<a href="screenshots.php?screenshot=NodeTrayAddon-01.gif&shotTitle=Node Tray Addon 01">
 									<img src="screenshots/_th_NodeTrayAddon-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-02.gif">
-									<img src="screenshots/_th_NodeTrayAddon-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-03.gif">
-									<img src="screenshots/_th_NodeTrayAddon-03.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 						</tr>
 						<tr>
 							<td align="center">
-								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif">
+								<a href="screenshots.php?screenshot=NodeTrayAddon-02.gif&shotTitle=Node Tray Addon 02">
+									<img src="screenshots/_th_NodeTrayAddon-02.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=NodeTrayAddon-03.gif&shotTitle=Node Tray Addon 03">
+									<img src="screenshots/_th_NodeTrayAddon-03.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif&shotTitle=Protein Sequence Alignment">
 									<img src="screenshots/_th_ProteinSequenceAlignment.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=ServerStats-01.gif">
+								<a href="screenshots.php?screenshot=RuntimeMonitoring.gif&shotTitle=Runtime Monitoring">
+									<img src="screenshots/_th_RuntimeMonitoring.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01">
 									<img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-01.gif">
+								<a href="screenshots.php?screenshot=Topology-01.gif&shotTitle=Topology 01">
 									<img src="screenshots/_th_Topology-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-GraphView-02.gif">
+								<a href="screenshots.php?screenshot=Topology-GraphView-02.gif&shotTitle=Topology  Graph View 02">
 									<img src="screenshots/_th_Topology-GraphView-02.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-GraphView.gif">
+								<a href="screenshots.php?screenshot=Topology-GraphView.gif&shotTitle=Topology  Graph View">
 									<img src="screenshots/_th_Topology-GraphView.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=UpdateNodeConfiguration.gif">
+								<a href="screenshots.php?screenshot=UpdateNodeConfiguration.gif&shotTitle=Update Node Configuration">
 									<img src="screenshots/_th_UpdateNodeConfiguration.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
@@ -300,7 +322,7 @@ else
 		</table>
 		<br>
 				<div>
-					<h3 align="center"><?php echo $screenshot; ?></h3>
+					<h3 align="center"><?php echo $shot_title; ?></h3>
 				<div  style="margin: 1px">
 				<br>
 				<img src="screenshots/<?php echo $screenshot; ?>" border="0" alt="screenshot"/>
