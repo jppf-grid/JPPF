@@ -292,8 +292,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param listener the listener to register.
    * @param filter the notification filter.
    * @param handback the handback object.
-   * @return the id of the registered listener, to use with {@link #unregisterForwardingNotificationListener()}.
-   * @throws Exception if any error occurss.
+   * @return the id of the registered listener, to use with {@link #unregisterForwardingNotificationListener(String)}.
+   * @throws Exception if any error occurs.
    */
   public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName,
       final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception

@@ -353,7 +353,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Stop this node and release the resources it is using.
-   * @see org.jppf.node.Node#stopNode()
    */
   @Override
   public synchronized void stopNode() {

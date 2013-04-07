@@ -91,7 +91,6 @@ public class Equal extends ExecutionPolicy
    * Determines whether this policy accepts the specified node.
    * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
-   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
   public boolean accepts(final PropertiesCollection info)
@@ -116,7 +115,6 @@ public class Equal extends ExecutionPolicy
   /**
    * Print this object to a string.
    * @return an XML string representation of this object
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString()

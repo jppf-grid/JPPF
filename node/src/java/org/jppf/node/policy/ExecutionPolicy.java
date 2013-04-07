@@ -154,7 +154,6 @@ public abstract class ExecutionPolicy implements Serializable
     /**
      * Print this object to a string.
      * @return an XML string representation of this object
-     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()
@@ -192,7 +191,6 @@ public abstract class ExecutionPolicy implements Serializable
      * Determine if a node is acceptable for this policy.
      * @param info system information for the node on which the tasks will run if accepted.
      * @return true if and only if the 2 operands' accepts() method return true or an empty or null operand list was specified.
-     * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
     public boolean accepts(final PropertiesCollection info)
@@ -240,7 +238,6 @@ public abstract class ExecutionPolicy implements Serializable
      * Determine if a node is acceptable for this policy.
      * @param info system information for the node on which the tasks will run if accepted.
      * @return true if at least one of the operands' accepts() method returns true.
-     * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
     public boolean accepts(final PropertiesCollection info)
@@ -254,7 +251,6 @@ public abstract class ExecutionPolicy implements Serializable
     /**
      * Print this object to a string.
      * @return an XML string representation of this object
-     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()
@@ -288,7 +284,6 @@ public abstract class ExecutionPolicy implements Serializable
      * Determine if a node is acceptable for this policy.
      * @param info system information for the node on which the tasks will run if accepted.
      * @return true if and only if the operands' accepts() method return different values.
-     * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
     public boolean accepts(final PropertiesCollection info)
@@ -302,7 +297,6 @@ public abstract class ExecutionPolicy implements Serializable
     /**
      * Print this object to a string.
      * @return an XML string representation of this object
-     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()
@@ -341,7 +335,6 @@ public abstract class ExecutionPolicy implements Serializable
      * Determine if a node is acceptable for this policy.
      * @param info system information for the node on which the tasks will run if accepted.
      * @return true if and only if the 2 operands' accepts() method return true.
-     * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
      */
     @Override
     public boolean accepts(final PropertiesCollection info)
@@ -352,7 +345,6 @@ public abstract class ExecutionPolicy implements Serializable
     /**
      * Print this object to a string.
      * @return an XML string representation of this object
-     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()

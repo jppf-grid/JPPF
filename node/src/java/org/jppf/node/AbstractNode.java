@@ -63,7 +63,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 
   /**
    * Stop this node and release the resources it is using.
-   * @see org.jppf.node.Node#stopNode()
    */
   @Override
   public abstract void stopNode();
@@ -98,7 +97,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   /**
    * Default implementation
    * @return this method always returns null.
-   * @see org.jppf.node.Node#getLifeCycleEventHandler()
+   * @see org.jppf.node.NodeInternal#getLifeCycleEventHandler()
+   * @exclude
    */
   @Override
   public LifeCycleEventHandler getLifeCycleEventHandler()
@@ -110,6 +110,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * {@inheritDoc}
    * <p>This implementation throws a <code>JPPFUnsupportedOperationException</code>.
    * It is up to subclasses to implement it.
+   * @exclude
    */
   @Override
   public JMXServer getJmxServer() throws Exception

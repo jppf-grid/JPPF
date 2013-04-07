@@ -24,7 +24,7 @@ import java.util.*;
 import org.jppf.node.policy.ExecutionPolicy;
 
 /**
- * Marker interface for selecting nodes when using the {@link JPPFNodeForwardingMBean} methods.
+ * Marker interface for selecting nodes when using the {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean JPPFNodeForwardingMBean} methods.
  * @author Laurent Cohen
  */
 public interface NodeSelector extends Serializable

@@ -28,8 +28,10 @@
  * </ul>
  * 
  * <h2>Forwarding management requests</h2>
- * <p>The request forwarding mechanism is based on a built-in driver MBean: {@link JPPFNodeForwardingMBean}, which provides methods to invoke methods, or get or set attributes on remote node MBeans.
- * Each of its methods requires a {@link NodeSelector} argument and an MBean name, to determine to which nodes, and which MBean in these nodes, the request will be performed.
+ * <p>The request forwarding mechanism is based on a built-in driver MBean: {@link JPPFNodeForwardingMBean},
+ * which provides methods to invoke methods, or get or set attributes on remote node MBeans.
+ * Each of its methods requires a {@link org.jppf.management.NodeSelector NodeSelector} argument and an MBean name,
+ * to determine to which nodes, and which MBean in these nodes, the request will be performed.
  * The return value is always a map of node UUIDs to the corresponding value returned by the request (if any) to the corresponding node.
  * If an exception is raised when performing the request on a specific node, then that exception is returned in the map.
  * 
@@ -69,7 +71,8 @@
  * no reliable way of overriding it.
  * <p>To circumvent this, the notification listener registration is performed via the JMX client wrapper {@link org.jppf.management.JMXDriverConnectionWrapper}:
  * <ul>
- * <li>to add a notification listener, use {@link org.jppf.management.JMXDriverConnectionWrapper#registerForwardingNotificationListener(NodeSelector,String,NotificationListener,NotificationFilter,Object) registerForwardingNotificationListener(NodeSelector selector, String mBeanName, NotificationListener listener, NotificationFilter filter, Object handback)}.
+ * <li>to add a notification listener, use
+ * {@link org.jppf.management.JMXDriverConnectionWrapper#registerForwardingNotificationListener(NodeSelector,String,NotificationListener,NotificationFilter,Object) registerForwardingNotificationListener(NodeSelector selector, String mBeanName, NotificationListener listener, NotificationFilter filter, Object handback)}.
  * This will register a notification listener for the specified MBean on each of the selected nodes.
  * This method returns a <i>listener ID</i> which will be used to remove the notfication listener later on.
  * Thus, the application must be careful to keep track of all registered listener IDs.

@@ -46,7 +46,7 @@ public interface NodeInternal extends Node
   LifeCycleEventHandler getLifeCycleEventHandler();
 
   /**
-   * Get the JMX connecter server associated with the node.
+   * Get the JMX connector server associated with the node.
    * @return a JMXServer instance.
    * @throws Exception if any error occurs.
    */

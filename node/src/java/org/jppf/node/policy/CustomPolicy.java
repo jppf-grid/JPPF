@@ -73,7 +73,6 @@ public abstract class CustomPolicy extends ExecutionPolicy
   /**
    * Print this object to a string.
    * @return an XML string representation of this object
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString()

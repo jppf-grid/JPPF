@@ -164,7 +164,7 @@ public class ThreadInformation implements Serializable
 
   /**
    * Get the state of this thread.
-   * @return a {@link Thread.State} enum value.
+   * @return a {@link java.lang.Thread.State Thread.State} enum value.
    */
   public Thread.State getState()
   {
@@ -173,7 +173,7 @@ public class ThreadInformation implements Serializable
 
   /**
    * Get the stack trace of this thread.
-   * @return a list of {@link StackFrameInformation} elements, or {@link null} if no stack trace is available.
+   * @return a list of {@link StackFrameInformation} elements, or <code>null</code> if no stack trace is available.
    */
   public List<StackFrameInformation> getStackTrace()
   {

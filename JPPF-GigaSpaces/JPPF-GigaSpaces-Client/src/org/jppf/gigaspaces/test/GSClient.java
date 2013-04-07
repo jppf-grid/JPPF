@@ -62,7 +62,6 @@ public class GSClient implements InitializingBean
   /**
    * Called after the Spring bean initialization.
    * @throws Exception if any error occurs.
-   * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
   @Override
   public void afterPropertiesSet() throws Exception
