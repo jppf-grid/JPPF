@@ -22,7 +22,7 @@
   <!--                         Compile the application                           -->
   <!-- ========================================================================= -->
 
-  <target name="compile" description="Compile" depends="init, i18n">
+  <target name="compile" description="Compile" depends="init, i18n" unless="compile.done">
     <antcall target="compile.module">
       <param name="path" value="${node}"/>
     </antcall>
@@ -41,6 +41,7 @@
     <antcall target="compile.module">
       <param name="path" value="${demo}"/>
     </antcall>
+    <property name="compile.done" value="true"/>
   </target>
 
   <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
@@ -54,7 +55,7 @@
     <javac srcdir="" destdir="${path}/classes" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath"/>
-      <compilerarg line="-Xlint:unchecked"/>
+      <compilerarg line="-Xlint:none"/>
       <src path="${path}/src/java"/>
       <src path="${path}/src/resources"/>
     </javac>
@@ -78,7 +79,7 @@
   <!--                     Build the jar files                                   -->
   <!-- ========================================================================= -->
 
-  <target name="jar" description="generates the application jar" depends="compile">
+  <target name="jar" description="generates the application jar" depends="compile" unless="jar.done">
     <antcall target="jar.module">
       <param name="module" value="common"/>
     </antcall>
@@ -98,6 +99,7 @@
     <antcall target="jar.module">
       <param name="module" value="demo" />
     </antcall>
+    <property name="jar.done" value="true"/>
   </target>
 
   <target name="jar.module">
@@ -126,7 +128,7 @@
   <!--                     Build the source jar files                            -->
   <!-- ========================================================================= -->
 
-  <target name="jar.src" description="generates the application jar" depends="compile">
+  <target name="jar.src" description="generates the source jars" depends="compile"  unless="jar.src.done">
     <antcall target="jar.src.module">
       <param name="module" value="common"/>
     </antcall>
@@ -146,6 +148,7 @@
     <antcall target="jar.src.module">
       <param name="module" value="demo"/>
     </antcall>
+    <property name="jar.src.done" value="true"/>
   </target>
 
   <target name="jar.src.module">

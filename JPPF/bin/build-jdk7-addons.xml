@@ -32,14 +32,22 @@
         </or>
       </not>
     </condition>
+    <condition property="jppf.jdk7-addons.dobuild">
+      <and>
+        <isset property="jdk1.7+"/>
+        <not>
+          <isset property="jppf.jdk7-addons.build.done"/>
+        </not>
+      </and>
+    </condition>
   </target>
 
-  <target name="jppf.jdk7-addons" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jdk1.7+">
+  <target name="jppf.jdk7-addons" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jppf.jdk7-addons.dobuild">
     <antcall target="jppf.jdk7-addons.build"/>
     <antcall target="jppf.jdk7-addons.nobuild"/>
   </target>
 
-  <target name="jppf.jdk7-addons.build" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jdk1.7+">
+  <target name="jppf.jdk7-addons.build" description="build the jdk7-addons" depends="jppf.jdk7-addons.check" if="jppf.jdk7-addons.dobuild">
     <ant antfile="${jdk7-addons}/ThreadManagerForkJoin/build.xml" target="jar" inheritall="false"/>
     <property name="jdk7-addons.prefix" value="${app.ver}-jdk7-addons"/>
     <property name="jdk7-addons.file" value="${build}/${jdk7-addons.prefix}.zip"/>
@@ -55,6 +63,7 @@
       </zipfileset>
     </zip>
     <delete dir="${jdk7-addons}" includes="**/*.jar" quiet="true"/>
+    <property name="jppf.jdk7-addons.build.done" value="true"/>
   </target>
 
   <target name="jppf.jdk7-addons.nobuild" description="Cannot build because JDK 1.7+ is needed" unless="jdk1.7+">

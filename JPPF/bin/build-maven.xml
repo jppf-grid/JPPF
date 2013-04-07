@@ -22,44 +22,44 @@
 	<!--                     Build the maven artifacts                             -->
 	<!-- ========================================================================= -->
 
-  <target name="maven.artifacts" depends="compile.doclet, build, maven.init, maven.generate"/>
+  <target name="maven.artifacts" depends="maven.init, maven.generate"/>
 
-    <target name="maven.init" depends="">
-      <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
-      <loadfile property="jppf.maven.header" srcFile="${bin}/maven/pom-header.xml"/>
-      <loadfile property="jppf.maven.common" srcFile="${bin}/maven/pom-common.xml"/>
-      <loadfile property="jppf.maven.common-dep" srcFile="${bin}/maven/pom-common-dep.xml"/>
-      <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
-      <property name="maven.dist" value="${build}/maven"/>
-      <!-- defined maven snapshots and staging repository id and url -->
-      <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
-      <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
-      <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
-      <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
-      <property name="pom.file" value="${maven.dist}/pom.xml"/>
-      <condition property="maven.snapshot">
-        <contains string="${maven.version}" substring="SNAPSHOT"/>
-      </condition>
-    </target>
+  <target name="maven.init" depends="">
+    <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
+    <loadfile property="jppf.maven.header" srcFile="${bin}/maven/pom-header.xml"/>
+    <loadfile property="jppf.maven.common" srcFile="${bin}/maven/pom-common.xml"/>
+    <loadfile property="jppf.maven.common-dep" srcFile="${bin}/maven/pom-common-dep.xml"/>
+    <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
+    <property name="maven.dist" value="${build}/maven"/>
+    <!-- defined maven snapshots and staging repository id and url -->
+    <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
+    <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
+    <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
+    <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+    <property name="pom.file" value="${maven.dist}/pom.xml"/>
+    <condition property="maven.snapshot">
+      <contains string="${maven.version}" substring="SNAPSHOT" casesensitive="false"/>
+    </condition>
+  </target>
 
-    <target name="maven.generate" depends="">
-      <antcall target="maven.artifacts.module">
-        <param name="module" value="${node}"/>
-        <param name="file" value="common-node"/>
-      </antcall>
-      <antcall target="maven.artifacts.module">
-        <param name="module" value="${common}"/>
-        <param name="file" value="common"/>
-      </antcall>
-      <antcall target="maven.artifacts.module">
-        <param name="module" value="${client}"/>
-        <param name="file" value="client"/>
-      </antcall>
-      <antcall target="maven.artifacts.module">
-        <param name="module" value="${server}"/>
-        <param name="file" value="server"/>
-      </antcall>
-    </target>
+  <target name="maven.generate" depends="">
+    <antcall target="maven.artifacts.module">
+      <param name="module" value="${node}"/>
+      <param name="file" value="common-node"/>
+    </antcall>
+    <antcall target="maven.artifacts.module">
+      <param name="module" value="${common}"/>
+      <param name="file" value="common"/>
+    </antcall>
+    <antcall target="maven.artifacts.module">
+      <param name="module" value="${client}"/>
+      <param name="file" value="client"/>
+    </antcall>
+    <antcall target="maven.artifacts.module">
+      <param name="module" value="${server}"/>
+      <param name="file" value="server"/>
+    </antcall>
+  </target>
 
   <!-- ========================================================================= -->
 	<!-- Generate the jar, src jar, javadoc jar, pom.xml and thier gpg signatures  -->
