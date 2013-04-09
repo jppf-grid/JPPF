@@ -78,7 +78,9 @@
         <include name="build.number"/>
       </fileset>
     </copy>
+    <!--
     <ant antfile="${basedir}/../jca-client/build.xml" target="build.util.jar" inheritall="false"/>
+    -->
   </target>
 
 </project> 

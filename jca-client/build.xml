@@ -30,7 +30,6 @@
 	<property name="build.dir"             value="${basedir}/build"/>
 	<property name="lib.dir"               value="${basedir}/lib"/>
 	<property name="meta.inf.dir"          value="${basedir}/appserver"/>
-	<property name="ejb.client.jar"        value="${build.dir}/JPPFServer-Client.jar"/>
 	<property name="ear.prefix"            value="JPPF_J2EE_Demo"/>
 	<property file="${basedir}/build.properties"/>
 	<property file="${basedir}/build.number"/>
@@ -41,7 +40,7 @@
 	<!-- ========================================================================= -->
 	<property name="was"           value="Websphere"/>
 	<property name="jboss"         value="JBoss"/>
-	<property name="jboss7"         value="JBoss-7"/>
+	<property name="jboss7"        value="JBoss-7"/>
 	<property name="oracle"        value="Oracle"/>
 	<property name="sunas"         value="Glassfish"/>
 	<property name="weblogic"      value="Weblogic"/>
@@ -98,7 +97,7 @@
 	<!--                         Build everything                                  -->
 	<!-- ========================================================================= -->
 
-	<target name="build" depends="ear.all,rar.all"/>
+	<target name="build" depends="build.util.jar,ear.all,rar.all"/>
 	<target name="build.deploy.jboss" depends="build, deploy.jboss"/>
 
 	<!-- ========================================================================= -->
@@ -108,12 +107,12 @@
   <taskdef resource="checkstyletask.properties" classpath="${lib.dir}/checkstyle-5.5-all.jar"/>
 
 	<target name="compile" depends="init">
-		<echo message="compiling the project..."/>
+		<echo message="compiling the J2EE connector classes ..."/>
     <checkstyle config="${basedir}/CheckStyle_JPPF_config.xml"><fileset dir="${src.dir}" includes="**/*.java"/></checkstyle>
 		<javac srcdir="" destdir="${classes.dir}/jca" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>
-			<compilerarg line="-Xlint:unchecked"/>
+			<compilerarg line="-Xlint:none"/>
 			<src path="${src.dir}/java"/>
 		</javac>
 		<copy todir="${classes.dir}/jca">
@@ -128,7 +127,7 @@
 		<javac srcdir="" destdir="${classes.dir}/j2eeclient" source="1.6" target="1.6"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>
-			<compilerarg line="-Xlint:unchecked"/>
+			<compilerarg line="-Xlint:none"/>
 			<src path="${src.dir}/j2eeclient"/>
 		</javac>
 	</target>
@@ -237,23 +236,23 @@
 	<!-- Build the WAR and EAR, wihtout any client classes in the application -->
 	<target name="ear.noclient.classes" if="noclient.classes">
 		<war warfile="${build.dir}/${appserver}/jppftest.war" webxml="${meta.inf.dir}/${appserver}/WEB-INF/web.xml">
-		    <manifest>
+		  <manifest>
 				<attribute name="Class-Path" value="lib/jppf-j2ee-client.jar"/>
 				<attribute name="JPPF-Version" value="${version.number}"/>
 				<attribute name="JPPF-Build" value="${build.number}"/>
 				<attribute name="JPPF-BuildDate" value="${readable.now}"/>
-	    	</manifest>
+	  	</manifest>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/WEB-INF" excludes="web.xml" prefix="WEB-INF"/>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/docroot" includes="**/*.*"/>
 			<zipfileset dir="${meta.inf.dir}/common/docroot" includes="**/*.*"/>
-	    </war>
+	  </war>
 
 		<ear destfile="${build.dir}/${ear.prefix}_${appserver}.ear" appxml="${meta.inf.dir}/application.xml">
-		    <manifest>
+		  <manifest>
 				<attribute name="JPPF-Version" value="${version.number}"/>
 				<attribute name="JPPF-Build" value="${build.number}"/>
 				<attribute name="JPPF-BuildDate" value="${readable.now}"/>
-		    </manifest>
+		  </manifest>
 			<zipfileset dir="${meta.inf.dir}/${appserver}/application" prefix="META-INF"/>
 			<fileset dir="${build.dir}/${appserver}" includes="jppftest.war"/>
 			<zipfileset dir="${build.dir}/lib" prefix="lib" includes="jppf-j2ee-client.jar"/>

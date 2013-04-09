@@ -1,5 +1,6 @@
 <%@ page language="java" %>
 <%@ page import="java.util.*" %>
+<%@ page import="org.jppf.client.*" %>
 <%@ page import="org.jppf.jca.demo.*" %>
 <%@ include file="jndiName.jsp"%>
 <%@ include file="header.jsp"%>

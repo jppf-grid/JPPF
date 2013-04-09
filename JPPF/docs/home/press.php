@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="3.2" ?>
+<?php $jppfVersion="3.3" ?>
 <html>
 		<head>
 		<title>JPPF Press Kit
@@ -146,7 +146,7 @@ else
 				<?php if ($currentPage == "current work") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1" class="<?php echo $itemClass; ?>">current work</a><br></div>
 				<hr/>
 				<?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+				<?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=3.3" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
 				<?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
 				<?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
 				<?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -170,19 +170,18 @@ else
 	<br>
 	<a name="original_release"></a>
 <h3>Latest press release: JPPF <?php echo $jppfVersion ?></h3>
-<p><b>Load balancing in the client</b>:
-As for the server with the nodes, <a href="/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client">the client can now distribute jobs</a> over multiple server channels and the local execution channel.
-Load-balancing / scheduling is applied in exactly the same way as within the server, with the same APIs and configuration properties and the ability to implement custom class loaders.
-<p><b>Client-side SLA</b>:
-All jobs now have a distinct <a href="/doc/v3/index.php?title=Job_Service_Level_Agreement">service level agreement</a> for the client-side dispatching of their tasks.
-<p><b>Executor services enhancements</b>:
-data providers can now be sent with the jobs submitted by the executor services, job listeners can be registered and completion listeners can be attached to the jobs.
-<p><b>Class loading improvements</b>: 
-new optimizations bring a new level of performance and resilience to the JPPF class loading mechanism
-<p><b>IPv6 ready</b>:
-All areas of JPPF networking have been updated to handle IPv6 addresses properly and transparently.
-<p><b>Automated testing</b>:
-A major effort has taken place to provide automated testing of the JPPF features, to ensure that the quality of each release meets the expectations.
+<p><b>Forwarding of node management requests through the server</b>:
+<a href="/doc/v3/index.php?title=Nodes_management_and_monitoring_via_the_driver">This feature</a> resolves a long-standing issue which prevented management and monitoring of the nodes not directly reachable by the clients and administration console.
+It also opens up new possibilities that make monitoring and management of a JPPF grid easier, more flexible and more powerful by an order of magnitude.
+<p><b>JVM monitoring and diagnostics help</b>:
+A new <a href="/doc/v3/index.php?title=JVM_health_monitoring">JVM diagnostic MBean</a> allows users to monitor the JVM health of remote servers and nodes. Both management APIs and administration console now provide a set of JVM telemetry and diagnostics features.
+<p><b>GPU computing</b>:
+<p>A new <a href="/samples-pack/GPU/Readme.php">GPU computing demo</a> was added to the JPPF samples pack, which demonstrates how JPPF tasks can submit work to OpenCL-compatible devices with the <a href="http://code.google.com/p/aparapi/">APARAPI</a> library.
+<p><b>Class loading improvements</b>:
+The nodes now have the ability to reset a client-linked class loader without the need to restart, allowing complete control over the classpath of each class loader with minimal performance impact.
+The <a href="/samples-pack/ExtendedClassLoading/Readme.php">Extended class loading</a> demo was updated to use this feature.
+<p><b>Class loading events</b>: this new <a href="/doc/v3/index.php?title=Receiving_notifications_of_class_loader_events">extension point</a> enables users to receive notifications when a JPPF class loader loads a class or fails to load it.
+<p><b>JPPF artifacts published to Maven Central</b>: as of JPPF 3.3, the JPPF jar files and associated sources and javadoc are available on Maven Central.
 <a name="features"></a>
 	<h3>Features</h3>
 	<div class="u_link" style="margin-left: 10px">
