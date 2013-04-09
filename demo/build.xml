@@ -1,0 +1,432 @@
+<!--
+	JPPF.
+	 Copyright (C) 2005-2013 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name='Demo' basedir=".">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="jppf"        value="${basedir}/../JPPF"/>
+	<property name="jppf.lib"    value="${jppf}/lib"/>
+	<property name="jppf.build"  value="${jppf}/build"/>
+	<property name="config.dir"  value="${basedir}/config"/>
+	<property name="classes.dir" value="${basedir}/classes"/>	
+	<property name="src.dir"     value="${basedir}/src"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${basedir}/../node/classes"/>
+		<pathelement location="${basedir}/../common/classes"/>
+		<pathelement location="${basedir}/../client/classes"/>
+		<pathelement location="${basedir}/../server/classes"/>
+		<pathelement location="${basedir}/../admin/classes"/>
+		<pathelement location="${basedir}/../demo/classes"/>
+		<pathelement location="${jppf.build}/classes"/>
+		<fileset dir="${jppf.lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+  <path id="node.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${basedir}/../node/classes"/>
+		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+		<pathelement location="${jppf.lib}/ApacheCommons/commons-logging-1.1.jar"/>
+  </path>
+
+  <path id="gui.classpath">
+		<pathelement location="${config.dir}"/>
+    <path refid="project.classpath"/>	
+  </path>
+
+  <path id="client.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${basedir}/../node/classes"/>
+		<pathelement location="${basedir}/../common/classes"/>
+		<pathelement location="${basedir}/../client/classes"/>
+		<pathelement location="${basedir}/../server/classes"/>
+		<pathelement location="${basedir}/../demo/classes"/>
+		<pathelement location="${jppf.lib}/log4j/log4j-1.2.9.jar"/>
+		<pathelement location="${jppf.lib}/ApacheCommons/commons-logging-1.1.jar"/>
+		<pathelement location="${jppf.lib}/Hazelcast/hazelcast.jar"/>
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${classes.dir}" quiet="true"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" description="Initialize ressources">
+ 		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                     Run the demo applications                             -->
+	<!-- ========================================================================= -->
+
+	<target name="demo.console">
+		<echo message="starting the JPPF Demonstration Console"/>
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<arg value="org/jppf/demo/console/xml/JPPFDemoConsole.xml"/>
+			<arg value="file"/>
+		</java>       
+	</target>
+
+	<target name="run.demo1">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.long.task"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo2">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.matrix"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo3">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.matrix.async"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo4">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.client.pool"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo5">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.notification"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo6">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.ui"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.commandline"/>
+				<fail status="1" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.demo7">
+		<parallel>
+			<antcall target="run.driver"/>
+			<sequential>
+				<sleep milliseconds="1000"/>
+				<antcall target="run.node1"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="2000"/>
+				<antcall target="run.node2"/>
+			</sequential>
+			<sequential>
+				<sleep milliseconds="3000"/>
+				<antcall target="run.taskcommunication"/>
+				<fail status="0" message="Demo has ended normally."/>
+			</sequential>
+		</parallel>
+	</target>
+
+	<target name="run.long.task">
+		<echo message="starting the 'Long task' demo application"/>
+		<java fork="yes" classname="sample.dist.tasklength.LongTaskRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.matrix">
+		<echo message="starting the 'Matrix Multiplication' demo application"/>
+		<java fork="yes" classname="sample.dist.matrix.MatrixRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.notification">
+		<echo message="starting the 'Matrix Multiplication' demo application"/>
+		<java fork="yes" classname="sample.dist.notification.TaskNotificationRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.matrix.async">
+		<echo message="starting the 'Matrix Multiplication With Non-Blocking Client' demo application"/>
+		<java fork="yes" classname="sample.dist.matrix.NonBlockingMatrixRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.matrix2">
+		<echo message="starting the second demo application"/>
+		<java fork="yes" classname="sample.dist.matrix.MatrixRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client-2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client-2.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.client.pool">
+		<echo message="starting the 'Servrer Connection Pool' demo application"/>
+		<java fork="yes" classname="sample.dist.matrix.clientpool.NonBlockingPoolMatrixRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client-pool.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client-pool.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.commandline">
+		<echo message="starting the 'Command Line' demo application"/>
+		<java fork="yes" classname="sample.dist.commandline.CommandLineTaskRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.taskcommunication">
+		<echo message="starting the 'Task Communication' demo application"/>
+		<java fork="yes" classname="sample.dist.taskcommunication.MyTaskRunner" classpathref="client.classpath" taskname="client">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.driver">
+		<echo message="starting the JPPF driver"/>
+		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="client.classpath" taskname="driver">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.driver2">
+		<echo message="starting the JPPF driver"/>
+		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="client.classpath" taskname="driver2">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx32m"/>
+			<jvmarg value="-Djppf.config=jppf-driver-2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-driver-2.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.node1">
+		<echo message="starting local node 1"/>
+		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath" taskname="node1" dir="${basedir}">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=node1.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-node1.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.node2">
+		<echo message="starting local node 2"/>
+		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath" taskname="node2" dir="${basedir}">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=node2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-node2.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.node3">
+		<echo message="starting local node 3"/>
+		<java fork="yes" classname="org.jppf.node.NodeLauncher" classpathref="node.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Djppf.config=node3.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-node3.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.ui">
+		<echo message="starting the server monitoring GUI"/>
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath" taskname="ui">
+			<arg value="org/jppf/ui/options/xml/JPPFAdminTool.xml"/>
+			<arg value="file"/>
+			<jvmarg value="-Djppf.config=jppf-gui.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-gui.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="run.ui2">
+		<echo message="starting the server monitoring GUI"/>
+		<java fork="yes" classname="org.jppf.ui.monitoring.UILauncher" classpathref="gui.classpath" taskname="ui2">
+			<arg value="org/jppf/ui/options/xml/JPPFAdminTool.xml"/>
+			<arg value="file"/>
+			<jvmarg value="-Djppf.config=jppf-gui-2.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-gui-2.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+		</java>
+	</target>
+
+	<target name="do.replacements">
+		<property name="findOnly" value="false"/>
+		<antcall target="file.replacer"><param name="ext" value="java"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="properties"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="xml"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="xsd"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="bat"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="cmd"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="sh"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="txt"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="html"/><param name="find" value="${findOnly}"/></antcall>
+		<antcall target="file.replacer"><param name="ext" value="php"/><param name="find" value="${findOnly}"/></antcall>
+	</target>
+
+	<target name="file.replacer">
+		<echo message="starting the file replacement for extensions = ${ext}, find only: ${find}"/>
+		<java fork="yes" classname="org.jppf.utils.FileReplacer" classpathref="client.classpath">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx256m"/>
+			<jvmarg value="-Djppf.config=jppf-client.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-FileReplacer.properties"/>
+			<arg value="C:/Workspaces/SourceForge"/>
+			<arg value="C:/temp/src.txt"/>
+			<arg value="C:/temp/dest.txt"/>
+			<arg value="${ext}"/>
+			<arg value="${find}"/>
+		</java>       
+	</target>
+
+</project> 
