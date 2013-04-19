@@ -26,7 +26,7 @@ import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.comm.socket.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
@@ -193,7 +193,8 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
   @Override
   protected SocketInitializer createSocketInitializer()
   {
-    return new JcaSocketInitializer();
+    //return new JcaSocketInitializer();
+    return new SocketInitializerImpl();
   }
 
   /**

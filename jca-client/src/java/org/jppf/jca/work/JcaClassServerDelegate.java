@@ -23,7 +23,8 @@ import javax.resource.spi.work.Work;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.comm.socket.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -78,6 +79,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
       if (debugEnabled) log.debug("[client: " + getName() + "] Attempting connection to the class server");
+      if (debugEnabled) log.debug("JPPF configuration: " + JPPFConfiguration.getProperties());
       socketInitializer.initializeSocket(socketClient);
       if (!socketInitializer.isClosed())
       {
@@ -105,10 +107,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
     }
   }
 
-  /**
-   * Main processing loop of this delegate.
-   * @see org.jppf.client.ClassServerDelegate#run()
-   */
   @Override
   public void run()
   {
@@ -129,7 +127,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
           {
             if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
             setStatus(DISCONNECTED);
-            //init();
           }
         }
       }
@@ -168,7 +165,8 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
   @Override
   protected SocketInitializer createSocketInitializer()
   {
-    return new JcaSocketInitializer();
+    //return new JcaSocketInitializer();
+    return new SocketInitializerImpl();
   }
 
   /**
