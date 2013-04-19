@@ -23,7 +23,7 @@ import javax.resource.spi.work.Work;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.comm.socket.SocketInitializer;
+import org.jppf.comm.socket.*;
 import org.slf4j.*;
 
 /**
@@ -168,7 +168,7 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
   @Override
   protected SocketInitializer createSocketInitializer()
   {
-    return new JcaSocketInitializer();
+    return new SocketInitializerImpl();
   }
 
   /**
