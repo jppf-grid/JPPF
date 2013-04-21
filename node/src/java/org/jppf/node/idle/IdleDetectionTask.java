@@ -22,6 +22,8 @@ import static org.jppf.node.idle.IdleState.*;
 
 import java.util.*;
 
+import org.jppf.JPPFError;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -76,20 +78,26 @@ public class IdleDetectionTask extends TimerTask
     init();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
-    if (detector == null)
+    try
     {
-      cancel();
-      return;
+      if (detector == null)
+      {
+        cancel();
+        return;
+      }
+      long idleTime = detector.getIdleTimeMillis();
+      if ((idleTime >= idleTimeout) && BUSY.equals(state)) changeStateTo(IDLE);
+      else if ((idleTime < idleTimeout) && IDLE.equals(state)) changeStateTo(BUSY);
     }
-    long idleTime = detector.getIdleTimeMillis();
-    if ((idleTime >= idleTimeout) && BUSY.equals(state)) changeStateTo(IDLE);
-    else if ((idleTime < idleTimeout) && IDLE.equals(state)) changeStateTo(BUSY);
+    catch(JPPFError e)
+    {
+      System.out.println(ExceptionUtils.getMessage(e) + " - idle mode is disbled");
+      detector = null;
+      cancel();
+    }
   }
 
   /**
