@@ -78,7 +78,11 @@ public abstract class AbstractClassLoaderManager
    */
   public synchronized AbstractJPPFClassLoader getClassLoader()
   {
-    if (classLoader == null) classLoader = createClassLoader();
+    if (classLoader == null)
+    {
+      classLoader = createClassLoader();
+      if (debugEnabled) log.debug("created class loader " + classLoader);
+    }
     return classLoader;
   }
 
