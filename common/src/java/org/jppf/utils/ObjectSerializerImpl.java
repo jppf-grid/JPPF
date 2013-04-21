@@ -19,8 +19,7 @@ package org.jppf.utils;
 
 import java.io.*;
 
-import org.jppf.io.DataLocation;
-import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.serialization.*;
 import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 
 /**
@@ -32,6 +31,11 @@ import org.jppf.utils.streams.JPPFByteArrayOutputStream;
  */
 public class ObjectSerializerImpl implements ObjectSerializer
 {
+  /**
+   * 
+   */
+  private static JPPFSerialization serialization = JPPFSerialization.Factory.getSerialization();
+
   /**
    * The default constructor must be public to allow for instantiation through Java reflection.
    */
@@ -79,29 +83,13 @@ public class ObjectSerializerImpl implements ObjectSerializer
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception
   {
-    ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
-    try {
-      oos.writeObject(o);
-      oos.flush();
-    } finally {
-      oos.close();
+    try
+    {
+      serialization.serialize(o, os);
     }
-  }
-
-  /**
-   * Serialize an object into an output stream.
-   * @param o the object to Serialize.
-   * @param location the location to serialize to.
-   * @throws Exception if the object can't be serialized.
-   */
-  public static void serialize(final Object o, final DataLocation location) throws Exception
-  {
-    ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(location.getOutputStream());
-    try {
-      oos.writeObject(o);
-      oos.flush();
-    } finally {
-      oos.close();
+    finally
+    {
+      os.close();
     }
   }
 
@@ -161,11 +149,16 @@ public class ObjectSerializerImpl implements ObjectSerializer
    */
   public Object deserialize(final InputStream is, final boolean closeStream) throws Exception
   {
-    ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-    try {
-      return ois.readObject();
-    } finally {
-      if (closeStream) ois.close();
+    ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+    try
+    {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      return serialization.deserialize(is);
+    }
+    finally
+    {
+      Thread.currentThread().setContextClassLoader(oldCL);
+      if (closeStream) is.close();
     }
   }
 }
