@@ -74,15 +74,6 @@ public abstract class AbstractJMXServer implements JMXServer
    */
   protected boolean ssl = false;
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public abstract void start(ClassLoader cl) throws Exception;
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void stop() throws Exception
   {
@@ -90,45 +81,30 @@ public abstract class AbstractJMXServer implements JMXServer
     connectorServer.stop();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public MBeanServer getServer()
   {
     return server;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isStopped()
   {
     return stopped;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getId()
   {
     return id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getManagementPort()
   {
     return managementPort;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getManagementHost()
   {

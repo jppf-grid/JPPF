@@ -31,6 +31,7 @@ import org.slf4j.*;
  * If you do not use it, it will not generate compile time errors, even if the XStream libraries are not in the classpath,
  * as this class relies entirely on reflection to instantiate the required objects.
  * @author Laurent Cohen
+ * @deprecated in favor of using {@link JPPFSerialization}.
  */
 public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 {

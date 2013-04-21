@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * This class builds object streams based on JPPF configuration properties.
  * @author Laurent Cohen
+ * @deprecated in favor of using {@link JPPFSerialization}.
  */
 public class JPPFObjectStreamFactory
 {
@@ -54,6 +55,23 @@ public class JPPFObjectStreamFactory
    * The object stream builder used by this factory to instantiate object streams.
    */
   private static JPPFObjectStreamBuilder builder = initializeBuilder();
+
+  /**
+   * Initialize the obsolete object stream builder, if any is configured.
+   * @return a {@link JPPFObjectStreamBuilder} if any was configured, possibly the default one,
+   * or <code>null</code> if any error occurred in the configuration or initialization.
+   */
+  static JPPFObjectStreamBuilder init()
+  {
+    try
+    {
+      builder = initializeBuilder();
+    }
+    catch (JPPFError ignore)
+    {
+    }
+    return builder;
+  }
 
   /**
    * Initialize the object stream builder.<br>
@@ -103,7 +121,8 @@ public class JPPFObjectStreamFactory
         throw new JPPFError(sb + e.getMessage(), e);
       }
     }
-    return new JPPFObjectStreamBuilderImpl();
+    //return new JPPFObjectStreamBuilderImpl();
+    return null;
   }
 
   /**
@@ -114,6 +133,10 @@ public class JPPFObjectStreamFactory
    */
   public static ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
   {
+    synchronized(JPPFObjectStreamFactory.class) {
+      if (builder == null) builder = init();
+      if (builder == null) builder = new JPPFObjectStreamBuilderImpl();
+    }
     return builder.newObjectInputStream(in);
   }
 
@@ -125,6 +148,10 @@ public class JPPFObjectStreamFactory
    */
   public static ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
   {
+    synchronized(JPPFObjectStreamFactory.class) {
+      if (builder == null) builder = init();
+      if (builder == null) builder = new JPPFObjectStreamBuilderImpl();
+    }
     return builder.newObjectOutputStream(out);
   }
 }

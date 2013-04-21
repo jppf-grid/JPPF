@@ -20,7 +20,7 @@ package org.jppf.comm.socket;
 
 import java.io.*;
 
-import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.serialization.JPPFSerialization;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 
@@ -30,6 +30,11 @@ import org.jppf.utils.streams.JPPFByteArrayOutputStream;
  */
 public class BootstrapObjectSerializer implements ObjectSerializer
 {
+  /**
+   * 
+   */
+  private static JPPFSerialization serialization = JPPFSerialization.Factory.getSerialization();
+
   /**
    * The default constructor must be public to allow for instantiation through Java reflection.
    */
@@ -77,15 +82,13 @@ public class BootstrapObjectSerializer implements ObjectSerializer
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception
   {
-    ObjectOutputStream oos = JPPFObjectStreamFactory.newObjectOutputStream(os);
     try
     {
-      oos.writeObject(o);
-      oos.flush();
+      serialization.serialize(o, os);
     }
     finally
     {
-      oos.close();
+      os.close();
     }
   }
 
@@ -140,16 +143,13 @@ public class BootstrapObjectSerializer implements ObjectSerializer
   @Override
   public Object deserialize(final InputStream is) throws Exception
   {
-    Object o = null;
-    ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
     try
     {
-      o = ois.readObject();
+      return serialization.deserialize(is);
     }
     finally
     {
-      ois.close();
+      is.close();
     }
-    return o;
   }
 }

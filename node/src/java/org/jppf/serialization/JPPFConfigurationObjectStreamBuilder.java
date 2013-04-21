@@ -26,6 +26,7 @@ import java.lang.reflect.Constructor;
  * This factory creates instances of {@link java.io.ObjectInputStream ObjectInputStream}
  * and {@link java.io.ObjectOutputStream ObjectOutputStream}
  * @author Laurent Cohen
+ * @deprecated in favor of using {@link JPPFSerialization}.
  */
 public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBuilder
 {

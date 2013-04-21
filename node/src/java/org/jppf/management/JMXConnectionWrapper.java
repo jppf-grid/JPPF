@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 import javax.management.remote.*;
+import javax.management.remote.generic.*;
 
 import org.jppf.JPPFException;
 import org.jppf.ssl.SSLHelper;
@@ -91,7 +92,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected boolean local = false;
   /**
-   * JMX property used for establishing the connection.
+   * JMX properties used for establishing the connection.
    */
   protected Map<String, Object> env = new HashMap<String, Object>();
   /**
@@ -159,6 +160,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       this.displayName = this.idString;
       url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
       if (ssl) SSLHelper.configureJMXProperties(env);
+      env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
     }
     catch(Exception e)
     {

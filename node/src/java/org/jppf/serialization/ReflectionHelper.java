@@ -23,7 +23,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import org.jppf.JPPFException;
-import org.jppf.utils.*;
+import org.jppf.utils.Pair;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
@@ -286,7 +286,7 @@ public final class ReflectionHelper
    * @return the newly created object.
    * @throws Exception if any error occurs.
    */
-  static Object create(final Class<?> clazz) throws Exception
+ public  static Object create(final Class<?> clazz) throws Exception
   {
     //return createFromConstructor(clazz);
     if (rfMethod == null) return createFromConstructor(clazz);

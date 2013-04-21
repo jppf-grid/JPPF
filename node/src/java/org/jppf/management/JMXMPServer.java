@@ -23,6 +23,7 @@ import java.net.*;
 import java.util.*;
 
 import javax.management.remote.*;
+import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -63,9 +64,6 @@ public class JMXMPServer extends AbstractJMXServer
     this.ssl = ssl;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void start(final ClassLoader cl) throws Exception
   {
@@ -84,6 +82,7 @@ public class JMXMPServer extends AbstractJMXServer
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(env);
+      env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
       boolean found = false;
       JMXServiceURL url = null;
       while (!found)

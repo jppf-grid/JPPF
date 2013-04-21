@@ -23,24 +23,18 @@ import java.nio.ByteBuffer;
 import org.jppf.utils.streams.StreamConstants;
 
 /**
- * A ByteBuffer pool backed by a {@link ConcurrentLinkedQueue}.
+ * A ByteBuffer pool backed by a {@link java.util.concurrent.ConcurrentLinkedQueue ConcurrentLinkedQueue}.
  * @author Laurent Cohen
+ * @exclude
  */
 public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer>
 {
-  /**
-   * Create a new object for the pool.
-   * @return an object that can be returned to the pool.
-   */
   @Override
   protected ByteBuffer create()
   {
     return ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final ByteBuffer buffer)
   {

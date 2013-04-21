@@ -23,6 +23,7 @@ import java.io.*;
 /**
  * Interface for all builders instantiating alternate object input streams and output streams.
  * @author Laurent Cohen
+ * @deprecated in favor of using {@link JPPFSerialization}.
  */
 public interface JPPFObjectStreamBuilder
 {

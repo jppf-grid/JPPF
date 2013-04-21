@@ -25,21 +25,16 @@ import java.io.*;
  * This the factory for the JPPF implementation of object streams which allow
  * the serialization and deserialization of objects whose class does not implement <code>java.io.Serializable</code>.
  * @author Laurent Cohen
+ * @deprecated in favor of using {@link JPPFSerialization}.
  */
 public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder
 {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
   {
     return new JPPFObjectInputStream(in);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ObjectOutputStream newObjectOutputStream(final OutputStream out) throws Exception
   {

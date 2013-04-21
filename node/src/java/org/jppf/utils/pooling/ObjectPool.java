@@ -18,9 +18,10 @@
 
 package org.jppf.utils.pooling;
 
+
 /**
- * 
- * @param <E>
+ * Interface for oject pools.
+ * @param <E> the type of objects in the pool.
  * @author Laurent Cohen
  */
 public interface ObjectPool<E>

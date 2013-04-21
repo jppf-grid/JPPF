@@ -25,6 +25,7 @@ import org.slf4j.*;
 /**
  * Static factory for a bool of direct byte buffers.
  * @author Laurent Cohen
+ * @exclude
  */
 public class DirectBufferPool
 {

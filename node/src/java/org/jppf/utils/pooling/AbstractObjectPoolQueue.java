@@ -22,8 +22,15 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * A ByteBuffer pool backed by a {@link ConcurrentLinkedQueue}.
- * @param <T>
+ * A thread-safe, dynamic object pool backed by a {@link ConcurrentLinkedQueue}.
+ * This pool is designed for maximum throughput, thus its size will grow dynamically,
+ * up to maximum concurrent usage.
+ * <p>Subclasses that wish to avoid a size too large for the pool may for instance
+ * introduce a core pool size, and override the {@link #put(T)} method such that it
+ * doesn't put released object back into the queue if its size > core size.
+ * <p>In this case the {@link #size()} method might need to be overriden as well, as its
+ * performance in O(n) may be the main bottleneck of the implementation.
+ * @param <T> the type of objects in the pool.
  * @author Laurent Cohen
  */
 public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
@@ -33,9 +40,6 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
    */
   protected final Queue<T> queue = new ConcurrentLinkedQueue<T>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public T get()
   {
@@ -49,19 +53,12 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
    */
   protected abstract T create();
  
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void put(final T t)
   {
     queue.offer(t);
   }
   
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isEmpty()
   {

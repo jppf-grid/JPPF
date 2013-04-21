@@ -17,7 +17,6 @@
  */
 
 /**
- * Utility and helper classes used throughout the JPPF code.
- * @exclude
+ * Support for dyynamic object pooling in JPPF.
  */
 package org.jppf.utils.pooling;
