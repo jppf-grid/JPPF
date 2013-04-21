@@ -17,21 +17,15 @@
  */
 package org.jppf.classloader;
 
-import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.TypedProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.beans.Introspector;
 import java.lang.ref.Reference;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.lang.reflect.*;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Implementation for class loader leak prevention.

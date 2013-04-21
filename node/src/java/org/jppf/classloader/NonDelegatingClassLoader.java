@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.jppf.utils.streams.*;
 
 /**

@@ -78,6 +78,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     }
     catch (IOException e)
     {
+      log.debug(e.getMessage(), e);
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
     }
     catch (Exception e)

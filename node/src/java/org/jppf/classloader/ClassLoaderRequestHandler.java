@@ -21,7 +21,7 @@ package org.jppf.classloader;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
 
 import org.jppf.utils.*;
 import org.slf4j.*;

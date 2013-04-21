@@ -20,7 +20,7 @@ package org.jppf.data.transform;
 
 import java.io.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.streams.*;
 import org.slf4j.*;
 
