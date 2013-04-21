@@ -18,6 +18,7 @@
 
 package org.jppf.example.idlesystem;
 
+import org.jppf.JPPFError;
 import org.jppf.node.idle.IdleTimeDetector;
 
 import com.sun.jna.*;
@@ -61,6 +62,14 @@ public class X11IdleTimeDetector implements IdleTimeDetector
      * events
      */
     public NativeLong event_mask;
+
+    /*
+    @Override
+    protected List getFieldOrder()
+    {
+      return Arrays.asList("window", "state", "kind", "til_or_since", "idle", "event_mask");
+    }
+    */
   }
 
   /**
@@ -89,9 +98,6 @@ public class X11IdleTimeDetector implements IdleTimeDetector
     int XScreenSaverQueryInfo(Display display, Drawable drawable, XScreenSaverInfo saver_info);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long getIdleTimeMillis()
   {
@@ -103,17 +109,20 @@ public class X11IdleTimeDetector implements IdleTimeDetector
     try
     {
       display = X11.INSTANCE.XOpenDisplay(null);
+      if (display == null) display = X11.INSTANCE.XOpenDisplay(":0.0");
+      if (display == null) throw new JPPFError("Could not find a display, please setup your DISPLAY environment variable");
       window = X11.INSTANCE.XDefaultRootWindow(display);
-      //info = Xss.INSTANCE.XScreenSaverAllocInfo();
       info = new XScreenSaverInfo();
       Xss.INSTANCE.XScreenSaverQueryInfo(display, window, info);
       idleMillis = info.idle.longValue();
     }
+    catch(UnsatisfiedLinkError e)
+    {
+      throw new JPPFError(e.getMessage(), e);
+    }
     finally
     {
-      //if (info != null) X11.INSTANCE.XFree(info.getPointer());
       info = null;
-
       if (display != null) X11.INSTANCE.XCloseDisplay(display);
       display = null;
     }
