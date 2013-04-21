@@ -20,7 +20,7 @@ package org.jppf.gigaspaces.serialization;
 
 import java.io.*;
 
-import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.serialization.*;
 import org.jppf.utils.ObjectSerializerImpl;
 
 /**
@@ -46,11 +46,16 @@ public class GSObjectSerializer extends ObjectSerializerImpl
   @Override
   public Object deserialize(final InputStream is) throws Exception
   {
-    ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-    try {
-      return ois.readObject();
-    } finally {
-      ois.close();
+    //ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
+    try
+    {
+      //return ois.readObject();
+      return JPPFSerialization.Factory.getSerialization().deserialize(is);
+    }
+    finally
+    {
+      //ois.close();
+      is.close();
     }
   }
 }

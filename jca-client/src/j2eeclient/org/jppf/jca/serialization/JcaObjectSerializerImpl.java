@@ -20,7 +20,7 @@ package org.jppf.jca.serialization;
 
 import java.io.*;
 
-import org.jppf.serialization.JPPFObjectStreamFactory;
+import org.jppf.serialization.*;
 import org.jppf.utils.ObjectSerializerImpl;
 
 /**
@@ -46,11 +46,13 @@ public class JcaObjectSerializerImpl extends ObjectSerializerImpl
   @Override
   public Object deserialize(final InputStream is) throws Exception
   {
-    ObjectInputStream ois = JPPFObjectStreamFactory.newObjectInputStream(is);
-    try {
-      return ois.readObject();
-    } finally {
-      ois.close();
+    try
+    {
+      return JPPFSerialization.Factory.getSerialization().deserialize(is);
+    }
+    finally
+    {
+      is.close();
     }
   }
 }
