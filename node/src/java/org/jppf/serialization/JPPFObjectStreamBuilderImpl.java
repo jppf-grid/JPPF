@@ -38,7 +38,16 @@ public class JPPFObjectStreamBuilderImpl implements JPPFObjectStreamBuilder
   @Override
   public ObjectInputStream newObjectInputStream(final InputStream in) throws Exception
   {
-    return new ObjectInputStream(in);
+    //ObjectInputStream ois = new ObjectInputStream(in);
+    ObjectInputStream ois = new ObjectInputStream(in) {
+      @Override
+      protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null)  return super.resolveClass(desc);
+        return Class.forName(desc.getName(), false, cl);
+      }
+    };
+    return ois;
   }
 
   /**
