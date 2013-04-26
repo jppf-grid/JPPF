@@ -1,0 +1,7 @@
+<project>
+@header@
+@common@
+  <dependencies>
+@common-dep@
+  </dependencies>
+</project>

@@ -1,0 +1,3 @@
+org.jppf.server.node.spi.JPPFDefaultNodeMBeanProvider            # node management
+org.jppf.server.node.spi.JPPFNodeTaskMonitorProvider             # tasks execution monitoring
+org.jppf.management.diagnostics.spi.NodeDiagnosticsMBeanProvider # node JVM diagnostics

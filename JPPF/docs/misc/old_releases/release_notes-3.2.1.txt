@@ -1,0 +1,15 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.2.1
+
+This maintenance release brings important bug fixes.
+
+Bugs fixes:
+
+[JPPF-105 Temporary files disappear when setting a large MemoryMapDataProvider as data provider in a JPPFJob](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-105)
+[JPPF-107 Missing exception handling upon invocation of NodeLifeCycleListener methods](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-107)
+[JPPF-108 Deadlock in the server upon client disconnection](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-108)
+[JPPF-113 NullPointerException in the console upon connection to first driver](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-113)
+[JPPF-114 Missing unit tests for node management and monitoring APIs](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-114)
+
+JPPF Links: [Web Site](http://www.jppf.org) - [Downloads](http://www.jppf.org/downloads.php) - [Documentation](http://www.jppf.org/wiki) - [User forums](http://www.jppf.org/forums) - [Issue tracker](http://www.jppf.org/tracker/tbg/jppf) - [SF.net project page](http://sourceforge.net/projects/jppf-project/)

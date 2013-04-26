@@ -1,0 +1,22 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
+
+This maintenance release brings important bug fixes.
+
+Fixed bugs:
+
+3484823 - CommandLineTask does not provide the subprocess exit code
+3486440 - JPPFExecutorService.throws NPE on Future.get()
+3485206 - J2EE connector build fails 
+3488090 - JMXConnectionWrapper.connectAndWait(0) does not wait
+3492730 - Tomcat port is missing jmxremote_optional.jar
+3504612 - IllegalAccessError with startup deployed on node and server
+3512624 - Bad handling of incorrect server port configuration
+3513973 - Client does not pick the right connection pool size
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+SF.net project page: http://sourceforge.net/projects/jppf-project/

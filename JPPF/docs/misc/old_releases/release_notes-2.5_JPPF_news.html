@@ -1,0 +1,54 @@
+What's new in JPPF 2.5
+
+Broadcast jobs, flexible serialization, data grid integration, embedded FTP server and many other enhancements and fixes.
+
+JPPF 2.5: broadcast jobs, flexible serialization schemes, data grid integration, embedded FTP server
+
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a grid
+
+<h2>What's new in JPPF 2.5</h2>
+
+<p>A new <a href="/wiki/index.php?title=Specifying_alternate_object_streams#Generic_JPPF_serialization"><b>generic serialization framework</b></a> enables developers to use non-serializable classes in their JPPF tasks. This is especially useful when using third party libraries whose source code is not available.
+
+<p><a href="/wiki/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs"><b>Broadcast jobs</b></a> bring the ability to run the same JPPF job on all available grid nodes
+
+<p><b>Class loading performance enhancements</b>: a new class definition cache on the server brings improved node startup time and faster job execution.
+
+<p><b>Administration console enhancements</b>:
+<ul>
+	<li>elements are now sorted in the tree views</li>
+	<li>ability to reset the server statistics</li>
+	<li>rendering and display fixes and enhancements</li>
+</ul>
+
+<p><b>Data grid integration</b>: the <a href="/samples-pack/DataDependency/Readme.php">real-time portfolio updates</a> sample now uses Hazelcast as its distributed data fabric
+
+<p>New integration sample: <a href="/samples-pack/FTPServer/Readme.php"><b>embedding a FTP server and client</b></a>, demonstrates how Apache ftpd server can be embedded within a JPPF server, and how FTP client APIs can access it from a JPPF task.
+
+<p>New sample: <a href="/samples-pack/Nbody/Readme.php"><b>parallel N-body problem implementation</b></a>, a JPPF-powered implementation of the N-body problem applied to anti-protons trapped in a magnetic field.
+
+
+<h3>Feature requests</h3>
+
+<p>3151670 - Client startup classes<br/>
+3149103 - Broadcast jobs<br/>
+3156063 - Provide shell scripts to run JPPF components<br/>
+3037770 - Ability to sort artifacts in tree table view<br/>
+3170878 - Use a soft map for the class definition cache<br/>
+3170216 - Visual indicator for nodes that cannot be managed<br/>
+2211733 - Ability to reset the server statistics<br/>
+3179788 - Enable idle timeout on socket connections<br/>
+3148503 - Remove driver from the admin console when it is shutdown<br/>
+3105057 - Enable cancellation of a job upon client disconnection<br/>
+
+<h3>Bug fixes</h3>
+
+<p>3166884 - The task life cycle documentation is outdated<br/>
+3148007 - Job not removed from server upon suspend/resume<br/>
+3152285 - Job never returns upon cancellation<br/>
+3152769 - OutOfMemoryError: PermGen space upon many client runs<br/>
+3162338 - Missing exception handling for custom load balancers<br/>
+3166896 - JPPFExecutorService not working<br/>
+3173345 - Multithreaded deserialization of Calendar leads to CCE<br/>
+3215335 - IP address filtering is not working<br/>
+3301406 - Client failover is not working<br/>

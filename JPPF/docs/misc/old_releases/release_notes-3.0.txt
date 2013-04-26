@@ -1,0 +1,88 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
+
+JPPF 3.0 brings incredible improvements in ease of use, stability, reliability and  flexibility.
+
+Simplification and improvement of the configuration
+- Servers, nodes and clients now only require a single TCP port instead of 3 for executing jobs.
+- Adoption of the JMXMP remote connector allows JMX-based management to use a single port instead of 2.
+- Server discovery and manual configuration can now be mixed for clients and servers in P2P.
+
+Improved recovery and failover on the client side
+- A persistence manager allows job states to be recovered after an applicationr crash. The persistence manager is an API which allows storing the states of the jobs on the fly and recover them after an application crash or restart. A default implementation is provided and demonstrated in a new sample.
+- Upon recovery of a client connection to the server, only the un-executed tasks in each job are resubmitted
+- Applications can now receive notifications when a job is sent to the server, and when the final results are returned.
+
+Class loading
+- The distributed class loading mechanism is now fully documented.
+- New extensions enable the optimization of the class loading overhead at node startup, along with the ability to update the classpath at runtime.
+- New class loader delegation model enables faster class loading.
+- A new sample illustrates how to automate the management of remote library repositories on the grid nodes.
+
+New customizations and extension points
+- Ability to receive node connection events in the server.
+- Node initialization hooks enable sophisticated strategies for failover and recovery of broken server connections.
+- The node life cycle listener extension can now be deployed both at the server and node level.
+
+Administration console, management and monitoring improvements
+- The server statistics panel now displays jobs data.
+- The priority of each job can now be dynamically and remotely updated.
+- The driver system information can now be displayed in the admin console as for the nodes.
+- The number of idle nodes is now monitored in the server statistics.
+
+New samples
+- How to receive notifications of nodes connecting and disconnecting on the server.
+- Job recovery after an application crash.
+- Using a node initialization hook to implement a sophisticated failover mechanism.
+- Using the JPPF class loading extensions to automate the deployment and management of application libraries in the nodes at runtime.
+
+All implemented feature requests:
+
+Server:
+3315345 - NIO-based server to client communication
+3315349 - Have the driver use 1 port instead of three
+3370967 - Enable JMXMP remote connector
+3016253 - Add new extension points on node connection events
+3315028 - Configurable initial bundle size for proportional algorithm
+
+Node:
+3405336 - Enable overriding the class loader delegation model
+3302047 - Use thread pool instead of timer for task timeout
+3424072 - Refactoring needed for node life cycle add-on
+3451045 - Node initialization hooks
+
+Client:
+3420815 - Make job priority manageable
+3314053 - Improve the flow of results for local execution
+3378701 - Enable or disable cancel job upon client disconnection
+3407602 - StartListener for jobs on the client side
+3362723 - Allow driver definition with auto discovery
+3158724 - Avoid resubmission of already executed tasks
+3427483 - Jobs persistence and failover on the client side
+
+Administration console, monitoring and management:
+3299267 - Add job statistics in the server
+3423470 - Add number of idle nodes to server statistics
+3452103 - Driver system information in the admin console
+3420815 - Make job priority manageable
+
+Other:
+3452118 - Code cleanup
+3434615 - Fix typos in source code/javadoc
+3439821 - Remove task cancel/restart features
+3400572 - Avoid 'SocketException: Address in use when localNode=T
+3102697 - Document JPPF class loading in details
+
+New sample applications
+- How to receive notifications of nodes connecting and disconnecting on the server
+- Job recovery after an application crash
+- Using a node initialization hook to implement a sophisticated failover mechanism
+- Using the JPPF class loading extensions to automate the deployment and management of application libraries in the nodes at runtime
+
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+SF.net project page: http://sourceforge.net/projects/jppf-project/
