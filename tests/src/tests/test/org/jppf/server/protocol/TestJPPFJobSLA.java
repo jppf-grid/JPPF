@@ -257,7 +257,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * Test that a job is only executed on one node at a time.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  //@Test(timeout=8000)
   public void testJobMaxNodes() throws Exception
   {
     int nbTasks = 10;
