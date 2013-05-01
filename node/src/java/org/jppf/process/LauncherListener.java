@@ -18,7 +18,11 @@
 
 package org.jppf.process;
 
+import java.io.EOFException;
 import java.net.Socket;
+
+import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
 
 /**
  * Instances of this class listen to a socket connection setup in the ProcessLauncher, to handle the situation when the Launcher dies unexpectedly.<br>
@@ -27,6 +31,14 @@ import java.net.Socket;
  */
 public class LauncherListener extends Thread
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(LauncherListener.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The port on which to listen for the launcher signals.
    */
@@ -52,10 +64,12 @@ public class LauncherListener extends Thread
     try
     {
       Socket s = new Socket("localhost", port);
-      s.getInputStream().read();
+      int n = s.getInputStream().read();
+      if (n == -1) throw new EOFException("eof");
     }
     catch(Throwable t)
     {
+      if (debugEnabled) log.debug("exiting with exception: " + ExceptionUtils.getMessage(t));
       System.exit(0);
     }
   }

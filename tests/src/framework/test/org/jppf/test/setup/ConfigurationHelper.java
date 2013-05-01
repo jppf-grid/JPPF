@@ -32,6 +32,10 @@ import org.jppf.utils.streams.StreamUtils;
 public class ConfigurationHelper
 {
   /**
+   * Cache of the created temp files, so they can be deleted upon cleanup.
+   */
+  private static List<File> tempFiles = new Vector<File>();
+  /**
    * Create a temporary file containing the specified configuration.
    * @param config the configuration to store on file.
    * @return the path to the created file.
@@ -54,6 +58,7 @@ public class ConfigurationHelper
         if (writer != null) StreamUtils.closeSilent(writer);
       }
       path = file.getCanonicalPath().replace('\\', '/');
+      tempFiles.add(file);
     }
     catch (Exception e)
     {
@@ -204,5 +209,13 @@ public class ConfigurationHelper
         config.put(entry.getKey(), entry.getValue());
       }
     }
+  }
+
+  /**
+   * Cleanup the created temporary files.
+   */
+  static void cleanup()
+  {
+    while (!tempFiles.isEmpty()) tempFiles.remove(0).delete();
   }
 }

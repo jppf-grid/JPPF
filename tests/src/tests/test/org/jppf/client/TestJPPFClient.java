@@ -260,16 +260,16 @@ public class TestJPPFClient extends Setup1D1N
       int poolSize = 2;
       int maxReconnect = 3;
       config.setProperty("reconnect.max.time", Integer.toString(maxReconnect));
-      config.setProperty("jppf.discovery.enabled", Boolean.toString(false));
+      config.setProperty("jppf.discovery.enabled", "false");
       config.setProperty("jppf.pool.size", Integer.toString(poolSize));
       config.setProperty("jppf.drivers", "driver1");
       config.setProperty("driver1.jppf.server.host", "localhost");
-      config.setProperty("driver1.jppf.server.port", Integer.toString(11101));
+      config.setProperty("driver1.jppf.server.port", "11101");
       config.setProperty("driver1.jppf.pool.size", Integer.toString(poolSize));
-      config.setProperty("driver1.jppf.management.port", Integer.toString(11201));
+      config.setProperty("driver1.jppf.management.port", "11201");
       client = new MyClient();
       waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
-      restartDriver(client, poolSize, 1000L * maxReconnect + 500L);
+      restartDriver(client, poolSize, 1000L * maxReconnect + 1500L);
       String[] threads = threadNames("^JMX connection .*");
       assertEquals(poolSize, threads.length);
     } finally {

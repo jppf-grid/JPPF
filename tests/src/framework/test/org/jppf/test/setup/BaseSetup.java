@@ -167,6 +167,16 @@ public class BaseSetup
    */
   public static void cleanup() throws Exception
   {
+    close();
+    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+  }
+
+  /**
+   * Stops the driver and node and close the client.
+   * @throws Exception if a process could not be stopped.
+   */
+  private static void close() throws Exception
+  {
     if (client != null)
     {
       client.close();
@@ -175,7 +185,7 @@ public class BaseSetup
     }
     System.gc();
     stopProcesses();
-    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    ConfigurationHelper.cleanup();
   }
 
   /**
@@ -264,7 +274,13 @@ public class BaseSetup
       @Override
       public void run()
       {
-        stopProcesses();
+        try
+        {
+          close();
+        }
+        catch(Exception ignore)
+        {
+        }
       }
     };
     Runtime.getRuntime().addShutdownHook(shutdownHook);

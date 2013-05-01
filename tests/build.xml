@@ -152,7 +152,7 @@
 
   <target name="run" depends="compile, generate.tests.list" description="run the junit tests">
     <echo message="Running the tests"/>
-    <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
+    <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx512m"/>
       <jvmarg value="-Djppf.config=client.properties"/>

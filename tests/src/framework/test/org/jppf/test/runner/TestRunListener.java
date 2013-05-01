@@ -85,9 +85,6 @@ public class TestRunListener extends RunListener
     return resultHolder;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void testRunStarted(final Description description) throws Exception
   {
@@ -101,9 +98,6 @@ public class TestRunListener extends RunListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void testRunFinished(final Result result) throws Exception
   {
@@ -115,9 +109,6 @@ public class TestRunListener extends RunListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void testStarted(final Description description) throws Exception
   {
@@ -134,9 +125,6 @@ public class TestRunListener extends RunListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void testFailure(final Failure failure) throws Exception
   {
@@ -144,9 +132,6 @@ public class TestRunListener extends RunListener
     if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "'");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void testFinished(final Description description) throws Exception
   {
@@ -157,9 +142,6 @@ public class TestRunListener extends RunListener
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void testIgnored(final Description description) throws Exception
   {

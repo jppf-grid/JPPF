@@ -68,14 +68,14 @@ public class ResourceCache
   /**
    * Shutdown hook for cleaning up this cache instance.
    */
-  private final Thread shutdownHook = new Thread(new ShutdownHook(tempFolders, uuid));
+  //private final Thread shutdownHook = ;
 
   /**
    * Default initializations.
    */
   public ResourceCache()
   {
-    Runtime.getRuntime().addShutdownHook(shutdownHook);
+    Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(tempFolders, uuid)));
     cacheMap.put(uuid, this);
     initTempFolders();
   }
@@ -288,6 +288,7 @@ public class ResourceCache
     @Override
     public void run()
     {
+      System.out.println("cleaning up resource cache [uuid=" + uuid + "]");
       cacheMap.remove(uuid);
       while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
       
@@ -299,6 +300,7 @@ public class ResourceCache
    */
   public synchronized void close()
   {
+    /*
     try
     {
       Runtime.getRuntime().removeShutdownHook(shutdownHook);
@@ -306,6 +308,7 @@ public class ResourceCache
     catch (Exception ignore)
     {
     }
+    */
     new ShutdownHook(tempFolders, uuid).run();
   }
 
