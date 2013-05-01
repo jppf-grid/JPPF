@@ -33,6 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @deprecated in favor of using {@link JPPFSerialization}.
  */
+@Deprecated
 public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder
 {
   /**

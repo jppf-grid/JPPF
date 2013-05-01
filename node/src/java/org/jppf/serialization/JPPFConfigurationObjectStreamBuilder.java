@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
  * @author Laurent Cohen
  * @deprecated in favor of using {@link JPPFSerialization}.
  */
+@Deprecated
 public class JPPFConfigurationObjectStreamBuilder implements JPPFObjectStreamBuilder
 {
   /**

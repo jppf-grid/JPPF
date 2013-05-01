@@ -1,6 +1,6 @@
 <!--
 	JPPF
-  Copyright (C) 2005-2013 JPPF Team. 
+	Copyright (C) 2005-2013 JPPF Team. 
 	http://www.jppf.org
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,11 +40,12 @@
 		<antcall target="include.code"><param name="sample" value="CustomLoadBalancer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="DataEncryption"/></antcall>
 		<antcall target="include.code"><param name="sample" value="ExtendedClassLoading"/></antcall>
-    <antcall target="include.code"><param name="sample" value="FTPServer"/></antcall>
-    <antcall target="include.code"><param name="sample" value="GPU"/></antcall>
+		<antcall target="include.code"><param name="sample" value="FTPServer"/></antcall>
+		<antcall target="include.code"><param name="sample" value="GPU"/></antcall>
 		<antcall target="include.code"><param name="sample" value="IdleSystem"/></antcall>
 		<antcall target="include.code"><param name="sample" value="InitializationHook"/></antcall>
 		<antcall target="include.code"><param name="sample" value="JobRecovery"/></antcall>
+		<antcall target="include.code"><param name="sample" value="KryoSerializer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="NodeLifeCycle"/></antcall>
 		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
 		<!-- Generate the samples pack zip file -->
@@ -66,7 +67,7 @@
 			</zipfileset>
 		</zip>
 		<!-- Clean up and add the samples pack sources to the proper web site folder -->
-    <delete dir="${home}/samples-pack" quiet="true"/>
+		<delete dir="${home}/samples-pack" quiet="true"/>
  		<mkdir dir="${home}/samples-pack"/>
 		<copy todir="${home}/samples-pack">
 			<fileset dir="${samples-pack}">
@@ -80,18 +81,18 @@
 				<include name="shared/images/*.*"/>
 				<include name="DataDependency/images/*.gif"/>
 				<include name="NodeTray/images/*.gif"/>
-        <include name="Nbody/images/*.gif"/>
-        <include name="GPU/**/*.c"/>
+				<include name="Nbody/images/*.gif"/>
+				<include name="GPU/**/*.c"/>
 			</fileset>
 		</copy>
 		<!-- remove HTML-converted files after the zip is created -->
 		<delete><fileset dir="${samples-pack}" includes="**/*.java.html"/></delete>
-  </target>
+	</target>
 
 	<!-- Convert source files to HTML -->
 	<target name="include.code">
 		<java2html srcdir="${samples-pack}/${sample}" destdir="${samples-pack}/${sample}" includes="**/*.java"
 			style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
-  </target>
+	</target>
 
 </project> 
