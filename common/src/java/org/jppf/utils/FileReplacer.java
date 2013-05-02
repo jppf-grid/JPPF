@@ -99,7 +99,7 @@ public class FileReplacer
     if (f.isDirectory()) replaceFolder(f);
     else replaceFile(f);
     log.info("Total number of occurrences found: " + nbReplacements);
-    log.info("Total number of files" + (searchOnly ? " would have been" : "") + " changed: " + nbFilesChanged);
+    log.info("Total number of files" + (searchOnly ? " that would have been" : "") + " changed: " + nbFilesChanged);
   }
 
   /**
@@ -169,13 +169,6 @@ public class FileReplacer
   {
     try
     {
-      /*
-      String rootFolder = args[0];
-      String find = args[1];
-      String replace = args[2];
-      String ext = args[3];
-      boolean searchOnly = Boolean.valueOf(args[4]);
-       */
       Arguments a = parseArguments(args);
       System.out.println("using " + a);
       FileReplacer replacer = new FileReplacer();

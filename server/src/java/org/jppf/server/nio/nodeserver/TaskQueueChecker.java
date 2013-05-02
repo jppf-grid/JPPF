@@ -325,62 +325,45 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param bundle the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
-  private C findIdleChannelIndex(final ServerJob bundle)
-  {
+  private C findIdleChannelIndex(final ServerJob bundle) {
     int idleChannelsSize = idleChannels.size();
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
     List<C> acceptableChannels = new ArrayList<C>(idleChannelsSize);
     List<String> uuidPath = bundle.getJob().getUuidPath().getList();
     Iterator<C> iterator = idleChannels.iterator();
-    while (iterator.hasNext())
-    {
+    while (iterator.hasNext()) {
       C ch = iterator.next();
-      if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE)
-      {
+      if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
         iterator.remove();
         continue;
       }
       if (!ch.isActive()) continue;
       if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + ch.getUuid());
-      if (uuidPath.contains(ch.getUuid()))
-      {
+      if (uuidPath.contains(ch.getUuid())) {
         if (debugEnabled) log.debug("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + ch.getUuid());
         continue;
       }
       if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
-      if (policy != null)
-      {
+      if (policy != null) {
         JPPFSystemInformation info = ch.getSystemInformation();
         boolean b = false;
-        try
-        {
+        try {
           b = policy.accepts(info);
-        }
-        catch(Exception ex)
-        {
+        } catch(Exception ex) {
           log.error("An error occurred while running the execution policy to determine node participation.", ex);
         }
-        if (debugEnabled)
-        {
-          log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
-        }
+        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
         if (!b) continue;
       }
       // add a bias toward local node
-      if (ch.isLocal())
-      {
-        return ch;
-      }
+      if (ch.isLocal()) return ch;
       acceptableChannels.add(ch);
     }
     int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
-    if (size > 0)
-    {
-      return acceptableChannels.get(size > 1 ? random.nextInt(size) : 0);
-    }
+    if (size > 0) return acceptableChannels.get(size > 1 ? random.nextInt(size) : 0);
     return null;
   }
 

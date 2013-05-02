@@ -28,6 +28,7 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.utils.ObjectSerializer;
 import org.slf4j.*;
 
 /**
@@ -66,7 +67,8 @@ public class RemoteNodeIO extends AbstractNodeIO
   @Override
   protected Object[] deserializeObjects() throws Exception
   {
-    if (debugEnabled) log.debug("waiting for next request");
+    ObjectSerializer ser = node.getHelper().getSerializer();
+    if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
     JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketWrapper, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     node.getExecutionManager().setBundle(bundle);
