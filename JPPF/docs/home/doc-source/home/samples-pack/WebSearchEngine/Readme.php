@@ -12,7 +12,7 @@ $template{name="samples-page-header" title="Web Crawler and Search Engine sample
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you must have a JPPF server and at least one node running.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
 
 					<h3>How do I use it?</h3>

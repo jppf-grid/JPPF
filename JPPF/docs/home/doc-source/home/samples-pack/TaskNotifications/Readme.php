@@ -12,8 +12,8 @@ $template{name="samples-page-header" title="Tasks Notifications sample"}$
 					<h3>Description of the solution</h3>
 					This feature is implemented via two JPPF extensions for the nodes:
 					<ul class="samplesList">
-						<li>A <a href="http://www.jppf.org/doc/v3/index.php?title=Pluggable_MBeans#Writing_a_custom_node_MBean"/>custom node MBean</a> that will send notifications to local or remote listeners using the JMX APIs.</li>
-						<li>A simple facade to the MBean, deployed as a <a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_startup_classes#Node_startup_classes">JPPF node startup class</a>,
+						<li>A <a href="http://www.jppf.org/doc/v4/index.php?title=Pluggable_MBeans#Writing_a_custom_node_MBean"/>custom node MBean</a> that will send notifications to local or remote listeners using the JMX APIs.</li>
+						<li>A simple facade to the MBean, deployed as a <a href="http://www.jppf.org/doc/v4/index.php?title=JPPF_startup_classes#Node_startup_classes">JPPF node startup class</a>,
 							that provides an easy access to the MBean without having to deal with its complexities, initialization, etc.</li>
 					</ul>
 					In addition, we have a JPPF client that will query the server for all attached nodes, connect to each node's JMX server, and subscribe to all notifications from each instance of our custom MBean.
@@ -40,7 +40,7 @@ $template{name="samples-page-header" title="Tasks Notifications sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol class="samplesList">
 						<li>open a command prompt in JPPF-x.y.z-samples-pack/TaskNotifications</li>
@@ -59,9 +59,9 @@ $template{name="samples-page-header" title="Tasks Notifications sample"}$
 
 					<h3>What features of JPPF are demonstrated?</h3>
 					<ul class="samplesList">
-						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Pluggable_MBeans#Writing_a_custom_node_MBean"/>Pluggable management beans for JPPF nodes</a></li>
-						<li><a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_startup_classes#Node_startup_classes">Node startup classes</a></li>
-						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Node_management#Subscribing_to_MBean_notifications">Subscribing to notifications from a node</a></li>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Pluggable_MBeans#Writing_a_custom_node_MBean"/>Pluggable management beans for JPPF nodes</a></li>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=JPPF_startup_classes#Node_startup_classes">Node startup classes</a></li>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Node_management#Subscribing_to_MBean_notifications">Subscribing to notifications from a node</a></li>
 					</ul>
 
 					<h3>I have additional questions and comments, where can I go?</h3>

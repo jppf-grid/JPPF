@@ -9,7 +9,7 @@ $template{name="samples-page-header" title="Custom MBeans sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol class="samplesList">
 						<li>open a command prompt in JPPF-x.y-samples-pack/CustomMBeans</li>
@@ -28,7 +28,7 @@ $template{name="samples-page-header" title="Custom MBeans sample"}$
 					<h3>What features of JPPF are demonstrated?</h3>
 					Pluggable management beans for JPPF nodes and servers.<br>
 					For a detailed explanation, please refer to the related documentation in the
-					<a href="http://www.jppf.org/doc/v3/index.php?title=Pluggable_MBeans">Pluggable MBeans</a> section.
+					<a href="http://www.jppf.org/doc/v4/index.php?title=Pluggable_MBeans">Pluggable MBeans</a> section.
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.

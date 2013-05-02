@@ -37,7 +37,7 @@ $template{name="samples-page-header" title="Idle Mode for JPPF Nodes"}$
 					</ol>
 
 					<h3>What features of JPPF are demonstrated?</h3>
-					Ability to <a href="http://www.jppf.org/doc/v3/index.php?title=Deployment_and_run_modes#JPPF_Node_in_.E2.80.9CIdle_Host.E2.80.9D_mode">run a node when the host is idle</a>.
+					Ability to <a href="http://www.jppf.org/doc/v4/index.php?title=Deployment_and_run_modes#JPPF_Node_in_.E2.80.9CIdle_Host.E2.80.9D_mode">run a node when the host is idle</a>.
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>There are 2 privileged places you can go to:

@@ -10,13 +10,13 @@ $template{name="samples-page-header" title="Initialization Hook sample"}$
 					<ol class="samplesList">
 						<li>At node startup time, read the list of servers and store it in memory</li>
 						<li>Use the first server in the list and attempt to connect</li>
-						<li>When the connection fails, the <a href="http://www.jppf.org/doc/v3/index.php?title=Node_configuration#Recovery_and_failover">recovery mechanism</a> will attempt to reconnect to the current server</li>
+						<li>When the connection fails, the <a href="http://www.jppf.org/doc/v4/index.php?title=Node_configuration#Recovery_and_failover">recovery mechanism</a> will attempt to reconnect to the current server</li>
 						<li>If the recovery fails, the current server is put at the end of the list and we get back to step 2</li>
 					</ol>
 
 					<h3>How do I run it?</h3>
 					Before running this sample, you need to install at least two JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
 					<p>For convenience, this sample provides 2 configurations for the servers, which you will find in <b>InitializationHook/config/driver1</b> and <b>InitializationHook/config/driver2</b>.
 					Additionally, a node configuration is provided in <b>InitializationHook/config/node</b>.<br/>
 					Once you have installed the 2 servers and at least one node, perform the following steps:
@@ -71,13 +71,13 @@ Node successfully initialized</pre>
 
 					<h3>What features of JPPF are demonstrated?</h3>
 					The main feature demonstrated is detailed in the JPPF documentation, in the
-					<a href="http://www.jppf.org/doc/v3/index.php?title=Node_initialization_hooks">Node Initialization Hooks</a> section.
+					<a href="http://www.jppf.org/doc/v4/index.php?title=Node_initialization_hooks">Node Initialization Hooks</a> section.
 
 					<h3>I have additional questions and comments, where can I go?</h3>
 					<p>There are 2 privileged places you can go to:
 					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/doc/v3">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
 					</ul>
 					
 </div>

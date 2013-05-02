@@ -20,7 +20,7 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v3/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol>
 						<li>open a command prompt in JPPF-x.y-samples-pack/NodeTray</li>
@@ -33,8 +33,8 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 
 					<h3>What features of JPPF are demonstrated?</h3>
 					<ul>
-						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Receiving_notifications_of_node_life_cycle_events">JPPF node life cycle notifications</a></li>
-						<li><a href="http://www.jppf.org/doc/v3/index.php?title=Node_management#Subscribing_to_MBean_notifications">Subscribing to task-level JMX notifications</a></li>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">JPPF node life cycle notifications</a></li>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Node_management#Subscribing_to_MBean_notifications">Subscribing to task-level JMX notifications</a></li>
 					</ul>
 
 					<h3>I have additional questions and comments, where can I go?</h3>
@@ -42,7 +42,7 @@ $template{name="samples-page-header" title="Node Tray sample"}$
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul>
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/doc/v3">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
 					</ul>
 					
 </div>
