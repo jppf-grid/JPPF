@@ -18,6 +18,7 @@
 
 package org.jppf.utils.collections;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
@@ -27,7 +28,7 @@ import java.util.concurrent.locks.Lock;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public interface CollectionMap<K, V> extends Iterable<V>
+public interface CollectionMap<K, V> extends Iterable<V>, Serializable
 {
   /**
    * Add a value for the specified key.

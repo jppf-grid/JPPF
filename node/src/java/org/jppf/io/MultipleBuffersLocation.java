@@ -83,19 +83,35 @@ public class MultipleBuffersLocation extends AbstractDataLocation
   }
 
   /**
-   * Initialize this location from a single buffer.
-   * @param buffer the buffer that contains the data.
+   * Initialize this location from an array of buffers.
+   * @param buffers the buffers that contain the data.
    */
-  public MultipleBuffersLocation(final JPPFBuffer buffer)
+  public MultipleBuffersLocation(final JPPFBuffer...buffers)
   {
-    this.list = new ArrayList<JPPFBuffer>();
-    this.list.add(buffer);
-    this.size = buffer.length;
+    this.list = new ArrayList<JPPFBuffer>(buffers.length);
+    this.size = 0;
+    for (JPPFBuffer buf: buffers)
+    {
+      this.list.add(buf);
+      this.size += buf.length;
+    }
   }
 
   /**
-   * {@inheritDoc}
+   * Initialize this location from an array of buffers.
+   * @param buffers the buffers that contain the data.
    */
+  public MultipleBuffersLocation(final byte[]...buffers)
+  {
+    this.list = new ArrayList<JPPFBuffer>(buffers.length);
+    this.size = 0;
+    for (byte[] buf: buffers)
+    {
+      this.list.add(new JPPFBuffer(buf));
+      this.size += buf.length;
+    }
+  }
+
   @Override
   public int transferFrom(final InputSource source, final boolean blocking) throws Exception
   {

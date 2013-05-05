@@ -22,8 +22,8 @@ import java.util.*;
 
 import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
-import org.jppf.data.transform.*;
-import org.jppf.utils.*;
+import org.jppf.io.IOHelper;
+import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 
 /**
@@ -134,10 +134,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   protected JPPFResourceWrapper readResource() throws Exception
   {
     if (debugEnabled) log.debug(formattedName + " reading next resource ...");
-    JPPFBuffer buffer = socketClient.receiveBytes(0);
-    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-    byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, false, buffer.buffer, 0, buffer.length);
-    return (JPPFResourceWrapper) socketClient.getSerializer().deserialize(data);
+    return (JPPFResourceWrapper) IOHelper.unwrappedData(socketClient, socketClient.getSerializer());
   }
 
   /**
@@ -147,11 +144,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected void writeResource(final JPPFResourceWrapper resource) throws Exception
   {
-    JPPFBuffer buffer = socketClient.getSerializer().serialize(resource);
-    JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-    byte[] data = (transform == null) ? buffer.getBuffer() : JPPFDataTransformFactory.transform(transform, true, buffer.buffer, 0, buffer.length);
-    if (debugEnabled) log.debug(formattedName + " sending " + data.length + " bytes to the server");
-    socketClient.sendBytes(new JPPFBuffer(data, data.length));
+    IOHelper.sendData(socketClient, resource, socketClient.getSerializer());
     socketClient.flush();
     if (debugEnabled) log.debug(formattedName + " data sent to the server");
   }

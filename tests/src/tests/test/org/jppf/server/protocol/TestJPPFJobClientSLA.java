@@ -261,7 +261,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * Test that a job is only executed on one channel at a time, either local or remote.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  //@Test(timeout=8000)
   public void testJobMaxChannelsClient() throws Exception
   {
     try

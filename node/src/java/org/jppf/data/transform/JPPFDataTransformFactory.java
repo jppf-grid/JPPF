@@ -42,6 +42,10 @@ public class JPPFDataTransformFactory
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The transform class specified in the configuration.
+   */
+  private static final Class<?> TRANSFORM_CLASS = initTransformClass();
 
   /**
    * Create the singleton data transform instance.
@@ -50,13 +54,11 @@ public class JPPFDataTransformFactory
   private static JPPFDataTransform createInstance()
   {
     JPPFDataTransform result = null;
-    String s = JPPFConfiguration.getProperties().getString("jppf.data.transform.class", null);
-    if (s != null)
+    if (TRANSFORM_CLASS != null)
     {
       try
       {
-        Class clazz = Class.forName(s);
-        result = (JPPFDataTransform) clazz.newInstance();
+        result = (JPPFDataTransform) TRANSFORM_CLASS.newInstance();
       }
       catch(Exception e)
       {
@@ -64,6 +66,28 @@ public class JPPFDataTransformFactory
       }
     }
     return result;
+  }
+
+  /**
+   * The transform class specified in the configuration.
+   * @return an instance of {@link Class} or <code>null</code> if no class is specified or the class could not be found.
+   */
+  private static Class<?> initTransformClass()
+  {
+    Class<?> c = null;
+    String s = JPPFConfiguration.getProperties().getString("jppf.data.transform.class", null);
+    if (s != null)
+    {
+      try
+      {
+        c = Class.forName(s);
+      }
+      catch(Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
+    }
+    return c;
   }
 
   /**

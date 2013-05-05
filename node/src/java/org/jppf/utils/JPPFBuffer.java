@@ -57,6 +57,15 @@ public class JPPFBuffer
     this.length = buffer.length;
   }
 
+  /**
+   * Initialize this buffer with a specified buffer.
+   * @param buffer the buffer to use.
+   */
+  public JPPFBuffer(final byte[] buffer)
+  {
+    this.buffer = buffer;
+    this.length = buffer.length;
+  }
 
   /**
    * Initialize this buffer with a specified buffer and buffer length.

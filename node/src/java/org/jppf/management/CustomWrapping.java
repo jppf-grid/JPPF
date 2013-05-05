@@ -23,7 +23,9 @@ import java.io.IOException;
 import javax.management.remote.generic.ObjectWrapping;
 
 import org.jppf.comm.socket.BootstrapObjectSerializer;
-import org.jppf.utils.ObjectSerializer;
+import org.jppf.io.*;
+import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * This implementation uses the configured JPPF serialization scheme.
@@ -40,7 +42,7 @@ public class CustomWrapping implements ObjectWrapping
   {
     try
     {
-      return serializer.deserialize((byte[]) wrapped);
+      return IOHelper.unwrappedData(new MultipleBuffersLocation((byte[]) wrapped), serializer);
     }
     catch(IOException e)
     {
@@ -61,7 +63,8 @@ public class CustomWrapping implements ObjectWrapping
   {
     try
     {
-      return serializer.serialize(obj).buffer;
+      DataLocation dl = IOHelper.serializeData(obj, serializer);
+      return StreamUtils.getInputStreamAsByte(dl.getInputStream());
     }
     catch(IOException e)
     {
