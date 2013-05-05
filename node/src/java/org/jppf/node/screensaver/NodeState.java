@@ -191,9 +191,6 @@ class NodeState implements NodeLifeCycleListener
 	}
    */
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event)
   {
@@ -203,9 +200,6 @@ class NodeState implements NodeLifeCycleListener
     statusLabels[1][1].setIcon(NodePanel.BRIGHT_RED);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event)
   {
@@ -215,9 +209,11 @@ class NodeState implements NodeLifeCycleListener
     statusLabels[1][1].setIcon(NodePanel.DARK_RED);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
+  {
+  }
+
   @Override
   public void jobStarting(final NodeLifeCycleEvent event)
   {
@@ -225,9 +221,6 @@ class NodeState implements NodeLifeCycleListener
     statusLabels[1][1].setIcon(NodePanel.DARK_RED);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {

@@ -220,6 +220,11 @@ public class NodeSystemTray implements NodeLifeCycleListener
   }
 
   @Override
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
+  {
+  }
+
+  @Override
   public void jobStarting(final NodeLifeCycleEvent event)
   {
   }

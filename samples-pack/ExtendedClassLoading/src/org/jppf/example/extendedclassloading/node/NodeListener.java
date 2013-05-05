@@ -27,11 +27,11 @@ import org.jppf.node.protocol.*;
 import org.slf4j.*;
 
 /**
- * A {@link NodeLifeCycleListenerEx} implementation that performs the dynamic management of Java libraries,
+ * A {@link NodeLifeCycleListener} implementation that performs the dynamic management of Java libraries,
  * based on the metadata provided by the jobs.
  * @author Laurent Cohen
  */
-public class NodeListener implements NodeLifeCycleListenerEx {
+public class NodeListener implements NodeLifeCycleListener {
   /**
    * Logger for this class.
    */

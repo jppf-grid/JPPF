@@ -166,7 +166,7 @@ public class LifeCycleEventHandler
       {
         try
         {
-          if (listener instanceof NodeLifeCycleListenerEx) ((NodeLifeCycleListenerEx) listener).jobHeaderLoaded(event);
+          listener.jobHeaderLoaded(event);
         }
         catch(Throwable t)
         {

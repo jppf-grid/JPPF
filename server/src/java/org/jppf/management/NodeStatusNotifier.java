@@ -27,7 +27,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements NodeLifeCycleListenerEx
+public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements NodeLifeCycleListener
 {
   /**
    * Logger for this class.

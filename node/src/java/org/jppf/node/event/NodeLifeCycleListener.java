@@ -39,6 +39,13 @@ public interface NodeLifeCycleListener extends EventListener
   void nodeEnding(NodeLifeCycleEvent event);
 
   /**
+   * Called when the node has loaded a job header and before the <code>DataProvider</code> or any of the tasks has been loaded.
+   * <br>Note that <code>event.getTasks()</code> will return <code>null</code> at this point.
+   * @param event encapsulates information about the job.
+   */
+  void jobHeaderLoaded(NodeLifeCycleEvent event);
+
+  /**
    * Called before the node starts processing a job.
    * @param event encapsulates information about the job.
    */

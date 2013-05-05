@@ -58,9 +58,6 @@ public class NodeListener implements NodeLifeCycleListener
    */
   private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event)
   {
@@ -72,9 +69,6 @@ public class NodeListener implements NodeLifeCycleListener
     endTransaction(true);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event)
   {
@@ -82,9 +76,11 @@ public class NodeListener implements NodeLifeCycleListener
     endTransaction(true);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
+  {
+  }
+
   @Override
   public void jobStarting(final NodeLifeCycleEvent event)
   {
@@ -92,9 +88,6 @@ public class NodeListener implements NodeLifeCycleListener
     startTransaction(false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {
