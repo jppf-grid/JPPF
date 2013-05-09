@@ -65,17 +65,13 @@ public class ResourceCache
    * The unique identifier for this resource cache.
    */
   private final String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
-  /**
-   * Shutdown hook for cleaning up this cache instance.
-   */
-  private final Thread shutdownHook = new Thread(new ShutdownHook(tempFolders, uuid));
 
   /**
    * Default initializations.
    */
   public ResourceCache()
   {
-    Runtime.getRuntime().addShutdownHook(shutdownHook);
+    Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(tempFolders, uuid)));
     cacheMap.put(uuid, this);
     initTempFolders();
   }
@@ -299,13 +295,6 @@ public class ResourceCache
    */
   public synchronized void close()
   {
-    try
-    {
-      Runtime.getRuntime().removeShutdownHook(shutdownHook);
-    }
-    catch (Exception ignore)
-    {
-    }
     new ShutdownHook(tempFolders, uuid).run();
   }
 

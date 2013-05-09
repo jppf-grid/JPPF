@@ -23,6 +23,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.comm.socket.*;
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
 import org.jppf.utils.TypedProperties;
@@ -117,6 +118,10 @@ public class GenericProcessLauncher implements Runnable {
    * 
    */
   protected static AtomicBoolean streamsConfigured = new AtomicBoolean(false);
+  /**
+   * 
+   */
+  protected SocketWrapper socketClient = null;
 
   /**
    * Default constructor.
@@ -327,14 +332,20 @@ public class GenericProcessLauncher implements Runnable {
     if ((wrapper != null) && (wrapper.getProcess() != null)) {
       Process process = wrapper.getProcess();
       if (debugEnabled) log.debug(name + "stopping process " + process);
+      if (socketClient != null) {
+        try {
+          socketClient.close();
+        } catch (Exception ignore) {
+        }
+      }
+      synchronized(this) {
+        try {
+          wait(100L);
+        } catch (Exception e) {
+        }
+      }
       process.destroy();
     }
-    /*
-    boolean closeOut = (stdout != System.out) && (stdout != System.err);
-    boolean closeErr = (stderr != System.out) && (stderr != System.err) && (stderr != stdout);
-    if (closeOut) StreamUtils.closeSilent(stdout);
-    if ((stderr != System.out) && (stderr != System.err)) StreamUtils.closeSilent(stderr);
-    */
   }
 
   /**
@@ -355,11 +366,17 @@ public class GenericProcessLauncher implements Runnable {
         @Override
         public void run() {
           try {
-            Socket s = processServer.accept();
-            int n = s.getInputStream().read();
+            socketClient = new SocketClient(processServer.accept());
+            int n = socketClient.readInt();
             if (n == -1) throw new EOFException();
-          } catch(IOException ioe) {
+          } catch(Exception ioe) {
             if (debugEnabled) log.debug(name, ioe);
+            if (socketClient != null) {
+              try {
+                  socketClient.close();
+                } catch (Exception ignore) {
+                }
+            }
           }
         }
       };

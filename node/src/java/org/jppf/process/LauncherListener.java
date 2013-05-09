@@ -18,6 +18,7 @@
 
 package org.jppf.process;
 
+import java.io.EOFException;
 import java.net.Socket;
 
 /**
@@ -52,7 +53,8 @@ public class LauncherListener extends Thread
     try
     {
       Socket s = new Socket("localhost", port);
-      s.getInputStream().read();
+      int n = s.getInputStream().read();
+      if (n <= -1) throw new EOFException();
     }
     catch(Throwable t)
     {
