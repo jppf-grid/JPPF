@@ -281,6 +281,7 @@ public class NodeExecutionManagerImpl
   private void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     node.getLifeCycleEventHandler().fireJobEnding(bundle, taskClassLoader, (List<Task>) taskList, dataProvider);
+    this.dataProvider = null;
     taskClassLoader = null;
     this.bundle = null;
     this.taskList = null;
