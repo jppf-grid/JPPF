@@ -77,7 +77,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   {
     try
     {
-      connection.close();
+      if (!dynamic) connection.close();
     }
     catch (Exception e)
     {

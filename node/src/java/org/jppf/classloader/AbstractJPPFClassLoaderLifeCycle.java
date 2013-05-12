@@ -133,11 +133,11 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   protected JPPFResourceWrapper loadResource(final Map<String, Object> map) throws ClassNotFoundException {
     JPPFResourceWrapper resource = null;
     try {
-      if (debugEnabled) log.debug(build("loading remote definition for resource [", map.get("name"), "]"));
+      if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
       resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
-      if (debugEnabled) log.debug(build("remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
+      if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
     } catch(IOException e) {
-      if (debugEnabled) log.debug("connection with class server ended, re-initializing, exception is:", e);
+      if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
       throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
     } catch(ClassNotFoundException e) {
       throw e;
@@ -163,13 +163,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public void setRequestUuid(final String requestUuid) {
     this.requestUuid = requestUuid;
   }
-
-  /**
-   * Terminate this classloader and clean the resources it uses.
-   * @exclude
-   */
-  //@Override
-  public abstract void close();
 
   @Override
   public void addURL(final URL url) {
@@ -219,12 +212,12 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         List<URL> locationsList = cache.getResourcesURLs(name);
         if ((locationsList != null) && !locationsList.isEmpty()) {
           results[i] = locationsList.get(0);
-          if (debugEnabled) log.debug(build("resource ", name, " found in local cache as ", results[i]));
+          if (debugEnabled) log.debug(build(this, " resource ", name, " found in local cache as ", results[i]));
         } else {
           URL url = super.findResource(names[i]);
           if (url != null) {
             results[i] = url;
-            if (debugEnabled) log.debug(build("resource ", name, " found in URL classpath as ", results[i]));
+            if (debugEnabled) log.debug(build(this, " resource ", name, " found in URL classpath as ", results[i]));
           } else {
             if (debugEnabled) log.debug(build("resource ", name, " not found locally"));
             indices.add(i);
@@ -232,7 +225,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         }
       }
       if (indices.isEmpty()) {
-        if (debugEnabled) log.debug("all resources were found locally");
+        if (debugEnabled) log.debug(this.toString() + " all resources were found locally");
         return results;
       }
       Map<String, Object> map = new HashMap<String, Object>();
@@ -246,12 +239,12 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         String name = names[index];
         List<byte[]> dataList = dataMap.get(name);
         boolean found = (dataList != null) && !dataList.isEmpty();
-        if (debugEnabled && !found) log.debug(build("resource [", name, "] not found remotely"));
+        if (debugEnabled && !found) log.debug(build(this, " resource [", name, "] not found remotely"));
         if (found) {
           cache.registerResources(name, dataList);
           URL url = cache.getResourceURL(name);
           results[index] = url;
-          if (debugEnabled) log.debug(build("resource [", name, "] found remotely as ", url));
+          if (debugEnabled) log.debug(build(this, " resource [", name, "] found remotely as ", url));
         }
         else if (resource != null) notFoundCache.add(name);
       }

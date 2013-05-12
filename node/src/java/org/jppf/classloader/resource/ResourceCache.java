@@ -75,6 +75,7 @@ public class ResourceCache
    */
   public ResourceCache()
   {
+    System.out.println("new resource cache with uuid = " + uuid);
     Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(tempFolders, uuid)));
     cacheMap.put(uuid, this);
     initTempFolders();
@@ -300,15 +301,7 @@ public class ResourceCache
    */
   public synchronized void close()
   {
-    /*
-    try
-    {
-      Runtime.getRuntime().removeShutdownHook(shutdownHook);
-    }
-    catch (Exception ignore)
-    {
-    }
-    */
+    cacheMap.remove(uuid);
     new ShutdownHook(tempFolders, uuid).run();
   }
 

@@ -193,14 +193,14 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @exclude
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception {
-    if (debugEnabled) log.debug(build("requesting remote computation, requestUuid = ", requestUuid));
+    if (debugEnabled) log.debug(build(this, " requesting remote computation, requestUuid = ", requestUuid));
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", "callable");
     map.put("callable", callable);
     JPPFResourceWrapper resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
     byte[] b = null;
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) b = resource.getCallable();
-    if (debugEnabled) log.debug(build("remote definition for callable resource ", b==null ? "not " : "", "found"));
+    if (debugEnabled) log.debug(build(this, " remote definition for callable resource ", b==null ? "not " : "", "found"));
     return b;
   }
 
@@ -216,12 +216,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     URL url = null;
     if (notFoundCache.has(name)) return null;
     url = cache.getResourceURL(name);
-    if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
+    if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
     if (url == null) {
       url = super.findResource(name);
-      if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
+      if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
       if (url == null) {
-        if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
+        if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
         try {
           List<URL> urlList = findRemoteResources(name);
           if ((urlList != null) && !urlList.isEmpty()) url = urlList.get(0);
@@ -229,7 +229,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }
-        if (debugEnabled) log.debug(build("resource [", name, "] ", url == null ? "not " : "", "found remotely"));
+        if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found remotely"));
       }
     }
     if (url == null) notFoundCache.add(name);
@@ -258,7 +258,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     try {
       URL url = getResource(name);
       if (url != null) is = url.openStream();
-      if (debugEnabled) log.debug(build("lookup for '", name, "' = ", url, " for ", this));
+      if (debugEnabled) log.debug(build(this, " lookup for '", name, "' = ", url, " for ", this));
     } catch(IOException e) {
     }
     return is;
@@ -276,7 +276,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public Enumeration<URL> findResources(final String name) throws IOException {
     List<URL> urlList = new ArrayList<URL>();
     if (!notFoundCache.has(name)) {
-      if (debugEnabled) log.debug(build("resource [", name, "] not found locally, attempting remote lookup"));
+      if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
       try {
         urlList = cache.getResourcesURLs(name);
         if (urlList == null) urlList = new ArrayList<URL>();
@@ -308,7 +308,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     List<URL> urlList = new ArrayList<URL>();
     JPPFResourceWrapper resource = null;
     if (!notFoundCache.has(name)) {
-      List<String> locationsList = null;
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("name", name);
       map.put("multiple", "true");
@@ -316,7 +315,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       List<byte[]> dataList = null;
       if (resource != null) dataList = (List<byte[]>) resource.getData("resource_list");
       boolean found = (dataList != null) && !dataList.isEmpty();
-      if (debugEnabled) log.debug(build("resource [", name, "] ", found ? "" : "not ", "found remotely"));
+      if (debugEnabled) log.debug(build(this, "resource [", name, "] ", found ? "" : "not ", "found remotely"));
       if (found) {
         cache.registerResources(name, dataList);
         urlList = cache.getResourcesURLs(name);
@@ -463,6 +462,13 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public void close() {
     cache.close();
     notFoundCache.clear();
+    try
+    {
+      super.close();
+    }
+    catch (IOException ignore)
+    {
+    }
   }
 
   /**
