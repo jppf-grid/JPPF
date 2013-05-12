@@ -60,7 +60,7 @@ public abstract class AbstractClassLoaderManager
   /**
    Leak prevention instance.
    */
-  private final JPPFLeakPrevention leakPrevention;
+  //private final JPPFLeakPrevention leakPrevention;
 
   /**
    * Default constructor for class loader manager.
@@ -69,7 +69,7 @@ public abstract class AbstractClassLoaderManager
   {
     TypedProperties config = JPPFConfiguration.getProperties();
     this.maxContainers = config.getInt("jppf.classloader.cache.size", 50);
-    this.leakPrevention = new JPPFLeakPrevention(config);
+    //this.leakPrevention = new JPPFLeakPrevention(config);
   }
 
   /**
@@ -135,8 +135,7 @@ public abstract class AbstractClassLoaderManager
         JPPFContainer toRemove = containerList.removeFirst();
         try
         {
-          AbstractJPPFClassLoader loader = toRemove.getClassLoader();
-          if (loader != null) leakPrevention.clearReferences(loader);
+          clearContainer(toRemove);
         }
         finally
         {
@@ -179,16 +178,26 @@ public abstract class AbstractClassLoaderManager
     closeClassLoader();
     try
     {
-      for (JPPFContainer container : containerList)
-      {
-        AbstractJPPFClassLoader loader = container.getClassLoader();
-        if (loader != null) leakPrevention.clearReferences(loader);
-      }
+      for (JPPFContainer container : containerList) clearContainer(container);
     }
     finally
     {
       containerMap.clear();
       containerList.clear();
+    }
+  }
+
+  /**
+   * Clear the specified container and cleanup its class loader.
+   * @param container th container to clean up.
+   */
+  protected void clearContainer(final JPPFContainer container)
+  {
+    AbstractJPPFClassLoader loader = container.getClassLoader();
+    if (loader != null)
+    {
+      loader.close();
+      //leakPrevention.clearReferences(loader);
     }
   }
 

@@ -66,23 +66,4 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   {
     init();
   }
-
-  /**
-   * Terminate this classloader and clean the resources it uses.
-   * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
-   * @exclude
-   */
-  @Override
-  public void close()
-  {
-    try
-    {
-      connection.close();
-    }
-    catch (Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-    super.close();
-  }
 }

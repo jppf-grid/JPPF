@@ -461,8 +461,18 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   @Override
   public void close() {
+    try {
+      if (!dynamic) connection.close();
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
     cache.close();
     notFoundCache.clear();
+    try {
+      super.close();
+    } catch (IOException e) {
+      log.error(e.getMessage(), e);
+    }
   }
 
   /**

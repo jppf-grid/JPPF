@@ -286,7 +286,6 @@ public class ResourceCache
     {
       cacheMap.remove(uuid);
       while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
-      
     }
   }
 
@@ -295,6 +294,7 @@ public class ResourceCache
    */
   public synchronized void close()
   {
+    cacheMap.remove(uuid);
     new ShutdownHook(tempFolders, uuid).run();
   }
 

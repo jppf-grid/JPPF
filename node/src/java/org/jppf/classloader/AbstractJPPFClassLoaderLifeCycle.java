@@ -164,13 +164,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     this.requestUuid = requestUuid;
   }
 
-  /**
-   * Terminate this classloader and clean the resources it uses.
-   * @exclude
-   */
-  //@Override
-  public abstract void close();
-
   @Override
   public void addURL(final URL url) {
     super.addURL(url);
