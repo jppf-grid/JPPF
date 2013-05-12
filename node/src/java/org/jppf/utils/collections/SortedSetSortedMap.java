@@ -21,33 +21,49 @@ package org.jppf.utils.collections;
 import java.util.*;
 
 /**
- * A sorted map whose values are sets of a given component type.
+ * A sorted map whose values are sorted sets of a given component type.
  * @param <K> the type of keys in the map.
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public class SetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
+public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
 {
+  /**
+   * Comparator used to sort the keys.
+   */
+  protected Comparator<V> valueComparator = null;
+
   /**
    * Default cosntructor.
    */
-  public SetSortedMap()
+  public SortedSetSortedMap()
   {
     super();
   }
 
   /**
    * Default cosntructor.
-   * @param comparator comparator used to sort the keys.
+   * @param comparator tomparator used to sort the keys.
    */
-  public SetSortedMap(final Comparator<K> comparator)
+  public SortedSetSortedMap(final Comparator<K> comparator)
   {
     super(comparator);
+  }
+
+  /**
+   * Default cosntructor.
+   * @param keyComparator comparator used to sort the keys.
+   * @param valueComparator comparator used to sort the values.
+   */
+  public SortedSetSortedMap(final Comparator<K> keyComparator, final Comparator<V> valueComparator)
+  {
+    super(keyComparator);
+    this.valueComparator = valueComparator;
   }
 
   @Override
   protected Collection<V> newCollection()
   {
-    return new HashSet<V>();
+    return valueComparator == null ? new TreeSet<V>() : new TreeSet<V>(valueComparator);
   }
 }

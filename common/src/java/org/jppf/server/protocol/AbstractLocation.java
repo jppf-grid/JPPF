@@ -19,7 +19,8 @@
 package org.jppf.server.protocol;
 
 import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.utils.streams.*;
 
@@ -37,7 +38,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
   /**
    * The list of listeners to this location.
    */
-  protected List<LocationEventListener> listeners = new LinkedList<LocationEventListener>();
+  protected List<LocationEventListener> listeners = new CopyOnWriteArrayList<LocationEventListener>();
   /**
    * Boolean flag that determines if at least one listener is registered.
    * Used to minimize the overhead of sending events if there is no listener.
@@ -71,7 +72,7 @@ public abstract class AbstractLocation<T> implements Serializable, Location<T>
    * @see org.jppf.server.protocol.Location#copyTo(org.jppf.server.protocol.Location)
    */
   @Override
-  public void copyTo(final Location location) throws Exception
+  public void copyTo(final Location<?> location) throws Exception
   {
     InputStream is = getInputStream();
     OutputStream os = location.getOutputStream();

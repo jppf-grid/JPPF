@@ -76,14 +76,32 @@ public final class StringUtils
    * @return a string formatted to the specified length.
    */
   public static String padLeft(final String source, final char padChar, final int maxLen) {
-    StringBuilder sb = new StringBuilder();
     String src = (source == null) ? "" : source;
     int length = src.length();
     if (length > maxLen) return source;
-    else {
-      for (int i=0; i<maxLen-length; i++) sb.append(padChar);
-      sb.append(src);
-    }
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<maxLen-length; i++) sb.append(padChar);
+    sb.append(src);
+    return sb.toString();
+  }
+
+  /**
+   * Format a string so that it fits into a string of specified length.<br>
+   * If the string is longer than the specified length, then characters on the left are truncated, otherwise
+   * the specified character is appended to the result on the left  to obtain the appropriate length.
+   * @param source the string to format; if null, it is considered an empty string.
+   * @param padChar the character used to fill the result up to the specified length.
+   * @param maxLen the length of the formatted string.
+   * @param truncate if <code>true</code>, then truncate the string if its length is greater than <code>maxLen</code>.
+   * @return a string formatted to the specified length.
+   */
+  public static String padLeft(final String source, final char padChar, final int maxLen, final boolean truncate) {
+    String src = (source == null) ? "" : source;
+    int length = src.length();
+    if (length > maxLen) return source;
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<maxLen-length; i++) sb.append(padChar);
+    sb.append(src);
     return sb.toString();
   }
 
@@ -98,9 +116,24 @@ public final class StringUtils
    * @return the padded (or truncated) string
    */
   public static String padRight(final String source, final char padChar, final int maxLen) {
+    return padRight(source, padChar, maxLen, true);
+  }
+
+  /**
+   * Pads a string on the right side with a given character
+   * If the string is longer than the specified length, then characters on the right are truncated, otherwise
+   * the specified character is appended to the result on the right  to obtain the appropriate length.
+   * @param source the string to pad to the right
+   * @param padChar the character used for padding
+   * @param maxLen the length to pad the string up to
+   * if its length is greater than the padding length
+   * @param truncate if <code>true</code>, then truncate the string if its length is greater than <code>maxLen</code>.
+   * @return the padded (or truncated) string
+   */
+  public static String padRight(final String source, final char padChar, final int maxLen, final boolean truncate) {
     String s = source;
     if (s == null) s = "";
-    if (s.length() > maxLen) s = s.substring(0, maxLen);
+    if (s.length() > maxLen) return truncate ? s = s.substring(0, maxLen) : s;
     StringBuilder sb = new StringBuilder(s);
     while (sb.length() < maxLen) sb.append(padChar);
     return sb.toString();

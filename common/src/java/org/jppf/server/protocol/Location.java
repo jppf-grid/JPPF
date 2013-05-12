@@ -51,7 +51,7 @@ public interface Location<T>
    * @param location the location to copy to.
    * @throws Exception if an I/O error occurs.
    */
-  void copyTo(Location location) throws Exception;
+  void copyTo(Location<?> location) throws Exception;
   /**
    * Get the size of the data this location points to.
    * @return the size as a long value, or -1 if the size is not available.
