@@ -49,44 +49,33 @@ public class UILauncher
    * Start this UI.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
       String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
           "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
       int n = 3;
       boolean success = false;
       String s = System.getProperty("swing.defaultlaf");
-      if (!success && (s != null))
-      {
-        try
-        {
+      if (!success && (s != null)) {
+        try {
           UIManager.setLookAndFeel(s);
           success = true;
-        }
-        catch(Throwable t)
-        {
+        } catch(Throwable t) {
           log.error("could not set specified look and feel '" + s + "' : " + t.getMessage());
           System.getProperties().remove("swing.defaultlaf");
         }
       }
-      if (!success)
-      {
-        try
-        {
+      if (!success) {
+        try {
           UIManager.setLookAndFeel(laf[n]);
-        }
-        catch(Throwable t)
-        {
+        } catch(Throwable t) {
           log.error("could not set look and feel '" + laf[n] + "' : " + t.getMessage());
           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
       }
       boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
-      if (showSplash)
-      {
+      if (showSplash) {
         splash = new JPPFSplash("The management console is starting ...");
         splash.start();
       }
@@ -97,10 +86,15 @@ public class UILauncher
       OptionsHandler.getBuilder().triggerInitialEvents(elt);
       if (showSplash) splash.stop();
       Frame[] frames = JFrame.getFrames();
-      for (Frame f: frames) f.setVisible(true);
-    }
-    catch(Exception e)
-    {
+      for (final Frame f: frames) {
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            f.setVisible(true);
+          }
+        });
+      }
+    } catch(Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
