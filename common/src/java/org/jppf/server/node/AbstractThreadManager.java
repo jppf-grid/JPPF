@@ -18,8 +18,6 @@
 
 package org.jppf.server.node;
 
-import java.lang.management.*;
-
 import org.jppf.node.*;
 
 /**
@@ -30,22 +28,10 @@ import org.jppf.node.*;
 public abstract class AbstractThreadManager implements ThreadManager
 {
   /**
-   * The platform MBean used to gather statistics about the JVM threads.
-   */
-  protected ThreadMXBean threadMXBean = null;
-  /**
-   * Determines whether the thread cpu time measurement is supported and enabled.
-   */
-  protected boolean cpuTimeEnabled = false;
-
-  /**
    * Initialize this execution manager with the specified node.
    */
   protected AbstractThreadManager()
   {
-    threadMXBean = ManagementFactory.getThreadMXBean();
-    cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
-    if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
   }
 
   @Override
@@ -60,7 +46,7 @@ public abstract class AbstractThreadManager implements ThreadManager
   @Override
   public NodeExecutionInfo computeExecutionInfo(final long threadID)
   {
-    return (!cpuTimeEnabled) ? new NodeExecutionInfo() : new NodeExecutionInfo(threadMXBean.getThreadCpuTime(threadID), threadMXBean.getThreadUserTime(threadID));
+    return CpuTimeCollector.computeExecutionInfo(threadID);
   }
 
   /**
@@ -72,12 +58,12 @@ public abstract class AbstractThreadManager implements ThreadManager
   @Override
   public long getCpuTime(final long threadId)
   {
-    return cpuTimeEnabled ? threadMXBean.getThreadCpuTime(threadId) : -1L;
+    return CpuTimeCollector.getCpuTime(threadId);
   }
 
   @Override
   public boolean isCpuTimeEnabled()
   {
-    return cpuTimeEnabled;
+    return CpuTimeCollector.isCpuTimeEnabled();
   }
 }

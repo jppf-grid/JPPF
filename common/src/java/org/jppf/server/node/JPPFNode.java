@@ -495,6 +495,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       AbstractJPPFClassLoader newCL = classLoaderManager.newClientClassLoader(cont.uuidPath);
       newCL.setRequestUuid(requestUuid);
       cont.setClassLoader(newCL);
+      oldCL.close();
       return newCL;
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
