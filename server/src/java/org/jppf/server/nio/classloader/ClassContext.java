@@ -79,6 +79,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   private final Lock lockResponse = new ReentrantLock();
   /**
+   * Used to synchronize pending requests performed by multiple threads.
+   */
+  private final Lock lockRequest = new ReentrantLock();
+  /**
    * Reference to the driver.
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
@@ -192,12 +196,23 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * Ensure the pending requests are processed.
    */
-  private synchronized void processRequests()
+  private void processRequests()
   {
-    if (ClassState.IDLE_PROVIDER.equals(getState()) && (currentRequest.get() == null) && (getNbPendingRequests() > 0))
+    // if requests are already being processed, no need to do anything
+    if (lockRequest.tryLock())
     {
-      if (debugEnabled) log.debug("state changing from {} to {} for {}", new Object[] {ClassState.IDLE_PROVIDER, ClassState.SENDING_PROVIDER_REQUEST, this});
-      driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
+      try
+      {
+        if (ClassState.IDLE_PROVIDER.equals(getState()) && (currentRequest.get() == null) && (getNbPendingRequests() > 0))
+        {
+          if (debugEnabled) log.debug("state changing from {} to {} for {}", new Object[] {ClassState.IDLE_PROVIDER, ClassState.SENDING_PROVIDER_REQUEST, this});
+          driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
+        }
+      }
+      finally
+      {
+        lockRequest.unlock();
+      }
     }
   }
 

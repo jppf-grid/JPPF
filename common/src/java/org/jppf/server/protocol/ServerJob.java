@@ -273,7 +273,7 @@ public class ServerJob extends AbstractServerJob {
    * @param bundle    the completed task.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public synchronized void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
+  public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
     lock.lock();
     try {
       if (isCancelled()) {
