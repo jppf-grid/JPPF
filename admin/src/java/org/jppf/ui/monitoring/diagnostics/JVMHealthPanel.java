@@ -130,11 +130,15 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    */
   void repaintTreeTable()
   {
-    if (treeTable != null)
-    {
-      treeTable.invalidate();
-      treeTable.repaint();
-    }
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        if (treeTable != null) {
+          treeTable.invalidate();
+          treeTable.repaint();
+        }
+      }
+    });
   }
 
   /**
