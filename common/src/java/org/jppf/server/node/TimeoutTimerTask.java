@@ -28,39 +28,28 @@ import java.util.concurrent.Future;
 public class TimeoutTimerTask implements Runnable
 {
   /**
-   * The future on which to call the cancel() method.
-   */
-  private final Future<?> future;
-  /**
    * The task to cancel.
    */
   private final NodeTaskWrapper taskWrapper;
 
   /**
    * Initialize this timer task with the specified future.
-   * @param future the future on which to call the cancel() method.
    * @param taskWrapper the task to cancel.
    */
-  public TimeoutTimerTask(final Future<?> future, final NodeTaskWrapper taskWrapper)
+  public TimeoutTimerTask(final NodeTaskWrapper taskWrapper)
   {
-    if (future == null) throw new IllegalArgumentException("future is null");
     if (taskWrapper == null) throw new IllegalArgumentException("taskWrapper is null");
-
-    this.future = future;
     this.taskWrapper = taskWrapper;
   }
 
-  /**
-   * Execute this task.
-   * @see java.util.TimerTask#run()
-   */
   @Override
   public void run()
   {
+    Future<?> future = taskWrapper.getFuture();
     if (!future.isDone())
     {
-        taskWrapper.timeout();
-        future.cancel(true);
+      taskWrapper.timeout();
+      future.cancel(true);
     }
   }
 }

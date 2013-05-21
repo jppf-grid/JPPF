@@ -20,9 +20,9 @@ package org.jppf.server.node;
 import java.util.concurrent.Future;
 
 import org.jppf.*;
-import org.jppf.node.*;
+import org.jppf.node.NodeExecutionInfo;
 import org.jppf.node.protocol.Task;
-import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.scheduling.*;
 import org.slf4j.*;
 
 /**
@@ -33,7 +33,7 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-class NodeTaskWrapper implements Runnable
+public class NodeTaskWrapper implements Runnable
 {
   /**
    * Logger for this class.
@@ -44,13 +44,9 @@ class NodeTaskWrapper implements Runnable
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * The execution manager.
+   * Timer managing the tasks timeout.
    */
-  private final NodeExecutionManagerImpl executionManager;
-  /**
-   * The class loader instance.
-   */
-  private final ClassLoader classLoader;
+  private final JPPFScheduleHandler timeoutHandler;
   /**
    * Indicator whether task was cancelled;
    */
@@ -72,27 +68,37 @@ class NodeTaskWrapper implements Runnable
    */
   private final Task task;
   /**
+   * The future created by the executor service.
+   */
+  private Future<?> future = null;
+  /**
    * 
    */
-  Future<?> future = null;
+  private JPPFNodeReconnectionNotification reconnectionNotification = null;
+  /**
+   * Holds the used cpu time for this task.
+   */
+  private NodeExecutionInfo executionInfo = null;
+  /**
+   * The elapsed time for this task's execution.
+   */
+  private long elapsedTime = 0L;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
-   * @param executionManager reference to the execution manager.
    * @param task the task to execute within a try/catch block.
-   * @param classLoader the class loader used as context class loader.
+   * @param timeoutHandler handles the timeout for this task.
    */
-  public NodeTaskWrapper(final NodeExecutionManagerImpl executionManager, final Task task, final ClassLoader classLoader) {
+  public NodeTaskWrapper(final Task task, final JPPFScheduleHandler timeoutHandler) {
     this.task = task;
-    this.executionManager = executionManager;
-    this.classLoader = classLoader;
+    this.timeoutHandler = timeoutHandler;
   }
 
   /**
    * Set cancel indicator and cancel task when it implements <code>Future</code> interface.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
    */
-  public synchronized void cancel(final boolean callOnCancel) {
+  synchronized void cancel(final boolean callOnCancel) {
     this.cancelled = true;
     this.callOnCancel |= callOnCancel;
     if (task instanceof Future) {
@@ -104,9 +110,9 @@ class NodeTaskWrapper implements Runnable
   /**
    * Set timeout indicator and cancel task when it implements <code>Future</code> interface.
    */
-  public synchronized void timeout() {
+  synchronized void timeout() {
     this.timeout |= !this.cancelled;
-    if (!this.cancelled && !started) executionManager.cancelTimeoutAction(this);
+    if (!this.cancelled && !started) cancelTimeoutAction();
     if (task instanceof Future) {
       Future future = (Future) task;
       if (!future.isDone()) future.cancel(true);
@@ -122,47 +128,36 @@ class NodeTaskWrapper implements Runnable
   {
     if (traceEnabled) log.trace(toString());
     started = true;
-    JPPFNodeReconnectionNotification rn = null;
-    ThreadManager.UsedClassLoader usedClassLoader = null;
-    ThreadManager threadManager = executionManager.getThreadManager();
-    NodeExecutionInfo info = null;
-    long elapsedTime = 0L;
     long id = Thread.currentThread().getId();
     long startTime = System.nanoTime();
     try {
-      usedClassLoader = threadManager.useClassLoader(classLoader);
       handleTimeout();
-      info = threadManager.computeExecutionInfo(id);
+      executionInfo = CpuTimeCollector.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
     } catch(JPPFNodeReconnectionNotification t) {
-      rn = t;
+      reconnectionNotification = t;
     } catch(Throwable t) {
       if (t instanceof Exception) task.setException((Exception) t);
       else task.setException(new JPPFException(t));
     } finally {
       try {
         elapsedTime = System.nanoTime() - startTime;
-        if (info != null) info = threadManager.computeExecutionInfo(id).subtract(info);
+        if (executionInfo != null) executionInfo = CpuTimeCollector.computeExecutionInfo(id).subtract(executionInfo);
+      } catch(JPPFNodeReconnectionNotification t) {
+        if (reconnectionNotification == null) reconnectionNotification = t;
       } catch(Throwable ignore) {
       }
       try {
         silentTimeout();
         silentCancel();
+      } catch(JPPFNodeReconnectionNotification t) {
+        if (reconnectionNotification == null) reconnectionNotification = t;
       } catch (Throwable t) {
         if (t instanceof Exception) task.setException((Exception) t);
         else task.setException(new JPPFException(t));
       }
       if (task.getException() instanceof InterruptedException) task.setException(null);
-      if (usedClassLoader != null) usedClassLoader.dispose();
-      executionManager.cancelTimeoutAction(this);
-      if (rn == null) {
-        try {
-          executionManager.taskEnded(task, info, elapsedTime);
-        } catch(JPPFNodeReconnectionNotification t) {
-          rn = t;
-        }
-      }
-      if (rn != null) executionManager.setReconnectionNotification(rn);
+      cancelTimeoutAction();
     }
   }
 
@@ -170,7 +165,7 @@ class NodeTaskWrapper implements Runnable
    * Get the task this wrapper executes within a try/catch block.
    * @return the task as a <code>JPPFTask</code> instance.
    */
-  public Task getTask() {
+  Task getTask() {
     return task;
   }
 
@@ -201,12 +196,15 @@ class NodeTaskWrapper implements Runnable
   }
 
   /**
-   * Handle the task expiration/timeout if any is specified. 
+   * Handle the task expiration/timeout if any is specified.
    * @throws Exception if any error occurs.
    */
-  void handleTimeout() throws Exception {
+  private void handleTimeout() throws Exception {
     JPPFSchedule schedule = task.getTimeoutSchedule();
-    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null))) executionManager.processTaskTimeout(this);
+    if ((schedule != null) && ((schedule.getDuration() > 0L) || (schedule.getDate() != null))) {
+      TimeoutTimerTask tt = new TimeoutTimerTask(this);
+      timeoutHandler.scheduleAction(future, getTask().getTimeoutSchedule(), tt);
+    }
   }
 
   @Override
@@ -218,5 +216,59 @@ class NodeTaskWrapper implements Runnable
     sb.append(", started=").append(started);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the future created by the executor service.
+   * @return an instance of {@link Future}.
+   */
+  public Future<?> getFuture()
+  {
+    return future;
+  }
+
+  /**
+   * Set the future created by the executor service.
+   * @param future an instance of {@link Future}.
+   */
+  public void setFuture(final Future<?> future)
+  {
+    this.future = future;
+  }
+
+  /**
+   * Get the reconnection notification thrown by the atysk execution, if any.
+   * @return a {@link JPPFNodeReconnectionNotification} or <code>null</code>.
+   */
+  JPPFNodeReconnectionNotification getReconnectionNotification()
+  {
+    return reconnectionNotification;
+  }
+
+  /**
+   * Remove the specified future from the pending set and notify
+   * all threads waiting for the end of the execution.
+   */
+  void cancelTimeoutAction()
+  {
+    if (future != null) timeoutHandler.cancelAction(future);
+  }
+
+  /**
+   * Get trhe object that holds the used cpu time for this task.
+   * @return a {@link NodeExecutionInfo} instance.
+   */
+  NodeExecutionInfo getExecutionInfo()
+  {
+    return executionInfo;
+  }
+
+  /**
+   * Get the elapsed time for this task's execution.
+   * @return the elapsed time in nanoseconds.
+   */
+  long getElapsedTime()
+  {
+    return elapsedTime;
   }
 }

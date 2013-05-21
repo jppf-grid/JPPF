@@ -54,9 +54,21 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
   public ThreadManagerThreadPool(final int poolSize)
   {
     super();
-    threadFactory = new JPPFThreadFactory("node processing", cpuTimeEnabled);
+    threadFactory = new JPPFThreadFactory("node processing", CpuTimeCollector.isCpuTimeEnabled());
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-    threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory);
+    threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory)
+    {
+      @Override
+      protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value)
+      {
+        RunnableFuture<T> future = super.newTaskFor(runnable, value);
+        if (runnable instanceof NodeTaskWrapper)
+        {
+          ((NodeTaskWrapper) runnable).setFuture(future);
+        }
+        return future;
+      }
+    };
   }
 
   @Override
