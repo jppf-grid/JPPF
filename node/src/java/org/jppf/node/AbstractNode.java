@@ -21,7 +21,6 @@ package org.jppf.node;
 import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
-import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.utils.*;
 
 /**
@@ -62,12 +61,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   }
 
   /**
-   * Stop this node and release the resources it is using.
-   */
-  @Override
-  public abstract void stopNode();
-
-  /**
    * Get the total number of tasks executed.
    * @return the number of tasks as an int.
    */
@@ -92,18 +85,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   public SerializationHelper getHelper()
   {
     return helper;
-  }
-
-  /**
-   * Default implementation
-   * @return this method always returns null.
-   * @see org.jppf.node.NodeInternal#getLifeCycleEventHandler()
-   * @exclude
-   */
-  @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler()
-  {
-    return null;
   }
 
   /**

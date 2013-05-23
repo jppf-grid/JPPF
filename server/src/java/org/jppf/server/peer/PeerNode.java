@@ -23,6 +23,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
+import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.*;
@@ -276,5 +277,17 @@ class PeerNode extends AbstractCommonNode
   public boolean isLocal()
   {
     return false;
+  }
+
+  /**
+   * Default implementation
+   * @return this method always returns null.
+   * @see org.jppf.node.NodeInternal#getLifeCycleEventHandler()
+   * @exclude
+   */
+  @Override
+  public LifeCycleEventHandler getLifeCycleEventHandler()
+  {
+    return null;
   }
 }

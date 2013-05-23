@@ -69,7 +69,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The cache handling resources temporarily stored to file.
    * @exclude
    */
-  protected final ResourceCache cache = new ResourceCache();
+  protected ResourceCache cache = new ResourceCache();
   /**
    * The cache handling resources that were not found by this class loader.
    * @exclude
@@ -329,5 +329,17 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public void removeClassLoaderListener(final ClassLoaderListener listener) {
     if (listener == null) throw new IllegalArgumentException("cannot remove a null listener");
     listeners.remove(listener);
+  }
+
+  /**
+   * Reset this class loader's resource cache. This method actually clears the
+   * cache, including removing the locally stored temp files, then creates a
+   * new cache instance.
+   */
+  public void resetResourceCache() {
+    if (cache != null) {
+      cache.close();
+      cache = new ResourceCache();
+    }
   }
 }

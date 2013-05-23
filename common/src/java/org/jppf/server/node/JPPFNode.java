@@ -23,7 +23,7 @@ import java.util.List;
 import javax.management.*;
 
 import org.jppf.*;
-import org.jppf.classloader.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.NodeRunner;
@@ -39,8 +39,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class JPPFNode extends AbstractCommonNode implements ClassLoaderProvider
-{
+public abstract class JPPFNode extends AbstractCommonNode implements ClassLoaderProvider {
   /**
    * Logger for this class.
    */
@@ -78,10 +77,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private JPPFMBeanProviderManager providerManager = null;
   /**
-   * Manages the class loaders and how they are used.
-   */
-  protected AbstractClassLoaderManager classLoaderManager = null;
-  /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
    */
   protected LifeCycleEventHandler lifeCycleEventHandler = null;
@@ -97,8 +92,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Default constructor.
    */
-  public JPPFNode()
-  {
+  public JPPFNode() {
     uuid = NodeRunner.getUuid();
     executionManager = new NodeExecutionManagerImpl(this);
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
@@ -154,6 +148,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("Start of node secondary loop");
     while (!isStopped())
     {
+      clearResourceCachesIfRequested();
       Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
       JPPFTaskBundle bundle = pair.first();
       checkInitialBundle(bundle);
@@ -186,10 +181,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param bundle the bundle to check.
    * @throws Exception if any error occurs.
    */
-  private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception
-  {
-    if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
-    {
+  private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception {
+    if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState())) {
       if (debugEnabled) log.debug("setting initial bundle uuid");
       bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
       if (isJmxEnabled()) setupManagementParameters(bundle);
@@ -270,28 +263,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-   * @return a <code>ClassLoader</code> used for loading the classes of the framework.
-   */
-  public AbstractJPPFClassLoader getClassLoader()
-  {
-    return classLoaderManager.getClassLoader();
-  }
-
-  /**
-   * Set the main classloader for the node.
-   * @param cl the class loader to set.
-   */
-  public void setClassLoader(final JPPFClassLoader cl)
-  {
-    classLoaderManager.setClassLoader(cl);
-  }
-
-  /**
-   * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @throws Exception if an error occurs while instantiating the class loader.
    */
-  public void initHelper() throws Exception
-  {
+  public void initHelper() throws Exception {
     if (debugEnabled) log.debug("Initializing serializer");
     Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
     if (debugEnabled) log.debug("Loaded serializer class " + c);
@@ -305,22 +279,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Get a reference to the JPPF container associated with an application uuid.
-   * @param uuidPath the uuid path containing the key to the container.
-   * @return a <code>JPPFContainer</code> instance.
-   * @throws Exception if an error occurs while getting the container.
-   */
-  public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
-  {
-    return classLoaderManager.getContainer(uuidPath);
-  }
-
-  /**
    * Get the administration and monitoring MBean for this node.
    * @return a <code>JPPFNodeAdminMBean</code> instance.
    */
-  public synchronized JPPFNodeAdminMBean getNodeAdmin()
-  {
+  public synchronized JPPFNodeAdminMBean getNodeAdmin() {
     return nodeAdmin;
   }
 
@@ -328,8 +290,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Set the administration and monitoring MBean for this node.
    * @param nodeAdmin a <code>JPPFNodeAdminMBean</code>m instance.
    */
-  public synchronized void setNodeAdmin(final JPPFNodeAdminMBean nodeAdmin)
-  {
+  public synchronized void setNodeAdmin(final JPPFNodeAdminMBean nodeAdmin) {
     this.nodeAdmin = nodeAdmin;
   }
 
@@ -337,8 +298,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Get the task execution manager for this node.
    * @return a <code>NodeExecutionManager</code> instance.
    */
-  public NodeExecutionManagerImpl getExecutionManager()
-  {
+  public NodeExecutionManagerImpl getExecutionManager() {
     return executionManager;
   }
 
@@ -346,8 +306,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Determines whether JMX management and monitoring is enabled for this node.
    * @return true if JMX is enabled, false otherwise.
    */
-  boolean isJmxEnabled()
-  {
+  boolean isJmxEnabled() {
     return jmxEnabled;
   }
 
@@ -371,8 +330,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Shutdown and eventually restart the node.
    * @param restart determines whether this node should be restarted by the node launcher.
    */
-  public void shutdown(final boolean restart)
-  {
+  public void shutdown(final boolean restart) {
     NodeRunner.setShuttingDown(true);
     lifeCycleEventHandler.fireNodeEnding();
     NodeRunner.shutdown(this, restart);
@@ -409,8 +367,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Set the action executed when the node exits the main loop.
    * @param exitAction the action to execute.
    */
-  public synchronized void setExitAction(final Runnable exitAction)
-  {
+  public synchronized void setExitAction(final Runnable exitAction) {
     this.exitAction = exitAction;
   }
 
@@ -457,15 +414,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler()
-  {
+  public LifeCycleEventHandler getLifeCycleEventHandler() {
     return lifeCycleEventHandler;
-  }
-
-  @Override
-  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception
-  {
-    return classLoaderManager.getContainer(uuidPath).getClassLoader();
   }
 
   /**
@@ -478,10 +428,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Trigger the configuration changed flag.
    */
-  public void triggerConfigChanged()
-  {
+  public void triggerConfigChanged() {
     updateSystemInformation();
     executionManager.triggerConfigChanged();
+  }
+
+  @Override
+  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception {
+    return classLoaderManager.getContainer(uuidPath).getClassLoader();
   }
 
   @Override
@@ -489,14 +443,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     JPPFTaskBundle bundle = executionManager.getBundle();
     if (bundle == null) return null;
     try {
-      JPPFContainer cont = classLoaderManager.getContainer(bundle.getUuidPath().getList());
-      AbstractJPPFClassLoader oldCL = cont.getClassLoader();
-      String requestUuid = oldCL.getRequestUuid();
-      AbstractJPPFClassLoader newCL = classLoaderManager.newClientClassLoader(cont.uuidPath);
-      newCL.setRequestUuid(requestUuid);
-      cont.setClassLoader(newCL);
-      oldCL.close();
-      return newCL;
+      return classLoaderManager.resetClassLoader(bundle.getUuidPath().getList());
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

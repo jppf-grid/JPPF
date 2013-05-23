@@ -18,6 +18,10 @@
 
 package org.jppf.server.node;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.jppf.classloader.*;
 import org.jppf.management.JMXServer;
 import org.jppf.node.AbstractNode;
 import org.jppf.server.protocol.*;
@@ -38,6 +42,15 @@ public abstract class AbstractCommonNode extends AbstractNode
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Manages the class loaders and how they are used.
+   */
+  protected AbstractClassLoaderManager classLoaderManager = null;
+  /**
+   * Flag which determines whether a reset of the resource caches
+   * should be performed at the next opportunity.
+   */
+  protected AtomicBoolean cacheResetFlag = new AtomicBoolean(false);
 
   /**
    * Add management parameters to the specified bundle, before sending it back to a server.
@@ -56,5 +69,62 @@ public abstract class AbstractCommonNode extends AbstractNode
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
+  }
+
+  /**
+   * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
+   * @return a <code>ClassLoader</code> used for loading the classes of the framework.
+   */
+  public AbstractJPPFClassLoader getClassLoader()
+  {
+    return classLoaderManager.getClassLoader();
+  }
+
+  /**
+   * Set the main classloader for the node.
+   * @param cl the class loader to set.
+   */
+  public void setClassLoader(final JPPFClassLoader cl)
+  {
+    classLoaderManager.setClassLoader(cl);
+  }
+
+  /**
+   * Get a reference to the JPPF container associated with an application uuid.
+   * @param uuidPath the uuid path containing the key to the container.
+   * @return a <code>JPPFContainer</code> instance.
+   * @throws Exception if an error occurs while getting the container.
+   */
+  public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
+  {
+    return classLoaderManager.getContainer(uuidPath);
+  }
+
+  /**
+   * Clear the resource caches of all class loaders managed by this object.
+   */
+  protected void clearResourceCachesIfRequested()
+  {
+    if (cacheResetFlag.get())
+    {
+      try
+      {
+        classLoaderManager.clearResourceCaches();
+      }
+      finally
+      {
+        cacheResetFlag.set(false);
+      }
+    }
+  }
+
+  /**
+   * Request a reset of the class loaders resource caches.
+   * This method merely sets a floag, the actual reset will
+   * be performed at the next opportunity, when it is safe to do so. 
+   */
+  public void requestResourceCacheReset()
+  {
+    cacheResetFlag.compareAndSet(false, true);
   }
 }
