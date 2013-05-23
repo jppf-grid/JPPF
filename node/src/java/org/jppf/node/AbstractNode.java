@@ -62,12 +62,6 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   }
 
   /**
-   * Stop this node and release the resources it is using.
-   */
-  @Override
-  public abstract void stopNode();
-
-  /**
    * Get the total number of tasks executed.
    * @return the number of tasks as an int.
    */

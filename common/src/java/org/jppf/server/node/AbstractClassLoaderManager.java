@@ -210,7 +210,7 @@ public abstract class AbstractClassLoaderManager
    * @param uuidPath uuid path for the corresponding client.
    * @param cl the class loader to use.
    * @return a {@link JPPFContainer} instance.
-   * @throws Exception if any error occurs
+   * @throws Exception if any error occurs.
    */
   protected abstract JPPFContainer newJPPFContainer(List<String> uuidPath, AbstractJPPFClassLoader cl) throws Exception;
 
@@ -220,4 +220,35 @@ public abstract class AbstractClassLoaderManager
    * @return a {@link Callable} instance.
    */
   protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
+
+  /**
+   * Clear the resource caches of all class loaders managed by this object.
+   */
+  public void clearResourceCaches()
+  {
+    for (JPPFContainer cont: containerList)
+    {
+      AbstractJPPFClassLoader cl = cont.getClassLoader();
+      if (cl != null) cl.resetResourceCache();
+    }
+    if (classLoader != null) classLoader.resetResourceCache();
+  }
+
+  /**
+   * Reset the class loader specified by its uuid path.
+   * @param uuidPath uuid path of the class loader to reset.
+   * @return the new created class loader istance.
+   * @throws Exception if any error occurs.
+   */
+  public AbstractJPPFClassLoader resetClassLoader(final List<String> uuidPath) throws Exception
+  {
+    JPPFContainer cont = getContainer(uuidPath);
+    AbstractJPPFClassLoader oldCL = cont.getClassLoader();
+    String requestUuid = oldCL.getRequestUuid();
+    AbstractJPPFClassLoader newCL = newClientClassLoader(cont.uuidPath);
+    newCL.setRequestUuid(requestUuid);
+    cont.setClassLoader(newCL);
+    oldCL.close();
+    return newCL;
+  }
 }

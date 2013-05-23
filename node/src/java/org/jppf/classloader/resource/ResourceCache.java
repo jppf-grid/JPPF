@@ -75,7 +75,7 @@ public class ResourceCache
    */
   public ResourceCache()
   {
-    System.out.println("new resource cache with uuid = " + uuid);
+    //System.out.println("new resource cache with uuid = " + uuid);
     Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(tempFolders, uuid)));
     cacheMap.put(uuid, this);
     initTempFolders();
@@ -289,7 +289,7 @@ public class ResourceCache
     @Override
     public void run()
     {
-      System.out.println("cleaning up resource cache [uuid=" + uuid + "]");
+      //System.out.println("cleaning up resource cache [uuid=" + uuid + "]");
       cacheMap.remove(uuid);
       while (!tempFolders.isEmpty()) FileUtils.deletePath(new File(tempFolders.remove(0)));
       

@@ -39,8 +39,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Domingos Creado
  */
-public abstract class JPPFNode extends AbstractCommonNode implements ClassLoaderProvider
-{
+public abstract class JPPFNode extends AbstractCommonNode implements ClassLoaderProvider {
   /**
    * Logger for this class.
    */
@@ -77,10 +76,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Manager for the MBean defined through the service provider interface.
    */
   private JPPFMBeanProviderManager providerManager = null;
-  /**
-   * Manages the class loaders and how they are used.
-   */
-  protected AbstractClassLoaderManager classLoaderManager = null;
   /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
    */
@@ -152,6 +147,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
     while (!isStopped()) {
+      clearResourceCachesIfRequested();
       Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
       JPPFTaskBundle bundle = pair.first();
       checkInitialBundle(bundle);
@@ -295,16 +291,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Get a reference to the JPPF container associated with an application uuid.
-   * @param uuidPath the uuid path containing the key to the container.
-   * @return a <code>JPPFContainer</code> instance.
-   * @throws Exception if an error occurs while getting the container.
-   */
-  public JPPFContainer getContainer(final List<String> uuidPath) throws Exception {
-    return classLoaderManager.getContainer(uuidPath);
-  }
-
-  /**
    * Get the administration and monitoring MBean for this node.
    * @return a <code>JPPFNodeAdminMBean</code> instance.
    */
@@ -445,11 +431,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     return lifeCycleEventHandler;
   }
 
-  @Override
-  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception {
-    return classLoaderManager.getContainer(uuidPath).getClassLoader();
-  }
-
   /**
    * Create the connection checker for this node.
    * @return an implementation of {@link NodeConnectionChecker}.
@@ -470,16 +451,15 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     JPPFTaskBundle bundle = executionManager.getBundle();
     if (bundle == null) return null;
     try {
-      JPPFContainer cont = classLoaderManager.getContainer(bundle.getUuidPath().getList());
-      AbstractJPPFClassLoader oldCL = cont.getClassLoader();
-      String requestUuid = oldCL.getRequestUuid();
-      AbstractJPPFClassLoader newCL = classLoaderManager.newClientClassLoader(cont.uuidPath);
-      newCL.setRequestUuid(requestUuid);
-      cont.setClassLoader(newCL);
-      return newCL;
+      return classLoaderManager.resetClassLoader(bundle.getUuidPath().getList());
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return null;
+  }
+
+  @Override
+  public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception {
+    return classLoaderManager.getContainer(uuidPath).getClassLoader();
   }
 }
