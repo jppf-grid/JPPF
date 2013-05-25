@@ -1,0 +1,60 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  <groupId>org.jppf</groupId>
+  <artifactId>jppf-server</artifactId>
+  <packaging>jar</packaging>
+  <name>JPPF server API</name>
+  <version>@version@</version>
+  <description>JPPF, the open source grid computing solution</description>
+  <url>http://www.jppf.org</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <issueManagement>
+    <system>The Bug Genie</system>
+    <url>http://www.jppf.org/tracker/tbg</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:svn:http://svn.code.sf.net/p/jppf-project/code/trunk</connection>
+    <developerConnection>scm:svn:https://svn.code.sf.net/p/jppf-project/code/trunk</developerConnection>
+    <url>http://svn.code.sf.net/p/jppf-project/code/trunk</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>lolocohen</id>
+      <name>Laurent Cohen</name>
+      <email>laurent.cohen@jppf.org</email>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-common-node</artifactId>
+      <version>@version@</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-common</artifactId>
+      <version>@version@</version>
+    </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.opendmk</groupId>
+			<artifactId>jmxremote_optional</artifactId>
+			<version>1.0_01-ea</version>
+		</dependency>
+  </dependencies>
+</project>

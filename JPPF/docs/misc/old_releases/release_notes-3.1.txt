@@ -1,0 +1,54 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
+
+This version brings new security features, load-balancing in the client, fork/join tasks execution and more.
+
+What's new in JPPF 3.1:
+
+Security
+
+JPPF 3.1 brings a new security layer by performing all network communications through SSL/TLS, providing data encryption, data integrity and certificate-based authentication.
+Switching from plain to secure connections is as easy as toggling a single configuration flag. In this new context, a JPPF driver can serve both plain and secure connections, whereas clients and nodes attach via either.
+Secure communication has been implemented on top of all connections used by JPPF: client to server, node to server, server to server and JMX remote connectors.
+Security configuration is documented here: http://www.jppf.org/doc/v3/index.php?title=Configuring_SSL/TLS_communications)
+
+Management and monitoring
+
+A new graph view of the grid topology has been added to the administration console
+A new management policy was added to test execution policies against the current grid state
+Jobs can now be cancelled directly from a standalone JPPF client or from a JCA connection to the J2EE connector
+
+Executor services
+
+Job SLAs and metadata, along with task timeout and cancel handlers, can now be dynamically configured for tasks and jobs submitted from a JPPFExecutorService
+Documentation can be found here: http://www.jppf.org/doc/v3/index.php?title=JPPF_Executor_Services#Configuring_jobs_and_tasks
+
+Clients
+
+The load balancing between local and remote execution is now fully configurable in the client. The same algorithms and configuration parameters as for the server are available.
+Documentation can be found here: http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client
+
+Nodes
+
+A new node extension enables switching the node execution model to a local fork/join model, using the JDK 7 APIs.
+This feature is documented here: http://www.jppf.org/doc/v3/index.php?title=Fork/Join_thread_pool_in_the_nodes
+
+All implemented feature requests
+
+2977885 - Add SSL capabilities to JPPF
+3390360 - Graph view of the grid topology (admin console)
+3442570 - Enable timeout/onCancel for Callable/Runnable/POJO tasks
+3522495 - Add management capabilities to J2EE connector
+3502395 - Document runtime dependencies for JPPF components
+3488092 - Determine if a job SLA matches any node before submission
+3481576 - ForkJoin executor service
+3353566 - Add JPPFClient.cancelJob(<jobID>)
+3285058 - Enable configurable load-balancing on the client
+3353578 - JPPFTask timeout for local execution 
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+SF.net project page: http://sourceforge.net/projects/jppf-project/

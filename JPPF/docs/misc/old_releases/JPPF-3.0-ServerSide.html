@@ -1,0 +1,61 @@
+<p><a href="http://www.jppf.org">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+<p><b>Simplified network configuration</b>: only <"http://www.jppf.org/doc/v3/index.php?title=Configuring_a_JPPF_server#Basic_network_configuration">one TCP port for grid operations, only one port for management, that's only 2 ports needed instead of 5 in previous versions.
+Server manual and auto discovery can now be <"http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Using_manual_configuration_and_server_discovery_together">mixed.
+
+<p><b>Job recovery</b>: grid jobs will survive an application crash and will be restarted from their latest persisited state. Documentation is <"http://www.jppf.org/doc/v3/index.php?title=Jobs_runtime_behavior%2C_recovery_and_failover#Job_persistence_and_recovery">here
+and an example can be found <"http://www.jppf.org/samples-pack/JobRecovery/Readme.php">here.
+
+<p><b>Class loading</b>: full <"http://www.jppf.org/doc/v3/index.php?title=Class_loading_in_JPPF">documentation, new <"http://www.jppf.org/doc/v3/index.php?title=Class_loading_in_JPPF#JPPF_class_loading_extensions">extensions,
+multiple <"http://www.jppf.org/doc/v3/index.php?title=Class_loading_in_JPPF#Class_loader_delegation_models">delegation models enable faster startup of grid jobs and nodes, and open up new possibilities for efficient and flexible grid usage.
+A new <"http://www.jppf.org/samples-pack/ExtendedClassLoading/Readme.php">sample illustrates how these can be used to automate the management of remote grid nodes classpath.
+
+<p><b>New extension points</b> allow powerful capabilities to be easily added to an existing grid infrastructure.
+
+<p><b>The administration console</b> now enables management of <"http://www.jppf.org/screenshots.php?screenshot=JobPriority.gif">jobs priority, displays <"http://www.jppf.org/screenshots.php?screenshot=JobStatistics.gif">jobs statistics and
+<"http://www.jppf.org/screenshots.php?screenshot=ConnectionsStatistics.gif">idle nodes, retrieves full <"http://www.jppf.org/screenshots.php?screenshot=DriverSystemInformation.gif">system information from servers.
+
+<p><b>Four new samples</b>:
+<ul>
+	<"http://www.jppf.org/samples-pack/NodeConnectionEvents/Readme.php">How to receive notifications of nodes connecting and disconnecting on the server
+	<"http://www.jppf.org/samples-pack/JobRecovery/Readme.php">Job recovery after an application crash
+	<"http://www.jppf.org/samples-pack/InitializationHook/Readme.php">Using a node initialization hook to implement a sophisticated failover mechanism
+	<"http://www.jppf.org/samples-pack/ExtendedClassLoading/Readme.php">Automating the deployment and management of application libraries in the nodes at runtime
+</ul>
+
+JPPF links:
+
+- <"http://www.jppf.org/release_notes.php?version=3.0">Full release notes<br/>
+- <"http://www.jppf.org">Web Site<br/>
+- <"http://www.jppf.org/downloads.php">Downloads<br/>
+- <"http://www.jppf.org/doc/v3/">Documentation<br/>
+- <"http://www.jppf.org/forums">User forums<br/>
+
+
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+Simplified network configuration: only one TCP port for grid operations, only one port for management, that's only 2 ports needed instead of 5 in previous versions.
+Server manual and auto discovery can now be mixed.
+
+Job recovery: grid jobs will survive an application crash and will be restarted from their latest persisited state. Documentation is here and an example can be found here.
+
+Distributed class loading: full documentation, new extensions, multiple delegation models enable faster startup of grid jobs and nodes, and open up new possibilities for efficient and flexible grid usage. A new example illustrates how these can be used to automate the management of remote grid nodes classpath.
+
+New extension points allow powerful capabilities to be easily added to an existing grid infrastructure.
+
+The administration console now enables management of jobs priority, displays jobs statistics and idle nodes, retrieves full system information from servers.
+
+4 new examples were added to the distribution:
+
+    How to receive notifications of nodes connecting and disconnecting on the server
+    Job recovery after an application crash
+    Using a node initialization hook to implement a sophisticated failover mechanism
+    Automating the deployment and management of application libraries in the nodes at runtime
+
+JPPF links:
+
+    Full release notes
+    Web Site
+    Downloads
+    Documentation
+    User forums
+

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE orion-application PUBLIC "-//Evermind//DTD J2EE Application runtime 1.2//EN" "http://xmlns.oracle.com/ias/dtds/orion-application.dtd">
+
+<orion-application>
+	<!--
+  <persistence path="../persistence" />
+
+  <log>
+    <file path="../../log/ascontrol-application.log" />
+  </log>
+
+        <security-role-mapping name="ascontrol_admin">
+          <group name="oc4j-administrators" />
+          <group name="ascontrol_admin" />
+        </security-role-mapping>
+        <security-role-mapping name="ascontrol_appadmin">
+          <group name="ascontrol_appadmin" />
+        </security-role-mapping>
+        <security-role-mapping name="ascontrol_monitor">
+          <group name="ascontrol_monitor" />
+        </security-role-mapping>
+
+  <jazn provider="XML" location="./jazn-data.xml" />
+
+  <imported-shared-libraries>
+	<remove-inherited name="global.libraries"/>
+  </imported-shared-libraries>
+  -->
+
+</orion-application>

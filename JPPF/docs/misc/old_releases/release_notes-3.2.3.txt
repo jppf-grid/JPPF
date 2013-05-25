@@ -1,0 +1,20 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+**What's new in JPPF 3.2.3**
+
+This maintenance release brings important bug fixes.
+
+**Bugs fixes:**
+
+[JPPF-122 JMX connection threads leak in the driver](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-122)
+[JPPF-123 NPE at driver startup when jppf.ssl.server.port = -1](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-123)
+[JPPF-125 Selection in job data panel does not update the buttons state](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-125)
+[JPPF-126 Job cancelled from the admin console may get stuck in the server queue](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-126)
+[JPPF-130 Job hang when loading a large number of classes with multiple nodes](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-130)
+[JPPF-131 JPPF client does not release JMX thread upon connection failure](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-130)
+
+**Enhancements **
+
+[JPPF-118 Improvements in NodeExecutionManagerImpl](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-118)
+
+**JPPF Links:** [Web Site](http://www.jppf.org) - [Downloads](http://www.jppf.org/downloads.php) - [Documentation](http://www.jppf.org/wiki) - [User forums](http://www.jppf.org/forums) - [Issue tracker](http://www.jppf.org/tracker/tbg/jppf) - [SF.net project page](http://sourceforge.net/projects/jppf-project/)
