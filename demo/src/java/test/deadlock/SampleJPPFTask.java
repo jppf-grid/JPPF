@@ -15,45 +15,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sample.test.profiling;
-
-import java.net.URL;
+package test.deadlock;
 
 import org.jppf.server.protocol.JPPFTask;
 
 /**
- * Instances of this class do nothing and are intended for node profiling purposes,
- * to analyse the JPPF overhead for task execution.
+ * This class is a template for a standard JPPF task.
  * @author Laurent Cohen
  */
-public class EmptyTask extends JPPFTask
+public class SampleJPPFTask extends JPPFTask
 {
   /**
-   * The data size in KB.
+   * 
    */
-  private int dataSize = 0;
+  private int idx = 0;
+
   /**
-   * The data in this task.
+   * Perform initializations.
+   * @param idx the idx.
    */
-  private byte[] data = null;
-  /**
-   * Initialize with the specified data size.
-   * @param dataSize the data size in bytes.
-   */
-  public EmptyTask(final int dataSize)
+  public SampleJPPFTask(final int idx)
   {
-    this.dataSize = dataSize;
-    data = new byte[dataSize];
+    this.idx = idx;
   }
 
   /**
-   * Perform the execution of this task.
-   * @see java.lang.Runnable#run()
+   * This method contains the code that will be executed by a node.
    */
   @Override
   public void run()
   {
-    String name = "sample/test/profiling/EmptyTask.java";
-    URL url = getClass().getClassLoader().getResource(name);
+    //System.out.println("Hello, this is the node executing a template JPPF task");
+    //for (int i=0; i<10; i++) getClass().getClassLoader().getResource("this/will/not/be/found/" + i + ".txt");
+    try
+    {
+      Thread.sleep(1);
+      //getClass().getClassLoader().getResource("this/will/not/be/found/nf" + idx + ".txt");
+      setResult("the execution was performed successfully");
+    }
+    catch (Exception e)
+    {
+      setException(e);
+    }
   }
 }

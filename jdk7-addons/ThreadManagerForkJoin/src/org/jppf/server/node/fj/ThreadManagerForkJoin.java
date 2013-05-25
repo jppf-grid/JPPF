@@ -18,16 +18,13 @@
 
 package org.jppf.server.node.fj;
 
-import org.jppf.node.NodeExecutionInfo;
-import org.jppf.server.node.AbstractThreadManager;
-import org.jppf.utils.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.*;
+
+import org.jppf.node.NodeExecutionInfo;
+import org.jppf.server.node.*;
+import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
 
 /**
  * This class manages the fork join pool for the node's execution manager.
@@ -58,40 +55,38 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
    */
   public ThreadManagerForkJoin(final int poolSize)
   {
-    this.threadFactory = new FJThreadFactory("node processing", cpuTimeEnabled);
+    this.threadFactory = new FJThreadFactory("node processing", CpuTimeCollector.isCpuTimeEnabled());
     threadPool = new ForkJoinPool(poolSize, threadFactory, new Thread.UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(final Thread t, final Throwable e) {
         StringBuilder sb = new StringBuilder();
         new Formatter(sb).format("UncaughtException in thread[%d:%s] - %s", t.getId(), t.getName(), ExceptionUtils.getMessage(e));
-        //System.out.println(sb);
-        //e.printStackTrace(System.out);
         log.error(sb.toString(), e);
       }
-    }, false);
+    }, false) {
+      @Override
+      protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
+        RunnableFuture<T> future = super.newTaskFor(runnable, value);
+        if (runnable instanceof NodeTaskWrapper) {
+          ((NodeTaskWrapper) runnable).setFuture(future);
+        }
+        return future;
+      }
+    };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected long[] getThreadIds()
   {
     return threadFactory.getThreadIDs();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ExecutorService getExecutorService()
   {
     return threadPool;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setPoolSize(final int size)
   {
@@ -102,36 +97,24 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getPoolSize()
   {
     return threadPool.getParallelism();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getPriority()
   {
     return threadFactory.getPriority();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setPriority(final int priority)
   {
     threadFactory.setPriority(priority);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public UsedClassLoader useClassLoader(final ClassLoader classLoader)
   {
@@ -375,9 +358,6 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
       this.threadFactory = threadFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void dispose()
     {

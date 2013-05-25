@@ -1,6 +1,6 @@
 
-Total tests: 120, successful: 120, failed: 0, ignored: 0
-Start time: Tue Apr 23 19:53:15 CEST 2013, total elapsed: 00:02:43.410
+Total tests: 119, successful: 119, failed: 0, ignored: 0
+Start time: Thu May 23 08:12:10 CEST 2013, total elapsed: 00:02:40.742
 
 Tests results:
 
@@ -78,8 +78,8 @@ class test.org.jppf.management.TestJPPFNodeAdminMBean
   testSetDelegationModel() : OK
   testState() : OK
 class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
-  testReset() : OK
   testSnapshot() : OK
+  testReset() : OK
   testNotifications() : OK
 class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
   testCancelJob() : OK
@@ -94,11 +94,11 @@ class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
   testState() : OK
 class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean2
   testNoNotifcationReceivedExecutionPolicySelector() : OK
+  testNotifcationsExecutionPolicySelector() : OK
   testNoNotifcationReceivedAllNodesSelector() : OK
   testNoNotifcationReceivedUuidSelector() : OK
   testNotifcationsAllNodes() : OK
   testNotifcationsUuidSelector() : OK
-  testNotifcationsExecutionPolicySelector() : OK
 class test.org.jppf.server.job.management.TestDriverJobManagementMBean
   testCancelJob() : OK
   testResumeAndCancelSuspendedJob() : OK
@@ -111,7 +111,6 @@ class test.org.jppf.server.protocol.TestJPPFJobClientSLA
   testMultipleJobsExpirationClient() : OK
   testJobInNodeExecutionPolicyClient() : OK
   testJobLocalExecutionPolicyClient() : OK
-  testJobMaxChannelsClient() : OK
   testJobMaxChannels2Client() : OK
 class test.org.jppf.server.protocol.TestJPPFJobSLA
   testJobExpirationAtDateTooLate() : OK
