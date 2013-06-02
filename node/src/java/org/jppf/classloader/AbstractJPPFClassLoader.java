@@ -470,7 +470,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     notFoundCache.clear();
     try {
       super.close();
-    } catch (IOException e) {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
