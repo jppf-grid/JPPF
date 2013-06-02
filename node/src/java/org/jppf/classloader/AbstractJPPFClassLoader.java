@@ -462,12 +462,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public void close() {
     cache.close();
     notFoundCache.clear();
-    try
-    {
+    try {
       super.close();
-    }
-    catch (IOException ignore)
-    {
+    } catch (Exception ignore) {
     }
   }
 

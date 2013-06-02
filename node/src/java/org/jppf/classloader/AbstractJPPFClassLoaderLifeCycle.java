@@ -342,4 +342,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       cache = new ResourceCache();
     }
   }
+
+  /**
+   * This method does nothing.
+   */
+  public void close() {
+  }
 }
