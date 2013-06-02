@@ -139,19 +139,16 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning)
       {
-        if(isDone()) return false;
-        if(isCancelled()) {
-          return true;
-        } else {
-          bundle.cancel();
-          try {
-            channel.cancelJob(bundle.getClientJob().getUuid());
-          } catch (Exception e) {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-            else log.warn(ExceptionUtils.getMessage(e));
-          } finally {
-            return super.cancel(false);
-          }
+        if (isCancelled()) return true;
+        if (isDone()) return false;
+        bundle.cancel();
+        try {
+          channel.cancelJob(bundle.getClientJob().getUuid());
+        } catch (Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(ExceptionUtils.getMessage(e));
+        } finally {
+          return super.cancel(false);
         }
       }
     };

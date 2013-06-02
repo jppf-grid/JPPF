@@ -355,8 +355,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   public boolean cancelJob(final String jobId) throws Exception
   {
-    queue.cancelJob(jobId);
-    return true;
+    return queue.cancelJob(jobId);
   }
 
   @Override

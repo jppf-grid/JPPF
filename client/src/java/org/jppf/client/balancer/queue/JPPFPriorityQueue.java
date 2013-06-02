@@ -408,10 +408,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     try
     {
       ClientJob job = jobMap.get(jobId);
-      if (job == null)
-        return false;
-      else
-        return job.cancel(false);
+      if (debugEnabled) log.debug("request to cancel jobId=" + jobId + ", client job=" + job);
+      return (job == null) ? false : job.cancel(false);
     }
     finally
     {
@@ -422,8 +420,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   /**
    * Close this queue and all resources it uses.
    */
-  public void close()
-  {
+  public void close() {
     lock.lock();
     try {
       jobScheduleHandler.clear(true);
@@ -441,8 +438,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    * Cancels queued broadcast jobs for connection.
    * @param connectionUUID The connection UUID that failed or was disconnected.
    */
-  public void cancelBroadcastJobs(final String connectionUUID)
-  {
+  public void cancelBroadcastJobs(final String connectionUUID) {
     if (connectionUUID == null || connectionUUID.isEmpty()) return;
 
     Set<String> jobIDs = Collections.emptySet();
@@ -451,8 +447,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       if (jobMap.isEmpty()) return;
 
       jobIDs = new HashSet<String>();
-      for (Map.Entry<String, ClientJob> entry : jobMap.entrySet())
-      {
+      for (Map.Entry<String, ClientJob> entry : jobMap.entrySet()) {
         if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
       }
     } finally {

@@ -20,7 +20,8 @@ package org.jppf.client.balancer.utils;
 
 import static org.jppf.utils.StringUtils.build;
 
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
@@ -72,11 +73,11 @@ public abstract class AbstractClientJob
   /**
    * The job status.
    */
-  private volatile int status = NEW;
+  protected volatile int status = NEW;
   /**
    * List of all runnables called on job completion.
    */
-  private final List<Runnable> onDoneList = new ArrayList<Runnable>();
+  private final List<Runnable> onDoneList = new CopyOnWriteArrayList<Runnable>();
   /**
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
@@ -84,7 +85,7 @@ public abstract class AbstractClientJob
   /**
    * The time at which this wrapper was added to the queue.
    */
-  private transient long queueEntryTime = 0L;
+  private long queueEntryTime = 0L;
   /**
    * The underlying task bundle.
    */
@@ -130,9 +131,7 @@ public abstract class AbstractClientJob
   {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
-
     this.job = job;
-
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
@@ -327,15 +326,7 @@ public abstract class AbstractClientJob
    */
   protected void done()
   {
-    Runnable[] runnables;
-    synchronized (onDoneList)
-    {
-      runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
-    }
-    for (Runnable runnable : runnables)
-    {
-      runnable.run();
-    }
+    for (Runnable runnable : onDoneList) runnable.run();
   }
 
   /**
@@ -345,11 +336,7 @@ public abstract class AbstractClientJob
   public void addOnDone(final Runnable runnable)
   {
     if(runnable == null) throw new IllegalArgumentException("runnable is null");
-
-    synchronized (onDoneList)
-    {
-      onDoneList.add(runnable);
-    }
+    onDoneList.add(runnable);
   }
 
   /**
@@ -359,11 +346,7 @@ public abstract class AbstractClientJob
   public void removeOnDone(final Runnable runnable)
   {
     if(runnable == null) throw new IllegalArgumentException("runnable is null");
-
-    synchronized (onDoneList)
-    {
-      onDoneList.remove(runnable);
-    }
+    onDoneList.remove(runnable);
   }
 
   /**
