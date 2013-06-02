@@ -87,7 +87,7 @@ public class ClientJob extends AbstractClientJob
   /**
    * State map for tasks on which resultReceived was called.
    */
-  private final SortedMap<Integer, TaskState> taskStateMap = new TreeMap<Integer, TaskState>();
+  private final TaskStateMap taskStateMap = new TaskStateMap();
   /**
    * The original number of tasks in the job.
    */
@@ -132,7 +132,7 @@ public class ClientJob extends AbstractClientJob
     this.tasks = new ArrayList<JPPFTask>(tasks);
 
     for (JPPFTask result : job.getResults().getAll()) {
-      if(result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
+      if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
     }
   }
 
@@ -392,7 +392,7 @@ public class ClientJob extends AbstractClientJob
       if (empty) setExecuting(false);
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
-      boolean callDone = updateStatus(EXECUTING, DONE);
+      boolean callDone = updateStatus(isCancelled() ? CANCELLED : EXECUTING, DONE);
       if (empty) setExecuting(false);
       try {
         if (callDone) done();
@@ -410,10 +410,7 @@ public class ClientJob extends AbstractClientJob
   protected boolean hasPending() {
     synchronized (tasks) {
       if (tasks.isEmpty() && taskStateMap.size() >= job.getTasks().size()) {
-        for (TaskState state : taskStateMap.values()) {
-          if (state == TaskState.EXCEPTION) return true;
-        }
-        return false;
+        return taskStateMap.getStateCount(TaskState.EXCEPTION) > 0;
       } else return true;
     }
   }
