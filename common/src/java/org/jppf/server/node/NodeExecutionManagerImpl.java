@@ -180,7 +180,7 @@ public class NodeExecutionManagerImpl
       if (!isJobCancelled()) {
         ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<NodeTaskWrapper>(getExecutor());
         for (Task task : taskList) {
-          NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, timeoutHandler);
+          NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler);
           taskWrapperList.add(taskWrapper);
           Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
         }
@@ -210,13 +210,15 @@ public class NodeExecutionManagerImpl
    */
   public void cancelAllTasks(final boolean callOnCancel, final boolean requeue) {
     if (debugEnabled) log.debug("cancelling all tasks with: callOnCancel=" + callOnCancel + ", requeue=" + requeue);
-    if (requeue) {
+    if (requeue && (bundle != null)) {
       synchronized(bundle) {
         bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
         bundle.getSLA().setSuspended(true);
       }
     }
-    for (NodeTaskWrapper ntw: taskWrapperList) cancelTask(ntw, callOnCancel);
+    if (taskWrapperList != null) {
+      for (NodeTaskWrapper ntw: taskWrapperList) cancelTask(ntw, callOnCancel);
+    }
   }
 
   /**

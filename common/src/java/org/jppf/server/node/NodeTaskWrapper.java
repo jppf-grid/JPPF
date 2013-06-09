@@ -83,14 +83,20 @@ public class NodeTaskWrapper implements Runnable
    * The elapsed time for this task's execution.
    */
   private long elapsedTime = 0L;
+  /**
+   * The class loader that was used to load the task class.
+   */
+  private final ClassLoader taskClassLoader;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param task the task to execute within a try/catch block.
+   * @param taskClassLoader the class loader that was used to load the task class.
    * @param timeoutHandler handles the timeout for this task.
    */
-  public NodeTaskWrapper(final Task task, final JPPFScheduleHandler timeoutHandler) {
+  public NodeTaskWrapper(final Task task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler) {
     this.task = task;
+    this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
   }
 
@@ -130,8 +136,11 @@ public class NodeTaskWrapper implements Runnable
     started = true;
     long id = Thread.currentThread().getId();
     long startTime = System.nanoTime();
+    ClassLoader oldCl = null;
     try {
+      oldCl = Thread.currentThread().getContextClassLoader();
       handleTimeout();
+      Thread.currentThread().setContextClassLoader(taskClassLoader);
       executionInfo = CpuTimeCollector.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
     } catch(JPPFNodeReconnectionNotification t) {
@@ -140,6 +149,7 @@ public class NodeTaskWrapper implements Runnable
       if (t instanceof Exception) task.setException((Exception) t);
       else task.setException(new JPPFException(t));
     } finally {
+      Thread.currentThread().setContextClassLoader(oldCl);
       try {
         elapsedTime = System.nanoTime() - startTime;
         if (executionInfo != null) executionInfo = CpuTimeCollector.computeExecutionInfo(id).subtract(executionInfo);
