@@ -55,7 +55,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   /**
    * Initialize this client with a specified application UUID.
    * @param client the JPPF client that owns this connection.
-   * @param uuid the unique identifier for this local client.
+   * @param uuid the unique identifier of the remote driver.
    * @param name configuration name for this local client.
    * @param info the connection properties for this connection.
    * @param ssl determines whether this is an SSL connection.

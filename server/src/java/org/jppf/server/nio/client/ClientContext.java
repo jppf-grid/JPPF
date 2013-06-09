@@ -204,10 +204,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public void offerCompletedBundle(final ServerTaskBundleClient bundleWrapper)
   {
-    //synchronized(completedBundles)
-    {
-      completedBundles.offer(bundleWrapper);
-    }
+    completedBundles.offer(bundleWrapper);
   }
 
   /**
@@ -216,10 +213,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ServerTaskBundleClient pollCompletedBundle()
   {
-    //synchronized(completedBundles)
-    {
-      return completedBundles.poll();
-    }
+    return completedBundles.poll();
   }
 
   /**
@@ -238,10 +232,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public boolean isCompletedBundlesEmpty()
   {
-    //synchronized (completedBundles)
-    {
-      return completedBundles.isEmpty();
-    }
+    return completedBundles.isEmpty();
   }
 
   /**
@@ -259,7 +250,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   /**
    * Send the job ended notification.
    */
-  private synchronized void cancelJobOnClose()
+  synchronized void cancelJobOnClose()
   {
     if (initialBundleWrapper != null)
     {

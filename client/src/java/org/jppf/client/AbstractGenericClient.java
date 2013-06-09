@@ -255,7 +255,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   {
     log.info("Connection [" + c.getName() + "] failed");
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) c;
-    if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getUuid());
+    if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
     try
     {
       JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
@@ -449,19 +449,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
     RegisteredClassLoader registeredClassLoader;
     synchronized (classLoaderRegistrations) {
-//      String uuid = classLoaderUUIDs.get(cl);
-//      if (uuid == null)
-//      {
-//        uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
-//        classLoaderUUIDs.put(cl, uuid);
-//      }
-
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);
       if(list == null) {
         list = new HashSet<RegisteredClassLoader>();
         classLoaderRegistrations.put(uuid, list);
-
         addRequestClassLoader(uuid, cl);
       }
       list.add(registeredClassLoader);

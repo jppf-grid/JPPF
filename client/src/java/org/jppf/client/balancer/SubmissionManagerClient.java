@@ -208,7 +208,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(),
-            ((AbstractJPPFClientConnection) cnn).getUuid(), JPPFManagementInfo.DRIVER, cnn.isSSL());
+            ((AbstractJPPFClientConnection) cnn).getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSL());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }

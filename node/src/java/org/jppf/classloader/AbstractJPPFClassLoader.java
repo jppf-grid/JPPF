@@ -147,7 +147,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (resource != null) b = resource.getDefinition();
     if ((b == null) || (b.length == 0)) {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
-      if (resource != null) notFoundCache.add(name);
+      if ((resource != null) && (resource.getState() != JPPFResourceWrapper.State.NODE_RESPONSE_ERROR)) notFoundCache.add(name);
       fireEvent(null, name, false);
       throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
@@ -321,7 +321,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         urlList = cache.getResourcesURLs(name);
       }
     }
-    if ((urlList == null) || urlList.isEmpty() && (resource != null)) notFoundCache.add(name);
+    if ((urlList == null) || urlList.isEmpty() &&
+        ((resource != null) && (resource.getState() != JPPFResourceWrapper.State.NODE_RESPONSE_ERROR))) notFoundCache.add(name);
     return urlList;
   }
 

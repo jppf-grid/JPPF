@@ -66,18 +66,12 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NioServerFactory<ClientState, ClientTransition> createFactory()
   {
     return new ClientServerFactory(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void postAccept(final ChannelWrapper<?> channel)
   {
@@ -167,9 +161,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
   {

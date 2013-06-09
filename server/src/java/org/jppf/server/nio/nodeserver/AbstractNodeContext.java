@@ -365,7 +365,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);
     if (jmxConnection != null && jmxConnection.isConnected())
     {
-      jmxConnection.cancelJob(jobId, requeue);
+      try {
+        jmxConnection.cancelJob(jobId, requeue);
+      } catch (Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(ExceptionUtils.getMessage(e));
+        throw e;
+      }
       return true;
     }
     return false;

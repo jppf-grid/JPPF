@@ -246,7 +246,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
           results[index] = url;
           if (debugEnabled) log.debug(build(this, " resource [", name, "] found remotely as ", url));
         }
-        else if (resource != null) notFoundCache.add(name);
+        else if (resource != null && (resource.getState() != JPPFResourceWrapper.State.NODE_RESPONSE_ERROR)) notFoundCache.add(name);
       }
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);

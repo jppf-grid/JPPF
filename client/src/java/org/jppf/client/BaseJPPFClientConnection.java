@@ -21,7 +21,6 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.CREATED;
 
 import java.nio.channels.AsynchronousCloseException;
-import java.security.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
@@ -79,7 +78,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   protected ClassServerDelegate delegate = null;
   /**
-   * Unique identifier of the client.
+   * Unique identifier of the remote driver.
    */
   protected String uuid = null;
   /**
@@ -199,12 +198,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @throws Exception if an error is raised while reading the results from the server.
    */
   @SuppressWarnings("unchecked")
-  protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults() throws Exception
-  {
+  protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults() throws Exception {
     List<JPPFTask> taskList = new LinkedList<JPPFTask>();
     JPPFTaskBundle bundle = null;
-    try
-    {
+    try {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) cl = getClass().getClassLoader();
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
@@ -213,37 +210,27 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       int count = bundle.getTaskCount();
       if (debugEnabled) log.debug(this.toDebugString() + " : received bundle " + bundle);
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
-      try
-      {
+      try {
         for (int i = 0; i < count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
-      }
-      finally
-      {
+      } finally {
         if (SEQUENTIAL_DESERIALIZATION) lock.unlock();
       }
 
       // if an exception prevented the node from executing the tasks
       Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
-      if (t != null)
-      {
+      if (t != null) {
         if (debugEnabled) log.debug(this.toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         for (JPPFTask task : taskList) task.setException(e);
       }
       return new Pair(bundle, taskList);
-    }
-    catch (AsynchronousCloseException e)
-    {
+    } catch (AsynchronousCloseException e) {
       log.debug(e.getMessage(), e);
       throw e;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw e;
-    }
-    catch (Error e)
-    {
+    } catch (Error e) {
       log.error(e.getMessage(), e);
       throw e;
     }
@@ -299,54 +286,57 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
    */
-  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception
-  {
+  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception {
+    ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
+    String helperClassName = getSerializationHelperClassName();
+    Class clazz = null;
+    for (ClassLoader cl: clArray) {
+      try {
+        if (cl == null) continue;
+        clazz = cl.loadClass(helperClassName);
+        if (clazz != null) break;
+      } catch (Exception e) {
+      }
+    }
+    return (SerializationHelper) clazz.newInstance();
+  }
+  /*
+  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception {
     ClassLoader cl = classLoader;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
     String helperClassName = getSerializationHelperClassName();
     Class clazz = null;
     NonDelegatingClassLoader ndCl = ndclCache.get(cl);
-    if (ndCl == null)
-    {
+    if (ndCl == null) {
       final ClassLoader parent = cl;
-      PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>()
-      {
+      PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>() {
         @Override
-        public NonDelegatingClassLoader run()
-        {
+        public NonDelegatingClassLoader run() {
           return new NonDelegatingClassLoader(null, parent);
         }
       };
       ndCl = AccessController.doPrivileged(pa);
       ndclCache.put(cl, ndCl);
-      try
-      {
+      try {
         clazz = ndCl.loadClassDirect(helperClassName);
-      }
-      catch (ClassNotFoundException e)
-      {
+      } catch (ClassNotFoundException e) {
         log.error(e.getMessage(), e);
       }
-    }
-    else
-    {
-      try
-      {
+    } else {
+      try {
         clazz = ndCl.loadClass(helperClassName);
-      }
-      catch (ClassNotFoundException e)
-      {
+      } catch (ClassNotFoundException e) {
         log.error(e.getMessage(), e);
       }
     }
-    if (clazz == null)
-    {
+    if (clazz == null) {
       cl = this.getClass().getClassLoader();
       clazz = cl.loadClass(helperClassName);
     }
     return (SerializationHelper) clazz.newInstance();
   }
+  */
 
   /**
    * Get the name of the serialization helper implementation class name to use.
@@ -419,10 +409,20 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   }
 
   /**
-   * Get the unique identifier of the client.
+   * Get the unique identifier of the remote driver.
    * @return the uuid as a string.
+   * @deprecated use {@link #getDriverUuid()} instead.
    */
   public String getUuid()
+  {
+    return uuid;
+  }
+
+  /**
+   * Get the unique identifier of the remote driver.
+   * @return the uuid as a string.
+   */
+  public String getDriverUuid()
   {
     return uuid;
   }

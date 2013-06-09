@@ -21,10 +21,9 @@ package org.jppf.client;
 import java.util.*;
 
 /**
- * Instances of this class manage a list of client connections with the same priority.
- * @exclude
+ * Instances of this class manage a list of client connections with the same priority and remote driver.
  */
-class ClientPool
+public class ClientPool
 {
   /**
    * The priority associated with this pool.
@@ -37,15 +36,16 @@ class ClientPool
   /**
    * List of <code>JPPFClientConnection</code> instances with the same priority.
    */
-  private final List<JPPFClientConnection> clientList = new ArrayList<JPPFClientConnection>();
+  private final List<AbstractJPPFClientConnection> clientList = new ArrayList<AbstractJPPFClientConnection>();
 
   /**
-   * Initialize this pool with the specified priority.
-   * @param priority the priority assigned to the connections n the pool.
+   * Initialize this pool with the specified connection.
+   * @param connection the first connection added to this pool.
    */
-  public ClientPool(final int priority)
+  public ClientPool(final AbstractJPPFClientConnection connection)
   {
-    this.priority = priority;
+    this.priority = connection.getPriority();
+    clientList.add(connection);
   }
 
   /**
@@ -82,7 +82,7 @@ class ClientPool
    * @param client the connection too add.
    * @return true if the underlying list of connections changed as a result of calling this method.
    */
-  public boolean add(final JPPFClientConnection client)
+  public boolean add(final AbstractJPPFClientConnection client)
   {
     return clientList.add(client);
   }
@@ -99,10 +99,7 @@ class ClientPool
       if (lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
       return true;
     }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 
   /**

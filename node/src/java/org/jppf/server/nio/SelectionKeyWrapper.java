@@ -71,6 +71,17 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public String toString()
   {
+    if ((channel == null) || !channel.isValid())
+    {
+      StringBuilder sb = new StringBuilder(1000);
+      sb.append(getClass().getSimpleName());
+      sb.append('[');
+      sb.append(getStringId());
+      sb.append(", channel=").append(channel);
+      sb.append(", context=").append(getContext());
+      sb.append(']');
+      return sb.toString();
+    }
     return super.toString();
   }
 

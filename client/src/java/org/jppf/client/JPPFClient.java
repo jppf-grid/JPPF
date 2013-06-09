@@ -91,7 +91,7 @@ public class JPPFClient extends AbstractGenericClient
 
   /**
    * Create a new driver connection based on the specified parameters.
-   * @param uuid the uuid of the JPPF client.
+   * @param uuid the uuid of the remote driver.
    * @param name the name of the connection.
    * @param info the driver connection information.
    * @param ssl determines whether this is an SSL connection.

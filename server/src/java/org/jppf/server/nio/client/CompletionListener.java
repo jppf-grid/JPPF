@@ -67,9 +67,16 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results)
   {
     if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
+    if (!isChannelValid())
+    {
+      ClientContext context = (ClientContext) channel.getContext();
+      context.getInitialBundleWrapper().removeCompletionListener(this);
+      context.cancelJobOnClose();
+      return;
+    }
     if (results.isEmpty())
     {
-      if (debugEnabled) log.debug("empty results list", new Exception());
+      if (debugEnabled) log.debug("empty results list");
       return;
     }
     if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
@@ -99,5 +106,16 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
 
   @Override
   public void bundleEnded(final ServerTaskBundleClient bundle) {
+  }
+
+  /**
+   * Determine whether the channel is valid at the time this method is called.
+   * @return <code>true</code> if the channel is valid, <code>false</code> otherwise.
+   */
+  private boolean isChannelValid()
+  {
+    if (channel instanceof SelectionKeyWrapper)
+      return ((SelectionKeyWrapper) channel).getChannel().isValid();
+    return true;
   }
 }

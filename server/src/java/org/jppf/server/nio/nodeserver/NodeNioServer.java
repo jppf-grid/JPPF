@@ -344,29 +344,24 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Close a connection to a node.
    * @param context a <code>SocketChannel</code> that encapsulates the connection.
    */
-  public void closeNode(final AbstractNodeContext context)
-  {
+  public void closeNode(final AbstractNodeContext context) {
     if (JPPFDriver.JPPF_DEBUG && (context != null)) driver.getInitializer().getServerDebug().removeChannel(context.getChannel(), NioConstants.NODE_SERVER);
-    try
-    {
+    try {
       if(context != null) context.close();
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
     }
-    catch (Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-    try
-    {
+    try {
       JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
       nodeConnectionHandler.fireNodeDisconnected(info);
       driver.getStatsManager().nodeConnectionClosed();
       removeConnection(context);
       taskQueueChecker.removeIdleChannel(context);
-    }
-    catch (Exception e)
-    {
-      log.error(e.getMessage(), e);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
     }
   }
 
@@ -481,17 +476,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * Close this server and interrupt the thread that runs it.
    */
-  public void close()
-  {
+  public void close() {
     setStopped(true);
-    if (taskQueueChecker != null)
-    {
+    if (taskQueueChecker != null) {
       taskQueueChecker.setStopped(true);
       taskQueueChecker.wakeUp();
     }
     queue.close();
-    synchronized(this)
-    {
+    synchronized(this) {
       for (AbstractNodeContext channel: allConnections.values()) {
         try {
           channel.close();

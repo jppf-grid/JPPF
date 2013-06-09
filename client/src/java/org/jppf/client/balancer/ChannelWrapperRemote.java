@@ -66,7 +66,7 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
     if (channel == null) throw new IllegalArgumentException("channel is null");
 
     this.channel = channel;
-    this.uuid = channel.getUuid();
+    this.uuid = channel.getDriverUuid();
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, channel.isSSL());
     managementInfo.setSystemInfo(systemInfo);
