@@ -57,6 +57,29 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   }
 
   /**
+   * Test that at task startup in the node, the thread context class loader and the task class loader re the same. 
+   * <br/>See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution)</a>
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=5000)
+  public void testClassLoadersMatch() throws Exception
+  {
+    String name = ReflectionUtils.getCurrentMethodName();
+    String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
+    List<JPPFTask> results = client.submit(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
+    results = client.submit(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    MyTask task = (MyTask) results.get(0);
+    assertNotNull(task);
+    assertNull(task.getException());
+    assertTrue(task.isClassLoaderMatch());
+    assertNotNull(task.getContextClassLoaderStr());
+    assertNotNull(task.getTaskClassLoaderStr());
+    assertEquals(task.getContextClassLoaderStr(),task.getTaskClassLoaderStr()); 
+  }
+
+  /**
    * 
    */
   public static class MyTask extends JPPFTask {
@@ -64,6 +87,18 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
      * Name of a resource to lookup.
      */
     private final String resource;
+    /**
+     * The outcome of <code>Thread.currentThread().getContextClassLoader().toString()</code>.
+     */
+    private String contextClassLoaderStr = null;
+    /**
+     * The outcome of <code>this.getClass(().getClassLoader().toString()</code>.
+     */
+    private String taskClassLoaderStr = null;
+    /**
+     * Determines whether both class loaders are identical.
+     */
+    private boolean classLoaderMatch = false;
 
     /**
      * Initiialize with a resource name that doesn't exist in the classpath.
@@ -76,11 +111,43 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
     @Override
     public void run() {
       try {
+        ClassLoader cl1 = Thread.currentThread().getContextClassLoader();
+        contextClassLoaderStr = cl1 == null ? "null" : cl1.toString();
+        ClassLoader cl2 = getClass().getClassLoader();
+        taskClassLoaderStr = cl2 == null ? "null" : cl2.toString();
+        classLoaderMatch = cl1 == cl2;
         Enumeration<URL> res = getClass().getClassLoader().getResources(resource);
         setResult("success");
       } catch(Exception e) {
         setException(e);
       }
+    }
+
+    /**
+     * Get the outcome of <code>Thread.currentThread().getContextClassLoader().toString()</code>.
+     * @return a string describing the class loader.
+     */
+    public String getContextClassLoaderStr()
+    {
+      return contextClassLoaderStr;
+    }
+
+    /**
+     * Get the outcome of <code>this.getClass(().getClassLoader().toString()</code>.
+     * @return a string describing the class loader.
+     */
+    public String getTaskClassLoaderStr()
+    {
+      return taskClassLoaderStr;
+    }
+
+    /**
+     * Determine whether both class loaders are identical.
+     * @return <code>true</code> if the class loaders match, <code>false</code> otherwise.
+     */
+    public boolean isClassLoaderMatch()
+    {
+      return classLoaderMatch;
     }
   }
 }
