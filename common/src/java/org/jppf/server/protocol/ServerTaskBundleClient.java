@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.*;
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.protocol.results.*;
-import org.jppf.utils.Pair;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -202,6 +202,7 @@ public class ServerTaskBundleClient
   public synchronized void resultReceived(final Collection<ServerTask> tasks, final Throwable exception)
   {
     if (isCancelled()) return;
+    if (debugEnabled) log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
     for (ServerTask task: tasks)
     {
       if (task.getState() == TaskState.PENDING) {

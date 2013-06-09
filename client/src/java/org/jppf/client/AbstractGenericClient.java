@@ -140,13 +140,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Initialize remote connection pools according to configuration.
    * @param props The JPPF configuration properties.
    */
-  protected void initRemotePools(final TypedProperties props)
-  {
-    try
-    {
+  protected void initRemotePools(final TypedProperties props) {
+    try {
       boolean initPeers;
-      if (props.getBoolean("jppf.discovery.enabled", true))
-      {
+      if (props.getBoolean("jppf.discovery.enabled", true)) {
         if (debugEnabled) log.debug("initializing connections from discovery");
         boolean acceptMultipleInterfaces = props.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
@@ -155,11 +152,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
             newConnection(name, info, 0, props.getInt("jppf.pool.size", 1), sslEnabled);
           }
         }, new IPFilter(props), acceptMultipleInterfaces);
-        new Thread(receiverThread).start();
+        new Thread(receiverThread, "JPPFMulticastReceiver").start();
         initPeers = false;
-      }
-      else
-      {
+      } else {
         receiverThread = null;
         initPeers = true;
       }
@@ -173,11 +168,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
         initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
       }
 
-      if (initPeers)
-      {
+      if (initPeers) {
         for (String name : names) {
-          if (!VALUE_JPPF_DISCOVERY.equals(name))
-          {
+          if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
             // for backward compatibility with v2.x configurations
@@ -192,9 +185,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
           }
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -449,13 +440,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
     RegisteredClassLoader registeredClassLoader;
     synchronized (classLoaderRegistrations) {
-//      String uuid = classLoaderUUIDs.get(cl);
-//      if (uuid == null)
-//      {
-//        uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
-//        classLoaderUUIDs.put(cl, uuid);
-//      }
-
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);
       if(list == null) {

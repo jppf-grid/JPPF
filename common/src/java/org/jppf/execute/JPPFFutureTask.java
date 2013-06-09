@@ -18,10 +18,8 @@
 
 package org.jppf.execute;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /**
  * Future task that notifies transition to done state.
@@ -33,7 +31,7 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
   /**
    * List of listeners for this task.
    */
-  private final List<Listener> listenerList = new ArrayList<Listener>();
+  private final List<Listener> listenerList = new CopyOnWriteArrayList<Listener>();
 
   /**
    * Creates a <tt>FutureTask</tt> that will, upon running, execute the
@@ -61,31 +59,14 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
   @Override
   protected void done()
   {
-    Listener[] listeners;
-    synchronized (listenerList) {
-      listeners = listenerList.toArray(new Listener[listenerList.size()]);
-    }
-    for (Listener listener : listeners)
-    {
-      listener.onDone(this);
-    }
+    for (Listener listener : listenerList) listener.onDone(this);
   }
 
   @Override
   public void addListener(final Listener listener)
   {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    if (isDone())
-    {
-      listener.onDone(this);
-    }
-    else
-    {
-      synchronized (listenerList)
-      {
-        listenerList.add(listener);
-      }
-    }
+    if (isDone()) listener.onDone(this);
+    else listenerList.add(listener);
   }
 }

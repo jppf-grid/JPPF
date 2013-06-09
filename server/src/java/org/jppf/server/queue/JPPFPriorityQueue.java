@@ -112,16 +112,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public void addBundle(final ServerTaskBundleClient clientBundle)
-  {
+  public void addBundle(final ServerTaskBundleClient clientBundle) {
+    if (debugEnabled) log.debug("adding bundle=" + clientBundle);
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
 
     JobSLA sla = clientBundle.getSLA();
     final String jobUuid = clientBundle.getUuid();
     lock.lock();
     try {
-      if (sla.isBroadcastJob())
-      {
+      if (sla.isBroadcastJob()) {
         if (debugEnabled) log.debug("before processing broadcast job " + clientBundle.getJob());
         processBroadcastJob(clientBundle);
       } else {
@@ -143,9 +142,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
             scheduleManager.handleExpirationJobSchedule(serverJob);
           }
           jobMap.put(jobUuid, serverJob);
-        } else queued = false;
-        if(serverJob.addBundle(clientBundle)) {
-          if(!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
+        } else  {
+          queued = false;
+          if (debugEnabled) log.debug("job already queued");
+        }
+        if (serverJob.addBundle(clientBundle)) {
+          if (!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return;
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
@@ -159,6 +161,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
       lock.unlock();
+      if (debugEnabled) log.debug("end of add bundle");
     }
     statsManager.taskInQueue(clientBundle.getTaskCount());
   }
