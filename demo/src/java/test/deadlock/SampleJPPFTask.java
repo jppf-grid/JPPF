@@ -58,4 +58,10 @@ public class SampleJPPFTask extends JPPFTask
       setException(e);
     }
   }
+
+  @Override
+  public void onCancel()
+  {
+    System.out.println("task id " + idx + " cancelled!");
+  }
 }

@@ -17,8 +17,11 @@
  */
 package test.deadlock;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.utils.StringUtils;
 
 /**
  * This is a template JPPF application runner.
@@ -49,22 +52,25 @@ public class DeadlockRunner {
       }
       job.setBlocking(false);
       //job.getSLA().setCancelUponClientDisconnect(false);
+      final AtomicLong time = new AtomicLong();
       job.addJobListener(new JobListener() {
         @Override
-        public void jobStarted(final JobEvent arg0) {
+        public void jobStarted(final JobEvent event) {
+          time.set(System.nanoTime());
+          System.out.println("job '" + event.getJob().getName() + "' started");
         }
-
         @Override
-        public void jobReturned(final JobEvent arg0) {
-        }
-
-        @Override
-        public void jobEnded(final JobEvent arg0) {
+        public void jobEnded(final JobEvent event) {
+          System.out.println("job '" + event.getJob().getName() + "' ended, total time: " + StringUtils.toStringDuration((System.nanoTime() - time.get())/1000000L));
           System.exit(0);
         }
-
         @Override
-        public void jobDispatched(final JobEvent arg0) {
+        public void jobDispatched(final JobEvent event) {
+          System.out.println("job '" + event.getJob().getName() + "' dispatched " + event.getTasks().size() + " tasks");
+        }
+        @Override
+        public void jobReturned(final JobEvent event) {
+          System.out.println("job '" + event.getJob().getName() + "' returned " + event.getTasks().size() + " tasks");
         }
       });
 
@@ -75,6 +81,11 @@ public class DeadlockRunner {
         }
       });
       jppfClient.submit(job);
+      /*
+      */
+      Thread.sleep(3000L);
+      System.out.println("requesting job cancel");
+      jppfClient.cancelJob(job.getUuid());
       while (true) {
         Thread.sleep(1);
       }
