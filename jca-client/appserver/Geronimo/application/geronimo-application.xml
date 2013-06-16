@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application xmlns="http://geronimo.apache.org/xml/ns/j2ee/application-2.0"
+  xmlns:dep="http://geronimo.apache.org/xml/ns/deployment-1.2"
+  xmlns:naming="http://geronimo.apache.org/xml/ns/naming-1.2"
+  xmlns:security="http://geronimo.apache.org/xml/ns/security-1.2">
+
+  <dep:environment>
+    <dep:moduleId>
+      <dep:groupId>JPPF</dep:groupId>
+      <dep:artifactId>testjppfAPP</dep:artifactId>
+      <dep:version>2.0</dep:version>
+      <dep:type>ear</dep:type>
+    </dep:moduleId>
+		<dep:dependencies>
+			<dep:dependency>
+				<dep:groupId>JPPF</dep:groupId>
+				<dep:artifactId>jca-client</dep:artifactId>
+				<dep:version>2.0</dep:version>
+				<dep:type>rar</dep:type>
+			</dep:dependency>
+		</dep:dependencies>
+    
+    <dep:hidden-classes/>
+    <dep:non-overridable-classes/>
+  </dep:environment>
+
+  <module>
+    <web>jppftest.war</web>
+		<web-app xmlns="http://geronimo.apache.org/xml/ns/j2ee/web-2.0">
+		  <dep:environment>
+		    <dep:moduleId>
+		      <dep:groupId>JPPF</dep:groupId>
+		      <dep:artifactId>web.test</dep:artifactId>
+		      <dep:version>2.0</dep:version>
+		      <dep:type>war</dep:type>
+		    </dep:moduleId>
+		    <dep:dependencies/>
+		    <dep:hidden-classes/>
+		    <dep:non-overridable-classes/>
+		  </dep:environment>
+		  <context-root>/jppftest</context-root>
+		  <!-- Optional JNDI references -->
+		  <naming:resource-ref>
+		  	<ref-name>eis/JPPFConnectionFactory</ref-name>
+		  	<resource-link>eis/JPPFConnectionFactory</resource-link>
+			</naming:resource-ref>
+		  <!--
+		  -->
+		</web-app>
+  </module>
+
+</application>
+

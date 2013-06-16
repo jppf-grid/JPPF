@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2013 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ConfigPage" type="page">
+
+	<property name="label" value="Configuration"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value="Run the matrix multiplication demos"/>
+	<script language="javascript"><![CDATA[
+		importPackage(Packages.org.jppf.utils);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.event);
+	]]></script>
+	<script language="javascript"><![CDATA[
+		BASE = "org.jppf.demo.console.i18n.MatrixPage";
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!--                   Top Panels                                          -->
+	<!-- ===================================================================== -->
+	
+	<child name="FrameworkConfig" type="page">
+
+		<property name="label" value="Framework configuration"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+
+		<!-- ===================================================================== -->
+		<!--          Administrator password configuration area                    -->
+		<!-- ===================================================================== -->
+	
+		<child name="Config" type="page">
+	
+			<property name="label" value="Configuration properties"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+	
+			<child name="NbConnections" type="SpinnerNumber">
+				<property name="label" value="Number of server connections"/>
+				<property name="tooltip" value="Creation of a server connection pool of the specified size"/>
+				<property name="value" value="1"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="10"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="NbNodes" type="SpinnerNumber">
+				<property name="label" value="Number of nodes"/>
+				<property name="tooltip" value="Number of nodes to start (local nodes, fit for multicore or multiprocessor machines)"/>
+				<property name="value" value="1"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="10"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                   Messages area                                       -->
+	<!-- ===================================================================== -->
+
+	<!--
+	<child name="msgText" type="TextArea">
+		<property name="label" value="Server Messages"/>
+		<property name="tooltip" value="Console messages"/>
+		<property name="value" value=""/>
+	</child>
+	-->
+
+</opt:main>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" output="classes/j2eeclient" path="src/j2eeclient"/>
+	<classpathentry kind="src" path="src/resources"/>
+	<classpathentry kind="src" output="test/classes" path="test/src/java"/>
+	<classpathentry kind="src" output="test/classes" path="test/src/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
+	<classpathentry kind="lib" path="/JPPF/lib/J2EE/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-servlet_2.5_spec-1.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tests"/>
+	<classpathentry kind="output" path="classes/jca"/>
+</classpath>

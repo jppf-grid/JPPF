@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-web>
+	<context-root>JPPF_J2EE_Tests</context-root>
+	<resource-ref>
+		<res-ref-name>eis/JPPFConnectionFactory</res-ref-name>
+		<res-type>javax.resource.cci.ConnectionFactory</res-type>
+		<jndi-name>java:/eis/JPPFConnectionFactory</jndi-name>
+	</resource-ref>
+</jboss-web>
