@@ -92,9 +92,9 @@ public class NodeDataPanelManager {
    */
   void driverAdded(final JPPFClientConnection connection) {
     AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) connection;
-    if (findDriver(c.getUuid()) != null) return;
+    if (findDriver(c.getDriverUuid()) != null) return;
     JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
-    String driverName = c.getUuid();
+    String driverName = c.getDriverUuid();
     int index = driverInsertIndex(driverName);
     if (index < 0) return;
     TopologyData driverData = new TopologyData(connection);

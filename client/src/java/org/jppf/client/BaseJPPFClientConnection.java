@@ -26,8 +26,6 @@ import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.JPPFException;
-import org.jppf.caching.*;
-import org.jppf.classloader.NonDelegatingClassLoader;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
 import org.jppf.server.protocol.*;
@@ -80,7 +78,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   /**
    * Unique identifier of the remote driver.
    */
-  protected String uuid = null;
+  protected String driverUuid = null;
   /**
    * The name or IP address of the host the JPPF driver is running on.
    */
@@ -105,11 +103,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Fully qualified name of the serilaization helper class to use.
    */
   protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
-  /**
-   * Cache of non-delegating classloaders, mapped to originating class loaders (performance optimization).
-   */
-  protected final JPPFMapCache<ClassLoader, NonDelegatingClassLoader> ndclCache = new JPPFHashMapCache<ClassLoader, NonDelegatingClassLoader>();
-  //protected final JPPFMapCache<ClassLoader, NonDelegatingClassLoader> ndclCache = new JPPFSynchronizedSoftCache<ClassLoader, NonDelegatingClassLoader>();
   /**
    * Holds the tasks, data provider and submission mode for the current execution.
    */
@@ -415,7 +408,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   public String getUuid()
   {
-    return uuid;
+    return driverUuid;
   }
 
   /**
@@ -424,7 +417,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   public String getDriverUuid()
   {
-    return uuid;
+    return driverUuid;
   }
 
   /**

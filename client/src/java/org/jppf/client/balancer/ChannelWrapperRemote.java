@@ -195,8 +195,7 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
   /**
    *
    */
-  private class RemoteRunnable implements Runnable
-  {
+  private class RemoteRunnable implements Runnable {
     /**
      * The task bundle to execute.
      */
@@ -216,36 +215,31 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
      * @param clientBundle     the execution to perform.
      * @param connection the connection to the driver to use.
      */
-    public RemoteRunnable(final Bundler bundler, final ClientTaskBundle clientBundle, final AbstractJPPFClientConnection connection)
-    {
+    public RemoteRunnable(final Bundler bundler, final ClientTaskBundle clientBundle, final AbstractJPPFClientConnection connection) {
       this.bundler = bundler;
       this.clientBundle = clientBundle;
       this.connection = connection;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
       Exception exception = null;
       List<JPPFTask> tasks = this.clientBundle.getTasksL();
       AbstractGenericClient client = connection.getClient();
       AbstractGenericClient.RegisteredClassLoader registeredClassLoader = null;
-      try
-      {
+      try {
         long start = System.nanoTime();
         int count = 0;
         boolean completed = false;
         JPPFJob newJob = createNewJob(clientBundle, tasks);
         ClassLoader classLoader = getClassLoader(newJob);
         registeredClassLoader = client.registerClassLoader(classLoader, newJob.getUuid());
-        while (!completed)
-        {
+        while (!completed) {
           JPPFTaskBundle bundle = createBundle(newJob);
           bundle.setRequestUuid(registeredClassLoader.getUuid());
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           connection.sendTasks(classLoader, bundle, newJob);
-          while (count < tasks.size())
-          {
+          while (count < tasks.size()) {
             List<JPPFTask> results = connection.receiveResults(classLoader);
             int n = results.size();
             count += n;
@@ -257,22 +251,17 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
 
         double elapsed = System.nanoTime() - start;
         bundler.feedback(tasks.size(), elapsed);
-      }
-      catch (Throwable t)
-      {
+      } catch (Throwable t) {
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException))
-        {
+        if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) {
           clientBundle.resultsReceived(t);
           return;
         }
         clientBundle.resubmit();
         reconnect();
-      }
-      finally
-      {
+      } finally {
         if (registeredClassLoader != null) registeredClassLoader.dispose();
         clientBundle.taskCompleted(exception);
         clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);

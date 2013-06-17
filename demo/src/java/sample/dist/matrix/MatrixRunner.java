@@ -115,6 +115,7 @@ public class MatrixRunner implements NotificationListener
       JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(nbChannels));
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
+      while (!jppfClient.hasAvailableConnection()) Thread.sleep(1L);
       /*
 			//monitor = new GridMonitor(jppfClient, 1000L);
 			monitor = new GridMonitor("localhost", 11198);

@@ -115,9 +115,10 @@ public class NodeRefreshHandler
     for (JPPFClientConnection c: connectionList)
     {
       JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) c;
-      if (uuidSet.contains(conn.getUuid())) continue;
-      uuidSet.add(conn.getUuid());
-      map.put(conn.getUuid(), c);
+      String driverUuid = conn.getDriverUuid();
+      if (uuidSet.contains(driverUuid)) continue;
+      uuidSet.add(driverUuid);
+      map.put(driverUuid, c);
     }
     Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
 
@@ -125,7 +126,7 @@ public class NodeRefreshHandler
     List<String> driversToProcess = new ArrayList<String>();
     for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
     {
-      String uuid = ((AbstractJPPFClientConnection) entry.getValue()).getUuid();
+      String uuid = ((AbstractJPPFClientConnection) entry.getValue()).getDriverUuid();
       if (!map.containsKey(uuid)) driversToProcess.add(uuid);
       else refreshNodes(uuid);
     }

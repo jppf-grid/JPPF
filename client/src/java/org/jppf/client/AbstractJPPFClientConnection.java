@@ -100,7 +100,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean ssl)
   {
-    this.uuid = uuid;
+    this.driverUuid = uuid;
     this.host = host;
     this.port = driverPort;
     this.priority = priority;
@@ -334,7 +334,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   {
     JPPFTaskBundle bundle = super.sendHandshakeJob();
     this.systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-    this.uuid = (String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
+    this.driverUuid = (String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
     return bundle;
   }
 
@@ -389,7 +389,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
       }
       if (job != null) list = Collections.singletonList(job);
     }
-    ndclCache.clear();
     if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + toDebugString() + " closed");
     return list;

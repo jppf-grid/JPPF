@@ -17,6 +17,8 @@
  */
 package sample.test.profiling;
 
+import java.net.URL;
+
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -51,5 +53,12 @@ public class EmptyTask extends JPPFTask
   @Override
   public void run()
   {
+    String[] res = { "res/res1.txt", "res/res2.txt", "res/res3.txt"};
+    ClassLoader cl = getClass().getClassLoader();
+    for (String s: res)
+    {
+      URL url = cl.getResource(s);
+      //System.out.println("url for '" + s + "' : " + url);
+    }
   }
 }

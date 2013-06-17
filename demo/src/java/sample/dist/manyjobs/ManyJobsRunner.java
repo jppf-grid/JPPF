@@ -50,10 +50,10 @@ public class ManyJobsRunner
   {
     try
     {
-      int nbConnections = 10;
-      int length = 200;
-      int nbTask = 100;
-      int nbJobs = 10;
+      int nbConnections = 31;
+      int length = 2;
+      int nbTask = 1000;
+      int nbJobs = 1000;
       TypedProperties props = JPPFConfiguration.getProperties();
       props.setProperty("jppf.discovery.enabled", "true");
       props.setProperty("jppf.pool.size", String.valueOf(nbConnections));
@@ -93,6 +93,7 @@ public class ManyJobsRunner
         String s = StringUtils.padLeft(""+(n+1), '0', 4);
         jobs[n].setName("JPPF Job " + s);
         jobs[n].setBlocking(false);
+        jobs[n].getSLA().setPriority(n/10);
         //job.getJobSLA().setMaxNodes(1);
         jobs[n].getClientSLA().setMaxChannels(1);
         for (int i=0; i<nbTask; i++)

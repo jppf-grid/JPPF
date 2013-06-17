@@ -74,7 +74,7 @@ class ConnectionStatusListener implements ClientConnectionStatusListener
       if (driverNode != null)
       {
         TopologyData data = (TopologyData) driverNode.getUserObject();
-        if (data.getUuid() == null) data.setUuid(c.getUuid());
+        if (data.getUuid() == null) data.setUuid(c.getDriverUuid());
         panel.getModel().changeNode(driverNode);
       }
     }

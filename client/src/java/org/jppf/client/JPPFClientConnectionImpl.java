@@ -144,19 +144,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   }
 
   /**
-   * Submit the request to the server.
-   * @param job the job to execute remotely.
-   * @throws Exception if an error occurs while sending the request.
-   * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
-   * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
-   */
-  @Override
-  public void submit(final JPPFJob job) throws Exception
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * Create a socket initializer.
    * @return an instance of <code>SocketInitializerImpl</code>.
    * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()

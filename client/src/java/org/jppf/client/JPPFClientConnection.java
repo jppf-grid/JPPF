@@ -34,14 +34,6 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
   void init();
 
   /**
-   * Submit the request to the server.
-   * @param job the job to execute remotely.
-   * @throws Exception if an error occurs while sending the request.
-   * @deprecated job submissions should be performed via the {@link JPPFClient} directly.
-   */
-  void submit(JPPFJob job) throws Exception;
-
-  /**
    * Get the priority assigned to this connection.
    * @return a priority as an int value.
    */

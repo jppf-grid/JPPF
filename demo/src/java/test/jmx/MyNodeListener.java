@@ -55,6 +55,10 @@ public class MyNodeListener implements NodeLifeCycleListener {
   }
 
   @Override
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
+  }
+
+  @Override
   public void jobStarting(final NodeLifeCycleEvent event) {
     // store the uuid before the job starts in the node
     currentUuid = event.getJob().getUuid();

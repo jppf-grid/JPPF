@@ -351,7 +351,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   public synchronized void newConnection(final ClientEvent event)
   {
     final AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) event.getConnection();
-    if (c.getUuid() == null)
+    if (c.getDriverUuid() == null)
     {
       c.addClientConnectionStatusListener(new ClientConnectionStatusListener()
       {
@@ -373,7 +373,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   public void connectionFailed(final ClientEvent event)
   {
     JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
-    driverRemoved(c.getUuid(), false);
+    driverRemoved(c.getDriverUuid(), false);
   }
 
   /**

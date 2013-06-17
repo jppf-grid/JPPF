@@ -23,7 +23,6 @@ import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -117,7 +116,7 @@ public class JPPFClient extends AbstractGenericClient
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
-            (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
+        (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     SubmissionManager submissionManager = getSubmissionManager();
     submissionManager.submitJob(job);
     if (job.isBlocking())
@@ -126,19 +125,6 @@ public class JPPFClient extends AbstractGenericClient
       return collector.waitForResults();
     }
     return null;
-  }
-
-  /**
-   * Send a request to get the statistics collected by the JPPF server.
-   * @return a <code>JPPFStats</code> instance.
-   * @throws Exception if an error occurred while trying to get the server statistics.
-   * @deprecated this method does not allow to chose which driver to get the statistics from.
-   * Use <code>((JPPFClientConnectionImpl) getConnection(java.lang.String)).getJmxConnection().statistics()</code> instead.
-   */
-  public JPPFStats requestStatistics() throws Exception
-  {
-    JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) getClientConnection(true);
-    return (conn == null) ? null : conn.getJmxConnection().statistics();
   }
 
   @Override
