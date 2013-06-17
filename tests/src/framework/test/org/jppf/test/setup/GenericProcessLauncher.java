@@ -346,12 +346,6 @@ public class GenericProcessLauncher implements Runnable {
       }
       process.destroy();
     }
-    /*
-    boolean closeOut = (stdout != System.out) && (stdout != System.err);
-    boolean closeErr = (stderr != System.out) && (stderr != System.err) && (stderr != stdout);
-    if (closeOut) StreamUtils.closeSilent(stdout);
-    if ((stderr != System.out) && (stderr != System.err)) StreamUtils.closeSilent(stderr);
-    */
   }
 
   /**
@@ -379,9 +373,9 @@ public class GenericProcessLauncher implements Runnable {
             if (debugEnabled) log.debug(name, ioe);
             if (socketClient != null) {
               try {
-                  socketClient.close();
-                } catch (Exception ignore) {
-                }
+                socketClient.close();
+              } catch (Exception ignore) {
+              }
             }
           }
         }
