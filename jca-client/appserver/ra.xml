@@ -19,7 +19,7 @@
 		<config-property>
 			<config-property-name>ClientConfiguration</config-property-name>
 			<config-property-type>java.lang.String</config-property-type>
-			<config-property-value>
+			<config-property-value><![CDATA[
 				jppf.drivers = driver1 driver2
 
 				driver1.jppf.server.host = localhost
@@ -50,7 +50,7 @@
 
 				#jppf.data.transform.class = org.jppf.data.transform.DESCipherTransform
 				#jppf.object.stream.builder = org.jppf.serialization.XstreamObjectStreamBuilder
-			</config-property-value>
+			]]></config-property-value>
 		</config-property>
 
 		<outbound-resourceadapter>

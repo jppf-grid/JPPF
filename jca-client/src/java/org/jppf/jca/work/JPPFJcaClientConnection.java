@@ -82,7 +82,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
       if (closed) throw new IllegalStateException("this client connection is closed");
       try
       {
-        //String s = InetAddress.getByName(host).getCanonicalHostName();
         host = InetAddress.getByName(host).getCanonicalHostName();
         displayName = name + '[' + host + ':' + port + ']';
         getJmxConnection().setHost(host);
@@ -170,19 +169,6 @@ public class JPPFJcaClientConnection extends AbstractJPPFClientConnection
     {
       if (cl != null) Thread.currentThread().setContextClassLoader(oldCl);
     }
-  }
-
-  /**
-   * Submit the request to the server.
-   * @param job the job to execute remotely.
-   * @throws Exception if an error occurs while sending the request.
-   * @see org.jppf.client.JPPFClientConnection#submit(org.jppf.client.JPPFJob)
-   * @deprecated job submissions should be performed via {@link JPPFClient#submit(JPPFJob)} directly.
-   */
-  @Override
-  public void submit(final JPPFJob job) throws Exception
-  {
-    throw new UnsupportedOperationException();
   }
 
   /**

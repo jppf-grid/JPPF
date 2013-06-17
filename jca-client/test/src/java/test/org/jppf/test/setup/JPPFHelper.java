@@ -31,30 +31,6 @@ import org.jppf.jca.cci.*;
 public class JPPFHelper
 {
   /**
-   * JNDI name of the JPPFConnectionFactory.
-   * <p>This value is dependent on the application server used:
-   * <ul>
-   * <li>On Apache Geronimo: "<b>jca:/JPPF/jca-client/JCAManagedConnectionFactory/eis/JPPFConnectionFactory</b>"</li>
-   * <li>On JBoss: "<b>java:eis/JPPFConnectionFactory</b>"</li>
-   * <li>On Websphere: "<b>java:comp/env/eis/JPPFConnectionFactory</b>"</li>
-   * <li>All other supported servers: "<b>eis/JPPFConnectionFactory</b>"</li>
-   * <ul>
-   */
-  public static final String JNDI_NAME = "eis/JPPFConnectionFactory";
-
-  /**
-   * Obtain a JPPF connection from the resource adapter's connection pool.
-   * The obtained connection must be closed by the caller of this method, once it is done using it.
-   * @return a <code>JPPFConnection</code> instance.
-   * @throws NamingException if the connection factory lookup failed.
-   * @throws ResourceException if a connection could not be obtained.
-   */
-  public static JPPFConnection getConnection() throws NamingException, ResourceException
-  {
-    return getConnection(JNDI_NAME);
-  }
-
-  /**
    * Obtain a JPPF connection from the resource adapter's connection pool.
    * The obtained connection must be closed by the caller of this method, once it is done using it.
    * @param jndiName the jNDI name of the JPPF connection factory (application server-dependent).

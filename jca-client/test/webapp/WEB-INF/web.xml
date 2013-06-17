@@ -4,7 +4,7 @@
      "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <!-- ============================================================= -->
-<!-- Deployement descriptor for the "jppftest" Web Application.    -->
+<!-- Deployment descriptor for the "jppftest" Web Application.     -->
 <!-- ============================================================= -->
 
 <web-app>

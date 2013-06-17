@@ -30,7 +30,7 @@ import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.ExceptionUtils;
 import org.junit.Test;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.JPPFHelper;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -39,6 +39,10 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestJPPFConnection
 {
+  /**
+   * JNDI name pf the connection factory for Geronimo app server.
+   */
+  private static final String JNDI_NAME = "jca:/JPPF/jca-client/JCAManagedConnectionFactory/eis/JPPFConnectionFactory"; 
   /**
    * A connection to the JPPF connector.
    */
@@ -54,7 +58,7 @@ public class TestJPPFConnection
     JPPFConnection connection = null;
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class);
       String id = connection.submit(job);
@@ -87,7 +91,7 @@ public class TestJPPFConnection
     String id = null;
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 500L);
       id = connection.submit(job);
@@ -100,7 +104,7 @@ public class TestJPPFConnection
     Thread.sleep(1000L);
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       List<JPPFTask> results = connection.waitForResults(id);
       assertNotNull(results);
       int n = results.size();
@@ -131,7 +135,7 @@ public class TestJPPFConnection
     JPPFConnection connection = null;
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class);
       GatheringStatusListener listener = new GatheringStatusListener();
@@ -161,7 +165,7 @@ public class TestJPPFConnection
     JPPFConnection connection = null;
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class, 5000L);
       String id = connection.submit(job);
@@ -193,7 +197,7 @@ public class TestJPPFConnection
     JPPFConnection connection = null;
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, 1, LifeCycleTask.class, 100L);
       String id = connection.submit(job);
@@ -228,7 +232,7 @@ public class TestJPPFConnection
     String id = null;
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       JPPFJob job = BaseTestHelper.createJob("JCA job", true, false, nbTasks, LifeCycleTask.class, 100L);
       id = connection.submit(job);
@@ -241,7 +245,7 @@ public class TestJPPFConnection
     Thread.sleep(2000L);
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       List<JPPFTask> results = connection.getSubmissionResults(id);
       assertNotNull(results);
       int n = results.size();
@@ -276,7 +280,7 @@ public class TestJPPFConnection
     String[] ids= new String[nbJobs];
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       // remove existing submissions
       for (String id: connection.getAllSubmissionIds()) connection.getSubmissionResults(id);
@@ -297,7 +301,7 @@ public class TestJPPFConnection
     Thread.sleep(500L);
     try
     {
-      connection = JPPFHelper.getConnection("java:eis/JPPFConnectionFactory");
+      connection = JPPFHelper.getConnection(JNDI_NAME);
       Collection<String> coll = connection.getAllSubmissionIds();
       assertNotNull(coll);
       assertEquals(nbJobs, coll.size());

@@ -31,18 +31,12 @@ import test.org.jppf.test.runner.*;
  */
 public class JPPFTestServlet extends HttpServlet
 {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
   {
     perform(request, response);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
   {
