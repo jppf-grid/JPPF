@@ -1,0 +1,49 @@
+/*
+	JPPF
+	Copyright (C) 2005-2013 JPPF Team.
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+/* Javadoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; background-color: #D8DAED }
+
+.TableHeadingColor     { background-color: #6D78B6; color: white }
+.TableSubHeadingColor  { background-color: #D0D0FF; color: #000060 }
+.TableRowColor         { background: transparent }
+
+table, td {font-size: 10pt; font-family: Arial, Helvetica, sans-serif; background: transparent }
+h1, h2, h3 {font-family: Arial, Helvetica, sans-serif; color: #6D78B6 }
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 10pts; font-family: Arial, Helvetica, sans-serif; color: #6D78B6 }
+.FrameHeadingFont { font-size: 10pts; font-family: Arial, Helvetica, sans-serif; color: #6D78B6 }
+.FrameItemFont    { font-size: 10pts; font-family: Arial, Helvetica, sans-serif }
+
+/* Example of smaller, sans-serif font in frames */
+
+.NavBarCell1    { background-color: #D8DAED } /* 252, 230, 171 */
+.NavBarCell1Rev { background-color: #00008B }
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color: #6D78B6 }
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color: white }
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color: #6D78B6; color: white }
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color: #6D78B6; color: white  }
+
+td.NavBarCell2 a { color: white }
+td.NavBarCell3 a { color: white }
