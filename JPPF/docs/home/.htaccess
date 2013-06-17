@@ -13,3 +13,7 @@ RewriteEngine on
 #RewriteRule ^jppf\/?(.*)$ "http\:\/\/www\.jppf\.org\/$1" [R=301,L]
 RewriteRule ^wiki\/?(.*)$ "\/doc\/v2\/$1" [R]
 #RewriteRule ^/wiki$ /doc/v2 [R]
+
+ErrorDocument 403 /JPPF-403.php
+ErrorDocument 404 /JPPF-404.php
+ErrorDocument 500 /JPPF-500.php
