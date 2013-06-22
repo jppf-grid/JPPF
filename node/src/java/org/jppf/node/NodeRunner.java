@@ -26,10 +26,11 @@ import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JMXServer;
-import org.jppf.node.initialization.InitializationHooksHandler;
+import org.jppf.node.initialization.*;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -84,10 +85,6 @@ public class NodeRunner
    */
   private static TypedProperties initialConfig = null;
   /**
-   * Loads and invokes node initialization hooks defined via their SPI definition.
-   */
-  private static InitializationHooksHandler hooksHandler = null;
-  /**
    * Determines whether this node is currently shutting down.
    */
   private static boolean shuttingDown = false;
@@ -105,8 +102,7 @@ public class NodeRunner
       VersionUtils.logVersionInformation("node", uuid);
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
-      hooksHandler = new InitializationHooksHandler(initialConfig);
-      hooksHandler.loadHooks();
+      HookFactory.registerSPIMultipleHook(InitializationHook.class, null, "initializing", null);
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
@@ -163,7 +159,7 @@ public class NodeRunner
    */
   public static NodeInternal createNode() throws Exception
   {
-    hooksHandler.callHooks();
+    HookFactory.invokeHook(InitializationHook.class, new UnmodifiableTypedProperties(initialConfig));
     if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";

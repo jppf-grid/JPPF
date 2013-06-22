@@ -104,10 +104,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
   /**
-   * Holds the tasks, data provider and submission mode for the current execution.
-   */
-  protected JPPFJob job = null;
-  /**
    * Status of the connection.
    */
   protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CREATED);
@@ -459,7 +455,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("connectionUuid=").append(connectionUuid);
     sb.append(", status=").append(status);
-    sb.append(", jobUuid=").append(job == null ? "null" : job.getUuid());
     sb.append(']');
     return sb.toString();
   }

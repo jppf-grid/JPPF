@@ -45,11 +45,12 @@ public class ServiceFinder
    * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
    * @param <T> The type of provider implementations to find.
    * @param providerClass the provider class.
-   * @param cl the class loader to user for the lookup.
+   * @param cl the class loader to use for the lookup.
+   * @param single determines whether only the first looked up provider should be returned, or all the providers found.
    * @return a list of concrete providers of the specified type.
    */
   @SuppressWarnings("unchecked")
-  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl)
+  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single)
   {
     if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
     if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
@@ -65,6 +66,7 @@ public class ServiceFinder
         Class<?> clazz = cl.loadClass(s);
         T t = (T) clazz.newInstance();
         list.add(t);
+        if (single) break;
         alreadyLoaded.add(s);
       }
       catch(Exception e)
@@ -74,6 +76,19 @@ public class ServiceFinder
       }
     }
     return list;
+  }
+
+  /**
+   * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @param cl the class loader to user for the lookup.
+   * @return a list of concrete providers of the specified type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl)
+  {
+    return findProviders(providerClass, cl, false);
   }
 
   /**
@@ -159,11 +174,24 @@ public class ServiceFinder
    * @param <T> The type of provider implementations to find.
    * @param providerClass the provider class.
    * @param cl the class loader to user for the lookup.
+   * @param single determines whether only the first looked up provider should be returned, or all the providers found.
+   * @return an iterator over concrete providers of the specified type.
+   */
+  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single)
+  {
+    return new ServiceFinder().findProviders(providerClass, cl).iterator();
+  }
+
+  /**
+   * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @param cl the class loader to user for the lookup.
    * @return an iterator over concrete providers of the specified type.
    */
   public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl)
   {
-    return new ServiceFinder().findProviders(providerClass, cl).iterator();
+    return lookupProviders(providerClass, cl, false);
   }
 
   /**

@@ -17,11 +17,8 @@
  */
 package org.jppf.utils;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
-
-import org.jppf.server.protocol.JPPFRunnable;
 
 /**
  * Collection of static utility methods for dealing with reflection-based APIs.
@@ -233,51 +230,6 @@ public class ReflectionUtils
   public static Object deepCopy(final Object o)
   {
     return null;
-  }
-
-  /**
-   * Determines whether a class has a JPPF-annotated method and can be executed as a task.
-   * @param clazz the class to check.
-   * @return true if the class can be executed as a task, false otherwise.
-   */
-  public static boolean isJPPFAnnotated(final Class<?> clazz)
-  {
-    return getJPPFAnnotatedElement(clazz) != null;
-  }
-
-  /**
-   * Determines whether a class has a JPPF-annotated method and can be executed as a task.
-   * @param clazz the class to check.
-   * @return true if the class can be executed as a task, false otherwise.
-   */
-  public static AnnotatedElement getJPPFAnnotatedElement(final Class<?> clazz)
-  {
-    if (clazz == null) return null;
-    for (Method m: clazz.getDeclaredMethods())
-    {
-      if (isJPPFAnnotated(m)) return m;
-    }
-    for (Constructor c: clazz.getDeclaredConstructors())
-    {
-      if (isJPPFAnnotated(c)) return c;
-    }
-    return null;
-  }
-
-  /**
-   * Determines whether a method is JPPF-annotated and can be executed as a task.
-   * @param annotatedElement the method to check.
-   * @return true if the method can be executed as a task, false otherwise.
-   */
-  public static boolean isJPPFAnnotated(final AnnotatedElement annotatedElement)
-  {
-    if (annotatedElement == null) return false;
-    Annotation[] annotations = annotatedElement.getAnnotations();
-    for (Annotation a: annotations)
-    {
-      if (JPPFRunnable.class.equals(a.annotationType())) return true;
-    }
-    return false;
   }
 
   /**

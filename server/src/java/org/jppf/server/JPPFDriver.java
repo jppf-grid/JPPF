@@ -41,6 +41,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
 /**
@@ -172,7 +173,10 @@ public class JPPFDriver
 
     initializer.initJmxServer();
     if (isManagementEnabled(config)) initializer.registerProviderMBeans();
-    new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
+    HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, "run", null).invoke();
+    //Hook<JPPFDriverStartupSPI> startupHook = HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, "run", null);
+    //HookFactory.invokeHook(JPPFDriverStartupSPI.class.getName());
+    //new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();

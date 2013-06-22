@@ -20,11 +20,12 @@ package org.jppf.client.taskwrapper;
 
 import static org.jppf.client.taskwrapper.TaskObjectWrapper.MethodType.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.security.AccessController;
 
 import org.jppf.JPPFException;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.server.protocol.JPPFRunnable;
 
 /**
  * Wrapper class for a task not extending {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
@@ -60,7 +61,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
   {
     boolean isClass = taskObject instanceof Class;
     Class clazz = isClass ? (Class) taskObject : taskObject.getClass();
-    AnnotatedElement elt = ReflectionUtils.getJPPFAnnotatedElement(clazz);
+    AnnotatedElement elt = getJPPFAnnotatedElement(clazz);
     if (elt == null) throw new JPPFException("object '" + taskObject + "' is not a JPPFTask nor JPPF-annotated");
     if (elt instanceof Method)
     {
@@ -98,14 +99,14 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
     switch(methodType)
     {
       case CONSTRUCTOR:
-        Constructor c = (Constructor) ReflectionUtils.getJPPFAnnotatedElement(clazz);
+        Constructor c = (Constructor) getJPPFAnnotatedElement(clazz);
         action = new PrivilegedConstructorAction(c, args);
         break;
 
       case INSTANCE:
       case STATIC:
       default:
-        Method m = (Method) ReflectionUtils.getJPPFAnnotatedElement(clazz);
+        Method m = (Method) getJPPFAnnotatedElement(clazz);
         action = new PrivilegedMethodAction(m, taskObject, args);
         break;
     }
@@ -123,5 +124,50 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
   public Object getTaskObject()
   {
     return taskObject;
+  }
+
+  /**
+   * Determines whether a class has a JPPF-annotated method and can be executed as a task.
+   * @param clazz the class to check.
+   * @return true if the class can be executed as a task, false otherwise.
+   */
+  private boolean isJPPFAnnotated(final Class<?> clazz)
+  {
+    return getJPPFAnnotatedElement(clazz) != null;
+  }
+
+  /**
+   * Determines whether a class has a JPPF-annotated method and can be executed as a task.
+   * @param clazz the class to check.
+   * @return true if the class can be executed as a task, false otherwise.
+   */
+  private AnnotatedElement getJPPFAnnotatedElement(final Class<?> clazz)
+  {
+    if (clazz == null) return null;
+    for (Method m: clazz.getDeclaredMethods())
+    {
+      if (isJPPFAnnotated(m)) return m;
+    }
+    for (Constructor c: clazz.getDeclaredConstructors())
+    {
+      if (isJPPFAnnotated(c)) return c;
+    }
+    return null;
+  }
+
+  /**
+   * Determines whether a method is JPPF-annotated and can be executed as a task.
+   * @param annotatedElement the method to check.
+   * @return true if the method can be executed as a task, false otherwise.
+   */
+  private boolean isJPPFAnnotated(final AnnotatedElement annotatedElement)
+  {
+    if (annotatedElement == null) return false;
+    Annotation[] annotations = annotatedElement.getAnnotations();
+    for (Annotation a: annotations)
+    {
+      if (JPPFRunnable.class.equals(a.annotationType())) return true;
+    }
+    return false;
   }
 }

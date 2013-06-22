@@ -122,7 +122,7 @@ class DeserializationCaches
         {
           tmp = types.get(i);
           if (tmp.clazz != null) continue;
-          if (!tmp.array) tmp.clazz = ReflectionHelper.getNonArrayTypeFromSignature(tmp.signature, classloader);
+          if (!tmp.array) tmp.clazz = SerializationReflectionHelper.getNonArrayTypeFromSignature(tmp.signature, classloader);
           else
           {
             Class<?> clazz = types.get(i+1).clazz;
@@ -131,7 +131,7 @@ class DeserializationCaches
           }
         }
       }
-      else cd.clazz = ReflectionHelper.getNonArrayTypeFromSignature(cd.signature, classloader);
+      else cd.clazz = SerializationReflectionHelper.getNonArrayTypeFromSignature(cd.signature, classloader);
     }
   }
 }

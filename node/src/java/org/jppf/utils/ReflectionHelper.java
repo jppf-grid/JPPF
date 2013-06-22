@@ -79,12 +79,8 @@ public final class ReflectionHelper
     try
     {
       int nbArgs = (values == null) ? 0 : values.length;
-      Method[] methods = clazz.getMethods();
-      for (Method m: methods)
-      {
-        if (m.getName().equals(methodName) && (m.getParameterTypes().length == nbArgs)) return m.invoke(instance, values);
-      }
-      throw new NoSuchMethodException("class : " + clazz + ", method: " + methodName);
+      Method m = findMethod(clazz, methodName, nbArgs);
+      return m.invoke(instance, values);
     }
     catch(Exception e)
     {
@@ -104,6 +100,57 @@ public final class ReflectionHelper
   public static Object invokeMethod(final Class clazz, final Object instance, final String methodName)
   {
     return invokeMethod(clazz, instance, methodName, null, (Object[]) null);
+  }
+
+  /**
+   * Find a method without having to specify the parameters types.
+   * In this case, we assume the first method found with the specified name, and whose 
+   * number of parameter is the same as the number of values, is the one we use.
+   * @param clazz the class on which to invoke the method.
+   * @param methodName the name of the method to find.
+   * @param nbArgs the of parameters in the method, may be zero if no parameters.
+   * @return the method with the specified name and number of parameters.
+   * @throws Exception if any erorr occurs.
+   */
+  public static Method findMethod(final Class<?> clazz, final String methodName, final int nbArgs) throws Exception
+  {
+    Method[] methods = clazz.getMethods();
+    for (Method m: methods)
+    {
+      if (m.getName().equals(methodName) && (m.getParameterTypes().length == nbArgs)) return m;
+    }
+    throw new NoSuchMethodException("class : " + clazz.getName() + ", method: " + methodName);
+  }
+
+  /**
+   * Find a method without having to specify the parameters types.
+   * In this case, we assume the first method found with the specified name and zero arugments is the one we use.
+   * @param clazz the class on which to invoke the method.
+   * @param methodName the name of the method to find.
+   * @return the method with the specified name and no parameters.
+   * @throws Exception if any erorr occurs.
+   */
+  public static Method findMethod(final Class<?> clazz, final String methodName) throws Exception
+  {
+    return findMethod(clazz, methodName, 0);
+  }
+
+  /**
+   * Find a method without having to specify the parameters types.
+   * In this case, we assume the first method found with the specified name is the one we use.
+   * @param clazz the class on which to invoke the method.
+   * @param methodName the name of the method to find.
+   * @return the method with the specified name and number of parameters.
+   * @throws Exception if any erorr occurs.
+   */
+  public static Method findMethodAnyArgs(final Class<?> clazz, final String methodName) throws Exception
+  {
+    Method[] methods = clazz.getMethods();
+    for (Method m: methods)
+    {
+      if (m.getName().equals(methodName)) return m;
+    }
+    throw new NoSuchMethodException("class : " + clazz.getName() + ", method: " + methodName);
   }
 
   /**

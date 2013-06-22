@@ -21,6 +21,7 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
@@ -55,11 +56,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * List of status listeners for this connection.
    */
-  protected final List<ClientConnectionStatusListener> listeners = new LinkedList<ClientConnectionStatusListener>();
-  /**
-   * Temporary listeners array to allow access to the listeners without synchronization. 
-   */
-  protected ClientConnectionStatusListener[] listenersArray;
+  protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<ClientConnectionStatusListener>();
   /**
    * Determines whether this connection has been shut down;
    */
@@ -173,11 +170,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners)
-    {
-      listeners.add(listener);
-      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
-    }
+    listeners.add(listener);
   }
 
   /**
@@ -188,11 +181,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners)
-    {
-      listeners.remove(listener);
-      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
-    }
+    listeners.remove(listener);
   }
 
   /**
@@ -202,12 +191,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
   {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    ClientConnectionStatusListener[] array;
-    synchronized (listeners)
-    {
-      array = listenersArray;
-    }
-    for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
+    for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   /**
@@ -227,24 +211,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   @Override
   protected abstract SocketInitializer createSocketInitializer();
-
-  /**
-   * Get the object that holds the tasks, data provider and submission mode for the current execution.
-   * @return a <code>JPPFJob</code> instance.
-   */
-  public JPPFJob getCurrentJob()
-  {
-    return job;
-  }
-
-  /**
-   * Set the object that holds the tasks, data provider and submission mode for the current execution.
-   * @param currentExecution a <code>ClientExecution</code> instance.
-   */
-  public void setCurrentJob(final JPPFJob currentExecution)
-  {
-    this.job = currentExecution;
-  }
 
   /**
    * Cancel the job with the specified id.
@@ -387,7 +353,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
         if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
         else log.error('[' + name + "] " + e.getMessage());
       }
-      if (job != null) list = Collections.singletonList(job);
     }
     if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + toDebugString() + " closed");

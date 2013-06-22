@@ -169,7 +169,7 @@ class Deserializer
     {
       if (desc.hasWriteObject)
       {
-        Method m = ReflectionHelper.getReadObjectMethod(desc.clazz);
+        Method m = SerializationReflectionHelper.getReadObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking readObject() for class=" + desc + " on object " + obj); } catch(Exception e) {}
         m.invoke(obj, in);
@@ -313,7 +313,7 @@ class Deserializer
    */
   private Object newInstance(final ClassDescriptor cd) throws Exception
   {
-    return ReflectionHelper.create(cd.clazz);
+    return SerializationReflectionHelper.create(cd.clazz);
   }
 
   /**

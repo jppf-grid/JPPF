@@ -134,12 +134,12 @@ class ClassDescriptor
     if (!primitive && !enumType)
     {
       externalizable = Externalizable.class.isAssignableFrom(clazz);
-      writeObjectMethod = ReflectionHelper.getWriteObjectMethod(clazz);
+      writeObjectMethod = SerializationReflectionHelper.getWriteObjectMethod(clazz);
       hasWriteObject = writeObjectMethod != null;
       array = clazz.isArray();
       if (!array)
       {
-        Field[] refFields = ReflectionHelper.getNonTransientFields(clazz);
+        Field[] refFields = SerializationReflectionHelper.getNonTransientFields(clazz);
         if (refFields.length > 0)
         {
           fields = new FieldDescriptor[refFields.length];
@@ -147,7 +147,7 @@ class ClassDescriptor
         }
       }
     }
-    signature = ReflectionHelper.getSignatureFromType(clazz).intern();
+    signature = SerializationReflectionHelper.getSignatureFromType(clazz).intern();
   }
 
   /**

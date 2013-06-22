@@ -26,6 +26,7 @@ import org.jppf.comm.discovery.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -93,14 +94,17 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param configuration the object holding the JPPF configuration.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public AbstractGenericClient(final String uuid, final Object configuration, final ClientListener... listeners)
-  {
+  public AbstractGenericClient(final String uuid, final Object configuration, final ClientListener... listeners) {
     super(uuid);
     for (ClientListener listener : listeners) addClientListener(listener);
     this.config = initConfig(configuration);
     sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
-    new JPPFStartupLoader().load(JPPFClientStartupSPI.class);
+    try {
+      HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, "run", null).invoke();
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
     Runnable r = new Runnable() {
       @Override
       public void run() {

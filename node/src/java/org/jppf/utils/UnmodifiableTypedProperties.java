@@ -56,12 +56,11 @@ public class UnmodifiableTypedProperties extends TypedProperties
   {
     if (map != null)
     {
-      Set<Map.Entry<Object, Object>> entries = map.entrySet();
-      for (Map.Entry<Object, Object> entry: entries)
+      for (Map.Entry<Object, Object> entry: map.entrySet())
       {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
         {
-          super.setProperty((String) entry.getKey(), (String) entry.getValue());
+          super.put(entry.getKey(), entry.getValue());
         }
       }
     }

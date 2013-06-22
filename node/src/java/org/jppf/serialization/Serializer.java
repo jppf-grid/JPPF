@@ -188,7 +188,7 @@ class Serializer
     {
       if (desc.hasWriteObject)
       {
-        Method m = ReflectionHelper.getWriteObjectMethod(desc.clazz);
+        Method m = SerializationReflectionHelper.getWriteObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
         m.invoke(obj, out);

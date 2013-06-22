@@ -33,12 +33,12 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public final class ReflectionHelper
+public final class SerializationReflectionHelper
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
+  private static Logger log = LoggerFactory.getLogger(SerializationReflectionHelper.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */

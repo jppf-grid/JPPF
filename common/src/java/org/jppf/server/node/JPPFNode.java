@@ -32,6 +32,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.startup.*;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
 /**
@@ -234,7 +235,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         log.error("Error creating the JMX server", e);
       }
     }
-    new JPPFStartupLoader().load(JPPFNodeStartupSPI.class);
+    HookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, "run", null).invoke();
     initDataChannel();
     if (checkConnection) {
       connectionChecker = createConnectionChecker();
