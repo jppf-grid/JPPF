@@ -19,6 +19,10 @@
 package org.jppf.io;
 
 import java.io.*;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.*;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.data.transform.*;
@@ -46,9 +50,26 @@ public final class IOHelper
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Free memory / requested allocation size ration threshold that triggers disk overflow.
+   * Ratio of free memory / requested allocation size threshold that triggers disk overflow.
    */
   private static final double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);
+  /**
+   * The available heap threshold above which it is unlikely that memory fragmentation will cause object allocations to fail,
+   * i.e. when there is enough free memory but not enough <i><b>contiguous</b></i> free memory. Default value is 32 MB.  
+   */
+  private static final long LOW_MEMORY_THRESHOLD = JPPFConfiguration.getProperties().getLong("jppf.low.memory.threshold", 32L) * 1024L * 1024L;
+  /**
+   * Lock used to check if there is sufficient free memory to read an object, AND reserve the memory, in a single atomic operation. 
+   */
+  private static Lock lock = new ReentrantLock();
+  /**
+   * This is used to reserve the memory for an object about to be read, so that we don't have to lock the JVM while reading the object. 
+   */
+  private static AtomicLong footprint = new AtomicLong(0L);
+  /**
+   * A number formatter for debugging and tracing purposes.
+   */
+  private static NumberFormat nf = createNumberFormat();
 
   /**
    * Instantiation of this class is not permitted.
@@ -71,11 +92,16 @@ public final class IOHelper
     {
       try
       {
-        return new MultipleBuffersLocation(size);
+        DataLocation dl = new MultipleBuffersLocation(size);
+        return dl;
       }
       catch (OutOfMemoryError oome)
       {
-        if (debugEnabled) log.debug("OOM when allocating in-memory data location", oome);
+        if (debugEnabled) log.debug("OOM when allocating in-memory data location, attempting disk overflow", oome);
+      }
+      finally
+      {
+        footprint.addAndGet(-size);
       }
     }
     File file = createTempFile(size);
@@ -92,7 +118,7 @@ public final class IOHelper
   public static DataLocation readData(final InputSource source) throws Exception
   {
     int n = source.readInt();
-    if (traceEnabled) log.trace("read data size = " + n);
+    if (traceEnabled) log.trace("read data size = " + nf.format(n));
     DataLocation dl = createDataLocationMemorySensitive(n);
     dl.transferFrom(source, true);
     return dl;
@@ -119,7 +145,7 @@ public final class IOHelper
   public static File createTempFile(final int size) throws Exception
   {
     File file = File.createTempFile("jppf", ".tmp");
-    if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + size);
+    if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + nf.format(size));
     file.deleteOnExit();
     return file;
   }
@@ -131,9 +157,19 @@ public final class IOHelper
    */
   public static boolean fitsInMemory(final int size)
   {
-    long freeMem = SystemUtils.maxFreeHeap();
-    if (traceEnabled) log.trace("free mem / requested size : " + freeMem + '/' + size);
-    return (long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem;
+    lock.lock();
+    try
+    {
+      long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
+      if (traceEnabled) log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
+      boolean b = ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > LOW_MEMORY_THRESHOLD);
+      if (b) footprint.addAndGet(size);
+      return b;
+    }
+    finally
+    {
+      lock.unlock();
+    }
   }
 
   /**
@@ -165,7 +201,24 @@ public final class IOHelper
     InputStream is = null;
     if (transform != null)
     {
-      is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
+      int size = dl.getSize();
+      if (fitsInMemory(size))
+      {
+        try
+        {
+          is = unwrapData(transform, dl);
+        }
+        catch(OutOfMemoryError oome)
+        {
+          if (debugEnabled) log.debug("OOM when allocating in-memory data location, attempting disk overflow", oome);
+        }
+        finally
+        {
+          footprint.addAndGet(-size);
+        }
+      }
+      if (is == null) is = unwrapDataToFile(transform, dl);
+      //is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
     }
     else is = dl.getInputStream();
     try
@@ -314,5 +367,16 @@ public final class IOHelper
     }
     else dl = new FileDataLocation(file);
     return dl;
+  }
+
+  /**
+   * Create a number formatter for debugging purposes.
+   * @return a {@link NumberFormat} instance.
+   */
+  private static NumberFormat createNumberFormat()
+  {
+    NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+    nf.setGroupingUsed(true);
+    return nf;
   }
 }
