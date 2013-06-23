@@ -51,9 +51,6 @@ public class NotifyingInputStream extends InputStream
     this.callback = callback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int read() throws IOException
   {
@@ -62,18 +59,12 @@ public class NotifyingInputStream extends InputStream
     return n;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int read(final byte[] b) throws IOException
   {
     return read(b, 0, b.length);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int read(final byte[] b, final int off, final int len) throws IOException
   {
@@ -82,9 +73,6 @@ public class NotifyingInputStream extends InputStream
     return n;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long skip(final long n) throws IOException
   {
@@ -93,9 +81,6 @@ public class NotifyingInputStream extends InputStream
     return l;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close() throws IOException
   {

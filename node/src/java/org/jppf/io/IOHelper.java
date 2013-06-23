@@ -275,12 +275,14 @@ public final class IOHelper
     if (traceEnabled) log.trace("serializing object to memory " + o);
     JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
     MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
-    ser.serialize(o, mbos);
+    NotifyingOutputStream nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
+    ser.serialize(o, nos);
     if (transform != null)
     {
       MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
       mbos = new MultipleBuffersOutputStream();
-      transform.wrap(mbis, mbos);
+      nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
+      transform.wrap(mbis, nos);
     }
     return new MultipleBuffersLocation(mbos.toBufferList(), mbos.size());
   }
@@ -297,7 +299,8 @@ public final class IOHelper
     if (traceEnabled) log.trace("serializing object to file " + o);
     File file = IOHelper.createTempFile(-1);
     OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-    ser.serialize(o, os);
+    NotifyingOutputStream nos = new NotifyingOutputStream(os, new OverflowDetectorCallback());
+    ser.serialize(o, nos);
     DataLocation dl = null;
     JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
     if (transform != null)
@@ -305,7 +308,8 @@ public final class IOHelper
       InputStream is = new BufferedInputStream(new FileInputStream(file));
       File file2 = IOHelper.createTempFile(-1);
       os = new BufferedOutputStream(new FileOutputStream(file2));
-      transform.wrap(is, os);
+      nos = new NotifyingOutputStream(os, new OverflowDetectorCallback());
+      transform.wrap(is, nos);
       dl = new FileDataLocation(file2);
     }
     else dl = new FileDataLocation(file);

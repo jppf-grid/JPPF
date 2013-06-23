@@ -29,6 +29,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -70,6 +71,8 @@ public abstract class AbstractNodeIO implements NodeIO
   public AbstractNodeIO(final JPPFNode node)
   {
     this.node = node;
+    HookFactory.registerConfigSingleHook("jppf.serialization.exception.hook", SerializationExceptionHook.class, new DefaultSerializationExceptionHook(),
+      "buildExceptionResult", getClass().getClassLoader());
   }
 
   /**
@@ -236,14 +239,15 @@ public abstract class AbstractNodeIO implements NodeIO
         ser = node.getHelper().getSerializer();
         if (traceEnabled) log.trace("before serialization of object at position " + p);
         dl = IOHelper.serializeData(object, ser);
-        if (traceEnabled) log.trace("serialized object at position " + p);
+        int size = dl.getSize();
+        if (traceEnabled) log.trace("serialized object at position " + p + ", size = " + size);
       }
       catch(Throwable t)
       {
         log.error(t.getMessage(), t);
         try
         {
-          JPPFExceptionResult result = new JPPFExceptionResult(t, object);
+          JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeHook(SerializationExceptionHook.class, object, t);
           result.setPosition(p);
           dl = IOHelper.serializeData(result, ser);
         }
