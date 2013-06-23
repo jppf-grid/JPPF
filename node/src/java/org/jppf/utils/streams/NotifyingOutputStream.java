@@ -51,9 +51,6 @@ public class NotifyingOutputStream extends OutputStream
     this.callback = callback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final int n) throws IOException
   {
@@ -61,18 +58,12 @@ public class NotifyingOutputStream extends OutputStream
     callback.bytesNotification(1);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final byte[] b) throws IOException
   {
     write(b, 0, b.length);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(final byte[] b, final int off, final int len) throws IOException
   {
@@ -80,18 +71,12 @@ public class NotifyingOutputStream extends OutputStream
     callback.bytesNotification(len);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close() throws IOException
   {
     delegate.close();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flush() throws IOException
   {

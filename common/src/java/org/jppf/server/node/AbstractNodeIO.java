@@ -62,6 +62,10 @@ public abstract class AbstractNodeIO implements NodeIO
    * Used to serialize/deserialize tasks and data providers.
    */
   protected ObjectSerializer serializer = null;
+  /**
+   * Hook invoked when the serialization of a task raises an exception.
+   */
+  private SerializationExceptionHook serializationExceptionHook = null;
 
   /**
    * Initialize this TaskIO with the specified node.
@@ -70,6 +74,7 @@ public abstract class AbstractNodeIO implements NodeIO
   public AbstractNodeIO(final JPPFNode node)
   {
     this.node = node;
+    this.serializationExceptionHook = initHook();
   }
 
   /**
@@ -90,7 +95,7 @@ public abstract class AbstractNodeIO implements NodeIO
       DataProvider dataProvider = (DataProvider) result[1];
       for (int i=0; i<currentBundle.getTaskCount(); i++)
       {
-        JPPFTask task = (JPPFTask) result[2 + i];
+        Task task = (Task) result[2 + i];
         task.setDataProvider(dataProvider);
         task.setInNode(true);
         taskList.add(task);
@@ -184,6 +189,27 @@ public abstract class AbstractNodeIO implements NodeIO
   }
 
   /**
+   * Intiialize the hook invoked when the serialization of a task raises an exception.
+   * @return a {@link SerializationExceptionHook} instance.
+   */
+  private SerializationExceptionHook initHook()
+  {
+    SerializationExceptionHook hook = null;
+    String name = JPPFConfiguration.getProperties().getString("jppf.serialization.exception.hook", DefaultSerializationExceptionHook.class.getName());
+    try
+    {
+      Class clazz = Class.forName(name);
+      hook = (SerializationExceptionHook) clazz.newInstance();
+    }
+    catch (Throwable t)
+    {
+     log.warn("could not initialize serialization exception hook '" + name + "' reverting to default", t);
+     hook = new DefaultSerializationExceptionHook();
+    }
+    return hook;
+  }
+
+  /**
    * A pairing of a list of buffers and the total length of their usable data.
    * @exclude
    */
@@ -236,14 +262,15 @@ public abstract class AbstractNodeIO implements NodeIO
         ser = node.getHelper().getSerializer();
         if (traceEnabled) log.trace("before serialization of object at position " + p);
         dl = IOHelper.serializeData(object, ser);
-        if (traceEnabled) log.trace("serialized object at position " + p);
+        int size = dl.getSize();
+        if (traceEnabled) log.trace("serialized object at position " + p + ", size = " + size);
       }
       catch(Throwable t)
       {
         log.error(t.getMessage(), t);
         try
         {
-          JPPFExceptionResult result = new JPPFExceptionResult(t, object);
+          JPPFExceptionResult result = serializationExceptionHook.buildExceptionResult(object, t);
           result.setPosition(p);
           dl = IOHelper.serializeData(result, ser);
         }

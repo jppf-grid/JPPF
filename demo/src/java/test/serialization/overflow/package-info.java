@@ -16,23 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.streams;
-
-import java.io.IOException;
-
 /**
- * This interface defines a callback used by notifying streams to provide notifications
- * of the bytes read, written or skipped.
- * @see org.jppf.utils.streams.NotifyingInputStream
- * @see org.jppf.utils.streams.NotifyingOutputStream
- * @author Laurent Cohen
+ * Test that when serializing a task on the node side results in a an array
+ * of bytes larger than {@link java.lang.Integer#MAX_INT}, then an error is properly reported.
+ * For this test, the node must have 4GB of heap available.
  */
-public interface NotifyingStreamCallback
-{
-  /**
-   * Notify that some bytes were read, written or skipped.
-   * @param length the number of bytes.
-   * @throws IOException if any I/O error occurs.
-   */
-  void bytesNotification(long length) throws IOException;
-}
+package test.serialization.overflow;
