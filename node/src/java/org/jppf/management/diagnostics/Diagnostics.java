@@ -18,16 +18,18 @@
 
 package org.jppf.management.diagnostics;
 
+import java.io.*;
 import java.lang.management.*;
 
 import org.jppf.JPPFException;
+import org.jppf.utils.CloseableHandler;
 import org.slf4j.*;
 
 /**
  * Implementation of the {@link DiagnosticsMBean} interface.
  * @author Laurent Cohen
  */
-public class Diagnostics implements DiagnosticsMBean
+public class Diagnostics implements DiagnosticsMBean, Closeable
 {
   /**
    * Logger for this class.
@@ -56,8 +58,18 @@ public class Diagnostics implements DiagnosticsMBean
 
   /**
    * Initialize this MBean implementation.
+   * @param closeableType the name of the type of closeable to use.
    */
-  public Diagnostics()
+  public Diagnostics(final String closeableType)
+  {
+    init();
+    CloseableHandler.addResetCloseable(closeableType, this);
+  }
+
+  /**
+   * Initialize this Mbean.
+   */
+  private void init()
   {
     if (debugEnabled) log.debug("initializing " + getClass().getSimpleName());
     if (threadsMXBean.isThreadCpuTimeSupported())
@@ -161,5 +173,11 @@ public class Diagnostics implements DiagnosticsMBean
   public Double cpuLoad()
   {
     return cpuTimeCollector == null ? -1d : cpuTimeCollector.getLoad();
+  }
+
+  @Override
+  public void close() throws IOException
+  {
+    if (cpuTimeCollector != null) cpuTimeCollector.setStopped(true);
   }
 }

@@ -71,7 +71,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
   {
     try
     {
-      while (true)
+      while (!isStopped())
       {
         long oldValue = totalCpuTime.get();
         long start = System.currentTimeMillis();

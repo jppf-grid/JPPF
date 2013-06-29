@@ -64,6 +64,10 @@ public class ClassLoaderRequestHandler
    */
   private PeriodicTask periodicTask = new PeriodicTask();
   /**
+   * A thread wrapping the periodic task.
+   */
+  private Thread periodicThread = null;
+  /**
    * 
    */
   private int maxBatchSize = 0;
@@ -76,7 +80,8 @@ public class ClassLoaderRequestHandler
   {
     this.nextRequest = new CompositeResourceWrapper();
     this.requestRunner = requestRunner;
-    new Thread(periodicTask, "PeriodicTask").start();
+    periodicThread = new Thread(periodicTask, "PeriodicTask");
+    periodicThread.start();
   }
 
   /**
@@ -103,9 +108,13 @@ public class ClassLoaderRequestHandler
    */
   public void close()
   {
+    if (debugEnabled) log.debug("closing request handler");
     periodicTask.setStopped(true);
+    periodicThread.interrupt();
     requestRunner = null;
-    nextRequest = null;
+    //nextRequest = null;
+    periodicThread = null;
+    periodicTask = null;
   }
 
   /**
@@ -126,8 +135,8 @@ public class ClassLoaderRequestHandler
           long start = System.nanoTime();
           synchronized(this)
           {
-            while (nextRequest.getFutureMap().isEmpty()) goToSleep();
-            while ((elapsed = System.nanoTime() - start) < MAX_WAIT)
+            while (nextRequest.getFutureMap().isEmpty() && !isStopped()) goToSleep();
+            while (((elapsed = System.nanoTime() - start) < MAX_WAIT) && !isStopped()) 
             {
               goToSleep((MAX_WAIT-elapsed) / NANO_RANGE, (int) ((MAX_WAIT-elapsed) % NANO_RANGE));
             }

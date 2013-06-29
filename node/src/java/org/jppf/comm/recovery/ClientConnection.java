@@ -60,12 +60,10 @@ public class ClientConnection extends AbstractRecoveryConnection
     this.uuid = uuid;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {
+    runThread = Thread.currentThread();
     try
     {
       configure();
@@ -89,7 +87,7 @@ public class ClientConnection extends AbstractRecoveryConnection
     catch (Exception e)
     {
       log.error(e.getMessage(), e);
-      fireClientConnectionEvent();
+      if (!(e instanceof InterruptedException)) fireClientConnectionEvent();
       close();
     }
     if (debugEnabled) log.debug(Thread.currentThread().getName() + " stopping");
@@ -118,6 +116,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   public void close()
   {
     setStopped(true);
+    if (runThread != null) runThread.interrupt();
     try
     {
       if (debugEnabled) log.debug("closing connection");

@@ -65,13 +65,20 @@ public class ResourceCache
    * The unique identifier for this resource cache.
    */
   private final String uuid = new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString();
+  /**
+   * Reference ot the shutdown hook created by this cache.
+   */
+  private ShutdownHook shutdownHook = null;
 
   /**
    * Default initializations.
    */
   public ResourceCache()
   {
-    Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook(tempFolders, uuid)));
+    shutdownHook = new ShutdownHook(tempFolders, uuid);
+    // to avoid class loader leak !!!
+    shutdownHook.setContextClassLoader(null);
+    Runtime.getRuntime().addShutdownHook(shutdownHook);
     cacheMap.put(uuid, this);
     initTempFolders();
   }
@@ -294,8 +301,16 @@ public class ResourceCache
    */
   public synchronized void close()
   {
+    if (debugEnabled) log.debug("closing resource cache for uuid=" + uuid + ", shutdownHook=" + shutdownHook);
     cacheMap.remove(uuid);
-    new ShutdownHook(tempFolders, uuid).run();
+    if (shutdownHook != null)
+    {
+      Runtime.getRuntime().removeShutdownHook(shutdownHook);
+      ShutdownHook tmp = shutdownHook;
+      shutdownHook = null;
+      tmp.run();
+      //new ShutdownHook(tempFolders, uuid).run();
+    }
   }
 
   @Override

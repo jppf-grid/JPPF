@@ -209,7 +209,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       //getNodeAdmin().setTaskCounter(getTaskCount() + taskList.size());
       // if jmx is enabled, this is done by the status notifier
       if (!isJmxEnabled()) setTaskCount(getTaskCount() + taskList.size());
-     // if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
+      // if (debugEnabled) log.debug("tasks executed: " + getTaskCount());
     }
   }
 
@@ -323,7 +323,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
-    reset(false);
+    reset(true);
   }
 
   /**
@@ -361,6 +361,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         log.error(e.getMessage(), e);
       }
     }
+    CloseableHandler.handleCloseables(CloseableHandler.NODE);
   }
 
   /**

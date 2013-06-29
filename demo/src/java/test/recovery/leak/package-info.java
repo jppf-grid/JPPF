@@ -16,27 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.management.diagnostics.spi;
-
-import org.jppf.management.diagnostics.*;
-import org.jppf.management.spi.JPPFDriverMBeanProvider;
-import org.jppf.utils.CloseableHandler;
-
 /**
- * 
- * @author Laurent Cohen
+ * Classes used ot test the submission of jobs with prioritization.
  */
-public class DriverDiagnosticsMBeanProvider extends AbstractDiagnosticsMBeanProvider implements JPPFDriverMBeanProvider
-{
-  @Override
-  public Object createMBean()
-  {
-    return new Diagnostics(CloseableHandler.DRIVER);
-  }
-
-  @Override
-  public String getMBeanName()
-  {
-    return DiagnosticsMBean.MBEAN_NAME_DRIVER;
-  }
-}
+package test.recovery.leak;
