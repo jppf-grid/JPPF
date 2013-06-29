@@ -67,6 +67,10 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * Determines whether the initial handshake has been performed.
    */
   protected boolean initialized;
+  /**
+   * 
+   */
+  protected Thread runThread = null;
 
   /**
    * Read a message form the remote peer.

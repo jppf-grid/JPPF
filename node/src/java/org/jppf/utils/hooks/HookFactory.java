@@ -22,7 +22,7 @@ import java.util.*;
 
 
 /**
- * 
+ * Factcory methods for the registration and invocation of hooks.
  * @author Laurent Cohen
  */
 public class HookFactory

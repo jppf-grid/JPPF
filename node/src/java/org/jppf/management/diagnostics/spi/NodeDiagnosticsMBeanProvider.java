@@ -21,6 +21,7 @@ package org.jppf.management.diagnostics.spi;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
 import org.jppf.node.Node;
+import org.jppf.utils.CloseableHandler;
 
 /**
  * 
@@ -31,7 +32,7 @@ public class NodeDiagnosticsMBeanProvider extends AbstractDiagnosticsMBeanProvid
   @Override
   public Object createMBean(final Node node)
   {
-    return new Diagnostics();
+    return new Diagnostics(CloseableHandler.NODE);
   }
 
   @Override

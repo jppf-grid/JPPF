@@ -20,6 +20,7 @@ package org.jppf.management.diagnostics.spi;
 
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.spi.JPPFDriverMBeanProvider;
+import org.jppf.utils.CloseableHandler;
 
 /**
  * 
@@ -30,7 +31,7 @@ public class DriverDiagnosticsMBeanProvider extends AbstractDiagnosticsMBeanProv
   @Override
   public Object createMBean()
   {
-    return new Diagnostics();
+    return new Diagnostics(CloseableHandler.DRIVER);
   }
 
   @Override

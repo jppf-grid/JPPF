@@ -336,7 +336,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
-    reset(false);
+    reset(true);
   }
 
   /**
