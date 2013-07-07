@@ -20,6 +20,7 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
@@ -138,19 +139,17 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
     executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
+    if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
   }
 
   /**
    * Initialize remote connection pools according to configuration.
    * @param props The JPPF configuration properties.
    */
-  protected void initRemotePools(final TypedProperties props)
-  {
-    try
-    {
+  protected void initRemotePools(final TypedProperties props) {
+    try {
       boolean initPeers;
-      if (props.getBoolean("jppf.discovery.enabled", true))
-      {
+      if (props.getBoolean("jppf.discovery.enabled", true)) {
         if (debugEnabled) log.debug("initializing connections from discovery");
         boolean acceptMultipleInterfaces = props.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
@@ -161,9 +160,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
         }, new IPFilter(props), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
         initPeers = false;
-      }
-      else
-      {
+      } else {
         receiverThread = null;
         initPeers = true;
       }
@@ -177,11 +174,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
         initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
       }
 
-      if (initPeers)
-      {
+      if (initPeers) {
         for (String name : names) {
-          if (!VALUE_JPPF_DISCOVERY.equals(name))
-          {
+          if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
             // for backward compatibility with v2.x configurations
@@ -196,9 +191,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
           }
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -429,6 +422,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   public boolean cancelJob(final String jobId) throws Exception
   {
     if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
+
+    if (debugEnabled) log.debug("request to cancel job with uuid=" + jobId);
+    SubmissionManager submissionManager = getSubmissionManager();
+    if (submissionManager instanceof SubmissionManagerClient)
+      return ((SubmissionManagerClient) submissionManager).cancelJob(jobId);
 
     boolean cancelled = false;
     for (JPPFClientConnection connection : getAllConnections())
