@@ -124,7 +124,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param configuration an object holding the JPPF configuration.
    * @return <code>TypedProperties</code> instance holding JPPF configuration. Never be <code>null</code>.
    */
-  protected abstract TypedProperties initConfig(Object configuration);
+  protected TypedProperties initConfig(final Object configuration)
+  {
+    if (configuration instanceof TypedProperties) return (TypedProperties) configuration;
+    return JPPFConfiguration.getProperties();
+  }
 
   @Override
   @SuppressWarnings("unchecked")
@@ -134,6 +138,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
     executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
+    if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
   }
 
   /**
