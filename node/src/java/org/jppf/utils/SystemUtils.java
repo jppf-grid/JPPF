@@ -37,7 +37,7 @@ public final class SystemUtils
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NetworkUtils.class);
+  private static Logger log = LoggerFactory.getLogger(SystemUtils.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -112,14 +112,12 @@ public final class SystemUtils
     {
       // run as privileged so we don't have to set write access on all properties
       // in the security policy file.
-      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
-          {
+      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>() {
         @Override
-        public Properties run()
-        {
+        public Properties run() {
           return System.getProperties();
         }
-          });
+      });
       Enumeration en = sysProps.propertyNames();
       while (en.hasMoreElements())
       {
@@ -264,8 +262,12 @@ public final class SystemUtils
       network = new TypedProperties();
       try
       {
+        if (debugEnabled) log.debug("before getting ipv4 addresses");
         network.setProperty("ipv4.addresses", formatAddresses(NetworkUtils.getIPV4Addresses()));
+        if (debugEnabled) log.debug("get ipv4 addresses: " + network.getProperty("ipv4.addresses"));
+        if (debugEnabled) log.debug("before getting ipv6 addresses");
         network.setProperty("ipv6.addresses", formatAddresses(NetworkUtils.getIPV6Addresses()));
+        if (debugEnabled) log.debug("got ipv6 addresses: " + network.getProperty("ipv6.addresses"));
       }
       catch(SecurityException e)
       {

@@ -17,7 +17,6 @@
  */
 package org.jppf.jca.work;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.jppf.client.*;
@@ -25,7 +24,7 @@ import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.jca.work.submission.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -52,35 +51,9 @@ public class JPPFJcaClient extends AbstractGenericClient
    * @param uuid the unique identifier for this local client.
    * @param configuration the object holding the JPPF configuration.
    */
-  public JPPFJcaClient(final String uuid, final String configuration)
+  public JPPFJcaClient(final String uuid, final TypedProperties configuration)
   {
     super(uuid, configuration);
-  }
-
-  @Override
-  protected TypedProperties initConfig(final Object configuration)
-  {
-    if (log.isDebugEnabled()) log.debug("initializing configuration:\n" + configuration);
-    TypedProperties props = JPPFConfiguration.getProperties();
-    try
-    {
-      //TypedProperties props = new TypedProperties();
-      ByteArrayInputStream bais = new ByteArrayInputStream(((String) configuration).getBytes());
-      try
-      {
-        props.load(bais);
-      }
-      finally
-      {
-        bais.close();
-      }
-    }
-    catch(Exception e)
-    {
-      log.error("Error while initializing the JPPF client configuration", e);
-    }
-    if (log.isDebugEnabled()) log.debug("config properties: " + props);
-    return props;
   }
 
   @Override

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="src" output="classes/j2eeclient" path="src/j2eeclient"/>
 	<classpathentry kind="src" path="src/resources"/>
+	<classpathentry kind="src" output="classes/j2eeclient" path="src/j2eeclient"/>
 	<classpathentry kind="src" output="test/classes" path="test/src/java"/>
 	<classpathentry kind="src" output="test/classes" path="test/src/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

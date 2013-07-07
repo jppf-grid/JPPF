@@ -83,12 +83,6 @@ public class JPPFClient extends AbstractGenericClient
     super(uuid, JPPFConfiguration.getProperties(), listeners);
   }
 
-  @Override
-  protected TypedProperties initConfig(final Object configuration)
-  {
-    return (TypedProperties) configuration;
-  }
-
   /**
    * Create a new driver connection based on the specified parameters.
    * @param uuid the uuid of the JPPF client.

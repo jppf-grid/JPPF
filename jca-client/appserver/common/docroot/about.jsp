@@ -28,7 +28,7 @@
 		<tr><td>
 			Visit us on the <a href="http://www.jppf.org">JPPF Web Site</a><br>
 			Participate and find help in the <a href="http://www.jppf.org/forums">JPPF Forums</a><br>
-			Find the information you need on the <a href="http://www.jppf.org/wiki">JPPF Documentation Pages</a><br>
+      Find the information you need in the <a href="http://www.jppf.org/doc/v3">JPPF Documentation</a><br>
 		</td></tr>
 	</table>
 

@@ -25,10 +25,9 @@ import javax.resource.spi.*;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
-import org.jppf.client.submission.SubmissionManager;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.JPPFJcaClient;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -48,12 +47,19 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
   private static Logger log = LoggerFactory.getLogger(JPPFResourceAdapter.class);
   /**
    * A string holding the client configuration, specified as a property in the ra.xml descriptor.
+   * @deprecated
    */
   private String clientConfiguration = "";
   /**
-   * The submission manager.
+   * Defines how the configuration is to be located.<br>
+   * This property is defined in the format "<i>type</i>|<i>path</i>", where <i>type</i> can be one of:<br>
+   * <ul>
+   * <li>"classpath": in this case <i>path</i> is a path to a properties file in one of the jars of the .rar file, for instance "resources/config/jppf.properties"</li>
+   * <li>"url": <i>path</i> is a url that points to a properties file, for instance "file:///home/me/jppf/jppf.properties" (could be a http:// or ftp:// url as well)</li>
+   * <li>"file": <i>path</i> is considered a path on the file system, for instance "/home/me/jppf/config/jppf.properties"</li>
+   * </ul>
    */
-  private transient SubmissionManager submissionManager;
+  private String configurationSource = "";
 
   /**
    * Start this resource adapter with the specified bootstrap context.
@@ -68,11 +74,9 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
     try
     {
       log.info("Starting JPPF resource adapter");
-      jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), getClientConfiguration());
-      log.info("Starting JPPF resource adapter: jppf client="+jppfClient);
-      // start the submission manager
-      submissionManager = jppfClient.getSubmissionManager();
-      //new Thread(submissionManager, "JPPF SubmissionManager").start();
+      TypedProperties config = new JPPFConfigurationParser(getConfigurationSource(), getClientConfiguration()).parse();
+      jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), config);
+      if (log.isDebugEnabled()) log.debug("Starting JPPF resource adapter: jppf client="+jppfClient);
       log.info("JPPF resource adapter started");
     }
     catch (Exception e)
@@ -88,11 +92,6 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
   @Override
   public void stop()
   {
-    if (submissionManager != null)
-    {
-      //submissionManager.setStopped(true);
-      //submissionManager.wakeUp();
-    }
     if (jppfClient != null) jppfClient.close();
   }
 
@@ -136,6 +135,7 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
   /**
    * Get the string holding the client configuration.
    * @return the configuration as a string.
+   * @deprecated
    */
   public String getClientConfiguration()
   {
@@ -145,9 +145,28 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
   /**
    * Set the string holding the client configuration.
    * @param clientConfiguration the configuration as a string.
+   * @deprecated
    */
   public void setClientConfiguration(final String clientConfiguration)
   {
     this.clientConfiguration = clientConfiguration;
+  }
+
+  /**
+   * Get the property which defines how the configuration is to be located.
+   * @return the property as a string.
+   */
+  public String getConfigurationSource()
+  {
+    return configurationSource;
+  }
+
+  /**
+   * Set the property which defines how the configuration is to be located.
+   * @param configurationSource the property as a string.
+   */
+  public void setConfigurationSource(final String configurationSource)
+  {
+    this.configurationSource = configurationSource;
   }
 }

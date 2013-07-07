@@ -48,6 +48,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   private static final Logger log = LoggerFactory.getLogger(SubmissionManagerClient.class);
   /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * A reference to the tasks queue.
    */
   private final JPPFPriorityQueue queue;
@@ -74,17 +78,12 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   /**
    * Listener used for monitoring state changes.
    */
-  private final ClientConnectionStatusListener statusListener = new ClientConnectionStatusListener()
-  {
+  private final ClientConnectionStatusListener statusListener = new ClientConnectionStatusListener() {
     @Override
-    public void statusChanged(final ClientConnectionStatusEvent event)
-    {
-      if (event.getSource() instanceof JPPFClientConnection)
-      {
+    public void statusChanged(final ClientConnectionStatusEvent event) {
+      if (event.getSource() instanceof JPPFClientConnection) {
         updateConnectionStatus(((JPPFClientConnection) event.getSource()), event.getOldStatus());
-      }
-      else if (event.getSource() instanceof ChannelWrapper)
-      {
+      } else if (event.getSource() instanceof ChannelWrapper) {
         updateConnectionStatus((ChannelWrapper<?>) event.getSource(), event.getOldStatus());
       }
     }
@@ -122,11 +121,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     taskQueueChecker = new TaskQueueChecker<ChannelWrapper<?>>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
 
-    this.queue.addQueueListener(new QueueListener<ClientJob, ClientJob, ClientTaskBundle>()
-    {
+    this.queue.addQueueListener(new QueueListener<ClientJob, ClientJob, ClientTaskBundle>() {
       @Override
-      public void newBundle(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event)
-      {
+      public void newBundle(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
         taskQueueChecker.wakeUp();
       }
     });
@@ -194,7 +191,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   protected synchronized ChannelWrapper<?> addConnection(final JPPFClientConnection cnn)
   {
-    if (log.isDebugEnabled()) log.debug("adding connection " + cnn);
+    if (debugEnabled) log.debug("adding connection " + cnn);
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) cnn;
 
@@ -203,7 +200,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     {
       try
       {
+        if (debugEnabled) log.debug("before creating channel for connection " + cnn);
         wrapper = new ChannelWrapperRemote(connection);
+        if (debugEnabled) log.debug("created channel for connection " + cnn);
         JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
@@ -222,7 +221,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         addConnection(wrapper);
       }
     }
-    if (log.isDebugEnabled()) log.debug("end of adding connection " + cnn);
+    if (debugEnabled) log.debug("end of adding connection " + cnn);
     return wrapper;
   }
 

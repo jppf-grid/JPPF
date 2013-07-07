@@ -40,6 +40,14 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    */
   private static Logger log = LoggerFactory.getLogger(AbstractSocketWrapper.class);
   /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * The underlying socket wrapped by this SocketClient.
    */
   protected Socket socket = null;
@@ -278,10 +286,12 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
       socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
       socket.setSendBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
       socket.setTcpNoDelay(SOCKET_TCP_NO_DELAY);
+      if (debugEnabled) log.debug("before connect()");
       socket.connect(addr);
+      if (debugEnabled) log.debug("after connect()");
       initStreams();
       opened = true;
-      if (log.isDebugEnabled()) log.debug("getReceiveBufferSize() = " + socket.getReceiveBufferSize());
+      if (debugEnabled) log.debug("getReceiveBufferSize() = " + socket.getReceiveBufferSize());
     }
     //else throw new ConnectException("Client connection already opened");
   }

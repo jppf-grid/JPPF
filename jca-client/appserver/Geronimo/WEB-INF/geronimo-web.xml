@@ -12,22 +12,29 @@
       <dep:version>2.0</dep:version>
       <dep:type>war</dep:type>
     </dep:moduleId>
-    <dep:dependencies/>
+    <dep:dependencies>
+      <dep:dependency>
+        <dep:groupId>JPPF</dep:groupId>
+        <dep:artifactId>jca-client</dep:artifactId>
+        <dep:version>2.0</dep:version>
+        <dep:type>rar</dep:type>
+      </dep:dependency>
+    </dep:dependencies>
+    <dep:import-package>org.jppf.jca.cci</dep:import-package>
+    <dep:import-package>org.jppf.utils</dep:import-package>
+    <dep:import-package>org.jppf.client</dep:import-package>
+    <dep:import-package>org.jppf.client.event</dep:import-package>
+    <dep:import-package>org.jppf.server.protocol</dep:import-package>
+    <dep:import-package>org.jppf.node.protocol</dep:import-package>
+    <dep:import-package>org.jppf.node.policy</dep:import-package>
+    <dep:import-package>org.jppf.task.storage</dep:import-package>
+    <dep:import-package>org.jppf.serialization</dep:import-package>
+    <dep:import-package>org.jppf.client.submission</dep:import-package>
     <dep:hidden-classes/>
     <dep:non-overridable-classes/>
   </dep:environment>
 
   <context-root>/jppftest</context-root>
-
-  <!-- Optional JNDI references -->
-  <!--
-  <naming:ejb-ref> ... </ejb-ref>
-  <naming:ejb-local-ref> ... </ejb-local-ref>
-  <naming:gbean-ref> ... </gbean-ref>
-  <naming:resource-ref> ... </resource-ref>
-  <naming:resource-env-ref> ... </resource-env-ref>
-  <naming:service-ref> ... </service-ref>
-  -->
 
 </web-app>
 

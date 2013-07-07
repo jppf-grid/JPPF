@@ -201,15 +201,26 @@ public class JPPFBundlerFactory
   private void loadProviders() throws Exception
   {
     Map<String, JPPFBundlerProvider> map = new Hashtable<String, JPPFBundlerProvider>();
-    Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
-    while (it.hasNext())
+    ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+    ClassLoader currentCL = getClass().getClassLoader();
+    if (debugEnabled) log.debug("oldCL=" + oldCL + ", currentCL=" + currentCL);
+    final boolean isDiff = (oldCL != currentCL);
+    try
     {
-      JPPFBundlerProvider provider = it.next();
-      map.put(provider.getAlgorithmName(), provider);
-      if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
+      if (isDiff) Thread.currentThread().setContextClassLoader(currentCL);
+      Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
+      while (it.hasNext())
+      {
+        JPPFBundlerProvider provider = it.next();
+        map.put(provider.getAlgorithmName(), provider);
+        if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
+      }
+      providerMap = map;
     }
-    if (debugEnabled) log.debug("found " + map.size() + " load-balancing algorithms in the classpath");
-    providerMap = map;
+    finally
+    {
+      if (isDiff) Thread.currentThread().setContextClassLoader(oldCL);
+    }
   }
 
   /**

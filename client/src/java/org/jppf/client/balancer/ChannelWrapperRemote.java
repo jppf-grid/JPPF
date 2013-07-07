@@ -64,13 +64,19 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
   public ChannelWrapperRemote(final AbstractJPPFClientConnection channel)
   {
     if (channel == null) throw new IllegalArgumentException("channel is null");
-
+    String s = getClass().getSimpleName() + " for connection " + channel;
+    if (debugEnabled) log.debug("creating[0] " + s);
     this.channel = channel;
     this.uuid = channel.getUuid();
+    if (debugEnabled) log.debug("creating[1] " + s);
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
+    if (debugEnabled) log.debug("creating[2] " + s);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, channel.isSSL());
+    if (debugEnabled) log.debug("creating[3] " + s);
     managementInfo.setSystemInfo(systemInfo);
+    if (debugEnabled) log.debug("creating[4] " + s);
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper" + channel.getName() + '-'));
+    if (debugEnabled) log.debug("end of creating " + getClass().getSimpleName() + " for connection " + channel);
   }
 
   @Override

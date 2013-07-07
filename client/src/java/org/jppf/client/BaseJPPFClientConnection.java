@@ -340,12 +340,25 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
         log.error(e.getMessage(), e);
       }
     }
-    if (clazz == null)
+    try
     {
-      cl = this.getClass().getClassLoader();
-      clazz = cl.loadClass(helperClassName);
+      if (clazz == null)
+      {
+        cl = this.getClass().getClassLoader();
+        clazz = Class.forName(helperClassName, true, cl);
+      }
+      return (SerializationHelper) clazz.newInstance();
     }
-    return (SerializationHelper) clazz.newInstance();
+    catch(Error e)
+    {
+      if (debugEnabled)
+      {
+        log.debug("*** cl = " + cl);
+        log.debug("*** current cl = " + getClass().getClassLoader());
+        log.debug("*** context class loader = " + Thread.currentThread().getContextClassLoader());
+      }
+      throw e;
+    }
   }
 
   /**
