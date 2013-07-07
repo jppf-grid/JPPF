@@ -109,7 +109,7 @@
 	<target name="compile" depends="init">
 		<echo message="compiling the J2EE connector classes ..."/>
     <checkstyle config="${basedir}/CheckStyle_JPPF_config.xml"><fileset dir="${src.dir}" includes="**/*.java"/></checkstyle>
-		<javac srcdir="" destdir="${classes.dir}/jca" source="1.6" target="1.6"
+		<javac srcdir="" destdir="${classes.dir}/jca" source="1.7" target="1.7"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>
 			<compilerarg line="-Xlint:none"/>
@@ -124,7 +124,7 @@
 				<exclude name="**/*.java"/>
 			</fileset>
 		</copy>
-		<javac srcdir="" destdir="${classes.dir}/j2eeclient" source="1.6" target="1.6"
+		<javac srcdir="" destdir="${classes.dir}/j2eeclient" source="1.7" target="1.7"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 			<classpath refid="project.classpath"/>
 			<compilerarg line="-Xlint:none"/>

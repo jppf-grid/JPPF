@@ -18,7 +18,6 @@
 package org.jppf.utils;
 
 import org.jppf.classloader.*;
-import org.slf4j.*;
 
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.
@@ -27,14 +26,6 @@ import org.slf4j.*;
  */
 public class SerializationHelperImpl implements SerializationHelper
 {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(SerializationHelperImpl.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private boolean debugEnabled = log.isDebugEnabled();
   /**
    * Determines whether dumping byte arrays in the log is enabled.
    */

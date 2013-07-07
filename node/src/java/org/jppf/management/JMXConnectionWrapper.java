@@ -161,6 +161,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
       if (ssl) SSLHelper.configureJMXProperties(env);
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
+      env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
+      env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
+      env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
     }
     catch(Exception e)
     {

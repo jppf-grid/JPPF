@@ -134,24 +134,22 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
   public JPPFFuture<?> submit(final ClientTaskBundle bundle)
   {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    JPPFFutureTask<?> task = new JPPFFutureTask(new RemoteRunnable(getBundler(), bundle, channel), null)
-    {
+    JPPFFutureTask<?> task = new JPPFFutureTask(new RemoteRunnable(getBundler(), bundle, channel), null) {
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning)
       {
-        if(isDone()) return false;
-        if(isCancelled()) {
-          return true;
-        } else {
-          bundle.cancel();
-          try {
-            channel.cancelJob(bundle.getClientJob().getUuid());
-          } catch (Exception e) {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-            else log.warn(ExceptionUtils.getMessage(e));
-          } finally {
-            return super.cancel(false);
-          }
+        if (isDone()) return false;
+        String uuid = bundle.getClientJob().getUuid();
+        if (debugEnabled) log.debug("JPPFFutureTask.cancel() : requesting cancel of jobId=" + uuid);
+        if (isCancelled()) return true;
+        bundle.cancel();
+        try {
+          channel.cancelJob(uuid);
+        } catch (Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.warn(ExceptionUtils.getMessage(e));
+        } finally {
+          return super.cancel(false);
         }
       }
     };
@@ -265,7 +263,7 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
         if (registeredClassLoader != null) registeredClassLoader.dispose();
         clientBundle.taskCompleted(exception);
         clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
-        if(getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
+        if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
 

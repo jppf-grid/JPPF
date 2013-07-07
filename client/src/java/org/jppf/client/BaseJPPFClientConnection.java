@@ -282,50 +282,15 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     for (ClassLoader cl: clArray) {
       try {
         if (cl == null) continue;
-        clazz = cl.loadClass(helperClassName);
+        //clazz = cl.loadClass(helperClassName);
+        clazz = Class.forName(helperClassName, true, cl);
         if (clazz != null) break;
       } catch (Exception e) {
       }
+      if (clazz == null) throw new IllegalStateException("could not load class " + helperClassName + " from any of these class loaders: " + Arrays.asList(clArray));
     }
     return (SerializationHelper) clazz.newInstance();
   }
-  /*
-  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception {
-    ClassLoader cl = classLoader;
-    if (cl == null) cl = Thread.currentThread().getContextClassLoader();
-    if (cl == null) cl = getClass().getClassLoader();
-    String helperClassName = getSerializationHelperClassName();
-    Class clazz = null;
-    NonDelegatingClassLoader ndCl = ndclCache.get(cl);
-    if (ndCl == null) {
-      final ClassLoader parent = cl;
-      PrivilegedAction<NonDelegatingClassLoader> pa = new PrivilegedAction<NonDelegatingClassLoader>() {
-        @Override
-        public NonDelegatingClassLoader run() {
-          return new NonDelegatingClassLoader(null, parent);
-        }
-      };
-      ndCl = AccessController.doPrivileged(pa);
-      ndclCache.put(cl, ndCl);
-      try {
-        clazz = ndCl.loadClassDirect(helperClassName);
-      } catch (ClassNotFoundException e) {
-        log.error(e.getMessage(), e);
-      }
-    } else {
-      try {
-        clazz = ndCl.loadClass(helperClassName);
-      } catch (ClassNotFoundException e) {
-        log.error(e.getMessage(), e);
-      }
-    }
-    if (clazz == null) {
-      cl = this.getClass().getClassLoader();
-      clazz = cl.loadClass(helperClassName);
-    }
-    return (SerializationHelper) clazz.newInstance();
-  }
-  */
 
   /**
    * Get the name of the serialization helper implementation class name to use.

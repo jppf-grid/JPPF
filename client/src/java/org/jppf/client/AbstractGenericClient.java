@@ -129,7 +129,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param configuration an object holding the JPPF configuration.
    * @return <code>TypedProperties</code> instance holding JPPF configuration. Never be <code>null</code>.
    */
-  protected abstract TypedProperties initConfig(Object configuration);
+  protected TypedProperties initConfig(final Object configuration)
+  {
+    if (configuration instanceof TypedProperties) return (TypedProperties) configuration;
+    return JPPFConfiguration.getProperties();
+  }
 
   @Override
   @SuppressWarnings("unchecked")

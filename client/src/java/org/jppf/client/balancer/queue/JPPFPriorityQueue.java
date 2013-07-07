@@ -404,14 +404,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    */
   public boolean cancelJob(final String jobId)
   {
+    if (debugEnabled) log.debug("requesting cancel of jobId=" + jobId);
     lock.lock();
     try
     {
       ClientJob job = jobMap.get(jobId);
-      if (job == null)
-        return false;
-      else
-        return job.cancel(false);
+      return job == null ? false : job.cancel(false);
     }
     finally
     {

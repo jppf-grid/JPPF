@@ -435,6 +435,7 @@ public class ClientJob extends AbstractClientJob
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
+    if (debugEnabled) log.debug("requesting cancel of jobId=" + this.getUuid());
     if (super.cancel(mayInterruptIfRunning)) {
       done();
       List<ClientJob> list;

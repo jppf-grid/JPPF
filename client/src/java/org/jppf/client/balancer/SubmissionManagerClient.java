@@ -48,6 +48,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   private static final Logger log = LoggerFactory.getLogger(SubmissionManagerClient.class);
   /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * A reference to the tasks queue.
    */
   private final JPPFPriorityQueue queue;
@@ -355,6 +359,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   public boolean cancelJob(final String jobId) throws Exception
   {
+    if (debugEnabled) log.debug("requesting cancel of jobId=" + jobId);
     queue.cancelJob(jobId);
     return true;
   }

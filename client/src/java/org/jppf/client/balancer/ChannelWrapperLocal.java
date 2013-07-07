@@ -165,6 +165,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(getBundler(), bundle), null) {
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning) {
+        if (debugEnabled) log.debug("requesting cancel of jobId=" + bundle.getUuid());
         if (super.cancel(mayInterruptIfRunning)) {
           try {
             executionManager.cancelAllTasks(true, false);

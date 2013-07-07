@@ -40,7 +40,7 @@
     <pathelement location="${classes.dir}" />
     <pathelement location="${config.dir}" />
     <pathelement location="${basedir}/../classes/jca" />
-    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/slf4j-jdk1*.jar"/>
   </path>
 
   <path id="generate.classpath">
@@ -76,7 +76,6 @@
   <!-- ========================================================================= -->
 
   <target name="build" depends="war"/>
-  <target name="build.deploy.jboss" depends="build, deploy.jboss" />
 
   <!-- ========================================================================= -->
   <!--                     Genrates the list of test classes                     -->
@@ -100,7 +99,7 @@
 
   <target name="compile" depends="init">
     <echo message="compiling the project..." />
-    <javac srcdir="" destdir="${classes.dir}" source="1.6" target="1.6" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+    <javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath" />
       <compilerarg line="-Xlint:unchecked" />
       <src path="${src.dir}/java" />
@@ -135,25 +134,16 @@
   </target>
 
   <!-- ========================================================================= -->
-  <!--                       Deploy the WAR file                                 -->
-  <!-- ========================================================================= -->
-
-  <target name="deploy.jboss">
-		<property name="jboss.deploy" value="C:/Tools/jboss-5.1.0.GA/server/jppf/deploy"/>
-    <copy todir="${jboss.deploy}" file="${build.dir}/${war.prefix}.war"/>
-  </target>
-
-  <!-- ========================================================================= -->
   <!--                          Run the tests                                    -->
   <!-- ========================================================================= -->
 
   <target name="run.tests">
     <echo message="Running the tests"/>
-    <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="project.classpath">
+    <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="project.classpath" resultproperty="test.result">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx256m"/>
       <arg value="-u"/>
-      <arg value="http://localhost:8080/JPPF_J2EE_Tests/performTests?remoteClient=true"/>
+      <arg value="http://localhost:8080/jppfunittests/performTests?remoteClient=true"/>
     </java>
   </target>
 
@@ -161,13 +151,7 @@
   <!--                         Compile the application                           -->
   <!-- ========================================================================= -->
 
-  <target name="download.launch.geronimo" depends="install.geronimo, start.geronimo, deploy.connector">
-    <!--
-    <antcall target="undeploy.module"><param name="mid" value="JPPF/jca-client/2.0/rar"/></antcall>
-    <antcall target="stop.geronimo"/>
-    <antcall target="start.geronimo"/>
-    -->
-  </target>
+  <target name="download.launch.geronimo" depends="build, install.geronimo, start.geronimo, deploy.connector, deploy.test.war"/>
 
   <target name="install.geronimo" depends="">
     <echo message="downloading geronimo 3.0.0 ..." />
@@ -224,8 +208,16 @@
     <antcall target="deploy.module"><param name="resource" value="${j2e.dir}/jppf_ra_Geronimo.rar"/></antcall>
   </target>
 
+  <target name="deploy.test.war" depends="">
+    <antcall target="deploy.module"><param name="resource" value="${build.dir}/${war.prefix}.war"/></antcall>
+  </target>
+
   <target name="undeploy.connector" depends="">
     <antcall target="undeploy.module"><param name="mid" value="JPPF/jca-client/2.0/rar"/></antcall>
+  </target>
+
+  <target name="undeploy.test.war" depends="">
+    <antcall target="undeploy.module"><param name="mid" value="JPPF/unit.tests/2.0/war"/></antcall>
   </target>
 
   <target name="deploy.module" depends="">

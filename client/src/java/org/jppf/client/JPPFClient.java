@@ -82,12 +82,6 @@ public class JPPFClient extends AbstractGenericClient
     super(uuid, JPPFConfiguration.getProperties(), listeners);
   }
 
-  @Override
-  protected TypedProperties initConfig(final Object configuration)
-  {
-    return (TypedProperties) configuration;
-  }
-
   /**
    * Create a new driver connection based on the specified parameters.
    * @param uuid the uuid of the remote driver.
@@ -140,24 +134,5 @@ public class JPPFClient extends AbstractGenericClient
       log.error("Can't initialize Submission Manager", e);
     }
     return submissionManager;
-  }
-
-  /**
-   * Cancel the job with the specified id.
-   * @param jobId the id of the job to cancel.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
-   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
-   */
-  @Override
-  public boolean cancelJob(final String jobId) throws Exception
-  {
-    if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobId is blank");
-
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager instanceof SubmissionManagerClient)
-      return ((SubmissionManagerClient) submissionManager).cancelJob(jobId);
-    else
-      return super.cancelJob(jobId);
   }
 }
