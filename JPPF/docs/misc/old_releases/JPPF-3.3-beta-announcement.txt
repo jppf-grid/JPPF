@@ -1,0 +1,35 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.3_beta
+
+Bug fixes	
+
+[JPPF-107 Missing exception handling upon invocation of NodeLifeCycleListener methods](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-107)
+[JPPF-110 Proportional algorithm results in uneven load with small number of long-lived tasks](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-110)
+[JPPF-113 NullPointerException in the console upon connection to first driver](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-113)
+[JPPF-114 Missing unit tests for node management and monitoring APIs](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-114)
+[JPPF-116 NPE in AbstractJPPFClassLoader.findResources()](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-116)
+[JPPF-117 Task timeout is not working as expected](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-117)
+[JPPF-120 [Regression] Impossible to make an SSL connection to the server](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-120)
+[JPPF-122 JMX connection threads leak in the driver](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-122)
+[JPPF-123 NPE at driver startup when jppf.ssl.server.port = -1](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-123)
+[JPPF-125 Selection in job data panel does not update the buttons state](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-125)
+[JPPF-126 Job cancelled from the admin console may get stuck in the server queue](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-126)
+
+Enhancements 
+
+[JPPF-68 Node: separation of class loader instances and driver connection](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-68)
+[JPPF-69 Minimize usage of static fields/instances in JPPF](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-69)
+[JPPF-104 Inconsistent naming of the load-balancing properties](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-104)
+[JPPF-118 Improvements in NodeExecutionManagerImpl](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-118)
+[JPPF-124 Refactor the "Extended Class Loading" sample to use class loader reset ability](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-124)
+
+Feature requests 
+
+[JPPF-24 Ability to deactivate a node](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-24)
+[JPPF-26 Enable node management via the driver connection](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-26)
+[JPPF-38 Use SplashScreen support from Java](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-38)
+[JPPF-109 Pluggable error handler for NodeLifeCycleListener](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-109)
+[JPPF-112 Refactor the admin console for management and monitoring via the driver](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-112)
+
+JPPF Links: [Web Site](http://www.jppf.org) - [Downloads](http://www.jppf.org/downloads.php) - [Documentation](http://www.jppf.org/wiki) - [User forums](http://www.jppf.org/forums) - [Issue tracker](http://www.jppf.org/tracker/tbg/jppf) - [SF.net project page](http://sourceforge.net/projects/jppf-project/)

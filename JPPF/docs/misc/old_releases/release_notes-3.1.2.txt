@@ -1,0 +1,24 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.1.2
+
+This is a maintenance release which brings important bug fixes.
+
+Bugs fixes:
+
+JPPF-48 Impossible to get the class loader of a Runnable submitted via JPPFExecutorService
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-48
+JPPF-49 JPPFTask.getTaskObject() should not return null
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-49
+JPPF-51 Leak in the node: task timeout timer thread groups
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-51
+JPPF-52 MemLeak: JPPFLocalClassLoader
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-52
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+SF.net project page: http://sourceforge.net/projects/jppf-project/

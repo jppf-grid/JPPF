@@ -1,0 +1,53 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a grid
+
+What's new in JPPF 2.5
+
+Broadcast jobs, flexible serialization, data grid integration, embedded FTP server and many other enhancements and fixes.
+
+A new generic serialization framework enables developers to use non-serializable classes in their JPPF tasks. This is especially useful when using third party libraries whose source code is not available.
+see http://www.jppf.org/wiki/index.php?title=Specifying_alternate_object_streams#Generic_JPPF_serialization
+
+Broadcast jobs bring the ability to run the same JPPF job on all available grid nodes
+see http://www.jppf.org/wiki/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs
+
+Class loading performance enhancements: a new class definition cache on the server brings improved node startup time and faster job execution.
+
+Administration console enhancements:
+- elements are now sorted in the tree views
+- ability to reset the server statistics
+- rendering and display fixes and enhancements
+
+Data grid integration: the real-time portfolio updates sample now uses Hazelcast as its distributed data fabric
+see http://www.jppf.org/samples-pack/DataDependency/Readme.php
+
+New integration sample: embedding a FTP server and client, demonstrates how Apache ftpd server can be embedded within a JPPF server, and how FTP client APIs can access it from a JPPF task.
+see http://www.jppf.org/samples-pack/FTPServer/Readme.php
+
+New sample: parallel N-body problem implementation, a JPPF-based implementation of the N-body problem applied to anti-protons trapped in a magnetic field.
+see http://www.jppf.org/samples-pack/Nbody/Readme.php
+
+
+Feature requests
+
+3151670 - Client startup classes
+3149103 - Broadcast jobs
+3156063 - Provide shell scripts to run JPPF components
+3037770 - Ability to sort artifacts in tree table view
+3170878 - Use a soft map for the class definition cache
+3170216 - Visual indicator for nodes that cannot be managed
+2211733 - Ability to reset the server statistics
+3179788 - Enable idle timeout on socket connections
+3148503 - Remove driver from the admin console when it is shutdown
+3105057 - Enable cancellation of a job upon client disconnection
+
+Bug fixes
+
+3166884 - The task life cycle documentation is outdated
+3148007 - Job not removed from server upon suspend/resume
+3152285 - Job never returns upon cancellation
+3152769 - OutOfMemoryError: PermGen space upon many client runs
+3162338 - Missing exception handling for custom load balancers 
+3166896 - JPPFExecutorService not working
+3173345 - Multithreaded deserialization of Calendar leads to CCE
+3215335 - IP address filtering is not working
+3301406 - Client failover is not working

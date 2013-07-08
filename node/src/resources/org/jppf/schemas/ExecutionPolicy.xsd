@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  JPPF.
+   Copyright (C) 2005-2013 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd"
+  targetNamespace="http://www.jppf.org/schemas/ExecutionPolicy.xsd"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified"
+>
+
+  <element name="ExecutionPolicy" type="jppf:OneRuleType"/>
+
+  <group name="Rule">
+    <choice>
+      <element name="NOT" type="jppf:OneRuleType"/>
+      <element name="AND" type="jppf:TwoOrMoreRulesType"/>
+      <element name="OR" type="jppf:TwoOrMoreRulesType"/>
+      <element name="XOR" type="jppf:TwoOrMoreRulesType"/>
+      <element name="LessThan" type="jppf:Numeric2Type"/>
+      <element name="AtMost" type="jppf:Numeric2Type"/>
+      <element name="MoreThan" type="jppf:Numeric2Type"/>
+      <element name="AtLeast" type="jppf:Numeric2Type"/>
+      <element name="BetweenII" type="jppf:Numeric3Type"/>
+      <element name="BetweenIE" type="jppf:Numeric3Type"/>
+      <element name="BetweenEI" type="jppf:Numeric3Type"/>
+      <element name="BetweenEE" type="jppf:Numeric3Type"/>
+      <element name="Equal" type="jppf:EqualType"/>
+      <element name="Contains" type="jppf:ContainsType"/>
+      <element name="OneOf" type="jppf:OneOfType"/>
+      <element name="RegExp" type="jppf:RegExpType"/>
+      <element name="CustomRule" type="jppf:CustomRuleType"/>
+    </choice>
+  </group>
+
+  <complexType name="OneRuleType">
+    <sequence>
+      <group ref="jppf:Rule"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="TwoOrMoreRulesType">
+    <sequence minOccurs="2" maxOccurs="unbounded">
+      <group ref="jppf:Rule"/>
+    </sequence>
+  </complexType>
+
+  <!-- test of type "property_value is less than value" -->
+  <complexType name="Numeric2Type">
+    <sequence>
+      <element name="Property" type="string"/>
+      <element name="Value" type="double"/>
+    </sequence>
+  </complexType>
+
+  <!-- test of type "property_value is in range [a, b]" -->
+  <complexType name="Numeric3Type">
+    <sequence>
+      <element name="Property" type="string"/>
+      <element name="Value" type="double" minOccurs="2" maxOccurs="2"/>
+    </sequence>
+  </complexType>
+
+  <!-- test of type "property_value is equal to value" -->
+  <complexType name="EqualType">
+    <sequence>
+      <element name="Property" type="string"/>
+      <element name="Value" type="string"/>
+    </sequence>
+    <attribute name="valueType" use="optional" default="string">
+      <simpleType>
+        <restriction base="string">
+          <enumeration value="string"/>
+          <enumeration value="numeric"/>
+          <enumeration value="boolean"/>
+        </restriction>
+      </simpleType>
+    </attribute>
+    <attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
+  </complexType>
+
+  <!-- test of type "property_value contains substring" -->
+  <complexType name="ContainsType">
+    <sequence>
+      <element name="Property" type="string"/>
+      <element name="Value" type="string"/>
+    </sequence>
+    <attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
+  </complexType>
+
+  <!-- test of type "property_value is one of { value1, ... , valueN } " -->
+  <complexType name="OneOfType">
+    <sequence>
+      <element name="Property" type="string"/>
+      <element name="Value" type="string" maxOccurs="unbounded"/>
+    </sequence>
+    <attribute name="valueType" use="optional" default="string">
+      <simpleType>
+        <restriction base="string">
+          <enumeration value="string"/>
+          <enumeration value="numeric"/>
+        </restriction>
+      </simpleType>
+    </attribute>
+    <attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
+  </complexType>
+
+  <!-- test of type "property_value matches regular_expression " -->
+  <complexType name="RegExpType">
+    <sequence>
+      <element name="Property" type="string"/>
+      <element name="Value" type="string"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="TrueFalse">
+    <restriction base="string">
+      <enumeration value="true"/>
+      <enumeration value="false"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="CustomRuleType">
+    <sequence>
+      <element name="Arg" type="string" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+    <attribute name="class" type="string"/>
+  </complexType>
+
+</schema>
