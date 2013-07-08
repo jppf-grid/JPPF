@@ -23,7 +23,7 @@ import java.util.*;
 import javax.management.remote.JMXServiceURL;
 
 import org.jppf.client.*;
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.JPPFConfiguration;
 
@@ -85,7 +85,7 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbNodes) throws Exception
   {
-    return setup(1, nbNodes, true);
+    return setup(1, nbNodes, true, null);
   }
 
   /**
@@ -97,7 +97,7 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbNodes, final boolean initClient) throws Exception
   {
-    return setup(1, nbNodes, initClient);
+    return setup(1, nbNodes, initClient, null);
   }
 
   /**
@@ -110,21 +110,35 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception
   {
+    return setup(nbDrivers, nbNodes, initClient, null);
+  }
+
+  /**
+   * Launches a driver and node and start the client.
+   * @param nbDrivers the number of drivers to launch.
+   * @param nbNodes the number of nodes to launch.
+   * @param initClient if true then start a client.
+   * @param config the driver and node configuration to use.
+   * @return an instance of <code>JPPFClient</code>.
+   * @throws Exception if a process could not be started.
+   */
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient, final Configuration config) throws Exception
+  {
     System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (initClient ? " and 1 client" : ""));
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++)
     {
-      // to avoid driver and node producing the same UUID
-      drivers[i] = new DriverProcessLauncher(i+1);
-      new Thread(drivers[i], drivers[i].getName() + "process launcher").start(); 
+      if (config == null) drivers[i] = new DriverProcessLauncher(i+1);
+      else drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions);
+      new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++)
     {
-      // to avoid driver and node producing the same UUID
-      nodes[i] = new NodeProcessLauncher(i+1);
-      new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
+      if (config == null) nodes[i] = new NodeProcessLauncher(i+1);
+      else nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions);
+      new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
     if (initClient)
     {
@@ -196,7 +210,7 @@ public class BaseSetup
    */
   public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
   {
-  	checkDriverAndNodesInitialized(client, nbDrivers, nbNodes);
+    checkDriverAndNodesInitialized(client, nbDrivers, nbNodes);
   }
 
   /**
@@ -222,7 +236,7 @@ public class BaseSetup
         }
       }
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
-      else allConnected = true; 
+      else allConnected = true;
     }
     Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<JMXServiceURL, JMXDriverConnectionWrapper>();
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
@@ -284,5 +298,44 @@ public class BaseSetup
       }
     };
     Runtime.getRuntime().addShutdownHook(shutdownHook);
+  }
+
+  /**
+   * 
+   */
+  public static class Configuration
+  {
+    /**
+     * Path to the driver JPPF config
+     */
+    public String driverJppf = "";
+    /**
+     * Path to the driver log4j config
+     */
+    public String driverLog4j = "";
+    /**
+     * Driver classpath elements.
+     */
+    public List<String> driverClasspath = new ArrayList<String>();
+    /**
+     * Driver JVM options.
+     */
+    public List<String> driverJvmOptions = new ArrayList<String>();
+    /**
+     * Path to the node JPPF config
+     */
+    public String nodeJppf = "";
+    /**
+     * Path to the node log4j config
+     */
+    public String nodeLog4j = "";
+    /**
+     * Node classpath elements.
+     */
+    public List<String> nodeClasspath = new ArrayList<String>();
+    /**
+     * Node JVM options.
+     */
+    public List<String> nodeJvmOptions = new ArrayList<String>();
   }
 }

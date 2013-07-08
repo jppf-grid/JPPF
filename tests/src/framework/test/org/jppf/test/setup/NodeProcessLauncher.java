@@ -18,6 +18,8 @@
 
 package test.org.jppf.test.setup;
 
+import java.util.List;
+
 
 /**
  * Used to launch a single node.
@@ -33,6 +35,20 @@ public class NodeProcessLauncher extends GenericProcessLauncher
   {
     super(n, "  node", "classes/tests/config/node.template.properties", "classes/tests/config/log4j-node.template.properties");
     setupCommon();
+  }
+
+  /**
+   * Initialize the node launcher.
+   * @param n the id of the driver, used to determine which configuration files to use.
+   * @param driverConfig the path to the JPPF configuration template file.
+   * @param log4jConfig the path to the log4j template file.
+   * @param classpath the classpath elements for the node.
+   * @param jvmOptions additional JVM options for the node.
+   */
+  public NodeProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions)
+  {
+    super(n, "  node", driverConfig, log4jConfig, classpath, jvmOptions);
+    setMainClass("org.jppf.node.NodeRunner");
   }
 
   /**

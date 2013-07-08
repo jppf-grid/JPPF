@@ -52,7 +52,7 @@
       <fileset dir="${path}/src/java" includes="**/*.java"/>
     </checkstyle>
     <mkdir dir="${path}/classes"/>
-    <javac srcdir="" destdir="${path}/classes" source="1.6" target="1.6"
+    <javac srcdir="" destdir="${path}/classes" source="1.7" target="1.7"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
       <classpath refid="project.classpath"/>
       <compilerarg line="-Xlint:none"/>

@@ -34,7 +34,6 @@
   	<copy toDir="${home}/doc/v2/includes" file="${home}/jppf_menu.php"/>
   	<copy toDir="${home}/doc/v3/includes" file="${home}/jppf_header.php"/>
   	<copy toDir="${home}/doc/v3/includes" file="${home}/jppf_menu.php"/>
-  	<!--<copy toDir="${home}/forums" file="${home}/jppf_header.php"/>-->
 	</target>
 
 	<target name="doc.gen" description="generates the project web site pages">
@@ -103,13 +102,12 @@
 			<packageset dir="${client}/src/java"/>
 			<packageset dir="${server}/src/java"/>
 			<packageset dir="${admin}/src/java"/>
-			<!--<packageset dir="${demo}/src/java"/>-->
 			<packageset dir="${jca-client}/src/java"/>
 			<packageset dir="${jca-client}/src/j2eeclient"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
-			<link href="http://download.oracle.com/javase/6/docs/api/"/>
+			<link href="http://docs.oracle.com/javase/7/docs/api/"/>
 			<link href="http://docs.oracle.com/javaee/6/api/"/>
 			<link href="http://kentbeck.github.com/junit/javadoc/latest"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
@@ -129,7 +127,7 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2012 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2013 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
@@ -159,7 +157,7 @@
 
 	<target name="compile.doclet" description="compile the @exclude doclet">
 		<delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
-		<javac srcdir="" destdir="${basedir}/classes" source="1.6" target="1.6"
+		<javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="doclet.classpath"/>
 	    <compilerarg line="-Xlint:unchecked"/>

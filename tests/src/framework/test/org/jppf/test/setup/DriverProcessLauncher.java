@@ -18,6 +18,8 @@
 
 package test.org.jppf.test.setup;
 
+import java.util.List;
+
 
 /**
  * Used to launch a driver.
@@ -33,6 +35,20 @@ public class DriverProcessLauncher extends GenericProcessLauncher
   {
     super(n, "driver", "classes/tests/config/driver.template.properties", "classes/tests/config/log4j-driver.template.properties");
     setupCommon();
+  }
+
+  /**
+   * Initialize the driver launcher.
+   * @param n the id of the driver, used to determine which configuration files to use.
+   * @param driverConfig the path to the JPPF configuration template file.
+   * @param log4jConfig the path to the log4j template file.
+   * @param classpath the classpath elements for the driver.
+   * @param jvmOptions additional JVM options for the driver.
+   */
+  public DriverProcessLauncher(final int n, final String driverConfig, final String log4jConfig, final List<String> classpath, final List<String> jvmOptions)
+  {
+    super(n, "driver", driverConfig, log4jConfig, classpath, jvmOptions);
+    setMainClass("org.jppf.server.JPPFDriver");
   }
 
   /**

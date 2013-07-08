@@ -25,6 +25,8 @@ import java.util.*;
 import org.jppf.utils.FileUtils;
 import org.junit.runner.*;
 
+import test.org.jppf.test.setup.BaseSetup;
+
 /**
  * This class is intended to run the JPPF JUnit tests, either as a standalone application,
  * or by sending a test request to a web application, for testing the JCA connector.
@@ -104,14 +106,39 @@ public class JPPFTestRunner
    */
   public ResultHolder sendTestRequest(final URL webAppUrl) throws Exception
   {
-    HttpURLConnection conn = (HttpURLConnection) webAppUrl.openConnection();
-    conn.setDoOutput(true);
-    conn.setRequestMethod("GET");
-    conn.connect();
-    InputStream in = conn.getInputStream();
-    ObjectInputStream ois = new ObjectInputStream(in);
-    Object o = ois.readObject();
-    return (ResultHolder) o;
+    try
+    {
+      BaseSetup.Configuration config = new BaseSetup.Configuration();
+      List<String> commonCP = new ArrayList<String>();
+      commonCP.add("../lib/jppf-common-node.jar");
+      commonCP.add("../lib/slf4j-api-1.6.1.jar");
+      commonCP.add("../lib/slf4j-log4j12-1.6.1.jar");
+      commonCP.add("../lib/log4j-1.2.15.jar");
+      commonCP.add("../lib/jmxremote_optional-1.0_01-ea.jar");
+      config.driverJppf = "config/driver.template.properties";
+      config.driverLog4j = "config/log4j-driver.template.properties";
+      config.driverClasspath.addAll(commonCP);
+      config.driverClasspath.add("../lib/jppf-common.jar");
+      config.driverClasspath.add("../lib/jppf-server.jar");
+      config.driverJvmOptions.add("-Djava.util.logging.config.file=config/logging-driver.properties");
+      config.nodeJppf = "config/node.template.properties";
+      config.nodeLog4j = "config/log4j-node.template.properties";
+      config.nodeClasspath.addAll(commonCP);
+      config.nodeJvmOptions.add("-Djava.util.logging.config.file=config/logging-node1.properties");
+      BaseSetup.setup(1, 1, false, config);
+      HttpURLConnection conn = (HttpURLConnection) webAppUrl.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("GET");
+      conn.connect();
+      InputStream in = conn.getInputStream();
+      ObjectInputStream ois = new ObjectInputStream(in);
+      Object o = ois.readObject();
+      return (ResultHolder) o;
+    }
+    finally
+    {
+      BaseSetup.cleanup();
+    }
   }
 
   /**

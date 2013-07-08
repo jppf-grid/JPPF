@@ -22,11 +22,12 @@
   <!--                          Property definitions                             -->
   <!-- ========================================================================= -->
 
-  <property name="classes.dir" value="${basedir}/classes" />
-  <property name="src.dir"     value="${basedir}/src" />
-  <property name="build.dir"   value="${basedir}/build" />
-  <property name="lib.dir"     value="${basedir}/../lib" />
-  <property name="war.prefix"  value="JPPF_J2EE_Tests" />
+  <property name="classes.dir"   value="${basedir}/classes" />
+  <property name="src.dir"       value="${basedir}/src" />
+  <property name="config.dir"    value="${basedir}/config" />
+  <property name="build.dir"     value="${basedir}/build" />
+  <property name="lib.dir"       value="${basedir}/../lib" />
+  <property name="war.prefix"    value="JPPF_J2EE_Tests" />
   <property file="${basedir}/../build.number" />
   <property name="geronimo.name" value="geronimo-tomcat7-javaee6-3.0.0"/>
   <property name="geronimo.dir"  value="${user.home}/geronimo"/>
@@ -40,7 +41,8 @@
     <pathelement location="${classes.dir}" />
     <pathelement location="${config.dir}" />
     <pathelement location="${basedir}/../classes/jca" />
-    <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/slf4j-jdk1*.jar"/>
+    <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/slf4j-jdk*.jar"/>
+    <pathelement location="${basedir}/config" />
   </path>
 
   <path id="generate.classpath">
@@ -76,9 +78,10 @@
   <!-- ========================================================================= -->
 
   <target name="build" depends="war"/>
+  <target name="build.run" depends="build, geronimo.install, geronimo.start, geronimo.deploy.connector, geronimo.deploy.testwar, run.tests, geronimo.stop"/>
 
   <!-- ========================================================================= -->
-  <!--                     Genrates the list of test classes                     -->
+  <!--                     Generates the list of test classes                    -->
   <!-- ========================================================================= -->
 
   <target name="generate.tests.list">
@@ -142,18 +145,17 @@
     <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="project.classpath" resultproperty="test.result">
       <jvmarg value="-server"/>
       <jvmarg value="-Xmx256m"/>
+      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
       <arg value="-u"/>
       <arg value="http://localhost:8080/jppfunittests/performTests?remoteClient=true"/>
     </java>
   </target>
 
   <!-- ========================================================================= -->
-  <!--                         Compile the application                           -->
+  <!--                       Download and install Geronimo                       -->
   <!-- ========================================================================= -->
 
-  <target name="download.launch.geronimo" depends="build, install.geronimo, start.geronimo, deploy.connector, deploy.test.war"/>
-
-  <target name="install.geronimo" depends="">
+  <target name="geronimo.install" depends="">
     <echo message="downloading geronimo 3.0.0 ..." />
     <mkdir dir="${geronimo.dir}"/>
     <get dest="${geronimo.dir}/${geronimo.name}.tar.gz" verbose="true" skipexisting="true">
@@ -174,7 +176,11 @@
     -->
   </target>
 
-  <target name="start.geronimo" depends="">
+  <!-- ========================================================================= -->
+  <!--                       Start and stop Geronimo                             -->
+  <!-- ========================================================================= -->
+
+  <target name="geronimo.start" depends="">
     <echo message="starting geronimo 3.0.0 ..." />
     <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
       <arg value="/c"/>
@@ -186,7 +192,7 @@
     </waitfor>
   </target>
 
-  <target name="stop.geronimo" depends="">
+  <target name="geronimo.stop" depends="">
     <echo message="stopping geronimo 3.0.0 ..." />
     <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
       <arg value="/c"/>
@@ -204,23 +210,27 @@
     </waitfor>
   </target>
 
-  <target name="deploy.connector" depends="">
-    <antcall target="deploy.module"><param name="resource" value="${j2e.dir}/jppf_ra_Geronimo.rar"/></antcall>
+  <!-- ========================================================================= -->
+  <!--                       Deploy/undeploy modules                             -->
+  <!-- ========================================================================= -->
+
+  <target name="geronimo.deploy.connector" depends="">
+    <antcall target="geronimo.deploy"><param name="resource" value="${j2e.dir}/jppf_ra_Geronimo.rar"/></antcall>
   </target>
 
-  <target name="deploy.test.war" depends="">
-    <antcall target="deploy.module"><param name="resource" value="${build.dir}/${war.prefix}.war"/></antcall>
+  <target name="geronimo.deploy.testwar" depends="">
+    <antcall target="geronimo.deploy"><param name="resource" value="${build.dir}/${war.prefix}.war"/></antcall>
   </target>
 
-  <target name="undeploy.connector" depends="">
-    <antcall target="undeploy.module"><param name="mid" value="JPPF/jca-client/2.0/rar"/></antcall>
+  <target name="geronimo.undeploy.connector" depends="">
+    <antcall target="geronimo.undeploy"><param name="mid" value="JPPF/jca-client/2.0/rar"/></antcall>
   </target>
 
-  <target name="undeploy.test.war" depends="">
-    <antcall target="undeploy.module"><param name="mid" value="JPPF/unit.tests/2.0/war"/></antcall>
+  <target name="geronimo.undeploy.testwar" depends="">
+    <antcall target="geronimo.undeploy"><param name="mid" value="JPPF/unit.tests/2.0/war"/></antcall>
   </target>
 
-  <target name="deploy.module" depends="">
+  <target name="geronimo.deploy" depends="">
     <echo message="deploying ${resource} ..." />
     <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
       <arg value="/c"/>
@@ -234,7 +244,7 @@
     </exec>    
   </target>
 
-  <target name="undeploy.module" depends="">
+  <target name="geronimo.undeploy" depends="">
     <echo message="un-deploying ${mid} ..." />
     <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
       <arg value="/c"/>

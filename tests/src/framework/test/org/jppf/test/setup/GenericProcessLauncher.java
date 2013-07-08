@@ -144,7 +144,7 @@ public class GenericProcessLauncher implements Runnable {
    * @param n a number ssigned to this process.
    * @param processType the type of process (node or driver).
    * @param jppfTemplate the path to the JPPF configuration template file.
-   * @param log4jTemplate the path to the JPPF configuration template file.
+   * @param log4jTemplate the path to the log4j template file.
    */
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
     this.n = n;
@@ -163,6 +163,24 @@ public class GenericProcessLauncher implements Runnable {
       String[] options = s.split("\\s");
       for (String opt: options) addJvmOption(opt);
     }
+  }
+
+  /**
+   * Default constructor.
+   * @param n a number ssigned to this process.
+   * @param processType the type of process (node or driver).
+   * @param jppfTemplate the path to the JPPF configuration template file.
+   * @param log4jTemplate the path to the log4j template file.
+   * @param classpath the classpath elements for the driver.
+   * @param jvmOptions additional JVM options for the driver.
+   */
+  public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate, final List<String> classpath, final List<String> jvmOptions) {
+    this.n = n;
+    this.name = "[" + processType + '-' + n + "] ";
+    jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
+    log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
+    for (String elt: classpath) addClasspathElement(elt);
+    for (String option: jvmOptions) addJvmOption(option);
   }
 
   /**
