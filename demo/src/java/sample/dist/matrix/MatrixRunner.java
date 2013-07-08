@@ -206,7 +206,8 @@ public class MatrixRunner implements NotificationListener
     Matrix c = new Matrix(size);
     // Get the matrix values from the tasks results
     int rowIdx = 0;
-    for (JPPFTask matrixTask : results) {
+    for (JPPFTask matrixTask : results)
+    {
       if (matrixTask.getException() != null)
       {
         output("got exception: " + ExceptionUtils.getStackTrace(matrixTask.getException()));
