@@ -153,7 +153,6 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
     if (s != null)
     {
       String[] options = s.split("\\s");
-      //for (String opt: options) command.add(opt);
       int count = 0;
       while (count < options.length)
       {
@@ -173,8 +172,10 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
       sb.append(cpElements.get(i));
     }
     command.add(sb.toString());
-    //command.add(System.getProperty("java.class.path"));
-    command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + System.getProperty(JPPFConfiguration.CONFIG_PROPERTY));
+    s = System.getProperty(JPPFConfiguration.CONFIG_PROPERTY);
+    if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + s);
+    s = System.getProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY);
+    if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PLUGIN_PROPERTY + '=' + s);
     command.add("-Dlog4j.configuration=" + System.getProperty("log4j.configuration"));
     for (String opt: jvmOptions) command.add(opt);
     command.add(mainClass);
