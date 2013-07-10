@@ -33,7 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Jonathan Newbrough
  */
-public class JPPFConfiguration
+public final class JPPFConfiguration
 {
   /**
    * Logger for this class.
@@ -59,6 +59,13 @@ public class JPPFConfiguration
    * Holds the JPPF configuration properties.
    */
   private static TypedProperties props = null;
+
+  /**
+   * Prevent instantiation from another class.
+   */
+  private JPPFConfiguration()
+  {
+  }
 
   /**
    * Get the configuration properties.
@@ -121,7 +128,7 @@ public class JPPFConfiguration
    * @return an input stream that can be used to load the properties.
    * @throws Exception if any error occurs while trying to obtain the stream.
    */
-  public static InputStream getConfigurationStream(final String filename, final String configurationSourceName) throws Exception
+  private static InputStream getConfigurationStream(final String filename, final String configurationSourceName) throws Exception
   {
     InputStream is = null;
     if (configurationSourceName != null)
