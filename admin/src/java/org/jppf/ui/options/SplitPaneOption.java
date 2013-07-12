@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.options;
 
-import java.util.*;
-
 import javax.swing.JSplitPane;
 
 import org.slf4j.*;
@@ -27,7 +25,7 @@ import org.slf4j.*;
  * This option class encapsulates a split pane, as the one present in the Swing api.
  * @author Laurent Cohen
  */
-public class SplitPaneOption extends AbstractOptionElement implements OptionsPage
+public class SplitPaneOption extends AbstractOptionContainer
 {
   /**
    * Logger for this class.
@@ -50,10 +48,6 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
    */
   protected final Option FILLER2 = new FillerOption(0, 0);
   /**
-   * The list of children of this options page.
-   */
-  protected List<OptionElement> children = new ArrayList<OptionElement>();
-  /**
    * The split pane's resize weight.
    */
   protected double resizeWeight = 0.5d;
@@ -66,28 +60,11 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
    */
   protected int orientation = 0;
 
-  /**
-   * Initialize the split pane with 2 fillers as left (or top) and right (or bottom) components.
-   */
-  public SplitPaneOption()
-  {
-  }
-
-  /**
-   * Initialize the panel used to display this options page.
-   */
   @Override
   public void createUI()
   {
     JSplitPane pane = new JSplitPane();
-    if (orientation == HORIZONTAL)
-    {
-      pane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-    }
-    else
-    {
-      pane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-    }
+    pane.setOrientation(orientation == HORIZONTAL ? JSplitPane.HORIZONTAL_SPLIT : JSplitPane.VERTICAL_SPLIT);
     UIComponent = pane;
     children.add(FILLER1);
     children.add(FILLER2);
@@ -98,34 +75,6 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
     pane.setOpaque(false);
   }
 
-  /**
-   * Enable or disable this option.
-   * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
-   */
-  @Override
-  public void setEnabled(final boolean enabled)
-  {
-    if (UIComponent != null) UIComponent.setEnabled(enabled);
-    for (OptionElement elt: children) elt.setEnabled(enabled);
-  }
-
-  /**
-   * Enable or disable the events firing in this option and/or its children.
-   * @param enabled true to enable the events, false to disable them.
-   * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-   */
-  @Override
-  public void setEventsEnabled(final boolean enabled)
-  {
-    for (OptionElement elt: children) elt.setEventsEnabled(enabled);
-  }
-
-  /**
-   * Add an element to this options page. The element can be either an option, or another page.
-   * @param element the element to add.
-   * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
-   */
   @Override
   public void add(final OptionElement element)
   {
@@ -149,15 +98,9 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
       log.error(msg);
       return;
     }
-    if (element instanceof AbstractOptionElement)
-      ((AbstractOptionElement) element).setParent(this);
+    if (element instanceof AbstractOptionElement) ((AbstractOptionElement) element).setParent(this);
   }
 
-  /**
-   * Remove an element from this options page.
-   * @param element the element to remove.
-   * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
-   */
   @Override
   public void remove(final OptionElement element)
   {
@@ -176,19 +119,7 @@ public class SplitPaneOption extends AbstractOptionElement implements OptionsPag
       children.add(1, FILLER2);
       pane.setRightComponent(FILLER2.getUIComponent());
     }
-    if (element instanceof AbstractOptionElement)
-      ((AbstractOptionElement) element).setParent(null);
-  }
-
-  /**
-   * Get the options in this page.
-   * @return a list of <code>Option</code> instances.
-   * @see org.jppf.ui.options.OptionsPage#getChildren()
-   */
-  @Override
-  public List<OptionElement> getChildren()
-  {
-    return Collections.unmodifiableList(children);
+    if (element instanceof AbstractOptionElement) ((AbstractOptionElement) element).setParent(null);
   }
 
   /**

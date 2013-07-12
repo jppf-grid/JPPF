@@ -69,11 +69,11 @@ public class ActionsInitializer implements Runnable
   @Override
   public void run()
   {
-    OptionsPage page = null;
+    OptionContainer page = null;
     while (page == null)
     {
       final OptionElement parent = mainPanel.getParent();
-      if (parent != null) page = (OptionsPage) mainPanel.findFirstWithName(btnContainerName);
+      if (parent != null) page = (OptionContainer) mainPanel.findFirstWithName(btnContainerName);
       try
       {
         Thread.sleep(100L);

@@ -29,16 +29,15 @@ import javax.swing.tree.TreePath;
 public interface OptionElement extends OptionProperties
 {
   /**
+   * Get the root of the option tree this option belongs to.
+   * @return a <code>OptionElement</code> instance.
+   */
+  OptionElement getRoot();
+  /**
    * Get the parent page for this options page.
    * @return an <code>OptionsPage</code> instance.
    */
   OptionElement getParent();
-  /**
-   * Get the root of the option tree this option belongs to.
-   * @return a <code>OptionElement</code> instance.
-   */
-  @Override
-  OptionElement getRoot();
   /**
    * Get the path of this element in the option tree.
    * @return a <code>TreePath</code> whose components are <code>OptionElement</code> instances.

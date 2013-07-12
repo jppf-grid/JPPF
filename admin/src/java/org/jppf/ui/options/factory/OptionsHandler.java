@@ -106,7 +106,7 @@ public final class OptionsHandler
    * Remove a page from the list of pages managed by this handler.
    * @param page an <code>OptionsPage</code> instance.
    */
-  public static synchronized void removePage(final OptionsPage page)
+  public static synchronized void removePage(final OptionContainer page)
   {
     pageList.remove(page);
     pageMap.remove(page.getName());
@@ -260,10 +260,10 @@ public final class OptionsHandler
   public static OptionNode buildPersistenceGraph(final OptionElement elt)
   {
     OptionNode node = null;
-    if (elt instanceof OptionsPage)
+    if (elt instanceof OptionContainer)
     {
       node = new OptionNode(elt);
-      OptionsPage page = (OptionsPage) elt;
+      OptionContainer page = (OptionContainer) elt;
       for (OptionElement child: page.getChildren())
       {
         OptionNode childNode = buildPersistenceGraph(child);

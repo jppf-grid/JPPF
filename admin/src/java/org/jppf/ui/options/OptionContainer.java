@@ -23,7 +23,7 @@ import java.util.List;
  * Interface for dynamic UI components representing a page (or panel) container.
  * @author Laurent Cohen
  */
-public interface OptionsPage extends OptionElement
+public interface OptionContainer extends OptionElement
 {
   /**
    * Add an element to this options page.

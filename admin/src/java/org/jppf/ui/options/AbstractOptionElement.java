@@ -154,8 +154,8 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
    */
   protected OptionElement getChildForName(final String childName)
   {
-    if (!(this instanceof OptionsPage)) return null;
-    OptionsPage page = 	(OptionsPage) this;
+    if (!(this instanceof OptionContainer)) return null;
+    OptionContainer page = 	(OptionContainer) this;
     for (OptionElement elt: page.getChildren())
     {
       if (childName.equals(elt.getName())) return elt;
@@ -172,7 +172,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append('[').append((this instanceof OptionsPage) ? "Page" : "Option").append(" : ");
+    sb.append('[').append((this instanceof OptionContainer) ? "Page" : "Option").append(" : ");
     sb.append(getClass().getName()).append("] ");
     sb.append("name=").append(name);
     sb.append("; label=").append(label);
@@ -233,9 +233,9 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
   protected void findAll(final String name, final List<OptionElement> list)
   {
     if (name.equals(getName())) list.add(this);
-    if (this instanceof OptionsPage)
+    if (this instanceof OptionContainer)
     {
-      OptionsPage page = (OptionsPage) this;
+      OptionContainer page = (OptionContainer) this;
       for (OptionElement elt: page.getChildren()) ((AbstractOptionElement) elt).findAll(name, list);
     }
   }

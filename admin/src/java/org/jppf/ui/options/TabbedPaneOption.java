@@ -17,33 +17,19 @@
  */
 package org.jppf.ui.options;
 
-import java.util.*;
+import java.awt.Component;
 
 import javax.swing.*;
 
+import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
  * This option class encapsulates a tabbed pane, as the one present in the Swing api.
  * @author Laurent Cohen
  */
-public class TabbedPaneOption extends AbstractOptionElement implements OptionsPage
+public class TabbedPaneOption extends AbstractOptionContainer
 {
-  /**
-   * The list of children of this options page.
-   */
-  protected List<OptionElement> children = new ArrayList<OptionElement>();
-
-  /**
-   * Initialize the split pane with 2 fillers as left (or top) and right (or bottom) components.
-   */
-  public TabbedPaneOption()
-  {
-  }
-
-  /**
-   * Initialize the panel used to display this options page.
-   */
   @Override
   public void createUI()
   {
@@ -51,78 +37,37 @@ public class TabbedPaneOption extends AbstractOptionElement implements OptionsPa
     pane.setDoubleBuffered(true);
     if (!bordered) pane.setBorder(BorderFactory.createEmptyBorder());
     UIComponent = pane;
-    //pane.setOpaque(false);
   }
 
-  /**
-   * Enable or disable this option.
-   * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
-   */
-  @Override
-  public void setEnabled(final boolean enabled)
-  {
-    if (UIComponent != null) UIComponent.setEnabled(enabled);
-    for (OptionElement elt: children) elt.setEnabled(enabled);
-  }
-
-  /**
-   * Enable or disable the events firing in this option and/or its children.
-   * @param enabled true to enable the events, false to disable them.
-   * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-   */
-  @Override
-  public void setEventsEnabled(final boolean enabled)
-  {
-    for (OptionElement elt: children) elt.setEventsEnabled(enabled);
-  }
-
-  /**
-   * Add an element to this options page. The element can be either an option, or another page.
-   * @param element the element to add.
-   * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
-   */
   @Override
   public void add(final OptionElement element)
   {
-    children.add(element);
+    int idx = children.size();
+    super.add(element);
     JTabbedPane pane = (JTabbedPane) UIComponent;
     ImageIcon icon = null;
     if (element.getIconPath() != null) icon = GuiUtils.loadIcon(element.getIconPath());
+    DockingManager dmgr = DockingManager.getInstance();
     try
     {
-      pane.addTab(element.getLabel(), icon, element.getUIComponent(), element.getToolTipText());
+      pane.addTab("", icon, element.getUIComponent(), element.getToolTipText());
+      JLabel l = new JLabel(element.getLabel());
+      l.addMouseListener(dmgr.getMouseAdapter());
+      pane.setTabComponentAt(idx, l);
+      if (!dmgr.isRegistered(element)) dmgr.register(element, l);
+      else dmgr.update(element, l);
     }
     catch(Throwable t)
     {
       t.printStackTrace();
     }
-    if (element instanceof AbstractOptionElement)
-      ((AbstractOptionElement) element).setParent(this);
   }
 
-  /**
-   * Remove an element from this options page.
-   * @param element the element to remove.
-   * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
-   */
   @Override
   public void remove(final OptionElement element)
   {
-    children.remove(element);
+    super.remove(element);
     UIComponent.remove(element.getUIComponent());
-    if (element instanceof AbstractOptionElement)
-      ((AbstractOptionElement) element).setParent(null);
-  }
-
-  /**
-   * Get the options in this page.
-   * @return a list of <code>Option</code> instances.
-   * @see org.jppf.ui.options.OptionsPage#getChildren()
-   */
-  @Override
-  public List<OptionElement> getChildren()
-  {
-    return Collections.unmodifiableList(children);
+    Component comp = null;
   }
 }

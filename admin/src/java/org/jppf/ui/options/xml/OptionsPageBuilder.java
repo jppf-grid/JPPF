@@ -202,9 +202,9 @@ public class OptionsPageBuilder
       {
       }
     }
-    if (elt instanceof OptionsPage)
+    if (elt instanceof OptionContainer)
     {
-      for (OptionElement child: ((OptionsPage) elt).getChildren())
+      for (OptionElement child: ((OptionContainer) elt).getChildren())
       {
         triggerLifeCycleEvents(child, initial);
       }

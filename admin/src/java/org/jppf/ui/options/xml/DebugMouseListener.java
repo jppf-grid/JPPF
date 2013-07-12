@@ -100,7 +100,7 @@ public class DebugMouseListener extends MouseAdapter
   {
     try
     {
-      OptionsPage parent = (OptionsPage) option.getParent();
+      OptionContainer parent = (OptionContainer) option.getParent();
       parent.remove(option);
       OptionsPageBuilder builder = new OptionsPageBuilder(true);
       OptionElement elt;

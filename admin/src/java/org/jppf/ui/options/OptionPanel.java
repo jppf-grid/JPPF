@@ -17,8 +17,6 @@
  */
 package org.jppf.ui.options;
 
-import java.util.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -31,12 +29,8 @@ import net.miginfocom.swing.MigLayout;
  * added to a {@link javax.swing.ButtonGroup ButtonGroup}.
  * @author Laurent Cohen
  */
-public class OptionPanel extends AbstractOptionElement implements OptionsPage
+public class OptionPanel extends AbstractOptionContainer
 {
-  /**
-   * The list of children of this options page.
-   */
-  protected List<OptionElement> children = new ArrayList<OptionElement>();
   /**
    * The panel used to display this options page.
    */
@@ -47,8 +41,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
   protected ButtonGroup buttonGroup = null;
 
   /**
-   * Constructor provided as a convenience to facilitate the creation of
-   * option elements through reflexion.
+   * Default constructor.
    */
   public OptionPanel()
   {
@@ -82,9 +75,6 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
     this(name, label, scrollable, false);
   }
 
-  /**
-   * Initialize the panel used to display this options page.
-   */
   @Override
   public void createUI()
   {
@@ -92,7 +82,7 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
     if (bordered)
     {
       Border border = (label != null)
-      ? border = BorderFactory.createTitledBorder(label)
+          ? BorderFactory.createTitledBorder(label)
           : BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
       panel.setBorder(border);
     }
@@ -107,76 +97,24 @@ public class OptionPanel extends AbstractOptionElement implements OptionsPage
       UIComponent = sp;
     }
     else UIComponent = panel;
-    //panel.setBackground(new Color(0, 0, 255));
   }
 
-  /**
-   * Get the options in this page.
-   * @return a list of <code>Option</code> instances.
-   * @see org.jppf.ui.options.OptionsPage#getChildren()
-   */
-  @Override
-  public List<OptionElement> getChildren()
-  {
-    return children;
-  }
-
-  /**
-   * Add an element to this options page. The element can be either an option, or another page.
-   * @param element the element to add.
-   * @see org.jppf.ui.options.OptionsPage#add(org.jppf.ui.options.OptionElement)
-   */
   @Override
   public void add(final OptionElement element)
   {
-    children.add(element);
-    if (element instanceof AbstractOptionElement)
+    super.add(element);
+    if (element instanceof RadioButtonOption)
     {
-      ((AbstractOptionElement) element).setParent(this);
-      if (element instanceof RadioButtonOption)
-      {
-        if (buttonGroup == null) buttonGroup = new ButtonGroup();
-        buttonGroup.add((JRadioButton) element.getUIComponent());
-      }
+      if (buttonGroup == null) buttonGroup = new ButtonGroup();
+      buttonGroup.add((JRadioButton) element.getUIComponent());
     }
     panel.add(element.getUIComponent(), element.getComponentConstraints());
   }
 
-  /**
-   * Remove an element from this options page.
-   * @param element the element to remove.
-   * @see org.jppf.ui.options.OptionsPage#remove(org.jppf.ui.options.OptionElement)
-   */
   @Override
   public void remove(final OptionElement element)
   {
     children.remove(element);
-    if (element instanceof AbstractOption)
-    {
-      ((AbstractOption) element).setParent(null);
-    }
     panel.remove(element.getUIComponent());
-  }
-
-  /**
-   * Enable or disable this option.
-   * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
-   */
-  @Override
-  public void setEnabled(final boolean enabled)
-  {
-    for (OptionElement elt: children) elt.setEnabled(enabled);
-  }
-
-  /**
-   * Enable or disable the events firing in this option and/or its children.
-   * @param enabled true to enable the events, false to disable them.
-   * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
-   */
-  @Override
-  public void setEventsEnabled(final boolean enabled)
-  {
-    for (OptionElement elt: children) elt.setEventsEnabled(enabled);
   }
 }
