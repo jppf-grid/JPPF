@@ -24,9 +24,9 @@ import javax.resource.ResourceException;
 import javax.resource.spi.*;
 import javax.security.auth.Subject;
 
+import org.jppf.client.AbstractGenericClient;
 import org.jppf.jca.cci.JPPFConnectionFactory;
 import org.jppf.jca.util.JPPFAccessorImpl;
-import org.jppf.jca.work.JPPFJcaClient;
 
 
 /**
@@ -164,10 +164,10 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
 
   /**
    * Get the JPPF client used to submit tasks.
-   * @return a <code>JPPFJcaClient</code> instance.
+   * @return an <code>AbstractGenericClient</code> instance.
    */
   @Override
-  public JPPFJcaClient getJppfClient()
+  public AbstractGenericClient getJppfClient()
   {
     if (jppfClient == null)
     {

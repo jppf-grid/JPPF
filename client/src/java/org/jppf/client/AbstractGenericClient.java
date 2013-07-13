@@ -20,12 +20,11 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.startup.*;
+import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
@@ -423,24 +422,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
-  public boolean cancelJob(final String jobId) throws Exception
-  {
+  public boolean cancelJob(final String jobId) throws Exception {
     if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
-
     if (debugEnabled) log.debug("request to cancel job with uuid=" + jobId);
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager instanceof SubmissionManagerClient)
-      return ((SubmissionManagerClient) submissionManager).cancelJob(jobId);
-
-    boolean cancelled = false;
-    for (JPPFClientConnection connection : getAllConnections())
-    {
-      if (connection instanceof AbstractJPPFClientConnection)
-      {
-        cancelled |= ((AbstractJPPFClientConnection) connection).cancelJob(jobId);
-      }
-    }
-    return cancelled;
+    return getSubmissionManager().cancelJob(jobId);
   }
 
   /**

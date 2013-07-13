@@ -48,28 +48,11 @@ public class JPPFClient extends AbstractGenericClient
 
   /**
    * Initialize this client with an automatically generated application UUID.
-   */
-  public JPPFClient()
-  {
-    super(null, JPPFConfiguration.getProperties());
-  }
-
-  /**
-   * Initialize this client with an automatically generated application UUID.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
   public JPPFClient(final ClientListener... listeners)
   {
     super(null, JPPFConfiguration.getProperties(), listeners);
-  }
-
-  /**
-   * Initialize this client with a specified application UUID.
-   * @param uuid the unique identifier for this local client.
-   */
-  public JPPFClient(final String uuid)
-  {
-    super(uuid, JPPFConfiguration.getProperties());
   }
 
   /**
@@ -80,6 +63,17 @@ public class JPPFClient extends AbstractGenericClient
   public JPPFClient(final String uuid, final ClientListener... listeners)
   {
     super(uuid, JPPFConfiguration.getProperties(), listeners);
+  }
+
+  /**
+   * Initialize this client with the specified application UUID and new connection listeners.
+   * @param uuid the unique identifier for this local client.
+   * @param config the JPPF configuration to use for this client.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   */
+  public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners)
+  {
+    super(uuid, config, listeners);
   }
 
   /**

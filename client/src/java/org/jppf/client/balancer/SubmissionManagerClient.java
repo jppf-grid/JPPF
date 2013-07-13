@@ -102,11 +102,11 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   private ChannelWrapperLocal wrapperLocal = null;
   /**
-   * Counts the current number of connections with ACTIVE or EXECUTING status. 
+   * Counts the current number of connections with ACTIVE or EXECUTING status.
    */
   private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
   /**
-   * Determines whether this submission manager has been closed. 
+   * Determines whether this submission manager has been closed.
    */
   private final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -127,13 +127,13 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     taskQueueChecker.setBundler(bundler);
 
     this.queue.addQueueListener(new QueueListener<ClientJob, ClientJob, ClientTaskBundle>()
-    {
+        {
       @Override
       public void newBundle(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event)
       {
         taskQueueChecker.wakeUp();
       }
-    });
+        });
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
 
     client.addClientListener(new ClientListener()
@@ -212,7 +212,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(),
-            ((AbstractJPPFClientConnection) cnn).getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSL());
+            ((AbstractJPPFClientConnection) cnn).getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }
@@ -281,7 +281,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         JMXDriverConnectionWrapper jmxConnection = connection.getJmxConnection();
 
         wrapper.setSystemInformation(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER, cnn.isSSL());
+        JPPFManagementInfo info = new JPPFManagementInfo(jmxConnection.getHost(), jmxConnection.getPort(), jmxConnection.getId(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }
@@ -350,13 +350,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     return submitJob(job);
   }
 
-  /**
-   * Cancel the job with the specified id.
-   * @param jobId the id of the job to cancel.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
-   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
-   */
+  @Override
   public boolean cancelJob(final String jobId) throws Exception
   {
     if (debugEnabled) log.debug("requesting cancel of jobId=" + jobId);

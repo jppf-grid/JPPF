@@ -68,7 +68,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Determines whether the communication via the server is done via SSL.
    */
-  protected boolean ssl = false;
+  protected boolean sslEnabled = false;
   /**
    * Represents the system information.
    */
@@ -93,16 +93,16 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @param host the name or IP address of the host the JPPF driver is running on.
    * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
    * @param priority the assigned to this client connection.
-   * @param ssl determines whether the communication via the server is done via SSL.
+   * @param sslEnabled determines whether the communication via the server is done via SSL.
    */
-  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean ssl)
+  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean sslEnabled)
   {
     this.driverUuid = uuid;
     this.host = host;
     this.port = driverPort;
     this.priority = priority;
     this.name = name;
-    this.ssl = ssl;
+    this.sslEnabled = sslEnabled;
     displayName = name;
     this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
   }
@@ -134,22 +134,12 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     this.priority = priority;
   }
 
-  /**
-   * Get the status of this connection.
-   * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
-   * @see org.jppf.client.JPPFClientConnection#getStatus()
-   */
   @Override
   public JPPFClientConnectionStatus getStatus()
   {
     return status.get();
   }
 
-  /**
-   * Set the status of this connection.
-   * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
-   * @see org.jppf.client.JPPFClientConnection#setStatus(org.jppf.client.JPPFClientConnectionStatus)
-   */
   @Override
   public void setStatus(final JPPFClientConnectionStatus status)
   {
@@ -162,22 +152,12 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     }
   }
 
-  /**
-   * Add a connection status listener to this connection's list of listeners.
-   * @param listener the listener to add to the list.
-   * @see org.jppf.client.JPPFClientConnection#addClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-   */
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
     listeners.add(listener);
   }
 
-  /**
-   * Remove a connection status listener from this connection's list of listeners.
-   * @param listener the listener to remove from the list.
-   * @see org.jppf.client.JPPFClientConnection#removeClientConnectionStatusListener(org.jppf.client.event.ClientConnectionStatusListener)
-   */
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
@@ -197,7 +177,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Get a string representation of this client connection.
    * @return a string representing this connection.
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString()
@@ -205,10 +184,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     return displayName + " : " + status;
   }
 
-  /**
-   * Create a socket initializer.
-   * @return an instance of a class implementing <code>SocketInitializer</code>.
-   */
   @Override
   protected abstract SocketInitializer createSocketInitializer();
 
@@ -283,9 +258,9 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   @Override
-  public boolean isSSL()
+  public boolean isSSLEnabled()
   {
-    return ssl;
+    return sslEnabled;
   }
 
   /**
@@ -311,7 +286,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   public void initializeJmxConnection()
   {
-    jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, ssl);
+    jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, sslEnabled);
     jmxConnection.connect();
   }
 
@@ -361,10 +336,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     return list;
   }
 
-  /**
-   * Determine whether this connection has been shut down;
-   * @return <code>true</code> if this connection has been closed, <code>false</code> otherwise.
-   */
+  @Override
   public boolean isClosed()
   {
     return closed;

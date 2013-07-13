@@ -46,6 +46,12 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
   List<JPPFJob> close();
 
   /**
+   * Determine whether this connection was closed.
+   * @return <code>true</code> if the connection is closed, <code>false</code> otherwise.
+   */
+  boolean isClosed();
+
+  /**
    * Get the name assigned to this client connection.
    * @return the name as a string.
    */
@@ -55,7 +61,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
    * Determines if this connection is over SSL.
    * @return <code>true</code> if this is an SSL connection, <code>false</code> otherwise.
    */
-  boolean isSSL();
+  boolean isSSLEnabled();
   
   /**
    * Get the driver's host name or ip address.

@@ -61,16 +61,15 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
   }
 
   /**
-   * Initialize this node's resources.
+   * Initialize this delegate's resources.
    * @throws Exception if an error is raised during initialization.
-   * @see org.jppf.client.ClassServerDelegate#init()
    */
   @Override
   public final void init() throws Exception
   {
     try
     {
-      if (((AbstractJPPFClientConnection) owner).isClosed()) throw new IllegalStateException("this task server connection is closed");
+      if (owner.isClosed()) throw new IllegalStateException("this task server connection is closed");
       handshakeDone = false;
       socketInitializer.setName('[' + getName() + " - delegate] ");
       setStatus(CONNECTING);
@@ -83,7 +82,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
       {
         throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
       }
-      if (owner.isSSL()) createSSLConnection();
+      if (owner.isSSLEnabled()) createSSLConnection();
       if (!socketInitializer.isClosed())
       {
         msg = "[client: " + getName() + "] Reconnected to the class server";

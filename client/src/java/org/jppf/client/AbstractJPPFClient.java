@@ -45,6 +45,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Name of the default SerializationHelper implementation class.
+   */
+  public static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
+  /**
+   * Name of the SerializationHelper implementation class for the JCA connector.
+   */
+  public static String JCA_SERIALIZATION_HELPER = "org.jppf.jca.serialization.JcaSerializationHelperImpl";
+  /**
    * Total count of the tasks submitted by this client.
    */
   protected int totalTaskCount = 0;
@@ -69,6 +77,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @exclude
    */
   protected final AtomicBoolean closed = new AtomicBoolean(false);
+  /**
+   * Fully qualified name of the serilaization helper class to use.
+   */
+  protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
 
   /**
    * Initialize this client with a specified application UUID.
@@ -396,6 +408,15 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public boolean isClosed()
   {
     return closed.get();
+  }
+
+  /**
+   * Get the name of the serialization helper implementation class name to use.
+   * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
+   */
+  protected String getSerializationHelperClassName()
+  {
+    return serializationHelperClassName;
   }
 
   /**

@@ -25,10 +25,11 @@ import javax.resource.spi.*;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
+import org.jppf.client.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.jca.util.JPPFAccessorImpl;
-import org.jppf.jca.work.JPPFJcaClient;
-import org.jppf.utils.*;
+import org.jppf.jca.work.JcaSubmissionManager;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -61,10 +62,6 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
    * </ul>
    */
   private String configurationSource = "";
-  /**
-   * The submission manager.
-   */
-  private transient SubmissionManager submissionManager;
 
   /**
    * Start this resource adapter with the specified bootstrap context.
@@ -80,8 +77,25 @@ public class JPPFResourceAdapter extends JPPFAccessorImpl implements ResourceAda
     {
       log.info("Starting JPPF resource adapter");
       TypedProperties config = new JPPFConfigurationParser(getConfigurationSource(), getClientConfiguration()).parse();
-      jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), config);
-      if (log.isDebugEnabled()) log.debug("Starting JPPF resource adapter: jppf client="+jppfClient);
+      //jppfClient = new JPPFJcaClient(new JPPFUuid().toString(), config);
+      jppfClient = new JPPFClient(null, config) {
+        @Override
+        protected SubmissionManager createSubmissionManager() {
+          SubmissionManager submissionManager = null;
+          try {
+            submissionManager = new JcaSubmissionManager(this);
+          } catch (Exception e) {
+            log.error("Can't initialize Submission Manager", e);
+          }
+          return submissionManager;
+        }
+
+        @Override
+        protected String getSerializationHelperClassName(){
+          return AbstractJPPFClient.JCA_SERIALIZATION_HELPER;
+        }
+      };
+      if (log.isDebugEnabled()) log.debug("Starting JPPF resource adapter: jppf client=" + jppfClient);
       log.info("JPPF resource adapter started");
     }
     catch (Exception e)

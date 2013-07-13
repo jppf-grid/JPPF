@@ -29,7 +29,7 @@ import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.client.submission.*;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessorImpl;
-import org.jppf.jca.work.submission.JcaSubmissionManager;
+import org.jppf.jca.work.JcaSubmissionManager;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 

@@ -13,5 +13,4 @@
       <module name="deployment.jppf_ra_JBoss-7.rar"/>
     </dependencies>
   </sub-deployment>
-  </deployment>
 </jboss-deployment-structure>

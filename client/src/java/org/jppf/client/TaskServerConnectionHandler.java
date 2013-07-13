@@ -91,7 +91,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
         }
         try
         {
-          if (owner.isSSL()) createSSLConnection();
+          if (owner.isSSLEnabled()) createSSLConnection();
           if (debugEnabled) log.debug("sending JPPF identifier");
           socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
           JPPFTaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();

@@ -52,10 +52,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Name of the SerializationHelper implementation class.
-   */
-  protected static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
-  /**
    * Used to prevent parallel deserialization.
    */
   private static Lock lock = new ReentrantLock();
@@ -100,10 +96,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   protected String connectionUuid = null;
   /**
-   * Fully qualified name of the serilaization helper class to use.
-   */
-  protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
-  /**
    * Status of the connection.
    */
   protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CREATED);
@@ -124,7 +116,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
-    ObjectSerializer ser = makeHelper(cl).getSerializer();
+    ObjectSerializer ser = makeHelper(cl, client.getSerializationHelperClassName()).getSerializer();
     int count = job.getTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
@@ -168,33 +160,25 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser);
     socketClient.flush();
-    String name = getSerializationHelperClassName();
-    try
-    {
-      setSerializationHelperClassName(SERIALIZATION_HELPER_IMPL);
-      return receiveBundleAndResults().first();
-    }
-    finally
-    {
-      setSerializationHelperClassName(name);
-    }
+    return receiveBundleAndResults(AbstractJPPFClient.SERIALIZATION_HELPER_IMPL).first();
   }
 
   /**
    * Receive results of tasks execution.
+   * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
   @SuppressWarnings("unchecked")
-  protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults() throws Exception {
+  protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults(final String helperClassName) throws Exception {
     List<JPPFTask> taskList = new LinkedList<JPPFTask>();
     JPPFTaskBundle bundle = null;
     try {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) cl = getClass().getClassLoader();
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
-      ObjectSerializer ser = makeHelper(cl).getSerializer();
+      ObjectSerializer ser = makeHelper(cl, helperClassName).getSerializer();
       bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
       if (debugEnabled) log.debug(this.toDebugString() + " : received bundle " + bundle);
@@ -233,7 +217,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   public List<JPPFTask> receiveResults() throws Exception
   {
-    return receiveBundleAndResults().second();
+    return receiveBundleAndResults(client.getSerializationHelperClassName()).second();
   }
 
   /**
@@ -261,23 +245,24 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
 
   /**
    * Instantiate a <code>SerializationHelper</code> using the current context class loader.
+   * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
    */
-  protected SerializationHelper makeHelper() throws Exception
+  protected SerializationHelper makeHelper(final String helperClassName) throws Exception
   {
-    return makeHelper(null);
+    return makeHelper(null, helperClassName);
   }
 
   /**
    * Instantiate a <code>SerializationHelper</code> using the current context class loader.
    * @param classLoader the class loader to use to load the serialization helper class.
+   * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
    */
-  protected SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception {
+  protected SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
     ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
-    String helperClassName = getSerializationHelperClassName();
     Class clazz = null;
     for (ClassLoader cl: clArray) {
       try {
@@ -290,24 +275,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       if (clazz == null) throw new IllegalStateException("could not load class " + helperClassName + " from any of these class loaders: " + Arrays.asList(clArray));
     }
     return (SerializationHelper) clazz.newInstance();
-  }
-
-  /**
-   * Get the name of the serialization helper implementation class name to use.
-   * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
-   */
-  protected String getSerializationHelperClassName()
-  {
-    return serializationHelperClassName;
-  }
-
-  /**
-   * Set the name of the serialization helper implementation class name to use.
-   * @param name the fully qualified class name of a <code>SerializationHelper</code> implementation.
-   */
-  protected void setSerializationHelperClassName(final String name)
-  {
-    this.serializationHelperClassName = name;
   }
 
   /**

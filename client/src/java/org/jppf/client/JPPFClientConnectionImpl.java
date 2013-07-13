@@ -21,7 +21,6 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.net.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.JPPFError;
 import org.jppf.client.event.*;
@@ -47,10 +46,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Used to synchronize request submissions performed by multiple threads.
-   */
-  private ReentrantLock lock = new ReentrantLock();
 
   /**
    * Initialize this client with a specified application UUID.
@@ -63,17 +58,13 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
     this.client = client;
-    this.ssl = ssl;
+    this.sslEnabled = ssl;
     this.connectionUuid = client.getUuid() + '_' + connectionCount.incrementAndGet();
     configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
     jmxPort = ssl ? info.sslManagementPort : info.managementPort;
     initializeJmxConnection();
   }
 
-  /**
-   * Initialize this client connection.
-   * @see org.jppf.client.JPPFClientConnection#init()
-   */
   @Override
   public void init()
   {
@@ -152,14 +143,5 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   protected SocketInitializer createSocketInitializer()
   {
     return new SocketInitializerImpl();
-  }
-
-  /**
-   * Get the lock used to synchronize request submissions performed by multiple threads.
-   * @return a <code>ReentrantLock</code> instance.
-   */
-  public ReentrantLock getLock()
-  {
-    return lock;
   }
 }

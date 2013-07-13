@@ -75,13 +75,23 @@ public interface SubmissionManager
    * @return a vector of connections instances.
    */
   Vector<JPPFClientConnection> getAvailableConnections();
+
   /**
    * Get a listener to the status of the managed connections.
    * @return a {@link ClientConnectionStatusListener} instance.
    */
   ClientConnectionStatusListener getClientConnectionStatusListener();
+
   /**
    * Close this submission manager and all the resources it uses.
    */
   void close();
+
+  /**
+   * Cancel the job with the specified id.
+   * @param jobId the id of the job to cancel.
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
+   * @throws Exception if any error occurs.
+   */
+  boolean cancelJob(String jobId) throws Exception;
 }

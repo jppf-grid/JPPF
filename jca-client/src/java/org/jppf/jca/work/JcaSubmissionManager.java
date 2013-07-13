@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.jca.work.submission;
+package org.jppf.jca.work;
 
 import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.SubmissionStatusListener;
-import org.jppf.jca.work.JPPFJcaClient;
 import org.slf4j.*;
 
 /**
@@ -52,7 +51,7 @@ public class JcaSubmissionManager extends SubmissionManagerClient
    * @param client the JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
-  public JcaSubmissionManager(final JPPFJcaClient client) throws Exception
+  public JcaSubmissionManager(final AbstractGenericClient client) throws Exception
   {
     super(client);
   }
