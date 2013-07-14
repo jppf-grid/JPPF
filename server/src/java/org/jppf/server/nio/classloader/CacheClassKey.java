@@ -26,11 +26,11 @@ public class CacheClassKey
   /**
    * The provider uuid.
    */
-  private String uuid;
+  private final String uuid;
   /**
    * String describing the cached resource.
    */
-  private String res;
+  private final String res;
 
   /**
    * Initialize this key with a specified provider uuid and resource string.
@@ -74,9 +74,6 @@ public class CacheClassKey
     return uuid.hashCode() + 13*res.hashCode();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

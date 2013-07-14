@@ -26,7 +26,7 @@ public class CacheClassContent
   /**
    * The actual content of this element.
    */
-  private byte[] content;
+  private final byte[] content;
 
   /**
    * Initialize this content with the specified data.
@@ -34,7 +34,6 @@ public class CacheClassContent
    */
   public CacheClassContent(final byte[] content)
   {
-    super();
     this.content = content;
   }
 

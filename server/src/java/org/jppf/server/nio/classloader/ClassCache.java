@@ -20,6 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import java.util.Map;
 
+import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
@@ -34,18 +35,18 @@ public class ClassCache
    */
   private static Logger log = LoggerFactory.getLogger(ClassCache.class);
   /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-  /**
    * Determines whether TRACE logging level is enabled.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * Determines whether this cache is enabled. 
+   */
+  private boolean enabled = JPPFConfiguration.getProperties().getBoolean("jppf.server.class.cache.enabled", true);
+  /**
    * The cache of class definition, this is done to not flood the provider when it dispatch many tasks. it uses
    * a soft map to minimize the OutOfMemory.
    */
-  final Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<CacheClassKey, CacheClassContent>();
+  private final Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<>();
 
   /**
    * Add a resource content to the class cache.
@@ -55,6 +56,7 @@ public class ClassCache
    */
   public void setCacheContent(final String uuid, final String name, final byte[] content)
   {
+    if (!enabled) return;
     if (traceEnabled) log.trace("adding cache entry with key=[" + uuid + ", " + name + ']');
     CacheClassContent cacheContent = new CacheClassContent(content);
     CacheClassKey cacheKey = new CacheClassKey(uuid, name);
@@ -72,6 +74,7 @@ public class ClassCache
    */
   public byte[] getCacheContent(final String uuid, final String name)
   {
+    if (!enabled) return null;
     if (traceEnabled) log.trace("looking up key=[" + uuid + ", " + name + ']');
     CacheClassContent content;
     synchronized(classCache)
