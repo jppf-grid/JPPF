@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.util.List;
 
 import org.jppf.client.event.ClientConnectionStatusHandler;
+import org.jppf.management.*;
 
 /**
  * Interface for a client connection to a JPPF driver.
@@ -74,4 +75,28 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
    * @return the port number as an int.
    */
   int getPort();
+
+  /**
+   * Get the unique identifier of the remote driver.
+   * @return the uuid as a string.
+   */
+  String getDriverUuid();
+
+  /**
+   * Get the object that provides access to the management functions of the driver.
+   * @return a <code>JMXConnectionWrapper</code> instance.
+   */
+  JMXDriverConnectionWrapper getJmxConnection();
+
+  /**
+   * Get the system information.
+   * @return a {@link JPPFSystemInformation} instance.
+   */
+  JPPFSystemInformation getSystemInfo();
+
+  /**
+   * Get the unique ID for this connection and its two channels.
+   * @return the id as a string.
+   */
+  String getConnectionUuid();
 }

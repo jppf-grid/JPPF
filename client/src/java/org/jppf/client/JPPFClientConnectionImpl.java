@@ -134,11 +134,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
     }
   }
 
-  /**
-   * Create a socket initializer.
-   * @return an instance of <code>SocketInitializerImpl</code>.
-   * @see org.jppf.client.AbstractJPPFClientConnection#createSocketInitializer()
-   */
   @Override
   protected SocketInitializer createSocketInitializer()
   {

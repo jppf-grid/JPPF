@@ -66,8 +66,8 @@ class JobDataPanelManager
    */
   public void driverAdded(final JPPFClientConnection connection)
   {
-    JMXDriverConnectionWrapper wrapper = ((JPPFClientConnectionImpl) connection).getJmxConnection();
-    String driverName = ((JPPFClientConnectionImpl) connection).getDriverUuid();
+    JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
+    String driverName = connection.getDriverUuid();
     final int index = driverInsertIndex(driverName);
     if (index < 0) return;
     JobData data = new JobData(connection);
@@ -249,7 +249,7 @@ class JobDataPanelManager
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
       JobData data = (JobData) driverNode.getUserObject();
-      String name = ((JPPFClientConnectionImpl) data.getClientConnection()).getDriverUuid();
+      String name = data.getClientConnection().getDriverUuid();
       if (name.equals(driverName)) return driverNode;
     }
     return null;
@@ -316,7 +316,7 @@ class JobDataPanelManager
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) root.getChildAt(i);
       JobData data = (JobData) driverNode.getUserObject();
-      String name = ((JPPFClientConnectionImpl) data.getClientConnection()).getDriverUuid();
+      String name = data.getClientConnection().getDriverUuid();
       if (name.equals(driverName))
       {
         return -1;

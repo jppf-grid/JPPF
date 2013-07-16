@@ -101,8 +101,8 @@ public class TopologyData
   {
     this.type = TopologyDataType.DRIVER;
     this.clientConnection = clientConnection;
-    this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
-    this.uuid = ((JPPFClientConnectionImpl) clientConnection).getDriverUuid();
+    this.jmxWrapper = clientConnection.getJmxConnection();
+    this.uuid = clientConnection.getDriverUuid();
     initializeProxies();
   }
 

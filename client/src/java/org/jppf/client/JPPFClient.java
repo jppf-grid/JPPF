@@ -96,7 +96,6 @@ public class JPPFClient extends AbstractGenericClient
    * @return the list of executed tasks with their results for a blocking job, or <code>null</code> for a non-blocking job.
    * @throws IllegalArgumentException if the job is null or empty.
    * @throws Exception if an error occurs while sending the request.
-   * @see org.jppf.client.AbstractJPPFClient#submit(org.jppf.client.JPPFJob)
    */
   @Override
   public List<JPPFTask> submit(final JPPFJob job) throws Exception

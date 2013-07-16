@@ -48,7 +48,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The list of tasks to execute.
    */
-  private final List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+  private final List<JPPFTask> tasks = new ArrayList<>();
   /**
    * The container for data shared between tasks.
    * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
@@ -89,7 +89,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The list of listeners registered with this job.
    */
-  private transient List<JobListener> listeners = new LinkedList<JobListener>();
+  private transient List<JobListener> listeners = new LinkedList<>();
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
@@ -231,7 +231,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public synchronized List<JPPFTask> getPendingTasks()
   {
-    List<JPPFTask> list = new LinkedList<JPPFTask>();
+    List<JPPFTask> list = new LinkedList<>();
     for (JPPFTask t: tasks)
     {
       if (!results.hasResult(t.getPosition())) list.add(t);

@@ -28,9 +28,6 @@ import org.jppf.client.balancer.ClientJob;
  */
 class JobPriorityComparator implements Comparator<ClientJob>
 {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int compare(final ClientJob o1, final ClientJob o2)
   {

@@ -18,8 +18,8 @@
 
 package org.jppf.client.balancer;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
+import java.util.List;
+import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
@@ -30,11 +30,10 @@ import org.slf4j.*;
 
 /**
  * Context associated with a channel serving state and tasks submission.
- * @param <T> type of task bundle.
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBundle>
+public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle>
 {
   /**
    * Logger for this class.
@@ -63,7 +62,11 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   /**
    * List of execution status listeners for this channel.
    */
-  private final List<ExecutorChannelStatusListener> listenerList = new ArrayList<ExecutorChannelStatusListener>();
+  private final List<ExecutorChannelStatusListener> listenerList = new CopyOnWriteArrayList<>();
+  /**
+   * The priority assigned to this channel.
+   */
+  protected int priority = 0;
 
   /**
    * Default constructor.
@@ -163,13 +166,10 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
       this.systemInfo = systemInfo;
       if (traceEnabled) log.trace("setting system info for " + this + ", jppf.channel.local=" + this.systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
     }
-    else
+    else if (traceEnabled)
     {
-      if (traceEnabled)
-      {
-        Exception e = new Exception("call stack for setSystemInfo(null)");
-        log.trace(e.getMessage(), e);
-      }
+      Exception e = new Exception("call stack for setSystemInfo(null)");
+      log.trace(e.getMessage(), e);
     }
   }
 
@@ -203,21 +203,13 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   @Override
   public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList)
-    {
-      listenerList.add(listener);
-    }
+    listenerList.add(listener);
   }
 
   @Override
   public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
-    synchronized (listenerList)
-    {
-      listenerList.remove(listener);
-    }
+    listenerList.remove(listener);
   }
 
   /**
@@ -228,20 +220,22 @@ public abstract class ChannelWrapper<T> implements ExecutorChannel<ClientTaskBun
   protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue)
   {
     if (oldValue == newValue) return;
-    ExecutorChannelStatusListener[] listeners;
-    synchronized (listenerList)
-    {
-      listeners = listenerList.toArray(new ExecutorChannelStatusListener[listenerList.size()]);
-    }
     ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
-    for (ExecutorChannelStatusListener listener : listeners) {
-      listener.executionStatusChanged(event);
-    }
+    for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
   }
 
   @Override
   public boolean isActive()
   {
     return true;
+  }
+
+  /**
+   * The priority assigned to this channel.
+   * @return the priority as an int value.
+   */
+  public int getPriority()
+  {
+    return priority;
   }
 }

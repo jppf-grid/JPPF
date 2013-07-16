@@ -33,7 +33,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -70,7 +70,9 @@ public class ConsoleLoader
     try
     {
       System.out.println("Default charset: " + Charset.defaultCharset());
-      startWithCheckNoDownload();
+      boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.console.download.charts", false);
+      if (!b) startWithCheckNoDownload();
+      else startWithCheckAndDownload();
       log.info("terminating");
     }
     catch(Exception e)
@@ -133,7 +135,7 @@ public class ConsoleLoader
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         frame = new JFrame(TITLE);
         frame.setUndecorated(true);
-        frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/jppf-icon.gif").getImage());
+        frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
         if (showDownloadDialog())
         {
           downloader.setListener(new DownloadListener());

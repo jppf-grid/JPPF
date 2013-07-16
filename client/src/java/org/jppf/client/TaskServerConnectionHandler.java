@@ -75,7 +75,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
   {
     try
     {
-      if (((AbstractJPPFClientConnection) owner).isClosed()) throw new IllegalStateException("this task server connection is closed");
+      if (owner.isClosed()) throw new IllegalStateException("this task server connection is closed");
       boolean done = false;
       while (!done)
       {

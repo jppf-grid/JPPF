@@ -263,10 +263,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     return sslEnabled;
   }
 
-  /**
-   * Get the system information.
-   * @return a {@link JPPFSystemInformation} instance.
-   */
+  @Override
   public JPPFSystemInformation getSystemInfo()
   {
     return systemInfo;
@@ -290,10 +287,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     jmxConnection.connect();
   }
 
-  /**
-   * Get the object that provides access to the management functions of the driver.
-   * @return a <code>JMXConnectionWrapper</code> instance.
-   */
+  @Override
   public JMXDriverConnectionWrapper getJmxConnection()
   {
     return jmxConnection;

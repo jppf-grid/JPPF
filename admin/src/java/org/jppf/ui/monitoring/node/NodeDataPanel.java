@@ -350,7 +350,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   @Override
   public synchronized void newConnection(final ClientEvent event)
   {
-    final AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) event.getConnection();
+    final JPPFClientConnection c = (JPPFClientConnection) event.getConnection();
     if (c.getDriverUuid() == null)
     {
       c.addClientConnectionStatusListener(new ClientConnectionStatusListener()

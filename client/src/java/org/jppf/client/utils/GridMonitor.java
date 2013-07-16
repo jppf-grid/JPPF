@@ -148,7 +148,7 @@ public class GridMonitor
     // if the JPPF client was provided in the constructor
     if (jppfClient != null)
     {
-      JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+      JPPFClientConnection connection = jppfClient.getClientConnection();
       // get the connection to the driver's JMX connection
       driver.jmx = connection.getJmxConnection();
     }

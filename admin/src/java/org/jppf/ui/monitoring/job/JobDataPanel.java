@@ -113,9 +113,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     {
       panelManager.driverAdded(c);
       if (debugEnabled) log.debug("added driver " + c);
-      JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) c;
-      if (connection.getJmxConnection() == null) continue;
-      String driverName = ((JPPFClientConnectionImpl) connection).getDriverUuid();
+      if (c.getJmxConnection() == null) continue;
+      String driverName = c.getDriverUuid();
       DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
       if (driverNode == null) continue;
       JobData driverData = (JobData) driverNode.getUserObject();
@@ -185,7 +184,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   public void driverAdded(final JPPFClientConnection clientConnection)
   {
     if (clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
-    String driverName = ((JPPFClientConnectionImpl) clientConnection).getDriverUuid();
+    String driverName = clientConnection.getDriverUuid();
     if (debugEnabled) log.debug("adding driver " + clientConnection + ", uuid=" + driverName);
     synchronized(accumulatorHelper)
     {
@@ -210,7 +209,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   public void driverRemoved(final JPPFClientConnection clientConnection)
   {
     if (clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
-    String driverName = ((JPPFClientConnectionImpl) clientConnection).getDriverUuid();
+    String driverName = clientConnection.getDriverUuid();
     if (debugEnabled) log.debug("removing driver " + clientConnection + ", uuid=" + driverName);
     synchronized(accumulatorHelper)
     {
@@ -231,7 +230,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   public void driverUpdated(final JPPFClientConnection clientConnection)
   {
     if (clientConnection == null) throw new IllegalArgumentException("clientConnection is null");
-    String driverName = ((JPPFClientConnectionImpl) clientConnection).getDriverUuid();
+    String driverName = clientConnection.getDriverUuid();
     if (debugEnabled) log.debug("updating driver " + clientConnection + ", uuid=" + driverName);
     synchronized(accumulatorHelper)
     {

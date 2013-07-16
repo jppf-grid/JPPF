@@ -339,19 +339,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     return driverUuid;
   }
 
-  /**
-   * Get the unique identifier of the remote driver.
-   * @return the uuid as a string.
-   */
+  @Override
   public String getDriverUuid()
   {
     return driverUuid;
   }
 
-  /**
-   * Get the unique ID for this connection and its two channels.
-   * @return the id as a string.
-   */
+  @Override
   public String getConnectionUuid()
   {
     return connectionUuid;

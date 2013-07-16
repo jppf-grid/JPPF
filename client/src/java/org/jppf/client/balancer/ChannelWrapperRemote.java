@@ -38,7 +38,7 @@ import org.slf4j.*;
  * Context associated with a remote channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> implements ClientConnectionStatusHandler
+public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler
 {
   /**
    * Logger for this class.
@@ -61,12 +61,13 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
    * Default initializer for remote channel wrapper.
    * @param channel to the driver to use.
    */
-  public ChannelWrapperRemote(final AbstractJPPFClientConnection channel)
+  public ChannelWrapperRemote(final JPPFClientConnection channel)
   {
     if (channel == null) throw new IllegalArgumentException("channel is null");
 
-    this.channel = channel;
+    this.channel = (AbstractJPPFClientConnection) channel;
     this.uuid = channel.getDriverUuid();
+    priority = channel.getPriority();
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, channel.isSSLEnabled());
     managementInfo.setSystemInfo(systemInfo);

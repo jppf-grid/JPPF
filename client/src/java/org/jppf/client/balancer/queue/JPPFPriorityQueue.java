@@ -66,7 +66,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   /**
    * A priority queue holding broadcast jobs that could not be sent due to no available connection.
    */
-  private final PriorityBlockingQueue<ClientJob> pendingBroadcasts = new PriorityBlockingQueue<ClientJob>(16, new JobPriorityComparator());
+  private final PriorityBlockingQueue<ClientJob> pendingBroadcasts = new PriorityBlockingQueue<>(16, new JobPriorityComparator());
 
   /**
    * Initialize this queue.

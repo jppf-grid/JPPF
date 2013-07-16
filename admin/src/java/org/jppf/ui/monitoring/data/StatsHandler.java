@@ -58,7 +58,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
   /**
    * The current client connection for which statistics and charts are displayed.
    */
-  JPPFClientConnectionImpl currentConnection = null;
+  JPPFClientConnection currentConnection = null;
   /**
    * The object holding the current statistics values.
    */
@@ -154,14 +154,14 @@ public final class StatsHandler implements StatsConstants, ClientListener
   public void requestUpdate()
   {
     if (getCurrentConnection() == null) return;
-    requestUpdate((JPPFClientConnectionImpl) getCurrentConnection());
+    requestUpdate(getCurrentConnection());
   }
 
   /**
    * Request an update from the server.
    * @param c the client connection to request the data from.
    */
-  public void requestUpdate(final JPPFClientConnectionImpl c)
+  public void requestUpdate(final JPPFClientConnection c)
   {
     try
     {
@@ -179,8 +179,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
   /**
    * Request the server settings.
-   * @param algorithm - the name of the load-balancing algorithm to set on the server.
-   * @param params - the algorithm's parameters.
+   * @param algorithm the name of the load-balancing algorithm to set on the server.
+   * @param params the algorithm's parameters.
    * @return the response message from the server.
    */
   public String changeSettings(final String algorithm, final Map params)
@@ -202,8 +202,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
   /**
    * Shutdown, and eventually restart, the server.
-   * @param shutdownDelay - the delay before shutting down.
-   * @param restartDelay - the delay, starting after shutdown, before restarting. If it is < 0, no restart occurs.
+   * @param shutdownDelay the delay before shutting down.
+   * @param restartDelay the delay, starting after shutdown, before restarting. If it is < 0, no restart occurs.
    * @return the response message from the server.
    */
   public String requestShutdownRestart(final Number shutdownDelay, final Number restartDelay)
@@ -223,8 +223,8 @@ public final class StatsHandler implements StatsConstants, ClientListener
 
   /**
    * Update the current statistics with new values obtained from the server.
-   * @param connection - the client connection from which the data is obtained.
-   * @param stats - the object holding the new statistics values.
+   * @param connection the client connection from which the data is obtained.
+   * @param stats the object holding the new statistics values.
    */
   public synchronized void update(final JPPFClientConnection connection, final JPPFStats stats)
   {
@@ -419,7 +419,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
    * Set the current client connection for which statistics and charts are displayed.
    * @param connection a <code>JPPFClientConnection</code> instance.
    */
-  public synchronized void setCurrentConnection(final JPPFClientConnectionImpl connection)
+  public synchronized void setCurrentConnection(final JPPFClientConnection connection)
   {
     if ((currentConnection == null) || ((connection != null) && !connection.getName().equals(currentConnection.getName())))
     {
@@ -506,7 +506,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
    */
   public JMXDriverConnectionWrapper currentJmxConnection()
   {
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) getCurrentConnection();
+    JPPFClientConnection c = getCurrentConnection();
     if (c == null) return null;
     return c.getJmxConnection();
   }

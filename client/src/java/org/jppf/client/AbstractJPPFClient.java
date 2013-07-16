@@ -264,7 +264,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Add a new connection to the set of connections handled by this client.
    * @param connection the connection to add.
    */
-  public void addClientConnection(final AbstractJPPFClientConnection connection)
+  public void addClientConnection(final JPPFClientConnection connection)
   {
     if (connection == null) throw new IllegalArgumentException("connection is null");
     //connection.addClientConnectionStatusListener(this);
@@ -421,8 +421,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * This comparator defines a descending value order for integers.
+   * @exclude
    */
-  static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
+  public static class DescendingIntegerComparator implements Comparator<Integer>, Serializable
   {
     /**
      * Explicit serialVersionUID.

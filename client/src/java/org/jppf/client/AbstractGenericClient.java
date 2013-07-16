@@ -231,7 +231,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Invoked when a new connection is created.
    * @param c the connection that failed.
-   * @see org.jppf.client.AbstractJPPFClient#newConnection(org.jppf.client.JPPFClientConnection)
    */
   @Override
   public void newConnection(final JPPFClientConnection c)
@@ -248,13 +247,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
   /**
    * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
-   * @param c the connection that failed.
+   * @param connection the connection that failed.
    */
   @Override
-  protected void connectionFailed(final JPPFClientConnection c)
+  protected void connectionFailed(final JPPFClientConnection connection)
   {
-    log.info("Connection [" + c.getName() + "] failed");
-    AbstractJPPFClientConnection connection = (AbstractJPPFClientConnection) c;
+    log.info("Connection [" + connection.getName() + "] failed");
     if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
     try
     {
@@ -263,12 +261,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     }
     catch(Exception e)
     {
-      if (debugEnabled) log.debug("could not close JMX connection for " + c, e);
-      else log.warn("could not close JMX connection for " + c + " : " + ExceptionUtils.getMessage(e));
+      if (debugEnabled) log.debug("could not close JMX connection for " + connection, e);
+      else log.warn("could not close JMX connection for " + connection + " : " + ExceptionUtils.getMessage(e));
     }
-    c.close();
-    removeClientConnection(c);
-    fireConnectionFailed(c);
+    connection.close();
+    removeClientConnection(connection);
+    fireConnectionFailed(connection);
   }
 
   /**

@@ -36,13 +36,13 @@ public class ClientPool
   /**
    * List of <code>JPPFClientConnection</code> instances with the same priority.
    */
-  private final List<AbstractJPPFClientConnection> clientList = new ArrayList<AbstractJPPFClientConnection>();
+  private final List<JPPFClientConnection> clientList = new ArrayList<>();
 
   /**
    * Initialize this pool with the specified connection.
    * @param connection the first connection added to this pool.
    */
-  public ClientPool(final AbstractJPPFClientConnection connection)
+  public ClientPool(final JPPFClientConnection connection)
   {
     this.priority = connection.getPriority();
     clientList.add(connection);
@@ -82,7 +82,7 @@ public class ClientPool
    * @param client the connection too add.
    * @return true if the underlying list of connections changed as a result of calling this method.
    */
-  public boolean add(final AbstractJPPFClientConnection client)
+  public boolean add(final JPPFClientConnection client)
   {
     return clientList.add(client);
   }

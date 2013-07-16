@@ -19,7 +19,7 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -40,7 +40,7 @@ import org.slf4j.*;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implements ClientConnectionStatusHandler, NodeInternal
+public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, NodeInternal
 {
   /**
    * Logger for this class.
@@ -65,19 +65,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   /**
    * List of status listeners for this connection.
    */
-  private final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
-  /**
-   * Temporary listeners array to allow access to the listeners without synchronization.
-   */
-  private ClientConnectionStatusListener[] listenersArray;
-  /**
-   * The jmx server that handles administration and monitoring functions for this node.
-   */
-  private static JMXServer jmxServer = null;
-  /**
-   * Handles the firing of node life cycle events and the listeners that subscribe to these events.
-   */
-  protected final LifeCycleEventHandler lifeCycleEventHandler;
+  private final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Default initializer for local channel wrapper.
@@ -86,7 +74,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   {
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper"));
     executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads");
-    lifeCycleEventHandler = new LifeCycleEventHandler(this);
+    priority = JPPFConfiguration.getProperties().getInt("jppf.local.execution.priority", 0);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
     managementInfo.setSystemInfo(systemInfo);
@@ -124,21 +112,13 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners)
-    {
-      listeners.add(listener);
-      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
-    }
+    listeners.add(listener);
   }
 
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners)
-    {
-      listeners.remove(listener);
-      listenersArray = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
-    }
+    listeners.remove(listener);
   }
 
   /**
@@ -150,12 +130,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   {
     if (oldStatus == newStatus) return;
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    ClientConnectionStatusListener[] array;
-    synchronized (listeners)
-    {
-      array = listenersArray;
-    }
-    for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
+    for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   @Override
@@ -272,34 +247,24 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
   }
 
   /**
-   * Get the jmx server that handles administration and monitoring functions for this node.
-   * @return a <code>JMXServerImpl</code> instance.
+   * This method returns null.
+   * @return <code>null</code>.
    * @throws Exception if any error occurs.
    */
   @Override
   public JMXServer getJmxServer() throws Exception
   {
-    synchronized (this)
-    {
-      if ((jmxServer == null) || jmxServer.isStopped())
-      {
-        boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
-        jmxServer = JMXServerFactory.createServer(getUuid(), ssl);
-        jmxServer.start(getClass().getClassLoader());
-        System.out.println("JPPF Node management initialized");
-      }
-    }
-    return jmxServer;
+    return null;
   }
 
   /**
-   * Get the object that handles the firing of node life cycle events and the listeners that subscribe to these events.
-   * @return an instance of <code>LifeCycleEventHandler</code>.
+   * This method returns null..
+   * @return <code>null</code>.
    */
   @Override
   public LifeCycleEventHandler getLifeCycleEventHandler()
   {
-    return lifeCycleEventHandler;
+    return null;
   }
 
   @Override
@@ -318,10 +283,7 @@ public class ChannelWrapperLocal extends ChannelWrapper<ClientTaskBundle> implem
     }
     finally
     {
-      synchronized (listeners)
-      {
-        listeners.clear();
-      }
+      listeners.clear();
     }
   }
 

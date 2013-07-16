@@ -161,7 +161,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
     resource.addUuid(clientUuid);
-    resource.setData("connection.uuid", ((AbstractJPPFClientConnection) owner).getConnectionUuid());
+    resource.setData("connection.uuid", owner.getConnectionUuid());
     writeResource(resource);
     // read the server response
     readResource();

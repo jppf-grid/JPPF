@@ -87,7 +87,7 @@ public class JobData
   {
     this(JobDataType.DRIVER);
     this.clientConnection = clientConnection;
-    this.jmxWrapper = ((JPPFClientConnectionImpl) clientConnection).getJmxConnection();
+    this.jmxWrapper = clientConnection.getJmxConnection();
   }
 
   /**
