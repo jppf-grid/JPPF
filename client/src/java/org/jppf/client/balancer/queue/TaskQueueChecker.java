@@ -24,18 +24,18 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.stats.JPPFClientStatsManager;
-import org.jppf.execute.*;
+import org.jppf.execute.ExecutorStatus;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.fixedsize.*;
 import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
  * This class ensures that idle nodes get assigned pending tasks in the queue.
- * @param <T> type of the <code>ExecutorChannel</code>.
  */
-public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchronization implements Runnable
+public class TaskQueueChecker extends ThreadSynchronization implements Runnable
 {
   /**
    * Logger for this class.
@@ -68,7 +68,9 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
   /**
    * The list of idle node channels.
    */
-  private final Set<T> idleChannels = new LinkedHashSet<T>();
+  private final CollectionMap<Integer, ChannelWrapper> idleChannels =
+      new SetSortedMap<Integer, ChannelWrapper>(new AbstractJPPFClient.DescendingIntegerComparator());
+  //private final Set<ChannelWrapper> idleChannels = new LinkedHashSet<>();
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -152,7 +154,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final T channel)
+  public void addIdleChannel(final ChannelWrapper channel)
   {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
@@ -161,7 +163,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
     int count;
     synchronized (idleChannels)
     {
-      idleChannels.add(channel);
+      idleChannels.putValue(channel.getPriority(), channel);
       count = idleChannels.size();
     }
     wakeUp();
@@ -172,11 +174,11 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<T> getIdleChannels()
+  public List<ChannelWrapper> getIdleChannels()
   {
     synchronized (idleChannels)
     {
-      return new ArrayList<T>(idleChannels);
+      return idleChannels.allValues();
     }
   }
 
@@ -185,13 +187,13 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  public T removeIdleChannel(final T channel)
+  public ChannelWrapper removeIdleChannel(final ChannelWrapper channel)
   {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     int count;
     synchronized (idleChannels)
     {
-      idleChannels.remove(channel);
+      idleChannels.removeValue(channel.getPriority(), channel);
       count = idleChannels.size();
     }
     statsManager.idleNodes(count);
@@ -238,7 +240,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
       {
         if (idleChannels.isEmpty() || queue.isEmpty()) return false;
         if (debugEnabled) log.debug(Integer.toString(idleChannels.size()) + " channels idle");
-        T channel = null;
+        ChannelWrapper channel = null;
         ClientJob selectedBundle = null;
         queueLock.lock();
         try
@@ -280,7 +282,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @return a channel for a node on which to execute the job.
    * @throws Exception if any error occurs.
    */
-  private T retrieveChannel(final ClientJob bundleWrapper) throws Exception
+  private ChannelWrapper retrieveChannel(final ClientJob bundleWrapper) throws Exception
   {
     return findIdleChannelIndex(bundleWrapper);
   }
@@ -291,7 +293,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param selectedBundle the job to dispatch.
    */
   @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final T channel, final ClientJob selectedBundle)
+  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)
   {
     if (debugEnabled)
     {
@@ -324,14 +326,14 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param bundle the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
-  private T findIdleChannelIndex(final ClientJob bundle)
+  private ChannelWrapper findIdleChannelIndex(final ClientJob bundle)
   {
     int idleChannelsSize = idleChannels.size();
-    List<T> acceptableChannels = new ArrayList<T>(idleChannelsSize);
-    Iterator<T> iterator = idleChannels.iterator();
+    List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
+    Iterator<ChannelWrapper> iterator = idleChannels.iterator();
     while (iterator.hasNext())
     {
-      T ch = iterator.next();
+      ChannelWrapper ch = iterator.next();
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE)
       {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
@@ -357,7 +359,7 @@ public class TaskQueueChecker<T extends ExecutorChannel> extends ThreadSynchroni
    * @param taskBundle the job.
    * @param context    the current node context.
    */
-  private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final T context)
+  private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final ChannelWrapper context)
   {
     context.checkBundler(bundler, jppfContext);
     if (context.getBundler() instanceof JobAwareness)
