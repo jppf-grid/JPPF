@@ -54,7 +54,7 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
   @Override
   protected Map<K, Collection<V>> createMap()
   {
-    return (comparator == null) ? new TreeMap<K, Collection<V>>() : new TreeMap<K, Collection<V>>(comparator);
+    return comparator == null ? new TreeMap<K, Collection<V>>() : new TreeMap<K, Collection<V>>(comparator);
   }
 
   /**

@@ -48,6 +48,6 @@ public class SetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
   @Override
   protected Collection<V> newCollection()
   {
-    return new HashSet<V>();
+    return new HashSet<>();
   }
 }

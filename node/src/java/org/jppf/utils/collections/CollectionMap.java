@@ -131,4 +131,10 @@ public interface CollectionMap<K, V> extends Iterable<V>, Serializable
    * Clear the map.
    */
   void clear();
+
+  /**
+   * Get a collection of all the values for all keys.
+   * @return a collection of all values in this map.
+   */
+  List<V> allValues();
 }

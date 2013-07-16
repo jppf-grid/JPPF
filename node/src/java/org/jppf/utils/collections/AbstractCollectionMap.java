@@ -313,4 +313,15 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
   {
     return map == null ? null : map.entrySet();
   }
+
+  @Override
+  public List<V> allValues()
+  {
+    List<V> list = new ArrayList<>();
+    for (Map.Entry<K, Collection<V>> entry: map.entrySet())
+    {
+      if (!entry.getValue().isEmpty()) list.addAll(entry.getValue());
+    }
+    return list;
+  }
 }
