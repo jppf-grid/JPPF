@@ -19,6 +19,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.execute.*;
@@ -75,7 +76,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * List of execution status listeners for this channel.
    */
-  private final List<ExecutorChannelStatusListener> listenerList = new ArrayList<ExecutorChannelStatusListener>();
+  private final List<ExecutorChannelStatusListener> listenerList = new CopyOnWriteArrayList<>();
   /**
    * <code>Runnable</code> called when node context is closed.
    */
@@ -211,7 +212,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
-    List<DataLocation> tasks = new ArrayList<DataLocation>();
+    List<DataLocation> tasks = new ArrayList<>();
     if (locations.size() > 1)
     {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
@@ -424,17 +425,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void addExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-    synchronized (listenerList) {
-      listenerList.add(listener);
-    }
+    listenerList.add(listener);
   }
 
   @Override
   public void removeExecutionStatusListener(final ExecutorChannelStatusListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-    synchronized (listenerList) {
-      listenerList.remove(listener);
-    }
+    listenerList.remove(listener);
   }
 
   /**
@@ -445,15 +442,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue)
   {
     if (oldValue == newValue) return;
-    ExecutorChannelStatusListener[] listeners;
-    synchronized (listenerList)
-    {
-      listeners = listenerList.toArray(new ExecutorChannelStatusListener[listenerList.size()]);
-    }
     ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
-    for (ExecutorChannelStatusListener listener : listeners) {
-      listener.executionStatusChanged(event);
-    }
+    for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
   }
 
   /**

@@ -83,7 +83,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * A list of all the connections.
    */
-  private final Map<String, AbstractNodeContext> allConnections = new LinkedHashMap<String, AbstractNodeContext>();
+  private final Map<String, AbstractNodeContext> allConnections = new LinkedHashMap<>();
   /**
    * Reference to the driver.
    */
@@ -415,7 +415,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public synchronized List<AbstractNodeContext> getAllChannels()
   {
-    return new ArrayList<AbstractNodeContext>(allConnections.values());
+    return new ArrayList<>(allConnections.values());
   }
 
   /**
@@ -424,7 +424,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public synchronized Set<AbstractNodeContext> getAllChannelsAsSet()
   {
-    return new HashSet<AbstractNodeContext>(allConnections.values());
+    return new HashSet<>(allConnections.values());
   }
 
   /**

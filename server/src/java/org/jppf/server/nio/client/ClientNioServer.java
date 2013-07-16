@@ -50,7 +50,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   /**
    * 
    */
-  private List<ChannelWrapper<?>> channels = new ArrayList<ChannelWrapper<?>>();
+  private List<ChannelWrapper<?>> channels = new ArrayList<>();
 
   /**
    * Initialize this class loader server.

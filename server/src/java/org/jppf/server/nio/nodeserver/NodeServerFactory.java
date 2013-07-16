@@ -50,7 +50,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
   @Override
   public Map<NodeState, NioState<NodeTransition>> createStateMap()
   {
-    Map<NodeState, NioState<NodeTransition>> map = new EnumMap<NodeState, NioState<NodeTransition>>(NodeState.class);
+    Map<NodeState, NioState<NodeTransition>> map = new EnumMap<>(NodeState.class);
     map.put(SEND_INITIAL_BUNDLE, new SendInitialBundleState((NodeNioServer) server));
     map.put(WAIT_INITIAL_BUNDLE, new WaitInitialBundleState((NodeNioServer) server));
     map.put(SENDING_BUNDLE, new SendingBundleState((NodeNioServer) server));
@@ -67,8 +67,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
   @Override
   public Map<NodeTransition, NioTransition<NodeState>> createTransitionMap()
   {
-    Map<NodeTransition, NioTransition<NodeState>> map =
-        new EnumMap<NodeTransition, NioTransition<NodeState>>(NodeTransition.class);
+    Map<NodeTransition, NioTransition<NodeState>> map = new EnumMap<>(NodeTransition.class);
     map.put(TO_SENDING_BUNDLE, transition(SENDING_BUNDLE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_RESULTS, transition(WAITING_RESULTS, R));
     map.put(TO_SEND_INITIAL, transition(SEND_INITIAL_BUNDLE, NioConstants.CHECK_CONNECTION ? RW : W));
@@ -82,7 +81,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
   @Override
   protected CollectionMap<NodeState, NodeState> createAllowedTransitionsMap()
   {
-    CollectionMap<NodeState, NodeState> map = new EnumSetEnumMap<NodeState>(NodeState.class);
+    CollectionMap<NodeState, NodeState> map = new EnumSetEnumMap<>(NodeState.class);
     map.addValues(SEND_INITIAL_BUNDLE, SEND_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE);
     map.addValues(WAIT_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE, IDLE);
     map.addValues(IDLE, IDLE, SENDING_BUNDLE);

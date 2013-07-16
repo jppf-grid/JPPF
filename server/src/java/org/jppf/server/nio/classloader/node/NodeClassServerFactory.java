@@ -51,8 +51,7 @@ final class NodeClassServerFactory	extends NioServerFactory<ClassState, ClassTra
   @Override
   public Map<ClassState, NioState<ClassTransition>> createStateMap()
   {
-    Map<ClassState, NioState<ClassTransition>> map =
-        new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
+    Map<ClassState, NioState<ClassTransition>> map = new EnumMap<>(ClassState.class);
     map.put(WAITING_INITIAL_NODE_REQUEST, new WaitingInitialNodeRequestState((ClassNioServer) server));
     map.put(SENDING_INITIAL_NODE_RESPONSE, new SendingInitialNodeResponseState((ClassNioServer) server));
     map.put(SENDING_NODE_RESPONSE, new SendingNodeResponseState((ClassNioServer) server));
@@ -70,8 +69,7 @@ final class NodeClassServerFactory	extends NioServerFactory<ClassState, ClassTra
   @Override
   public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()
   {
-    Map<ClassTransition, NioTransition<ClassState>> map =
-        new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
+    Map<ClassTransition, NioTransition<ClassState>> map = new EnumMap<>(ClassTransition.class);
     map.put(TO_WAITING_INITIAL_NODE_REQUEST, transition(WAITING_INITIAL_NODE_REQUEST, R));
     map.put(TO_SENDING_INITIAL_NODE_RESPONSE, transition(SENDING_INITIAL_NODE_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_NODE_REQUEST, transition(WAITING_NODE_REQUEST, R));
@@ -84,7 +82,7 @@ final class NodeClassServerFactory	extends NioServerFactory<ClassState, ClassTra
   @Override
   protected CollectionMap<ClassState, ClassState> createAllowedTransitionsMap()
   {
-    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap<ClassState>(ClassState.class);
+    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap<>(ClassState.class);
     map.addValues(WAITING_INITIAL_NODE_REQUEST, WAITING_INITIAL_NODE_REQUEST, SENDING_INITIAL_NODE_RESPONSE);
     map.addValues(SENDING_INITIAL_NODE_RESPONSE, SENDING_INITIAL_NODE_RESPONSE, WAITING_NODE_REQUEST);
     map.addValues(WAITING_NODE_REQUEST, WAITING_NODE_REQUEST, IDLE_NODE, SENDING_NODE_RESPONSE);

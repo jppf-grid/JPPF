@@ -49,7 +49,7 @@ public class ClientClassNioServer extends ClassNioServer
    * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
    * which application classpath to look for the requested resources.
    */
-  protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<String, List<ChannelWrapper<?>>>();
+  protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<>();
 
   /**
    * Initialize this class server.

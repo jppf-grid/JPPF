@@ -56,7 +56,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   /**
    * Mapping of channels to their uuid.
    */
-  protected final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<String, ChannelWrapper<?>>();
+  protected final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<>();
 
   /**
    * Initialize this class server.

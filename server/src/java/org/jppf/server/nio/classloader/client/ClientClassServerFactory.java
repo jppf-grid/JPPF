@@ -51,7 +51,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   @Override
   public Map<ClassState, NioState<ClassTransition>> createStateMap()
   {
-    Map<ClassState, NioState<ClassTransition>> map = new EnumMap<ClassState, NioState<ClassTransition>>(ClassState.class);
+    Map<ClassState, NioState<ClassTransition>> map = new EnumMap<>(ClassState.class);
     map.put(WAITING_INITIAL_PROVIDER_REQUEST, new WaitingProviderInitialRequestState((ClassNioServer) server));
     map.put(SENDING_INITIAL_PROVIDER_RESPONSE, new SendingProviderInitialResponseState((ClassNioServer) server));
     map.put(SENDING_PROVIDER_REQUEST, new SendingProviderRequestState((ClassNioServer) server));
@@ -71,7 +71,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   @Override
   public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()
   {
-    Map<ClassTransition, NioTransition<ClassState>> map = new EnumMap<ClassTransition, NioTransition<ClassState>>(ClassTransition.class);
+    Map<ClassTransition, NioTransition<ClassState>> map = new EnumMap<>(ClassTransition.class);
     map.put(TO_WAITING_INITIAL_PROVIDER_REQUEST, transition(WAITING_INITIAL_PROVIDER_REQUEST, R));
     map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_SENDING_PROVIDER_REQUEST, transition(SENDING_PROVIDER_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
@@ -87,7 +87,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   @Override
   protected CollectionMap<ClassState, ClassState> createAllowedTransitionsMap()
   {
-    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap<ClassState>(ClassState.class);
+    CollectionMap<ClassState, ClassState> map = new EnumSetEnumMap<>(ClassState.class);
     map.addValues(WAITING_INITIAL_PROVIDER_REQUEST, WAITING_INITIAL_PROVIDER_REQUEST, SENDING_INITIAL_PROVIDER_RESPONSE);
     map.addValues(SENDING_INITIAL_PROVIDER_RESPONSE, SENDING_INITIAL_PROVIDER_RESPONSE, IDLE_PROVIDER);
     map.addValues(SENDING_PROVIDER_REQUEST, SENDING_PROVIDER_REQUEST, WAITING_PROVIDER_RESPONSE, IDLE_PROVIDER);
