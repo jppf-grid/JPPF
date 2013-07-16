@@ -59,7 +59,7 @@ public abstract class JPPFContainer
   /**
    * The unique identifier for the submitting application.
    */
-  protected List<String> uuidPath = new ArrayList<String>();
+  protected List<String> uuidPath = new ArrayList<>();
   /**
    * Used to prevent parallel deserialization.
    */

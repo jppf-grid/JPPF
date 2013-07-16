@@ -54,7 +54,7 @@ public class ServerJobBroadcast extends ServerJob {
   /**
    * Map of all pending broadcast jobs.
    */
-  private final Set<ServerJobBroadcast> broadcastSet = new LinkedHashSet<ServerJobBroadcast>();
+  private final Set<ServerJobBroadcast> broadcastSet = new LinkedHashSet<>();
 
   /**
    * Initialized broadcast job with task bundle and data provider.
@@ -83,7 +83,7 @@ public class ServerJobBroadcast extends ServerJob {
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
     if (broadcastUUID == null) {
-      this.broadcastMap = new LinkedHashMap<String, ServerJobBroadcast>();
+      this.broadcastMap = new LinkedHashMap<>();
     } else {
       this.broadcastMap = Collections.emptyMap();
     }
@@ -176,8 +176,7 @@ public class ServerJobBroadcast extends ServerJob {
     lock.lock();
     try {
       if (isCancelled()) {
-        List<ServerJobBroadcast> list;
-        list = new ArrayList<ServerJobBroadcast>(broadcastSet.size() + broadcastMap.size());
+        List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
         broadcastSet.clear();
@@ -195,9 +194,7 @@ public class ServerJobBroadcast extends ServerJob {
     try {
       if (parentJob == null) {
         if (!super.addBundle(bundle)) return false;
-        for (ServerJobBroadcast item : broadcastSet) {
-          item.addBundle(bundle);
-        }
+        for (ServerJobBroadcast item : broadcastSet) item.addBundle(bundle);
         return true;
       } else {
         return super.addBundle(new ServerTaskBundleClient(bundle.getJob().copy(), bundle.getDataProvider(), bundle.getDataLocationList()));

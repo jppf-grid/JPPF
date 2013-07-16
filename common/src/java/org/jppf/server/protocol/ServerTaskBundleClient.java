@@ -62,11 +62,11 @@ public class ServerTaskBundleClient
   /**
    * The tasks to be executed by the node.
    */
-  private final List<ServerTask> taskList = new LinkedList<ServerTask>();
+  private final List<ServerTask> taskList = new LinkedList<>();
   /**
    * The tasks to be sent back to the client.
    */
-  private final List<ServerTask> tasksToSendList = new LinkedList<ServerTask>();
+  private final List<ServerTask> tasksToSendList = new LinkedList<>();
   /**
    * The count of pending tasks.
    */
@@ -74,7 +74,7 @@ public class ServerTaskBundleClient
   /**
    * The list of listeners registered with this bundle.
    */
-  private final List<CompletionListener> listenerList = new CopyOnWriteArrayList<CompletionListener>();
+  private final List<CompletionListener> listenerList = new CopyOnWriteArrayList<>();
   /**
    * Bundle cancel indicator.
    */
@@ -283,7 +283,7 @@ public class ServerTaskBundleClient
    */
   public List<DataLocation> getDataLocationList()
   {
-    List<DataLocation> list = new ArrayList<DataLocation>(taskList.size());
+    List<DataLocation> list = new ArrayList<>(taskList.size());
     for (ServerTask task : taskList) list.add(task.getDataLocation());
     return list;
   }
@@ -326,7 +326,7 @@ public class ServerTaskBundleClient
    * Notifies that tasks have been completed.
    */
   protected void fireTasksCompleted() {
-    List<ServerTask> completedTasks = new ArrayList<ServerTask>(tasksToSendList);
+    List<ServerTask> completedTasks = new ArrayList<>(tasksToSendList);
     tasksToSendList.clear();
 
     ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);

@@ -67,7 +67,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * The unique identifier for the submitting application.
    */
-  private TraversalList<String> uuidPath = new TraversalList<String>();
+  private TraversalList<String> uuidPath = new TraversalList<>();
   /**
    * The number of tasks in this bundle at the time it is received by a driver.
    */
@@ -108,7 +108,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   /**
    * Map holding the parameters of the request.
    */
-  private final Map<Object, Object> parameters = new HashMap<Object, Object>();
+  private final Map<Object, Object> parameters = new HashMap<>();
   /**
    * The service level agreement between the job and the server.
    */

@@ -102,7 +102,7 @@ public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
 
     this.job = job;
     this.taskBundle = taskBundle;
-    this.taskList = Collections.unmodifiableList(new ArrayList<ServerTask>(taskList));
+    this.taskList = Collections.unmodifiableList(new ArrayList<>(taskList));
     int size = this.taskList.size();
     this.taskBundle.setTaskCount(size);
     this.taskBundle.setCurrentTaskCount(size);

@@ -42,7 +42,7 @@ public class SendResultsStrategyManager
    */
   private static Map<String, SendResultsStrategy> initializeMap()
   {
-    Map<String, SendResultsStrategy> map = new HashMap<String, SendResultsStrategy>();
+    Map<String, SendResultsStrategy> map = new HashMap<>();
     map.put(SendResultsStrategy.ALL_RESULTS, new SendResultsStrategy.SendAllResultsStrategy());
     map.put(SendResultsStrategy.NODE_RESULTS, new SendResultsStrategy.SendNodeResultsStrategy());
     return map;

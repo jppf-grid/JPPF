@@ -50,11 +50,11 @@ public class ServerJob extends AbstractServerJob {
   /**
    * The list of the tasks.
    */
-  private final List<ServerTask> tasks = new ArrayList<ServerTask>();
+  private final List<ServerTask> tasks = new ArrayList<>();
   /**
    * The list of the incoming bundles.
    */
-  private final List<ServerTaskBundleClient> bundleList = new ArrayList<ServerTaskBundleClient>();
+  private final List<ServerTaskBundleClient> bundleList = new ArrayList<>();
   /**
    * Listener for handling completed bundles.
    */
@@ -62,7 +62,7 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Set of all dispatched bundles in this job.
    */
-  private final Set<ServerTaskBundleNode> dispatchSet = new LinkedHashSet<ServerTaskBundleNode>();
+  private final Set<ServerTaskBundleNode> dispatchSet = new LinkedHashSet<>();
   /**
    * The requeue handler.
    */
@@ -93,7 +93,7 @@ public class ServerJob extends AbstractServerJob {
   public List<ServerTaskBundleClient> getBundleList() {
     lock.lock();
     try {
-      return new ArrayList<ServerTaskBundleClient>(bundleList);
+      return new ArrayList<>(bundleList);
     } finally {
       lock.unlock();
     }
@@ -207,10 +207,10 @@ public class ServerJob extends AbstractServerJob {
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("*** received " + results.size() + " results from " + bundle);
     if (results.isEmpty()) return;
-    CollectionMap<ServerTaskBundleClient, Pair<Integer, DataLocation>> map = new SetIdentityMap<ServerTaskBundleClient, Pair<Integer, DataLocation>>();
+    CollectionMap<ServerTaskBundleClient, Pair<Integer, DataLocation>> map = new SetIdentityMap<>();
     lock.lock();
     try {
-      List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<ServerTask>(tasks) : bundle.getTaskList();
+      List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
       if (isJobExpired() || isCancelled()) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), new Pair(task.getPosition(), task.getDataLocation()));
       } else {
@@ -235,7 +235,7 @@ public class ServerJob extends AbstractServerJob {
    */
   public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<ServerTaskBundleClient, ServerTask>();
+    CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
       for (ServerTask task : bundle.getTaskList()) map.putValue(task.getBundle(), task);
@@ -279,7 +279,7 @@ public class ServerJob extends AbstractServerJob {
       if (isCancelled()) {
         List<Future>   futureList;
         synchronized (dispatchSet) {
-          futureList = new ArrayList<Future>(dispatchSet.size());
+          futureList = new ArrayList<>(dispatchSet.size());
           for (ServerTaskBundleNode item : dispatchSet) futureList.add(item.getFuture());
         }
         for (Future future : futureList) {
@@ -291,7 +291,7 @@ public class ServerJob extends AbstractServerJob {
         }
       }
       boolean requeue = false;
-      List<DataLocation> list = new ArrayList<DataLocation>();
+      List<DataLocation> list = new ArrayList<>();
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
@@ -303,7 +303,7 @@ public class ServerJob extends AbstractServerJob {
           addAll(list, this.tasks);
         }
         if (bundle.isRequeued()) {
-          List<ServerTask> taskList = new ArrayList<ServerTask>();
+          List<ServerTask> taskList = new ArrayList<>();
           for (ServerTask task : bundle.getTaskList()) {
             if (task.getState() != TaskState.RESULT) taskList.add(task);
           }
@@ -394,7 +394,7 @@ public class ServerJob extends AbstractServerJob {
    */
   public Set<ServerTaskBundleNode> getDispatchSet() {
     synchronized (dispatchSet) {
-      return new LinkedHashSet<ServerTaskBundleNode>(dispatchSet);
+      return new LinkedHashSet<>(dispatchSet);
     }
   }
 
@@ -434,7 +434,7 @@ public class ServerJob extends AbstractServerJob {
     lock.lock();
     try {
       if (getSubmissionStatus() == SubmissionStatus.COMPLETE) {
-        if (completionBundles == null) completionBundles = new ArrayList<ServerTaskBundleClient>();
+        if (completionBundles == null) completionBundles = new ArrayList<>();
         completionBundles.add(bundle);
         return false;
       } else if (getSubmissionStatus() == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
