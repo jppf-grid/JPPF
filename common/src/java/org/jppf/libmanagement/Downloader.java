@@ -38,7 +38,7 @@ public class Downloader
 
   /**
    * Entry point.
-   * @param args - not used.
+   * @param args not used.
    */
   public static void main(final String...args)
   {
@@ -64,9 +64,9 @@ public class Downloader
 
   /**
    * Extract the specified files from the specified archive.
-   * @param sourceUrl - the URL pointing to the archive to download.
-   * @param destPath - the folder in which to extract the files.
-   * @param names - the names of the zip entries to extract.
+   * @param sourceUrl the URL pointing to the archive to download.
+   * @param destPath the folder in which to extract the files.
+   * @param names the names of the zip entries to extract.
    * @throws Exception if any IO error occurs.
    */
   public void extractFiles(final String sourceUrl, final String destPath, final String...names) throws Exception
@@ -85,19 +85,14 @@ public class Downloader
       Location dest = new FileLocation(tmp);
       System.out.println("downloading " + source);
       LocationEventListener l = listener;
-      if (l == null) l = new LocationEventListener()
-      {
+      if (l == null) l = new LocationEventListener() {
         private int count = 0;
         @Override
-        public void dataTransferred(final LocationEvent event)
-        {
+        public void dataTransferred(final LocationEvent event) {
           int oneMB = 1024*1024;
           int n = event.bytesTransferred();
           int p = count % oneMB;
-          if (n + p >= oneMB)
-          {
-            System.out.println(String.valueOf(((n + count) / oneMB)) +" MB downloaded");
-          }
+          if (n + p >= oneMB) System.out.println(String.valueOf(((n + count) / oneMB)) +" MB downloaded");
           count += n;
         }
       };
@@ -125,8 +120,8 @@ public class Downloader
 
   /**
    * Check that the specified files are present in the specified path.
-   * @param folder - the folder in which to check for the files.
-   * @param names - the names of the files to lookup.
+   * @param folder the folder in which to check for the files.
+   * @param names the names of the files to lookup.
    * @return true if the folder and the files exist.
    */
   public boolean checkFilesPresent(final File folder, final String...names)
@@ -167,7 +162,7 @@ public class Downloader
 
   /**
    * Set the location listener used to show the progress of the download.
-   * @param listener - a <code>LocationEventListener</code> instance.
+   * @param listener a <code>LocationEventListener</code> instance.
    */
   public void setListener(final LocationEventListener listener)
   {

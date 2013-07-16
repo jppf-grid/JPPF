@@ -32,8 +32,8 @@ import org.slf4j.*;
 
 /**
  * Node-specific connection wrapper, implementing a user-friendly interface for the monitoring
- * and management of the node. Note that this class implements all the methods in the interface
- * {@link org.jppf.server.job.management.DriverJobManagementMBean DriverJobManagementMBean}, without implementing the interface itself.
+ * and management of the node. Note that this class implements the interface
+ * {@link org.jppf.server.job.management.DriverJobManagementMBean DriverJobManagementMBean}.
  * @author Laurent Cohen
  */
 public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean
