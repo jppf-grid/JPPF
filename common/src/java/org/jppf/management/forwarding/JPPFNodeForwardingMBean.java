@@ -48,7 +48,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forwardInvoke(final NodeSelector selector, String name, String methodName, Object[] params, String[] signature) throws Exception;
+  Map<String, Object> forwardInvoke(NodeSelector selector, String name, String methodName, Object[] params, String[] signature) throws Exception;
 
   /**
    * Convenience method to invoke an MBean method that has no parameter.
@@ -60,7 +60,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName) throws Exception;
+  Map<String, Object> forwardInvoke(NodeSelector selector, String name, String methodName) throws Exception;
 
   /**
    * Get the value of an attribute of the specified MBean for each specified node.
@@ -70,7 +70,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @return a mapping of node uuids to the result of getting the MBean attribute on the corresponding node. Each result may be an exception.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forwardGetAttribute(final NodeSelector selector, String name, String attribute) throws Exception;
+  Map<String, Object> forwardGetAttribute(NodeSelector selector, String name, String attribute) throws Exception;
 
   /**
    * Set the value of an attribute of the specified MBean on the specified nodes attached to the driver.
@@ -82,7 +82,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * This map may be empty if no exception was raised.
    * @throws Exception if the invocation failed.
    */
-  Map<String, Object> forwardSetAttribute(final NodeSelector selector, String name, String attribute, Object value) throws Exception;
+  Map<String, Object> forwardSetAttribute(NodeSelector selector, String name, String attribute, Object value) throws Exception;
 
   /**
    * Get the latest state information from the node.
@@ -238,7 +238,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws IllegalArgumentException if <code>selector</code> or <code>mBeanName</code> is null.
    * @exclude
    */
-  String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName) throws IllegalArgumentException;
+  String registerForwardingNotificationListener(NodeSelector selector, final String mBeanName) throws IllegalArgumentException;
 
   /**
    * Unregister the specified listener.
@@ -246,5 +246,5 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws ListenerNotFoundException if the listener could not be found.
    * @exclude
    */
-  void unregisterForwardingNotificationListener(final String listenerID) throws ListenerNotFoundException;
+  void unregisterForwardingNotificationListener(String listenerID) throws ListenerNotFoundException;
 }
