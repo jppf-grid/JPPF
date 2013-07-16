@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 
 import org.jppf.ui.options.*;
+import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LocalizationUtils;
 
 /**
@@ -67,7 +68,7 @@ public final class DockingManager
   /**
    * Mapping of view ids to the corresponding UI frame.
    */
-  private Map<String, ViewDescriptor> viewMap = new HashMap<>();
+  private Map<String, ViewDescriptor> viewMap = new TreeMap<>();
   /**
    * Handles what to do when a view frame is closed.
    */
@@ -188,6 +189,7 @@ public final class DockingManager
   {
     String id = VIEW_PREFIX + VIEW_SEQ.incrementAndGet();
     JFrame frame = new JFrame(id);
+    frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     frame.addWindowListener(windowAdapter);
     TabbedPaneOption container = new TabbedPaneOption();

@@ -2,7 +2,7 @@ def comp = option.findFirstWithName("/AdminPanels").getUIComponent();
 def frame = new JFrame(option.getLabel());
 OptionsHandler.setMainWindow(frame);
 DockingManager.getInstance().setMainView(frame);
-frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/jppf-icon.gif").getImage());
+frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
 frame.addWindowListener(new WindowClosingListener());
 def statsHandler = StatsHandler.getInstance();
 comp.setSelectedIndex(0);

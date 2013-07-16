@@ -31,9 +31,13 @@ import javax.swing.*;
 public final class GuiUtils
 {
   /**
+   * Path tot he JPPF icon used in the GUI.
+   */
+  public static final String JPPF_ICON = "/org/jppf/ui/resources/jppf-icon.gif";
+  /**
    * A mapping of icons to their path, to use as an icon cache.
    */
-  private static Map<String, ImageIcon> iconMap = new Hashtable<String, ImageIcon>();
+  private static Map<String, ImageIcon> iconMap = new Hashtable<>();
   /**
    * Precompiled pattern for searching line breaks in a string.
    */
@@ -165,7 +169,7 @@ public final class GuiUtils
    */
   private static Map<String, String> createShortener()
   {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("Execution", "Exec");
     map.put("execution", "exec");
     map.put("Maximum", "Max");
