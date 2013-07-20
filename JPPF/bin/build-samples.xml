@@ -57,7 +57,9 @@
 				<exclude name="**/*.log"/>
 				<exclude name="**/IdleSystem/lib/IdleSystem.*"/>
 				<exclude name="**/javadoc/**/*.*"/>
+				<exclude name="**/*.sh"/>
 			</zipfileset>
+			<zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}" includes="**/*.sh" filemode="755"/>
 			<zipfileset dir="${build}/" prefix="${samples.pack.prefix}/shared/lib-src">
 				<include name="jppf-common-node-src.jar"/>
 				<include name="jppf-common-src.jar"/>

@@ -41,13 +41,10 @@
 				<zipfileset dir="${basedir}" prefix="${@{module}.prefix}">
 					<include name="${license.file}"/>
 				</zipfileset>
-				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" />
+				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" excludes="**/*.sh"/>
+				<zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755"/>
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-node.jar"/>
 				<zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
-        <!--
-				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
-				<zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib/jmxremote-license" includes="*.html"/>
-				-->
 				<zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib">
 					<include name="slf4j-api-*.jar"/>
