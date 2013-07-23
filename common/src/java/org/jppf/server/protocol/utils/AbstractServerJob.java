@@ -481,7 +481,7 @@ public abstract class AbstractServerJob {
     lock.lock();
     try {
       if(completionBundles == null) return Collections.emptyList();
-      else return completionBundles;
+      else return new ArrayList<>(completionBundles);
     } finally {
       lock.unlock();
     }
