@@ -44,7 +44,7 @@ public class JcaSubmissionManager extends SubmissionManagerClient
   /**
    * Mapping of submissions to their submission id.
    */
-  private Map<String, JPPFResultCollector> submissionMap = new Hashtable<String, JPPFResultCollector>();
+  private Map<String, JPPFResultCollector> submissionMap = new Hashtable<>();
 
   /**
    * Initialize this submission worker with the specified JPPF client.
@@ -97,6 +97,6 @@ public class JcaSubmissionManager extends SubmissionManagerClient
    */
   public Collection<String> getAllSubmissionIds()
   {
-    return Collections.unmodifiableSet(new HashSet<String>(submissionMap.keySet()));
+    return Collections.unmodifiableSet(new HashSet<>(submissionMap.keySet()));
   }
 }
