@@ -181,10 +181,12 @@ public final class IOHelper
    */
   public static Object unwrappedData(final SocketWrapper socketWrapper, final ObjectSerializer ser) throws Exception
   {
-    if (traceEnabled) log.trace("unwrapping from network connection");
+    //if (traceEnabled) log.trace("unwrapping from network connection");
     InputSource sis = new SocketWrapperInputSource(socketWrapper);
     DataLocation dl = IOHelper.readData(sis);
-    return unwrappedData(dl, ser);
+    Object o = unwrappedData(dl, ser);
+    if (traceEnabled) log.trace("unwrapping from network connection, serialized size=" + dl.getSize() + " : object=" + o);
+    return o;
   }
 
   /**
@@ -287,8 +289,8 @@ public final class IOHelper
    */
   public static void sendData(final SocketWrapper socketWrapper, final Object o, final ObjectSerializer ser) throws Exception
   {
-    if (traceEnabled) log.trace("sending object " + o);
     DataLocation dl = serializeData(o, ser);
+    if (traceEnabled) log.trace("sending object with serialized size=" + dl.getSize() + " : " + o);
     socketWrapper.writeInt(dl.getSize());
     OutputDestination od = new SocketWrapperOutputDestination(socketWrapper);
     dl.transferTo(od, true);
