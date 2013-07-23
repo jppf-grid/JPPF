@@ -101,7 +101,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     try {
-      HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, "run", null).invoke();
+      HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, null).invoke("run");
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

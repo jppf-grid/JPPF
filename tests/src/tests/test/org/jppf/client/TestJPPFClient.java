@@ -310,7 +310,7 @@ public class TestJPPFClient extends Setup1D1N
         Thread.sleep(10L);
         List<JPPFClientConnection> list = client.getAllConnections();
         for (JPPFClientConnection conn: list) {
-          if ((status == null) || ((AbstractJPPFClientConnection) conn).getStatus() == status) count++;
+          if ((status == null) || (conn.getStatus() == status)) count++;
         }
       } catch (Exception ignore) {
         throw ignore;
@@ -329,7 +329,7 @@ public class TestJPPFClient extends Setup1D1N
     JMXDriverConnectionWrapper jmx = null;
     while (jmx == null) {
       try {
-        jmx = ((AbstractJPPFClientConnection) client.getClientConnection()).getJmxConnection();
+        jmx = client.getClientConnection().getJmxConnection();
         while (!jmx.isConnected()) Thread.sleep(10L);
       } catch (Exception e) {
         Thread.sleep(10L);
@@ -357,6 +357,7 @@ public class TestJPPFClient extends Setup1D1N
     }
     return result.toArray(new String[result.size()]);
   }
+
   /**
    * A task which holds a non-serializable object.
    */

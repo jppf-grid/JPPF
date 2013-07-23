@@ -21,7 +21,6 @@ package org.jppf.test.scenario.jmxthreads;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.client.JPPFClientConnectionImpl;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.test.scenario.AbstractScenarioRunner;
@@ -57,7 +56,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
       executor = Executors.newFixedThreadPool(nbNodes, new JPPFThreadFactory("NodeRestart"));
       int iterations = config.getInt("iterations", 10);
       output("performing test with " + nbNodes + " nodes, for " + iterations + " iterations");
-      JMXDriverConnectionWrapper jmxDriver = ((JPPFClientConnectionImpl) getSetup().getClient().getClientConnection()).getJmxConnection();
+      JMXDriverConnectionWrapper jmxDriver = getSetup().getClient().getClientConnection().getJmxConnection();
       for (int i=1; i<=iterations; i++)
       {
         long start = System.nanoTime();

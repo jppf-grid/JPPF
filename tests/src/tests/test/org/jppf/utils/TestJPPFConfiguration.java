@@ -61,9 +61,6 @@ public class TestJPPFConfiguration
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public InputStream getPropertyStream() throws IOException
     {

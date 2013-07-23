@@ -88,7 +88,7 @@ public class Setup
    */
   public JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
   {
-    JMXDriverConnectionWrapper driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver;
   }

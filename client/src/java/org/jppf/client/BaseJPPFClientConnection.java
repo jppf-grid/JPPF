@@ -146,7 +146,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   public JPPFTaskBundle sendHandshakeJob() throws Exception
   {
     JPPFTaskBundle header = new JPPFTaskBundle();
-    //ObjectSerializer ser = makeHelper(getClass().getClassLoader()).getSerializer();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<String>();
     uuidPath.add(client.getUuid());
@@ -267,7 +266,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     for (ClassLoader cl: clArray) {
       try {
         if (cl == null) continue;
-        //clazz = cl.loadClass(helperClassName);
         clazz = Class.forName(helperClassName, true, cl);
         if (clazz != null) break;
       } catch (Exception e) {

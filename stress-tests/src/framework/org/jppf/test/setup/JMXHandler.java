@@ -74,8 +74,7 @@ public class JMXHandler
     }
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
     {
-      JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) entry.getValue();
-      JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
+      JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
       String url = wrapper.getURL().toString();
       if (!wrapperMap.containsKey(url))
       {

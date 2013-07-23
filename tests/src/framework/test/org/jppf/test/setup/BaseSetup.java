@@ -59,7 +59,7 @@ public class BaseSetup
    */
   public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception
   {
-    JMXDriverConnectionWrapper driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
@@ -72,7 +72,7 @@ public class BaseSetup
    */
   public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception
   {
-    JMXDriverConnectionWrapper driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver;
   }
@@ -241,8 +241,7 @@ public class BaseSetup
     Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<JMXServiceURL, JMXDriverConnectionWrapper>();
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
     {
-      JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) entry.getValue();
-      JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
+      JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
       if (!wrapperMap.containsKey(wrapper.getURL()))
       {
         while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
