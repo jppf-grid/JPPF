@@ -121,8 +121,8 @@
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${src.dir}"/>
-			<link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
-			<link href="http://www.jppf.org/api-2.0"/>
+			<link href="http://docs.oracle.com/javase/7/docs/api"/>
+			<link href="http://www.jppf.org/api-3"/>
 			<doctitle><![CDATA[JPPF - Node Tray Sample]]></doctitle>
 			<header>
 				<![CDATA[

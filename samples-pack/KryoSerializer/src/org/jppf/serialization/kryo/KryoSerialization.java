@@ -104,7 +104,7 @@ public class KryoSerialization implements JPPFSerialization {
     @Override
     public Object newInstance() {
       try {
-        return ReflectionHelper.create(c);
+        return SerializationReflectionHelper.create(c);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
