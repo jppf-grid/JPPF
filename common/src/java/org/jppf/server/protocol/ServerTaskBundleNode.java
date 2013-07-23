@@ -200,10 +200,11 @@ public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
   /**
    * Called when this task bundle should be resubmitted
    */
-  public synchronized void resubmit()
-  {
+  public void resubmit() {
     if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
-    requeued = true;
+    synchronized(this) {
+      requeued = true;
+    }
   }
 
   /**
