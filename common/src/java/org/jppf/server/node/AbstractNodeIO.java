@@ -71,8 +71,7 @@ public abstract class AbstractNodeIO implements NodeIO
   public AbstractNodeIO(final JPPFNode node)
   {
     this.node = node;
-    HookFactory.registerConfigSingleHook("jppf.serialization.exception.hook", SerializationExceptionHook.class, new DefaultSerializationExceptionHook(),
-      "buildExceptionResult", getClass().getClassLoader());
+    HookFactory.registerConfigSingleHook("jppf.serialization.exception.hook", SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
   }
 
   /**
@@ -247,7 +246,7 @@ public abstract class AbstractNodeIO implements NodeIO
         log.error(t.getMessage(), t);
         try
         {
-          JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeHook(SerializationExceptionHook.class, object, t);
+          JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
           result.setPosition(p);
           dl = IOHelper.serializeData(result, ser);
         }

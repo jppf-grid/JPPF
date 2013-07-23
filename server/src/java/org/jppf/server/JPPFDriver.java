@@ -173,10 +173,7 @@ public class JPPFDriver
 
     initializer.initJmxServer();
     if (isManagementEnabled(config)) initializer.registerProviderMBeans();
-    HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, "run", null).invoke();
-    //Hook<JPPFDriverStartupSPI> startupHook = HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, "run", null);
-    //HookFactory.invokeHook(JPPFDriverStartupSPI.class.getName());
-    //new JPPFStartupLoader().load(JPPFDriverStartupSPI.class);
+    HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();

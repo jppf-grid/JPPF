@@ -22,7 +22,7 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
 /**
@@ -41,14 +41,6 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The class of the mbean provider interface.
-   */
-  private Class<S> providerClass = null;
-  /**
-   * The list of providers found in the class path.
-   */
-  private List<S> providerList = null;
-  /**
    * Keeps a list of MBeans registered with the MBean server.
    */
   private List<String> registeredMBeanNames = new Vector<String>();
@@ -58,39 +50,34 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
   private MBeanServer server = null;
 
   /**
-   * Initialize this mbean provider manager.
+   * Initialize this mbean provider manager and register the MBeans implementing the specified provider interface.
    * @param clazz the class object for the provider interface.
+   * @param cl the class loader used to oad the MBean implementation classes.
+   * @param createParams the parameters used to create the MBean implementations.
    * @param server the MBean server on which to register.
+   * @throws Exception if the registration failed.
    */
-  public JPPFMBeanProviderManager(final Class<S> clazz, final MBeanServer server)
+  public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final MBeanServer server, final Object...createParams) throws Exception
   {
-    this.providerClass = clazz;
     this.server = server;
-  }
-
-  /**
-   * Retrieve all defined MBean providers for the specified provider interface.
-   * @return a list of <code>S</code> instances.
-   */
-  public List<S> getAllProviders()
-  {
-    return getAllProviders(getClass().getClassLoader());
-  }
-
-  /**
-   * Retrieve all defined MBean providers for the specified provider interface.
-   * @param cl the class loader to use for class lookup.
-   * @return a list of <code>S</code> instances.
-   */
-  public List<S> getAllProviders(final ClassLoader cl)
-  {
-    if (providerList == null)
-    {
-      providerList = new LinkedList<S>();
-      Iterator<S> it = ServiceFinder.lookupProviders(providerClass, cl);
-      while (it.hasNext()) providerList.add(it.next());
+    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+    ClassLoader loader = cl == null ? tmp : cl;
+    if (loader == null) loader = getClass().getClassLoader();
+    Hook<S> hook = HookFactory.registerSPIMultipleHook(clazz, null, loader);
+    Object[] mbeans = hook.invoke("createMBean", createParams);
+    Object[] infNames = hook.invoke("getMBeanInterfaceName");
+    Object[] mbeanNames = hook.invoke("getMBeanName");
+    try {
+      Thread.currentThread().setContextClassLoader(cl);
+      for (int i=0; i<mbeans.length; i++) {
+        Class inf = Class.forName((String) infNames[i], true, loader);
+        boolean b = registerProviderMBean(mbeans[i], inf, (String) mbeanNames[i]);
+        if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanNames[i] + ']');
+        if (b) registeredMBeanNames.add((String) mbeanNames[i]);
+      }
+    } finally {
+      Thread.currentThread().setContextClassLoader(tmp);
     }
-    return providerList;
   }
 
   /**
@@ -101,7 +88,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
    * @param name the MBean name.
    * @return true if the registration succeeded, false otherwise.
    */
-  public <T> boolean registerProviderMBean(final T impl, final Class<T> intf, final String name)
+  private <T> boolean registerProviderMBean(final T impl, final Class<T> intf, final String name)
   {
     try
     {

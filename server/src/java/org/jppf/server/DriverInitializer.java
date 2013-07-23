@@ -138,15 +138,7 @@ public class DriverInitializer
   void registerProviderMBeans() throws Exception
   {
     MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<JPPFDriverMBeanProvider>(JPPFDriverMBeanProvider.class, server);
-    List<JPPFDriverMBeanProvider> list = mgr.getAllProviders();
-    for (JPPFDriverMBeanProvider provider: list)
-    {
-      Object o = provider.createMBean();
-      Class<?> inf = Class.forName(provider.getMBeanInterfaceName());
-      boolean b = mgr.registerProviderMBean(o, inf, provider.getMBeanName());
-      if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + ']');
-    }
+    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
   }
 
   /**

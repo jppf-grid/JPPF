@@ -102,7 +102,7 @@ public class NodeRunner
       VersionUtils.logVersionInformation("node", uuid);
       initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
-      HookFactory.registerSPIMultipleHook(InitializationHook.class, null, "initializing", null);
+      HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
@@ -159,7 +159,7 @@ public class NodeRunner
    */
   public static NodeInternal createNode() throws Exception
   {
-    HookFactory.invokeHook(InitializationHook.class, new UnmodifiableTypedProperties(initialConfig));
+    HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
     if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";

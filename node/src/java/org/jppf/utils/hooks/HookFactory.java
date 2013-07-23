@@ -30,7 +30,7 @@ public class HookFactory
   /**
    * Mapping of the hooks to their interface name.
    */
-  private static Map<String, Hook<?>> hookMap = new Hashtable<String, Hook<?>>();
+  private static Map<String, Hook<?>> hookMap = new Hashtable<>();
 
   /**
    * Register a hook defined via a configuration property, of which a single instance is discovered and invoked.
@@ -38,13 +38,12 @@ public class HookFactory
    * @param property the name of the property used to specify the hook implementation class name.
    * @param infClass the class of the hook's interface.
    * @param defaultImpl the default implementation, which may be null.
-   * @param methodName the name of the implementation method to invoke.
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerConfigSingleHook(final String property, final Class<T> infClass, final T defaultImpl, final String methodName, final ClassLoader classLoader)
+  public static <T> Hook<T> registerConfigSingleHook(final String property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
-    return register(new Hook<T>(property, infClass, defaultImpl, methodName, classLoader));
+    return register(new Hook<T>(property, infClass, defaultImpl, classLoader));
   }
 
   /**
@@ -52,13 +51,12 @@ public class HookFactory
    * @param <T> the type of the hook interface.
    * @param infClass the class of the hook's interface.
    * @param defaultImpl the default implementation, which may be null.
-   * @param methodName the name of the implementation method to invoke.
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerSPISingleHook(final Class<T> infClass, final T defaultImpl, final String methodName, final ClassLoader classLoader)
+  public static <T> Hook<T> registerSPISingleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
-    return register(new Hook<T>(infClass, defaultImpl, methodName, classLoader, true));
+    return register(new Hook<T>(infClass, defaultImpl, classLoader, true));
   }
 
   /**
@@ -66,13 +64,12 @@ public class HookFactory
    * @param <T> the type of the hook interface.
    * @param infClass the class of the hook's interface.
    * @param defaultImpl the default implementation, which may be null.
-   * @param methodName the name of the implementation method to invoke.
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final String methodName, final ClassLoader classLoader)
+  public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
-    return register(new Hook<T>(infClass, defaultImpl, methodName, classLoader, false));
+    return register(new Hook<T>(infClass, defaultImpl, classLoader, false));
   }
 
   /**
@@ -90,26 +87,52 @@ public class HookFactory
   /**
    * Invoke all instances of the hook with the specified interface name, with the specified parameters.
    * @param inf the hook's interface name.
+   * @param methodName the name of the implementation method to invoke.
    * @param parameters the parameters with which to invoke the hook.
    * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
-   * @throws Exception if any error occurs during the invocation.
    */
-  public static Object invokeHook(final String inf, final Object...parameters) throws Exception
+  public static Object[] invokeHook(final String inf, final String methodName, final Object...parameters)
   {
     Hook<?> hook = hookMap.get(inf);
-    if (hook != null) return hook.invoke(parameters);
+    if (hook != null) return hook.invoke(methodName, parameters);
     return null;
   }
 
   /**
    * Invoke all instances of the hook with the specified interface name, with the specified parameters.
    * @param inf the hook's interface.
+   * @param methodName the name of the implementation method to invoke.
    * @param parameters the parameters with which to invoke the hook.
    * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
-   * @throws Exception if any error occurs during the invocation.
    */
-  public static Object invokeHook(final Class<?> inf, final Object...parameters) throws Exception
+  public static Object[] invokeHook(final Class<?> inf, final String methodName, final Object...parameters)
   {
-    return invokeHook(inf.getName(), parameters);
+    return invokeHook(inf.getName(), methodName, parameters);
+  }
+
+  /**
+   * Invoke all instances of the hook with the specified interface name, with the specified parameters.
+   * @param inf the hook's interface name.
+   * @param methodName the name of the implementation method to invoke.
+   * @param parameters the parameters with which to invoke the hook.
+   * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
+   */
+  public static Object invokeSingleHook(final String inf, final String methodName, final Object...parameters)
+  {
+    Hook<?> hook = hookMap.get(inf);
+    if (hook != null) return hook.invoke(methodName, parameters)[0];
+    return null;
+  }
+
+  /**
+   * Invoke all instances of the hook with the specified interface name, with the specified parameters.
+   * @param inf the hook's interface.
+   * @param methodName the name of the implementation method to invoke.
+   * @param parameters the parameters with which to invoke the hook.
+   * @return the hook instance return value if the hook id defined with a single instance, null otherwise.
+   */
+  public static Object invokeSingleHook(final Class<?> inf, final String methodName, final Object...parameters)
+  {
+    return invokeSingleHook(inf.getName(), methodName, parameters);
   }
 }

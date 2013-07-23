@@ -65,7 +65,7 @@ public final class ReflectionHelper
 
   /**
    * Invoke a method using reflection, without having to specify the parameters types.
-   * In this case, we assume the first method found with the specified name, and whose 
+   * In this case, we assume the first method found with the specified name, and whose
    * number of parameter is the same as the number of values, is the one we use.
    * @param clazz the class on which to invoke the method.
    * @param instance the object on which to invoke the method, may be null if the method is static.
@@ -104,7 +104,7 @@ public final class ReflectionHelper
 
   /**
    * Find a method without having to specify the parameters types.
-   * In this case, we assume the first method found with the specified name, and whose 
+   * In this case, we assume the first method found with the specified name, and whose
    * number of parameter is the same as the number of values, is the one we use.
    * @param clazz the class on which to invoke the method.
    * @param methodName the name of the method to find.
@@ -225,9 +225,8 @@ public final class ReflectionHelper
     {
       if ((classNames == null) || (classNames.length <= 0)) return new Class[0];
       Class[] classes = new Class[classNames.length];
-      //for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i]);
       ClassLoader cl = getCurrentClassLoader();
-      for (int i=0; i<classNames.length; i++) classes[i] = cl.loadClass(classNames[i]);
+      for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i], true, cl);
       return classes;
     }
     catch(Exception e)
@@ -246,7 +245,7 @@ public final class ReflectionHelper
   {
     try
     {
-      return getCurrentClassLoader().loadClass(className);
+      return Class.forName(className, true, getCurrentClassLoader());
     }
     catch(Exception e)
     {
@@ -264,5 +263,39 @@ public final class ReflectionHelper
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = ReflectionHelper.class.getClassLoader();
     return cl;
+  }
+
+  /**
+   * 
+   * @param clazz the class on which to find the method.
+   * @param methodName the name of the method to find.
+   * @param params the concrete parameters.
+   * A best effort is made to try and match the specified parameters to the formal parameters of an existing method.
+   * @return a method that matches the name and parameters.
+   * @throws Exception if any erorr occurs.
+   */
+  public Method findMethodFromConcreteArgs(final Class<?> clazz, final String methodName, final Object...params) throws Exception
+  {
+    Method[] methods = clazz.getMethods();
+    Object[] p = params == null ? new Object[0] : params;
+    for (Method m: methods)
+    {
+      Class<?>[] formalParams = m.getParameterTypes();
+      if (m.getName().equals(methodName) && (formalParams.length == p.length))
+      {
+        boolean mismatch = false;
+        for (int i=0; i<formalParams.length; i++)
+        {
+          Class<?> paramClass = formalParams[i];
+          if ((p[i] != null) && !formalParams[i].isAssignableFrom(p[i].getClass()))
+          {
+            mismatch = true;
+            break;
+          }
+        }
+        if (!mismatch) return m;
+      }
+    }
+    return null;
   }
 }

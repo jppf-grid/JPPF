@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -479,11 +480,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   protected void fireEvent(final Class<?> c, final String name, final boolean foundInURLClassPath) {
     boolean found = c != null;
     ClassLoaderEvent event = found ? new ClassLoaderEvent(this, c, foundInURLClassPath) : new ClassLoaderEvent(this, name);
-    if (found) {
-      for (ClassLoaderListener listener: listeners) listener.classLoaded(event);
-    } else {
-      for (ClassLoaderListener listener: listeners) listener.classNotFound(event);
-    }
+    HookFactory.invokeHook(ClassLoaderListener.class, found ? "classLoaded" : "classNotFound", event);
   }
 
   /**

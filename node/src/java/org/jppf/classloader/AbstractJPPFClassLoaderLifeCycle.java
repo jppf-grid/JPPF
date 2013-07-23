@@ -22,13 +22,13 @@ import static org.jppf.utils.StringUtils.build;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.caching.*;
 import org.jppf.classloader.resource.ResourceCache;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -84,10 +84,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The connection to the driver.
    */
   protected ClassLoaderConnection<?> connection;
-  /**
-   * The list of listeners to this class loader.
-   */
-  protected final List<ClassLoaderListener> listeners = new CopyOnWriteArrayList<ClassLoaderListener>();
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -101,7 +97,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     this.connection = connection;
     this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
     if (uuidPath != null) this.uuidPath = uuidPath;
-    listeners.addAll(ClassLoaderListenerHandler.getInstance().getListeners());
+    HookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
   }
 
   /**
@@ -311,24 +307,6 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public String getClientUuid() {
     if (!dynamic) return null;
     return uuidPath.get(0);
-  }
-
-  /**
-   * Add the specified listener to the list of listeners.
-   * @param listener the listener to add.
-   */
-  public void addClassLoaderListener(final ClassLoaderListener listener) {
-    if (listener == null) throw new IllegalArgumentException("cannot add a null listener");
-    listeners.add(listener);
-  }
-
-  /**
-   * Remove the specified listener from the list of listeners.
-   * @param listener the listener to remove.
-   */
-  public void removeClassLoaderListener(final ClassLoaderListener listener) {
-    if (listener == null) throw new IllegalArgumentException("cannot remove a null listener");
-    listeners.remove(listener);
   }
 
   /**

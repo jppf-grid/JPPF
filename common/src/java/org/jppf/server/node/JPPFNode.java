@@ -235,7 +235,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         log.error("Error creating the JMX server", e);
       }
     }
-    HookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, "run", null).invoke();
+    HookFactory.registerSPIMultipleHook(JPPFNodeStartupSPI.class, null, null).invoke("run");
     initDataChannel();
     if (checkConnection) {
       connectionChecker = createConnectionChecker();
@@ -394,19 +394,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     ClassLoader cl = getClass().getClassLoader();
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     MBeanServer server = getJmxServer().getServer();
-    if (providerManager == null) providerManager = new JPPFMBeanProviderManager<JPPFNodeMBeanProvider>(JPPFNodeMBeanProvider.class, server);
-    try {
-      Thread.currentThread().setContextClassLoader(cl);
-      List<JPPFNodeMBeanProvider> list = providerManager.getAllProviders(cl);
-      for (JPPFNodeMBeanProvider provider: list) {
-        Object o = provider.createMBean(this);
-        Class inf = Class.forName(provider.getMBeanInterfaceName());
-        boolean b = providerManager.registerProviderMBean(o, inf, provider.getMBeanName());
-        if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + provider.getMBeanName() + ']');
-      }
-    } finally {
-      Thread.currentThread().setContextClassLoader(tmp);
-    }
+    if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, server, this);
   }
 
   /**
