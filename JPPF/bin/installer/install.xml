@@ -132,12 +132,6 @@
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="JDK7_Addons" required="no" preselected="no">
-      <description>A set of addons using the JDK 7 APIs and language extensions</description>
-      <fileset dir="./build/@{app.ver}/@{app.ver}-jdk7-addons" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-jdk7-addons">
-      	<include name="**/*.*"/>
-      </fileset>
-    </pack>
     <pack name="GigaSpaces_Connector" required="no" preselected="no">
       <description></description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-GigaSpaces" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-GigaSpaces">

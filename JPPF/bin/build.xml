@@ -33,7 +33,6 @@
 	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
-  <property name="jdk7-addons"           value="${basedir}/../jdk7-addons"/>
   <property name="tests"                 value="${basedir}/../tests"/>
   <property name="stress-tests"          value="${basedir}/../stress-tests"/>
 
@@ -155,13 +154,13 @@
   <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector"/>
 	<target name="rebuild" depends="clean.all, build"/>
 	<target name="deploy"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, jppf.jdk7-addons, user.guide, doc, javadoc, installer"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc, javadoc, installer"/>
 	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, jppf.jdk7-addons, user.guide, doc, javadoc           "/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc, javadoc           "/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, jppf.jdk7-addons, user.guide, doc,          installer"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc,          installer"/>
 	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, jppf.jdk7-addons, user.guide, doc                    "/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc                    "/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -170,7 +169,6 @@
 	<import file="build-compile-jar.xml"/>
 	<import file="build-modules.xml"/>
   <import file="build-samples.xml"/>
-  <import file="build-jdk7-addons.xml"/>
 	<import file="build-connectors.xml"/>
 	<import file="build-installer.xml"/>
 	<import file="build-findbugs.xml"/>
@@ -203,7 +201,6 @@
 			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
-      <zipfileset dir="${jdk7-addons}" prefix="${zip.prefix}/jdk7-addons"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
       <zipfileset dir="${gigaspaces}" prefix="${zip.prefix}/JPPF-GigaSpaces">
         <exclude name="deployable/*.jar"/>
