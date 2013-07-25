@@ -28,7 +28,8 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
   <li><a href="ExtendedClassLoading/Readme.php">On-demand management and deployment of appplication libraries in the Grid</a></li>
   <li><a href="GPU/Readme.php">Harnessing the power of the GPU with APARAPI</a></li>
   <li><a href="KryoSerializer/Readme.php">A JPPF serialization scheme using Kryo</a></li>
-  <li><a href="ForkJoinNodeExecutor/Readme.php">A FIbonacci computation demo using fork/join thread pools in the nodes</a></li>
+  <li><a href="ForkJoinNodeExecutor/Readme.php">A Fibonacci computation demo using fork/join thread pools in the nodes</a></li>
+  <li><a href="WordCount/Readme.php">A word count demo on the Wikipedia database</a></li>
 </ul>
 <br>
 

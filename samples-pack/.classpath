@@ -6,6 +6,7 @@
 	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
 	<classpathentry kind="src" output="ExtendedClassLoading/classes" path="ExtendedClassLoading/src"/>
 	<classpathentry kind="src" output="ExtendedClassLoading/classes2" path="ExtendedClassLoading/src2"/>
+	<classpathentry kind="src" output="ForkJoinNodeExecutor/classes" path="ForkJoinNodeExecutor/src"/>
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
 	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
@@ -24,6 +25,8 @@
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
 	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
+	<classpathentry kind="src" output="WordCount/classes" path="WordCount/src"/>
+	<classpathentry kind="src" output="WordCount/classes-client" path="WordCount/src-client"/>
 	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
 	<classpathentry kind="lib" path="shared/lib/js.jar"/>
 	<classpathentry kind="lib" path="shared/lib/crawler-1.0.0.jar"/>
