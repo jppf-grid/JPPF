@@ -174,15 +174,17 @@ public class ChannelWrapperRemote extends ChannelWrapper<ClientTaskBundle> imple
    */
   public void reconnect()
   {
-    setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-    try
-    {
-      channel.getTaskServerConnection().init();
-    }
-    catch (Exception e2)
-    {
-      log.error(e2.getMessage(), e2);
-    }
+    Runnable r = new Runnable() {
+      public void run() {
+        setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+        try {
+          channel.getTaskServerConnection().init();
+        } catch (Exception e2) {
+          log.error(e2.getMessage(), e2);
+        }
+      }
+    };
+    new Thread(r, "connecting " + channel).start();
   }
 
   @Override
