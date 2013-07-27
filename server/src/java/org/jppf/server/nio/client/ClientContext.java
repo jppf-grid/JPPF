@@ -238,30 +238,29 @@ public class ClientContext extends AbstractNioContext<ClientState>
   /**
    * Send the job ended notification.
    */
-  synchronized void jobEnded()
+  void jobEnded()
   {
-    if (initialBundleWrapper != null)
+    ServerTaskBundleClient bundle;
+    if ((bundle = getInitialBundleWrapper()) != null)
     {
-      initialBundleWrapper.bundleEnded();
-      initialBundleWrapper = null;
+      bundle.bundleEnded();
+      setInitialBundleWrapper(null);
     }
   }
 
   /**
    * Send the job ended notification.
    */
-  synchronized void cancelJobOnClose()
+  void cancelJobOnClose()
   {
-    if (initialBundleWrapper != null)
+    ServerTaskBundleClient bundle;
+    if ((bundle = getInitialBundleWrapper()) != null)
     {
-      JPPFTaskBundle header = initialBundleWrapper.getJob();
+      JPPFTaskBundle header = bundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect = " + header.getSLA().isCancelUponClientDisconnect() + " for " + header);
-      if (header.getSLA().isCancelUponClientDisconnect())
-      {
-        initialBundleWrapper.cancel();
-      }
-      initialBundleWrapper.bundleEnded();
-      initialBundleWrapper = null;
+      if (header.getSLA().isCancelUponClientDisconnect()) bundle.cancel();
+      bundle.bundleEnded();
+      setInitialBundleWrapper(null);
     }
   }
 
