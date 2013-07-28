@@ -22,9 +22,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.JPPFConfiguration;
+import org.slf4j.*;
 
 /**
  * Helper object for setting up and cleaning the environment before and after testing.
@@ -32,6 +34,14 @@ import org.jppf.utils.JPPFConfiguration;
  */
 public class Setup
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(Setup.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The jppf client to use.
    */
@@ -68,6 +78,7 @@ public class Setup
   public Setup(final ScenarioConfiguration config)
   {
     this.config = config;
+    if (debugEnabled) log.debug("initializing setup with config=" + config);
   }
 
   /**
@@ -79,6 +90,17 @@ public class Setup
   {
     JMXDriverConnectionWrapper driver = getDriverManagementProxy();
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+  }
+
+  /**
+   * Get a proxy to the driver's diagnostics MBean.
+   * @return an instance of <code>DiagnosticsMBean</code>.
+   * @throws Exception if the proxy could not be obtained.
+   */
+  public DiagnosticsMBean getDriverDiagnosticsMBean() throws Exception
+  {
+    JMXDriverConnectionWrapper driver = getDriverManagementProxy();
+    return driver.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
   }
 
   /**
@@ -102,7 +124,10 @@ public class Setup
    */
   public JPPFClient setup(final int nbDrivers, final int nbNodes) throws Exception
   {
-    System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes and 1 client");
+    String msg = "performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes and 1 client";
+    System.out.println(msg);
+    if (debugEnabled) log.debug(msg);
+
     createShutdownHook();
     drivers = new RestartableDriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++)
@@ -110,14 +135,18 @@ public class Setup
       drivers[i] = new RestartableDriverProcessLauncher(i+1, config);
       new Thread(drivers[i], drivers[i].getName() + "process launcher").start(); 
     }
+    if (debugEnabled) log.debug("launched " + nbDrivers + " drivers");
     nodes = new RestartableNodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++)
     {
       nodes[i] = new RestartableNodeProcessLauncher(i+1, config);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
     }
+    if (debugEnabled) log.debug("launched " + nbNodes + " nodes");
     client = createClient("c" + clientCount.incrementAndGet(), true);
+    if (debugEnabled) log.debug("created client");
     jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+    if (debugEnabled) log.debug("checked drivers and nodes initialized");
     return client;
   }
 
@@ -153,7 +182,7 @@ public class Setup
     }
     System.gc();
     stopProcesses();
-    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
   }
 
   /**

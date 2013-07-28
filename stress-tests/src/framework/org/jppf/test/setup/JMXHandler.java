@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.slf4j.*;
 
 /**
  * 
@@ -29,6 +30,14 @@ import org.jppf.management.*;
  */
 public class JMXHandler
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JMXHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Cache of <i>distinct</i> driver JMX connections. There is one entry per driver to which the client is connected.
    */
@@ -56,6 +65,7 @@ public class JMXHandler
   public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
   {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
+    if (debugEnabled) log.debug("starting checks");
     Map<Integer, JPPFClientConnection> connectionMap = new HashMap<Integer, JPPFClientConnection>();
     boolean allConnected = false;
     while (!allConnected)
@@ -72,6 +82,7 @@ public class JMXHandler
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
+    if (debugEnabled) log.debug("all drivers connected");
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
     {
       JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) entry.getValue();
@@ -83,6 +94,7 @@ public class JMXHandler
         wrapperMap.put(url, wrapper);
       }
     }
+    if (debugEnabled) log.debug("registered all service urls");
     int sum = 0;
     while (sum < nbNodes)
     {
@@ -91,9 +103,14 @@ public class JMXHandler
       {
         Integer n = entry.getValue().nbNodes();
         if (n != null) sum += n;
-        else break;
+        else
+        {
+          Thread.sleep(10L);
+          break;
+        }
       }
     }
+    if (debugEnabled) log.debug("all nodes connected");
   }
 
   /**
