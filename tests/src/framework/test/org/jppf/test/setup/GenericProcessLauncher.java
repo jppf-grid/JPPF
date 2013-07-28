@@ -20,6 +20,7 @@ package test.org.jppf.test.setup;
 
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -122,6 +123,10 @@ public class GenericProcessLauncher implements Runnable {
    * 
    */
   protected SocketWrapper socketClient = null;
+  /**
+   * 
+   */
+  final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 
   /**
    * Default constructor.
@@ -313,11 +318,11 @@ public class GenericProcessLauncher implements Runnable {
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {
-        if (stdout != null) stdout.print(name + event.getContent());
+        if (stdout != null) stdout.print(new StringBuilder(sdf.format(new Date(event.getTimestamp()))).append(' ').append(name).append(event.getContent()).toString());
       }
       @Override
       public void errorStreamAltered(final ProcessWrapperEvent event) {
-        if (stderr != null) stderr.print(name + event.getContent());
+        if (stderr != null) stderr.print(new StringBuilder(sdf.format(new Date(event.getTimestamp()))).append(' ').append(name).append(event.getContent()).toString());
       }
     });
     wrapper.setProcess(builder.start());

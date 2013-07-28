@@ -28,12 +28,18 @@ import java.util.EventObject;
 public class ProcessWrapperEvent extends EventObject
 {
   /**
+   * The timestamp of this event.
+   */
+  private final long timestamp;
+
+  /**
    * Initialize this event with the specified source.
    * @param content the source of this event, in effect the content of the corresponding process stream.
    */
   public ProcessWrapperEvent(final String content)
   {
     super(content);
+    this.timestamp = System.currentTimeMillis();
   }
 
   /**
@@ -43,5 +49,14 @@ public class ProcessWrapperEvent extends EventObject
   public String getContent()
   {
     return (String) getSource();
+  }
+
+  /**
+   * Get the timestamp of this event.
+   * @return the timestamp as a long value.
+   */
+  public long getTimestamp()
+  {
+    return timestamp;
   }
 }
