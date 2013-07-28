@@ -31,14 +31,14 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
   /**
    * Comparator used to sort the keys.
    */
-  protected Comparator<K> comparator = null;
+  protected final Comparator<K> comparator;
 
   /**
    * Default cosntructor.
    */
   public AbstractCollectionSortedMap()
   {
-    map = createMap();
+    this(null);
   }
 
   /**
@@ -55,6 +55,16 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
   protected Map<K, Collection<V>> createMap()
   {
     return comparator == null ? new TreeMap<K, Collection<V>>() : new TreeMap<K, Collection<V>>(comparator);
+  }
+
+  /**
+   * Get the last key in this sorted map.
+   * @return the last key based on the order of the map.
+   */
+  @SuppressWarnings("unchecked")
+  public K firstKey()
+  {
+    return ((SortedMap<K, V>) map).firstKey();
   }
 
   /**
