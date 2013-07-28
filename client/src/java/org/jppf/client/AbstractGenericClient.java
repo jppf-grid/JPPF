@@ -57,6 +57,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
   /**
    * The pool of threads used for submitting execution requests.
+   * @exclude
    */
   protected ThreadPoolExecutor executor = null;
   /**
@@ -65,6 +66,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   private final TypedProperties config;
   /**
    * Performs server discovery.
+   * @exclude
    */
   protected JPPFMulticastReceiverThread receiverThread = null;
   /**
@@ -127,6 +129,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Initialize this client's configuration.
    * @param configuration an object holding the JPPF configuration.
    * @return <code>TypedProperties</code> instance holding JPPF configuration. Never be <code>null</code>.
+   * @exclude
    */
   protected TypedProperties initConfig(final Object configuration)
   {
@@ -134,6 +137,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     return JPPFConfiguration.getProperties();
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   @SuppressWarnings("unchecked")
   protected void initPools(final TypedProperties config)
@@ -148,6 +155,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Initialize remote connection pools according to configuration.
    * @param props The JPPF configuration properties.
+   * @exclude
    */
   protected void initRemotePools(final TypedProperties props) {
     try {
@@ -206,6 +214,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param priority the priority assigned to the connection.
    * @param poolSize the size of the associated connection pool.
    * @param ssl determines whether this is an SSL connection.
+   * @exclude
    */
   protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl)
   {
@@ -225,12 +234,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param info the driver connection information.
    * @param ssl determines whether this is an SSL connection.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
+   * @exclude
    */
   protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl);
 
   /**
    * Invoked when a new connection is created.
    * @param c the connection that failed.
+   * @exclude
    */
   @Override
   public void newConnection(final JPPFClientConnection c)
@@ -248,6 +259,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Invoked when the status of a connection has changed to <code>JPPFClientConnectionStatus.FAILED</code>.
    * @param connection the connection that failed.
+   * @exclude
    */
   @Override
   protected void connectionFailed(final JPPFClientConnection connection)
@@ -317,6 +329,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     return (submissionManager != null) && submissionManager.hasAvailableConnection();
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event)
   {
@@ -337,6 +353,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Get the pool of threads used for submitting execution requests.
    * @return a {@link ThreadPoolExecutor} instance.
+   * @exclude
    */
   public ThreadPoolExecutor getExecutor()
   {
@@ -347,6 +364,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Add a request uuid to class loader mapping to this submission manager.
    * @param uuid the uuid of the request.
    * @param cl the class loader for the request.
+   * @exclude
    */
   public void addRequestClassLoader(final String uuid, final ClassLoader cl)
   {
@@ -359,6 +377,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Add a request uuid to class loader mapping to this submission manager.
    * @param uuid the uuid of the request.
+   * @exclude
    */
   public void removeRequestClassLoader(final String uuid)
   {
@@ -372,6 +391,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Get a class loader from its request uuid.
    * @param uuid the uuid of the request.
    * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
+   * @exclude
    */
   public ClassLoader getRequestClassLoader(final String uuid)
   {
@@ -398,6 +418,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Set the submission manager for this JPPF client.
    * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
+   * @exclude
    */
   protected void setSubmissionManager(final SubmissionManager submissionManager)
   {
@@ -431,6 +452,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param cl a <code>ClassLoader</code> instance.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
    * @return a <code>RegisteredClassLoader</code> instance.
+   * @exclude
    */
   public RegisteredClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
     if(cl == null) throw new IllegalArgumentException("cl is null");
@@ -453,6 +475,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Unregisters class loader from this submission manager.
    * @param registeredClassLoader a <code>RegisteredClassLoader</code> instance.
+   * @exclude
    */
   protected void unregister(final RegisteredClassLoader registeredClassLoader) {
     if(registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
@@ -473,6 +496,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
 
   /**
    * Helper class for managing registered class loaders.
+   * @exclude
    */
   public class RegisteredClassLoader {
     /**
