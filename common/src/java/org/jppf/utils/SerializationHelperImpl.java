@@ -17,20 +17,18 @@
  */
 package org.jppf.utils;
 
-import org.jppf.classloader.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.
  * @author Laurent Cohen
  * @exclude
  */
-public class SerializationHelperImpl implements SerializationHelper
-{
+public class SerializationHelperImpl implements SerializationHelper {
   /**
    * Determines whether dumping byte arrays in the log is enabled.
    */
   private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
-
   /**
    * Used to serialize and deserialize objects to and from object streams.
    */
@@ -39,8 +37,7 @@ public class SerializationHelperImpl implements SerializationHelper
   /**
    * Default constructor.
    */
-  public SerializationHelperImpl()
-  {
+  public SerializationHelperImpl() {
   }
 
   /**
@@ -50,26 +47,16 @@ public class SerializationHelperImpl implements SerializationHelper
    * @see org.jppf.utils.SerializationHelper#getSerializer()
    */
   @Override
-  public ObjectSerializer getSerializer() throws Exception
-  {
-    if (serializer == null)
-    {
+  public ObjectSerializer getSerializer() throws Exception {
+    if (serializer == null) {
       ClassLoader cl = getClass().getClassLoader();
-      if (cl instanceof AbstractJPPFClassLoader)
-      {
-        serializer = (ObjectSerializer)
-        ((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+      Class<?> clazz = null;
+      if (cl instanceof AbstractJPPFClassLoader) {
+        clazz = ((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
+      } else {
+        clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
       }
-      else if (cl instanceof NonDelegatingClassLoader)
-      {
-        serializer = (ObjectSerializer)
-        ((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
-      }
-      else
-      {
-        serializer = (ObjectSerializer)
-        cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
-      }
+      serializer = (ObjectSerializer) clazz.newInstance();
     }
     return serializer;
   }
