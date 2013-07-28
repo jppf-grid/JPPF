@@ -63,7 +63,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * @exclude
    */
   @Override
-  public void reset()
+  void reset()
   {
     try
     {
