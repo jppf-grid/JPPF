@@ -46,7 +46,7 @@ public class TestJPPFConfiguration
     assertNotNull(config);
     String s  = config.getString("jppf.config.source.origin", null);
     assertNotNull(s);
-    assertEquals(s, "string");
+    assertEquals("string", s);
   }
 
   /**
@@ -61,9 +61,6 @@ public class TestJPPFConfiguration
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public InputStream getPropertyStream() throws IOException
     {
