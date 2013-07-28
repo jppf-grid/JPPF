@@ -64,7 +64,7 @@ public class TestJMX
     {
       client = new JPPFClient();
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-      AbstractJPPFClientConnection conn = (AbstractJPPFClientConnection) client.getClientConnection();
+      JPPFClientConnection conn = client.getClientConnection();
       driverJmx = conn.getJmxConnection();
       System.out.println("waiting till jmx is connected ...");
       while (!driverJmx.isConnected()) Thread.sleep(10L);
