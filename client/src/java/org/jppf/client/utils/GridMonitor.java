@@ -43,7 +43,10 @@ import org.jppf.utils.*;
  * monitor.close();
  * </pre>
  * @author Laurent Cohen
+ * @deprecated this class doesn't use the management request forwarding APIs, and thus doesn't handle
+ * nodes dynamically joining or leaving the grid.
  */
+@Deprecated
 public class GridMonitor
 {
   /**

@@ -90,6 +90,7 @@ public class JPPFClient extends AbstractGenericClient
    * @param info the driver connection information.
    * @param ssl determines whether this is an SSL connection.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
+   * @exclude
    */
   @Override
   protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
@@ -135,6 +136,10 @@ public class JPPFClient extends AbstractGenericClient
     return (conn == null) ? null : conn.getJmxConnection().statistics();
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   protected SubmissionManager createSubmissionManager()
   {

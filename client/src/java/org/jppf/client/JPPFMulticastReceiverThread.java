@@ -73,8 +73,9 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    */
   JPPFMulticastReceiverThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final boolean acceptMultipleInterfaces)
   {
-    if(connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
+    if (connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
 
+    if (debugEnabled) log.debug("creating " + getClass().getSimpleName());
     this.connectionHandler = connectionHandler;
     this.ipFilter = ipFilter;
     this.acceptMultipleInterfaces = acceptMultipleInterfaces;
@@ -87,6 +88,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   @Override
   public void run()
   {
+    if (debugEnabled) log.debug("starting " + getClass().getSimpleName());
     runningThread = Thread.currentThread();
     JPPFMulticastReceiver receiver = null;
     try
