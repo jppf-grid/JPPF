@@ -59,7 +59,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
   /**
    * List of listeners to this ticker.
    */
-  private List<TickerListener> listeners = new Vector<TickerListener>();
+  private List<TickerListener> listeners = new CopyOnWriteArrayList<TickerListener>();
   /**
    * Executes the event notifications.
    */
