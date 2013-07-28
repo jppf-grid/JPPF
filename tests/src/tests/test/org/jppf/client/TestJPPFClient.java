@@ -25,6 +25,7 @@ import java.lang.management.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.*;
@@ -87,7 +88,7 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       int nbTasks = 10;
-      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (JPPFTask task: job.getTasks()) task.setId("" + i++);
       List<JPPFTask> results = client.submit(job);
@@ -119,7 +120,7 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       int nbTasks = 10;
-      JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 5000L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       int i = 0;
       for (JPPFTask task: job.getTasks()) task.setId("" + i++);
@@ -161,7 +162,7 @@ public class TestJPPFClient extends Setup1D1N
 
       // submit a job to ensure all local execution threads are created
       int nbTasks = 100;
-      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (JPPFTask task: job.getTasks()) task.setId("" + i++);
       List<JPPFTask> results = client.submit(job);
@@ -187,6 +188,67 @@ public class TestJPPFClient extends Setup1D1N
         if (name.startsWith("node processing")) count++;
       }
       assertEquals(nbThreads, count);
+    }
+    finally
+    {
+      client.close();
+      JPPFConfiguration.reset();
+    }
+  }
+
+  /**
+   * Test that the thread context class loader during local execution of a task is not null.
+   * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-174">JPPF-174 Thread context class loader is null for client-local execution</a>.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testLocalExecutionContextClassLoader() throws Exception
+  {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    config.setProperty("jppf.rmeote.execution.enabled", "false");
+    config.setProperty("jppf.local.execution.enabled", "true");
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, ThreadContextClassLoaderTask.class);
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(1, results.size());
+      JPPFTask task = results.get(0);
+      assertEquals(null, task.getException());
+      assertNotNull(task.getResult());
+    }
+    finally
+    {
+      client.close();
+      JPPFConfiguration.reset();
+    }
+  }
+
+  /**
+   * Test that the thread context class loader during remote execution of a task is not null, that it matches the task classloader
+   * and that both are client class loader.
+   * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution</a>.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testRemoteExecutionContextClassLoader() throws Exception
+  {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    config.setProperty("jppf.rmeote.execution.enabled", "true");
+    config.setProperty("jppf.local.execution.enabled", "false");
+    JPPFClient client = new JPPFClient();
+    try
+    {
+      while (!client.hasAvailableConnection()) Thread.sleep(10L);
+      client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, 1, ThreadContextClassLoaderTask.class);
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(1, results.size());
+      JPPFTask task = results.get(0);
+      assertEquals(null, task.getException());
+      assertNotNull(task.getResult());
     }
     finally
     {
@@ -291,7 +353,13 @@ public class TestJPPFClient extends Setup1D1N
     JMXDriverConnectionWrapper jmx = getJmxConnection(client);
     jmx.restartShutdown(100L, restartDelay);
     waitForNbConnections(client, 0, null);
-    client.initRemotePools(JPPFConfiguration.getProperties());
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        client.initRemotePools(JPPFConfiguration.getProperties());
+      }
+    };
+    new Thread(r, "InitPools").start();
     waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
   }
 
@@ -357,6 +425,7 @@ public class TestJPPFClient extends Setup1D1N
     }
     return result.toArray(new String[result.size()]);
   }
+
   /**
    * A task which holds a non-serializable object.
    */
@@ -386,6 +455,34 @@ public class TestJPPFClient extends Setup1D1N
     public void run()
     {
       if (!instantiateInClient) nso = new NotSerializableObject();
+    }
+  }
+
+  /**
+   * A task that checks the current thread context class loader during its execution.
+   */
+  public static class ThreadContextClassLoaderTask extends JPPFTask
+  {
+    @Override
+    public void run()
+    {
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      if (cl == null) throw new IllegalStateException("thread context class loader is null for " + (isInNode() ? "remote" : "local")  + " execution");
+      if (isInNode())
+      {
+        if (!(cl instanceof AbstractJPPFClassLoader))
+          throw new IllegalStateException("thread context class loader for remote execution should be an AbstractJPPFClassLoader, but is " + cl);
+        Object o = getTaskObject();
+        AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader)  (o == null ? getClass().getClassLoader() : o.getClass().getClassLoader());
+        if (cl != ajcl2)
+        {
+          throw new IllegalStateException("thread context class loader and task class loader do not match:\n" +
+            "thread context class loader = " + cl + "\n" +
+            "task class loader = " + ajcl2);
+        }
+        if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
+      }
+      setResult(cl.toString());
     }
   }
 
