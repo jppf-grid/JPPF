@@ -26,6 +26,7 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.*;
 import org.jppf.node.ThreadManager.UsedClassLoader;
+import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.*;
@@ -76,7 +77,7 @@ public class NodeExecutionManagerImpl
   /**
    * List of listeners to task execution events.
    */
-  private final List<TaskExecutionListener> taskExecutionListeners = new CopyOnWriteArrayList<TaskExecutionListener>();
+  private final List<TaskExecutionListener> taskExecutionListeners = new CopyOnWriteArrayList<>();
   /**
    * Determines whether the number of threads or their priority has changed.
    */
@@ -84,7 +85,7 @@ public class NodeExecutionManagerImpl
   /**
    * Set if the node must reconnect to the driver.
    */
-  private AtomicReference<JPPFNodeReconnectionNotification> reconnectionNotification = new AtomicReference<JPPFNodeReconnectionNotification>(null);
+  private AtomicReference<JPPFNodeReconnectionNotification> reconnectionNotification = new AtomicReference<>(null);
   /**
    * The thread manager that is used for execution.
    */
@@ -178,7 +179,7 @@ public class NodeExecutionManagerImpl
     try {
       setup(bundle, taskList);
       if (!isJobCancelled()) {
-        ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<NodeTaskWrapper>(getExecutor());
+        ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
         for (Task task : taskList) {
           NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler);
           taskWrapperList.add(taskWrapper);
@@ -257,8 +258,9 @@ public class NodeExecutionManagerImpl
     this.taskWrapperList = new ArrayList<NodeTaskWrapper>(taskList.size());
     this.dataProvider = taskList.get(0).getDataProvider();
     this.uuidList = bundle.getUuidPath().getList();
+    ClassLoader taskClassLoader = null;
     try {
-      AbstractJPPFClassLoader taskClassLoader = (AbstractJPPFClassLoader) ((node instanceof ClassLoaderProvider) ? ((ClassLoaderProvider)node).getClassLoader(uuidList) : null);
+      taskClassLoader = node instanceof ClassLoaderProvider ? ((ClassLoaderProvider) node).getClassLoader(uuidList) : getTaskClassLoader(taskList.get(0));
       usedClassLoader = threadManager.useClassLoader(taskClassLoader);
     } catch (Exception e) {
       String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
@@ -266,7 +268,9 @@ public class NodeExecutionManagerImpl
       else log.warn(msg);
     }
     accumulatedElapsed.set(0L);
-    node.getLifeCycleEventHandler().fireJobStarting(bundle, (AbstractJPPFClassLoader) usedClassLoader.getClassLoader(), (List<Task>) taskList, dataProvider);
+    LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
+    if (handler != null) handler.fireJobStarting(bundle, taskClassLoader instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) taskClassLoader : null,
+      (List<Task>) taskList, dataProvider);
   }
 
   /**
@@ -275,7 +279,9 @@ public class NodeExecutionManagerImpl
   @SuppressWarnings("unchecked")
   private void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
-    node.getLifeCycleEventHandler().fireJobEnding(bundle, (AbstractJPPFClassLoader) usedClassLoader.getClassLoader(), (List<Task>) taskList, dataProvider);
+    ClassLoader cl = usedClassLoader.getClassLoader();
+    LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
+    if (handler != null) handler.fireJobEnding(bundle, cl instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) cl : null, (List<Task>) taskList, dataProvider);
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;
@@ -439,5 +445,15 @@ public class NodeExecutionManagerImpl
    */
   public void setBundle(final JPPFTaskBundle bundle) {
     this.bundle = bundle;
+  }
+
+  /**
+   * Get the appropiate class loader for the specfied task.
+   * @param task the task from which to get the class laoder.
+   * @return an instance of {@link ClassLoader}.
+   */
+  private ClassLoader getTaskClassLoader(final Task<?> task) {
+    Object o = task.getTaskObject();
+    return (o == null) ? task.getClass().getClassLoader() : o.getClass().getClassLoader();
   }
 }
