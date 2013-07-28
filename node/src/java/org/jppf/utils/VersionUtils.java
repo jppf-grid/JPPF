@@ -163,8 +163,7 @@ public final class VersionUtils
     public String toString()
     {
       StringBuilder sb = new StringBuilder();
-      sb.append("JPPF version information: ");
-      sb.append("Version: ").append(versionNumber);
+      sb.append("JPPF Version: ").append(versionNumber);
       sb.append(", Build number: ").append(buildNumber);
       sb.append(", Build date: ").append(buildDate);
       return sb.toString();
