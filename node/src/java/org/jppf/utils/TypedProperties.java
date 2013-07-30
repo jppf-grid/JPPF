@@ -22,6 +22,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.utils.configuration.PropertiesLoader;
 import org.jppf.utils.streams.StreamUtils;
 
 /**
@@ -440,6 +441,17 @@ public class TypedProperties extends Properties {
       }
     }
     return result;
+  }
+
+  /**
+   * Load this properties objects from the specified reader.
+   * This load operation will recursively process all <code>!#include</code> statements before parsing the properties. 
+   * @param reader the reader to load from.
+   * @throws IOException if any I/O error occurs.
+   */
+  public synchronized void loadWithIncludes(final Reader reader) throws IOException
+  {
+    new PropertiesLoader().load(this, reader);
   }
 
   /**

@@ -19,7 +19,6 @@ package org.jppf.utils;
 
 import java.io.*;
 
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -93,19 +92,13 @@ public final class JPPFConfiguration
   private static void loadProperties()
   {
     props = new TypedProperties();
-    InputStream is = null;
-    try
+    try (Reader reader = getReader())
     {
-      is = getStream();
-      if (is != null) props.load(is);
+      if (reader != null) props.loadWithIncludes(reader);
     }
     catch(Exception e)
     {
       log.error("error reading the configuration", e);
-    }
-    finally
-    {
-      StreamUtils.close(is, log);
     }
   }
 
@@ -114,11 +107,11 @@ public final class JPPFConfiguration
    * @return an {@link InputStream} instance.
    * @throws Exception if any error occurs while trying to obtain the stream.
    */
-  private static InputStream getStream() throws Exception
+  private static Reader getReader() throws Exception
   {
     String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
     String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
-    return getConfigurationStream(filename, altSource);
+    return getConfigurationReader(filename, altSource);
   }
 
   /**
@@ -128,27 +121,53 @@ public final class JPPFConfiguration
    * @return an input stream that can be used to load the properties.
    * @throws Exception if any error occurs while trying to obtain the stream.
    */
-  private static InputStream getConfigurationStream(final String filename, final String configurationSourceName) throws Exception
+  private static Reader getConfigurationReader(final String filename, final String configurationSourceName) throws Exception
   {
-    InputStream is = null;
+    Reader reader = null;
     if (configurationSourceName != null)
     {
-      if (log.isDebugEnabled()) log.debug("reading JPPF configuration from config source: " + configurationSourceName);
-      ConfigurationSource source = (ConfigurationSource) Class.forName(configurationSourceName).newInstance();
-      is = source.getPropertyStream();
+      reader = getConfigurationSourceReader(configurationSourceName);
     }
     else
     {
       if (log.isDebugEnabled()) log.debug("reading JPPF configuration file: " + filename);
-      is = FileUtils.getFileInputStream(filename);
+      reader = FileUtils.getFileReader(filename);
     }
-    return is;
+    return reader;
   }
 
   /**
-   * Implement this interface to provide an alternate configuration source.
-   * <p>WARNING: not shown in the interface but also required:
-   * implementations must have a public no-arg constructor.
+   * Get an inputStream for a properties file located by the specified configuration source.
+   * @param configurationSourceName fully qualified name of a class implementating {@link JPPFConfiguration.ConfigurationSource}
+   * or {@link JPPFConfiguration.ConfigurationSourceReader}.
+   * @return an input stream that can be used to load the properties.
+   * @throws Exception if any error occurs while trying to obtain the stream.
+   * @exclude
+   */
+  public static Reader getConfigurationSourceReader(final String configurationSourceName) throws Exception
+  {
+    Reader reader = null;
+    if (log.isDebugEnabled()) log.debug("reading JPPF configuration from config source: " + configurationSourceName);
+    Class<?> clazz = Class.forName(configurationSourceName);
+    if (ConfigurationSourceReader.class.isAssignableFrom(clazz))
+    {
+      ConfigurationSourceReader source = (ConfigurationSourceReader) clazz.newInstance();
+      reader = source.getPropertyReader();
+    }
+    else if (ConfigurationSource.class.isAssignableFrom(clazz))
+    {
+      ConfigurationSource source = (ConfigurationSource) clazz.newInstance();
+      InputStream is = source.getPropertyStream();
+      reader = new InputStreamReader(is);
+    }
+    else throw new IllegalArgumentException("the type '" + configurationSourceName + "' is neither a JPPFConfiguration.ConfigurationSource " + 
+      "nor a JPPFConfiguration.ConfigurationSourceReader");
+    return reader;
+  }
+
+  /**
+   * Implement this interface to provide an alternate configuration source via an {@link InputStream}.
+   * <p>WARNING: not shown in the interface but also required: implementations must have a public no-arg constructor.
    */
   public interface ConfigurationSource
   {
@@ -160,5 +179,21 @@ public final class JPPFConfiguration
      * @throws IOException if the stream cannot be created.
      */
     InputStream getPropertyStream() throws IOException;
+  }
+
+  /**
+   * Implement this interface to provide an alternate configuration source via a {@link Reader}.
+   * <p>WARNING: not shown in the interface but also required: implementations must have a public no-arg constructor.
+   */
+  public interface ConfigurationSourceReader
+  {
+    /**
+     * Obtain the JPPF configuration properties from a {@link Reader}.
+     * The returned reader content must conform to the properties file's specifications
+     * (i.e. it must be usable as the argument to <code>Properties.load(InputStream)</code>).
+     * @return an {@link Reader} instance.
+     * @throws IOException if the stream cannot be created.
+     */
+    Reader getPropertyReader() throws IOException;
   }
 }
