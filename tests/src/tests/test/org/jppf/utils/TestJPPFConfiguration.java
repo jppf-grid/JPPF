@@ -32,21 +32,39 @@ import org.junit.Test;
 public class TestJPPFConfiguration
 {
   /**
-   * Invocation of the <code>JPPFClient()</code> constructor.
+   * Test reading the configuration from a {@link JPPFConfiguration.ConfigurationSource} plugin.
    * @throws Exception if any error occurs
    */
   @Test(timeout=5000)
   public void testAlternateConfigurationSource() throws Exception
   {
-    JPPFConfiguration.ConfigurationSource source  = new TestConfigurationSource();
+    JPPFConfiguration.ConfigurationSource source = new TestConfigurationSource();
     System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
     System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
     JPPFConfiguration.reset();
     TypedProperties config = JPPFConfiguration.getProperties();
     assertNotNull(config);
-    String s  = config.getString("jppf.config.source.origin", null);
+    String s = config.getString("jppf.config.source.origin", null);
     assertNotNull(s);
-    assertEquals(s, "string");
+    assertEquals(s, "stream");
+  }
+
+  /**
+   * Test reading the configuration from a {@link JPPFConfiguration.ConfigurationSourceReader} plugin.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=5000)
+  public void testAlternateConfigurationSourceReader() throws Exception
+  {
+    JPPFConfiguration.ConfigurationSourceReader source = new TestConfigurationSourceReader();
+    System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
+    System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
+    JPPFConfiguration.reset();
+    TypedProperties config = JPPFConfiguration.getProperties();
+    assertNotNull(config);
+    String s = config.getString("jppf.config.source.reader.origin", null);
+    assertNotNull(s);
+    assertEquals(s, "reader");
   }
 
   /**
@@ -54,19 +72,25 @@ public class TestJPPFConfiguration
    */
   public static class TestConfigurationSource implements JPPFConfiguration.ConfigurationSource
   {
-    /**
-     * Public noargs constructor.
-     */
-    public TestConfigurationSource()
-    {
-    }
-
     @Override
     public InputStream getPropertyStream() throws IOException
     {
-      String props = "jppf.config.source.origin = string";
+      String props = "jppf.config.source.origin = stream";
       JPPFBuffer buffer = new JPPFBuffer(props);
       return new ByteArrayInputStream(buffer.getBuffer());
+    }
+  }
+
+  /**
+   * Test implementation of alternate configuration source.
+   */
+  public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader
+  {
+    @Override
+    public Reader getPropertyReader() throws IOException
+    {
+      String props = "jppf.config.source.reader.origin = reader";
+      return new StringReader(props);
     }
   }
 }

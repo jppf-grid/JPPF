@@ -20,3 +20,4 @@ test.org.jppf.server.protocol.TestJPPFJobSLA
 test.org.jppf.server.protocol.TestJPPFTask
 test.org.jppf.utils.TestJPPFConfiguration
 test.org.jppf.utils.TestRange
+test.org.jppf.utils.TestTypedProperties
