@@ -86,12 +86,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public synchronized Class<?> loadJPPFClass(final String name) throws ClassNotFoundException {
     if (debugEnabled) log.debug(build("looking up resource [", name, "]"));
     Class<?> c = findLoadedClass(name);
-    if ((c != null) && debugEnabled) log.debug("classloader = " + c.getClassLoader());
     if (c == null) {
       if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
-      c = findClass(name, false);
+      c = isOffline() ? Class.forName(name, true, this) : findClass(name, false);
     }
     if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
+    if ((c != null) && debugEnabled) log.debug("class '" + name + "' loaded by " + c.getClassLoader());
     return c;
   }
 
@@ -136,10 +136,14 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
       }
     }
+    if (isOffline()) {
+      notFoundCache.add(name);;
+      throw new ClassNotFoundException(build("Could not load class '", name, "'"));
+    }
     if (debugEnabled) log.debug(build("looking up definition for resource [", name, "]"));
     byte[] b = null;
     String resName = name.replace('.', '/') + ".class";
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("name", resName);
     JPPFResourceWrapper resource = null;
     synchronized(this) {
@@ -221,7 +225,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (url == null) {
       url = super.findResource(name);
       if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
-      if (url == null) {
+      if (!isOffline() && (url == null)) {
         if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
         try {
           List<URL> urlList = findRemoteResources(name);
@@ -281,8 +285,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       try {
         urlList = cache.getResourcesURLs(name);
         if (urlList == null) urlList = new ArrayList<URL>();
-        List<URL> tempList = findRemoteResources(name);
-        if (tempList != null) urlList.addAll(tempList);
+        if (!isOffline()) {
+          List<URL> tempList = findRemoteResources(name);
+          if (tempList != null) urlList.addAll(tempList);
+        }
         Enumeration<URL> tempEnum = super.findResources(name);
         if (tempEnum != null) {
           while (tempEnum.hasMoreElements()) urlList.add(tempEnum.nextElement());
@@ -464,10 +470,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public void close() {
     cache.close();
     notFoundCache.clear();
-    try {
-      super.close();
-    } catch (Exception ignore) {
-    }
+    super.close();
   }
 
   /**

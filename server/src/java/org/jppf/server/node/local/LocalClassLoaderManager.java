@@ -80,8 +80,8 @@ class LocalClassLoaderManager extends AbstractClassLoaderManager
           @Override
           public AbstractJPPFClassLoader run()
           {
-            AbstractJPPFClassLoader cl = getClassLoader();
-            return new JPPFLocalClassLoader(cl.getConnection(), cl, uuidPath);
+            AbstractJPPFClassLoader parent = getClassLoader();
+            return new JPPFLocalClassLoader(parent.getConnection(), parent, uuidPath);
           }
         };
         return AccessController.doPrivileged(pa);

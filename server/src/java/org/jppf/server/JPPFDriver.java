@@ -189,7 +189,8 @@ public class JPPFDriver
       localClassChannel.getContext().setChannel(localClassChannel);
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
       localNodeChannel.getContext().setChannel(localNodeChannel);
-      localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), new LocalClassLoaderConnection(localClassChannel));
+      final boolean offline = JPPFConfiguration.getProperties().getBoolean("jppf.node.offline", false);
+      localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), offline  ? null : new LocalClassLoaderConnection(localClassChannel));
       nodeClassServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
       new Thread(localNode, "Local node").start();

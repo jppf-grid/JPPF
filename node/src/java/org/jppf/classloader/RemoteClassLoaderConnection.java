@@ -18,6 +18,8 @@
 
 package org.jppf.classloader;
 
+import static org.jppf.utils.StringUtils.build;
+
 import java.io.IOException;
 
 import org.jppf.JPPFNodeReconnectionNotification;
@@ -75,7 +77,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
           }
           if (sslEnabled) createSSLConnection();
           performHandshake();
-          System.out.println("Reconnected to the class server");
+          System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
         }
         finally
         {

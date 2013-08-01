@@ -250,12 +250,13 @@ public class NodeRunner
    * @exclude
    */
   public static AbstractJPPFClassLoader getJPPFClassLoader() {
+    final boolean offline = JPPFConfiguration.getProperties().getBoolean("jppf.node.offline", false);
     synchronized(JPPFClassLoader.class) {
       if (classLoader == null) {
         PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>() {
           @Override
           public JPPFClassLoader run() {
-            return new JPPFClassLoader(new RemoteClassLoaderConnection(), NodeRunner.class.getClassLoader());
+            return new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(), NodeRunner.class.getClassLoader());
           }
         };
         classLoader = AccessController.doPrivileged(pa);

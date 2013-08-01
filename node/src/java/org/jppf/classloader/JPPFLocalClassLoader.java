@@ -62,7 +62,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
    * @exclude
    */
   @Override
-  public void reset()
+  void reset()
   {
     init();
   }
@@ -77,7 +77,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
   {
     try
     {
-      if (!dynamic) connection.close();
+      if (!dynamic && !isOffline()) connection.close();
     }
     catch (Exception e)
     {

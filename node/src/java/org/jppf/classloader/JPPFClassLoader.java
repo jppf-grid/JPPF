@@ -63,15 +63,18 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * @exclude
    */
   @Override
-  public void reset()
+  void reset()
   {
-    try
+    if (!isOffline())
     {
-      connection.reset();
-    }
-    catch (Exception e)
-    {
-      log.error(e.getMessage(), e);
+      try
+      {
+        connection.reset();
+      }
+      catch (Exception e)
+      {
+        log.error(e.getMessage(), e);
+      }
     }
   }
 
@@ -84,7 +87,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   {
     try
     {
-      if (!dynamic) connection.close();
+      if (!dynamic && !isOffline()) connection.close();
     }
     catch (Exception e)
     {

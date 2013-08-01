@@ -53,6 +53,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
   /**
    * Determines whether this class loader should handle dynamic class updating.
+   * @exclude
    */
   protected final boolean dynamic;
   /**
@@ -82,8 +83,13 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   protected final int instanceNumber = INSTANCE_COUNT.incrementAndGet();
   /**
    * The connection to the driver.
+   * @exclude
    */
   protected ClassLoaderConnection<?> connection;
+  /**
+   * Determines whether this class laoder is in connected mode or not.
+   */
+  protected boolean offline; 
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -96,6 +102,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     super(StringUtils.ZERO_URL, parent);
     this.connection = connection;
     this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
+    this.offline = dynamic ? ((AbstractJPPFClassLoaderLifeCycle) parent).isOffline() : connection == null;
     if (uuidPath != null) this.uuidPath = uuidPath;
     HookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
   }
@@ -105,10 +112,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @exclude
    */
   protected void init() {
-    try {
-      connection.init();
-    } catch (Exception e) {
-      throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
+    if (!isOffline()) {
+      try {
+        connection.init();
+      } catch (Exception e) {
+        throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
+      }
+    } else {
+      System.out.println("This node is 'offline', no class loader connection is established");
     }
   }
 
@@ -117,7 +128,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Reset and reinitialize the connection to the server.
    * @exclude
    */
-  public abstract void reset();
+  abstract void reset();
 
   /**
    * Load the specified class from a socket connection.
@@ -128,17 +139,19 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected JPPFResourceWrapper loadResource(final Map<String, Object> map) throws ClassNotFoundException {
     JPPFResourceWrapper resource = null;
-    try {
-      if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
-      resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
-      if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
-    } catch(IOException e) {
-      if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
-      throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
-    } catch(ClassNotFoundException e) {
-      throw e;
-    } catch(Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
+    if (!isOffline()) {
+      try {
+        if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
+        resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
+        if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
+      } catch(IOException e) {
+        if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
+        throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
+      } catch(ClassNotFoundException e) {
+        throw e;
+      } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+      }
     }
     return resource;
   }
@@ -170,6 +183,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append("[id=").append(instanceNumber).append(", type=").append(dynamic ? "client" : "server");
     sb.append(", uuidPath=").append(uuidPath);
+    sb.append(", offline=").append(offline);
     URL[] urls = getURLs();
     sb.append(", classpath=");
     if ((urls != null) && (urls.length > 0)) {
@@ -201,7 +215,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       alreadyNotFound[i] = notFoundCache.has(names[i]);
     }
     try {
-      List<Integer> indices = new ArrayList<Integer>();
+      List<Integer> indices = new ArrayList<>();
       for (int i=0; i<names.length; i++) {
         if (alreadyNotFound[i]) continue;
         String name = names[i];
@@ -220,11 +234,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
           }
         }
       }
-      if (indices.isEmpty()) {
-        if (debugEnabled) log.debug(this.toString() + " all resources were found locally");
+      if (indices.isEmpty() || isOffline()) {
+        if (debugEnabled) {
+          if (isOffline()) log.debug(this.toString() + " offline mode: resources were looked up locally only");
+          else log.debug(this.toString() + " all resources were found locally");
+        }
         return results;
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       String[] namesToLookup = new String[indices.size()];
       for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
       map.put("name", StringUtils.arrayToString(", ", null, null, namesToLookup));
@@ -325,5 +342,23 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * This method does nothing.
    */
   public void close() {
+    try
+    {
+      super.close();
+    }
+    catch (IOException e)
+    {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+    }
+  }
+
+  /**
+   * Determine whether this class loader is in offline mode or not.
+   * @return <code>true</code> if this class loader is offline, <code>false</code> otherwise.
+   */
+  public boolean isOffline()
+  {
+    return offline;
   }
 }
