@@ -325,10 +325,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         JPPFTaskBundle bundle = new JPPFTaskBundle();
         bundle.setName("server handshake");
         bundle.setUuid(INITIAL_BUNDLE_UUID);
-        bundle.setRequestUuid("0");
+        bundle.setUuid("0");
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
-        bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
+        bundle.setHandshake(true);
         ServerJob serverJob = new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
         initialBundle = serverJob.copy(serverJob.getTaskCount());
       }

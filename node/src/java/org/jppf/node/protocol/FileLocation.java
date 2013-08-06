@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 import java.io.*;
 
@@ -25,49 +25,45 @@ import java.io.*;
  * This implementation of the {@link Location} interface allows writing to and reading from a file.
  * @author Laurent Cohen
  */
-public class FileLocation extends AbstractLocation<File>
+public class FileLocation extends AbstractLocation<String>
 {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * The file size.
+   */
+  private long size = -1L;
 
   /**
    * Initialize this location with the specified file path.
+   * <p><b>Warning</b>: if this file location is intended for use on a remote machine,
+   * then you should use {@link #FileLocation(java.lang.String) FileLocation(String)} instead,
+   * since this constructor computes the path as the system-dependent {@link File#getCanonicalPath() canonical path} of the argument.
    * @param file an abstract file path.
+   * @throws IOException if any I/O error occurs.
    */
-  public FileLocation(final File file)
+  public FileLocation(final File file) throws IOException
+  {
+    super(file.getCanonicalPath());
+  }
+
+  /**
+   * Initialize this location with the specified file path.
+   * @param file a string representing the file path.
+   */
+  public FileLocation(final String file)
   {
     super(file);
   }
 
-  /**
-   * Initialize this location with the specified file path.
-   * @param file an abstract file path.
-   */
-  public FileLocation(final String file)
-  {
-    super(new File(file));
-  }
-
-  /**
-   * Obtain an input stream to read from this location.
-   * @return an <code>InputStream</code> instance.
-   * @throws Exception if an I/O error occurs.
-   * @see org.jppf.server.protocol.Location#getInputStream()
-   */
   @Override
   public InputStream getInputStream() throws Exception
   {
     return new BufferedInputStream(new FileInputStream(path));
   }
 
-  /**
-   * Obtain an output stream to write to this location.
-   * @return an <code>OutputStream</code> instance.
-   * @throws Exception if an I/O error occurs.
-   * @see org.jppf.server.protocol.Location#getOutputStream()
-   */
   @Override
   public OutputStream getOutputStream() throws Exception
   {
@@ -77,12 +73,15 @@ public class FileLocation extends AbstractLocation<File>
   /**
    * Get the size of the file this location points to.
    * @return the size as a long value, or -1 if the file does not exist.
-   * @see org.jppf.server.protocol.Location#size()
    */
   @Override
   public long size()
   {
-    if ((path != null) && path.exists()) return path.length();
-    return -1;
+    if (size < 0)
+    {
+      File file = new File(path);
+      if (file.exists()) size = file.length();
+    }
+    return size;
   }
 }

@@ -82,10 +82,14 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
     this.name = profileName;
     String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
-    performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000, 1, Integer.MAX_VALUE);
-    proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 1, 1, Integer.MAX_VALUE);
-    initialSize = props.getInt(prefix + "initialSize", 10, 1, Integer.MAX_VALUE);
-    initialMeanTime = props.getDouble(prefix + "initialMeanTime", 1e9d, Double.MIN_VALUE, Double.MAX_VALUE);
+    performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
+    if (performanceCacheSize < 1) performanceCacheSize = 1;
+    proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 1);
+    if (proportionalityFactor < 1) proportionalityFactor = 1;
+    initialSize = props.getInt(prefix + "initialSize", 10);
+    if (initialSize < 1) initialSize = 1;
+    initialMeanTime = props.getDouble(prefix + "initialMeanTime", 1e9d);
+    if (initialMeanTime < Double.MIN_VALUE) initialMeanTime = Double.MIN_VALUE;
   }
 
   /**
@@ -98,7 +102,8 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
     performanceCacheSize = config.getInt("performanceCacheSize", 2000);
     proportionalityFactor = config.getInt("proportionalityFactor", 1);
     initialSize = config.getInt("initialSize", 10);
-    initialMeanTime = config.getDouble("initialMeanTime", 1e9d, Double.MIN_VALUE, Double.MAX_VALUE);
+    initialMeanTime = config.getDouble("initialMeanTime", 1e9d);
+    if (initialMeanTime < Double.MIN_VALUE) initialMeanTime = Double.MIN_VALUE;
   }
 
   /**

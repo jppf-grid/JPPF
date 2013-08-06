@@ -50,7 +50,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   /**
    * An ordered map of bundle sizes, mapping to a list of bundles of this size.
    */
-  protected final SetSortedMap<Integer, T> sizeMap = new SetSortedMap<Integer, T>();
+  protected final SetSortedMap<Integer, T> sizeMap = new SetSortedMap<>();
   /**
    *
    */
@@ -73,7 +73,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   /**
    * A map of task bundles, ordered by descending priority.
    */
-  protected final LinkedListSortedMap<Integer, T> priorityMap = new LinkedListSortedMap<Integer, T>(PRIORITY_COMPARATOR);
+  protected final LinkedListSortedMap<Integer, T> priorityMap = new LinkedListSortedMap<>(PRIORITY_COMPARATOR);
   /**
    * Contains the ids of all queued jobs.
    */

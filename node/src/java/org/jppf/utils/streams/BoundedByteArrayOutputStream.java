@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.classloader.resource;
+package org.jppf.utils.streams;
 
 import java.io.*;
 

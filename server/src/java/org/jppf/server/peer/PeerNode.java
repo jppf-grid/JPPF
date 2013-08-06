@@ -157,7 +157,7 @@ class PeerNode extends AbstractCommonNode
     {
       ServerTaskBundleClient bundleWrapper = readBundle();
       JPPFTaskBundle bundle = bundleWrapper.getJob();
-      if (bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE)
+      if (bundle.isHandshake())
       {
         if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
         bundle.setUuid(uuid);
@@ -183,7 +183,7 @@ class PeerNode extends AbstractCommonNode
         resultSender.bundle = bundleWrapper;
         resultSender.sendResults(bundleWrapper);
       }
-      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE)
+      if (!bundle.isHandshake())
       {
         bundleWrapper.bundleEnded();
       }
@@ -274,6 +274,12 @@ class PeerNode extends AbstractCommonNode
 
   @Override
   public boolean isLocal()
+  {
+    return false;
+  }
+
+  @Override
+  public boolean isOffline()
   {
     return false;
   }

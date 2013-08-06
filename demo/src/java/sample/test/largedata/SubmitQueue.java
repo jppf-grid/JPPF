@@ -57,7 +57,7 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
   {
     this.client = client;
     int capacity = JPPFConfiguration.getProperties().getInt("largedata.job.cache.size", 1);
-    queue = new ArrayBlockingQueue(capacity);
+    queue = new ArrayBlockingQueue<>(capacity);
   }
 
   @Override

@@ -30,9 +30,9 @@ import org.jppf.node.NodeRunner;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
-import org.jppf.startup.*;
+import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
-import org.jppf.utils.hooks.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -182,7 +182,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception {
-    if (JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState())) {
+    if (bundle.isHandshake()) {
       if (debugEnabled) log.debug("setting initial bundle uuid");
       bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
       if (isJmxEnabled()) setupManagementParameters(bundle);
@@ -197,7 +197,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception {
     if (debugEnabled) log.debug("processing      " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
-    if (executionManager.checkConfigChanged() || bundle.getState() == JPPFTaskBundle.State.INITIAL_BUNDLE) {
+    if (executionManager.checkConfigChanged() || bundle.isHandshake()) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       TypedProperties jppf = systemInformation.getJppf();
       jppf.clear();
@@ -262,6 +262,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @return a <code>ClassLoader</code> used for loading the classes of the framework.
    */
+  @Override
   public AbstractJPPFClassLoader getClassLoader() {
     return classLoaderManager.getClassLoader();
   }
@@ -270,6 +271,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Set the main classloader for the node.
    * @param cl the class loader to set.
    */
+  @Override
   public void setClassLoader(final JPPFClassLoader cl) {
     classLoaderManager.setClassLoader(cl);
   }
@@ -450,5 +452,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   @Override
   public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception {
     return classLoaderManager.getContainer(uuidPath).getClassLoader();
+  }
+
+  @Override
+  public boolean isOffline() {
+    return getClassLoader().isOffline();
   }
 }

@@ -23,6 +23,7 @@ import java.net.*;
 import java.util.List;
 
 import org.jppf.classloader.resource.*;
+import org.jppf.node.protocol.Location;
 
 /**
  * Implementation of a {@link URLConnection} for the &quot;jppfres:&quot; URL protocol.
@@ -33,7 +34,7 @@ public class JPPFResourceConnection extends URLConnection
   /**
    * The class loader resource the URL points to. 
    */
-  private Resource resource = null;
+  private Location resource = null;
   /**
    * When true, indicates that a connection was already attempted and failed.
    */
@@ -59,7 +60,7 @@ public class JPPFResourceConnection extends URLConnection
       while (((c = path.charAt(0)) == '/') || (c == '\\')) path.deleteCharAt(0);
       String[] keyvalue = url.getQuery().split("\\?|=");
       int id = Integer.valueOf(keyvalue[1]);
-      List<Resource> list = rc.getResourcesLocations(path.toString());
+      List<Location> list = rc.getResourcesLocations(path.toString());
       if (list != null) resource = list.get(id);
       else throw new IOException("URL '"+ url + "' does not point to an existing or valid resource");
       this.connected = true;

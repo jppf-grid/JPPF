@@ -296,4 +296,10 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   {
     return null;
   }
+
+  @Override
+  public boolean isOffline()
+  {
+    return false;
+  }
 }

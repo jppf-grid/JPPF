@@ -21,7 +21,7 @@ package sample.dist.commandline;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.FileLocation;
 
 /**
  * This task lists the files in a specified directory of the node's host.

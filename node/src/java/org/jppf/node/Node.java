@@ -40,7 +40,7 @@ public interface Node extends Runnable
 
   /**
    * Determine whether this node is local to another component.
-   * @return true if this node is local, false otherwise.
+   * @return <code>true</code> if this node is local, <code>false</code> otherwise.
    */
   boolean isLocal();
 
@@ -49,4 +49,10 @@ public interface Node extends Runnable
    * @return the newly created class loader, or <code>null</code> if none could be created at this time. 
    */
   AbstractJPPFClassLoader resetTaskClassLoader();
+
+  /**
+   * Determine whether this node is running in offline mode.
+   * @return <code>true</code> if this node is offline, <code>false</code> otherwise.
+   */
+  boolean isOffline();
 }

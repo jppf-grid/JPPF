@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 import java.io.*;
 
@@ -27,52 +27,59 @@ import java.io.*;
  * @param <T> the type of this location.
  * @author Laurent Cohen
  */
-public interface Location<T>
+public interface Location<T> extends Serializable
 {
   /**
    * Get the path for this location.
    * @return the path as a string.
    */
   T getPath();
+
   /**
    * Obtain an input stream to read from this location.
    * @return an <code>InputStream</code> instance.
    * @throws Exception if an I/O error occurs.
    */
   InputStream getInputStream() throws Exception;
+
   /**
    * Obtain an output stream to write to this location.
    * @return an <code>OutputStream</code> instance.
    * @throws Exception if an I/O error occurs.
    */
   OutputStream getOutputStream() throws Exception;
+
   /**
    * Copy the content at this location to another location.
-   * @param location the location to copy to.
+   * @param location the destination location to copy to.
+   * @return the destination location.
    * @throws Exception if an I/O error occurs.
    */
-  void copyTo(Location<?> location) throws Exception;
+  Location copyTo(Location<?> location) throws Exception;
   /**
    * Get the size of the data this location points to.
    * @return the size as a long value, or -1 if the size is not available.
    */
   long size();
+
   /**
    * Get the content at this location as an array of bytes.
    * @return a byte array.
    * @throws Exception if an I/O error occurs.
    */
   byte[] toByteArray() throws Exception;
+
   /**
    * Add a listener to the list of location event listeners for this location.
    * @param listener the listener to add to the list.
-   * @throws NullPointerException if the listener object is null.
+   * @throws IllegalArgumentException if the listener object is null.
    */
   void addLocationEventListener(LocationEventListener listener);
+
   /**
    * Remove a listener from the list of location event listeners for this location.
    * @param listener the listener to remove from the list.
-   * @throws NullPointerException if the listener object is null.
+   * @throws IllegalArgumentException if the listener object is null.
    */
   void removeLocationEventListener(LocationEventListener listener);
 }

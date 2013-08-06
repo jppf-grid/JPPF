@@ -149,15 +149,12 @@ public class ObjectSerializerImpl implements ObjectSerializer
    */
   public Object deserialize(final InputStream is, final boolean closeStream) throws Exception
   {
-    ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
     try
     {
-      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
       return serialization.deserialize(is);
     }
     finally
     {
-      Thread.currentThread().setContextClassLoader(oldCL);
       if (closeStream) is.close();
     }
   }

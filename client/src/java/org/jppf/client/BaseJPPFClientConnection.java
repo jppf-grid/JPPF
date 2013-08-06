@@ -151,7 +151,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
-    header.setRequestUuid(new JPPFUuid().toString());
+    header.setUuid(new JPPFUuid().toString());
     header.setName("handshake job");
     header.setUuid("handshake job");
     header.setParameter("connection.uuid", connectionUuid);

@@ -17,7 +17,7 @@
  */
 package sample.test;
 
-import org.jppf.server.protocol.URLLocation;
+import org.jppf.node.protocol.URLLocation;
 
 /**
  * This task downloads a file from a web site, then uploads it to an ftp server.

@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.*;
-import org.jppf.utils.TraversalList;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -37,29 +37,14 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-
   /**
-   * Type safe enumeration for the values of the bundle state.
+   * Flag indicating whether collection of debug information is available via JMX.
    */
-  public enum State {
-    /**
-     * Means the bundle is used for handshake with the server (initial bundle).
-     */
-    INITIAL_BUNDLE,
-    /**
-     * Means the bundle is used normally, to transport executable tasks.
-     */
-    EXECUTION_BUNDLE
-  }
-
+  private static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
   /**
    * The unique identifier for the request (the job) this task bundle is a part of.
    */
-  private String jobUuid = null;
-  /**
-   * Uuid of the original task bundle that triggered this resource request.
-   */
-  private String requestUuid = null;
+  private String uuid = null;
   /**
    * The user-defined display name for this job.
    */
@@ -85,10 +70,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   protected int initialTaskCount = 0;
   /**
-   * The time at which this wrapper was added to the queue.
-   */
-  private transient long queueEntryTime = 0L;
-  /**
    * The task completion listener to notify, once the execution of this task has completed.
    */
   private transient TaskCompletionListener completionListener = null;
@@ -97,14 +78,13 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   private long nodeExecutionTime = 0L;
   /**
-   * The time at which the bundle is taken out of the queue fir sending to a node.
+   * The time at which the bundle is taken out of the queue for sending to a node.
    */
   private long executionStartTime = 0L;
   /**
-   * The state of this bundle, to indicate whether it is used for handshake with
-   * the server or for transporting tasks to execute.
+   * Indicates whether this object is used for handshake instead of execution.
    */
-  private State state = State.EXECUTION_BUNDLE;
+  private boolean handshake = false;
   /**
    * Map holding the parameters of the request.
    */
@@ -129,22 +109,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   }
 
   /**
-   * Get the unique identifier for the request this task is a part of.
-   * @return the request uuid as a string.
-   */
-  public String getRequestUuid() {
-    return (requestUuid == null) ? getUuid() : requestUuid;
-  }
-
-  /**
-   * Set the unique identifier for the request this task is a part of.
-   * @param requestUuid the request uuid as a string.
-   */
-  public void setRequestUuid(final String requestUuid) {
-    this.requestUuid = requestUuid;
-  }
-
-  /**
    * Get the uuid path of the applications (driver or client) in whose classpath the class definition may be found.
    * @return the uuid path as a list of string elements.
    */
@@ -158,22 +122,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public void setUuidPath(final TraversalList<String> uuidPath) {
     this.uuidPath = uuidPath;
-  }
-
-  /**
-   * Get the time at which this wrapper was added to the queue.
-   * @return the time in milliseconds as a long value.
-   */
-  public long getQueueEntryTime() {
-    return queueEntryTime;
-  }
-
-  /**
-   * Set the time at which this wrapper was added to the queue.
-   * @param queueEntryTime the time in milliseconds as a long value.
-   */
-  public void setQueueEntryTime(final long queueEntryTime) {
-    this.queueEntryTime = queueEntryTime;
   }
 
   /**
@@ -266,7 +214,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   public synchronized JPPFTaskBundle copy() {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setUuidPath(uuidPath);
-    bundle.setRequestUuid(getRequestUuid());
     bundle.setUuid(getUuid());
     bundle.setName(name);
     bundle.setTaskCount(taskCount);
@@ -275,12 +222,11 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     synchronized(bundle.getParametersMap()) {
       for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
     }
-    bundle.setQueueEntryTime(queueEntryTime);
     bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
     bundle.setMetadata(jobMetadata);
-    bundle.setState(state);
-    bundle.setParameter("bundle.uuid", uuidPath.getLast() + '-' + copyCount.incrementAndGet());
+    bundle.setHandshake(handshake);
+    if (JPPF_DEBUG) bundle.setParameter("bundle.uuid", uuidPath.getLast() + '-' + copyCount.incrementAndGet());
     return bundle;
   }
 
@@ -296,22 +242,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
       taskCount -= nbTasks;
     }
     return bundle;
-  }
-
-  /**
-   * Get the state of this bundle.
-   * @return a <code>State</code> type safe enumeration value.
-   */
-  public State getState() {
-    return state;
-  }
-
-  /**
-   * Set the state of this bundle.
-   * @param state a <code>State</code> type safe enumeration value.
-   */
-  public void setState(final State state) {
-    this.state = state;
   }
 
   /**
@@ -405,7 +335,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
-    sb.append(", uuid=").append(jobUuid);
+    sb.append(", uuid=").append(uuid);
     sb.append(", initialTaskCount=").append(initialTaskCount);
     sb.append(", taskCount=").append(taskCount);
     sb.append(", bundleUuid=").append(getParameter("bundle.uuid"));
@@ -442,7 +372,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
 
   @Override
   public String getUuid() {
-    return jobUuid;
+    return uuid;
   }
 
   /**
@@ -450,7 +380,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @param jobUuid the uuid as a string.
    */
   public void setUuid(final String jobUuid) {
-    this.jobUuid = jobUuid;
+    this.uuid = jobUuid;
   }
 
   /**
@@ -470,19 +400,19 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   }
 
   /**
-   * Get the bundle uuid.
-   * @return the bundle uuid.
-   */
-  public Object getBundleUuid() {
-    return getParameter("bundle.uuid");
-  }
-
-  /**
    * Get the job requeue flag.
    * @return job requeue flag.
    */
-  public Object getRequeue() {
-    return getParameter(BundleParameter.JOB_REQUEUE);
+  public boolean isRequeue() {
+    return (Boolean) getParameter(BundleParameter.JOB_REQUEUE, false);
+  }
+
+  /**
+   * Set the job requeue flag.
+   * @param requeue job requeue flag.
+   */
+  public void setRequeue(final boolean requeue) {
+    setParameter(BundleParameter.JOB_REQUEUE, requeue);
   }
 
   /**
@@ -499,5 +429,21 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    */
   public void setDriverQueueTaskCount(final int driverQueueTaskCount) {
     this.driverQueueTaskCount = driverQueueTaskCount;
+  }
+
+  /**
+   * Determine whether this object is used for handshake instead of execution.
+   * @return <code>true</code> if this bundle is a handshake bundle, <code>false</code> otherwise.
+   */
+  public boolean isHandshake() {
+    return handshake;
+  }
+
+  /**
+   * Specify whether this object is used for handshake instead of execution.
+   * @param handshake <code>true</code> if this bundle is a handshake bundle, <code>false</code> otherwise.
+   */
+  public void setHandshake(final boolean handshake) {
+    this.handshake = handshake;
   }
 }

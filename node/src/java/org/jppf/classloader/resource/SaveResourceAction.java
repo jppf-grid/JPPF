@@ -21,13 +21,14 @@ import java.io.File;
 import java.security.PrivilegedAction;
 import java.util.List;
 
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 
 /**
  * Privileged action wrapper for saving a resource definition to a temporary file.
  * @exclude
  */
-public class SaveResourceAction implements PrivilegedAction<Resource>
+public class SaveResourceAction implements PrivilegedAction<Location>
 {
   /**
    * Indicates storage is on the file system, with fallback to memory storage.
@@ -72,9 +73,9 @@ public class SaveResourceAction implements PrivilegedAction<Resource>
   }
 
   @Override
-  public Resource run()
+  public Location run()
   {
-    Resource resource = null;
+    Location resource = null;
     if (!IS_MEMORY_STORAGE) resource = saveToFileResource();
     if (resource == null) resource = saveToMemoryResource();
     return resource;
@@ -84,9 +85,9 @@ public class SaveResourceAction implements PrivilegedAction<Resource>
    * Save the resource to a temporary file.
    * @return an instance of {@link FileResource}.
    */
-  private Resource saveToFileResource()
+  private Location saveToFileResource()
   {
-    Resource resource = null;
+    Location resource = null;
     File tmp = null;
     try
     {
@@ -111,7 +112,7 @@ public class SaveResourceAction implements PrivilegedAction<Resource>
       FileUtils.mkdirs(tmp);
       tmp.deleteOnExit();
       FileUtils.writeBytesToFile(definition, tmp);
-      resource = new FileResource(tmp);
+      resource = new FileLocation(tmp);
       exception = null;
     }
     catch(Exception e)
@@ -130,12 +131,12 @@ public class SaveResourceAction implements PrivilegedAction<Resource>
    * Save the resource to memory.
    * @return an instance of {@link MemoryResource}.
    */
-  private Resource saveToMemoryResource()
+  private Location saveToMemoryResource()
   {
-    Resource resource = null;
+    Location resource = null;
     try
     {
-      resource = new MemoryResource(definition);
+      resource = new MemoryLocation(definition);
       exception = null;
     }
     catch (Exception e)

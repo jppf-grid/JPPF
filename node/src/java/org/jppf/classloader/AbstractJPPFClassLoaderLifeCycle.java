@@ -70,7 +70,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The cache handling resources temporarily stored to file.
    * @exclude
    */
-  protected ResourceCache cache = new ResourceCache();
+  protected ResourceCache resourceCache = new ResourceCache();
   /**
    * The cache handling resources that were not found by this class loader.
    * @exclude
@@ -89,7 +89,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * Determines whether this class laoder is in connected mode or not.
    */
-  protected boolean offline; 
+  protected boolean offline;
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -219,7 +219,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       for (int i=0; i<names.length; i++) {
         if (alreadyNotFound[i]) continue;
         String name = names[i];
-        List<URL> locationsList = cache.getResourcesURLs(name);
+        List<URL> locationsList = resourceCache.getResourcesURLs(name);
         if ((locationsList != null) && !locationsList.isEmpty()) {
           results[i] = locationsList.get(0);
           if (debugEnabled) log.debug(build(this, " resource ", name, " found in local cache as ", results[i]));
@@ -254,8 +254,8 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         boolean found = (dataList != null) && !dataList.isEmpty();
         if (debugEnabled && !found) log.debug(build(this, " resource [", name, "] not found remotely"));
         if (found) {
-          cache.registerResources(name, dataList);
-          URL url = cache.getResourceURL(name);
+          resourceCache.registerResources(name, dataList);
+          URL url = resourceCache.getResourceURL(name);
           results[index] = url;
           if (debugEnabled) log.debug(build(this, " resource [", name, "] found remotely as ", url));
         }
@@ -311,14 +311,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * Get the connection to the driver.
    * @return a {@link ClassLoaderConnection} instance.
-   * @exclude 
+   * @exclude
    */
   public ClassLoaderConnection getConnection() {
     return connection;
   }
 
   /**
-   * Get the uuid of the JPPF client this class laoder gets resources from.
+   * Get the uuid of the JPPF client this class loader gets resources from.
    * @return a client uuid as a string, or <code>null</code> if this class cloader is not a client class loader.
    */
   public String getClientUuid() {
@@ -332,22 +332,18 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * new cache instance.
    */
   public void resetResourceCache() {
-    if (cache != null) {
-      cache.close();
-      cache = new ResourceCache();
+    if (resourceCache != null) {
+      resourceCache.close();
+      resourceCache = new ResourceCache();
     }
   }
 
-  /**
-   * This method does nothing.
-   */
+  @Override
   public void close() {
-    try
-    {
+    //log.info("closing classloader " + this);
+    try {
       super.close();
-    }
-    catch (IOException e)
-    {
+    } catch (IOException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -357,8 +353,16 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * Determine whether this class loader is in offline mode or not.
    * @return <code>true</code> if this class loader is offline, <code>false</code> otherwise.
    */
-  public boolean isOffline()
-  {
+  public boolean isOffline() {
     return offline;
+  }
+
+  /**
+   * Get the reosurce cache handled by this class loader.
+   * @return an instance of {@link ResourceCache}.
+   * @exclude
+   */
+  public ResourceCache getResourceCache() {
+    return resourceCache;
   }
 }

@@ -178,7 +178,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
     }
     if(onClose != null) onClose.run();
-    if ((bundle != null) && !JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getJob().getState()))
+    if ((bundle != null) && !bundle.getJob().isHandshake())
     {
       ServerTaskBundleNode tmpWrapper = bundle;
       setBundle(null);

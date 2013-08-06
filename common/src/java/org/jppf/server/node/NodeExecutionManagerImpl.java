@@ -213,7 +213,7 @@ public class NodeExecutionManagerImpl
     if (debugEnabled) log.debug("cancelling all tasks with: callOnCancel=" + callOnCancel + ", requeue=" + requeue);
     if (requeue && (bundle != null)) {
       synchronized(bundle) {
-        bundle.setParameter(BundleParameter.JOB_REQUEUE, true);
+        bundle.setRequeue(true);
         bundle.getSLA().setSuspended(true);
       }
     }

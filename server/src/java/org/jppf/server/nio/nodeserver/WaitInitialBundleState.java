@@ -73,7 +73,7 @@ class WaitInitialBundleState extends NodeServerState
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
       Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
       JPPFTaskBundle bundle = received.first();
-      if (bundle.getState() != JPPFTaskBundle.State.INITIAL_BUNDLE) throw new IllegalStateException("INITIAL_BUNDLE expected.");
+      if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
 
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
       context.setUuid(uuid);

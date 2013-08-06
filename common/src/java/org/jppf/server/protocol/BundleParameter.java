@@ -26,10 +26,6 @@ package org.jppf.server.protocol;
 public enum  BundleParameter
 {
   /**
-   * Parameter to determine whether the tasks bundle size is determined manually or automatically.
-   */
-  BUNDLE_TUNING_TYPE_PARAM,
-  /**
    * To determine whether a node connection is for a peer driver or an actual execution node.
    */
   IS_PEER,
@@ -45,10 +41,6 @@ public enum  BundleParameter
    * Parameter for the RMI port used by JMX in the node.
    */
   NODE_MANAGEMENT_PORT_PARAM,
-  /**
-   * Parameter for the RMI port used by JMX in the node.
-   */
-  NODE_MANAGEMENT_ID_PARAM,
   /**
    * Parameter for the node's available system information.
    */
@@ -69,18 +61,6 @@ public enum  BundleParameter
    * Job expired indicator, determines whether the job is should be cancelled.
    */
   JOB_EXPIRED,
-  /**
-   * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
-   */
-  JOB_RECEIVED_TIME,
-  /**
-   * Uuid of the node to which a broadcast job is dispatched.
-   */
-  NODE_BROADCAST_UUID,
-  /**
-   * Number of tasks in a job at the time it is submitted by the client.
-   */
-  REAL_TASK_COUNT,
   /**
    * Parameter for the driver's uuid.
    */

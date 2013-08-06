@@ -20,7 +20,7 @@ package org.jppf.classloader;
 import static org.jppf.utils.StringUtils.build;
 
 import java.io.*;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 
 import org.jppf.utils.*;
@@ -137,13 +137,13 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       }
     }
     if (isOffline()) {
-      notFoundCache.add(name);;
+      notFoundCache.add(name);
       throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
     if (debugEnabled) log.debug(build("looking up definition for resource [", name, "]"));
     byte[] b = null;
     String resName = name.replace('.', '/') + ".class";
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> map = new HashMap<String, Object>();
     map.put("name", resName);
     JPPFResourceWrapper resource = null;
     synchronized(this) {
@@ -214,13 +214,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * The resource lookup order is the same as the one specified by {@link #getResourceAsStream(String)}
    * @param name the name of the resource to find.
    * @return the URL of the resource.
-   * @see java.lang.ClassLoader#findResource(java.lang.String)
    */
   @Override
   public URL findResource(final String name) {
     URL url = null;
     if (notFoundCache.has(name)) return null;
-    url = cache.getResourceURL(name);
+    url = resourceCache.getResourceURL(name);
     if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
     if (url == null) {
       url = super.findResource(name);
@@ -242,27 +241,19 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   }
 
   /**
-   * Get a stream from a resource file accessible form this class loader.
-   * The lookup order is defined as follows:
-   * <ul>
-   * <li>locally, in the classpath for this class loader, such as specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
-   * <li>if the parent of this class loader is NOT an instance of {@link AbstractJPPFClassLoader},
-   * in the classpath of the <i>JPPF driver</i>, such as specified by {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}</li>
-   * (the search may eventually be sped up by looking up the driver's resource cache first)</li>
-   * <li>if the parent of this class loader IS an instance of {@link AbstractJPPFClassLoader},
-   * in the <i>classpath of the JPPF client</i>, such as specified by {@link org.jppf.classloader.ResourceProvider#getResourceAsBytes(java.lang.String, java.lang.ClassLoader) ResourceProvider.getResourceAsBytes(String, ClassLoader)}
-   * (the search may eventually be sped up by looking up the driver's resource cache first)</li>
-   * </ul>
+   * Get a stream from a resource file accessible from this class loader.
    * @param name name of the resource to obtain a stream from.
    * @return an <code>InputStream</code> instance, or null if the resource was not found.
-   * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
    */
   @Override
   public InputStream getResourceAsStream(final String name) {
     InputStream is = null;
     try {
       URL url = getResource(name);
-      if (url != null) is = url.openStream();
+      if (url != null) {
+        URLConnection connection = url.openConnection();
+        is = connection.getInputStream();
+      }
       if (debugEnabled) log.debug(build(this, " lookup for '", name, "' = ", url, " for ", this));
     } catch(IOException e) {
     }
@@ -274,7 +265,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @param name name of the resources to find in the class loader's classpath.
    * @return An enumeration of URLs pointing to the resources found.
    * @throws IOException if an error occurs.
-   * @see java.lang.ClassLoader#findResources(java.lang.String)
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -283,7 +273,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (!notFoundCache.has(name)) {
       if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
       try {
-        urlList = cache.getResourcesURLs(name);
+        urlList = resourceCache.getResourcesURLs(name);
         if (urlList == null) urlList = new ArrayList<URL>();
         if (!isOffline()) {
           List<URL> tempList = findRemoteResources(name);
@@ -324,8 +314,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       boolean found = (dataList != null) && !dataList.isEmpty();
       if (debugEnabled) log.debug(build(this, "resource [", name, "] ", found ? "" : "not ", "found remotely"));
       if (found) {
-        cache.registerResources(name, dataList);
-        urlList = cache.getResourcesURLs(name);
+        resourceCache.registerResources(name, dataList);
+        urlList = resourceCache.getResourcesURLs(name);
       }
     }
     if ((urlList == null) || urlList.isEmpty() &&
@@ -468,7 +458,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   @Override
   public void close() {
-    cache.close();
+    resourceCache.close();
     notFoundCache.clear();
     super.close();
   }

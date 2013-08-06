@@ -26,7 +26,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * This class encapsulates the network connection of a node to a server job channel.
  * @author Laurent Cohen
  * @exclude
  */
@@ -72,8 +72,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
       TypedProperties config = JPPFConfiguration.getProperties();
       sslEnabled = config.getBoolean("jppf.ssl.enabled", false);
       String host = config.getString("jppf.server.host", "localhost");
-      // for backward compatibility with v2.x configurations
-      int port = config.getAndReplaceInt("jppf.server.port", "class.server.port", 11111, false);
+      int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
       channel = new SocketClient();
       channel.setHost(host);
       channel.setPort(port);

@@ -78,6 +78,15 @@ public class TypedProperties extends Properties {
   }
 
   /**
+   * Set a property with the specified String value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
+   */
+  public void setString(final String key, final String value) {
+    setProperty(key, value);
+  }
+
+  /**
    * Get the integer value of a property with a specified name.
    * @param key the name of the property to look for.
    * @return the value of the property as an int, or zero if it is not found.
@@ -105,19 +114,12 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Get the integer value of a property with a specified name.
-   * @param key the name of the property to look for.
-   * @param defValue a default value to return if the property is not found.
-   * @param min the minimum value the property can have.
-   * @param max the maximum value the property can have.
-   * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+   * Set a property with the specified int value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
    */
-  public int getInt(final String key, final int defValue, final int min, final int max) {
-    if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
-    int val = getInt(key, defValue);
-    if (val > max) val = max;
-    if (val < min) val = min;
-    return val;
+  public void setInt(final String key, final int value) {
+    setProperty(key, Integer.toString(value));
   }
 
   /**
@@ -148,19 +150,12 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Get the long value of a property with a specified name.
-   * @param key the name of the property to look for.
-   * @param defValue a default value to return if the property is not found.
-   * @param min the minimum value the property can have.
-   * @param max the maximum value the property can have.
-   * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+   * Set a property with the specified long value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
    */
-  public long getLong(final String key, final long defValue, final long min, final long max) {
-    if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
-    long val = getLong(key, defValue);
-    if (val > max) val = max;
-    if (val < min) val = min;
-    return val;
+  public void setLong(final String key, final long value) {
+    setProperty(key, Long.toString(value));
   }
 
   /**
@@ -191,19 +186,12 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Get the single precision value of a property with a specified name.
-   * @param key the name of the property to look for.
-   * @param defValue a default value to return if the property is not found.
-   * @param min the minimum value the property can have.
-   * @param max the maximum value the property can have.
-   * @return the value of the property as a float, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+   * Set a property with the specified float value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
    */
-  public float getFloat(final String key, final float defValue, final float min, final float max) {
-    if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
-    float val = getFloat(key, defValue);
-    if (val > max) val = max;
-    if (val < min) val = min;
-    return val;
+  public void setFloat(final String key, final float value) {
+    setProperty(key, Float.toString(value));
   }
 
   /**
@@ -235,19 +223,12 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Get the double precision value of a property with a specified name.
-   * @param key the name of the property to look for.
-   * @param defValue a default value to return if the property is not found.
-   * @param min the minimum value the property can have.
-   * @param max the maximum value the property can have.
-   * @return the value of the property as a double, or the default value if it is not found, adjusted to ensure it is in the [min, max] range.
+   * Set a property with the specified double value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
    */
-  public double getDouble(final String key, final double defValue, final double min, final double max) {
-    if (min > max) throw new IllegalArgumentException("min (" + min + ") must be <= max (" + max + ')');
-    double val = getDouble(key, defValue);
-    if (val > max) val = max;
-    if (val < min) val = min;
-    return val;
+  public void setDouble(final String key, final double value) {
+    setProperty(key, Double.toString(value));
   }
 
   /**
@@ -274,6 +255,15 @@ public class TypedProperties extends Properties {
   }
 
   /**
+   * Set a property with the specified boolean value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
+   */
+  public void setBoolean(final String key, final boolean value) {
+    setProperty(key, Boolean.toString(value));
+  }
+
+  /**
    * Get the char value of a property with a specified name.
    * If the key is not found a default value of ' ' is returned.
    * @param key the name of the property to look for.
@@ -295,6 +285,15 @@ public class TypedProperties extends Properties {
     String val = getProperty(key, null);
     if ((val != null) && (val.length() > 0)) charVal = val.charAt(0);
     return charVal;
+  }
+
+  /**
+   * Set a property with the specified char value.
+   * @param key the name of the property to set.
+   * @param value the value to set on the property.
+   */
+  public void setChar(final String key, final char value) {
+    setProperty(key, Character.toString(value));
   }
 
   /**
@@ -370,65 +369,7 @@ public class TypedProperties extends Properties {
   }
 
   /**
-   * Load this set of properties from a string.
-   * @param source the string to load from.
-   * @return this object.
-   * @throws IOException if any error occurs.
-   */
-  public TypedProperties loadString(final CharSequence source) throws IOException {
-    if (source != null) {
-      ByteArrayInputStream bais = new ByteArrayInputStream(source.toString().getBytes());
-      load(bais);
-      StreamUtils.closeSilent(bais);
-    }
-    return this;
-  }
-
-  /**
-   * Get an int value from the first specified property if it exists, or from the specified second one if it doesn't.
-   * If the first property does not exist, it will be created with the value of the second. If <code>doRemove</code> is true,
-   * then the second property will be removed. This method is essentially used for backward compatibility with previous versions
-   * of JPPF configuration files.
-   * @param name1 the name of the first property.
-   * @param name2 the name of the second property.
-   * @param def the default value to use if neither the first nor the second properties are defined.
-   * @param doRemove <code>true</code> to force the remove of the second property, <code>false</code> otherwise.
-   * @return the value of the first property, or the value of the second if it is not found, or the default value.
-   */
-  public int getAndReplaceInt(final String name1, final String name2, final int def, final boolean doRemove) {
-    int value = getInt(name1, -1);
-    if (value < 0) {
-      value = getInt(name2, def);
-      setProperty(name1, "" + value);
-    }
-    if (doRemove) remove(name2);
-    return value;
-  }
-
-  /**
-   * Get a String value from the first specified property if it exists, or from the specified second one if it doesn't.
-   * If the first property does not exist, it will be created with the value of the second. If <code>doRemove</code> is true,
-   * then the second property will be removed. This method is essentially used for backward compatibility with previous versions
-   * of JPPF configuration files.
-   * @param name1 the name of the first property.
-   * @param name2 the name of the second property.
-   * @param def the default value to use if neither the first nor the second properties are defined.
-   * @param doRemove <code>true</code> to force the remove of the second property, <code>false</code> otherwise.
-   * @return the value of the first property, or the value of the second if it is not found, or the default value.
-   */
-  public String getAndReplaceString(final String name1, final String name2, final String def, final boolean doRemove)
-  {
-    String value = getString(name1, null);
-    if (value == null) {
-      value = getString(name2, def);
-      setProperty(name1, "" + value);
-    }
-    if (doRemove) remove(name2);
-    return value;
-  }
-
-  /**
-   * Extract the properties that passs the specfied filter.
+   * Extract the properties that pass the specfied filter.
    * @param filter the filter to use, if <code>null</code> then all properties are retruned.
    * @return a new <code>TypedProperties</code> object containing only the properties matching the filter.
    */
@@ -445,12 +386,11 @@ public class TypedProperties extends Properties {
 
   /**
    * Load this properties objects from the specified reader.
-   * This load operation will recursively process all <code>!#include</code> statements before parsing the properties. 
+   * This load operation will recursively process all <code>!#include</code> statements before parsing the properties.
    * @param reader the reader to load from.
    * @throws IOException if any I/O error occurs.
    */
-  public synchronized void loadWithIncludes(final Reader reader) throws IOException
-  {
+  public synchronized void loadWithIncludes(final Reader reader) throws IOException {
     new PropertiesLoader().load(this, reader);
   }
 

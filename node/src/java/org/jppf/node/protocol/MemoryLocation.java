@@ -16,16 +16,18 @@
  * limitations under the License.
  */
 
-package org.jppf.classloader.resource;
+package org.jppf.node.protocol;
 
 import java.io.*;
 
+import org.jppf.utils.streams.BoundedByteArrayOutputStream;
+
 /**
- * Abstraction for a resource stored in memory.
- * This implementation of the {@link Resource} interface allows writing to and reading from a <code>byte</code> array.
+ * Wrapper fro manipulating a block of data in memory.
+ * This implementation of the {@link Location} interface allows writing to and reading from a <code>byte</code> array.
  * @author Laurent Cohen
  */
-public class MemoryResource extends AbstractResource<byte[]>
+public class MemoryLocation extends AbstractLocation<byte[]>
 {
   /**
    * Explicit serialVersionUID.
@@ -44,7 +46,7 @@ public class MemoryResource extends AbstractResource<byte[]>
    * Initialize this location and create a buffer of the specified size.
    * @param size the size of the buffer handled by this memory location.
    */
-  public MemoryResource(final int size)
+  public MemoryLocation(final int size)
   {
     this(new byte[size], 0, size);
   }
@@ -53,7 +55,7 @@ public class MemoryResource extends AbstractResource<byte[]>
    * Initialize this location with the specified buffer.
    * @param buffer an array of bytes.
    */
-  public MemoryResource(final byte[] buffer)
+  public MemoryLocation(final byte[] buffer)
   {
     this(buffer, 0, buffer.length);
   }
@@ -64,31 +66,55 @@ public class MemoryResource extends AbstractResource<byte[]>
    * @param offset the start position in the array of bytes.
    * @param len the length of the buffer.
    */
-  public MemoryResource(final byte[] buffer, final int offset, final int len)
+  public MemoryLocation(final byte[] buffer, final int offset, final int len)
   {
     super(buffer);
     this.offset = offset;
     this.len = len;
   }
 
+  /**
+   * Obtain an input stream to read from this location.
+   * @return an <code>InputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.node.protocol.Location#getInputStream()
+   */
   @Override
   public InputStream getInputStream() throws Exception
   {
     return new ByteArrayInputStream(path, offset, len);
   }
 
+  /**
+   * Obtain an output stream to write to this location.
+   * @return an <code>OutputStream</code> instance.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.node.protocol.Location#getOutputStream()
+   */
   @Override
   public OutputStream getOutputStream() throws Exception
   {
     return new BoundedByteArrayOutputStream(path, offset, len);
   }
 
+  /**
+   * Get the size of the file this location points to.
+   * @return the size as a long value, or -1 if the file does not exist.
+   * @see org.jppf.node.protocol.Location#size()
+   */
   @Override
   public long size()
   {
     return len;
   }
 
+  /**
+   * Get the content at this location as an array of bytes. This method is
+   * overridden from {@link org.jppf.node.protocol.AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
+   * @return a byte array.
+   * @throws Exception if an I/O error occurs.
+   * @see org.jppf.node.protocol.AbstractLocation#toByteArray()
+   */
   @Override
   public byte[] toByteArray() throws Exception
   {

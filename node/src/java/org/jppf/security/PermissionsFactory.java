@@ -137,12 +137,13 @@ public final class PermissionsFactory
   {
     try
     {
-      TypedProperties props = JPPFConfiguration.getProperties();
-      String host = props.getString("jppf.server.host", "localhost");
+      TypedProperties config = JPPFConfiguration.getProperties();
+      String host = config.getString("jppf.server.host", "localhost");
+      boolean sslEnabled = config.getBoolean("jppf.ssl.enabled", false);
       // for backward compatibility with v2.x configurations
-      int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", 11111, false);
+      int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
       addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
-      host = props.getString("jppf.discovery.group", "230.0.0.1");
+      host = config.getString("jppf.discovery.group", "230.0.0.1");
       //port = props.getInt("jppf.discovery.port", 11111);
       addPermission(new SocketPermission(host + ":0-", "accept,connect,listen,resolve"), "dynamic");
     }

@@ -60,7 +60,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * The list of registered job listeners.
    */
-  private final List<JobListener> jobListeners = new ArrayList<JobListener>();
+  private final List<JobListener> jobListeners = new ArrayList<>();
   /**
    * Manages jobs start and expiration scheduling.
    */
@@ -85,7 +85,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * A priority queue holding broadcast jobs that could not be sent due to no available connection.
    */
-  private final PriorityBlockingQueue<ServerJobBroadcast> pendingBroadcasts = new PriorityBlockingQueue<ServerJobBroadcast>(16, new JobPriorityComparator());
+  private final PriorityBlockingQueue<ServerJobBroadcast> pendingBroadcasts = new PriorityBlockingQueue<>(16, new JobPriorityComparator());
   /**
    * Callback for getting all available connections. Used for processing broadcast jobs.
    */
@@ -221,13 +221,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
   /**
    * Remove the specified bundle from the queue.
-   * @param bundleWrapper the bundle to remove.
+   * @param serverJob the bundle to remove.
    * @return the removed bundle.
    */
   @Override
-  public ServerJob removeBundle(final ServerJob bundleWrapper)
+  public ServerJob removeBundle(final ServerJob serverJob)
   {
-    return removeBundle(bundleWrapper, true);
+    return removeBundle(serverJob, true);
   }
 
   /**
@@ -258,11 +258,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     return serverJob;
   }
 
-  /**
-   * Update the priority of the job with the specified uuid.
-   * @param jobUuid the uuid of the job to re-prioritize.
-   * @param newPriority the new priority of the job.
-   */
   @Override
   public void updatePriority(final String jobUuid, final int newPriority)
   {
@@ -283,11 +278,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     }
   }
 
-  /**
-   * Cancel the job with the specified UUID
-   * @param jobId the uuid of the job to cancel.
-   * @return whether cancellation was successful.
-   */
   @Override
   public boolean cancelJob(final String jobId)
   {
@@ -515,15 +505,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     statsManager.taskInQueue(broadcastJob.getTaskCount());
   }
 
-  /**
-   * Get the bundle size to use for bundle size tuning.
-   * @param bundleWrapper the bundle to get the size from.
-   * @return the bundle size as an int.
-   */
   @Override
-  protected int getSize(final ServerJob bundleWrapper)
-  {
+  protected int getSize(final ServerJob bundleWrapper) {
     return bundleWrapper.getJob().getDriverQueueTaskCount();
-    //return bundleWrapper.getInitialTaskCount();
   }
 }

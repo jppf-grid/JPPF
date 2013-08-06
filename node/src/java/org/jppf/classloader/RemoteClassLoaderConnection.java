@@ -142,8 +142,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
     TypedProperties props = JPPFConfiguration.getProperties();
     sslEnabled = props.getBoolean("jppf.ssl.enabled", false);
     String host = props.getString("jppf.server.host", "localhost");
-    // for backward compatibility with v2.x configurations
-    int port = props.getAndReplaceInt("jppf.server.port", "class.server.port", sslEnabled ? 11443 : 11111, false);
+    int port = props.getInt("jppf.server.port", sslEnabled ? 11443 : 11111);
     channel = new BootstrapSocketClient();
     channel.setHost(host);
     channel.setPort(port);

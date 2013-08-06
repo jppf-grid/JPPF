@@ -91,7 +91,7 @@ class WaitingResultsState extends NodeServerState
             ((BundlerEx) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
           } else bundler.feedback(newBundle.getTaskCount(), elapsed);
         }
-        requeue = (Boolean) newBundle.getParameter(BundleParameter.JOB_REQUEUE, false);
+        requeue = newBundle.isRequeue();
         JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
         if (systemInfo != null) {
           context.setNodeInfo(systemInfo, true);

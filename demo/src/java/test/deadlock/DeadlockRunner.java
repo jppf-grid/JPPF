@@ -49,8 +49,7 @@ public class DeadlockRunner {
       List<JPPFClientConnection> list = jppfClient.getAllConnections();
       System.out.println("client uuid=" + jppfClient.getUuid());
       for (JPPFClientConnection c: list) {
-        AbstractJPPFClientConnection conn = (AbstractJPPFClientConnection) c;
-        System.out.println("connection name=" + conn.getName() + ", uuid=" + conn.getDriverUuid() + ", connectionUuid=" + conn.getConnectionUuid());
+        System.out.println("connection name=" + c.getName() + ", uuid=" + c.getDriverUuid() + ", connectionUuid=" + c.getConnectionUuid());
       }
       JPPFJob job = createJob();
       for (int i = 0; i < 100*1000; i++) {
@@ -112,7 +111,7 @@ public class DeadlockRunner {
    * @throws Exception if any error occurs.
    */
   private static void cancelJobWithJMX(final String uuid) throws Exception {
-    AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) jppfClient.getClientConnection();
+    JPPFClientConnection c = jppfClient.getClientConnection();
     c.getJmxConnection().cancelJob(uuid);
   }
 }

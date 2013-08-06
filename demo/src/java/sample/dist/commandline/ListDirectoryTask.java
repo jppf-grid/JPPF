@@ -18,7 +18,7 @@
 
 package sample.dist.commandline;
 
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.*;
 
 
 /**

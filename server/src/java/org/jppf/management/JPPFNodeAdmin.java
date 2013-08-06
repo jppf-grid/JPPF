@@ -53,11 +53,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * The node whose state is monitored.
    */
-  private transient JPPFNode node = null;
-  /**
-   * Unique id for this mbean.
-   */
-  private final String uuid = new JPPFUuid().toString();
+  transient JPPFNode node = null;
 
   /**
    * Initialize this node management bean with the specified node.

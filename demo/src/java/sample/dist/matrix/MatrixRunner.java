@@ -17,18 +17,13 @@
  */
 package sample.dist.matrix;
 
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.concurrent.*;
-
-import javax.management.*;
+import java.io.File;
+import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.client.utils.GridMonitor;
-import org.jppf.logging.jmx.JmxLogger;
-import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
+import org.jppf.server.protocol.*;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -37,7 +32,7 @@ import org.slf4j.*;
  * Runner class for the square matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class MatrixRunner implements NotificationListener
+public class MatrixRunner
 {
   /**
    * Logger for this class.
@@ -52,17 +47,9 @@ public class MatrixRunner implements NotificationListener
    */
   private int iterationsCount = 0;
   /**
-   * Proxies to the MBean server of each node.
+   * 
    */
-  private List<JMXNodeConnectionWrapper> jmxConnections = new ArrayList<JMXNodeConnectionWrapper>();
-  /**
-   * Used to sequentialize the processing of notifications from multiple nodes.
-   */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
-  /**
-   * Used to print remote JMX log messages to a file.
-   */
-  private PrintWriter jmxPrinter = null;
+  private ClassPath classpath = null;
 
   /**
    * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -75,10 +62,6 @@ public class MatrixRunner implements NotificationListener
     MatrixRunner runner = null;
     try
     {
-      /*
-      System.out.println("press any key when ready to start");
-      int c = System.in.read();
-       */
       String clientUuid = ((args != null) && (args.length > 0)) ? args[0] : null;
       TypedProperties props = JPPFConfiguration.getProperties();
       int size = props.getInt("matrix.size", 300);
@@ -88,7 +71,6 @@ public class MatrixRunner implements NotificationListener
       int nbRows = props.getInt("task.nbRows", 1);
       output("Running Matrix demo with matrix size = "+size+ '*'+size+" for "+iterations+" iterations"  + " with " + nbChannels  + " channels");
       runner = new MatrixRunner();
-      //runner.registerToMBeans();
       runner.perform(size, iterations, nbRows, clientUuid, nbChannels);
       //runner.perform2(size, iterations, nbRows, clientUuid);
     }
@@ -109,19 +91,26 @@ public class MatrixRunner implements NotificationListener
    */
   public void perform(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception
   {
-    GridMonitor monitor = null;
     try
     {
       JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(nbChannels));
+      String s = JPPFConfiguration.getProperties().getString("matrix.classpath");
+      if (s != null)
+      {
+        classpath = new ClassPathImpl();
+        String[] paths = s.split("\\|");
+        for (String path: paths)
+        {
+          String p = path.trim();
+          String name = new File(p).getName();
+          Location fileLoc = new FileLocation(p);
+          Location jar = fileLoc.copyTo(new MemoryLocation((int) fileLoc.size()));
+          classpath.add(name, jar);
+        }
+      }
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
       while (!jppfClient.hasAvailableConnection()) Thread.sleep(1L);
-      /*
-			//monitor = new GridMonitor(jppfClient, 1000L);
-			monitor = new GridMonitor("localhost", 11198);
-			monitor.testPIDs();
-			monitor.startMonitoring();
-       */
 
       // initialize the 2 matrices to multiply
       Matrix a = new Matrix(size);
@@ -144,21 +133,9 @@ public class MatrixRunner implements NotificationListener
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
-      /*
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
-      {
-        JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
-        output("End statistics :\n" + stats.toString());
-      }
-      */
-      /*
-			monitor.stopMonitoring();
-			monitor.storeData("./GridMonitoring");
-      */
     }
     finally
     {
-      if (monitor != null) monitor.close();
       output("closing the client");
       if (jppfClient != null) jppfClient.close();
     }
@@ -176,7 +153,6 @@ public class MatrixRunner implements NotificationListener
    */
   private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy, final int nbChannels) throws Exception
   {
-    //long start = System.currentTimeMillis();
     long start = System.nanoTime();
     int size = a.getSize();
     // create a task for each row in matrix a
@@ -200,6 +176,7 @@ public class MatrixRunner implements NotificationListener
     job.setDataProvider(new MemoryMapDataProvider());
     job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
     job.getSLA().setExecutionPolicy(policy);
+    if (classpath != null) job.getSLA().setClassPath(classpath);
     //job.getJobSLA().setMaxNodes(8);
     // submit the tasks for execution
     List<JPPFTask> results = jppfClient.submit(job);
@@ -208,8 +185,7 @@ public class MatrixRunner implements NotificationListener
     // Get the matrix values from the tasks results
     int rowIdx = 0;
     for (JPPFTask matrixTask : results) {
-      if (matrixTask.getException() != null)
-      {
+      if (matrixTask.getException() != null) {
         output("got exception: " + ExceptionUtils.getStackTrace(matrixTask.getException()));
         throw matrixTask.getException();
       }
@@ -291,94 +267,5 @@ public class MatrixRunner implements NotificationListener
   {
     System.out.println(message);
     log.info(message);
-  }
-
-  /**
-   * Subscribe to notifications from all the nodes.
-   * @throws Exception if any error occurs.
-   */
-  public void registerToMBeans() throws Exception
-  {
-    jmxPrinter = new PrintWriter("remote-jmx.log");
-    //String name = "com.parallel.matters:name=jmxlogger,type=log4j";
-    //String name = "com.parallel.matters:name=jmxlogger,type=jdk";
-    String name = JmxLogger.DEFAULT_MBEAN_NAME;
-    // obtain the driver connection object
-    JPPFClientConnectionImpl connection = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-    // get its jmx connection to the driver MBean server
-    JMXDriverConnectionWrapper jmxDriver = connection.getJmxConnection();
-    jmxDriver.connectAndWait(5000L);
-    JmxLogger driverProxy = jmxDriver.getProxy(name, JmxLogger.class);
-    // used as handback object so we know where the log messages comes from.
-    String source = "driver " + jmxDriver.getHost() + ':' + jmxDriver.getPort();
-    // subscribe to all notifications from the MBean
-    driverProxy.addNotificationListener(this, null, source);
-    /*
-     */
-    // collect the information to connect to the nodes' mbean servers
-    Collection<JPPFManagementInfo> nodes = jmxDriver.nodesInformation();
-    for (JPPFManagementInfo node: nodes)
-    {
-      try
-      {
-        // get a jmx connection to the node MBean server
-        JMXNodeConnectionWrapper jmxNode = new JMXNodeConnectionWrapper(node.getHost(), node.getPort(), node.isSecure());
-        JmxLogger nodeProxy = jmxNode.getProxy(name, JmxLogger.class);
-
-        // used as handback object so we know where the log messages comes from.
-        source = "node   " + jmxNode.getHost() + ':' + jmxNode.getPort();
-        // subscribe to all notifications from the MBean
-        nodeProxy.addNotificationListener(this, null, source);
-        jmxConnections.add(jmxNode);
-      }
-      catch(Exception e)
-      {
-        log.error(e.getMessage());
-      }
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void handleNotification(final Notification notification, final Object handback)
-  {
-    // to smoothe the throughput of notifications processing,
-    // we submit each notification to a queue instead of handling it directly
-    final String message = notification.getMessage();
-    Runnable r = new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        String s = handback.toString() + ": " + message;
-        // process the notification; here we simply display the message
-        System.out.print(s);
-        jmxPrinter.print(s);
-        jmxPrinter.flush();
-      }
-    };
-    executor.submit(r);
-  }
-
-  /**
-   * Close the connections to all nodes.
-   */
-  public void close()
-  {
-    for (JMXNodeConnectionWrapper jmxNode: jmxConnections)
-    {
-      try
-      {
-        jmxNode.close();
-      }
-      catch(Exception e)
-      {
-        e.printStackTrace();
-      }
-    }
-    if (executor != null) executor.shutdown();
-    jmxPrinter.close();
   }
 }

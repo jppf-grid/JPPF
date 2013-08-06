@@ -19,7 +19,7 @@
 package org.jppf.server.protocol;
 
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JobSLA;
+import org.jppf.node.protocol.*;
 
 /**
  * This class represents the Service Level Agreement Between a JPPF job and a server.
@@ -57,6 +57,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * Get the name of the strategy used to return the results back to the client.
    */
   private String resultsStrategy = null;
+  /**
+   * The classpath associated with the job.
+   */
+  private ClassPath classPath = new ClassPathImpl();
 
   /**
    * Default constructor.
@@ -184,5 +188,18 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   public void setResultsStrategy(final String name)
   {
     this.resultsStrategy = name;
+  }
+
+  @Override
+  public ClassPath getClassPath()
+  {
+    return classPath;
+  }
+
+  @Override
+  public void setClassPath(final ClassPath classpath)
+  {
+    if (classpath == null) throw new IllegalArgumentException("classpath cannot be null");
+    this.classPath = classpath;
   }
 }

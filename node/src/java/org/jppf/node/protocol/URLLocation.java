@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 import java.io.*;
 import java.net.*;
@@ -56,7 +56,7 @@ public class URLLocation extends AbstractLocation<URL>
    * Obtain an input stream to read from this location.
    * @return an <code>InputStream</code> instance.
    * @throws Exception if an I/O error occurs.
-   * @see org.jppf.server.protocol.Location#getInputStream()
+   * @see org.jppf.node.protocol.Location#getInputStream()
    */
   @Override
   public InputStream getInputStream() throws Exception
@@ -68,7 +68,7 @@ public class URLLocation extends AbstractLocation<URL>
    * Obtain an output stream to write to this location.
    * @return an <code>OutputStream</code> instance.
    * @throws Exception if an I/O error occurs.
-   * @see org.jppf.server.protocol.Location#getOutputStream()
+   * @see org.jppf.node.protocol.Location#getOutputStream()
    */
   @Override
   public OutputStream getOutputStream() throws Exception
@@ -81,7 +81,7 @@ public class URLLocation extends AbstractLocation<URL>
   /**
    * This method always returns -1, as there is no reliable way to know the actual size of available data.
    * @return -1.
-   * @see org.jppf.server.protocol.Location#size()
+   * @see org.jppf.node.protocol.Location#size()
    */
   @Override
   public long size()

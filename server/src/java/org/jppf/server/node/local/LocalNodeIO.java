@@ -108,11 +108,11 @@ public class LocalNodeIO extends AbstractNodeIO
     try
     {
       initializePerformanceData(bundle);
-      if (debugEnabled) log.debug("bundle task count = " + count + ", state = " + bundle.getState());
-      if (!JPPFTaskBundle.State.INITIAL_BUNDLE.equals(bundle.getState()))
+      if (debugEnabled) log.debug("bundle task count = " + count + ", hanshake = " + bundle.isHandshake());
+      if (!bundle.isHandshake())
       {
         JPPFLocalContainer cont = (JPPFLocalContainer) node.getContainer(bundle.getUuidPath().getList());
-        cont.getClassLoader().setRequestUuid(bundle.getRequestUuid());
+        cont.getClassLoader().setRequestUuid(bundle.getUuid());
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.setCurrentMessage(currentMessage);
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());

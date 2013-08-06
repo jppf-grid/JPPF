@@ -29,7 +29,7 @@ import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
 import org.jppf.libmanagement.Downloader;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -302,7 +302,7 @@ public class ConsoleLoader
     /**
      * Notification that some data was transferred from a source to a destination.
      * @param event - the event that encapsulates the transfer information.
-     * @see org.jppf.server.protocol.LocationEventListener#dataTransferred(org.jppf.server.protocol.LocationEvent)
+     * @see org.jppf.node.protocol.LocationEventListener#dataTransferred(org.jppf.node.protocol.LocationEvent)
      */
     @Override
     public void dataTransferred(final LocationEvent event)

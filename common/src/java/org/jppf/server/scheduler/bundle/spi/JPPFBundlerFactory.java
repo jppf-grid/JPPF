@@ -18,6 +18,7 @@
 
 package org.jppf.server.scheduler.bundle.spi;
 
+import java.io.*;
 import java.util.*;
 
 import org.jppf.JPPFException;
@@ -75,10 +76,16 @@ public class JPPFBundlerFactory
     {
       try
       {
-        this.config = new TypedProperties().loadString(config);
+        String s = (config instanceof String) ? (String) config : config.toString();
+        this.config = new TypedProperties();
+        try (Reader reader = new StringReader(s))
+        {
+          this.config.loadWithIncludes(reader);
+        }
       }
-      catch (Exception ignore)
+      catch (Exception e)
       {
+        if (debugEnabled) log.debug("could not load default configuration", e);
       }
     }
  

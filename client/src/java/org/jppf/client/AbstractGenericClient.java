@@ -190,8 +190,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
-            // for backward compatibility with v2.x configurations
-            int port = props.getAndReplaceInt(String.format("%s.jppf.server.port", name), String.format("%s.class.server.port", name), sslEnabled ? 11443 : 11111, false);
+            int port = props.getInt(String.format("%s.jppf.server.port", name), sslEnabled ? 11443 : 11111);
             if (!sslEnabled) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
             if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);

@@ -151,7 +151,7 @@ public class DriverInitializer
     {
       connectionInfo = new JPPFConnectionInformation();
       connectionInfo.uuid = driver.getUuid();
-      String s = config.getAndReplaceString("jppf.server.port", "class.server.port", "11111", false);
+      String s = config.getString("jppf.server.port", "11111");
       connectionInfo.serverPorts = parsePorts(s, 11111);
       s = config.getString("jppf.ssl.server.port", null);
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
@@ -234,7 +234,7 @@ public class DriverInitializer
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
             // to keep backward compatibility with v2.x configurations
-            String s = props.getAndReplaceString(String.format("jppf.peer.%s.server.port", name), String.format("class.peer.%s.server.port", name), "11111", false);
+            String s = props.getString(String.format("jppf.peer.%s.server.port", name), "11111");
             if (ssl) info.sslServerPorts = StringUtils.parseIntValues(s);
             else info.serverPorts = StringUtils.parseIntValues(s);
             if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);

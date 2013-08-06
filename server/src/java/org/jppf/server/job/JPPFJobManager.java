@@ -158,7 +158,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   public synchronized void jobEnded(final ServerJob bundleWrapper)
   {
     if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-    if (bundleWrapper.getJob().getState() == JPPFTaskBundle.State.INITIAL_BUNDLE) return; // skip notifications for initial bundles
+    if (bundleWrapper.getJob().isHandshake()) return; // skip notifications for handshake bundles
 
     JPPFTaskBundle bundle = bundleWrapper.getJob();
     //long time = System.currentTimeMillis() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
