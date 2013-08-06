@@ -43,7 +43,7 @@ public class ViewDescriptor
   private final Set<DetachableComponentDescriptor> components = new HashSet<>();
 
   /**
-   * Initiailze this veiw descriptor.
+   * Initiailze this view descriptor.
    * @param frame the frame for this view.
    * @param container the main container to which other elements are attached.
    */
