@@ -33,7 +33,7 @@ public class JPPFServiceImpl implements JPPFService
   /**
    * Unique reference to the JPPF client.
    */
-  private static final AtomicReference<JPPFClient> client = new AtomicReference<JPPFClient>(newJPPFClient());
+  private static final AtomicReference<JPPFClient> client = new AtomicReference<>(newJPPFClient());
 
   /**
    * Default constructor.
