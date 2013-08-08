@@ -34,7 +34,7 @@ public class TaskStateMap extends TreeMap<Integer, TaskState>
   /**
    * Maps for each state the number of tasks in this state.
    */
-  private final Map<TaskState, AtomicInteger> stateCounts = new EnumMap<TaskState, AtomicInteger>(TaskState.class);
+  private final Map<TaskState, AtomicInteger> stateCounts = new EnumMap<>(TaskState.class);
 
   /**
    * Initialize this map.

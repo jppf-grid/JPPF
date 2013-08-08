@@ -56,7 +56,7 @@ abstract class AbstractJobConfiguration implements JobConfiguration
   /**
    * The list of listeners to register with the job.
    */
-  protected List<JobListener> listeners = new LinkedList<JobListener>();
+  protected List<JobListener> listeners = new LinkedList<>();
 
   /**
    * Default constructor.

@@ -71,12 +71,12 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   /**
    * The job to send for execution. If the reference is ont null, then the job is sent immediately.
    */
-  private AtomicReference<JPPFJob> currentJobRef = new AtomicReference<JPPFJob>(null);
+  private AtomicReference<JPPFJob> currentJobRef = new AtomicReference<>(null);
   /**
    * The next job being prepared. It will be assigned to <code>currentJobRef</code> when it is ready for execution,
    * depending on the batching parameters.
    */
-  private AtomicReference<JPPFJob> nextJobRef = new AtomicReference<JPPFJob>(null);
+  private AtomicReference<JPPFJob> nextJobRef = new AtomicReference<>(null);
   /**
    * The time at which we started to count for the the timeout.
    */
@@ -260,7 +260,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       {
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
         job.addTask(task);
-        future = new JPPFTaskFuture<T>(collector, task.getPosition());
+        future = new JPPFTaskFuture<>(collector, task.getPosition());
       }
       catch (JPPFException e)
       {
@@ -297,7 +297,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
         JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.addTask(task);
         t.setResult(result);
         configureTask(t);
-        future = new JPPFTaskFuture<T>(collector, t.getPosition());
+        future = new JPPFTaskFuture<>(collector, t.getPosition());
       }
       catch (JPPFException e)
       {
@@ -332,7 +332,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
         JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.addTask(task);
         configureTask(jppfTask);
-        future = new JPPFTaskFuture<T>(collector, jppfTask.getPosition());
+        future = new JPPFTaskFuture<>(collector, jppfTask.getPosition());
       }
       catch (JPPFException e)
       {

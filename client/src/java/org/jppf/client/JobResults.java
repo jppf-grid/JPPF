@@ -37,7 +37,7 @@ public class JobResults implements Serializable
    * A map containing the tasks that have been successfully executed,
    * ordered by ascending position in the submitted list of tasks.
    */
-  private final SortedMap<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+  private final SortedMap<Integer, JPPFTask> resultMap = new TreeMap<>();
 
   /**
    * Get the current number of received results.

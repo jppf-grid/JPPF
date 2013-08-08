@@ -60,7 +60,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Mapping of class loader to requests uuids.
    */
-  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<>();
   /**
    * Determines if the handshake with the server has been performed.
    */

@@ -65,7 +65,7 @@ public class GridMonitor
   /**
    * Holds the memory usage snapshots for all the nodes.
    */
-  private Map<String, JPPFManagement> nodes = new TreeMap<String, JPPFManagement>();
+  private Map<String, JPPFManagement> nodes = new TreeMap<>();
   /**
    * The timer that schedules regular memory snapshots of the nodes.
    */
@@ -73,7 +73,7 @@ public class GridMonitor
   /**
    * Holds the memory usage snapshots for all the nodes.
    */
-  private final Map<String, List<NodeData>> dataMap = new TreeMap<String, List<NodeData>>();
+  private final Map<String, List<NodeData>> dataMap = new TreeMap<>();
   /**
    * Interval at which memory usage snapshots are taken.
    */
@@ -324,7 +324,7 @@ public class GridMonitor
             List<NodeData> list = dataMap.get(id);
             if (list == null)
             {
-              list = new LinkedList<NodeData>();
+              list = new LinkedList<>();
               dataMap.put(id, list);
             }
             list.add(data);

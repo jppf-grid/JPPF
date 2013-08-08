@@ -98,7 +98,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   /**
    * Status of the connection.
    */
-  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(CREATED);
+  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(CREATED);
 
   /**
    * Initialize this client connection.
@@ -118,7 +118,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   {
     ObjectSerializer ser = makeHelper(cl, client.getSerializationHelperClassName()).getSerializer();
     int count = job.getTasks().size() - job.getResults().size();
-    TraversalList<String> uuidPath = new TraversalList<String>();
+    TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
     header.setTaskCount(count);
@@ -147,7 +147,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   {
     JPPFTaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
-    TraversalList<String> uuidPath = new TraversalList<String>();
+    TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
@@ -171,7 +171,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    */
   @SuppressWarnings("unchecked")
   protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults(final String helperClassName) throws Exception {
-    List<JPPFTask> taskList = new LinkedList<JPPFTask>();
+    List<JPPFTask> taskList = new LinkedList<>();
     JPPFTaskBundle bundle = null;
     try {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();

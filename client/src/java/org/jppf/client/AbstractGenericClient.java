@@ -72,15 +72,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   /**
    * Mapping of class loader to requests uuids.
    */
-  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<String, ClassLoader>();
+  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<>();
   /**
    * Mapping of registered class loaders.
    */
-  private final Map<String, Set<RegisteredClassLoader>> classLoaderRegistrations = new HashMap<String, Set<RegisteredClassLoader>>();
+  private final Map<String, Set<RegisteredClassLoader>> classLoaderRegistrations = new HashMap<>();
   /**
    * Mapping class loader to uuid.
    */
-  private final Map<ClassLoader, String>  classLoaderUUIDs = new WeakHashMap<ClassLoader, String>();
+  private final Map<ClassLoader, String>  classLoaderUUIDs = new WeakHashMap<>();
   /**
    * Determines whether SSL communication is on or off.
    */
@@ -462,7 +462,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);
       if(list == null) {
-        list = new HashSet<RegisteredClassLoader>();
+        list = new HashSet<>();
         classLoaderRegistrations.put(uuid, list);
         addRequestClassLoader(uuid, cl);
       }

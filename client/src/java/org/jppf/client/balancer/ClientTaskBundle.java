@@ -77,7 +77,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
     this.job = job;
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
-    this.tasks = new ArrayList<JPPFTask>(tasks);
+    this.tasks = new ArrayList<>(tasks);
     this.setName(job.getJob().getName());
     setTaskCount(this.tasks.size());
   }

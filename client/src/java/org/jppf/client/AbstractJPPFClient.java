@@ -130,7 +130,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   public List<String> getAllConnectionNames()
   {
-    List<String> names = new LinkedList<String>();
+    List<String> names = new LinkedList<>();
     for (JPPFClientConnection c : allConnections) names.add(c.getName());
     return names;
   }

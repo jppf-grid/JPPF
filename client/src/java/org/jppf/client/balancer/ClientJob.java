@@ -55,7 +55,7 @@ public class ClientJob extends AbstractClientJob
   /**
    * Map of all futures in this job.
    */
-  private final Map<ClientTaskBundle, Future> bundleMap = new LinkedHashMap<ClientTaskBundle, Future>();
+  private final Map<ClientTaskBundle, Future> bundleMap = new LinkedHashMap<>();
   /**
    * The status of this submission.
    */
@@ -75,7 +75,7 @@ public class ClientJob extends AbstractClientJob
   /**
    * Map of all pending broadcast jobs.
    */
-  private final Set<ClientJob> broadcastSet = new LinkedHashSet<ClientJob>();
+  private final Set<ClientJob> broadcastSet = new LinkedHashSet<>();
   /**
    * Indicator whether this job is executing.
    */
@@ -118,7 +118,7 @@ public class ClientJob extends AbstractClientJob
 
     if (broadcastUUID == null) {
       if (job.getSLA().isBroadcastJob())
-        this.broadcastMap = new LinkedHashMap<String, ClientJob>();
+        this.broadcastMap = new LinkedHashMap<>();
       else
         this.broadcastMap = Collections.emptyMap();
       this.resultsListener = this.job.getResultListener();
@@ -129,7 +129,7 @@ public class ClientJob extends AbstractClientJob
 
     if (this.job.getResultListener() instanceof SubmissionStatusHandler) this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
     else this.submissionStatus = SubmissionStatus.SUBMITTED;
-    this.tasks = new ArrayList<JPPFTask>(tasks);
+    this.tasks = new ArrayList<>(tasks);
 
     for (JPPFTask result : job.getResults().getAll()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
@@ -164,7 +164,7 @@ public class ClientJob extends AbstractClientJob
    */
   public List<JPPFTask> getTasks() {
     synchronized (tasks) {
-      return Collections.unmodifiableList(new ArrayList<JPPFTask>(tasks));
+      return Collections.unmodifiableList(new ArrayList<>(tasks));
     }
   }
 
@@ -340,7 +340,7 @@ public class ClientJob extends AbstractClientJob
     //if (empty) clearChannels();
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {
-      List<JPPFTask> list = new ArrayList<JPPFTask>();
+      List<JPPFTask> list = new ArrayList<>();
       synchronized (tasks) {
         if (bundle != null) {
           for (JPPFTask task : bundle.getTasksL()) {
@@ -355,7 +355,7 @@ public class ClientJob extends AbstractClientJob
       resultsReceived(bundle, list);
     } else if (bundle == null) {
       if (isCancelled()) {
-        List<JPPFTask> list = new ArrayList<JPPFTask>();
+        List<JPPFTask> list = new ArrayList<>();
         synchronized (tasks) {
           list.addAll(this.tasks);
           this.tasks.clear();
@@ -364,7 +364,7 @@ public class ClientJob extends AbstractClientJob
       }
     } else {
       if (bundle.isCancelled()) {
-        List<JPPFTask> list = new ArrayList<JPPFTask>();
+        List<JPPFTask> list = new ArrayList<>();
         synchronized (tasks) {
           for (JPPFTask task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
@@ -375,7 +375,7 @@ public class ClientJob extends AbstractClientJob
         resultsReceived(bundle, list);
       }
       if (bundle.isRequeued()) {
-        List<JPPFTask> list = new ArrayList<JPPFTask>();
+        List<JPPFTask> list = new ArrayList<>();
         synchronized (tasks) {
           for (JPPFTask task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
@@ -441,11 +441,11 @@ public class ClientJob extends AbstractClientJob
       List<ClientJob> list;
       List<Future>   futureList;
       synchronized (bundleMap) {
-        list = new ArrayList<ClientJob>(broadcastSet.size() + broadcastMap.size());
+        list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
 
-        futureList = new ArrayList<Future>(bundleMap.size());
+        futureList = new ArrayList<>(bundleMap.size());
         futureList.addAll(bundleMap.values());
       }
       for (ClientJob broadcastJob : list) broadcastJob.cancel(mayInterruptIfRunning);

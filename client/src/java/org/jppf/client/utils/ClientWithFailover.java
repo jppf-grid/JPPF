@@ -79,7 +79,7 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
    * This array may be empty, in which case it is equivalent to invoking constructor with the uuid as its sole argument. 
    */
   public ClientWithFailover(final String uuid, final ClientListener...listeners) {
-    List<ClientListener> list = new ArrayList<ClientListener>();
+    List<ClientListener> list = new ArrayList<>();
     list.add(this);
     if ((listeners != null) && (listeners.length > 0)) list.addAll(Arrays.asList(listeners));
     client = new JPPFClient(uuid, list.toArray(new ClientListener[list.size()]));
@@ -161,7 +161,7 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
     try {
       Set<JPPFClientConnection> set = connectionMap.get(p);
       if (set == null) {
-        set = new HashSet<JPPFClientConnection>();
+        set = new HashSet<>();
         connectionMap.put(p, set);
       }
       set.add(c);

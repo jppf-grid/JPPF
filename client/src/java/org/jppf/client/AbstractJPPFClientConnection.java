@@ -56,7 +56,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * List of status listeners for this connection.
    */
-  protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<ClientConnectionStatusListener>();
+  protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * Determines whether this connection has been shut down;
    */

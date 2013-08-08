@@ -70,7 +70,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   /**
    * List of listeners registered to receive this submission's status change notifications.
    */
-  private final List<SubmissionStatusListener> listeners = new ArrayList<SubmissionStatusListener>();
+  private final List<SubmissionStatusListener> listeners = new ArrayList<>();
 
   /**
    * Default constructor, provided as a convenience for subclasses.
@@ -198,7 +198,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   protected void buildResults()
   {
-    results = new ArrayList<JPPFTask>(jobResults.getAll());
+    results = new ArrayList<>(jobResults.getAll());
   }
 
   @Override

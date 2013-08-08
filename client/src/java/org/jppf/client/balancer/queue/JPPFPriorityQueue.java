@@ -122,7 +122,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
         }
         jobMap.put(jobUuid, bundleWrapper);
         updateLatestMaxSize();
-        fireQueueEvent(new QueueEvent<ClientJob, ClientJob, ClientTaskBundle>(this, bundleWrapper, false));
+        fireQueueEvent(new QueueEvent<>(this, bundleWrapper, false));
         if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
       } finally {
         lock.unlock();
@@ -141,7 +141,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
 
       priorityMap.putValue(job.getSLA().getPriority(), job);
       sizeMap.putValue(getSize(job), job);
-      fireQueueEvent(new QueueEvent<ClientJob, ClientJob, ClientTaskBundle>(this, job, true));
+      fireQueueEvent(new QueueEvent<>(this, job, true));
     } finally {
       lock.unlock();
     }
@@ -317,9 +317,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       return;
     }
     JobSLA sla = bundle.getSLA();
-    List<ClientJob> jobList = new ArrayList<ClientJob>(connections.size());
+    List<ClientJob> jobList = new ArrayList<>(connections.size());
 
-    Set<String> uuidSet = new HashSet<String>();
+    Set<String> uuidSet = new HashSet<>();
     for (ChannelWrapper connection : connections)
     {
       ExecutorStatus status = connection.getExecutionStatus();
@@ -363,7 +363,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
         bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
 
         jobMap.put(jobUuid, bundleWrapper);
-        fireQueueEvent(new QueueEvent<ClientJob, ClientJob, ClientTaskBundle>(this, bundleWrapper, false));
+        fireQueueEvent(new QueueEvent<>(this, bundleWrapper, false));
         for (ClientJob job : jobList) addBundle(job);
       } finally {
         lock.unlock();
@@ -448,7 +448,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     try {
       if (jobMap.isEmpty()) return;
 
-      jobIDs = new HashSet<String>();
+      jobIDs = new HashSet<>();
       for (Map.Entry<String, ClientJob> entry : jobMap.entrySet())
       {
         if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());

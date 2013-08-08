@@ -46,7 +46,7 @@ public class JPPFCompletionService<V> implements CompletionService<V>
   /**
    * Maps all the futures for the tasks submitted via this completion service.
    */
-  private final Map<String, Map<Integer, JPPFTaskFuture<V>>> futureMap = new HashMap<String, Map<Integer, JPPFTaskFuture<V>>>();
+  private final Map<String, Map<Integer, JPPFTaskFuture<V>>> futureMap = new HashMap<>();
   /**
    * Listens to notifications of results received for the tasks submitted via this completion service. 
    */
@@ -54,7 +54,7 @@ public class JPPFCompletionService<V> implements CompletionService<V>
   /**
    * Holds the queue of futures that can be obtained from this completion service.
    */
-  private final BlockingQueue<Future<V>> queue = new LinkedBlockingDeque<Future<V>>();
+  private final BlockingQueue<Future<V>> queue = new LinkedBlockingDeque<>();
 
   /**
    * Initialize this completion service with the specified executor.
@@ -110,7 +110,7 @@ public class JPPFCompletionService<V> implements CompletionService<V>
       if (map == null)
       {
         collector.addListener(listener);
-        map = new HashMap<Integer, JPPFTaskFuture<V>>();
+        map = new HashMap<>();
         futureMap.put(uuid, map);
       }
       map.put(future.getPosition(), future);

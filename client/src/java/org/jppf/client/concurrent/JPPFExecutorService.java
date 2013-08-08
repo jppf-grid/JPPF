@@ -70,7 +70,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
   /**
    * Maintains a list of the jobs submitted by this executor.
    */
-  private final Map<String, JPPFJob> jobMap = new Hashtable<String, JPPFJob>();
+  private final Map<String, JPPFJob> jobMap = new Hashtable<>();
   /**
    * Determines whether a shutdown has been requested.
    */
@@ -138,7 +138,7 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
     Pair<FutureResultCollector, Integer> pair = batchHandler.addTasks(tasks);
     FutureResultCollector collector = pair.first();
     int position = pair.second();
-    List<Future<T>> futureList = new ArrayList<Future<T>>(tasks.size());
+    List<Future<T>> futureList = new ArrayList<>(tasks.size());
     for (Callable<T> task: tasks)
     {
       if (task == null) throw new NullPointerException("a task cannot be null");

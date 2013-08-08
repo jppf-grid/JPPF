@@ -486,7 +486,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @return an instance of {@link Object}.
    */
   protected Object readResolve() {
-    listeners = new LinkedList<JobListener>();
+    listeners = new LinkedList<>();
     return this;
   }
 

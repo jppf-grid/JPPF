@@ -221,7 +221,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    */
   public synchronized List<ChannelWrapper> getAllConnections()
   {
-    return new ArrayList<ChannelWrapper>(allConnections);
+    return new ArrayList<>(allConnections);
   }
 
   /**
@@ -299,7 +299,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
-    List<JPPFTask> pendingTasks = new ArrayList<JPPFTask>();
+    List<JPPFTask> pendingTasks = new ArrayList<>();
     if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector))
     {
       ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
@@ -378,7 +378,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   public Vector<JPPFClientConnection> getAvailableConnections()
   {
     List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
-    Vector<JPPFClientConnection> availableConnections = new Vector<JPPFClientConnection>(idleChannels.size());
+    Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
     for (ChannelWrapper idleChannel : idleChannels)
     {
       if (idleChannel instanceof ChannelWrapperRemote)

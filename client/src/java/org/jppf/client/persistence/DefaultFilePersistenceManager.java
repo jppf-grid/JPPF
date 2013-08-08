@@ -175,7 +175,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
     }
     else
     {
-      List<String> result = new ArrayList<String>(files.length);
+      List<String> result = new ArrayList<>(files.length);
       for (File f: files)
       {
         String s = f.getName().substring(prefix.length());
@@ -214,7 +214,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
         if (count < 4) continue;
         count = 0;
         int size = SerializationUtils.readInt(bytes, 0);
-        List<JPPFTask> tasks = new ArrayList<JPPFTask>(size);
+        List<JPPFTask> tasks = new ArrayList<>(size);
         for (int i=0; i<size; i++) tasks.add((JPPFTask) serializer.deserialize(is, false));
         job.getResults().putResults(tasks);
       }

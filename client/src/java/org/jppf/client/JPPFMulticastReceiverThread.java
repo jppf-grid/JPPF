@@ -42,7 +42,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   /**
    * Contains the set of retrieved connection information objects.
    */
-  private final Map<String, Set<JPPFConnectionInformation>> infoMap = new HashMap<String, Set<JPPFConnectionInformation>>();
+  private final Map<String, Set<JPPFConnectionInformation>> infoMap = new HashMap<>();
   /**
    * Count of distinct retrieved connection information objects.
    */
@@ -151,7 +151,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
     Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
     if (set == null)
     {
-      set = new HashSet<JPPFConnectionInformation>();
+      set = new HashSet<>();
       infoMap.put(info.uuid, set);
     }
     set.add(info);

@@ -76,11 +76,11 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * Status of the connection.
    */
-  protected final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<JPPFClientConnectionStatus>(NEW);
+  protected final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(NEW);
   /**
    * List of status listeners for this connection.
    */
-  protected final List<ClientConnectionStatusListener> listeners = new ArrayList<ClientConnectionStatusListener>();
+  protected final List<ClientConnectionStatusListener> listeners = new ArrayList<>();
 
   /**
    * Initialize this connection with the specified owner.

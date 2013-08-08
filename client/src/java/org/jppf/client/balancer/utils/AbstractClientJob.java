@@ -76,7 +76,7 @@ public abstract class AbstractClientJob
   /**
    * List of all runnables called on job completion.
    */
-  private final List<Runnable> onDoneList = new ArrayList<Runnable>();
+  private final List<Runnable> onDoneList = new ArrayList<>();
   /**
    * Time at which the job is received on the server side. In milliseconds since January 1, 1970 UTC.
    */
