@@ -159,7 +159,7 @@ public class J2EEDemo
     String prefix = (jobNamePrefix == null) ? "(No name)" : jobNamePrefix;
     JPPFConnection connection = null;
     String id = null;
-    List<String> idList = new ArrayList<String>();
+    List<String> idList = new ArrayList<>();
     try
     {
       connection = JPPFHelper.getConnection(jndiBinding);
@@ -227,7 +227,7 @@ public class J2EEDemo
    */
   public Map getStatusMap() throws Exception
   {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     JPPFConnection connection = null;
     try
     {

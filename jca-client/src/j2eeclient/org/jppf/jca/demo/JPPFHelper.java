@@ -37,7 +37,7 @@ public class JPPFHelper
   /**
    * 
    */
-  private static Map<String, JPPFJob> statusMap = new Hashtable<String, JPPFJob>();
+  private static Map<String, JPPFJob> statusMap = new Hashtable<>();
   /**
    * JNDI name of the JPPFConnectionFactory.
    * <p>This value is dependent on the application server used:

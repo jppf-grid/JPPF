@@ -42,7 +42,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
   /**
    * List of connection event listeners for this managed connection.
    */
-  private List<ConnectionEventListener> listeners = new ArrayList<ConnectionEventListener>();
+  private List<ConnectionEventListener> listeners = new ArrayList<>();
 
   /**
    * Default constructor.
