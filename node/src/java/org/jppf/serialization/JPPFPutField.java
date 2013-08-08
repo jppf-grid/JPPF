@@ -32,11 +32,11 @@ class JPPFPutField extends PutField
   /**
    * Map of names to primitive values.
    */
-  Map<String, Object> primitiveFields = new HashMap<String, Object>();
+  Map<String, Object> primitiveFields = new HashMap<>();
   /**
    * Map of names to object values.
    */
-  Map<String, Object> objectFields = new HashMap<String, Object>();
+  Map<String, Object> objectFields = new HashMap<>();
   /**
    * The stream to write to.
    */

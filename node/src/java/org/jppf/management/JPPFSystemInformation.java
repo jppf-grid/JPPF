@@ -53,7 +53,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
   /**
    * Mapping of all properties containers.
    */
-  private Map<String, TypedProperties> map = new LinkedHashMap<String, TypedProperties>();
+  private Map<String, TypedProperties> map = new LinkedHashMap<>();
   /**
    * <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
    */

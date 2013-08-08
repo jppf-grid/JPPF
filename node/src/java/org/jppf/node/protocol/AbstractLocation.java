@@ -38,7 +38,7 @@ public abstract class AbstractLocation<T> implements Location<T>
   /**
    * The list of listeners to this location.
    */
-  protected List<LocationEventListener> listeners = new CopyOnWriteArrayList<LocationEventListener>();
+  protected List<LocationEventListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * Boolean flag that determines if at least one listener is registered.
    * Used to minimize the overhead of sending events if there is no listener.
@@ -65,8 +65,7 @@ public abstract class AbstractLocation<T> implements Location<T>
   {
     try (InputStream is = getInputStream(); OutputStream os = location.getOutputStream())
     {
-      copyStream(is, os);
-      os.flush();
+      copyStream(is, os, eventsEnabled);
     }
     return location;
   }
@@ -76,8 +75,7 @@ public abstract class AbstractLocation<T> implements Location<T>
   {
     try (InputStream is = getInputStream(); JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream())
     {
-      copyStream(is, os);
-      os.flush();
+      copyStream(is, os, false);
       return os.toByteArray();
     }
   }
@@ -112,7 +110,7 @@ public abstract class AbstractLocation<T> implements Location<T>
    * Notify all listeners that a data transfer has occurred.
    * @param n the size of the data that was transferred.
    */
-  protected void fireLocationEvent(final int n)
+  protected void fireLocationEvent(final long n)
   {
     if (listeners.isEmpty()) return;
     LocationEvent event = new LocationEvent(this, n);
@@ -123,17 +121,17 @@ public abstract class AbstractLocation<T> implements Location<T>
    * Copy the data read from the specified input stream to the specified output stream.
    * @param is the input stream to read from.
    * @param os the output stream to write to.
+   * @param withEvt if <code>true</code>, then {@link LocationEvent}s will be generated during the transfer.
    * @throws IOException if an I/O error occurs.
    */
-  private void copyStream(final InputStream is, final OutputStream os) throws IOException
+  private void copyStream(final InputStream is, final OutputStream os, final boolean withEvt) throws IOException
   {
-    byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
-    while(true)
-    {
-      int n = is.read(bytes);
-      if (n <= 0) break;
-      if (eventsEnabled) fireLocationEvent(n);
-      os.write(bytes, 0, n);
-    }
+    OutputStream tmpos = !withEvt ? os : new NotifyingOutputStream(os, new NotifyingStreamCallback() {
+      @Override
+      public void bytesNotification(final long length) throws IOException {
+        fireLocationEvent(length);
+      }
+    });
+    StreamUtils.copyStream(is, tmpos, false);
   }
 }

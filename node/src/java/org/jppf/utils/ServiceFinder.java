@@ -54,10 +54,10 @@ public class ServiceFinder
   {
     if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
     if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
-    List<T> list = new ArrayList<T>();
+    List<T> list = new ArrayList<>();
     String name = providerClass.getName();
     List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
-    Set<String> alreadyLoaded = new HashSet<String>();
+    Set<String> alreadyLoaded = new HashSet<>();
     for (String s: lines)
     {
       if (alreadyLoaded.contains(s)) continue;
@@ -112,7 +112,7 @@ public class ServiceFinder
    */
   private List<URL> resourcesList(final String path, final ClassLoader cl)
   {
-    List<URL> urls = new ArrayList<URL>();
+    List<URL> urls = new ArrayList<>();
     try
     {
       Enumeration<URL> enu = cl.getResources(path);
@@ -135,7 +135,7 @@ public class ServiceFinder
    */
   public List<String> findServiceDefinitions(final String path, final ClassLoader cl)
   {
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     try
     {
       List<URL> urls = resourcesList(path, cl);

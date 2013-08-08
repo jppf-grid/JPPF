@@ -77,7 +77,7 @@ public final class SystemUtils
   /**
    * Holds and manages the shutdown hooks set on the JVM.
    */
-  private static Map<String, Thread> shutdownHooks = new Hashtable<String, Thread>();
+  private static Map<String, Thread> shutdownHooks = new Hashtable<>();
 
   /**
    * Instantiation of this class is not permitted.

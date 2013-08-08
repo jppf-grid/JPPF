@@ -134,7 +134,7 @@ class Serializer
    */
   private void writeObject(final Object obj, final int handle) throws Exception
   {
-    Map<Class<?>, ClassDescriptor> map = new HashMap<Class<?>, ClassDescriptor>();
+    Map<Class<?>, ClassDescriptor> map = new HashMap<>();
     ClassDescriptor cd = caches.getClassDescriptor(obj.getClass(), map);
     currentObject = obj;
     currentClassDescriptor = cd;
@@ -160,7 +160,7 @@ class Serializer
    */
   private void writeClassObject(final Class obj) throws Exception
   {
-    Map<Class<?>, ClassDescriptor> map = new HashMap<Class<?>, ClassDescriptor>();
+    Map<Class<?>, ClassDescriptor> map = new HashMap<>();
     ClassDescriptor cd = caches.getClassDescriptor(obj, map);
     currentObject = obj;
     currentClassDescriptor = cd;
@@ -178,7 +178,7 @@ class Serializer
   void writeFields(final Object obj, final ClassDescriptor cd) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
-    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<ClassDescriptor>();
+    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
     while (tmpDesc != null)
     {
       stack.addFirst(tmpDesc);

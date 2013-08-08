@@ -74,7 +74,7 @@ public class MultipleBuffersOutputStream extends OutputStream
    */
   public MultipleBuffersOutputStream()
   {
-    list = new ArrayList<JPPFBuffer>();
+    list = new ArrayList<>();
   }
 
   /**
@@ -83,7 +83,7 @@ public class MultipleBuffersOutputStream extends OutputStream
    */
   public MultipleBuffersOutputStream(final List<JPPFBuffer> initialList)
   {
-    list = new ArrayList<JPPFBuffer>(initialList.size() + 10);
+    list = new ArrayList<>(initialList.size() + 10);
     for (JPPFBuffer buf: initialList) this.list.add(new JPPFBuffer(buf.buffer, 0));
     hasInitialBuffers = true;
   }
@@ -95,7 +95,7 @@ public class MultipleBuffersOutputStream extends OutputStream
    */
   public MultipleBuffersOutputStream(final int defaultLength) throws IllegalArgumentException
   {
-    list = new ArrayList<JPPFBuffer>();
+    list = new ArrayList<>();
     if (defaultLength <= 0) throw new IllegalArgumentException("the default buffer length must be > 0");
     this.defaultLength = defaultLength;
   }

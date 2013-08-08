@@ -87,7 +87,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Keeps and manages the uuid path list and the current position in it.
    */
-  private TraversalList<String> uuidPath = new TraversalList<String>();
+  private TraversalList<String> uuidPath = new TraversalList<>();
   /**
    * Determines whether the class should be loaded through the network classloader.
    */
@@ -101,19 +101,13 @@ public class JPPFResourceWrapper implements Serializable
    */
   private String providerUuid = null;
   /**
-   * Determines whether the resource is to be loaded using <code>ClassLoader.getResource()</code>.
-   * @deprectaed this attribute is not used meaningfully anywhere in the code and should be removed in the next major version (v4.0).
-   */
-  @Deprecated
-  private boolean asResource = false;
-  /**
    * Uuid of the original task bundle that triggered this resource request.
    */
   private String requestUuid = null;
   /**
    * Contains data about the kind of lookup that is to be done.
    */
-  private final Map<String, Object> dataMap = new HashMap<String, Object>();
+  private final Map<String, Object> dataMap = new HashMap<>();
   /**
    * Performance optimization.
    */

@@ -30,7 +30,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Wrapper around the JMXMP reomte connector server implementation.
+ * Wrapper around the JMXMP remote connector server implementation.
  * @author Laurent Cohen
  * @exclude
  */
@@ -78,7 +78,7 @@ public class JMXMPServer extends AbstractJMXServer
       managementHost = NetworkUtils.getManagementHost();
       if (!ssl) managementPort = props.getInt("jppf.management.port", 11198);
       else managementPort = props.getInt("jppf.management.ssl.port", 11193);
-      Map<String, Object> env = new HashMap<String, Object>();
+      Map<String, Object> env = new HashMap<>();
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       if (ssl) SSLHelper.configureJMXProperties(env);

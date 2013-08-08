@@ -41,7 +41,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   /**
    * Mapping of futures to corresponding resource requests.
    */
-  private final transient Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = new HashMap<JPPFResourceWrapper, Future<JPPFResourceWrapper>>();
+  private final transient Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = new HashMap<>();
 
   /**
    *
@@ -70,7 +70,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
     synchronized (getMonitor()) {
       Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
       if(resources == null) {
-        resources = new HashSet<JPPFResourceWrapper>();
+        resources = new HashSet<>();
         setData(RESOURCES_KEY, resources);
       } else resources.remove(resource);
       resources.add(resource);
@@ -88,7 +88,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
     if (f == null)
     {
       addOrReplaceResource(resource);
-      f = new ResourceFuture<JPPFResourceWrapper>();
+      f = new ResourceFuture<>();
       futureMap.put(resource, f);
     }
     return f;

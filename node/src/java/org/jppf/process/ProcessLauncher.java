@@ -144,8 +144,8 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
   public Process buildProcess() throws Exception
   {
     TypedProperties config = JPPFConfiguration.getProperties();
-    List<String> jvmOptions = new ArrayList<String>();
-    List<String> cpElements = new ArrayList<String>();
+    List<String> jvmOptions = new ArrayList<>();
+    List<String> cpElements = new ArrayList<>();
     cpElements.add(System.getProperty("java.class.path"));
     String s = config.getString("jppf.jvm.options");
     // for backward compatibility with 1.x versions
@@ -161,7 +161,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
         else jvmOptions.add(option);
       }
     }
-    List<String> command = new ArrayList<String>();
+    List<String> command = new ArrayList<>();
     command.add(System.getProperty("java.home")+"/bin/java");
     command.add("-cp");
     StringBuilder sb = new StringBuilder();

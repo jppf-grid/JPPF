@@ -62,7 +62,7 @@ public class NodeRunner
   /**
    * Container for data stored at the JVM level.
    */
-  private static Hashtable<Object, Object> persistentData = new Hashtable<Object, Object>();
+  private static Hashtable<Object, Object> persistentData = new Hashtable<>();
   /**
    * Used to executed a JVM termination task;
    */

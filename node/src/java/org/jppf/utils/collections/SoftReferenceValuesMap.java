@@ -54,8 +54,8 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
    */
   public SoftReferenceValuesMap()
   {
-    refQueue = new ReferenceQueue<V>();
-    map = new HashMap<K, SoftValue<K, V>>();
+    refQueue = new ReferenceQueue<>();
+    map = new HashMap<>();
   }
 
   /**

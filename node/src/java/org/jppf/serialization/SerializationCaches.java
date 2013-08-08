@@ -49,12 +49,12 @@ class SerializationCaches
   /**
    * Mapping of classes to their descriptor.
    */
-  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<Class<?>, ClassDescriptor>();
+  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
   //Map<Class<?>, ClassDescriptor> classToDescMap = new IdentityHashMap<Class<?>, ClassDescriptor>(256);
   /**
    * Mapping of objects to their handle.
    */
-  Map<Object, Integer> objectHandleMap = new IdentityHashMap<Object, Integer>(256);
+  Map<Object, Integer> objectHandleMap = new IdentityHashMap<>(256);
   /**
    * Counter for the class handles.
    */
@@ -70,7 +70,7 @@ class SerializationCaches
    */
   private static Map<Class<?>, ClassDescriptor> initGlobalTypes()
   {
-    Map<Class<?>, ClassDescriptor> map = new IdentityHashMap<Class<?>, ClassDescriptor>();
+    Map<Class<?>, ClassDescriptor> map = new IdentityHashMap<>();
     AtomicInteger counter = new AtomicInteger(0);
     try
     {

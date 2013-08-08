@@ -134,7 +134,7 @@ public final class NetworkUtils
    */
   private static List<InetAddress> getIPAddresses(final InetAddressFilter filter)
   {
-    List<InetAddress> list = new ArrayList<InetAddress>();
+    List<InetAddress> list = new ArrayList<>();
     try
     {
       Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -163,7 +163,7 @@ public final class NetworkUtils
    */
   public static List<InetAddress> getNonLocalIPAddresses()
   {
-    List<InetAddress> addresses = new ArrayList<InetAddress>();
+    List<InetAddress> addresses = new ArrayList<>();
     addresses.addAll(getNonLocalIPV4Addresses());
     addresses.addAll(getNonLocalIPV6Addresses());
     return addresses;
@@ -176,7 +176,7 @@ public final class NetworkUtils
    */
   private static Set<String> createLoopbackAddresses()
   {
-    Set<String> addresses = new HashSet<String>();
+    Set<String> addresses = new HashSet<>();
     String s = "127.0.0.";
     for (int i=0; i<=8; i++) addresses.add(s + i);
     return addresses;
@@ -244,7 +244,7 @@ public final class NetworkUtils
    */
   public static List<SubnetInformation> getAllNonLocalSubnetInfo()
   {
-    List<SubnetInformation> result = new ArrayList<SubnetInformation>();
+    List<SubnetInformation> result = new ArrayList<>();
     List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
     for (InetAddress addr: addresses)
     {

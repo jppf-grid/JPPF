@@ -45,7 +45,7 @@ public class EnumSetEnumMap<S extends Enum<S>> extends AbstractCollectionMap<S, 
   @Override
   protected Map<S, Collection<S>> createMap()
   {
-    return new EnumMap<S, Collection<S>>(enumClass);
+    return new EnumMap<>(enumClass);
   }
 
   @Override

@@ -47,13 +47,13 @@ public class PolicyDescriptor
    * The operands for this element, applies to non-logical rules (ie not AND, OR, XOR, NOT).
    * The first operand is always a property name.
    */
-  public List<String> operands = new ArrayList<String>();
+  public List<String> operands = new ArrayList<>();
   /**
    * List of arguments used in a custom (user-defined policy).
    */
-  public List<String> arguments = new ArrayList<String>();
+  public List<String> arguments = new ArrayList<>();
   /**
    * The children of this element, if any.
    */
-  public List<PolicyDescriptor> children = new ArrayList<PolicyDescriptor>();
+  public List<PolicyDescriptor> children = new ArrayList<>();
 }

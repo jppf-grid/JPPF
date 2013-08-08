@@ -39,12 +39,12 @@ public class ArrayListHashMap<K, V> extends AbstractCollectionMap<K, V>
   @Override
   protected Map<K, Collection<V>> createMap()
   {
-    return new HashMap<K, Collection<V>>();
+    return new HashMap<>();
   }
 
   @Override
   protected Collection<V> newCollection()
   {
-    return new ArrayList<V>();
+    return new ArrayList<>();
   }
 }

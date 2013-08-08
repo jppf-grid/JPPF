@@ -30,15 +30,15 @@ public class JPPFErrorReporter
   /**
    * A list of collected warnings.
    */
-  public List<String> warnings = new ArrayList<String>();
+  public List<String> warnings = new ArrayList<>();
   /**
    * A list of collected errors.
    */
-  public List<String> errors = new ArrayList<String>();
+  public List<String> errors = new ArrayList<>();
   /**
    * A list of fatal (non recoverable) errors.
    */
-  public List<String> fatalErrors = new ArrayList<String>();
+  public List<String> fatalErrors = new ArrayList<>();
   /**
    * A name used to identify this error reporter.
    */

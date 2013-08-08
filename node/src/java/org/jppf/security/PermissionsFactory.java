@@ -115,7 +115,7 @@ public final class PermissionsFactory
   private static synchronized void createPermissions(final ClassLoader classLoader)
   {
     if (permList != null) return;
-    permList = new ArrayList<Permission>();
+    permList = new ArrayList<>();
     createDynamicPermissions();
     createManagementPermissions();
     readStaticPermissions(classLoader);

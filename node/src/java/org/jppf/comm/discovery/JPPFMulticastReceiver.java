@@ -68,7 +68,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
   /**
    * List of retrieved connection information.
    */
-  private LinkedList<JPPFConnectionInformation> infoList = new LinkedList<JPPFConnectionInformation>();
+  private LinkedList<JPPFConnectionInformation> infoList = new LinkedList<>();
   /**
    * Count of connection information objects used for ordering.
    */

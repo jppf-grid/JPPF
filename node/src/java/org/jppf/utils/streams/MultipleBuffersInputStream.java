@@ -70,7 +70,7 @@ public class MultipleBuffersInputStream extends InputStream
    */
   public MultipleBuffersInputStream(final JPPFBuffer...buffers)
   {
-    list = new ArrayList<JPPFBuffer>(buffers.length);
+    list = new ArrayList<>(buffers.length);
     for (JPPFBuffer b: buffers)
     {
       list.add(new JPPFBuffer(b.buffer, b.length));
@@ -84,7 +84,7 @@ public class MultipleBuffersInputStream extends InputStream
    */
   public MultipleBuffersInputStream(final List<JPPFBuffer> buffers)
   {
-    list = new ArrayList<JPPFBuffer>(buffers.size());
+    list = new ArrayList<>(buffers.size());
     for (JPPFBuffer b: buffers)
     {
       list.add(new JPPFBuffer(b.buffer, b.length));

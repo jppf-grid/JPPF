@@ -70,7 +70,7 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler
    */
   private static Map<NodeLifeCycleEventType, String> generateMethodsNamesMap()
   {
-    Map<NodeLifeCycleEventType, String> map = new HashMap<NodeLifeCycleEventType, String>();
+    Map<NodeLifeCycleEventType, String> map = new HashMap<>();
     map.put(NODE_STARTING, "nodeStarting()");
     map.put(NODE_ENDING, "nodeEnding()");
     map.put(JOB_HEADER_LOADED, "jobHeaderLoaded()");

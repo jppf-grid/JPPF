@@ -54,7 +54,6 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    */
   public JMXNodeConnectionWrapper(final String host, final int port)
   {
-    //super(host, port, JPPFAdminMBean.NODE_SUFFIX);
     this(host, port, false);
   }
 
@@ -66,7 +65,6 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    */
   public JMXNodeConnectionWrapper(final String host, final int port, final boolean secure)
   {
-    //super(host, port, JPPFAdminMBean.NODE_SUFFIX);
     super(host, port, secure);
     local = false;
   }

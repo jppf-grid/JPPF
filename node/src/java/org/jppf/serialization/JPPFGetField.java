@@ -32,11 +32,11 @@ class JPPFGetField extends GetField
   /**
    * Map of names to primitive values.
    */
-  Map<String, Object> primitiveFields = new HashMap<String, Object>();
+  Map<String, Object> primitiveFields = new HashMap<>();
   /**
    * Map of names to object values.
    */
-  Map<String, Object> objectFields = new HashMap<String, Object>();
+  Map<String, Object> objectFields = new HashMap<>();
 
   @Override
   public ObjectStreamClass getObjectStreamClass()

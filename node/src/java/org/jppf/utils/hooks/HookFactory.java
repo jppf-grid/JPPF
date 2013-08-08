@@ -43,7 +43,7 @@ public class HookFactory
    */
   public static <T> Hook<T> registerConfigSingleHook(final String property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
-    return register(new Hook<T>(property, infClass, defaultImpl, classLoader));
+    return register(new Hook<>(property, infClass, defaultImpl, classLoader));
   }
 
   /**
@@ -56,7 +56,7 @@ public class HookFactory
    */
   public static <T> Hook<T> registerSPISingleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
-    return register(new Hook<T>(infClass, defaultImpl, classLoader, true));
+    return register(new Hook<>(infClass, defaultImpl, classLoader, true));
   }
 
   /**
@@ -69,7 +69,7 @@ public class HookFactory
    */
   public static <T> Hook<T> registerSPIMultipleHook(final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
-    return register(new Hook<T>(infClass, defaultImpl, classLoader, false));
+    return register(new Hook<>(infClass, defaultImpl, classLoader, false));
   }
 
   /**

@@ -124,7 +124,7 @@ public class PropertiesLoader
   private String readInclude(final String include) {
     String[] tokens = WHITE_SPACE_PATTERN.split(include, 3);
     if ((tokens == null) || (tokens.length < 3)) {
-      log.warn("could not process include '" + include + "' : not enough arguments");
+      log.warn("could not process include '{}' : not enough arguments", include);
       return EMPTY_STRING;
     }
     String result = null;

@@ -40,7 +40,7 @@ public class JPPFPermissions extends PermissionCollection
   /**
    * The list of permissions in this collection.
    */
-  private List<Permission> permissions = new Vector<Permission>();
+  private List<Permission> permissions = new Vector<>();
 
   /**
    * Adds a permission object to the current collection of permission objects.
@@ -127,7 +127,7 @@ public class JPPFPermissions extends PermissionCollection
     {
       synchronized(JPPFPermissions.this)
       {
-        enumPermissions = new Vector<Permission>();
+        enumPermissions = new Vector<>();
         enumPermissions.addAll(permissions);
       }
       //enumPermissions = permissions;

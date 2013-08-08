@@ -28,7 +28,7 @@ import java.util.concurrent.locks.Lock;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, CollectionMap<K, V>
+public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 {
   /**
    * The underlying map to which operations are delegated.

@@ -45,7 +45,7 @@ public class TraversalList<E> implements Serializable
    */
   public TraversalList()
   {
-    list = new LinkedList<E>();
+    list = new LinkedList<>();
   }
 
   /**

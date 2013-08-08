@@ -40,7 +40,6 @@ public class DirectBufferPool
   /**
    * 
    */
-  //private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolImpl();
   private static ObjectPool<ByteBuffer> pool = new DirectBufferPoolQueue();
 
   /**

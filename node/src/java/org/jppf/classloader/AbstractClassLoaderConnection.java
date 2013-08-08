@@ -93,7 +93,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
     resource.setDynamic(dynamic);
-    TraversalList<String> list = new TraversalList<String>(uuidPath);
+    TraversalList<String> list = new TraversalList<>(uuidPath);
     resource.setUuidPath(list);
     if (list.size() > 0) list.setPosition(uuidPath.size()-1);
     for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());

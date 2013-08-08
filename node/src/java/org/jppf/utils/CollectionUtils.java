@@ -45,7 +45,7 @@ public final class CollectionUtils
    */
   public static <T> Set<T> set(final T...array)
   {
-    Set<T> newSet = new HashSet<T>(array.length);
+    Set<T> newSet = new HashSet<>(array.length);
     for (T element: array) newSet.add(element);
     return newSet;
   }
@@ -58,7 +58,7 @@ public final class CollectionUtils
    */
   public static <T> List<T> list(final T...array)
   {
-    List<T> list = new ArrayList<T>(array.length);
+    List<T> list = new ArrayList<>(array.length);
     for (T element: array) list.add(element);
     return list;
   }
@@ -76,7 +76,7 @@ public final class CollectionUtils
     if (arrays == null) return null;
     int size = 0;
     for (T[] array: arrays) size += array.length;
-    List<T> result = new ArrayList<T>(size);
+    List<T> result = new ArrayList<>(size);
     T[] tmp = null;
     for (T[] array: arrays)
     {
@@ -107,7 +107,7 @@ public final class CollectionUtils
     List<U> list = map.get(key);
     if (list == null)
     {
-      list = new ArrayList<U>();
+      list = new ArrayList<>();
       map.put(key, list);
     }
     list.add(value);
@@ -186,7 +186,7 @@ public final class CollectionUtils
    */
   public static <T> List<T> getAllElements(final List<T> source, final int start, final int size)
   {
-    List<T> result = new ArrayList<T>(size);
+    List<T> result = new ArrayList<>(size);
     for (int i=0; i<size; i++) result.add(source.get(i+start));
     return result;
   }

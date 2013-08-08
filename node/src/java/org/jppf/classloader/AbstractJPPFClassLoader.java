@@ -143,7 +143,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (debugEnabled) log.debug(build("looking up definition for resource [", name, "]"));
     byte[] b = null;
     String resName = name.replace('.', '/') + ".class";
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("name", resName);
     JPPFResourceWrapper resource = null;
     synchronized(this) {
@@ -199,7 +199,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception {
     if (debugEnabled) log.debug(build(this, " requesting remote computation, requestUuid = ", requestUuid));
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("name", "callable");
     map.put("callable", callable);
     JPPFResourceWrapper resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
@@ -269,12 +269,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @Override
   @SuppressWarnings("unchecked")
   public Enumeration<URL> findResources(final String name) throws IOException {
-    List<URL> urlList = new ArrayList<URL>();
+    List<URL> urlList = new ArrayList<>();
     if (!notFoundCache.has(name)) {
       if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
       try {
         urlList = resourceCache.getResourcesURLs(name);
-        if (urlList == null) urlList = new ArrayList<URL>();
+        if (urlList == null) urlList = new ArrayList<>();
         if (!isOffline()) {
           List<URL> tempList = findRemoteResources(name);
           if (tempList != null) urlList.addAll(tempList);
@@ -290,7 +290,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       }
     }
     if (urlList.isEmpty()) notFoundCache.add(name);
-    return new IteratorEnumeration<URL>(urlList.iterator());
+    return new IteratorEnumeration<>(urlList.iterator());
   }
 
   /**
@@ -302,10 +302,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   @SuppressWarnings("unchecked")
   private List<URL> findRemoteResources(final String name) throws Exception {
-    List<URL> urlList = new ArrayList<URL>();
+    List<URL> urlList = new ArrayList<>();
     JPPFResourceWrapper resource = null;
     if (!notFoundCache.has(name)) {
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("name", name);
       map.put("multiple", "true");
       resource = loadResource(map);

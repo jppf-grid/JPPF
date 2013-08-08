@@ -33,7 +33,7 @@ public class JPPFSynchronizedSoftCache<K, V> implements JPPFMapCache<K, V>
   /**
    * The backing map for this cache.
    */
-  private final Map<K, V> map = new SoftReferenceValuesMap<K, V>();
+  private final Map<K, V> map = new SoftReferenceValuesMap<>();
 
   @Override
   public void put(final K key, final V value)

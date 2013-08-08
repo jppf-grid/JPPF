@@ -40,12 +40,12 @@ public class ConcurrentMapCopyOnWriteList<K, V> extends AbstractCollectionMap<K,
   @Override
   protected Map<K, Collection<V>> createMap()
   {
-    return new ConcurrentHashMap<K, Collection<V>>();
+    return new ConcurrentHashMap<>();
   }
 
   @Override
   protected Collection<V> newCollection()
   {
-    return new CopyOnWriteArrayList<V>();
+    return new CopyOnWriteArrayList<>();
   }
 }

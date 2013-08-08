@@ -47,7 +47,7 @@ public class ThreadDump implements Serializable
     if ((tis == null) || (tis.length <= 0)) threads = null;
     else
     {
-      threads = new TreeMap<Long, ThreadInformation>();
+      threads = new TreeMap<>();
       for (ThreadInfo ti: tis) threads.put(ti.getThreadId(), new ThreadInformation(ti));
     }
     long[] ids = threadMXBean.isSynchronizerUsageSupported() ? threadMXBean.findDeadlockedThreads() : null;

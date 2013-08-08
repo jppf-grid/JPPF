@@ -64,6 +64,6 @@ public class SortedSetSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
   @Override
   protected Collection<V> newCollection()
   {
-    return valueComparator == null ? new TreeSet<V>() : new TreeSet<V>(valueComparator);
+    return valueComparator == null ? new TreeSet<V>() : new TreeSet<>(valueComparator);
   }
 }

@@ -35,7 +35,7 @@ public class RangePattern
   /**
    * The list of ranges constituting this address pattern.
    */
-  protected List<Range<Integer>> ranges = new ArrayList<Range<Integer>>();
+  protected List<Range<Integer>> ranges = new ArrayList<>();
   /**
    * The configuration used for this pattern.
    */
@@ -130,7 +130,7 @@ public class RangePattern
   private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException
   {
     if ((src == null) || "".equals(src)) return config.fullRange;
-    if (src.indexOf('-') < 0) return new Range<Integer>(parseValue(src));
+    if (src.indexOf('-') < 0) return new Range<>(parseValue(src));
     String[] vals = MINUS_PATTERN.split(src);
     if ((vals == null) || vals.length == 0) return config.fullRange;
     if (vals.length > 2) throw new IllegalArgumentException(build("invalid range pattern (pattern: ", src, ")"));
@@ -155,7 +155,7 @@ public class RangePattern
       upper = "".equals(vals[1]) ? config.maxValue : parseValue(vals[1]);
     }
     if (upper < lower) throw new IllegalArgumentException(build("lower bound must be <= upper bound (pattern: ", src, ")"));
-    return new Range<Integer>(lower, upper);
+    return new Range<>(lower, upper);
   }
 
   /**

@@ -38,7 +38,7 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
   /**
    * The pool of {@link ByteBuffer}.
    */
-  protected final Queue<T> queue = new ConcurrentLinkedQueue<T>();
+  protected final Queue<T> queue = new ConcurrentLinkedQueue<>();
 
   @Override
   public T get()

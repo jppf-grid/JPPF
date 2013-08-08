@@ -87,7 +87,7 @@ public final class PatternConfiguration
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.compSeparator = compSeparator;
-    fullRange = new Range<Integer>(minValue, maxValue);
+    fullRange = new Range<>(minValue, maxValue);
     compSeparatorPattern = Pattern.compile((compSeparator == '.' ? "\\" : "") + compSeparator);
     this.valuePrefix = valuePrefix;
   }

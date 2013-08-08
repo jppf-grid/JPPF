@@ -48,7 +48,7 @@ public class LinkedListSortedMap<K, V> extends AbstractCollectionSortedMap<K, V>
   @Override
   protected Collection<V> newCollection()
   {
-    return new LinkedList<V>();
+    return new LinkedList<>();
   }
 
   /**

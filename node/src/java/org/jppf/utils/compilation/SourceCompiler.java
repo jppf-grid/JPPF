@@ -86,7 +86,7 @@ public class SourceCompiler implements Closeable
    */
   public void compileToFile(final Map<String, CharSequence> sources, final File classesDir) throws Exception
   {
-    List<File> files = new ArrayList<File>();
+    List<File> files = new ArrayList<>();
     files.add(classesDir);
     toFileManager.setLocation(StandardLocation.CLASS_OUTPUT, files);
     Boolean b = compile(sources, toFileManager);
@@ -122,7 +122,7 @@ public class SourceCompiler implements Closeable
   @SuppressWarnings("unchecked")
   private Boolean compile(final Map<String, CharSequence> sources, final JavaFileManager fmgr) throws Exception
   {
-    List<JavaFileObject> sourceObjects = new ArrayList<JavaFileObject>();
+    List<JavaFileObject> sourceObjects = new ArrayList<>();
     for (Map.Entry<String, CharSequence> entry: sources.entrySet())
     {
       sourceObjects.add(new CharSequenceSource(entry.getKey(), entry.getValue()));

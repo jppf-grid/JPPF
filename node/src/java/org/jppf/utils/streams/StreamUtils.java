@@ -89,33 +89,9 @@ public final class StreamUtils
    */
   public static byte[] getInputStreamAsByte(final InputStream is) throws IOException
   {
-    byte[] buffer = new byte[StreamConstants.TEMP_BUFFER_SIZE];
-    byte[] result = null;
     ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
-    boolean end = false;
-    try
-    {
-      while (!end)
-      {
-        int n = is.read(buffer, 0, buffer.length);
-        if (n < 0) end = true;
-        else baos.write(buffer, 0, n);
-      }
-      baos.flush();
-      result = baos.toByteArray();
-    }
-    finally
-    {
-      try
-      {
-        is.close();
-      }
-      finally
-      {
-        baos.close();
-      }
-    }
-    return result;
+    copyStream(is, baos, true);
+    return baos.toByteArray();
   }
 
   /**
@@ -127,26 +103,33 @@ public final class StreamUtils
    */
   public static void copyStream(final InputStream is, final OutputStream os) throws IOException
   {
-    try
-    {
+    copyStream(is, os, true);
+  }
+
+  /**
+   * Copy the data read from the specified input stream to the specified output stream.
+   * This method closes both streams before terminating.
+   * @param is the input stream to read from.
+   * @param os the output stream to write to.
+   * @param closeStreams <code>true</code> to cause the streams to be closed at the end of the copy, <code>false</code> otherwise.
+   * @throws IOException if an I/O error occurs.
+   */
+  public static void copyStream(final InputStream is, final OutputStream os, final boolean closeStreams) throws IOException {
+    try {
       byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
-      while(true)
-      {
+      while(true) {
         int n = is.read(bytes);
         if (n <= 0) break;
         os.write(bytes, 0, n);
       }
       os.flush();
-    }
-    finally
-    {
-      try
-      {
-        is.close();
-      }
-      finally
-      {
-        os.close();
+    } finally {
+      if (closeStreams) {
+        try {
+          is.close();
+        } finally {
+          os.close();
+        }
       }
     }
   }

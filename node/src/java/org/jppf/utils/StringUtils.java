@@ -178,7 +178,7 @@ public final class StringUtils
    */
   public static byte[] toBytes(final String hexString) {
     String[] bytes = hexString.split("\\s");
-    List<Byte> list = new ArrayList<Byte>(bytes.length);
+    List<Byte> list = new ArrayList<>(bytes.length);
     byte[] result = new byte[list.size()];
     for (int i=0; i<bytes.length; i++) {
       int n = Byte.parseByte(bytes[i].substring(0, 1), 16);
@@ -440,7 +440,7 @@ public final class StringUtils
     ClassLoader cl = leafClassLoader;
     if (cl != null) {
       sb.append("class loader hierarchy:\n");
-      Stack<String> stack = new Stack<String>();
+      Stack<String> stack = new Stack<>();
       while (cl != null) {
         if (cl instanceof AbstractJPPFClassLoader) stack.push(cl.toString());
         else if (cl instanceof URLClassLoader) stack.push(toString((URLClassLoader) cl));

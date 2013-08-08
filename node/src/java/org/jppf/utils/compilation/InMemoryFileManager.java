@@ -33,7 +33,7 @@ class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileM
   /**
    * Map of class names to JavaFileObject instances for the bytecode.
    */
-  private Map<String, BytecodeObject> classMap = new HashMap<String, BytecodeObject>();
+  private Map<String, BytecodeObject> classMap = new HashMap<>();
 
   /**
    * Construct this file manager.
@@ -73,7 +73,7 @@ class InMemoryFileManager<M extends JavaFileManager> extends ForwardingJavaFileM
    */
   public Map<String, byte[]> getAllByteCodes()
   {
-    Map<String, byte[]> result = new HashMap<String, byte[]>();
+    Map<String, byte[]> result = new HashMap<>();
     for (Map.Entry<String, BytecodeObject> entry: classMap.entrySet())
     {
       result.put(entry.getKey(), entry.getValue().getBytecode());

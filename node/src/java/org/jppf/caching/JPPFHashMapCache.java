@@ -31,7 +31,7 @@ public class JPPFHashMapCache<K, V> implements JPPFMapCache<K, V>
   /**
    * The backing map for this cache.
    */
-  private final Map<K, V> map = new HashMap<K, V>();
+  private final Map<K, V> map = new HashMap<>();
 
   @Override
   public void put(final K key, final V value)

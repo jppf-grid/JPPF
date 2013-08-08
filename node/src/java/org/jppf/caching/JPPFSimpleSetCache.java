@@ -30,7 +30,7 @@ public class JPPFSimpleSetCache<E> implements JPPFCollectionCache<E>
   /**
    * The backing set for this cache.
    */
-  private final Set<E> set = new HashSet<E>();
+  private final Set<E> set = new HashSet<>();
 
   @Override
   public void add(final E element)

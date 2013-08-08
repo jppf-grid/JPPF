@@ -159,7 +159,7 @@ class Deserializer
   void readFields(final ClassDescriptor cd, final Object obj) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
-    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<ClassDescriptor>();
+    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
     while (tmpDesc != null)
     {
       stack.addFirst(tmpDesc);
@@ -283,7 +283,7 @@ class Deserializer
   private void readClassDescriptors() throws Exception
   {
     int n = in.readInt();
-    List<ClassDescriptor> list = new ArrayList<ClassDescriptor>(n > 0 ? n : 10);
+    List<ClassDescriptor> list = new ArrayList<>(n > 0 ? n : 10);
     for (int i=0; i<n; i++)
     {
       ClassDescriptor cd = new ClassDescriptor();

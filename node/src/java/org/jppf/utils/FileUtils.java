@@ -63,7 +63,7 @@ public final class FileUtils {
    * @throws IOException if the file can't be found or read.
    */
   public static List<String> textFileAsLines(final Reader aReader) throws IOException {
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
     try {
       String s = "";
@@ -216,7 +216,7 @@ public final class FileUtils {
     InputStream is = getFileInputStream(fileListPath);
     String content = readTextFile(new BufferedReader(new InputStreamReader(is)));
     BufferedReader reader = new BufferedReader(new StringReader(content));
-    List<String> filePaths = new ArrayList<String>();
+    List<String> filePaths = new ArrayList<>();
     try {
       boolean end = false;
       while (!end) {

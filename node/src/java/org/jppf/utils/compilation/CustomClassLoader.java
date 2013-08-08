@@ -32,7 +32,7 @@ class CustomClassLoader extends URLClassLoader
    * A cache of the definitions of the classes loaded by this class loader.<br>
    * This is in fact the "classpath" for this class loader.
    */
-  private Map<String, byte[]> bytecodes = new Hashtable<String, byte[]>();
+  private Map<String, byte[]> bytecodes = new Hashtable<>();
 
   /**
    * Initialize this class loader with the specified urls and parent.

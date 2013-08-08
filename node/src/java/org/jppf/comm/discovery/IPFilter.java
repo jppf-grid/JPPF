@@ -43,11 +43,11 @@ public class IPFilter
   /**
    * List of accepted IP address patterns.
    */
-  private List<AbstractIPAddressPattern> includePatterns = new ArrayList<AbstractIPAddressPattern>();
+  private List<AbstractIPAddressPattern> includePatterns = new ArrayList<>();
   /**
    * List of rejected IP address patterns.
    */
-  private List<AbstractIPAddressPattern> excludePatterns = new ArrayList<AbstractIPAddressPattern>();
+  private List<AbstractIPAddressPattern> excludePatterns = new ArrayList<>();
   /**
    * The loaded configuration.
    */

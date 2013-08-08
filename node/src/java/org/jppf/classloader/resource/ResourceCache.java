@@ -49,7 +49,7 @@ public class ResourceCache
   /**
    * A map of all resource caches to their uuid.
    */
-  private static final Map<String, ResourceCache> cacheMap = new Hashtable<String, ResourceCache>();
+  private static final Map<String, ResourceCache> cacheMap = new Hashtable<>();
   /**
    * Name of the resource cache root.
    */
@@ -57,11 +57,11 @@ public class ResourceCache
   /**
    * Map of resource names to temporary file names to which their content is stored.
    */
-  private Map<String, List<Location>> cache = new Hashtable<String, List<Location>>();
+  private Map<String, List<Location>> cache = new Hashtable<>();
   /**
    * List of temp folders used by this cache.
    */
-  private List<String> tempFolders = new LinkedList<String>();
+  private List<String> tempFolders = new LinkedList<>();
   /**
    * The unique identifier for this resource cache.
    */
@@ -125,7 +125,7 @@ public class ResourceCache
   {
     List<Location> resources = getResourcesLocations(name);
     if (resources == null) return null;
-    List<URL> urls = new ArrayList<URL>(resources.size());
+    List<URL> urls = new ArrayList<>(resources.size());
     int count = 0;
     for (Location res: resources)
     {
@@ -184,7 +184,7 @@ public class ResourceCache
   public synchronized void registerResources(final String name, final List<byte[]> definitions)
   {
     if (isAbsolutePath(name)) return;
-    List<Location> locations = new LinkedList<Location>();
+    List<Location> locations = new LinkedList<>();
     for (byte[] def: definitions)
     {
       try

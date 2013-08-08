@@ -52,7 +52,7 @@ public class ReflectionUtils
    */
   public static String dumpObject(final Object o, final String separator, final boolean displaySimpleClassName, final boolean displayHashCode, final String...names)
   {
-    Set<String> fieldNames = new LinkedHashSet<String>();
+    Set<String> fieldNames = new LinkedHashSet<>();
     if (names != null) Collections.addAll(fieldNames, names);
     if (o == null) return "null";
     Class<?> clazz = o.getClass();
@@ -209,7 +209,7 @@ public class ReflectionUtils
    */
   public static Method[] getAllBeanMethods(final Class clazz, final boolean getters)
   {
-    List<Method> methodList = new ArrayList<Method>();
+    List<Method> methodList = new ArrayList<>();
     Method[] allMethods = clazz.getMethods();
     for (Method meth: allMethods)
     {

@@ -40,12 +40,12 @@ public class SetIdentityMap<K, V> extends AbstractCollectionMap<K, V>
   @Override
   protected Map<K, Collection<V>> createMap()
   {
-    return new IdentityHashMap<K, Collection<V>>();
+    return new IdentityHashMap<>();
   }
 
   @Override
   protected Collection<V> newCollection()
   {
-    return new HashSet<V>();
+    return new HashSet<>();
   }
 }

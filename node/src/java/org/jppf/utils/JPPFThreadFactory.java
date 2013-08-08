@@ -127,7 +127,7 @@ public class JPPFThreadFactory implements ThreadFactory
     this.monitoringEnabled = monitoringEnabled;
     this.priority = priority;
     this.doPrivileged = doPrivileged;
-    if (monitoringEnabled) threadIDs = new ArrayList<Long>();
+    if (monitoringEnabled) threadIDs = new ArrayList<>();
   }
 
   /**

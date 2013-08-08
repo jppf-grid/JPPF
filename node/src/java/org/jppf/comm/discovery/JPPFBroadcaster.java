@@ -56,7 +56,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
   /**
    * Used to keep track of sockets for which an error was detected.
    */
-  private Set<Pair<MulticastSocket, DatagramPacket>> socketsInError = new HashSet<Pair<MulticastSocket, DatagramPacket>>();
+  private Set<Pair<MulticastSocket, DatagramPacket>> socketsInError = new HashSet<>();
 
   /**
    * Initialize this broadcaster using the server configuration information.
@@ -82,7 +82,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
     addresses.addAll(NetworkUtils.getNonLocalIPV6Addresses());
     if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
     IPFilter filter = new IPFilter(props, true);
-    List<InetAddress> filteredAddresses = new LinkedList<InetAddress>();
+    List<InetAddress> filteredAddresses = new LinkedList<>();
     for (InetAddress addr: addresses) if (filter.isAddressAccepted(addr)) filteredAddresses.add(addr);
     if (debugEnabled)
     {
@@ -93,7 +93,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
       for (InetAddress addr: filteredAddresses) sb.append(' ').append(addr.getHostAddress());
       log.debug(sb.toString());
     }
-    socketsInfo = new ArrayList<Pair<MulticastSocket, DatagramPacket>>(filteredAddresses.size());
+    socketsInfo = new ArrayList<>(filteredAddresses.size());
     for (InetAddress addr: addresses)
     {
       try
@@ -108,7 +108,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
         DatagramPacket packet = new DatagramPacket(buffer.array(), 512, InetAddress.getByName(group), port);
         MulticastSocket socket = new MulticastSocket(port);
         socket.setInterface(addr);
-        socketsInfo.add(new Pair<MulticastSocket, DatagramPacket>(socket, packet));
+        socketsInfo.add(new Pair<>(socket, packet));
       }
       catch(Exception e)
       {

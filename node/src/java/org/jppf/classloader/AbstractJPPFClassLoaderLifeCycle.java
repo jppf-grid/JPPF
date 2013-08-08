@@ -60,7 +60,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The unique identifier for the submitting application.
    * @exclude
    */
-  protected List<String> uuidPath = new ArrayList<String>();
+  protected List<String> uuidPath = new ArrayList<>();
   /**
    * Uuid of the original task bundle that triggered a resource loading request.
    * @exclude
@@ -75,7 +75,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The cache handling resources that were not found by this class loader.
    * @exclude
    */
-  protected final JPPFCollectionCache<String> notFoundCache = new JPPFSimpleSetCache<String>();
+  protected final JPPFCollectionCache<String> notFoundCache = new JPPFSimpleSetCache<>();
   /**
    * Uniquely identifies this class loader instance.
    * @exclude
@@ -294,7 +294,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         results = ((AbstractJPPFClassLoader) parent).getMultipleResources(names);
       }
       for (int i=0; i<length; i++) if (results[i] == null) results[i] = super.getResource(names[i]);
-      List<Integer> indices = new ArrayList<Integer>();
+      List<Integer> indices = new ArrayList<>();
       for (int i=0; i<length; i++) if (results[i] == null) indices.add(i);
       if (!indices.isEmpty()) {
         String[] namesToFind = new String[indices.size()];

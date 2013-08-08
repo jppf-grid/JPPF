@@ -37,11 +37,11 @@ class DeserializationCaches
   /**
    * Mapping of handles to corresponding class descriptors.
    */
-  Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<Integer, ClassDescriptor>();
+  Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<>();
   /**
    * Mapping of handles to corresponding objects.
    */
-  Map<Integer, Object> handleToObjectMap = new HashMap<Integer, Object>();
+  Map<Integer, Object> handleToObjectMap = new HashMap<>();
 
   /**
    * Default constructor.
@@ -49,7 +49,7 @@ class DeserializationCaches
   DeserializationCaches()
   {
     Set<Map.Entry<Class<?>, ClassDescriptor>> entries = SerializationCaches.globalTypesMap.entrySet();
-    List<ClassDescriptor> list = new ArrayList<ClassDescriptor>(entries.size());
+    List<ClassDescriptor> list = new ArrayList<>(entries.size());
     for (Map.Entry<Class<?>, ClassDescriptor> entry: entries)
     {
       ClassDescriptor cd = entry.getValue();
@@ -111,7 +111,7 @@ class DeserializationCaches
       if (cd.clazz != null) continue;
       if (cd.array)
       {
-        List<ClassDescriptor> types = new ArrayList<ClassDescriptor>();
+        List<ClassDescriptor> types = new ArrayList<>();
         ClassDescriptor tmp = cd;
         while (tmp != null)
         {

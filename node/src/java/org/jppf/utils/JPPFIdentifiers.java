@@ -50,7 +50,7 @@ public final class JPPFIdentifiers
   /**
    * Mapping of ids to readable names.
    */
-  private static Map<Integer, String> idMap = new HashMap<Integer, String>();
+  private static Map<Integer, String> idMap = new HashMap<>();
 
   static
   {

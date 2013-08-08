@@ -49,7 +49,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * The list of listeners to this object's events.
    */
-  private final List<ClientConnectionListener> listeners = new ArrayList<ClientConnectionListener>();
+  private final List<ClientConnectionListener> listeners = new ArrayList<>();
 
   /**
    * Initialize this client connection with the specified uuid.

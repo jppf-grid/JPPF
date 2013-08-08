@@ -98,7 +98,7 @@ public final class SerializationReflectionHelper
   {
     Field[] allFields = clazz.getDeclaredFields();
     if (allFields.length <= 0) return allFields;
-    List<Field> fields = new ArrayList<Field>(allFields.length);
+    List<Field> fields = new ArrayList<>(allFields.length);
     for (Field f: allFields)
     {
       int mod = f.getModifiers();
@@ -278,7 +278,7 @@ public final class SerializationReflectionHelper
   /**
    * A cache of constructors used for deserialization.
    */
-  private static final Map<Class<?>, Constructor> CONSTRUCTOR_MAP = new SoftReferenceValuesMap<Class<?>, Constructor>();
+  private static final Map<Class<?>, Constructor> CONSTRUCTOR_MAP = new SoftReferenceValuesMap<>();
 
   /**
    * Create an object without calling any of its class constructors.
@@ -336,7 +336,7 @@ public final class SerializationReflectionHelper
   /**
    * A cache of constructors used for deserialization.
    */
-  private static final Map<Class<?>, ConstructorWithParameters> DEFAULT_CONSTRUCTOR_MAP = new SoftReferenceValuesMap<Class<?>, ConstructorWithParameters>();
+  private static final Map<Class<?>, ConstructorWithParameters> DEFAULT_CONSTRUCTOR_MAP = new SoftReferenceValuesMap<>();
 
   /**
    * Instantiate an object from one of its class' existing constructor.

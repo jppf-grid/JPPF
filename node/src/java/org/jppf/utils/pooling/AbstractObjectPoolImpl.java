@@ -28,7 +28,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
   /**
    * The pool of objects.
    */
-  protected final LinkedData<T> data = new LinkedData<T>();
+  protected final LinkedData<T> data = new LinkedData<>();
 
   /**
    * {@inheritDoc}
@@ -98,7 +98,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
      */
     public void put(final E content)
     {
-      LinkedNode<E> node = new LinkedNode<E>(content);
+      LinkedNode<E> node = new LinkedNode<>(content);
       synchronized(this)
       {
         if (tail != null)

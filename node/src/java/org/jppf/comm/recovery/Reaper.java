@@ -62,7 +62,7 @@ public class Reaper
   /**
    * The list of listeners to this object's events.
    */
-  private final List<ReaperListener> listeners = new ArrayList<ReaperListener>();
+  private final List<ReaperListener> listeners = new ArrayList<>();
 
   /**
    * Initialize this reaper with the specified recovery server.
@@ -168,7 +168,7 @@ public class Reaper
     public void run()
     {
       ServerConnection[] connections = server.connections();
-      List<Future<?>> futures = new ArrayList<Future<?>>(connections.length);
+      List<Future<?>> futures = new ArrayList<>(connections.length);
       for (ServerConnection c: connections) futures.add(threadPool.submit(c));
       for (Future<?> f: futures)
       {

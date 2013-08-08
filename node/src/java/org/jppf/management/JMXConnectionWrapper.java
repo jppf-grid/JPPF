@@ -62,7 +62,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * A connection to the MBean server.
    */
-  protected AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<MBeanServerConnection>(null);
+  protected AtomicReference<MBeanServerConnection> mbeanConnection = new AtomicReference<>(null);
   /**
    * The host the server is running on.
    */
@@ -74,7 +74,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * The connection thread that performs the connection to the management server.
    */
-  protected AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<JMXConnectionThread>(null);
+  protected AtomicReference<JMXConnectionThread> connectionThread = new AtomicReference<>(null);
   /**
    * A string representing this connection, used for logging purposes.
    */
@@ -94,11 +94,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * JMX properties used for establishing the connection.
    */
-  protected Map<String, Object> env = new HashMap<String, Object>();
+  protected Map<String, Object> env = new HashMap<>();
   /**
    * Determines whether the JMX connection should be secure or not.
    */
-  protected boolean secure = false;
+  protected boolean sslEnabled = false;
   /**
    * 
    */
@@ -107,8 +107,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * Initialize a local connection (same JVM) to the MBean server.
    */
-  public JMXConnectionWrapper()
-  {
+  public JMXConnectionWrapper() {
     local = true;
     idString = displayName = "local";
     host = "local";
@@ -117,56 +116,23 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * Initialize the connection to the remote MBean server.
    * @param host the host the server is running on.
-   * @param port the RMI port used by the server.
-   * @param rmiSuffix	RMI registry namespace suffix.
-   * @deprecated JPPF no longer uses the RMI remote connector for JMX.
-   * @exclude
-   */
-  private JMXConnectionWrapper(final String host, final int port, final String rmiSuffix)
-  {
-    this.host = host;
-    this.port = port;
-
-    try
-    {
-      idString = host + ':' + port;
-      displayName = idString;
-      String s = null;
-      if (!JMXServerFactory.isUsingRMIConnector() && JMXServerFactory.isJMXMPPresent()) s = "service:jmx:jmxmp://" + idString;
-      else s = "service:jmx:rmi:///jndi/rmi://" + idString + rmiSuffix;
-      url = new JMXServiceURL(s);
-    }
-    catch(Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-    local = false;
-  }
-
-  /**
-   * Initialize the connection to the remote MBean server.
-   * @param host the host the server is running on.
    * @param port the port used by the server.
-   * @param ssl specifies whether the jmx connection should be secure or not.
+   * @param sslEnabled specifies whether the jmx connection should be secure or not.
    */
-  public JMXConnectionWrapper(final String host, final int port, final boolean ssl)
-  {
-    try
-    {
+  public JMXConnectionWrapper(final String host, final int port, final boolean sslEnabled) {
+    try {
       this.host = (NetworkUtils.isIPv6Address(host)) ? "[" + host + "]" : host;
       this.port = port;
-      this.secure = ssl;
+      this.sslEnabled = sslEnabled;
       idString = this.host + ':' + this.port;
       this.displayName = this.idString;
       url = new JMXServiceURL("service:jmx:jmxmp://" + idString);
-      if (ssl) SSLHelper.configureJMXProperties(env);
+      if (sslEnabled) SSLHelper.configureJMXProperties(env);
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     local = false;
@@ -175,23 +141,17 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * Initialize the connection to the remote MBean server.
    */
-  public void connect()
-  {
+  public void connect() {
     if (isConnected()) return;
-    if (local)
-    {
+    if (local) {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
       setConnectedStatus(true);
-    }
-    else
-    {
+    } else {
       JMXConnectionThread jct = null;
       boolean jctNull = true;
-      synchronized(this)
-      {
+      synchronized(this) {
         jctNull = (jct = connectionThread.get()) == null;
-        if (jctNull)
-        {
+        if (jctNull) {
           jct = new JMXConnectionThread(this);
           connectionThread.set(jct);
           Thread t = new Thread(jct, "JMX connection " + getId());
@@ -208,8 +168,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param timeout the maximum time to wait for, a value of zero means no timeout and
    * this method just waits until the connection is established.
    */
-  public void connectAndWait(final long timeout)
-  {
+  public void connectAndWait(final long timeout) {
     if (isConnected()) return;
     long start = System.currentTimeMillis();
     long max = timeout > 0 ? timeout : Long.MAX_VALUE;
@@ -222,22 +181,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Initialize the connection to the remote MBean server.
    * @throws Exception if the connection could not be established.
    */
-  void performConnection() throws Exception
-  {
+  void performConnection() throws Exception {
     setConnectedStatus(false);
-    synchronized(connectionLock)
-    {
+    synchronized(connectionLock) {
       jmxc = JMXConnectorFactory.connect(url, env);
     }
-    synchronized(this)
-    {
+    synchronized(this) {
       mbeanConnection.set(jmxc.getMBeanServerConnection());
-      try
-      {
+      try {
         setHost(InetAddress.getByName(host).getHostName());
-      }
-      catch (UnknownHostException e)
-      {
+      } catch (UnknownHostException e) {
       }
     }
     setConnectedStatus(true);
@@ -248,8 +201,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Close the connection to the remote MBean server.
    * @throws Exception if the connection could not be closed.
    */
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
     if (connectionThread.get() != null) connectionThread.get().close();
     if (jmxc != null) jmxc.close();
   }
@@ -263,27 +215,19 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
-  {
+  public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
     if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
-    synchronized(this)
-    {
+    synchronized(this) {
       Object result = null;
-      try
-      {
+      try {
         ObjectName mbeanName = new ObjectName(name);
         result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
-      }
-      catch(IOException e)
-      {
+      } catch(IOException e) {
         if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
         setConnectedStatus(false);
-        try
-        {
+        try {
           if (jmxc != null) jmxc.close();
-        }
-        catch(Exception e2)
-        {
+        } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
         if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
@@ -301,8 +245,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public Object invoke(final String name, final String methodName) throws Exception
-  {
+  public Object invoke(final String name, final String methodName) throws Exception {
     return invoke(name, methodName, (Object[]) null, (String[]) null);
   }
 
@@ -313,26 +256,18 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an object or null.
    * @throws Exception if the invocation failed.
    */
-  public Object getAttribute(final String name, final String attribute) throws Exception
-  {
+  public Object getAttribute(final String name, final String attribute) throws Exception {
     if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
-    synchronized(this)
-    {
+    synchronized(this) {
       Object result = null;
-      try
-      {
+      try {
         ObjectName mbeanName = new ObjectName(name);
         result = getMbeanConnection().getAttribute(mbeanName, attribute);
-      }
-      catch(IOException e)
-      {
+      } catch(IOException e) {
         setConnectedStatus(false);
-        try
-        {
+        try {
           if (jmxc != null) jmxc.close();
-        }
-        catch(Exception e2)
-        {
+        } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
         if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
@@ -350,25 +285,17 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param value the value to set on the attribute.
    * @throws Exception if the invocation failed.
    */
-  public void setAttribute(final String name, final String attribute, final Object value) throws Exception
-  {
+  public void setAttribute(final String name, final String attribute, final Object value) throws Exception {
     if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return;
-    synchronized(this)
-    {
-      try
-      {
+    synchronized(this) {
+      try {
         ObjectName mbeanName = new ObjectName(name);
         getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
-      }
-      catch(IOException e)
-      {
+      } catch(IOException e) {
         setConnectedStatus(false);
-        try
-        {
+        try {
           if (jmxc != null) jmxc.close();
-        }
-        catch(Exception e2)
-        {
+        } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
         if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
@@ -382,8 +309,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get the host the server is running on.
    * @return the host as a string.
    */
-  public String getHost()
-  {
+  public String getHost() {
     return host;
   }
 
@@ -391,8 +317,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get the host the server is running on.
    * @param host the host as a string.
    */
-  public void setHost(final String host)
-  {
+  public void setHost(final String host) {
     this.host = host;
     //this.idString = this.host + ':' + this.port;
     this.displayName = this.host + ':' + this.port;
@@ -402,8 +327,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get the JMX remote port used by the server.
    * @return the port as an int.
    */
-  public int getPort()
-  {
+  public int getPort() {
     return port;
   }
 
@@ -411,8 +335,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get a string describing this connection.
    * @return a string in the format host:port.
    */
-  public String getId()
-  {
+  public String getId() {
     return idString;
   }
 
@@ -420,8 +343,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get the service URL of the MBean server.
    * @return a {@link JMXServiceURL} instance.
    */
-  public JMXServiceURL getURL()
-  {
+  public JMXServiceURL getURL() {
     return url;
   }
 
@@ -429,8 +351,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get the connection to the MBean server.
    * @return a <code>MBeanServerConnection</code> instance.
    */
-  public MBeanServerConnection getMbeanConnection()
-  {
+  public MBeanServerConnection getMbeanConnection() {
     return mbeanConnection.get();
   }
 
@@ -438,8 +359,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Set the connected state of this connection wrapper.
    * @param status true if the jmx connection is established, false otherwise.
    */
-  protected void setConnectedStatus(final boolean status)
-  {
+  protected void setConnectedStatus(final boolean status) {
     connected.set(status);
     wakeUp();
   }
@@ -448,8 +368,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Determines whether the connection to the JMX server has been established.
    * @return true if the connection is established, false otherwise.
    */
-  public boolean isConnected()
-  {
+  public boolean isConnected() {
     return connected.get();
   }
 
@@ -461,8 +380,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an instance of the specified proxy interface.
    * @throws Exception if any error occurs.
    */
-  public <T> T getProxy(final String name, final Class<T> inf) throws Exception
-  {
+  public <T> T getProxy(final String name, final Class<T> inf) throws Exception {
     return getProxy(new ObjectName(name), inf);
   }
 
@@ -474,11 +392,9 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @return an instance of the specified proxy interface.
    * @throws Exception if any error occurs.
    */
-  public <T> T getProxy(final ObjectName objectName, final Class<T> inf) throws Exception
-  {
+  public <T> T getProxy(final ObjectName objectName, final Class<T> inf) throws Exception {
     if (!isConnected()) connect();
-    if (isConnected())
-    {
+    if (isConnected()) {
       MBeanServerConnection mbsc = getMbeanConnection();
       return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
     }
@@ -491,8 +407,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param listener the listener to add.
    * @throws Exception if any error occurs.
    */
-  public void addNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception
-  {
+  public void addNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception {
     mbeanConnection.get().addNotificationListener(new ObjectName(mBeanName), listener, null, null);
   }
 
@@ -504,8 +419,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param handback the handback object to use.
    * @throws Exception if any error occurs.
    */
-  public void addNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception
-  {
+  public void addNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
     mbeanConnection.get().addNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
   }
 
@@ -515,8 +429,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param listener the listener to remove.
    * @throws Exception if any error occurs.
    */
-  public void removeNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception
-  {
+  public void removeNotificationListener(final String mBeanName, final NotificationListener listener) throws Exception {
     mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, null, null);
   }
 
@@ -528,14 +441,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @param handback the handback object used.
    * @throws Exception if any error occurs.
    */
-  public void removeNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception
-  {
+  public void removeNotificationListener(final String mBeanName, final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
     mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
   }
 
   @Override
-  public JPPFSystemInformation systemInformation() throws Exception
-  {
+  public JPPFSystemInformation systemInformation() throws Exception {
     throw new JPPFException("this method is not implemented");
   }
 
@@ -543,8 +454,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Get the string representing this connection, used for displaying in the admin conosle.
    * @return the display name as a string.
    */
-  public String getDisplayName()
-  {
+  public String getDisplayName() {
     return displayName;
   }
 
@@ -552,20 +462,18 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Determine whether the JMX connection is secure or not.
    * @return <code>true</code> if this connection is secure, <code>false</code> otherwise.
    */
-  public boolean isSecure()
-  {
-    return secure;
+  public boolean isSecure() {
+    return sslEnabled;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('[');
     //sb.append(", idString=").append( idString);
     sb.append("url=").append( url);
     sb.append(", connected=").append( connected);
     sb.append(", local=").append( local);
-    sb.append(", secure=").append( secure);
+    sb.append(", secure=").append( sslEnabled);
     sb.append(']');
     return sb.toString();
   }

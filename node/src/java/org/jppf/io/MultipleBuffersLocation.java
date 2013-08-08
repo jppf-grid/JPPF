@@ -66,7 +66,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
    */
   public MultipleBuffersLocation(final int size)
   {
-    list = new ArrayList<JPPFBuffer>();
+    list = new ArrayList<>();
     list.add(new JPPFBuffer(new byte[size], size));
     this.size = size;
   }
@@ -88,7 +88,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
    */
   public MultipleBuffersLocation(final JPPFBuffer...buffers)
   {
-    this.list = new ArrayList<JPPFBuffer>(buffers.length);
+    this.list = new ArrayList<>(buffers.length);
     this.size = 0;
     for (JPPFBuffer buf: buffers)
     {
@@ -103,7 +103,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
    */
   public MultipleBuffersLocation(final byte[]...buffers)
   {
-    this.list = new ArrayList<JPPFBuffer>(buffers.length);
+    this.list = new ArrayList<>(buffers.length);
     this.size = 0;
     for (byte[] buf: buffers)
     {
@@ -307,7 +307,7 @@ public class MultipleBuffersLocation extends AbstractDataLocation
   @Override
   public DataLocation copy()
   {
-    List<JPPFBuffer> copyList = new ArrayList<JPPFBuffer>();
+    List<JPPFBuffer> copyList = new ArrayList<>();
     for (JPPFBuffer buf: list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));
     return new MultipleBuffersLocation(copyList, size);
   }

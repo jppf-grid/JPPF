@@ -113,7 +113,7 @@ public class ThreadInformation implements Serializable
     LockInfo[] sync = ti.getLockedSynchronizers();
     if (sync.length > 0)
     {
-      ownableSynchronizers = new ArrayList<LockInformation>();
+      ownableSynchronizers = new ArrayList<>();
       for (LockInfo li: sync) ownableSynchronizers.add(new LockInformation(li));
       if (debugEnabled) log.debug("thread '" + name + "' ownable synchronizers: " + ownableSynchronizers);
     }
@@ -133,8 +133,8 @@ public class ThreadInformation implements Serializable
   {
     StackTraceElement[] ste = ti.getStackTrace();
     if (ste.length <= 0) return null;
-    List<StackFrameInformation> result = new ArrayList<StackFrameInformation>();
-    SortedMap<Integer, LockInformation> lockInfoMap = new TreeMap<Integer, LockInformation>();
+    List<StackFrameInformation> result = new ArrayList<>();
+    SortedMap<Integer, LockInformation> lockInfoMap = new TreeMap<>();
     for (MonitorInfo mi: ti.getLockedMonitors())
     {
       int idx = mi.getLockedStackDepth();

@@ -28,7 +28,7 @@ import org.jppf.utils.*;
  * Abstract implementation of the {@link Node} interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractNode extends ThreadSynchronization implements NodeInternal, Runnable
+public abstract class AbstractNode extends ThreadSynchronization implements NodeInternal
 {
   /**
    * Utility for deserialization and serialization.
