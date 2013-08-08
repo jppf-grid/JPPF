@@ -108,7 +108,7 @@ public class Scenario
   {
     try
     {
-      Map<String, Object> variables = new HashMap<String, Object>();
+      Map<String, Object> variables = new HashMap<>();
       variables.put("$n", 1);
       variables.put("$scenario_dir", configDir.getPath());
       variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
@@ -238,7 +238,7 @@ public class Scenario
       HealthSnapshot info = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
       getJmx().invoke(name, "gc", (Object[]) null, (String[]) null);
       HealthSnapshot info2 = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
-      return new JMXResult<DiagnosticsResult>(getJmx().getURL().toString(), new DiagnosticsResult(info, info2));
+      return new JMXResult<>(getJmx().getURL().toString(), new DiagnosticsResult(info, info2));
     }
   }
 }

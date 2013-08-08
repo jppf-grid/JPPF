@@ -120,7 +120,7 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
    */
   private static Map<String, Object> createVariables(final String dir)
   {
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("$scenario_dir", dir);
     return vars;
   }

@@ -32,7 +32,7 @@ public class JMXHandler
   /**
    * Cache of <i>distinct</i> driver JMX connections. There is one entry per driver to which the client is connected.
    */
-  private final Map<String, JMXDriverConnectionWrapper> wrapperMap = new HashMap<String, JMXDriverConnectionWrapper>();
+  private final Map<String, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
   /**
    * The JPPF client from which fetch the JMX connections.
    */
@@ -56,7 +56,7 @@ public class JMXHandler
   public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
   {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<Integer, JPPFClientConnection>();
+    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<>();
     boolean allConnected = false;
     while (!allConnected)
     {
@@ -125,10 +125,10 @@ public class JMXHandler
    */
   public <D, N> Map<JMXResult<D>, List<JMXResult<N>>> performJmxOperations(final JmxAwareCallable<D> driverOp, final JmxAwareCallable<N> nodeOp) throws Exception
   {
-    Map<JMXResult<D>, List<JMXResult<N>>> map = new HashMap<JMXResult<D>, List<JMXResult<N>>>();
+    Map<JMXResult<D>, List<JMXResult<N>>> map = new HashMap<>();
     for (Map.Entry<String, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet())
     {
-      List<JMXResult<N>> list = new ArrayList<JMXResult<N>>();
+      List<JMXResult<N>> list = new ArrayList<>();
       driverOp.setJmx(entry.getValue());
       JMXResult<D> t = driverOp.call();
       map.put(t, list);

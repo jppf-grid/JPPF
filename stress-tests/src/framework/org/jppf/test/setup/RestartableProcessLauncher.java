@@ -31,7 +31,7 @@ import test.org.jppf.test.setup.*;
  * 
  * @author Laurent Cohen
  */
-public class RestartableProcessLauncher extends GenericProcessLauncher implements Runnable
+public class RestartableProcessLauncher extends GenericProcessLauncher
 {
   /**
    * Logger for this class.
@@ -52,11 +52,11 @@ public class RestartableProcessLauncher extends GenericProcessLauncher implement
   /**
    * Caching of the created config files.
    */
-  private List<String> tempFileCache = new ArrayList<String>();
+  private List<String> tempFileCache = new ArrayList<>();
   /**
    * A map of variable names to their value, which can be used in a groovy expression.
    */
-  protected final Map<String, Object> variables = new HashMap<String, Object>();
+  protected final Map<String, Object> variables = new HashMap<>();
 
   /**
    * Default constructor.

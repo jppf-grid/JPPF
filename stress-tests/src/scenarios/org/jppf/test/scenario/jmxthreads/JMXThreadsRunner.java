@@ -93,7 +93,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
    */
   private void restartNodes(final Collection<JPPFManagementInfo> nodesInfo) throws Exception
   {
-    List<Future<RestartNode>> futures = new ArrayList<Future<RestartNode>>(nodesInfo.size());
+    List<Future<RestartNode>> futures = new ArrayList<>(nodesInfo.size());
     for (JPPFManagementInfo info: nodesInfo)
     {
       RestartNode task = new RestartNode(info);
