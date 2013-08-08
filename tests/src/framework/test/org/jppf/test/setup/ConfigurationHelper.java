@@ -34,7 +34,7 @@ public class ConfigurationHelper
   /**
    * Cache of the created temp files, so they can be deleted upon cleanup.
    */
-  private static List<File> tempFiles = new Vector<File>();
+  private static List<File> tempFiles = new Vector<>();
   /**
    * Create a temporary file containing the specified configuration.
    * @param config the configuration to store on file.
@@ -76,7 +76,7 @@ public class ConfigurationHelper
    */
   public static TypedProperties createConfigFromTemplate(final String templatePath, final int n)
   {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("$n", n);
     return createConfigFromTemplate(templatePath, variables);
   }

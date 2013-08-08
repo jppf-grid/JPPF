@@ -222,7 +222,7 @@ public class TestJPPFNodeTaskMonitorMBean
     /**
      * The task information received as notifications from the node.
      */
-    public List<TaskInformation> notifs = new ArrayList<TaskInformation>();
+    public List<TaskInformation> notifs = new ArrayList<>();
     /**
      * 
      */

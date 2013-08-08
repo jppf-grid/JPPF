@@ -54,7 +54,7 @@ public class JPPFTestRunner
       if (is != null)
       {
         List<String> list = FileUtils.textFileAsLines(new InputStreamReader(is));
-        List<Class<?>> classes = new ArrayList<Class<?>>(list.size());
+        List<Class<?>> classes = new ArrayList<>(list.size());
         for (String name: list)
         {
           String s = name.trim();
@@ -109,7 +109,7 @@ public class JPPFTestRunner
     try
     {
       BaseSetup.Configuration config = new BaseSetup.Configuration();
-      List<String> commonCP = new ArrayList<String>();
+      List<String> commonCP = new ArrayList<>();
       commonCP.add("../lib/jppf-common-node.jar");
       commonCP.add("../lib/slf4j-api-1.6.1.jar");
       commonCP.add("../lib/slf4j-log4j12-1.6.1.jar");

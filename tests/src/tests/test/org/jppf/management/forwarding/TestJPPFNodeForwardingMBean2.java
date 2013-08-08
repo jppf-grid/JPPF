@@ -189,7 +189,7 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
     assertNotNull(notifs);
     int nbNotifsPerNode = nbTasks / allNodes.size();
     assertEquals(expectedNodes.length * nbNotifsPerNode, notifs.size());
-    Map<String, AtomicInteger> notifCounts = new HashMap<String, AtomicInteger>();
+    Map<String, AtomicInteger> notifCounts = new HashMap<>();
     for (String uuid: expectedNodes) notifCounts.put(uuid, new AtomicInteger(0));
     for (Notification notification: notifs)
     {
@@ -218,7 +218,7 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
     /**
      * The task information received as notifications from the node.
      */
-    public List<Notification> notifs = new Vector<Notification>();
+    public List<Notification> notifs = new Vector<>();
     /**
      * 
      */

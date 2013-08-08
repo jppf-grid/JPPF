@@ -53,11 +53,11 @@ public class GenericProcessLauncher implements Runnable {
   /**
    * List of files to have in the classpath.
    */
-  protected List<String> classpath = new ArrayList<String>();
+  protected List<String> classpath = new ArrayList<>();
   /**
    * The JVM options to set.
    */
-  protected List<String> jvmOptions = new ArrayList<String>();
+  protected List<String> jvmOptions = new ArrayList<>();
   /**
    * Path to the JPPF configuration file.
    */
@@ -65,7 +65,7 @@ public class GenericProcessLauncher implements Runnable {
   /**
    * The program arguments.
    */
-  protected List<String> arguments = new ArrayList<String>();
+  protected List<String> arguments = new ArrayList<>();
   /**
    * Path to the log4j configuration file.
    */
@@ -307,7 +307,7 @@ public class GenericProcessLauncher implements Runnable {
    */
   public void startProcess() throws IOException {
     startDriverSocket();
-    List<String> command = new ArrayList<String>();
+    List<String> command = new ArrayList<>();
     command.add(System.getProperty("java.home")+"/bin/java");
     command.add("-cp");
     StringBuilder sb = new StringBuilder();

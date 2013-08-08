@@ -33,7 +33,7 @@ public class GatheringStatusListener implements SubmissionStatusListener
   /**
    * The statuses collected by this listener over time.
    */
-  private final List<SubmissionStatus> statuses = new ArrayList<SubmissionStatus>();
+  private final List<SubmissionStatus> statuses = new ArrayList<>();
 
   @Override
   public void submissionStatusChanged(final SubmissionStatusEvent event)

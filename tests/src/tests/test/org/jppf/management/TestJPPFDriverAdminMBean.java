@@ -287,7 +287,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       int i = 0;
       for (JPPFManagementInfo info: nodesList) nodeUuids[i++] = info.getUuid();
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, nbTasks, LifeCycleTask.class, 0L);
-      Set<String> executedOnUuids = new HashSet<String>();
+      Set<String> executedOnUuids = new HashSet<>();
       List<JPPFTask> results = client.submit(job);
       for (JPPFTask t: results)
       {

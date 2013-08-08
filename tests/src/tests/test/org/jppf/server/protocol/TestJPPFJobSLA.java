@@ -222,7 +222,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       client.submit(jobs[i]);
       if (i == 0) Thread.sleep(500L);
     }
-    List<List<JPPFTask>> results = new ArrayList<List<JPPFTask>>();
+    List<List<JPPFTask>> results = new ArrayList<>();
     for (int i=0; i<nbJobs; i++) results.add(((JPPFResultCollector) jobs[i].getResultListener()).waitForResults());
     LifeCycleTask t1 = (LifeCycleTask) results.get(1).get(0);
     assertNotNull(t1);
@@ -270,11 +270,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C
     for (int i=0; i<results.size()-1; i++)
     {
       LifeCycleTask t1 = (LifeCycleTask) results.get(i);
-      Range<Double> r1 = new Range<Double>(t1.getStart(), t1.getStart() + t1.getElapsed());
+      Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
       for (int j=i+1; j<results.size(); j++)
       {
         LifeCycleTask t2 = (LifeCycleTask) results.get(j);
-        Range<Double> r2 = new Range<Double>(t2.getStart(), t2.getStart() + t2.getElapsed());
+        Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
         assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(),
             r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
       }
@@ -299,11 +299,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C
     for (int i=0; i<results.size()-1; i++)
     {
       LifeCycleTask t1 = (LifeCycleTask) results.get(i);
-      Range<Double> r1 = new Range<Double>(t1.getStart(), t1.getStart() + t1.getElapsed());
+      Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
       for (int j=i+1; j<results.size(); j++)
       {
         LifeCycleTask t2 = (LifeCycleTask) results.get(j);
-        Range<Double> r2 = new Range<Double>(t2.getStart(), t2.getStart() + t2.getElapsed());
+        Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
         if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid()))
         {
           found = true;

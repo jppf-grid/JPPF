@@ -42,7 +42,7 @@ public class TestListBuilder
   /**
    * A list of Java class names holding JUnit tests.
    */
-  private final List<String> names = new ArrayList<String>();
+  private final List<String> names = new ArrayList<>();
 
   /**
    * Initialize this test list builder witht he specified root directory.

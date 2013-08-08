@@ -177,7 +177,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     executor.setBatchSize(2);
     executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
     int nbTasks = 10;
-    List<Future<String>> futures = new ArrayList<Future<String>>();
+    List<Future<String>> futures = new ArrayList<>();
     for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
     assertEquals(nbTasks, futures.size());
     for (Future<String> future: futures)
@@ -203,7 +203,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     executor.setBatchSize(10);
     executor.getConfiguration().getJobConfiguration().addJobListener(listener);
     int nbTasks = 20;
-    List<Future<String>> futures = new ArrayList<Future<String>>();
+    List<Future<String>> futures = new ArrayList<>();
     for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
     assertEquals(nbTasks, futures.size());
     for (Future<String> future: futures)

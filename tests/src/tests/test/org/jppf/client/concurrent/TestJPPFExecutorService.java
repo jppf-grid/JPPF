@@ -123,7 +123,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   public void testInvokeAll() throws Exception
   {
     int n = 10;
-    List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
+    List<SimpleCallable> tasks = new ArrayList<>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
     List<Future<TaskResult>> futures = executor.invokeAll(tasks);
     assertNotNull(futures);
@@ -151,7 +151,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   {
     int n = 2;
     long timeout = TASK_DURATION / 2L;
-    List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
+    List<SimpleCallable> tasks = new ArrayList<>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
     List<Future<TaskResult>> futures = executor.invokeAll(tasks, timeout, TimeUnit.MILLISECONDS);
     assertNotNull(futures);
@@ -173,7 +173,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   public void testInvokeAny() throws Exception
   {
     int n = 10;
-    List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
+    List<SimpleCallable> tasks = new ArrayList<>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i));
     TaskResult result = executor.invokeAny(tasks);
     assertNotNull(result);
@@ -191,7 +191,7 @@ public class TestJPPFExecutorService extends Setup1D1N1C
   {
     int n = 2;
     long timeout = TASK_DURATION / 2L;
-    List<SimpleCallable> tasks = new ArrayList<SimpleCallable>();
+    List<SimpleCallable> tasks = new ArrayList<>();
     for (int i=0; i<n; i++) tasks.add(new SimpleCallable(i, TASK_DURATION));
     TaskResult result = executor.invokeAny(tasks, timeout, TimeUnit.MILLISECONDS);
     assertNull(result);

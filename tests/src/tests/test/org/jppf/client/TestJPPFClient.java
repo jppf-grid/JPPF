@@ -414,7 +414,7 @@ public class TestJPPFClient extends Setup1D1N
     ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
     long[] ids = threadsBean.getAllThreadIds();
     ThreadInfo[] infos = threadsBean.getThreadInfo(ids, 0);
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     for (int i=0; i<infos.length; i++)
     {
       if ((p == null) || p.matcher(infos[i].getThreadName()).matches())

@@ -54,7 +54,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
   /**
    * The uuids of all nodes.
    */
-  protected static Set<String> allNodes = new HashSet<String>();
+  protected static Set<String> allNodes = new HashSet<>();
   /**
    * 
    */

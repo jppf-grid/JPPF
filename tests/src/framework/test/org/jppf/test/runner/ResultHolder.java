@@ -35,27 +35,27 @@ public class ResultHolder implements Serializable
   /**
    * Holds exceptions that occurred outside of the JUnit runner.
    */
-  private final List<ExceptionHolder> exceptions = new ArrayList<ExceptionHolder>();
+  private final List<ExceptionHolder> exceptions = new ArrayList<>();
   /**
    * Holds all failures.
    */
-  private final Map<String, List<Failure>> failureMap = new TreeMap<String, List<Failure>>();
+  private final Map<String, List<Failure>> failureMap = new TreeMap<>();
   /**
    * Holds all ingored tests.
    */
-  private final Map<String, List<Description>> ignoredMap = new TreeMap<String, List<Description>>();
+  private final Map<String, List<Description>> ignoredMap = new TreeMap<>();
   /**
    * Holds all failures.
    */
-  private final Map<String, List<Description>> successMap = new TreeMap<String, List<Description>>();
+  private final Map<String, List<Description>> successMap = new TreeMap<>();
   /**
    * A sorted set of classes that were run.
    */
-  private final Set<String> classes = new TreeSet<String>();
+  private final Set<String> classes = new TreeSet<>();
   /**
    * 
    */
-  private transient Set<String> tests = new HashSet<String>();
+  private transient Set<String> tests = new HashSet<>();
   /**
    * The test run start time.
    */

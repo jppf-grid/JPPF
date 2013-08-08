@@ -223,7 +223,7 @@ public class BaseSetup
   public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes) throws Exception
   {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<Integer, JPPFClientConnection>();
+    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<>();
     boolean allConnected = false;
     while (!allConnected)
     {
@@ -238,7 +238,7 @@ public class BaseSetup
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
-    Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<JMXServiceURL, JMXDriverConnectionWrapper>();
+    Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
     {
       JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
@@ -315,11 +315,11 @@ public class BaseSetup
     /**
      * Driver classpath elements.
      */
-    public List<String> driverClasspath = new ArrayList<String>();
+    public List<String> driverClasspath = new ArrayList<>();
     /**
      * Driver JVM options.
      */
-    public List<String> driverJvmOptions = new ArrayList<String>();
+    public List<String> driverJvmOptions = new ArrayList<>();
     /**
      * Path to the node JPPF config
      */
@@ -331,10 +331,10 @@ public class BaseSetup
     /**
      * Node classpath elements.
      */
-    public List<String> nodeClasspath = new ArrayList<String>();
+    public List<String> nodeClasspath = new ArrayList<>();
     /**
      * Node JVM options.
      */
-    public List<String> nodeJvmOptions = new ArrayList<String>();
+    public List<String> nodeJvmOptions = new ArrayList<>();
   }
 }
