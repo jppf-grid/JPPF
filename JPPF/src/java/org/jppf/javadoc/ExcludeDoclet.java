@@ -127,7 +127,7 @@ public class ExcludeDoclet
     {
       Class componentType = expect.getComponentType();
       Object[] array = (Object[]) obj;
-      List<Object> list = new ArrayList<Object>(array.length);
+      List<Object> list = new ArrayList<>(array.length);
       for (int i = 0; i < array.length; i++)
       {
         Object entry = array[i];
