@@ -138,7 +138,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
-    taskQueueChecker = new TaskQueueChecker<AbstractNodeContext>(queue, statsManager);
+    taskQueueChecker = new TaskQueueChecker<>(queue, statsManager);
     taskQueueChecker.setBundler(bundler);
     this.queue.addQueueListener(new QueueListener<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override

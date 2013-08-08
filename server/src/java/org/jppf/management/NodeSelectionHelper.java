@@ -76,7 +76,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
     if (selector instanceof NodeSelector.AllNodesSelector)
     {
       Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
-      Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
+      Set<AbstractNodeContext> result = new HashSet<>();
       for (AbstractNodeContext ctx: fullSet)
       {
         if (!ctx.isPeer()) result.add(ctx);
@@ -84,7 +84,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
       return result;
     }
     else if (selector instanceof NodeSelector.UuidSelector)
-      return getChannels(new HashSet<String>(((NodeSelector.UuidSelector) selector).getUuids()));
+      return getChannels(new HashSet<>(((NodeSelector.UuidSelector) selector).getUuids()));
     else if (selector instanceof NodeSelector.ExecutionPolicySelector)
       return getChannels(((NodeSelector.ExecutionPolicySelector) selector).getPolicy());
     throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
@@ -97,7 +97,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    */
   private Set<AbstractNodeContext> getChannels(final Set<String> uuids)
   {
-    Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
+    Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     for (AbstractNodeContext context: allChannels)
     {
@@ -114,7 +114,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    */
   private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy)
   {
-    Set<AbstractNodeContext> result = new HashSet<AbstractNodeContext>();
+    Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     for (AbstractNodeContext context: allChannels)
     {

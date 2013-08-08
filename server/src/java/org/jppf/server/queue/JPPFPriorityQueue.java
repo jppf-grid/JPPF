@@ -155,7 +155,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         }
         updateLatestMaxSize();
         if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(clientBundle.getTaskCount());
-        fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, serverJob, false));
+        fireQueueEvent(new QueueEvent<>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
@@ -175,7 +175,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
       priorityMap.putValue(job.getSLA().getPriority(), job);
       sizeMap.putValue(getSize(job), job);
-      fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, job, true));
+      fireQueueEvent(new QueueEvent<>(this, job, true));
     } finally {
       lock.unlock();
     }
@@ -403,7 +403,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       if (jobMap.isEmpty()) return;
-      jobIDs = new HashSet<String>();
+      jobIDs = new HashSet<>();
       for (Map.Entry<String, ServerJob> entry : jobMap.entrySet()) {
         if (connectionUUID.equals(entry.getValue().getBroadcastUUID())) jobIDs.add(entry.getKey());
       }
@@ -442,9 +442,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
 
     JobSLA sla = broadcastJob.getSLA();
-    List<ServerJobBroadcast> jobList = new ArrayList<ServerJobBroadcast>(connections.size());
+    List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
 
-    Set<String> uuidSet = new HashSet<String>();
+    Set<String> uuidSet = new HashSet<>();
     for (AbstractNodeContext connection : connections) {
       ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
@@ -470,7 +470,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     else {
       lock.lock();
       try {
-        fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, broadcastJob, false));
+        fireQueueEvent(new QueueEvent<>(this, broadcastJob, false));
         for (ServerJobBroadcast job : jobList) addBroadcastJob(job);
       } finally {
         lock.unlock();
@@ -499,7 +499,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     jobMap.put(jobUuid, broadcastJob);
     updateLatestMaxSize();
     jobManager.jobQueued(broadcastJob);
-    fireQueueEvent(new QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>(this, broadcastJob, false));
+    fireQueueEvent(new QueueEvent<>(this, broadcastJob, false));
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     statsManager.taskInQueue(broadcastJob.getTaskCount());

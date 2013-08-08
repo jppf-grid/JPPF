@@ -61,11 +61,11 @@ class ForwardingNotificationDispatcher
   /**
    * Mapping of MBean names to corresponding notification listeners.
    */
-  private final Map<String, ForwardingNotificationHandler> handlerMap = new HashMap<String, ForwardingNotificationHandler>();
+  private final Map<String, ForwardingNotificationHandler> handlerMap = new HashMap<>();
   /**
    * The list of registered event listeners.
    */
-  private final List<ForwardingNotificationEventListener> listenerList = new ArrayList<ForwardingNotificationEventListener>();
+  private final List<ForwardingNotificationEventListener> listenerList = new ArrayList<>();
   /**
    * A temporary array used to avoid synchronization issues between addition/removal of listeners
    * and firing of events.

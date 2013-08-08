@@ -217,7 +217,7 @@ class PeerNode extends AbstractCommonNode
     DataLocation dataProvider = IOHelper.readData(is);
     if (traceEnabled) log.trace("received data provider from peer driver, data length = " + dataProvider.getSize());
 
-    List<DataLocation> tasks = new ArrayList<DataLocation>(count);
+    List<DataLocation> tasks = new ArrayList<>(count);
     for (int i=1; i<count+1; i++)
     {
       DataLocation dl = IOHelper.readData(is);

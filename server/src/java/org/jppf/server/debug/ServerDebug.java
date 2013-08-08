@@ -35,23 +35,23 @@ public class ServerDebug implements ServerDebugMBean
   /**
    * The class loader channels.
    */
-  private final Set<ChannelWrapper<?>> clientClassLoaderSet = new HashSet<ChannelWrapper<?>>();
+  private final Set<ChannelWrapper<?>> clientClassLoaderSet = new HashSet<>();
   /**
    * The class loader channels.
    */
-  private final Set<ChannelWrapper<?>> nodeClassLoaderSet = new HashSet<ChannelWrapper<?>>();
+  private final Set<ChannelWrapper<?>> nodeClassLoaderSet = new HashSet<>();
   /**
    * The node channels.
    */
-  private final Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
+  private final Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
   /**
    * The client channels.
    */
-  private final Set<ChannelWrapper<?>> clientSet = new HashSet<ChannelWrapper<?>>();
+  private final Set<ChannelWrapper<?>> clientSet = new HashSet<>();
   /**
    * The acceptor channels.
    */
-  private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<ChannelWrapper<?>>();
+  private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<>();
 
   @Override
   public String[] clientClassLoaderChannels()
@@ -182,7 +182,7 @@ public class ServerDebug implements ServerDebugMBean
   public String[] allChannels()
   {
     int size = clientClassLoaderSet.size() + nodeClassLoaderSet.size() + nodeSet.size() + clientSet.size();
-    List<String> list = new ArrayList<String>(size);
+    List<String> list = new ArrayList<>(size);
     for (ChannelWrapper<?> channel: clientClassLoaderSet) list.add(channel.toString());
     for (ChannelWrapper<?> channel: nodeClassLoaderSet) list.add(channel.toString());
     for (ChannelWrapper<?> channel: nodeSet) list.add(channel.toString());

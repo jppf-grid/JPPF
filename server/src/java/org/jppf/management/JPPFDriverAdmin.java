@@ -85,7 +85,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     try
     {
       List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-      List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(allChannels.size());
+      List<JPPFManagementInfo> list = new ArrayList<>(allChannels.size());
       for (AbstractNodeContext context : allChannels)
       {
         JPPFManagementInfo info = context.getManagementInfo();
@@ -215,7 +215,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
     catch (Exception e)
     {
-      algorithmsList = new ArrayList<String>();
+      algorithmsList = new ArrayList<>();
       log.error(e.getMessage(), e);
     }
     return new LoadBalancingInformation(algorithm, params, algorithmsList);
@@ -292,7 +292,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     List<AbstractNodeContext> idleChannels = getNodeNioServer().getIdleChannels();
     int size = idleChannels.size();
     if (debugEnabled) log.debug("found " + size + " idle channels");
-    List<JPPFManagementInfo> list = new ArrayList<JPPFManagementInfo>(size);
+    List<JPPFManagementInfo> list = new ArrayList<>(size);
     for (AbstractNodeContext context: idleChannels)
     {
       JPPFManagementInfo info = context.getManagementInfo();

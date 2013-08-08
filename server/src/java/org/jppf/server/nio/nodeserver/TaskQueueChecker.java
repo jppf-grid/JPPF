@@ -70,7 +70,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
   /**
    * The list of idle node channels.
    */
-  private final Set<C> idleChannels = new LinkedHashSet<C>();
+  private final Set<C> idleChannels = new LinkedHashSet<>();
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -178,7 +178,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
   {
     synchronized (idleChannels)
     {
-      return new ArrayList<C>(idleChannels);
+      return new ArrayList<>(idleChannels);
     }
   }
 
@@ -329,7 +329,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
     int idleChannelsSize = idleChannels.size();
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
-    List<C> acceptableChannels = new ArrayList<C>(idleChannelsSize);
+    List<C> acceptableChannels = new ArrayList<>(idleChannelsSize);
     List<String> uuidPath = bundle.getJob().getUuidPath().getList();
     Iterator<C> iterator = idleChannels.iterator();
     while (iterator.hasNext()) {

@@ -177,7 +177,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       getBundler().dispose();
       if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
     }
-    if(onClose != null) onClose.run();
+    if (onClose != null) onClose.run();
     if ((bundle != null) && !bundle.getJob().isHandshake())
     {
       ServerTaskBundleNode tmpWrapper = bundle;
@@ -217,7 +217,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
-    return new Pair<JPPFTaskBundle, List<DataLocation>>(bundle, tasks);
+    return new Pair<>(bundle, tasks);
   }
 
   /**

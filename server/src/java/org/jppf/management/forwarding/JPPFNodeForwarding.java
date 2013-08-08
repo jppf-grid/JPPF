@@ -84,7 +84,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
   {
     Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     for (AbstractNodeContext context: channels)
     {
       String uuid = context.getUuid();
@@ -114,7 +114,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception
   {
     Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     for (AbstractNodeContext context: channels)
     {
       String uuid = context.getUuid();
@@ -138,7 +138,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception
   {
     Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     for (AbstractNodeContext context: channels)
     {
       String uuid = context.getUuid();

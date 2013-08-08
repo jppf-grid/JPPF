@@ -46,7 +46,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Contains the set of retrieved connection information objects.
    */
-  private final Set<JPPFConnectionInformation> infoSet = new HashSet<JPPFConnectionInformation>();
+  private final Set<JPPFConnectionInformation> infoSet = new HashSet<>();
   /**
    * Count of distinct retrieved connection information objects.
    */

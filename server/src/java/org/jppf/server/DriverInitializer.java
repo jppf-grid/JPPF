@@ -405,7 +405,7 @@ public class DriverInitializer
   private static int[] parsePorts(final String s, final int def)
   {
     String[] strPorts = s.split("\\s");
-    List<Integer> portsList = new ArrayList<Integer>(strPorts.length);
+    List<Integer> portsList = new ArrayList<>(strPorts.length);
     for (int i=0; i<strPorts.length; i++)
     {
       try

@@ -43,7 +43,7 @@ public class NodeConnectionEventHandler
   /**
    * The list of node connection listeners.
    */
-  private final List<NodeConnectionListener> listeners = new LinkedList<NodeConnectionListener>();
+  private final List<NodeConnectionListener> listeners = new LinkedList<>();
 
   /**
    * Add a listener to the list of listeners.

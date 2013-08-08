@@ -57,11 +57,11 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   /**
    * Mapping of node uuids to corresponding notification dispatchers.
    */
-  private Map<String, ForwardingNotificationDispatcher> nodeMap = new HashMap<String, ForwardingNotificationDispatcher>();
+  private Map<String, ForwardingNotificationDispatcher> nodeMap = new HashMap<>();
   /**
    * Each node uuid is mapped to a mapping of mbean names to a list of notification listeners.
    */
-  private Map<String, CollectionMap<String, NotificationListenerWrapper>> clientMap = new HashMap<String, CollectionMap<String, NotificationListenerWrapper>>();
+  private Map<String, CollectionMap<String, NotificationListenerWrapper>> clientMap = new HashMap<>();
   /**
    * Used to synchronized access to the collection in this class.
    */
@@ -135,7 +135,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
       CollectionMap<String, NotificationListenerWrapper> map = clientMap.get(uuid);
       if (map == null)
       {
-        map = new ArrayListHashMap<String, NotificationListenerWrapper>();
+        map = new ArrayListHashMap<>();
         map.putValue(mbean, wrapper);
       }
       clientMap.put(uuid, map);

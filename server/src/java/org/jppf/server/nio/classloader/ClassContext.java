@@ -56,16 +56,16 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * The list of pending resource requests for a resource provider.
    */
-  private final Queue<ResourceRequest> pendingRequests = new ConcurrentLinkedQueue<ResourceRequest>();
+  private final Queue<ResourceRequest> pendingRequests = new ConcurrentLinkedQueue<>();
   //private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
   /**
    * The list of pending resource responses for a node.
    */
-  private final Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = new HashMap<JPPFResourceWrapper, ResourceRequest>();
+  private final Map<JPPFResourceWrapper, ResourceRequest> pendingResponses = new HashMap<>();
   /**
    * The request currently processed.
    */
-  protected AtomicReference<ResourceRequest> currentRequest = new AtomicReference<ResourceRequest>(null);
+  protected AtomicReference<ResourceRequest> currentRequest = new AtomicReference<>(null);
   /**
    * Determines whether this context relates to a provider or node connection.
    */
@@ -229,7 +229,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @return a {@link List} of {@link ResourceRequest} instances.
    */
   protected /*synchronized*/ List<ResourceRequest> getPendingRequests() {
-    return new ArrayList<ResourceRequest>(pendingRequests);
+    return new ArrayList<>(pendingRequests);
   }
 
   /**
@@ -291,7 +291,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       synchronized (this)
       {
         currentRequest = getCurrentRequest();
-        pendingList = new ArrayList<ResourceRequest>(pendingRequests);
+        pendingList = new ArrayList<>(pendingRequests);
         if (currentRequest != null)
         {
           pendingList.add(currentRequest);
@@ -304,7 +304,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       {
         if (debugEnabled) log.debug(build("provider: ", getChannel(), " sending null response(s) for disconnected provider"));
         ClassNioServer server = driver.getNodeClassServer();
-        Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
+        Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
         for (ResourceRequest resourceRequest : pendingList)
         {
           ChannelWrapper<?> nodeChannel = resourceRequest.getChannel();
@@ -369,7 +369,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     lockResponse.lock();
     try {
-      return new HashMap<JPPFResourceWrapper, ResourceRequest>(pendingResponses);
+      return new HashMap<>(pendingResponses);
     } finally {
       lockResponse.unlock();
     }

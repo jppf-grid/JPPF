@@ -47,11 +47,11 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Mapping of jobs to the nodes they are executing on.
    */
-  private final Map<String, List<ChannelJobPair>> jobMap = new HashMap<String, List<ChannelJobPair>>();
+  private final Map<String, List<ChannelJobPair>> jobMap = new HashMap<>();
   /**
    * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
    */
-  private final Map<String, ServerJob> bundleMap = new HashMap<String, ServerJob>();
+  private final Map<String, ServerJob> bundleMap = new HashMap<>();
   /**
    * Processes the event queue asynchronously.
    */
@@ -59,7 +59,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * The list of registered listeners.
    */
-  private final List<JobListener> eventListeners = new ArrayList<JobListener>();
+  private final List<JobListener> eventListeners = new CopyOnWriteArrayList<>();
   /**
    * Reference to the driver.
    */
@@ -112,7 +112,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
     {
-      list = new ArrayList<ChannelJobPair>();
+      list = new ArrayList<>();
       jobMap.put(jobUuid, list);
     }
     list.add(new ChannelJobPair(channel, bundleWrapper));
@@ -212,10 +212,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public void addJobListener(final JobListener listener)
   {
-    synchronized(eventListeners)
-    {
-      eventListeners.add(listener);
-    }
+    eventListeners.add(listener);
   }
 
   /**
@@ -224,10 +221,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public void removeJobListener(final JobListener listener)
   {
-    synchronized(eventListeners)
-    {
-      eventListeners.remove(listener);
-    }
+    eventListeners.remove(listener);
   }
 
   /**

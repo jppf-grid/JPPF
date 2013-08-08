@@ -127,7 +127,7 @@ public class ClientClassNioServer extends ClassNioServer
       List<ChannelWrapper<?>> list = providerConnections.get(uuid);
       if (list == null)
       {
-        list = new ArrayList<ChannelWrapper<?>>();
+        list = new ArrayList<>();
         providerConnections.put(uuid, list);
       }
       list.add(channel);

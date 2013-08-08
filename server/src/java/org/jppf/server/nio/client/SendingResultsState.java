@@ -63,7 +63,7 @@ class SendingResultsState extends ClientServerState
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    if (channel.isReadable()) throw new ConnectException("client " + channel + " has been disconnected");
+    if (channel.isReadable()) throw new ConnectException("client {}" + channel + " has been disconnected");
 
     ClientContext context = (ClientContext) channel.getContext();
     ServerTaskBundleClient clientBundle = context.getBundle();
@@ -72,7 +72,7 @@ class SendingResultsState extends ClientServerState
       clientBundle = context.pollCompletedBundle();
       if (clientBundle == null)
       {
-        if (debugEnabled) log.debug("*** clientBundle = null for " + channel);
+        if (debugEnabled) log.debug("*** clientBundle = null for {}", channel);
         return TO_IDLE;
       }
       context.setBundle(clientBundle);
@@ -80,14 +80,13 @@ class SendingResultsState extends ClientServerState
     }
     if (context.writeMessage(channel))
     {
-      if (debugEnabled) log.debug("*** sent entire bundle " + clientBundle + " to client " + channel);
-      if (debugEnabled) log.debug("*** NbTasksToSend=" + context.getNbTasksToSend() + ", TaskCount=" + clientBundle.getTaskCount() + ", CompletedBundlesEmpty=" + context.isCompletedBundlesEmpty());
+      if (debugEnabled) log.debug("*** sent entire bundle {} to client {}", clientBundle, channel);
+      if (debugEnabled) log.debug("*** NbTasksToSend={}, TaskCount={}, CompletedBundlesEmpty={}", new Object[] {context.getNbTasksToSend(), clientBundle.getTaskCount(), context.isCompletedBundlesEmpty()});
       context.setNbTasksToSend(context.getNbTasksToSend() - clientBundle.getTaskCount());
       context.setBundle(null);
       context.setClientMessage(null);
       if (context.isCompletedBundlesEmpty())
       {
-        //if (context.getPendingTasksCount() <= 0)
         if (context.getNbTasksToSend() <= 0)
         {
           if (debugEnabled) log.debug("*** client bundle ended " + context.getInitialBundleWrapper());

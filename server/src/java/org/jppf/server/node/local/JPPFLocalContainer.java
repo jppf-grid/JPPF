@@ -75,7 +75,7 @@ public class JPPFLocalContainer extends JPPFContainer
     {
       Thread.currentThread().setContextClassLoader(classLoader);
       List<DataLocation> locations = currentMessage.getLocations();
-      List<Future<Object>> futureList = new ArrayList<Future<Object>>(count);
+      List<Future<Object>> futureList = new ArrayList<>(count);
       for (int i=0; i<count; i++)
       {
         futureList.add(executor.submit(new ObjectDeserializationTask(locations.get(i+1), i)));

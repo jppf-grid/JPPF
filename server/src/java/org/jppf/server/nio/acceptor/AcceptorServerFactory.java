@@ -49,7 +49,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
   @Override
   public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
   {
-    Map<AcceptorState, NioState<AcceptorTransition>> map = new EnumMap<AcceptorState, NioState<AcceptorTransition>>(AcceptorState.class);
+    Map<AcceptorState, NioState<AcceptorTransition>> map = new EnumMap<>(AcceptorState.class);
     map.put(IDENTIFYING_PEER, new IdentifyingPeerState((AcceptorNioServer) server));
     //map.put(IDLE, new IdleState((AcceptorNioServer) server));
     return map;
@@ -63,8 +63,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
   @Override
   public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()
   {
-    Map<AcceptorTransition, NioTransition<AcceptorState>> map =
-      new EnumMap<AcceptorTransition, NioTransition<AcceptorState>>(AcceptorTransition.class);
+    Map<AcceptorTransition, NioTransition<AcceptorState>> map = new EnumMap<>(AcceptorTransition.class);
     map.put(TO_IDENTIFYING_PEER, transition(IDENTIFYING_PEER, R));
     return map;
   }

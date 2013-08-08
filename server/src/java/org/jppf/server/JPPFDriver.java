@@ -499,7 +499,7 @@ public class JPPFDriver
   private int[] extractValidPorts(final int[] ports)
   {
     if ((ports == null) || (ports.length == 0)) return ports;
-    List<Integer> list = new ArrayList<Integer>();
+    List<Integer> list = new ArrayList<>();
     for (int port: ports)
     {
       if (port >= 0) list.add(port);

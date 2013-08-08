@@ -66,7 +66,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
     if (!context.hasPendingResponse()) return sendResponse(context);
     Map<JPPFResourceWrapper, ResourceRequest>  pendingResponses = context.getPendingResponses();
     JPPFResourceWrapper res = context.getResource();
-    Queue<JPPFResourceWrapper> toRemove = new LinkedList<JPPFResourceWrapper>();
+    Queue<JPPFResourceWrapper> toRemove = new LinkedList<>();
     CompositeResourceWrapper composite = null;
     if (res instanceof CompositeResourceWrapper) composite = (CompositeResourceWrapper) res;
     for (Map.Entry<JPPFResourceWrapper, ResourceRequest> entry: pendingResponses.entrySet())
