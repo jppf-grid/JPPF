@@ -108,7 +108,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     super(name);
     selector = Selector.open();
     factory = createFactory();
-    transitionManager = new StateTransitionManager<S, T>(this);
+    transitionManager = new StateTransitionManager<>(this);
   }
 
   /**
@@ -402,7 +402,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       lock.lock();
       selector.wakeup();
       Set<SelectionKey> keySet = selector.keys();
-      List<SelectableChannel> channels = new ArrayList<SelectableChannel>();
+      List<SelectableChannel> channels = new ArrayList<>();
       for (SelectionKey key: keySet) channels.add(key.channel());
       selector.close();
       for (SelectableChannel channel: channels)

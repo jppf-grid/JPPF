@@ -67,7 +67,7 @@ public class ThumbnailGenerator
   /**
    * Mapping of image files to their corresponding thumbnail.
    */
-  private Map<File, File> fileMap = new TreeMap<File, File>();
+  private Map<File, File> fileMap = new TreeMap<>();
 
   /**
    * Initialize this thumbnail generator with the specified root dir, width and height.

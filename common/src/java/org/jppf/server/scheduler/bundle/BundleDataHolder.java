@@ -31,7 +31,7 @@ public class BundleDataHolder
   /**
    * Holds the samples required for calculating the moving average.
    */
-  private LinkedList<BundlePerformanceSample> samples = new LinkedList<BundlePerformanceSample>();
+  private LinkedList<BundlePerformanceSample> samples = new LinkedList<>();
   /**
    * Current value of the moving average.
    */

@@ -42,7 +42,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
   /**
    * A default profile with default parameter values.
    */
-  private static AtomicReference<ProportionalTuneProfile> defaultProfile = new AtomicReference<ProportionalTuneProfile>(new ProportionalTuneProfile());
+  private static AtomicReference<ProportionalTuneProfile> defaultProfile = new AtomicReference<>(new ProportionalTuneProfile());
   /**
    * The maximum size of the performance samples cache.
    */

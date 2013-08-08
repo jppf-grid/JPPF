@@ -31,7 +31,7 @@ public class GroovyScriptRunner implements ScriptRunner
   /**
    * Mapping of Groovy scripts to their uuid.
    */
-  private static Map<String, Script> scriptMap = new HashMap<String, Script>();
+  private static Map<String, Script> scriptMap = new HashMap<>();
 
   /**
    * Evaluate the script specified as input and get the evaluation result.

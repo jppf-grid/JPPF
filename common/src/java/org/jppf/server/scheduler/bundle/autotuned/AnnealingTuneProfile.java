@@ -39,7 +39,7 @@ public class AnnealingTuneProfile extends AbstractAutoTuneProfile
   /**
    * A default profile with default parameter values.
    */
-  private static AtomicReference<AnnealingTuneProfile> defaultProfile = new AtomicReference<AnnealingTuneProfile>(new AnnealingTuneProfile());
+  private static AtomicReference<AnnealingTuneProfile> defaultProfile = new AtomicReference<>(new AnnealingTuneProfile());
   /**
    * The minimum number of samples that must be collected before an analysis is triggered.
    */

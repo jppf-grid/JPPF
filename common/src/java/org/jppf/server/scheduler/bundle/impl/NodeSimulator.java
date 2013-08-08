@@ -145,7 +145,7 @@ public class NodeSimulator
         int pending = maxTasks;
         while (pending > 0)
         {
-          List<Integer> list = new ArrayList<Integer>();
+          List<Integer> list = new ArrayList<>();
           for (int j=0; j<nbNodes; j++)
           {
             int n = bundlers[j].getBundleSize();
@@ -155,7 +155,7 @@ public class NodeSimulator
             if (pending <= 0) break;
           }
           if (debugEnabled) log.debug("Iteration #"+i+" : list = "+list);
-          List<Future<?>> futures = new ArrayList<Future<?>>();
+          List<Future<?>> futures = new ArrayList<>();
           for (int j=0; j<list.size(); j++)
           {
             int n = list.get(j);

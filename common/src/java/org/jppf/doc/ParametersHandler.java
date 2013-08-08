@@ -37,7 +37,7 @@ public class ParametersHandler
   public Map<ParameterNames, Object> parseArguments(final String...args) throws Exception
   {
     if ((args == null) || (args.length < 3)) throw new IllegalArgumentException("not enough arguments there must be at least the 3 arguments: -s sourceDir -d destDir -t templatesDir");
-    Map<ParameterNames, Object> map = new EnumMap<ParameterNames, Object>(ParameterNames.class);
+    Map<ParameterNames, Object> map = new EnumMap<>(ParameterNames.class);
     int i = 0;
     while (i < args.length)
     {
@@ -53,7 +53,7 @@ public class ParametersHandler
       else if ("-r".equals(cmd)) map.put(RECURSIVE, true);
       else throw new IllegalArgumentException("unknown option '" + cmd + '\'');
     }
-    List<String> errors = new ArrayList<String>();
+    List<String> errors = new ArrayList<>();
     if (map.get(SOURCE_DIR) == null) errors.add("missing option '-s sourceDir'");
     if (map.get(DEST_DIR) == null) errors.add("missing option '-d destDir'");
     if (map.get(TEMPLATES_DIR) == null) errors.add("missing option '-t templatesDir'");

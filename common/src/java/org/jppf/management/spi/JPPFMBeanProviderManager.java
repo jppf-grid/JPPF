@@ -43,7 +43,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
   /**
    * Keeps a list of MBeans registered with the MBean server.
    */
-  private List<String> registeredMBeanNames = new Vector<String>();
+  private List<String> registeredMBeanNames = new Vector<>();
   /**
    * The mbean server with which all mbeans are registered.
    */

@@ -72,7 +72,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
    */
   private List<File> getHTMLFiles() throws Exception
   {
-    List<File> result = new ArrayList<File>();
+    List<File> result = new ArrayList<>();
     File[] subdirs = sourceDir.listFiles(new JPPFDirFilter());
     for (File dir: subdirs)
     {

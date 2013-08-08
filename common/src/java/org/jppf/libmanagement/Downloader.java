@@ -89,9 +89,9 @@ public class Downloader
         private int count = 0;
         @Override
         public void dataTransferred(final LocationEvent event) {
-          int oneMB = 1024*1024;
-          int n = event.bytesTransferred();
-          int p = count % oneMB;
+          long oneMB = 1024*1024;
+          long n = event.getTransferredBytes();
+          long p = count % oneMB;
           if (n + p >= oneMB) System.out.println(String.valueOf(((n + count) / oneMB)) +" MB downloaded");
           count += n;
         }

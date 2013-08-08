@@ -85,7 +85,7 @@ public abstract class AbstractNodeIO implements NodeIO
   {
     Object[] result = readObjects();
     currentBundle = (JPPFTaskBundle) result[0];
-    List<Task> taskList = new LinkedList<Task>();
+    List<Task> taskList = new LinkedList<>();
     if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null))
     {
       DataProvider dataProvider = (DataProvider) result[1];
@@ -97,7 +97,7 @@ public abstract class AbstractNodeIO implements NodeIO
         taskList.add(task);
       }
     }
-    return new Pair<JPPFTaskBundle, List<Task>>(currentBundle, taskList);
+    return new Pair<>(currentBundle, taskList);
   }
 
   /**

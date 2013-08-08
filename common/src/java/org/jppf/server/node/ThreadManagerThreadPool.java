@@ -55,7 +55,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
   {
     super();
     threadFactory = new JPPFThreadFactory("node processing", CpuTimeCollector.isCpuTimeEnabled());
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory)
     {
       @Override

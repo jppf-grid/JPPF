@@ -70,7 +70,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>>
   {
     //if (debugEnabled) log.debug("submitting transition for " + key + ", state=" + key.getContext().getState());
     setKeyOps(channel, 0);
-    StateTransitionTask<S, T> transition = new StateTransitionTask<S, T>(channel, server.getFactory());
+    StateTransitionTask<S, T> transition = new StateTransitionTask<>(channel, server.getFactory());
     //transition.run();
     executor.submit(transition);
   }

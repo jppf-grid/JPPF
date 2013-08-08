@@ -37,7 +37,7 @@ public final class NodeForwardingHelper
   /**
    * A mapping of register listener ids to the associated node selector and MBean name.
    */
-  private Map<String, NotificationListenerWrapper> listenerWrappers = new Hashtable<String, NotificationListenerWrapper>();
+  private Map<String, NotificationListenerWrapper> listenerWrappers = new Hashtable<>();
   /**
    * The object which implements the node selection logic, based on a {@link NodeSelector}.
    */
@@ -95,7 +95,7 @@ public final class NodeForwardingHelper
    */
   Collection<NotificationListenerWrapper> allListeners()
   {
-    return new ArrayList<NotificationListenerWrapper>(listenerWrappers.values());
+    return new ArrayList<>(listenerWrappers.values());
   }
 
   /**

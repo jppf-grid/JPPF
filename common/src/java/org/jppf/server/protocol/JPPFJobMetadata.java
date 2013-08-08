@@ -38,7 +38,7 @@ public class JPPFJobMetadata implements JobMetadata
   /**
    * The metadata map.
    */
-  private final Map<Object, Object> metadata = new HashMap<Object, Object>();
+  private final Map<Object, Object> metadata = new HashMap<>();
 
   /**
    * Set a parameter in the metadata.
@@ -88,7 +88,7 @@ public class JPPFJobMetadata implements JobMetadata
   @Override
   public Map<Object, Object> getAll()
   {
-    Map<Object, Object> map = new HashMap<Object, Object>();
+    Map<Object, Object> map = new HashMap<>();
     map.putAll(metadata);
     return map;
   }

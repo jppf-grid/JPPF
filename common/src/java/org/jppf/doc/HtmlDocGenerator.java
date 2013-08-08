@@ -148,7 +148,7 @@ public class HtmlDocGenerator
   {
     int pos = TEMPLATE_START.length();
     int index = pos;
-    Map<String, String> parameterMap = new HashMap<String, String>();
+    Map<String, String> parameterMap = new HashMap<>();
     while (index > 0)
     {
       index = templateCall.indexOf(EQUALS, pos);
@@ -293,7 +293,7 @@ public class HtmlDocGenerator
   private static void generateDocRecursive(final File sourceDir, final File destDir, final File templateDir, final Map<ParameterNames, Object> parameters) throws Exception
   {
     generateDoc(sourceDir, destDir, templateDir, parameters);
-    List<File> allSourceDirs = new ArrayList<File>();
+    List<File> allSourceDirs = new ArrayList<>();
     allDirsRecursive(sourceDir, allSourceDirs, parameters);
     String rootSourceName = sourceDir.getCanonicalPath();
     String rootTargetName = destDir.getCanonicalPath();

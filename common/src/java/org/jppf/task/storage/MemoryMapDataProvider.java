@@ -33,7 +33,7 @@ public class MemoryMapDataProvider implements DataProvider
   /**
    * The actual store implementation for the shared data.
    */
-  private final Map<Object, Object> store = new HashMap<Object, Object>();
+  private final Map<Object, Object> store = new HashMap<>();
 
   /**
    * Get a value specified by its key.

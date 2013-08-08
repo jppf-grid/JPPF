@@ -49,7 +49,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    * 
    */
-  private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<String, Map<String, ListenerWrapper>>();
+  private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<>();
   /**
    * Initialize a local connection to the MBean server.
    */
@@ -308,7 +308,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
       Map<String, ListenerWrapper> map = listeners.get(getId());
       if (map == null)
       {
-        map = new HashMap<String, ListenerWrapper>();
+        map = new HashMap<>();
         listeners.put(getId(), map);
       }
       map.put(listenerID, new ListenerWrapper(listener, internalFilter, handback));

@@ -31,7 +31,7 @@ public class JPPFFutureTask<V> extends FutureTask<V> implements JPPFFuture<V>
   /**
    * List of listeners for this task.
    */
-  private final List<Listener> listenerList = new CopyOnWriteArrayList<Listener>();
+  private final List<Listener> listenerList = new CopyOnWriteArrayList<>();
 
   /**
    * Creates a <tt>FutureTask</tt> that will, upon running, execute the

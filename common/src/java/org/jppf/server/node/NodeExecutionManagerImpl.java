@@ -255,7 +255,7 @@ public class NodeExecutionManagerImpl
   private void setup(final JPPFTaskBundle bundle, final List<? extends Task> taskList) {
     this.bundle = bundle;
     this.taskList = taskList;
-    this.taskWrapperList = new ArrayList<NodeTaskWrapper>(taskList.size());
+    this.taskWrapperList = new ArrayList<>(taskList.size());
     this.dataProvider = taskList.get(0).getDataProvider();
     this.uuidList = bundle.getUuidPath().getList();
     ClassLoader taskClassLoader = null;

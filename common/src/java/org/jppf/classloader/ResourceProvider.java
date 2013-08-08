@@ -184,7 +184,7 @@ public class ResourceProvider
       Enumeration<URL> urlEnum = cl.getResources(name);
       if (urlEnum.hasMoreElements())
       {
-        result = new ArrayList<byte[]>();
+        result = new ArrayList<>();
         while (urlEnum.hasMoreElements())
         {
           URL url = urlEnum.nextElement();
@@ -205,7 +205,7 @@ public class ResourceProvider
         File file = new File(name);
         if (file.exists())
         {
-          if (result == null) result = new ArrayList<byte[]>();
+          if (result == null) result = new ArrayList<>();
           result.add(FileUtils.getFileAsByte(file));
         }
       }
@@ -225,7 +225,7 @@ public class ResourceProvider
    */
   public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader cl, final String...names)
   {
-    Map<String, List<byte[]>> result = new HashMap<String, List<byte[]>>();
+    Map<String, List<byte[]>> result = new HashMap<>();
     for (String name: names)
     {
       List<byte[]> resources = getMultipleResourcesAsBytes(name, cl);

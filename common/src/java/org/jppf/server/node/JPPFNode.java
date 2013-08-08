@@ -260,24 +260,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
-   * @return a <code>ClassLoader</code> used for loading the classes of the framework.
-   */
-  @Override
-  public AbstractJPPFClassLoader getClassLoader() {
-    return classLoaderManager.getClassLoader();
-  }
-
-  /**
-   * Set the main classloader for the node.
-   * @param cl the class loader to set.
-   */
-  @Override
-  public void setClassLoader(final JPPFClassLoader cl) {
-    classLoaderManager.setClassLoader(cl);
-  }
-
-  /**
-   * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @throws Exception if an error occurs while instantiating the class loader.
    */
   public void initHelper() throws Exception {
@@ -322,7 +304,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @return true if JMX is enabled, false otherwise.
    */
   boolean isJmxEnabled() {
-    return jmxEnabled;
+    return jmxEnabled && !isOffline();
   }
 
   /**
@@ -451,7 +433,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   @Override
   public ClassLoader getClassLoader(final List<String> uuidPath) throws Exception {
-    return classLoaderManager.getContainer(uuidPath).getClassLoader();
+    return getContainer(uuidPath).getClassLoader();
   }
 
   @Override

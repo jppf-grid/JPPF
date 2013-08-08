@@ -111,8 +111,8 @@ public class FileReplacer
   {
     if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
     File[] fileList = folder.listFiles(filter);
-    List<File> folders = new ArrayList<File>();
-    List<File> files = new ArrayList<File>();
+    List<File> folders = new ArrayList<>();
+    List<File> files = new ArrayList<>();
     for (File f: fileList)
     {
       if (f.isDirectory()) folders.add(f);

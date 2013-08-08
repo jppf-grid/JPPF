@@ -178,7 +178,7 @@ public class ServerTaskBundleClient
   public synchronized void resultReceived(final Collection<Pair<Integer, DataLocation>> results) {
     if (isCancelled()) return;
     if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
-    List<ServerTask> tasks = new ArrayList<ServerTask>(results.size());
+    List<ServerTask> tasks = new ArrayList<>(results.size());
     for (Pair<Integer, DataLocation> result: results) {
       ServerTask task = taskList.get(result.first());
       //if (task.getState() != ServerTask.State.RESULT) {

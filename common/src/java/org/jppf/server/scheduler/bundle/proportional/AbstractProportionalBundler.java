@@ -52,7 +52,7 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
   /**
    * Mapping of individual bundler to corresponding performance data - global.
    */
-  private static final Set<AbstractProportionalBundler> BUNDLERS = new HashSet<AbstractProportionalBundler>();
+  private static final Set<AbstractProportionalBundler> BUNDLERS = new HashSet<>();
   /**
    * Mapping of individual bundler to corresponding performance data - local.
    */

@@ -43,7 +43,7 @@ public abstract class AbstractNioMessage implements NioMessage
   /**
    * The data location objects abstracting the data to send or receive.
    */
-  protected List<DataLocation> locations = new ArrayList<DataLocation>();
+  protected List<DataLocation> locations = new ArrayList<>();
   /**
    * The current position in the list of data locations.
    */

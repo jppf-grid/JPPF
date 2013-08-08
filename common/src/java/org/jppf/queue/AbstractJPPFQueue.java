@@ -77,7 +77,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   /**
    * Contains the ids of all queued jobs.
    */
-  protected final Map<String, T> jobMap = new HashMap<String, T>();
+  protected final Map<String, T> jobMap = new HashMap<>();
 
   /**
    * Add a listener to the list of listeners.

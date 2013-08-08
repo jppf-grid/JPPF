@@ -148,7 +148,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     /**
      * List of monitored threads.
      */
-    private final List<Thread> threadList = new ArrayList<Thread>();
+    private final List<Thread> threadList = new ArrayList<>();
     /**
      * A context class loader used during execution.
      */
@@ -156,7 +156,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     /**
      * A set of used class loaders used during execution.
      */
-    private final Set<UsedClassLoader> usedClassLoaders = new HashSet<UsedClassLoader>();
+    private final Set<UsedClassLoader> usedClassLoaders = new HashSet<>();
 
     /**
      * Initialize this thread factory with the specified name.
@@ -200,7 +200,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
       threadGroup = new ThreadGroup(this.name + " thread group");
       threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
       if (monitoringEnabled)
-        threadIDs = new ArrayList<Long>();
+        threadIDs = new ArrayList<>();
       else
         threadIDs = null;
     }

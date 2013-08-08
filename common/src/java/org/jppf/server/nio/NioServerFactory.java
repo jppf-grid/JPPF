@@ -131,7 +131,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
    */
   protected NioTransition<S> transition(final S state, final int ops)
   {
-    return new NioTransition<S>(state, ops);
+    return new NioTransition<>(state, ops);
   }
 
   /**

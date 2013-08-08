@@ -84,7 +84,7 @@ public abstract class AbstractCommonNode extends AbstractNode
    * Set the main classloader for the node.
    * @param cl the class loader to set.
    */
-  public void setClassLoader(final JPPFClassLoader cl)
+  public void setClassLoader(final AbstractJPPFClassLoader cl)
   {
     classLoaderManager.setClassLoader(cl);
   }

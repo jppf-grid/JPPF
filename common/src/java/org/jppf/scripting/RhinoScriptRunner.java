@@ -52,7 +52,7 @@ public class RhinoScriptRunner implements ScriptRunner
   /**
    * Mapping of Rhino scripts to their uuid.
    */
-  private static Map<String, Script> scriptMap = new HashMap<String, Script>();
+  private static Map<String, Script> scriptMap = new HashMap<>();
 
   /**
    * Initialize the Rhino environment.
@@ -163,7 +163,7 @@ public class RhinoScriptRunner implements ScriptRunner
     /**
      * Errors thrown during execution or translation of a script.
      */
-    public List<String> errors = new LinkedList<String>();
+    public List<String> errors = new LinkedList<>();
 
     /**
      * Report an error.

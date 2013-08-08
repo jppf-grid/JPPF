@@ -198,7 +198,7 @@ public class JPPFBundlerFactory
   public List<String> getBundlerProviderNames() throws Exception
   {
     if (providerMap == null) loadProviders();
-    return new ArrayList<String>(providerMap.keySet());
+    return new ArrayList<>(providerMap.keySet());
   }
 
   /**
@@ -207,7 +207,7 @@ public class JPPFBundlerFactory
    */
   private void loadProviders() throws Exception
   {
-    Map<String, JPPFBundlerProvider> map = new Hashtable<String, JPPFBundlerProvider>();
+    Map<String, JPPFBundlerProvider> map = new Hashtable<>();
     ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
     ClassLoader currentCL = getClass().getClassLoader();
     if (debugEnabled) log.debug("oldCL=" + oldCL + ", currentCL=" + currentCL);

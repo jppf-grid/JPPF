@@ -52,11 +52,11 @@ public abstract class AbstractClassLoaderManager
   /**
    * Mapping of containers to their corresponding application uuid.
    */
-  private final Map<String, JPPFContainer> containerMap = new HashMap<String, JPPFContainer>();
+  private final Map<String, JPPFContainer> containerMap = new HashMap<>();
   /**
    * A list retaining the container in chronological order of their creation.
    */
-  private final LinkedList<JPPFContainer> containerList = new LinkedList<JPPFContainer>();
+  private final LinkedList<JPPFContainer> containerList = new LinkedList<>();
   /**
    Leak prevention instance.
    */
@@ -96,7 +96,7 @@ public abstract class AbstractClassLoaderManager
    * Set the main class loader for the node.
    * @param cl the class loader to set.
    */
-  public synchronized void setClassLoader(final JPPFClassLoader cl)
+  public synchronized void setClassLoader(final AbstractJPPFClassLoader cl)
   {
     classLoader = cl;
   }
