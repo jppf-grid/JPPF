@@ -183,7 +183,7 @@ public class LongTaskRunner
     //executor.setBatchTimeout(1000L);
 
     long totalTime = System.currentTimeMillis();
-    List<Future<?>> futureList = new ArrayList<Future<?>>();
+    List<Future<?>> futureList = new ArrayList<>();
     for (int i=0; i<nbTasks; i++)
     {
       LongTask task = new LongTask(length, false);
@@ -219,7 +219,7 @@ public class LongTaskRunner
     for (int iter=0; iter<iterations; iter++)
     {
       long iterTime = System.currentTimeMillis();
-      List<JPPFTaskCallable> tasks = new ArrayList<JPPFTaskCallable>();
+      List<JPPFTaskCallable> tasks = new ArrayList<>();
       for (int i=0; i<nbTasks; i++)
       {
         LongTask task = new LongTask(length, false);

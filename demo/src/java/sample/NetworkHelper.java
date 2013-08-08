@@ -61,7 +61,7 @@ public class NetworkHelper
    * @throws Exception if any error occurs.
    */
   public static List<InetAddress> getIPAddresses(final InetAddressFilter filter) throws Exception {
-    List<InetAddress> list = new ArrayList<InetAddress>();
+    List<InetAddress> list = new ArrayList<>();
     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
     while (interfaces.hasMoreElements()) {
       NetworkInterface ni = interfaces.nextElement();

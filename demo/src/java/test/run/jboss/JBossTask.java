@@ -76,19 +76,19 @@ public class JBossTask extends CommandLineTask
     StringBuilder javaCmd = new StringBuilder(System.getProperty("java.home").replace("\\", "/"));
     if (javaCmd.charAt(javaCmd.length()-1) != '/') javaCmd.append('/');
     javaCmd.append("bin/java");
-    List<String> command = new ArrayList<String>();
+    List<String> command = new ArrayList<>();
     command.add(javaCmd.toString());
     command.addAll(Arrays.asList(args));
     setCommandList(command);
 
-    Map<String, String> rawEnv = new HashMap<String, String>();
+    Map<String, String> rawEnv = new HashMap<>();
     rawEnv.put("JBOSS_CLASSPATH", jbossHome + "/bin/run.jar");
     rawEnv.put("JBOSS_ENDORSED_DIRS", jbossHome + "/lib/endorsed");
     rawEnv.put("JBOSS_HOME", jbossHome );
     rawEnv.put("RUN_CLASSPATH", jbossHome + "/bin/run.jar");
     rawEnv.put("RUN_CONF", jbossHome + "/bin/run.conf.bat");
     rawEnv.put("RUNJAR", jbossHome + "/bin/run.jar");
-    Map<String, String> env = new HashMap<String, String>();
+    Map<String, String> env = new HashMap<>();
     String sep = System.getProperty("file.separator");
     for (Map.Entry<String, String> entry: rawEnv.entrySet()) env.put(entry.getKey(), entry.getValue().replace("/", sep));
     rawEnv.clear();

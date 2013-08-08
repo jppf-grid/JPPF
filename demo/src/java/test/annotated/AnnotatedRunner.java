@@ -75,7 +75,7 @@ public class AnnotatedRunner
 
     output("Running demo with time = " + time + " for " + nbJobs + " jobs");
     long totalTime = System.currentTimeMillis();
-    List<JPPFJob> jobs = new ArrayList<JPPFJob>();
+    List<JPPFJob> jobs = new ArrayList<>();
     for (int i=0; i<nbJobs; i++)
     {
       JPPFJob job = new JPPFJob();
@@ -113,7 +113,7 @@ public class AnnotatedRunner
     URLClassLoader cl = new URLClassLoader(new URL[] { url }, AnnotatedRunner.class.getClassLoader());
     Thread.currentThread().setContextClassLoader(cl);
     long totalTime = System.currentTimeMillis();
-    List<JPPFJob> jobs = new ArrayList<JPPFJob>();
+    List<JPPFJob> jobs = new ArrayList<>();
     for (int i=0; i<nbJobs; i++)
     {
       JPPFJob job = new JPPFJob();

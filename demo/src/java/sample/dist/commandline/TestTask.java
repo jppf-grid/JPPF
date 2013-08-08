@@ -87,8 +87,8 @@ public class TestTask extends CommandLineTaskEx
 
       // Read in the File
       String line = "";
-      List<String> file = new ArrayList<String>();
-      List<String> bFile = new ArrayList<String>();
+      List<String> file = new ArrayList<>();
+      List<String> bFile = new ArrayList<>();
       while ((line = br.readLine()) != null) file.add(line);
       // "Process" the File
       for (int i = file.size()-1; i >= 0; i--) bFile.add(file.get(i));

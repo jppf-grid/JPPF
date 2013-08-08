@@ -56,7 +56,7 @@ public class JPPFSourceCompiler
       //CharSequence[] srcArray = { buildTaskSource() };
       CharSequence[] srcArray = { buildSourceCode(), buildSourceCode2() };
       // build the map of sources to compile
-      Map<String, CharSequence> sources = new HashMap<String, CharSequence>();
+      Map<String, CharSequence> sources = new HashMap<>();
       for (CharSequence seq: srcArray)
       {
         String name = classNameFromSource(seq);

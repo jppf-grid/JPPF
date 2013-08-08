@@ -103,7 +103,7 @@ public class ProfilingRunner
   private static void performSequential(final int nbTask, final boolean silent) throws Exception
   {
     long start = System.nanoTime();
-    List<JPPFTask> tasks = new ArrayList<JPPFTask>();
+    List<JPPFTask> tasks = new ArrayList<>();
     for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
     for (JPPFTask task: tasks) task.run();
     long elapsed = System.nanoTime() - start;

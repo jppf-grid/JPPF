@@ -41,7 +41,7 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
   /**
    * The queue where the notifications are stored before being printed to file.
    */
-  private Queue<String> queue = new ConcurrentLinkedQueue<String>();
+  private Queue<String> queue = new ConcurrentLinkedQueue<>();
   /**
    * The writer printing the notifications to a file.
    */

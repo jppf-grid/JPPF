@@ -96,7 +96,7 @@ public class NonBlockingPoolMatrixRunner
         // create a data provider to share matrix b among all tasks
         DataProvider dataProvider = new MemoryMapDataProvider();
         dataProvider.setValue(MatrixTask.DATA_KEY, b);
-        List<JPPFJob> submissions = new ArrayList<JPPFJob>();
+        List<JPPFJob> submissions = new ArrayList<>();
         for (int n=0; n<nbSubmissions; n++)
         {
           JPPFJob job = new JPPFJob(dataProvider);

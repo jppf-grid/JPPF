@@ -134,7 +134,7 @@ public class DataSizeRunner
 
     output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
     long totalTime = System.currentTimeMillis();
-    List<Future<?>> futureList = new ArrayList<Future<?>>();
+    List<Future<?>> futureList = new ArrayList<>();
     for (int i=0; i<nbTasks; i++) futureList.add(executor.submit(new DataTask(datasize, inNodeOnly)));
     for (Future<?> f: futureList)
     {

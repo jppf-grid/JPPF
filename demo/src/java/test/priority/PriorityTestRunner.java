@@ -66,7 +66,7 @@ public class PriorityTestRunner
   public static void performJobSubmissions() throws Exception
   {
     int n = 10;
-    List<JPPFJob> jobList = new ArrayList<JPPFJob>();
+    List<JPPFJob> jobList = new ArrayList<>();
     jobList.add(createJob(new WaitTask(2000L), 0));
     for (int i=1; i<=n; i++) jobList.add(createJob(new PrioritizedTask(i), i));
     for (JPPFJob job: jobList) client.submit(job);

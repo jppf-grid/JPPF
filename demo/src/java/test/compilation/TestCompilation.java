@@ -74,7 +74,7 @@ public class TestCompilation
       if (!classesDir.mkdirs()) throw new IOException("could not create the classes directory '" + classesDir + "'");
     }
     String className = "test.compilation.MyTask";
-    Map<String, CharSequence> sources = new HashMap<String, CharSequence>();
+    Map<String, CharSequence> sources = new HashMap<>();
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
     SourceCompiler compiler = null;
@@ -101,7 +101,7 @@ public class TestCompilation
     output("****************************************");
     String className = "test.compilation.MyTask";
     // build the map of sources to compile
-    Map<String, CharSequence> sources = new HashMap<String, CharSequence>();
+    Map<String, CharSequence> sources = new HashMap<>();
     sources.put(className, buildSourceCode());
     sources.put(className + "2", buildSourceCode2());
     SourceCompiler compiler = null;

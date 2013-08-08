@@ -33,7 +33,7 @@ public abstract class JPPFTestTask extends JPPFTask
   /**
    * Holder for the execution results.
    */
-  protected List<ExecutionReport> reports = new ArrayList<ExecutionReport>();
+  protected List<ExecutionReport> reports = new ArrayList<>();
 
   /**
    * Initialize this task.

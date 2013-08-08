@@ -77,7 +77,7 @@ public class OptimizedJobRunner
 
     output("Running demo with time = " + time + " for " + nbJobs + " jobs");
     long totalTime = System.currentTimeMillis();
-    List<JPPFJob> jobs = new ArrayList<JPPFJob>();
+    List<JPPFJob> jobs = new ArrayList<>();
     for (int i=0; i<nbJobs; i++)
     {
       final JPPFJob job = new JPPFJob();

@@ -156,7 +156,7 @@ public class TestJMX
     /**
      * The task information received as notifications from the node.
      */
-    public List<Notification> notifs = new ArrayList<Notification>();
+    public List<Notification> notifs = new ArrayList<>();
     /**
      * 
      */

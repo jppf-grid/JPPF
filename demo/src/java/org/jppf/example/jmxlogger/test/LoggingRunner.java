@@ -50,7 +50,7 @@ public class LoggingRunner implements NotificationListener
   /**
    * Proxies to the MBean server of each node.
    */
-  private List<JMXNodeConnectionWrapper> jmxConnections = new ArrayList<JMXNodeConnectionWrapper>();
+  private List<JMXNodeConnectionWrapper> jmxConnections = new ArrayList<>();
   /**
    * Used to sequentialize the processing of notifications from multiple nodes.
    */

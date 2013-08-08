@@ -100,7 +100,7 @@ public class JPPFCallableRunner
       loggingHandler.register(jmxLogger);
     }
     print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
-    List<JPPFJob> jobList = new ArrayList<JPPFJob>();
+    List<JPPFJob> jobList = new ArrayList<>();
     for (int n=1; n<=nbJobs; n++)
     {
       String name = "job-" + StringUtils.padLeft(String.valueOf(n), '0', 4);

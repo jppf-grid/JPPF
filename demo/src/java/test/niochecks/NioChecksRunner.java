@@ -57,7 +57,7 @@ public class NioChecksRunner
       JPPFConfiguration.getProperties().setProperty("jppf.pool.size", "1");
       jppfClient = new JPPFClient("Always the same UUID");
       NioChecksRunner runner = new NioChecksRunner();
-      List<JPPFJob> jobList = new ArrayList<JPPFJob>();
+      List<JPPFJob> jobList = new ArrayList<>();
       for (int i=1; i<=1; i++)
       {
         JPPFJob job = runner.createJob("job " + i);

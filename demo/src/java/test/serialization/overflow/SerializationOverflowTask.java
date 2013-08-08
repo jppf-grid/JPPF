@@ -65,7 +65,7 @@ public class SerializationOverflowTask extends JPPFTask
     {
       if (time > 0L) Thread.sleep(time);
       int size = 256 * 1024 * 1024; // 256 MB
-      data = new ArrayList<byte[]>();
+      data = new ArrayList<>();
       for (int i=0; i<10; i++) data.add(new byte[size]);
       s = "task #" + id + " execution successful";
     }

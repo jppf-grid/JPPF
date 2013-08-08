@@ -137,7 +137,7 @@ public class LocalExecutionRunner
       jppfClient.setLocalExecutionEnabled(true);
       Thread.sleep(1000L);
       print("creating the jobs");
-      List<JPPFJob> jobs = new ArrayList<JPPFJob>(nbJobs);
+      List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=0; i<nbJobs; i++)
       {
         JPPFJob job = new JPPFJob();

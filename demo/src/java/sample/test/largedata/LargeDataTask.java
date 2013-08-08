@@ -48,7 +48,7 @@ public class LargeDataTask extends JPPFTask
   @Override
   public void run()
   {
-    Map<String, Long> countMap = new HashMap<String, Long>();
+    Map<String, Long> countMap = new HashMap<>();
     try
     {
       for (String article: articles)

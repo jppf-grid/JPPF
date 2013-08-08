@@ -90,7 +90,7 @@ public class LargeDataRunner
   /**
    * Holds the merged results.
    */
-  private static Map<String, Long> mergedResults = new TreeMap<String, Long>();
+  private static Map<String, Long> mergedResults = new TreeMap<>();
 
   /**
    * Entry point for this class, submits the tasks with a set duration to the server.
@@ -179,7 +179,7 @@ public class LargeDataRunner
     {
       int articleCount = 0;
       String article = null;
-      List<String> list = new ArrayList<String>(nbArticles);
+      List<String> list = new ArrayList<>(nbArticles);
       while (!reader.isClosed() && (articleCount < nbArticles))
       {
         article = reader.nextArticle();

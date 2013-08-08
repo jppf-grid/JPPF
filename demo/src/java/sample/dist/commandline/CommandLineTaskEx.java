@@ -43,11 +43,11 @@ public abstract class CommandLineTaskEx extends JPPFTask implements ProcessWrapp
   /**
    * The list of command-line arguments.
    */
-  private List<String> commandList = new LinkedList<String>();
+  private List<String> commandList = new LinkedList<>();
   /**
    * The environment variables to set.
    */
-  private Map<String, String> env = new HashMap<String, String>();
+  private Map<String, String> env = new HashMap<>();
   /**
    * The directory to start the command in.
    */

@@ -56,7 +56,7 @@ public class Main
       executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
       executor.setBatchSize(5);
       executor.setBatchTimeout(100L);
-      List<Future<Integer>> futures = new ArrayList<Future<Integer>>(20);
+      List<Future<Integer>> futures = new ArrayList<>(20);
       int nbTasks = 20;
       logger.info("Adding tasks");
       for (int i = 0; i < nbTasks; i++)
