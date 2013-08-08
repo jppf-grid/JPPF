@@ -91,6 +91,8 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
     JPPFTaskBundle bundle = clientBundle.getJob();
     // i don't know why bundle.getTaskCount() = 0 at this point
     bundle.setTaskCount(clientBundle.getTaskCount());
+    bundle.setSLA(null);
+    bundle.setMetadata(null);
     if (debugEnabled) log.debug("Sending bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
     IOHelper.sendData(socketClient, bundle, helper.getSerializer());
     for (ServerTask task : clientBundle.getTaskList()) IOHelper.writeData(task.getResult(), destination);

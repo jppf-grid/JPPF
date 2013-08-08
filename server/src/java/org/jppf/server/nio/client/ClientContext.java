@@ -47,7 +47,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   /**
    * The task bundle to send or receive.
    */
-  protected ServerTaskBundleClient bundle = null;
+  protected ServerTaskBundleClient clientBundle = null;
   /**
    * Helper used to serialize the bundle objects.
    */
@@ -55,8 +55,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
   /**
    * List of completed bundles to send to the client.
    */
-  //protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<ServerTaskBundleClient>();
-  protected final Queue<ServerTaskBundleClient> completedBundles = new ConcurrentLinkedQueue<ServerTaskBundleClient>();
+  //protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<>();
+  protected final Queue<ServerTaskBundleClient> completedBundles = new ConcurrentLinkedQueue<>();
   /**
    * The job as initially submitted by the client.
    */
@@ -76,7 +76,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ServerTaskBundleClient getBundle()
   {
-    return bundle;
+    return clientBundle;
   }
 
   /**
@@ -85,7 +85,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public void setBundle(final ServerTaskBundleClient bundle)
   {
-    this.bundle = bundle;
+    this.clientBundle = bundle;
   }
 
   @Override
@@ -119,9 +119,12 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public void serializeBundle() throws Exception
   {
     ClientMessage message = newMessage();
-    message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
-    for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getResult());
-    message.setBundle(bundle.getJob());
+    JPPFTaskBundle bundle = clientBundle.getJob();
+    bundle.setSLA(null);
+    bundle.setMetadata(null);
+    message.addLocation(IOHelper.serializeData(bundle, helper.getSerializer()));
+    for (ServerTask task: clientBundle.getTaskList()) message.addLocation(task.getResult());
+    message.setBundle(clientBundle.getJob());
     setClientMessage(message);
   }
 

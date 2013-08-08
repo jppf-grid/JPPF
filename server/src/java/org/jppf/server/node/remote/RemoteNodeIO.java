@@ -79,7 +79,7 @@ public class RemoteNodeIO extends AbstractNodeIO
   protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
   {
     int count = bundle.getTaskCount();
-    List<Object> list = new ArrayList<Object>(count + 2);
+    List<Object> list = new ArrayList<>(count + 2);
     list.add(bundle);
     try
     {
@@ -134,7 +134,9 @@ public class RemoteNodeIO extends AbstractNodeIO
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizePerformanceData(bundle);
-    List<Future<DataLocation>> futureList = new ArrayList<Future<DataLocation>>(tasks.size() + 1);
+    bundle.setSLA(null);
+    bundle.setMetadata(null);
+    List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
     OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
