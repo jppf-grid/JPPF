@@ -50,7 +50,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
    * Singleton instance of this class.
    */
   //private static StatsHandler instance = null;
-  private static AtomicReference<StatsHandler> instance = new AtomicReference<StatsHandler>();
+  private static AtomicReference<StatsHandler> instance = new AtomicReference<>();
   /**
    * JPPF client used to submit execution requests.
    */
@@ -66,7 +66,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
   /**
    * List of listeners registered with this stats formatter.
    */
-  private List<StatsHandlerListener> listeners = new ArrayList<StatsHandlerListener>();
+  private List<StatsHandlerListener> listeners = new ArrayList<>();
   /**
    * Timer used to query the stats from the server.
    */
@@ -82,7 +82,7 @@ public final class StatsHandler implements StatsConstants, ClientListener
   /**
    * Contains all the data and its converted values received from the server.
    */
-  Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<String, ConnectionDataHolder>();
+  Map<String, ConnectionDataHolder> dataHolderMap = new HashMap<>();
   /**
    * Number of data updates so far.
    */

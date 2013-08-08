@@ -61,7 +61,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
   /**
    * Scripts used by this option or its children.
    */
-  protected List<ScriptDescriptor> scripts = new ArrayList<ScriptDescriptor>();
+  protected List<ScriptDescriptor> scripts = new ArrayList<>();
   /**
    * The action to fire immediately after the page is built, allowing to
    * perform initializations before the page is displayed and used.

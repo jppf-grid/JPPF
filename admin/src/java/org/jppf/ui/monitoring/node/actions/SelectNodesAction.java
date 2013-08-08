@@ -53,7 +53,7 @@ public class SelectNodesAction extends AbstractSelectionAction
     {
       JPPFTreeTable treeTable = panel.getTreeTable();
       TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-      List<TreePath> selectionPath = new ArrayList<TreePath>();
+      List<TreePath> selectionPath = new ArrayList<>();
       for (DefaultMutableTreeNode driverNode: getDriverNodes())
       {
         for (int i=0; i<driverNode.getChildCount(); i++)

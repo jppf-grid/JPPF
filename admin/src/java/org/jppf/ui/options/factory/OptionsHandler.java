@@ -48,11 +48,11 @@ public final class OptionsHandler
   /**
    * The list of option pages managed by this handler.
    */
-  private static List<OptionElement> pageList = new Vector<OptionElement>();
+  private static List<OptionElement> pageList = new Vector<>();
   /**
    * A mapping of option pages to their name.
    */
-  private static Map<String, OptionElement> pageMap = new Hashtable<String, OptionElement>();
+  private static Map<String, OptionElement> pageMap = new Hashtable<>();
   /**
    * The page builder used to instantiate pages from XML descriptors.
    */
@@ -373,7 +373,7 @@ public final class OptionsHandler
     /**
      * The children of the corresponding option element.
      */
-    public List<OptionNode> children = new ArrayList<OptionNode>();
+    public List<OptionNode> children = new ArrayList<>();
 
     /**
      * Initialize this node.

@@ -66,11 +66,11 @@ public class GraphTopologyHandler implements TopologyChangeListener
   /**
    * 
    */
-  private Map<String, TopologyData> drivers = new HashMap<String, TopologyData>();
+  private Map<String, TopologyData> drivers = new HashMap<>();
   /**
    * 
    */
-  private Map<String, java.util.List<TopologyData>> driversAsNodes = new HashMap<String, java.util.List<TopologyData>>();
+  private Map<String, java.util.List<TopologyData>> driversAsNodes = new HashMap<>();
 
   /**
    * Initialize this graph handler.
@@ -79,8 +79,8 @@ public class GraphTopologyHandler implements TopologyChangeListener
   public GraphTopologyHandler(final GraphOption graphOption)
   {
     this.graphOption = graphOption;
-    fullGraph = new SparseMultigraph<TopologyData, Number>();
-    displayGraph = new SparseMultigraph<TopologyData, Number>();
+    fullGraph = new SparseMultigraph<>();
+    displayGraph = new SparseMultigraph<>();
   }
 
   /**
@@ -188,7 +188,7 @@ public class GraphTopologyHandler implements TopologyChangeListener
         java.util.List<TopologyData> list = driversAsNodes.get(node.getUuid());
         if (list == null)
         {
-          list = new ArrayList<TopologyData>();
+          list = new ArrayList<>();
           driversAsNodes.put(node.getUuid(), list);
         }
         list.add(node);

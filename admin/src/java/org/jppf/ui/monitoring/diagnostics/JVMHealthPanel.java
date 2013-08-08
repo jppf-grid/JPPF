@@ -160,7 +160,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
         log.error("error getting health snapshot for driver " + driverData.getUuid(), e);
       }
       if ((driverNode.getChildCount() <= 0) || (driverData.getNodeForwarder() == null)) continue;
-      Map<String, TopologyData> uuidMap = new HashMap<String, TopologyData>();
+      Map<String, TopologyData> uuidMap = new HashMap<>();
       for (int j=0; j<driverNode.getChildCount(); j++) {
         DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
         TopologyData data = (TopologyData) nodeNode.getUserObject();
@@ -168,7 +168,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
       }
       Map<String, Object> result = null;
       try {
-        result = driverData.getNodeForwarder().healthSnapshot(new NodeSelector.UuidSelector(new HashSet<String>(uuidMap.keySet())));
+        result = driverData.getNodeForwarder().healthSnapshot(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
       } catch(IOException e) {
         log.error("error getting node health for driver " + driverData.getUuid() + ", reinitializing the connection", e);
         driverData.initializeProxies();
@@ -336,7 +336,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   {
     Preferences pref = OptionsHandler.getPreferences().node("thresholds");
     Map<Thresholds.Name, Double> values = thresholds.getValues();
-    List<Thresholds.Name> list = new ArrayList<Thresholds.Name>(values.keySet());
+    List<Thresholds.Name> list = new ArrayList<>(values.keySet());
     for (Thresholds.Name name: list)
     {
       Double value = pref.getDouble(name.toString().toLowerCase(), -1d);

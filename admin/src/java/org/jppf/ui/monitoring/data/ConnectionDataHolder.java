@@ -32,15 +32,15 @@ public class ConnectionDataHolder
    * The list of all snapshots kept in memory. the size of this list is always equal to or less than
    * the rollover position.
    */
-  private List<JPPFStats> dataList = new Vector<JPPFStats>();
+  private List<JPPFStats> dataList = new Vector<>();
   /**
    * Cache of the data snapshots fields maps to their corresponding string values.
    */
-  private List<Map<Fields, String>> stringValuesMaps = new Vector<Map<Fields, String>>();
+  private List<Map<Fields, String>> stringValuesMaps = new Vector<>();
   /**
    * Cache of the data snapshots fields maps to their corresponding double values.
    */
-  private List<Map<Fields, Double>> doubleValuesMaps = new Vector<Map<Fields, Double>>();
+  private List<Map<Fields, Double>> doubleValuesMaps = new Vector<>();
 
   /**
    * Get the list of statistic snapshots for this connection data holder.

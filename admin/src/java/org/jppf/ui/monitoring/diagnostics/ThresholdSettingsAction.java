@@ -175,7 +175,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
   private void doOK()
   {
     final Map<Thresholds.Name, Double> values = healthPanel.thresholds.getValues();
-    final List<Thresholds.Name> list = new ArrayList<Thresholds.Name>(values.keySet());
+    final List<Thresholds.Name> list = new ArrayList<>(values.keySet());
     Runnable r = new Runnable() {
       @Override
       public void run() {

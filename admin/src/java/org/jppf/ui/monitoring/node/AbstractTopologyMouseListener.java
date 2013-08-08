@@ -89,7 +89,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter
     JTree tree = treeTable.getTree();
     int x = event.getX();
     int y = event.getY();
-    List<TopologyData> dataList = new ArrayList<TopologyData>();
+    List<TopologyData> dataList = new ArrayList<>();
     int[] rows = treeTable.getSelectedRows();
     if ((rows == null) || (rows.length == 0))
     {

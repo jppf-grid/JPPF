@@ -59,19 +59,19 @@ public class OptionDescriptor extends TypedProperties
   /**
    * Children of this option element.
    */
-  public List<OptionDescriptor> children = new ArrayList<OptionDescriptor>();
+  public List<OptionDescriptor> children = new ArrayList<>();
   /**
    * Listeners of this option element.
    */
-  public List<ListenerDescriptor> listeners = new ArrayList<ListenerDescriptor>();
+  public List<ListenerDescriptor> listeners = new ArrayList<>();
   /**
    * Items used in list boxes or combo boxes.
    */
-  public List<ItemDescriptor> items = new ArrayList<ItemDescriptor>();
+  public List<ItemDescriptor> items = new ArrayList<>();
   /**
    * Items used in list boxes or combo boxes.
    */
-  public List<ScriptDescriptor> scripts = new ArrayList<ScriptDescriptor>();
+  public List<ScriptDescriptor> scripts = new ArrayList<>();
   /**
    * Initializer.
    */

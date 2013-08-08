@@ -32,7 +32,7 @@ public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
   /**
    * Represents map of accumulated changes.
    */
-  private final Map<K, V> map = new HashMap<K, V>();
+  private final Map<K, V> map = new HashMap<>();
 
   /**
    * Initialize this branch job accumulator with the specified value and type of change.

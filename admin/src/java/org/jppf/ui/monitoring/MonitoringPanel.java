@@ -53,7 +53,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   /**
    * Holds a list of table models to update when new stats are received.
    */
-  private List<MonitorTableModel> tableModels = new ArrayList<MonitorTableModel>();
+  private List<MonitorTableModel> tableModels = new ArrayList<>();
 
   /**
    * Default constructor.

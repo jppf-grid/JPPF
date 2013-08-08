@@ -110,8 +110,8 @@ public class NodeRefreshHandler
   private synchronized void refresh0()
   {
     Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
-    Set<String> uuidSet = new HashSet<String>();
-    Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
+    Set<String> uuidSet = new HashSet<>();
+    Map<String, JPPFClientConnection> map = new HashMap<>();
     for (JPPFClientConnection c: connectionList)
     {
       String driverUuid = c.getDriverUuid();
@@ -122,7 +122,7 @@ public class NodeRefreshHandler
     Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
 
     // handle drivers that were removed
-    List<String> driversToProcess = new ArrayList<String>();
+    List<String> driversToProcess = new ArrayList<>();
     for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
     {
       String uuid = entry.getValue().getDriverUuid();
@@ -136,7 +136,7 @@ public class NodeRefreshHandler
     }
 
     // handle drivers that were added
-    driversToProcess = new ArrayList<String>();
+    driversToProcess = new ArrayList<>();
     for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
     {
       String uuid = entry.getKey();
@@ -159,7 +159,7 @@ public class NodeRefreshHandler
     DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverUuid);
     //if (debugEnabled) log.debug("driverNode = " + driverNode);
     if (driverNode == null) return;
-    Set<String> panelUuids = new HashSet<String>();
+    Set<String> panelUuids = new HashSet<>();
     for (int i=0; i<driverNode.getChildCount(); i++) {
       DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       TopologyData data = (TopologyData) nodeNode.getUserObject();
@@ -176,9 +176,9 @@ public class NodeRefreshHandler
       return;
     }
     if (nodesInfo == null) return;
-    Map<String, JPPFManagementInfo> actualMap = new HashMap<String, JPPFManagementInfo>();
+    Map<String, JPPFManagementInfo> actualMap = new HashMap<>();
     for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getUuid(), info);
-    List<String> nodesToProcess = new ArrayList<String>(panelUuids.size());
+    List<String> nodesToProcess = new ArrayList<>(panelUuids.size());
     for (String uuid: panelUuids) {
       if (!actualMap.containsKey(uuid)) nodesToProcess.add(uuid);
     }

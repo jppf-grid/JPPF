@@ -98,7 +98,7 @@ public class ListOption extends AbstractOption
       public void valueChanged(final ListSelectionEvent e)
       {
         if (e.getValueIsAdjusting()) return;
-        List<Object> sel = new ArrayList<Object>();
+        List<Object> sel = new ArrayList<>();
         sel.addAll(Arrays.asList(list.getSelectedValues()));
         value = sel;
         fireValueChanged();
@@ -153,7 +153,7 @@ public class ListOption extends AbstractOption
     if (value == null) value = new ArrayList();
     else if (value instanceof String)
     {
-      List<Object> tmpList = new ArrayList<Object>();
+      List<Object> tmpList = new ArrayList<>();
       String[] names = ((String) value).split(",");
       for (String s: names)
       {
@@ -172,7 +172,7 @@ public class ListOption extends AbstractOption
     List selectedItems = (List) value;
     model.removeAllElements();
     for (Object item: items) model.addElement(item);
-    List<Integer> indices = new ArrayList<Integer>();
+    List<Integer> indices = new ArrayList<>();
     for (Object item: selectedItems)
     {
       int n = items.indexOf(item);

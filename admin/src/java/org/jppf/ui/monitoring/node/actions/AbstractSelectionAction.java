@@ -55,7 +55,7 @@ public abstract class AbstractSelectionAction extends AbstractTopologyAction
    */
   protected List<DefaultMutableTreeNode> getDriverNodes()
   {
-    List<DefaultMutableTreeNode> list = new ArrayList<DefaultMutableTreeNode>();
+    List<DefaultMutableTreeNode> list = new ArrayList<>();
     JPPFTreeTable treeTable = panel.getTreeTable();
     TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getTreeTableModel().getRoot();

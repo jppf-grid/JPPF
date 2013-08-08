@@ -111,12 +111,12 @@ public class GraphOption extends AbstractOption implements ActionHolder
       SparseMultigraph<TopologyData, Number> graph = graphHandler.getDisplayGraph();
       layoutFactory = new LayoutFactory(graph);
       layout = "Radial";
-      viewer = new VisualizationViewer<TopologyData, Number>(layoutFactory.createLayout(layout));
+      viewer = new VisualizationViewer<>(layoutFactory.createLayout(layout));
       layoutFactory.setViewer(viewer);
       viewer.setBackground(Color.white);
       viewer.setPickedVertexState(new MultiPickedState());
       viewer.setPickSupport(new ShapePickSupport(viewer));
-      VertexLabelAsShapeRenderer<TopologyData, Number> vlasr = new VertexLabelAsShapeRenderer<TopologyData, Number>(viewer.getRenderContext());
+      VertexLabelAsShapeRenderer<TopologyData, Number> vlasr = new VertexLabelAsShapeRenderer<>(viewer.getRenderContext());
       viewer.getRenderer().setVertexLabelRenderer(vlasr);
       viewer.getRenderContext().setVertexShapeTransformer(vlasr);
       JPPFVertexLabelRenderer renderer = new JPPFVertexLabelRenderer();
@@ -129,7 +129,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
         renderer.setPreferredSize(d);
       }
       viewer.getRenderContext().setVertexLabelRenderer(renderer);
-      viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<TopologyData>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
+      viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
       viewer.getRenderContext().setVertexDrawPaintTransformer(new ConstantTransformer(null));
       viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(0.5f)));
       viewer.setVertexToolTipTransformer(new ToStringLabeller<TopologyData>() {
@@ -140,9 +140,9 @@ public class GraphOption extends AbstractOption implements ActionHolder
       });
       graphComponent = new GraphZoomScrollPane(viewer);
       actionHandler = new GraphActionHandler(viewer);
-      EditingModalGraphMouse<TopologyData, Number> graphMouse = new EditingModalGraphMouse<TopologyData, Number>(viewer.getRenderContext(), null, null);
+      EditingModalGraphMouse<TopologyData, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
       graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
-      PopupMenuMousePlugin<TopologyData, Number> myPlugin = new PopupMenuMousePlugin<TopologyData, Number>(actionHandler);
+      PopupMenuMousePlugin<TopologyData, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
       graphMouse.remove(graphMouse.getPopupEditingPlugin());
       graphMouse.add(myPlugin);
       viewer.setGraphMouse(graphMouse);

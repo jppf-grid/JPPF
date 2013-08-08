@@ -76,7 +76,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
   {
     try
     {
-      final List<JMXDriverConnectionWrapper> driverConnections = new ArrayList<JMXDriverConnectionWrapper>();
+      final List<JMXDriverConnectionWrapper> driverConnections = new ArrayList<>();
       for (Object o: selectedElements)
       {
         if (!(o instanceof TopologyData)) continue;

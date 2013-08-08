@@ -49,19 +49,19 @@ public class NodeDataPanelManager {
   /**
    * Mapping of driver uuids to the corresponding {@link TopologyData} objects.
    */
-  private final Map<String, TopologyData> driverMap = new Hashtable<String, TopologyData>();
+  private final Map<String, TopologyData> driverMap = new Hashtable<>();
   /**
    * Mapping of peer driver uuids to the corresponding {@link TopologyData} objects.
    */
-  private final Map<String, TopologyData> peerMap = new Hashtable<String, TopologyData>();
+  private final Map<String, TopologyData> peerMap = new Hashtable<>();
   /**
    * Mapping of node uuids to the corresponding {@link TopologyData} objects.
    */
-  private final Map<String, TopologyData> nodeMap = new Hashtable<String, TopologyData>();
+  private final Map<String, TopologyData> nodeMap = new Hashtable<>();
   /**
    * 
    */
-  private final List<TopologyChangeListener> listeners = new CopyOnWriteArrayList<TopologyChangeListener>();
+  private final List<TopologyChangeListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Initialize this manager.

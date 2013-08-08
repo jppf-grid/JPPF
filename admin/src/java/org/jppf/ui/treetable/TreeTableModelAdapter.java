@@ -295,7 +295,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
     try
     {
       if (paths == null) return;
-      List<TreePath> validPaths = new ArrayList<TreePath>();
+      List<TreePath> validPaths = new ArrayList<>();
       for (TreePath path: paths)
       {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();

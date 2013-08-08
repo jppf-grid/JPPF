@@ -318,7 +318,7 @@ public class OptionElementFactory
     ComboBoxOption option = new ComboBoxOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
-    List<Object> items = new ArrayList<Object>();
+    List<Object> items = new ArrayList<>();
     for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
     option.setItems(items);
     option.setValue(desc.getProperty("value"));
@@ -338,13 +338,13 @@ public class OptionElementFactory
     ListOption option = new ListOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
-    List<Object> items = new ArrayList<Object>();
+    List<Object> items = new ArrayList<>();
     for (ItemDescriptor itemDesc: desc.items) items.add(itemDesc.name);
     int selMode = "single".equals(desc.getProperty("selection"))
     ? ListSelectionModel.SINGLE_SELECTION : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
     option.setSelMode(selMode);
     option.setItems(items);
-    option.setValue(new ArrayList<Object>());
+    option.setValue(new ArrayList<>());
     option.createUI();
     option.setEventsEnabled(true);
     return option;
@@ -405,7 +405,7 @@ public class OptionElementFactory
   public List<OptionElement> loadImport(final OptionDescriptor desc) throws Exception
   {
     OptionsPageBuilder builder = new OptionsPageBuilder(true);
-    List<OptionElement> list = new ArrayList<OptionElement>();
+    List<OptionElement> list = new ArrayList<>();
     String source = desc.getProperty("source");
     String location = desc.getProperty("location");
     if ("url".equalsIgnoreCase(source)) list.add(builder.buildPageFromURL(location, builder.getBaseName()));
@@ -413,7 +413,7 @@ public class OptionElementFactory
     else if ("plugin".equalsIgnoreCase(source))
     {
       List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
-      Set<String> names = new HashSet<String>();
+      Set<String> names = new HashSet<>();
       for (String def: pathList)
       {
         OptionElement elt = builder.buildPage(def, null);

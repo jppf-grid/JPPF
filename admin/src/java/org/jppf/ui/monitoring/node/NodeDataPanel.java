@@ -60,7 +60,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Mapping of connection names to status listener.
    */
-  private Map<String, ConnectionStatusListener> listenerMap = new Hashtable<String, ConnectionStatusListener>();
+  private Map<String, ConnectionStatusListener> listenerMap = new Hashtable<>();
   /**
    * Number of active servers.
    */
@@ -261,7 +261,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    */
   public synchronized Map<String, JPPFClientConnection> getAllDriverNames()
   {
-    Map<String, JPPFClientConnection> map = new HashMap<String, JPPFClientConnection>();
+    Map<String, JPPFClientConnection> map = new HashMap<>();
     for (int i=0; i<treeTableRoot.getChildCount(); i++)
     {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
@@ -283,7 +283,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       TopologyData driverData = (TopologyData) driverNode.getUserObject();
       if (driverNode.getChildCount() <= 0) continue;
       if (driverData.getNodeForwarder() == null) continue;
-      Map<String, TopologyData> uuidMap = new HashMap<String, TopologyData>();
+      Map<String, TopologyData> uuidMap = new HashMap<>();
       for (int j=0; j<driverNode.getChildCount(); j++)
       {
         DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
@@ -293,7 +293,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
       Map<String, Object> result = null;
       try
       {
-        result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet<String>(uuidMap.keySet())));
+        result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
       }
       catch(IOException e)
       {

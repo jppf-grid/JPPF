@@ -130,7 +130,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
    */
   private Collection<TopologyData> getDrivers()
   {
-    Set<TopologyData> drivers = new HashSet<TopologyData>();
+    Set<TopologyData> drivers = new HashSet<>();
     Collection<TopologyData> coll = graph.getVertices();
     if (coll != null)
     {
@@ -146,7 +146,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
    */
   private Collection<TopologyData> getNodes(final TopologyData driver)
   {
-    Set<TopologyData> nodes = new HashSet<TopologyData>();
+    Set<TopologyData> nodes = new HashSet<>();
     Collection<TopologyData> coll = graph.getNeighbors(driver);
     if (coll != null)
     {

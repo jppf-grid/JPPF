@@ -49,7 +49,7 @@ public class SelectDriversAction extends AbstractSelectionAction
     {
       JPPFTreeTable treeTable = panel.getTreeTable();
       TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
-      List<TreePath> selectionPath = new ArrayList<TreePath>();
+      List<TreePath> selectionPath = new ArrayList<>();
       for (DefaultMutableTreeNode driverNode: getDriverNodes()) selectionPath.add(treeTable.getPathForNode(driverNode));
       model.setSelectedPaths(selectionPath.toArray(new TreePath[selectionPath.size()]));
     }

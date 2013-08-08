@@ -163,7 +163,7 @@ public class PreferencesStorage
     config.unit = child.get("unit", null);
     String fields = child.get("fields", "");
     String[] sFields = fields.split("\\|");
-    List<Fields> list = new ArrayList<Fields>();
+    List<Fields> list = new ArrayList<>();
     for (String sField : sFields) {
       Fields f = lookupEnum(sField);
       if (f != null) list.add(f);

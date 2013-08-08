@@ -283,7 +283,7 @@ public class OptionsPageBuilder
   public List<OptionElement> build(final OptionDescriptor desc) throws Exception
   {
     OptionElementFactory f = getFactory();
-    List<OptionElement> list = new ArrayList<OptionElement>();
+    List<OptionElement> list = new ArrayList<>();
     String type = desc.type;
     if ("page".equalsIgnoreCase(type)) list.add(f.buildPage(desc));
     else if ("SplitPane".equalsIgnoreCase(desc.type)) list.add(f.buildSplitPane(desc));

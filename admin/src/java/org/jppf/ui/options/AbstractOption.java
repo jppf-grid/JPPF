@@ -47,7 +47,7 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
   /**
    * List of listeners that are notified when the value of this option changes.
    */
-  protected java.util.List<ValueChangeListener> listeners = new ArrayList<ValueChangeListener>();
+  protected java.util.List<ValueChangeListener> listeners = new ArrayList<>();
   /**
    * Determines whether the value of this option should be saved in the user preferences.
    */

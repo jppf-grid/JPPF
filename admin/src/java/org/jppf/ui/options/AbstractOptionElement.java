@@ -91,7 +91,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
   @Override
   public TreePath getPath()
   {
-    List<OptionElement> list = new ArrayList<OptionElement>();
+    List<OptionElement> list = new ArrayList<>();
     OptionElement elt = this;
     while (elt != null)
     {
@@ -109,7 +109,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
   @Override
   public String getStringPath()
   {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     OptionElement elt = this;
     while (elt != null)
     {
@@ -191,7 +191,7 @@ public abstract class AbstractOptionElement extends AbstractOptionProperties imp
   public List<OptionElement> findAllWithName(final String name)
   {
     if (name.startsWith("/")) return getRoot().findAllWithName(name.substring(1));
-    List<OptionElement> list = new ArrayList<OptionElement>();
+    List<OptionElement> list = new ArrayList<>();
     findAll(name, list);
     return list;
   }

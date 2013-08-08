@@ -171,7 +171,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
       else if (o instanceof Exception) throw (Exception) o;
       JPPFSystemInformation info = (JPPFSystemInformation) o;
       TypedProperties props = info.getJppf();
-      Set<String> keys = new TreeSet<String>();
+      Set<String> keys = new TreeSet<>();
       for (Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
       for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
     }
@@ -191,7 +191,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
   {
     try
     {
-      Map<Object, Object> map = new HashMap<Object, Object>();
+      Map<Object, Object> map = new HashMap<>();
       BufferedReader reader = new BufferedReader(new StringReader(source));
       try {
         while (true)

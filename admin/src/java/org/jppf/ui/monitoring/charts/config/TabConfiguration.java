@@ -38,7 +38,7 @@ public class TabConfiguration
   /**
    * The list of chart configurations contained in this tab.
    */
-  public List<ChartConfiguration> configs = new ArrayList<ChartConfiguration>();
+  public List<ChartConfiguration> configs = new ArrayList<>();
   /**
    * The position of this tab in the list of tabs.
    */

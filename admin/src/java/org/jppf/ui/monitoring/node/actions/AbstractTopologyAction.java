@@ -57,7 +57,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
   public void updateState(final List<Object> selectedElements)
   {
     super.updateState(selectedElements);
-    List<TopologyData> list = new ArrayList<TopologyData>();
+    List<TopologyData> list = new ArrayList<>();
     for (Object o: selectedElements)
     {
       TopologyData data = (TopologyData) o;
@@ -76,7 +76,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
    */
   protected CollectionMap<TopologyData, String> getDriverMap()
   {
-    CollectionMap<TopologyData, String> map = new ArrayListHashMap<TopologyData, String>();
+    CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
     for (TopologyData data: dataArray)
     {
       if (data.getType() != TopologyDataType.NODE) continue;

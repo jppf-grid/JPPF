@@ -102,7 +102,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
       sb.append(script);
       scriptText = sb.toString();
     }
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("root", option.getRoot());
     variables.put("option", option);
     try

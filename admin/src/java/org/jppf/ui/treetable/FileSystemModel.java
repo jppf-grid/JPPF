@@ -69,7 +69,7 @@ import java.util.*;
  * @author Philip Milne
  * @author Scott Violet
  */
-public class FileSystemModel extends AbstractTreeTableModel implements TreeTableModel
+public class FileSystemModel extends AbstractTreeTableModel
 {
   /**
    * Names of the columns.

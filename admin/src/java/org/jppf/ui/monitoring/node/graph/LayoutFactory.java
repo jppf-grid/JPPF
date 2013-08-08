@@ -76,7 +76,7 @@ class LayoutFactory
    */
   private CircleLayout<TopologyData, Number> createCircleLayout()
   {
-    CircleLayout<TopologyData, Number> layout = new CircleLayout<TopologyData, Number>(initialGraph);
+    CircleLayout<TopologyData, Number> layout = new CircleLayout<>(initialGraph);
     layout.setRadius(150);
     return layout;
   }
@@ -87,7 +87,7 @@ class LayoutFactory
    */
   private FRLayout<TopologyData, Number> createFRLayout()
   {
-    FRLayout<TopologyData, Number> layout = new FRLayout<TopologyData, Number>(initialGraph);
+    FRLayout<TopologyData, Number> layout = new FRLayout<>(initialGraph);
     layout.setAttractionMultiplier(0.75d);
     layout.setRepulsionMultiplier(0.75d);
     layout.setMaxIterations(700);
@@ -100,7 +100,7 @@ class LayoutFactory
    */
   private FRLayout2<TopologyData, Number> createFRLayout2()
   {
-    FRLayout2<TopologyData, Number> layout = new FRLayout2<TopologyData, Number>(initialGraph);
+    FRLayout2<TopologyData, Number> layout = new FRLayout2<>(initialGraph);
     layout.setAttractionMultiplier(0.75d);
     layout.setRepulsionMultiplier(0.75d);
     layout.setMaxIterations(700);
@@ -113,7 +113,7 @@ class LayoutFactory
    */
   private ISOMLayout<TopologyData, Number> createISOMLayout()
   {
-    ISOMLayout<TopologyData, Number> layout = new ISOMLayout<TopologyData, Number>(initialGraph);
+    ISOMLayout<TopologyData, Number> layout = new ISOMLayout<>(initialGraph);
     return layout;
   }
 
@@ -123,7 +123,7 @@ class LayoutFactory
    */
   private KKLayout<TopologyData, Number> createKKLayout()
   {
-    KKLayout<TopologyData, Number> layout = new KKLayout<TopologyData, Number>(initialGraph);
+    KKLayout<TopologyData, Number> layout = new KKLayout<>(initialGraph);
     layout.setAdjustForGravity(true);
     layout.setDisconnectedDistanceMultiplier(0.5d);
     layout.setExchangeVertices(true);
@@ -138,7 +138,7 @@ class LayoutFactory
    */
   private SpringLayout<TopologyData, Number> createSpringLayout()
   {
-    SpringLayout<TopologyData, Number> layout = new SpringLayout<TopologyData, Number>(initialGraph);
+    SpringLayout<TopologyData, Number> layout = new SpringLayout<>(initialGraph);
     layout.setForceMultiplier(1d/3d);
     layout.setRepulsionRange(100*100);
     layout.setStretch(0.7d);
@@ -151,7 +151,7 @@ class LayoutFactory
    */
   private SpringLayout2<TopologyData, Number> createSpringLayout2()
   {
-    SpringLayout2<TopologyData, Number> layout = new SpringLayout2<TopologyData, Number>(initialGraph);
+    SpringLayout2<TopologyData, Number> layout = new SpringLayout2<>(initialGraph);
     layout.setForceMultiplier(1d/3d);
     layout.setRepulsionRange(100*100);
     layout.setStretch(0.7d);
@@ -176,7 +176,7 @@ class LayoutFactory
   private StaticLayout<TopologyData, Number> createStaticLayout()
   {
     Collection<TopologyData> vertices = initialGraph.getVertices();
-    StaticLayout<TopologyData, Number> layout = new StaticLayout<TopologyData, Number>(initialGraph);
+    StaticLayout<TopologyData, Number> layout = new StaticLayout<>(initialGraph);
     return layout;
   }
 

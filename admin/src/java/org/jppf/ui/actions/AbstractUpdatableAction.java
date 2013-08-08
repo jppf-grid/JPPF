@@ -42,7 +42,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
   /**
    * The list of selected elements.
    */
-  protected List<Object> selectedElements = new LinkedList<Object>();
+  protected List<Object> selectedElements = new LinkedList<>();
   /**
    * Location at which to display any window or dialog created by this action.
    */

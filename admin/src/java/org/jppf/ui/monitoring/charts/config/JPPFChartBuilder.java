@@ -40,7 +40,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * Mapping of chart types to the chart handler used to create and update them.
    */
-  private Map<ChartType, ChartHandler> handlerMap = new HashMap<ChartType, ChartHandler>();
+  private Map<ChartType, ChartHandler> handlerMap = new HashMap<>();
   /**
    * The tabbed pane in which each pane contains user-defined charts.
    */
@@ -48,11 +48,11 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * The list of tab names handled by this chart builder.
    */
-  private List<TabConfiguration> tabList = new ArrayList<TabConfiguration>();
+  private List<TabConfiguration> tabList = new ArrayList<>();
   /**
    * Mapping of tab names to their respective configuration parameters.
    */
-  private Map<String, TabConfiguration> tabMap = new HashMap<String, TabConfiguration>();
+  private Map<String, TabConfiguration> tabMap = new HashMap<>();
   /**
    * Used to store and retrieve the configuration, to and from the preferences tree.
    */

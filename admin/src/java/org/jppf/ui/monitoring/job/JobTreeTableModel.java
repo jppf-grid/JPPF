@@ -26,7 +26,7 @@ import org.jppf.ui.treetable.*;
 /**
  * Tree table model for the tree table.
  */
-public class JobTreeTableModel extends AbstractJPPFTreeTableModel implements TreeTableModel
+public class JobTreeTableModel extends AbstractJPPFTreeTableModel
 {
   /**
    * Column number for the node's url.

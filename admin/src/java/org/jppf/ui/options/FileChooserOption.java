@@ -61,7 +61,7 @@ public class FileChooserOption extends AbstractOption
   /**
    * The list of filters used to control what files can be selected.
    */
-  private List<Filter> filters = new ArrayList<Filter>();
+  private List<Filter> filters = new ArrayList<>();
 
   /**
    * Default constructor.

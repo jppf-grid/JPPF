@@ -87,7 +87,7 @@ public final class StatsFormatter implements StatsConstants
    */
   public static Map<Fields, String> getStringValuesMap(final JPPFStats stats)
   {
-    Map<Fields, String> stringValueMap = new HashMap<Fields, String>();
+    Map<Fields, String> stringValueMap = new HashMap<>();
     stringValueMap.put(TOTAL_TASKS_EXECUTED, formatInt(stats.getTotalTasksExecuted()));
     stringValueMap.put(TOTAL_EXECUTION_TIME, formatTime((long) stats.getExecution().getTotal()));
     stringValueMap.put(LATEST_EXECUTION_TIME, formatDouble(stats.getExecution().getLatest()));
@@ -139,7 +139,7 @@ public final class StatsFormatter implements StatsConstants
    */
   public static Map<Fields, Double> getDoubleValuesMap(final JPPFStats stats)
   {
-    Map<Fields, Double> doubleValueMap = new HashMap<Fields, Double>();
+    Map<Fields, Double> doubleValueMap = new HashMap<>();
     doubleValueMap.put(TOTAL_TASKS_EXECUTED, (double) stats.getTotalTasksExecuted());
     doubleValueMap.put(TOTAL_EXECUTION_TIME, (double) stats.getExecution().getTotal());
     doubleValueMap.put(LATEST_EXECUTION_TIME, (double) stats.getExecution().getLatest());

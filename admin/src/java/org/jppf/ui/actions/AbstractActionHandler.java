@@ -29,11 +29,11 @@ public abstract class AbstractActionHandler implements ActionHandler
   /**
    * Mapping of actions to their name.
    */
-  protected Map<String, UpdatableAction> actionMap = new HashMap<String, UpdatableAction>();
+  protected Map<String, UpdatableAction> actionMap = new HashMap<>();
   /**
    * List of elements selected in the managed component.
    */
-  protected List<Object> selectedElements = new LinkedList<Object>();
+  protected List<Object> selectedElements = new LinkedList<>();
 
   /**
    * Add an action with the specified name to this action manager.

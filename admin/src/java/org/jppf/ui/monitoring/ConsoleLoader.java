@@ -307,7 +307,7 @@ public class ConsoleLoader
     @Override
     public void dataTransferred(final LocationEvent event)
     {
-      count += event.bytesTransferred();
+      count += event.getTransferredBytes();
       /*
       SwingUtilities.invokeLater(new Runnable()
       {

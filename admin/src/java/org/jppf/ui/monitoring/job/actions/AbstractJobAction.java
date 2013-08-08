@@ -59,8 +59,8 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction
   public void updateState(final List<Object> selectedElements)
   {
     super.updateState(selectedElements);
-    List<JobData> jobList = new ArrayList<JobData>();
-    List<JobData> subjobList = new ArrayList<JobData>();
+    List<JobData> jobList = new ArrayList<>();
+    List<JobData> subjobList = new ArrayList<>();
     for (Object o: selectedElements)
     {
       JobData data = (JobData) o;

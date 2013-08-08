@@ -471,7 +471,7 @@ public class JTreeTable extends JTable
           if ((rows == null) || (rows.length == 0)) listSelectionModel.clearSelection();
           else
           {
-            Set<Integer> selectionSet = new HashSet<Integer>();
+            Set<Integer> selectionSet = new HashSet<>();
             for (int r: rows) selectionSet.add(r);
             for (int i=0; i<JTreeTable.this.getRowCount(); i++)
             {

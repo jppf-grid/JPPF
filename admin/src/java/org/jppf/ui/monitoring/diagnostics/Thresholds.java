@@ -75,7 +75,7 @@ public class Thresholds
   /**
    * The map of values.
    */
-  private final Map<Name, Double> values = new EnumMap<Name, Double>(Name.class);
+  private final Map<Name, Double> values = new EnumMap<>(Name.class);
 
   /**
    * Default contructor.

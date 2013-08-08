@@ -47,7 +47,7 @@ public class AccumulatorHelper
   /**
    * Map that accumulates changes between TreeTable updates.
    */
-  Map<String, AccumulatorDriver> accumulatorMap = new HashMap<String, AccumulatorDriver>();
+  Map<String, AccumulatorDriver> accumulatorMap = new HashMap<>();
   /**
    * The GUI panel.
    */
@@ -192,7 +192,7 @@ public class AccumulatorHelper
    */
   private synchronized Map<String, AccumulatorDriver> getMap()
   {
-    Map<String, AccumulatorDriver> copy = new HashMap<String, AccumulatorDriver>(accumulatorMap);
+    Map<String, AccumulatorDriver> copy = new HashMap<>(accumulatorMap);
     accumulatorMap.clear();
     return copy;
   }

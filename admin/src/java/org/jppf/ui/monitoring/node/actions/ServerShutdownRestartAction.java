@@ -99,7 +99,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    final List<JMXDriverConnectionWrapper> list = new ArrayList<JMXDriverConnectionWrapper>();
+    final List<JMXDriverConnectionWrapper> list = new ArrayList<>();
     for (Object o: selectedElements)
     {
       if (!(o instanceof TopologyData)) continue;
