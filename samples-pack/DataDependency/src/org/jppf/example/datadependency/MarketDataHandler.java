@@ -73,7 +73,7 @@ public class MarketDataHandler implements TickerListener
   {
     int nbThreads = 8;
     ExecutorService tmpExecutor = Executors.newFixedThreadPool(nbThreads);
-    List<Future<?>> futures = new ArrayList<Future<?>>();
+    List<Future<?>> futures = new ArrayList<>();
     for (int i=0; i<nbThreads; i++) futures.add(tmpExecutor.submit(new PopulateTask(i, nbThreads, marketDataList)));
     for (Future<?> f: futures)
     {

@@ -48,7 +48,7 @@ public class RepositoryImpl implements Repository {
   /**
    * A list of old library files to delete whenever possible.
    */
-  private Set<String> filesToDelete = new HashSet<String>();
+  private Set<String> filesToDelete = new HashSet<>();
 
   /**
    * Create a repository persisted in the specified root folder.
@@ -65,8 +65,8 @@ public class RepositoryImpl implements Repository {
   @Override
   public URL[] download(final ClassPath classpath, final AbstractJPPFClassLoader cl) {
     URL[] urls = new URL[classpath.size()];
-    List<String> toDownload = new ArrayList<String>();
-    List<Integer> toDownloadIndices = new ArrayList<Integer>();
+    List<String> toDownload = new ArrayList<>();
+    List<Integer> toDownloadIndices = new ArrayList<>();
     int idx = 0;
     for (Map.Entry<String, String> elt: classpath.elements().entrySet()) {
       try {
@@ -205,7 +205,7 @@ public class RepositoryImpl implements Repository {
       if (!file.exists()) return;
       Reader reader = new BufferedReader(new FileReader(file));
       // transform the text file into a set of  strings and close the reader.
-      filesToDelete = new HashSet<String>(FileUtils.textFileAsLines(reader));
+      filesToDelete = new HashSet<>(FileUtils.textFileAsLines(reader));
       deleteFilesToDelete();
     } catch (IOException ignore) {
     }

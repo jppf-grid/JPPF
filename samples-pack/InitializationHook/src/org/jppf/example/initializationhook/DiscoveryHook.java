@@ -73,7 +73,7 @@ public class DiscoveryHook implements InitializationHook
     Queue<String> queue = (Queue<String>) NodeRunner.getPersistentData("jppf.servers");
     if (queue == null)
     {
-      queue = new ConcurrentLinkedQueue<String>();
+      queue = new ConcurrentLinkedQueue<>();
       // servers are configured via the property "jppf.drivers.discovery" in the node's configuration
       String s = JPPFConfiguration.getProperties().getString("jppf.drivers.discovery", "").trim();
       if (!"".equals(s))

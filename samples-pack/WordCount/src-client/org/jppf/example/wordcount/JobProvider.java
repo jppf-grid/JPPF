@@ -98,7 +98,7 @@ public class JobProvider {
     while (!reader.isClosed() && (taskCount < params.nbTasks)) {
       int articleCount = 0;
       String article = null;
-      List<String> list = new ArrayList<String>(params.nbArticles);
+      List<String> list = new ArrayList<>(params.nbArticles);
       while (!reader.isClosed() && (articleCount < params.nbArticles)) {
         article = reader.nextArticle();
         if (article == null) break;

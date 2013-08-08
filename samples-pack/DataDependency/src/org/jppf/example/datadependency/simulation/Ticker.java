@@ -43,7 +43,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
   /**
    * Market data to use.
    */
-  private List<MarketData> marketData = new ArrayList<MarketData>();
+  private List<MarketData> marketData = new ArrayList<>();
   /**
    * The minimum tick interval in milliseconds.
    */
@@ -59,7 +59,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
   /**
    * List of listeners to this ticker.
    */
-  private List<TickerListener> listeners = new Vector<TickerListener>();
+  private List<TickerListener> listeners = new Vector<>();
   /**
    * Executes the event notifications.
    */

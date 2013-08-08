@@ -44,7 +44,7 @@ public class TaskNotificationsRunner implements NotificationListener
   /**
    * Proxies to the MBean server of each node.
    */
-  private List<JMXNodeConnectionWrapper> nodeConnections = new ArrayList<JMXNodeConnectionWrapper>();
+  private List<JMXNodeConnectionWrapper> nodeConnections = new ArrayList<>();
   /**
    * Used to sequentialize the processing of notifications from multiple nodes.
    */

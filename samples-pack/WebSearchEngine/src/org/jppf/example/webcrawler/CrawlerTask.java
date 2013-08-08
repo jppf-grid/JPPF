@@ -64,11 +64,11 @@ public class CrawlerTask extends JPPFTask
   /**
    * The list of links visited during the crawl.
    */
-  private List<LinkMatch> matchedLinks = new ArrayList<LinkMatch>();
+  private List<LinkMatch> matchedLinks = new ArrayList<>();
   /**
    * URLs left to visit.
    */
-  private Set<String> toVisit = new HashSet<String>();
+  private Set<String> toVisit = new HashSet<>();
   /**
    * Determines whether the search should also be done, in addition to crawling.
    */

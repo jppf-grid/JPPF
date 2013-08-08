@@ -68,7 +68,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
   /**
    * Associations between market data and trades.
    */
-  protected SortedMap<String, Set<String>> dataToTradeMap = new TreeMap<String, Set<String>>();
+  protected SortedMap<String, Set<String>> dataToTradeMap = new TreeMap<>();
   /**
    * Executes the job submissions.
    */
@@ -130,7 +130,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
         Set<String> tradeSet = dataToTradeMap.get(marketDataId);
         if (tradeSet == null)
         {
-          tradeSet = new HashSet<String>();
+          tradeSet = new HashSet<>();
           dataToTradeMap.put(marketDataId, tradeSet);
         }
         tradeSet.add(t.getId());
@@ -149,7 +149,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
     JMXDriverConnectionWrapper driver = c.getJmxConnection();
     while (!driver.isConnected()) Thread.sleep(1L);
     Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
-    List<String> idList = new ArrayList<String>();
+    List<String> idList = new ArrayList<>();
     for (JPPFManagementInfo info: nodesInfo) idList.add(info.getUuid());
     return idList;
   }
@@ -198,7 +198,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
       {
         if (debugEnabled) log.debug("processing update for " + Arrays.toString(marketData));
         // determine which trades are impacted
-        Set<String> tradeIdSet = new HashSet<String>();
+        Set<String> tradeIdSet = new HashSet<>();
         for (MarketData md: marketData)
         {
           Set<String> set = dataToTradeMap.get(md.getId());
@@ -206,14 +206,14 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
         }
         if (tradeIdSet.isEmpty()) return;
         // associate each node with a list of impacted trades
-        Map<String, List<String>> nodeMap = new HashMap<String, List<String>>();
+        Map<String, List<String>> nodeMap = new HashMap<>();
         for (String tradeId: tradeIdSet)
         {
           String nodeId = nodeSelector.getNodeId(tradeId);
           List<String> list = nodeMap.get(nodeId);
           if (list == null)
           {
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
             nodeMap.put(nodeId, list);
           }
           list.add(tradeId);

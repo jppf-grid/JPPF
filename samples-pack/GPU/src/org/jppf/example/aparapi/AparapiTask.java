@@ -125,7 +125,7 @@ public class AparapiTask extends JPPFTask {
     /**
      * The collected devices.
      */
-    private final List<OpenCLDevice> devices = new ArrayList<OpenCLDevice>();
+    private final List<OpenCLDevice> devices = new ArrayList<>();
 
     @Override
     public OpenCLDevice select(final OpenCLDevice device) {

@@ -52,7 +52,7 @@ public class AlignmentResultCollector implements TaskResultListener
    * A map containing the resulting tasks, ordered by ascending position in the
    * submitted list of tasks.
    */
-  private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+  private Map<Integer, JPPFTask> resultMap = new TreeMap<>();
   /**
    * The list of final results.
    */
@@ -109,7 +109,7 @@ public class AlignmentResultCollector implements TaskResultListener
         e.printStackTrace();
       }
     }
-    results = new ArrayList<JPPFTask>();
+    results = new ArrayList<>();
     for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
     resultMap.clear();
     return results;

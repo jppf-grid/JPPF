@@ -68,7 +68,7 @@ public class WordCountTask extends JPPFTask {
             String key = sb.toString();
             if (isWord(key)) {
               if (countMap == null) {
-                countMap = new HashMap<String, Long>();
+                countMap = new HashMap<>();
                 countMap.put(key, 1L);
               } else {
                 Long count = countMap.get(key);

@@ -119,7 +119,7 @@ public class WebCrawlerRunner
         else if (t instanceof Error) throw (Error) t;
       }
     }
-    if (job.getTasks() == null) return new ArrayList<JPPFTask>();
+    if (job.getTasks() == null) return new ArrayList<>();
     CrawlerResultCollector collector = new CrawlerResultCollector(job);
     job.setResultListener(collector);
     job.setBlocking(false);
@@ -249,10 +249,10 @@ public class WebCrawlerRunner
       try
       {
         long start = System.currentTimeMillis();
-        Set<LinkMatch> results = new TreeSet<LinkMatch>(new LinkMatch.Comparator());
-        Set<String> toSearch = new HashSet<String>();
+        Set<LinkMatch> results = new TreeSet<>(new LinkMatch.Comparator());
+        Set<String> toSearch = new HashSet<>();
         toSearch.add(url);
-        List<String> temp = new ArrayList<String>();
+        List<String> temp = new ArrayList<>();
         temp.add(url);
         for (int i=0; i<=depth; i++)
         {

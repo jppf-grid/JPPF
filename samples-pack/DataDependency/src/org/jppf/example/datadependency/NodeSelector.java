@@ -35,11 +35,11 @@ public class NodeSelector
   /**
    * Mapping of tradeId to corresponding node uuid.
    */
-  private Map<String, String> tradeToNodeMap = new Hashtable<String, String>();
+  private Map<String, String> tradeToNodeMap = new Hashtable<>();
   /**
    * Distribution of trade sets among the nodes.
    */
-  private Map<String, Map<String, Trade>> nodeToHazelcastMap = new Hashtable<String, Map<String, Trade>>();
+  private Map<String, Map<String, Trade>> nodeToHazelcastMap = new Hashtable<>();
   /**
    * The list of node ids.
    */
@@ -58,7 +58,7 @@ public class NodeSelector
     final Trade[] tradeArray = trades.toArray(new Trade[0]);
     //for (int i=0; i<tradeArray.length; i++) tradeToNodeMap.put(tradeArray[i].getId(), nodeIdList.get(i % nbNodes));
     ExecutorService executor = Executors.newFixedThreadPool(nbNodes);
-    List<Future<?>> futures = new ArrayList<Future<?>>();
+    List<Future<?>> futures = new ArrayList<>();
     for (int i=0; i<nbNodes; i++)
     {
       String nodeId = nodeIdList.get(i);

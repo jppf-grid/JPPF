@@ -53,7 +53,7 @@ public class ClassPathImpl implements ClassPath {
   /**
    * Represents the repository elements.
    */
-  private Map<String, String> elementsMap = new HashMap<String, String>();
+  private Map<String, String> elementsMap = new HashMap<>();
 
   /**
    * Create a transient repository that is not persisted.
@@ -90,12 +90,12 @@ public class ClassPathImpl implements ClassPath {
 
   @Override
   public Map<String, String> elements() {
-    return Collections.unmodifiableMap(new HashMap<String, String>(elementsMap));
+    return Collections.unmodifiableMap(new HashMap<>(elementsMap));
   }
 
   @Override
   public Collection<String> elementNames() {
-    return Collections.unmodifiableSet(new HashSet<String>(elementsMap.keySet()));
+    return Collections.unmodifiableSet(new HashSet<>(elementsMap.keySet()));
   }
 
   @Override
@@ -112,7 +112,7 @@ public class ClassPathImpl implements ClassPath {
     if (rootDir == null) throw new IllegalStateException("this repository is not persisted and can't be loaded");
     elementsMap.clear();
     checkOrCreateDefinition();
-    List<String> lines = new ArrayList<String>();
+    List<String> lines = new ArrayList<>();
     Reader reader = FileUtils.getFileReader(indexFile);
     lines = FileUtils.textFileAsLines(reader);
     for (String line: lines) {

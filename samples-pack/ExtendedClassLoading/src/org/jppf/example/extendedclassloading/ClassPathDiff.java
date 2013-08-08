@@ -29,19 +29,19 @@ public class ClassPathDiff
   /**
    * The list of elements that are the same in the source and the target classpath.
    */
-  private final List<String> unchangedElements = new ArrayList<String>();
+  private final List<String> unchangedElements = new ArrayList<>();
   /**
    * The list of elements that are in the target but not in the source classpath.
    */
-  private final List<String> newElements = new ArrayList<String>();
+  private final List<String> newElements = new ArrayList<>();
   /**
    * The list of elements that are that are in the source and whose signature is different in the target classpath.
    */
-  private final List<String> updatedElements = new ArrayList<String>();
+  private final List<String> updatedElements = new ArrayList<>();
   /**
    * The list of elements that are in the source and not in the target classpath.
    */
-  private final List<String> deletedElements = new ArrayList<String>();
+  private final List<String> deletedElements = new ArrayList<>();
 
   /**
    * Initialize this diff-er with the specified source and target classpaths.

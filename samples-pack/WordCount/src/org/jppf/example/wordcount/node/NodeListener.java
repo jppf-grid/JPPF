@@ -110,7 +110,7 @@ public class NodeListener implements NodeLifeCycleListener, NodeLifeCycleErrorHa
     try {
       InputStream is = getClass().getClassLoader().getResourceAsStream(DICTIONARY_PATH);
       if (is == null) throw new RuntimeException("could not find '" + DICTIONARY_PATH + "'");
-      dictionary = new HashSet<String>();
+      dictionary = new HashSet<>();
       reader = new BufferedReader(new InputStreamReader(is));
       String s = "";
       while (s != null) {

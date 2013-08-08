@@ -48,11 +48,11 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
   /**
    * The currently pending updates.
    */
-  private Set<MarketData> pendingUpdates =  new HashSet<MarketData>();
+  private Set<MarketData> pendingUpdates =  new HashSet<>();
   /**
    * The updates currently being processed.
    */
-  private Set<MarketData> processingUpdates =  new HashSet<MarketData>();
+  private Set<MarketData> processingUpdates =  new HashSet<>();
   /**
    * The timer that triggers the snapshot updates.
    */
@@ -165,7 +165,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
       {
         lock.lock();
         processingUpdates = pendingUpdates;
-        pendingUpdates = new HashSet<MarketData>();
+        pendingUpdates = new HashSet<>();
       }
       finally
       {

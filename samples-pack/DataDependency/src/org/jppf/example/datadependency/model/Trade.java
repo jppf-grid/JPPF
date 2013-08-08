@@ -38,7 +38,7 @@ public class Trade implements Serializable
   /**
    * A list of identifiers for the pieces of market data this depends on.
    */
-  private SortedSet<String> dataDependencies = new TreeSet<String>();
+  private SortedSet<String> dataDependencies = new TreeSet<>();
 
   /**
    * Default constructor.

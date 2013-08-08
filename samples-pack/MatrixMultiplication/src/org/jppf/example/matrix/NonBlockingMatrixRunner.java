@@ -53,7 +53,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
   /**
    * 
    */
-  private Map<Integer, JPPFTask> resultMap = new TreeMap<Integer, JPPFTask>();
+  private Map<Integer, JPPFTask> resultMap = new TreeMap<>();
 
   /**
    * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -116,7 +116,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         // submit the tasks for execution
         jppfClient.submit(job);
         waitForResults();
-        List<JPPFTask> results = new ArrayList<JPPFTask>();
+        List<JPPFTask> results = new ArrayList<>();
         for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
         // initialize the resulting matrix
         Matrix c = new Matrix(size);
@@ -173,7 +173,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         // submit the tasks for execution
         jppfClient.submit(job);
         waitForResults();
-        List<JPPFTask> results = new ArrayList<JPPFTask>();
+        List<JPPFTask> results = new ArrayList<>();
         for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
         // initialize the resulting matrix
         Matrix c = new Matrix(size);

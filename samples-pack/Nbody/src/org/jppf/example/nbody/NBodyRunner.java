@@ -133,7 +133,7 @@ public class NBodyRunner
     dp.setValue("qp_qp", Double.valueOf(qp*qp));
     dp.setValue("qp_b", Double.valueOf(qp*b));
     dp.setValue("dt", Double.valueOf(dt));
-    List<JPPFTask> tasks = new ArrayList<JPPFTask>(nbTasks);
+    List<JPPFTask> tasks = new ArrayList<>(nbTasks);
     for (int i=0; i<nbTasks; i++)
     {
       NBody[] bodies = new NBody[count + bodiesPerTask < nbBodies ? bodiesPerTask : nbBodies - count];

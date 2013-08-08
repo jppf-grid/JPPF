@@ -76,7 +76,7 @@ public class TradeUpdateTask extends JPPFTask
     /*
      */
     Trade trade = DataDependencyStartup.getTrade(tradeId);
-    List<MarketData> data = new ArrayList<MarketData>();
+    List<MarketData> data = new ArrayList<>();
     for (String id: trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
     // perform some dummy cpu-consuming computation
     long elapsed = 0L;
