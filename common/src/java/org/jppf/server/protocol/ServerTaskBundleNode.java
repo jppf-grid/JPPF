@@ -23,14 +23,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
  * Instances of this class group tasks for the same node channel together.
  * @author Martin JANDA
  */
-public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
+public class ServerTaskBundleNode {
   /**
    * Explicit serialVersionUID.
    */
@@ -48,7 +48,7 @@ public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
    */
   private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
   /**
-   * A unique id for this client bundle.
+   * A unique id for this node bundle.
    */
   private final long id = INSTANCE_COUNT.incrementAndGet();
   /**
@@ -86,7 +86,7 @@ public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
   /**
    * The number of tasks in this node bundle.
    */
-  private final int taskCount; 
+  private final int taskCount;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -133,7 +133,7 @@ public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
    * Get shared data provider for this task.
    * @return a <code>DataProvider</code> instance.
    */
-  public DataLocation getDataProviderL()
+  public DataLocation getDataProvider()
   {
     return dataProvider;
   }
@@ -275,9 +275,38 @@ public class ServerTaskBundleNode /*extends JPPFTaskBundle*/ {
     sb.append(", uuid=").append(job.getUuid());
     sb.append(", initialTaskCount=").append(job.getInitialTaskCount());
     sb.append(", taskCount=").append(taskCount);
-    sb.append(", cancelled=").append(cancelled); 
-    sb.append(", requeued=").append(requeued); 
+    sb.append(", cancelled=").append(cancelled);
+    sb.append(", requeued=").append(requeued);
     sb.append(']');
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    ServerTaskBundleNode other = (ServerTaskBundleNode) obj;
+    if (id != other.id) return false;
+    return true;
+  }
+
+  /**
+   * Get the unique id for this node bundle.
+   * @return the id as a long value.
+   */
+  public long getId()
+  {
+    return id;
   }
 }

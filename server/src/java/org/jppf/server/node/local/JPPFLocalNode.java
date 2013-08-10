@@ -45,13 +45,13 @@ public class JPPFLocalNode extends JPPFNode
   }
 
   @Override
-  protected void initDataChannel() throws Exception
+  public void initDataChannel() throws Exception
   {
     nodeIO = new LocalNodeIO(this);
   }
 
   @Override
-  protected void closeDataChannel() throws Exception
+  public void closeDataChannel() throws Exception
   {
   }
 

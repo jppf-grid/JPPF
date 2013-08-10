@@ -407,4 +407,13 @@ public class FileDataLocation extends AbstractDataLocation
     if (traceEnabled) log.trace("copying " + this);
     return new FileDataLocation(filePath, size, copyCount);
   }
+
+  /**
+   * Get the path to the underlying file.
+   * @return the path as a string.
+   */
+  public String getFilePath()
+  {
+    return filePath;
+  }
 }

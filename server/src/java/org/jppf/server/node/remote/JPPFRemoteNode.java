@@ -60,7 +60,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
    * @see org.jppf.server.node.JPPFNode#initDataChannel()
    */
   @Override
-  protected void initDataChannel() throws Exception
+  public void initDataChannel() throws Exception
   {
     TypedProperties config = JPPFConfiguration.getProperties();
     (nodeConnection = new RemoteNodeConnection(serializer)).init();
@@ -83,7 +83,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
    * @see org.jppf.server.node.JPPFNode#closeDataChannel()
    */
   @Override
-  protected void closeDataChannel() throws Exception
+  public void closeDataChannel() throws Exception
   {
     if (debugEnabled) log.debug("closing data channel: nodeConnection=" + nodeConnection + ", recoveryConnection=" + recoveryConnection);
     nodeConnection.close();

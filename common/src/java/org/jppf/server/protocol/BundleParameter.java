@@ -68,5 +68,21 @@ public enum  BundleParameter
   /**
    * Parameter the total accumulated task execution elapsed time in a bundle.
    */
-  NODE_BUNDLE_ELAPSED_PARAM
+  NODE_BUNDLE_ELAPSED_PARAM,
+  /**
+   * Request sent by the offline node to the driver upon reconnection to notify that the results are ready for a specified NODE_BUNDLE_ID.
+   */
+  NODE_OFFLINE_OPEN_REQUEST,
+  /**
+   * Request sent by the node to the driver to close the job channel while a job is executing.
+   */
+  NODE_OFFLINE_CLOSE_REQUEST,
+  /**
+   * Id of the task bundle sent to the node.
+   */
+  NODE_BUNDLE_ID,
+  /**
+   * Uuid of a job executed offline.
+   */
+  JOB_UUID
 }

@@ -300,6 +300,18 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
   }
 
   /**
+   * Get the value of a parameter of this request as a the type of the specified default value.
+   * @param name the name of the parameter to get.
+   * @param defaultValue the default value to return if the parameter is not set.
+   * @param <T> the type of the value to return.
+   * @return the parameter value.
+   */
+  public <T> T getTypedParameter(final Object name, final T defaultValue) {
+    T res = (T) parameters.get(name);
+    return res == null ? defaultValue : res;
+  }
+
+  /**
    * Remove a parameter from this request.
    * @param name the name of the parameter to remove.
    * @return the value of the parameter to remove, or null if the parameter is not set.

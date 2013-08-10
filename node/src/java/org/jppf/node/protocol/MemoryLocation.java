@@ -73,24 +73,12 @@ public class MemoryLocation extends AbstractLocation<byte[]>
     this.len = len;
   }
 
-  /**
-   * Obtain an input stream to read from this location.
-   * @return an <code>InputStream</code> instance.
-   * @throws Exception if an I/O error occurs.
-   * @see org.jppf.node.protocol.Location#getInputStream()
-   */
   @Override
   public InputStream getInputStream() throws Exception
   {
     return new ByteArrayInputStream(path, offset, len);
   }
 
-  /**
-   * Obtain an output stream to write to this location.
-   * @return an <code>OutputStream</code> instance.
-   * @throws Exception if an I/O error occurs.
-   * @see org.jppf.node.protocol.Location#getOutputStream()
-   */
   @Override
   public OutputStream getOutputStream() throws Exception
   {
@@ -100,7 +88,6 @@ public class MemoryLocation extends AbstractLocation<byte[]>
   /**
    * Get the size of the file this location points to.
    * @return the size as a long value, or -1 if the file does not exist.
-   * @see org.jppf.node.protocol.Location#size()
    */
   @Override
   public long size()
@@ -110,13 +97,11 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 
   /**
    * Get the content at this location as an array of bytes. This method is
-   * overridden from {@link org.jppf.node.protocol.AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
+   * overridden from {@link AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
    * @return a byte array.
-   * @throws Exception if an I/O error occurs.
-   * @see org.jppf.node.protocol.AbstractLocation#toByteArray()
    */
   @Override
-  public byte[] toByteArray() throws Exception
+  public byte[] toByteArray()
   {
     return path;
   }

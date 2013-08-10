@@ -89,6 +89,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Determines whether the node connection checker should be used.
    */
   protected final boolean checkConnection = JPPFConfiguration.getProperties().getBoolean("jppf.node.check.connection", false);
+  /**
+   * 
+   */
+  protected JPPFTaskBundle currentBundle  = null;
 
   /**
    * Default constructor.
@@ -149,30 +153,43 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("Start of node secondary loop");
     while (!isStopped()) {
       clearResourceCachesIfRequested();
-      Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
-      JPPFTaskBundle bundle = pair.first();
-      checkInitialBundle(bundle);
-      List<Task> taskList = pair.second();
-      boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
-      if (debugEnabled) {
-        if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
-        else log.debug("received an empty bundle");
-      }
-      if (notEmpty) {
-        if (checkConnection) {
-          try {
-            connectionChecker.resume();
-            executionManager.execute(bundle, taskList);
-          } finally {
-            connectionChecker.suspend();
-            if (connectionChecker.getException() != null) throw connectionChecker.getException();
-          }
-        }
-        else executionManager.execute(bundle, taskList);
-      }
-      processResults(bundle, taskList);
+      processNextJob();
     }
     if (debugEnabled) log.debug("End of node secondary loop");
+  }
+
+  /**
+   * Read a job to execute or a hanshake job.
+   * @throws Exception if any error occurs.
+   */
+  private void processNextJob() throws Exception {
+    Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
+    JPPFTaskBundle bundle = pair.first();
+    if (bundle.isHandshake()) checkInitialBundle(bundle);
+    List<Task> taskList = pair.second();
+    boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
+    if (debugEnabled) {
+      if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
+      else log.debug("received an empty bundle");
+    }
+    if (notEmpty) {
+      if (checkConnection) {
+        try {
+          connectionChecker.resume();
+          executionManager.execute(bundle, taskList);
+        } finally {
+          connectionChecker.suspend();
+          if (connectionChecker.getException() != null) throw connectionChecker.getException();
+        }
+      }
+      else executionManager.execute(bundle, taskList);
+      if (isOffline()) {
+        currentBundle = bundle;
+        initDataChannel();
+        processNextJob(); // new handshake
+      }
+    }
+    processResults(bundle, taskList);
   }
 
   /**
@@ -182,11 +199,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception {
-    if (bundle.isHandshake()) {
-      if (debugEnabled) log.debug("setting initial bundle uuid");
-      bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
-      if (isJmxEnabled()) setupManagementParameters(bundle);
+    if (debugEnabled) log.debug("setting initial bundle, offline=" + isOffline() + ", currentBundle=" + currentBundle);
+    bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+    if (isOffline()) {
+      if (currentBundle != null) {
+        bundle.setParameter(BundleParameter.NODE_OFFLINE_OPEN_REQUEST, true);
+        bundle.setParameter(BundleParameter.NODE_BUNDLE_ID, currentBundle.getParameter(BundleParameter.NODE_BUNDLE_ID));
+        bundle.setParameter(BundleParameter.JOB_UUID, currentBundle.getUuid());
+      }
     }
+    if (isJmxEnabled()) setupManagementParameters(bundle);
   }
 
   /**
@@ -196,6 +218,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception {
+    currentBundle = null;
     if (debugEnabled) log.debug("processing      " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     if (executionManager.checkConfigChanged() || bundle.isHandshake()) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
@@ -249,14 +272,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Initialize this node's data channel.
    * @throws Exception if an error is raised during initialization.
+   * @exclude
    */
-  protected abstract void initDataChannel() throws Exception;
+  public abstract void initDataChannel() throws Exception;
 
   /**
    * Initialize this node's data channel.
    * @throws Exception if an error is raised during initialization.
+   * @exclude
    */
-  protected abstract void closeDataChannel() throws Exception;
+  public abstract void closeDataChannel() throws Exception;
 
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.

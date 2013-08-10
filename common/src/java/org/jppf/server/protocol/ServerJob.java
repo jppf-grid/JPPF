@@ -28,7 +28,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.protocol.utils.*;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.*;
+import org.jppf.utils.Pair;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -62,7 +62,8 @@ public class ServerJob extends AbstractServerJob {
   /**
    * Set of all dispatched bundles in this job.
    */
-  private final Set<ServerTaskBundleNode> dispatchSet = new LinkedHashSet<>();
+  //private final Set<ServerTaskBundleNode> dispatchSet = new LinkedHashSet<>();
+  private final Map<Long, ServerTaskBundleNode> dispatchSet = new LinkedHashMap<>();
   /**
    * The requeue handler.
    */
@@ -176,7 +177,7 @@ public class ServerJob extends AbstractServerJob {
     boolean empty;
     synchronized (dispatchSet) {
       empty = dispatchSet.isEmpty();
-      dispatchSet.add(bundle);
+      dispatchSet.put(bundle.getId(), bundle);
     }
     if (empty) {
       updateStatus(ServerJobStatus.NEW, ServerJobStatus.EXECUTING);
@@ -217,7 +218,7 @@ public class ServerJob extends AbstractServerJob {
         for (int index = 0; index < bundleTasks.size(); index++) {
           ServerTask task = bundleTasks.get(index);
           DataLocation location = results.get(index);
-          map.putValue(task.getBundle(), new Pair(task.getPosition(), location));
+          if (task.getBundle() != null) map.putValue(task.getBundle(), new Pair(task.getPosition(), location));
         }
       }
     } finally {
@@ -280,7 +281,7 @@ public class ServerJob extends AbstractServerJob {
         List<Future>   futureList;
         synchronized (dispatchSet) {
           futureList = new ArrayList<>(dispatchSet.size());
-          for (ServerTaskBundleNode item : dispatchSet) futureList.add(item.getFuture());
+          for (Map.Entry<Long, ServerTaskBundleNode> entry: dispatchSet.entrySet()) futureList.add(entry.getValue().getFuture());
         }
         for (Future future : futureList) {
           try {
@@ -389,12 +390,23 @@ public class ServerJob extends AbstractServerJob {
   }
 
   /**
+   * Get the node bundle with the specified id from the dispatch set.
+   * @param id the id of the bundle to find.
+   * @return a {@link ServerTaskBundleNode} instance.
+   */
+  public ServerTaskBundleNode getNodeBundle(final long id) {
+    synchronized (dispatchSet) {
+      return dispatchSet.get(id);
+    }
+  }
+
+  /**
    * Get the dispatch set. Used for debugging purposes.
    * @return a set of {@link ServerTaskBundleNode} instances.
    */
   public Set<ServerTaskBundleNode> getDispatchSet() {
     synchronized (dispatchSet) {
-      return new LinkedHashSet<>(dispatchSet);
+      return new LinkedHashSet<>(dispatchSet.values());
     }
   }
 
@@ -406,7 +418,7 @@ public class ServerJob extends AbstractServerJob {
   public NodeJobInformation[] getNodeJobInformation() {
     ServerTaskBundleNode[] entries;
     synchronized (dispatchSet) {
-      entries = dispatchSet.toArray(new ServerTaskBundleNode[dispatchSet.size()]);
+      entries = dispatchSet.values().toArray(new ServerTaskBundleNode[dispatchSet.size()]);
     }
     if (entries.length == 0) return NodeJobInformation.EMPTY_ARRAY;
 
@@ -417,7 +429,7 @@ public class ServerJob extends AbstractServerJob {
       JPPFTaskBundle bundle = nodeBundle.getJob();
       boolean pending = Boolean.TRUE.equals(bundle.getParameter(BundleParameter.JOB_PENDING));
       JobInformation jobInfo = new JobInformation(getUuid(), bundle.getName(), bundle.getTaskCount(),
-        bundle.getInitialTaskCount(), bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), pending);
+          bundle.getInitialTaskCount(), bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), pending);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i++] = new NodeJobInformation(nodeInfo, jobInfo);
     }
@@ -465,12 +477,12 @@ public class ServerJob extends AbstractServerJob {
         lock.unlock();
       }
     }
-    sb.append(", nbBundles=").append(getNbBundles()); 
+    sb.append(", nbBundles=").append(getNbBundles());
     //sb.append(", nbChannels=").append(getNbChannels());
     sb.append(']');
-    sb.append(", jobExpired=").append(jobExpired); 
-    sb.append(", pending=").append(pending); 
-    sb.append(", suspended=").append(isSuspended()); 
+    sb.append(", jobExpired=").append(jobExpired);
+    sb.append(", pending=").append(pending);
+    sb.append(", suspended=").append(isSuspended());
     return sb.toString();
   }
 

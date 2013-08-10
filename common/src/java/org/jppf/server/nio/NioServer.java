@@ -45,8 +45,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Lane Schwartz (dynamically allocated server port) 
  */
-public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread
-{
+public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread {
   /**
    * Logger for this class.
    */
@@ -103,8 +102,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * performed sequentially or through the executor thread pool.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final String name) throws Exception
-  {
+  protected NioServer(final String name) throws Exception {
     super(name);
     selector = Selector.open();
     factory = createFactory();
@@ -119,8 +117,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * performed sequentially or through the executor thread pool.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NioServer(final int[] ports, final int[] sslPorts, final String name) throws Exception
-  {
+  public NioServer(final int[] ports, final int[] sslPorts, final String name) throws Exception {
     this(name);
     this.ports = ports;
     this.sslPorts = sslPorts;
@@ -137,8 +134,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Initialize the underlying server sockets.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  protected final void init() throws Exception
-  {
+  protected final void init() throws Exception {
     if ((ports != null) && (ports.length != 0)) init(ports, false);
     if ((sslPorts != null) && (sslPorts.length != 0))
     {
@@ -153,8 +149,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param ssl <code>true</code> if the server sockets should be initialized with SSL enabled, <code>false</code> otherwise.
    * @throws Exception if any error occurs while initializing the server sockets.
    */
-  private void init(final int[] portsToInit, final Boolean ssl) throws Exception
-  {
+  private void init(final int[] portsToInit, final Boolean ssl) throws Exception {
     for (int i=0; i<portsToInit.length; i++)
     {
       if (portsToInit[i] < 0) continue;
@@ -174,8 +169,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Configure all SSL settings. This method is for interested subclasses classes to override.
    * @throws Exception if any error occurs during the SSL configuration.
    */
-  protected void createSSLContext() throws Exception
-  {
+  protected void createSSLContext() throws Exception {
   }
 
   /**
@@ -184,8 +178,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param engine the SSL engine to configure.
    * @throws Exception if any error occurs during the SSL configuration.
    */
-  protected void configureSSLEngine(final SSLEngine engine) throws Exception
-  {
+  protected void configureSSLEngine(final SSLEngine engine) throws Exception {
   }
 
   /**
@@ -195,33 +188,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   @Override
   public void run()
   {
-    try
-    {
+    try {
       boolean hasTimeout = selectTimeout > 0L;
-      while (!isStopped() && !externalStopCondition())
-      {
-        try
-        {
+      while (!isStopped() && !externalStopCondition()) {
+        try {
           lock.lock();
-        }
-        finally
-        {
+        } finally {
           lock.unlock();
         }
         int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        if (!isStopped())
-        {
+        if (!isStopped()) {
           if (n > 0) go(selector.selectedKeys());
           postSelect();
         }
       }
-    }
-    catch (Throwable t)
-    {
+    } catch (Throwable t) {
       log.error(t.getMessage(), t);
-    }
-    finally
-    {
+    } finally {
       end();
     }
   }
@@ -250,34 +233,24 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param selectedKeys the set of keys that were selected by the latest <code>select()</code> invocation.
    * @throws Exception if an error is raised while processing the keys.
    */
-  public void go(final Set<SelectionKey> selectedKeys) throws Exception
-  {
+  public void go(final Set<SelectionKey> selectedKeys) throws Exception {
     Iterator<SelectionKey> it = selectedKeys.iterator();
-    while (it.hasNext())
-    {
+    while (it.hasNext()) {
       SelectionKey key = it.next();
       it.remove();
-      try
-      {
+      try {
         if (!key.isValid()) continue;
         if (key.isAcceptable()) doAccept(key);
-        else
-        {
+        else {
           NioContext context = (NioContext) key.attachment();
           transitionManager.submitTransition(context.getChannel());
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
-        if (!(key.channel() instanceof ServerSocketChannel))
-        {
-          try
-          {
+        if (!(key.channel() instanceof ServerSocketChannel)) {
+          try {
             key.channel().close();
-          }
-          catch (Exception e2)
-          {
+          } catch (Exception e2) {
             log.error(e2.getMessage(), e2);
           }
         }
@@ -289,8 +262,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * This method is invoked after all selected keys have been processed.
    * This implementation does nothing. Subclasses should override this method as needed.
    */
-  public void postSelect()
-  {
+  public void postSelect() {
   }
 
   /**
@@ -299,30 +271,23 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param key the selection key that represents the channel's registration with the selector.
    */
   @SuppressWarnings("unchecked")
-  private void doAccept(final SelectionKey key)
-  {
+  private void doAccept(final SelectionKey key) {
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
     boolean ssl = (Boolean) key.attachment();
     SocketChannel channel;
-    try
-    {
+    try {
       channel = serverSocketChannel.accept();
-    }
-    catch (IOException e)
-    {
+    } catch (IOException e) {
       log.error(e.getMessage(), e);
       return;
     }
     if (channel == null) return;
-    try
-    {
+    try {
       channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
       channel.socket().setTcpNoDelay(SocketWrapper.SOCKET_TCP_NO_DELAY);
       if (channel.isBlocking()) channel.configureBlocking(false);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       StreamUtils.close(channel, log);
       return;
@@ -340,27 +305,22 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @return a wrapper for the newly registered channel.
    */
   @SuppressWarnings("unchecked")
-  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl)
-  {
+  public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
     NioContext context = createNioContext();
     SelectionKeyWrapper wrapper = null;
-    try
-    {
+    try {
       if (sslHandler != null) context.setSSLHandler(sslHandler);
       SelectionKey selKey = channel.register(selector,	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
-      if (ssl && (sslHandler == null))
-      {
+      if (ssl && (sslHandler == null)) {
         SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
         configureSSLEngine(engine);
         SSLHandler newSSLHandler = new SSLHandler(wrapper, engine);
         context.setSSLHandler(newSSLHandler);
       }
       postAccept(wrapper);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       wrapper = null;
       log.error(e.getMessage(), e);
     }
@@ -382,10 +342,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Close the underlying server socket and stop this socket server.
    */
-  public void end()
-  {
-    if (!isStopped())
-    {
+  public void end() {
+    if (!isStopped()) {
       setStopped(true);
       removeAllConnections();
     }
@@ -394,35 +352,25 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Close and remove all connections accepted by this server.
    */
-  public void removeAllConnections()
-  {
+  public void removeAllConnections() {
     if (!isStopped()) return;
-    try
-    {
+    try {
       lock.lock();
       selector.wakeup();
       Set<SelectionKey> keySet = selector.keys();
       List<SelectableChannel> channels = new ArrayList<>();
       for (SelectionKey key: keySet) channels.add(key.channel());
       selector.close();
-      for (SelectableChannel channel: channels)
-      {
-        try
-        {
+      for (SelectableChannel channel: channels) {
+        try {
           channel.close();
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           log.error(e.getMessage(), e);
         }
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -431,8 +379,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the selector for this server.
    * @return a Selector instance.
    */
-  public Selector getSelector()
-  {
+  public Selector getSelector() {
     return selector;
   }
 
@@ -440,8 +387,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the factory for this server.
    * @return an <code>NioServerFactory</code> instance.
    */
-  public synchronized NioServerFactory<S, T> getFactory()
-  {
+  public synchronized NioServerFactory<S, T> getFactory() {
     if (factory == null) factory = createFactory();
     return factory;
   }
@@ -450,8 +396,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the lock used to synchronize selector operations.
    * @return a <code>ReentrantLock</code> instance.
    */
-  public ReentrantLock getLock()
-  {
+  public ReentrantLock getLock() {
     return lock;
   }
 
@@ -459,8 +404,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Set this server in the specified stopped state.
    * @param stopped true if this server is stopped, false otherwise.
    */
-  protected void setStopped(final boolean stopped)
-  {
+  protected void setStopped(final boolean stopped) {
     this.stopped.set(stopped);
   }
 
@@ -468,8 +412,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the stopped state of this server.
    * @return  true if this server is stopped, false otherwise.
    */
-  protected boolean isStopped()
-  {
+  protected boolean isStopped() {
     return stopped.get();
   }
 
@@ -477,8 +420,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the manager that performs all operations that relate to channel states.
    * @return a <code>StateTransitionManager</code> instance.
    */
-  public StateTransitionManager<S, T> getTransitionManager()
-  {
+  public StateTransitionManager<S, T> getTransitionManager() {
     return transitionManager;
   }
 
@@ -486,8 +428,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the ports this server is listening to.
    * @return an array of int values.
    */
-  public int[] getPorts()
-  {
+  public int[] getPorts() {
     return ports;
   }
 
@@ -495,8 +436,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the SSL ports this server is listening to.
    * @return an array of int values.
    */
-  public int[] getSSLPorts()
-  {
+  public int[] getSSLPorts() {
     return sslPorts;
   }
 
@@ -504,8 +444,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the SSL context associated with this server.
    * @return a {@link SSLContext} instance.
    */
-  public SSLContext getSSLContext()
-  {
+  public SSLContext getSSLContext() {
     return sslContext;
   }
 

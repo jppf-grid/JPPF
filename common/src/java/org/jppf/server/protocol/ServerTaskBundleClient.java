@@ -393,4 +393,12 @@ public class ServerTaskBundleClient
      */
     void bundleEnded(final ServerTaskBundleClient bundle);
   }
+
+  /**
+   * Get the unique id for this client bundle.
+   * @return the id as a long value.
+   */
+  public long getId() {
+    return id;
+  }
 }

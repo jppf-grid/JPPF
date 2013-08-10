@@ -18,14 +18,8 @@
 
 package org.jppf.management;
 
-import java.io.File;
-import java.net.URL;
-
-import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.node.Node;
 import org.jppf.node.event.*;
-import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.LocalizationUtils;
 import org.slf4j.*;
 
 /**
@@ -122,51 +116,5 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event)
   {
-    if (log.isTraceEnabled()) log.trace(StringUtils.printClassLoaderHierarchy(event.getTaskClassLoader()));
-    ClassPath classpath = event.getJob().getSLA().getClassPath();
-    Node node = event.getNode();
-    if ((classpath != null) && !classpath.isEmpty() && node.isOffline())
-    {
-      AbstractJPPFClassLoader cl = node.resetTaskClassLoader();
-      for (ClassPathElement elt: classpath)
-      {
-        boolean validated = false;
-        try
-        {
-          validated = elt.validate();
-        }
-        catch (Throwable t)
-        {
-          String format = "exception occurred during validation of classpath element '{}' : {}";
-          if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(t));
-          else log.warn(format, elt, ExceptionUtils.getMessage(t));
-        }
-        if (!validated) continue;
-        URL url = null;
-        Location location = elt.getLocation();
-        try
-        {
-          if (location instanceof MemoryLocation)
-          {
-            cl.getResourceCache().registerResource(elt.getName(), location);
-            url = cl.getResourceCache().getResourceURL(elt.getName());
-          }
-          else if (location instanceof FileLocation)
-          {
-            File file = new File(((FileLocation) location).getPath());
-            if (file.exists()) url = file.toURI().toURL();
-          }
-          else if (location instanceof URLLocation) url = ((URLLocation) location).getPath();
-        }
-        catch (Exception e)
-        {
-          String format = "exception occurred during processing of classpath element '{}' : {}";
-          if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(e));
-          else log.warn(format, elt, ExceptionUtils.getMessage(e));
-        }
-        if (url != null) cl.addURL(url);
-      }
-      classpath.clear();
-    }
   }
 }

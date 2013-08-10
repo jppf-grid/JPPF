@@ -83,6 +83,22 @@ public class MultipleBuffersLocation extends AbstractDataLocation
   }
 
   /**
+   * Initialize this location with the specified list of buffers.
+   * The size is computed as the sum of used sizes of all buffers.
+   * @param buffers the list of buffers that contain the data.
+   */
+  public MultipleBuffersLocation(final List<JPPFBuffer> buffers)
+  {
+    this.list = buffers;
+    this.size = 0;
+    for (JPPFBuffer buf: buffers)
+    {
+      this.list.add(buf);
+      this.size += buf.length;
+    }
+  }
+
+  /**
    * Initialize this location from an array of buffers.
    * @param buffers the buffers that contain the data.
    */
@@ -184,9 +200,6 @@ public class MultipleBuffersLocation extends AbstractDataLocation
     return n;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int transferTo(final OutputDestination dest, final boolean blocking) throws Exception
   {
@@ -283,32 +296,32 @@ public class MultipleBuffersLocation extends AbstractDataLocation
     return n;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public InputStream getInputStream() throws Exception
   {
     return new MultipleBuffersInputStream(list);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public OutputStream getOutputStream() throws Exception
   {
     return new MultipleBuffersOutputStream(list);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataLocation copy()
   {
     List<JPPFBuffer> copyList = new ArrayList<>();
     for (JPPFBuffer buf: list) copyList.add(new JPPFBuffer(buf.buffer, buf.length));
     return new MultipleBuffersLocation(copyList, size);
+  }
+
+  /**
+   * Get the list of buffers that contain the data.
+   * @return a list of {@link JPPFBuffer} instances.
+   */
+  public List<JPPFBuffer> getBufferList()
+  {
+    return list;
   }
 }

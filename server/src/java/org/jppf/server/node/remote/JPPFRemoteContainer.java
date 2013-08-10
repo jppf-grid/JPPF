@@ -103,4 +103,13 @@ public class JPPFRemoteContainer extends JPPFContainer
       Thread.currentThread().setContextClassLoader(cl);
     }
   }
+
+  /**
+   * The node connection wrapper.
+   * @param nodeConnection the node connection to set.
+   */
+  public void setNodeConnection(final RemoteNodeConnection nodeConnection)
+  {
+    this.nodeConnection = nodeConnection;
+  }
 }

@@ -35,8 +35,7 @@ import org.slf4j.*;
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements ExecutorChannel<ServerTaskBundleNode>
-{
+public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> implements ExecutorChannel<ServerTaskBundleNode> {
   /**
    * Logger for this class.
    */
@@ -110,8 +109,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Get the task bundle to send or receive.
    * @return a <code>ServerJob</code> instance.
    */
-  public ServerTaskBundleNode getBundle()
-  {
+  public ServerTaskBundleNode getBundle() {
     return bundle;
   }
 
@@ -119,15 +117,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the task bundle to send or receive.
    * @param bundle a {@link JPPFTaskBundle} instance.
    */
-  public void setBundle(final ServerTaskBundleNode bundle)
-  {
+  public void setBundle(final ServerTaskBundleNode bundle) {
     this.bundle = bundle;
     if (bundle != null) bundle.checkTaskCount();
   }
 
   @Override
-  public Bundler getBundler()
-  {
+  public Bundler getBundler() {
     return bundler;
   }
 
@@ -135,8 +131,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the bundler used to schedule tasks for the corresponding node.
    * @param bundler a {@link Bundler} instance.
    */
-  public void setBundler(final Bundler bundler)
-  {
+  public void setBundler(final Bundler bundler) {
     this.bundler = bundler;
   }
 
@@ -150,14 +145,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
   @Override
-  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext)
-  {
+  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext) {
     if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
 
-    if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp())
-    {
-      if (this.bundler != null)
-      {
+    if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp()) {
+      if (this.bundler != null) {
         this.bundler.dispose();
         if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
       }
@@ -171,17 +163,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception exception)
-  {
-    if (getBundler() != null) {
-      getBundler().dispose();
-      if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
-    }
-    if (onClose != null) onClose.run();
-    if ((bundle != null) && !bundle.getJob().isHandshake())
-    {
-      ServerTaskBundleNode tmpWrapper = bundle;
-      setBundle(null);
+  public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
+    ServerTaskBundleNode tmpWrapper = bundle;
+    cleanup(channel);
+    if ((tmpWrapper != null) && !tmpWrapper.getJob().isHandshake()) {
       tmpWrapper.resubmit();
       tmpWrapper.taskCompleted(new Exception(exception));
     }
@@ -192,12 +177,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param wrapper channel wrapper for this context.
    * @throws Exception if any error occurs.
    */
-  public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception {
     bundle.checkTaskCount();
     AbstractTaskBundleMessage message = newMessage();
+    bundle.getJob().setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
     message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
-    message.addLocation(bundle.getDataProviderL());
+    message.addLocation(bundle.getDataProvider());
     for (ServerTask dl: bundle.getTaskList()) message.addLocation(dl.getDataLocation());
     message.setBundle(bundle.getJob());
     setMessage(message);
@@ -208,12 +193,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a pairing of the received result head and the serialized tasks.
    * @throws Exception if an error occurs during the deserialization.
    */
-  public Pair<JPPFTaskBundle, List<DataLocation>> deserializeBundle() throws Exception
-  {
+  public Pair<JPPFTaskBundle, List<DataLocation>> deserializeBundle() throws Exception {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
-    List<DataLocation> tasks = new ArrayList<>();
-    if (locations.size() > 1)
+    List<DataLocation> tasks = new ArrayList<>(); if (locations.size() > 1)
     {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
@@ -227,15 +210,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public abstract AbstractTaskBundleMessage newMessage();
 
   @Override
-  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
-  {
+  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
     if (message == null) message = newMessage();
     return message.read(channel);
   }
 
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
-  {
+  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
     return message.write(channel);
   }
 
@@ -244,8 +225,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a {@link JPPFSystemInformation} instance.
    */
   @Override
-  public JPPFSystemInformation getSystemInformation()
-  {
+  public JPPFSystemInformation getSystemInformation() {
     return systemInfo;
   }
 
@@ -253,8 +233,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the node system information.
    * @param nodeInfo a {@link JPPFSystemInformation} instance.
    */
-  public void setNodeInfo(final JPPFSystemInformation nodeInfo)
-  {
+  public void setNodeInfo(final JPPFSystemInformation nodeInfo) {
     setNodeInfo(nodeInfo, false);
   }
 
@@ -263,12 +242,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param nodeInfo a {@link JPPFSystemInformation} instance.
    * @param update a flag indicates whether update system information in management information.
    */
-  public void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update)
-  {
+  public void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update) {
     if (update && debugEnabled) log.debug("updating node information for " + nodeInfo + ", channel=" + channel);
     this.systemInfo = nodeInfo;
     systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(channel.isLocal()));
-    if(update && managementInfo != null) managementInfo.setSystemInfo(nodeInfo);
+    if (update && managementInfo != null) managementInfo.setSystemInfo(nodeInfo);
   }
 
   /**
@@ -276,8 +254,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a {@link JPPFManagementInfo} instance.
    */
   @Override
-  public JPPFManagementInfo getManagementInfo()
-  {
+  public JPPFManagementInfo getManagementInfo() {
     return managementInfo;
   }
 
@@ -285,8 +262,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the management information.
    * @param managementInfo a {@link JPPFManagementInfo} instance.
    */
-  public void setManagementInfo(final JPPFManagementInfo managementInfo)
-  {
+  public void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
     initializeJmxConnection();
@@ -348,8 +324,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Get the object that provides access to the management functions of the driver.
    * @return a <code>JMXConnectionWrapper</code> instance.
    */
-  public JMXNodeConnectionWrapper getJmxConnection()
-  {
+  public JMXNodeConnectionWrapper getJmxConnection() {
     return jmxConnection;
   }
 
@@ -361,11 +336,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
-  public boolean cancelJob(final String jobId, final boolean requeue) throws Exception
-  {
+  public boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
     if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);
-    if (jmxConnection != null && jmxConnection.isConnected())
-    {
+    if (jmxConnection != null && jmxConnection.isConnected()) {
       try {
         jmxConnection.cancelJob(jobId, requeue);
       } catch (Exception e) {
@@ -380,29 +353,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public JPPFFuture<?> submit(final ServerTaskBundleNode nodeBundle) {
-    JPPFFuture<?> future = new JPPFFutureTask<Object>(NOOP_RUNNABLE, null) {
-      @Override
-      public boolean cancel(final boolean mayInterruptIfRunning) {
-        if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
-        if(isDone()) return false;
-        if(isCancelled()) return true;
-        bundle.cancel();
-        try {
-          nodeBundle.cancel();
-          cancelJob(bundle.getClientJob().getUuid(), false);
-        } catch (Exception e) {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.warn(ExceptionUtils.getMessage(e));
-        } finally {
-          return super.cancel(false);
-        }
-      }
-    };
     setBundle(nodeBundle);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
     nodeBundle.checkTaskCount();
-    return future;
+    return createFuture();
   }
 
   /**
@@ -439,8 +394,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param oldValue the channel execution status before the change.
    * @param newValue the channel execution status after the change.
    */
-  protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue)
-  {
+  protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
     if (oldValue == newValue) return;
     ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
     for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
@@ -450,8 +404,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Determine whether the node is active or inactive.
    * @return <code>true</code> if the node is active, <code>false</code> if it is inactive.
    */
-  public boolean isActive()
-  {
+  public boolean isActive() {
     return active.get();
   }
 
@@ -459,9 +412,58 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Activate or deactivate the node.
    * @param active <code>true</code> to activate the node, <code>false</code> to deactivate it.
    */
-  public void setActive(final boolean active)
-  {
+  public void setActive(final boolean active) {
     this.active.set(active);
     if (managementInfo != null) managementInfo.setActive(active);
+  }
+
+  /**
+   * Create a new future for this cotext.
+   * @return a {@link JPFFFuture} instance. 
+   */
+  public JPPFFuture<?> createFuture() {
+    return new NodeContextFuture();
+  }
+
+  /**
+   * Close and cleanup the resources used by the channel.
+   * @param channel the channel to close.
+   */
+  void cleanup(final ChannelWrapper<?> channel) {
+    if (getBundler() != null) {
+      getBundler().dispose();
+      if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
+    }
+    if (onClose != null) onClose.run();
+    if (bundle != null) setBundle(null);
+  }
+
+  /**
+   * Fuiture associated with this context which handles the job cancellation.
+   */
+  public class NodeContextFuture extends JPPFFutureTask<Object> {
+    /**
+     * Initialize witht he specified runnable and result object.
+     */
+    public NodeContextFuture() {
+      super(NOOP_RUNNABLE, null);
+    }
+
+    @Override
+    public boolean cancel(final boolean mayInterruptIfRunning) {
+      if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
+      if(isDone()) return false;
+      if(isCancelled()) return true;
+      bundle.cancel();
+      try {
+        bundle.cancel();
+        cancelJob(bundle.getClientJob().getUuid(), false);
+      } catch (Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(ExceptionUtils.getMessage(e));
+      } finally {
+        return super.cancel(false);
+      }
+    }
   }
 }
