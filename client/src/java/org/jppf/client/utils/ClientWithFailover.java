@@ -51,8 +51,7 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
    * Sorted map of connections grouped by descending priority.
    * @exclude
    */
-  protected final SortedMap<Integer, Set<JPPFClientConnection>> connectionMap =
-      new TreeMap<Integer, Set<JPPFClientConnection>>(new DescendingIntegerComparator());
+  protected final SortedMap<Integer, Set<JPPFClientConnection>> connectionMap = new TreeMap<Integer, Set<JPPFClientConnection>>();
   /**
    * Synchrnonizes access to the connections map.
    * @exclude
@@ -65,17 +64,19 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
   protected final ExecutionPolicy failoverPolicy = new FailoverPolicy();
 
   /**
-   * Default constructor.
-   * @param listeners a set of {@link ClientListener}s to add to the client upon startup. 
+   * Initialize this client wrapper with the specified array of listeners.
+   * @param listeners an array of {@link ClientListener}s to add to the client upon startup.
+   * This array may be empty, in which case it is equivalent ot invoking a no-args constructor. 
    */
   public ClientWithFailover(final ClientListener...listeners) {
     this(null, listeners);
   }
 
   /**
-   * Default constructor.
+   * Initialize this client wrapper with the specified uuid and array of listeners.
    * @param uuid a user-defined uuid assigned to the JPPF client. 
-   * @param listeners a set of {@link ClientListener}s to add to the client upon startup. 
+   * @param listeners an array of {@link ClientListener}s to add to the client upon startup.
+   * This array may be empty, in which case it is equivalent ot invoking constructor with the uuid as its sole argument. 
    */
   public ClientWithFailover(final String uuid, final ClientListener...listeners) {
     List<ClientListener> list = new ArrayList<ClientListener>();
@@ -110,24 +111,20 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
   }
 
   /**
-   * Close this undermying client and free its resources.
+   * Close the underlying client and free its resources.
    */
   public void  close() {
     if (client != null) client.close();
   }
 
   /**
-   * The JPPF client to which requests are delegated.
+   * Get the JPPF client to which requests are delegated.
    * @return a {@link JPPFClient} instance.
    */
   public JPPFClient getClient() {
     return client;
   }
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
   public void newConnection(final ClientEvent event) {
     JPPFClientConnection c = event.getConnection();
@@ -135,10 +132,6 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
     c.addClientConnectionStatusListener(this);
   }
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
   public void connectionFailed(final ClientEvent event) {
     JPPFClientConnection c = event.getConnection();
@@ -146,10 +139,6 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
     c.removeClientConnectionStatusListener(this);
   }
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
     JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
@@ -214,8 +203,8 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
    */
   public class FailoverPolicy extends CustomPolicy {
     /**
-     * 
-     * @param args the args to use.
+     * Constructor for this custom policy.
+     * @param args the arguments for this policy, not used here.
      */
     public FailoverPolicy(final String...args) {
     }
@@ -226,16 +215,16 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
       lock.lock();
       try {
         if (connectionMap.isEmpty()) return false;
-        int priority =  connectionMap.firstKey();
+        int priority =  connectionMap.lastKey();
         // we create a new hash set to ensure we need the lock for the minimum possible time
-        set = new HashSet(connectionMap.get(priority));
+        set = new HashSet<JPPFClientConnection>(connectionMap.get(priority));
       } finally {
         lock.unlock();
       }
       JPPFSystemInformation inf = (JPPFSystemInformation) info;
       String ipv4 = inf.getNetwork().getString("ipv4.addresses");
       String ipv6 = inf.getNetwork().getString("ipv6.addresses");
-      int priority = inf.getJppf().getInt("jppf.server.port");
+      int port = inf.getJppf().getInt("jppf.server.port");
       boolean accepted = false;
       for (JPPFClientConnection c: set) {
         // we attempt to resolve to the ip address
@@ -247,22 +236,10 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }
-        accepted = accepted || ((ipv4.indexOf(ip) >= 0) || (ipv6.indexOf(ip) >= 0)) && (priority == c.getPort());
+        accepted = accepted || ((ipv4.indexOf(ip) >= 0) || (ipv6.indexOf(ip) >= 0)) && (port == c.getPort());
         if (accepted) return true;
       }
       return false;
-    }
-  }
-
-  /**
-   * A comparator to sort integers in descending order.
-   * @exclude
-   */
-  protected static class DescendingIntegerComparator implements Comparator<Integer> {
-    @Override
-    public int compare(final Integer o1, final Integer o2) {
-      if (o1 == null) return (o2 == null) ? 0 : -1;
-      return -o1.compareTo(o2);
     }
   }
 }
