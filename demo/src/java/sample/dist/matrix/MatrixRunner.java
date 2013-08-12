@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 import javax.management.*;
 
 import org.jppf.client.*;
-import org.jppf.client.utils.GridMonitor;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -109,19 +108,11 @@ public class MatrixRunner implements NotificationListener
    */
   public void perform(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception
   {
-    GridMonitor monitor = null;
     try
     {
       JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(nbChannels));
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
-      /*
-			//monitor = new GridMonitor(jppfClient, 1000L);
-			monitor = new GridMonitor("localhost", 11198);
-			monitor.testPIDs();
-			monitor.startMonitoring();
-       */
-
       // initialize the 2 matrices to multiply
       Matrix a = new Matrix(size);
       a.assignRandomValues();
@@ -143,21 +134,9 @@ public class MatrixRunner implements NotificationListener
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
-      /*
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
-      {
-        JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
-        output("End statistics :\n" + stats.toString());
-      }
-      */
-      /*
-			monitor.stopMonitoring();
-			monitor.storeData("./GridMonitoring");
-      */
     }
     finally
     {
-      if (monitor != null) monitor.close();
       output("closing the client");
       if (jppfClient != null) jppfClient.close();
     }

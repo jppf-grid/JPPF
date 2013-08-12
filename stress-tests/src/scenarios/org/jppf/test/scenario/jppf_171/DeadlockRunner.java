@@ -15,14 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package test.deserialization.error;
+package org.jppf.test.scenario.jppf_171;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
+import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
+import org.jppf.test.scenario.AbstractScenarioRunner;
+import org.jppf.test.setup.Setup;
 
 /**
  * This is a template JPPF application runner.
@@ -30,48 +32,44 @@ import org.jppf.utils.*;
  * to write an application using JPPF.
  * @author Laurent Cohen
  */
-public class DeserializationErrorRunner {
-  /**
-   * The JPPF client, handles all communications with the server.
-   * It is recommended to only use one JPPF client per JVM, so it
-   * should generally be created and used as a singleton.
-   */
-  private static JPPFClient jppfClient =  null;
+public class DeadlockRunner extends AbstractScenarioRunner {
   /**
    * 
    */
   private static AtomicInteger jobSeq = new AtomicInteger(0);
 
-  /**
-   * The entry point for this application runner to be run from a Java command line.
-   * @param args by default, we do not use the command line arguments,
-   * however nothing prevents us from using them if need be.
-   * @throws Exception if any error occurs
-   */
-  public static void main(final String[] args) throws Exception {
-    try {
-      jppfClient = new JPPFClient();
+  @Override
+  public void run()
+  {
+    JPPFClient jppfClient = null;
+    Setup setup = getSetup();
+    try
+    {
+      jppfClient = setup.getClient();
       while (!jppfClient.hasAvailableConnection()) Thread.sleep(1L);
+      int nbNodes = setup.getNodes().length;
       long time = System.nanoTime();
-      // warmup job
-      jppfClient.submit(createJob(32, true));
-      JPPFJob job = createJob(8 * 4 * 3, false);
+      jppfClient.submit(createJob(32, true, 1)); // warmup job
+      JPPFJob job = createJob(8 * 1 * 20, false, 50);
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      System.out.println("submitting job with  " + job.getTasks().size() + " tasks");
       jppfClient.submit(job);
-      Thread.sleep(DeserializationErrorTask.EXEC_SLEEP_TIME + 5L);
-      System.out.println("closing the connection");
-      closeConnection();
-      //jppfClient.close();
-      List<JPPFTask> results = collector.waitForResults();
-      JPPFTask task = results.get(0);
-      Exception e = task.getException();
-      System.out.println("result task = " + ReflectionUtils.dumpObject(task));
-      System.out.println("exception = " + (e == null ? "null" : ExceptionUtils.getStackTrace(e)));
-      System.out.println("result = " + task.getResult());
+      int closeCount = 0;
+      List<JPPFTask> results = null;
+      while (results == null)
+      {
+        results = collector.waitForResults(50 + 5L);
+        System.out.println("closing the connection " + ++closeCount);
+        if (results != null) closeConnection(jppfClient);
+        while (!jppfClient.hasAvailableConnection()) Thread.sleep(1L);
+      }
       time = System.nanoTime() - time;
-      System.out.println("execution time = " + StringUtils.toStringDuration(time/1000000L));
-    } finally {
-      if ((jppfClient != null) && !jppfClient.isClosed()) jppfClient.close();
+      HealthSnapshot snp = setup.getDriverDiagnosticsMBean().healthSnapshot();
+      System.out.println("diagnostics: " + snp.toFormattedString());
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
     }
   }
 
@@ -79,37 +77,30 @@ public class DeserializationErrorRunner {
    * Create a job.
    * @param nbTasks number of tasks in the job.
    * @param blocking true if job is blocking, false otherwise.
+   * @param minSleepTime the minimum sleep time for each task.
    * @return a JPPFJob instance.
    * @throws Exception if any error occurs.
    */
-  private static JPPFJob createJob(final int nbTasks, final boolean blocking) throws Exception
+  private JPPFJob createJob(final int nbTasks, final boolean blocking, final long minSleepTime) throws Exception
   {
     JPPFJob job = new JPPFJob();
-    job.setName(DeserializationErrorRunner.class.getSimpleName() + '-' + jobSeq.incrementAndGet());
+    job.setName(DeadlockRunner.class.getSimpleName() + '-' + jobSeq.incrementAndGet());
     job.setBlocking(blocking);
-    for (int i=1; i<=nbTasks; i++) job.addTask(new DeserializationErrorTask(i));
+    for (int i=1; i<=nbTasks; i++) job.addTask(new DeadlockTask(i, minSleepTime + (i%10)));
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
     return job;
   }
 
   /**
-   * Cancel the specified job.
-   * @param uuid uuid of the job to cancel.
-   * @throws Exception if any error occurs.
-   */
-  private static void cancelJobWithJMX(final String uuid) throws Exception {
-    AbstractJPPFClientConnection c = (AbstractJPPFClientConnection) jppfClient.getClientConnection();
-    c.getJmxConnection().cancelJob(uuid);
-  }
-
-  /**
    * 
+   * @param jppfClient .
    * @throws Exception if any error occurs
    */
-  private static void closeConnection() throws Exception {
+  private void closeConnection(final JPPFClient jppfClient) throws Exception {
     final JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
     List<Thread> threads = new ArrayList<Thread>();
+    /*
     threads.add(new Thread() {
       @Override
       public void run() {
@@ -120,7 +111,7 @@ public class DeserializationErrorRunner {
         }
       }
     });
-    /*
+    */
     threads.add(new Thread() {
       @Override
       public void run() {
@@ -131,7 +122,6 @@ public class DeserializationErrorRunner {
         }
       }
     });
-    */
     for (Thread t: threads) t.start();
     for (Thread t: threads) t.join();
   }

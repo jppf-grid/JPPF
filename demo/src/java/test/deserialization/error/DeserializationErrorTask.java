@@ -28,6 +28,14 @@ import org.jppf.server.protocol.JPPFTask;
 public class DeserializationErrorTask extends JPPFTask
 {
   /**
+   * How long to sleep before deserializing.
+   */
+  static final long DESERIALIZATION_SLEEP_TIME = 1L;
+  /**
+   * How long to sleep before deserializing.
+   */
+  static final long EXEC_SLEEP_TIME = 50L;
+  /**
    * 
    */
   private int idx = 0;
@@ -52,7 +60,7 @@ public class DeserializationErrorTask extends JPPFTask
   {
     try
     {
-      Thread.sleep(1);
+      Thread.sleep(EXEC_SLEEP_TIME);
       setResult("the execution was performed successfully");
     }
     catch (Exception e)
@@ -82,7 +90,7 @@ public class DeserializationErrorTask extends JPPFTask
   {
     try
     {
-      Thread.sleep(4000L);
+      Thread.sleep(DESERIALIZATION_SLEEP_TIME);
     }
     catch (Exception e)
     {

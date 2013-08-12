@@ -25,12 +25,12 @@
   <target name="maven.artifacts" depends="maven.init, maven.generate"/>
 
   <target name="maven.init" depends="">
+    <property name="maven.dist" value="${build}/maven"/>
     <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
     <loadfile property="jppf.maven.header" srcFile="${bin}/maven/pom-header.xml"/>
     <loadfile property="jppf.maven.common" srcFile="${bin}/maven/pom-common.xml"/>
     <loadfile property="jppf.maven.common-dep" srcFile="${bin}/maven/pom-common-dep.xml"/>
     <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
-    <property name="maven.dist" value="${build}/maven"/>
     <!-- defined maven snapshots and staging repository id and url -->
     <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
     <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
@@ -67,7 +67,7 @@
 
 	<target name="maven.artifacts.module" depends="" description="Generate maven artifacts">
 	  <property name="artifactId" value="jppf-${file}"/>
-    <property name="maven.dist.javadoc" value="${maven.dist}/${atifactId}-api"/>
+    <property name="maven.dist.javadoc" value="${maven.dist}/${artifactId}-api"/>
     <delete dir="${maven.dist.javadoc}" quiet="true"/>
 	  <waitfor maxwait="5000" maxwaitunit="millisecond">
 	    <not><available file="${maven.dist.javadoc}" type="dir"/></not>

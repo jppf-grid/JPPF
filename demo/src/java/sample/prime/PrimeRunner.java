@@ -77,6 +77,7 @@ public class PrimeRunner
     output("Running Mersenne prime demo with limit = " + limit + " with a batch size of " + batchSize + " tasks, starting with an exponent of " + count);
     try
     {
+      //ExecutionPolicy policy = new Contains("ipv4.addresses", true, "1.2.3.4").or(new Contains("ipv4.addresses", true, "www.myhost.com"));
       long totalTime = System.currentTimeMillis();
       int pending = limit;
       //int count = 3;
@@ -84,6 +85,7 @@ public class PrimeRunner
       while (pending > 0)
       {
         JPPFJob job = new JPPFJob();
+        //job.getClientSLA().setExecutionPolicy(policy);
         int nbTasks = (pending > batchSize) ? batchSize : pending;
         for (int i=0; i<nbTasks; i++)
         {
