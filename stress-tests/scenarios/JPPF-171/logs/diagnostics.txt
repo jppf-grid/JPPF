@@ -1,0 +1,9 @@
+---------------------------------------------------------
+results for driver service:jmx:jmxmp://localhost:11201
+---------------------------------------------------------
+before GC: HealthSnapshot[heapUsedRatio=  10.3 %; heapUsed=  46.9 MB; nonheapUsedRatio=   9.9 %; nonheapUsed=  12.9 MB; deadlocked=false; liveThreads=67; cpuLoad=   0.8 %]
+after GC:  HealthSnapshot[heapUsedRatio=   0.8 %; heapUsed=   3.5 MB; nonheapUsedRatio=   9.9 %; nonheapUsed=  12.9 MB; deadlocked=false; liveThreads=67; cpuLoad=   0.8 %]
+---------------------------------------------------------
+results for node service:jmx:jmxmp://192.168.1.14:11330
+before GC: HealthSnapshot[heapUsedRatio=  18.1 %; heapUsed=  11.1 MB; nonheapUsedRatio=   7.2 %; nonheapUsed=   9.4 MB; deadlocked=false; liveThreads=18; cpuLoad=   0.2 %]
+after GC:  HealthSnapshot[heapUsedRatio=   2.2 %; heapUsed=   1.3 MB; nonheapUsedRatio=   7.2 %; nonheapUsed=   9.3 MB; deadlocked=false; liveThreads=18; cpuLoad=   0.2 %]

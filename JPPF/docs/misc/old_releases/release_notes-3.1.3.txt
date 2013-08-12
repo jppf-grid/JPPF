@@ -1,0 +1,29 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.1.3
+
+This maintenance release brings important bug fixes.
+
+Bugs fixes:
+
+JPPF-56 Bad initialization of management broadcast information
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-56
+JPPF-57 Driver management port not used in the client when SSL is enabled
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-57
+JPPF-58 JPPFResultCollector.setStatus(COMPLETE) is called twice for each job
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-58
+JPPF-59 Cannot submit multiple jobs concurrently with JCA adaptor
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-59
+JPPF-62 Jobs with timeout expire in the client instead of the server
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-62
+JPPF-65 Some threads are still alive when the client is closed
+http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-65
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+Issue tracker: http://www.jppf.org/tracker/tbg/jppf
+SF.net project page: http://sourceforge.net/projects/jppf-project/

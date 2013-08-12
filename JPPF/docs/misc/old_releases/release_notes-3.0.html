@@ -1,0 +1,107 @@
+<p>JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+<p>JPPF 3.0 brings incredible improvements in ease of use, stability, reliability and  flexibility
+
+<h1>What's new in JPPF 3.0</h1>
+
+<a name="config"></a>
+<h3>Simplification and improvement of the configuration</h3>
+<ul class="samplesList">
+  <li>Servers, nodes and clients now only require a <a href="/doc/v3/index.php?title=Configuring_a_JPPF_server#Basic_network_configuration">single TCP port</a> instead of 3 for executing jobs.</li>
+  <li>Adoption of the JMXMP remote connector allows JMX-based management to use a single port instead of 2.</li>
+  <li>Server discovery and manual configuration can now be mixed for <a href="/doc/v3/index.php?title=Client_and_administration_console_configuration#Using_manual_configuration_and_server_discovery_together">clients</a> and <a href="/doc/v3/index.php?title=Configuring_a_JPPF_server#Connecting_to_other_servers">servers in P2P</a>.</li>
+</ul>
+
+<a name="jobrecovery"></a>
+<h3>Improved recovery and failover on the client side</h3>
+<ul class="samplesList">
+  <li>A <a href="/doc/v3/index.php?title=Jobs_runtime_behavior%2C_recovery_and_failover#Job_persistence_and_recovery">persistence manager</a> allows job states to be recovered after an applicationr crash.<br/>
+  The persistence manager is an <a href="/api-3/index.html?org/jppf/client/persistence/JobPersistence.html">API</a> which allows storing the states of the jobs on the fly and recover them after an application crash or restart.
+  A <a href="/api-3/index.html?org/jppf/client/persistence/DefaultFilePersistenceManager.html">default implementation</a> is provided and demonstrated in <a href="/samples-pack/JobRecovery/Readme.php">a new sample.</a></li>
+  <li>Upon recovery of a client connection to the server, <a href="/doc/v3/index.php?title=Jobs_runtime_behavior%2C_recovery_and_failover#Failover_and_job_re-submission">only the un-executed tasks</a> in each job are resubmitted</li>
+  <li>Applications can now <a href="/doc/v3/index.php?title=Jobs_runtime_behavior%2C_recovery_and_failover#Job_start_and_completion_notifications">receive notifications</a> when a job is sent to the server, and when the final results are returned.</li>
+</ul>
+
+<a name="classloading"></a>
+<h3>Class loading</h3>
+<ul class="samplesList">
+  <li>The distributed class loading mechanism is now <a href="/doc/v3/index.php?title=Class_loading_in_JPPF">fully documented</a>.</li>
+  <li>New <a href="/doc/v3/index.php?title=Class_loading_in_JPPF#JPPF_class_loading_extensions">extensions</a> enable the optimization of the class loading overhead at node startup, along with the ability to update the classpath at runtime.</li>
+  <li>New class loader <a href="/doc/v3/index.php?title=Class_loading_in_JPPF#Class_loader_delegation_models">delegation model</a> enables faster class loading.</li>
+  <li>A <a href="/samples-pack/ExtendedClassLoading/Readme.php">new sample</a> illustrates how to automate the management of remote library repositories on the grid nodes.</li>
+</ul>
+
+<a name="customization"></a>
+<h3>New customizations and extension points</h3>
+<ul class="samplesList">
+  <li>Ability to receive <a href="/doc/v3/index.php?title=Receiving_node_connection_events_in_the_server">node connection events</a> in the server.</li>
+  <li><a href="/doc/v3/index.php?title=Node_initialization_hooks">Node initialization hooks</a> enable <a href="/samples-pack/InitializationHook/Readme.php">sophisticated strategies</a> for failover and recovery of broken server connections.</li>
+  <li>The <a href="/doc/v3/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle listener</a> extension can now be deployed both at the server and node level.</li>
+</ul>
+
+<a name="management"></a>
+<h3>Administration console, management and monitoring improvements</h3>
+<ul class="samplesList">
+  <li>The server statistics panel now displays <a href="/screenshots.php?screenshot=JobStatistics.gif">jobs data</a>.</li>
+  <li>The <a href="/screenshots.php?screenshot=JobPriority.gif">priority of each job</a> can now be dynamically and remotely updated.</li>
+  <li>The <a href="/screenshots.php?screenshot=DriverSystemInformation.gif">driver system information</a> can now be displayed in the admin console as for the nodes</li>
+  <li>The number of <a href="/screenshots.php?screenshot=ConnectionsStatistics.gif">idle nodes</a> is now monitored in the server statistics</li>
+</ul>
+
+<a name="samples"></a>
+<h3>New samples</h3>
+<ul class="samplesList">
+  <li><a href="/samples-pack/NodeConnectionEvents/Readme.php">How to receive notifications of nodes connecting and disconnecting on the server</a></li>
+  <li><a href="/samples-pack/JobRecovery/Readme.php">Job recovery after an application crash</a></li>
+  <li><a href="/samples-pack/InitializationHook/Readme.php">Using a node initialization hook to implement a sophisticated failover mechanism</a></li>
+  <li><a href="/samples-pack/ExtendedClassLoading/Readme.php">Using the JPPF class loading extensions to automate the deployment and management of application libraries in the nodes at runtime</a></li>
+</ul>
+
+<a name="features"></a>
+<h3>All implemented feature requests</h3>
+
+<p><b>Server</b>
+<ul class="samplesList">
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3315345&group_id=135654&atid=733521">3315345 - NIO-based server to client communication</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3315349&group_id=135654&atid=733521">3315349 - Have the driver use 1 port instead of three</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3370967&group_id=135654&atid=733521">3370967 - Enable JMXMP remote connector</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3016253&group_id=135654&atid=733521">3016253 - Add new extension points on node connection events</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3315028&group_id=135654&atid=733521">3315028 - Configurable initial bundle size for proportional algorithm</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3481393&group_id=135654&atid=733521">3481393 - Reduce driver CPU usage when idle</a></li>
+</ul>
+
+<p><b>Node</b>
+<ul class="samplesList">
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3405336&group_id=135654&atid=733521">3405336 - Enable overriding the class loader delegation model</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3302047&group_id=135654&atid=733521">3302047 - Use thread pool instead of timer for task timeout</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3424072&group_id=135654&atid=733521">3424072 - Refactoring needed for node life cycle add-on</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3451045&group_id=135654&atid=733521">3451045 - Node initialization hooks</a></li>
+</ul>
+
+<p><b>Client</b>
+<ul class="samplesList">
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3420815&group_id=135654&atid=733521">3420815 - Make job priority manageable</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3314053&group_id=135654&atid=733521">3314053 - Improve the flow of results for local execution</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3378701&group_id=135654&atid=733521">3378701 - Enable or disable cancel job upon client disconnection</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3407602&group_id=135654&atid=733521">3407602 - StartListener for jobs on the client side</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3362723&group_id=135654&atid=733521">3362723 - Allow driver definition with auto discovery</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3158724&group_id=135654&atid=733521">3158724 - Avoid resubmission of already executed tasks</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3427483&group_id=135654&atid=733521">3427483 - Jobs persistence and failover on the client side</a></li>
+</ul>
+
+<p><b>Admin console and management</b>
+<ul class="samplesList">
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3299267&group_id=135654&atid=733521">3299267 - Add job statistics in the server</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3423470&group_id=135654&atid=733521">3423470 - Add number of idle nodes to server statistics</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3452103&group_id=135654&atid=733521">3452103 - Driver system information in the admin console</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3420815&group_id=135654&atid=733521">3420815 - Make job priority manageable</a></li>
+</ul>
+
+<p><b>Other</b>
+<ul class="samplesList">
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3452118&group_id=135654&atid=733521">3452118 - Code cleanup</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3434615&group_id=135654&atid=733521">3434615 - Fix typos in source code/javadoc</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3439821&group_id=135654&atid=733521">3439821 - Remove task cancel/restart features</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3400572&group_id=135654&atid=733521">3400572 - Avoid 'SocketException: Address in use when localNode=T</a></li>
+  <li><a href="http://sourceforge.net/tracker/?func=detail&aid=3102697&group_id=135654&atid=733521">3102697 - Document JPPF class loading in details</a></li>
+</ul>
