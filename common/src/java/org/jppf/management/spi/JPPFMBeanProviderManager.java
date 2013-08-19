@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
@@ -97,7 +98,6 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
       if (!server.isRegistered(objectName))
       {
         server.registerMBean(impl, objectName);
-        registeredMBeanNames.add(name);
         return true;
       }
       else log.warn("an instance of MBean [" + name + "] already exists, registration was skipped");
@@ -114,16 +114,20 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
    */
   public void unregisterProviderMBeans()
   {
+    if (debugEnabled) log.debug("list of registered MBeans {}", registeredMBeanNames);
     while (!registeredMBeanNames.isEmpty())
     {
       String s = registeredMBeanNames.remove(0);
       try
       {
         server.unregisterMBean(new ObjectName(s));
+        if (debugEnabled) log.debug("MBean un-registration succeeded for [{}]", s);
       }
       catch(Exception e)
       {
-        log.error(e.getMessage(), e);
+        String format = "MBean un-registration failed for [{}] : {}";
+        if (debugEnabled) log.debug(format, s, ExceptionUtils.getStackTrace(e));
+        else log.warn(format, s, ExceptionUtils.getMessage(e));
       }
     }
   }
