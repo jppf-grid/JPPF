@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
@@ -89,7 +90,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The list of listeners registered with this job.
    */
-  private transient List<JobListener> listeners = new LinkedList<>();
+  private transient List<JobListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
@@ -413,10 +414,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public void addJobListener(final JobListener listener)
   {
-    synchronized(listeners)
-    {
-      listeners.add(listener);
-    }
+    listeners.add(listener);
   }
 
   /**
@@ -425,10 +423,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    */
   public void removeJobListener(final JobListener listener)
   {
-    synchronized(listeners)
-    {
-      listeners.remove(listener);
-    }
+    listeners.remove(listener);
   }
 
   /**
@@ -441,22 +436,16 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<JPPFTask> tasks)
   {
     JobEvent event = new JobEvent(this, channel, tasks);
-    synchronized(listeners)
+    switch(type)
     {
-      for (JobListener listener: listeners)
-      {
-        switch(type)
-        {
-          case JOB_START: listener.jobStarted(event);
-            break;
-          case JOB_END: listener.jobEnded(event);
-            break;
-          case JOB_DISPATCH: listener.jobDispatched(event);
-            break;
-          case JOB_RETURN: listener.jobReturned(event);
-            break;
-        }
-      }
+      case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
+        break;
+      case JOB_END: for (JobListener listener: listeners) listener.jobEnded(event);
+        break;
+      case JOB_DISPATCH: for (JobListener listener: listeners) listener.jobDispatched(event);
+        break;
+      case JOB_RETURN: for (JobListener listener: listeners) listener.jobReturned(event);
+        break;
     }
   }
 
