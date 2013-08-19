@@ -54,7 +54,7 @@ public class WaitTask extends JPPFTask
     }
     catch(InterruptedException e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 }

@@ -68,7 +68,7 @@ public class MatrixTask extends JPPFTask
   {
     try
     {
-      Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+      Matrix matrix = getDataProvider().getParameter(DATA_KEY);
       int size = matrix.getSize();
       result = new double[size];
 
@@ -84,7 +84,7 @@ public class MatrixTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 }

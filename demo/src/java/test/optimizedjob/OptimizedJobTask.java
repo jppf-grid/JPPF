@@ -63,7 +63,7 @@ public class OptimizedJobTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
       s = "task #" + id + " " + e.getMessage();
       e.printStackTrace();
     }

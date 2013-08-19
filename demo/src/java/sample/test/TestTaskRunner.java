@@ -325,7 +325,7 @@ public class TestTaskRunner
   static void performMyTaskTest() throws Exception
   {
     DataProvider dataProvider = new MemoryMapDataProvider();
-    dataProvider.setValue("DATA", new SimpleData("Data and more data"));
+    dataProvider.setParameter("DATA", new SimpleData("Data and more data"));
     JPPFJob job = new JPPFJob(dataProvider);
     singleTest("my task", dataProvider, new MyTask());
   }
@@ -365,7 +365,7 @@ public class TestTaskRunner
   {
     DataProvider dp = new MemoryMapDataProvider();
     byte[] data = new byte[128 * 1024 * 1204];
-    dp.setValue("test", data);
+    dp.setParameter("test", data);
     singleTest("Large Data", dp, new ConstantTask(1));
   }
 

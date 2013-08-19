@@ -58,7 +58,7 @@ public class MyTask extends JPPFTask
     catch (Exception e)
     {
       System.out.println("task " + getId() + " completed with error [" + e.getClass().getName() + ": " + e.getMessage() + ']');
-      setException(e);
+      setThrowable(e);
     }
   }
 }

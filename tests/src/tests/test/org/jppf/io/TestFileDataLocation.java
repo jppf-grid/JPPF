@@ -58,7 +58,7 @@ public class TestFileDataLocation extends Setup1D1N1C
       configureLoadBalancing();
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       DataProvider dp = new MemoryMapDataProvider();
-      dp.setValue("bytes", new byte[size]);
+      dp.setParameter("bytes", new byte[size]);
       job.setDataProvider(dp);
       List<JPPFTask> results = client.submit(job);
     }

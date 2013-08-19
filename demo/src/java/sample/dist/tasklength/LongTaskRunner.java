@@ -279,7 +279,7 @@ public class LongTaskRunner
     {
       task.run();
       setResult(task.getResult());
-      setException(task.getException());
+      setThrowable(task.getException());
     }
 
     /**

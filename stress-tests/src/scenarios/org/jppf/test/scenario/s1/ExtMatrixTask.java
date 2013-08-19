@@ -55,7 +55,7 @@ public class ExtMatrixTask extends JPPFTask
   {
     try
     {
-      final Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+      final Matrix matrix = getDataProvider().getParameter(DATA_KEY);
       final int size = matrix.getSize();
       final double[][] computeResult = new double[rowValues.length][size];
 
@@ -97,7 +97,7 @@ public class ExtMatrixTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

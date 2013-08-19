@@ -17,7 +17,6 @@
  */
 package test.niochecks;
 
-import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -52,15 +51,10 @@ public class NioChecksTask extends JPPFTask
       Thread.sleep(duration);
       setResult("the execution was performed successfully");
     }
-    catch(Exception e)
+    catch(Throwable t)
     {
-      setException(e);
-      e.printStackTrace();
-    }
-    catch(Error e)
-    {
-      e.printStackTrace();
-      setException(new JPPFException(e));
+      setThrowable(t);
+      t.printStackTrace();
     }
   }
 }

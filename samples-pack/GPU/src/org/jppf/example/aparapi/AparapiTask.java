@@ -95,7 +95,7 @@ public class AparapiTask extends JPPFTask {
       setResult(new SquareMatrix(kernel.getKernelResults()));
 
     } catch (Exception e) {
-      setException(e);
+      setThrowable(e);
     } finally {
       if (kernel != null) kernel.dispose();
       // we don't need to send the operands back to the client.

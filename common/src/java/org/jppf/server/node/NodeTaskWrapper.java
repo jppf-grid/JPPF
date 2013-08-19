@@ -146,8 +146,7 @@ public class NodeTaskWrapper implements Runnable
     } catch(JPPFNodeReconnectionNotification t) {
       reconnectionNotification = t;
     } catch(Throwable t) {
-      if (t instanceof Exception) task.setException((Exception) t);
-      else task.setException(new JPPFException(t));
+      task.setThrowable(t);
     } finally {
       Thread.currentThread().setContextClassLoader(oldCl);
       try {
@@ -163,10 +162,9 @@ public class NodeTaskWrapper implements Runnable
       } catch(JPPFNodeReconnectionNotification t) {
         if (reconnectionNotification == null) reconnectionNotification = t;
       } catch (Throwable t) {
-        if (t instanceof Exception) task.setException((Exception) t);
-        else task.setException(new JPPFException(t));
+        task.setThrowable(t);
       }
-      if (task.getException() instanceof InterruptedException) task.setException(null);
+      if (task.getThrowable() instanceof InterruptedException) task.setThrowable(null);
       cancelTimeoutAction();
     }
   }

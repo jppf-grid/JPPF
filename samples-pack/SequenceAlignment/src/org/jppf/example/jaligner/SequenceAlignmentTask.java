@@ -64,14 +64,14 @@ public class SequenceAlignmentTask extends JPPFTask
     try
     {
       Sequence seq = SequenceParser.parse(sequence);
-      Sequence target = (Sequence) getDataProvider().getValue(TARGET_SEQUENCE);
-      Matrix matrix = (Matrix) getDataProvider().getValue(SCORING_MATRIX);
+      Sequence target = getDataProvider().getParameter(TARGET_SEQUENCE);
+      Matrix matrix = getDataProvider().getParameter(SCORING_MATRIX);
       Alignment a = SmithWatermanGotoh.align(seq, target, matrix, 10.0f, 0.5f);
       setResult(a.calculateScore());
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

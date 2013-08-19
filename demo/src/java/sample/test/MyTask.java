@@ -42,7 +42,7 @@ public class MyTask extends JPPFTask
 
     try
     {
-      str = ((SimpleData) getDataProvider().getValue("DATA")).getStr();
+      str = ((SimpleData) getDataProvider().getParameter("DATA")).getStr();
     }
     catch (Exception e)
     {

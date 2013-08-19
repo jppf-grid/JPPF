@@ -52,7 +52,7 @@ public abstract class AbstractMyTask extends JPPFTask
     }
     catch(InterruptedException e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

@@ -67,7 +67,7 @@ public class CustomLoadBalancerTask extends JPPFTask
     }
     catch (Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
     // set the execution results
     setResult("the execution was performed successfully");

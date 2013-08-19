@@ -22,7 +22,6 @@ import java.util.concurrent.Future;
 
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -139,7 +138,7 @@ public class DataSizeRunner
     for (Future<?> f: futureList)
     {
       f.get();
-      Task t = ((JPPFTaskFuture<?>) f).getTask();
+      JPPFTask t = ((JPPFTaskFuture<?>) f).getTask();
       if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
       else System.out.println("task result: " + t.getResult());
     }

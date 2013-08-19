@@ -41,7 +41,7 @@ public class MyTask extends JPPFTask {
     }
     catch (Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

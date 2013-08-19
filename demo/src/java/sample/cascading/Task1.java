@@ -53,7 +53,7 @@ public class Task1 extends JPPFTask
     catch(Exception e)
     {
       e.printStackTrace();
-      setException(e);
+      setThrowable(e);
     }
     finally
     {

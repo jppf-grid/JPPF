@@ -60,7 +60,7 @@ public class Test
     JPPFTask task = new LongTask(1000);
     task.setId("someID");
     task.setResult("result");
-    task.setException(new JPPFException("exception"));
+    task.setThrowable(new JPPFException("exception"));
     job.addTask(task);
     Test test = new Test();
     byte[] data = test.serialize(job);

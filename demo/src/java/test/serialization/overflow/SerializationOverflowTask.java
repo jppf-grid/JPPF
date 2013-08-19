@@ -71,7 +71,7 @@ public class SerializationOverflowTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
       s = "task #" + id + " " + e.getMessage();
       e.printStackTrace();
     }

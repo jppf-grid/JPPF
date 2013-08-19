@@ -21,7 +21,6 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -77,7 +76,7 @@ public abstract class JPPFTestTask extends JPPFTask
         PrintWriter writer = new PrintWriter(sw);
         t.printStackTrace(writer);
         report.stackTrace = sw.toString();
-        setException((t instanceof Exception) ? (Exception) t : new JPPFException(t));
+        setThrowable(t);
       }
       reports.add(report);
     }

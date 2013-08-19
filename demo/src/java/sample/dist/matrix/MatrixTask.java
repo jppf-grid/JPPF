@@ -68,7 +68,7 @@ public class MatrixTask extends BaseDemoTask
   {
     try
     {
-      Matrix matrix = (Matrix) getDataProvider().getValue(DATA_KEY);
+      Matrix matrix = getDataProvider().getParameter(DATA_KEY);
       int size = matrix.getSize();
       result = new double[size];
 
@@ -84,7 +84,7 @@ public class MatrixTask extends BaseDemoTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 }

@@ -51,8 +51,7 @@ public class LyapunovTask extends JPPFTask
     try
     {
       // retrieve the configuration from the data provider
-      FractalConfiguration config =
-        (FractalConfiguration) getDataProvider().getValue("config");
+      FractalConfiguration config = getDataProvider().getParameter("config");
       double[] lambda = new double[config.asize];
       double bval = config.bmin +
       b * (config.bmax - config.bmin) / config.bsize;
@@ -79,7 +78,7 @@ public class LyapunovTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 }

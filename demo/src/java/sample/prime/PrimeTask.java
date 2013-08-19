@@ -100,7 +100,7 @@ public class PrimeTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

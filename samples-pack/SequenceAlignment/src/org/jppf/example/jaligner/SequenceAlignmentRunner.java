@@ -124,8 +124,8 @@ public class SequenceAlignmentRunner
     //System.out.println("Target sequence:\n" + targetSequence);
     Sequence target = SequenceParser.parse(targetSequence);
     DataProvider dp = new MemoryMapDataProvider();
-    dp.setValue(SequenceAlignmentTask.TARGET_SEQUENCE, target);
-    dp.setValue(SequenceAlignmentTask.SCORING_MATRIX, MatrixLoader.load(matrix));
+    dp.setParameter(SequenceAlignmentTask.TARGET_SEQUENCE, target);
+    dp.setParameter(SequenceAlignmentTask.SCORING_MATRIX, MatrixLoader.load(matrix));
     JPPFJob job = new JPPFJob(dp);
 
     System.out.println("Indexing sequence database...");

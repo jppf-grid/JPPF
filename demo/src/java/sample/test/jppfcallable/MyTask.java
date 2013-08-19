@@ -18,7 +18,6 @@
 
 package sample.test.jppfcallable;
 
-import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -71,7 +70,7 @@ public class MyTask extends JPPFTask
     catch (Throwable t)
     {
       //t.printStackTrace();
-      setException(t instanceof Exception ? (Exception) t : new JPPFException(t));
+      setThrowable(t);
       log.error(getId() + " : " + ExceptionUtils.getMessage(t), t);
     }
   }

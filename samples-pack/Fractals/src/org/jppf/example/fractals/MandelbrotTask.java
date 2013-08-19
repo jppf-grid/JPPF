@@ -55,8 +55,7 @@ public class MandelbrotTask extends JPPFTask
     try
     {
       // retrieve the configuration from the data provider
-      FractalConfiguration config =
-        (FractalConfiguration) getDataProvider().getValue("config");
+      FractalConfiguration config = getDataProvider().getParameter("config");
       int[] iter = new int[config.asize];
       colors = new int[config.asize];
       double bval = config.bmin +
@@ -86,7 +85,7 @@ public class MandelbrotTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

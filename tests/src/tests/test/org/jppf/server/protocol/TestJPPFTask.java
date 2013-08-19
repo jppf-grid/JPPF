@@ -292,7 +292,7 @@ public class TestJPPFTask extends Setup1D1N1C
       }
       catch (Exception e)
       {
-        setException(e);
+        setThrowable(e);
       }
     }
   }

@@ -310,7 +310,7 @@ public class ClientJob extends AbstractClientJob
         TaskState oldState = taskStateMap.get(task.getPosition());
         if (!ioe && (oldState != TaskState.RESULT)) {
           taskStateMap.put(task.getPosition(), TaskState.EXCEPTION);
-          task.setException(e);
+          task.setThrowable(e);
         }
       }
     }

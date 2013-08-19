@@ -47,15 +47,30 @@ public interface Task<T> extends Runnable, Serializable
    * Get the exception that was raised by this task's execution. If the task raised a
    * {@link Throwable}, the exception is embedded into a {@link org.jppf.JPPFException}.
    * @return a <code>Exception</code> instance, or null if no exception was raised.
+   * @deprecated {@link #getThrowable()} should be used instead.
    */
   Exception getException();
 
   /**
    * Sets the exception that was raised by this task's execution in the <code>run</code> method.
    * The exception is set by the JPPF framework.
-   * @param exception a <code>ClientApplicationException</code> instance.
+   * @param exception an <code>Exception</code> instance.
+   * @deprecated {@link #setThrowable(java.lang.Throwable)} should be used instead.
    */
   void setException(Exception exception);
+
+  /**
+   * Get the Throwable that was raised by this task's execution.
+   * @return a <code>Exception</code> instance, or null if no exception was raised.
+   */
+  Throwable getThrowable();
+
+  /**
+   * Sets the Throwable that was raised by this task's execution in the <code>run</code> method.
+   * The Throwable is normally set by the JPPF framework.
+   * @param throwable a <code>Throwable</code> instance.
+   */
+  void setThrowable(Throwable throwable);
 
   /**
    * Get the provider of shared data for this task.

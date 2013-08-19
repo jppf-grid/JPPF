@@ -103,7 +103,7 @@ public class CrawlerTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

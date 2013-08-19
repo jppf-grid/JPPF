@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
@@ -70,7 +69,7 @@ public class JPPF_130_Runner extends AbstractScenarioRunner
           getSetup().getClient().submit(job);
           JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
           List<JPPFTask> results = collector.waitForResults();
-          for (Task task: results)
+          for (JPPFTask task: results)
           {
             if (task.getException() != null) throw task.getException();
           }

@@ -130,9 +130,9 @@ public class NBodyRunner
     createUI();
     int count = 0;
     DataProvider dp = new MemoryMapDataProvider();
-    dp.setValue("qp_qp", Double.valueOf(qp*qp));
-    dp.setValue("qp_b", Double.valueOf(qp*b));
-    dp.setValue("dt", Double.valueOf(dt));
+    dp.setParameter("qp_qp", Double.valueOf(qp*qp));
+    dp.setParameter("qp_b", Double.valueOf(qp*b));
+    dp.setParameter("dt", Double.valueOf(dt));
     List<JPPFTask> tasks = new ArrayList<>(nbTasks);
     for (int i=0; i<nbTasks; i++)
     {
@@ -151,7 +151,7 @@ public class NBodyRunner
       job.setName("Time step #" + iter);
       for (JPPFTask task: tasks) job.addTask(task);
       panel.updatePositions(positions);
-      dp.setValue("positions", positions);
+      dp.setParameter("positions", positions);
       long start = System.currentTimeMillis();
       // submit the tasks for execution
       List<JPPFTask> results = jppfClient.submit(job);

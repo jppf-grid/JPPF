@@ -114,7 +114,7 @@ public class LifeCycleTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
       //e.printStackTrace();
     }
     finally

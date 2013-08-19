@@ -127,7 +127,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     DataProvider dp = new MemoryMapDataProvider();
     String key = "myKey";
     String value = "myValue";
-    dp.setValue(key, value);
+    dp.setParameter(key, value);
     executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
     MyTask task = new MyTask(key);
     Future<String> future = executor.submit(task);
@@ -313,7 +313,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     @Override
     public String call() throws Exception
     {
-      String result = (String) dataProvider.getValue(key);
+      String result = dataProvider.getParameter(key);
       System.out.println("task executed");
       return result;
     }

@@ -95,7 +95,7 @@ public class NonBlockingPoolMatrixRunner
         long start = System.currentTimeMillis();
         // create a data provider to share matrix b among all tasks
         DataProvider dataProvider = new MemoryMapDataProvider();
-        dataProvider.setValue(MatrixTask.DATA_KEY, b);
+        dataProvider.setParameter(MatrixTask.DATA_KEY, b);
         List<JPPFJob> submissions = new ArrayList<>();
         for (int n=0; n<nbSubmissions; n++)
         {

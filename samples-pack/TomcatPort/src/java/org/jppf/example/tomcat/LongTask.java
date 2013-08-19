@@ -86,7 +86,7 @@ public class LongTask extends JPPFTask
       }
       catch(InterruptedException e)
       {
-        setException(e);
+        setThrowable(e);
         setResult("error executing this task: " + e.getMessage());
       }
     }

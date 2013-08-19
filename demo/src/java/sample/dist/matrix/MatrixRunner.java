@@ -174,7 +174,7 @@ public class MatrixRunner
     }
     // create a data provider to share matrix b among all tasks
     job.setDataProvider(new MemoryMapDataProvider());
-    job.getDataProvider().setValue(MatrixTask.DATA_KEY, b);
+    job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
     job.getSLA().setExecutionPolicy(policy);
     if (classpath != null) job.getSLA().setClassPath(classpath);
     //job.getJobSLA().setMaxNodes(8);

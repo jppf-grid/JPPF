@@ -119,7 +119,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
         Enumeration<URL> res = getClass().getClassLoader().getResources(resource);
         setResult("success");
       } catch(Exception e) {
-        setException(e);
+        setThrowable(e);
       }
     }
 

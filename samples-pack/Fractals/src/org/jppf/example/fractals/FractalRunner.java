@@ -102,7 +102,7 @@ public class FractalRunner
     int nbTask = config.bsize;
     log.info("Executing " + nbTask + " tasks");
     DataProvider dp = new MemoryMapDataProvider();
-    dp.setValue("config", config);
+    dp.setParameter("config", config);
     JPPFJob job = new JPPFJob(dp);
     job.setName("Mandelbrot fractal");
     long start = System.currentTimeMillis();

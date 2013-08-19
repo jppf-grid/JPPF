@@ -63,7 +63,7 @@ public class JPPF_130_Task extends JPPFTask
     }
     catch (Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 }

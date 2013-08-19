@@ -76,11 +76,6 @@ public class Pair<U, V> implements Serializable
     return second;
   }
 
-  /**
-   * Get the hashcode for this object.
-   * @return the hashcode as an int value.
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode()
   {
@@ -91,12 +86,6 @@ public class Pair<U, V> implements Serializable
     return result;
   }
 
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * @param obj the reference object with which to compare.
-   * @return <code>true</code> if this object is the same as the obj.
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(final Object obj)
   {
@@ -119,6 +108,6 @@ public class Pair<U, V> implements Serializable
   @Override
   public String toString()
   {
-    return StringUtils.build("Pair[first=", first, ", second=", second, "]");
+    return StringUtils.build(getClass().getSimpleName(), "[first=", first, ", second=", second, "]");
   }
 }

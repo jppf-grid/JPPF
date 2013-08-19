@@ -68,7 +68,7 @@ public class AnnotatedTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
       setResult("task #" + id + ' ' + e.getMessage());
     }
     //System.out.print(StringUtils.padRight(result, ' ', 250));

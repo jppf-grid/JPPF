@@ -471,7 +471,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       }
       catch (Exception e)
       {
-        setException(e);
+        setThrowable(e);
         e.printStackTrace();
       }
     }

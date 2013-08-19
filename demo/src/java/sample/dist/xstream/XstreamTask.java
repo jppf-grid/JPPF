@@ -52,7 +52,7 @@ public class XstreamTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 
@@ -74,7 +74,7 @@ public class XstreamTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

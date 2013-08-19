@@ -18,7 +18,6 @@
 
 package org.jppf.server.protocol;
 
-import org.jppf.JPPFException;
 import org.jppf.utils.ExceptionUtils;
 
 /**
@@ -51,8 +50,7 @@ public final class JPPFExceptionResult extends JPPFTask
    */
   public JPPFExceptionResult(final Throwable throwable, final Object object)
   {
-    if (throwable instanceof Exception) setException((Exception) throwable);
-    else setException(new JPPFException(throwable));
+    setThrowable(throwable);
     objectDescriptor = String.valueOf(object);
     className = (object != null) ? object.getClass().getName() : "unknown class";
   }
@@ -77,7 +75,7 @@ public final class JPPFExceptionResult extends JPPFTask
   {
     StringBuilder sb = new StringBuilder();
     sb.append("Error occurred on object [").append(objectDescriptor).append("], class=").append(className);
-    if (getException() != null) sb.append(" :\n").append(ExceptionUtils.getStackTrace(getException()));
+    if (getThrowable() != null) sb.append(" :\n").append(ExceptionUtils.getStackTrace(getThrowable()));
     return sb.toString();
   }
 

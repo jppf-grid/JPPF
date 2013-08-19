@@ -17,6 +17,7 @@
  */
 package org.jppf.server.protocol;
 
+import org.jppf.JPPFException;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
@@ -55,9 +56,9 @@ public abstract class JPPFTask implements Task<Object>
    */
   private Object result = null;
   /**
-   * The exception that was raised by this task's execution.
+   * The <code>Throwable</code> that was raised by this task's execution.
    */
-  private Exception exception = null;
+  private Throwable throwable = null;
   /**
    * The provider of shared data for this task.
    */
@@ -95,16 +96,26 @@ public abstract class JPPFTask implements Task<Object>
     this.result = result;
   }
 
+  /**
+   * This method returns the underlying {@link Throwable} raised by this task's execution.
+   * If the Throwable is not an instance of {@link Exception}, it will be wrapped in a {@link JPPFException}.
+   * @return an {@link Exception}, eventually wrapping the throwable object raised by this task's execution.
+   */
   @Override
   public Exception getException()
   {
-    return exception;
+    if (throwable == null) return null;
+    return throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated {@link #setThrowable(java.lang.Throwable)} should be used instead.
+   */
   @Override
   public void setException(final Exception exception)
   {
-    this.exception = exception;
+    this.throwable = exception;
   }
 
   @Override
@@ -203,5 +214,17 @@ public abstract class JPPFTask implements Task<Object>
     }
     else result = callable.call();
     return result;
+  }
+
+  @Override
+  public Throwable getThrowable()
+  {
+    return throwable;
+  }
+
+  @Override
+  public void setThrowable(final Throwable throwable)
+  {
+    this.throwable = throwable;
   }
 }

@@ -75,7 +75,7 @@ public class DemoTask extends JPPFTask
     }
     catch (InterruptedException e)
     {
-      setException(e);
+      setThrowable(e);
       setResult("Exception for task [" + getId() + "] with specified duration of " + res + " seconds: " + e.getMessage());
     }
   }

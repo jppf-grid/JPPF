@@ -85,7 +85,7 @@ public class FTPRunner
     String host = c.getJmxConnection().getHost();
     // store the host in a data provider
     DataProvider dataProvider = new MemoryMapDataProvider();
-    dataProvider.setValue("ftp.host", host);
+    dataProvider.setParameter("ftp.host", host);
     job.setDataProvider(dataProvider);
     // add a single task
     job.addTask(new FTPTask("input.txt", "output.html"));

@@ -55,7 +55,7 @@ public class LoggingTask extends JPPFTask
     }
     catch(InterruptedException e)
     {
-      setException(e);
+      setThrowable(e);
     }
     log.info("task " + getId() + " has ended");
   }

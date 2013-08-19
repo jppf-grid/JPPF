@@ -52,7 +52,7 @@ public class Main
     try
     {
       DataProvider dp = new MemoryMapDataProvider();
-      dp.setValue("testKey", "testValue");
+      dp.setParameter("testKey", "testValue");
       executor.getConfiguration().getJobConfiguration().setDataProvider(dp);
       executor.setBatchSize(5);
       executor.setBatchTimeout(100L);

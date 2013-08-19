@@ -68,7 +68,7 @@ public class Task extends JPPFTask
     catch (Exception e)
     {
       e.printStackTrace();
-      setException(e);
+      setThrowable(e);
     }
   }
 

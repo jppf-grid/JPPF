@@ -34,7 +34,7 @@ public class MyTask2 extends JPPFTask {
       setResult("Successful execution");
     } catch (Exception e) {
       e.printStackTrace();
-      setException(e);
+      setThrowable(e);
     }
   }
 }

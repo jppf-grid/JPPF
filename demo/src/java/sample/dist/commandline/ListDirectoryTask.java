@@ -87,7 +87,7 @@ public class ListDirectoryTask extends CommandLineTaskEx
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 }

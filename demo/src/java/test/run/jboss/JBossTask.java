@@ -112,7 +112,7 @@ public class JBossTask extends CommandLineTask
     }
     catch (Exception e)
     {
-      setException(e);
+      setThrowable(e);
       e.printStackTrace();
     }
   }

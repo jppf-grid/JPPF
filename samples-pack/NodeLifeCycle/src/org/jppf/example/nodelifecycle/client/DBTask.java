@@ -63,8 +63,7 @@ public class DBTask extends JPPFTask
       // if the SQL update failed, we store the exception into the JPPF task
       if (t != null)
       {
-        if (t instanceof Exception) setException((Exception) t);
-        else setException(new Exception("Error while executing SQL statement", t));
+        setThrowable(t);
         NodeListener.output(ExceptionUtils.getStackTrace(t));
       }
       // otherwise we set the execution result
@@ -78,7 +77,7 @@ public class DBTask extends JPPFTask
     }
     catch (Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

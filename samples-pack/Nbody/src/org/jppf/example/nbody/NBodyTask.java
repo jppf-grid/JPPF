@@ -69,10 +69,10 @@ public class NBodyTask extends JPPFTask
   {
     try
     {
-      Vector2d[] positions = (Vector2d[]) getDataProvider().getValue("positions");
-      double qp_qp = (Double) getDataProvider().getValue("qp_qp");
-      double qp_b = (Double) getDataProvider().getValue("qp_b");
-      double dt = (Double) getDataProvider().getValue("dt");
+      Vector2d[] positions = getDataProvider().getParameter("positions");
+      double qp_qp = getDataProvider().getParameter("qp_qp");
+      double qp_b = getDataProvider().getParameter("qp_b");
+      double dt = getDataProvider().getParameter("dt");
 
       for (NBody body: bodies)
       {
@@ -104,7 +104,7 @@ public class NBodyTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 

@@ -304,7 +304,7 @@ public class NodeExecutionManagerImpl
     NodeExecutionInfo info = taskWrapper.getExecutionInfo();
     long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
     Task task = taskWrapper.getTask();
-    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getException() != null);
+    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
     for (TaskExecutionListener listener : taskExecutionListeners) listener.taskExecuted(event);
   }
 

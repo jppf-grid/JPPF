@@ -100,7 +100,7 @@ public class TestTask extends CommandLineTaskEx
     catch(Exception e)
     {
       setResult("an exception was raised: " +e);
-      setException(e);
+      setThrowable(e);
     }
     System.out.println("std output:\n" + getStandardOutput());
     System.out.println("err output:\n" + getErrorOutput());

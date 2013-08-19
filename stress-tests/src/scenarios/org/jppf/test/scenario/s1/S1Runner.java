@@ -114,7 +114,7 @@ public class S1Runner extends AbstractScenarioRunner
     }
     // create a data provider to share matrix b among all tasks
     job.setDataProvider(new MemoryMapDataProvider());
-    job.getDataProvider().setValue(ExtMatrixTask.DATA_KEY, b);
+    job.getDataProvider().setParameter(ExtMatrixTask.DATA_KEY, b);
     List<JPPFTask> results = getSetup().getClient().submit(job);
     Matrix c = new Matrix(size);
     int rowIdx = 0;

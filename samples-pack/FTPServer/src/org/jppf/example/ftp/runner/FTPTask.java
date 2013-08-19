@@ -60,7 +60,7 @@ public class FTPTask extends JPPFTask
     {
       // retrieve the FTP host from the data provider
       DataProvider dataProvider = getDataProvider();
-      String host = (String) dataProvider.getValue("ftp.host");
+      String host = dataProvider.getParameter("ftp.host");
       FTPClientWrapper client = new FTPClientWrapper();
       // this is just for demonstration purposes, the password should never be exposed like this!
       client.open(host, 12222, "admin", "admin");
@@ -87,7 +87,7 @@ public class FTPTask extends JPPFTask
     catch(Exception e)
     {
       setResult("execution failed: " + e.getClass().getName() + ": " + e.getMessage());
-      setException(e);
+      setThrowable(e);
     }
   }
 }

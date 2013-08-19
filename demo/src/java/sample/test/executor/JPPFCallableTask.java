@@ -44,7 +44,7 @@ public abstract class JPPFCallableTask<V> extends JPPFTask implements Callable<V
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
     }
   }
 
