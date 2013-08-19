@@ -33,8 +33,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @exclude
  */
-public class ResourceProvider
-{
+public class ResourceProvider {
   /**
    * Logger for this class.
    */
@@ -47,36 +46,7 @@ public class ResourceProvider
   /**
    * Default constructor.
    */
-  public ResourceProvider()
-  {
-  }
-
-  /**
-   * Load a resource file (including class files) from the class path into an array of byte.<br>
-   * This method simply calls {@link #getResourceAsBytes(java.lang.String, java.lang.ClassLoader) getResourceAsBytes(String, ClassLoader)}
-   * with a null class loader.
-   * @param resName the name of the resource to load.
-   * @return an array of bytes, or nll if the resource could not be found.
-   * @deprecated use {@link #getResource(String)} instead.
-   */
-  public byte[] getResourceAsBytes(final String resName)
-  {
-    return getResource(resName, null);
-  }
-
-  /**
-   * Load a resource file (including class files) from the class path or the file system into an array of byte.
-   * The search order is defined as follows:<br>
-   * - first the search is performed in the order specified by {@link java.lang.ClassLoader#getResourceAsStream(java.lang.String) ClassLoader.getResourceAsStream(String)}<br>
-   * - if the resource is not found, it will be looked up in the file system <br>
-   * @param resName the name of the resource to load.
-   * @param classLoader the class loader to use to load the request resource.
-   * @return an array of bytes, or nll if the resource could not be found.
-   * @deprecated use {@link #getResource(String, ClassLoader)} instead.
-   */
-  public byte[] getResourceAsBytes(final String resName, final ClassLoader classLoader)
-  {
-    return getResource(resName, classLoader);
+  public ResourceProvider() {
   }
 
   /**
@@ -86,8 +56,7 @@ public class ResourceProvider
    * @param resName the name of the resource to find.
    * @return the content of the resource as an array of bytes.
    */
-  public byte[] getResource(final String resName)
-  {
+  public byte[] getResource(final String resName) {
     return getResource(resName, null);
   }
 
@@ -97,29 +66,28 @@ public class ResourceProvider
    * @param classLoader the class loader to use to load the request resource.
    * @return the content of the resource as an array of bytes.
    */
-  public byte[] getResource(final String resName, final ClassLoader classLoader)
-  {
+  public byte[] getResource(final String resName, final ClassLoader classLoader) {
     ClassLoader cl = classLoader;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
     InputStream is = null;
-    try
-    {
-      URL url = cl.getResource(resName);
-      if (url != null) is = url.openStream();
-      if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
-      {
+    try {
+      Enumeration<URL> urls = cl.getResources(resName);
+      if (urls != null) {
+        while (urls.hasMoreElements() && (is == null)) {
+          URL url = urls.nextElement();
+          if (url != null) is = url.openStream();
+        }
+      }
+      if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
         File file = new File(resName);
         if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
       }
-      if (is != null)
-      {
+      if (is != null) {
         if (debugEnabled) log.debug("resource [" + resName + "] found");
         return StreamUtils.getInputStreamAsByte(is);
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
 
@@ -132,35 +100,25 @@ public class ResourceProvider
    * @param serializedCallable the callable to execute in serialized form.
    * @return the serialized result of the callable's execution, or of an eventually resulting exception.
    */
-  public byte[] computeCallable(final byte[] serializedCallable)
-  {
+  public byte[] computeCallable(final byte[] serializedCallable) {
     if (debugEnabled) log.debug("before deserialization");
     JPPFCallable callable = null;
     ObjectSerializer ser = new ObjectSerializerImpl();
     Object result = null;
-    try
-    {
+    try {
       callable = (JPPFCallable) ser.deserialize(serializedCallable);
       result = callable.call();
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       result = (t instanceof Exception) ? t : new JPPFException(t);
     }
     byte[] bytes = null;
-    try
-    {
+    try {
       bytes = ser.serialize(result).getBuffer();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
-      try
-      {
+      try {
         bytes = ser.serialize(e).getBuffer();
-      }
-      catch(Exception e2)
-      {
+      } catch(Exception e2) {
         log.error(e2.getMessage(), e2);
       }
     }
@@ -173,44 +131,37 @@ public class ResourceProvider
    * @param classLoader the class loader used to load the resources.
    * @return the content of all found resources as a list of byte arrays.
    */
-  public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classLoader)
-  {
+  public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classLoader) {
     ClassLoader cl = classLoader;
     List<byte[]> result = null;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = this.getClass().getClassLoader();
-    try
-    {
+    try {
       Enumeration<URL> urlEnum = cl.getResources(name);
-      if (urlEnum.hasMoreElements())
-      {
-        result = new ArrayList<>();
-        while (urlEnum.hasMoreElements())
-        {
+      if (urlEnum != null) {
+        while (urlEnum.hasMoreElements()) {
           URL url = urlEnum.nextElement();
-          InputStream is = url.openStream();
-          byte[] b = StreamUtils.getInputStreamAsByte(is);
-          result.add(b);
+          if (url != null) {
+            InputStream is = url.openStream();
+            byte[] b = StreamUtils.getInputStreamAsByte(is);
+            if (result == null) result = new ArrayList<>();
+            result.add(b);
+          }
         }
       }
     }
-    catch(Exception e)
-    {
+    catch(Exception e) {
       log.error(e.getMessage(), e);
     }
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
-    {
-      try
-      {
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
+      try {
         File file = new File(name);
-        if (file.exists())
-        {
+        if (file.exists()) {
           if (result == null) result = new ArrayList<>();
           result.add(FileUtils.getFileAsByte(file));
         }
       }
-      catch(Exception e)
-      {
+      catch(Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -223,11 +174,9 @@ public class ResourceProvider
    * @param names the names of all the resources to look for.
    * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
    */
-  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader cl, final String...names)
-  {
+  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader cl, final String...names) {
     Map<String, List<byte[]>> result = new HashMap<>();
-    for (String name: names)
-    {
+    for (String name: names) {
       List<byte[]> resources = getMultipleResourcesAsBytes(name, cl);
       if (resources != null) result.put(name, resources);
     }
