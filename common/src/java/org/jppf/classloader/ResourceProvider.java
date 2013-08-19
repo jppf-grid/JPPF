@@ -105,8 +105,15 @@ public class ResourceProvider
     InputStream is = null;
     try
     {
-      URL url = cl.getResource(resName);
-      if (url != null) is = url.openStream();
+      Enumeration<URL> urls = cl.getResources(resName);
+      if (urls != null)
+      {
+        while (urls.hasMoreElements() && (is == null))
+        {
+          URL url = urls.nextElement();
+          if (url != null) is = url.openStream();
+        }
+      }
       if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true))
       {
         File file = new File(resName);
