@@ -19,38 +19,23 @@
 package org.jppf.comm.socket;
 
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
+
+import org.jppf.utils.ThreadSynchronization;
 
 /**
  * Common abstract superclass for objects that establish a connection with a remote socket.
  * @author Laurent Cohen
  */
-public abstract class AbstractSocketInitializer implements SocketInitializer
+public abstract class AbstractSocketInitializer extends ThreadSynchronization implements SocketInitializer
 {
-  /**
-   * Instances count.
-   */
-  protected static final AtomicLong instanceCount = new AtomicLong(0L);
-  /**
-   * Instance number.
-   */
-  protected final long instanceNumber = instanceCount.incrementAndGet();
   /**
    * Determines whether any connection attempt succeeded.
    */
-  protected boolean successfull = false;
-  /**
-   * Current number of connection attempts.
-   */
-  protected int attemptCount = 0;
-  /**
-   * The socket wrapper to initialize.
-   */
-  protected SocketWrapper socketWrapper = null;
+  protected boolean successful = false;
   /**
    * Used to compute a random start delay for this node.
    */
-  protected Random rand = new Random(System.currentTimeMillis());
+  protected Random rand = new Random(System.nanoTime());
   /**
    * Determine whether this socket initializer has been intentionally closed.
    */
@@ -63,7 +48,6 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
   /**
    * Determine whether this socket initializer has been intentionally closed.
    * @return true if this socket initializer has been intentionally closed, false otherwise.
-   * @see org.jppf.comm.socket.SocketInitializer#isClosed()
    */
   @Override
   public boolean isClosed()
@@ -74,33 +58,10 @@ public abstract class AbstractSocketInitializer implements SocketInitializer
   /**
    * Determine whether any connection attempt succeeded.
    * @return true if any attempt was successful, false otherwise.
-   * @see org.jppf.comm.socket.SocketInitializer#isSuccessful()
    */
   @Override
   public boolean isSuccessful()
   {
-    return successfull;
-  }
-
-  /**
-   * Get the name given to this initializer.
-   * @return the name as a string.
-   * @see org.jppf.comm.socket.SocketInitializer#getName()
-   */
-  @Override
-  public String getName()
-  {
-    return name;
-  }
-
-  /**
-   * Set the name given to this initializer.
-   * @param name the name as a string.
-   * @see org.jppf.comm.socket.SocketInitializer#setName(java.lang.String)
-   */
-  @Override
-  public void setName(final String name)
-  {
-    this.name = name;
+    return successful;
   }
 }
