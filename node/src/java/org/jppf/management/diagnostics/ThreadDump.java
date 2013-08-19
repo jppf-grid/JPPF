@@ -71,4 +71,10 @@ public class ThreadDump implements Serializable
   {
     return deadlockedThreads;
   }
+
+  @Override
+  public String toString()
+  {
+    return TextThreadDumpWriter.printToString(this, "ThreadDump");
+  }
 }
