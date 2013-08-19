@@ -18,9 +18,8 @@
 
 package org.jppf.server.protocol;
 
-import java.util.*;
-
 import org.jppf.node.protocol.JobMetadata;
+import org.jppf.utils.collections.MetadataImpl;
 
 /**
  * Instances of this class hold metadata about a job, that can be used from a load-balancer,
@@ -29,67 +28,10 @@ import org.jppf.node.protocol.JobMetadata;
  * @see org.jppf.server.scheduler.bundle.JobAwareness
  * @author Laurent Cohen
  */
-public class JPPFJobMetadata implements JobMetadata
+public class JPPFJobMetadata extends MetadataImpl implements JobMetadata
 {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * The metadata map.
-   */
-  private final Map<Object, Object> metadata = new HashMap<>();
-
-  /**
-   * Set a parameter in the metadata.
-   * If a parameter with the same key already exists, its value is replaced with he new one.
-   * @param key the parameter's key.
-   * @param value the parameter's value.
-   */
-  @Override
-  public void setParameter(final Object key, final Object value)
-  {
-    metadata.put(key, value);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Object getParameter(final Object key)
-  {
-    return metadata.get(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Object getParameter(final Object key, final Object def)
-  {
-    Object value = metadata.get(key);
-    return value != null ? value : def;
-  }
-
-  /**
-   * Remove a parameter from the metadata.
-   * @param key the parameter's key.
-   * @return the removed parameter's value or null if no parameter with the specified key exists.
-   */
-  @Override
-  public Object removeParameter(final Object key)
-  {
-    return metadata.remove(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Map<Object, Object> getAll()
-  {
-    Map<Object, Object> map = new HashMap<>();
-    map.putAll(metadata);
-    return map;
-  }
 }

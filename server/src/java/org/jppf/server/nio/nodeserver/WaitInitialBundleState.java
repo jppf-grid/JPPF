@@ -74,10 +74,10 @@ class WaitInitialBundleState extends NodeServerState
       JPPFTaskBundle bundle = received.first();
       if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
 
-      String uuid = (String) bundle.getParameter(NODE_UUID_PARAM);
+      String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
       Bundler bundler = server.getBundler().copy();
-      JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(SYSTEM_INFO_PARAM);
+      JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
       if (systemInfo != null) {
         context.setNodeInfo(systemInfo);
         if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
@@ -87,12 +87,12 @@ class WaitInitialBundleState extends NodeServerState
       if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
       context.setBundler(bundler);
-      boolean isPeer = bundle.getTypedParameter(IS_PEER, false);
+      boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) {
         if (uuid != null) {
-          String host = (String) bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
-          int port = bundle.getTypedParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
+          String host = bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
+          int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
           boolean sslEnabled;
           if (channel.isLocal()) sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
           else sslEnabled = context.getSSLHandler() != null;
@@ -106,7 +106,7 @@ class WaitInitialBundleState extends NodeServerState
       }
       server.nodeConnected(context);
       context.setMessage(null);
-      if (bundle.getTypedParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(bundle, context);
+      if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(bundle, context);
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setBundle(null);
       return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
@@ -122,10 +122,10 @@ class WaitInitialBundleState extends NodeServerState
    * @throws Exception if any error occurs.
    */
   private NodeTransition processOfflineReopen(final JPPFTaskBundle bundle, final AbstractNodeContext context) throws Exception {
-    String jobUuid = (String) bundle.getParameter(JOB_UUID);
-    long id = (Long) bundle.getParameter(NODE_BUNDLE_ID);
+    String jobUuid = bundle.getParameter(JOB_UUID);
+    long id = bundle.getParameter(NODE_BUNDLE_ID);
     ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
-    if (debugEnabled) log.debug("processing offline reopen with jobUuid=" + jobUuid + ", id=" + id + ", nodeBundle=" + nodeBundle);
+    if (debugEnabled) log.debug("processing offline reopen with jobUuid=" + jobUuid + ", id=" + id + ", nodeBundle=" + nodeBundle + ", node=" + context.getChannel());
     context.setBundle(nodeBundle);
     return TO_WAITING_RESULTS;
   }

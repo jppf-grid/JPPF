@@ -54,17 +54,9 @@ class WaitingResultsState extends NodeServerState {
     super(server);
   }
 
-  /**
-   * Execute the action associated with this channel state.
-   * @param channel the selection key corresponding to the channel and selector for this state.
-   * @return a state transition as an <code>NioTransition</code> instance.
-   * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
-   */
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
       Exception exception = null;
       ServerTaskBundleNode nodeBundle = context.getBundle();
@@ -74,31 +66,10 @@ class WaitingResultsState extends NodeServerState {
         Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
         JPPFTaskBundle newBundle = received.first();
         if (debugEnabled) log.debug("*** read bundle " + received + " from node " + channel);
-        if (offlineCloseRequest = newBundle.getTypedParameter(NODE_OFFLINE_CLOSE_REQUEST, false)) return processOfflineRequest(channel, context);
-        // if an exception prevented the node from executing the tasks or sending back the results
-        Throwable t = (Throwable) newBundle.getParameter(NODE_EXCEPTION_PARAM);
-        Bundler bundler = context.getBundler();
-        if (t != null) {
-          if (debugEnabled) log.debug("node " + channel + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
-          exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-          nodeBundle.resultsReceived(t);
-        } else {
-          if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received);
-          nodeBundle.resultsReceived(received.second());
-          long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
-          server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L, 
-              ((AbstractTaskBundleMessage) context.getMessage()).getLength());
-          if (bundler instanceof BundlerEx) {
-            long accumulatedTime = newBundle.getTypedParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
-            ((BundlerEx) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
-          } else bundler.feedback(newBundle.getTaskCount(), elapsed);
-        }
-        requeue = newBundle.isRequeue();
-        JPPFSystemInformation systemInfo = (JPPFSystemInformation) newBundle.getParameter(SYSTEM_INFO_PARAM);
-        if (systemInfo != null) {
-          context.setNodeInfo(systemInfo, true);
-          if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-        }
+        if (offlineCloseRequest = newBundle.getParameter(NODE_OFFLINE_CLOSE_REQUEST, false)) return processOfflineRequest(context);
+        Pair<Boolean, Exception> res = processResults(context, received);
+        requeue = res.first();
+        exception = res.second();
       }
       catch (Throwable t) {
         log.error(t.getMessage(), t);
@@ -120,16 +91,53 @@ class WaitingResultsState extends NodeServerState {
   }
 
   /**
+   * Process the results received from the node.
+   * @param context the context associated witht he node channel.
+   * @param received groups the job header and resuls of the tasks.
+   * @return A pairing of a requeue indicator and an eventual exception returned by the node.
+   * @throws Exception if any error occurs.
+   */
+  private Pair<Boolean, Exception> processResults(final AbstractNodeContext context, final Pair<JPPFTaskBundle, List<DataLocation>> received) throws Exception {
+    JPPFTaskBundle newBundle = received.first();
+    ServerTaskBundleNode nodeBundle = context.getBundle();
+    Exception exception = null;
+    // if an exception prevented the node from executing the tasks or sending back the results
+    Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
+    Bundler bundler = context.getBundler();
+    if (t != null) {
+      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
+      exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+      nodeBundle.resultsReceived(t);
+    } else {
+      if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received);
+      nodeBundle.resultsReceived(received.second());
+      long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
+      server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L, 
+          ((AbstractTaskBundleMessage) context.getMessage()).getLength());
+      if (bundler instanceof BundlerEx) {
+        long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
+        ((BundlerEx) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
+      } else bundler.feedback(newBundle.getTaskCount(), elapsed);
+    }
+    boolean requeue = newBundle.isRequeue();
+    JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);
+    if (systemInfo != null) {
+      context.setNodeInfo(systemInfo, true);
+      if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+    }
+    return new Pair<>(requeue, exception);
+  }
+  
+  /**
    * Process an offline request from the node.
-   * @param channel the selection key corresponding to the channel and selector for this state.
    * @param context the current context assoiated witht he channel.
    * @return a <code>null</code> transition since the channel is closed by this method.
    * @throws Exception if any error occurs.
    */
-  private NodeTransition processOfflineRequest(final ChannelWrapper<?> channel, final AbstractNodeContext context) throws Exception {
-    if (debugEnabled) log.debug("processing offline request, nodeBundle={}", context.getBundle());
+  private NodeTransition processOfflineRequest(final AbstractNodeContext context) throws Exception {
+    if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", context.getBundle(), context.getChannel());
     server.getOfflineNodeHandler().addNodeBundle(context.getBundle());
-    context.cleanup(channel);
+    context.cleanup(context.getChannel());
     return null;
   }
 }

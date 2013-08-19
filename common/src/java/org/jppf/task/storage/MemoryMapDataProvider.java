@@ -17,51 +17,38 @@
  */
 package org.jppf.task.storage;
 
-import java.util.*;
+import org.jppf.utils.collections.MetadataImpl;
+
 
 /**
  * Implementation of a data provider that handles in-memory data backed by a <code>Map</code>.
  * @see org.jppf.task.storage.DataProvider
  * @author Laurent Cohen
  */
-public class MemoryMapDataProvider implements DataProvider
+public class MemoryMapDataProvider extends MetadataImpl implements DataProvider
 {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * The actual store implementation for the shared data.
-   */
-  private final Map<Object, Object> store = new HashMap<>();
 
   /**
-   * Get a value specified by its key.
-   * @param key the key identifying the value to retrieve in the store.
-   * @return the value as an <code>Object</code>.
-   * @see org.jppf.task.storage.DataProvider#getValue(java.lang.Object)
+   * {@inheritDoc}
+   * @deprecated use {@link #getParameter(Object)} instead)
    */
   @Override
-  public Object getValue(final Object key)
+  public <T> T  getValue(final Object key)
   {
-    return store.get(key);
+    return getParameter(key);
   }
 
   /**
-   * Set a value specified by its key in the store.
-   * @param key the key identifying the value to retrieve in the store.
-   * @param value the value to store, associated with the key.
-   * @see org.jppf.task.storage.DataProvider#setValue(java.lang.Object, java.lang.Object)
+   * {@inheritDoc}
+   * @deprecated use {@link #setParameter(Object, Object)} instead)
    */
   @Override
   public void setValue(final Object key, final Object value)
   {
-    store.put(key, value);
-  }
-
-  @Override
-  public String toString()
-  {
-    return store.toString();
+    setParameter(key, value);
   }
 }

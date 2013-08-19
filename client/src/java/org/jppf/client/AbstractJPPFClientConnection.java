@@ -273,8 +273,8 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   public JPPFTaskBundle sendHandshakeJob() throws Exception
   {
     JPPFTaskBundle bundle = super.sendHandshakeJob();
-    this.systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-    this.driverUuid = (String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
+    this.systemInfo = bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
+    this.driverUuid = bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
     return bundle;
   }
 

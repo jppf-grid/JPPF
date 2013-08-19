@@ -189,11 +189,11 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       }
 
       // if an exception prevented the node from executing the tasks
-      Throwable t = (Throwable) bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
+      Throwable t = bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
       if (t != null) {
         if (debugEnabled) log.debug(this.toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        for (JPPFTask task : taskList) task.setException(e);
+        for (JPPFTask task : taskList) task.setThrowable(e);
       }
       return new Pair(bundle, taskList);
     } catch (AsynchronousCloseException e) {

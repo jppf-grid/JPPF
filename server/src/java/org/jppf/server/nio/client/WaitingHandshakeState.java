@@ -86,7 +86,7 @@ class WaitingHandshakeState extends ClientServerState
 
       context.setClientMessage(null);
       context.setBundle(bundleWrapper);
-      header.getParametersMap().clear();
+      header.clear();
       // send system info (and more) back to the client
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, driver.getSystemInformation());
       header.setParameter(BundleParameter.DRIVER_UUID_PARAM, driverUUID);

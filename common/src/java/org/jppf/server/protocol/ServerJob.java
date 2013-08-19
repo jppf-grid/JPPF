@@ -427,7 +427,7 @@ public class ServerJob extends AbstractServerJob {
     for (ServerTaskBundleNode nodeBundle : entries) {
       JPPFManagementInfo nodeInfo = nodeBundle.getChannel().getManagementInfo();
       JPPFTaskBundle bundle = nodeBundle.getJob();
-      boolean pending = Boolean.TRUE.equals(bundle.getParameter(BundleParameter.JOB_PENDING));
+      boolean pending = bundle.getParameter(BundleParameter.JOB_PENDING, false);
       JobInformation jobInfo = new JobInformation(getUuid(), bundle.getName(), bundle.getTaskCount(),
           bundle.getInitialTaskCount(), bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), pending);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());

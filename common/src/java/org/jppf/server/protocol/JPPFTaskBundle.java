@@ -17,12 +17,11 @@
  */
 package org.jppf.server.protocol;
 
-import java.io.Serializable;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -32,7 +31,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>, JPPFDistributedJob {
+public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskBundle>, JPPFDistributedJob {
   /**
    * Explicit serialVersionUID.
    */
@@ -85,10 +84,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * Indicates whether this object is used for handshake instead of execution.
    */
   private boolean handshake = false;
-  /**
-   * Map holding the parameters of the request.
-   */
-  private final Map<Object, Object> parameters = new HashMap<>();
   /**
    * The service level agreement between the job and the server.
    */
@@ -219,9 +214,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     bundle.setTaskCount(taskCount);
     bundle.setCurrentTaskCount(currentTaskCount);
     bundle.initialTaskCount = initialTaskCount;
-    synchronized(bundle.getParametersMap()) {
-      for (Map.Entry<Object, Object> entry: parameters.entrySet()) bundle.setParameter(entry.getKey(), entry.getValue());
-    }
+    bundle.getAll().putAll(this.getAll());
     bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
     bundle.setMetadata(jobMetadata);
@@ -268,66 +261,6 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     return initialTaskCount;
   }
 
-  /**
-   * Set a parameter of this request.
-   * @param name the name of the parameter to set.
-   * @param value the value of the parameter to set.
-   */
-  public void setParameter(final Object name, final Object value) {
-    synchronized(parameters) {
-      parameters.put(name, value);
-    }
-  }
-
-  /**
-   * Get the value of a parameter of this request.
-   * @param name the name of the parameter to get.
-   * @return the value of the parameter, or null if the parameter is not set.
-   */
-  public Object getParameter(final Object name) {
-    return parameters.get(name);
-  }
-
-  /**
-   * Get the value of a parameter of this request.
-   * @param name the name of the parameter to get.
-   * @param defaultValue the default value to return if the parameter is not set.
-   * @return the value of the parameter, or <code>defaultValue</code> if the parameter is not set.
-   */
-  public Object getParameter(final Object name, final Object defaultValue) {
-    Object res = parameters.get(name);
-    return res == null ? defaultValue : res;
-  }
-
-  /**
-   * Get the value of a parameter of this request as a the type of the specified default value.
-   * @param name the name of the parameter to get.
-   * @param defaultValue the default value to return if the parameter is not set.
-   * @param <T> the type of the value to return.
-   * @return the parameter value.
-   */
-  public <T> T getTypedParameter(final Object name, final T defaultValue) {
-    T res = (T) parameters.get(name);
-    return res == null ? defaultValue : res;
-  }
-
-  /**
-   * Remove a parameter from this request.
-   * @param name the name of the parameter to remove.
-   * @return the value of the parameter to remove, or null if the parameter is not set.
-   */
-  public Object removeParameter(final Object name) {
-    return parameters.remove(name);
-  }
-
-  /**
-   * Get the map holding the parameters of the request.
-   * @return a map of string keys to object values.
-   */
-  public Map<Object, Object> getParametersMap() {
-    return parameters;
-  }
-
   @Override
   public JobSLA getSLA() {
     return jobSLA;
@@ -352,6 +285,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
     sb.append(", taskCount=").append(taskCount);
     sb.append(", bundleUuid=").append(getParameter("bundle.uuid"));
     sb.append(", uuidPath=").append(uuidPath);
+    if (JPPF_DEBUG) sb.append(", nodeBundleId=").append(getParameter("node.bundle.id"));
     sb.append(']');
     return sb.toString();
   }
@@ -416,7 +350,7 @@ public class JPPFTaskBundle implements Serializable, Comparable<JPPFTaskBundle>,
    * @return job requeue flag.
    */
   public boolean isRequeue() {
-    return (Boolean) getParameter(BundleParameter.JOB_REQUEUE, false);
+    return getParameter(BundleParameter.JOB_REQUEUE, false);
   }
 
   /**
