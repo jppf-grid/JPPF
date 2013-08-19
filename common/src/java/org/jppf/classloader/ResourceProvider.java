@@ -189,15 +189,18 @@ public class ResourceProvider
     try
     {
       Enumeration<URL> urlEnum = cl.getResources(name);
-      if (urlEnum.hasMoreElements())
+      if (urlEnum != null)
       {
-        result = new ArrayList<byte[]>();
         while (urlEnum.hasMoreElements())
         {
           URL url = urlEnum.nextElement();
-          InputStream is = url.openStream();
-          byte[] b = StreamUtils.getInputStreamAsByte(is);
-          result.add(b);
+          if (url != null)
+          {
+            InputStream is = url.openStream();
+            byte[] b = StreamUtils.getInputStreamAsByte(is);
+            if (result == null) result = new ArrayList<byte[]>();
+            result.add(b);
+          }
         }
       }
     }
