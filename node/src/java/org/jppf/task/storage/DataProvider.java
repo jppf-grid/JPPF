@@ -33,7 +33,7 @@ public interface DataProvider extends Metadata
    * @return the value as an <code>Object</code>.
    * @throws Exception if an error occurred while retrieving the data.
    * @param <T> the type of the value to get.
-   * @deprecated use {@link #getParameter(Object)} instead)
+   * @deprecated use {@link #getParameter(Object)} instead.
    */
   <T> T  getValue(final Object key) throws Exception;
 
