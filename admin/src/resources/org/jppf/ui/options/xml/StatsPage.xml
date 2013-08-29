@@ -32,14 +32,44 @@
 		<property name="label" value="Actions"/>
 		<property name="componentConstraints" value="growy 0"/>
 	
-		<child name="RefreshBtn" type="Button">
-			<property name="componentConstraints" value="growx 0"/>
-			<listener type="script">
-				<script language="groovy">StatsHandler.getInstance().requestUpdate()</script>
-			</listener>
-		</child>
+    <child name="RefreshBtn" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().requestUpdate()</script>
+      </listener>
+    </child>
 
-	</child>
+    <child name="fillerb0" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="CopyAsLabel" type="Label">
+      <property name="componentConstraints" value="growx 0"/>
+    </child>
+
+    <child name="fillerb1" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="CopyAsTextBtn" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().copyStatsToClipboard(StatsExporter.TEXT)</script>
+      </listener>
+    </child>
+
+    <child name="fillerb2" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="CopyAsCsvBtn" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().copyStatsToClipboard(StatsExporter.CSV)</script>
+      </listener>
+    </child>
+  
+  </child>
 
 	<!-- ===================================================================== -->
 	<!--                      Tree table area                                  -->

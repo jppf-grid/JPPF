@@ -43,7 +43,7 @@ public class LabelOption extends AbstractOption
   {
     JLabel lab = new JLabel();
     lab.setHorizontalAlignment(SwingConstants.RIGHT);
-    if (value != null) lab.setText((String) value);
+    if (label != null) lab.setText((String) label);
     if (iconPath != null)
     {
       ImageIcon icon = GuiUtils.loadIcon(iconPath);
