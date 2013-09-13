@@ -20,18 +20,20 @@ package org.jppf.example.matrix;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.PolicyParser;
+import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the square matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class MatrixRunner
-{
+public class MatrixRunner {
   /**
    * Logger for this class.
    */
@@ -49,12 +51,10 @@ public class MatrixRunner
    * Entry point for this class, performs a matrix multiplication a number of times.,<br>
    * The number of times is specified as a configuration property named &quot;matrix.iterations&quot;.<br>
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
-   * @param args - not used.
+   * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args)  {
+    try {
       if ((args != null) && (args.length > 0)) jppfClient = new JPPFClient(args[0]);
       else jppfClient = new JPPFClient();
       TypedProperties props = JPPFConfiguration.getProperties();
@@ -63,28 +63,22 @@ public class MatrixRunner
       int nbRows = props.getInt("task.nbRows", 1);
       output("Running Matrix demo with matrix size = "+size+"*"+size+" for "+iterations+" iterations");
       perform(size, iterations, nbRows);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
 
   /**
    * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-   * @param size - the size of the matrices.
-   * @param iterations - the number of times the multiplication will be performed.
-   * @param nbRows - number of rows of matrix a per task.
+   * @param size the size of the matrices.
+   * @param iterations the number of times the multiplication will be performed.
+   * @param nbRows number of rows of matrix a per task.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform(final int size, final int iterations, final int nbRows) throws Exception
-  {
-    try
-    {
+  private static void perform(final int size, final int iterations, final int nbRows) throws Exception {
+    try {
       // initialize the 2 matrices to multiply
       Matrix a = new Matrix(size);
       a.assignRandomValues();
@@ -96,55 +90,46 @@ public class MatrixRunner
       // determine whether an execution policy should be used
       ExecutionPolicy policy = null;
       String s = JPPFConfiguration.getProperties().getString("jppf.execution.policy");
-      if (s != null)
-      {
+      if (s != null) {
         PolicyParser.validatePolicy(s);
         policy = PolicyParser.parsePolicy(s);
       }
       // perform "iteration" times
-      for (int iter=0; iter<iterations; iter++)
-      {
+      for (int iter=0; iter<iterations; iter++) {
         long elapsed = performParallelMultiplication(a, b, nbRows, policy);
         totalIterationTime += elapsed;
         output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
-      /*
-			if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
-			{
-				JPPFStats stats = jppfClient.requestStatistics();
-				output("End statistics :\n" + stats.toString());
-			}
-       */
-    }
-    catch(Exception e)
-    {
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
+      {
+        JPPFStats stats = jppfClient.getClientConnection().getJmxConnection().statistics();
+        output("End statistics :\n" + stats.toString());
+      }
+    } catch(Exception e) {
       throw e;
     }
   }
 
   /**
    * Perform the sequential multiplication of 2 squares matrices of equal sizes.
-   * @param a - the left-hand matrix.
-   * @param b - the right-hand matrix.
-   * @param nbRows - number of rows of matrix a per task.
-   * @param policy - the execution policy to apply to the submitted job, may be null.
+   * @param a the left-hand matrix.
+   * @param b the right-hand matrix.
+   * @param nbRows number of rows of matrix a per task.
+   * @param policy the execution policy to apply to the submitted job, may be null.
    * @return the elapsed time for the computation.
    * @throws Exception if an error is raised during the execution.
    */
-  private static long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy) throws Exception
-  {
-    long start = System.currentTimeMillis();
+  private static long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final ExecutionPolicy policy) throws Exception {
+    long start = System.nanoTime();
     int size = a.getSize();
     // create a task for each row in matrix a
     JPPFJob job = new JPPFJob();
     job.setName("matrix sample " + (iterationsCount++));
     int remaining = size;
-    for (int i=0; i<size; i+= nbRows)
-    {
+    for (int i=0; i<size; i+= nbRows) {
       double[][] rows = null;
-      if (remaining >= nbRows)
-      {
+      if (remaining >= nbRows) {
         rows = new double[nbRows][];
         remaining -= nbRows;
       }
@@ -170,7 +155,7 @@ public class MatrixRunner
       }
       rowIdx += rows.length;
     }
-    return System.currentTimeMillis() - start;
+    return (System.nanoTime() - start)/1000000L;
   }
 
   /**
@@ -178,20 +163,18 @@ public class MatrixRunner
    * @param a - the left-hand matrix.
    * @param b - the right-hand matrix.
    */
-  private static void performSequentialMultiplication(final Matrix a, final Matrix b)
-  {
-    long start = System.currentTimeMillis();
+  private static void performSequentialMultiplication(final Matrix a, final Matrix b) {
+    long start = System.nanoTime();
     a.multiply(b);
-    long elapsed = System.currentTimeMillis() - start;
-    output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed));
+    long elapsed = System.nanoTime() - start;
+    output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed/1000000L));
   }
 
   /**
    * Print a message to the console and/or log file.
    * @param message - the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }
