@@ -83,7 +83,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   }
 
   @Override
-  public int getKeyOps()
+  public int getInterestOps()
   {
     synchronized(opsLock)
     {
@@ -92,7 +92,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   }
 
   @Override
-  public void setKeyOps(final int keyOps)
+  public void setInterestOps(final int keyOps)
   {
     synchronized(opsLock)
     {
@@ -230,9 +230,9 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
     StringBuilder sb = new StringBuilder(1000);
     sb.append(getClass().getSimpleName());
     sb.append('[');
-    sb.append(getStringId());
+    sb.append("id=").append(getId());
     sb.append(", readyOps=").append(getReadyOps());
-    sb.append(", keyOps=").append(getKeyOps());
+    sb.append(", keyOps=").append(getInterestOps());
     sb.append(", serverResource=").append(serverResource);
     sb.append(", nodeResource=").append(serverResource);
     sb.append(", context=").append(getContext());

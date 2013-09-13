@@ -39,6 +39,16 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
   }
 
   /**
+   * Initialize this nio message with the specified sll flag.
+   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param debug to enable debug-level logging.
+   */
+  protected RemoteNodeMessage(final boolean ssl, final boolean debug)
+  {
+    super(ssl, debug);
+  }
+
+  /**
    * Actions to take after the first object in the message has been fully read.
    * @throws Exception if an IO error occurs.
    */
@@ -70,6 +80,9 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
     sb.append(", length=").append(length);
     sb.append(", count=").append(count);
     sb.append(", currentLength=").append(currentLength);
+    sb.append(", currentLengthObject=").append(currentLengthObject);
+    sb.append(", currentObject=").append(currentObject);
+    sb.append(", bundle=").append(bundle);
     sb.append(']');
     return sb.toString();
   }

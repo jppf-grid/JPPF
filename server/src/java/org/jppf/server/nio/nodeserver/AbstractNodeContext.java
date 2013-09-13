@@ -173,17 +173,33 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   /**
+   * Close and cleanup the resources used by the channel.
+   * @param channel the channel to close.
+   */
+  void cleanup(final ChannelWrapper<?> channel) {
+    Bundler bundler = getBundler();
+    if (bundler != null) {
+      bundler.dispose();
+      if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
+    }
+    if (onClose != null) onClose.run();
+    if (bundle != null) setBundle(null);
+    setMessage(null);
+  }
+
+  /**
    * Serialize this context's bundle into a byte buffer.
    * @param wrapper channel wrapper for this context.
    * @throws Exception if any error occurs.
    */
   public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception {
     bundle.checkTaskCount();
+    JPPFTaskBundle taskBundle = bundle.getJob();
     AbstractTaskBundleMessage message = newMessage();
-    bundle.getJob().setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
-    message.addLocation(IOHelper.serializeData(bundle.getJob(), helper.getSerializer()));
+    if (!taskBundle.isHandshake()) taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
+    message.addLocation(IOHelper.serializeData(taskBundle, helper.getSerializer()));
     message.addLocation(bundle.getDataProvider());
-    for (ServerTask dl: bundle.getTaskList()) message.addLocation(dl.getDataLocation());
+    for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getDataLocation());
     message.setBundle(bundle.getJob());
     setMessage(message);
   }
@@ -196,8 +212,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public Pair<JPPFTaskBundle, List<DataLocation>> deserializeBundle() throws Exception {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
-    List<DataLocation> tasks = new ArrayList<>(); if (locations.size() > 1)
-    {
+    List<DataLocation> tasks = new ArrayList<>();
+    if (locations.size() > 1) {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
     return new Pair<>(bundle, tasks);
@@ -220,10 +236,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     return message.write(channel);
   }
 
-  /**
-   * Get the node system information.
-   * @return a {@link JPPFSystemInformation} instance.
-   */
   @Override
   public JPPFSystemInformation getSystemInformation() {
     return systemInfo;
@@ -265,7 +277,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
-    initializeJmxConnection();
+    if ((managementInfo.getHost() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
   }
 
   @Override
@@ -278,7 +290,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     ExecutorStatus oldExecutionStatus = getExecutionStatus();
     boolean b = super.setState(state);
     switch (state) {
-      case IDLE: 
+      case IDLE:
         executionStatus = getChannel().isOpen() ? ExecutorStatus.ACTIVE : ExecutorStatus.FAILED;
         break;
       case SENDING_BUNDLE:
@@ -308,11 +320,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Initialize the jmx connection using the specified jmx id.
    */
-  public void initializeJmxConnection() {
+  private void initializeJmxConnection() {
     JPPFManagementInfo info = getManagementInfo();
     if (info == null) jmxConnection = null;
     else {
-      if ((info.getHost() != null) && (info.getPort() > 0)) {
+      if ((info.getHost() != null) && (info.getPort() >= 0)) {
         jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
         jmxConnection.connect();
       } else jmxConnection = null;
@@ -418,24 +430,17 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   /**
+   * Determine whether the node works in offline mode.
+   * @return <code>true</code> if the node is in offline mode, <code>false</code> otherwise.
+   */
+  protected abstract boolean isOffline();
+
+  /**
    * Create a new future for this cotext.
    * @return a {@link JPFFFuture} instance. 
    */
   public JPPFFuture<?> createFuture() {
     return new NodeContextFuture();
-  }
-
-  /**
-   * Close and cleanup the resources used by the channel.
-   * @param channel the channel to close.
-   */
-  void cleanup(final ChannelWrapper<?> channel) {
-    if (getBundler() != null) {
-      getBundler().dispose();
-      if (getBundler() instanceof ContextAwareness) ((ContextAwareness)getBundler()).setJPPFContext(null);
-    }
-    if (onClose != null) onClose.run();
-    if (bundle != null) setBundle(null);
   }
 
   /**

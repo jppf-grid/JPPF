@@ -83,7 +83,7 @@ final class NodeServerFactory extends NioServerFactory<NodeState, NodeTransition
   {
     CollectionMap<NodeState, NodeState> map = new EnumSetEnumMap<>(NodeState.class);
     map.addValues(SEND_INITIAL_BUNDLE, SEND_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE);
-    map.addValues(WAIT_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE, IDLE);
+    map.addValues(WAIT_INITIAL_BUNDLE, WAIT_INITIAL_BUNDLE, IDLE, WAITING_RESULTS);
     map.addValues(IDLE, IDLE, SENDING_BUNDLE);
     map.addValues(SENDING_BUNDLE, SENDING_BUNDLE, WAITING_RESULTS, IDLE);
     map.addValues(WAITING_RESULTS, WAITING_RESULTS, IDLE);

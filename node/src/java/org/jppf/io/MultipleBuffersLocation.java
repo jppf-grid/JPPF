@@ -324,4 +324,19 @@ public class MultipleBuffersLocation extends AbstractDataLocation
   {
     return list;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("size=").append(size);
+    sb.append(", count=").append(count);
+    sb.append(", currentBuffer=").append(currentBuffer);
+    sb.append(", currentBufferIndex=").append(currentBufferIndex);
+    sb.append(", transferring=").append(transferring);
+    sb.append(", list=").append(list);
+    sb.append(']');
+    return sb.toString();
+  }
 }

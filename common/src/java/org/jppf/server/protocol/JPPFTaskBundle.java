@@ -51,7 +51,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   /**
    * The unique identifier for the submitting application.
    */
-  private TraversalList<String> uuidPath = new TraversalList<>();
+  private TraversalList<String> uuidPath;
   /**
    * The number of tasks in this bundle at the time it is received by a driver.
    */
@@ -87,20 +87,23 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   /**
    * The service level agreement between the job and the server.
    */
-  private JobSLA jobSLA = new JPPFJobSLA();
+  private JobSLA jobSLA;
   /**
    * The user-defined metadata associated with this job.
    */
-  private JobMetadata jobMetadata = new JPPFJobMetadata();
+  private JobMetadata jobMetadata;
   /**
    * Count of bundles copied.
    */
-  private static AtomicLong copyCount = new AtomicLong(0);
+  private static AtomicLong copyCount = new AtomicLong(0L);
 
   /**
    * Initialize this task bundle and set its build number.
    */
   public JPPFTaskBundle() {
+    uuidPath = new TraversalList<>();
+    jobSLA = new JPPFJobSLA();
+    jobMetadata = new JPPFJobMetadata();
   }
 
   /**
@@ -209,7 +212,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   public synchronized JPPFTaskBundle copy() {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setUuidPath(uuidPath);
-    bundle.setUuid(getUuid());
+    bundle.setUuid(uuid);
     bundle.setName(name);
     bundle.setTaskCount(taskCount);
     bundle.setCurrentTaskCount(currentTaskCount);

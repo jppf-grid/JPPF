@@ -63,7 +63,7 @@ class SendingBundleState extends NodeServerState
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
+    //if (debugEnabled) log.debug("exec() for " + channel);
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -95,10 +95,25 @@ class SendingBundleState extends NodeServerState
     {
       if (debugEnabled) log.debug("sent entire bundle " + context.getBundle() + " to node " + channel);
       context.setMessage(null);
+      if (context.isOffline()) return processOfflineRequest(context);
       //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
       return TO_WAITING_RESULTS;
     }
     if (traceEnabled) log.trace("part yet to send to node " + channel);
     return TO_SENDING_BUNDLE;
+  }
+
+  
+  /**
+   * Process an offline request from the node.
+   * @param context the current context associated with the channel.
+   * @return a <code>null</code> transition since the channel is closed by this method.
+   * @throws Exception if any error occurs.
+   */
+  protected NodeTransition processOfflineRequest(final AbstractNodeContext context) throws Exception {
+    if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", context.getBundle(), context.getChannel());
+    server.getOfflineNodeHandler().addNodeBundle(context.getBundle());
+    context.cleanup(context.getChannel());
+    return null;
   }
 }

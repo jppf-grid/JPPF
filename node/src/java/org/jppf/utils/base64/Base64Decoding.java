@@ -22,7 +22,7 @@ import static org.jppf.utils.base64.Base64.*;
 
 import java.io.*;
 
-import org.jppf.utils.streams.StreamConstants;
+import org.jppf.io.IO;
 
 /**
  * 
@@ -136,7 +136,7 @@ public final class Base64Decoding
     if( off < 0 || off + len > source.length )
       throw new IllegalArgumentException( String.format("Source array with length %d cannot have offset of %d and process %d bytes.", source.length, off, len ) );
 
-    if( len == 0 )return StreamConstants.EMPTY_BYTES;
+    if( len == 0 )return IO.EMPTY_BYTES;
     else if( len < 4 ){
       throw new IllegalArgumentException(
           "Base64-encoded string must have at least four characters, but length specified was " + len );

@@ -127,7 +127,7 @@ public class NodeExecutionManagerImpl
     int poolSize = config.getInt(nbThreadsProperty, Runtime.getRuntime().availableProcessors());
     if (poolSize <= 0) {
       poolSize = Runtime.getRuntime().availableProcessors();
-      config.setProperty(nbThreadsProperty, Integer.toString(poolSize));
+      config.setInt(nbThreadsProperty, poolSize);
     }
     log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadManager = createThreadManager(config, poolSize);
@@ -159,10 +159,10 @@ public class NodeExecutionManagerImpl
       log.info("Using default thread manager");
       return new ThreadManagerThreadPool(poolSize);
     }
-    config.setProperty("processing.threads", Integer.toString(result.getPoolSize()));
+    config.setInt("processing.threads", result.getPoolSize());
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     boolean cpuTimeEnabled = result.isCpuTimeEnabled();
-    config.setProperty("cpuTimeSupported", Boolean.toString(cpuTimeEnabled));
+    config.setBoolean("cpuTimeSupported", cpuTimeEnabled);
     log.info("Thread CPU time measurement is " + (cpuTimeEnabled ? "" : "not ") + "supported");
     return result;
   }

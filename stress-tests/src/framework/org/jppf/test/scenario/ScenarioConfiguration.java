@@ -57,6 +57,12 @@ public interface ScenarioConfiguration
   String getDescription();
 
   /**
+   * Determines whether a client should be started.
+   * @return <code>true</code> if a client is to be started, <code>false</code> otherwise.
+   */
+  boolean isStartClient();
+  
+  /**
    * Get the number of drivers.
    * @return the number of drivers as an int.
    */

@@ -79,7 +79,8 @@ public class NodeSelectionHelper implements NodeSelectionProvider
       Set<AbstractNodeContext> result = new HashSet<>();
       for (AbstractNodeContext ctx: fullSet)
       {
-        if (!ctx.isPeer()) result.add(ctx);
+        if (!hasWorkingJmxConnection(ctx)) continue;
+        result.add(ctx);
       }
       return result;
     }
@@ -101,7 +102,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     for (AbstractNodeContext context: allChannels)
     {
-      if (context.isPeer()) continue;
+      if (!hasWorkingJmxConnection(context)) continue;
       if (uuids.contains(context.getUuid())) result.add(context);
     }
     return result;
@@ -118,7 +119,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     for (AbstractNodeContext context: allChannels)
     {
-      if (context.isPeer()) continue;
+      if (!hasWorkingJmxConnection(context)) continue;
       JPPFSystemInformation info = context.getSystemInformation();
       if (info == null) continue;
       if (policy.accepts(info)) result.add(context);
@@ -134,5 +135,18 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   private NodeNioServer getNodeNioServer()
   {
     return driver.getNodeNioServer();
+  }
+
+  /**
+   * Determine whether the specified node has a working JMX ocnnection.
+   * @param ctx the context associated witht he node.
+   * @return true if node has a working JMX connection, false otherwise.
+   */
+  private boolean hasWorkingJmxConnection(final AbstractNodeContext ctx)
+  {
+    if (ctx.isPeer()) return false;
+    JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
+    if ((jmx == null) || !jmx.isConnected()) return false;
+    return true;
   }
 }

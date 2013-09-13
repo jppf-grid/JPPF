@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.StringUtils;
@@ -33,36 +34,20 @@ import org.jppf.utils.StringUtils;
 public class ServerDebug implements ServerDebugMBean
 {
   /**
-   * The class loader channels.
+   * 
    */
-  private final Set<ChannelWrapper<?>> clientClassLoaderSet = new HashSet<>();
-  /**
-   * The class loader channels.
-   */
-  private final Set<ChannelWrapper<?>> nodeClassLoaderSet = new HashSet<>();
-  /**
-   * The node channels.
-   */
-  private final Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
-  /**
-   * The client channels.
-   */
-  private final Set<ChannelWrapper<?>> clientSet = new HashSet<>();
-  /**
-   * The acceptor channels.
-   */
-  private final Set<ChannelWrapper<?>> acceptorSet = new HashSet<>();
+  private final JPPFDriver driver = JPPFDriver.getInstance();
 
   @Override
   public String[] clientClassLoaderChannels()
   {
-    return classLoaderChannels(clientClassLoaderSet);
+    return classLoaderChannels(clientClassLoaderSet());
   }
 
   @Override
   public String[] nodeClassLoaderChannels()
   {
-    return classLoaderChannels(nodeClassLoaderSet);
+    return classLoaderChannels(nodeClassLoaderSet());
   }
 
   /**
@@ -85,13 +70,29 @@ public class ServerDebug implements ServerDebugMBean
   @Override
   public String[] nodeDataChannels()
   {
-    return viewChannels(nodeSet);
+    return viewChannels(nodeSet());
   }
 
   @Override
   public String[] clientDataChannels()
   {
-    return viewChannels(clientSet);
+    return viewChannels(clientSet());
+  }
+
+  @Override
+  public String[] nodeMessages()
+  {
+    Set<ChannelWrapper<?>> set = new HashSet<>(nodeSet());
+    String[] result = new String[set.size()];
+    int count = 0;
+    for (ChannelWrapper<?> ch: set)
+    {
+      long id = ch.getId();
+      AbstractNodeContext ctx = (AbstractNodeContext) ch.getContext();
+      String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
+      result[count++] = new StringBuilder().append("channelId=").append(id).append(", message=").append(s).toString();
+    }
+    return result;
   }
 
   @Override
@@ -137,56 +138,32 @@ public class ServerDebug implements ServerDebugMBean
   }
 
   /**
-   * Add a channel to those observed.
-   * @param channel the channel to add.
-   * @param serverName the name of the server that owns the channel.
-   */
-  public void addChannel(final ChannelWrapper<?> channel, final String serverName)
-  {
-    Set<ChannelWrapper<?>> set = findSetFromName(serverName);
-    synchronized(set)
-    {
-      set.add(channel);
-    }
-  }
-
-  /**
-   * Remove a channel from those observed.
-   * @param channel the channel to add.
-   * @param serverName the name of the server that owns the channel.
-   */
-  public void removeChannel(final ChannelWrapper<?> channel, final String serverName)
-  {
-    Set<ChannelWrapper<?>> set = findSetFromName(serverName);
-    synchronized(set)
-    {
-      set.remove(channel);
-    }
-  }
-
-  /**
    * Get the set of channels for the specified server name.
    * @param name the name of the server for which to get the channels.
    * @return a set of <code>ChannelWrapper</code> instances.
    */
   private Set<ChannelWrapper<?>> findSetFromName(final String name)
   {
-    if (NioConstants.CLIENT_CLASS_SERVER.equals(name)) return clientClassLoaderSet;
-    else if (NioConstants.NODE_CLASS_SERVER.equals(name)) return nodeClassLoaderSet;
-    else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet;
-    else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet;
-    return acceptorSet;
+    if (NioConstants.CLIENT_CLASS_SERVER.equals(name)) return clientClassLoaderSet();
+    else if (NioConstants.NODE_CLASS_SERVER.equals(name)) return nodeClassLoaderSet();
+    else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet();
+    else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet();
+    return acceptorSet();
   }
 
   @Override
   public String[] allChannels()
   {
-    int size = clientClassLoaderSet.size() + nodeClassLoaderSet.size() + nodeSet.size() + clientSet.size();
+    Set<ChannelWrapper<?>> ccl = clientClassLoaderSet();
+    Set<ChannelWrapper<?>> ncl = nodeClassLoaderSet();
+    Set<ChannelWrapper<?>> c = clientSet();
+    Set<ChannelWrapper<?>> n = nodeSet();
+    int size = ccl.size() + ncl.size() + n.size() + c.size();
     List<String> list = new ArrayList<>(size);
-    for (ChannelWrapper<?> channel: clientClassLoaderSet) list.add(channel.toString());
-    for (ChannelWrapper<?> channel: nodeClassLoaderSet) list.add(channel.toString());
-    for (ChannelWrapper<?> channel: nodeSet) list.add(channel.toString());
-    for (ChannelWrapper<?> channel: clientSet) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: ccl) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: ncl) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: n) list.add(channel.toString());
+    for (ChannelWrapper<?> channel: c) list.add(channel.toString());
     return list.toArray(new String[list.size()]);
   }
 
@@ -218,8 +195,8 @@ public class ServerDebug implements ServerDebugMBean
       if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
       else
       {
-      sb.append("client bundles:\n");
-      for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
+        sb.append("client bundles:\n");
+        for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
       }
       List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
       if (completionBundles.isEmpty()) sb.append("client completion bundles: empty\n");
@@ -237,5 +214,53 @@ public class ServerDebug implements ServerDebugMBean
       }
     }
     return sb.toString();
+  }
+
+  /**
+   * Get the set of client class loader connections.
+   * @return a set of {@link ChannelWrapper} instances.
+   */
+  private Set<ChannelWrapper<?>> clientClassLoaderSet()
+  {
+    return new HashSet<>(driver.getClientClassServer().getAllConnections());
+  }
+
+  /**
+   * Get the set of client class loader connections.
+   * @return a set of {@link ChannelWrapper} instances.
+   */
+  private Set<ChannelWrapper<?>> nodeClassLoaderSet()
+  {
+    return new HashSet<>(driver.getNodeClassServer().getAllConnections());
+  }
+
+  /**
+   * Get the set of client class loader connections.
+   * @return a set of {@link ChannelWrapper} instances.
+   */
+  private Set<ChannelWrapper<?>> nodeSet()
+  {
+    List<AbstractNodeContext> list = driver.getNodeNioServer().getAllChannels();
+    Set<ChannelWrapper<?>> set = new HashSet<>();
+    for (AbstractNodeContext ctx: list) set.add(ctx.getChannel());
+    return set;
+  }
+
+  /**
+   * Get the set of client class loader connections.
+   * @return a set of {@link ChannelWrapper} instances.
+   */
+  private Set<ChannelWrapper<?>> clientSet()
+  {
+    return new HashSet<>(driver.getClientNioServer().getAllConnections());
+  }
+
+  /**
+   * Get the set of client class loader connections.
+   * @return a set of {@link ChannelWrapper} instances.
+   */
+  private Set<ChannelWrapper<?>> acceptorSet()
+  {
+    return new HashSet<>(driver.getAcceptorServer().getAllConnections());
   }
 }

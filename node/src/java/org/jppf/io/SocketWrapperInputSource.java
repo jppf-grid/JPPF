@@ -22,7 +22,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.streams.StreamConstants;
 
 /**
  * Input source backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
@@ -71,7 +70,7 @@ public class SocketWrapperInputSource implements InputSource
   @Override
   public int read(final ByteBuffer data) throws Exception
   {
-    byte[] buf = new byte[StreamConstants.TEMP_BUFFER_SIZE];
+    byte[] buf = new byte[IO.TEMP_BUFFER_SIZE];
     int size = Math.min(buf.length, data.remaining());
     int n = read(buf, 0, size);
     if (n > 0) data.put(buf, 0, n);

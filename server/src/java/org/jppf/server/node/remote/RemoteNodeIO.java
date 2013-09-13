@@ -28,15 +28,14 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.ObjectSerializer;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
-public class RemoteNodeIO extends AbstractNodeIO
-{
+public class RemoteNodeIO extends AbstractNodeIO {
   /**
    * Logger for this class.
    */
@@ -54,51 +53,43 @@ public class RemoteNodeIO extends AbstractNodeIO
    * Initialize this TaskIO with the specified node.
    * @param node - the node who owns this TaskIO.
    */
-  public RemoteNodeIO(final JPPFNode node)
-  {
+  public RemoteNodeIO(final JPPFNode node) {
     super(node);
   }
 
   @Override
-  protected Object[] deserializeObjects() throws Exception
-  {
+  protected Object[] deserializeObjects() throws Exception {
     ObjectSerializer ser = node.getHelper().getSerializer();
     if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
     JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(getSocketWrapper(), node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
     Object[] result = deserializeObjects(bundle);
-    if (node.isOffline() && !bundle.isHandshake()) sendOfflineCloseRequest(bundle);
+    //if (node.isOffline() && !bundle.isHandshake()) sendOfflineCloseRequest(bundle);
+    if (node.isOffline() && !bundle.isHandshake()) waitChannelClosed(getSocketWrapper());
     return result;
   }
 
   @Override
-  protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
-  {
+  protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception {
     int count = bundle.getTaskCount();
     List<Object> list = new ArrayList<>(count + 2);
     list.add(bundle);
-    try
-    {
+    try {
       initializePerformanceData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
-      if (!bundle.isHandshake())
-      {
+      if (!bundle.isHandshake()) {
         JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.setNodeConnection((RemoteNodeConnection) node.getNodeConnection());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
-      }
-      else
-      {
+      } else {
         // skip null data provider
         getSocketWrapper().receiveBytes(0);
       }
       if (debugEnabled) log.debug("got all data");
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       log.error("Exception occurred while deserializing the tasks", t);
       bundle.setTaskCount(0);
       bundle.setParameter(NODE_EXCEPTION_PARAM, t);
@@ -112,8 +103,7 @@ public class RemoteNodeIO extends AbstractNodeIO
    * @see org.jppf.server.node.AbstractNodeIO#handleReload()
    */
   @Override
-  protected void handleReload() throws Exception
-  {
+  protected void handleReload() throws Exception {
     node.setClassLoader(null);
     node.initHelper();
     getSocketWrapper().setSerializer(node.getHelper().getSerializer());
@@ -127,8 +117,7 @@ public class RemoteNodeIO extends AbstractNodeIO
    * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
    */
   @Override
-  public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
-  {
+  public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizePerformanceData(bundle);
@@ -139,45 +128,61 @@ public class RemoteNodeIO extends AbstractNodeIO
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
     SocketWrapper socketWrapper = getSocketWrapper();
     OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
-    for (Future<DataLocation> f: futureList)
-    {
+    int count = 0;
+    for (Future<DataLocation> f: futureList) {
       DataLocation dl = f.get();
-      if (traceEnabled) log.trace("writing object size = " + dl.getSize());
+      if (traceEnabled) log.trace("writing "  + (count == 0 ? "header" : "task[" + count + ']') + " with size = " + dl.getSize());
       IOHelper.writeData(dl, dest);
+      count++;
     }
     socketWrapper.flush();
     if (debugEnabled) log.debug("wrote full results");
   }
 
   /**
-   * Send an offline request to the driver.
-   * The driver will close the connection and persist the task bundle until it receives an onlone request for this node.
-   * In the meantime, the node will be executing the job. Once executed, it will reconnect, send an online request and then send the results.
-   * @param currentJob the current job.
-   * @throws Exception if any error occurs.
+   * Wait until the connection is closed by the other end.
+   * @param socketWrapper the connection to check.
    */
-  private void sendOfflineCloseRequest(final JPPFTaskBundle currentJob) throws Exception
-  {
-    JPPFTaskBundle bundle = new JPPFTaskBundle();
-    bundle.setUuid(currentJob.getUuid());
-    bundle.setName(currentJob.getName());
-    bundle.setParameter(BundleParameter.NODE_OFFLINE_CLOSE_REQUEST, Boolean.TRUE);
-
-    ExecutorService executor = node.getExecutionManager().getExecutor();
-    Future<DataLocation> future = executor.submit(new ObjectSerializationTask(bundle));
-    SocketWrapper socketWrapper = getSocketWrapper();
-    OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
-    DataLocation dl = future.get();
-    if (traceEnabled) log.trace("writing object size = " + dl.getSize());
-    IOHelper.writeData(dl, dest);
-    socketWrapper.flush();
+  private void waitChannelClosed(final SocketWrapper socketWrapper) {
     try {
       socketWrapper.readInt();
     } catch (Exception ignore) {
+    } catch (Error e) {
+      if (debugEnabled) log.debug("error closing socket: ", e);
     }
+    if (traceEnabled) log.trace("server closed the connection");
     try {
       node.closeDataChannel();
     } catch (Exception ignore) {
+    } catch (Error e) {
+      if (debugEnabled) log.debug("error closing data channel: ", e);
+    }
+    if (traceEnabled) log.trace("closed the data channel");
+  }
+
+  /**
+   * Wait until the connection is closed by the other end.
+   * @param socketWrapper the connection to check.
+   */
+  private void waitChannelClosed2(final SocketWrapper socketWrapper) {
+    boolean done = false;
+    JPPFBuffer buf = new JPPFBuffer(new byte[1]);
+    while (!done) {
+      try {
+        //we attempt to write to make the non-blocking channel at the other end readable.
+        socketWrapper.sendBytes(buf);
+        synchronized(this) {
+          try {
+            wait(0L, 100000);
+          } catch(InterruptedException ignore) {
+          }
+        }
+      } catch (Exception ignore) {
+        done = true;
+      } catch (Error e) {
+        done = true;
+        if (debugEnabled) log.debug("error closing socket: ", e);
+      }
     }
   }
 
@@ -185,8 +190,7 @@ public class RemoteNodeIO extends AbstractNodeIO
    * Get the socket wrapper associated with the node connection.
    * @return a {@link SocketWrapper} instance.
    */
-  private SocketWrapper getSocketWrapper()
-  {
+  private SocketWrapper getSocketWrapper() {
     return ((RemoteNodeConnection) node.getNodeConnection()).getChannel();
   }
 }

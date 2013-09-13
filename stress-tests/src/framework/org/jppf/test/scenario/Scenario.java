@@ -152,6 +152,7 @@ public class Scenario
    */
   private void printDiagnostics() throws Exception
   {
+    if (!configuration.isStartClient()) return;
     String fileName = configuration.getDiagnosticsOutputFilename();
     if ("none".equals(fileName)) return;
     PrintStream out = null;

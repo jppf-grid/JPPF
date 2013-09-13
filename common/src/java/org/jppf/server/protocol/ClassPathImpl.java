@@ -47,9 +47,16 @@ public class ClassPathImpl implements ClassPath
   }
 
   @Override
-  public ClassPath add(final String name, final Location location)
+  public ClassPath add(final String name, final Location<?> location)
   {
     elementMap.put(name, new ClassPathElementImpl(name, location));
+    return this;
+  }
+
+  @Override
+  public ClassPath add(final String name, final Location<?> localLocation, final Location<?> remoteLocation)
+  {
+    elementMap.put(name, new ClassPathElementImpl(name, localLocation, remoteLocation));
     return this;
   }
 

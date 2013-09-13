@@ -47,7 +47,7 @@ public interface NodeConnection<C>
 
   /**
    * Get the communication channel for this connection.
-   * @return an object trpesenting the channel.
+   * @return an object representing the channel.
    */
   C getChannel();
 }

@@ -18,12 +18,13 @@
 package org.jppf.server.node;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import javax.management.*;
 
 import org.jppf.*;
-import org.jppf.classloader.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.NodeRunner;
@@ -92,7 +93,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * 
    */
-  protected JPPFTaskBundle currentBundle  = null;
+  protected Pair<JPPFTaskBundle, List<Task>> currentBundle  = null;
 
   /**
    * Default constructor.
@@ -165,31 +166,34 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private void processNextJob() throws Exception {
     Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
     JPPFTaskBundle bundle = pair.first();
-    if (bundle.isHandshake()) checkInitialBundle(bundle);
+    //if (bundle.isHandshake()) checkInitialBundle(bundle);
     List<Task> taskList = pair.second();
-    boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
-    if (debugEnabled) {
-      if (notEmpty) log.debug("received a bundle with " + taskList.size()  + " tasks");
-      else log.debug("received an empty bundle");
-    }
-    if (notEmpty) {
-      if (checkConnection) {
-        try {
-          connectionChecker.resume();
-          executionManager.execute(bundle, taskList);
-        } finally {
+    //boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
+    if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
+    if (!bundle.isHandshake()) {
+      try {
+        if (checkConnection) connectionChecker.resume();
+        executionManager.execute(bundle, taskList);
+      } finally {
+        if (checkConnection) {
           connectionChecker.suspend();
           if (connectionChecker.getException() != null) throw connectionChecker.getException();
         }
       }
-      else executionManager.execute(bundle, taskList);
       if (isOffline()) {
-        currentBundle = bundle;
+        currentBundle = pair;
         initDataChannel();
         processNextJob(); // new handshake
+      } else processResults(bundle, taskList);
+    } else {
+      if (currentBundle != null) {
+        bundle = currentBundle.first();
+        taskList = currentBundle.second();
       }
+      checkInitialBundle(bundle);
+      currentBundle = null;
+      processResults(bundle, taskList);
     }
-    processResults(bundle, taskList);
   }
 
   /**
@@ -199,13 +203,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception {
-    if (debugEnabled) log.debug("setting initial bundle, offline=" + isOffline() + ", currentBundle=" + currentBundle);
+    if (debugEnabled) log.debug("setting initial bundle, offline=" + isOffline() + (currentBundle == null ? ", bundle=" + bundle : ", currentBundle=" + currentBundle.first()));
     bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
     if (isOffline()) {
+      bundle.setParameter(BundleParameter.NODE_OFFLINE, true);
       if (currentBundle != null) {
         bundle.setParameter(BundleParameter.NODE_OFFLINE_OPEN_REQUEST, true);
-        bundle.setParameter(BundleParameter.NODE_BUNDLE_ID, currentBundle.getParameter(BundleParameter.NODE_BUNDLE_ID));
-        bundle.setParameter(BundleParameter.JOB_UUID, currentBundle.getUuid());
+        bundle.setParameter(BundleParameter.NODE_BUNDLE_ID, currentBundle.first().getParameter(BundleParameter.NODE_BUNDLE_ID));
+        bundle.setParameter(BundleParameter.JOB_UUID, currentBundle.first().getUuid());
       }
     }
     if (isJmxEnabled()) setupManagementParameters(bundle);
@@ -219,8 +224,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception {
     currentBundle = null;
-    if (debugEnabled) log.debug("processing      " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
-    if (executionManager.checkConfigChanged() || bundle.isHandshake()) {
+    if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
+    //if (executionManager.checkConfigChanged() || (bundle.isHandshake() && (currentBundle == null))) {
+    if (executionManager.checkConfigChanged() || bundle.isHandshake() || isOffline()) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       TypedProperties jppf = systemInformation.getJppf();
       jppf.clear();
@@ -240,11 +246,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private synchronized void init() throws Exception {
     if (debugEnabled) log.debug("start node initialization");
     initHelper();
+    try {
+      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      if (!server.isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME))) registerProviderMBeans();
+    } catch (Exception e) {
+      log.error("Error registering the MBeans", e);
+    }
     if (isJmxEnabled()) {
       JMXServer jmxServer = null;
       try {
         jmxServer = getJmxServer();
-        if (!jmxServer.getServer().isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME))) registerProviderMBeans();
       } catch(Exception e) {
         jmxEnabled = false;
         System.out.println("JMX initialization failure - management is disabled for this node");
@@ -378,7 +389,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     }
     if (stopJmx) {
       try {
-        providerManager.unregisterProviderMBeans();
+        if (providerManager != null) providerManager.unregisterProviderMBeans();
         if (jmxServer != null) jmxServer.stop();
       } catch(Exception e) {
         log.error(e.getMessage(), e);
@@ -401,8 +412,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   @SuppressWarnings("unchecked")
   private void registerProviderMBeans() throws Exception {
     ClassLoader cl = getClass().getClassLoader();
-    ClassLoader tmp = Thread.currentThread().getContextClassLoader();
-    MBeanServer server = getJmxServer().getServer();
+    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, server, this);
   }
 

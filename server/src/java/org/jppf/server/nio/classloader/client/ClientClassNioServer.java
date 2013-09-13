@@ -24,6 +24,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -49,7 +50,9 @@ public class ClientClassNioServer extends ClassNioServer
    * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
    * which application classpath to look for the requested resources.
    */
-  protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<>();
+  protected final CollectionMap<String, ChannelWrapper<?>> providerConnections = new ConcurrentMapCopyOnWriteList<>();
+  //protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<>();
+  //ConcurrentMapCopyOnWriteList
 
   /**
    * Initialize this class server.
@@ -122,17 +125,7 @@ public class ClientClassNioServer extends ClassNioServer
   public void addProviderConnection(final String uuid, final ChannelWrapper<?> channel)
   {
     if (debugEnabled) log.debug("adding provider connection: uuid=" + uuid + ", channel=" + channel);
-    synchronized(providerConnections)
-    {
-      List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-      if (list == null)
-      {
-        list = new ArrayList<>();
-        providerConnections.put(uuid, list);
-      }
-      list.add(channel);
-    }
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
+    providerConnections.putValue(uuid, channel);
   }
 
   /**
@@ -143,13 +136,7 @@ public class ClientClassNioServer extends ClassNioServer
   public void removeProviderConnection(final String uuid, final ChannelWrapper channel)
   {
     if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
-    synchronized(providerConnections)
-    {
-      List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-      if (list == null) return;
-      list.remove(channel);
-    }
+    providerConnections.removeValue(uuid, channel);
   }
 
   /**
@@ -159,12 +146,16 @@ public class ClientClassNioServer extends ClassNioServer
    */
   public List<ChannelWrapper<?>> getProviderConnections(final String uuid)
   {
-    synchronized(providerConnections)
-    {
-      List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-      if (list == null) return null;
-      return Collections.unmodifiableList(list);
-    }
+    return new ArrayList<>(providerConnections.getValues(uuid));
+  }
+
+  /**
+   * Get all the provider connections handled by this server.
+   * @return a list of connection channels.
+   */
+  public List<ChannelWrapper<?>> getAllConnections()
+  {
+    return new ArrayList<>(providerConnections.allValues());
   }
 
   /**
@@ -175,16 +166,10 @@ public class ClientClassNioServer extends ClassNioServer
   public synchronized void removeAllConnections()
   {
     if (!isStopped()) return;
-    synchronized(providerConnections)
-    {
-      providerConnections.clear();
-    }
+    providerConnections.clear();
     super.removeAllConnections();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
   {

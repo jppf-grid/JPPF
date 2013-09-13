@@ -116,8 +116,11 @@ public class Setup
       nodes[i] = new RestartableNodeProcessLauncher(i+1, config);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
     }
-    client = createClient("c" + clientCount.incrementAndGet(), true);
-    jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+    if (config.isStartClient())
+    {
+      client = createClient("c" + clientCount.incrementAndGet(), true);
+      jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+    }
     return client;
   }
 
@@ -153,7 +156,7 @@ public class Setup
     }
     System.gc();
     stopProcesses();
-    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
   }
 
   /**

@@ -20,7 +20,7 @@ package org.jppf.server.node.remote;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
-import org.jppf.node.AbstractNodeConnection;
+import org.jppf.node.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -78,7 +78,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
       channel.setPort(port);
       channel.setSerializer(serializer);
       if (debugEnabled) log.debug("end socket client initialization");
-      System.out.println("Attempting connection to the node server at " + host + ':' + port);
+      if (!NodeRunner.isOffline()) System.out.println("Attempting connection to the node server at " + host + ':' + port);
       socketInitializer.initializeSocket(channel);
       if (!socketInitializer.isSuccessful())
       {
@@ -86,7 +86,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
         throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
       }
       if (sslEnabled) channel = SSLHelper.createSSLClientConnection(channel);
-      System.out.println("Reconnected to the node server");
+      if (!NodeRunner.isOffline()) System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
       if (debugEnabled) log.debug("end socket initializer");

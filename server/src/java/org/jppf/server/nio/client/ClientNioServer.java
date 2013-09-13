@@ -50,7 +50,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   /**
    * 
    */
-  private List<ChannelWrapper<?>> channels = new ArrayList<>();
+  private List<ChannelWrapper<?>> channels = new Vector<>();
 
   /**
    * Initialize this class loader server.
@@ -62,7 +62,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     super(NioConstants.CLIENT_SERVER);
     if (driver == null) throw new IllegalArgumentException("driver is null");
 
-    this.driver = driver;
+    ClientNioServer.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
@@ -77,10 +77,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   {
     try
     {
-      synchronized(channels)
-      {
-        channels.add(channel);
-      }
+      channels.add(channel);
       transitionManager.transitionChannel(channel, ClientTransition.TO_WAITING_HANDSHAKE);
     }
     catch (Exception e)
@@ -90,7 +87,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
       closeClient(channel);
     }
     driver.getStatsManager().newClientConnection();
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, NioConstants.CLIENT_SERVER);
   }
 
   @Override
@@ -105,10 +101,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    */
   public void removeChannel(final ChannelWrapper<?> channel)
   {
-    synchronized(channels)
-    {
-      channels.remove(channel);
-    }
+    channels.remove(channel);
   }
 
   /**
@@ -141,7 +134,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   public static void closeClient(final ChannelWrapper<?> channel)
   {
     if (debugEnabled) log.debug("closing client channel " + channel);
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.CLIENT_SERVER);
     try
     {
       driver.getClientNioServer().removeChannel(channel);
@@ -165,5 +157,11 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   public boolean isIdle(final ChannelWrapper<?> channel)
   {
     return ClientState.IDLE == channel.getContext().getState();
+  }
+
+  @Override
+  public List<ChannelWrapper<?>> getAllConnections()
+  {
+    return channels;
   }
 }

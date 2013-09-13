@@ -155,7 +155,7 @@ public class NodeRefreshHandler
    * Refresh the nodes currently attached to the specified driver.
    * @param driverUuid the name of the driver.
    */
-  private synchronized void refreshNodes(final String driverUuid) {
+  private void refreshNodes(final String driverUuid) {
     DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverUuid);
     //if (debugEnabled) log.debug("driverNode = " + driverNode);
     if (driverNode == null) return;
@@ -177,7 +177,9 @@ public class NodeRefreshHandler
     }
     if (nodesInfo == null) return;
     Map<String, JPPFManagementInfo> actualMap = new HashMap<>();
-    for (JPPFManagementInfo info: nodesInfo) actualMap.put(info.getUuid(), info);
+    for (JPPFManagementInfo info: nodesInfo) {
+      if (info.getPort() >= 0) actualMap.put(info.getUuid(), info);
+    }
     List<String> nodesToProcess = new ArrayList<>(panelUuids.size());
     for (String uuid: panelUuids) {
       if (!actualMap.containsKey(uuid)) nodesToProcess.add(uuid);

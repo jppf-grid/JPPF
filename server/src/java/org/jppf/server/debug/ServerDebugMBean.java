@@ -51,6 +51,11 @@ public interface ServerDebugMBean extends Serializable
    */
   String[] clientDataChannels();
   /**
+   * Get a view of the nio messages for the node data channels.
+   * @return the nio messages as an array of string in format channelId = NioMessage.toString().
+   */
+  String[] nodeMessages();
+  /**
    * Get the states of all channels.
    * @return the states as as an array of strings.
    */

@@ -175,6 +175,8 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
     sla.setMaxNodes(maxNodes);
     sla.setSuspended(suspended);
     sla.setCancelUponClientDisconnect(cancelUponClientDisconnect);
+    sla.setResultsStrategy(resultsStrategy);
+    sla.setClassPath(classPath);
     return sla;
   }
 

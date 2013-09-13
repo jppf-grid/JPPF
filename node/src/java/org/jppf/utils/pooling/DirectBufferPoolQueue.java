@@ -20,7 +20,7 @@ package org.jppf.utils.pooling;
 
 import java.nio.ByteBuffer;
 
-import org.jppf.utils.streams.StreamConstants;
+import org.jppf.io.IO;
 
 /**
  * A ByteBuffer pool backed by a {@link java.util.concurrent.ConcurrentLinkedQueue ConcurrentLinkedQueue}.
@@ -32,7 +32,7 @@ public class DirectBufferPoolQueue extends AbstractObjectPoolQueue<ByteBuffer>
   @Override
   protected ByteBuffer create()
   {
-    return ByteBuffer.allocateDirect(StreamConstants.TEMP_BUFFER_SIZE);
+    return ByteBuffer.allocateDirect(IO.TEMP_BUFFER_SIZE);
   }
 
   @Override

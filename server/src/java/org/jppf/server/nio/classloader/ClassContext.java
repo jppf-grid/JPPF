@@ -205,7 +205,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       {
         if (ClassState.IDLE_PROVIDER.equals(getState()) && (currentRequest.get() == null) && (getNbPendingRequests() > 0))
         {
-          if (debugEnabled) log.debug("state changing from {} to {} for {}", new Object[] {ClassState.IDLE_PROVIDER, ClassState.SENDING_PROVIDER_REQUEST, this});
+          if (debugEnabled) log.debug("state changing from IDLE_PROVIDER to SENDING_PROVIDER_REQUEST for {}", this);
           driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
         }
       }

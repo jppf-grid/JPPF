@@ -19,6 +19,7 @@
 package org.jppf.server.event;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.utils.ServiceFinder;
@@ -43,7 +44,7 @@ public class NodeConnectionEventHandler
   /**
    * The list of node connection listeners.
    */
-  private final List<NodeConnectionListener> listeners = new LinkedList<>();
+  private final List<NodeConnectionListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Add a listener to the list of listeners.
@@ -52,10 +53,7 @@ public class NodeConnectionEventHandler
   public void addNodeConnectionListener(final NodeConnectionListener listener)
   {
     if (listener == null) return;
-    synchronized(listeners)
-    {
-      listeners.add(listener);
-    }
+    listeners.add(listener);
   }
 
   /**
@@ -65,10 +63,7 @@ public class NodeConnectionEventHandler
   public void removeNodeConnectionListener(final NodeConnectionListener listener)
   {
     if (listener == null) return;
-    synchronized(listeners)
-    {
-      listeners.remove(listener);
-    }
+    listeners.remove(listener);
   }
 
   /**
@@ -78,10 +73,7 @@ public class NodeConnectionEventHandler
   public void fireNodeConnected(final JPPFManagementInfo info)
   {
     NodeConnectionEvent event = new NodeConnectionEvent(info);
-    synchronized(listeners)
-    {
-      for (NodeConnectionListener listener: listeners) listener.nodeConnected(event);
-    }
+    for (NodeConnectionListener listener: listeners) listener.nodeConnected(event);
   }
 
   /**
@@ -91,10 +83,7 @@ public class NodeConnectionEventHandler
   public void fireNodeDisconnected(final JPPFManagementInfo info)
   {
     NodeConnectionEvent event = new NodeConnectionEvent(info);
-    synchronized(listeners)
-    {
-      for (NodeConnectionListener listener: listeners) listener.nodeDisconnected(event);
-    }
+    for (NodeConnectionListener listener: listeners) listener.nodeDisconnected(event);
   }
 
   /**
@@ -103,18 +92,14 @@ public class NodeConnectionEventHandler
   public void loadListeners()
   {
     Iterator<NodeConnectionListener> it = ServiceFinder.lookupProviders(NodeConnectionListener.class);
+    List<NodeConnectionListener> list = new ArrayList<>();
     while (it.hasNext())
     {
-      try
-      {
-        NodeConnectionListener listener = it.next();
-        addNodeConnectionListener(listener);
-        if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());
-      }
-      catch(Error e)
-      {
-        log.error(e.getMessage(), e);
-      }
+      NodeConnectionListener listener = it.next();
+      if (listener == null) continue;
+      list.add(listener);
+      if (debugEnabled) log.debug("successfully added node connection listener " + listener.getClass().getName());
     }
+    listeners.addAll(list);
   }
 }

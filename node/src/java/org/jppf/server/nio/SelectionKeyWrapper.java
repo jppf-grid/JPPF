@@ -18,9 +18,7 @@
 
 package org.jppf.server.nio;
 
-import java.nio.channels.SelectionKey;
-
-import org.jppf.utils.StringUtils;
+import java.nio.channels.*;
 
 /**
  * Channel wrapper implementation for a {@link SelectionKey}.
@@ -50,7 +48,9 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public void close() throws Exception
   {
-    channel.channel().close();
+    //channel.cancel();
+    SelectableChannel ch = (SelectableChannel) channel.channel();
+    ch.close();
   }
 
   /**
@@ -76,7 +76,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
       StringBuilder sb = new StringBuilder(1000);
       sb.append(getClass().getSimpleName());
       sb.append('[');
-      sb.append(getStringId());
+      sb.append("id=").append(getId());
       sb.append(", channel=").append(channel);
       sb.append(", context=").append(getContext());
       sb.append(']');
@@ -85,19 +85,13 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
     return super.toString();
   }
 
-  @Override
-  public String getStringId()
-  {
-    return "id=" + id + ", " + StringUtils.getRemoteHost(getChannel().channel());
-  }
-
   /**
    * Get the operations enabled for this channel.
    * @return the operations as an int value.
-   * @see org.jppf.server.nio.AbstractChannelWrapper#getKeyOps()
+   * @see org.jppf.server.nio.AbstractChannelWrapper#getInterestOps()
    */
   @Override
-  public int getKeyOps()
+  public int getInterestOps()
   {
     return channel.interestOps();
   }
@@ -105,10 +99,10 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   /**
    * Get the operations enabled for this channel.
    * @param keyOps the operations as an int value.
-   * @see org.jppf.server.nio.AbstractChannelWrapper#setKeyOps(int)
+   * @see org.jppf.server.nio.AbstractChannelWrapper#setInterestOps(int)
    */
   @Override
-  public void setKeyOps(final int keyOps)
+  public void setInterestOps(final int keyOps)
   {
     channel.interestOps(keyOps);
   }

@@ -64,7 +64,7 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
   {
     TypedProperties config = JPPFConfiguration.getProperties();
     (nodeConnection = new RemoteNodeConnection(serializer)).init();
-    nodeIO = new RemoteNodeIO(this);
+    if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
     if (config.getBoolean("jppf.recovery.enabled", false))
     {
       if (recoveryConnection == null)
@@ -86,13 +86,15 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
   public void closeDataChannel() throws Exception
   {
     if (debugEnabled) log.debug("closing data channel: nodeConnection=" + nodeConnection + ", recoveryConnection=" + recoveryConnection);
-    nodeConnection.close();
+    if (nodeConnection != null) nodeConnection.close();
     if (recoveryConnection != null)
     {
-      //clientConnection.removeClientConnectionListener(this);
       ClientConnection tmp = recoveryConnection;
-      recoveryConnection = null;
-      tmp.close();
+      if (tmp != null)
+      {
+        recoveryConnection = null;
+        tmp.close();
+      }
     }
   }
 

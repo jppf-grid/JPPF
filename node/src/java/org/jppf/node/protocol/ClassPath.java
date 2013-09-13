@@ -36,11 +36,22 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement>
 
   /**
    * Add the specified element to this classpath.
+   * When using this method, the local and remote locations are assumed to be the same.
    * @param name the the name of the element to add.
    * @param location the location of the element to add.
    * @return this <code>ClassPath</code>.
    */
-  ClassPath add(String name, Location location);
+  ClassPath add(String name, Location<?> location);
+
+  /**
+   * Add the specified element to this classpath.
+   * Upon processing by the node, the local location will be copied into the remote location.
+   * @param name the the name of the element to add.
+   * @param localLocation the location of the element to add, in the client environment.
+   * @param remoteLocation the location of the element to add, in the node environment.
+   * @return this <code>ClassPath</code>.
+   */
+  ClassPath add(String name, Location<?> localLocation, Location<?> remoteLocation);
 
   /**
    * Remove the specified element from this classpath.

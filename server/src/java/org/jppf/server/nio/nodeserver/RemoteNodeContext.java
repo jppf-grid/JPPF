@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.server.nio.StateTransitionManager;
+import org.jppf.server.nio.*;
+import org.jppf.utils.JPPFConfiguration;
 
 
 /**
@@ -28,6 +28,15 @@ import org.jppf.server.nio.StateTransitionManager;
  */
 public class RemoteNodeContext extends AbstractNodeContext
 {
+  /**
+   * 
+   */
+  private static final boolean DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.nio.message.debug", false);
+  /**
+   *  Determines whether the node works in offline mode.
+   */
+  private boolean offline = false;
+
   /**
    * Default constructor.
    * @param transitionManager instance of transition manager used by this node context.
@@ -39,11 +48,27 @@ public class RemoteNodeContext extends AbstractNodeContext
   @Override
   public AbstractTaskBundleMessage newMessage()
   {
-    return new RemoteNodeMessage(sslHandler != null);
+    //return new RemoteNodeMessage(sslHandler != null);
+    return new RemoteNodeMessage(sslHandler != null, DEBUG);
   }
 
   @Override
   public boolean isLocal() {
     return false;
+  }
+
+  @Override
+  public boolean isOffline()
+  {
+    return offline;
+  }
+
+  /**
+   * Specify whether the node works in offline mode.
+   * @param offline <code>true</code> if the node is in offline mode, <code>false</code> otherwise.
+   */
+  public void setOffline(final boolean offline)
+  {
+    this.offline = offline;
   }
 }

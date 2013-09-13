@@ -70,7 +70,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   @Override
   protected void configureSSLEngine(final SSLEngine engine) throws Exception
   {
-    //SSLParameters params = sslContext.getDefaultSSLParameters();
     SSLParameters params = SSLHelper.getSSLParameters();
     engine.setUseClientMode(false);
     engine.setSSLParameters(params);
@@ -110,7 +109,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   public void closeChannel(final ChannelWrapper<?> channel)
   {
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, NioConstants.ACCEPTOR);
     try
     {
       channel.close();

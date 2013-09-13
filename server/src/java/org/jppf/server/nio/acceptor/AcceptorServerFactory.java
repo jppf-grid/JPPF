@@ -67,5 +67,4 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
     map.put(TO_IDENTIFYING_PEER, transition(IDENTIFYING_PEER, R));
     return map;
   }
-
 }

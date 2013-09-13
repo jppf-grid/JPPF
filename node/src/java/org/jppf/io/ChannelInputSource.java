@@ -146,4 +146,12 @@ public class ChannelInputSource implements InputSource
   public void close() throws IOException
   {
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("ChannelInputSource[channel=").append(channel).append("]");
+    return sb.toString();
+  }
 }

@@ -42,6 +42,16 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
   }
 
   /**
+   * Initialize this nio message with the specified sll flag.
+   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param debug to enable debug-level logging.
+   */
+  protected AbstractTaskBundleMessage(final boolean ssl, final boolean debug)
+  {
+    super(ssl, debug);
+  }
+
+  /**
    * Get the latest bundle that was sent or received.
    * @return a <code>JPPFTaskBundle</code> instance.
    */
@@ -68,6 +78,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
     sb.append(", nbObjects=").append(nbObjects);
     sb.append(", length=").append(length);
     sb.append(", count=").append(count);
+    sb.append(", currentLength=").append(currentLength);
     sb.append(", bundle=").append(bundle);
     sb.append(']');
     return sb.toString();

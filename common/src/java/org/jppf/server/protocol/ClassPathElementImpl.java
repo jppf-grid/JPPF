@@ -31,23 +31,43 @@ public class ClassPathElementImpl implements ClassPathElement
    */
   private static final long serialVersionUID = 1L;
   /**
-   * The location of this classpath element.
+   * The location of this classpath element in the client environment.
    */
-  protected final Location<?> location;
+  protected final Location<?> localLocation;
+  /**
+   * The location of this classpath element in the node environment.
+   */
+  protected final Location<?> remoteLocation;
   /**
    * The name of this classpath element.
    */
   protected final String name;
 
   /**
-   * Initialize this classpath element with the specified name and location.
+   * Initialize this classpath element with the specified name and local location.
+   * The remote location is set to the same location.
    * @param name the name of this classpath element.
    * @param location the location of this classpath element.
    */
   protected ClassPathElementImpl(final String name, final Location<?> location)
   {
     this.name = name;
-    this.location = location;
+    this.localLocation = location;
+    this.remoteLocation = this.localLocation;
+  }
+
+  /**
+   * Initialize this classpath element with the specified name and local location.
+   * The remote location is set to the same location.
+   * @param name the name of this classpath element.
+   * @param localLocation the location of this classpath element in the client environment.
+   * @param remoteLocation the location of this classpath element in the node environment.
+   */
+  protected ClassPathElementImpl(final String name, final Location<?> localLocation, final Location<?> remoteLocation)
+  {
+    this.name = name;
+    this.localLocation = localLocation;
+    this.remoteLocation = remoteLocation;
   }
 
   @Override
@@ -57,9 +77,15 @@ public class ClassPathElementImpl implements ClassPathElement
   }
 
   @Override
-  public Location<?> getLocation()
+  public Location<?> getLocalLocation()
   {
-    return location;
+    return localLocation;
+  }
+
+  @Override
+  public Location<?> getRemoteLocation()
+  {
+    return remoteLocation;
   }
 
   /**

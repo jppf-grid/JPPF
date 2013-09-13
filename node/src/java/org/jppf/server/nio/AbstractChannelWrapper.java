@@ -47,10 +47,6 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * The selector for this channel.
    */
   protected ChannelSelector selector = null;
-  /**
-   * Determines whether this channel is executing a transition.
-   */
-  protected AtomicBoolean executing = new AtomicBoolean(false);
 
   /**
    * Initialize this channel wrapper with the specified channel.
@@ -109,26 +105,25 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
   @Override
   public String toString()
   {
-    //return getClass().getSimpleName() + "[id=" + getId() + ", readyOps=" + getReadyOps() + ", keyOps=" + getKeyOps() + "]";
     StringBuilder sb = new StringBuilder(1000);
     sb.append(getClass().getSimpleName());
     sb.append('[');
-    sb.append(getStringId());
+    sb.append("id=").append(getId());
     sb.append(", readyOps=").append(getReadyOps());
-    sb.append(", keyOps=").append(getKeyOps());
+    sb.append(", interestOps=").append(getInterestOps());
     sb.append(", context=").append(getContext());
     sb.append(']');
     return sb.toString();
   }
 
   @Override
-  public int getKeyOps()
+  public int getInterestOps()
   {
     return 0;
   }
 
   @Override
-  public void setKeyOps(final int keyOps)
+  public void setInterestOps(final int keyOps)
   {
   }
 
@@ -177,15 +172,6 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
   public void setSelector(final ChannelSelector selector)
   {
     this.selector = selector;
-  }
-
-  /**
-   * Get a string uniquely identifying this channel.
-   * @return a unique id as a string.
-   */
-  public String getStringId()
-  {
-    return "id=" + id;
   }
 
   /**

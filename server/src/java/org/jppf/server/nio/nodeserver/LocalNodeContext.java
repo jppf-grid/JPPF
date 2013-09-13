@@ -58,7 +58,7 @@ public class LocalNodeContext extends AbstractNodeContext
     if (debugEnabled) log.debug("reading message from " + channel);
     LocalNodeChannel handler = (LocalNodeChannel) channel;
     handler.getServerLock().wakeUp();
-    LocalNodeMessage lnm; 
+    LocalNodeMessage lnm;
     synchronized(handler.getServerLock())
     {
       while ((lnm = handler.getServerResource()) == null) handler.getServerLock().goToSleep();
@@ -87,5 +87,11 @@ public class LocalNodeContext extends AbstractNodeContext
   @Override
   public boolean isLocal() {
     return true;
+  }
+
+  @Override
+  protected boolean isOffline()
+  {
+    return false;
   }
 }

@@ -19,6 +19,7 @@
 package org.jppf.server.nio;
 
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -35,9 +36,10 @@ public class NioConstants
   /**
    * Size of the pool of threads for the state transition executor.
    * It is defined as the value of the configuration property
-   * &quot;transition.thread.pool.size&quot;, with a default value of 1.
+   * &quot;jppf.transition.thread.pool.size&quot;, with a default value of 1.
    */
-  public static final int THREAD_POOL_SIZE = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", Runtime.getRuntime().availableProcessors());
+  public static final int THREAD_POOL_SIZE =
+    ConfigurationHelper.getInt("jppf.transition.thread.pool.size", "transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32 * 1024);
   /**
    * Name of the class server.
    */
@@ -80,15 +82,5 @@ public class NioConstants
 		boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.nio.check.connection", true);
 		log.info("NIO checks are " + (b ? "enabled" : "disabled"));
 		return b;
-	}
-
-	/**
-	 * Get the size of the pool of threads for the state transition manager executor.
-	 * @return the pool size as an int value.
-	 */
-	private static int getTransitionManagerPoolSize()
-	{
-    int size = JPPFConfiguration.getProperties().getInt("transition.thread.pool.size", -1);
-    return (size <= 0) ? Runtime.getRuntime().availableProcessors() : size;
 	}
 }

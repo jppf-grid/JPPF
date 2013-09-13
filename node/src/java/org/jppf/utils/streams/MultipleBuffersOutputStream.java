@@ -21,6 +21,7 @@ package org.jppf.utils.streams;
 import java.io.*;
 import java.util.*;
 
+import org.jppf.io.IO;
 import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
@@ -46,8 +47,7 @@ public class MultipleBuffersOutputStream extends OutputStream
   /**
    * Default length of each new buffer.
    */
-  private int defaultLength = StreamConstants.TEMP_BUFFER_SIZE;
-  //private int defaultLength = 32768;
+  private int defaultLength = IO.TEMP_BUFFER_SIZE;
   /**
    * Contains the data written to this output stream, as a sequence of {@link JPPFBuffer} instances.
    */

@@ -53,13 +53,13 @@ public interface ChannelWrapper<S>
    * Get the operations enabled for this channel.
    * @return the operations as an int value.
    */
-  int getKeyOps();
+  int getInterestOps();
 
   /**
    * Get the operations enabled for this channel.
    * @param keyOps the operations as an int value.
    */
-  void setKeyOps(int keyOps);
+  void setInterestOps(int keyOps);
 
   /**
    * Get the operations available for this channel.

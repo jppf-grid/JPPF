@@ -83,6 +83,7 @@ public class PlainNioObject extends AbstractNioObject
    * @return true if the frame has been read fully, false otherwise.
    * @throws Exception if any error occurs.
    */
+  @Override
   public boolean read() throws Exception
   {
     if (source == null)
@@ -94,12 +95,7 @@ public class PlainNioObject extends AbstractNioObject
     int n = location.transferFrom(source, blocking);
     if (n > 0) count += n;
     if (debugEnabled) log.debug("read " + n + " bytes from input source, count/size = " + count + '/' + size);
-    if (count >= size)
-    {
-      if (debugEnabled) log.debug("count = " + count + ", size = " + size);
-      return true;
-    }
-    return false;
+    return count >= size;
   }
 
   /**
@@ -107,6 +103,7 @@ public class PlainNioObject extends AbstractNioObject
    * @return true if the data has been written fully, false otherwise.
    * @throws Exception if any error occurs.
    */
+  @Override
   public boolean write() throws Exception
   {
     if (dest == null)
@@ -118,21 +115,14 @@ public class PlainNioObject extends AbstractNioObject
     int n = location.transferTo(dest, blocking);
     if (n > 0) count += n;
     if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count/size = " + count + '/' + size + " (dl = " + location + ')');
-    if (count > size)
-    {
-      int breakpoint = 0;
-    }
-    if (count >= size)
-    {
-      return true;
-    }
-    return false;
+    return count >= size;
   }
 
   /**
    * Location of the data to read or write.
    * @return a <code>DataLocation</code> instance.
    */
+  @Override
   public DataLocation getData()
   {
     return location;
@@ -142,8 +132,26 @@ public class PlainNioObject extends AbstractNioObject
    * Number of bytes read from or written to the message.
    * @return  the number of bytes as an int.
    */
+  @Override
   public int getCount()
   {
     return count;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("channelId=").append(channel.getId());
+    sb.append(", blocking=").append(blocking);
+    sb.append(", size=").append(size);
+    sb.append(", count=").append(count);
+    sb.append(", isSSL=").append(isSSL);
+    sb.append(", source=").append(source);
+    sb.append(", dest=").append(dest);
+    sb.append(", location=").append(location);
+    sb.append("]");
+    return sb.toString();
   }
 }

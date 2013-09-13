@@ -18,9 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.comm.recovery.*;
@@ -62,7 +61,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * The the task bundle sent to a newly connected node.
    */
-  private ServerTaskBundleNode initialBundle = null;
+  //private ServerTaskBundleNode initialNodeBundle = null;
+  private ServerJob initialServerJob = null;
   /**
    * A reference to the driver's tasks queue.
    */
@@ -82,7 +82,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * A list of all the connections.
    */
-  private final Map<String, AbstractNodeContext> allConnections = new LinkedHashMap<>();
+  private final Map<String, AbstractNodeContext> allConnections = new ConcurrentHashMap<>();
   /**
    * Reference to the driver.
    */
@@ -165,27 +165,39 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to add.
    */
-  public synchronized void addConnection(final AbstractNodeContext nodeContext) {
-    if (nodeContext == null) throw new IllegalArgumentException("nodeContext is null");
-    if (nodeContext.getChannel() == null) throw new IllegalArgumentException("channel is null");
-
-    allConnections.put(nodeContext.getUuid(), nodeContext);
-    nodeContext.addExecutionStatusListener(statusListener);
-    updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
+  public void addConnection(final AbstractNodeContext nodeContext) {
+    try {
+      if (nodeContext == null) throw new IllegalArgumentException("nodeContext is null");
+      if (nodeContext.getChannel() == null) throw new IllegalArgumentException("channel is null");
+      if (debugEnabled) log.debug("adding connection {}", nodeContext.getChannel()); 
+      allConnections.put(nodeContext.getUuid(), nodeContext);
+      nodeContext.addExecutionStatusListener(statusListener);
+      updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
+    } catch(Exception e) {
+      if (debugEnabled) log.debug("error adding connection {} : {}", nodeContext, e);
+    }
   }
 
   /**
    * Remove the specified connection wrapper from the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to remove.
    */
-  public synchronized void removeConnection(final AbstractNodeContext nodeContext) {
+  public void removeConnection(final AbstractNodeContext nodeContext) {
     if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
+    if (debugEnabled) log.debug("removing connection {}", nodeContext.getChannel());
     try {
       taskQueueChecker.removeIdleChannel(nodeContext);
       updateConnectionStatus(nodeContext, nodeContext.getExecutionStatus(), ExecutorStatus.DISABLED);
+    } catch(Exception e) {
+      if (debugEnabled) log.debug("error removing connection {} : {}", nodeContext, e);
     } finally {
-      allConnections.remove(nodeContext.getUuid());
-      nodeContext.removeExecutionStatusListener(statusListener);
+      try {        
+        String uuid = nodeContext.getUuid();
+        if (uuid != null) allConnections.remove(uuid);
+        nodeContext.removeExecutionStatusListener(statusListener);
+      } catch (Throwable e) {
+        if (debugEnabled) log.debug("error removing connection {} : {}", nodeContext, e);
+      }
     }
   }
 
@@ -194,8 +206,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param uuid the id of the connection to remove.
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext removeConnection(final String uuid) {
-    final AbstractNodeContext nodeContext = allConnections.get(uuid);
+  public AbstractNodeContext removeConnection(final String uuid) {
+    final AbstractNodeContext nodeContext = getConnection(uuid);
     if (nodeContext == null) return null;
     removeConnection(nodeContext);
     return nodeContext;
@@ -206,8 +218,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param uuid the id of the connection to get.
    * @return the context of the cpnnect that was found, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext getConnection(final String uuid) {
-    return allConnections.get(uuid);
+  public AbstractNodeContext getConnection(final String uuid) {
+    return uuid == null ? null : allConnections.get(uuid);
   }
 
   /**
@@ -216,8 +228,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param activate <code>true</code> to activate the node, <code>false</code> to deactivate it.
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext activateNode(final String uuid, final boolean activate) {
-    final AbstractNodeContext nodeContext = allConnections.get(uuid);
+  public AbstractNodeContext activateNode(final String uuid, final boolean activate) {
+    AbstractNodeContext nodeContext = getConnection(uuid);
     if (nodeContext == null) return null;
     if (activate != nodeContext.isActive()) nodeContext.setActive(activate);
     return nodeContext;
@@ -232,7 +244,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
     localChannel.setSelector(channelSelector);
     selectorThread = new ChannelSelectorThread(channelSelector, this, 1L);
-    localChannel.setKeyOps(0);
+    localChannel.setInterestOps(0);
     new Thread(selectorThread, "NodeChannelSelector").start();
     postAccept(localChannel);
   }
@@ -262,7 +274,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   @Override
   public void postAccept(final ChannelWrapper channel) {
-    if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
     statsManager.newNodeConnection();
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     try {
@@ -294,29 +305,27 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @return a <code>ServerJob</code> instance, with no task in it.
    */
   ServerTaskBundleNode getInitialBundle() {
-    if (initialBundle == null) {
+    if (initialServerJob == null) {
       try {
         SerializationHelper helper = new SerializationHelperImpl();
         // serializing a null data provider.
         JPPFBuffer buf = helper.getSerializer().serialize(null);
-        byte[] dataProviderBytes = new byte[4 + buf.getLength()];
-        ByteBuffer bb = ByteBuffer.wrap(dataProviderBytes);
-        bb.putInt(buf.getLength());
-        bb.put(buf.getBuffer());
+        int len = buf.getLength();
+        byte[] bytes = new byte[4 + len];
+        SerializationUtils.writeInt(len, bytes, 0);
+        System.arraycopy(buf.getBuffer(), 0, bytes, 4, len);
         JPPFTaskBundle bundle = new JPPFTaskBundle();
         bundle.setName("server handshake");
         bundle.setUuid(INITIAL_BUNDLE_UUID);
-        bundle.setUuid("0");
         bundle.getUuidPath().add(driver.getUuid());
         bundle.setTaskCount(0);
         bundle.setHandshake(true);
-        ServerJob serverJob = new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
-        initialBundle = serverJob.copy(serverJob.getTaskCount());
+        initialServerJob = new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(bytes)));
       } catch(Exception e) {
         log.error(e.getMessage(), e);
       }
     }
-    return initialBundle;
+    return initialServerJob.copy(0);
   }
 
   /**
@@ -324,9 +333,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param context a <code>SocketChannel</code> that encapsulates the connection.
    */
   public void closeNode(final AbstractNodeContext context) {
-    if (JPPFDriver.JPPF_DEBUG && (context != null)) driver.getInitializer().getServerDebug().removeChannel(context.getChannel(), NioConstants.NODE_SERVER);
     try {
-      if(context != null) context.close();
+      if (context != null) context.close();
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
@@ -337,7 +345,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       nodeConnectionHandler.fireNodeDisconnected(info);
       driver.getStatsManager().nodeConnectionClosed();
       removeConnection(context);
-      taskQueueChecker.removeIdleChannel(context);
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
@@ -380,7 +387,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get number of nodes attached to the server.
    * @return the number of nodes as an <code>int</code> value.
    */
-  public synchronized int getNbNodes() {
+  public int getNbNodes() {
     return allConnections.size();
   }
 
@@ -388,7 +395,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get all the node connections handled by this server.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
-  public synchronized List<AbstractNodeContext> getAllChannels() {
+  public List<AbstractNodeContext> getAllChannels() {
     return new ArrayList<>(allConnections.values());
   }
 
@@ -396,7 +403,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get all the node connections handled by this server.
    * @return a set of <code>ChannelWrapper</code> instances.
    */
-  public synchronized Set<AbstractNodeContext> getAllChannelsAsSet() {
+  public Set<AbstractNodeContext> getAllChannelsAsSet() {
     return new HashSet<>(allConnections.values());
   }
 
@@ -448,7 +455,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       taskQueueChecker.wakeUp();
     }
     queue.close();
-    synchronized(this) {
+    lock.lock();
+    try {
       for (AbstractNodeContext channel: allConnections.values()) {
         try {
           channel.close();
@@ -457,6 +465,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         }
       }
       allConnections.clear();
+    } finally {
+      lock.unlock();
     }
   }
 

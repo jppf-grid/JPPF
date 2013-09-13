@@ -80,6 +80,10 @@ public class NodeRunner
    */
   private static String uuid = JPPFConfiguration.getProperties().getString("jppf.node.uuid", JPPFUuid.normalUUID());
   /**
+   * The offline node flag.
+   */
+  private static boolean offline = JPPFConfiguration.getProperties().getBoolean("jppf.node.offline", false);
+  /**
    * The initial configuration, such as read from the config file.
    * The JPPF config is modified by the discovery mechanism, so we want to store the initial values somewhere.
    */
@@ -250,7 +254,6 @@ public class NodeRunner
    * @exclude
    */
   public static AbstractJPPFClassLoader getJPPFClassLoader() {
-    final boolean offline = JPPFConfiguration.getProperties().getBoolean("jppf.node.offline", false);
     synchronized(JPPFClassLoader.class) {
       if (classLoader == null) {
         PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>() {
@@ -411,5 +414,14 @@ public class NodeRunner
    */
   public synchronized static void setShuttingDown(final boolean shuttingDown) {
     NodeRunner.shuttingDown = shuttingDown;
+  }
+
+  /**
+   * Get the offline node flag.
+   * @return <code>true</code> if the node is offline, <code>false</code> otherwise.
+   */
+  public static boolean isOffline()
+  {
+    return offline;
   }
 }

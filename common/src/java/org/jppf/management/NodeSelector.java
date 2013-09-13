@@ -116,12 +116,7 @@ public interface NodeSelector extends Serializable
      */
     public UuidSelector(final String...uuids)
     {
-      if (uuids == null) this.uuids = Collections.<String>emptyList();
-      else
-      {
-        this.uuids = new ArrayList<>(uuids.length);
-        for (String uuid: uuids) this.uuids.add(uuid);
-      }
+      this.uuids = (uuids == null) ? Collections.<String>emptyList() : Arrays.asList(uuids);
     }
 
     /**

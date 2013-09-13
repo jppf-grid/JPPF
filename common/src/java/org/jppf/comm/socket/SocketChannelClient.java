@@ -22,6 +22,7 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import org.jppf.io.IO;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -256,9 +257,9 @@ public class SocketChannelClient implements SocketWrapper
   public void open() throws ConnectException, IOException
   {
     channel = SocketChannel.open();
-    channel.socket().setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
-    channel.socket().setSendBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
-    channel.socket().setTcpNoDelay(SOCKET_TCP_NO_DELAY);
+    channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+    channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
+    channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NO_DELAY);
     channel.configureBlocking(blocking);
     InetSocketAddress address = new InetSocketAddress(host, port);
     channel.connect(address);

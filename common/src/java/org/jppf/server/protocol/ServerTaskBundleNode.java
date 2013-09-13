@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -43,6 +43,10 @@ public class ServerTaskBundleNode {
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Flag indicating whether collection of debug information is available via JMX.
+   */
+  private static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
   /**
    * Count of instances of this class.
    */
@@ -108,6 +112,7 @@ public class ServerTaskBundleNode {
     this.taskBundle.setCurrentTaskCount(size);
     this.dataProvider = job.getDataProvider();
     this.taskCount = size;
+    if (JPPF_DEBUG) this.taskBundle.setParameter("node.bundle.id", this.id);
     checkTaskCount();
   }
 

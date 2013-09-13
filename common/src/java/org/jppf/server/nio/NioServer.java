@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.net.ssl.*;
 
 import org.jppf.classloader.ResourceProvider;
-import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.io.IO;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -104,9 +104,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected NioServer(final String name) throws Exception {
     super(name);
-    selector = Selector.open();
     factory = createFactory();
     transitionManager = new StateTransitionManager<>(this);
+    selector = Selector.open();
   }
 
   /**
@@ -154,7 +154,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     {
       if (portsToInit[i] < 0) continue;
       ServerSocketChannel server = ServerSocketChannel.open();
-      server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+      server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
       server.socket().bind(addr);
       // If the user specified port zero, the operating system should dynamically allocated a port number.
@@ -283,9 +283,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     }
     if (channel == null) return;
     try {
-      channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-      channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-      channel.socket().setTcpNoDelay(SocketWrapper.SOCKET_TCP_NO_DELAY);
+      channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
+      channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+      channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NO_DELAY);
       if (channel.isBlocking()) channel.configureBlocking(false);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -373,6 +373,28 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Get all connections accepted by this server.
+   * @return a list of {@link ChannelWrapper} instances.
+   */
+  public List<ChannelWrapper<?>> getAllConnections() {
+    List<ChannelWrapper<?>> channels = new ArrayList<>();
+    lock.lock();
+    try {
+      selector.wakeup();
+      Set<SelectionKey> keySet = selector.keys();
+      for (SelectionKey key: keySet) {
+        NioContext ctx = (NioContext) key.attachment();
+        channels.add(ctx.getChannel());
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+      lock.unlock();
+    }
+    return channels;
   }
 
   /**

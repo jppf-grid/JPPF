@@ -56,38 +56,47 @@ class WaitingResultsState extends NodeServerState {
 
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    //if (debugEnabled) log.debug("exec() for " + channel);
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.readMessage(channel)) {
-      Exception exception = null;
-      ServerTaskBundleNode nodeBundle = context.getBundle();
-      boolean requeue = false;
-      boolean offlineCloseRequest = false;
-      try {
-        Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
-        JPPFTaskBundle newBundle = received.first();
-        if (debugEnabled) log.debug("*** read bundle " + received + " from node " + channel);
-        if (offlineCloseRequest = newBundle.getParameter(NODE_OFFLINE_CLOSE_REQUEST, false)) return processOfflineRequest(context);
-        Pair<Boolean, Exception> res = processResults(context, received);
-        requeue = res.first();
-        exception = res.second();
-      }
-      catch (Throwable t) {
-        log.error(t.getMessage(), t);
-        exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        nodeBundle.resultsReceived(t);
-      } finally {
-        if (!offlineCloseRequest) {
-          nodeBundle.taskCompleted(exception);
-          context.setBundle(null);
-        }
-      }
-      if (requeue) nodeBundle.resubmit();
-      // there is nothing left to do, so this instance will wait for a task bundle
-      // make sure the context is reset so as not to resubmit the last bundle executed by the node.
-      context.setMessage(null);
-      return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
+      Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
+      return process(received, context);
     }
     return TO_WAITING_RESULTS;
+  }
+
+  /**
+   * Process the bundle that was just read.
+   * @param received holds the received bundle along with the tasks.
+   * @param context the channel from which the bundle was read.
+   * @return the enxt transition to perform.
+   * @throws Exception if any error occurs.
+   */
+  public NodeTransition process(final Pair<JPPFTaskBundle, List<DataLocation>> received, final AbstractNodeContext context) throws Exception {
+    //AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
+    Exception exception = null;
+    ServerTaskBundleNode nodeBundle = context.getBundle();
+    boolean requeue = false;
+    try {
+      JPPFTaskBundle newBundle = received.first();
+      if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + context.getChannel());
+      Pair<Boolean, Exception> res = processResults(context, received);
+      requeue = res.first();
+      exception = res.second();
+    }
+    catch (Throwable t) {
+      log.error(t.getMessage(), t);
+      exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
+      nodeBundle.resultsReceived(t);
+    } finally {
+      nodeBundle.taskCompleted(exception);
+      context.setBundle(null);
+    }
+    if (requeue) nodeBundle.resubmit();
+    // there is nothing left to do, so this instance will wait for a task bundle
+    // make sure the context is reset so as not to resubmit the last bundle executed by the node.
+    context.setMessage(null);
+    return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
   }
 
   /**
@@ -109,7 +118,7 @@ class WaitingResultsState extends NodeServerState {
       exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
       nodeBundle.resultsReceived(t);
     } else {
-      if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received);
+      if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.first());
       nodeBundle.resultsReceived(received.second());
       long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
       server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L, 
@@ -130,11 +139,11 @@ class WaitingResultsState extends NodeServerState {
   
   /**
    * Process an offline request from the node.
-   * @param context the current context assoiated witht he channel.
+   * @param context the current context associated with the channel.
    * @return a <code>null</code> transition since the channel is closed by this method.
    * @throws Exception if any error occurs.
    */
-  private NodeTransition processOfflineRequest(final AbstractNodeContext context) throws Exception {
+  protected NodeTransition processOfflineRequest(final AbstractNodeContext context) throws Exception {
     if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", context.getBundle(), context.getChannel());
     server.getOfflineNodeHandler().addNodeBundle(context.getBundle());
     context.cleanup(context.getChannel());

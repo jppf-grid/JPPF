@@ -70,13 +70,13 @@ public enum  BundleParameter
    */
   NODE_BUNDLE_ELAPSED_PARAM,
   /**
+   * Flag indicating whether the node is in offline mode.
+   */
+  NODE_OFFLINE,
+  /**
    * Request sent by the offline node to the driver upon reconnection to notify that the results are ready for a specified NODE_BUNDLE_ID.
    */
   NODE_OFFLINE_OPEN_REQUEST,
-  /**
-   * Request sent by the node to the driver to close the job channel while a job is executing.
-   */
-  NODE_OFFLINE_CLOSE_REQUEST,
   /**
    * Id of the task bundle sent to the node.
    */

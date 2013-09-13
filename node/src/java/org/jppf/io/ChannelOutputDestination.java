@@ -124,4 +124,12 @@ public class ChannelOutputDestination implements OutputDestination
   public void close() throws IOException
   {
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder builder = new StringBuilder();
+    builder.append("ChannelOutputDestination[channel=").append(channel).append("]");
+    return builder.toString();
+  }
 }

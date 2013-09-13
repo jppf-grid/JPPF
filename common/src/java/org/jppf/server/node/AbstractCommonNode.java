@@ -61,7 +61,7 @@ public abstract class AbstractCommonNode extends AbstractNode
     try
     {
       JMXServer jmxServer = getJmxServer();
-      bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
+      //bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
       bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
     }
     catch(Exception e)

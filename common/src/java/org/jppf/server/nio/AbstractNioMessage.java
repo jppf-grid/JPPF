@@ -24,6 +24,7 @@ import java.util.*;
 import org.jppf.io.*;
 import org.jppf.utils.SerializationUtils;
 import org.jppf.utils.streams.StreamUtils;
+import org.slf4j.*;
 
 /**
  * Common abstract superclass representing a message sent or received by a channel.
@@ -32,6 +33,14 @@ import org.jppf.utils.streams.StreamUtils;
  */
 public abstract class AbstractNioMessage implements NioMessage
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractNioMessage.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The current count of bytes sent or received.
    */
@@ -67,11 +76,15 @@ public abstract class AbstractNioMessage implements NioMessage
   /**
    * <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
-  protected boolean ssl = false;
+  protected final boolean ssl;
   /**
    * 
    */
   protected SSLHandler sslHandler = null;
+  /**
+   * 
+   */
+  protected final boolean debug;
 
   /**
    * Initialize this nio message with the specified sll flag.
@@ -80,6 +93,18 @@ public abstract class AbstractNioMessage implements NioMessage
   protected AbstractNioMessage(final boolean ssl)
   {
     this.ssl = ssl;
+    this.debug = false;
+  }
+
+  /**
+   * Initialize this nio message with the specified sll flag.
+   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param debug to enable debug-level logging.
+   */
+  protected AbstractNioMessage(final boolean ssl, final boolean debug)
+  {
+    this.ssl = ssl;
+    this.debug = debug && debugEnabled;
   }
 
   /**
@@ -113,6 +138,11 @@ public abstract class AbstractNioMessage implements NioMessage
   {
     if (nbObjects <= 0)
     {
+      if (debug)
+      {
+        for (DataLocation dl: locations) length += dl.getSize();
+        length += 4 * locations.size();
+      }
       if (ssl) this.sslHandler = channel.getContext().getSSLHandler();
       position = 0;
       beforeFirstWrite();
@@ -161,6 +191,7 @@ public abstract class AbstractNioMessage implements NioMessage
     currentLengthObject = null;
     currentObject = null;
     currentLength = 0;
+    if (debug) log.debug("channel id={} read object at position {}", channel.getId(), position);
     position++;
     return true;
   }
@@ -191,9 +222,11 @@ public abstract class AbstractNioMessage implements NioMessage
     {
       DataLocation loc = locations.get(position);
       currentObject = ssl ? new SSLNioObject(loc.copy(), sslHandler) : new PlainNioObject(channel, loc.copy(), false);
+      currentLength = loc.getSize();
     }
     if (!currentObject.write()) return false;
     count += 4 + locations.get(position).getSize();
+    if (debug) log.debug("channel id={} wrote object at position {}", channel.getId(), position);
     position++;
     currentLengthObject = null;
     currentObject = null;
@@ -234,9 +267,6 @@ public abstract class AbstractNioMessage implements NioMessage
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {
@@ -246,6 +276,7 @@ public abstract class AbstractNioMessage implements NioMessage
     sb.append(", nbObjects=").append(nbObjects);
     sb.append(", length=").append(length);
     sb.append(", count=").append(count);
+    sb.append(", currentObject=").append(currentObject);
     sb.append(']');
     return sb.toString();
   }

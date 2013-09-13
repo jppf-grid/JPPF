@@ -34,10 +34,15 @@ public interface ClassPathElement extends Serializable
    */
   String getName();
   /**
-   * Get the location of this element, pointing to or embedding the underlying jar or zip file.
+   * Get the location of this element, pointing to or embedding the underlying jar or zip file in the client environment.
    * @return a {@link Location} object.
    */
-  Location<?> getLocation();
+  Location<?> getLocalLocation();
+  /**
+   * Get the location of this element, pointing to or embedding the underlying jar or zip file in the node environment.
+   * @return a {@link Location} object.
+   */
+  Location<?> getRemoteLocation();
   /**
    * Perform a validation of this classpath element.
    * If validation fails, if will not be added tot he node's classpath and its classes will not be loaded nor executed.

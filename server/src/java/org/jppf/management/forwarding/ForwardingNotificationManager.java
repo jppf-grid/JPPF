@@ -23,7 +23,7 @@ import java.util.concurrent.locks.*;
 
 import javax.management.ListenerNotFoundException;
 
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
 import org.jppf.server.event.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.collections.*;
@@ -69,7 +69,11 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   /**
    * Helper for dispatching node notifications to the client-side listeners.
    */
-  private NodeForwardingHelper helper = NodeForwardingHelper.getInstance();
+  private NodeForwardingHelper forwardingHelper = NodeForwardingHelper.getInstance();
+  /**
+   * Provides an API for selecting nodes based on a {@link NodeSelector}.
+   */
+  final NodeSelectionHelper selectionHelper;
 
   /**
    * Initialize this manager.
@@ -78,6 +82,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   public ForwardingNotificationManager(final JPPFNodeForwarding forwarder)
   {
     this.forwarder = forwarder;
+    this.selectionHelper = forwarder.getSelectionHelper();
     forwarder.driver.getInitializer().getNodeConnectionEventHandler().addNodeConnectionListener(this);
   }
 
@@ -99,11 +104,11 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   private void addNotificationListener(final NotificationListenerWrapper wrapper)
   {
     NodeSelector selector = wrapper.getSelector();
-    Set<AbstractNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
+    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector);
     lock.lock();
     try
     {
-      helper.setListener(wrapper.getListenerID(), wrapper);
+      forwardingHelper.setListener(wrapper.getListenerID(), wrapper);
       for (AbstractNodeContext node: nodes) addNotificationListener(node, wrapper);
     }
     finally
@@ -149,7 +154,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    */
   public void removeNotificationListener(final String listenerID) throws ListenerNotFoundException
   {
-    NotificationListenerWrapper wrapper = helper.removeListener(listenerID);
+    NotificationListenerWrapper wrapper = forwardingHelper.removeListener(listenerID);
     if (wrapper == null) throw new ListenerNotFoundException("could not find listener with id=" + listenerID);
     removeNotificationListener(wrapper);
   }
@@ -199,15 +204,17 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   @Override
   public void nodeConnected(final NodeConnectionEvent event)
   {
+    JPPFManagementInfo info = event.getNodeInformation();
+    if ((info == null) || (info.getPort() < 0) || (info.getHost() == null)) return;
     String uuid = event.getNodeInformation().getUuid();
     AbstractNodeContext node = forwarder.driver.getNodeNioServer().getConnection(uuid);
     if (node == null) return;
     lock.lock();
     try
     {
-      for (NotificationListenerWrapper wrapper: helper.allListeners())
+      for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners())
       {
-        if (forwarder.getSelectionHelper().isNodeAccepted(node, wrapper.getSelector())) addNotificationListener(node, wrapper);
+        if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) addNotificationListener(node, wrapper);
       }
     }
     finally
@@ -225,9 +232,9 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     lock.lock();
     try
     {
-      for (NotificationListenerWrapper wrapper: helper.allListeners())
+      for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners())
       {
-        if (forwarder.getSelectionHelper().isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
+        if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
       }
     }
     finally

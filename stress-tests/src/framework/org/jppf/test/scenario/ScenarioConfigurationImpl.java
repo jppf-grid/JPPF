@@ -124,4 +124,10 @@ public class ScenarioConfigurationImpl extends TypedProperties implements Scenar
     vars.put("$scenario_dir", dir);
     return vars;
   }
+
+  @Override
+  public boolean isStartClient()
+  {
+    return getBoolean("jppf.scenario.start.client", true);
+  }
 }

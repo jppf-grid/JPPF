@@ -21,11 +21,13 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.server.protocol.BundleParameter.*;
 
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
 import java.util.List;
 
 import org.jppf.io.DataLocation;
 import org.jppf.management.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
@@ -66,13 +68,15 @@ class WaitInitialBundleState extends NodeServerState
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception  {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (debugEnabled) log.debug("exec() for " + channel);
+    //if (debugEnabled) log.debug("exec() for " + channel);
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
       Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
       JPPFTaskBundle bundle = received.first();
-      if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
+      boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));
+      if (offline) ((RemoteNodeContext) context).setOffline(true);
+      else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
 
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
@@ -81,33 +85,29 @@ class WaitInitialBundleState extends NodeServerState
       if (systemInfo != null) {
         context.setNodeInfo(systemInfo);
         if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-        if (debugEnabled) log.debug("processing threads for node " + channel + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
       } else if (debugEnabled) log.debug("no system info received for node " + channel);
 
-      if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
+      if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
       context.setBundler(bundler);
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) {
-        if (uuid != null) {
-          String host = bundle.getParameter(NODE_MANAGEMENT_HOST_PARAM);
+        if ((uuid != null) && !bundle.getParameter(NODE_OFFLINE, false)) {
+          String host = getChannelHost(channel);
           int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
-          boolean sslEnabled;
-          if (channel.isLocal()) sslEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
-          else sslEnabled = context.getSSLHandler() != null;
+          boolean sslEnabled = channel.isLocal() ? false : context.getSSLHandler() != null;
           byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
-          if(channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
+          if (channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
           JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, type, sslEnabled);
-          if (debugEnabled) log.debug("setting " + info);
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           context.setManagementInfo(info);
         }
       }
       server.nodeConnected(context);
-      context.setMessage(null);
-      if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(bundle, context);
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
+      if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(received, context);
+      context.setMessage(null);
       context.setBundle(null);
       return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
     }
@@ -116,17 +116,34 @@ class WaitInitialBundleState extends NodeServerState
 
   /**
    * Process a request from the node to send the results of a job executed offline.
-   * @param bundle the handshake task bundle.
+   * @param received holds the received bundle along with the tasks.
    * @param context the context associated witht he node channel.
    * @return the {@link TO_WAITING_RESULTS} transition name.
    * @throws Exception if any error occurs.
    */
-  private NodeTransition processOfflineReopen(final JPPFTaskBundle bundle, final AbstractNodeContext context) throws Exception {
+  private NodeTransition processOfflineReopen(final Pair<JPPFTaskBundle, List<DataLocation>> received, final AbstractNodeContext context) throws Exception {
+    JPPFTaskBundle bundle = received.first();
     String jobUuid = bundle.getParameter(JOB_UUID);
     long id = bundle.getParameter(NODE_BUNDLE_ID);
     ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
     if (debugEnabled) log.debug("processing offline reopen with jobUuid=" + jobUuid + ", id=" + id + ", nodeBundle=" + nodeBundle + ", node=" + context.getChannel());
     context.setBundle(nodeBundle);
-    return TO_WAITING_RESULTS;
+    WaitingResultsState wrs = (WaitingResultsState) server.getFactory().getState(NodeState.WAITING_RESULTS);
+    return wrs.process(received, context);
+  }
+
+  /**
+   * Extract the remote host name from the specified channel.
+   * @param channel the channel that carries the host information.
+   * @return the remote host name as a string.
+   * @throws Exception if any error occurs.
+   */
+  private String getChannelHost(final ChannelWrapper<?> channel) throws Exception {
+    if (channel instanceof SelectionKeyWrapper) {
+      SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
+      SocketChannel ch = (SocketChannel) skw.getChannel().channel();
+      return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
+    }
+    return null;
   }
 }

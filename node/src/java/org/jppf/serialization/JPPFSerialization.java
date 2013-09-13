@@ -30,12 +30,6 @@ import org.slf4j.*;
  * and configured in a JPPF configuration file using the property definition:<br>
  * <code>jppf.object.serialization.class = my.implementation.OfJPPFSerialization</code>
  * <p>The same implementation must be used for all nodes, servers and clients.
- * <p>The following built-in serialization schemes are provided:<br>
- * - {@link DefaultJavaSerialization}, configured as<br>
- *   <code>jppf.object.serialization.class = org.jppf.serialization.JPPFSerialization$DefaultJavaSerialization</code><br>
- * - {@link DefaultJPPFSerialization}, configured as<br>
- *   <code>jppf.object.serialization.class = org.jppf.serialization.JPPFSerialization$DefaultJPPFSerialization</code><br>
- * (note the use of '$' for the inner class).
  * @author Laurent Cohen
  */
 public interface JPPFSerialization

@@ -16,20 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.utils.streams;
-
 /**
- * Definition of important constants for stream I/O.
- * @author Laurent Cohen
+ * Classes used to reproduce the problem reported in forums thread
+ * <a href="http://www.jppf.org/forums/index.php/topic,1179.0.html">http://www.jppf.org/forums/index.php/topic,1179.0.html</a>.
  */
-public final class StreamConstants
-{
-  /**
-   * Size of temporary buffers used in I/O transfers.
-   */
-  public static final int TEMP_BUFFER_SIZE = 4 * 1024;
-  /**
-   * A definition of an empty byte array.
-   */
-  public static final byte[] EMPTY_BYTES = new byte[0];
-}
+package test.counters;

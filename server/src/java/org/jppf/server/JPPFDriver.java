@@ -236,7 +236,7 @@ public class JPPFDriver
    * @return a <code>ClassNioServer</code> instance.
    * @exclude
    */
-  public ClassNioServer getClientClassServer()
+  public ClientClassNioServer getClientClassServer()
   {
     return clientClassServer;
   }
@@ -246,7 +246,7 @@ public class JPPFDriver
    * @return a <code>ClassNioServer</code> instance.
    * @exclude
    */
-  public ClassNioServer getNodeClassServer()
+  public NodeClassNioServer getNodeClassServer()
   {
     return nodeClassServer;
   }

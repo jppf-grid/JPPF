@@ -20,10 +20,29 @@ package org.jppf.io;
 
 import java.io.Closeable;
 
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.ConfigurationHelper;
+
 /**
  * Super interface for all input source and output destination implementations.
  * @author Laurent Cohen
  */
 public interface IO extends Closeable
 {
+  /**
+   * Size of receive buffer size for socket connections.
+   */
+  int SOCKET_BUFFER_SIZE = ConfigurationHelper.getInt("jppf.socket.buffer.size", 32*1024, 1024, 64 * 1024);
+  /**
+   * Disable Nagle's algorithm to improve performance.
+   */
+  boolean SOCKET_TCP_NO_DELAY = JPPFConfiguration.getProperties().getBoolean("jppf.socket.tcp_no_delay", true);
+  /**
+   * Size of temporary buffers used in I/O transfers.
+   */
+  int TEMP_BUFFER_SIZE = ConfigurationHelper.getInt("jppf.temp.buffer.size", 32*1024, 1024, 65536);
+  /**
+   * A definition of an empty byte array.
+   */
+  byte[] EMPTY_BYTES = new byte[0];
 }

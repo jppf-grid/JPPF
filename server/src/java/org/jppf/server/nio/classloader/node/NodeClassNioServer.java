@@ -19,6 +19,7 @@
 package org.jppf.server.nio.classloader.node;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.server.JPPFDriver;
@@ -56,7 +57,8 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   /**
    * Mapping of channels to their uuid.
    */
-  protected final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<>();
+  //protected final Map<String, ChannelWrapper<?>> nodeConnections = new HashMap<>();
+  protected final Map<String, ChannelWrapper<?>> nodeConnections = new ConcurrentHashMap<>();
 
   /**
    * Initialize this class server.
@@ -80,7 +82,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
       ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);
       selectorThread = new ChannelSelectorThread(channelSelector, this);
-      localChannel.setKeyOps(0);
+      localChannel.setInterestOps(0);
       new Thread(selectorThread, "ClassChannelSelector").start();
       postAccept(localChannel);
     }
@@ -118,10 +120,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    */
   protected ChannelWrapper<?> getNodeConnection(final String uuid)
   {
-    synchronized(nodeConnections)
-    {
-      return nodeConnections.get(uuid);
-    }
+    return nodeConnections.get(uuid);
   }
 
   /**
@@ -132,11 +131,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   public void addNodeConnection(final String uuid, final ChannelWrapper<?> channel)
   {
     if (debugEnabled) log.debug("adding node connection: uuid=" + uuid + ", channel=" + channel);
-    synchronized(nodeConnections)
-    {
-      nodeConnections.put(uuid, channel);
-      if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().addChannel(channel, getName());
-    }
+    nodeConnections.put(uuid, channel);
   }
 
   /**
@@ -147,12 +142,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   public ChannelWrapper<?> removeNodeConnection(final String uuid)
   {
     if (debugEnabled) log.debug("removing node connection: uuid=" + uuid);
-    synchronized(nodeConnections)
-    {
-      ChannelWrapper<?> channel = nodeConnections.remove(uuid);
-      if (JPPFDriver.JPPF_DEBUG && (channel != null)) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
-      return channel;
-    }
+    return nodeConnections.remove(uuid);
   }
 
   /**
@@ -166,7 +156,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    NodeClassNioServer server = (NodeClassNioServer) JPPFDriver.getInstance().getNodeClassServer();
+    NodeClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
     ClassContext context = (ClassContext) channel.getContext();
     String uuid = context.getUuid();
     if (uuid != null) server.removeNodeConnection(uuid);
@@ -202,10 +192,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   public synchronized void removeAllConnections()
   {
     if (!isStopped()) return;
-    synchronized(nodeConnections)
-    {
-      nodeConnections.clear();
-    }
+    nodeConnections.clear();
     super.removeAllConnections();
   }
 
@@ -213,5 +200,13 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   public boolean isIdle(final ChannelWrapper<?> channel)
   {
     return ClassState.IDLE_NODE == channel.getContext().getState();
+  }
+
+  @Override
+  public List<ChannelWrapper<?>> getAllConnections()
+  {
+    List<ChannelWrapper<?>> list = super.getAllConnections();
+    if (localChannel != null) list.add(localChannel);
+    return list;
   }
 }

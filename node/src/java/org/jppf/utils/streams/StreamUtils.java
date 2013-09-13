@@ -20,6 +20,7 @@ package org.jppf.utils.streams;
 
 import java.io.*;
 
+import org.jppf.io.IO;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.Logger;
 
@@ -116,7 +117,7 @@ public final class StreamUtils
    */
   public static void copyStream(final InputStream is, final OutputStream os, final boolean closeStreams) throws IOException {
     try {
-      byte[] bytes = new byte[StreamConstants.TEMP_BUFFER_SIZE];
+      byte[] bytes = new byte[IO.TEMP_BUFFER_SIZE];
       while(true) {
         int n = is.read(bytes);
         if (n <= 0) break;
@@ -140,7 +141,7 @@ public final class StreamUtils
    */
   public static void waitKeyPressed() throws Exception
   {
-    waitKeyPressed("press any key to continue ...");
+    waitKeyPressed("press <Enter> to continue ...");
   }
 
   /**

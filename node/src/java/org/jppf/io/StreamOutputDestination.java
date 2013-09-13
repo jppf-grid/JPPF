@@ -22,7 +22,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 
 import org.jppf.utils.SerializationUtils;
-import org.jppf.utils.streams.StreamConstants;
 
 /**
  * Output destination backed by an {@link java.io.OutputStream OutputStream}.
@@ -71,7 +70,7 @@ public class StreamOutputDestination implements OutputDestination
   public int write(final ByteBuffer buffer) throws Exception
   {
     int pos = buffer.position();
-    ByteBuffer tmp = ByteBuffer.wrap(new byte[StreamConstants.TEMP_BUFFER_SIZE]);
+    ByteBuffer tmp = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
     byte[] bytes = tmp.array();
     while (buffer.remaining() > 0)
     {

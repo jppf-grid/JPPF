@@ -17,7 +17,7 @@
  */
 package org.jppf.utils;
 
-import org.jppf.utils.streams.StreamConstants;
+import org.jppf.io.IO;
 
 /**
  * buffer for the data read from or written to a socket connection.
@@ -30,7 +30,7 @@ public class JPPFBuffer
   /**
    * The actual buffer, intended to contain a serialized object graph.
    */
-  public byte[] buffer = StreamConstants.EMPTY_BYTES;
+  public byte[] buffer = IO.EMPTY_BYTES;
   /**
    * The length of the buffer.
    */

@@ -162,7 +162,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   {
     if (systemInfo != null)
     {
-      systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(isLocal()));
+      systemInfo.getJppf().setBoolean("jppf.channel.local", isLocal());
       this.systemInfo = systemInfo;
       if (traceEnabled) log.trace("setting system info for " + this + ", jppf.channel.local=" + this.systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
     }

@@ -114,7 +114,7 @@ public class DriverInitializer
    */
   void registerDebugMBean()
   {
-    if (config.getBoolean("jppf.debug.enabled", false))
+    if (JPPFDriver.JPPF_DEBUG)
     {
       try
       {

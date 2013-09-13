@@ -21,7 +21,9 @@ import java.io.*;
 import java.net.*;
 
 import org.jppf.JPPFException;
+import org.jppf.io.IO;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 
@@ -127,10 +129,9 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   @Override
   public void sendBytes(final JPPFBuffer buf) throws IOException
   {
-    checkOpened();
     dos.writeInt(buf.getLength());
     dos.write(buf.getBuffer(), 0, buf.getLength());
-    dos.flush();
+    flush();
   }
 
   /**
@@ -146,7 +147,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   {
     checkOpened();
     dos.write(data, offset, len);
-    dos.flush();
+    flush();
   }
 
   /**
@@ -160,7 +161,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   {
     checkOpened();
     dos.writeInt(n);
-    dos.flush();
+    flush();
   }
 
   /**
@@ -269,15 +270,13 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   {
     if (!opened)
     {
-      if ((host == null) || "".equals(host.trim()))
-        throw new ConnectException("You must specify the host name");
-      else if (port <= 0)
-        throw new ConnectException("You must specify the port number");
+      if ((host == null) || "".equals(host.trim())) throw new ConnectException("You must specify the host name");
+      else if (port <= 0) throw new ConnectException("You must specify the port number");
       socket = new Socket();
       InetSocketAddress addr = new InetSocketAddress(host, port);
-      socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
-      socket.setSendBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
-      socket.setTcpNoDelay(SOCKET_TCP_NO_DELAY);
+      socket.setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+      socket.setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
+      socket.setTcpNoDelay(IO.SOCKET_TCP_NO_DELAY);
       socket.connect(addr);
       initStreams();
       opened = true;
@@ -295,12 +294,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   {
     OutputStream os = socket.getOutputStream();
     InputStream is = socket.getInputStream();
-    //BufferedOutputStream bos = new BufferedOutputStream(os, SOCKET_RECEIVE_BUFFER_SIZE);
-    BufferedOutputStream bos = new BufferedOutputStream(os);
-    dos = new DataOutputStream(bos);
-    //dos.flush();
-    BufferedInputStream bis = new BufferedInputStream(is);
-    dis = new DataInputStream(bis);
+    dos = new DataOutputStream(new BufferedOutputStream(os));
+    dis = new DataInputStream(new BufferedInputStream(is));
   }
 
   /**
@@ -313,7 +308,12 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   public void close() throws ConnectException, IOException
   {
     opened = false;
-    if (socket != null) socket.close();
+    if (socket != null)
+    {
+      StreamUtils.closeSilent(dis);
+      StreamUtils.closeSilent(dos);
+      socket.close();
+    }
   }
 
   /**

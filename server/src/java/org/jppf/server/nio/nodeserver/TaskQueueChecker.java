@@ -202,13 +202,26 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
 
   /**
    * Return whether any idle channel is available.
-   * @return true when there are no idle channels.
+   * @return <code>true</code> when there are no idle channels.
    */
   public boolean hasIdleChannel()
   {
     synchronized (idleChannels)
     {
       return !idleChannels.isEmpty();
+    }
+  }
+
+  /**
+   * Return whether the specified channel is in the set of idle channels.
+   * @param channel the channel to check.
+   * @return <code>true</code> if the channel is in the set of idle channels, <code>false</code> otherwise.
+   */
+  public boolean hasIdleChannel(final C channel)
+  {
+    synchronized (idleChannels)
+    {
+      return idleChannels.contains(channel);
     }
   }
 

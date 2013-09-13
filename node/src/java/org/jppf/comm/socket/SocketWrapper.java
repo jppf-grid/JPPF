@@ -32,15 +32,6 @@ import org.jppf.utils.*;
 public interface SocketWrapper
 {
   /**
-   * Size of receive buffer size for socket connections.
-   */
-  int SOCKET_RECEIVE_BUFFER_SIZE = 64*1024;
-  /**
-   * Disable Nagle's algorithm to improve performance.
-   */
-  boolean SOCKET_TCP_NO_DELAY = true;
-
-  /**
    * Send an object over a TCP socket connection.
    * @param o the object to send.
    * @throws Exception if the underlying output stream throws an exception.
