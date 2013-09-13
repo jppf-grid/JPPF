@@ -119,10 +119,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Initialize this node server.
    * @param driver reference to the driver.
    * @param queue the reference queue to use.
+   * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeNioServer(final JPPFDriver driver, final JPPFPriorityQueue queue) throws Exception {
-    super(NioConstants.NODE_SERVER);
+  public NodeNioServer(final JPPFDriver driver, final JPPFPriorityQueue queue, final boolean useSSL) throws Exception {
+    super(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
     if (queue == null) throw new IllegalArgumentException("queue is null");
 

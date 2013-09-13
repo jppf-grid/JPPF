@@ -29,6 +29,8 @@ import javax.net.ssl.*;
 
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.io.IO;
+import org.jppf.ssl.SSLHelper;
+import org.jppf.utils.JPPFIdentifiers;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -95,30 +97,36 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * The SSL context associated with this server.
    */
   protected SSLContext sslContext = null;
+  /**
+   * The channel identifier for channels handled by this server.
+   */
+  protected int identifier = 0;
 
   /**
    * Initialize this server with a specified port number and name.
-   * @param name the name given to this thread.
-   * performed sequentially or through the executor thread pool.
+   * @param identifier the channel identifier for channels handled by this server.
+   * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  protected NioServer(final String name) throws Exception {
-    super(name);
+  protected NioServer(final int identifier, final boolean useSSL) throws Exception {
+    super(JPPFIdentifiers.serverName(identifier));
+    this.identifier = identifier;
+    selector = Selector.open();
     factory = createFactory();
     transitionManager = new StateTransitionManager<>(this);
-    selector = Selector.open();
+    if (useSSL) createSSLContext();
   }
 
   /**
    * Initialize this server with a specified list of port numbers and name.
    * @param ports the list of ports this server accepts connections from.
    * @param sslPorts the list of SSL ports this server accepts connections from.
-   * @param name the name given to this thread.
+   * @param identifier the channel identifier for channels handled by this server.
    * performed sequentially or through the executor thread pool.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NioServer(final int[] ports, final int[] sslPorts, final String name) throws Exception {
-    this(name);
+  public NioServer(final int[] ports, final int[] sslPorts, final int identifier) throws Exception {
+    this(identifier, false);
     this.ports = ports;
     this.sslPorts = sslPorts;
     init();
@@ -136,11 +144,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   protected final void init() throws Exception {
     if ((ports != null) && (ports.length != 0)) init(ports, false);
-    if ((sslPorts != null) && (sslPorts.length != 0))
-    {
-      createSSLContext();
-      init(sslPorts, true);
-    }
+    if ((sslPorts != null) && (sslPorts.length != 0)) init(sslPorts, true);
   }
 
   /**
@@ -170,6 +174,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @throws Exception if any error occurs during the SSL configuration.
    */
   protected void createSSLContext() throws Exception {
+    sslContext = SSLHelper.getSSLContext(identifier);
   }
 
   /**
@@ -179,6 +184,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @throws Exception if any error occurs during the SSL configuration.
    */
   protected void configureSSLEngine(final SSLEngine engine) throws Exception {
+    SSLParameters params = SSLHelper.getSSLParameters();
+    engine.setUseClientMode(false);
+    engine.setSSLParameters(params);
   }
 
   /**
@@ -313,7 +321,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       SelectionKey selKey = channel.register(selector,	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
-      if (ssl && (sslHandler == null)) {
+      if (ssl && (sslHandler == null) && (sslContext != null)) {
         SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
         configureSSLEngine(engine);
         SSLHandler newSSLHandler = new SSLHandler(wrapper, engine);

@@ -42,9 +42,6 @@ public class PlainTextPassword implements Callable<char[]>
     if ((args == null) || (args.length == 0)) throw new SSLConfigurationException("missing plain text password");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public char[] call() throws Exception
   {

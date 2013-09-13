@@ -98,7 +98,7 @@ class IdentifyingPeerState extends AcceptorServerState
       try
       {
         newServer.getSelector().wakeup();
-        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLHandler(), false);
+        ChannelWrapper<?> newChannel = newServer.accept(socketChannel, context.getSSLHandler(), context.isSsl());
         if (debugEnabled) log.debug("channel registered: " + newChannel);
       }
       finally

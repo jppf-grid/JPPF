@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -57,11 +57,12 @@ public class ClientClassNioServer extends ClassNioServer
   /**
    * Initialize this class server.
    * @param driver reference to the driver.
+   * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientClassNioServer(final JPPFDriver driver) throws Exception
+  public ClientClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
   {
-    super(NioConstants.CLIENT_CLASS_SERVER, driver);
+    super(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, driver, useSSL);
   }
 
   @Override

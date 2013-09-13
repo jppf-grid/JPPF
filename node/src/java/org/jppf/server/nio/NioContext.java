@@ -98,4 +98,16 @@ public interface NioContext<S extends Enum<S>>
    * @param sslHandler an instance of {@link SSLHandler}.
    */
   void setSSLHandler(SSLHandler sslHandler);
+
+  /**
+   * Determines whether the connection was opened on an SSL port.
+   * @return <code>true</code> for an SSL connection, <code>false</code> otherwise.
+   */
+  boolean isSsl();
+
+  /**
+   * Specifies whether the connection was opened on an SSL port.
+   * @param ssl <code>true</code> for an SSL connection, <code>false</code> otherwise.
+   */
+  void setSsl(final boolean ssl);
 }

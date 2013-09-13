@@ -36,7 +36,7 @@ public class FileStoreSource implements Callable<InputStream>
 
   /**
    * Initialize this store source with a file name.
-   * @param args the firt argument reprsents the path to the key or trust store
+   * @param args the firt argument represents the path to the key or trust store
    * @throws SSLConfigurationException if there is less than 1 argument.
    */
   public FileStoreSource(final String... args) throws SSLConfigurationException
@@ -45,9 +45,6 @@ public class FileStoreSource implements Callable<InputStream>
     if ((args == null) || (args.length == 0)) throw new SSLConfigurationException("missing parameter: keystore or trustore path");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public InputStream call() throws Exception
   {

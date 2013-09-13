@@ -177,11 +177,13 @@ public class JPPFDriver
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this));
-    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this));
-    clientNioServer = startServer(recoveryServer, new ClientNioServer(this));
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue));
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), extractValidPorts(info.sslServerPorts)));
+    int[] sslPorts = extractValidPorts(info.sslServerPorts);
+    boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
+    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL));
+    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL));
+    clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL));
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL));
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts));
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {

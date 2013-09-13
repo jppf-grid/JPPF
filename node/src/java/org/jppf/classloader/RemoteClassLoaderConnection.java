@@ -75,7 +75,6 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
             channel = null;
             throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
           }
-          if (sslEnabled) createSSLConnection();
           performHandshake();
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
         }
@@ -120,6 +119,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       channel.flush();
+      if (sslEnabled) createSSLConnection();
       ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
       performCommonHandshake(rr);
     }

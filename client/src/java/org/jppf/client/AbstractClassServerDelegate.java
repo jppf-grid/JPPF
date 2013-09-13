@@ -157,6 +157,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   {
     if (debugEnabled) log.debug(formattedName + " : sending channel identifier");
     socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
+    if (owner.isSSLEnabled()) createSSLConnection();
     if (debugEnabled) log.debug(formattedName + " : sending initial resource");
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);

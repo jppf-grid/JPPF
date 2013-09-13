@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -55,14 +55,15 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   /**
    * Initialize this class loader server.
    * @param driver reference to the driver.
+   * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientNioServer(final JPPFDriver driver) throws Exception
+  public ClientNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
   {
-    super(NioConstants.CLIENT_SERVER);
+    super(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
 
-    ClientNioServer.driver = driver;
+    this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 

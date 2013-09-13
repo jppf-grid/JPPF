@@ -66,13 +66,47 @@ public final class SSLHelper
    */
   public static SSLContext getSSLContext() throws Exception
   {
+    return getSSLContext("jppf.ssl");
+  }
+
+  /**
+   * Get a SSL context from the SSL configuration.
+   * @param identifier identifies the type of channel for which to get the SSL context.
+   * @return a {@link SSLContext} instance.
+   * @throws Exception if any error occurs.
+   */
+  public static SSLContext getSSLContext(final int identifier) throws Exception
+  {
+    if (sslConfig == null) loadSSLProperties();
+    boolean b = sslConfig.getBoolean("jppf.ssl.client.distinct.truststore", false);
+    if (debugEnabled) log.debug("using {} trust store for clients, identifier = ", b ? "distinct" : "same", JPPFIdentifiers.asString(identifier));
+    switch(identifier)
+    {
+      case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
+      case JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL:
+        return getSSLContext(b ? "jppf.ssl.client" : "jppf.ssl");
+      case JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL:
+      case JPPFIdentifiers.NODE_JOB_DATA_CHANNEL:
+        return getSSLContext("jppf.ssl");
+    }
+    throw new IllegalStateException("unknown channel identifier " + Integer.toHexString(identifier));
+  }
+
+  /**
+   * Get a SSL context from the SSL configuration.
+   * @param trustStorePropertyPrefix the prefix to use to get the the trustore's location and password.
+   * @return a {@link SSLContext} instance.
+   * @throws Exception if any error occurs.
+   */
+  private static SSLContext getSSLContext(final String trustStorePropertyPrefix) throws Exception
+  {
     if (sslConfig == null) loadSSLProperties();
     char[] keyPwd = getPassword("jppf.ssl.keystore.password");
     KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
     KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
     kmf.init(keyStore, keyPwd);
-    char[] trustPwd = getPassword("jppf.ssl.truststore.password");
-    KeyStore trustStore = getStore("jppf.ssl.truststore", trustPwd);
+    char[] trustPwd = getPassword(trustStorePropertyPrefix + ".truststore.password");
+    KeyStore trustStore = getStore(trustStorePropertyPrefix + ".truststore", trustPwd);
     TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     tmf.init(trustStore);
     SSLContext sslContext = SSLContext.getInstance(sslConfig.getString("jppf.ssl.context.protocol"));
@@ -96,11 +130,11 @@ public final class SSLHelper
     tokens = (s == null) ? null : s.trim().split("\\s");
     params.setProtocols(tokens);
     s = sslConfig.getString("jppf.ssl.client.auth", "none").toLowerCase();
-    params.setNeedClientAuth("need".equals(s));
     params.setWantClientAuth("want".equals(s));
+    params.setNeedClientAuth("need".equals(s));
 
     if (debugEnabled) log.debug("SSL parameters : cipher suites=" + StringUtils.arrayToString(params.getCipherSuites()) +
-      ", protocols=" + StringUtils.arrayToString(params.getProtocols()) + ", needCLientAuth=" + params.getNeedClientAuth() + ", wantClientAuth=" + params.getWantClientAuth());
+        ", protocols=" + StringUtils.arrayToString(params.getProtocols()) + ", needCLientAuth=" + params.getNeedClientAuth() + ", wantClientAuth=" + params.getWantClientAuth());
     return params;
   }
 
@@ -241,7 +275,7 @@ public final class SSLHelper
     catch (NoSuchMethodException ignore)
     {
     }
-    Callable<E> callable = (Callable<E>) (c == null ? clazz.newInstance() : c.newInstance((Object) args));
+    Callable<E> callable = c == null ? clazz.newInstance() : c.newInstance((Object) args);
     return callable.call();
   }
 
