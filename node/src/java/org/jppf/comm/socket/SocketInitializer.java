@@ -47,16 +47,4 @@ public interface SocketInitializer
    * @return true if this socket initializer has been intentionally closed, false otherwise.
    */
   boolean isClosed();
-
-  /**
-   * Get the name given to this initializer.
-   * @return the name as a string.
-   */
-  String getName();
-
-  /**
-   * Set the name given to this initializer.
-   * @param name the name as a string.
-   */
-  void setName(String name);
 }
