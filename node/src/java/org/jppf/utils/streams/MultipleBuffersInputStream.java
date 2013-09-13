@@ -58,7 +58,7 @@ public class MultipleBuffersInputStream extends InputStream
   /**
    * The total number of bytes written into this output stream.
    */
-  private int totalSize = 0;
+  private int totalSize = -1;
   /**
    * Determines whether end of file was reached.
    */
@@ -71,11 +71,7 @@ public class MultipleBuffersInputStream extends InputStream
   public MultipleBuffersInputStream(final JPPFBuffer...buffers)
   {
     list = new ArrayList<JPPFBuffer>(buffers.length);
-    for (JPPFBuffer b: buffers)
-    {
-      list.add(new JPPFBuffer(b.buffer, b.length));
-      totalSize += b.length;
-    }
+    Collections.addAll(list, buffers);
   }
 
   /**
@@ -84,29 +80,23 @@ public class MultipleBuffersInputStream extends InputStream
    */
   public MultipleBuffersInputStream(final List<JPPFBuffer> buffers)
   {
-    list = new ArrayList<JPPFBuffer>(buffers.size());
-    for (JPPFBuffer b: buffers)
-    {
-      list.add(new JPPFBuffer(b.buffer, b.length));
-      totalSize += b.length;
-    }
+    list = new ArrayList<JPPFBuffer>(buffers);
   }
 
   /**
    * Read a single byte from this input stream.
    * @return the data to write.
    * @throws IOException if any error occurs.
-   * @see java.io.OutputStream#write(int)
    */
   @Override
   public int read() throws IOException
   {
-    if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
     if (eofReached) return -1;
+    if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
     byte b = currentBuffer.buffer[currentBuffer.pos];
     currentBuffer.pos++;
-    if (traceEnabled) log.trace("read one byte '" + b + "' from " + this);
-    return b < 0 ? b + 256 : b;
+    return b & 0xff;
+    //return b < 0 ? b + 256 : b;
   }
 
   /**
@@ -116,16 +106,10 @@ public class MultipleBuffersInputStream extends InputStream
    * @param len the number of bytes to read.
    * @return the number of bytes read from the stream, or -1 if end of file was reached.
    * @throws IOException if any error occurs.
-   * @see java.io.OutputStream#write(byte[], int, int)
    */
   @Override
   public int read(final byte[] b, final int off, final int len) throws IOException
   {
-    /*
-		if (b == null) throw new NullPointerException("the destination buffer must not be null");
-		if ((off < 0) || (off > b.length) || (len < 0) || (off + len > b.length))
-			throw new ArrayIndexOutOfBoundsException("b.length=" + b.length + ", off=" + off + ", len=" + len);
-     */
     if (eofReached) return -1;
     int count = 0;
     while (count < len)
@@ -137,10 +121,6 @@ public class MultipleBuffersInputStream extends InputStream
       count += n;
       currentBuffer.pos += n;
     }
-    /*
-		if (traceEnabled) log.trace("read " + count + " bytes from " + this +
-			", bytes = " + StringUtils.dumpBytes(currentBuffer.buffer, currentBuffer.pos - count, Math.min(100, count)));
-     */
     return count;
   }
 
@@ -149,12 +129,10 @@ public class MultipleBuffersInputStream extends InputStream
    * @param b buffer that receives the data read form this stream.
    * @return the number of bytes read from the stream, or -1 if end of file was reached.
    * @throws IOException if any error occurs.
-   * @see java.io.OutputStream#write(byte[])
    */
   @Override
   public int read(final byte[] b) throws IOException
   {
-    //if (b == null) throw new NullPointerException("the destination buffer must not be null");
     return read(b, 0, b.length);
   }
 
@@ -185,14 +163,16 @@ public class MultipleBuffersInputStream extends InputStream
     return currentBuffer;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
+    if (totalSize < 0)
+    {
+      totalSize = 0;
+      for (JPPFBuffer buf: list) totalSize += buf.length;
+    }
     sb.append("totalSize=").append(totalSize);
     sb.append(", nbBuffers=").append(list.size());
     sb.append(", bufferIndex=").append(bufferIndex);
