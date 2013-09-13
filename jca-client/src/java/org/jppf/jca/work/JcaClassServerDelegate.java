@@ -62,7 +62,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
     this.host = host;
     this.port = port;
     setName(name);
-    socketInitializer.setName("[" + getName() + " - delegate] ");
   }
 
   /**
@@ -86,7 +85,6 @@ public class JcaClassServerDelegate extends AbstractClassServerDelegate implemen
         if (socketInitializer.isSuccessful())
         {
           log.info("[client: " + getName() + "] Reconnected to the class server");
-          if (owner.isSSL()) createSSLConnection();
           setStatus(ACTIVE);
         }
         else

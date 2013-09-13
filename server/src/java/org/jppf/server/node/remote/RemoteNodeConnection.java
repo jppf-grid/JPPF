@@ -86,10 +86,10 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver");
       }
-      if (sslEnabled) channel = SSLHelper.createSSLClientConnection(channel);
-      System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
+      if (sslEnabled) channel = SSLHelper.createSSLClientConnection(channel);
+      System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("end socket initializer");
     }
     finally

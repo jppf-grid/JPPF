@@ -176,11 +176,13 @@ public class JPPFDriver
     initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
-    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this));
-    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this));
-    clientNioServer = startServer(recoveryServer, new ClientNioServer(this));
-    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue));
-    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), extractValidPorts(info.sslServerPorts)));
+    int[] sslPorts = extractValidPorts(info.sslServerPorts);
+    boolean useSSL = (sslPorts != null) && (sslPorts.length > 0);
+    clientClassServer = startServer(recoveryServer, new ClientClassNioServer(this, useSSL));
+    nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL));
+    clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL));
+    nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL));
+    acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts));
 
     if (config.getBoolean("jppf.local.node.enabled", false))
     {
@@ -493,8 +495,9 @@ public class JPPFDriver
    * Extract only th valid ports from the input array.
    * @param ports the array of port numbers to check.
    * @return an array, possibly of length 0, containing all the valid port numbers in the input array.
+   * @exclude
    */
-  private int[] extractValidPorts(final int[] ports)
+  public int[] extractValidPorts(final int[] ports)
   {
     if ((ports == null) || (ports.length == 0)) return ports;
     List<Integer> list = new ArrayList<Integer>();

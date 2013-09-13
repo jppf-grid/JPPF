@@ -72,7 +72,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
     {
       if (((AbstractJPPFClientConnection) owner).isClosed()) throw new IllegalStateException("this task server connection is closed");
       handshakeDone = false;
-      socketInitializer.setName('[' + getName() + " - delegate] ");
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
       String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ':' + port;
@@ -83,7 +82,6 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
       {
         throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
       }
-      if (owner.isSSL()) createSSLConnection();
       if (!socketInitializer.isClosed())
       {
         msg = "[client: " + getName() + "] Reconnected to the class server";

@@ -18,12 +18,11 @@
 
 package org.jppf.server.nio.acceptor;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLEngine;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
-import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -57,23 +56,18 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    */
   public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception
   {
-    super(ports, sslPorts, NioConstants.ACCEPTOR);
+    super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
   @Override
   protected void createSSLContext() throws Exception
   {
-    sslContext = SSLHelper.getSSLContext();
   }
 
   @Override
   protected void configureSSLEngine(final SSLEngine engine) throws Exception
   {
-    //SSLParameters params = sslContext.getDefaultSSLParameters();
-    SSLParameters params = SSLHelper.getSSLParameters();
-    engine.setUseClientMode(false);
-    engine.setSSLParameters(params);
   }
 
   @Override

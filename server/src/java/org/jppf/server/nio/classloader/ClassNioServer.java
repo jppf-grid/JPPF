@@ -45,16 +45,21 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    * Reference to the driver.
    */
   protected final JPPFDriver driver;
+  /**
+   * Reads resource files from the classpath.
+   */
+  protected final ResourceProvider resourceProvider = new ResourceProvider();
 
   /**
    * Initialize this class server.
-   * @param name the name given to this server.
+   * @param identifier the channel identifier for channels handled by this server.
    * @param driver reference to the driver.
+   * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClassNioServer(final String name, final JPPFDriver driver) throws Exception
+  public ClassNioServer(final int identifier, final JPPFDriver driver, final boolean useSSL) throws Exception
   {
-    super(name);
+    super(identifier, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
 
     this.driver = driver;
@@ -70,9 +75,6 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
     return driver.getInitializer().getClassCache();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public NioContext<?> createNioContext()
   {

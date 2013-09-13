@@ -96,10 +96,10 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
         System.out.println("Connecting to  " + name);
         socketInitializer.initializeSocket(channel);
         if (!socketInitializer.isSuccessful()) throw new JPPFException("Unable to reconnect to " + name);
-        System.out.println("Reconnected to " + name);
-        if (secure) channel = SSLHelper.createSSLClientConnection(channel);
         if (debugEnabled) log.debug("sending channel identifier");
         channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
+        if (secure) channel = SSLHelper.createSSLClientConnection(channel);
+        System.out.println("Reconnected to " + name);
       }
     }
     finally

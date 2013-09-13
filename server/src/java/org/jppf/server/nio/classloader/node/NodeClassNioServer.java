@@ -61,11 +61,12 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   /**
    * Initialize this class server.
    * @param driver reference to the driver.
+   * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeClassNioServer(final JPPFDriver driver) throws Exception
+  public NodeClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
   {
-    super(NioConstants.NODE_CLASS_SERVER, driver);
+    super(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, driver, useSSL);
   }
 
   /**
