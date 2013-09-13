@@ -74,7 +74,7 @@ public class HelloTask extends JPPFTask
     }
     catch(Exception e)
     {
-      setException(e);
+      setThrowable(e);
       s = "execution failed with exception message: " + e.getMessage();
     }
     System.out.println(s);
