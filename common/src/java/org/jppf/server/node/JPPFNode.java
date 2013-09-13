@@ -344,6 +344,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     lifeCycleEventHandler.fireNodeEnding();
     lifeCycleEventHandler.removeAllListeners();
     setNodeAdmin(null);
+    if (stopJmx) {
+      try {
+        providerManager.unregisterProviderMBeans();
+        if (jmxServer != null) jmxServer.stop();
+      } catch(Exception e) {
+        log.error(e.getMessage(), e);
+      }
+    }
     classLoaderManager.closeClassLoader();
     try {
       synchronized(this) {
@@ -352,14 +360,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       classLoaderManager.clearContainers();
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-    }
-    if (stopJmx) {
-      try {
-        providerManager.unregisterProviderMBeans();
-        if (jmxServer != null) jmxServer.stop();
-      } catch(Exception e) {
-        log.error(e.getMessage(), e);
-      }
     }
     CloseableHandler.handleCloseables(CloseableHandler.NODE);
   }
