@@ -30,15 +30,19 @@ import org.jppf.utils.configuration.ConfigurationHelper;
 public interface IO extends Closeable
 {
   /**
-   * Size of receive buffer size for socket connections.
+   * Size of send and receive buffer for socket connections. Defaults to 32768.
    */
   int SOCKET_BUFFER_SIZE = ConfigurationHelper.getInt("jppf.socket.buffer.size", 32*1024, 1024, 64 * 1024);
   /**
-   * Disable Nagle's algorithm to improve performance.
+   * Disable Nagle's algorithm to improve performance. Defaults to true.
    */
-  boolean SOCKET_TCP_NO_DELAY = JPPFConfiguration.getProperties().getBoolean("jppf.socket.tcp_no_delay", true);
+  boolean SOCKET_TCP_NODELAY = JPPFConfiguration.getProperties().getBoolean("jppf.socket.tcp_nodelay", true);
   /**
-   * Size of temporary buffers used in I/O transfers.
+   * Enable / disable keepalive. Defaults to false.
+   */
+  boolean SOCKET_KEEPALIVE = JPPFConfiguration.getProperties().getBoolean("jppf.socket.keepalive", false);
+  /**
+   * Size of temporary buffers (including direct buffers) used in I/O transfers. Defaults to 32768.
    */
   int TEMP_BUFFER_SIZE = ConfigurationHelper.getInt("jppf.temp.buffer.size", 32*1024, 1024, 65536);
   /**

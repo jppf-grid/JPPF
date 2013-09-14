@@ -276,7 +276,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
       InetSocketAddress addr = new InetSocketAddress(host, port);
       socket.setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       socket.setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-      socket.setTcpNoDelay(IO.SOCKET_TCP_NO_DELAY);
+      socket.setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
+      socket.setKeepAlive(IO.SOCKET_KEEPALIVE);
       socket.connect(addr);
       initStreams();
       opened = true;

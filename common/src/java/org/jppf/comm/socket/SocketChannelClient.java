@@ -259,7 +259,8 @@ public class SocketChannelClient implements SocketWrapper
     channel = SocketChannel.open();
     channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
     channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-    channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NO_DELAY);
+    channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
+    channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
     channel.configureBlocking(blocking);
     InetSocketAddress address = new InetSocketAddress(host, port);
     channel.connect(address);

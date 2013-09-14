@@ -293,7 +293,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     try {
       channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
       channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-      channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NO_DELAY);
+      channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
+      channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
       if (channel.isBlocking()) channel.configureBlocking(false);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
