@@ -283,9 +283,10 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
         throw new ConnectException("You must specify the port number");
       socket = new Socket();
       InetSocketAddress addr = new InetSocketAddress(host, port);
-      socket.setReceiveBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
-      socket.setSendBufferSize(SOCKET_RECEIVE_BUFFER_SIZE);
-      socket.setTcpNoDelay(SOCKET_TCP_NO_DELAY);
+      socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
+      socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
+      socket.setTcpNoDelay(SOCKET_TCP_NODELAY);
+      socket.setKeepAlive(SOCKET_KEEPALIVE);
       if (debugEnabled) log.debug("before connect()");
       socket.connect(addr);
       if (debugEnabled) log.debug("after connect()");

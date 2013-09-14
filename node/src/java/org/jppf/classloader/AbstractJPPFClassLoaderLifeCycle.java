@@ -110,7 +110,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected void init() {
     try {
-      connection.init();
+      if (connection != null) connection.init();
     } catch (Exception e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
     }

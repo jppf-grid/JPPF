@@ -152,7 +152,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     for (int i=0; i<portsToInit.length; i++) {
       if (portsToInit[i] < 0) continue;
       ServerSocketChannel server = ServerSocketChannel.open();
-      server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
+      server.socket().setReceiveBufferSize(SocketWrapper.SOCKET_BUFFER_SIZE);
       InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
       server.socket().bind(addr);
       // If the user specified port zero, the operating system should dynamically allocated a port number.
@@ -279,9 +279,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     }
     if (channel == null) return;
     try {
-      channel.socket().setSendBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-      channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_RECEIVE_BUFFER_SIZE);
-      channel.socket().setTcpNoDelay(SocketWrapper.SOCKET_TCP_NO_DELAY);
+      channel.socket().setSendBufferSize(SocketWrapper.SOCKET_BUFFER_SIZE);
+      channel.socket().setReceiveBufferSize(SocketWrapper.SOCKET_BUFFER_SIZE);
+      channel.socket().setTcpNoDelay(SocketWrapper.SOCKET_TCP_NODELAY);
+      channel.socket().setKeepAlive(SocketWrapper.SOCKET_KEEPALIVE);
       if (channel.isBlocking()) channel.configureBlocking(false);
     }
     catch (Exception e) {

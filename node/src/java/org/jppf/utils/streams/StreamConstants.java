@@ -18,6 +18,8 @@
 
 package org.jppf.utils.streams;
 
+import org.jppf.utils.JPPFConfiguration;
+
 /**
  * Definition of important constants for stream I/O.
  * @author Laurent Cohen
@@ -27,7 +29,7 @@ public final class StreamConstants
   /**
    * Size of temporary buffers used in I/O transfers.
    */
-  public static final int TEMP_BUFFER_SIZE = 4 * 1024;
+  public static final int TEMP_BUFFER_SIZE = JPPFConfiguration.getProperties().getInt("jppf.temp.buffer.size", 32*1024);
   /**
    * A definition of an empty byte array.
    */

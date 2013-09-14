@@ -32,13 +32,17 @@ import org.jppf.utils.*;
 public interface SocketWrapper
 {
   /**
-   * Size of receive buffer size for socket connections.
+   * Size of receive/send buffer size for socket connections. Defaults to 32768.
    */
-  int SOCKET_RECEIVE_BUFFER_SIZE = 64*1024;
+  int SOCKET_BUFFER_SIZE = JPPFConfiguration.getProperties().getInt("jppf.socket.buffer.size", 32*1024);
   /**
-   * Disable Nagle's algorithm to improve performance.
+   * Disable Nagle's algorithm to improve performance.  Defaults to true.
    */
-  boolean SOCKET_TCP_NO_DELAY = true;
+  boolean SOCKET_TCP_NODELAY = JPPFConfiguration.getProperties().getBoolean("jppf.socket.tcp_nodelay", true);
+  /**
+   * Enable / disable keepalive.  Defaults to false.
+   */
+  boolean SOCKET_KEEPALIVE = JPPFConfiguration.getProperties().getBoolean("jppf.socket.keepalive", false);
 
   /**
    * Send an object over a TCP socket connection.
