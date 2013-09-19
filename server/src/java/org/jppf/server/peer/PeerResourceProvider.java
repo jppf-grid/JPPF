@@ -122,7 +122,7 @@ class PeerResourceProvider
       socketClient.setChannel(null);
       ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
       if (debugEnabled) log.debug("registered class server channel " + channel);
-      if (secure) configureSSL(channel);
+      if (secure) context.setSsl(true);
       server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_SENDING_PEER_CHANNEL_IDENTIFIER);
       socketClient = null;
       peerName = peerNameBase;
