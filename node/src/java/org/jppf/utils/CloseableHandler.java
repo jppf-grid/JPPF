@@ -50,7 +50,7 @@ public class CloseableHandler
   /**
    * Map of named handlers.
    */
-  private static CollectionMap<String, Closeable> handlerMap = new ConcurrentMapCopyOnWriteList<String, Closeable>();
+  private static CollectionMap<String, Closeable> handlerMap = new CopyOnWriteListConcurrentMap<String, Closeable>();
 
   /**
    * Close() all the closeables.

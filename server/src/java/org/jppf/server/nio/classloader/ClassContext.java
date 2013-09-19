@@ -18,10 +18,11 @@
 
 package org.jppf.server.nio.classloader;
 
+import static org.jppf.server.nio.classloader.ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
@@ -57,7 +58,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * The list of pending resource requests for a resource provider.
    */
   private final Queue<ResourceRequest> pendingRequests = new ConcurrentLinkedQueue<ResourceRequest>();
-  //private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
   /**
    * The list of pending resource responses for a node.
    */
@@ -71,7 +71,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   protected boolean provider = false;
   /**
-   * Contains the JPPF peer identifier written the socket channel.
+   * Contains the JPPF peer identifier written to the socket channel.
    */
   private NioObject nioObject = null;
   /**
@@ -91,15 +91,11 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public boolean setState(final ClassState state) {
     ClassState oldState = this.state;
     boolean b = super.setState(state);
-    if (ClassState.IDLE_PROVIDER.equals(state))
-    {
+    if (ClassState.IDLE_PROVIDER.equals(state)) {
       processRequests();
       return false;
-    }
-    else if (ClassState.IDLE_NODE.equals(state))
-    {
-      synchronized(getChannel())
-      {
+    } else if (ClassState.IDLE_NODE.equals(state)) {
+      synchronized(getChannel()) {
         getChannel().notifyAll();
       }
     }
@@ -139,29 +135,25 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @return <code>true</code> if the message was fully written, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  public boolean writeIdentifier(final ChannelWrapper<?> channel) throws Exception
-  {
-    if (nioObject == null)
-    {
-      byte[] bytes = SerializationUtils.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+  public boolean writeIdentifier(final ChannelWrapper<?> channel) throws Exception {
+    if (nioObject == null) {
+      int identifier = JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL;
+      byte[] bytes = SerializationUtils.writeInt(identifier);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
       if (sslHandler == null) nioObject = new PlainNioObject(channel, dl, false);
       else nioObject = new SSLNioObject(dl, sslHandler);
     }
     boolean b = nioObject.write();
-    if (b  && debugEnabled) log.debug(build("sent channel identifier ", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL), " to peer server"));
+    if (b  && debugEnabled) log.debug("sent channel identifier {} to peer server", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL));
     return b;
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e)
-  {
-    if (isProvider())
-    {
+  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+    if (isProvider()) {
       ClientClassNioServer.closeConnection(channel);
       handleProviderError();
-    }
-    else NodeClassNioServer.closeConnection(channel);
+    } else NodeClassNioServer.closeConnection(channel);
   }
 
   /**
@@ -189,28 +181,25 @@ public class ClassContext extends SimpleNioContext<ClassState>
   @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request)
   {
-    pendingRequests.offer(request);
-    processRequests();
+    if (!((ClientClassNioServer) driver.getClientClassServer()).addResourceRequest(uuid, request))
+    {
+      pendingRequests.offer(request);
+      processRequests();
+    }
   }
 
   /**
    * Ensure the pending requests are processed.
    */
-  private void processRequests()
-  {
+  private void processRequests() {
     // if requests are already being processed, no need to do anything
-    if (lockRequest.tryLock())
-    {
-      try
-      {
-        if (ClassState.IDLE_PROVIDER.equals(getState()) && (currentRequest.get() == null) && (getNbPendingRequests() > 0))
-        {
+    if (lockRequest.tryLock()) {
+      try {
+        if (ClassState.IDLE_PROVIDER.equals(getState()) && (currentRequest.get() == null) && hasPendingRequest()) {
           if (debugEnabled) log.debug("state changing from {} to {} for {}", new Object[] {ClassState.IDLE_PROVIDER, ClassState.SENDING_PROVIDER_REQUEST, this});
           driver.getClientClassServer().getTransitionManager().transitionChannel(getChannel(), ClassTransition.TO_SENDING_PROVIDER_REQUEST);
         }
-      }
-      finally
-      {
+      } finally {
         lockRequest.unlock();
       }
     }
@@ -225,11 +214,21 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   /**
-   * Get the set of pending resource requests for a node.
-   * @return a {@link List} of {@link ResourceRequest} instances.
+   * Get the number of pending resource requests for a resource provider.
+   * @return a the number of requests as an int.
    */
-  protected /*synchronized*/ List<ResourceRequest> getPendingRequests() {
-    return new ArrayList<ResourceRequest>(pendingRequests);
+  public int getNbPendingRequests()
+  {
+    return pendingRequests.size();
+  }
+
+  /**
+   * Determine whether this context has at least one pending request.
+   * @return <code>true</code> if there is at least obne pending request, <code>false</code> otherwise.
+   */
+  public boolean hasPendingRequest()
+  {
+    return !pendingRequests.isEmpty();
   }
 
   /**
@@ -248,16 +247,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public void setCurrentRequest(final ResourceRequest currentRequest)
   {
     this.currentRequest.set(currentRequest);
-  }
-
-  /**
-   * Get the number of pending resource requests for a resource provider.
-   * @return a the number of requests as an int.
-   */
-  public int getNbPendingRequests()
-  {
-    //return pendingRequests.size() + (getCurrentRequest() == null ? 0 : 1);
-    return pendingRequests.size();
   }
 
   /**
@@ -282,62 +271,37 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Handle the scenario where an exception occurs while sending a request to
    * or receiving a response from a provider, and a node channel is waiting for the response.
    */
-  protected void handleProviderError()
-  {
-    try
-    {
-      ResourceRequest currentRequest;
+  protected void handleProviderError() {
+    try {
       List<ResourceRequest> pendingList;
-      synchronized (this)
-      {
-        currentRequest = getCurrentRequest();
+      synchronized (this) {
+        ResourceRequest currentRequest = getCurrentRequest();
         pendingList = new ArrayList<ResourceRequest>(pendingRequests);
-        if (currentRequest != null)
-        {
+        if (currentRequest != null) {
           pendingList.add(currentRequest);
           setCurrentRequest(null);
         }
         pendingRequests.clear();
       }
 
-      if (!pendingList.isEmpty())
-      {
-        if (debugEnabled) log.debug(build("provider: ", getChannel(), " sending null response(s) for disconnected provider"));
-        ClassNioServer server = driver.getNodeClassServer();
+      if (!pendingList.isEmpty()) {
+        if (debugEnabled) log.debug("provider: {} sending null response(s) for disconnected provider", getChannel());
+        ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
+        ClassNioServer nodeClassServer = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
-        for (ResourceRequest resourceRequest : pendingList)
-        {
-          ChannelWrapper<?> nodeChannel = resourceRequest.getChannel();
-          if (!nodeSet.contains(nodeChannel)) nodeSet.add(nodeChannel);
-          resourceRequest.getResource().setState(State.NODE_RESPONSE_ERROR);
+        for (ResourceRequest mainRequest : pendingList) {
+          Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, mainRequest.getResource().getName());
+          if (coll == null) continue;
+          for (ResourceRequest request: coll) {
+            ChannelWrapper<?> nodeChannel = request.getChannel();
+            if (!nodeSet.contains(nodeChannel)) nodeSet.add(nodeChannel);
+            request.getResource().setState(State.NODE_RESPONSE_ERROR);
+          }
         }
-        for (ChannelWrapper<?> nodeChannel: nodeSet) resetNodeState(nodeChannel, server);
+        for (ChannelWrapper<?> nodeChannel: nodeSet) resetNodeState(nodeChannel, nodeClassServer);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Reset the state of the requesting node channel, after an error
-   * occurred on the provider which attempted to provide a response.
-   * @param request the requesting node channel.
-   * @param server the server handling the node.
-   */
-  private void resetNodeState(final ResourceRequest request, final ClassNioServer server)
-  {
-    try
-    {
-      if (debugEnabled) log.debug(build("resetting channel state for node ", request));
-      request.getResource().setState(State.NODE_RESPONSE_ERROR);
-      server.getTransitionManager().transitionChannel(request.getChannel(), ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
-      server.getTransitionManager().submitTransition(request.getChannel());
-    }
-    catch (Exception e)
-    {
-      log.error(build("error while trying to send response to node ", request, ", this node may be unavailable"), e);
     }
   }
 
@@ -349,15 +313,34 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   private void resetNodeState(final ChannelWrapper<?> channel, final ClassNioServer server)
   {
-    try
-    {
+    try {
       if (debugEnabled) log.debug(build("resetting channel state for node ", channel));
-      server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE);
-      server.getTransitionManager().submitTransition(channel);
+      server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE, true);
+    } catch (Exception e) {
+      log.error("error while trying to send response to node {}, this node may be unavailable : {}", e);
     }
-    catch (Exception e)
-    {
-      log.error(build("error while trying to send response to node ", channel, ", this node may be unavailable"), e);
+  }
+
+  /**
+   * Send the specified response ot the specified node.
+   * @param request the initial request for the node to send the response to.
+   * @param resource the response from the provider.
+   * @throws Exception if any error occurs.
+   */
+  public void sendNodeResponse(final ResourceRequest request, final JPPFResourceWrapper resource) throws Exception {
+    String uuid = request.getResource().getUuidPath().getFirst();
+    ClientClassNioServer server = (ClientClassNioServer) driver.getClientClassServer();
+    Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, resource.getName());
+    StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
+    for (ResourceRequest req: allRequests) {
+      ChannelWrapper<?> nodeChannel = req.getChannel();
+      ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
+      synchronized(nodeChannel) {
+        while (ClassState.IDLE_NODE != nodeContext.getState()) nodeChannel.wait(0L, 10000);
+        ResourceRequest pendingResponse = nodeContext.getPendingResponse(resource);
+        pendingResponse.setResource(resource);
+        tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, true);
+      }
     }
   }
 

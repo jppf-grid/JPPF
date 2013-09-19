@@ -374,7 +374,7 @@ public class JPPFResourceWrapper implements Serializable
   @Override
   public int hashCode()
   {
-    Long id = getCallableID();
-    return 31 + (dynamic ? 1 : 0) + uuidPath.hashCode() + (id != null ? id.intValue() : 0) + getName().hashCode();
+    long id = getCallableID();
+    return 31 + (dynamic ? 1 : 0) + uuidPath.hashCode() + (int) id + getName().hashCode();
   }
 }

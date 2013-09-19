@@ -19,11 +19,13 @@
 package org.jppf.server.nio.classloader.client;
 
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -49,7 +51,15 @@ public class ClientClassNioServer extends ClassNioServer
    * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
    * which application classpath to look for the requested resources.
    */
-  protected final Map<String, List<ChannelWrapper<?>>> providerConnections = new Hashtable<String, List<ChannelWrapper<?>>>();
+  protected final CollectionMap<String, ChannelWrapper<?>> providerConnections = new VectorHashtable<String, ChannelWrapper<?>>();
+  /**
+   * Maintainsa a mapping of requested classes to the nodes that requested them.
+   */
+  private final CollectionMap<CacheClassKey, ResourceRequest> requestMap = new ArrayListHashMap<CacheClassKey, ResourceRequest>();
+  /**
+   * Usd to synchronize access to the requests map.
+   */
+  private final Lock lockRequests = new ReentrantLock();
 
   /**
    * Initialize this class server.
@@ -123,16 +133,7 @@ public class ClientClassNioServer extends ClassNioServer
   public void addProviderConnection(final String uuid, final ChannelWrapper<?> channel)
   {
     if (debugEnabled) log.debug("adding provider connection: uuid=" + uuid + ", channel=" + channel);
-    synchronized(providerConnections)
-    {
-      List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-      if (list == null)
-      {
-        list = new ArrayList<ChannelWrapper<?>>();
-        providerConnections.put(uuid, list);
-      }
-      list.add(channel);
-    }
+    providerConnections.putValue(uuid, channel);
     if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
   }
 
@@ -145,12 +146,7 @@ public class ClientClassNioServer extends ClassNioServer
   {
     if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
     if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().removeChannel(channel, getName());
-    synchronized(providerConnections)
-    {
-      List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-      if (list == null) return;
-      list.remove(channel);
-    }
+    providerConnections.removeValue(uuid, channel);
   }
 
   /**
@@ -160,35 +156,64 @@ public class ClientClassNioServer extends ClassNioServer
    */
   public List<ChannelWrapper<?>> getProviderConnections(final String uuid)
   {
-    synchronized(providerConnections)
-    {
-      List<ChannelWrapper<?>> list = providerConnections.get(uuid);
-      if (list == null) return null;
-      return Collections.unmodifiableList(list);
-    }
+    List<ChannelWrapper<?>> list = (List<ChannelWrapper<?>>) providerConnections.getValues(uuid);
+    if (list == null) return null;
+    return Collections.unmodifiableList(list);
   }
 
-  /**
-   * Close and remove all connections accepted by this server.
-   * @see org.jppf.server.nio.NioServer#removeAllConnections()
-   */
   @Override
-  public synchronized void removeAllConnections()
+  public void removeAllConnections()
   {
     if (!isStopped()) return;
-    synchronized(providerConnections)
-    {
-      providerConnections.clear();
-    }
+    providerConnections.clear();
     super.removeAllConnections();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isIdle(final ChannelWrapper<?> channel)
   {
     return ClassState.IDLE_PROVIDER == channel.getContext().getState();
+  }
+
+  /**
+   * Add the specified request for the specified client.
+   * @param uuid the uuid of the client to send the request to.
+   * @param request the request to send.
+   * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
+   */
+  public boolean addResourceRequest(final String uuid, final ResourceRequest request)
+  {
+    CacheClassKey key = new CacheClassKey(uuid, request.getResource().getName());
+    lockRequests.lock();
+    try
+    {
+      boolean result = requestMap.containsKey(key);
+      requestMap.putValue(key, request);
+      return result;
+    }
+    finally
+    {
+      lockRequests.unlock();
+    }
+  }
+
+  /**
+   * Remove all requests for the specified client and resource name.
+   * @param uuid the uuid of the client to send the request to.
+   * @param name the name of the resource.
+   * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
+   */
+  public Collection<ResourceRequest> removeResourceRequest(final String uuid, final String name)
+  {
+    CacheClassKey key = new CacheClassKey(uuid, name);
+    lockRequests.lock();
+    try
+    {
+      return requestMap.removeKey(key);
+    }
+    finally
+    {
+      lockRequests.unlock();
+    }
   }
 }

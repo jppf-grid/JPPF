@@ -17,21 +17,14 @@
  */
 package org.jppf.server.nio.classloader;
 
+import org.jppf.utils.Pair;
+
 /**
  * This class represents the key used in the class cache.
  * @author Domingos Creado
  */
-public class CacheClassKey
+public class CacheClassKey extends Pair<String, String>
 {
-  /**
-   * The provider uuid.
-   */
-  private String uuid;
-  /**
-   * String describing the cached resource.
-   */
-  private String res;
-
   /**
    * Initialize this key with a specified provider uuid and resource string.
    * @param uuid the provider uuid.
@@ -39,47 +32,14 @@ public class CacheClassKey
    */
   public CacheClassKey(final String uuid, final String res)
   {
+    super(uuid, res);
     if (uuid == null) throw new IllegalArgumentException("uuid is null");
     if (res == null) throw new IllegalArgumentException("res is null");
-
-    this.uuid = uuid;
-    this.res = res;
   }
 
-  /**
-   * Determine whether this key is equal to another one.
-   * @param obj the other key to compare with.
-   * @return true if the 2 keys a re equal, false otherwise.
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj)
-  {
-    if (obj instanceof CacheClassKey)
-    {
-      CacheClassKey other = (CacheClassKey) obj;
-      return this.uuid.equals(other.uuid) && this.res.equals(other.res);
-    }
-    return false;
-  }
-
-  /**
-   * Calculate the hash code of this key.
-   * @return the hash code as an int value.
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode()
-  {
-    return uuid.hashCode() + 13*res.hashCode();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {
-    return "CacheClassKey[uuid=" + uuid + ", res=" + res + ']';
+    return getClass().getSimpleName() + "[uuid=" + first + ", res=" + second + ']';
   }
 }

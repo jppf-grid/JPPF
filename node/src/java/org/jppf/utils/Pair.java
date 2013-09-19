@@ -119,6 +119,6 @@ public class Pair<U, V> implements Serializable
   @Override
   public String toString()
   {
-    return StringUtils.build("Pair[first=", first, ", second=", second, "]");
+    return StringUtils.build(getClass().getSimpleName(), "[first=", first, ", second=", second, "]");
   }
 }

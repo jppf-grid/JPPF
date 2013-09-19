@@ -19,7 +19,7 @@
 package org.jppf.test.scenario.resubmit;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
@@ -41,29 +41,41 @@ public class ResubmitRunner extends AbstractScenarioRunner
    */
   static Logger log = LoggerFactory.getLogger(ResubmitRunner.class);
   /**
-   * The count of itearations runs.
-   */
-  private int iterationsCount = 0;
-  /**
    * 
    */
-  private final AtomicBoolean dispatched = new AtomicBoolean(false);
+  private static final AtomicInteger RESTART_COUNT = new AtomicInteger(0);
 
   @Override
   public void run()
   {
     try
     {
+      TypedProperties config = getConfiguration().getProperties();
+      final int nbTasks = config.getInt("nbTasks");
+      long taskDuration = config.getLong("taskDuration");
+      long delay = config.getLong("taskDuration");
       long start = System.nanoTime();
-      JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
-      job.addJobListener(new MyJobListener());
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, nbTasks, LifeCycleTask.class, taskDuration);
+      JPPFResultCollector collector = new JPPFResultCollector(job) {
+        @Override
+        public synchronized void resultsReceived(final TaskResultEvent event) {
+          super.resultsReceived(event);
+          if (event.getThrowable() == null) {
+            List<JPPFTask> list = event.getTaskList();
+            output("received " + list.size() + " tasks, pending=" + (nbTasks - jobResults.size()) + ", results=" + jobResults.size());
+          }
+        }
+      };
+      job.setResultListener(collector);
       getSetup().getClient().submit(job);
-      while (!dispatched.get()) Thread.sleep(1000L);
-      getSetup().getDriverManagementProxy().restartShutdown(1L, 1L);
-      List<JPPFTask> results = collector.waitForResults();
+      List<JPPFTask> results;
+      while ((results = collector.waitForResults(5000L)) == null)
+      {
+        getSetup().getDriverManagementProxy().restartShutdown(1L, 1000L);
+        RESTART_COUNT.incrementAndGet();
+      }
       long elapsed = System.nanoTime() - start;
-      output("total time: " + StringUtils.toStringDuration(elapsed/1000000L));
+      output(job.getName() + " done, driver restarts: " + RESTART_COUNT + ", in " + StringUtils.toStringDuration(elapsed/1000000L));
     }
     catch (Exception e)
     {
@@ -79,17 +91,5 @@ public class ResubmitRunner extends AbstractScenarioRunner
   {
     System.out.println(message);
     log.info(message);
-  }
-
-  /**
-   * Set the "dispatched" flag when at least one dispatch has occurred.
-   */
-  public class MyJobListener extends JobListenerAdapter
-  {
-    @Override
-    public void jobDispatched(final JobEvent event)
-    {
-      dispatched.set(true);
-    }
   }
 }

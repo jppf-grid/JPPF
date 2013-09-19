@@ -19,7 +19,7 @@
 package org.jppf.server.nio.classloader;
 
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.NioState;
 import org.slf4j.*;
 
 /**

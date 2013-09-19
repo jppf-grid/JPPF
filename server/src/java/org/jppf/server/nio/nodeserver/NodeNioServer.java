@@ -354,7 +354,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     }
     catch (Exception e)
     {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
     }
     try
     {
@@ -367,7 +368,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     }
     catch (Exception e)
     {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
     }
   }
 

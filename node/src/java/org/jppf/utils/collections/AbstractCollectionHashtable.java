@@ -19,20 +19,19 @@
 package org.jppf.utils.collections;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 /**
- * A {@link ConcurrentHashMap} whose values are {@link CopyOnWriteArryList} instances.
+ * A {@link Hashtable} whose values are {@link Collection} instances (specialized in concrete subclasses).
  * @param <K> the type of the keys.
- * @param <V> the type of the objects in the map"'s collection values.
+ * @param <V> the type of the objects in the map's collection values.
  * @author Laurent Cohen
  */
-public class ConcurrentMapCopyOnWriteList<K, V> extends AbstractCollectionMap<K, V>
+public abstract class AbstractCollectionHashtable<K, V> extends AbstractCollectionMap<K, V>
 {
   /**
    * Default constructor.
    */
-  public ConcurrentMapCopyOnWriteList()
+  public AbstractCollectionHashtable()
   {
     this.map = createMap();
   }
@@ -40,12 +39,20 @@ public class ConcurrentMapCopyOnWriteList<K, V> extends AbstractCollectionMap<K,
   @Override
   protected Map<K, Collection<V>> createMap()
   {
-    return new ConcurrentHashMap<K, Collection<V>>();
+    return new Hashtable<K, Collection<V>>();
   }
 
   @Override
-  protected Collection<V> newCollection()
+  public void putValue(final K key, final V value)
   {
-    return new CopyOnWriteArrayList<V>();
+    Collection<V> coll = createOrGetCollectionSynchronized(key);
+    coll.add(value);
+  }
+
+  @Override
+  public void addValues(final K key, final V... values)
+  {
+    Collection<V> coll = createOrGetCollectionSynchronized(key);
+    for (V value: values) coll.add(value);
   }
 }

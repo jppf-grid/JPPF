@@ -28,7 +28,7 @@ import java.util.concurrent.locks.Lock;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, CollectionMap<K, V>
+public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
 {
   /**
    * The underlying map to which operations are delegated.
@@ -45,12 +45,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
   @Override
   public void putValue(final K key, final V value)
   {
-    Collection<V> coll = map.get(key);
-    if (coll == null)
-    {
-      coll = newCollection();
-      map.put(key, coll);
-    }
+    Collection<V> coll = createOrGetCollection(key);
     coll.add(value);
   }
 
@@ -70,12 +65,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
   @Override
   public void addValues(final K key, final V...values)
   {
-    Collection<V> coll = map.get(key);
-    if (coll == null)
-    {
-      coll = newCollection();
-      map.put(key, coll);
-    }
+    Collection<V> coll = createOrGetCollection(key);
     for (V value: values) coll.add(value);
   }
 
@@ -266,7 +256,7 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
             if (listIterator.hasNext()) return listIterator.next();
           }
         }
-        throw new NoSuchElementException("no more element in this BundleIterator");
+        throw new NoSuchElementException("no more element for this iterator");
       }
       finally
       {
@@ -312,5 +302,45 @@ public abstract class AbstractCollectionMap<K, V> implements Iterable<V>, Collec
   public Set<Entry<K, Collection<V>>> entrySet()
   {
     return map == null ? null : map.entrySet();
+  }
+
+  /**
+   * Get an exisitng collection for the specified key, or create it if it doesn't exist.
+   * @param key the key for which to get a collection of values.
+   * @return a collection of value for the specified keys, may be empty if newly created.
+   */
+  protected Collection<V> createOrGetCollectionSynchronized(final K key)
+  {
+    Collection<V> coll;
+    synchronized(map)
+    {
+      coll = map.get(key);
+      if (coll == null)
+      {
+        coll = newCollection();
+        map.put(key, coll);
+      }
+    }
+    return coll;
+  }
+
+  /**
+   * Get an exisitng collection for the specified key, or create it if it doesn't exist.
+   * @param key the key for which to get a collection of values.
+   * @return a collection of value for the specified keys, may be empty if newly created.
+   */
+  protected Collection<V> createOrGetCollection(final K key)
+  {
+    Collection<V> coll;
+    synchronized(map)
+    {
+      coll = map.get(key);
+      if (coll == null)
+      {
+        coll = newCollection();
+        map.put(key, coll);
+      }
+    }
+    return coll;
   }
 }

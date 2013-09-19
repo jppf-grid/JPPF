@@ -23,6 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
 
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
@@ -59,28 +60,32 @@ class SendingProviderRequestState extends ClassServerState
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !channel.isLocal())
-    {
-      throw new ConnectException(build("provider ", channel, " has been disconnected"));
-    }
+    if (channel.isReadable() && !channel.isLocal()) throw new ConnectException(build("provider ", channel, " has been disconnected"));
     ResourceRequest request = context.getCurrentRequest();
-    if (request == null)
-    {
+    if (request == null) {
       request = context.pollPendingRequest();
-      if (request != null)
-      {
+      if (request != null) {
         context.setMessage(null);
-        context.setResource(request.getResource());
+        JPPFResourceWrapper resource = request.getResource();
+        if ((resource.getCallable() == null) && (resource.getData("multiple") == null) && !(resource.getData("multiple.resources.names") == null)) {
+          byte[] content = server.getClassCache().getCacheContent(resource.getUuidPath().getFirst(), resource.getName());
+          if (content != null) {
+            resource.setDefinition(content);
+            resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+            context.sendNodeResponse(request, resource);
+            context.setResource(null);
+            return context.hasPendingRequest() ? TO_SENDING_PROVIDER_REQUEST : TO_IDLE_PROVIDER;
+          }
+        }
+        context.setResource(resource);
         if (debugEnabled) log.debug(build("provider ", channel, " serving new request [", context.getResource().getName(), "] from node: ", request.getChannel()));
         context.serializeResource();
         context.setCurrentRequest(request);
       }
     }
-    if (context.writeMessage(channel))
-    {
+    if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug(build("request sent to provider ", channel, " from node ", request, ", resource: ", context.getResource().getName()));
       //context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
       context.setMessage(null);

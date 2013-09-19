@@ -76,6 +76,7 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
   @Override
   public void jobStarting(final NodeLifeCycleEvent event)
   {
+    if (debugEnabled) log.debug("starting job {}", event.getJob());
     synchronized(nodeAdmin)
     {
       nodeAdmin.getNodeState().setExecutionStatus(JPPFNodeState.ExecutionState.EXECUTING);
@@ -85,6 +86,7 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
   @Override
   public void jobEnding(final NodeLifeCycleEvent event)
   {
+    if (debugEnabled) log.debug("ending job {}", event.getJob());
     synchronized(nodeAdmin)
     {
       nodeAdmin.getNodeState().setExecutionStatus(JPPFNodeState.ExecutionState.IDLE);

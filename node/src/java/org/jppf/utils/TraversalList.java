@@ -41,6 +41,7 @@ public class TraversalList<E> implements Serializable
   private int position = -1;
   /**
    * String representation of this list.
+   * @deprecated this is not used any more. we keep it for serialized format compatibility only.
    */
   private String toStr = null;
 
@@ -50,7 +51,6 @@ public class TraversalList<E> implements Serializable
   public TraversalList()
   {
     list = new LinkedList<E>();
-    toStr = list.toString();
   }
 
   /**
@@ -60,7 +60,6 @@ public class TraversalList<E> implements Serializable
   public TraversalList(final List<E> list)
   {
     this.list = list;
-    toStr = list.toString();
   }
 
   /**
@@ -70,7 +69,6 @@ public class TraversalList<E> implements Serializable
   public void add(final E element)
   {
     list.add(element);
-    toStr = list.toString();
   }
 
   /**
@@ -96,10 +94,7 @@ public class TraversalList<E> implements Serializable
    */
   public void incPosition()
   {
-    if (position >= list.size() - 1)
-    {
-      throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" larger than " + list.size());
-    }
+    if (position >= list.size() - 1) throw new ArrayIndexOutOfBoundsException("position " + (position + 1) + " larger than " + list.size());
     position++;
   }
 
@@ -108,10 +103,7 @@ public class TraversalList<E> implements Serializable
    */
   public void decPosition()
   {
-    if (position <= 0)
-    {
-      throw new ArrayIndexOutOfBoundsException("position "+(position+1)+" less than 0");
-    }
+    if (position <= 0) throw new ArrayIndexOutOfBoundsException("position " + (position + 1) + " less than 0");
     position--;
   }
 
@@ -122,7 +114,6 @@ public class TraversalList<E> implements Serializable
   public List<E> getList()
   {
     return list;
-    //return Collections.unmodifiableList(list);
   }
 
   /**
@@ -177,16 +168,12 @@ public class TraversalList<E> implements Serializable
   @Override
   public String toString()
   {
-    return toStr;
-  }
-
-  /**
-   * Get a string rpresentation of this list.
-   * @return a string equivalent to <code>toString()</code>.
-   */
-  public String asString()
-  {
-    return toStr;
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("position=").append(position);
+    sb.append(", list=").append(list);
+    sb.append(']');
+    return sb.toString();
   }
 
   @Override
@@ -194,7 +181,6 @@ public class TraversalList<E> implements Serializable
   {
     if (!(obj instanceof TraversalList)) return false;
     return list.equals(((TraversalList) obj).list);
-    //return super.equals(obj);
   }
 
   @Override
