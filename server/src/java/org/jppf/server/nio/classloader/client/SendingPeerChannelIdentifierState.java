@@ -20,12 +20,16 @@ package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import java.net.ConnectException;
+import java.net.*;
+import java.nio.channels.*;
+
+import javax.net.ssl.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.ssl.SSLHelper;
 import org.slf4j.*;
 
 /**
@@ -71,7 +75,8 @@ public class SendingPeerChannelIdentifierState extends ClassServerState
     }
     if (context.writeIdentifier(channel))
     {
-      if (debugEnabled) log.debug("sent peer initiation to server " + channel);
+      if (debugEnabled) log.debug("sent peer channel identitifer to server {}", channel);
+      if (context.isSsl()) configureSSL(channel);
       JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
       String uuid = JPPFDriver.getInstance().getUuid();
@@ -83,5 +88,24 @@ public class SendingPeerChannelIdentifierState extends ClassServerState
       return TO_SENDING_PEER_INITIATION_REQUEST;
     }
     return TO_SENDING_PEER_CHANNEL_IDENTIFIER;
+  }
+
+  /**
+   * Configure the SSL options for the specified channel.
+   * @param  channel the channel for which to configure SSL.
+   * @throws Exception if any error occurs.
+   */
+  private void configureSSL(final ChannelWrapper<?> channel) throws Exception
+  {
+    SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
+    ClassContext context = (ClassContext) channel.getContext();
+    SSLContext sslContext = server.getSSLContext();
+    Socket socket = socketChannel.socket();
+    SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
+    SSLParameters params = SSLHelper.getSSLParameters();
+    engine.setUseClientMode(true);
+    engine.setSSLParameters(params);
+    SSLHandler sslHandler = new SSLHandler(channel, engine);
+    context.setSSLHandler(sslHandler);
   }
 }
