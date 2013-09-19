@@ -22,7 +22,7 @@ import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.*;
 
 /**
- * 
+ * Instances of this class represent a class loading request from a node to a client channel.
  */
 public class ResourceRequest
 {
@@ -36,7 +36,7 @@ public class ResourceRequest
   private JPPFResourceWrapper resource;
 
   /**
-   * 
+   * Initialize this request with the specified node channel and resource.
    * @param channel the node class loader channel.
    * @param resource the resource to lookup in the client.
    */

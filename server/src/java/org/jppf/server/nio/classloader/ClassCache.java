@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader;
 
 import java.util.Map;
 
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
@@ -47,6 +47,14 @@ public class ClassCache
    * a soft map to minimize the OutOfMemory.
    */
   private final Map<CacheClassKey, CacheClassContent> classCache = new SoftReferenceValuesMap<>();
+  /**
+   * Total number of cache lookups.
+   */
+  private long nbLookups = 0L;
+  /**
+   * Total number of positive cache lookups.
+   */
+  private long nbHits = 0L;
 
   /**
    * Add a resource content to the class cache.
@@ -75,12 +83,15 @@ public class ClassCache
   public byte[] getCacheContent(final String uuid, final String name)
   {
     if (!enabled) return null;
-    if (traceEnabled) log.trace("looking up key=[" + uuid + ", " + name + ']');
     CacheClassContent content;
+    boolean contentNull;
     synchronized(classCache)
     {
-      content = classCache.get(new CacheClassKey(uuid, name));
+      contentNull = (content = classCache.get(new CacheClassKey(uuid, name))) == null;
+      nbLookups++;
+      if (!contentNull) nbHits++;
+      if (traceEnabled) log.trace(StringUtils.build("nbLookups=", nbLookups, ", nbHits=", nbHits, ", lookup for key=[", uuid, ", ", name, "] : ", ReflectionUtils.simpleDump(content)));
     }
-    return content != null ? content.getContent() : null;
+    return contentNull ? null : content.getContent();
   }
 }

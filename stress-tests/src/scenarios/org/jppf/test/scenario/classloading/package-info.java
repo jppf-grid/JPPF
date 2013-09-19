@@ -15,34 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.nio.classloader;
 
 /**
- * This class encapsulates the content oif a class cache entry.
- * @author Domingos Creado
+ * Unit tests setup classes.
+ * @exclude
  */
-class CacheClassContent
-{
-  /**
-   * The actual content of this element.
-   */
-  private final byte[] content;
-
-  /**
-   * Initialize this content with the specified data.
-   * @param content the data as an array of bytes.
-   */
-  public CacheClassContent(final byte[] content)
-  {
-    this.content = content;
-  }
-
-  /**
-   * Get the actual content of this element.
-   * @return the data as an array of bytes.
-   */
-  public byte[] getContent()
-  {
-    return content;
-  }
-}
+package org.jppf.test.scenario.classloading;

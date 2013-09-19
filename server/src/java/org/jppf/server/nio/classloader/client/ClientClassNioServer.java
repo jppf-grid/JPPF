@@ -19,6 +19,7 @@
 package org.jppf.server.nio.classloader.client;
 
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
@@ -50,7 +51,15 @@ public class ClientClassNioServer extends ClassNioServer
    * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
    * which application classpath to look for the requested resources.
    */
-  protected final CollectionMap<String, ChannelWrapper<?>> providerConnections = new CopyOnWriteListConcurrentMap<>();
+  protected final CollectionMap<String, ChannelWrapper<?>> providerConnections = new VectorHashtable<>();
+  /**
+   * Maintainsa a mapping of requested classes to the nodes that requested them.
+   */
+  private final CollectionMap<CacheClassKey, ResourceRequest> requestMap = new ArrayListHashMap<>();
+  /**
+   * Usd to synchronize access to the requests map.
+   */
+  private final Lock lockRequests = new ReentrantLock();
 
   /**
    * Initialize this class server.
@@ -173,5 +182,47 @@ public class ClientClassNioServer extends ClassNioServer
   public boolean isIdle(final ChannelWrapper<?> channel)
   {
     return ClassState.IDLE_PROVIDER == channel.getContext().getState();
+  }
+
+  /**
+   * Add the specified request for the specified client.
+   * @param uuid the uuid of the client to send the request to.
+   * @param request the request to send.
+   * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
+   */
+  public boolean addResourceRequest(final String uuid, final ResourceRequest request)
+  {
+    CacheClassKey key = new CacheClassKey(uuid, request.getResource().getName());
+    lockRequests.lock();
+    try
+    {
+      boolean result = requestMap.containsKey(key);
+      requestMap.putValue(key, request);
+      return result;
+    }
+    finally
+    {
+      lockRequests.unlock();
+    }
+  }
+
+  /**
+   * Remove all requests for the specified client and resource name.
+   * @param uuid the uuid of the client to send the request to.
+   * @param name the name of the resource.
+   * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
+   */
+  public Collection<ResourceRequest> removeResourceRequest(final String uuid, final String name)
+  {
+    CacheClassKey key = new CacheClassKey(uuid, name);
+    lockRequests.lock();
+    try
+    {
+      return requestMap.removeKey(key);
+    }
+    finally
+    {
+      lockRequests.unlock();
+    }
   }
 }

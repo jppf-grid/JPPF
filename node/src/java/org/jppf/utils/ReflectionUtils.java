@@ -336,4 +336,17 @@ public class ReflectionUtils
     if (elts.length < 2) return "method name not found";
     return elts[1].getMethodName();
   }
+
+  /**
+   * Returns a string in format <i>simple_class_name</i>@<i>identity_hashcode</i> from the specified object.
+   * @param o the object to dump.
+   * @return a string representing the specified object, or "null" if the object is null.
+   */
+  public static String simpleDump(final Object o)
+  {
+    if (o == null) return "null";
+    StringBuilder sb = new StringBuilder(o.getClass().getSimpleName());
+    sb.append('@').append(Integer.toHexString(System.identityHashCode(o)));
+    return sb.toString();
+  }
 }

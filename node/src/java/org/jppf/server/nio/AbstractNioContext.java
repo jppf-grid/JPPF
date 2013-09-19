@@ -40,7 +40,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    */
   protected S state = null;
   /**
-   * Uuid for this node context.
+   * Uuid of the remote client or node.
    */
   protected String uuid = null;
   /**
