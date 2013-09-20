@@ -25,7 +25,7 @@ import org.jppf.server.protocol.*;
  * This task lists the files in a specified directory of the node's host.
  * @author Laurent Cohen
  */
-public class ListDirectoryTask extends CommandLineTaskEx
+public class ListDirectoryTask extends CommandLineTask
 {
   /**
    * Directory in which to list the files.
@@ -43,6 +43,7 @@ public class ListDirectoryTask extends CommandLineTaskEx
   public ListDirectoryTask(final String dir)
   {
     this.dir = dir;
+    setStartDir("c:\\temp\\JPPF");
   }
 
   /**
@@ -68,7 +69,8 @@ public class ListDirectoryTask extends CommandLineTaskEx
         }
       }
       if (found) setCommandList("ls", "-a", dir, ">", "dirlist.txt");
-      else if (os.contains("windows")) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
+      //else if (os.contains("windows")) setCommandList("cmd", "/C", "dir", dir, ">", "dirlist.txt");
+      else if (os.contains("windows")) setCommandList("cmd", "/C", "dir " + dir + " > dirlist.txt");
       else
       {
         setResult("OS '" + os + "' not recognized");
@@ -80,7 +82,7 @@ public class ListDirectoryTask extends CommandLineTaskEx
       int code = launchProcess();
       System.out.println("code = " + code + ", getExitCode() = " + getExitCode());
       // copy the resulting file in memory and set it as a result
-      FileLocation fl = new FileLocation("dirlist.txt");
+      FileLocation fl = new FileLocation(getStartDir() + "\\dirlist.txt");
       MemoryLocation ml = new MemoryLocation((int) fl.size());
       fl.copyTo(ml);
       setResult(new String(ml.toByteArray()));

@@ -74,30 +74,16 @@ public class ExtMatrixTask extends JPPFTask
           computeResult[n][col] = sum;
         }
       }
-      /*
-			for (int n=0; n<rowValues.length; n++)
-			{
-				double count = 0d;
-				for (int i=0; i<size; i++)
-				{
-					for (int j=0; j<size; j++)
-					{
-						count += 1d;
-					}
-					computeResult[n][i] = count;
-				}
-			}
-       */
-      /*
-			long stop = System.currentTimeMillis() + 5L;
-			long count = 0L;
-			while (System.currentTimeMillis() < stop) count++;
-       */
       setResult(computeResult);
     }
     catch(Exception e)
     {
       setException(e);
+    }
+    finally
+    {
+      // no need to serialize and transport the input back to the client
+      rowValues = null;
     }
   }
 

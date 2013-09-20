@@ -52,9 +52,6 @@ public class SimpleTask extends JPPFTask
     this.duration = duration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void run()
   {

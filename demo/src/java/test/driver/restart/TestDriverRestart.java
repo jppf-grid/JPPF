@@ -62,7 +62,7 @@ public class TestDriverRestart
       int iterations = 1;
       for (int i=1; i<=iterations; i++)
       {
-        JPPFJob job = createJPPFJob("test_job_" + i, 1000, 100L, false);
+        JPPFJob job = createJPPFJob("test_job_" + i, 1000, 1000L, false);
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
         client.submit(job);
         List<JPPFTask> results;
@@ -99,7 +99,7 @@ public class TestDriverRestart
     JPPFJob job = new JPPFJob();
     job.setName(name);
     job.setBlocking(blocking);
-    for (int i=0; i<nbTasks; i++) job.addTask(new LongTask(1000L, true)).setId("task_" + (i+1));
+    for (int i=0; i<nbTasks; i++) job.addTask(new LongTask(duration, false)).setId("task_" + (i+1));
     job.setResultListener(new JPPFResultCollector(job) {
       @Override
       public synchronized void resultsReceived(final TaskResultEvent event) {
@@ -140,7 +140,7 @@ public class TestDriverRestart
       try
       {
         JPPFDriverAdminMBean jmx = getDriverJmx();
-        jmx.restartShutdown(10L, 10L);
+        jmx.restartShutdown(10L, 1000L);
       }
       catch (Exception e)
       {

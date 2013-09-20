@@ -20,7 +20,7 @@ package test.org.jppf.client;
 
 import static org.junit.Assert.*;
 
-import java.io.NotSerializableException;
+import java.io.*;
 import java.lang.management.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -45,16 +45,12 @@ public class TestJPPFClient extends Setup1D1N
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testDefaultConstructor() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testDefaultConstructor() throws Exception {
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-    }
-    finally
-    {
+    } finally {
       client.close();
     }
   }
@@ -63,16 +59,12 @@ public class TestJPPFClient extends Setup1D1N
    * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testConstructorWithUuid() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testConstructorWithUuid() throws Exception {
     JPPFClient client = new JPPFClient("some_uuid");
-    try
-    {
+    try {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-    }
-    finally
-    {
+    } finally {
       client.close();
     }
   }
@@ -81,12 +73,10 @@ public class TestJPPFClient extends Setup1D1N
    * Test the submission of a job.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSubmit() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testSubmit() throws Exception {
     JPPFClient client = BaseSetup.createClient(null);
-    try
-    {
+    try {
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
@@ -95,16 +85,13 @@ public class TestJPPFClient extends Setup1D1N
       assertNotNull(results);
       assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
       String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
-      for (i=0; i<nbTasks; i++)
-      {
+      for (i=0; i<nbTasks; i++) {
         JPPFTask t = results.get(i);
         Exception e = t.getException();
         assertNull("task " + i +" has an exception " + e, e);
         assertEquals("result of task " + i + " should be " + msg + " but is " + t.getResult(), msg, t.getResult());
       }
-    }
-    finally
-    {
+    } finally {
       client.close();
     }
   }
@@ -113,12 +100,10 @@ public class TestJPPFClient extends Setup1D1N
    * Test the cancellation of a job.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testCancelJob() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testCancelJob() throws Exception {
     JPPFClient client = BaseSetup.createClient(null);
-    try
-    {
+    try {
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
@@ -131,14 +116,11 @@ public class TestJPPFClient extends Setup1D1N
       assertNotNull(results);
       assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
       int count = 0;
-      for (JPPFTask t: results)
-      {
+      for (JPPFTask t: results) {
         if (t.getResult() == null) count++;
       }
       assertTrue(count > 0);
-    }
-    finally
-    {
+    } finally {
       client.close();
     }
   }
@@ -148,16 +130,14 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539111&group_id=135654&atid=733518">3539111 - Local execution does not use configured number of threads</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testLocalExecutionNbThreads() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testLocalExecutionNbThreads() throws Exception {
     int nbThreads = 2;
     TypedProperties config = JPPFConfiguration.getProperties();
     config.setProperty("jppf.local.execution.enabled", "true");
     config.setProperty("jppf.local.execution.threads", "" + nbThreads);
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
 
       // submit a job to ensure all local execution threads are created
@@ -169,8 +149,7 @@ public class TestJPPFClient extends Setup1D1N
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
-      for (JPPFTask t: results)
-      {
+      for (JPPFTask t: results) {
         Exception e = t.getException();
         assertNull(e);
         assertEquals(msg, t.getResult());
@@ -180,17 +159,14 @@ public class TestJPPFClient extends Setup1D1N
       long[] ids = mxbean.getAllThreadIds();
       ThreadInfo[] allInfo = mxbean.getThreadInfo(ids);
       int count = 0;
-      for (ThreadInfo ti: allInfo)
-      {
+      for (ThreadInfo ti: allInfo) {
         if (ti == null) continue;
         String name = ti.getThreadName();
         if (name == null) continue;
         if (name.startsWith("node processing")) count++;
       }
       assertEquals(nbThreads, count);
-    }
-    finally
-    {
+    } finally {
       client.close();
       JPPFConfiguration.reset();
     }
@@ -201,15 +177,13 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-174">JPPF-174 Thread context class loader is null for client-local execution</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testLocalExecutionContextClassLoader() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testLocalExecutionContextClassLoader() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
     config.setProperty("jppf.rmeote.execution.enabled", "false");
     config.setProperty("jppf.local.execution.enabled", "true");
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, ThreadContextClassLoaderTask.class);
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
@@ -217,9 +191,7 @@ public class TestJPPFClient extends Setup1D1N
       JPPFTask task = results.get(0);
       assertEquals(null, task.getException());
       assertNotNull(task.getResult());
-    }
-    finally
-    {
+    } finally {
       client.close();
       JPPFConfiguration.reset();
     }
@@ -231,15 +203,13 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testRemoteExecutionContextClassLoader() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testRemoteExecutionContextClassLoader() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
     config.setProperty("jppf.rmeote.execution.enabled", "true");
     config.setProperty("jppf.local.execution.enabled", "false");
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, 1, ThreadContextClassLoaderTask.class);
@@ -249,9 +219,7 @@ public class TestJPPFClient extends Setup1D1N
       JPPFTask task = results.get(0);
       assertEquals(null, task.getException());
       assertNotNull(task.getResult());
-    }
-    finally
-    {
+    } finally {
       client.close();
       JPPFConfiguration.reset();
     }
@@ -261,12 +229,10 @@ public class TestJPPFClient extends Setup1D1N
    * Test that a {@link java.io.NotSerializableException} occurring when submitting a job to a driver is properly handled.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testNotSerializableExceptionFromClient() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testNotSerializableExceptionFromClient() throws Exception {
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, true);
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
@@ -274,9 +240,7 @@ public class TestJPPFClient extends Setup1D1N
       JPPFTask task = results.get(0);
       assertNotNull(task.getException());
       assertTrue(task.getException() instanceof NotSerializableException);
-    }
-    finally
-    {
+    } finally {
       client.close();
     }
   }
@@ -285,12 +249,10 @@ public class TestJPPFClient extends Setup1D1N
    * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testNotSerializableExceptionFromNode() throws Exception
-  {
+  //@Test(timeout=10000)
+  public void testNotSerializableExceptionFromNode() throws Exception {
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, false);
       List<JPPFTask> results = client.submit(job);
       assertNotNull(results);
@@ -299,9 +261,32 @@ public class TestJPPFClient extends Setup1D1N
       assertTrue(task instanceof JPPFExceptionResult);
       assertNotNull(task.getException());
       assertTrue(task.getException() instanceof NotSerializableException);
+    } finally {
+      client.close();
     }
-    finally
-    {
+  }
+
+  /**
+   * Test the behavior when a task cannot be deserialized by the node.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testDeserializationErrorInNode() throws Exception {
+    JPPFClient client = new JPPFClient();
+    try {
+      NotDeserializableTask.throwSerializationError = false;
+      JPPFJob job = new JPPFJob();
+      job.setName(ReflectionUtils.getCurrentMethodName());
+      job.addTask(new SimpleTask());
+      job.addTask(new NotDeserializableTask());
+      List<JPPFTask> results = client.submit(job);
+      assertNotNull(results);
+      assertEquals(job.getTasks().size(), results.size());
+      for (JPPFTask task: results) {
+      assertNull(task.getResult());
+      assertNull(task.getException());
+      }
+    } finally {
       client.close();
     }
   }
@@ -311,9 +296,8 @@ public class TestJPPFClient extends Setup1D1N
    * This relates to the bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-131">JPPF-131 JPPF client does not release JMX thread upon connection failure</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout=15000)
-  public void testNoJMXConnectionThreadsLeak() throws Exception
-  {
+  //@Test(timeout=15000)
+  public void testNoJMXConnectionThreadsLeak() throws Exception {
     String name = Thread.currentThread().getName();
     MyClient client = null;
     TypedProperties config = JPPFConfiguration.getProperties();
@@ -411,8 +395,7 @@ public class TestJPPFClient extends Setup1D1N
    * @param pattern the pattern to match against.
    * @return an array of thread names.
    */
-  private String[] threadNames(final String pattern)
-  {
+  private String[] threadNames(final String pattern) {
     Pattern p = pattern == null ? null : Pattern.compile(pattern);
     ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
     long[] ids = threadsBean.getAllThreadIds();
@@ -429,8 +412,7 @@ public class TestJPPFClient extends Setup1D1N
   /**
    * A task which holds a non-serializable object.
    */
-  public static class NotSerializableTask extends JPPFTask
-  {
+  public static class NotSerializableTask extends JPPFTask {
     /**
      * A non-serializable object.
      */
@@ -445,40 +427,73 @@ public class TestJPPFClient extends Setup1D1N
      * @param instantiateInClient <code>true</code> if the non-serializable object should be created in the constructor (client side),
      * <code>false</code> if it should be created in the <code>run()</code> method (node side).
      */
-    public NotSerializableTask(final boolean instantiateInClient)
-    {
+    public NotSerializableTask(final boolean instantiateInClient) {
       this.instantiateInClient = instantiateInClient;
       if (instantiateInClient) nso = new NotSerializableObject();
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
       if (!instantiateInClient) nso = new NotSerializableObject();
+    }
+  }
+
+  /**
+   * A task which holds a non-serializable object.
+   */
+  public static class NotDeserializableTask extends JPPFTask {
+    /**
+     * A non-serializable object.
+     */
+    public static boolean throwSerializationError = true;
+
+    /**
+     * Initialize with the specified flag.
+     */
+    public NotDeserializableTask() {
+    }
+
+    @Override
+    public void run() {
+      setResult("executed");
+    }
+
+    /**
+     * 
+     * @param out .
+     * @throws IOException .
+     */
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+    }
+
+    /**
+     * 
+     * @param in .
+     * @throws IOException .
+     * @throws ClassNotFoundException .
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+      if (throwSerializationError) throw new ClassNotFoundException("dummy");
     }
   }
 
   /**
    * A task that checks the current thread context class loader during its execution.
    */
-  public static class ThreadContextClassLoaderTask extends JPPFTask
-  {
+  public static class ThreadContextClassLoaderTask extends JPPFTask {
     @Override
-    public void run()
-    {
+    public void run() {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) throw new IllegalStateException("thread context class loader is null for " + (isInNode() ? "remote" : "local")  + " execution");
-      if (isInNode())
-      {
+      if (isInNode()) {
         if (!(cl instanceof AbstractJPPFClassLoader))
           throw new IllegalStateException("thread context class loader for remote execution should be an AbstractJPPFClassLoader, but is " + cl);
         Object o = getTaskObject();
         AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader)  (o == null ? getClass().getClassLoader() : o.getClass().getClassLoader());
-        if (cl != ajcl2)
-        {
+        if (cl != ajcl2) {
           throw new IllegalStateException("thread context class loader and task class loader do not match:\n" +
-            "thread context class loader = " + cl + "\n" +
-            "task class loader = " + ajcl2);
+              "thread context class loader = " + cl + "\n" +
+              "task class loader = " + ajcl2);
         }
         if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
       }
@@ -489,8 +504,7 @@ public class TestJPPFClient extends Setup1D1N
   /**
    * A task which holds a non-serializable object.
    */
-  public static class NotSerializableObject
-  {
+  public static class NotSerializableObject {
     /**
      * Any attribute will do.
      */
@@ -500,8 +514,7 @@ public class TestJPPFClient extends Setup1D1N
   /**
    * 
    */
-  public static class MyClient extends JPPFClient
-  {
+  public static class MyClient extends JPPFClient {
     @Override
     public void initRemotePools(final TypedProperties props) {
       super.initRemotePools(props);

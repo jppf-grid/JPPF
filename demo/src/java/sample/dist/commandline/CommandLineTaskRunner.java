@@ -72,7 +72,7 @@ public class CommandLineTaskRunner
   private static void performCommand() throws Exception
   {
     JPPFJob job = new JPPFJob();
-		job.addTask(new ListDirectoryTask("/usr/local"));
+		//job.addTask(new ListDirectoryTask("/usr/local"));
 		job.addTask(new ListDirectoryTask("C:\\Windows"));
     /*
     job.addTask(new TestTask("1"));
