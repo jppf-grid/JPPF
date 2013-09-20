@@ -1,0 +1,109 @@
+2013-07-20 10:35:13,850 [driver-1] driver process id: 7744
+2013-07-20 10:35:13,905 [  node-1] node process id: 15304
+2013-07-20 10:35:13,926 [  node-1] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:13,967 [  node-2] node process id: 21248
+2013-07-20 10:35:13,978 [  node-5] node process id: 20552
+2013-07-20 10:35:13,989 [  node-4] node process id: 21068
+2013-07-20 10:35:13,992 [  node-2] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,014 [  node-5] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,015 [  node-4] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,018 [  node-6] node process id: 19344
+2013-07-20 10:35:14,030 [  node-3] node process id: 24932
+2013-07-20 10:35:14,054 [  node-3] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,056 [  node-6] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,169 [  node-22] node process id: 3648
+2013-07-20 10:35:14,207 [  node-7] node process id: 6308
+2013-07-20 10:35:14,222 [  node-22] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,228 [  node-7] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,258 [  node-8] node process id: 21996
+2013-07-20 10:35:14,327 [  node-18] node process id: 8204
+2013-07-20 10:35:14,357 [  node-8] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,383 [  node-18] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,385 [  node-9] node process id: 25772
+2013-07-20 10:35:14,406 [  node-9] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,739 [  node-19] node process id: 10388
+2013-07-20 10:35:14,813 [  node-26] node process id: 11340
+2013-07-20 10:35:14,834 [  node-26] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:14,854 [  node-19] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,030 [  node-21] node process id: 27720
+2013-07-20 10:35:15,051 [  node-21] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,052 [  node-23] node process id: 19588
+2013-07-20 10:35:15,055 [  node-31] node process id: 7800
+2013-07-20 10:35:15,065 [  node-16] node process id: 24652
+2013-07-20 10:35:15,065 [  node-13] node process id: 13020
+2013-07-20 10:35:15,068 [  node-28] node process id: 14776
+2013-07-20 10:35:15,074 [  node-12] node process id: 25996
+2013-07-20 10:35:15,074 [  node-23] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,090 [  node-13] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,090 [  node-31] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,092 [  node-16] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,092 [  node-30] node process id: 8716
+2013-07-20 10:35:15,095 [  node-10] node process id: 5056
+2013-07-20 10:35:15,097 [  node-25] node process id: 13488
+2013-07-20 10:35:15,097 [  node-27] node process id: 13552
+2013-07-20 10:35:15,107 [  node-17] node process id: 17284
+2013-07-20 10:35:15,109 [  node-32] node process id: 9696
+2013-07-20 10:35:15,113 [  node-30] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,117 [  node-12] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,118 [  node-27] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,128 [  node-17] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,132 [  node-32] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,138 [  node-28] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,141 [  node-25] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,145 [  node-24] node process id: 17236
+2013-07-20 10:35:15,149 [  node-10] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,167 [  node-24] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,172 [  node-15] node process id: 19892
+2013-07-20 10:35:15,175 [  node-11] node process id: 16964
+2013-07-20 10:35:15,186 [  node-29] node process id: 27532
+2013-07-20 10:35:15,197 [  node-11] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,199 [  node-15] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,208 [  node-29] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,209 [  node-14] node process id: 4748
+2013-07-20 10:35:15,215 [  node-20] node process id: 11000
+2013-07-20 10:35:15,233 [  node-14] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,236 [  node-20] Attempting connection to the class server at localhost:11101
+2013-07-20 10:35:15,571 [driver-1] management initialized and listening on port 11201
+2013-07-20 10:35:15,607 [driver-1] ClientClassServer initialized
+2013-07-20 10:35:15,611 [driver-1] NodeClassServer initialized
+2013-07-20 10:35:15,615 [driver-1] ClientJobServer initialized
+2013-07-20 10:35:15,631 [driver-1] NodeJobServer initialized
+2013-07-20 10:35:15,635 [driver-1] Acceptor initialized
+2013-07-20 10:35:15,635 [driver-1] -  accepting plain connections on port 11101
+2013-07-20 10:35:15,636 [driver-1] JPPF Driver initialization complete
+2013-07-20 10:35:15,739 [  node-27] Reconnected to the class server
+2013-07-20 10:35:15,755 [  node-30] Reconnected to the class server
+2013-07-20 10:35:15,755 [  node-13] Reconnected to the class server
+2013-07-20 10:35:15,756 [  node-15] Reconnected to the class server
+2013-07-20 10:35:15,771 [  node-25] Reconnected to the class server
+2013-07-20 10:35:15,771 [  node-17] Reconnected to the class server
+2013-07-20 10:35:15,777 [  node-32] Reconnected to the class server
+2013-07-20 10:35:15,778 [  node-31] Reconnected to the class server
+2013-07-20 10:35:15,781 [  node-22] Reconnected to the class server
+2013-07-20 10:35:15,781 [  node-23] Reconnected to the class server
+2013-07-20 10:35:15,785 [  node-11] Reconnected to the class server
+2013-07-20 10:35:15,792 [  node-14] Reconnected to the class server
+2013-07-20 10:35:15,793 [  node-29] Reconnected to the class server
+2013-07-20 10:35:15,803 [  node-28] Reconnected to the class server
+2013-07-20 10:35:15,805 [  node-10] Reconnected to the class server
+2013-07-20 10:35:15,812 [  node-12] Reconnected to the class server
+2013-07-20 10:35:15,815 [  node-24] Reconnected to the class server
+2013-07-20 10:35:15,882 [  node-20] Reconnected to the class server
+2013-07-20 10:35:15,983 [  node-7] Reconnected to the class server
+2013-07-20 10:35:16,030 [  node-1] Reconnected to the class server
+2013-07-20 10:35:16,081 [  node-18] Reconnected to the class server
+2013-07-20 10:35:16,081 [  node-19] Reconnected to the class server
+2013-07-20 10:35:16,088 [  node-9] Reconnected to the class server
+2013-07-20 10:35:16,095 [  node-26] Reconnected to the class server
+2013-07-20 10:35:16,171 [  node-4] Reconnected to the class server
+2013-07-20 10:35:16,178 [  node-6] Reconnected to the class server
+2013-07-20 10:35:16,204 [  node-3] Reconnected to the class server
+2013-07-20 10:35:16,207 [  node-5] Reconnected to the class server
+2013-07-20 10:35:16,207 [  node-16] Reconnected to the class server
+2013-07-20 10:35:16,211 [  node-8] Reconnected to the class server
+2013-07-20 10:35:16,223 [  node-2] Reconnected to the class server
+2013-07-20 10:35:16,247 [  node-21] Reconnected to the class server
+2013-07-20 10:36:10,738 [  node-30] JPPF Node management initialized
+2013-07-20 10:36:10,822 [  node-30] Attempting connection to the node server at localhost:11101
+2013-07-20 10:36:10,825 [  node-30] Reconnected to the node server
+2013-07-20 10:36:10,847 [  node-30] Node successfully initialized

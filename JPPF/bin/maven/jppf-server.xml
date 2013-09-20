@@ -1,0 +1,23 @@
+<project>
+@header@
+@common@
+  <dependencies>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-common-node</artifactId>
+      <version>@version@</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-common</artifactId>
+      <version>@version@</version>
+    </dependency>
+@common-dep@
+		<dependency>
+			<groupId>org.jvnet.opendmk</groupId>
+			<artifactId>jmxremote_optional</artifactId>
+			<version>1.0_01-ea</version>
+      <scope>runtime</scope>
+		</dependency>
+  </dependencies>
+</project>
