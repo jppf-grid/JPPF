@@ -37,9 +37,9 @@ public abstract class AbstractNioObject implements NioObject
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The message length.
+   * The size of the data ot send or receive.
    */
-  protected int size = 0;
+  protected final int size;
   /**
    * What has currently been read from the message.
    */
@@ -47,28 +47,28 @@ public abstract class AbstractNioObject implements NioObject
   /**
    * Location of the data to read or write.
    */
-  protected DataLocation location = null;
-  /**
-   * Determines whether we are in plain or SSL mode.
-   */
-  protected boolean isSSL = false;
+  protected final DataLocation location;
 
   /**
-   * Location of the data to read or write.
-   * @return a <code>DataLocation</code> instance.
+   * Initialize this NioObject with the specified data location and size.
+   * @param location the object which holds the data to read or write.
+   * @param size the size of the data.
    */
+  protected AbstractNioObject(final DataLocation location, final int size)
+  {
+    this.location = location;
+    this.size = size;
+  }
+
   @Override
   public DataLocation getData()
   {
     return location;
   }
 
-  /**
-   * Number of bytes read from or written to the message.
-   * @return  the number of bytes as an int.
-   */
-  public int getCount()
+  @Override
+  public int getSize()
   {
-    return count;
+    return size;
   }
 }

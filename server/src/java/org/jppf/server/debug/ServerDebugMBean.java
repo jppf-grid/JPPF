@@ -34,32 +34,32 @@ public interface ServerDebugMBean extends Serializable
    * Get the states of the class loader channels.
    * @return the states as as an array of strings.
    */
-  String[] clientClassLoaderChannels();
+  String clientClassLoaderChannels();
   /**
    * Get the states of the class loader channels.
    * @return the states as as an array of strings.
    */
-  String[] nodeClassLoaderChannels();
+  String nodeClassLoaderChannels();
   /**
    * Get the states of the node data channels.
    * @return the states as as an array of strings.
    */
-  String[] nodeDataChannels();
+  String nodeDataChannels();
   /**
    * Get the states of the client data channels.
    * @return the states as as an array of strings.
    */
-  String[] clientDataChannels();
+  String clientDataChannels();
   /**
    * Get a view of the nio messages for the node data channels.
    * @return the nio messages as an array of string in format channelId = NioMessage.toString().
    */
-  String[] nodeMessages();
+  String nodeMessages();
   /**
    * Get the states of all channels.
    * @return the states as as an array of strings.
    */
-  String[] allChannels();
+  String allChannels();
   /**
    * Dump the job queue.
    * @return a string representing the job queue.

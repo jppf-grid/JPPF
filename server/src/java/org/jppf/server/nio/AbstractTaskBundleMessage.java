@@ -34,21 +34,21 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
 
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    */
-  public AbstractTaskBundleMessage(final boolean ssl)
+  public AbstractTaskBundleMessage(final ChannelWrapper<?> channel)
   {
-    super(ssl);
+    super(channel);
   }
 
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    * @param debug to enable debug-level logging.
    */
-  protected AbstractTaskBundleMessage(final boolean ssl, final boolean debug)
+  protected AbstractTaskBundleMessage(final ChannelWrapper<?> channel, final boolean debug)
   {
-    super(ssl, debug);
+    super(channel, debug);
   }
 
   /**

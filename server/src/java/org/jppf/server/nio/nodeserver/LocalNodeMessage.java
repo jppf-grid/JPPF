@@ -31,34 +31,35 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
 {
   /**
    * Build this nio message.
+   * @param channel the channel to read from or write to.
    */
-  public LocalNodeMessage()
+  public LocalNodeMessage(final ChannelWrapper<?> channel)
   {
-    super(false);
+    super(channel);
   }
 
   @Override
-  public boolean read(final ChannelWrapper<?> wrapper) throws Exception
+  public boolean read() throws Exception
   {
     bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
     return true;
   }
 
   @Override
-  protected synchronized boolean readNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  protected synchronized boolean readNextObject() throws Exception
   {
     return true;
   }
 
   @Override
-  public boolean write(final ChannelWrapper<?> wrapper) throws Exception
+  public boolean write() throws Exception
   {
     //((LocalNodeWrapperHandler) wrapper).wakeUp();
     return true;
   }
 
   @Override
-  protected boolean writeNextObject(final ChannelWrapper<?> wrapper) throws Exception
+  protected boolean writeNextObject() throws Exception
   {
     return true;
   }

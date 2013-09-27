@@ -19,7 +19,7 @@
 package org.jppf.server.nio.client;
 
 import org.jppf.io.IOHelper;
-import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.SerializationHelperImpl;
 
@@ -31,11 +31,11 @@ public class ClientMessage extends AbstractTaskBundleMessage
 {
   /**
    * Initialize this nio message with the specified ssl flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    */
-  public ClientMessage(final boolean ssl)
+  public ClientMessage(final ChannelWrapper<?> channel)
   {
-    super(ssl);
+    super(channel);
   }
 
   /**

@@ -19,7 +19,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import org.jppf.io.IOHelper;
-import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.utils.SerializationHelperImpl;
 
@@ -31,21 +31,21 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
 {
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    */
-  public RemoteNodeMessage(final boolean ssl)
+  public RemoteNodeMessage(final ChannelWrapper<?> channel)
   {
-    super(ssl);
+    super(channel);
   }
 
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    * @param debug to enable debug-level logging.
    */
-  protected RemoteNodeMessage(final boolean ssl, final boolean debug)
+  protected RemoteNodeMessage(final ChannelWrapper<?> channel, final boolean debug)
   {
-    super(ssl, debug);
+    super(channel, debug);
   }
 
   /**
@@ -67,7 +67,6 @@ public class RemoteNodeMessage extends AbstractTaskBundleMessage
   protected void beforeFirstWrite() throws Exception
   {
     nbObjects = bundle.getTaskCount() + 2;
-    //nbObjects = bundle.getCurrentTaskCount() + 2;
   }
 
   @Override

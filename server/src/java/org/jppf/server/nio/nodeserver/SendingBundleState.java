@@ -63,7 +63,7 @@ class SendingBundleState extends NodeServerState
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
   {
-    //if (debugEnabled) log.debug("exec() for " + channel);
+    if (traceEnabled) log.trace("exec() for " + channel);
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -95,11 +95,9 @@ class SendingBundleState extends NodeServerState
     {
       if (debugEnabled) log.debug("sent entire bundle " + context.getBundle() + " to node " + channel);
       context.setMessage(null);
-      if (context.isOffline()) return processOfflineRequest(context);
-      //JPPFDriver.getInstance().getJobManager().jobDispatched(context.getBundle(), channel);
-      return TO_WAITING_RESULTS;
+      return context.isOffline() ? processOfflineRequest(context) : TO_WAITING_RESULTS;
     }
-    if (traceEnabled) log.trace("part yet to send to node " + channel);
+    if (traceEnabled) log.trace("part yet to send to node [id={}]", channel.getId());
     return TO_SENDING_BUNDLE;
   }
 

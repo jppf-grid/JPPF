@@ -136,17 +136,4 @@ class WaitingResultsState extends NodeServerState {
     }
     return new Pair<>(requeue, exception);
   }
-  
-  /**
-   * Process an offline request from the node.
-   * @param context the current context associated with the channel.
-   * @return a <code>null</code> transition since the channel is closed by this method.
-   * @throws Exception if any error occurs.
-   */
-  protected NodeTransition processOfflineRequest(final AbstractNodeContext context) throws Exception {
-    if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", context.getBundle(), context.getChannel());
-    server.getOfflineNodeHandler().addNodeBundle(context.getBundle());
-    context.cleanup(context.getChannel());
-    return null;
-  }
 }

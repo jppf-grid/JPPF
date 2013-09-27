@@ -44,15 +44,15 @@ public class SSLNioObject extends AbstractNioObject
   /**
    * The source from which the data is read.
    */
-  private InputStream is;
+  private InputStream is = null;
   /**
    * The destination to which the data is written.
    */
-  private OutputStream os;
+  private OutputStream os = null;
   /**
    * 
    */
-  private SSLHandler sslHandler;
+  private final SSLHandler sslHandler;
   /**
    * 
    */
@@ -77,8 +77,7 @@ public class SSLNioObject extends AbstractNioObject
    */
   public SSLNioObject(final DataLocation location, final SSLHandler sslHandler) throws Exception
   {
-    this.location = location;
-    this.size = location.getSize();
+    super(location, location.getSize());
     this.sslHandler = sslHandler;
   }
 

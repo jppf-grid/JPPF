@@ -149,7 +149,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   public ClientMessage newMessage()
   {
-    return new ClientMessage(sslHandler != null);
+    return new ClientMessage(getChannel());
   }
 
   /**
@@ -192,13 +192,13 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
     if (message == null) message = newMessage();
-    return getClientMessage().read(channel);
+    return getClientMessage().read();
   }
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
   {
-    return getClientMessage().write(channel);
+    return getClientMessage().write();
   }
 
   /**

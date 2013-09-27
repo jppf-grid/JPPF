@@ -48,8 +48,7 @@ public class RemoteNodeContext extends AbstractNodeContext
   @Override
   public AbstractTaskBundleMessage newMessage()
   {
-    //return new RemoteNodeMessage(sslHandler != null);
-    return new RemoteNodeMessage(sslHandler != null, DEBUG);
+    return new RemoteNodeMessage(getChannel(), DEBUG);
   }
 
   @Override

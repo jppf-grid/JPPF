@@ -39,13 +39,13 @@ public class ServerDebug implements ServerDebugMBean
   private final JPPFDriver driver = JPPFDriver.getInstance();
 
   @Override
-  public String[] clientClassLoaderChannels()
+  public String clientClassLoaderChannels()
   {
     return classLoaderChannels(clientClassLoaderSet());
   }
 
   @Override
-  public String[] nodeClassLoaderChannels()
+  public String nodeClassLoaderChannels()
   {
     return classLoaderChannels(nodeClassLoaderSet());
   }
@@ -55,44 +55,41 @@ public class ServerDebug implements ServerDebugMBean
    * @param set the set of channels to get a string representation of.
    * @return the channels as as an array of strings.
    */
-  private String[] classLoaderChannels(final Set<ChannelWrapper<?>> set)
+  private String classLoaderChannels(final Set<ChannelWrapper<?>> set)
   {
-    String[] result = null;
+    StringBuilder sb = new StringBuilder();
     synchronized(set)
     {
-      result = new String[set.size()];
-      int count = 0;
-      for (ChannelWrapper<?> channel: set) result[count++] = channel.toString();
+      for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
     }
-    return result;
+    return sb.toString();
   }
 
   @Override
-  public String[] nodeDataChannels()
+  public String nodeDataChannels()
   {
     return viewChannels(nodeSet());
   }
 
   @Override
-  public String[] clientDataChannels()
+  public String clientDataChannels()
   {
     return viewChannels(clientSet());
   }
 
   @Override
-  public String[] nodeMessages()
+  public String nodeMessages()
   {
     Set<ChannelWrapper<?>> set = new HashSet<>(nodeSet());
-    String[] result = new String[set.size()];
-    int count = 0;
+    StringBuilder sb = new StringBuilder();
     for (ChannelWrapper<?> ch: set)
     {
       long id = ch.getId();
       AbstractNodeContext ctx = (AbstractNodeContext) ch.getContext();
       String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
-      result[count++] = new StringBuilder().append("channelId=").append(id).append(", message=").append(s).toString();
+      sb.append("channelId=").append(id).append(", message=").append(s).append('\n');
     }
-    return result;
+    return sb.toString();
   }
 
   @Override
@@ -102,13 +99,13 @@ public class ServerDebug implements ServerDebugMBean
     sb.append("jobs in queue:").append('\n');
     sb.append(dumpQueueDetails()).append('\n');
     sb.append('\n').append("node class loader channels:").append('\n');
-    for (String s: nodeClassLoaderChannels()) sb.append(s).append('\n');
+    sb.append(nodeClassLoaderChannels()).append('\n');
     sb.append('\n').append("client class loader channels:").append('\n');
-    for (String s: clientClassLoaderChannels()) sb.append(s).append('\n');
+    sb.append(clientClassLoaderChannels()).append('\n');
     sb.append('\n').append("node job channels:").append('\n');
-    for (String s: nodeDataChannels()) sb.append(s).append('\n');
+    sb.append(nodeDataChannels()).append('\n');
     sb.append('\n').append("client job channels:").append('\n');
-    for (String s: clientDataChannels()) sb.append(s).append('\n');
+    sb.append(clientDataChannels()).append('\n');
     return sb.toString();
   }
 
@@ -117,24 +114,14 @@ public class ServerDebug implements ServerDebugMBean
    * @param set the set to view.
    * @return an array of state strings for each channel.
    */
-  private String[] viewChannels(final Set<ChannelWrapper<?>> set)
+  private String viewChannels(final Set<ChannelWrapper<?>> set)
   {
-    String[] result = null;
+    StringBuilder sb = new StringBuilder();
     synchronized(set)
     {
-      result = new String[set.size()];
-      int count = 0;
-      for (ChannelWrapper<?> channel: set)
-      {
-        /*
-        StringBuilder sb = new StringBuilder();
-        sb.append(channel.toString());
-        sb.append(", state=").append(channel.getContext().getState());
-         */
-        result[count++] = channel.toString();
-      }
+      for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
     }
-    return result;
+    return sb.toString();
   }
 
   /**
@@ -152,19 +139,18 @@ public class ServerDebug implements ServerDebugMBean
   }
 
   @Override
-  public String[] allChannels()
+  public String allChannels()
   {
-    Set<ChannelWrapper<?>> ccl = clientClassLoaderSet();
-    Set<ChannelWrapper<?>> ncl = nodeClassLoaderSet();
-    Set<ChannelWrapper<?>> c = clientSet();
-    Set<ChannelWrapper<?>> n = nodeSet();
-    int size = ccl.size() + ncl.size() + n.size() + c.size();
-    List<String> list = new ArrayList<>(size);
-    for (ChannelWrapper<?> channel: ccl) list.add(channel.toString());
-    for (ChannelWrapper<?> channel: ncl) list.add(channel.toString());
-    for (ChannelWrapper<?> channel: n) list.add(channel.toString());
-    for (ChannelWrapper<?> channel: c) list.add(channel.toString());
-    return list.toArray(new String[list.size()]);
+    StringBuilder sb = new StringBuilder();
+    sb.append("node class loader channels:").append('\n');
+    sb.append(nodeClassLoaderChannels()).append('\n');
+    sb.append('\n').append("client class loader channels:").append('\n');
+    sb.append(clientClassLoaderChannels()).append('\n');
+    sb.append('\n').append("node job channels:").append('\n');
+    sb.append(nodeDataChannels()).append('\n');
+    sb.append('\n').append("client job channels:").append('\n');
+    sb.append(clientDataChannels()).append('\n');
+    return sb.toString();
   }
 
   @Override

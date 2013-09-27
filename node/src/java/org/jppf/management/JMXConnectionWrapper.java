@@ -52,6 +52,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * Prefix for the name given to the connection thread.
+   */
+  public static String CONNECTION_NAME_PREFIX = "jmx@";
+  /**
    * URL of the MBean server, in a JMX-compliant format.
    */
   protected JMXServiceURL url = null;
@@ -154,7 +158,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         if (jctNull) {
           jct = new JMXConnectionThread(this);
           connectionThread.set(jct);
-          Thread t = new Thread(jct, "JMX connection " + getId());
+          Thread t = new Thread(jct, CONNECTION_NAME_PREFIX + getId());
           t.setDaemon(true);
           t.start();
         }

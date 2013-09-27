@@ -46,7 +46,7 @@ public abstract class AbstractNioMessage implements NioMessage
    */
   protected int count = 0;
   /**
-   * The total length of data to send or receive.
+   * The total length of data to send or receive, used for tracing and debugging purposes only.
    */
   protected int length = 0;
   /**
@@ -78,33 +78,42 @@ public abstract class AbstractNioMessage implements NioMessage
    */
   protected final boolean ssl;
   /**
-   * 
+   * Wraps a channel associated with an <code>SSLEngine</code>.
    */
-  protected SSLHandler sslHandler = null;
+  protected final SSLHandler sslHandler;
   /**
-   * 
+   * Determines whteher some low-levl traces should be logged.
    */
   protected final boolean debug;
+  /**
+   * The channel to read from or write to.
+   */
+  protected final ChannelWrapper<?> channel;
+  /**
+   * Temporary holder used as a local performance optimization for write operations.
+   */
+  private DataLocation currentDataLocation = null;
 
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    */
-  protected AbstractNioMessage(final boolean ssl)
+  protected AbstractNioMessage(final ChannelWrapper<?> channel)
   {
-    this.ssl = ssl;
-    this.debug = false;
+    this(channel, false);
   }
 
   /**
-   * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * Initialize this nio message.
+   * @param channel the channel to read from or write to.
    * @param debug to enable debug-level logging.
    */
-  protected AbstractNioMessage(final boolean ssl, final boolean debug)
+  protected AbstractNioMessage(final ChannelWrapper<?> channel, final boolean debug)
   {
-    this.ssl = ssl;
-    this.debug = debug && debugEnabled;
+    this.channel = channel;
+    this.sslHandler = channel.getContext().getSSLHandler();
+    this.ssl = sslHandler != null;
+    this.debug = debug;
   }
 
   /**
@@ -117,24 +126,22 @@ public abstract class AbstractNioMessage implements NioMessage
   }
 
   @Override
-  public boolean read(final ChannelWrapper<?> channel) throws Exception
+  public boolean read() throws Exception
   {
     if (nbObjects <= 0)
     {
-      if (ssl) this.sslHandler = channel.getContext().getSSLHandler();
-      if (position != 0) position = 0;
-      if (!readNextObject(channel)) return false;
+      if (!readNextObject()) return false;
       afterFirstRead();
     }
     while (position < nbObjects)
     {
-      if (!readNextObject(channel)) return false;
+      if (!readNextObject()) return false;
     }
     return true;
   }
 
   @Override
-  public boolean write(final ChannelWrapper<?> channel) throws Exception
+  public boolean write() throws Exception
   {
     if (nbObjects <= 0)
     {
@@ -143,32 +150,26 @@ public abstract class AbstractNioMessage implements NioMessage
         for (DataLocation dl: locations) length += dl.getSize();
         length += 4 * locations.size();
       }
-      if (ssl) this.sslHandler = channel.getContext().getSSLHandler();
-      position = 0;
       beforeFirstWrite();
     }
     while (position < nbObjects)
     {
-      if (!writeNextObject(channel)) return false;
+      if (!writeNextObject()) return false;
     }
     return true;
   }
 
   /**
    * Read the next serializable object from the specified channel.
-   * @param channel the channel to read from.
    * @return true if the object has been completely read from the channel, false otherwise.
    * @throws Exception if an IO error occurs.
    */
-  protected boolean readNextObject(final ChannelWrapper<?> channel) throws Exception
+  protected boolean readNextObject() throws Exception
   {
-    if (currentLengthObject == null)
-    {
-      currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4, false);
-    }
-    if (!currentLengthObject.read()) return false;
+    if (currentLengthObject == null) currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4);
     if (currentLength <= 0)
     {
+      if (!currentLengthObject.read()) return false;
       InputStream is = currentLengthObject.getData().getInputStream();
       try
       {
@@ -183,7 +184,7 @@ public abstract class AbstractNioMessage implements NioMessage
     if (currentObject == null)
     {
       DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
-      currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location, false);
+      currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location);
     }
     if (!currentObject.read()) return false;
     count += currentLength;
@@ -198,38 +199,37 @@ public abstract class AbstractNioMessage implements NioMessage
 
   /**
    * Write the next object to the specified channel.
-   * @param channel the channel to write to.
    * @return true if the object has been completely written the channel, false otherwise.
    * @throws Exception if an IO error occurs.
    */
-  protected boolean writeNextObject(final ChannelWrapper<?> channel) throws Exception
+  protected boolean writeNextObject() throws Exception
   {
     if (currentLengthObject == null)
     {
-      currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4, false);
-      OutputStream os = currentLengthObject.getData().getOutputStream();
-      try
-      {
-        SerializationUtils.writeInt(locations.get(position).getSize(), os);
-      }
-      finally
-      {
-        StreamUtils.close(os);
-      }
+      currentDataLocation = locations.get(position);
+      byte[] bytes = SerializationUtils.writeInt(currentDataLocation.getSize());
+      DataLocation dl = new MultipleBuffersLocation(bytes);
+      currentLengthObject = ssl ? new SSLNioObject(dl, sslHandler) : new PlainNioObject(channel, dl);
     }
-    if (!currentLengthObject.write()) return false;
+    if (currentLength <= 0)
+    {
+      if (!currentLengthObject.write()) return false;
+      currentLength = currentDataLocation.getSize();
+      count += 4;
+    }
     if (currentObject == null)
     {
-      DataLocation loc = locations.get(position);
-      currentObject = ssl ? new SSLNioObject(loc.copy(), sslHandler) : new PlainNioObject(channel, loc.copy(), false);
-      currentLength = loc.getSize();
+      DataLocation loc = currentDataLocation.copy();
+      currentObject = ssl ? new SSLNioObject(loc, sslHandler) : new PlainNioObject(channel, loc);
     }
     if (!currentObject.write()) return false;
-    count += 4 + locations.get(position).getSize();
+    count += currentLength;
     if (debug) log.debug("channel id={} wrote object at position {}", channel.getId(), position);
     position++;
     currentLengthObject = null;
     currentObject = null;
+    currentLength = 0;
+    currentDataLocation = null;
     return true;
   }
 

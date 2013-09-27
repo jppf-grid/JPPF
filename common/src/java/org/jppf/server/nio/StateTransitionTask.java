@@ -63,7 +63,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
   }
 
   /**
-   * Perform the state transition.
+   * Perform the state transition, basically a read or write operation with corresponding state changes.
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -76,28 +76,20 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
       T transition = null;
       synchronized(channel)
       {
-        NioState<T> state = factory.getState(ctx.getState());
-        if (traceEnabled) log.trace("performing transition to state " + ctx.getState() + " for " + channel);
+        S s = ctx.getState();
+        NioState<T> state = factory.getState(s);
+        if (traceEnabled) log.trace("performing transition to state {} for {}", s, channel);
         transition = state.performTransition(channel);
-        if (transition != null)
-        {
-          transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
-        }
+        if (transition != null) transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
+        else if (traceEnabled) log.trace("no further transition from {} for {}", s, channel);
       }
     }
-    catch(Exception e)
+    catch(Exception|Error e)
     {
-      String msg = "error on channel " + channel + " : " + ExceptionUtils.getMessage(e);
-      if (debugEnabled) log.debug(msg, e);
-      else log.warn(msg);
-      ctx.handleException(channel, e);
-    }
-    catch(Error e)
-    {
-      String msg = "error on channel " + channel + " : " + ExceptionUtils.getMessage(e);
-      if (debugEnabled) log.debug(msg, e);
-      else log.warn(msg);
-      throw e;
+      if (debugEnabled) log.debug("error on channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+      else log.warn("error on channel {} : {}", channel, ExceptionUtils.getMessage(e));
+      if (e instanceof Exception) ctx.handleException(channel, (Exception) e);
+      else throw (Error) e;
     }
   }
 }

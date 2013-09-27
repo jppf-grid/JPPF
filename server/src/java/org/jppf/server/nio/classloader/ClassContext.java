@@ -123,7 +123,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   {
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation location = IOHelper.serializeData(resource, serializer);
-    message = new BaseNioMessage(sslHandler != null);
+    message = new BaseNioMessage(getChannel());
     ((BaseNioMessage) message).addLocation(location);
   }
 
@@ -139,7 +139,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
     if (nioObject == null) {
       byte[] bytes = SerializationUtils.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
-      if (sslHandler == null) nioObject = new PlainNioObject(channel, dl, false);
+      if (sslHandler == null) nioObject = new PlainNioObject(channel, dl);
       else nioObject = new SSLNioObject(dl, sslHandler);
     }
     boolean b = nioObject.write();

@@ -48,8 +48,8 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public void close() throws Exception
   {
-    //channel.cancel();
     SelectableChannel ch = (SelectableChannel) channel.channel();
+    channel.cancel();
     ch.close();
   }
 

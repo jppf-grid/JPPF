@@ -60,18 +60,14 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
   @Override
   public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
   {
-    if (nioObject == null)
-    {
-      if (sslHandler == null) nioObject = new PlainNioObject(wrapper, 4, false);
-      else nioObject = new SSLNioObject(4, sslHandler);
-    }
-    boolean b = nioObject.read();
-    if (b)
+    if (nioObject == null) nioObject = new PlainNioObject(wrapper, 4);
+    if (nioObject.read())
     {
       id = SerializationUtils.readInt(nioObject.getData().getInputStream());
       nioObject = null;
+      return true;
     }
-    return b;
+    return false;
   }
 
   @Override

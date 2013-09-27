@@ -228,12 +228,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
     if (message == null) message = newMessage();
-    return message.read(channel);
+    return message.read();
   }
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
-    return message.write(channel);
+    return message.write();
   }
 
   @Override

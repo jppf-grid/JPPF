@@ -18,7 +18,6 @@
 
 package org.jppf.utils;
 
-import java.io.*;
 
 /**
  * This class provides a set of utility methods for manipulating {@link Throwable} objects.
@@ -40,11 +39,9 @@ public final class ExceptionUtils
    */
   public static String getStackTrace(final Throwable t)
   {
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
-    t.printStackTrace(pw);
-    pw.close();
-    return sw.toString();
+    StringBuilder sb = new StringBuilder(getMessage(t));
+    for (StackTraceElement elt: t.getStackTrace()) sb.append("\n  at ").append(elt);
+    return sb.toString();
   }
 
   /**

@@ -62,7 +62,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * The the task bundle sent to a newly connected node.
    */
   //private ServerTaskBundleNode initialNodeBundle = null;
-  private ServerJob initialServerJob = null;
+  private final ServerJob initialServerJob;
   /**
    * A reference to the driver's tasks queue.
    */
@@ -150,6 +150,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         taskQueueChecker.wakeUp();
       }
     });
+    initialServerJob = createInitialServerJob();
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
   }
 
@@ -306,27 +307,33 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @return a <code>ServerJob</code> instance, with no task in it.
    */
   ServerTaskBundleNode getInitialBundle() {
-    if (initialServerJob == null) {
-      try {
-        SerializationHelper helper = new SerializationHelperImpl();
-        // serializing a null data provider.
-        JPPFBuffer buf = helper.getSerializer().serialize(null);
-        int len = buf.getLength();
-        byte[] bytes = new byte[4 + len];
-        SerializationUtils.writeInt(len, bytes, 0);
-        System.arraycopy(buf.getBuffer(), 0, bytes, 4, len);
-        JPPFTaskBundle bundle = new JPPFTaskBundle();
-        bundle.setName("server handshake");
-        bundle.setUuid(INITIAL_BUNDLE_UUID);
-        bundle.getUuidPath().add(driver.getUuid());
-        bundle.setTaskCount(0);
-        bundle.setHandshake(true);
-        initialServerJob = new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(bytes)));
-      } catch(Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
     return initialServerJob.copy(0);
+  }
+
+  /**
+   * Create the base server job used to generate the initial bundle sent to each node.
+   * @return a <code>ServerJob</code> instance, with no task in it.
+   */
+  private ServerJob createInitialServerJob() {
+    try {
+      SerializationHelper helper = new SerializationHelperImpl();
+      // serializing a null data provider.
+      JPPFBuffer buf = helper.getSerializer().serialize(null);
+      int len = buf.getLength();
+      byte[] bytes = new byte[4 + len];
+      SerializationUtils.writeInt(len, bytes, 0);
+      System.arraycopy(buf.getBuffer(), 0, bytes, 4, len);
+      JPPFTaskBundle bundle = new JPPFTaskBundle();
+      bundle.setName("server handshake");
+      bundle.setUuid(INITIAL_BUNDLE_UUID);
+      bundle.getUuidPath().add(driver.getUuid());
+      bundle.setTaskCount(0);
+      bundle.setHandshake(true);
+      return new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(bytes)));
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return null;
   }
 
   /**
@@ -334,11 +341,15 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param context a <code>SocketChannel</code> that encapsulates the connection.
    */
   public void closeNode(final AbstractNodeContext context) {
+    lock.lock();
     try {
+      selector.wakeup();
       if (context != null) context.close();
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
+    } finally {
+      lock.unlock();
     }
     try {
       JPPFManagementInfo info = context.getManagementInfo();

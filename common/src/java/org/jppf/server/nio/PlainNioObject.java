@@ -38,10 +38,6 @@ public class PlainNioObject extends AbstractNioObject
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Determines whether the I/O performed by this object are blocking.
-   */
-  private boolean blocking = false;
-  /**
    * Where to read the data from (a socket channel)
    */
   private InputSource source = null;
@@ -52,90 +48,77 @@ public class PlainNioObject extends AbstractNioObject
   /**
    * The channel from which to read or write the data.
    */
-  private ChannelWrapper<?> channel = null;
+  private final ChannelWrapper<?> channel;
 
   /**
    * Initialize this NioObject with the specified channel and size.
    * @param channel where to read or write the data.
    * @param size the size of the internal buffer.
-   * @param blocking specifies whether the I/O performed by this object are blocking.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final int size, final boolean blocking)
+  public PlainNioObject(final ChannelWrapper<?> channel, final int size)
   {
-    this(channel, new MultipleBuffersLocation(size), blocking);
+    this(channel, new MultipleBuffersLocation(size));
   }
 
   /**
    * Initialize this NioObject with the specified size.
    * @param channel where to read or write the data.
    * @param location the location of the data to read from or write to.
-   * @param blocking specifies whether the I/O performed by this object are blocking.
    */
-  public PlainNioObject(final ChannelWrapper<?> channel, final DataLocation location, final boolean blocking)
+  public PlainNioObject(final ChannelWrapper<?> channel, final DataLocation location)
   {
+    super(location, location.getSize());
     this.channel = channel;
-    this.size = location.getSize();
-    this.location = location;
   }
 
   /**
-   * Read the current frame.
-   * @return true if the frame has been read fully, false otherwise.
+   * Read the current block of data.
+   * @return <code>true</code> if the data has been read fully, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
   @Override
   public boolean read() throws Exception
   {
+    if (count >= size) return true;
     if (source == null)
     {
       SocketChannel socketChannel = (SocketChannel) ((SelectionKeyWrapper) channel).getChannel().channel();
       source = new ChannelInputSource(socketChannel);
     }
-    if (count >= size) return true;
-    int n = location.transferFrom(source, blocking);
-    if (n > 0) count += n;
-    if (debugEnabled) log.debug("read " + n + " bytes from input source, count/size = " + count + '/' + size);
+    int n;
+    do
+    {
+      n = location.transferFrom(source, false);
+      if (n > 0) count += n;
+      if (debugEnabled) log.debug("read {} bytes for {}", n, this);
+    }
+    while ((n > 0) && (count < size));
     return count >= size;
   }
 
   /**
    * Write the current data object.
-   * @return true if the data has been written fully, false otherwise.
+   * @return <code>true</code> if the data has been written fully, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
   @Override
   public boolean write() throws Exception
   {
+    if (count >= size) return true;
     if (dest == null)
     {
       SocketChannel socketChannel = (SocketChannel) ((SelectionKeyWrapper) channel).getChannel().channel();
       dest = new ChannelOutputDestination(socketChannel);
     }
-    if (count >= size) return true;
-    int n = location.transferTo(dest, blocking);
-    if (n > 0) count += n;
-    if (debugEnabled) log.debug("wrote " + n + " bytes to output destination, count/size = " + count + '/' + size + " (dl = " + location + ')');
+    int n;
+    do
+    {
+      n = location.transferTo(dest, false);
+      if (n > 0) count += n;
+      if (debugEnabled) log.debug("read {} bytes for {}", n, this);
+    }
+    while ((n > 0) && (count < size));
     return count >= size;
-  }
-
-  /**
-   * Location of the data to read or write.
-   * @return a <code>DataLocation</code> instance.
-   */
-  @Override
-  public DataLocation getData()
-  {
-    return location;
-  }
-
-  /**
-   * Number of bytes read from or written to the message.
-   * @return  the number of bytes as an int.
-   */
-  @Override
-  public int getCount()
-  {
-    return count;
   }
 
   @Override
@@ -143,11 +126,9 @@ public class PlainNioObject extends AbstractNioObject
   {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    sb.append("channelId=").append(channel.getId());
-    sb.append(", blocking=").append(blocking);
+    sb.append("channel id=").append(channel.getId());
     sb.append(", size=").append(size);
     sb.append(", count=").append(count);
-    sb.append(", isSSL=").append(isSSL);
     sb.append(", source=").append(source);
     sb.append(", dest=").append(dest);
     sb.append(", location=").append(location);

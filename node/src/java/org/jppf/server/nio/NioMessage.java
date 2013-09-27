@@ -26,20 +26,18 @@ package org.jppf.server.nio;
 public interface NioMessage
 {
   /**
-   * Read data from the channel.
-   * @param channel the channel to read from.
+   * Read data from a channel.
    * @return true if the data has been completely read from the channel, false otherwise.
    * @throws Exception if an IO error occurs.
    */
-  boolean read(final ChannelWrapper<?> channel) throws Exception;
+  boolean read() throws Exception;
 
   /**
-   * Read data from the channel.
-   * @param channel the channel to write to.
+   * Read data from a channel.
    * @return true if the data has been completely written the channel, false otherwise.
    * @throws Exception if an IO error occurs.
    */
-  boolean write(final ChannelWrapper<?> channel) throws Exception;
+  boolean write() throws Exception;
 
   /**
    * Determines whether this message read from / writes to an SSL connection.

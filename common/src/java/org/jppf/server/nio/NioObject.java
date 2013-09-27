@@ -49,4 +49,10 @@ public interface NioObject
    * @return a <code>DataLocation</code> instance.
    */
   DataLocation getData();
+
+  /**
+   * Get the size of the data ot send or receive.
+   * @return the size as an int.
+   */
+  int getSize();
 }

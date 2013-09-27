@@ -49,7 +49,7 @@ public class LocalNodeContext extends AbstractNodeContext
   @Override
   public AbstractTaskBundleMessage newMessage()
   {
-    return new LocalNodeMessage();
+    return new LocalNodeMessage(getChannel());
   }
 
   @Override

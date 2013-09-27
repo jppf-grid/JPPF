@@ -27,11 +27,11 @@ public class BaseNioMessage extends AbstractNioMessage
 {
   /**
    * Initialize this nio message with the specified sll flag.
-   * @param ssl <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
+   * @param channel the channel to read from or write to.
    */
-  public BaseNioMessage(final boolean ssl)
+  public BaseNioMessage(final ChannelWrapper<?> channel)
   {
-    super(ssl);
+    super(channel);
   }
 
   /**

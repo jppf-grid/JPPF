@@ -45,7 +45,7 @@ import org.slf4j.*;
  * @param <S> the type of the states to use.
  * @param <T> the type of the transitions to use.
  * @author Laurent Cohen
- * @author Lane Schwartz (dynamically allocated server port) 
+ * @author Lane Schwartz (dynamically allocated server port)
  */
 public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Thread {
   /**
@@ -100,7 +100,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * The channel identifier for channels handled by this server.
    */
-  protected int identifier = 0;
+  protected final int identifier;
 
   /**
    * Initialize this server with a specified port number and name.
@@ -154,14 +154,13 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @throws Exception if any error occurs while initializing the server sockets.
    */
   private void init(final int[] portsToInit, final Boolean ssl) throws Exception {
-    for (int i=0; i<portsToInit.length; i++)
-    {
+    for (int i=0; i<portsToInit.length; i++) {
       if (portsToInit[i] < 0) continue;
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
       server.socket().bind(addr);
-      // If the user specified port zero, the operating system should dynamically allocated a port number.
+      // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
       server.configureBlocking(false);
@@ -205,13 +204,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
           lock.unlock();
         }
         int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        if (!isStopped()) {
-          if (n > 0) go(selector.selectedKeys());
-          postSelect();
-        }
+        if (!isStopped() && (n > 0)) go(selector.selectedKeys());
       }
     } catch (Throwable t) {
-      log.error(t.getMessage(), t);
+      log.error("error in selector loop for {} : {}", getClass().getSimpleName(), t);
     } finally {
       end();
     }
@@ -267,13 +263,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   }
 
   /**
-   * This method is invoked after all selected keys have been processed.
-   * This implementation does nothing. Subclasses should override this method as needed.
-   */
-  public void postSelect() {
-  }
-
-  /**
    * accept the incoming connection.
    * It accept and put it in a state to define what type of peer is.
    * @param key the selection key that represents the channel's registration with the selector.
@@ -290,18 +279,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       return;
     }
     if (channel == null) return;
-    try {
-      channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
-      channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
-      channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
-      channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
-      if (channel.isBlocking()) channel.configureBlocking(false);
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-      StreamUtils.close(channel, log);
-      return;
-    }
-    accept(channel, null, ssl);
+    Runnable task = new AcceptChannelTask(channel, ssl);
+    transitionManager.submit(task);
+    //task.run();
   }
 
   /**
@@ -317,7 +297,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
     NioContext context = createNioContext();
     SelectionKeyWrapper wrapper = null;
+    lock.lock();
     try {
+      selector.wakeup();
       if (sslHandler != null) context.setSSLHandler(sslHandler);
       SelectionKey selKey = channel.register(selector,	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
@@ -325,13 +307,14 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       if (ssl && (sslHandler == null) && (sslContext != null)) {
         SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
         configureSSLEngine(engine);
-        SSLHandler newSSLHandler = new SSLHandler(wrapper, engine);
-        context.setSSLHandler(newSSLHandler);
+        context.setSSLHandler(new SSLHandler(wrapper, engine));
       }
       postAccept(wrapper);
     } catch (Exception e) {
       wrapper = null;
       log.error(e.getMessage(), e);
+    } finally {
+      lock.unlock();
     }
     return wrapper;
   }
@@ -485,4 +468,53 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @return <code>true</code> if the channel is idle, <code>false</code> otherwise.
    */
   public abstract boolean isIdle(ChannelWrapper<?> channel);
+
+  /**
+   * This task performs the processing of a newly accepted channel.
+   */
+  private class AcceptChannelTask implements Runnable {
+    /**
+     * The newly accepted socket channel.
+     */
+    private final SocketChannel channel;
+    /**
+     * Determines whether ssl is enabled for the channel
+     */
+    private final boolean ssl;
+
+    /**
+     * Initialize this task with the specified selection key.
+     * @param channel the newly accepted socket channel.
+     * @param ssl determines whether ssl is enabled for the channel.
+     */
+    public AcceptChannelTask(final SocketChannel channel, final boolean ssl) {
+      this.channel = channel;
+      this.ssl = ssl;
+    }
+
+    @Override
+    public void run() {
+      try {
+        channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
+        channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
+        channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
+        channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
+        if (channel.isBlocking()) channel.configureBlocking(false);
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
+        StreamUtils.close(channel, log);
+        return;
+      }
+      accept(channel, null, ssl);
+    }
+  }
+
+  /**
+   * Get the channel identifier for channels handled by this server.
+   * @return an int whose value is one of the constants defined in {@link org.jppf.utils.JPPFIdentifiers}.
+   */
+  public int getIdentifier()
+  {
+    return identifier;
+  }
 }
