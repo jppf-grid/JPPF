@@ -56,7 +56,6 @@ class WaitingHandshakeState extends ClientServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception

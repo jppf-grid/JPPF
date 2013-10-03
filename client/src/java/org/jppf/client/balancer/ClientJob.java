@@ -45,7 +45,7 @@ public class ClientJob extends AbstractClientJob
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The list of of the tasks.
+   * The list of the tasks.
    */
   private final List<JPPFTask> tasks;
   /**
@@ -284,7 +284,15 @@ public class ClientJob extends AbstractClientJob
     if (results.isEmpty()) return;
 
     synchronized (tasks) {
-      for (JPPFTask task : results) taskStateMap.put(task.getPosition(), TaskState.RESULT);
+      for (int i=0; i<results.size(); i++) {
+        JPPFTask task = results.get(i);
+        taskStateMap.put(task.getPosition(), TaskState.RESULT);
+        if (task instanceof JPPFExceptionResult) {
+          JPPFTask originalTask = job.getTasks().get(task.getPosition());
+          originalTask.setThrowable(task.getThrowable());
+          results.set(i, originalTask);
+        }
+      }
     }
     TaskResultListener listener = resultsListener;
     if (listener != null) {

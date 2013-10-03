@@ -122,9 +122,14 @@ public class ClientContext extends AbstractNioContext<ClientState>
     JPPFTaskBundle bundle = clientBundle.getJob();
     bundle.setSLA(null);
     bundle.setMetadata(null);
+    List<ServerTask> tasks = clientBundle.getTaskList();
+    int[] positions = new int[tasks.size()];
+    for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getJobPosition();
+    if (debugEnabled) log.debug("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
+    bundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
     message.addLocation(IOHelper.serializeData(bundle, helper.getSerializer()));
-    for (ServerTask task: clientBundle.getTaskList()) message.addLocation(task.getResult());
-    message.setBundle(clientBundle.getJob());
+    for (ServerTask task: tasks) message.addLocation(task.getResult());
+    message.setBundle(bundle);
     setClientMessage(message);
   }
 
@@ -137,10 +142,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
   {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
     JPPFTaskBundle bundle = ((ClientMessage) message).getBundle();
-    if (locations.size() > 2)
-      return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
-    else
-      return new ServerTaskBundleClient(bundle, locations.get(1));
+    if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
+    return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
   }
 
   /**

@@ -84,5 +84,13 @@ public enum  BundleParameter
   /**
    * Uuid of a job executed offline.
    */
-  JOB_UUID
+  JOB_UUID,
+  /**
+   * An array of boolean flags indicating whther the task raised an error during serilaization or deserialization.
+   */
+  ERROR_MARKERS,
+  /**
+   * An array of ints that holds the positions odf the tasks such as they are in the initial job submiited by the client.
+   */
+  TASK_POSITIONS
 }

@@ -126,15 +126,27 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-    if (debugEnabled) log.debug(this.toDebugString() + " sending job " + header);
+
+    int[] positions = new int[count];
+    JPPFTask[] tasks = new JPPFTask[count];
+    int i = 0;
+    for (JPPFTask task : job.getTasks())
+    {
+      int pos = task.getPosition();
+      if (!job.getResults().hasResult(pos))
+      {
+        tasks[i] = task;
+        positions[i] = pos;
+        i++;
+      }
+    }
+    header.setParameter(BundleParameter.TASK_POSITIONS, positions);
+    if (debugEnabled) log.debug(this.toDebugString() + " sending job " + header + ", positions=" + StringUtils.buildString(positions));
 
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, job.getDataProvider(), ser);
-    for (JPPFTask task : job.getTasks())
-    {
-      if (!job.getResults().hasResult(task.getPosition())) IOHelper.sendData(socketClient, task, ser);
-    }
+    for (JPPFTask task : tasks) IOHelper.sendData(socketClient, task, ser);
     socketClient.flush();
   }
 
@@ -180,10 +192,17 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       ObjectSerializer ser = makeHelper(cl, helperClassName).getSerializer();
       bundle = (JPPFTaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
-      if (debugEnabled) log.debug(this.toDebugString() + " : received bundle " + bundle);
+      int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
+      if (debugEnabled) {
+        log.debug(this.toDebugString() + " : received bundle " + bundle + ", positions=" + StringUtils.buildString(positions));
+      }
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try {
-        for (int i = 0; i < count; i++) taskList.add((JPPFTask) IOHelper.unwrappedData(socketClient, ser));
+        for (int i = 0; i < count; i++) {
+          JPPFTask task = (JPPFTask) IOHelper.unwrappedData(socketClient, ser);
+          if ((positions != null) && (i < positions.length)) task.setPosition(positions[i]);
+          taskList.add(task);
+        }
       } finally {
         if (SEQUENTIAL_DESERIALIZATION) lock.unlock();
       }

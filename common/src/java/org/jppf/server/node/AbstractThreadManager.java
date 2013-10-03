@@ -28,6 +28,11 @@ import org.jppf.node.*;
 public abstract class AbstractThreadManager implements ThreadManager
 {
   /**
+   * Prefix used for the names of the threads created by the executor.
+   */
+  public static final String THREAD_NAME_PREFIX = "Processing";
+
+  /**
    * Initialize this execution manager with the specified node.
    */
   protected AbstractThreadManager()

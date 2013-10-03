@@ -116,8 +116,12 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
     List<JPPFTask> tasks = event.getTaskList();
     if (tasks != null)
     {
+      List<Integer> positions = new ArrayList<>(tasks.size());
+      for (JPPFTask task: tasks) positions.add(task.getPosition());
+      if (debugEnabled) log.debug("before putResults(): jobResults={}, positions={}", jobResults, positions);
       jobResults.putResults(tasks);
-      if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + (count - jobResults.size()));
+      if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks, pendingCount = " + (count - jobResults.size()) + 
+          ", count=" + count + ", jobResults=" + jobResults);
       JobPersistence pm = job.getPersistenceManager();
       if ((job != null) && (pm != null))
       {

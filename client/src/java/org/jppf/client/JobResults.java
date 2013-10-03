@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.server.protocol.JPPFTask;
+import org.slf4j.*;
 
 /**
  * Instances of this class hold and manage the results of a job.
@@ -33,6 +34,14 @@ public class JobResults implements Serializable
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JobResults.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * A map containing the tasks that have been successfully executed,
    * ordered by ascending position in the submitted list of tasks.
@@ -74,7 +83,13 @@ public class JobResults implements Serializable
    */
   public synchronized void putResults(final List<JPPFTask> tasks)
   {
-    for (JPPFTask task : tasks) resultMap.put(task.getPosition(), task);
+    for (JPPFTask task : tasks)
+    {
+      int pos = task.getPosition();
+      if (debugEnabled) log.debug("adding result at positon {}", pos);
+      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
+      resultMap.put(pos, task);
+    }
   }
 
   /**
@@ -84,5 +99,16 @@ public class JobResults implements Serializable
   public synchronized Collection<JPPFTask> getAll()
   {
     return Collections.unmodifiableCollection(resultMap.values());
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("size=").append(size());
+    sb.append(", positions=").append(resultMap.keySet());
+    sb.append(']');
+    return sb.toString();
   }
 }

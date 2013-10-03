@@ -35,6 +35,10 @@ public class ServerTask {
    */
   private final int position;
   /**
+   * The position of this task within the job submitted by the client.
+   */
+  private final int jobPosition;
+  /**
    * The shared data provider for this task.
    */
   private final DataLocation   dataLocation;
@@ -56,14 +60,16 @@ public class ServerTask {
    * @param bundle client bundle that own this task. 
    * @param position identification of this task within bundle.
    * @param dataLocation shared data provider for this task.
+   * @param jobPosition the position of this task within the job submitted by the client.
    */
-  public ServerTask(final ServerTaskBundleClient bundle, final int position, final DataLocation dataLocation) {
+  public ServerTask(final ServerTaskBundleClient bundle, final int position, final DataLocation dataLocation, final int jobPosition) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (dataLocation == null) throw new IllegalArgumentException("dataLocation is null");
 
     this.position = position;
     this.bundle = bundle;
     this.dataLocation = dataLocation;
+    this.jobPosition = jobPosition;
   }
 
   /**
@@ -163,5 +169,14 @@ public class ServerTask {
     sb.append(", exception=").append(exception);
     sb.append('}');
     return sb.toString();
+  }
+
+  /**
+   * Get the position of this task within the job submitted by the client.
+   * @return the position as an int.
+   */
+  public int getJobPosition()
+  {
+    return jobPosition;
   }
 }

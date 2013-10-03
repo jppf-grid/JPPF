@@ -24,6 +24,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
 import org.jppf.utils.*;
+import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
 /**
@@ -186,7 +187,6 @@ public abstract class JPPFContainer
     /**
      * Execute this task.
      * @return a deserialized object.
-     * @see java.util.concurrent.Callable#call()
      */
     @Override
     public Object call()
@@ -208,8 +208,16 @@ public abstract class JPPFContainer
       }
       catch(Throwable t)
       {
+        /*
         log.error(t.getMessage() + " [object index: " + index + ']', t);
         return t;
+        */
+        String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
+        if (debugEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
+        else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
+        Object result = null;
+        if (index > 0) result = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
+        return result;
       }
       finally
       {

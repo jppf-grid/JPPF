@@ -279,7 +279,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   /**
-   * Initialize the jmx connection using the specified jmx server id.
+   * Initialize the jmx connection using the specified jmx server information.
    */
   public void initializeJmxConnection()
   {

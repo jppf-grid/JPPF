@@ -55,7 +55,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
    */
   public ThreadManagerForkJoin(final int poolSize)
   {
-    this.threadFactory = new FJThreadFactory("node processing", CpuTimeCollector.isCpuTimeEnabled());
+    this.threadFactory = new FJThreadFactory(THREAD_NAME_PREFIX, CpuTimeCollector.isCpuTimeEnabled());
     threadPool = new ForkJoinPool(poolSize, threadFactory, new Thread.UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(final Thread t, final Throwable e) {

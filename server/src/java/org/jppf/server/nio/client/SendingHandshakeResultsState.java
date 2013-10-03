@@ -70,14 +70,10 @@ class SendingHandshakeResultsState extends ClientServerState
     }
 
     ClientContext context = (ClientContext) channel.getContext();
-    ServerTaskBundleClient bundleWrapper = context.getBundle();
-    if (context.getMessage() == null)
-    {
-      //context.setBundle(bundleWrapper);
-      context.serializeBundle();
-    }
+    if (context.getMessage() == null) context.serializeBundle();
     if (context.writeMessage(channel))
     {
+      ServerTaskBundleClient bundleWrapper = context.getBundle();
       if (debugEnabled) log.debug("sent entire bundle" + bundleWrapper.getJob() + " to client " + channel);
       context.setBundle(null);
       context.setClientMessage(null);

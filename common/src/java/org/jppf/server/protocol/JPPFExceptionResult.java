@@ -37,11 +37,18 @@ public final class JPPFExceptionResult extends JPPFTask
   /**
    * This captures the result of ("" + object).
    */
-  private final String objectDescriptor;
+  protected String objectDescriptor;
   /**
    * The fully qualified class name of the object that triggered the error.
    */
-  private final String className;
+  protected String className;
+
+  /**
+   * Default constructor provided as a convenience for subclassing.
+   */
+  public JPPFExceptionResult()
+  {
+  }
 
   /**
    * Initialize this task with the specified error context.
@@ -51,8 +58,16 @@ public final class JPPFExceptionResult extends JPPFTask
   public JPPFExceptionResult(final Throwable throwable, final Object object)
   {
     setThrowable(throwable);
-    objectDescriptor = String.valueOf(object);
-    className = (object != null) ? object.getClass().getName() : "unknown class";
+    if (object instanceof String)
+    {
+      objectDescriptor = (String) object;
+      className = "unknown class";
+    }
+    else
+    {
+      objectDescriptor = String.valueOf(object);
+      className = (object != null) ? object.getClass().getName() : "unknown class";
+    }
   }
 
   /**
@@ -62,7 +77,7 @@ public final class JPPFExceptionResult extends JPPFTask
   @Override
   public void run()
   {
-    System.out.println(toString());
+    //System.out.println(toString());
   }
 
   /**

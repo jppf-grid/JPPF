@@ -358,7 +358,7 @@ public abstract class AbstractClientJob
    */
   public void removeOnDone(final Runnable runnable)
   {
-    if(runnable == null) throw new IllegalArgumentException("runnable is null");
+    if (runnable == null) throw new IllegalArgumentException("runnable is null");
 
     synchronized (onDoneList)
     {

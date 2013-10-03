@@ -179,13 +179,17 @@ public class NodeExecutionManagerImpl
     try {
       setup(bundle, taskList);
       if (!isJobCancelled()) {
+        int count = 0;
         ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
         for (Task task : taskList) {
-          NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler);
-          taskWrapperList.add(taskWrapper);
-          Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
+          if (!(task instanceof JPPFExceptionResult)) {
+            NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler);
+            taskWrapperList.add(taskWrapper);
+            Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
+            count++;
+          }
         }
-        for (int i=0; i<taskList.size(); i++) {
+        for (int i=0; i<count; i++) {
           try {
             NodeTaskWrapper taskWrapper = ecs.take().get();
             JPPFNodeReconnectionNotification notif = taskWrapper.getReconnectionNotification();

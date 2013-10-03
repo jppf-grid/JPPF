@@ -96,6 +96,7 @@ public abstract class JPPFTask implements Task<Object>
     this.result = result;
   }
 
+  //* @deprecated {@link #getThrowable()} should be used instead.
   /**
    * This method returns the underlying {@link Throwable} raised by this task's execution.
    * If the Throwable is not an instance of {@link Exception}, it will be wrapped in a {@link JPPFException}.

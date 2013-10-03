@@ -179,6 +179,7 @@ public class ServerJob extends AbstractServerJob {
       empty = dispatchSet.isEmpty();
       dispatchSet.put(bundle.getId(), bundle);
     }
+    if (debugEnabled) log.debug("added to dispatch set: {}", bundle);
     if (empty) {
       updateStatus(ServerJobStatus.NEW, ServerJobStatus.EXECUTING);
       setSubmissionStatus(SubmissionStatus.EXECUTING);
@@ -194,8 +195,9 @@ public class ServerJob extends AbstractServerJob {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
 
     synchronized (dispatchSet) {
-      dispatchSet.remove(bundle);
+      dispatchSet.remove(bundle.getId());
     }
+    if (debugEnabled) log.debug("removed from dispatch set: {}", bundle);
     fireJobReturned(bundle.getChannel(), bundle);
   }
 
