@@ -14,10 +14,13 @@ test.org.jppf.management.TestJMXConnectionWrapper
 test.org.jppf.management.TestJPPFDriverAdminMBean
 test.org.jppf.management.TestJPPFNodeAdminMBean
 test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
+test.org.jppf.node.TestOfflineNode
 test.org.jppf.server.job.management.TestDriverJobManagementMBean
 test.org.jppf.server.protocol.TestJPPFJobClientSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA
+test.org.jppf.server.protocol.TestJPPFJobSLA2
 test.org.jppf.server.protocol.TestJPPFTask
+test.org.jppf.server.protocol.TestLocation
 test.org.jppf.utils.TestJPPFConfiguration
 test.org.jppf.utils.TestRange
 test.org.jppf.utils.TestTypedProperties

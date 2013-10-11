@@ -70,7 +70,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     {
       if (t.getResult() == null) count++;
     }
-    assertTrue(count > 0);
+    assertEquals(nbTasks, count);
   }
 
   /**
@@ -82,7 +82,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   {
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
     List<JPPFTask> results = client.submit(job);
-    assertEquals(results.size(), 1);
+    assertEquals(1, results.size());
     assertNotNull(results.get(0));
     assertNotNull(results.get(0).getResult());
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
@@ -110,7 +110,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     proxy.cancelJob(job.getUuid());
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     List<JPPFTask> results = collector.waitForResults();
-    assertEquals(results.size(), nbTasks);
+    assertEquals(nbTasks, results.size());
     Thread.sleep(1000L);
     String[] ids = proxy.getAllJobIds();
     assertNotNull(ids);

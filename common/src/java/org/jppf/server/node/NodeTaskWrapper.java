@@ -218,6 +218,7 @@ public class NodeTaskWrapper implements Runnable
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("task=").append(task);
     sb.append(", cancelled=").append(cancelled);
     sb.append(", callOnCancel=").append(callOnCancel);
     sb.append(", timeout=").append(timeout);

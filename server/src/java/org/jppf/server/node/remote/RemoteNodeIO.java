@@ -161,32 +161,6 @@ public class RemoteNodeIO extends AbstractNodeIO {
   }
 
   /**
-   * Wait until the connection is closed by the other end.
-   * @param socketWrapper the connection to check.
-   */
-  private void waitChannelClosed2(final SocketWrapper socketWrapper) {
-    boolean done = false;
-    JPPFBuffer buf = new JPPFBuffer(new byte[1]);
-    while (!done) {
-      try {
-        //we attempt to write to make the non-blocking channel at the other end readable.
-        socketWrapper.sendBytes(buf);
-        synchronized(this) {
-          try {
-            wait(0L, 100000);
-          } catch(InterruptedException ignore) {
-          }
-        }
-      } catch (Exception ignore) {
-        done = true;
-      } catch (Error e) {
-        done = true;
-        if (debugEnabled) log.debug("error closing socket: ", e);
-      }
-    }
-  }
-
-  /**
    * Get the socket wrapper associated with the node connection.
    * @return a {@link SocketWrapper} instance.
    */

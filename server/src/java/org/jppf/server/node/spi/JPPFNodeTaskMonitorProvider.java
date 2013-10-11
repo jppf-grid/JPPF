@@ -32,7 +32,6 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
   /**
    * Return the fully qualified name of the management interface defined by this provider.
    * @return the fully qualified interface name as a string.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanInterfaceName()
    */
   @Override
   public String getMBeanInterfaceName()
@@ -45,7 +44,6 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
    * The class of this MBean must implement the interface defined by {@link #getMBeanInterfaceName() getMBeanInterfaceName()}.
    * @param node - the JPPF node that is managed or monitored by the MBean.
    * @return an <code>Object</code> that is an implementation of the MBean interface.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#createMBean(org.jppf.node.Node)
    */
   @Override
   public Object createMBean(final Node node)
@@ -60,7 +58,6 @@ public class JPPFNodeTaskMonitorProvider implements JPPFNodeMBeanProvider
    * This is the name under which the MBean will be registered with the MBean server.
    * It must be a valid object name, as specified in the documentation for {@link javax.management.ObjectName ObjectName}.
    * @return the MBean name for this MBean provider.
-   * @see org.jppf.management.spi.JPPFNodeMBeanProvider#getMBeanName()
    */
   @Override
   public String getMBeanName()

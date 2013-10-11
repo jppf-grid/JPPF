@@ -44,8 +44,7 @@ import test.org.jppf.test.setup.common.*;
  * as specified in the job SLA.
  * @author Laurent Cohen
  */
-public class TestJPPFJobSLA extends Setup1D2N1C
-{
+public class TestJPPFJobSLA extends Setup1D2N1C {
   /**
    * A "short" duration for this test.
    */
@@ -64,8 +63,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAtDate() throws Exception
-  {
+  public void testJobExpirationAtDate() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     Date date = new Date(System.currentTimeMillis() + TIME_SHORT);
@@ -82,8 +80,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAtDateTooLate() throws Exception
-  {
+  public void testJobExpirationAtDateTooLate() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     Date date = new Date(System.currentTimeMillis() + TIME_LONG);
@@ -101,8 +98,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAfterDelay() throws Exception
-  {
+  public void testJobExpirationAfterDelay() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
     List<JPPFTask> results = client.submit(job);
@@ -117,8 +113,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAfterDelayTooLate() throws Exception
-  {
+  public void testJobExpirationAfterDelayTooLate() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
     List<JPPFTask> results = client.submit(job);
@@ -134,8 +129,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  public void testSuspendedJobExpiration() throws Exception
-  {
+  public void testSuspendedJobExpiration() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
     job.getSLA().setSuspended(true);
     job.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
@@ -151,8 +145,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testMultipleJobsExpiration() throws Exception
-  {
+  public void testMultipleJobsExpiration() throws Exception {
     JPPFJob job1 = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", false, false, 1, SimpleTask.class, TIME_LONG);
     job1.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
     JPPFJob job2 = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", false, false, 1, SimpleTask.class, TIME_SHORT);
@@ -178,13 +171,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  public void testCancelJobUponClientDisconnect() throws Exception
-  {
+  public void testCancelJobUponClientDisconnect() throws Exception {
     String fileName = "testCancelJobUponClientDisconnect";
     File f = new File(fileName + ".tmp");
     f.deleteOnExit();
-    try
-    {
+    try {
       assertFalse(f.exists());
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, FileTask.class, fileName, false);
       job.getSLA().setCancelUponClientDisconnect(false);
@@ -193,9 +184,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       client.close();
       Thread.sleep(2000L);
       assertTrue(f.exists());
-    }
-    finally
-    {
+    } finally {
       f.delete();
       client = BaseSetup.createClient(null);
     }
@@ -206,19 +195,16 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobPriority() throws Exception
-  {
+  public void testJobPriority() throws Exception {
     int nbJobs = 3;
     JPPFJob[] jobs = new JPPFJob[3];
     ExecutionPolicy policy = new Equal("jppf.node.uuid", false, "n1");
-    for (int i=0; i<nbJobs; i++)
-    {
+    for (int i=0; i<nbJobs; i++) {
       jobs[i] = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + i, false, false, 1, LifeCycleTask.class, 750L);
       jobs[i].getSLA().setPriority(i);
       jobs[i].getSLA().setExecutionPolicy(policy);
     }
-    for (int i=0; i<nbJobs; i++)
-    {
+    for (int i=0; i<nbJobs; i++) {
       client.submit(jobs[i]);
       if (i == 0) Thread.sleep(500L);
     }
@@ -236,16 +222,14 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExecutionPolicy() throws Exception
-  {
+  public void testJobExecutionPolicy() throws Exception {
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
     List<JPPFTask> results = client.submit(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    for (JPPFTask t: results)
-    {
+    for (JPPFTask t: results) {
       LifeCycleTask task = (LifeCycleTask) t;
       assertTrue("n2".equals(task.getNodeUuid()));
       assertNotNull(task.getResult());
@@ -258,8 +242,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   //@Test(timeout=8000)
-  public void testJobMaxNodes() throws Exception
-  {
+  public void testJobMaxNodes() throws Exception {
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
     job.getSLA().setMaxNodes(1);
@@ -267,12 +250,10 @@ public class TestJPPFJobSLA extends Setup1D2N1C
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     // check that no 2 tasks were executing at the same time on different nodes
-    for (int i=0; i<results.size()-1; i++)
-    {
+    for (int i=0; i<results.size()-1; i++) {
       LifeCycleTask t1 = (LifeCycleTask) results.get(i);
       Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
-      for (int j=i+1; j<results.size(); j++)
-      {
+      for (int j=i+1; j<results.size(); j++) {
         LifeCycleTask t2 = (LifeCycleTask) results.get(j);
         Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
         assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(),
@@ -286,8 +267,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobMaxNodes2() throws Exception
-  {
+  public void testJobMaxNodes2() throws Exception {
     int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
     job.getSLA().setMaxNodes(2);
@@ -296,16 +276,13 @@ public class TestJPPFJobSLA extends Setup1D2N1C
     assertEquals(results.size(), nbTasks);
     boolean found = false;
     // check that at least 2 tasks were executing at the same time on different nodes
-    for (int i=0; i<results.size()-1; i++)
-    {
+    for (int i=0; i<results.size()-1; i++) {
       LifeCycleTask t1 = (LifeCycleTask) results.get(i);
       Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
-      for (int j=i+1; j<results.size(); j++)
-      {
+      for (int j=i+1; j<results.size(); j++) {
         LifeCycleTask t2 = (LifeCycleTask) results.get(j);
         Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
-        if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid()))
-        {
+        if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid())) {
           found = true;
           break;
         }
@@ -320,14 +297,12 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testBroadcastJob() throws Exception
-  {
+  public void testBroadcastJob() throws Exception {
     String suffix = "node-";
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
     List<JPPFTask> results = client.submit(job);
-    for (int i=1; i<=2; i++)
-    {
+    for (int i=1; i<=2; i++) {
       File file = new File("node-n" + i + ".tmp");
       assertTrue("file '" + file + "' does not exist", file.exists());
       file.delete();
@@ -340,10 +315,8 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=15000)
-  public void testBroadcastJob2() throws Exception
-  {
-    try
-    {
+  public void testBroadcastJob2() throws Exception {
+    try {
       client.close();
       TypedProperties config = JPPFConfiguration.getProperties();
       config.setProperty("jppf.pool.size", "2");
@@ -361,15 +334,12 @@ public class TestJPPFJobSLA extends Setup1D2N1C
       collector.waitForResults();
       collector = (JPPFResultCollector) job2.getResultListener();
       collector.waitForResults();
-      for (int i=1; i<=2; i++)
-      {
+      for (int i=1; i<=2; i++) {
         File file = new File(suffix + "n" + i + ".tmp");
         assertTrue("file '" + file + "' does not exist", file.exists());
         file.delete();
       }
-    }
-    finally
-    {
+    } finally {
       client.close();
       client = BaseSetup.createClient(null, true);
     }
@@ -380,8 +350,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  public void testSendNodeResultsStrategy() throws Exception
-  {
+  public void testSendNodeResultsStrategy() throws Exception {
     checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategy.NODE_RESULTS, 4);
   }
 
@@ -390,8 +359,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  public void testSendAllResultsStrategy() throws Exception
-  {
+  public void testSendAllResultsStrategy() throws Exception {
     checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategy.ALL_RESULTS, 1);
   }
 
@@ -400,8 +368,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  public void testDefaultSendResultsStrategy() throws Exception
-  {
+  public void testDefaultSendResultsStrategy() throws Exception {
     checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), null, 4);
   }
 
@@ -412,8 +379,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
    * @param expectedReturnedCount the expected number of 'job returned' notifications.
    * @throws Exception if any error occurs.
    */
-  public void checkSendResultsStrategy(final String jobName, final String strategyName, final int expectedReturnedCount) throws Exception
-  {
+  private void checkSendResultsStrategy(final String jobName, final String strategyName, final int expectedReturnedCount) throws Exception {
     int nbTasks = 20;
     JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, LifeCycleTask.class, 1L);
     final AtomicInteger returnedCount = new AtomicInteger(0);
@@ -433,15 +399,10 @@ public class TestJPPFJobSLA extends Setup1D2N1C
   /**
    * A task that creates a file.
    */
-  public static class FileTask extends JPPFTask
-  {
-    /**
-     * 
-     */
+  public static class FileTask extends JPPFTask {
+    /** */
     private final String filePath;
-    /**
-     * 
-     */
+    /** */
     private final boolean appendNodeSuffix;
 
     /**
@@ -449,17 +410,14 @@ public class TestJPPFJobSLA extends Setup1D2N1C
      * @param filePath the path of the file to create.
      * @param appendNodeSuffix <code>true</code> to append the node name to the file's name, <code>false</code> otherwise.
      */
-    public FileTask(final String filePath, final boolean appendNodeSuffix)
-    {
+    public FileTask(final String filePath, final boolean appendNodeSuffix) {
       this.filePath = filePath;
       this.appendNodeSuffix = appendNodeSuffix;
     }
 
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         String name = filePath;
         if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         name = name + ".tmp";
@@ -468,9 +426,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C
         Thread.sleep(2000L);
         Writer writer = new FileWriter(f);
         StreamUtils.closeSilent(writer);
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         setThrowable(e);
         e.printStackTrace();
       }

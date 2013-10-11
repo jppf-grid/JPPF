@@ -39,6 +39,7 @@ public final class ExceptionUtils
    */
   public static String getStackTrace(final Throwable t)
   {
+    if (t == null) return "null";
     StringBuilder sb = new StringBuilder(getMessage(t));
     for (StackTraceElement elt: t.getStackTrace()) sb.append("\n  at ").append(elt);
     return sb.toString();
@@ -51,6 +52,7 @@ public final class ExceptionUtils
    */
   public static String getMessage(final Throwable t)
   {
+    if (t == null) return "null";
     return t.getClass().getName() + ": " + t.getMessage();
   }
 }
