@@ -27,6 +27,14 @@ public enum TaskState {
    */
   PENDING,
   /**
+   * Task is to be resubmitted following a dispatch expiration.
+   */
+  TIMEOUT_RESUBMIT,
+  /**
+   * Task is to be cancelled following one or more dispatch expirations.
+   */
+  TIMEOUT_CANCELLED,
+  /**
    * Exception was received for task.
    */
   EXCEPTION,
@@ -37,9 +45,5 @@ public enum TaskState {
   /**
    * Task is cancelled.
    */
-  CANCELLED,
-  /**
-   * The task was sent back to the client.
-   */
-  SENT
+  CANCELLED
 }

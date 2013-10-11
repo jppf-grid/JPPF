@@ -38,6 +38,7 @@ public class JPPFTestRunner
    * Default output file.
    */
   private static final String DEFAULT_OUTPUT = "";
+
   /**
    * Run all the test classes specified in the file.
    * @param classNamesFile contains the names of test classes to run, one per line.

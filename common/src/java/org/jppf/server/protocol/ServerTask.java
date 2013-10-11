@@ -19,6 +19,7 @@
 package org.jppf.server.protocol;
 
 import org.jppf.io.DataLocation;
+import org.slf4j.*;
 
 /**
  *
@@ -26,6 +27,14 @@ import org.jppf.io.DataLocation;
  * @exclude
  */
 public class ServerTask {
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ServerTask.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Client bundle that owns this task.
    */
@@ -54,10 +63,14 @@ public class ServerTask {
    * The state of this task.
    */
   private TaskState state = TaskState.PENDING;
+  /**
+   * Number of times a dispatch of this task has expired.
+   */
+  private int expirationCount = 0;
 
   /**
    *
-   * @param bundle client bundle that own this task. 
+   * @param bundle client bundle that own this task.
    * @param position identification of this task within bundle.
    * @param dataLocation shared data provider for this task.
    * @param jobPosition the position of this task within the job submitted by the client.
@@ -105,6 +118,14 @@ public class ServerTask {
   }
 
   /**
+   * Set the state of this task.
+   * @param state a {@link TaskState} enumerated value.
+   */
+  public void setState(final TaskState state) {
+    this.state = state;
+  }
+
+  /**
    * Get the result of the task execution.
    * @return the result as <code>DataLocation</code>.
    */
@@ -124,10 +145,29 @@ public class ServerTask {
    * Mark this task as cancelled.
    */
   public void cancel() {
+    if (debugEnabled) log.debug("cancelling {}", this);
     result = dataLocation;
     state = TaskState.CANCELLED;
   }
-  
+
+  /**
+   * Mark this task as cancelled after dispatch expiration.
+   */
+  public void expirationCancel() {
+    if (debugEnabled) log.debug("cancelling {}", this);
+    result = dataLocation;
+    state = TaskState.TIMEOUT_CANCELLED;
+  }
+
+  /**
+   * Mark this task as to be resubmitted followxing expiration of a node dispatch.
+   */
+  public void expirationResubmit() {
+    if (debugEnabled) log.debug("expiring {}", this);
+    result = null;
+    state = TaskState.TIMEOUT_RESUBMIT;
+  }
+
   /**
    * Called to notify that the task received result.
    * @param result the result.
@@ -150,20 +190,15 @@ public class ServerTask {
     this.state = TaskState.EXCEPTION;
   }
 
-  /**
-   * Set this task as sent back to the client.
-   */
-  public void taskSent() {
-    state = TaskState.SENT;
-  }
-
   @Override
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("ServerTask");
-    sb.append("{position=").append(position);
-    sb.append(", state=").append(getState());
+    sb.append("ServerTask[");
+    sb.append("state=").append(getState());
+    sb.append(", position=").append(position);
+    sb.append(", jobPosition=").append(jobPosition);
+    sb.append(", expirationCount=").append(expirationCount);
     sb.append(", dataLocation=").append(dataLocation);
     sb.append(", result=").append(result);
     sb.append(", exception=").append(exception);
@@ -178,5 +213,23 @@ public class ServerTask {
   public int getJobPosition()
   {
     return jobPosition;
+  }
+
+  /**
+   * Get the number of times a dispatch of this task has expired.
+   * @return the number of expirations as an int.
+   */
+  public int getExpirationCount()
+  {
+    return expirationCount;
+  }
+
+  /**
+   * Increment and get the number of times a dispatch of this task has expired.
+   * @return the new number of expirations as an int.
+   */
+  public int incExpirationCount()
+  {
+    return ++expirationCount;
   }
 }

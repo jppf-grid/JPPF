@@ -184,7 +184,7 @@ public class ServerTaskBundleClient
     for (Pair<Integer, DataLocation> result: results) {
       ServerTask task = taskList.get(result.first());
       //if (task.getState() != ServerTask.State.RESULT) {
-      if (task.getState() == TaskState.PENDING) {
+      if ((task.getState() == TaskState.PENDING) || (task.getState() == TaskState.TIMEOUT_CANCELLED)) {
         tasksToSendList.add(task);
         pendingTasksCount.decrementAndGet();
       }

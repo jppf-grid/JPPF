@@ -98,15 +98,14 @@ public class ServerTaskBundleNode {
    * @param taskBundle the job.
    * @param taskList the tasks to execute.
    */
-  public ServerTaskBundleNode(final ServerJob job, final JPPFTaskBundle taskBundle, final List<ServerTask> taskList)
-  {
+  public ServerTaskBundleNode(final ServerJob job, final JPPFTaskBundle taskBundle, final List<ServerTask> taskList) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskBundle == null) throw new IllegalArgumentException("taskBundle is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
 
     this.job = job;
     this.taskBundle = taskBundle;
-    this.taskList = Collections.unmodifiableList(new ArrayList<>(taskList));
+    this.taskList = new ArrayList<>(taskList);
     int size = this.taskList.size();
     this.taskBundle.setTaskCount(size);
     this.taskBundle.setCurrentTaskCount(size);
@@ -120,8 +119,7 @@ public class ServerTaskBundleNode {
    * Get the job this submission is for.
    * @return a {@link JPPFTaskBundle} instance.
    */
-  public JPPFTaskBundle getJob()
-  {
+  public JPPFTaskBundle getJob() {
     return taskBundle;
   }
 
@@ -129,8 +127,7 @@ public class ServerTaskBundleNode {
    * Get the client job this submission is for
    * @return a {@link ServerJob} instance.
    */
-  public ServerJob getClientJob()
-  {
+  public ServerJob getClientJob() {
     return job;
   }
 
@@ -138,8 +135,7 @@ public class ServerTaskBundleNode {
    * Get shared data provider for this task.
    * @return a <code>DataProvider</code> instance.
    */
-  public DataLocation getDataProvider()
-  {
+  public DataLocation getDataProvider() {
     return dataProvider;
   }
 
@@ -147,8 +143,7 @@ public class ServerTaskBundleNode {
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<ServerTask> getTaskList()
-  {
+  public List<ServerTask> getTaskList() {
     return taskList;
   }
 
@@ -157,14 +152,11 @@ public class ServerTaskBundleNode {
    * @param channel the node to which the job is dispatched.
    * @param future  future assigned to bundle execution.
    */
-  public void jobDispatched(final ExecutorChannel channel, final Future<?> future)
-  {
+  public void jobDispatched(final ExecutorChannel channel, final Future<?> future) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (future == null) throw new IllegalArgumentException("future is null");
-
     this.channel = channel;
     this.future  = future;
-
     job.jobDispatched(this);
   }
 
@@ -172,8 +164,7 @@ public class ServerTaskBundleNode {
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param results the list of tasks whose results have been received from the server.
    */
-  public void resultsReceived(final List<DataLocation> results)
-  {
+  public void resultsReceived(final List<DataLocation> results) {
     job.resultsReceived(this, results);
   }
 
@@ -181,8 +172,7 @@ public class ServerTaskBundleNode {
    * Called to notify that throwable eventually raised while receiving the results.
    * @param throwable the throwable that was raised while receiving the results.
    */
-  public void resultsReceived(final Throwable throwable)
-  {
+  public void resultsReceived(final Throwable throwable) {
     job.resultsReceived(this, throwable);
   }
 
@@ -190,8 +180,7 @@ public class ServerTaskBundleNode {
    * Called to notify that the execution of a task has completed.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public void taskCompleted(final Exception exception)
-  {
+  public void taskCompleted(final Exception exception) {
     if (debugEnabled && (exception != null)) log.debug("received exception for " + this + " : " + ExceptionUtils.getStackTrace(exception));
     try {
       job.jobReturned(this);
@@ -213,19 +202,29 @@ public class ServerTaskBundleNode {
   }
 
   /**
+   * Called when this task bundle should be resubmitted
+   */
+  public void expire() {
+    if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
+    int max = job.getSLA().getMaxDispatchExpirations();
+    for (ServerTask task: taskList) {
+      if (task.incExpirationCount() > max) task.expirationCancel();
+      else task.expirationResubmit();
+    }
+  }
+
+  /**
    * Get the requeued indicator.
    * @return <code>true</code> if job is requeued, <code>false</code> otherwise.
    */
-  public synchronized boolean isRequeued()
-  {
+  public synchronized boolean isRequeued() {
     return requeued;
   }
 
   /**
    * Called when this task bundle is cancelled.
    */
-  public synchronized void cancel()
-  {
+  public synchronized void cancel() {
     this.cancelled = true;
   }
 
@@ -233,8 +232,7 @@ public class ServerTaskBundleNode {
    * Get the cancelled indicator.
    * @return <code>true</code> if job is cancelled, <code>false</code> otherwise.
    */
-  public synchronized boolean isCancelled()
-  {
+  public synchronized boolean isCancelled() {
     return cancelled;
   }
 
@@ -313,5 +311,26 @@ public class ServerTaskBundleNode {
   public long getId()
   {
     return id;
+  }
+
+  /**
+   * Build a unique key for the specified node task bundle.
+   * @param bundle a {@link ServerTaskBundleNode} instance.
+   * @return a unique key as a string.
+   */
+  public static String makeKey(final ServerTaskBundleNode bundle)
+  {
+    return makeKey(bundle.getJob().getUuid(), bundle.getId());
+  }
+
+  /**
+   * Build a unique key for a node task bundle with the specified job uuid and node id.
+   * @param jobUuid the uuid of the job to which the bundle belongs.
+   * @param bundleId the id of the bundle.
+   * @return a unique key as a string.
+   */
+  public static String makeKey(final String jobUuid, final long bundleId)
+  {
+    return new StringBuilder(jobUuid).append('|').append(bundleId).toString();
   }
 }

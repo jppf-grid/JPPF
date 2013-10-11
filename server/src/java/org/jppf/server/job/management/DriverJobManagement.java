@@ -162,9 +162,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
     if (bundleWrapper == null) return null;
     JPPFTaskBundle bundle = bundleWrapper.getJob();
-    boolean pending = (Boolean) bundle.getParameter(BundleParameter.JOB_PENDING, false);
-    JobInformation job = new JobInformation(jobUuid, bundle.getName(), bundle.getTaskCount(), bundle.getInitialTaskCount(),
-        bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), pending);
+    JobInformation job = new JobInformation(bundle);
     job.setMaxNodes(bundle.getSLA().getMaxNodes());
     return job;
   }

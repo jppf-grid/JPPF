@@ -116,8 +116,7 @@ public abstract class AbstractServerJob {
    * @param lock used to synchronized access to job.
    * @param job  underlying task bundle.
    */
-  protected AbstractServerJob(final Lock lock, final JPPFTaskBundle job)
-  {
+  protected AbstractServerJob(final Lock lock, final JPPFTaskBundle job) {
     if (lock == null) throw new IllegalArgumentException("lock is null");
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + id);
@@ -134,8 +133,7 @@ public abstract class AbstractServerJob {
    * Get the underlying task bundle.
    * @return a <code>ClientTaskBundle</code> instance.
    */
-  public JPPFTaskBundle getJob()
-  {
+  public JPPFTaskBundle getJob() {
     return job;
   }
 
@@ -144,8 +142,7 @@ public abstract class AbstractServerJob {
    * @return the uuid as a string.
    * @exclude
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
@@ -153,8 +150,7 @@ public abstract class AbstractServerJob {
    * Set the universal unique id for this job.
    * @param uuid the universal unique id.
    */
-  public void setUuid(final String uuid)
-  {
+  public void setUuid(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -162,8 +158,7 @@ public abstract class AbstractServerJob {
    * Get the user-defined display name for this job. This is the name displayed in the administration console.
    * @return the name as a string.
    */
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -171,8 +166,7 @@ public abstract class AbstractServerJob {
    * Set the user-defined display name for this job.
    * @param name the display name as a string.
    */
-  public void setName(final String name)
-  {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -180,8 +174,7 @@ public abstract class AbstractServerJob {
    * Get the service level agreement between the job and the server.
    * @return an instance of {@link org.jppf.node.protocol.JobSLA}.
    */
-  public JobSLA getSLA()
-  {
+  public JobSLA getSLA() {
     return sla;
   }
 
@@ -189,8 +182,7 @@ public abstract class AbstractServerJob {
    * Get the job metadata.
    * @return an instance of {@link JobMetadata}.
    */
-  public JobMetadata getMetadata()
-  {
+  public JobMetadata getMetadata() {
     return metadata;
   }
 
@@ -198,8 +190,7 @@ public abstract class AbstractServerJob {
    * Set the job metadata.
    * @param metadata an instance of {@link JobMetadata}.
    */
-  public void setMetadata(final JobMetadata metadata)
-  {
+  public void setMetadata(final JobMetadata metadata) {
     this.metadata = metadata;
   }
 
@@ -207,8 +198,7 @@ public abstract class AbstractServerJob {
    * Get the service level agreement between the job and the server.
    * @param sla an instance of <code>JobSLA</code>.
    */
-  public void setSLA(final JobSLA sla)
-  {
+  public void setSLA(final JobSLA sla) {
     this.sla = sla;
   }
 
@@ -216,16 +206,14 @@ public abstract class AbstractServerJob {
    * Get the job expired indicator.
    * @return <code>true</code> if job has expired, <code>false</code> otherwise.
    */
-  public boolean isJobExpired()
-  {
+  public boolean isJobExpired() {
     return jobExpired;
   }
 
   /**
    * Sets and notifies that job has expired.
    */
-  public void jobExpired()
-  {
+  public void jobExpired() {
     setJobExpired(true);
   }
 
@@ -233,8 +221,7 @@ public abstract class AbstractServerJob {
    * Set the job expired indicator.
    * @param jobExpired <code>true</code> to indicate that job has expired. <code>false</code> otherwise.
    */
-  public void setJobExpired(final boolean jobExpired)
-  {
+  public void setJobExpired(final boolean jobExpired) {
     this.jobExpired = jobExpired;
     if (this.jobExpired && !isDone()) cancel(true);
   }
@@ -243,8 +230,7 @@ public abstract class AbstractServerJob {
    * Get the job pending indicator.
    * @return <code>true</code> if job is pending, <code>false</code> otherwise.
    */
-  public boolean isPending()
-  {
+  public boolean isPending() {
     return pending;
   }
 
@@ -252,8 +238,7 @@ public abstract class AbstractServerJob {
    * Set the job pending indicator.
    * @param pending <code>true</code> to indicate that job is pending, <code>false</code> otherwise
    */
-  public void setPending(final boolean pending)
-  {
+  public void setPending(final boolean pending) {
     boolean oldValue = isPending();
     this.pending = pending;
     boolean newValue = isPending();
@@ -273,8 +258,7 @@ public abstract class AbstractServerJob {
    * @param suspended <code>true</code> to indicate that job is suspended, <code>false</code> otherwise.
    * @param requeue <code>true</code> to indicate that job should be requeued, <code>false</code> otherwise.
    */
-  public void setSuspended(final boolean suspended, final boolean requeue)
-  {
+  public void setSuspended(final boolean suspended, final boolean requeue) {
     JobSLA sla = getJob().getSLA();
     if (sla.isSuspended() == suspended) return;
     sla.setSuspended(suspended);
@@ -285,8 +269,7 @@ public abstract class AbstractServerJob {
    * Set the maximum number of nodes this job can run on.
    * @param maxNodes the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
    */
-  public void setMaxNodes(final int maxNodes)
-  {
+  public void setMaxNodes(final int maxNodes) {
     if (maxNodes <= 0) return;
     getJob().getSLA().setMaxNodes(maxNodes);
     fireJobUpdated();
@@ -298,10 +281,8 @@ public abstract class AbstractServerJob {
    * @param newStatus the new value.
    * @return <code>true</code> if new status was set.
    */
-  protected final boolean updateStatus(final ServerJobStatus expect, final ServerJobStatus newStatus)
-  {
-    if (status == expect)
-    {
+  protected final boolean updateStatus(final ServerJobStatus expect, final ServerJobStatus newStatus) {
+    if (status == expect) {
       status = newStatus;
       return true;
     }
@@ -311,16 +292,14 @@ public abstract class AbstractServerJob {
   /**
    * @return <code>true</code> when job is cancelled or finished normally.
    */
-  public boolean isDone()
-  {
+  public boolean isDone() {
     return status.compareTo(ServerJobStatus.EXECUTING) >= 0;
   }
 
   /**
    * @return <code>true</code> when job was cancelled.
    */
-  public boolean isCancelled()
-  {
+  public boolean isCancelled() {
     return status.compareTo(ServerJobStatus.CANCELLED) >= 0;
   }
 
@@ -329,8 +308,7 @@ public abstract class AbstractServerJob {
    * @param mayInterruptIfRunning true if the thread executing this task should be interrupted.
    * @return whether cancellation was successful.
    */
-  public boolean cancel(final boolean mayInterruptIfRunning)
-  {
+  public boolean cancel(final boolean mayInterruptIfRunning) {
     if (status.compareTo(ServerJobStatus.EXECUTING) > 0) return false;
     status = ServerJobStatus.CANCELLED;
     return true;
@@ -339,11 +317,9 @@ public abstract class AbstractServerJob {
   /**
    * Called when task was cancelled or finished.
    */
-  protected void done()
-  {
+  protected void done() {
     Runnable[] runnables;
-    synchronized (onDoneList)
-    {
+    synchronized (onDoneList) {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
     }
     for (Runnable runnable : runnables) runnable.run();
@@ -353,11 +329,9 @@ public abstract class AbstractServerJob {
    * Registers instance to be called on job finish.
    * @param runnable {@link Runnable} to be called on job finish.
    */
-  public void addOnDone(final Runnable runnable)
-  {
+  public void addOnDone(final Runnable runnable) {
     if (runnable == null) throw new IllegalArgumentException("runnable is null");
-    synchronized (onDoneList)
-    {
+    synchronized (onDoneList) {
       onDoneList.add(runnable);
     }
   }
@@ -366,11 +340,9 @@ public abstract class AbstractServerJob {
    * Deregisters instance to be called on job finish.
    * @param runnable {@link Runnable} to be called on job finish.
    */
-  public void removeOnDone(final Runnable runnable)
-  {
+  public void removeOnDone(final Runnable runnable) {
     if (runnable == null) throw new IllegalArgumentException("runnable is null");
-    synchronized (onDoneList)
-    {
+    synchronized (onDoneList) {
       onDoneList.remove(runnable);
     }
   }
@@ -379,8 +351,7 @@ public abstract class AbstractServerJob {
    * Get the job received time.
    * @return the time in milliseconds as a long value.
    */
-  public long getJobReceivedTime()
-  {
+  public long getJobReceivedTime() {
     return jobReceivedTime;
   }
 
@@ -388,8 +359,7 @@ public abstract class AbstractServerJob {
    * Set the job received time.
    * @param jobReceivedTime the time in milliseconds as a long value.
    */
-  public void setJobReceivedTime(final long jobReceivedTime)
-  {
+  public void setJobReceivedTime(final long jobReceivedTime) {
     this.jobReceivedTime = jobReceivedTime;
   }
 
@@ -397,8 +367,7 @@ public abstract class AbstractServerJob {
    * Get the time at which this wrapper was added to the queue.
    * @return the time in milliseconds as a long value.
    */
-  public long getQueueEntryTime()
-  {
+  public long getQueueEntryTime() {
     return queueEntryTime;
   }
 
@@ -406,8 +375,7 @@ public abstract class AbstractServerJob {
    * Set the time at which this wrapper was added to the queue.
    * @param queueEntryTime the time in milliseconds as a long value.
    */
-  public void setQueueEntryTime(final long queueEntryTime)
-  {
+  public void setQueueEntryTime(final long queueEntryTime) {
     this.queueEntryTime = queueEntryTime;
   }
 
@@ -421,8 +389,7 @@ public abstract class AbstractServerJob {
    * Get the initial task count.
    * @return the count as an int.
    */
-  public int getInitialTaskCount()
-  {
+  public int getInitialTaskCount() {
     return job.getInitialTaskCount();
   }
 

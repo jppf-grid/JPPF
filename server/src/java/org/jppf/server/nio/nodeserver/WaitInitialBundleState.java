@@ -20,17 +20,16 @@ package org.jppf.server.nio.nodeserver;
 
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.server.protocol.BundleParameter.*;
+import static org.jppf.utils.StringUtils.build;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
-import java.util.List;
 
-import org.jppf.io.DataLocation;
 import org.jppf.management.*;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -72,8 +71,8 @@ class WaitInitialBundleState extends NodeServerState
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
-      Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
-      JPPFTaskBundle bundle = received.first();
+      BundleResults received = context.deserializeBundle();
+      JPPFTaskBundle bundle = received.bundle();
       boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
@@ -85,7 +84,7 @@ class WaitInitialBundleState extends NodeServerState
       if (systemInfo != null) {
         context.setNodeInfo(systemInfo);
         if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
-      } else if (debugEnabled) log.debug("no system info received for node " + channel);
+      } else if (debugEnabled) log.debug("no system info received for node {}", channel);
 
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
@@ -96,7 +95,7 @@ class WaitInitialBundleState extends NodeServerState
         if ((uuid != null) && !bundle.getParameter(NODE_OFFLINE, false)) {
           String host = getChannelHost(channel);
           int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
-          boolean sslEnabled = channel.isLocal() ? false : context.getSSLHandler() != null;
+          boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
           byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
           if (channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
           JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, type, sslEnabled);
@@ -107,26 +106,38 @@ class WaitInitialBundleState extends NodeServerState
       server.nodeConnected(context);
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(received, context);
-      context.setMessage(null);
-      context.setBundle(null);
-      return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
+      return finalizeTransition(context);
     }
     return TO_WAIT_INITIAL;
   }
 
   /**
-   * Process a request from the node to send the results of a job executed offline.
-   * @param received holds the received bundle along with the tasks.
-   * @param context the context associated witht he node channel.
-   * @return the {@link TO_WAITING_RESULTS} transition name.
+   * Finalize the state transition processing and return the traznsition to the next state.
+   * @param context the context associated with the node channel.
+   * @return the next transition to process.
    * @throws Exception if any error occurs.
    */
-  private NodeTransition processOfflineReopen(final Pair<JPPFTaskBundle, List<DataLocation>> received, final AbstractNodeContext context) throws Exception {
-    JPPFTaskBundle bundle = received.first();
+  private NodeTransition finalizeTransition(final AbstractNodeContext context) throws Exception {
+    context.setMessage(null);
+    context.setBundle(null);
+    return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
+  }
+
+  /**
+   * Process a request from the node to send the results of a job executed offline.
+   * @param received holds the received bundle along with the tasks.
+   * @param context the context associated with the node channel.
+   * @return the next transition to process.
+   * @throws Exception if any error occurs.
+   */
+  private NodeTransition processOfflineReopen(final BundleResults received, final AbstractNodeContext context) throws Exception {
+    JPPFTaskBundle bundle = received.bundle();
     String jobUuid = bundle.getParameter(JOB_UUID);
     long id = bundle.getParameter(NODE_BUNDLE_ID);
     ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);
-    if (debugEnabled) log.debug("processing offline reopen with jobUuid=" + jobUuid + ", id=" + id + ", nodeBundle=" + nodeBundle + ", node=" + context.getChannel());
+    // if the driver was restarted, we discard the results
+    if (nodeBundle == null) return finalizeTransition(context);
+    if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context.getChannel()));
     context.setBundle(nodeBundle);
     WaitingResultsState wrs = (WaitingResultsState) server.getFactory().getState(NodeState.WAITING_RESULTS);
     return wrs.process(received, context);

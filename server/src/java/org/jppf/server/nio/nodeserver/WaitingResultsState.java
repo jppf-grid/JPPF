@@ -21,10 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.server.protocol.BundleParameter.*;
 
-import java.util.List;
-
 import org.jppf.JPPFException;
-import org.jppf.io.DataLocation;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
@@ -59,7 +56,7 @@ class WaitingResultsState extends NodeServerState {
     //if (debugEnabled) log.debug("exec() for " + channel);
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.readMessage(channel)) {
-      Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
+      BundleResults received = context.deserializeBundle();
       return process(received, context);
     }
     return TO_WAITING_RESULTS;
@@ -72,13 +69,14 @@ class WaitingResultsState extends NodeServerState {
    * @return the enxt transition to perform.
    * @throws Exception if any error occurs.
    */
-  public NodeTransition process(final Pair<JPPFTaskBundle, List<DataLocation>> received, final AbstractNodeContext context) throws Exception {
+  public NodeTransition process(final BundleResults received, final AbstractNodeContext context) throws Exception {
     //AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     Exception exception = null;
     ServerTaskBundleNode nodeBundle = context.getBundle();
+    server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle));
     boolean requeue = false;
     try {
-      JPPFTaskBundle newBundle = received.first();
+      JPPFTaskBundle newBundle = received.bundle();
       if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + context.getChannel());
       Pair<Boolean, Exception> res = processResults(context, received);
       requeue = res.first();
@@ -106,8 +104,8 @@ class WaitingResultsState extends NodeServerState {
    * @return A pairing of a requeue indicator and an eventual exception returned by the node.
    * @throws Exception if any error occurs.
    */
-  private Pair<Boolean, Exception> processResults(final AbstractNodeContext context, final Pair<JPPFTaskBundle, List<DataLocation>> received) throws Exception {
-    JPPFTaskBundle newBundle = received.first();
+  private Pair<Boolean, Exception> processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
+    JPPFTaskBundle newBundle = received.bundle();
     ServerTaskBundleNode nodeBundle = context.getBundle();
     Exception exception = null;
     // if an exception prevented the node from executing the tasks or sending back the results
@@ -118,8 +116,8 @@ class WaitingResultsState extends NodeServerState {
       exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
       nodeBundle.resultsReceived(t);
     } else {
-      if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.first());
-      nodeBundle.resultsReceived(received.second());
+      if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
+      nodeBundle.resultsReceived(received.data());
       long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
       server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L, 
           ((AbstractTaskBundleMessage) context.getMessage()).getLength());

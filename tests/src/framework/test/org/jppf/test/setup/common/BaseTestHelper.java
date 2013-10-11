@@ -106,4 +106,26 @@ public class BaseTestHelper
     if (!blocking) job.setResultListener(new JPPFResultCollector(job));
     return job;
   }
+
+  /**
+   * Create a job with the specified parameters.
+   * The type of the tasks is specified via their class, and the constructor to
+   * use is specified based on the number of parameters.
+   * @param name the job's name.
+   * @param blocking specifies whether the job is blocking.
+   * @param broadcast specifies whether the job is a broadcast job.
+   * @param tasks the tasks to put in the job.
+   * @return a <code>JPPFJob</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFJob createJob2(final String name, final boolean blocking, final boolean broadcast, final Object...tasks) throws Exception
+  {
+    JPPFJob job = new JPPFJob();
+    job.setName(name);
+    for (int i=1; i<=tasks.length; i++) job.addTask(tasks[i-1]).setId(job.getName() + " - task " + i);
+    job.setBlocking(blocking);
+    job.getSLA().setBroadcastJob(broadcast);
+    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
+    return job;
+  }
 }

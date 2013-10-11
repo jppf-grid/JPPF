@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 import javax.management.*;
 
 import org.jppf.server.node.*;
+import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
@@ -71,7 +72,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * 
    */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("NodeTaskNonitor"));
 
   /**
    * Default constructor.
@@ -92,7 +93,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * Called to notify a listener that a task was executed.
    * @param event the event encapsulating the task-related data.
-   * @see org.jppf.server.node.TaskExecutionListener#taskExecuted(org.jppf.server.node.TaskExecutionEvent)
    */
   @Override
   public synchronized void taskExecuted(final TaskExecutionEvent event)
@@ -109,7 +109,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * Get the total number of tasks executed by the node.
    * @return the number of tasks as an integer value.
-   * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksExecuted()
    */
   @Override
   public synchronized Integer getTotalTasksExecuted()
@@ -120,7 +119,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The total cpu time used by the tasks in milliseconds.
    * @return the cpu time as long value.
-   * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskCpuTime()
    */
   @Override
   public synchronized Long getTotalTaskCpuTime()
@@ -131,7 +129,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The total elapsed time used by the tasks in milliseconds.
    * @return the elapsed time as long value.
-   * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTaskElapsedTime()
    */
   @Override
   public synchronized Long getTotalTaskElapsedTime()
@@ -142,7 +139,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The total number of tasks that ended in error.
    * @return the number as an integer value.
-   * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksInError()
    */
   @Override
   public synchronized Integer getTotalTasksInError()
@@ -153,7 +149,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The total number of tasks that executed successfully.
    * @return the number as an integer value.
-   * @see org.jppf.management.JPPFNodeTaskMonitorMBean#getTotalTasksSucessfull()
    */
   @Override
   public synchronized Integer getTotalTasksSucessfull()

@@ -78,6 +78,18 @@ public class BaseSetup
   }
 
   /**
+   * Get a proxy to the driver admin MBean.
+   * @return an instance of <code>DriverJobManagementMBean</code>.
+   * @throws Exception if the proxy could not be obtained.
+   */
+  public static JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
+  {
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
+    while (!driver.isConnected()) driver.connectAndWait(10L);
+    return driver;
+  }
+
+  /**
    * Launches a driver and the specified number of node and start the client.
    * @param nbNodes the number of nodes to launch.
    * @return an instance of <code>JPPFClient</code>.
@@ -297,6 +309,24 @@ public class BaseSetup
       }
     };
     Runtime.getRuntime().addShutdownHook(shutdownHook);
+  }
+
+  /**
+   * Get the number of drivers in the test setup.
+   * @return the number of drivers as an int.
+   */
+  public static int nbDrivers()
+  {
+    return drivers == null ? 0 : drivers.length;
+  }
+
+  /**
+   * Get the number of nodes in the test setup.
+   * @return the number of nodes as an int.
+   */
+  public static int nbNodes()
+  {
+    return nodes == null ? 0 : nodes.length;
   }
 
   /**

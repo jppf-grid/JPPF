@@ -103,8 +103,10 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    */
   private void addNotificationListener(final NotificationListenerWrapper wrapper)
   {
+    if (debugEnabled) log.debug("adding notification listener {}", wrapper);
     NodeSelector selector = wrapper.getSelector();
     Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector);
+    if (debugEnabled) log.debug("found {} nodes", nodes.size());
     lock.lock();
     try
     {
@@ -126,7 +128,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   {
     String uuid = node.getUuid();
     String mbean = wrapper.getMBeanName();
-    if (debugEnabled) log.debug("add notification listener for node=" + uuid + ", mbean='" + mbean + "'");
+    if (debugEnabled) log.debug("adding notification listener for node={} : {}", uuid, wrapper);
     ForwardingNotificationDispatcher dispatcher = nodeMap.get(uuid);
     boolean wasNull = dispatcher == null;
     if (wasNull) dispatcher = new ForwardingNotificationDispatcher(node);

@@ -23,21 +23,20 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.management.*;
+import javax.management.Notification;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.management.NodeSelector;
-import org.jppf.management.NodeSelector.*;
+import org.jppf.management.*;
+import org.jppf.management.NodeSelector.AllNodesSelector;
+import org.jppf.management.NodeSelector.ExecutionPolicySelector;
+import org.jppf.management.NodeSelector.UuidSelector;
 import org.jppf.management.forwarding.*;
-import org.jppf.node.NodeRunner;
 import org.jppf.node.policy.Equal;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.test.addons.mbeans.*;
-import org.jppf.test.addons.startups.TaskNotifier;
 import org.jppf.utils.*;
 import org.junit.Test;
 
-import test.org.jppf.test.setup.common.BaseTestHelper;
+import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for {@link JPPFNodeForwardingMBean}.
@@ -87,15 +86,15 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
     //int nbNodes = expectedNodes.length;
     int nbNodes = allNodes.size();
     int nbTasks = 5 * nbNodes;
-    NodeNotificationListener listener = null;
+    NotifyingTaskListener listener = null;
     String listenerID = null;
     try
     {
       configureLoadBalancer();
-      listener = new NodeNotificationListener();
+      listener = new NotifyingTaskListener();
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
-      JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotificationTask.class, 100L);
+      JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
       client.submit(job);
       Thread.sleep(1500L);
       checkNotifs(listener.notifs, nbTasks, expectedNodes);
@@ -148,16 +147,16 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
   {
     int nbNodes = expectedNodes.length;
     int nbTasks = 5 * nbNodes;
-    NodeNotificationListener listener = null;
+    NotifyingTaskListener listener = null;
     String listenerID = null;
     try
     {
       configureLoadBalancer();
-      listener = new NodeNotificationListener();
+      listener = new NotifyingTaskListener();
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       driverJmx.unregisterForwardingNotificationListener(listenerID);
       String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
-      JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotificationTask.class, 100L);
+      JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
       client.submit(job);
       assertTrue(listener.notifs.isEmpty());
       assertNull(listener.exception);
@@ -207,69 +206,6 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
     for (Map.Entry<String, AtomicInteger> entry: notifCounts.entrySet())
     {
       assertEquals(nbNotifsPerNode, entry.getValue().get());
-    }
-  }
-
-  /**
-   * A {@link NotificationListener} which simply accumulates the notifications it receives.
-   */
-  public static class NodeNotificationListener implements NotificationListener
-  {
-    /**
-     * The task information received as notifications from the node.
-     */
-    public List<Notification> notifs = new Vector<>();
-    /**
-     * 
-     */
-    public Exception exception = null;
-
-    @Override
-    public void handleNotification(final Notification notification, final Object handback)
-    {
-      try
-      {
-        notifs.add(notification);
-      }
-      catch (Exception e)
-      {
-        if (exception == null) exception = e;
-      }
-    }
-  }
-
-  /**
-   * A task that sends a notification via NodeTestMBean.
-   */
-  public static class NotificationTask extends JPPFTask
-  {
-    /**
-     * The duration of this task
-     */
-    private final long duration;
-
-    /**
-     * Initialize this task.
-     * @param duration the duration of this task.
-     */
-    public NotificationTask(final long duration)
-    {
-      this.duration = duration;
-    }
-
-    @Override
-    public void run()
-    {
-      try
-      {
-        Thread.sleep(duration);
-        TaskNotifier.addNotification(new UserObject(NodeRunner.getUuid(), getId()));
-        System.out.println("task " + getId() + " successful");
-      }
-      catch (Exception e)
-      {
-        e.printStackTrace();
-      }
     }
   }
 }

@@ -73,9 +73,8 @@ public class JobEventTask implements Runnable
   public void run()
   {
     JobSLA sla = bundle.getSLA();
-    boolean pending = bundle.getParameter(BundleParameter.JOB_PENDING, false);
     JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(),
-        bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), pending);
+        bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), bundle.getParameter(BundleParameter.JOB_PENDING, false));
     jobInfo.setMaxNodes(sla.getMaxNodes());
     JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);

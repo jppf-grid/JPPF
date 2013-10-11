@@ -81,4 +81,16 @@ class NotificationListenerWrapper
   {
     return mBeanName;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("listenerID=").append(listenerID);
+    sb.append(", selector=").append(selector);
+    sb.append(", mBeanName=").append(mBeanName);
+    sb.append(']');
+    return sb.toString();
+  }
 }

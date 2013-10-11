@@ -100,22 +100,17 @@ public class JPPFScheduleHandler
    * @param start the start time to use if the schedule is expressed as a duration.
    * @throws ParseException if the schedule date could not be parsed
    */
-  public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action, final long start) throws ParseException
-  {
-    if (debugEnabled)
-    {
-      synchronized(sdf)
-      {
+  public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action, final long start) throws ParseException {
+    if (debugEnabled) {
+      synchronized(sdf) {
         log.debug(name + " : scheduling action[key=" + key + ", " + schedule + ", action=" + action + ", start=" + sdf.format(new Date(start)));
       }
     }
     Date date = schedule.toDate(start);
     ScheduledFuture<?> future = executor.schedule(action, date.getTime() - start, TimeUnit.MILLISECONDS);
     futureMap.put(key, future);
-    if (debugEnabled)
-    {
-      synchronized(sdf)
-      {
+    if (debugEnabled) {
+      synchronized(sdf) {
         log.debug(name + " : date=" + sdf.format(date) + ", key=" + key + ", future=" + future);
       }
     }

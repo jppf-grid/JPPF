@@ -44,4 +44,15 @@ public class UserObject implements Serializable
     this.nodeUuid = nodeUuid;
     this.taskId = taskId;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("nodeUuid=").append(nodeUuid);
+    sb.append(", taskId=").append(taskId);
+    sb.append(']');
+    return sb.toString();
+  }
 }

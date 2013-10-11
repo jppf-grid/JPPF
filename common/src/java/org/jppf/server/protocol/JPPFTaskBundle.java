@@ -352,6 +352,14 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
    * Get the job requeue flag.
    * @return job requeue flag.
    */
+  public boolean isPending() {
+    return getParameter(BundleParameter.JOB_PENDING, false);
+  }
+
+  /**
+   * Get the job requeue flag.
+   * @return job requeue flag.
+   */
   public boolean isRequeue() {
     return getParameter(BundleParameter.JOB_REQUEUE, false);
   }

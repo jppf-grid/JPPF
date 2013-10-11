@@ -20,6 +20,8 @@ package test.org.jppf.test.runner;
 
 import java.io.PrintStream;
 
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.streams.StreamUtils;
 import org.junit.runner.*;
 import org.junit.runner.notification.*;
 
@@ -53,6 +55,10 @@ public class TestRunListener extends RunListener
    * The test class being executed.
    */
   private String currentClass = "";
+  /**
+   * 
+   */
+  private final String actionOnError = JPPFConfiguration.getProperties().getString("jppf.test.on_error", "NONE").toUpperCase();
 
   /**
    * Initialize this listener with the specified result holder.
@@ -130,6 +136,8 @@ public class TestRunListener extends RunListener
   {
     resultHolder.addFailure(failure);
     if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "'");
+    if ("EXIT".equals(actionOnError)) System.exit(1);
+    if ("WAIT".equals(actionOnError)) StreamUtils.waitKeyPressed("Press [Enter] to continue ...");
   }
 
   @Override

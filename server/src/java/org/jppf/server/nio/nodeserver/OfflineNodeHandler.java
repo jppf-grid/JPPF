@@ -40,8 +40,7 @@ public class OfflineNodeHandler
    */
   public void addNodeBundle(final ServerTaskBundleNode nodeBundle)
   {
-    String key = new StringBuilder(nodeBundle.getJob().getUuid()).append('|').append(nodeBundle.getId()).toString();
-    bundleMap.put(key, nodeBundle);
+    bundleMap.put(ServerTaskBundleNode.makeKey(nodeBundle), nodeBundle);
   }
 
   /**
@@ -52,7 +51,6 @@ public class OfflineNodeHandler
    */
   public ServerTaskBundleNode removeNodeBundle(final String jobUuid, final long bundleId)
   {
-    String key = new StringBuilder(jobUuid).append('|').append(bundleId).toString();
-    return bundleMap.remove(key);
+    return bundleMap.remove(ServerTaskBundleNode.makeKey(jobUuid, bundleId));
   }
 }

@@ -27,6 +27,7 @@ import org.jppf.execute.*;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.queue.*;
+import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.*;
@@ -105,7 +106,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   private final ExecutorChannelStatusListener statusListener = new ExecutorChannelStatusListener() {
     @Override
     public void executionStatusChanged(final ExecutorChannelStatusEvent event) {
-      if(event.getSource() instanceof AbstractNodeContext) {
+      if (event.getSource() instanceof AbstractNodeContext) {
         updateConnectionStatus((AbstractNodeContext) event.getSource(), event.getOldValue(), event.getNewValue());
       }
     }
@@ -114,6 +115,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * The object that holds the node bundles waiting for a node to reconnect and send the rsults.
    */
   private final OfflineNodeHandler offlineNodeHandler = new OfflineNodeHandler();
+  /**
+   * Handles expiration of dispatched bundles.
+   */
+  private final JPPFScheduleHandler dispatchExpirationHandler = new JPPFScheduleHandler("DispatchExpiration");
 
   /**
    * Initialize this node server.
@@ -506,5 +511,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public OfflineNodeHandler getOfflineNodeHandler() {
     return offlineNodeHandler;
+  }
+
+  /**
+   * Get the handler for the expiration of dispatched bundles.
+   * @return a {@link JPPFScheduleHandler} instance.
+   */
+  public JPPFScheduleHandler getDispatchExpirationHandler() {
+    return dispatchExpirationHandler;
   }
 }

@@ -32,6 +32,10 @@ public class ClassPathImpl implements ClassPath
    * Mapping of classpath elements to their names.
    */
   private final Map<String, ClassPathElement> elementMap = new HashMap<>();
+  /**
+   * Determines whether the node should force a reset of the class loader before executing the tasks.
+   */
+  private boolean forceClassLoaderReset = false;
 
   @Override
   public Iterator<ClassPathElement> iterator()
@@ -97,5 +101,17 @@ public class ClassPathImpl implements ClassPath
   public boolean isEmpty()
   {
     return elementMap.isEmpty();
+  }
+
+  @Override
+  public boolean isForceClassLoaderReset()
+  {
+    return forceClassLoaderReset;
+  }
+
+  @Override
+  public void setForceClassLoaderReset(final boolean forceClassLoaderReset)
+  {
+    this.forceClassLoaderReset = forceClassLoaderReset;
   }
 }

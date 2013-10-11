@@ -22,6 +22,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.net.ConnectException;
 
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
@@ -61,22 +62,18 @@ class SendingBundleState extends NodeServerState
    * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     if (traceEnabled) log.trace("exec() for " + channel);
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
 
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (context.getMessage() == null)
-    {
+    if (context.getMessage() == null) {
       ServerTaskBundleNode nodeBundle = context.getBundle();
       JPPFTaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
-      if (bundle != null)
-      {
+      if (bundle != null) {
         if (debugEnabled) log.debug("got bundle " + nodeBundle + " from the queue for " + channel);
         // to avoid cycles in peer-to-peer routing of jobs.
-        if (bundle.getUuidPath().contains(context.getUuid()))
-        {
+        if (bundle.getUuidPath().contains(context.getUuid())) {
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());
           context.setBundle(null);
           nodeBundle.resubmit();
@@ -84,16 +81,19 @@ class SendingBundleState extends NodeServerState
         }
         nodeBundle.getJob().setExecutionStartTime(System.nanoTime());
         context.serializeBundle(channel);
-      }
-      else
-      {
+      } else {
         if (debugEnabled) log.debug("null bundle for node " + channel);
         return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
       }
     }
-    if (context.writeMessage(channel))
-    {
+    if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent entire bundle " + context.getBundle() + " to node " + channel);
+      ServerTaskBundleNode nodeBundle = context.getBundle();
+      JPPFSchedule schedule = nodeBundle.getJob().getSLA().getDispatchExpirationSchedule();
+      if (schedule != null) {
+        NodeDispatchTimeoutAction action = new NodeDispatchTimeoutAction(server, nodeBundle, context.isOffline() ? null : context);
+        server.getDispatchExpirationHandler().scheduleAction(ServerTaskBundleNode.makeKey(nodeBundle), schedule, action);
+      }
       context.setMessage(null);
       return context.isOffline() ? processOfflineRequest(context) : TO_WAITING_RESULTS;
     }

@@ -27,7 +27,8 @@ import java.util.regex.Pattern;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.*;
+import org.jppf.server.node.AbstractThreadManager;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
@@ -153,8 +154,8 @@ public class TestJPPFClient extends Setup1D1N
   {
     int nbThreads = 2;
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.local.execution.enabled", "true");
-    config.setProperty("jppf.local.execution.threads", "" + nbThreads);
+    config.setBoolean("jppf.local.execution.enabled", true);
+    config.setInt("jppf.local.execution.threads", nbThreads);
     JPPFClient client = new JPPFClient();
     try
     {
@@ -183,7 +184,7 @@ public class TestJPPFClient extends Setup1D1N
         if (ti == null) continue;
         String name = ti.getThreadName();
         if (name == null) continue;
-        if (name.startsWith("node processing")) count++;
+        if (name.startsWith(AbstractThreadManager.THREAD_NAME_PREFIX)) count++;
       }
       assertEquals(nbThreads, count);
     }
@@ -203,8 +204,8 @@ public class TestJPPFClient extends Setup1D1N
   public void testLocalExecutionContextClassLoader() throws Exception
   {
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.rmeote.execution.enabled", "false");
-    config.setProperty("jppf.local.execution.enabled", "true");
+    config.setBoolean("jppf.remote.execution.enabled", false);
+    config.setBoolean("jppf.local.execution.enabled", true);
     JPPFClient client = new JPPFClient();
     try
     {
@@ -294,7 +295,7 @@ public class TestJPPFClient extends Setup1D1N
       assertNotNull(results);
       assertEquals(1, results.size());
       JPPFTask task = results.get(0);
-      assertTrue(task instanceof JPPFExceptionResult);
+      assertTrue(task instanceof NotSerializableTask);
       assertNotNull(task.getException());
       assertTrue(task.getException() instanceof NotSerializableException);
     }
@@ -330,7 +331,7 @@ public class TestJPPFClient extends Setup1D1N
       client = new MyClient();
       waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
       restartDriver(client, poolSize, 1000L * maxReconnect + 1500L);
-      String[] threads = threadNames("^JMX connection .*");
+      String[] threads = threadNames("^" + JMXConnectionWrapper.CONNECTION_NAME_PREFIX + ".*");
       assertEquals(poolSize, threads.length);
     } catch(Exception e) {
       e.printStackTrace();

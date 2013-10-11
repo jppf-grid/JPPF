@@ -23,7 +23,7 @@ import java.io.Serializable;
 import javax.management.NotificationEmitter;
 
 /**
- * An MBean used for unit testing of receiving notifications fromt he nodes.
+ * An MBean used for unit testing of receiving notifications from the nodes.
  * @author Laurent Cohen
  */
 public interface NodeTestMBean extends Serializable, NotificationEmitter

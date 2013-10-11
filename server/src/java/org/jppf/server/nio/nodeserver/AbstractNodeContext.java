@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.management.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
@@ -164,11 +165,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
-    ServerTaskBundleNode tmpWrapper = bundle;
+    ServerTaskBundleNode tmpBundle = bundle;
+    NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
+    server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
     cleanup(channel);
-    if ((tmpWrapper != null) && !tmpWrapper.getJob().isHandshake()) {
-      tmpWrapper.resubmit();
-      tmpWrapper.taskCompleted(new Exception(exception));
+    if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
+      tmpBundle.resubmit();
+      tmpBundle.taskCompleted(new Exception(exception));
     }
   }
 
@@ -209,14 +212,14 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a pairing of the received result head and the serialized tasks.
    * @throws Exception if an error occurs during the deserialization.
    */
-  public Pair<JPPFTaskBundle, List<DataLocation>> deserializeBundle() throws Exception {
+  public BundleResults deserializeBundle() throws Exception {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
     List<DataLocation> tasks = new ArrayList<>();
     if (locations.size() > 1) {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));
     }
-    return new Pair<>(bundle, tasks);
+    return new BundleResults(bundle, tasks);
   }
 
   /**
@@ -457,9 +460,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
       if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
-      if(isDone()) return false;
-      if(isCancelled()) return true;
-      bundle.cancel();
+      if (isDone()) return false;
+      if (isCancelled()) return true;
       try {
         bundle.cancel();
         cancelJob(bundle.getClientJob().getUuid(), false);

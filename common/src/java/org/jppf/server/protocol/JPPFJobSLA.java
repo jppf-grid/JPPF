@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
+import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This class represents the Service Level Agreement Between a JPPF job and a server.
@@ -61,6 +62,14 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * The classpath associated with the job.
    */
   private ClassPath classPath = new ClassPathImpl();
+  /**
+   * The expiration schedule for any subset of the job dispatched to a node.
+   */
+  protected JPPFSchedule dispatchExpirationSchedule = null;
+  /**
+   * The number of times a dispatched task can expire before it is finally cancelled.
+   */
+  protected int maxDispatchExpirations = 0;
 
   /**
    * Default constructor.
@@ -177,6 +186,8 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
     sla.setCancelUponClientDisconnect(cancelUponClientDisconnect);
     sla.setResultsStrategy(resultsStrategy);
     sla.setClassPath(classPath);
+    sla.setDispatchExpirationSchedule(dispatchExpirationSchedule);
+    sla.setMaxDispatchExpirations(maxDispatchExpirations);
     return sla;
   }
 
@@ -203,5 +214,29 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   {
     if (classpath == null) throw new IllegalArgumentException("classpath cannot be null");
     this.classPath = classpath;
+  }
+
+  @Override
+  public JPPFSchedule getDispatchExpirationSchedule()
+  {
+    return dispatchExpirationSchedule;
+  }
+
+  @Override
+  public void setDispatchExpirationSchedule(final JPPFSchedule dispatchExpirationSchedule)
+  {
+    this.dispatchExpirationSchedule = dispatchExpirationSchedule;
+  }
+
+  @Override
+  public int getMaxDispatchExpirations()
+  {
+    return maxDispatchExpirations;
+  }
+
+  @Override
+  public void setMaxDispatchExpirations(final int maxDispatchExpirations)
+  {
+    this.maxDispatchExpirations = maxDispatchExpirations;
   }
 }

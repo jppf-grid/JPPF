@@ -91,12 +91,14 @@ public interface JobSLA extends JobCommonSLA
   /**
    * Get the strategy used to return the results back to the client.
    * @return the name of the strategy to use.
+   * @exclude
    */
   String getResultsStrategy();
 
   /**
    * Set the strategy used to return the results back to the client.
    * @param name the name of the strategy to use.
+   * @exclude
    */
   void setResultsStrategy(String name);
 
