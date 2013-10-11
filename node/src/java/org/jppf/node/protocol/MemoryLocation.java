@@ -98,11 +98,14 @@ public class MemoryLocation extends AbstractLocation<byte[]>
   /**
    * Get the content at this location as an array of bytes. This method is
    * overridden from {@link AbstractLocation#toByteArray() AbstractLocation.toByteArray()} for improved performance.
-   * @return a byte array.
+   * @return a byte array with a length equals to this location's size and starting at the offset specified in the constructor, if any.
    */
   @Override
   public byte[] toByteArray()
   {
-    return path;
+    if ((offset == 0) && (len == path.length)) return path;
+    byte[] buf = new byte[len];
+    System.arraycopy(path, offset, buf, 0, len);
+    return buf;
   }
 }

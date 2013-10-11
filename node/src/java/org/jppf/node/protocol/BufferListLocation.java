@@ -27,6 +27,7 @@ import org.jppf.utils.streams.*;
 /**
  * An in-memory location based on a list of buffers.
  * @author Laurent Cohen
+ * @exclude
  */
 public class BufferListLocation extends AbstractLocation<List<JPPFBuffer>>
 {

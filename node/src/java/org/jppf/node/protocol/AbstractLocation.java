@@ -34,11 +34,11 @@ public abstract class AbstractLocation<T> implements Location<T>
   /**
    * The path for this location.
    */
-  protected T path = null;
+  protected final T path;
   /**
    * The list of listeners to this location.
    */
-  protected List<LocationEventListener> listeners = new CopyOnWriteArrayList<>();
+  protected final List<LocationEventListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * Boolean flag that determines if at least one listener is registered.
    * Used to minimize the overhead of sending events if there is no listener.
@@ -63,21 +63,16 @@ public abstract class AbstractLocation<T> implements Location<T>
   @Override
   public Location copyTo(final Location<?> location) throws Exception
   {
-    try (InputStream is = getInputStream(); OutputStream os = location.getOutputStream())
-    {
-      copyStream(is, os, eventsEnabled);
-    }
+    copyStream(getInputStream(), location.getOutputStream(), eventsEnabled);
     return location;
   }
 
   @Override
   public byte[] toByteArray() throws Exception
   {
-    try (InputStream is = getInputStream(); JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream())
-    {
-      copyStream(is, os, false);
-      return os.toByteArray();
-    }
+    JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
+    copyStream(getInputStream(), os, false);
+    return os.toByteArray();
   }
 
   @Override
@@ -132,6 +127,6 @@ public abstract class AbstractLocation<T> implements Location<T>
         fireLocationEvent(length);
       }
     });
-    StreamUtils.copyStream(is, tmpos, false);
+    StreamUtils.copyStream(is, tmpos, true);
   }
 }

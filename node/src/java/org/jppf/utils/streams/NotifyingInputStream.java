@@ -85,5 +85,6 @@ public class NotifyingInputStream extends InputStream
   public void close() throws IOException
   {
     delegate.close();
+    super.close();
   }
 }

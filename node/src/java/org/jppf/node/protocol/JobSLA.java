@@ -18,6 +18,8 @@
 
 package org.jppf.node.protocol;
 
+import org.jppf.scheduling.JPPFSchedule;
+
 
 /**
  * This interface represents the Service Level Agreement between a JPPF job and a server.
@@ -109,4 +111,28 @@ public interface JobSLA extends JobCommonSLA
    * @param classpath an instance of {@link ClassPath}.
    */
   void setClassPath(ClassPath classpath);
+
+  /**
+   * Get the expiration schedule for any subset of the job dispatched to a node.
+   * @return a {@link JPPFSchedule} instance.
+   */
+  JPPFSchedule getDispatchExpirationSchedule();
+
+  /**
+   * Set the expiration schedule for any subset of the job dispatched to a node.
+   * @param schedule a {@link JPPFSchedule} instance.
+   */
+  void setDispatchExpirationSchedule(JPPFSchedule schedule);
+
+  /**
+   * Get the number of times a dispatched task can expire before it is finally cancelled.
+   * @return the number of expirations as an int.
+   */
+  int getMaxDispatchExpirations();
+
+  /**
+   * Set the number of times a dispatched task can expire before it is finally cancelled.
+   * @param max the number of expirations as an int.
+   */
+  void setMaxDispatchExpirations(int max);
 }

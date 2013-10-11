@@ -75,6 +75,7 @@ public class NotifyingOutputStream extends OutputStream
   public void close() throws IOException
   {
     delegate.close();
+    super.close();
   }
 
   @Override

@@ -91,4 +91,18 @@ public interface ClassPath extends Serializable, Iterable<ClassPathElement>
    * @return <code>true</code> if this classpath has no element, <code>false</code> otherwise.
    */
   boolean isEmpty();
+
+  /**
+   * Determine whether the node should force a reset of the class loader before executing the tasks.
+   * <p>This only applies when this classpath is empty. If it is not empty, then the reset will occur regardless the value of this flag.
+   * @return <code>true</code> if the class loader reset should be forced, <code>false</code> otherwise.
+   */
+  boolean isForceClassLoaderReset();
+
+  /**
+   * Specify whether the node should force a reset of the class loader before executing the tasks.
+   * <p>This only applies when this classpath is empty. If it is not empty, then the reset will occur regardless the value of the specified flag.
+   * @param forceReset <code>true</code> if the class loader reset should be forced, <code>false</code> otherwise.
+   */
+  void setForceClassLoaderReset(boolean forceReset);
 }

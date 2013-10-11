@@ -77,12 +77,16 @@ public class URLLocation extends AbstractLocation<URL>
   @Override
   public InputStream getInputStream() throws Exception
   {
+    if ("file".equalsIgnoreCase(path.getProtocol())) return new BufferedInputStream(new FileInputStream(path.getPath()));
     return path.openStream();
   }
 
   @Override
   public OutputStream getOutputStream() throws Exception
   {
+    // URLConnection.getOutputStream() throws an UnknownServiceException for file urls.
+    // see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4485313
+    if ("file".equalsIgnoreCase(path.getProtocol())) return new BufferedOutputStream(new FileOutputStream(path.getPath()));
     URLConnection conn = path.openConnection();
     conn.setDoOutput(true);
     return conn.getOutputStream();
@@ -98,12 +102,21 @@ public class URLLocation extends AbstractLocation<URL>
   {
     if ((size < 0L) && !sizeAttemptMade)
     {
-      URLConnection c = null;
       try
       {
-        c = path.openConnection();
-        c.connect();
-        size = c.getContentLengthLong();
+        // for file URLs, opening a connection causes an input stream
+        // to be created, which is never released
+        if ("file".equalsIgnoreCase(path.getProtocol()))
+        {
+          File file = new File(path.getPath());
+          size = file.length();
+        }
+        else
+        {
+          URLConnection c = path.openConnection();
+          c.connect();
+          size = c.getContentLengthLong();
+        }
       }
       catch (Exception e)
       {
